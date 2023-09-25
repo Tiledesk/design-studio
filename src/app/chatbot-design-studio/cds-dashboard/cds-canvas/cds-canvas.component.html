@@ -1,0 +1,87 @@
+<div class="cds-toggle-setting-sidebar-icon-right-wpr" 
+    [class.is_opened]="IS_OPEN_INTENTS_LIST"
+    (click)="onToogleSidebarIntentsList()">
+    <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->
+    <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span>
+</div>
+
+<div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
+    <cds-panel-intent-list 
+        class="panel-intent-list"
+        [IS_OPEN]="IS_OPEN_INTENTS_LIST"
+        (selectIntent)=onSelectIntent($event) 
+        (deleteIntent)="onDeleteIntent($event)">
+    </cds-panel-intent-list>
+    
+    <div class="cds-toggle-setting-sidebar-icon-left-wpr" 
+        [class.is_opened]="IS_OPEN_INTENTS_LIST"
+        (click)="onToogleSidebarIntentsList()">
+        <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span>
+        <!-- <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span> -->
+    </div>
+</div>
+
+
+<div id="tds_container" class="box-right tds-drag-container" cdkDropListGroup>
+
+    <cds-panel-elements class="cds-panel-elements" 
+        (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
+        (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
+    </cds-panel-elements>
+
+    <div #receiver_elements_dropped_on_stage cdkDropList
+        class="receiver-elements-dropped-on-stage"
+        (cdkDropListDropped)="onDroppedElementToStage($event)">
+    </div>
+
+    <div #drawer_of_items_to_zoom_and_drag id="tds_drawer" class="tds-drag-drawer box-right-content">
+        <cds-intent *ngFor="let intent of listOfIntents" 
+            [id]="intent.intent_id"
+            class="panel-intent tds_input_block tds_draggable" 
+            [style.top.px]="getIntentPosition(intent.intent_id).y"
+            [style.left.px]="getIntentPosition(intent.intent_id).x" 
+            [intent]="intent"
+            [hideActionPlaceholderOfActionPanel]="hideActionPlaceholderOfActionPanel"
+            (actionSelected)=onActionSelected($event) 
+            (questionSelected)=onQuestionSelected($event)
+            (formSelected)=onIntentFormSelected($event) 
+            (showPanelActions)="onShowPanelActions($event)"
+            (testItOut)="onTestItOut($event)"
+            (actionDeleted)="onActionDeleted($event)"
+            (deleteIntent)="onDeleteIntent($event)">
+        </cds-intent>
+
+        <cds-event *ngFor="let intent of listOfEvents" 
+            [id]="intent.intent_id"
+            class="panel-intent tds_input_block tds_draggable" 
+            [style.top.px]="getIntentPosition(intent.intent_id).y"
+            [style.left.px]="getIntentPosition(intent.intent_id).x" 
+            [intent]="intent">
+        </cds-event>
+    </div> 
+    
+</div>
+
+<cds-add-action-menu class="menu--context--add" 
+    [style.top.px]="15" 
+    [style.left.px]="positionFloatMenu.x"
+    [style.display]="IS_OPEN_ADD_ACTIONS_MENU?'block':'none'"
+    [menuType]="TYPE_OF_MENU.ACTION"
+    (addingActionToStage)="onAddingActionToStage($event)">
+</cds-add-action-menu>
+
+<cds-panel-button-configuration  *ngIf="IS_OPEN_PANEL_BUTTON_CONFIG" 
+    id="button-configuration" 
+    class="cds-generic-panel"
+    [isOpenPanel]="IS_OPEN_PANEL_BUTTON_CONFIG" 
+    [button]=buttonSelected 
+    (saveButton)=onSaveButton($event)>
+</cds-panel-button-configuration>
+
+<cds-panel-action-detail *ngIf="IS_OPEN_PANEL_ACTION_DETAIL" 
+    id="action-detail" 
+    class="cds-generic-panel"
+    [project_id]="projectID"
+    [elementIntentSelected]="elementIntentSelected"
+    (onUpdateIntent)="onSavePanelIntentDetail($event)">
+</cds-panel-action-detail> 

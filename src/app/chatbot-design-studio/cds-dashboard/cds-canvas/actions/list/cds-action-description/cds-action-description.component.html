@@ -1,0 +1,76 @@
+<div [class.preview]="previewMode" class="action_wrp">
+
+    <!-- <div class="edit-mode-header-buttons" *ngIf="!previewMode">
+        <div class="control-button" 
+            (click)="onCloseIntent()"
+            matTooltipClass="cds-custom-tooltip"
+            matTooltip="Close" 
+            matTooltipPosition='below'>
+            <em class="material-icons">close</em>
+        </div> 
+        <div class="control-button" 
+            (click)="onSaveIntent()"
+            matTooltipClass="cds-custom-tooltip"
+            matTooltip="Save & close" 
+            matTooltipPosition='below'>
+            <em class="material-icons">check</em>
+        </div> 
+    </div> -->
+
+    <!-- <div class="custom-action-title">
+        <div class="custom-icon-action">
+            <img [src]="element?.src" [title]="element?.name">
+        </div>
+        <div class="custom-action-info-container">
+            <div class="custom-action-info">
+                <p>{{element?.name}}</p>
+                <input *ngIf="showTip" class="action-input"
+                    [ngModel]="dataInput"
+                    [placeholder]="titlePlaceholder"
+                    (input)="onChangeText($event.target.value)"/>    
+                </div>
+                <span *ngIf="showTip" class="material-icons-outlined custom-icon">more_vert</span>
+        </div>
+    </div> -->
+
+
+    <div class="section">
+        <div class="action-title">
+            <div class="icon-action">
+                <img [src]="element?.src" [title]="element?.name">
+            </div>
+            <p class="label-action">{{element?.name}}</p>
+        </div>
+        
+        <div *ngIf="showTip" class="action-description">
+            <div *ngIf="element?.description"
+                [satPopoverAnchor]="descriptionTooltip"
+                (click)="descriptionTooltip.toggle()">
+                <em class="material-icons">info</em>
+            </div>
+        
+            <div [innerHtml]="tipText"></div>
+        
+            <!-- **** _tdActionTitle **** -->
+            <!-- <input class="action-input"
+                 [ngModel]="dataInput"
+                 [placeholder]="titlePlaceholder"
+                (input)="onChangeText($event.target.value)"/>
+                (input)="onChangeText($event.target.value)"/> -->
+
+        </div>
+    </div>
+
+</div>
+
+<sat-popover #descriptionTooltip id="descriptionTooltip" 
+    hasBackdrop 
+    verticalAlign="center" 
+    horizontalAlign="after" 
+    (backdropClicked)="descriptionTooltip.close()" 
+    panelClass="description-tooltip">
+    <div class="tooltip-wrp">
+        <div class="caret_tooltip"></div>
+        <span [innerHTML]="element?.description"></span>
+   </div>
+</sat-popover>

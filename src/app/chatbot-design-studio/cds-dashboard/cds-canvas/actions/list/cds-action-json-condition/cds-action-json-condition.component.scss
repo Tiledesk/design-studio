@@ -1,0 +1,335 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+.previewContent{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    padding: 0px;
+  
+    .icon-action img{
+        height: 16px;
+        filter: brightness(0) saturate(100%) invert(42%) sepia(2%) saturate(2720%) hue-rotate(9deg) brightness(91%) contrast(81%);
+    }
+  
+    .title-preview-label{
+        color: #6c6859;
+        font-size: 12px; 
+        margin: 0px;
+    }
+
+}
+
+.content {
+    //padding: 10px 30px;
+    padding: 20px 0px;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.text-editor-wrapper {
+    font-size: $font-size-base;
+    position: relative;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 20px;    
+}
+
+.flex-element{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+
+// _________________CONDITION ::: START ___________________________
+
+.basic-filter-wrp{
+    background: #fff;
+    margin: 0 30px;
+    padding: 20px;
+    grid-row-gap: 15px;
+    border-radius: 4px;
+    display: flex;
+
+    .add-filter-button{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        font-weight: 600;
+        padding: 8px 15px;
+        border: 1px solid #c6cdd4;
+        border-radius: 4px;
+        color: $light-black;
+        cursor: pointer;
+
+
+        :hover{
+            border-color: $light-black
+        }
+    }
+    
+}
+
+
+::ng-deep .add-filter-panel {
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    // max-height: 600px;
+    min-height: 200px;
+    box-shadow: 0 0 20px 4px rgb(154 161 177 / 15%), 0 4px 80px -8px rgb(36 40 47 / 25%),
+        0 4px 4px -2px rgb(91 94 105 / 15%);
+    background: rgb(255, 255, 255);
+    border-radius: 4px;
+    // padding: 15px;
+    margin-top: 10px;
+    width: 500px
+}
+
+
+
+.filter-add-group-wrapper,
+.group-operator-wrapper{
+    align-items: center;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+    .filter-add-group{
+        cursor: pointer;
+        display: flex;
+        margin: 0px 10px;
+        transition: opacity 0.3s ease 0s;
+        span.text{
+            color: $icon-color;
+            font-weight: 600;
+        }
+    }
+
+    .filter-add-group-plus{
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        display: flex;
+        height: 22px;
+        justify-content: center;
+        margin-right: 10px;
+        width: 22px;
+        background: $action-item-background;
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+
+        span.material-icons{
+            color: $icon-color;
+            font-size: 20px;
+            transition: color 0.6s ease 0s;
+        }
+    }
+
+    &::before{
+        -webkit-box-flex: 1;
+        content: "";
+        flex-grow: 1;
+        height: 0px;
+        width: 0px;
+        border-top: 1px solid rgb(204, 204, 204);
+    }
+
+    &::after{
+        -webkit-box-flex: 1;
+        content: "";
+        flex-grow: 1;
+        height: 0px;
+        width: 0px;
+        border-top: 1px solid rgb(204, 204, 204);
+    }
+}
+.add-conditions-group {
+    margin: 0px 0 40px;
+}
+
+.base-filter{
+    &:hover{
+        div.filter-remove{
+            opacity: 1;
+            transition: opacity 0.3s ease 0s;
+        }
+    }
+}
+
+.control-buttons{
+    height: 100%;
+    left: -44px;
+    position: absolute;
+    top: 0px;
+    width: 44px;
+
+    div.filter-remove{
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        
+        opacity: 0;
+
+        height: 28px;
+        width: 28px;
+
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background: rgb(255, 255, 255);
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+
+        span.material-icons{
+            font-size: 20px;
+            color: $icon-color;
+        }
+
+        &:hover{
+            background-color: $icon-color;
+            span.material-icons{
+                color: white;
+            }
+        }
+    }
+}
+
+// _________________CONDITION ::: END ___________________________
+
+
+
+
+// _________________ TRUE/FALSE/STOP::: START ___________________________
+.condition-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 0px;
+}
+
+.condition-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+}
+
+  
+    .icon-action {
+        transition: opacity .15s ease 0s;
+        opacity: .85;
+        background: none;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            height: 20px;
+        }
+    } 
+
+  .checkbox-condition{
+    position: absolute;
+    bottom: 10px;
+    margin: 0;
+      
+  }
+  
+  ::ng-deep .mat-checkbox.mat-accent .mat-checkbox-frame {
+      border-color: $icon-color!important;
+  }
+  
+  // overwrite the checkbox background
+  ::ng-deep .mat-checkbox-checked .mat-checkbox-background, 
+  .mat-checkbox-indeterminate .mat-checkbox-background {
+      background-color: $icon-color!important;
+      .mat-checkbox-checkmark {
+          background: $icon-color!important;;
+          .mat-checkbox-checkmark-path {
+            stroke: white;
+            stroke-width: 5px;
+          }
+        }
+  
+  }
+
+// _________________ TRUE/FALSE/STOP::: END ___________________________
+
+
+
+#conditions{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .group{ 
+        display: flex;
+        width: 100%;
+        justify-content: center;
+    }
+    .group-operator{
+        font-size: 9px;
+        align-self: center;
+        justify-self: center;
+    }
+
+    .expression{
+        font-size: 9px;
+        line-height: 15px;
+        background-color: $intent-preview-background;
+        padding: 3px;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    .condition-group{
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: rgb(245, 245, 245);
+        border-radius: 3px;
+        padding: 2px; 
+    }
+
+    div.filter-icon {
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        color: $icon-color;
+        display: flex;
+        font-size: 15px;
+        justify-content: center;
+        width: 15px;
+        transition: color 0.3s ease 0s;
+        span.material-icons{
+            font-size: 15px;
+            color: $icon-color;
+        }
+    }
+
+    .ellips{
+        line-height: 20px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color 0.3s ease 0s;
+        overflow: hidden !important;
+    }
+}

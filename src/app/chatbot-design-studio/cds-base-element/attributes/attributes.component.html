@@ -1,0 +1,72 @@
+<div class="cds-attributes">
+   
+    <div *ngIf="method == typeMethodAttribute.INPUT">
+        <div *ngFor="let attribute of newAttributes; let i = index;">
+            <div class="auto-suggest-group">
+                <input *ngIf="method == typeMethodAttribute.INPUT"
+                    [(ngModel)]="attribute.key" 
+                    type="text" 
+                    placeholder="Key" 
+                    class="sx-input" 
+                    (ngModelChange)="onChangeAttributes(attribute, i)">
+                    
+                <cds-textarea id="value"
+                    class="value"
+                    [text]="attribute.value"
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false"
+                    [setAttributeBtn]="true"
+                    [minRow]="1" [maxRow]="1"
+                    [placeholder]="'Value'"
+                    (selectedAttribute)="onSelectedAttribute($event,i, 'value')"
+                    (changeTextarea)="onChangeTextarea($event, i)">
+                </cds-textarea>
+
+                <!-- <input [(ngModel)]="attribute.value" type="text" placeholder="Value" class="dx-input" (ngModelChange)="onChangeAttributes(attribute, i)"> -->
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="method == typeMethodAttribute.TEXT">
+        <mat-accordion>
+            <mat-expansion-panel [expanded]="openBlock" (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+                <mat-expansion-panel-header class="specific-class">
+                    <mat-panel-title>
+                        <div class="header__center ng-star-inserted">Attributes</div>
+                    </mat-panel-title>
+                    <!-- <i class="icon-setting material-icons">settings</i>  -->
+                </mat-expansion-panel-header>
+                <div class="auto-suggest-group">
+                    <div class="key-value-form-column">
+                        <div class="key-value-cell__placeholder">Key</div>
+                    </div>
+                    <div class="key-value-form-column">
+                        <div class="key-value-cell__placeholder">Value</div>
+                    </div>
+                </div>
+                <div *ngFor="let attribute of newAttributes; let i = index;">
+                    <div class="auto-suggest-group">
+                        <div class="value-wrp">
+                            <cds-textarea id="assignTo"
+                                [ngClass]="{'assigned' : attribute.key}"
+                                [text]="attribute.key"
+                                [textLimitBtn]="false"
+                                [emojiPikerBtn]="false"
+                                [setAttributeBtn]="attribute.key? false: true"
+                                [minRow]="1" [maxRow]="1"
+                                [readonly]="true"
+                                (clearSelectedAttribute)="onClearSelectedAttribute(i)"
+                                (selectedAttribute)="onSelectedAttribute($event,i)">
+                            </cds-textarea>
+                        </div> 
+                        <input [(ngModel)]="attribute.value" type="text" placeholder="Value" class="dx-input" (ngModelChange)="onChangeAttributes(attribute, i)">
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+
+
+    
+
+</div>

@@ -1,0 +1,9 @@
+<div class="item-action-content">
+    <div class="item-action-element">
+        <label class="card-subtitle">Message:</label>
+        <cds-text id="text"
+            [control]="actionForm.controls[0].get('message.text')"
+            [autocompleteOptions]="autocompleteOptions">
+        </cds-text>
+    </div>
+</div>

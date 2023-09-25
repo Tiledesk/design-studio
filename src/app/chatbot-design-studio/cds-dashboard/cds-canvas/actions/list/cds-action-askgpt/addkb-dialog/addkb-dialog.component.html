@@ -1,0 +1,44 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>Add Knowledge Base for OpenAI</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+    <form [formGroup]="kbForm" (submit)="onSubmitKb()">
+        <div class="tpl-modal-content">
+            <div class="tpl-info">
+                <i class="material-icons-outlined tpl-info-icon">help_outline</i>
+                <div class="tpl-info-text">
+                    <p>Set a name for the Knowledge Base and a valid URL to be indexed.</p>
+                    <p>Note: you can add a maximum of 3 Knwoledge Bases.</p>
+                </div>
+            </div>
+
+
+
+            <div class="tpl-label-textarea">Name</div>
+            <input placeholder="Type Knowledge Base name" name="name" formControlName="name" class="tpl-input" [class.invalid]="kbForm.controls.name.errors?.required && kbForm.controls.name.touched"
+                [(ngModel)]="data.name" (ngModelChange)="onChangeInput($event, 'name')" >
+
+            <div class="tpl-label-textarea" style="margin-top: 10px;">URL</div>
+            <input placeholder="Type Knowledge Base URL" name="url" formControlName="url" class="tpl-input" [class.invalid]="(kbForm.controls.url.errors?.pattern || kbForm.controls.url.errors?.required) && kbForm.controls.url.touched"
+                [(ngModel)]="data.url" (ngModelChange)="onChangeInput($event, 'url')">
+
+
+
+            <!-- <div class="tpl-label-textarea">Name</div> 
+        <input placeholder="Type Knowledge Base name" class="tpl-input" [(ngModel)]="data.name" (ngModelChange)="onChangeInput($event, 'name')">
+
+        <div class="tpl-label-textarea" style="margin-top: 10px;">URL</div> 
+        <input placeholder="Type Knowledge Base URL" class="tpl-input" [(ngModel)]="data.url" (ngModelChange)="onChangeInput($event, 'url')"> -->
+            <!-- <input placeholder="Type attribute name" class="tpl-input" [class.invalid]="btnDisabled" [(ngModel)]="data.name" (ngModelChange)="onChangeInput($event)"> -->
+        </div>
+        <div class="tpl-modal-buttons">
+            <button type="button" class="btn btn-cancel" [mat-dialog-close]="false">Cancel</button>
+            <!-- <button type="button" class="btn btn-warning cds-yellow-button" [disabled]="btnDisabled" [mat-dialog-close]="data.text">Add attribute</button> -->
+            <!-- <button type="submit" class="btn btn-warning cds-yellow-button" [mat-dialog-close]="data">Add Knowledge Base</button> -->
+            <button type="button" class="btn btn-warning cds-yellow-button" [disabled]="disableSubmit" [mat-dialog-close]="data">Add Knowledge Base</button>
+        </div>
+    </form>
+</div>

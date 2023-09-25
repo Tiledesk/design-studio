@@ -1,0 +1,277 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+::-webkit-scrollbar {
+    width: 0px;
+}
+
+#scrollMe {
+    scroll-behavior: smooth;
+}
+
+.content {
+    //padding: 10px 30px;
+    padding: 20px 0px;
+    margin-left: 30px;
+    margin-right: 30px;
+    max-height: calc(100vh - 223px);
+    overflow: auto;
+}
+
+
+
+.cds-web-request-row {
+    margin: 10px 0px;
+    padding: 0px 2px;
+    display: flex;
+    gap: 10px;
+    position: relative;
+    &.center{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .cds-rigth{
+        // position: absolute;
+        // right: 18px;
+        // top: -6px;
+        .btn{
+            padding: 8px 12px;
+            margin: 2px 10px;
+        }
+    }
+}
+.label-assign-to {
+    cursor: default;
+    display: flex;
+    outline: none;
+    overflow: hidden;
+    position: relative;
+    width: 150px;
+    height: 36px;
+    border-radius: 4px 0 0 4px;
+    background: #f2f2f2;
+    font-weight: 700;
+    margin: 6px 0;
+    padding: 8px 0 0 10px;
+}
+.input-group .input-group-addon {
+    border: 0;
+    background: transparent;
+    padding: 6px 0;
+}
+.cds-input-group {
+    // margin: 10px 10px;
+    display: flex;
+    input {
+        border: 0;
+        background: #fff;
+        margin: 6px 0px 0;
+        height: 36px;
+        width: 100%;
+        padding: 0 10px;
+        border-radius: 0px 4px 4px 0px;
+    }
+
+}
+
+.form-control-select {
+    width: 120px!important;
+}
+.form-control-select ::ng-deep .ng-select-container { 
+    cursor: default;
+    display: flex;
+    outline: none;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    border-radius: 4px 0px 0px 4px;
+    background: #f2f2f2;
+    font-weight: bold;
+}
+.form-control-select.ng-select-focused ::ng-deep .ng-select-container { 
+    border-color: transparent;
+    border: 1;
+    box-shadow: none;
+}
+.ng-select {
+    position: relative;
+    display: block;
+    box-sizing: border-box;
+    width: 120px;
+}
+
+.add-response { 
+    text-align: center;
+    cursor: pointer;
+    box-sizing: border-box;
+    outline: none;
+    padding: 0;
+    span {
+        align-items: center;
+        display: flex;
+        width: 80px;
+        padding: 8px;
+        justify-content: center;
+        background: $action-item-background;
+        color: $action-item-color;
+        border-radius: 6px;
+        height: 40px;
+        font-size: 0.8em;
+        border: 1px solid #0F172A;
+        font-weight: 400;
+        &:hover {
+            outline: 2px solid rgba(236,182,6,.6901960784)!important;
+        }
+        &.cds-action-active {
+            outline: 2px solid rgba(236,182,6,.6901960784)!important;
+        }
+    }
+}
+
+.cds-web-request-row-error {
+    display: flex;
+    font-size: 0.8em;
+    line-height: normal;
+    border-radius: 4px;
+    color: rgb(209, 47, 25);
+    background: rgb(251, 227, 228);
+    border-color: rgb(251, 194, 196);
+    opacity: 1;
+    height: 0px;
+    padding: 0px;
+    margin: 0px;
+    span{
+        line-height: normal;
+        min-height: 30px;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+    &.center{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    &.json-error-yes {
+        transition-delay: 0s;
+        transition: all 0.3s;
+        height: auto;
+        padding: 10px;
+        margin: 10px 0px;
+    } 
+}
+
+.cds-attributes {
+    display: block;
+    width: 100%;
+    // margin: 6px 15px;
+}
+
+
+
+
+/** CSS textarea */
+
+.material-icons {
+    color: #ecb606b0;
+    font-size: 18px;
+}
+
+cds-select#method ::ng-deep{
+    // padding: 6px 0;
+    min-width:120px;
+    .ng-select-container{
+        height: 37px;
+        border-radius: 8px 0px 0px 8px;
+        border: 1px solid rgb(118, 118, 118) !important;
+    }
+}
+
+// cds-textarea#assignTo ::ng-deep {
+//     display: flex;
+//     textarea {
+//         border: 1px solid rgb(118, 118, 118) !important;
+//         resize: none !important; 
+//         padding: 8px 20px !important;
+//         height: 25px !important;
+//         min-height: 25px !important;
+//     }
+// }
+
+cds-textarea#url ::ng-deep {
+    display: flex;
+    width: 100%;
+    // padding: 6px 0px 0px 0;
+    textarea {
+        border: 1px solid rgb(118, 118, 118) !important;
+        border-radius: 0px 8px 8px 0px;
+        resize: none !important; 
+        padding: 6px 16px !important;
+
+        height: 23px !important;
+        min-height: 23px !important;
+    }
+}
+
+cds-textarea#body.jsonError ::ng-deep {
+    textarea {
+        border: 1px solid red !important;
+    }
+}
+
+div.value-wrp {
+    min-height: 50px;
+}
+/*
+div.value-wrp {
+    position: relative;
+    min-height: 40px;
+    .flex{
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .close{
+            position: absolute;
+            display: flex;
+            top: -7px;
+            right: -7px;
+            width: 18px;
+            height: 18px;
+            font-size: 14px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid #ecb607;
+            color: #ecb606;
+            cursor: pointer;
+            opacity: 1;
+            justify-content: center;
+            align-items: center;
+            padding: 2px;
+            margin: 0;
+            &:hover{
+                background: #ecb606;
+                color: white;
+            }
+        }
+    }
+
+    div.tag {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0px;
+        right: unset;
+        border-radius: 7px;
+        margin: 5px 0;
+        padding: 5px 10px;
+        background-color: #ecb606;
+        color: #fff;
+        min-height: 30px;
+        height: fit-content;
+    }
+}
+*/

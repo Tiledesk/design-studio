@@ -1,0 +1,93 @@
+
+
+<div class="cds-panel-elements" (mouseover)="onOverMenu()" (mouseout)="onCloseMenu()" (mouseleave)="onLeaveMenu()">
+    
+    <div size="4" class="cds-elements" mat-button>
+
+        <!-- ACTIONS -->
+        <div *ngFor="let actionCategory of ACTION_CATEGORY" class="cds-element" (click)="onAddNewElement()"  (mouseout)="onCloseMenu()" (mouseleave)="onCloseMenu()"
+            (mouseover)="onOpenMenu(div3, TYPE_OF_MENU.ACTION, actionCategory.type)" #div3>
+            <div class="cds-button-element">
+                <div class="cds-box-button">
+                    <span class="box-img">
+                        <img [src]="actionCategory.src">
+                    </span>
+                    <span class="box-title">{{actionCategory.name}}</span>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- QUESTION -->
+        <!-- <div class="cds-element" (click)="onAddNewElement()" (mouseleave)="onCloseMenu()"
+            (mouseover)="onOpenMenu(div4, TYPE_OF_MENU.QUESTION)" #div4>
+            <div class="cds-button-element">
+                <div class="cds-box-button">
+                    <span class="box-img">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" width="24px" fill="#000000" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M14.855 6.547a3.991 3.991 0 0 0-.344-3.273 4.031 4.031 0 0 0-4.34-1.934 4.043 4.043 0 0 0-6.85 1.448A3.99 3.99 0 0 0 .655 4.72a4.03 4.03 0 0 0 .496 4.731 3.987 3.987 0 0 0 .34 3.274 4.034 4.034 0 0 0 4.343 1.933A3.99 3.99 0 0 0 8.84 16a4.037 4.037 0 0 0 3.848-2.804 3.992 3.992 0 0 0 2.665-1.933 4.037 4.037 0 0 0-.498-4.716ZM8.84 14.953c-.7 0-1.38-.245-1.918-.694l.095-.054 3.186-1.838a.53.53 0 0 0 .261-.455V7.421l1.347.78a.047.047 0 0 1 .025.034v3.722a3.003 3.003 0 0 1-2.996 2.996Zm-6.44-2.75a2.98 2.98 0 0 1-.357-2.01l.095.057 3.188 1.839a.514.514 0 0 0 .52 0l3.896-2.246v1.555a.054.054 0 0 1-.022.041L6.493 13.3A3 3 0 0 1 2.4 12.202Zm-.84-6.94A2.99 2.99 0 0 1 3.139 3.95v3.784a.511.511 0 0 0 .258.451l3.876 2.237-1.346.779a.05.05 0 0 1-.048 0l-3.22-1.858a3.003 3.003 0 0 1-1.097-4.094v.016Zm11.065 2.571-3.89-2.258L10.08 4.8a.05.05 0 0 1 .047 0l3.22 1.86a2.997 2.997 0 0 1-.45 5.404V8.279a.527.527 0 0 0-.272-.445Zm1.34-2.015-.094-.057-3.183-1.854a.517.517 0 0 0-.523 0L6.273 6.153V4.598a.044.044 0 0 1 .019-.04L9.512 2.7a3 3 0 0 1 4.453 3.106v.013ZM5.538 8.575 4.19 7.8a.054.054 0 0 1-.025-.037V4.049a3 3 0 0 1 4.917-2.302l-.095.054-3.185 1.838a.53.53 0 0 0-.262.455l-.003 4.481Zm.731-1.577 1.735-1 1.738 1v2l-1.732 1-1.737-1-.004-2Z"></path>
+                        </svg>
+                    </span>
+                    <span class="box-title">Train</span>
+                </div>
+            </div>
+        </div> -->
+
+
+        <!-- FORM-->
+        <!-- <div class="cds-element" (click)="onAddNewElement()" (mouseleave)="onCloseMenu()"
+            (mouseover)="onOpenMenu(div5, TYPE_OF_MENU.FORM)" #div5>
+            <div class="cds-button-element">
+                <div class="cds-box-button">
+                    <span class="box-img">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                            fill="#000000">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <path
+                                d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z" />
+                        </svg>
+                    </span>
+                    <span class="box-title">Form</span>
+                </div>
+            </div>
+        </div> -->
+    </div>
+
+    <div size="4" class="cds-elements" mat-button>
+        <!-- EVENT -->
+        <div class="cds-element" (click)="onAddNewElement()" (mouseout)="onCloseMenu()" (mouseleave)="onCloseMenu()"
+            (mouseover)="onOpenMenu(div1, TYPE_OF_MENU.EVENT)" #div1>
+            <div class="cds-button-element">
+                <div class="cds-box-button">
+                    <span class="box-img">
+                        <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22">
+                            <path fill="currentColor" d="M4.086 2.445a11 11 0 0 1 14.683.768l.008.008A11 11 0 0 1 4.086 19.555a.825.825 0 0 1 1.037-1.283A9.35 9.35 0 0 0 17.618 4.395l-.008-.007a9.35 9.35 0 0 0-12.487-.66.825.825 0 0 1-1.037-1.283zM5.5 5.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm9.934.243A7.442 7.442 0 0 1 17.6 11a7.442 7.442 0 0 1-2.166 5.257.825.825 0 1 1-1.168-1.164A5.793 5.793 0 0 0 15.95 11a5.793 5.793 0 0 0-1.684-4.093.825.825 0 1 1 1.168-1.164zM5.5 7.15a3.85 3.85 0 1 0 0 7.7 3.85 3.85 0 0 0 0-7.7zm7.893.907c.572.838.907 1.853.907 2.943a5.204 5.204 0 0 1-.91 2.947.825.825 0 1 1-1.362-.931A3.555 3.555 0 0 0 12.65 11c0-.748-.229-1.44-.62-2.013a.825.825 0 1 1 1.363-.93z"></path>
+                        </svg> -->
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                            fill="currentColor">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <path d="M7 2v11h3v9l7-12h-4l4-8z" />
+                        </svg>
+                    </span>
+                    <span class="box-title">Event</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div #menuElement id="menuElement" 
+        [style.display]="isOpen?'block':'none'" 
+        [style.top.px]="positionMenu.y"
+        [style.left.px]="positionMenu.x" 
+        (mouseover)="onOverMenu()" 
+        (mouseleave)="onLeaveMenu()">
+        <cds-panel-actions 
+            [menuType]="menuType" 
+            [menuCategory]="menuCategory"
+            (isDraggingMenuElement)="onDraggingMenuElement($event)"
+            (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
+        </cds-panel-actions>
+    </div>
+    
+</div>

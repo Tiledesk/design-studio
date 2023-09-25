@@ -1,0 +1,186 @@
+.cds-attributes {
+    // max-width: 400px;
+    .header__center {
+        font-size: 1.1em;
+        display: grid;
+        grid-template-columns: 1fr max-content 1fr;
+        grid-column-gap: 1.1em;
+        align-items: center;
+        padding-left: 12px;
+        padding-right: 12px;
+        color:#f2f2f2;
+        max-width: 400px;
+        width: 100%;
+    }
+      
+    .header__center::before,
+    .header__center::after {
+        content: "";
+        display: block;
+        height: 1px;
+        background-color: currentColor;
+    }
+    
+    .key-value-form-column {
+        font-size: 1em;
+        width: 50%;
+        color:#f2f2f2;
+        text-align: center;
+    }
+    
+    .auto-suggest-group {
+        display: flex;
+        // max-width: 400px;
+        // width: 100%;
+    }
+    
+
+    /**** PANEL *****/
+    ::ng-deep .mat-expansion-indicator:after {
+        color: #f2f2f2;
+    }
+    mat-expansion-panel {
+        box-shadow: none;
+        background: rgb(48 63 92);
+        border: 1px solid #5f6368;
+        overflow: visible;
+        &.open-block {
+            pointer-events: none;
+        }
+        mat-expansion-panel-header {
+            height: 40px;
+        }
+        &.mat-expanded {
+            ::ng-deep .mat-expansion-panel-body {
+                opacity: 1;
+            }
+        }
+        ::ng-deep .mat-expansion-panel-body {
+            opacity: 0;
+        }
+    }
+
+
+  
+    .sx-input {
+        border: 0;
+        cursor: default;
+        display: flex;
+        outline: none;
+        overflow: hidden;
+        position: relative;
+        width: 150px;
+        height: 26px;
+        border-radius: 4px 0 0 4px;
+        background: #f2f2f2;
+        font-weight: 500;
+        font-size: 14px;
+        margin: 3px 0;
+        margin-right: 2px;
+        padding: 0 10px 0 10px;
+        width: calc(50% - 2px);
+        color: #1e293b;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    
+    
+    .dx-input {
+        border: 0;
+        background: #fff;
+        margin: 3px 0;
+        font-size: 14px;
+        height: 26px;
+        width: 50%;
+        padding: 0 10px;
+        border-radius: 0 4px 4px 0;
+        color: #1e293b;
+        width: calc(50% - 2px);
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    
+    .dx-input:focus, .sx-input:focus {
+        outline: 2px solid rgba(236,182,6,1);
+    }
+
+
+
+    .value-wrp {
+        width: 50%;
+    }
+
+    cds-textarea#value.value ::ng-deep{
+        display: flex;
+        width: calc(50% - 2px);
+        textarea {
+            padding: 0 0 0 10px !important;
+            border: 0!important;
+            outline: 0!important;
+            border-radius: 0 4px 4px 0;
+        }
+    }
+
+    cds-textarea#assignTo.assigned ::ng-deep {
+        display: flex;
+        textarea {
+            background: transparent;
+            padding: 0!important;
+            border: 0!important;
+            outline: 0!important;
+        }
+    }
+
+
+    cds-textarea#assignTo ::ng-deep ,
+    cds-textarea#value ::ng-deep  {
+        display: flex;
+        .editor-utils {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            position: absolute;
+            bottom: -8px;
+            right: 4px;
+            z-index: 1;
+        }
+        textarea {
+            max-height: 41px;
+            cursor: default;
+            display: flex;
+            position: relative;
+            border-radius: 4px 0 0 4px;
+            background: rgb(242,242,242);
+            font-weight: 500;
+            font-size: 14px;
+            margin: 3px 0px 3px 0;
+            color: #1e293b;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 0!important;
+            width: calc(100% - 2px);
+            border: 0px!important;
+            outline: 0px!important;
+            height: 26px!important;
+            resize: none!important;
+        }
+
+        .text-editor-wrapper {
+            position: relative;
+            .tag {
+                inset: 0 2px 0 0;
+                border-radius: 4px 0 0 4px;
+                margin: 3px 0;
+                padding: 3px 0;
+                justify-content: initial;
+                max-width: 100%;
+                .close {
+                    left: -7px;
+                }
+            }
+        }
+    }
+}

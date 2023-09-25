@@ -1,0 +1,347 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+/** LOCAL COLORS **/
+$color-withe: #ffffff;
+$color-blue: #3ea9f5;
+$color-light-gray: #d3d3d3;
+$color-text-select: rgb(118, 149, 165);
+$color-bck-box: #e7f3ff;
+$color-text-box: #566787;
+
+.box-tilebot--form {
+    position: initial;
+    padding: 0 0 10px 0;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    .content-buttons--form {
+        position: relative;
+        display: block;
+        height: auto;
+        width: 100%;
+        margin-top: 0;
+        overflow: visible;
+        max-height: calc(100% - 35px);
+        .box-settings-form{
+            background: #425575;
+        }
+    }
+    .splash-screen--form {
+        text-align: center;
+        width: 100%;
+        height: auto;
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #cfe6fa;
+
+        .tpl-modal-header-text {
+            margin-bottom: 20px;
+        }
+        .tpl-info-text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            i {
+                margin-right: 10px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #cfe6fa;
+            }
+        }
+        
+    }
+
+    .more-info {
+        cursor: pointer;
+        position: absolute;
+        top: -60px;
+        left: 60px;
+        z-index: 2;
+        em.material-icons {
+            vertical-align: middle;
+            display: inline-flex;
+            color: #3ea9f5;
+            margin-right: 3px;
+        }
+    }
+    .header-buttons--form {
+        background: #425575;
+        align-items: center;
+        justify-content: space-between;
+        display: flex;
+        margin: auto;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+   
+
+    button {
+        padding: 6px 10px;
+        margin: 4px;
+        .icon-label {
+            vertical-align: text-top;
+            display: inline-block;
+            overflow: hidden;
+            margin-left: 0px;
+            width: auto;
+            max-width: 0px;
+            &.opened {
+                margin-left: 0px;
+                max-width: 100px;
+            }
+        }
+        &:hover {
+            // border: 2px solid rgb(178,142,38);
+            // .icon-label {
+            //     transition: max-width 0.1s ease-in;
+            //     margin-left: 10px;
+            //     max-width: 100px;
+            // }
+        }
+        &.only-icon {
+            border-radius: 20px;
+            padding: 0px;
+            height: 30px;
+            width: 30px;
+            background: transparent;
+            margin: 15px 0 0 0;
+            padding: 0;
+            box-shadow: none;
+            .material-icons {
+                transition: transform 1s;
+                font-size: 22px;
+                color: $color-blue;
+            }
+            &.btn-settings {
+                position: absolute;
+                top: 40px;
+                left: 0;
+            }
+        }
+        &:hover {
+            &.only-icon {
+                .icon-label {
+                    display: none;
+                }
+                .material-icons {
+                    transform: rotate(1turn);
+                }
+            }
+        }
+        &.add-form {
+            border-radius: 20px;
+            padding: 0 0 0 0px;
+            color: $color-withe;
+            //margin: 15px 10px 0 10px;
+            margin: 7px 10px;
+            min-height: 30px;
+            .material-icons {
+                font-size: 20px;
+                top: 0;
+                padding: 0 5px;
+            }
+        }
+    }
+
+    button#delete-form-btn{
+        background-color: transparent;
+        color: #fff;
+        box-shadow: none;
+        &:hover{
+            background-color: red;
+        }
+    }
+
+    button#open-setting-btn{
+        background-color: transparent;
+        color: #fff;
+        box-shadow: none;
+        &:hover{
+            background-color: rgba(138,180,248,.8);
+        }
+    }
+    button#close-general-btn{
+        background-color: transparent;
+        color: #fff;
+        box-shadow: none;
+        &:hover{
+            background-color: rgba(124, 125, 127, 0.8);
+        }
+    }
+
+    .box--setting-form {
+        margin-top: 0px;
+        font-family: "Poppins", "Roboto", Arial, sans-serif;
+        color: #e8eaed;
+        text-align: left;
+        padding: 6px 12px;
+        font-weight: 400;
+        line-height: 20px;
+        font-size: 14px;
+        .bold {
+            font-weight: 300;
+        }
+        .row-info {
+            padding: 10px 0;
+            input {
+                display: block;
+                width: 100%;
+                margin: 0px;
+                background: #1e293b;
+                border: none;
+                padding: 5px;
+                border-radius: 4px;
+            }
+        }
+        .row-info {
+            padding: 10px 0;
+            textarea {
+                display: block;
+                width: 100%;
+                margin: 0px;
+                background: #1e293b;
+                border: none;
+                padding: 5px;
+                border-radius: 4px;
+            }
+        }
+    }
+
+    .box-buttons {
+        text-align: end;
+        padding: 5px 10px;
+    }
+
+    .selectFormModel {
+        margin: 10px;
+        p {
+            color: #f1f3f4;
+            font-size: 12px;
+            font-weight: 400;
+            padding: 5px;
+        }
+    }
+
+    .settings-form {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0;
+        color: $color-blue;
+        background-color: transparent;
+        margin: 10px;
+        box-shadow: none;
+        padding: 5px 10px;
+        border-radius: 20px;
+        .icon-label {
+            vertical-align: text-top;
+        }
+        .material-icons {
+            font-size: 20px;
+            margin-left: 6px;
+        }
+    }
+}
+
+
+.header-list-form {
+    // position: absolute;
+    // bottom: 0;
+    // left: 0;
+    // right: 0;
+    // background-color: #51627e;
+    // z-index: 2;
+    // margin: auto 0;
+    // padding: 7px 20px;
+    // border-top: 2px solid rgb(66,85,117);
+    // width: 100%;
+    // text-align: left;
+    // padding: 0px 23px;
+    position: relative;
+    background-color: #425575;
+    z-index: 2;
+    margin: auto 0;
+    border-top: 2px solid rgb(66,85,117);
+    width: 100%;
+    text-align: center;
+    padding: 0 23px;
+
+    .add-field {
+        text-align: left;
+        padding: 8px 16px;
+        margin: 0px;
+        span.icon {
+            padding-right: 8px;
+        }
+        .hide {
+            display: none;
+        }
+    }
+}
+
+.btn-only-string {
+    background: transparent !important;
+    color: #fff !important;
+    border: unset !important;
+    box-shadow: unset !important;
+    // background-color: #dce9ff !important;
+    // border-color: #dce9ff !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+.btn-only-string:hover {
+    // color: rgba(138, 180, 248, .8) !important;
+    color: #8ab4f8cc!important;
+    // background-color: #9ac1ff  !important;
+    // border-color: #9ac1ff  !important;
+}
+
+#create-intent-form {
+    background: $light-blue !important;
+    color: $light-black !important;
+    box-shadow: none !important;
+    font-weight: 500 !important;
+    font-family: Poppins, Roboto, Arial, sans-serif !important;
+    text-transform: capitalize !important;
+    font-size: 14px !important;
+}
+#create-intent-form:hover {
+    background: rgba(138, 180, 248, 0.8) !important;
+}
+
+// #open-setting-btn {
+//     background: $light-blue !important;
+//     box-shadow: none !important;
+//     color: #202124;
+//     font-weight: 500;
+// }
+
+// #open-setting-btn:hover {
+//     background: rgba(138, 180, 248, 0.8) !important;
+// }
+
+// #close-general-btn > span {
+//     vertical-align: middle;
+// }
+ 
+#add-form-btn {
+    background: $light-blue !important;
+    box-shadow: none !important;
+    color: #202124;
+    font-weight: 500;
+    padding-right: 10px;
+}
+
+#add-form-btn:hover {
+    background: rgba(138, 180, 248, 0.8) !important;
+}
+
+#add-form-btn > span { 
+    vertical-align: middle;
+}

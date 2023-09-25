@@ -1,0 +1,142 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+#search {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    border-bottom: 1px solid #e8eef3;
+    padding: 0px 15px;
+    gap: 10px;
+
+    input{
+        background: transparent;
+        border: 0;
+        font-size: 16px;
+        height: 40px;
+        line-height: 20px;
+        width: 100%;
+    }
+
+    
+}
+
+.material-icons{
+    color: $icon-color;
+    font-size: 18px;
+}
+
+#variable-list-scrollMe {
+    // max-height: calc(34vh - 50px);
+    max-height: 60vh;
+    overflow-y: scroll;
+}
+
+#data{
+    // padding: 15px 0px;  
+    overflow-x: hidden;
+    &:first-child{
+        margin-bottom: 20px;
+        padding-top: 15px;
+    }
+
+    .category-name{
+        margin-bottom: 10px;
+        padding: 0 15px;
+        color: #9ba6b3;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 20px;
+    }
+
+    .category-row{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 32px;
+        padding: 0 15px;
+        transition: background-color .2s,opacity .2s;
+
+        &:hover{
+            background: #f0f4f7;
+            cursor: pointer;
+        }
+    }
+
+    .category-row-name{
+        color: #444a51;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 20px;
+        margin-right: 20px;
+        margin-bottom: 0px;
+        cursor: pointer;
+    }
+}
+
+#no-data{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    padding: 20px;
+
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    -webkit-box-flex: 1;
+
+    div.no-result{
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -webkit-box-align: center;
+
+        margin: 10px 0;
+        width: 100%;
+
+        color: #516173;
+    }
+
+    span.material-icons{
+        color: #c6cdd4;
+        display: block;
+        font-size: 30px;
+        margin-bottom: 15px;
+    }
+
+    span.text{
+        text-align: center;
+        font-size: 16px;
+        line-height: 20px;
+    }
+}
+
+
+
+
+
+#add-attribute{
+    border-top: 1px solid #e8eef3;
+    cursor: pointer;
+    flex-shrink: 0;
+    height: 43px;
+    transition: all .3s;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    .material-icons{
+        margin-right: 15px;
+        color: $icon-color;
+        font-size: 24px;
+        font-weight: 500;
+    }
+    div {
+        color: #22272d;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 20px;
+        transition: color .3s;
+    }
+}

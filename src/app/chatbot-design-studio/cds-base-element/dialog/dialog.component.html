@@ -1,0 +1,24 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>Add a custom attribute</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+    <div class="tpl-modal-content">
+        <div class="tpl-info">
+            <i class="material-icons-outlined tpl-info-icon">help_outline</i>
+            <div class="tpl-info-text">
+                The attribute’s name can only contain alphanumeric
+                characters which are letters A-Z, numbers 0-9 and
+                underscore.
+            </div>
+        </div>
+        <div class="tpl-label-textarea">Attribute name</div> 
+        <input placeholder="Type attribute name" class="tpl-input" [class.invalid]="btnDisabled" [(ngModel)]="data.text" (ngModelChange)="onChangeTextInput($event)">
+    </div>
+    <div class="tpl-modal-buttons">
+        <button type="button" class="btn btn-cancel" [mat-dialog-close]="false">Cancel</button>
+        <button type="button" class="btn btn-warning cds-yellow-button" [disabled]="btnDisabled" [mat-dialog-close]="data.text">Add attribute</button>
+    </div>
+</div>

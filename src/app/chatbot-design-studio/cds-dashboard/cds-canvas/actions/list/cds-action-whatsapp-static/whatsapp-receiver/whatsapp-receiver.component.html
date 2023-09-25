@@ -1,0 +1,252 @@
+<div class="whatsapp-receiver">
+
+    <div class="response-controls">
+        <div *ngIf="displayPreview === false" class="control-button copy" (click)="showPreview()">
+            <em class="material-icons-outlined">visibility</em>
+        </div>
+
+        <div *ngIf="displayPreview === true" class="control-button copy" (click)="hidePreview()">
+            <em class="material-icons-outlined">visibility_off</em>
+        </div>
+
+
+        <div class="control-button delete" (click)="onDeleteReceiver()">
+            <em class="material-icons">delete</em>
+
+        </div>
+        <!-- // TODO -->
+        <!-- <div class="control-button copy">
+            <em class="material-icons">content_copy</em>
+        </div> -->
+    </div>
+
+
+    <div id="parameters-container" class="parameters-container">
+
+
+        <div id="preview-container" class="preview-container">
+            <div class="inner-preview-container">
+                <div class="message-cloud">
+
+                    <!-- // Header -->
+                    <div class="header-preview">
+                        <span *ngIf="header_component?.format === 'TEXT'">{{ header_component?.text }}</span>
+                        <!-- <div id="header-image-container" *ngIf="header_component?.format === 'IMAGE'" class="header-image-container">
+                            <img [src]="header_params[0].image.link" (error)="onHeaderImageError($event)" />
+                        </div> -->
+                        <span *ngIf="header_component?.format === 'IMAGE'">
+                            <img [src]="header_params[0].image.link" (error)="onHeaderImageError($event)" />
+                        </span>
+                        <span *ngIf="header_component?.format === 'DOCUMENT'">
+                            <div class="pdf-preview">
+                                <p>PDF</p>
+                            </div>
+                            <!-- // doesn't works properly -> check ASAP -->
+                            <!-- <iframe [src]="sanitizedUrl" frameBorder="0" scrolling="no" height="100%" width="100%" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe> -->
+                        </span>
+                        <span *ngIf="header_component?.format === 'LOCATION'">
+                            <div class="location-preview">
+                                <p>Location</p>
+                            </div>
+                            <!-- <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3047.4846825263085!2d18.16983501538924!3d40.198280279391!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x134423b7392e6d13%3A0x60b481aa8d84673!2sEurofood%20SRL!5e0!3m2!1sit!2sit!4v1685097718757!5m2!1sit!2sit" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> -->
+
+                        </span>
+
+                    </div>
+
+                    <!-- // Body -->
+                    <div class="body-preview">
+                        <span>{{ body_component?.text }}</span>
+                    </div>
+
+                    <!-- // Footer -->
+                    <div class="footer-preview">
+                        <span>{{ footer_component?.text }}</span>
+                    </div>
+
+                    <!-- // Call to action preview -->
+                    <div *ngIf="buttons_component && (buttons_component.buttons[0].type === 'URL' || buttons_component.buttons[0].type === 'PHONE_NUMBER')"
+                        class="call-to-action-preview">
+
+                        <hr style="background-color: #eeeeee; margin-bottom: 0px;">
+                        <button *ngFor="let btn of buttons_component.buttons" class="btn whatsapp-call-to-action">
+                            <span *ngIf="btn.type === 'URL'"
+                                class="material-icons-outlined call-to-action-icon">open_in_new</span>
+                            <span *ngIf="btn.type === 'PHONE_NUMBER'"
+                                class="material-icons-round call-to-action-icon">phone</span>
+                            {{ btn.text }}
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="message-cloud-buttons-container"
+                    *ngIf="buttons_component && buttons_component.buttons[0].type === 'QUICK_REPLY'">
+                    <div class="message-cloud-buttons">
+                        <button *ngFor="let btn of buttons_component.buttons" fill="clear"
+                            class="message-cloud-button"><span class="_2VWlB">{{btn.text}}</span></button>
+                        <!-- <button class="vGQwA"><span class="_2VWlB">no sad. asdj asdjh asd asdgahsgda </span></button>
+              <button class="vGQwA"><span class="_2VWlB">Non voglio ricevere più messaggi</span></button> -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- // Phone Number - START -->
+        <div>
+            <p class="parameters-title">Phone number</p>
+            <div class="parameter">
+                <div class="param-number">
+                    <span class="material-icons-round">
+                        phone
+                    </span>
+                </div>
+                <div class="field-wrapper">
+                    <input type="text" placeholder="+1555123456" value="{{phone_number}}"
+                        (input)="onPhoneNumberChange($event.target.value)" (blur)="onBlur()" (focus)="onFocus()"
+                        maxlength="15">
+                </div>
+            </div>
+        </div>
+
+        <!-- // Phone Number - END -->
+
+
+        <!-- // Header parameters - START -->
+        <div *ngIf="header_component && header_component.example">
+            <p class="parameters-title">Header parameters</p>
+            <p *ngIf="header_component.example.header_handle" class="parameters-subtitle">The header contains a Media to
+                customize</p>
+
+            <!-- // header text -->
+            <div *ngFor="let hp of header_component.example.header_text; index as i" class="parameter">
+                <div class="param-number">
+                    <span>{{ i + 1 }}</span>
+                </div>
+                <div class="field-wrapper">
+                    <input type="text" placeholder="{{hp}}" value="{{header_params[i].text}}"
+                        (input)="onParamHeaderChange($event.target.value, i+1)" (blur)="onBlur()" (focus)="onFocus()">
+                </div>
+            </div>
+
+            <!-- // header handle - media -->
+            <div *ngFor="let hp of header_component.example.header_handle; index as i" class="parameter">
+                <div class="param-number">
+                    <!-- <span>{{</span> {{ i + 1 }} <span>}}</span> -->
+                    <span>{{ i + 1 }}</span>
+                </div>
+                <div class="field-wrapper large">
+                    <!-- <input type="text" placeholder="{{hp}}" (input)="onParamHeaderChange($event.target.value, i+1)"> -->
+                    <input *ngIf="!displayFileUploaded" type="text" placeholder="Insert a valid URL or update a file"
+                        (input)="onParamHeaderChange($event.target.value, i+1)" (blur)="onBlur()" (focus)="onFocus()">
+                    <input *ngIf="displayFileUploaded" type="text" placeholder="{{ fileUploadedName }}"
+                        value="{{fileUploadedName}}" disabled>
+                </div>
+                <button *ngIf="!displayFileUploaded" type="submit" class="icon-only" (click)="fileInput.click()">
+                    <span class="material-icons-outlined">
+                        cloud_upload
+                    </span>
+                    <!-- <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" capture="camera"
+                id="file-input" style="display: none;"> -->
+                    <input #fileInput type="file" [accept]="fileUploadAccept" (change)="onFileSelected($event)"
+                        capture="camera" id="file-input" style="display: none;">
+
+                </button>
+
+                <button *ngIf="displayFileUploaded" type="submit" class="icon-only" (click)="removeHeaderFile()">
+                    <span class="material-icons-outlined" style="color: #e22828;">
+                        delete
+                    </span>
+                </button>
+
+            </div>
+
+        </div>
+
+        <div *ngIf="header_component?.format == 'LOCATION'">
+            <p style="font-size: 14px;">Location headers not yet supported.</p>
+            <!-- <p class="parameters-title">Header parameters</p>
+            <div class="selected-place">
+                <div>
+                    <div class="share-location-header">
+                        <div class="share-location-title">
+                            <ion-icon name="locate"></ion-icon>
+                            <p>Location</p>
+                        </div>
+                        <div>
+                            <button *ngIf="!header_params[0]?.location?.name" fill="clear" class="small"
+                                (click)="displayMap()">
+                                <icon name="add-outline"></icon>Add
+                            </button>
+                            <button *ngIf="header_params[0]?.location?.name" fill="clear" class="small"
+                                (click)="displayMap()">
+                                <icon name="add-outline"></icon>Change
+                            </button>
+                        </div>
+                    </div>
+                    <div class="place-info">
+                        <p class="place-address">{{ header_params[0].location.address }}</p>
+                        <p class="place-coords">{{ header_params[0].location.latitude }} - {{
+                            header_params[0].location.longitude }}
+                        </p>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+        <!-- // Header parameters - END -->
+
+        <!-- // Body parameters - START -->
+        <div *ngIf="body_component.example">
+            <p class="parameters-title">Body parameters</p>
+            <div *ngFor="let bp of body_component.example.body_text[0]; index as i" class="parameter">
+                <div class="param-number">
+                    <!-- <span>{{</span> {{ i + 1 }} <span>}}</span> -->
+                    <span>{{ i + 1 }}</span>
+
+                </div>
+                <div class="field-wrapper">
+                    <input type="text" placeholder="{{bp}}" value="{{body_params[i].text}}"
+                        (input)="onParamBodyChange($event.target.value, i+1)" (blur)="onBlur()" (focus)="onFocus()">
+                </div>
+            </div>
+        </div>
+        <!-- // Body parameters - END -->
+
+
+        <div *ngIf="body_params.length == 0 && header_params.length == 0 && buttons_params.length == 0">
+            <p style="font-style: italic; color: #a3a3a3;">No parameters</p>
+        </div>
+
+        <!-- // Buttons parameters - START -->
+        <div *ngIf="url_button_component && url_button_component.example">
+            <p class="parameters-title">Buttons parameters</p>
+            <div *ngFor="let param of url_button_component.example; index as i" class="parameter">
+                <div class="param-number">
+                    <!-- <span>{{</span> {{ i + 1 }} <span>}}</span> -->
+                    <span>{{ i + 1 }}</span>
+                </div>
+                <div class="field-wrapper large">
+                    <input type="text" placeholder="Insert a valid URL" value="{{buttons_params[i].text}}"
+                        (input)="onParamButtonChange($event.target.value, i+1)" (blur)="onBlur()" (focus)="onFocus()">
+                </div>
+
+            </div>
+            <div class="url-button-previsioning">
+                <div *ngIf="url_button_component && url_button_component.type === 'URL'" class="call-to-action-preview">
+
+                    <button class="whatsapp-call-to-action">
+                        <span class="material-icons-outlined call-to-action-icon">open_in_new</span>
+                        {{ url_button_component.text }}
+                    </button>
+                </div>
+                <p class="previsioning-url">{{ previsioning_url }}</p>
+            </div>
+        </div>
+        <!-- // Buttons parameters - END -->
+
+
+
+    </div>
+
+</div>

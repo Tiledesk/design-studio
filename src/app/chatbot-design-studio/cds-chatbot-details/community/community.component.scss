@@ -1,0 +1,310 @@
+@import "./src/assets/sass/md/_variables.scss";
+
+.cds--custom-label {
+    color: #9aa0a6;
+    height: 30px;
+    padding-top: 7px;
+    padding-left: 16px;
+    padding-right: 16px;
+    // text-align: right !important;
+}
+
+@media (max-width: 768px) {
+
+    // .cds--custom-label {
+    //     height: 0px !important;
+    // }
+    .webhook-url-label {
+        text-align: left !important;
+        position: relative;
+        top: -17px;
+        margin-top: 16px;
+    }
+}
+
+.csd-chatbot-dtls-input {
+    max-width: 400px;
+}
+
+input[type="text"] {
+    // min-width: 307px !important;
+    height: 36px;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: #fff;
+    border: 1px solid #d9d9d9 !important;
+    border-top: 1px solid #c0c0c0;
+    /* border-radius: 2px; */
+    padding: 0 8px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    border-radius: 5px;
+    background-color: #fff !important;
+    border: solid 1px #ddd;
+}
+
+textarea[type="text"] {
+    // min-width: 307px !important;
+    // height: 36px;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: #fff;
+    border: 1px solid #d9d9d9 !important;
+    border-top: 1px solid #c0c0c0;
+    /* border-radius: 2px; */
+    padding-right: 8px;
+    padding-top: 5px;
+    padding-left: 8px;
+
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    border-radius: 5px;
+    background-color: #fff !important;
+    border: solid 1px #ddd;
+}
+
+input[type="text"]:disabled {
+    background-color: #f9f9f9 !important;
+    // cursor: not-allowed;
+}
+
+textarea[type="text"]:disabled {
+    background-color: #f9f9f9 !important;
+    // cursor: not-allowed;
+}
+
+input[type="text"]:disabled::placeholder {
+    color: #f9f9f9;
+    // font-size: 1.2em;
+    // font-style: italic;
+}
+
+::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #a0a0a0 !important;
+    font-weight: 300 !important;
+    opacity: 1;
+    /* Firefox */
+}
+
+:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: #a0a0a0 !important;
+    font-weight: 300 !important;
+}
+
+::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: #a0a0a0 !important;
+    font-weight: 300 !important;
+}
+
+ng-select {
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: #fff;
+    // border: 1px solid #d9d9d9 !important;
+    // border-top: 1px solid #c0c0c0;
+    /* border-radius: 2px; */
+    padding-right: 8px;
+    padding-top: 5px;
+    padding-left: 8px;
+
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    border-radius: 5px;
+    background-color: #fff !important;
+    // border: solid 1px #ddd;
+    margin: 0px;
+    padding: 0px;
+
+    &.ng-select-opened {
+        border-radius: 5px 5px 0px 0px;
+    }
+}
+
+.cds-community-btns-wrp {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 10px;
+    margin: 0 15px;
+}
+
+.link {
+    margin: 0;
+
+    .material-icons {
+        transform: rotate(135deg);
+    }
+
+    &:hover {
+        opacity: 0.8;
+        cursor: pointer;
+    }
+}
+
+.title-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.buttons-inside {
+    height: 40px;
+    position: relative;
+    display: block;
+    top: 3px;
+}
+
+/*
+/* Tags
+/* ------------------------------------ */
+.cds-select-chatbot-tags-wpr {
+    height: 78px;
+    margin-top: 12px;
+}
+
+.csd-chatbot-tags--container {
+    // height: 198px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.cds-chatbot-tag-wpr {
+    background: #f0f1f2;
+    height: 24px;
+    border-radius: 16px;
+    border: 1px solid #d2d4d6;
+    padding: 0px 6px;
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.cds-chatbot-tag-wpr:hover {
+    background: #fff;
+}
+
+.cds-chatbot-tag {
+    color: #3d4047;
+    // font-weight: 300;
+}
+
+.cds-chatbot-tag-delete-icon-wpr {
+    height: 16px;
+}
+
+.bot-description-note {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    color: #5c5f66;
+}
+
+.cds-mandatory {
+    color: #9aa0a6;
+    font-size: 11px;
+    height: 36px;
+    padding-top: 7px;
+    padding-left: 16px;
+    padding-right: 16px;
+    text-align: right !important;
+}
+
+.chatbot-community-wpr,
+.row {
+    margin-right: 0px;
+    margin-left: 8px;
+}
+
+.csd-community-required-field {
+    font-size: 12px;
+    color: #f44336;
+    font-weight: 400;
+    display: block;
+}
+
+/* Btn effect
+/* ********************************* */
+.btn-with-border--effect {
+    background: none;
+    border: 0;
+    box-sizing: border-box;
+    // margin: 1em;
+    // padding: 1em 2em;
+    //   padding-bottom: 37px;
+    font-size: 14px;
+    font-weight: 300;
+
+    // Required, since we're setting absolute on pseudo-elements
+    position: relative;
+    vertical-align: middle;
+    cursor: pointer;
+
+    &::before,
+    &::after {
+        box-sizing: inherit;
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.border-from-center {
+    &:hover {
+        color: $brand-primary;
+    }
+
+    // Set up base styles, we're going to scale instead of animating width/height
+    &::before,
+    &::after {
+        //   top: 3px;
+        top: 0px;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        transform-origin: center; // Ensure scaling is done from the center (expands outwards)
+    }
+
+    // scale3d(<scale-horizontal>, <scale-vertical>, <scale-depth>);
+    &::before {
+        // border-top: 2px solid $purple;
+        border-bottom: 3px solid $brand-primary;
+        transform: scale3d(0, 1, 1); // Shrink only width
+    }
+
+    &:hover::before,
+    &:hover::after {
+        transform: scale3d(1, 1, 1); // Show full-size
+        transition: transform 0.5s;
+    }
+}
+
+.disabled-li {
+    pointer-events: none;
+}
+
+.li-active {
+    border-bottom: 3px solid $brand-primary !important;
+}
+
+.community-tab {
+    display: flex;
+    gap: 30px;
+}

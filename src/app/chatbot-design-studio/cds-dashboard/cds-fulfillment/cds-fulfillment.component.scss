@@ -1,0 +1,206 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+.content {
+    width: 100%;
+    padding: 20px 40px;
+}
+
+.fulfillment {
+    width: 50%;
+    min-width: 600px;
+    // display: flex;
+    // flex-direction: row;
+    // justify-content: space-between;
+}
+
+.fulfillment-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    color: white !important;
+}
+
+.fulfillment-description {
+    color: #a0a3ab;
+    font-weight: 300;
+}
+
+.custom-link {
+    color: #3ea9f5;
+    cursor: pointer;
+}
+
+.custom-link:hover {
+    text-decoration: underline;
+}
+// .onoffswitch-wrapper {
+//     float: right;
+//     position: relative;
+//     top: 9px;
+// }
+
+// --------------------
+// SWITCH BTN
+// --------------------
+// --------- start new on-off btn logo ---------
+.nw-onoffswitch {
+    position: relative;
+    width: 45px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+.nw-onoffswitch-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.nw-onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    height: 25px;
+    padding: 0;
+    line-height: 25px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease-in;
+}
+.nw-onoffswitch-label:before {
+    content: "";
+    display: block;
+    width: 25px;
+    margin: 0px;
+    background: #ffffff;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 20px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    transition: all 0.3s ease-in 0s;
+}
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
+    background-color: $light-blue;
+}
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
+    border-color: $light-blue;
+}
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
+    right: 0px;
+}
+// --------- ./end new on-off btn logo ---------
+
+.custom-label {
+    color: #7695a5;
+    height: 36px;
+    padding-top: 7px;
+    padding-left: 16px;
+    padding-right: 16px;
+    text-align: right !important;
+}
+
+@media (max-width: 768px) {
+    .custom-label {
+        height: 0px !important;
+    }
+    .webhook-url-label {
+        text-align: left !important;
+        position: relative;
+        top: -17px;
+        margin-top: 16px;
+    }
+}
+
+.webhook-url-errors {
+    color: #fff !important;
+    text-align: left;
+    padding: 6px 12px;
+    //padding: 6px 12px 6px 0px;
+    background: #f76949;
+    font-weight: 300 !important;
+    line-height: 20px !important;
+    font-size: 13px !important;
+    margin-bottom: 12px !important;
+    margin-top: 5px;
+    display: block;
+    border-radius: 6px;
+}
+
+.webhook-url-errors:before {
+    position: relative;
+    top: -30px;
+    left: 20px;
+    content: "";
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 6px 6px 6px;
+    border-color: transparent transparent #f76949 transparent;
+}
+
+.webhook-enabled-box {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.input-box {
+    width: 100%;
+    // display: flex;
+    // flex: 1;
+}
+
+.input[type=text] {
+    height: 36px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 660px;
+    min-width: 660px;
+    margin-bottom: 10px;
+    //-webkit-appearance: none;
+    background: #fff;
+    border: 1px solid #d9d9d9 !important;
+    border-top: 1px solid #c0c0c0;
+    padding: 0 8px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    border-radius: 5px;
+    background-color: #fff !important;
+    border: solid 1px #ddd;
+}
+
+@media screen and (max-width: 1500px) {
+    .webhook-enabled-box {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    // .input-box {
+    //     display: flex;
+
+    // }
+    
+    .custom-label {
+        padding: 0px;
+        margin: 0px;
+        height: 30px;
+    }
+    
+    .input[type=text] {
+        min-width: 0px;
+    }
+}
+
+.cds-blue-button{
+    margin-top: 12px;
+    margin-bottom: 5px;
+    padding: 12px 30px;
+}

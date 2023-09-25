@@ -1,0 +1,72 @@
+<div class="main-content" style="padding-top:0px; padding-left: 5px;padding-right: 5px;margin-top: 0px;">
+  <div class="container-fluid" style="padding-left: 5px;padding-right: 5px;">
+    <div class="row">
+      <div class="chatbot-general-setting-tab-wpr">
+        <ul class="cds-bottom-nav"
+          style="margin-bottom: 16px;     background: #0f172a;   box-shadow: 0 2px 0px #00003c14 !important;">
+          <li (click)="toggleTab('bot_detail')" class="btn-with-border-effect" [ngClass]="
+                        { 'border-from-center' : activeSection !== 'bot_detail',
+                          'li-active' :          activeSection === 'bot_detail'
+                        }">
+
+            <a href="javascript:;" role="button">
+              Bot details
+              <!-- {{ "BotDetails" | translate }}-->
+            </a>
+          </li>
+
+          <li (click)="toggleTab('import_export')" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== 'import_export', 
+                      'li-active' :           activeSection === 'import_export'
+                    }">
+            <a href="javascript:;" role="button"> Import Export </a>
+          </li>
+
+          <li (click)="toggleTab('community')" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== 'community', 
+                      'li-active' :           activeSection === 'community'
+                    }">
+            <a href="javascript:;" role="button"> Community </a>
+          </li>
+
+          <li (click)="toggleTab('developer')" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== 'developer', 
+                      'li-active' :           activeSection === 'developer'
+                    }">
+            <a href="javascript:;" role="button"> Developer </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <cds-detail-botdetail *ngIf="activeSection==='bot_detail'"
+      [selectedChatbot]="selectedChatbot"
+      [project]="project"
+      [isVisibleDEP]="isVisibleDEP"
+      [translationsMap]="translationsMap">
+    </cds-detail-botdetail>
+
+    <cds-detail-import-export *ngIf="activeSection==='import_export'"
+      [id_faq_kb]="selectedChatbot?._id"
+      [faqKb_name]="faqKb_name">
+    </cds-detail-import-export>
+
+    <cds-detail-community *ngIf="activeSection==='community'"
+      [project]="project"
+      [selectedChatbot]="selectedChatbot"
+      [translationsMap]="translationsMap">
+    </cds-detail-community>
+
+    <cds-detail-developer *ngIf="activeSection==='developer'"
+      [selectedChatbot]="selectedChatbot">
+    </cds-detail-developer>
+
+  </div>
+</div>
+
+<!-- -------------------------------------------------------------------------------- -->
+<!-- MODAL WINDOWS -->
+<!-- -------------------------------------------------------------------------------- -->
+
+
+

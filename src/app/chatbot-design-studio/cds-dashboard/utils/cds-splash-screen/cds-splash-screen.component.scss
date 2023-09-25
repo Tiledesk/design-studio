@@ -1,0 +1,60 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+.cds-ss-main-content {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px calc(20%);
+    gap: 10px;
+    text-align: center;
+    color: white;
+    transition: 0.5s;
+    opacity: 1;
+    padding-top: 110px;
+}
+
+.cds-ss-welcome-wpr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.cds-ss-txt {
+    font-size: 24px;
+    margin-left: 8px;
+    color: #f18876;
+    font-weight: 400;
+}
+
+#cds-ss-add-intent-btn {
+    background: $light-blue !important;
+    color: $light-black !important;
+    box-shadow: none !important;
+    font-weight: 500 !important;
+    font-family: "Poppins", "Roboto", "Arial", sans-serif !important;
+    text-transform: capitalize !important;
+    font-size: 14px !important;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+#cds-ss-add-intent-btn:hover {
+    background: rgb(138, 180, 248, 0.8) !important;
+}
+
+.welcome_subtitle{
+    font-size: 20px;
+}
+
+.welcome_video{
+    .welcome_subtitle{
+        font-style: italic;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+}

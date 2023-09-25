@@ -1,0 +1,206 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+
+:host{
+    --content-background: rgb(66, 85, 117);
+    --icon-color: #{$icon-color};
+
+}
+.base-filter{
+    &:hover{
+        div.filter-remove{
+            opacity: 1;
+            transition: opacity 0.3s ease 0s;
+        }
+    }
+}
+.content{
+    background: var(--content-background);
+    // margin: 0 30px;
+    padding: 20px;
+    border-radius: 4px;
+}
+
+.control-buttons{
+    height: 100%;
+    left: -44px;
+    position: absolute;
+    top: 0px;
+    width: 44px;
+
+    div.filter-remove{
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        
+        opacity: 0;
+
+        height: 28px;
+        width: 28px;
+
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background: rgb(255, 255, 255);
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+
+        span.material-icons{
+            font-size: 20px;
+            color:  var(--icon-color);
+        }
+
+        &:hover{
+            background-color: var(--icon-color);
+            span.material-icons{
+                color: white;
+            }
+        }
+    }
+}
+
+.basic-filter-wrp{
+    // background: #fff;
+    // margin: 0 30px;
+    padding: 20px 0px;
+    grid-row-gap: 15px;
+    border-radius: 4px;
+    display: flex;
+
+    .add-filter-button{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        font-weight: 600;
+        padding: 8px 15px;
+        border: 1px solid #c6cdd4;
+        border-radius: 4px;
+        color: #c6cdd4;
+        cursor: pointer;
+
+        
+        &:hover{
+            border-color: white;
+            color: white
+        }
+    }
+    
+}
+
+
+::ng-deep .base-filter--add-filter-panel {
+    // position: relative;
+    box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;
+    background: rgb(255,255,255);
+    border-radius: 4px;
+    margin: auto;
+    width: 500px;
+    max-height: 80%;
+    min-height: 385px;
+    overflow: auto;
+    max-width: 500px;
+    display: inline-block;
+    top: 50%!important;
+    margin-top: -20%;
+    .category-row-name {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden !important;
+    }
+}
+
+.filter-operator {
+    min-width: 100px;
+    width: fit-content;
+    margin: 10px auto;
+}
+
+::ng-deep .filter-operator {
+    .select-bot-box {
+        width: max-content;
+        min-width: 70px;
+        text-align: center;
+        margin: 10px auto;
+    }
+}
+
+.filter-condition{
+    -webkit-box-align: center;
+    align-items: center;
+    display: flex;
+    position: relative;
+    border-radius: 4px;
+    padding: 8px 15px;
+    transition: background-color 0.3s ease 0s, border 0.3s ease 0s, opacity 0.3s ease 0s;
+    cursor: pointer;
+    background: rgb(245, 245, 245);
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(245, 245, 245);
+    border-image: initial;
+    &:hover{
+        background: #c6cdd4;
+        border-color: #c6cdd4;
+        div.remove{
+            opacity: 1;
+        }
+    }
+
+    div.remove {
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        transition: opacity 0.3s ease 0s;
+        opacity: 0;
+        height: 28px;
+        width: 28px;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background: rgb(255, 255, 255);
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+        span.material-icons {
+            font-size: 20px;
+            color:  var(--icon-color);
+        }
+        &:hover {
+            background-color:  var(--icon-color);
+            span.material-icons{
+                color: white;
+            }
+        }
+    }
+
+    div.filter-icon {
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        color: $icon-color;
+        display: flex;
+        font-size: 15px;
+        justify-content: center;
+        margin-right: 10px;
+        width: 15px;
+        transition: color 0.3s ease 0s;
+    }
+}
+
+.ellips{
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.3s ease 0s;
+    overflow: hidden !important;
+}

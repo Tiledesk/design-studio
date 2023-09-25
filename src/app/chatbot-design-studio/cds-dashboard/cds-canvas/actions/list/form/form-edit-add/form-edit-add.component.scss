@@ -1,0 +1,359 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+.tilebot-add-edit-form {
+    background: #425575;
+    height: auto;
+    max-height: 0;
+    overflow: hidden;
+    box-shadow: none;
+    transition: max-height 0.3s ease-in;
+    &.active {
+        max-height: 100vh;
+    }
+
+    button {
+        text-align: right;
+        padding: 8px 16px;
+        margin: 0px;
+    }
+    button.edit-form {
+        border-radius: 20px;
+        padding-right: 20px;
+        padding-top: 10px;
+        color: #fff;
+        min-height: 30px;
+        background-color: transparent;
+        box-shadow: none;
+        float: right;
+    }
+    button.edit-form .icon-label {
+        vertical-align: text-top;
+        display: inline-block;
+        overflow: hidden;
+        margin-right: 10px;
+        width: auto;
+    }
+
+
+
+    
+
+
+
+
+    .mat-expansion-panel {
+        box-shadow: none;
+        background: #51627e;
+        border: 0px solid #5f6368;
+        overflow: visible;
+    }
+    .mat-expansion-panel-header {
+        padding: 0 12px;
+    }
+    .validation-field-title {
+        font-size: 16px;
+        margin: 0;
+        font-weight: 400;
+        color: #e8eaed;
+    }
+
+    ::ng-deep .mat-expansion-indicator:after {
+        color: #f2f2f2;
+        margin-top: -4px;
+    }
+    mat-expansion-panel {
+        box-shadow: none;
+        background: rgb(48 63 92);
+        border: 1px solid #5f6368;
+        overflow: visible;
+        &.open-block {
+            pointer-events: none;
+        }
+        mat-expansion-panel-header {
+            height: 40px;
+        }
+        &.mat-expanded {
+            ::ng-deep .mat-expansion-panel-body {
+                opacity: 1;
+            }
+        }
+        ::ng-deep .mat-expansion-panel-body {
+            opacity: 0;
+        }
+    }
+
+
+
+    ::ng-deep .mat-expansion-panel-body {
+        padding: 0;
+        margin-top: 20px;
+    }
+    .mat-expansion-panel-content > .mat-expansion-panel-body {
+        // padding: 20px 0px 16px!important;
+        padding: 0px 0px 0px !important;
+    }
+    .input-wrapper {
+        margin: 10px 0 0 0;
+    }
+}
+
+.info-message {
+    background-color: #fff;
+    border: 1px solid #e8f0f5;
+    box-shadow: none;
+    padding: 10px 0;
+    display: flex;
+    border-radius: 6px;
+    font-size: 14px;
+    min-height: 64px;
+    em.material-icons {
+        vertical-align: middle;
+        display: inline-flex;
+        color: #3ea9f5;
+        margin-right: 3px;
+        span {
+            vertical-align: middle;
+            display: inline-flex;
+        }
+    }
+}
+
+.form-field {
+    padding: 20px;
+    width: 100%;
+    margin: 0px auto;
+    border-radius: 4px;
+}
+
+
+.form-group {
+    padding-bottom: 7px;
+    margin: 10px 0;
+    .form-control {
+        margin-bottom: 7px;
+        height: auto;
+        padding: 0;
+        background-image: none;
+    }
+    // &.is-focused {
+    //     .form-control {
+    //         background-image: linear-gradient(#3ea9f5, #3ea9f5), linear-gradient(#d2d2d200, #d2d2d200);
+    //     }
+    // }
+    label {
+        font-size: 12px;
+        line-height: normal;
+        color: #3c4858;
+        font-weight: 400;
+    }
+    .ng-select {
+        &.form-control-select ::ng-deep .ng-select-container {
+            background-size: 0 2px, 100% 1px;
+            background-repeat: no-repeat;
+            background-position: center bottom, center calc(100% - 1px);
+        }
+    }
+    .input-regex{
+        background-color: #fff;
+    }
+}
+
+.form-group.is-focused textarea.form-control {
+    background-image:none;
+    // background-size: 100% 2px, 100% 0px;
+    // box-shadow: none;
+    // transition-duration: 0.3s;
+    // background-image: linear-gradient(#3ea9f5, #3ea9f5), linear-gradient(#d2d2d200, #d2d2d200);
+    // background-position: center bottom,center calc(100% - 1px);
+}
+
+textarea.form-control,
+input.form-control {
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    width: 100%;
+    padding-left: 5px;
+    padding-top: 7px;
+    background-size: 0 2px, 100% 1px;
+    background-repeat: no-repeat;
+    background-position: center bottom, center calc(100% - 1px);
+    padding: 8px 10px!important;
+    border-radius: 8px;
+    line-height: 18px;
+    resize: none;
+    height: auto;
+}
+
+.form-footer {
+    text-align: right;
+    padding-top: 0px;
+    margin-top: 10px;
+    padding-right: 15px;
+    padding-left: 15px;
+    .btn {
+        margin: 10px 4px;
+    }
+}
+
+// .form-group.is-error {
+//     .form-control {
+//         outline: none;
+//         background-image: linear-gradient(#ed2e19, #ed2e19), linear-gradient(#d2d2d2, #d2d2d2);
+//         background-size: 100% 2px, 100% 1px;
+//         box-shadow: none;
+//         transition-duration: 0.3s;
+//     }
+//     .ng-select {
+//         &.form-control-select ::ng-deep .ng-select-container {
+//             display: flex;
+//             outline: none;
+//             background-image: linear-gradient(#ed2e19, #ed2e19), linear-gradient(#d2d2d2, #d2d2d2);
+//             background-size: 100% 2px, 100% 1px;
+//             box-shadow: none;
+//             transition-duration: 0.3s;
+//         }
+//     }
+// }
+
+.form-group label.control-label {
+    top: -20px;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    line-height: normal;
+    position: absolute;
+    font-weight: 400;
+    font-size: 13px;
+    white-space: normal;
+    word-wrap: break-word;
+    color: #e8eaed;
+}
+// .form-group.is-empty label.control-label {
+//     z-index: 1;
+//     pointer-events: none;
+// }
+
+// .form-group.is-focused label.control-label {    
+//     pointer-events: none;
+//     transition: 0.3s ease all;
+// }
+
+// .form-group.ng-select {
+//     label.control-label {
+//         font-size: 11px;
+//         line-height: normal;
+//         position: absolute;
+//         pointer-events: none;
+//         transition: 0.3s ease all;
+//         color: #fff;
+//     }
+//     &.is-placeholder {
+//         label.control-label {
+//             font-size: 14px;
+//             line-height: normal;
+//             position: absolute;
+//             color: #fff;
+//             z-index: 1;
+//             pointer-events: none;
+//         }
+//     }
+// }
+
+.input-prefix {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    color: #7d7d7d;
+    font-weight: 800;
+}
+
+.input-suffix {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: #7d7d7d;
+    font-weight: 800;
+}
+
+// .control-label {
+//     transition: unset;
+//     font-size: 15px !important;
+//     color: #fff !important;
+//     left: 6px !important;
+// }
+
+
+
+
+/** CSS textarea */
+
+.material-icons {
+    // color: #ecb606b0;
+    font-size: 18px;
+}
+
+// cds-textarea#assignTo ::ng-deep {
+//     display: flex;
+//     // &.assigned {
+//     //     textarea {
+//     //         background: transparent;
+//     //         padding: 0!important;
+//     //         border: 0!important;
+//     //         outline: 0!important;
+//     //     }
+//     // }
+//     textarea {
+//         border: 1px solid rgb(118, 118, 118) !important;
+//         resize: none !important; 
+//         padding: 8px 20px !important;
+//         height: 25px !important;
+//         min-height: 25px !important;
+//     }
+// }
+
+div.value-wrp {
+    position: relative;
+    min-height: 40px;
+    .flex{
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .close{
+            width: 17px;
+            top: -7px;
+            right: -7px;
+            font-size: 15px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            &:hover{
+                background: #ecb606;
+                color: white;
+            }
+        }
+    }
+
+    div.tag {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 6px;
+        right: unset;
+        border-radius: 7px;
+        margin: 5px 0;
+        padding: 5px 10px;
+        background-color: #ecb606;
+        color: #fff;
+        min-height: 30px;
+        height: fit-content;
+    }
+}

@@ -1,0 +1,35 @@
+<div id="panel-tab">
+    <div id="preloader" *ngIf="loading">
+        <div class="logo"></div>
+    </div>
+
+    <div class="widget-wrp">
+        <!-- <div class="header">
+            close
+        </div> -->
+        <div class="content">
+
+            <div class="btn-wrp" [style.visibility]="iframeVisibility? 'hidden':'visible'">
+                <img src="assets/cds/images/chatbot.png" width="80">
+                <div id="text" class="title"> Test your Chatbot</div>
+                <div id="text" class="description"> Start trying your chatbot and interact with it</div>
+                <!-- style="margin-left: 14px;" -->
+                <button id="cds-play-btn" class="btn btn-primary" type="button"  (click)="startTest()">
+                    <span class="material-icons">
+                        play_arrow
+                    </span>
+                    Test it
+                </button>
+            </div>
+           <iframe allowfullscreen [style.visibility]="iframeVisibility? 'visible':'hidden'"
+                #widgetIframe
+                id="widgetIframe"
+                style= "border:none;"
+                width = "100%" height = "100%"
+                [src]="widgetTestSiteUrl"
+                (load)="onLoaded($event)">
+            </iframe>
+        </div>
+    </div>
+    
+</div>

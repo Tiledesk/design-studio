@@ -1,0 +1,9 @@
+<div class="tile-typing-now" *ngIf="typingLocation === 'header'">
+  <span *ngIf="nameUserTypingNow">{{nameUserTypingNow}} </span>
+  {{ translationMap?.get('LABEL_WRITING') }}
+</div>
+<div class="spinner" *ngIf="typingLocation === 'content'">
+  <div class="bounce1"></div>
+  <div class="bounce2"></div>
+  <div class="bounce3"></div>
+</div>

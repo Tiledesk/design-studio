@@ -1,0 +1,295 @@
+<div class="chatbot-community-wpr">
+
+    <div class="row">
+        <div class="col-sm-10 col-md-10 title-buttons">
+            <!-- <h3 class="card_title__underlined" style="color: #e8eaed;">
+                <span class="card_title__underline buttons-inside">
+                    Setup Community info
+                </span>
+            </h3> -->
+            <!-- displayBtnLabelSeeYourRequets
+            displayBtnLabelSeeYourRequets
+            displayBtnLabelSeeYourRequets -->
+            <div class="community-tab">
+                <div (click)="displayUserCommunityInfo(seeUserCmntyInfo = !seeUserCmntyInfo)" class="btn-with-border--effect" [ngClass]="
+                { 'disabled-li' : seeUserCmntyInfo === false, 
+                    'border-from-center' : seeUserCmntyInfo === true,
+                    'li-active' : seeUserCmntyInfo === false
+                }">
+
+                    <a style="position: relative;top: 20px;" href="javascript:;" role="button"> Chatbot info</a>
+                </div>
+
+                <div (click)="displayUserCommunityInfo(seeUserCmntyInfo = !seeUserCmntyInfo)" class="btn-with-border--effect" [ngClass]="
+                    { 'disabled-li' : seeUserCmntyInfo === true, 
+                        'border-from-center' : seeUserCmntyInfo === false, 
+                        'li-active' : seeUserCmntyInfo === true
+                    }">
+                    <a style="position: relative;top: 20px;" href="javascript:;" role="button"> Personal info </a>
+                </div>
+            </div>
+            <div class="cds-community-btns-wrp">
+
+                <button *ngIf="selectedChatbot?.public === false" id="csd-update-bot-btn" #editbotbtn
+                    class="btn btn-primary pull-left cds-blue-button" (click)="publishOnCommunity()" [disabled]="(
+                        !selectedChatbot.hasOwnProperty('short_description') ||
+                        selectedChatbot.short_description === '') ||
+                        (!selectedChatbot.hasOwnProperty('title') || selectedChatbot.title === '') || !certifiedTag ">
+                    Go live on Community
+                </button>
+                <button *ngIf="selectedChatbot?.public === true" id="csd-update-bot-btn" #editbotbtn
+                    class="btn btn-primary pull-left cds-blue-button" (click)="removeFromCommunity()">
+                    Remove from community
+                </button>
+                <label class="link">
+                    <a (click)="goToCommunityChatbotDetail(selectedChatbot?._id)"
+                        *ngIf="selectedChatbot?.public === true">
+                        <span class="material-icons">link</span>
+                    </a>
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-10 col-md-10">
+            <div class="section-subtitle"> </div>
+        </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------------------------------- -->
+    <!-- Certified Tags  -->
+    <!-- ------------------------------------------------------------------------------------------- -->
+
+    <div class="row">
+        <div *ngIf="!userCmntyInfo" class="col-xs-6">
+            <!-- style="margin-bottom: 16px;" -->
+            <div class="row">
+
+                <label class="col-xs-12 cds--custom-label" style="font-size: 18px;">
+                    Chatbot community info
+                </label>
+                <label class="col-xs-12 cds--custom-label" style="font-size: 10px;
+                    padding-top: 0px;
+                    max-width: 400px;
+                    font-weight: 400;">
+                    Adds the below informations to describe to the community what your chatbot does
+                </label>
+            </div>
+
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 cds--custom-label">
+                    <!-- {{ 'Description' | translate }} -->
+                    Main Category <span>*</span>
+                </label>
+                <div class="col-xs-12">
+                    <ng-select class="csd-chatbot-dtls-input" id="select-tag" #ngSelectTags [items]="certifiedTags"
+                        bindLabel="name" [clearable]="true" placeholder="Select a category and press enter"
+                        [(ngModel)]="certifiedTag" (change)="addMainCategory($event)"
+                        (keyup.enter)="ngSelectTags.close()">
+
+                        <ng-template ng-label-tmp let-item="item">
+                            {{item.name}}
+                        </ng-template>
+                        <ng-template ng-option-tmp let-item="item" let-index="index">
+                            {{item.name}}
+                        </ng-template>
+                    </ng-select>
+                    <span *ngIf="certifiedTagNotSelected" class="csd-community-required-field">Required</span>
+                </div>
+            </div>
+
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <!--  Bot title  -->
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 cds--custom-label">
+                    <!-- {{ "BotsAddEditPage.Type" | translate }} -->
+                    <!-- {{ 'Title' | translate }} -->
+                    Title <span>*</span>
+                </label>
+                <div class="col-xs-12">
+                    <input id="bot_type" name="bot_type" [(ngModel)]="selectedChatbot.title"
+                        (ngModelChange)="onChangeTitle($event)" class="input csd-chatbot-dtls-input" type="text"
+                        style="margin-bottom: 0px; color:#808080" placeholder="Title">
+                    <span *ngIf="titleIsEmpty" class="csd-community-required-field">Required</span>
+                </div>
+            </div>
+
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <!-- Short Description  -->
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 cds--custom-label">
+                    <!-- {{ 'Description' | translate }} -->
+                    Short Description <span>*</span>
+                </label>
+                <div class="col-xs-12">
+                    <textarea id="bot_description" name="bot_description"
+                        [(ngModel)]="selectedChatbot.short_description"
+                        (ngModelChange)="onChangeShortDescription($event)" rows="4"
+                        style="resize: vertical; margin-bottom: 0px; color:#808080; "
+                        class="input csd-chatbot-dtls-input" type="text" placeholder="Short Description">
+                    </textarea>
+                    <span *ngIf="shortDescriptionIsEmpty" style="margin-top: -5px;"
+                        class="csd-community-required-field">Required</span>
+                </div>
+
+            </div>
+
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <!-- Description  -->
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 cds--custom-label">
+                    <!-- {{ 'Description' | translate }} -->
+                    Description
+                    <span class="bot-description-note">
+                        Markdown supported - use the Markdow language to enrich your text
+                    </span>
+                </label>
+                <div class="col-xs-12">
+                    <textarea id="bot_description" name="bot_description" [(ngModel)]="selectedChatbot.description"
+                        rows="6" style="resize: vertical; margin-bottom: 0px; color:#808080; margin-top: 10px;"
+                        class="input csd-chatbot-dtls-input" type="text" placeholder="Description">
+            </textarea>
+                </div>
+            </div>
+
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <!-- Tags Description  -->
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 cds--custom-label">
+                    <!-- {{ 'Description' | translate }} -->
+                    Tags
+                </label>
+                <div class="col-xs-12">
+                    <ng-select class="csd-chatbot-dtls-input" id="select-tag" #ngSelect [items]="tags" bindLabel="tag"
+                        bindValue="_id" [clearable]="false" [clearSearchOnAdd]="true" [hideSelected]="true"
+                        placeholder="Type to create a tag and press enter" [(ngModel)]="tag" addTagText="Create New"
+                        [addTag]="createNewTag" (keyup.enter)="ngSelect.close()"
+                        notFoundText="Type to create a tag and press enter">
+
+                        <ng-template ng-label-tmp let-item="item">
+                            {{item.tag}}
+                        </ng-template>
+                        <ng-template ng-option-tmp let-item="item" let-index="index">
+                            {{item.tag}}
+                        </ng-template>
+                    </ng-select>
+                    <div class="csd-chatbot-tags--container csd-chatbot-dtls-input" *ngIf="tagsList.length > 0">
+                        <div class="cds-chatbot-tag-wpr" *ngFor="let tag of tagsList" role="button">
+
+                            <div class="cds-chatbot-tag">
+                                {{ tag }}
+                            </div>
+
+                            <div class="cds-chatbot-tag-delete-icon-wpr" (click)="removeTag(tag)">
+                                <i class="material-icons" style="font-size: 12px;"> close </i>
+                                <!-- <svg style="width: 13px; height: auto;position:absolute;margin-top: 6px;"
+                    aria-hidden="true" focusable="false" data-prefix="fas" data-icon="tag"
+                    class="svg-inline--fa-tag-icon fa-tag fa-w-16" role="img"
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    
+                    <path class="tag_icon_in_ws_msgs"
+                      d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z">
+                    </path>
+                  </svg> -->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <!-- Update button  -->
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 col-sm-8 col-md-8 col-lg-8"></label>
+                <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+                    <button id="csd-update-bot-btn" #editbotbtn class="btn btn-primary pull-left cds-blue-button"
+                        (click)="update()">
+                        {{ "BotsAddEditPage.UpdateBotName" | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="userCmntyInfo" class="col-xs-6">
+            <div class="row">
+
+                <label class="col-xs-12 cds--custom-label" style="font-size: 18px;">
+                    Your community profile
+                </label>
+                <label class="col-xs-12 cds--custom-label" style="font-size: 10px;
+                    padding-top: 0px;
+                    max-width: 400px;
+                    font-weight: 400;">
+                    Enter your information which will be shown to the community for all chatbots you post live
+                </label>
+            </div>
+
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 cds--custom-label">
+                    Website
+                </label>
+                <div class="col-xs-12">
+                    <input id="user-website" name="user_website" [(ngModel)]="userWebsite"
+                        (ngModelChange)="onChangeUserWebsite($event)" class="input csd-chatbot-dtls-input" type="text"
+                        style="margin-bottom: 0px; color:#808080; position: relative;top: -1px;"
+                        placeholder="Your Website">
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 cds--custom-label">
+                    Public email
+                </label>
+                <div class="col-xs-12">
+                    <input id="user-public-email" name="user_public_email" [(ngModel)]="userPlublicEmail"
+                        class="input csd-chatbot-dtls-input" type="text"
+                        style="margin-bottom: 0px; color:#808080; position: relative;top: -1px;"
+                        placeholder="Your public email">
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 cds--custom-label">
+                    Description
+                </label>
+                <div class="col-xs-12">
+                    <textarea id="user-description" name="user_description" [(ngModel)]="userDescription"
+                        class="input csd-chatbot-dtls-input" type="text"
+                        style="margin-bottom: 0px; color:#808080; position: relative;top: -1px;"
+                        placeholder="Your description" rows="4">
+                    </textarea>
+                </div>
+            </div>
+
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <!-- Update user profile btn  -->
+            <!-- ------------------------------------------------------------------------------------------- -->
+            <div class="row" style="margin-bottom: 16px;">
+                <label class="col-xs-12 col-sm-8 col-md-8 col-lg-8"></label>
+                <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+                    <button id="csd-update-bot-btn" #editbotbtn class="btn btn-primary pull-left cds-blue-button"
+                        (click)="updateUserProfile()">
+                        Update your profile
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ------------------------------------------------------------------------------------------- -->
+    <!-- mandatory field  -->
+    <!-- ------------------------------------------------------------------------------------------- -->
+    <!-- <div class="row">
+        <label class="col-xs-2 cds-mandatory">
+            <span>*</span> mandatory field
+        </label>
+    </div> -->
+
+
+
+</div>

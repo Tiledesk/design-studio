@@ -1,0 +1,38 @@
+<div class="content-panel-intent-detail">
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">Assign to:</label>
+            <div class="value-wrp">
+                <cds-textarea id="assignTo"
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false"
+                    [setAttributeBtn]="true"
+                    [minRow]="1" [maxRow]="1"
+                    [readonly]="true"
+                    [text]="action.assignTo"
+                    (selectedAttribute)="onSelectedAttribute($event)">
+                </cds-textarea>
+            </div>
+        </div>
+    </div>
+    
+
+    <label class="title-label">Value:</label>
+    <div class="block-wrp">
+        <div class="operand-wrp">
+            <div class="select-function">
+                <cds-select id="selectOperand"
+                    [items]="listOfFunctions"
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'"
+                    [placeholder]="'Apply a function to the value'"
+                    [clearable]="true"
+                    [itemSelected]="action.functionName"
+                    (onSelected)="onSelectedFunction($event)">
+                </cds-select>
+            </div>
+        </div>
+    </div>
+
+</div>

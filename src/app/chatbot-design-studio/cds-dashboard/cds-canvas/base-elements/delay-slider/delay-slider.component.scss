@@ -1,0 +1,96 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+
+.delay {
+    align-items: center;
+    background: $color-bck-gray-hex;
+    border-radius: 13px;
+    display: inline-flex;
+    position: relative;
+    height: 26px;
+    padding: 0 9px 0 3px;
+    // width: 100px;
+    text-align: center;
+    transition: width .3s ease-in;
+    font-size: $font-size-base;
+    // margin-top: 30px;
+    .delay-current{
+        display: contents;
+        width: auto;
+        color: $color-light-gray-hex;
+        cursor: pointer;
+        font-size: 0.8em;
+        font-weight: 400;
+        white-space: nowrap;
+    }
+    .delay-slider{
+        display: inline-block;
+        // opacity: 0;
+        visibility: hidden;
+        width: 0;
+        transition: opacity .2s;
+    }
+    .delay-range {
+        display: inline-flex;
+        color: $color-withe-hex;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+    &.open {
+        width: 100%;
+        .delay-current{
+            display: none;
+        }
+        .delay-slider{
+            width: 100%;
+            // opacity: 1;
+            visibility: visible;
+        }
+    }
+}
+
+.delay-button {
+    padding-right: 4px;
+    color: $icon-color;
+    cursor: pointer;
+}
+
+
+
+.delay-icon {
+    color: $color-withe-hex;;
+    font-size: 1em;
+    font-weight: 700;
+    margin-right: 9px;
+}
+
+
+
+/** SLIDER **/ 
+.vue-slider {
+    margin: 0 5px;
+    position: relative;
+    display: inline-flex;
+    padding: 7px 0;
+    width: calc(100% - 80px);
+    height: 6px;
+}
+
+mat-slider {
+    width: 100%;
+    position: absolute;
+    top: -14px;
+}
+
+.vue-slider ::ng-deep{
+    .mat-accent .mat-slider-track-fill {
+        background-color: $icon-color !important;
+    }
+    .mat-slider-thumb-label {
+        background-color: $icon-color !important;
+
+    }
+    .mat-slider-thumb {
+        background-color: $icon-color !important;
+    }
+}

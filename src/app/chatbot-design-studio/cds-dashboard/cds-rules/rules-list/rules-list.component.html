@@ -1,0 +1,10 @@
+<div class="list-wrp">
+     <cds-rules-add *ngFor="let rule of listOfRules" 
+        [addMode]="false"
+        [selectedRule]="rule"
+        [listOfIntents]="listOfIntents"
+        [selectedChatbot]="selectedChatbot"
+        (onRuleAdded)="onRuleAdded($event)"
+        (onRuleDeleted)="onRuleDeleted($event)">
+    </cds-rules-add>
+</div>

@@ -1,0 +1,205 @@
+@import "./src/assets/sass/cds/_variables.scss";
+    
+.text-editor-wrapper:hover {
+    .text-editor {
+        .response-controls {
+            opacity: 1;
+        }
+    }
+}
+.text-editor-wrapper {
+    font-size: $font-size-base;
+    position: relative;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    .text-editor {
+        position: relative;
+        margin: 0;
+        padding: 0;
+
+        .response-controls {
+            position: absolute;
+            top: 10px;
+            left: 0px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            .control-button {
+                cursor: pointer;
+                color: $color-bck-gray-hex;
+                transition: color .3s;
+                height: 20px;
+                &.delete{
+                    height: 24px;
+                    width: 24px;
+                    background: $color-bck-gray-hex;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    em {
+                        font-size: 1.15em;
+                        color: $color-withe-hex;
+                        transition: color .3s;
+                    }
+                }
+            }
+            .control-button:hover{
+                color: $color-withe-hex;
+                &.delete{
+                    box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
+                    em {
+                        color: $color-red-hex;
+                    }
+                }
+            }
+        }
+
+        .box-input {
+            // width: calc(100% - 40px);
+            // margin-left: 20px;
+            width: 100%;
+            input {
+                border-radius: 8px;
+                background: $color-withe-hex;
+                border: 1px solid $color-withe-hex;
+                overflow-x: hidden;
+                overflow-y: auto;
+                // width: calc(100% - 2.5em);
+                width: 100%;
+                padding: 5px 5px;
+                color: $color-text-dark-hex;
+                font-size: 1.15em;
+                line-height: 25px;
+                resize: vertical;
+
+                &.customPrefix{
+                    padding-left: 20px;
+                    width: calc(100% - 20px);
+                }
+            }
+
+            .input-prefix {
+                position: absolute;
+                top: 14px;
+                left: 8px;
+                color: #7d7d7d;
+                font-weight: 800;
+            }
+            
+            .input-suffix {
+                position: absolute;
+                top: 14px;
+                right: 8px;
+                color: #7d7d7d;
+                font-weight: 800;
+            }
+        }
+
+        .text-editor-drop {
+            position: absolute;
+            display: inline-flex;
+            margin: 0;
+            left: 0;
+            top: -30px;
+            color: #dcdcdc;
+            cursor: grab;
+        }
+    }
+
+    .editor-utils {
+        position: relative;
+        margin: -20px 50px 0px 0px;
+        float: right;
+        .num-chars {
+            background: $color-light-gray-hex;
+            padding: 0px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            color: $color-text-box-hex;
+            float: right;
+            &.error {
+                background: $color-orange-hex;
+            }
+        }
+        .text-editor-insert-attribute {
+            float: right;
+        }
+        .moji-picker {
+            float: right;
+        }
+    }
+
+    
+}
+
+.text-editor-wrapper:hover .text-editor {
+    .response-controls {
+        opacity: 1;
+    }
+}
+
+/** TEXT **/
+mat-form-field.mat-form-field ::ng-deep {
+    .mat-form-field-infix{
+        border-top: 0px !important;
+        input{
+            &:hover{
+                border: 1px solid $icon-color !important;
+                outline: 1px solid $icon-color !important;
+            }
+        }
+    }
+}
+
+mat-form-field.mat-focused ::ng-deep {
+    .mat-form-field-wrapper {
+        .mat-form-field-flex {
+            .mat-form-field-infix {
+                display: flex;
+                input {
+                    border: 1px solid $icon-color!important;
+                    outline: 1px solid $icon-color!important;
+                    transition: border .3s;
+
+                    
+                }
+            }
+        }
+    }
+}
+mat-form-field.box-input ::ng-deep {
+    .mat-form-field-wrapper {
+        padding-bottom:0;
+        .mat-form-field-flex {
+            border-radius: 4px 4px 0 0;
+            // padding: 0 0.75em 0 0.75em;
+            padding: 0px;
+            margin: 0px;
+            background: transparent;
+        }
+    }
+    .mat-form-field-underline {
+        display: none;
+    }   
+    .mat-form-field-infix {
+        display: flex;
+        width: 100%;
+        padding: 0px;
+    } 
+}
+
+
+// Hide arrows inside the input of type number
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

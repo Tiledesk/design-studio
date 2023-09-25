@@ -1,0 +1,42 @@
+
+<div class="cds-dialog-popup-wpr" role="alertdialog" aria-describedby="popup-academy"
+    style="right: 264px; top: 66px; opacity: 1;" [ngStyle]="{'display': popup_visibility }">
+    <div>
+        <div class="cds-dialog-popup-img" role="img">
+            <!-- <div class="cds-dialog-popup-img-wpr">
+                <img src="https://tiledesk.com/wp-content/uploads/2023/02/jovana.png" style="width: 24px;" class="">
+            </div> -->
+        </div>
+
+        <div class="cds-dialog-popup-title">
+
+            <!-- Discover the new Chatbot Design Studio -->
+        </div>
+        <div class="cds-dialog-popup-content">
+
+            Remember to click the Publish button when you finish your work. Otherwise, your changes won’t be visible to
+            users.
+
+        </div>
+    </div>
+    <div class="cds-dialog-popup-btn-wpr">
+        <div role="button" class="cds-dialog-popup-btn" tabindex="0" style="user-select: none;"
+            (click)="closeRemenberToPublishPopup()">
+            {{'Done' | translate}}
+        </div>
+    </div>
+    <div class="cds-dialog-popup-close-btn" aria-label="Close" role="button" tabindex="0"
+        (click)="closeRemenberToPublishPopup()">
+        <span class="material-icons">
+            clear
+            </span>
+    </div>
+    <div class="cds-dialog-popup-arrow-wpr" style="top: -9px;">
+        <div class="cds-dialog-popup-arrow-a"></div>
+        <div class="cds-dialog-popup-arrow-b"></div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':popup_visibility}"
+    style="background-color: rgba(90,90,90,0.9); z-index: 1050 !important;">
+</div>

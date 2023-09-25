@@ -1,0 +1,38 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+.content-action {
+    margin-top: 10px;
+    height: 50px;
+    // float: left;
+    width: calc(100% - 250px);
+}
+// .content {
+//     //padding: 10px 30px;
+//     padding: 20px 0px;
+//     margin-left: 30px;
+//     margin-right: 30px;
+// }
+
+.text-editor-wrapper {
+    font-size: $font-size-base;
+    position: relative;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    // margin-bottom: 30px;    
+}
+
+.field-box {
+    display: flex;
+    flex-direction: column;
+    // width: 70%;
+    min-width: 90px;
+    gap: 10px;
+}
+
+.title-label {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 0px;
+}

@@ -1,0 +1,191 @@
+<div *ngIf="projectID" class="settings-sidebar-wpr" [class.is_opened]="IS_OPEN_SIDEBAR">
+    <ul class="settings-sidebar" style="padding-left: 0px;list-style: none;">
+
+        
+
+        <!-- ------------------------------------------------------- -->
+        <!-- @ Bot Intents -->
+        <!-- ------------------------------------------------------- -->
+        <ng-container *ngIf="USER_ROLE !== 'agent'">
+            <li [ngClass]="{'active-item': INTENTS_ROUTE_IS_ACTIVE}" (click)="goTo(SIDEBAR_PAGES.INTENTS)"
+                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="Blocks" #tooltip="matTooltip"
+                matTooltipPosition='right' matTooltipHideDelay="100" [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+                <a>
+                    <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false"
+                        class="material-icons-outlined settings-sidebar-icons">
+                        textsms
+                    </i>
+                    <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
+                        Blocks
+                    </p>
+                </a>
+            </li>
+        </ng-container>
+
+        <!-- ------------------------------------------------------- -->
+        <!-- @ Bot Fulfillment-->
+        <!-- ------------------------------------------------------- -->
+        <ng-container *ngIf="USER_ROLE !== 'agent'">
+            <li [ngClass]="{'active-item': FULFILLMENT_ROUTE_IS_ACTIVE }" (click)="goTo(SIDEBAR_PAGES.FULFILLMENT)"
+                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="Fulfillment" #tooltip="matTooltip"
+                matTooltipPosition='right' matTooltipHideDelay="100" [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+                <a>
+                    <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false"
+                        class="material-icons-outlined settings-sidebar-icons">
+                        offline_bolt
+                    </i>
+                    <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
+                        Fulfillment
+                    </p>
+                </a>
+            </li>
+        </ng-container>
+
+        <!-- ------------------------------------------------------- -->
+        <!-- Bot Training -->
+        <!-- ------------------------------------------------------- -->
+        <!-- <ng-container>
+            <li [ngClass]="{'active-item': TRAINING_ROUTE_IS_ACTIVE}" (click)="goTo('training')"
+            matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="{{'Training' | translate}}"
+            #tooltip="matTooltip" matTooltipPosition='right' matTooltipHideDelay="100" [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+            <a>
+                <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons settings-sidebar-icons">
+                school
+                </i>
+                <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
+                {{'Training' | translate}}
+                </p>
+            </a>
+            </li>
+        </ng-container> -->
+
+        <!-- ------------------------------------------------------- -->
+        <!-- Bot Rules -->
+        <!-- ------------------------------------------------------- -->
+        <ng-container>
+            <li [ngClass]="{'active-item': TRAINING_ROUTE_IS_ACTIVE}" (click)="goTo(SIDEBAR_PAGES.RULES)"
+                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" 
+                matTooltip="{{'Rules' | translate}}"
+                #tooltip="matTooltip" 
+                matTooltipPosition='right' 
+                matTooltipHideDelay="100"
+                [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+                <a>
+                    <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false"
+                        class="material-icons-outlined settings-sidebar-icons">
+                        <span class="material-icons">format_list_bulleted_add </span>
+                    </i>
+                    <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
+                        {{'Rules' | translate}}
+                    </p>
+                </a>
+            </li>
+        </ng-container>
+
+
+        <!-- -------------------------------------------------------- -->
+        <!--  @ Bot general settings  -->
+        <!-- -------------------------------------------------------- -->
+        <ng-container *ngIf="USER_ROLE !== 'agent'">
+            <li [ngClass]="{'active-item': GENERAL_ROUTE_IS_ACTIVE}" (click)="goTo(SIDEBAR_PAGES.SETTINGS)"
+                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" 
+                matTooltip="{{'General' | translate}}"
+                #tooltip="matTooltip" 
+                matTooltipPosition='right' 
+                matTooltipHideDelay="100">
+
+                <div class="sidebar-bot-profile-img-wpr" style="width: 0%;">
+                    <img *ngIf="botProfileImageExist === true || botImageHasBeenUploaded === true"
+                        class="sidebar-bot-profile-img" [src]="botProfileImageurl"
+                        onerror="this.src='assets/img/avatar_bot_tiledesk.svg'" />
+
+                    <img *ngIf="botProfileImageExist === false && botImageHasBeenUploaded !== true"
+                        class="sidebar-bot-profile-img" src="assets/img/avatar_bot_tiledesk.svg" />
+                </div>
+                <a>
+                    <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph"
+                        style="position: relative;left: 27px;margin-top: 8px;">
+                        {{ faqKb_name_truncated }}
+                        <!-- matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="{{'BotLanguage' | translate}}"
+                        #tooltip="matTooltip" matTooltipPosition='right' matTooltipHideDelay="100" -->
+                        <span class="bot-lang-badge">
+                            {{ bot_lang_in_badge }}
+                        </span>
+                    </p>
+
+                    <div class="settings-icon-wpr"
+                        style="float: right;height: 30px; width: 30px; position: relative;top: 5px;">
+                        <i *ngIf="IS_OPEN_SIDEBAR === true" class="material-icons-outlined settings-sidebar-icons">
+                            settings
+                        </i>
+                    </div>
+                </a>
+            </li>
+        </ng-container>
+    </ul>
+</div>
+
+
+<div class="content" [class.is_opened]="IS_OPEN_SIDEBAR">
+
+    <div id="cds-sb-intents" name="intents" class="section" (click)="goTo(SIDEBAR_PAGES.INTENTS)"
+        matTooltipClass="cds-mat-tooltip" 
+        matTooltip="Blocks" 
+        #tooltip="matTooltip"
+        matTooltipPosition='right' 
+        matTooltipHideDelay="100" 
+        [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+        <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons-outlined item-icon">
+            sms
+        </i>
+        <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
+            Blocks
+        </p>
+    </div>
+
+    <div id="cds-sb-fulfillment" name="fulfillment" class="section" (click)="goTo(SIDEBAR_PAGES.FULFILLMENT)"
+            matTooltipClass="cds-mat-tooltip" 
+            matTooltip="Fulfillment" 
+            #tooltip="matTooltip"
+            matTooltipPosition='right' 
+            matTooltipHideDelay="100" 
+            [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+        <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons-outlined item-icon">
+            offline_bolt
+        </i>
+        <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
+            Fulfillment
+        </p>
+    </div>
+
+    <div id="cds-sb-rules" name="rules" class="section" (click)="goTo(SIDEBAR_PAGES.RULES)"
+        matTooltipClass="cds-mat-tooltip" 
+        matTooltip="{{'Rules' | translate}}"
+        #tooltip="matTooltip" 
+        matTooltipPosition='right' 
+        matTooltipHideDelay="100"
+        [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+        <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons-outlined item-icon">
+            <span class="material-icons">format_list_bulleted_add</span>
+        </i>
+        <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
+            {{'Rules' | translate}}
+        </p>
+    </div>
+
+    <div id="cds-sb-settings" name="settings" class="section" (click)="goTo(SIDEBAR_PAGES.SETTINGS)"
+        matTooltipClass="cds-mat-tooltip" 
+        matTooltip="{{'General' | translate}}"
+        #tooltip="matTooltip" 
+        matTooltipPosition='right' 
+        matTooltipHideDelay="100"
+        [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+        <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons-outlined item-icon">
+            settings
+        </i>
+        <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
+            Settings
+        </p>
+    </div>
+
+</div>

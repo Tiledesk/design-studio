@@ -1,0 +1,294 @@
+@import "./src/assets/sass/cds/_variables.scss";
+/** GENERIC **/
+
+/*
+Ellips text
+*/
+.ellips {
+    line-height: inherit;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden !important;
+}
+
+/* PANEL INTENT DETAIL */
+// .content-panel-intent-detail {
+//     padding: 0;
+//     margin: 0;
+// }
+
+.content-panel-intent-detail {
+    padding: 20px 0 30px;
+    margin-left: 30px;
+    margin-right: 30px;
+    // overflow: auto; // nk
+    // max-height: calc(100vh - 200px); // nk
+
+}
+.footer-panel-intent-detail {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    // left: 0;
+    // right: 0;
+    background-color: #51627e;
+    z-index: 2;
+    height: 42px;
+    margin: auto 0;
+    padding: 7px 20px;
+    border-top: 2px solid rgb(66, 85, 117);
+}
+
+.cds-custom-tooltip {
+    background-color: #fff;
+    color: #555555;
+    font-size: 12px;
+    border-radius: 2px;
+    font-family: "Poppins";
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border: 1px solid #e5effe;
+}
+
+emoji-mart {
+    border: 0;
+    margin-top: 12px;
+    float: right;
+    ::ng-deep section.emoji-mart {
+        border: 0;
+    }
+}
+.emoji-picker {
+    .emoji-picker-button {
+        align-items: center;
+        background: #fff;
+        border-radius: 100%;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
+        cursor: pointer;
+        display: flex;
+        height: 23px;
+        justify-content: center;
+        margin-right: 5px;
+        width: 23px;
+        color: #647283;
+        &:hover {
+            background: #006cff;
+            color: #fff;
+        }
+    }
+}
+
+.cds-action-preview {
+    /* padding: 3px 16px 16px; */
+    padding: 5px 10px;;
+    margin: 0px;;
+    position: relative;
+}
+.action-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-direction: row;
+}
+
+.action-row-left {
+    height: 20px;
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-row-right {
+    font-size: 12px;
+    font-weight: 400;
+    color: $brown-85;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.action-row-right.empty,
+.set-attribute-value.empty {
+    background: none !important;
+    color: $empty-element-property !important;
+    font-size: 12px !important;
+    padding: unset !important;
+}
+
+.action-row .action-row-left svg {
+    fill: $brown-85;
+}
+
+.web-request-action-method {
+    font-weight: 500;
+    font-size: 14px;
+    color: $brown-85;
+}
+
+
+/* Intent Controls
+/* ------------------------ */
+.panel-intent-content:hover cds-panel-intent-controls > .intent-header-actions-container-on-start {
+    top: -28px!important;
+    right: 12px !important;
+}
+.panel-intent-content:hover cds-panel-intent-controls > .intent-header-actions-container {
+    top: -28px;
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+/* Action Controls
+/* ------------------------ */
+.body-action > cds-action-controls > .action-controls {
+    opacity: 0;
+    padding: 5px 10px 5px 5px;
+    pointer-events: none;
+    position: absolute;
+    right: calc(100% - 10px);
+    // top: -5px;
+    top: -4px;
+    transition: opacity 0.2s, -webkit-transform 0.2s;
+    transition: opacity 0.2s, transform 0.2s;
+    transition: opacity 0.2s, transform 0.2s, -webkit-transform 0.2s;
+    z-index: 1;
+    display: inline-flex;
+}
+.body-action:hover > cds-action-controls > .action-controls {
+    opacity: 1;
+    pointer-events: auto;
+    -webkit-transform: translateX(-10px);
+    transform: translateX(-10px);
+}
+
+.action-control-btns-wpr {
+    z-index: 10;
+    // background-color: #ebe2c6; 
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(0, 27, 71, 0.08) 0px 3px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    padding: 2px 6px;
+    border-radius: 14px;
+    height: 25px;
+    // gap: 8px;
+}
+
+.action-control-btn:first-child {
+    border-left: unset;
+}
+.action-control-btn {
+    cursor: pointer;
+    border-left: solid 1px $border-light;
+    padding: 0 6px;
+    height: 16px;
+    // width: 13px;
+  
+}
+
+.action-control-btn:hover svg {
+    fill: #3ea9f5;
+}
+
+/* Add action menu
+/* ****************************************** */
+.menu--context--add {
+    -webkit-touch-callout: none;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    // background: hsla(0,0%,100%,.95);
+    // border-radius: 5px;
+    // -webkit-box-shadow: 0 6px 24px 0 rgba(0,0,0,.3);
+    // box-shadow: 0 6px 24px 0 rgba(0,0,0,.3);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    // overflow-y: auto;
+    pointer-events: all;
+    position: absolute;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 270px;
+    z-index: 1;
+    overflow: scroll;
+}
+
+// https://www.codewithrandom.com/2023/05/01/ripple-effect-css/
+@keyframes ripple_effect {
+    0% {
+        box-shadow: 0 0 0 0 #a09e9e44, 0 0 0 0 #a09e9e44;
+    }
+    80% {
+        box-shadow: 0 0 0 20px #fff0, 0 0 0 40px #fff0;
+    }
+    100% {
+        box-shadow: 0 0 0 0 #fff0, 0 0 0 0 #fff0;
+    }
+}
+
+/** CONNECTOR TRUE/FALSE **/
+cds-connector.connector-true {
+    .point-connector-empty{
+        border-color: $success-connector;
+        background: $success-connector;
+    }
+    .point-connector{
+        background: $success-connector;
+    }
+}
+
+cds-connector.connector-false {
+    .point-connector-empty{
+      border-color: $failure-connector;
+      background: $failure-connector;
+    }
+    .point-connector{
+      background: $failure-connector;
+    }
+}
+
+cds-connector.connector {
+    position: absolute;
+    right: -25px;
+    top: calc(50% - 10px);
+}
+
+cds-connector.button-connector {
+    position: absolute;
+    right: -15px;
+    top: calc(50% - 10px);
+}
+
+cds-connector.connector-true,
+cds-connector.connector-false {
+    position: absolute;
+    right: -25px;
+    top: calc(50% - 10px);
+}
+
+
+::ng-deep .cds-mat-tooltip {
+    background-color: #2d323e !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
+    font-family: "Poppins", "Roboto", "Arial", sans-serif !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+
+::ng-deep .mat-expansion-indicator::after {
+color: white;
+}
+
+
+.preview-divider {
+    margin: 5px 0px;
+    border-top: 2px solid rgba( $base-blue , 0.3);
+}

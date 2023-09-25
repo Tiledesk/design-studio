@@ -1,0 +1,47 @@
+<div class="chatbot-developer-wpr">
+    <div class="row">
+        <div class="col-sm-10 col-md-10">
+            <h3 class="card_title__underlined" style="color: #e8eaed;">
+                <span class="card_title__underline">
+
+                    <!-- {{ "UserProfile.Profile" | translate }} -->
+                    Token
+                </span>
+            </h3>
+        </div>
+        <div class="col-sm-10 col-md-10">
+          <div class="section-subtitle"> </div>
+        </div>
+    </div>
+
+    <!-- --------------------------------------------------- -->
+    <!-- TOKEN Section title -->
+    <!-- --------------------------------------------------- -->
+    <div class="section-title" style="margin-left: 22px;">
+        Click the "Get Token" button to generate the chatbot token
+    </div>
+  
+  
+    <div class="row">
+        <div class="col-sm-10 col-md-10 token-btn-wpr">
+           <div class="input-wrp">
+                <input id="jwt" name="jwt" [(ngModel)]="jwt" class="input csd-chatbot-dtls-input"
+                    type="text" style="margin-bottom: 0px; color:#808080"
+                    placeholder="{{ 'JWT' | translate }}">
+                <span class="material-icons copy" (click)="copyToClipBoard()">content_copy</span>
+           </div>
+            <button class="btn btn-primary cds-blue-button" (click)="generateToken()">
+                <span class="icon" style="padding-right:8px">
+                <span class="material-icons">
+                    key
+                </span>
+                </span>
+                <!-- {{'ImportFromCSV' | translate }} -->
+                Get token
+            </button>
+        </div>
+    </div>
+
+</div>
+
+

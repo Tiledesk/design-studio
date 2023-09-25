@@ -1,0 +1,132 @@
+<div class="extensions-response" *ngIf="!previewMode">
+
+    <div class="text-editor-drop">
+        <em class="material-icons">drag_indicator</em>
+    </div> 
+
+    <div class="response-controls">
+        <div class="control-button delete" (click)="$event.stopPropagation();onDeleteActionReply()">
+           <em class="material-icons">delete</em>
+       </div>
+       <div class="control-button" (click)="$event.stopPropagation();onMoveUpResponse()">
+           <em class="material-icons">expand_less</em>
+       </div> 
+       <div class="control-button" (click)="$event.stopPropagation();onMoveDownResponse()">
+           <em class="material-icons">expand_more</em>
+       </div>
+    </div>
+
+    <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+        <appdashboard-delay-slider
+            [delayTime]="delayTime"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-slider>
+    </div>
+    <div class="filter-wrapper" *ngIf="canShowFilter || response._tdJSONCondition?.conditions?.length > 0">
+        <appdashboard-filter
+            [expression]="response._tdJSONCondition"
+            [booleanOperators]="booleanOperators"
+            [previewMode]="previewMode"
+            (onChangeExpression)="onChangeExpression($event)">
+        </appdashboard-filter>
+    </div>
+</div>
+
+<div class="previewMode image-editor-wrapper" *ngIf="previewMode">
+    
+    <div class="image-editor">
+        <div *ngIf="!response.metadata.src" class="response-image-uploader-wrapper no-image">
+            <div class="image"><img src="assets/cds/images/icons/add_image.svg"></div>
+            <div class="text">Click to add image</div>
+        </div>
+        <div *ngIf="response.metadata.src" class="response-image-uploader-wrapper">
+            <cds-image-upload
+                class="image-upload"
+                [metadata] = response.metadata
+                (onChangeMetadata)="onChangeMetadata($event)">
+            </cds-image-upload>
+        </div>
+
+        <div>
+            <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
+            <div class="response-wrp no-text" *ngIf="!response.text">Click to add text ...</div>
+        </div>
+
+    </div>
+
+</div>
+    
+<div class="image-editor-wrapper" *ngIf="!previewMode">
+        
+        <div class="image-editor">
+    
+            <div class="response-image-uploader-wrapper">
+                <cds-image-upload
+                    class="image-upload"
+                    [metadata] = response.metadata
+                    (onChangeMetadata)="onChangeMetadata($event)">
+                </cds-image-upload>
+                <div *ngIf="response.metadata.src" class="control-button delete" (click)="$event.stopPropagation();onDeletePathElement()">
+                    <em class="material-icons">clear</em>
+                </div>
+            </div>
+
+            <cds-textarea 
+                class="text-editable-div"
+                [text]="response.text" 
+                [minRow]="1"
+                popoverVerticalAlign="above"
+                (changeTextarea)="onChangeTextarea($event)">
+            </cds-textarea>
+
+        </div> 
+
+</div>
+
+<div class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
+    
+    <div *ngFor="let button of buttons; let i = index;" class="tpl-drop-down content-botton-reply" cdkDragBoundary=".button-replies" cdkDrag> 
+   
+        <div class="button-reply custom-placeholder" *cdkDragPlaceholder>
+            <div class="button-reply-text">
+                {{button.value}}
+            </div>
+        </div>
+
+        <div class="button-reply" cdkDragHandle>
+            <div class="button-reply-text single-btn-reply"
+                (click)="$event.stopPropagation(); onOpenButtonPanel(button)">
+                {{button.value}}
+            </div>
+            <div class="button-controls">
+                
+                <!-- <div class="buttonsToMove">
+                    <div class="control-button" (click)="onMoveLeftButton(i)">
+                        <em class="material-icons">chevron_left</em>
+                    </div> 
+                    <div class="control-button" (click)="onMoveRightButton(i)">
+                        <em class="material-icons">chevron_right</em>
+                    </div>
+                </div> -->
+
+                <div class="control-button delete" (click)="$event.stopPropagation();onDeleteButton(i)">
+                    <em class="material-icons">delete</em>
+                </div>
+
+           </div>
+        </div>
+
+        <cds-connector *ngIf="previewMode"
+            class="button-connector"
+            cdkDragDisabled
+            [idConnector]="button.__idConnector"
+            [isConnected]="button.__isConnected">
+        </cds-connector>
+        
+    </div>
+
+    <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onCreateNewButton()">
+    + Add button
+    </div>
+</div>

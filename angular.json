@@ -12,7 +12,7 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "app",
+      "prefix": "cds",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -28,9 +28,17 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/assets/sass/cds/styles.scss",
+              "node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "node_modules/material-icons/iconfont/material-icons.css",
+              "node_modules/roboto-fontface/css/roboto/roboto-fontface.css",
+              "node_modules/@ctrl/ngx-emoji-mart/picker.css"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/js/mqtt/4.1.0/mqtt.min.js",
+              "node_modules/moment/moment.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -53,6 +61,29 @@
                 }
               ],
               "outputHashing": "all"
+            },
+            "pre": {
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": false,
+                  "inlineCritical": true
+                },
+                "fonts": true
+              },
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.pre.ts"
+                }
+              ]
             },
             "development": {
               "buildOptimizer": false,

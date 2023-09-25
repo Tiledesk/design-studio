@@ -1,0 +1,78 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+
+
+.text-editor-wrapper {
+    font-size: $font-size-base;
+    position: relative;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 50px 0px 20px 0px;
+    .text-editor {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        .response-controls {
+            position: absolute;
+            top: 10px;
+            left: 0px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+    }
+}
+    
+.text-editor-wrapper:hover {
+    .text-editor {
+        .response-controls {
+            opacity: 1;
+        }
+    }
+}
+
+.box-textarea {
+    width: calc(100% - 40px);
+    margin-left: 20px;
+    textarea {
+        border-radius: 8px;
+        background: $color-withe-hex;
+        border: 1px solid $color-withe-hex;
+        overflow-x: hidden;
+        overflow-y: auto;
+        width: calc(100% - 2.5em);
+        padding: 20px 20px;
+        color: $color-text-dark-hex;
+        font-size: 1.15em;
+        line-height: 25px;
+        resize: vertical;
+    }
+}
+
+/** TEXT AREA **/
+mat-form-field.mat-focused ::ng-deep {
+    .mat-form-field-wrapper {
+        .mat-form-field-flex {
+            .mat-form-field-infix {
+                textarea {
+                    border: 1px solid $color-blue-hex!important;
+                    outline: 1px solid $color-blue-hex!important;
+                    transition: border .3s;
+                }
+            }
+        }
+    }
+}
+mat-form-field.box-textarea ::ng-deep {
+    .mat-form-field-wrapper {
+        padding-bottom:0;
+        .mat-form-field-flex {
+            border-radius: 4px 4px 0 0;
+            padding: 0 0.75em 0 0.75em;
+            margin: 0;
+        }
+    }
+    .mat-form-field-underline {
+        display: none;
+    }    
+}

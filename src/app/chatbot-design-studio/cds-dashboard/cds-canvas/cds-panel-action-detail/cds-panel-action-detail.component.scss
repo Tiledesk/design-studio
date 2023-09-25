@@ -1,0 +1,114 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+$margin-left: 10px;
+$padding: 10px; 
+
+.panel-intent-detail {
+    // position: relative;
+    display: block;
+    width: 480px;
+    min-width: 400px;
+    height: 100%; //auto
+    max-height: 100%;
+    // border-radius: 16px;
+    // border: 2px solid rgb(178,142,38);
+    // border-left: 2px solid rgb(178,142,38);
+    overflow: hidden;
+    padding: 0;
+    background-color: #51627e;
+    // margin: 0 auto 0 auto; // nk
+    inset: 0 0 0 200px;
+}
+
+.header-panel {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #51627e;
+    z-index: 2;
+}
+.content-panel{
+    // height: calc(100% - 73px); // nk
+    height: calc(100% - 100px); // nk
+    // overflow: hidden; // nk
+    overflow: hidden auto;
+}
+
+.panel-form { 
+    height: 100%;
+    min-height: 400px;
+}
+// .panel-response {
+//     position: relative;
+//     display: inline-block;
+//     vertical-align: top;
+//     width: calc(100% - 100px);
+//     max-height: 100%;
+//     height: auto;
+//     overflow: hidden;
+//     border-radius: 0.6em;
+//     background-color: rgb($bg-color-card-rgb);
+//     margin-left: $margin-left;
+//     font-family: 'Poppins','Roboto', 'Arial', sans-serif;
+//     color: #394f5a; 
+//     font-size: 1em;
+//     padding: $padding;
+// }
+
+// .panel-tools-response {
+//     position: relative;
+//     display: inline-flex;
+//     vertical-align: top;
+//     width: auto;
+//     margin-left: 10px;
+//     max-height: 100%;
+//     height: fit-content;
+//     overflow: hidden;
+//     border-radius: 0.6em;
+//     background-color: rgb($bg-color-card-rgb);
+//     font-family: 'Poppins','Roboto', 'Arial', sans-serif;
+//     color: #394f5a;
+//     font-size: 1em;
+//     padding: $padding;
+// }
+
+
+
+
+.card-buttons {
+    position: absolute;
+    display: none;
+    top: 0;
+    right: 0;
+    margin: 0;
+    outline: none;
+    width: 380px;
+    height: 100%;
+    color: #fff;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: transparent;
+    overflow: visible;
+    z-index: 14;
+    border-radius: 1em;
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+                0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    &.active{
+        display: block;
+    }
+}
+  
+
+.card-buttons-handle {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: #ccc;
+    cursor: move;
+    width: 24px;
+    height: 24px;
+    z-index: 1;
+}

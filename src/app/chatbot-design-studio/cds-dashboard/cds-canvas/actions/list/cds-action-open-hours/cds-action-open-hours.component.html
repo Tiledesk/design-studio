@@ -1,0 +1,106 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+    
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img src="assets/cds/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">
+            <b>OPEN</b>
+        </label>
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+        
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">else</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+
+<div *ngIf="!previewMode">
+    <div class="content-panel-intent-detail">
+
+        <!-- trueIntent -->
+        <div style="margin-bottom: 20px;">
+
+            <div class="condition-container">
+                <div class="icon-action">
+                    <img src="assets/cds/images/icons/if_condition.svg">
+                </div>
+                <span class="condition-text">OPEN</span>
+            </div>
+    
+            <div class="select-box" id="intentSelect">
+                <cds-select 
+                    id="text-condition" 
+                    [items]="listOfIntents" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'" 
+                    [itemSelected]="action?.trueIntent" 
+                    [placeholder]="'Select a block'"
+                    [clearable]="true" 
+                    (onSelected)="onChangeSelect($event, 'trueIntent')"
+                    (onReset)="onResetBlockSelect($event, 'trueIntent')">
+                </cds-select>
+            </div>
+            <!-- <cds-attributes 
+                class="cds-attributes" 
+                [attributes]="trueIntentAttributes"
+                (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+            </cds-attributes> -->
+
+        </div>
+    
+        <!-- falseIntent -->
+        <div>
+            <div class="condition-container">
+                <span class="condition-text">Else</span>
+            </div>
+            <div class="select-box" id="intentSelect">
+                <cds-select 
+                    id="text-condition" 
+                    [items]="listOfIntents" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'" 
+                    [itemSelected]="action?.falseIntent" 
+                    [placeholder]="'Select a block'"
+                    [clearable]="true" 
+                    (onSelected)="onChangeSelect($event, 'falseIntent')"
+                    (onReset)="onResetBlockSelect($event, 'falseIntent')">
+                </cds-select>
+            </div>
+            <!-- <cds-attributes 
+                class="cds-attributes" 
+                [attributes]="action.falseIntentAttributes"
+                (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+            </cds-attributes> -->
+        </div>
+    
+    </div>
+    
+    
+    <div class="footer-panel-intent-detail">
+        <div class="disable-input-message">
+            <section class="disable-input-message-section">
+                <mat-checkbox 
+                    [checked]="action.stopOnConditionMet"
+                    (change)="onStopConditionMeet()">
+                    {{"Stop on condition met" | translate}}
+                </mat-checkbox>
+            </section>
+        </div>
+    </div>
+</div>
+

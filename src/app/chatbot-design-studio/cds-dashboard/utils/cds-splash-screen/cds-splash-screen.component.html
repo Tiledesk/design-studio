@@ -1,0 +1,46 @@
+<div class="cds-ss-main-content">
+    <div class="cds-ss-welcome-wpr">
+        <div class="cds-ss-img">
+            <svg xml:space="preserve"
+            xmlns:xlink="http://www.w3.org/1999/xlink" height="30px" viewBox="0 0 60 60" width="30px" x="0px"
+            xmlns="http://www.w3.org/2000/svg" y="0px" style="    position: relative; left: -1px;">
+            <path
+              d="M51.8,28.2h-19c-1.7,0-3-1.3-3-3V6.4c0-1.7-1.3-3-3-3H8c-1.7,0-3,1.3-3,3v22v22c0,1.7,1.3,3,3,3H6.7h3.4  c0.8,0,1.3,0.2,1.9,0.8l2.3,2.3l2.1,2.1c0.8,0.8,1.7,0.8,2.4,0l2.1-2.1l2.3-2.3c0.6-0.6,1.1-0.8,1.9-0.8H52c1.7,0,3-1.3,3-3V31.2  C54.8,29.5,53.5,28.2,51.8,28.2"
+              fill="#F18876"></path>
+            <path 
+              d="M52,24.2H36.8c-1.5,0-2.8-1.3-2.8-2.8V6.2c0-1.5,1.3-2.8,2.8-2.8H52c1.5,0,2.8,1.3,2.8,2.8v15.2  C54.8,22.9,53.5,24.2,52,24.2"
+              fill="#E5BBAD"></path>
+          </svg>
+        </div>
+        <div class="cds-ss-txt">
+            Chatbot design studio
+        </div>
+    </div>
+
+    <!-- ******* VIDEO SECTION ******* -->
+    <div class="welcome_video" *ngIf="canShowVideo">
+        <div class="welcome_subtitle" [innerHTML]="videoDescription"></div>
+        <iframe 
+            width="500" 
+            height="345" 
+            [src]="url" 
+            frameborder="0" 
+            allowfullscreen 
+            allow='autoplay;encrypted-media;'>
+        </iframe>
+    </div>
+
+     <!-- ******* TEXT + BUTTON SECTION ******* -->
+    <div class="welcome_subtitle" [innerHTML]="text"></div>
+    <div class="button-wrp">
+        <!-- <div class="new-rules-button" (click)="addNew()">
+            <span class="material-icons icon plus-icon">add</span>
+            <p class="button-text">Add</p>
+        </div> -->
+
+        <button id="cds-ss-add-intent-btn" type="button" class="btn btn-primary cds-blue-button" (click)="onAdd()"> 
+            <span class="material-icons icon plus-icon">add</span>
+            Add
+        </button>
+    </div>
+</div>

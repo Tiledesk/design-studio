@@ -1,0 +1,138 @@
+
+<div 
+    #panel_detail_div
+    id="panel_detail_div"
+    class="actions-drawer" 
+    [style.width.px]="isOpenPanelDetail?450:0"
+    direction="left"
+    class="sc-jLMTHI sc-cBOif dpwGNg emOHWc">
+    <section id="vf-block-editor" class="sc-cWFgSD oAojv">
+        <header class="sc-cVVGlL irFMbu">
+            <div class="sc-ispOId sc-hYdjyz gvYlug MHLRR">Intent</div>
+            <div class="sc-ispOId sc-duSInm sc-fXMkjo gvYlug hrbVf bCXazO">
+                <div class="vf-tooltip" style="display: inline;">
+                    <div class="sc-dLVcNx jaaatM">
+                        <div class="sc-bYWUiG cKnnmt"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="sc-cBuMWM sc-gPEuOb iZOUDG hhBKxP">
+
+            <!-- <cds-panel-button-configuration
+                [button] = elementSelected
+                (closeButtonPanel) = onClosePanel()
+                (saveButton) = onSaveElement($event)>
+            </cds-panel-button-configuration> -->
+
+        </div>
+
+
+    </section>
+
+
+
+    <div class="panel-intent-detail">
+        <div class="header-panel">
+           // header
+        </div>
+    
+        <div id="content-panel" class="content-panel">
+
+            <!-- <div *ngIf="elementIntentSelectedType === typeIntentElement.ACTION" >
+                <div *ngFor="let item of elementSelectedMaxLength, let i = index" >
+                    <div *ngIf="i === elementSelectedIndex" [ngSwitch]="elementSelected._tdActionType">
+        
+                        <cds-action-reply *ngSwitchCase="typeAction.REPLY"
+                            class="panel-response"
+                            [typeAction]="typeAction.REPLY"
+                            [reply]="elementSelected"
+                            [intent_display_name]="elementIntentSelected.intent_display_name"
+                            [listOfActions]="listOfActions">
+                        </cds-action-reply>
+        
+                        <cds-action-reply *ngSwitchCase="typeAction.RANDOM_REPLY"
+                            class="panel-response"
+                            [typeAction]="typeAction.RANDOM_REPLY"
+                            [reply]="elementSelected"
+                            [intent_display_name]="elementIntentSelected.intent_display_name"
+                            [listOfActions]="listOfActions">
+                        </cds-action-reply>
+        
+                        <cds-action-web-request *ngSwitchCase="typeAction.WEB_REQUEST"
+                            [action]="elementSelected">
+                        </cds-action-web-request>
+                
+                        <cds-action-wait *ngSwitchCase="typeAction.WAIT"
+                            [action]="elementSelected">
+                        </cds-action-wait>
+                
+                        <cds-action-intent *ngSwitchCase="typeAction.INTENT"
+                            class="panel-response"
+                            [action]="elementSelected"
+                            [intents]="listOfActions">
+                        </cds-action-intent>
+                
+                        <cds-action-email *ngSwitchCase="typeAction.EMAIL"
+                            class="panel-response"
+                            [action]="elementSelected">
+                        </cds-action-email>
+                    
+                        <cds-action-json-condition *ngSwitchCase="typeAction.JSON_CONDITION"
+                            [action]="elementSelected"
+                            [listOfActions]="listOfActions">
+                        </cds-action-json-condition>
+                
+                        <cds-action-assign-variable *ngSwitchCase="typeAction.ASSIGN_VARIABLE"
+                            [action]="elementSelected">
+                        </cds-action-assign-variable>
+        
+                        <cds-action-assign-function *ngSwitchCase="typeAction.ASSIGN_FUNCTION"
+                            [action]="elementSelected">
+                        </cds-action-assign-function>
+                    
+                        <cds-action-delete-variable *ngSwitchCase="typeAction.DELETE_VARIABLE"
+                            [action]="elementSelected">
+                        </cds-action-delete-variable>
+                    
+                        <cds-action-online-agents *ngSwitchCase="typeAction.ONLINE_AGENTS"
+                            [listOfActions] = "listOfActions"    
+                            [action]="elementSelected">
+                        </cds-action-online-agents>
+                
+                        <cds-action-open-hours *ngSwitchCase="typeAction.OPEN_HOURS"
+                            [listOfActions] = "listOfActions"
+                            [action]="elementSelected">
+                        </cds-action-open-hours>
+                    
+                        <cds-action-hide-message *ngSwitchCase="typeAction.HIDE_MESSAGE"
+                            [action]="elementSelected">
+                        </cds-action-hide-message>
+        
+                        <cds-action-replace-bot *ngSwitchCase="typeAction.REPLACE_BOT"
+                            [action]="elementSelected">
+                        </cds-action-replace-bot>
+        
+                        <cds-action-change-department *ngSwitchCase="typeAction.CHANGE_DEPARTMENT"
+                            [action]="elementSelected">
+                        </cds-action-change-department>
+        
+                        <cds-action-agent *ngSwitchCase="typeAction.AGENT"
+                            [action]="elementSelected">
+                        </cds-action-agent>
+        
+                        <cds-action-close *ngSwitchCase="typeAction.CLOSE"
+                            [action]="elementSelected">
+                        </cds-action-close>
+        
+                    </div>
+                </div>
+            </div> -->
+    
+        </div>
+    
+    </div>
+
+</div>
+

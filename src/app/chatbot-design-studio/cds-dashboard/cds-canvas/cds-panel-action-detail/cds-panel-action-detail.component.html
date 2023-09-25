@@ -1,0 +1,254 @@
+<div class="panel-intent-detail">
+    <div class="header-panel">
+        <cds-action-description
+            [actionSelected]="elementIntentSelectedType === typeIntentElement.ACTION? elementSelected : null"
+            [elementType]="elementIntentSelectedType"
+            [showTip]="elementIntentSelectedType === typeIntentElement.ACTION? true : false"
+            [previewMode]="false">
+        </cds-action-description>
+    </div>
+
+    <div id="content-panel" class="content-panel">
+        <div *ngIf="elementIntentSelectedType === typeIntentElement.ACTION" >
+           
+            <!-- <div *ngFor="let item of elementSelectedMaxLength, let i = index" > 
+                 *ngIf="i === elementSelectedIndex" 
+                -->
+                
+                <div [ngSwitch]="elementSelected._tdActionType">
+
+                    <cds-action-reply *ngSwitchCase="typeAction.REPLY"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-reply>
+
+                    <cds-action-reply *ngSwitchCase="typeAction.RANDOM_REPLY"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-reply>
+
+                    <cds-action-intent *ngSwitchCase="typeAction.INTENT"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-intent>
+
+                    <cds-action-email *ngSwitchCase="typeAction.EMAIL"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-email>
+
+                    <cds-action-online-agents *ngSwitchCase="typeAction.ONLINE_AGENTS"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"   
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-online-agents>
+
+                    <cds-action-open-hours *ngSwitchCase="typeAction.OPEN_HOURS"
+                        class="panel-response"   
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-open-hours>
+
+                    <cds-action-agent *ngSwitchCase="typeAction.AGENT"
+                        class="panel-response"    
+                        [action]="elementSelected"
+                        [previewMode]="false">
+                    </cds-action-agent>
+
+                    <cds-action-wait *ngSwitchCase="typeAction.WAIT"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-wait>
+
+                    <cds-action-change-department *ngSwitchCase="typeAction.CHANGE_DEPARTMENT"
+                        class="panel-response"    
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-change-department>
+
+                    <cds-action-close *ngSwitchCase="typeAction.CLOSE"
+                        class="panel-response"    
+                        [action]="elementSelected"
+                        [previewMode]="false">
+                    </cds-action-close>
+
+                    <cds-action-json-condition *ngSwitchCase="typeAction.JSON_CONDITION"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-json-condition>
+
+                    <cds-action-replace-bot *ngSwitchCase="typeAction.REPLACE_BOT"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-replace-bot>
+
+                    <cds-action-assign-variable *ngSwitchCase="typeAction.ASSIGN_VARIABLE"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-assign-variable>
+
+                    <cds-action-delete-variable *ngSwitchCase="typeAction.DELETE_VARIABLE"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-delete-variable>
+
+                    <cds-action-hide-message *ngSwitchCase="typeAction.HIDE_MESSAGE"
+                        class="panel-response"   
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-hide-message>
+
+                    <cds-action-web-request *ngSwitchCase="typeAction.WEB_REQUEST"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-web-request>
+
+                    <cds-action-web-request-v2 *ngSwitchCase="typeAction.WEB_REQUESTV2"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-web-request-v2>
+
+                    <cds-action-whatsapp-attribute *ngSwitchCase="typeAction.WHATSAPP_ATTRIBUTE"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-whatsapp-attribute>
+
+                    <cds-action-whatsapp-static *ngSwitchCase="typeAction.WHATSAPP_STATIC"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [intentName]="intentSelected.intent_display_name"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-whatsapp-static>
+                    
+                    <cds-action-askgpt *ngSwitchCase="typeAction.ASKGPT"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-askgpt>
+
+                    <cds-action-gpt-task *ngSwitchCase="typeAction.GPT_TASK"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-gpt-task>
+                    
+                    <!-- <cds-action-assign-function *ngSwitchCase="typeAction.ASSIGN_FUNCTION"
+                        [action]="elementSelected">
+                    </cds-action-assign-function> -->
+    
+                </div>
+            <!-- </div> -->
+        </div>
+
+
+
+        <div *ngIf="elementIntentSelectedType === typeIntentElement.QUESTION" class="panel-question">
+            <cds-question 
+                [intentSelected]="intentSelected"
+                (updateIntentSelected)="onUpdateQuestionsIntentSelected($event)">
+            </cds-question>
+        </div>
+    
+        <div *ngIf="elementIntentSelectedType === typeIntentElement.FORM" class="panel-form">
+            <cds-form 
+                [intentForm]="elementSelected" 
+                [intentSelected]="intentSelected" 
+                (updateIntentForm)="onUpdateFormIntentSelected($event)">
+            </cds-form>
+        </div>
+    
+        <div *ngIf="elementIntentSelectedType === typeIntentElement.ANSWER" class="panel-answer">
+            <appdashboard-answer
+                [intentSelected]="intentSelected"
+                (updateAnswerIntentSelected)="onUpdateAnswerIntentSelected($event)">
+            </appdashboard-answer>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- <div class="card-buttons" 
+    *ngIf="openCardButton"
+    [ngClass]="{'active':openCardButton}"
+    cdkDragBoundary=".panel-response" cdkDrag>
+    <div class="card-buttons-handle" cdkDragHandle>
+        <svg id="card-buttons-no-close" width="24px" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"></path>
+            <path d="M0 0h24v24H0z" fill="none"></path>
+        </svg>
+    </div>
+    <appdashboard-panel-button-configuration
+        [button] = buttonSelected
+        [listOfActions] = listOfActions
+        (closeButtonPanel) = onCloseButtonPanel()
+        (saveButton) = onSaveButton($event)
+    ></appdashboard-panel-button-configuration>
+</div> -->
+
+<!-- <div class="card-buttons" 
+    *ngIf="openCardButton"
+    [ngClass]="{'active':openCardButton}">
+    <appdashboard-panel-button-configuration
+        [button] = buttonSelected
+        [listOfActions] = listOfActions
+        (closeButtonPanel) = onCloseButtonPanel()
+        (saveButton) = onSaveButton($event)
+    ></appdashboard-panel-button-configuration>
+</div> -->

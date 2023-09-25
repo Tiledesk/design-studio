@@ -1,0 +1,65 @@
+@import "./src/assets/sass/cds/_variables.scss";
+.section{
+    display: flex;
+    align-content: center;
+    align-items: center;
+    gap:20px;
+    // height: 60px;
+    margin: 0px 0px 0px 40px;
+
+    .section-label{
+        margin:0px;
+    }
+    mat-radio-button{
+        margin-right: 20px;
+
+        // &.mat-radio-checked .mat-radio-outer-circle{
+        //     border-color: rgb(202,132,0);
+        // }
+
+        // &.mat-radio-checked .mat-radio-inner-circle{
+        //     background-color: rgb(202,132,0);
+        // }
+        .mat-accent.mat-radio-checked .mat-radio-outer-circle {
+            border-color: blue;
+          }
+       
+          // For inner circle
+        .mat-radio-checked .mat-radio-inner-circle {
+              background-color: blue;
+        }
+
+        
+    }
+
+    mat-radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    cds-text{
+        display: flex;
+        width: 100%;
+    }
+
+    mat-chip.mat-chip-selected{
+        background-color: $icon-color
+    }
+}
+
+
+.section ::ng-deep {
+    .mat-accent.mat-radio-checked .mat-radio-outer-circle{
+        border-color: $icon-color; 
+    }
+      
+    .mat-accent .mat-radio-inner-circle{
+        color: $icon-color;
+        background-color: $icon-color;
+    }
+      
+    .mat-accent .mat-radio-ripple .mat-ripple-element {
+          background-color: $icon-color;
+    }
+}

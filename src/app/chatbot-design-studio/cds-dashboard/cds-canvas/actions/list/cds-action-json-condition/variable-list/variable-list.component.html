@@ -1,0 +1,34 @@
+<div id="search">
+    <span class="material-icons">search</span>
+    <input type="text" 
+        placeholder="Type search value" 
+        [(ngModel)]="textVariable"
+        (ngModelChange)="onChangeSearch($event)">
+</div>
+<div id="variable-list-scrollMe">
+    <div id="data" *ngIf="filteredVariableList && filteredVariableList.length > 0">
+        <div class="category-name" >USER DATA</div>
+        <div *ngFor="let variable of filteredVariableList" (click)="onVariableSelected(variable)" class="category-row">
+            <span class="material-icons">data_object</span>
+            <label class="category-row-name ellips">{{variable?.name}}</label>
+        </div>
+    </div>
+    <div id="data" *ngIf="filteredIntentVariableList && filteredIntentVariableList.length > 0">
+        <div class="category-name" >SYSTEM ATTRIBUTES</div>
+        <div *ngFor="let variable of filteredIntentVariableList" (click)="onVariableSelected(variable)" class="category-row">
+            <span class="material-icons">{{variable?.icon}}</span>
+            <label class="category-row-name ellips">{{variable?.name}}</label>
+        </div>
+    </div>
+    <div id="no-data" *ngIf="filteredVariableList.length === 0 && filteredIntentVariableList.length == 0">
+       <div class="no-result">
+            <span class="material-icons">search</span>
+            <span class="text ellips">Nothing found. Please consider changing your search query.</span>
+       </div>
+    </div>
+</div>
+
+<div id="add-attribute" (click)="onAddCustomAttribute()">
+    <span class="material-icons">add</span>
+    <div>Add custom attributes</div>
+</div>

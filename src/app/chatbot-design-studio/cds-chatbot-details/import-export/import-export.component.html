@@ -1,0 +1,495 @@
+<div class="chatbot-faq-export-import-wpr">
+
+
+    <!-- --------------------------------------------------- -->
+    <!-- CSV -->
+    <!-- --------------------------------------------------- -->
+    <div class="row">
+      <div class="col-sm-10 col-md-10">
+        <h3 class="card_title__underlined" style="color:#e8eaed">
+          <span class="card_title__underline">
+            CSV
+          </span>
+        </h3>
+      </div>
+      <div class="col-sm-10 col-md-10">
+        <div class="section-subtitle"> </div>
+      </div>
+    </div>
+
+    <!-- --------------------------------------------------- -->
+    <!-- CSV Section title -->
+    <!-- --------------------------------------------------- -->
+    <div class="export-import-section-title">
+      Frequently Asked Questions
+    </div>
+
+
+    <div class="import-faq-from-csv-btn-wpr">
+      <button class="btn btn-primary cds-blue-button" (click)="openImportModal()">
+        <span class="icon" style="padding-right:8px">
+          <span class="material-icons">
+            cloud_upload
+          </span>
+        </span>
+        <!-- {{'ImportFromCSV' | translate }} -->
+        Import from CSV
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-10 col-md-10">
+        <h3 class="card_title__underlined" style="margin-top: 30px; color:#e8eaed">
+          <span class="card_title__underline">
+            JSON
+          </span>
+        </h3>
+      </div>
+      <div class="col-sm-10 col-md-10">
+        <div class="section-subtitle"> </div>
+      </div>
+    </div>
+
+    <!-- --------------------------------------------------- -->
+    <!-- JSON Section tiltle-->
+    <!-- --------------------------------------------------- -->
+    <!-- <div class="export-import-section-title">
+      Intents
+    </div> -->
+
+
+    <!-- <div class="import-faq-from-csv-btn-wpr"> -->
+    <!-- -------------------------------------------- -->
+    <!-- Export Intents AS Json Btn -->
+    <!-- -------------------------------------------- -->
+    <!-- <button class="btn btn-primary cds-blue-button" (click)="exportIntentsToJSON()">
+        <span class="icon" style="padding-right:8px">
+          <span class="material-icons">
+            cloud_download
+          </span>
+        </span>
+        {{'ExportAsJSON' | translate}}
+      </button> -->
+
+    <!-- ------------------------------------------ -->
+    <!-- Import Intents from Json Btn (change)="fileChangeUploadIntentsFromJSON($event)"-->
+    <!-- ------------------------------------------ -->
+    <!-- <button class="btn btn-primary cds-blue-button" (click)="presentModalImportIntentsFromJson()">
+        <span class="icon" style="padding-right:8px">
+          <span class="material-icons">
+            cloud_upload
+          </span>
+        </span>
+        {{'ImportFromJSON' | translate}}
+      </button>
+    </div> -->
+
+    <!-- ------------------------------------------ -->
+    <!-- Not used -->
+    <!-- ------------------------------------------ -->
+    <!-- <span #importIntentsFromJson class="import-intents-from-json-btn-wpr" style="margin-left: 16px;">
+                    <input style="display:inline" name="upload-intents-from-json" id="upload-intents-from-json"
+                      class="inputfile" type="file" (change)="fileChangeUploadIntentsFromJSON($event)"
+                      accept=".json" />
+                    <label class="btn btn-primary" for="upload-intents-from-json">
+                      <span class="material-icons" style="padding-right: 8px;">
+                        cloud_upload
+                      </span>
+                      <!- - Import Intents from JSON - ->
+                      {{'ImportFromJSON' | translate}}
+                    </label>
+                  </span> -->
+
+    <!-- --------------------------------------------------- -->
+    <!-- JSON Section tiltle-->
+    <!-- --------------------------------------------------- -->
+    <div class="export-import-section-title" style="margin-top: 12px;">
+      Chatbot
+    </div>
+
+    <!-- -------------------------------------------- -->
+    <!-- Export Chatbot to Json Btn -->
+    <!-- -------------------------------------------- -->
+    <div class="import-faq-from-csv-btn-wpr">
+      <button class="btn btn-primary cds-blue-button" (click)="exportChatbotToJSON()">
+        <span class="icon" style="padding-right:8px">
+          <span class="material-icons">
+            cloud_download
+          </span>
+        </span>
+        <!-- Export Chatbot to JSON -->
+        <!-- {{'ExportAsJSON' | translate}} -->
+        Export as JSON
+      </button>
+    </div>
+    <!-- ---------------------------------------------------- -->
+    <!-- Import Chatbot from Json Btn ! Note: display NONE-->
+    <!-- ---------------------------------------------------- -->
+    <!-- <span class="import-chatbot-from-json-btn-wpr" style="margin-left: 16px;">
+                    <input style="display:inline" name="upload-chatbot-from-json" id="upload-chatbot-from-json"
+                      class="inputfile" type="file" (change)="fileChangeUploadChatbotFromJSON($event)"
+                      accept=".txt" />
+                    <label class="btn btn-primary" for="upload-chatbot-from-json">
+                      <span class="material-icons" style="padding-right: 8px;">
+                        cloud_upload
+                      </span>
+                      Import Chatbot from JSON
+                    </label>
+                  </span> -->
+</div>
+
+
+
+<!-- -------------------------------------------------------------------------------- -->
+<!-- MODAL WINDOWS -->
+<!-- -------------------------------------------------------------------------------- -->
+
+<!-- MODAL - INPORT CSV  -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':displayImportModal}"
+  style="background-color: rgba(90,90,90,0.5);">
+  <!-- modal-sm   -->
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="padding: 8px 15px;">
+        <!-- class="close" -->
+        <button type="button" class="close-modal-window" aria-label="Close" (click)="onCloseModal()">
+          <span aria-hidden="true" style="color: rgb(6, 6, 6) !important;position: relative;">&times;</span>
+        </button>
+
+        <h4 class="modal-title" style="line-height: 2!important;">
+
+          <!-- {{ 'FaqPage.ImportCsvFile' | translate }} -->
+          Import CSV File
+        </h4>
+      </div>
+
+      <div class="modal-body" style="padding-bottom: 20px !important; padding-top: 20px;">
+
+        <div class="row" style="margin-right: 0px; margin-bottom:8px">
+          <div class="col-xs-10 col-xs-offset-1 cds-dwnld-example-csv">
+            <p (click)="downloadExampleCsv()" style="margin:5px; cursor:pointer"> <i class="material-icons"
+                style="font-size:18px; top: 4px; position: relative;">save_alt</i>
+              <!-- {{ 'download' | translate }}  -->
+              download
+              <span style="font-weight:400">
+                <!-- {{ 'examplecsv' | translate }}  -->
+                example.csv
+              </span>
+            </p>
+          </div>
+          <!-- ----------------------------------- -->
+          <!-- Note -> display none -->
+          <!-- ----------------------------------- -->
+          <div class="col-xs-10 col-xs-offset-1"
+            style="text-align:center; border-left: 1px solid #eeeeee; border-right: 1px solid #eeeeee">
+            <p style="margin:5px; font-weight: 400;">
+              <!-- --------------------- -->
+              <!-- Question -->
+              <!-- --------------------- -->
+              <span>
+                <em>
+                  <!-- {{ 'FaqPage.Question' | translate }}* -->
+                  Question*
+                </em>
+              </span>
+
+              <!-- --------------------- -->
+              <!-- Columns Delimiter -->
+              <!-- --------------------- -->
+              <span>
+                <strong>
+                  {{csvColumnsDelimiter}}
+                </strong>
+              </span>
+
+              <!-- --------------------- -->
+              <!-- Answer -->
+              <!-- --------------------- -->
+              <span>
+                <em>
+                  <!-- {{ 'FaqPage.Answer' | translate }}* -->
+                  Answer*
+                </em>
+              </span>
+
+              <!-- --------------------- -->
+              <!-- Columns Delimiter -->
+              <!-- --------------------- -->
+              <!-- <span>
+              <strong>
+                {{csvColumnsDelimiter}}
+              </strong>
+            </span> -->
+
+              <!-- --------------------- -->
+              <!-- intent_id -->
+              <!-- --------------------- -->
+              <!-- <span>
+              <em>
+                intent id
+              </em>
+            </span> -->
+
+              <!-- --------------------- -->
+              <!-- Columns Delimiter -->
+              <!-- --------------------- -->
+              <!-- <span>
+              <strong>
+                {{csvColumnsDelimiter}}
+              </strong>
+            </span> -->
+
+              <!-- --------------------- -->
+              <!-- intent_display_name -->
+              <!-- --------------------- -->
+              <!-- <span>
+              <em>
+                intent name
+              </em>
+            </span> -->
+
+              <!-- --------------------- -->
+              <!-- Columns Delimiter -->
+              <!-- --------------------- -->
+              <!-- <span>
+              <strong>
+                {{csvColumnsDelimiter}}
+              </strong>
+            </span> -->
+
+              <!-- --------------------- -->
+              <!-- webhook_enabled -->
+              <!-- --------------------- -->
+              <!-- <span>
+              <em>
+                webhook enabled
+              </em>
+            </span> -->
+
+              <!-- <span style="display: block;font-size: 12px;font-weight: 400;color: rgb(100, 116, 145);">
+              ({{ 'InTheExampleCsFileTheAnswerAndQuestionAreRequired' | translate}})
+            </span> -->
+
+            </p>
+          </div>
+
+        </div>
+        <div class="row" style="margin-right: 0px;">
+          <div class="col-sm-12">
+            <label
+              style="height: 36px; padding-left:16px; padding-right:16px; text-align:right; color: #7695a5;font-weight: 300 !important;"
+              class="col-xs-6 col-sm-6 ">
+
+              <!-- {{ 'InTheCSVFileToBeUploadedTheColumnsAreSeparatedBy' | translate}}: -->
+              In the CSV file to be uploaded, the columns are separated by:
+            </label>
+            <div class="col-xs-6 col-sm-6" style="text-align:start">
+              <input style="padding-left:5px; margin-top:7px; width:55px; border-radius: 5px;
+                border: 1px solid #d9d9d9 !important;
+                font-weight: 600;
+                padding-left: 10px;" [(ngModel)]="csvColumnsDelimiter" (keyup)="countDelimiterDigit($event)">
+            </div>
+
+          </div>
+          <div class="col-sm-12" style="text-align: center">
+
+            <span *ngIf="modalChoosefileDisabled" style="color:#ff5252">
+
+              <!-- {{ 'FaqPage.DelimiterOptionMustBe' | translate }} -->
+              Delimiter option must be one character long
+            </span>
+          </div>
+
+        </div>
+
+
+      </div>
+
+      <div class="modal-footer" style="text-align: center;
+        padding-top: 0px !important;
+        padding-bottom: 10px;
+        background-color: #fff;
+        border-top: unset;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;">
+
+        <input name="fileChangeUploadCSV" id="fileChangeUploadCSV" class="inputfile" type="file"
+          (change)="fileChangeUploadCSV($event)" accept=".csv" />
+        <label id="upload-csv-choose-file" class="btn btn-primary" for="fileChangeUploadCSV"
+          [ngClass]="{'disabled': modalChoosefileDisabled }">
+
+          <!-- {{ 'FaqPage.ChooseFile' | translate }} -->
+          CHOOSE FILE
+        </label>
+      </div>
+
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<!-- MODAL - UPLOAD CSV INFO WINDOWS -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':displayInfoModal}"
+  style="background-color: rgba(90,90,90,0.5);">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" (click)="onCloseModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+        <h4 class="modal-title">
+          Upload CSV
+          <!-- {{ 'FaqPage.UploadCsv' | translate }} -->
+        </h4>
+      </div>
+
+      <div class="modal-body">
+
+        <span *ngIf="SHOW_CIRCULAR_SPINNER">
+          <div class="loader" style="top:25%">
+            <svg class="circular" viewBox="25 25 50 50">
+              <circle class="path" cx="50" cy="50" r="15" fill="none" stroke-width="2" stroke-miterlimit="10" />
+            </svg>
+
+          </div>
+          <p style="margin-top: 50px; text-align: center;">
+            <!-- {{ "FaqPage.Processing" | translate }} -->
+            <!-- {{ "Processing" | translate }} -->
+            Processing
+          </p>
+        </span>
+
+        <span *ngIf="!SHOW_CIRCULAR_SPINNER">
+          <div class="loader" style="top:5%">
+
+            <!-- // IF SUCCESSFULLY UPLOADED -->
+            <span *ngIf="parse_done">
+              <i class="material-icons" style="color:#70b665">done</i>
+              <span style="color:#70b665; position: relative; left: -14px;">
+                <!-- {{ "FaqPage.Completed" | translate }} -->
+                Completed
+              </span>
+            </span>
+
+            <!-- // IF AN ERROR OCCURRED DURING THE UPLOAD -->
+            <span *ngIf="parse_err">
+              <i class="material-icons" style="color:#ff5252">report_problem</i>
+              <br>
+              <span style="color:#ff5252">
+
+                <!-- {{ "Error" | translate }} -->
+                Error
+              </span>
+            </span>
+
+          </div>
+
+          <!-- // IF SUCCESSFULLY UPLOADED -->
+          <span *ngIf="parse_done">
+            <p style="margin-top: 50px; text-align: center;">
+              <!-- FAQs successfully uploaded -->
+              <!-- {{ "FaqPage.FaqsSuccessfullyUploaded" | translate }} -->
+              Blocks Successfully Uploaded
+            </p>
+          </span>
+
+          <!-- // IF AN ERROR OCCURRED DURING THE UPLOAD -->
+          <span *ngIf="parse_err">
+            <p style="margin-top: 50px; text-align: center;">
+              An error occurred during the upload
+              <!-- {{ "FaqPage.AnErrorOccurredDuringTheUpload" | translate }} -->
+            </p>
+          </span>
+
+        </span>
+      </div>
+
+      <div class="modal-footer" style="text-align: center;">
+        <!-- // IF SUCCESSFULLY UPLOADED -->
+        <button *ngIf="parse_done" class="btn btn-primary" [disabled]="SHOW_CIRCULAR_SPINNER"
+          (click)="onCloseInfoModalHandledSuccess()">
+          Ok
+        </button>
+        <button *ngIf="parse_err" class="btn btn-primary" [disabled]="SHOW_CIRCULAR_SPINNER"
+          (click)="onCloseInfoModalHandledError()">
+          Continue
+          <!-- {{ "FaqPage.Continue" | translate }} -->
+        </button>
+      </div>
+
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<!-- ------------------------------------- -->
+<!-- MODAL IMPORT JSON -->
+<!-- ------------------------------------- -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':displayImportJSONModal}"
+  style="background-color: rgba(90,90,90,0.5);">
+
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="padding: 8px 15px;">
+
+        <button type="button" class="close-modal-window" aria-label="Close" (click)="onCloseImportJSONModal()">
+          <span aria-hidden="true" style="color: rgb(6, 6, 6) !important;position: relative;">&times;</span>
+        </button>
+
+        <h4 class="modal-title" style="line-height: 2!important; font-size: 20px; font-weight: 400;">
+          <!-- {{'ImportFromJSON' | translate}} -->
+          Import from JSON
+        </h4>
+      </div>
+
+      <div class="modal-body import-json-modal-body">
+
+        You can import Intents by overwriting or keeping existing Intents
+
+      </div>
+
+      <div class="modal-footer" style="text-align: center;
+          padding-top: 0px !important;
+          padding-bottom: 10px;
+          background-color: #fff;
+          border-top: unset;
+          border-bottom-left-radius: 6px;
+          border-bottom-right-radius: 6px;">
+
+        <span #importIntentsFromJson class="import-intents-from-json-btn-wpr" style="margin-left: 16px;">
+          <input style="display:inline" name="upload-intents-from-json-overwrite"
+            id="upload-intents-from-json-overwrite" class="inputfile" type="file"
+            (change)="fileChangeUploadIntentsFromJSON($event, 'overwrite')" accept=".json" />
+          <label id="upload-intents-from-json-overwrite" class="btn btn-primary"
+            for="upload-intents-from-json-overwrite">
+            <span class="material-icons" style="padding-right: 8px;">
+              cloud_upload
+            </span>
+
+
+            Upload and overwrite
+          </label>
+        </span>
+
+        <span #importIntentsFromJson class="import-intents-from-json-btn-wpr" style="margin-left: 16px;">
+          <input style="display:inline" name="upload-intents-from-json-add" id="upload-intents-from-json-add"
+            class="inputfile" type="file" (change)="fileChangeUploadIntentsFromJSON($event, 'add')" accept=".json" />
+          <label id=upload-intents-from-json-add class="btn btn-primary" for="upload-intents-from-json-add">
+            <span class="material-icons" style="padding-right: 8px;">
+              cloud_upload
+            </span>
+
+
+            Upload
+          </label>
+        </span>
+      </div>
+
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>

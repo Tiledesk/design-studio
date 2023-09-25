@@ -1,0 +1,143 @@
+/** LOCAL COLORS **/
+$color-withe-hex: #ffffff;
+$color-blue-hex: #3ea9f5;
+$color-red-hex: #ed2e19;
+$color-orange-hex: #ffbb1c;
+$color-light-gray-hex: #D2D2D2;
+
+
+$color-1-rgb: 206 145 120;
+$color-2-rgb: 181 206 168;
+$color-3-rgb: 156 220 254;
+$color-4-rgb: 106 153 85;
+$color-5-rgb: 247 128 112;
+$color-6-rgb: 226 192 141;
+$color-7-rgb: 204 167 1;
+
+$color-1-hex: #CE9178;
+$color-2-hex: #B5CEA8;
+$color-3-hex: #9CDCFE;
+$color-4-hex: #6A9955;
+$color-5-hex: #F78070;
+$color-6-hex: #E2C08D;
+$color-7-hex: #CCA701;
+
+$color-bck-1-hex: #1E1E1E;
+$color-bck-2-hex: #252526;
+$color-bck-3-hex: #2D2D2D;
+$color-bck-4-hex: #333333;
+$color-bck-5-hex: #3D3D3D;
+
+$color-bck-1-rgb: 30 30 30;
+$color-bck-2-rgb: 37 37 38;
+$color-bck-3-rgb: 45 45 45;
+$color-bck-4-rgb: 51 51 51;
+$color-bck-5-rgb: 61 61 61;
+
+
+$color-txt-1-hex: #787878;
+$color-txt-2-hex: #858585;
+$color-txt-3-hex: #CCCCCC;
+$color-txt-4-hex: #ffffff;
+
+$color-txt-1-rgb: 120 120 120;
+$color-txt-2-rgb: 133 133 133;
+$color-txt-3-rgb: 204 204 204;
+$color-txt-4-rgb: 255 255 255;
+
+
+
+
+$color-bck-light-gray-hex: #e7f3ff;
+$color-bck-gray-hex: #647283;
+$color-text-box-hex: #566787;
+$color-text-dark-hex: #22272d;
+$color-text-select-hex: #7695A5;
+
+$bg-color-dark-rgb: 15 23 42;
+$bg-color-bck-rgb: 30 41 59; 
+$bg-color-card-rgb: 41 52 69;
+
+$bg-color-dark-hex: #0F172A;
+$bg-color-bck-hex: #1E293B;
+$bg-color-card-hex: #293445;
+
+
+
+$bg-opacity-full: 1;
+$bg-opacity-halfway: 0.5;
+$bg-opacity-empty: 0.2;
+
+$brown-85: #6c6859d9;
+
+
+// Typography elements
+$mdb-font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !default;
+$mdb-font-family-poppins: "Poppins", "Roboto", Arial, sans-serif !default;
+$font-size-base: 14px;
+
+$height-header: 25px;
+$padding-base: 15px !default;
+$margin-base: 15px !default;
+
+$button-height-base: 20px; //32px;
+$button-max-width-base: 240px;
+$button-border-radius-base: 16px;
+
+$label-height-base: 48px;
+
+$icon-color: #ecb606b0;
+$icon-color-background: #545454;
+$icon-active-color: white;
+$icon-active-background: rgb(58, 107, 147);
+
+$light-blue: #8ab4f8;
+$light-black: #202124;
+$blue-action-backgroud: #1e293b;
+$light-gray: #5f6368;
+$panel-border-radius: 16px;
+
+$deep-brown: #6c6859;
+$light-brown: #e8e6dd;
+
+$success-connector: rgb(44, 191, 35);
+$failure-connector: rgb(191, 35, 35);
+
+$action-item-color: #d2e3fc;
+$action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
+$action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
+$action-color-selected:rgb(58, 107, 147); // rgba(179,141,38,1);
+$intent-preview-background: #d3e3ee; //rgb(235, 226, 198);
+$empty-element-property:rgb(191, 35, 35);
+
+
+$padding-base-preview: 0 10px 10px;
+$base-element-gap: 5px;
+$border-radius-base-preview: 8px;
+
+/* CDS REFACTORING
+/* ******************************* */
+$deep-blu: #1e293b;
+$scrollbar-track-color: #1c2b45;
+// $scrollbar-track-light-color: rgba(231, 238, 239, 0.8);
+$scrollbar-track-white-color: rgb(255, 255, 255);
+$scrollbar-thumb-color:rgba(162, 176, 195, 1);
+$border-light: rgb(223,227,237);
+$background-extra-light-gray:rgb(238, 244, 246);
+$inactive-text-color:rgb(110, 132, 154);
+$gray-01: rgba(100, 116, 145, 0.08);
+$gray-02: #647491;
+$gray-03: rgb(100, 116, 145);
+$gray-04: rgb(142, 152, 168);
+$gray-05: #f5f5f5;
+$drop-zone-color-border: rgb(212, 217, 230);
+$drop-zone-background: rgb(142,152,168);
+$black-01:#080f1a;
+$blu-01:#132144;
+$black-02: #222;
+$blu-02: #006cff;
+$azure-01:rgb(220, 233, 255);
+$accent-blue: rgb(62, 169, 245);
+$base-blue: rgb(58, 107, 147);
+$red: #ff4000;
+$icon-bckgrnd-color: #e4e6eb;

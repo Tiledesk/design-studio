@@ -1,0 +1,43 @@
+<div class="header" (click)="onSelectIntent($event)">
+    <div *ngIf="intentName === 'start'" class="intent-icon">
+        <span class="material-icons rocket">rocket_launch</span>
+    </div>
+    <div *ngIf="intentName === 'defaultFallback'" class="intent-icon">
+        <span class="material-icons undo ">undo</span>
+    </div>
+
+    <div class="form-group" 
+        [ngClass]="{'is-error':intentNameResult === false || intentNameAlreadyExist}">
+        <input 
+            #myInput type="text" 
+            class="input form-control tds_draggable"
+            [(ngModel)]="intentName"
+            [readonly]="intentName === 'start' || intentName === 'defaultFallback'"
+            [placeholder]="'EnterIntentName' | translate"
+            (ngModelChange)="onChangeIntentName($event)"
+            (mouseup)="onMouseUpInput($event)" 
+            (dblclick)="doubleClickFunction($event)"
+            (keydown.enter)="onEnterButtonPressed($event)"
+            >
+        <div *ngIf="intentNameAlreadyExist" class="error---msg"> The block name must be unique </div>
+        <div *ngIf="intentNameNotHasSpecialCharacters === false" class="error---msg"> The block name cannot contain special characters </div>
+
+    </div> 
+
+    <!-- <div class="btns-wpr">
+        <div class="onff-intent-webhook">
+            <mat-slide-toggle labelPosition="before" [checked]="intentSelected.webhook_enabled"
+                (change)="toggleIntentWebhook($event)">
+                <span *ngIf="intentSelected.webhook_enabled">webhook enabled </span>
+                <span *ngIf="!intentSelected.webhook_enabled">webhook disabled </span>
+            </mat-slide-toggle>
+        </div>
+        <!- - <div class="loading-btn-wrapper">
+            <button id="cds-save-intent-btn" class="btn btn-primary btn-save loading-btn" [disabled]="showSpinner"
+                type="button" (click)="onSaveIntent()">
+                <span style="color: #202124;font-weight: 500" class="loading-btn__text"> {{ 'Save' | translate }}</span>
+            </button>
+        </div> - ->
+    </div> -->
+
+</div>

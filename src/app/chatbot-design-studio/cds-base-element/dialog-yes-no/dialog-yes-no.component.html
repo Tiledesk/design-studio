@@ -1,0 +1,15 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>{{data.title}}</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+    <div class="tpl-modal-content">
+        <div class="tpl-label-textarea">{{data.text}}</div> 
+    </div> 
+    <div class="tpl-modal-buttons">
+        <button type="button" class="btn btn-cancel" [mat-dialog-close]="false">{{data.no}}</button>
+        <button type="button" class="btn btn-warning cds-yellow-button" [mat-dialog-close]="true">{{data.yes}}</button>
+    </div>
+</div>

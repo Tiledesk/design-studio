@@ -1,0 +1,100 @@
+<ng-container [ngSwitch]="addMode">
+    <ng-container *ngSwitchCase="true" [ngTemplateOutlet]="addNewRule"></ng-container>
+    <ng-container *ngSwitchCase="false" [ngTemplateOutlet]="existingRule"></ng-container>
+</ng-container>
+
+<ng-template #addNewRule [ngOutletContext]="context">
+    <div class="card-wrp new-rule" [formGroup]="ruleFormGroup">
+
+            <div class="card-item">
+                <div class="card-title">Rule name:</div>
+                <cds-text
+                    [control]="ruleFormGroup.controls['name']">
+                </cds-text>
+            </div>
+      
+            <div class="card-item">
+                <div class="card-title">Condition</div>
+                <rule-condition
+                    [condition]="ruleFormGroup.controls['when']">
+                </rule-condition>
+            </div>
+    
+            <div class="card-item">
+                <div class="card-title">Action</div>
+                <rule-action
+                    [action]="ruleFormGroup.controls['do']"
+                    [autocompleteOptions]="autocompleteOptions">
+                </rule-action>
+            </div>
+    
+            <div class="card-item box-buttons">
+                <div class="loading-btn-wrapper">
+                    <button id="retun-rule-form" class="btn btn-primary loading-btn" (click)="returnBack()">
+                        <span class="loading-btn__text"><span class="material-icons">keyboard_return</span> Cancel</span>
+                    </button>
+                </div>
+                <div class="loading-btn-wrapper">
+                    <button id="create-rule-form" class="btn btn-primary loading-btn" (click)="submitForm()">
+                        <span class="loading-btn__text">Add Rule</span>
+                    </button>
+                </div>
+                
+            </div>         
+    </div>
+</ng-template>
+
+<ng-template #existingRule [ngOutletContext]="context">
+    <mat-accordion class="rules-list">
+        <div class="card-wrp" [formGroup]="ruleFormGroup">
+            <mat-expansion-panel
+                [expanded]="isPanelExpanded"
+                (opened)="openPanel($event)"
+                (click)="closePanel($event)">
+                <mat-expansion-panel-header>
+                    <mat-panel-title class="card-title no-margin">
+                        <span class="material-icons">
+                            label
+                        </span>
+                        <span>{{ruleFormGroup?.value?.name}}</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div class="card-item">
+                    <div class="card-title">Name:</div>
+                    <cds-text
+                        [control]="ruleFormGroup.controls['name']">
+                    </cds-text>
+                </div>
+          
+                <div class="card-item">
+                    <div class="card-title">Condition</div>
+                    <rule-condition
+                        [condition]="ruleFormGroup.controls['when']">
+                    </rule-condition>
+                </div>
+        
+                <div class="card-item">
+                    <div class="card-title">Action</div>
+                    <rule-action
+                        [action]="ruleFormGroup.controls['do']"
+                        [autocompleteOptions]="autocompleteOptions">
+                    </rule-action>
+                </div>
+        
+                <div class="card-item box-buttons">
+                    <div class="loading-btn-wrapper">
+                        <button id="delete-rule-form" class="btn btn-primary loading-btn" (click)="removeRule()">
+                            <span class="loading-btn__text">Delete Rule</span>
+                        </button>
+                    </div>
+                    <div class="loading-btn-wrapper">
+                        <button id="create-rule-form" class="btn btn-primary loading-btn" (click)="submitForm()">
+                            <span class="loading-btn__text">Update Rule</span>
+                        </button>
+                    </div>
+                </div>
+            </mat-expansion-panel>          
+        </div>
+    </mat-accordion> 
+</ng-template>

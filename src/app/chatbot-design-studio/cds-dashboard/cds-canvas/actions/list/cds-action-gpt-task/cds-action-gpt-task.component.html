@@ -1,0 +1,284 @@
+<div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
+
+    <div class="action-row">
+        <div class="action-row-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
+            </svg>
+        </div>
+
+        <div class="action-row-right">
+            <div *ngIf="action?.question" class="action-row-right">
+                {{action?.question}}
+            </div>
+            <div *ngIf="!action?.question" class="action-row-right empty">
+                Enter the question
+            </div>
+        </div>
+
+    </div>
+
+    <div class="action-row">
+
+        <div id="gpt-icon" class="action-row-left icon-action">
+            <img src="assets/cds/images/actions/openai-icon.svg">
+        </div>
+
+        <div class="action-row-right">
+            <div *ngIf="action?.model" class="action-row-right">
+                {{action?.model}}
+            </div>
+            <div *ngIf="!action?.model" class="action-row-right empty">
+                Enter the question
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="variables" class="content" *ngIf="!previewMode && showVariablesSection">
+
+    <div class="variables-content-header">
+        <!-- <span class="material-icons-round back-button" (click)="showHideVariablesSection()">keyboard_return</span> -->
+        <span class="material-icons-round back-button" (click)="showHideVariablesSection()">undo</span>
+        <label class="title-label">Set variables</label>
+    </div>
+
+    <div class="variables-container">
+
+        <div *ngFor="let variable of temp_variables" class="single-variable">
+            <div class="variable-name">{{ variable.name }}</div>
+            <cds-text [text]="variable.value" (onChange)="onChangeVar($event, variable.name)"></cds-text>
+
+        </div>
+    </div>
+</div>
+
+<div id="content" *ngIf="!previewMode && !showVariablesSection" class="content">
+
+
+    <div class="textarea-editor-wrapper">
+        <label class="title-label">Prompt</label>
+        <cds-textarea 
+            id="question" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [minRow]="2"
+            [maxRow]="6" 
+            [text]="action.question" 
+            [placeholder]="'Enter prompt'"
+            (changeTextarea)="changeTextarea($event, 'question')">
+        </cds-textarea>
+    </div>
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">GPT Reply</label>
+            <div class="value-wrp">
+                <cds-textarea id="assignTo" 
+                    [textLimitBtn]="false" 
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="action.assignReplyTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')">
+                </cds-textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="answer-preview" *ngIf="showPreview">
+        <div class="header-answer-preview">
+            <div class="label-and-button-container">
+                <label class="title-label">Answer preview</label>
+                <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
+                        (click)="showHideVariablesSection()">Set variables
+                        <span class="material-icons-round">
+                            chevron_right
+                            </span>
+                    </button>
+            </div>
+            <span class="material-icons-round close-button" (click)="closePreview()">close</span>
+        </div>
+
+
+        <div id="preview-container" class="preview-container">
+
+            <div class="placeholder-container" *ngIf="missingVariables">
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                    <span style="margin-left: 8px;">Set all variables to get the preview</span>
+                </div>
+            </div>
+
+            <div class="placeholder-container" *ngIf="searching && !missingVariables">
+                <loading-spinner class="custom-spinner"></loading-spinner>
+                <span style="margin-left: 8px;">Generating answer...</span>
+            </div>
+
+            <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content">
+                {{ ai_response.choices[0].message.content }}
+            </div>
+
+            <div *ngIf="showAiError">
+                {{ ai_error }}
+            </div>
+        </div>
+
+        <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content" style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 6px; padding: 0px 4px; color: #a6a6a6;  font-size: 11px; width: 100%;">
+                <span style="font-weight: 500;">Tokens usage</span>
+                <span>Prompt: {{ ai_response.usage.prompt_tokens }}</span>
+                <span>Answer: {{ ai_response.usage.completion_tokens }}</span>
+                <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens }}</span>
+        </div>
+    </div>
+
+
+    <hr class="custom-divider">
+
+    <mat-accordion>
+        <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
+            class="custom-expansion-panel">
+            <mat-expansion-panel-header class="disable_ripple">
+                <mat-panel-title>
+                    AI Settings
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div>
+
+                <!-- // model select -->
+                <div>
+                    <div class="select-box">
+                        <cds-select 
+                            id="text-condition" 
+                            [items]="models_list" 
+                            [itemSelected]="action.model"
+                            [bindLabelSelect]="'name'" 
+                            [bindValueSelect]="'value'"
+                            (onSelected)="onChangeSelect($event, 'model')">
+                        </cds-select>
+                    </div>
+                </div>
+
+                <!-- // max_tokens slider -->
+                <div class="text-editor-wrapper">
+                    <div class="field-box">
+                        <label class="title-label">Max Tokens</label>
+                        <div class="action-wait-content">
+            
+                            <div class="action-wait-slider ">
+                                <div class="action-wait-range">1</div>
+                                <mat-slider class="wait-slider" thumbLabel 
+                                    [displayWith]="formatLabel"
+                                    step="1" min="1" max="512"
+                                    [(ngModel)]="action.max_tokens"
+                                    (change)="updateSliderValue($event.value, 'max_tokens')"  
+                                    aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">512</div>
+                            </div>
+                            <!-- // doesn't work propely -->
+                            <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- // temperature slider -->
+                <div class="text-editor-wrapper">
+                    <div class="field-box">
+                        <label class="title-label">Temperature</label>
+                        <div class="action-wait-content">
+            
+                            <div class="action-wait-slider">
+                                <div class="action-wait-range">0</div>
+                                <mat-slider class="wait-slider" thumbLabel 
+                                    [displayWith]="formatLabel"
+                                    step="0.05" min="0" max="1"
+                                    [(ngModel)]="action.temperature"
+                                    (change)="updateSliderValue($event.value, 'temperature')"   
+                                    aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">1</div>
+                            </div>
+                            <!-- // doesn't work propely -->
+                            <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="textarea-editor-wrapper">
+                    <label class="title-label">System context</label>
+                    <cds-textarea 
+                        id="context" 
+                        [textLimitBtn]="false" 
+                        [emojiPikerBtn]="false" 
+                        [setAttributeBtn]="false" 
+                        [minRow]="1"
+                        [maxRow]="3" 
+                        [text]="action.context" 
+                        [placeholder]="'You are an awesome assistant'"
+                        (changeTextarea)="changeTextarea($event, 'context')">
+                    </cds-textarea>
+                </div>
+            
+
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+
+    <hr class="custom-divider">
+
+    <div style="width: 100%; display: flex; justify-content: flex-end;">
+        <button id="cds-publish-btn" class="btn btn-primary" type="button" [disabled]="!action.question"
+                (click)="getResponsePreview()">
+                <span class="material-icons">
+                    preview
+                </span>
+                Preview
+            </button>
+    </div>
+
+
+    <!-- <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">GPT Reply</label>
+            <div class="value-wrp">
+                <cds-textarea id="assignTo" 
+                    [textLimitBtn]="false" 
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="action.assignReplyTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')">
+                </cds-textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">GPT Source</label>
+            <div class="value-wrp">
+                <cds-textarea id="assignTo" 
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="action.assignSourceTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')">
+                </cds-textarea>
+            </div>
+        </div>
+    </div> -->
+
+</div>

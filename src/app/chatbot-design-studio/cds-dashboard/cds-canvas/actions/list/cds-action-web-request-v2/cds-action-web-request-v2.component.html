@@ -1,0 +1,241 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="action-row-left">
+       
+        <span class="web-request-action-method" *ngIf="action.method">
+            {{ action.method}}
+        </span>
+
+    </div>
+
+    <div *ngIf="action.url" class="action-row-right">
+        {{action.url}}
+    </div>
+    <div *ngIf="!action.url" class="action-row-right empty">
+        Enter request URL
+    </div>
+
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img src="assets/cds/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">Success</label>
+        
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+       <label class="title-preview-label">else</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
+
+</div>
+
+
+<!-- Details -->
+<div *ngIf="!previewMode" class="content" #scrollMe id="scrollMe" >
+
+    <div class="input-group cds-input-group">
+        <cds-select id="method"
+            [items]="methods"
+            [bindLabelSelect]="'label'"
+            [bindValueSelect]="'value'"
+            [itemSelected]="action?.method"
+            (onSelected)="onChangeMethodButton($event)">
+        </cds-select>
+        <cds-textarea id="url"
+            class="text-editable-div"
+            [text]="action.url" 
+            [minRow]="1" [maxRow]="1"
+            popoverVerticalAlign="above"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [placeholder]="'Enter request URL'"
+            (changeTextarea)="onChangeTextarea($event, 'url')">
+        </cds-textarea>
+    </div>
+
+    <div class="cds-web-request-options">
+
+        <mat-button-toggle-group [(ngModel)]="optionSelected" (change)="onChangeOption($event)">
+            <mat-button-toggle value="header">Header</mat-button-toggle>
+            <mat-button-toggle value="body">Body</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <!-- <div class="add-response" (click)="onChangeParamsButton()">
+            <span [ngClass]="{'cds-action-active': methodSelectedHeader}">Header</span>
+        </div>
+        <div class="add-response" (click)="onChangeParamsButton()">
+            <span [ngClass]="{'cds-action-active': methodSelectedBody}">Body</span>
+        </div> -->
+        <!-- <div *ngIf="optionSelected === 'body'" class="cds-rigth">
+            <button id="cds-community-btn" type="button" class="btn btn-primary pull-right cds-blue-button" (click)="onJsonFormatter()">format JSON </button>
+        </div> -->
+    </div>
+
+    <div class="cds-web-request-row"  *ngIf="optionSelected === 'header'">
+        <cds-attributes
+            class="cds-attributes"
+            [method]="typeMethodAttribute.INPUT"
+            [attributes]="jsonHeader"
+            (changeAttributes)="onChangeAttributes($event)">
+        </cds-attributes>
+    </div>
+    
+    <div class="cds-web-request-row" *ngIf="optionSelected === 'body'">
+
+        <cds-radio-buttons
+            [items]="bodyOptions"
+            (changeButtonSelect)="onChangeButtonSelect($event)">
+        </cds-radio-buttons>
+
+        <cds-textarea id="body"
+            [ngClass]="{'jsonError': !jsonIsValid}"
+            class = "text-editable-div"
+            [text]="body"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [minRow]="5" [maxRow]="10"
+            [readonly]="false"
+            (changeTextarea)="onChangeTextarea($event, 'body')">
+        </cds-textarea>
+
+
+        <div class="cds-web-request-row-error center" 
+            [ngClass]="{'json-error-yes': !jsonIsValid}">
+            <span>{{errorMessage}}</span>
+        </div>
+
+    </div>
+
+    <hr class="custom-divider">
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">Assign result to</label>
+            <div class="value-wrp">
+                <cds-textarea id="assignTo" 
+                    [textLimitBtn]="false" 
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="action.assignResultTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+                </cds-textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">Assign status</label>
+            <div class="value-wrp">
+                <cds-textarea id="assignTo" 
+                    [textLimitBtn]="false" 
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="action.assignStatusTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')">
+                </cds-textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">Assign error</label>
+            <div class="value-wrp">
+                <cds-textarea id="assignTo" 
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="action.assignErrorTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+                </cds-textarea>
+            </div>
+        </div>
+    </div>
+
+    <hr class="custom-divider">
+
+    <div style="margin-bottom: 20px;">
+
+        <div class="condition-container">
+            <div class="icon-action">
+                <img src="assets/cds/images/icons/if_condition.svg">
+            </div>
+            <span class="condition-text">Success</span>
+        </div>
+
+        <div class="select-box" id="intentSelect">
+            <cds-select 
+                id="text-condition" 
+                [items]="listOfIntents" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'" 
+                [itemSelected]="action?.trueIntent" 
+                [placeholder]="'Select a block'"
+                [clearable]="true" 
+                (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
+                (onReset)="onResetBlockSelect($event, 'trueIntent')">
+            </cds-select>
+        </div>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+
+    </div>
+    <div>
+
+        <div class="condition-container">
+            <span class="condition-text">Else</span>
+        </div>
+
+        <div class="select-box" id="intentSelect">
+            <cds-select 
+                id="text-condition" 
+                [items]="listOfIntents" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'" 
+                [itemSelected]="action?.falseIntent" 
+                [placeholder]="'Select a block'"
+                [clearable]="true" 
+                (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
+                (onReset)="onResetBlockSelect($event, 'falseIntent')">
+            </cds-select>
+        </div>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="action.falseIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+        </cds-attributes> -->
+
+    </div>
+    
+</div>

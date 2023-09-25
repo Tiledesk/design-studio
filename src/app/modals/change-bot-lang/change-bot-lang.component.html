@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Change chatbot language</h2>
+<mat-dialog-content class="mat-typography">
+    <h3 style="margin-bottom: 3px;">
+        Be aware that you must translate your training phrases to match the new language to get the maximum in terms of
+        Machine Learning performance.
+    </h3>
+
+    <div *ngIf="!intentsEngine || intentsEngine === 'none'" style="text-align: center;">
+        <h3> The chatbot training will restarted. </h3>
+    </div>
+
+
+    <ng-select appendTo="body" id="bot_default_language" [clearable]="true" [(ngModel)]="selectedDefaultBotLang"
+        [items]="botDefaultLanguages" bindLabel="name" placeholder="{{ 'ChooseALanguage' | translate }}"
+        (change)="onSelectBotDefaultlang(selectedDefaultBotLang)">
+    </ng-select>
+
+</mat-dialog-content>
+<mat-dialog-actions align="center">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button [mat-dialog-close]="true" (click)="changeBotLanguage()">Change</button>
+</mat-dialog-actions>

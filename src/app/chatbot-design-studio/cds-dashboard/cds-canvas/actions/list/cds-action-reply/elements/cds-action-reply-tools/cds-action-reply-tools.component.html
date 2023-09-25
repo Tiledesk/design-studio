@@ -1,0 +1,28 @@
+<div data-adding-allowed="true" class="add-responses">
+    <div class="add-response" (click)="addElement(TypeMessage.TEXT)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'Text' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <i class="material-icons">text_fields</i>
+        <!-- <span>{{'Text' | translate}}</span> -->
+    </div>
+
+    <div class="add-response" (click)="addElement(TypeMessage.IMAGE)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'Image' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <i class="material-icons">image</i>
+        <!-- <span>{{'Image' | translate}}</span> -->
+    </div>
+    <div class="add-response" (click)="addElement(TypeMessage.FRAME)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'Frame' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <i class="material-icons">play_circle</i>
+        <!-- <span>{{'Frame' | translate}}</span> -->
+    </div>
+    <div data-add-response-type="Type.GALLERY" class="add-response" (click)="addElement(TypeMessage.GALLERY)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'Gallery' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <i class="material-icons">view_carousel</i>
+        <!-- <span>{{'Gallery' | translate}}</span> -->
+    </div>
+    <div data-add-response-type="Type.REDIRECT" class="add-response" (click)="addElement(TypeMessage.REDIRECT)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'Redirect' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <i class="material-icons">launch</i>
+        <!-- <span>{{'Redirect' | translate}}</span> -->
+    </div>
+</div>

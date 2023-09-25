@@ -1,0 +1,27 @@
+<div *ngIf="!metadata.src" 
+    class="dropUploadImage"
+    [ngClass]="{'is-in-drop-event': isHovering === true}"
+    (drop)="drop($event)"
+    (dragover)="allowDrop($event)" 
+    (dragleave)="drag($event)">    
+
+    <label class="inputUploadImage" [for]="'uploadImage_'+ uuid">
+        <div class="image"><img src="assets/cds/images/icons/add_image.svg"></div>
+        <input style="display:none" type="file" [id]="'uploadImage_'+ uuid" accept=".jpg, .JPEG, .png, .gif, .webp" (change)="selectFile($event)" />
+    </label>
+
+    <div class="labelDropUploadImage">
+        <span *ngIf="isHovering === false">
+            {{'drag an image here or click to select them' | translate}}
+        </span>
+        <span *ngIf="isHovering === true">
+            {{'image dragging' | translate}}
+        </span>
+    </div>
+    
+</div>
+
+<div *ngIf="metadata.src" class="image-wrp">
+    <img *ngIf="!isImageSvg" #imageUploaded id="imageUploaded" [src]="sanitizerUrlImage()" (change)="getDimensionImage()">
+    <!-- <img *ngIf="isImageSvg" #imageUploaded id="imageUploaded" [src]="sanitizerUrlImage()" (change)="getDimensionImage()"> -->
+</div>

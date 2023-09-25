@@ -1,0 +1,132 @@
+:root {
+    --themeColor: rgb(240, 242, 247);
+    --foregroundColor: black;
+}
+
+
+.tile-typing-now {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    bottom: 3px;
+    width: auto;
+    text-align: center;
+    margin: 0px;
+    padding: 0px;
+    font-size: 1.1em;
+    color: var(--foregroundColor);
+    //display: none;
+    // &.active {
+    //     display: block;
+    // }
+}
+
+/* BEGIN LOADING */
+/*http://tobiasahlin.com/spinkit/*/
+#tile-spinner {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin: 0;
+    // &.active {
+    //     display: inline-block;
+    //     width: 30px;
+    // }
+}
+#tile-spinner > div {
+    width: 6px;
+    height: 6px;
+    background-color: var(--basic-blue);
+}
+// .spinner {
+//     margin: 100px auto 0;
+//     width: 70px;
+//     text-align: center;
+// }
+// .spinner > div {
+//     width: 18px;
+//     height: 18px;
+//     background-color: #333;
+//     border-radius: 100%;
+//     display: inline-block;
+//     -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+//     animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+// }
+// .spinner .bounce1 {
+//     -webkit-animation-delay: -0.32s;
+//     animation-delay: -0.32s;
+// }
+// .spinner .bounce2 {
+//     -webkit-animation-delay: -0.16s;
+//     animation-delay: -0.16s;
+// }
+// @-webkit-keyframes sk-bouncedelay {
+//     0%, 80%, 100% { -webkit-transform: scale(0) }
+//     40% { -webkit-transform: scale(1.0) }
+// }
+// @keyframes sk-bouncedelay {
+//     0%, 80%, 100% { 
+//     -webkit-transform: scale(0);
+//     transform: scale(0);
+//     } 40% { 
+//         -webkit-transform: scale(1.0);
+//         transform: scale(1.0);
+//     }
+// }
+/* END LOADING */
+
+
+/* ******BOUNCE SPINNER START****** */
+.spinner {
+    margin: 15px 10px; //remove it if activate avatar image 
+    width: 70px;
+    // text-align: center;
+    min-height: 20px;
+    display: block;
+}
+
+.spinner > div {
+    width: 9px;
+    height: 9px;
+    background-color: #333;
+
+    border-radius: 100%;
+    display: inline-block;
+    -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+    animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+
+.spinner .bounce1 {
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s;
+    background-color: var(--themeColor)
+}
+
+.spinner .bounce2 {
+    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s;
+    background-color: var(--themeColor);
+    opacity: 0.4
+}
+
+.spinner .bounce3 {
+    background-color: var(--themeColor);
+    opacity: 0.6
+}
+
+
+@-webkit-keyframes sk-bouncedelay {
+    0%, 80%, 100% { -webkit-transform: scale(0) }
+    40% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bouncedelay {
+    0%, 80%, 100% { 
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    } 40% { 
+        -webkit-transform: scale(1.0);
+        transform: scale(1.0);
+    }
+}
+/* ******BOUNCE SPINNER END****** */

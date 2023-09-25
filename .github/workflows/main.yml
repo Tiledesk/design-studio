@@ -1,0 +1,21 @@
+name: Publish Docker Community image tags
+
+on:
+  push:
+    tags:
+      - '**'           # Push events to every tag including hierarchical tags like
+jobs:
+
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+     - name: Check out the repo
+       uses: actions/checkout@v2
+     - name: Push to Docker Hub
+       uses: docker/build-push-action@v1
+       with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: tiledesk/tiledesk-dashboard
+        tag_with_ref: true

@@ -1,0 +1,93 @@
+<div class="content">
+
+    <div class="fulfillment">
+        <div class="fulfillment-header">
+            <div>
+                <h3 class="card_title__underlined">
+                    <span class="card_title__underline title">
+                        Fulfillment
+                    </span>
+                </h3>
+            </div>
+            <div>
+                <div class="onoffswitch-wrapper">
+                    <div style="display: inline-block;position: relative;top: -13px;margin-right: 12px;">
+                        <span *ngIf="selectedChatbot.webhook_enabled === true"
+                            style="color:#8ab4f8; text-transform: uppercase; font-weight: 400;">
+                            {{'Enabled' | translate}}
+                        </span>
+                        <span *ngIf="selectedChatbot.webhook_enabled === false"
+                            style="color:#818895; text-transform: uppercase; font-weight: 400;">
+                            {{'Disabled' | translate}}
+                        </span>
+                    </div>
+                    <div class="nw-onoffswitch-wrapper" style="clear: both;display: inline-block;">
+                        <div class="nw-onoffswitch">
+                            <input (change)="toggleWebhook($event)" type="checkbox" name="webhook-switch"
+                                class="nw-onoffswitch-checkbox" id="webhook-switch"
+                                [checked]="selectedChatbot.webhook_enabled === true">
+                            <label class="nw-onoffswitch-label" for="webhook-switch"></label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div>
+            <div class="section-subtitle" style="height: 8px;"> </div>
+        </div>
+
+        <div>
+            <div>
+                <p class="fulfillment-description">
+                    {{'YourWebServiceWillReceivePostRequestFrom' | translate: tparams}}
+                    {{'BeSureThatYourWebServiceMeetsAllTheWebhookRequirements' | translate}}
+                    <span class="custom-link" (click)="openWebhookRequirementsDoc()">
+                        {{'LearnMoreAboutWebhookRequirements' | translate }}
+                    </span>
+                </p>
+            </div>
+        </div>
+
+
+        <div *ngIf="selectedChatbot.webhook_enabled" class="webhook-enabled-box">
+            <label class="custom-label webhook-url-label">
+              <span>Webhook URL</span>
+              <span style="color:#ff5252">*</span>
+            </label>
+            <div class="input-box">
+              <input id="webhook-url" name="webhook-url" [(ngModel)]="selectedChatbot.webhook_url"
+                (ngModelChange)="onChangeWebhookUrl($event)" class="input" type="text"
+                style="margin-bottom: 3px;" placeholder="{{'EnterWebhookURL' | translate}}" autocomplete="off">
+
+              <div class="webhook-url-errors" *ngIf="WEBHOOK_URL_IS_EMPTY === true">
+                {{'ThisUrlWilReceiveAPostRequestFrom' | translate: tparams}}
+              </div>
+              <div class="webhook-url-errors"
+                *ngIf="WEBHOOK_URL_IS_EMPTY === false && WEBHOOK_URL_IS_HTTP_or_HTTPS === false">
+                {{'WebhookmentUrlMustBeAHttpsUrl' | translate}}
+              </div>
+
+              <div class="webhook-url-errors"
+                *ngIf="WEBHOOK_URL_IS_EMPTY === false && WEBHOOK_URL_IS_HTTP_or_HTTPS === true && WEBHOOK_URL_IS_VALID === false">
+                {{'WebhookmentUrlMustBeAValidUrl' | translate}}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div>
+              <button id="update-bot-btn" #editbotbtn
+                class="btn btn-primary pull-right cds-blue-button" (click)="editBot()"
+                [disabled]="(selectedChatbot.webhook_enabled === true && WEBHOOK_URL_HAS_ERROR === true) || (selectedChatbot.webhook_enabled === false  && selectedChatbot.webhook_url === undefined)">
+                {{ "BotsAddEditPage.UpdateBotName" | translate }}
+              </button>
+            </div>
+          </div>
+
+
+
+    </div>
+
+</div>
+

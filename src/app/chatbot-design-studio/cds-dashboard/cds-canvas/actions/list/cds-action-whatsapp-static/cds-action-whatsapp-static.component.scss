@@ -1,0 +1,211 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+.container-wrap {
+    padding: 20px 0 0;
+    max-height: calc(100vh - 170px);
+    overflow-y: scroll;
+}
+
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+
+    #opt-train-wrp {
+        display: flex;
+        align-items: center;
+
+        label {
+            font-weight: 500;
+            font-family: Poppins, Roboto, Arial, sans-serif;
+            text-transform: capitalize;
+            font-size: 14px;
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+        }
+    }
+}
+
+input {
+    width: 100%;
+    height: 36px;
+    border-radius: 4px;
+    border: solid 1px #eee;
+    padding: 8px;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+}
+
+input::placeholder {
+    color: rgb(198, 198, 198);
+    opacity: 1; /* Firefox */
+}
+
+.phone-number-id-container {
+    margin-bottom: 10px;
+}
+
+.highlighted {
+    box-shadow: 0px 0px 4px 1px red;
+}
+
+.select-template-container {
+    margin-bottom: 16px;
+}
+
+
+.select-template-box {
+    margin-right: 30px;
+    margin-left: 30px;
+}
+
+.receiver-list {
+    //max-height: calc(100vh - 380px);
+    overflow-y: scroll;
+    padding: 10px 0px 0px 0px;
+    margin-top: 10px;
+}
+
+.add-block-btn-container {
+    text-align: center;
+    margin-top: -10px;
+    //margin-top: 4px;
+
+    .add-block-btn {
+        margin: 0px;
+        padding: 4px;
+        border-radius: 50%;
+        box-shadow: unset;
+        background-color: white;
+        cursor: pointer;
+    }
+
+    .add-block-btn > span {
+        font-size: 24px;
+        color: $icon-color;
+        position: relative;
+        top: 0px;
+    }
+
+    .add-block-btn:hover > span {
+        color: rgba($icon-color, 0.8);
+    }
+
+    .add-btn-text {
+        cursor: pointer;
+        color: $icon-color;
+        position: relative;
+        width: 130px;
+        top: -27px;
+        left: 246px;
+
+        &:hover {
+            color: rgba($icon-color, 0.8);
+        }
+    }
+}
+
+
+.json-preview-container {
+    //margin-top: -20px;
+    //padding: 0 20px;
+    display: none;
+    margin: 0 30px;
+    background-color: #354552;
+    border-radius: 4px;
+    // animation: fadein 1s;
+    // animation-delay: 1s;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.preview-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    //padding: 2px 10px;
+    padding: 4px 10px 0px 10px;
+
+    span.title {
+        color: white;
+        font-size: 14px;
+    }
+}
+
+.icon-only {
+    background-color: transparent;
+    border: none;
+    color: #bababa;
+    padding: 0;
+    //position: relative;
+    // top: 36px;
+    // left: 400px;
+
+    span {
+        font-size: 14px;
+    }
+}
+
+.icon-only:hover {
+    color: white;
+}
+
+
+::ng-deep pre {
+    background: #354552;
+    color: #d6e5db;
+    line-height: 16px;
+    margin-bottom: 30px;
+    padding: 10px;
+    overflow-x: auto;
+    border-radius: 4px;
+    //margin: 10px;
+
+    span {
+        display: inline;
+    }
+
+    span::before {
+        display: none;
+    }
+    span.key {
+        color: red;
+    }
+    span.number {
+        color: #6eb4bc;
+    }
+    span.boolean {
+        color: #a693e0;
+    }
+    span.null {
+        color: #e09393;
+    }
+    span.key {
+        color: #a9d18f;
+    }
+
+    .json {
+        margin-top: -10px;
+    }
+
+    .headers {
+        span {
+            margin-left: -36px;
+        }
+    }
+}
+
+

@@ -1,0 +1,309 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+h4 {
+    font-size: 16px;
+    color: #e8eaed;
+}
+
+.text-editor-wrapper:hover {
+    .text-editor {
+        .response-controls {
+            opacity: 1;
+        }
+    }
+}
+
+.text-editor-wrapper {
+    font-size: $font-size-base;
+    position: relative;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 50px 0px 20px 0px;
+
+    .text-editor {
+        position: relative;
+        margin: 0;
+        padding: 0;
+
+        .response-controls {
+            position: absolute;
+            top: 10px;
+            left: 0px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+
+            .control-button {
+                cursor: pointer;
+                color: $color-bck-gray-hex;
+                transition: color 0.3s;
+                height: 20px;
+
+                &.delete {
+                    height: 24px;
+                    width: 24px;
+                    background: $color-bck-gray-hex;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    em {
+                        font-size: 1.15em;
+                        color: $color-withe-hex;
+                        transition: color 0.3s;
+                    }
+                }
+            }
+
+            .control-button:hover {
+                color: $color-withe-hex;
+
+                &.delete {
+                    box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
+
+                    em {
+                        color: $color-red-hex;
+                    }
+                }
+            }
+        }
+
+        .box-textarea {
+            width: calc(100% - 40px);
+            margin-left: 20px;
+
+            input {
+                border-radius: 8px;
+                background: $color-withe-hex;
+                border: 1px solid $color-withe-hex;
+                overflow-x: hidden;
+                overflow-y: auto;
+                width: calc(100% - 2.5em);
+                padding: 5px 5px;
+                color: $color-text-dark-hex;
+                font-size: 1.15em;
+                line-height: 25px;
+                resize: vertical;
+
+                &.customPrefix {
+                    padding-left: 20px;
+                    width: calc(100% - 2.5em - 20px);
+                }
+            }
+
+            .input-prefix {
+                position: absolute;
+                top: 14px;
+                left: 8px;
+                color: #7d7d7d;
+                font-weight: 800;
+            }
+
+            .input-suffix {
+                position: absolute;
+                top: 14px;
+                right: 8px;
+                color: #7d7d7d;
+                font-weight: 800;
+                margin-right: 40px;
+            }
+        }
+
+        .text-editor-drop {
+            position: absolute;
+            display: inline-flex;
+            margin: 0;
+            left: 0;
+            top: -30px;
+            color: #dcdcdc;
+            cursor: grab;
+        }
+    }
+
+    .editor-utils {
+        position: relative;
+        margin: -20px 50px 0px 0px;
+        float: right;
+
+        .num-chars {
+            background: $color-light-gray-hex;
+            padding: 0px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            color: $color-text-box-hex;
+            float: right;
+
+            &.error {
+                background: $color-orange-hex;
+            }
+        }
+
+        .text-editor-insert-attribute {
+            float: right;
+        }
+
+        .moji-picker {
+            float: right;
+        }
+    }
+}
+
+.text-editor-wrapper:hover .text-editor {
+    .response-controls {
+        opacity: 1;
+    }
+}
+
+/** TEXT AREA **/
+mat-form-field.mat-focused ::ng-deep {
+    .mat-form-field-wrapper {
+        .mat-form-field-flex {
+            .mat-form-field-infix {
+                input {
+                    border: 1px solid $icon-color !important;
+                    outline: 1px solid $icon-color !important;
+                    transition: border 0.3s;
+                }
+            }
+        }
+    }
+}
+
+mat-form-field.box-textarea ::ng-deep {
+    .mat-form-field-wrapper {
+        padding-bottom: 0;
+
+        .mat-form-field-flex {
+            border-radius: 4px 4px 0 0;
+            padding: 0 0.75em 0 0.75em;
+            margin: 0;
+            background: transparent;
+        }
+    }
+
+    .mat-form-field-underline {
+        display: none;
+    }
+}
+
+.cds-questions-main-content {
+    padding: 25px;
+    width: 100%;
+}
+
+.cds-questions-container {
+    width: 100%;
+}
+
+.cds-add-question-container {
+    margin-bottom: 18px;
+}
+
+.cds-input-group {
+    margin-bottom: 8px;
+}
+
+.cds-add-question-input {
+    border: 1px solid #fff;
+    height: 47px;
+    width: 100%;
+    // border-top-right-radius: 4px;
+    // border-bottom-right-radius: 4px;
+}
+
+.cds-question-input {
+    border: 1px solid #fff;
+    height: 47px;
+    width: 100%;
+    font-weight: 400;
+}
+
+.cds-group-addon-left {
+    background: #fff;
+    height: 47px;
+    border-radius: 0;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 4px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.cds-group-addon-question-right {
+    background: #006cff;
+    height: 47px;
+    border-radius: 0;
+    // padding-left: 6px;
+    // padding-right: 6px;
+    padding-top: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    cursor: pointer;
+    max-width: 47px;
+}
+
+.cds-group-addon-question-right:hover {
+    opacity: 0.8 !important;
+}
+
+.cds-group-addon-question-right-btn-text {
+    vertical-align: middle;
+    position: relative;
+    top: -7px;
+    color: #fff;
+}
+
+.cds-group-addon-question-right-btn-icon {
+    color: #fff;
+    position: relative;
+    right: 3px;
+}
+
+.cds-group-addon-right {
+    background: #fff;
+    height: 47px;
+    border-radius: 0;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    cursor: pointer;
+}
+
+// .cds-group-addon-right-icon:hover {
+//     color: #ff4000
+// }
+
+.cds-group-addon-right:hover>.cds-group-addon-right-icon {
+    color: #ff4000;
+}
+
+.add-question-btn-disabled {
+    pointer-events: none;
+    background: #aaa;
+}
+
+// .cds-question-input:hover ~ .cds-group-addon-right ~ span {
+//     opacity: 1;
+// }
+
+.cds-add-question-input::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    font-size: 14px;
+}
+
+.cds-add-question-input:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    font-size: 14px;
+}
+
+.cds-add-question-input::-ms-input-placeholder {
+    /* Microsoft Edge */
+    font-size: 14px;
+}
+
+.cds-add-question-input::-webkit-input-placeholder {
+    font-size: 14px;
+}

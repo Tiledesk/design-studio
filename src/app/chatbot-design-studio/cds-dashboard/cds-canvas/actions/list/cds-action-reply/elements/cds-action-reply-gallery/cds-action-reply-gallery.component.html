@@ -1,0 +1,233 @@
+<div  class="extensions-response" *ngIf="!previewMode">
+    
+    <div class="text-editor-drop">
+        <em class="material-icons">drag_indicator</em>
+    </div>
+
+    <div class="response-controls">
+        <div class="control-button delete" (click)="onDeleteActionReply()">
+            <em class="material-icons">delete</em>
+        </div>
+        <div class="control-button" (click)="onMoveUpResponse()">
+            <em class="material-icons">expand_less</em>
+        </div> 
+        <div class="control-button" (click)="onMoveDownResponse()">
+            <em class="material-icons">expand_more</em>
+        </div>
+    </div>
+    
+    <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+        <appdashboard-delay-slider
+            [delayTime]="delayTime"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-slider>
+    </div>
+    <div class="filter-wrapper" *ngIf="canShowFilter || response._tdJSONCondition?.conditions?.length > 0">
+        <appdashboard-filter
+            [expression]="response._tdJSONCondition"
+            [booleanOperators]="booleanOperators"
+            (onChangeExpression)="onChangeExpression($event)">
+        </appdashboard-filter>
+    </div>
+</div>
+
+
+<div *ngIf="previewMode" [class.previewMode]="previewMode">
+    <ng-container *ngIf="gallery.length === 1 && gallery[0].preview.src === ''" [ngTemplateOutlet]="placeholder"></ng-container>
+    <ng-container *ngIf="(gallery.length === 1 && gallery[0].preview.src !== '') ||  gallery.length > 1" [ngTemplateOutlet]="galleryElement"></ng-container>
+</div>
+
+
+<div *ngIf="!previewMode"
+    class="gallery-response gallery-replies" 
+    #scrollMe id="scrollMe"         
+    cdkDropListOrientation="horizontal" 
+    cdkDropList (cdkDropListDropped)="drop($event)" >
+    
+    <div *ngFor="let galleryEl of gallery; let i = index; let last= last" class="tpl-drop-down single-btn-reply" cdkDragBoundary=".gallery-replies" cdkDrag> 
+        <div style="display: flex;">
+            <div>
+                <div class="button-reply">
+                    <div class="gallery-reply-card single-btn-reply">
+                        <div class="gallery-image">
+                            <div class="image-overlay">
+                                <cds-image-upload
+                                    class="image-upload"
+                                    [index]="i"
+                                    [metadata] = galleryEl.preview
+                                    (onChangeMetadata)="onChangeMetadata($event, i)">
+                                </cds-image-upload>
+                                <div *ngIf="galleryEl.preview.src" class="control-button delete" (click)="onDeleteImage(i)">
+                                    <em class="material-icons">clear</em>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-title" (click)="initElement();activateEL[i].title=true"> 
+                            <cds-textarea id="title"
+                                [textLimitBtn]="activateEL[i]['title']"
+                                [emojiPikerBtn]="activateEL[i]['title']"
+                                [setAttributeBtn]="activateEL[i]['title']"
+                                [limitCharsText]="80"
+                                [minRow]="1"
+                                [text]="galleryEl.title" 
+                                (selectedAttribute)="onSelectedAttribute($event,'title',i)"
+                                (selectedEmoji)="onSelectedAttribute($event,'title',i)"
+                                (clearSelectedAttribute)="onClearSelectedAttribute()"
+                                (changeTextarea)="onChangeText($event, 'title', i)">
+                            </cds-textarea>
+                        </div>
+                        <div class="gallery-description" (click)="initElement();activateEL[i]['description']=true"> 
+                            <cds-textarea id="description"
+                                [class.noButtons]="galleryEl.buttons.length === 0"
+                                [textLimitBtn]="activateEL[i]['description']"
+                                [emojiPikerBtn]="activateEL[i]['description']"
+                                [setAttributeBtn]="activateEL[i]['description']"
+                                [limitCharsText]="80"
+                                [minRow]="1"
+                                [text]="galleryEl.description" 
+                                (selectedAttribute)="onSelectedAttribute($event,'description', i)"
+                                (selectedEmoji)="onSelectedAttribute($event,'description',i)"
+                                (clearSelectedAttribute)="onClearSelectedAttribute()"
+                                (changeTextarea)="onChangeText($event, 'description', i)">
+                            </cds-textarea>
+                        </div>
+                        <div class="gallery-buttons" *ngIf="galleryEl.buttons.length > 0"
+                            cdkDropListOrientation="vertical"
+                            [cdkDropListData]="galleryEl.buttons" 
+                            cdkDropList (cdkDropListDropped)="dropButton($event, i)">
+                            <div *ngFor="let button of galleryEl.buttons; let j= index; let firstBtn = first; let lastBtn = last" 
+                                class="single-button action"
+                                (click)="onOpenButtonPanel(i, j, button)" cdkDrag>
+                                    {{button.value}}
+                                <div class="button-controls action-button-controls">
+
+                                    <div class="buttonsToMove">
+                                        <div class="control-button" (click)="$event.stopPropagation();" *ngIf="galleryEl.buttons.length > 0">
+                                            <!-- <em class="material-icons">expand_less</em>  onMoveTopButton(i,j) -->
+                                            <em class="material-icons">import_export</em>
+                                        </div> 
+                                        <!-- <div class="control-button" *ngIf="lastBtn" (click)="$event.stopPropagation();onMoveBottomButton(i,j)">
+                                            <em class="material-icons">expand_more</em>
+                                        </div> -->
+                                    </div>
+                    
+                                    <div class="control-button delete" (click)="$event.stopPropagation();onDeleteButton(i,j)">
+                                        <em class="material-icons">delete</em>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="button-controls" *ngIf="gallery.length > 1">
+                        
+                        <div class="buttonsToMove">
+                            <div class="control-button" (click)="onMoveLeftGallery(i)">
+                                <em class="material-icons">chevron_left</em>
+                            </div> 
+                            <div class="control-button" (click)="onMoveRightGallery(i)">
+                                <em class="material-icons">chevron_right</em>
+                            </div>
+                        </div>
+        
+                        <div class="control-button delete" (click)="onDeleteGallery(i)">
+                            <em class="material-icons">delete</em>
+                        </div>
+        
+                    </div>
+                </div>
+                <!-- NEW BUTTON ADD-->
+                <div *ngIf="galleryEl.buttons.length < 3"class="gallery-buttons-add">
+                    <div class="gallery-buttons-add-lines"></div>
+                    <div class="csd-add-button-btn-wpr csd-add-button-btn-wpr-element" (click)="onAddButton(i)">
+                        <button class="btn btn-white cds-add-action-btn csd-add-action-btn-wpr-element">
+                            <span class="material-icons csd-add-action-btn-wpr-element">
+                                add
+                            </span>
+                        </button>
+                        <div class="action--text csd-add-action-btn-wpr-element"> Add button </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW GALLERY ADD-->
+            <div *ngIf="last" class="gallery-buttons-add last">
+                <div class="gallery-buttons-add-lines"></div>
+                <div class="csd-add-button-btn-wpr csd-add-button-btn-wpr-element" (click)="onAdd()">
+                    <button class="btn btn-white cds-add-action-btn csd-add-action-btn-wpr-element">
+                        <span class="material-icons csd-add-action-btn-wpr-element">
+                            add
+                        </span>
+                    </button>
+                    <div class="action--text csd-add-action-btn-wpr-element"> Add card </div>
+                </div>
+            </div>
+            <div *ngIf="last" class="cards-scroll-spacer"></div>
+        </div>
+        
+
+    </div>
+
+</div>
+
+
+<ng-template #placeholder [ngOutletContext]="context">
+    <div class="gallery-preview-wrp" id="placeholder">
+        <div class="image no-image">
+            <img src="assets/cds/images/icons/add_image.svg">
+        </div>
+        <div class="content">
+            <span class="text">Type Title</span>
+            <span class="text description">Type Description</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #galleryElement [ngOutletContext]="context">
+    <div *ngFor="let galleryEl of gallery; let i = index; let last = last" class="galleryElement">
+       <div class="gallery-preview-wrp" [ngStyle]="{ 'border-bottom' : last? 'unset' : 'border-bottom: 1px solid #dcd5ba'}">
+            <div class="image" [class.no-image]="galleryEl.preview.src === ''">
+                <img *ngIf="galleryEl.preview.src !== '' " [src]="sanitizerUrlImage(galleryEl.preview.src)" alt="{{galleryEl.preview.name}}">
+                <img *ngIf="galleryEl.preview.src === '' "src="assets/cds/images/icons/add_image.svg">
+            </div>
+            <div class="content">
+                <span class="text"> {{galleryEl.title}}</span>
+                <span class="text description"> {{galleryEl.description}}</span>
+            </div>
+       </div>
+        <div class="buttons-response button-replies">
+            <div *ngFor="let button of galleryEl.buttons; let j= index;" class="content-botton-reply"> 
+                <div class="button-reply">
+                    <div class="button-reply-text single-btn-reply"
+                        (click)="$event.stopPropagation(); onOpenButtonPanel(i, j, button)">
+                        {{button.value}}
+                    </div>
+                    <div class="button-controls">
+                        <!-- <div class="buttonsToMove">
+                            <div class="control-button" (click)="onMoveLeftButton(i)">
+                                <em class="material-icons">chevron_left</em>
+                            </div> 
+                            <div class="control-button" (click)="onMoveRightButton(i)">
+                                <em class="material-icons">chevron_right</em>
+                            </div>
+                        </div> -->
+                        <div class="control-button delete" (click)="$event.stopPropagation(); onDeleteButton(i)">
+                            <em class="material-icons">delete</em>
+                        </div>
+                    </div>
+                </div>
+        
+                <cds-connector class="button-connector"
+                    cdkDragDisabled
+                    [idConnector]="button.__idConnector"
+                    [isConnected]="button.__isConnected">
+                </cds-connector>
+        
+            </div>
+            <div *ngIf="galleryEl.buttons.length < 3" class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onAddButton(i)">
+                + Add button
+            </div>
+        </div> 
+        <!-- <div class="gallery-divider"></div> -->
+    </div>
+</ng-template>

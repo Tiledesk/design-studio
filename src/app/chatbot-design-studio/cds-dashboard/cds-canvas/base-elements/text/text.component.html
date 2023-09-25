@@ -1,0 +1,43 @@
+<div class="text-editor-wrapper">
+    <div class="text-editor">
+
+        <!-- <div class="response-controls">
+             <div class="control-button delete" (click)="onDeleteResponse()">
+                <em class="material-icons">delete</em>
+            </div>
+            <div class="control-button" (click)="onMoveUpResponse()">
+                <em class="material-icons">expand_less</em>
+            </div> 
+            <div class="control-button" (click)="onMoveDownResponse()">
+                <em class="material-icons">expand_more</em>
+            </div>
+        </div> -->
+        
+        <mat-form-field class="box-input" appearance="fill">
+            <div class="input-prefix" *ngIf="customPrefix"> / </div>
+            <input matInput
+                #input_text
+                [class.customPrefix]="customPrefix"
+                [formControl]="control"
+                [matAutocomplete]="auto"
+                [placeholder]="placeholder"
+                [disabled]="disabled"
+                [type]="inputType"
+                cdkTextareaAutosize
+                cdkAutosizeMinRows="1"
+                cdkAutosizeMaxRows="5"
+                [(ngModel)]="text"
+                (ngModelChange)="onChangeText($event)"/>
+            <div class="input-suffix" *ngIf="customPrefix"> / </div>
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                  {{option}}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+        <!-- <div *ngIf="control.invalid && (control.dirty || control.touched)">
+            FIELD REQUIRED
+        </div> -->
+        
+    </div>
+</div> 

@@ -1,0 +1,36 @@
+<div class="rules-container">
+    <div class="new-rules-box" [style.display]="showWelcome? 'none': 'block'">
+        <div class="button-wrp">
+            <button id="cds-new-rules-button" type="button" class="btn btn-primary cds-blue-button" (click)="addNew()"> 
+                <span class="material-icons icon plus-icon">add</span>
+                Add
+            </button>
+        </div>
+    </div>
+
+    <div class="welcome_message_wrp" *ngIf="showWelcome">
+        <cds-splash-screen *ngIf=!intentSelected
+            [text]="'You have no rules set for this Chatbot <br><br> Rules allow your Chatbot to proactively write to your visitor based on specific events (i.e. visitor lands on a specific page)'"
+            [videoUrl]="'https://www.youtube.com/embed/SgDGwvVoqWE'"
+            [videoDescription]="'Learn about AI rules and how to apply them here'"
+            [section]="'cds-sb-rules'"
+            (onClickBtn)="addNew($event)" > 
+        </cds-splash-screen>
+    </div>
+
+    <cds-rules-add *ngIf="addClicked"
+        [listOfIntents]="listOfIntents"
+        [selectedChatbot]="selectedChatbot"
+        (onRuleAdded)="onRuleAdded($event)"
+        (onBack)="onBack($event)">
+    </cds-rules-add>
+
+    <cds-rules-list
+        [listOfIntents]="listOfIntents"
+        [listOfRules]="listOfRules"
+        [selectedChatbot]="selectedChatbot"
+        (onRuleDeleted)="onRuleDeleted($event)">
+    </cds-rules-list>
+      
+</div>
+

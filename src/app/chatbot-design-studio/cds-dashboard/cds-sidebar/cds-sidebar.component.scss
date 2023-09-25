@@ -1,0 +1,227 @@
+@import "./src/assets/sass/md/_variables.scss";
+@import "./src/assets/sass/cds/_variables.scss";
+
+.settings-sidebar-wpr {
+    position: relative;
+    //display: flex;
+    display: none;
+    flex-direction: column;
+    flex: 1 0 auto;
+    font-size: 12px;
+    margin-top: 5px;
+    // padding-right: 10px;
+    width: 40px;
+
+    &.is_opened{
+        width: 140px;
+    }
+
+    // width: 140px;
+    // background-color: aliceblue;
+    // min-height: calc(100% - 123px);
+    // min-height: 100% ;
+    // background: rgb(245, 247, 249);
+    // padding-top: 13px;
+
+    // padding-right: 5px;
+    // padding-left: 7px;
+    // top: -9px;
+    // left: -13px;
+    // height: calc(100% + 39px);
+}
+
+.settings-sidebar-wpr-opened {
+    width: 215px;
+    min-width: 215px;
+    max-width: 215px;
+}
+.settings-sidebar-wpr-closed {
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+}
+
+.settings-sidebar > li {
+    // height: 40px;
+    height: 35px;
+    border-radius: 4px;
+    // margin-right: 6px;
+    font-weight: 400;
+    cursor: pointer;
+    width: 100%;
+    // padding-right: 6px;
+    display: flex;
+    align-items: center;
+    // margin-bottom: 3px;
+}
+
+.active-item {
+    background-color: rgb(220, 233, 255);
+    font-weight: 500 !important;
+}
+
+.custom_paragraph {
+    color: rgb(100, 116, 145);
+    
+    line-height: 1.2;
+    margin-bottom: 0px;
+    padding-left: 8px;
+    display: inline-block;
+    vertical-align: middle;
+    // width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.settings-sidebar-icons {
+    color: rgb(100, 116, 145);
+    vertical-align: middle;
+    font-size: 18px;
+    margin-left: 6px;
+}
+
+.settings-sidebar > li:hover {
+    background-color: rgba(100, 116, 145, 0.08);
+    color: rgb(8, 15, 26);
+}
+
+
+.settings-sidebar > li:hover .custom_paragraph {
+    // background-color: rgba(100, 116, 145, 0.08);
+    color: rgb(8, 15, 26);
+}
+
+.settings-sidebar > li:hover .settings-sidebar-icons {
+    color: rgb(8, 15, 26);
+}
+
+li.active a p.custom_paragraph {
+    color: $brand-sidebar-active-item-text-color !important;
+}
+
+li.active a i.settings-sidebar-icons {
+    color: $brand-sidebar-active-item-text-color !important;
+}
+
+li > a {
+    /* margin: 5px 15px !important; */
+
+    margin-top: 5px !important;
+    margin-right: 5px !important;
+    margin-bottom: 5px !important;
+    margin-left: 0px !important;
+    // width: 60px;
+    border-radius: 0px;
+}
+
+.bot-lang-badge {
+    // font-weight: 400;
+    background-color: #3ea9f5;
+    /* border-color: #e3e7fa; */
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #fff;
+    position: relative;
+    // top: -1px;
+    text-transform: uppercase;
+}
+
+
+
+.toggle-setting-sidebar-icon {
+    background: #fff;
+    border: 1px solid #e5effe !important;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.toggle-setting-sidebar-icon:hover {
+    background: #f5f8fa;
+}
+
+::ng-deep .custom-mat-tooltip-in-settings-sidebar {
+    background-color: #fff  !important;
+    color: #555555 !important;
+    font-size: 12px  !important;
+    border-radius: 2px !important;
+    font-family: 'Poppins' !important;
+    padding-top:8px!important;
+    padding-bottom:8px!important;
+    border: 1px solid #e5effe!important;
+}
+
+.sidebar-bot-profile-img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #eee;
+    margin-left: 3px;
+}
+
+///
+
+.content {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    //display: none;
+    flex-direction: column;
+    align-items: center;
+    // padding-left: 5px;
+    // padding-right: 5px;
+    
+    &.is_opened {
+
+        // display: block;
+        // padding-left: 5px;
+        // padding-right: 5px;
+        width: 175px;;
+
+        .section {
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+}
+
+.section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // margin-bottom: 10px;
+    padding: 5px 12px;
+    // border-radius: 4px;
+    transition: all .3s;
+    width: 100%;
+    cursor: pointer;
+    height: 60px;
+
+    .item-label {
+        margin-bottom: 0px;
+        color: white;
+        margin-left: 6px;
+    }
+
+    .item-icon {
+        color: $icon-color;
+    }
+
+}
+
+.section:hover {
+    background-color: $icon-color-background;
+}
+
+.is_active {
+    background-color: $icon-active-background;
+
+    .item-icon {
+        color: $icon-active-color;
+    }
+}

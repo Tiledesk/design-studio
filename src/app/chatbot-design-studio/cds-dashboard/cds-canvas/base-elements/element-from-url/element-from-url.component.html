@@ -1,0 +1,38 @@
+<div class="row-upload">
+    <div class="response-image-uploader-overlay">
+
+        <div class="form-group">
+            <label class="control-label">
+                {{ 'Add path' | translate }}
+            </label>
+            <input type = "text" 
+                [(ngModel)] = "pathElement"
+                class="input form-control"/>
+        </div> 
+
+        <button 
+            type="button" 
+            class="btn btn-primary btn-save" 
+            (click)="onLoadPathElement()">
+            {{ 'load frame' | translate }}
+        </button>
+    </div>
+
+</div>
+
+
+
+
+<div class="row-dimension">
+
+    <div class="row-info">
+        <span class="control-label">{{ 'width' | translate }}:</span>
+        <input [(ngModel)] = "widthElement" type="text" class="input ng-untouched ng-pristine ng-valid">
+    </div>
+    <div class="row-info">
+        <span class="control-label">{{ 'height' | translate }}:</span>
+        <input [(ngModel)] = "heightElement" type="text" class="input ng-untouched ng-pristine ng-valid">
+    </div>
+
+
+</div>

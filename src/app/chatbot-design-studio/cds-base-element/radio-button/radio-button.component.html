@@ -1,0 +1,11 @@
+<div class="content">
+    <mat-radio-group 
+        (change)="onChangeButton($event)">
+        <mat-radio-button class="example-radio-button" *ngFor="let item of items" 
+            [value]="item"
+            [disabled]="item.disabled"
+            [checked]="item.checked">
+            {{item?.label}}
+        </mat-radio-button>
+    </mat-radio-group>
+</div>

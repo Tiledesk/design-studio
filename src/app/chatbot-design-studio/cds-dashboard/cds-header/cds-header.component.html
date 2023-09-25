@@ -1,0 +1,112 @@
+<div class="header-left" [class.is_opened]="IS_OPEN_SIDEBAR">
+    <img *ngIf="!IS_OPEN_SIDEBAR" src="assets/img/logos/tiledesk_logo_white_small.svg">
+    <img *ngIf="IS_OPEN_SIDEBAR" src="assets/img/logos/tiledesk-logo_new_white.svg">
+</div>
+<div class="header-right">
+    <!-- <div class="toggle-setting-sidebar-icon-wpr" [class.is_opened]="IS_OPEN_SIDEBAR"
+        (click)="onToggleSidebarWith(IS_OPEN_SIDEBAR = !IS_OPEN_SIDEBAR)">
+        <span *ngIf="IS_OPEN_SIDEBAR" class="material-icons toggle-setting-sidebar-icon">
+            chevron_left
+        </span>
+        <span *ngIf="!IS_OPEN_SIDEBAR" class="material-icons toggle-setting-sidebar-icon">
+            chevron_right
+        </span>
+    </div> -->
+    <!-- <i class="material-icons cds-btn-back" (click)="goBack()">keyboard_arrow_left</i> -->
+    <div class="header-go-back"  
+        (click)="goToBack()" 
+        style="cursor:pointer"
+        matTooltip="Go back my Chatbots" 
+        matTooltipClass="custom-mat-tooltip"
+        matTooltipHideDelay="100"
+        matTooltipPosition='below'
+        #tooltip="matTooltip">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#006cff">
+            <path d="M0 0h24v24H0z" fill="none"/><path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"/>
+        </svg>
+        <span class="go-back-to-my-chatbot-text">
+            My Chatbots
+        </span>
+        
+    </div>
+    <div class="header-title">{{ selectedChatbot?.name }}</div>
+    <div class="right-opts">
+        <div *ngIf="isBetaUrl">
+            <button class="btn btn-primary pull-right cds-blue-button cds-beta"
+                type="button">
+                BETA
+            </button>
+        </div>
+
+        <div class="btn-group"  [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
+            <button id="cds-publish-btn" class="btn btn-primary" type="button"
+                (click)="publish()">
+                <span class="material-icons">
+                    cached
+                </span>
+                Publish
+            </button>
+            <!-- (click)="isOpenDropdown(isOpen = !isOpen)"  [ngClass]="{'caret-rotate-0': is0penDropDown === true, 'caret-rotate-180': is0penDropDown === false}" -->
+            <!-- <button id="cds-publish-btn-option" type="button" class="btn btn-primary dropdown-toggle"
+                data-toggle="dropdown">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+            </button> -->
+
+            <!-- <ul class="dropdown-menu" role="menu" style="border-radius: 3px ;background-color: rgb(51, 64, 94)">
+                <li>
+
+                    <a class="custom---anchor" *ngIf="selectedChatbot?.public === false"
+                        (click)="publishOnCommunity()" style="padding-left: 15px; padding-right: 15px;">
+                        <div class="btn-in-dropdown">
+                            Deploy on Community
+                        </div>
+
+                    </a>
+                    <a class="custom---anchor" *ngIf="selectedChatbot?.public === true"
+                        (click)="onRemoveFromCommunity()" style="padding-left: 15px; padding-right: 15px;">
+                        <div class="btn-in-dropdown">
+                            Remove from community
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a *ngIf="selectedChatbot?.public === true" 
+                        class="custom---anchor-community"
+                        (click)="onGoToCommunity()" 
+                        style="padding-left: 15px; padding-right: 15px;">
+                        <div class="btn-in-dropdown">
+                            Community window
+                        </div>
+                    </a>
+                </li>
+            </ul> -->
+        </div>
+        <div *ngIf="TRY_ON_WA === true">
+            <button id="cds-test-it-wab-out-btn" class="btn btn-primary cds-blue-button cds-test-it-out" type="button" (click)="openWhatsappPage()">
+                <img width="18px" height="auto" src="assets/img/channel_icons/whatsapp-logo_green.svg">
+                Try on WhatsApp
+            </button>
+        </div>
+        <div class="cds-test-it-out-btn-wpr" style="margin-right: 12px;">
+            <button id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button cds-test-it-out"
+                type="button" (click)="openTestSiteInPopupWindow()"
+                matTooltipClass="custom-mat-tooltip"
+                matTooltip="Test it" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100">
+                <span class="material-icons">
+                    play_arrow
+                </span>
+            </button>
+        </div>
+        <!-- <div class="cds-close-btn-wpr">
+
+            <button class="btn pull-right cds-close-btn" (click)="goToBack()">
+                <span class="material-icons cds-close-btn-icon">
+                    clear
+                </span>
+            </button>
+
+        </div> -->
+    </div>
+</div>

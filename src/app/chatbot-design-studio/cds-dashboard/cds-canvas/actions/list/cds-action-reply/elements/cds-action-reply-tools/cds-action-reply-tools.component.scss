@@ -1,0 +1,39 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+.add-responses {
+    grid-gap: 5px;
+    // display: grid;+
+    display: flex;
+    float: right;
+    .add-response { 
+        text-align: center;
+        cursor: pointer;
+        box-sizing: border-box;
+        outline: none;
+        margin: 0;
+        padding: 0;
+        i {
+
+            align-items: center;
+            border-radius: 4px;
+            display: flex;
+            width: 100%;
+            padding: 3px;
+            justify-content: center;
+            font-size: 1em;
+            background: $color-withe-hex;
+            color: $color-bck-gray-hex;
+            border: 1px solid $color-light-gray-hex;
+            &:hover {
+                outline: 1px solid $action-color-selected!important;
+                border: 1px solid $action-color-selected!important;
+            }
+        }
+        span {
+            color:$color-bck-gray-hex;
+            font-size: 10px;
+            font-weight: 400;
+            line-height: normal;
+        }
+    }
+}

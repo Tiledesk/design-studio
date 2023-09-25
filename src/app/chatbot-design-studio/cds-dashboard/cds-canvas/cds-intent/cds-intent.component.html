@@ -1,0 +1,254 @@
+<div class="panel-intent-content tds_draggable" [class.isStart]="isStart" [id]="'intent-content-'+ intent?.intent_id">
+
+    <cds-panel-intent-controls
+        [isInternalIntent]="isInternalIntent"
+        [isStart]="isStart"
+        [deleteOptionEnabled]="listOfActions?.length > 0"
+        [webhookEnabled]="intent.webhook_enabled"
+        (onOptionClicked)="onOptionIntentControlClicked($event)">
+    </cds-panel-intent-controls>
+
+    <div class="pic-header tds_draggable" 
+        [id]="'block-header-'+ intent?.intent_id"
+        [ngClass]="{'cds-start': isStart}">
+
+        <cds-panel-intent-header class="pic-title-text" 
+            [class.isStart]="isStart"
+            [intent]="intent">
+        </cds-panel-intent-header>
+
+        <div *ngIf="!isStart" class="cds-intent-options">
+            <div class="option" 
+                (click)="onSelectQuestion(HAS_SELECTED_TYPE.QUESTION)"
+                [attr.active]="questionCount > 0">
+                <img src="assets/cds/images/brain.svg" title="Question">
+            </div>
+            <div class="option" (click)="onSelectForm(HAS_SELECTED_TYPE.FORM)" 
+                [attr.active]="formSize > 0">
+                <img src="assets/cds/images/form.svg" title="Form">
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="isStart" class="cds-start-content">
+        <cds-action-intent class="panel-response" 
+            [isStart]="isStart" [intentSelected]="intent"
+            [action]="listOfActions[0]" 
+            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+        </cds-action-intent>
+    </div>
+
+
+
+    <div *ngIf="!isStart" class="actions-list-wpr"  
+        cdkDropList
+        [cdkDropListData]="listOfActions"
+        (cdkDropListDropped)="onDropAction($event)"
+        [cdkDropListEnterPredicate]="canEnterDropList(intent)">
+        <!-- [id]="'action_'+i" -->
+
+        <!-- ------------------------------------------------------------------------------------------------------------------------- -->
+        <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
+        <!-- ------------------------------------------------------------------------------------------------------------------------- -->
+        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
+            cdkDrag
+            [cdkDragDisabled]="dragDisabled">
+            <!-- add-action-placeholder  -->
+            <!-- <div class="add--action-placeholder-add-icon">
+                <span class="material-icons"> add </span>
+            </div> -->
+            <div class="add--action-placeholder-text">
+                Add an action to this block
+
+                <span style="display: block;font-size: 12px;">
+                    Actions are executed in sequence starting from the top block action
+                </span>
+            </div>
+
+            <div class="add-action-from-placeholder-btn-wpr">
+                <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+                    class="btn cds-add-action-btn csd-add-action-btn-wpr-element">
+                    <span class="material-icons csd-add-action-btn-wpr-element">
+                        add
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div *ngFor="let action of listOfActions; let i = index, let last = last;" 
+            cdkDrag
+            (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
+            (cdkDragReleased)="onDragEnded($event, i)"
+            [id]="action._tdActionId" 
+            class="box-action" 
+            tabindex="0" 
+            [ngClass]="{
+            'cds-action-active': intentService.actionSelectedID === action._tdActionId, 
+            'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY,
+            'cds-last-action': last
+            }" 
+            (keydown)="onKeydown($event)" 
+            (click)="onSelectAction(action, i, action._tdActionId)">
+            <!-- [ngClass]="{'hide-drag-action-palceholder': hideActionDragPlaceholder}" -->
+            <!-- [ngStyle]="{'opacity':hideActionDragPlaceholder === true ? '1' : '0' }" -->
+
+            <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
+
+            <cds-action-description  class="header-action" 
+                cdkDragHandle
+                [elementType]="action._tdActionType">
+            </cds-action-description>
+
+            <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
+
+                <cds-action-controls 
+                    (onClickControl)="onClickControl($event, action, i)">
+                </cds-action-controls>
+
+
+                <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY" 
+                    class="panel-response" 
+                    [intentSelected]="intent"
+                    [connector]="connector" 
+                    [action]="action"   
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-reply>
+
+                <cds-action-reply *ngSwitchCase="TYPE_ACTION.RANDOM_REPLY" 
+                    class="panel-response"
+                    [intentSelected]="intent" 
+                    [connector]="connector" 
+                    [action]="action"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-reply>
+
+                <cds-action-intent *ngSwitchCase="TYPE_ACTION.INTENT" 
+                    class="panel-response" 
+                    [intentSelected]="intent"
+                    [action]="action" 
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-intent>
+
+                <cds-action-email *ngSwitchCase="TYPE_ACTION.EMAIL" 
+                    class="panel-response" 
+                    [action]="action">
+                </cds-action-email>
+
+                <cds-action-online-agents *ngSwitchCase="TYPE_ACTION.ONLINE_AGENTS" 
+                    class="panel-response"
+                    [connectorChanged]="connectorChanged" 
+                    [intentSelected]="intent" 
+                    [action]="action"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-online-agents>
+
+                <cds-action-open-hours *ngSwitchCase="TYPE_ACTION.OPEN_HOURS" 
+                    class="panel-response"
+                    [connectorChanged]="connectorChanged" 
+                    [intentSelected]="intent" 
+                    [action]="action"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-open-hours>
+
+                <cds-action-agent *ngSwitchCase="TYPE_ACTION.AGENT" 
+                    class="panel-response" 
+                    [action]="action">
+                </cds-action-agent>
+
+                <cds-action-wait *ngSwitchCase="TYPE_ACTION.WAIT" 
+                    class="panel-response" 
+                    [action]="action">
+                </cds-action-wait>
+
+                <cds-action-change-department *ngSwitchCase="TYPE_ACTION.CHANGE_DEPARTMENT" 
+                    class="panel-response"
+                    [action]="action">
+                </cds-action-change-department>
+
+                <cds-action-close *ngSwitchCase="TYPE_ACTION.CLOSE" 
+                    [action]="action">
+                </cds-action-close>
+
+                <cds-action-json-condition *ngSwitchCase="TYPE_ACTION.JSON_CONDITION" 
+                    class="panel-response"
+                    [intentSelected]="intent" 
+                    [action]="action" 
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-json-condition>
+
+                <cds-action-replace-bot *ngSwitchCase="TYPE_ACTION.REPLACE_BOT" 
+                    class="panel-response"
+                    [action]="action">
+                </cds-action-replace-bot>
+
+                <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE" 
+                    class="panel-response"
+                    [action]="action">
+                </cds-action-assign-variable>
+
+                <cds-action-delete-variable *ngSwitchCase="TYPE_ACTION.DELETE_VARIABLE" 
+                    class="panel-response"
+                    [action]="action">
+                </cds-action-delete-variable>
+
+                <cds-action-hide-message *ngSwitchCase="TYPE_ACTION.HIDE_MESSAGE" 
+                    class="panel-response"
+                    [action]="action" 
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-hide-message>
+
+                <cds-action-web-request *ngSwitchCase="TYPE_ACTION.WEB_REQUEST"     
+                    class="panel-response"
+                    [action]="action">
+                </cds-action-web-request>
+
+                <cds-action-web-request-v2 *ngSwitchCase="TYPE_ACTION.WEB_REQUESTV2"    
+                    class="panel-response"
+                    [intentSelected]="intent" 
+                    [action]="action">
+                </cds-action-web-request-v2>
+
+                <cds-action-whatsapp-attribute *ngSwitchCase="TYPE_ACTION.WHATSAPP_ATTRIBUTE" 
+                    class="panel-response"
+                    [action]="action">
+                </cds-action-whatsapp-attribute>
+
+                <cds-action-whatsapp-static *ngSwitchCase="TYPE_ACTION.WHATSAPP_STATIC" 
+                    class="panel-response"
+                    [action]="action">
+                </cds-action-whatsapp-static>
+
+                <cds-action-askgpt *ngSwitchCase="TYPE_ACTION.ASKGPT" 
+                    class="panel-response" 
+                    [intentSelected]="intent" 
+                    [action]="action"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-askgpt>
+
+                <cds-action-gpt-task *ngSwitchCase="TYPE_ACTION.GPT_TASK" 
+                    class="panel-response" 
+                    [intentSelected]="intent"
+                    [action]="action"
+                    (updateAndSaveAction)="onSaveIntent($event)">
+                </cds-action-gpt-task>
+
+            </div>
+
+            <!-- [ngStyle]="{'display':isDragging === false ? 'block' : 'none' }" -->
+            <cds-action-arrow id="action-arrow-{{i}}" *ngIf="!last" class="cds-action-arrow">
+            </cds-action-arrow>
+
+            <div *ngIf="last" class="csd-open-action-menu-btn-wpr">
+                <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+                    class="btn cds-add-action-btn">
+                    <span class="material-icons">
+                        add
+                    </span>
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

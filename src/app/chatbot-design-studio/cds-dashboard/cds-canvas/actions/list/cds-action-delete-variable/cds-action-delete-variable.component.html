@@ -1,0 +1,39 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+    
+    <div class="action-row">
+        <!-- <div class="action-row-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 24 24" width="16px">
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path
+                    d="M12 1.95c-5.52 0-10 4.48-10 10s4.48 10 10 10h5v-2h-5c-4.34 0-8-3.66-8-8s3.66-8 8-8 8 3.66 8 8v1.43c0 .79-.71 1.57-1.5 1.57s-1.5-.78-1.5-1.57v-1.43c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5c1.38 0 2.64-.56 3.54-1.47.65.89 1.77 1.47 2.96 1.47 1.97 0 3.5-1.6 3.5-3.57v-1.43c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+            </svg>
+        </div> -->
+        <div *ngIf="action?.variableName" class="action-row-right">
+            {{action?.variableName}}
+        </div>
+        <div *ngIf="!action?.variableName" class="action-row-right empty">
+            Set variable to delete
+        </div>
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail">
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">Variable name:</label>
+            <!-- <cds-text id="text-condition"
+                [control]="actionDeleteFormGroup.controls['variableName']">
+            </cds-text> -->
+            <cds-select
+                [items]="variableListUserDefined"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [itemSelected]="action?.variableName"
+                (onSelected)="onChangeSelect($event)">
+            </cds-select>
+        </div>
+    </div>
+
+</div>

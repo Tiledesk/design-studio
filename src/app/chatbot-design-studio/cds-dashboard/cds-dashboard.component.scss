@@ -1,0 +1,73 @@
+@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/styles.scss";
+
+$mdb-font-family-poppins: 'Poppins', 'Roboto', Arial, sans-serif !default;
+
+.cds-header {
+  height: 60px;
+  font-family: $mdb-font-family-poppins;
+  line-height: 60px;
+  font-size: 21px;
+  color: #fff;
+  background: #1e293b;
+  display: flex;
+}
+
+.chatboat-dashboard {
+  background-color: rgb($bg-color-dark-rgb);
+  position: relative;
+  display: flex;
+  margin-top: 0px;
+  padding: 0px;
+  width: 100%;
+  height: calc(100vh - 60px);
+  overflow-x: hidden;
+  overflow-y: hidden;
+  font-family: $mdb-font-family-poppins;
+  color: #394f5a;
+  font-size: 16px;
+}
+
+cds-rules,
+cds-chatbot-details,
+cds-fulfillment {
+    width: 100%;
+}
+
+.is_opened_sidebar {
+  .cds-sidebar {
+    width: 175px;
+  }
+}
+
+.cds-sidebar {
+  border-right: 2px solid #394f5a;
+  width: 60px;
+  transition: 0.3s;
+  display: flex;
+  min-width: 60px;
+}
+
+.cds-content {
+  display: flex;
+  width: calc(100% - 60px);
+  overflow: hidden;
+}
+
+.cds-generic-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+  height: 100%;
+
+  &#action-detail{
+    z-index: 10
+  }
+  &#button-configuration{
+    z-index: 11
+  }
+  &#widget-preview{
+    z-index: 12
+  }
+}

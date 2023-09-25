@@ -1,0 +1,138 @@
+<div id="button-tab" class="button-tab" [style.width.px]="isOpenPanel?450:0" [style.opacity]="isOpenPanel?1:0">
+
+    
+
+    <div class="button-tab-header">
+        <div class="button-tab-title">
+            Button
+        </div>
+        <div class="button-tab-close" (click)="onCloseButtonPanel()">
+            <em class="material-icons">chevron_right</em>
+        </div> 
+    </div> 
+
+
+
+    <div class="button-tab-content">
+       
+        <div class="section displayed">
+            <div class="form-group" [ngClass]="{'is-error':buttonLabel}">
+               <label class="control-label ">
+                    {{ 'Button title' | translate }}
+                </label>
+                <!-- <cds-text id="input_title" 
+                    #input_title
+                    [text]="buttonLabel"
+                    (onChange)="onChangeTitle($event)">
+                </cds-text> -->
+
+                <cds-textarea 
+                    class="text-editable-div"
+                    [text]="buttonLabel" 
+                    [minRow]="1"
+                    popoverVerticalAlign="above"
+                    [emojiPikerBtn]="true"
+                    (changeTextarea)="onChangeTitle($event)">
+                </cds-textarea>
+
+                <!-- <div *ngIf="emojiPikerBtn" class="emoji-picker">
+                    <div class="emoji-picker-button" (click)="isEmojiPickerVisible = !isEmojiPickerVisible;">
+                        <span class="material-icons" style="font-size: 16px;">
+                            emoji_emotions
+                        </span>
+                    </div>
+                </div> -->
+            </div> 
+            <!-- <emoji-mart *ngIf="isEmojiPickerVisible"
+                class="box-emoji-mart"
+                [class.picker-visible] = "isEmojiPickerVisible"
+                [showPreview]="false" 
+                [perLine]="emojiPerLine" 
+                [include]="emojiiCategories"
+                [color]="emojiColor" 
+                [darkMode]="false"
+                [emojiSize] = "24"
+                (emojiSelect)="onAddEmoji($event)">
+            </emoji-mart> -->
+        </div>
+        
+        <div class="section displayed">
+            <div class="form-group ng-select">
+                <label class="control-label">
+                    {{ 'Type' | translate }}
+                </label>
+                <div class="selectFormModel class-test-select">
+                    <cds-select #select_action id="select-action"
+                        [items]="buttonTypes"
+                        [bindLabelSelect]="'label'"
+                        [bindValueSelect]="'value'"
+                        [itemSelected]="buttonType"
+                        (onSelected)="onChangeTypeButton($event)">
+                    </cds-select>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" [ngClass]="{'displayed':buttonType === typeOfButton.URL}">
+
+            <div class="form-group ng-select">
+                <label class="control-label">
+                    {{ 'Open in' | translate }}
+                </label>
+                <div class="selectFormModel class-test-select">
+                    <cds-select #select_action id="select-action"
+                        [items]="urlTypes"
+                        [bindLabelSelect]="'label'"
+                        [bindValueSelect]="'value'"
+                        [itemSelected]="urlType"
+                        (onSelected)="onChangeOpenIn($event)">
+                    </cds-select>
+                </div>
+            </div>
+
+            <div class="form-group" [ngClass]="{'is-error':errorUrl === true}">
+                <label class="control-label">
+                    {{ 'Url' | translate }}
+                </label>
+                <cds-text
+                    [text]="buttonUrl"
+                    (onChange)="onChangeUrl($event)">
+                </cds-text>
+            </div> 
+
+        </div>
+        
+
+        <div class="section" 
+            [ngClass]="{'displayed':button.type === typeOfButton.ACTION}">
+            <div class="form-group ng-select">
+                <label class="control-label">
+                    {{ 'Go to block' | translate }}
+                </label>
+                <cds-select #select_action id="select-action"
+                    [items]="listOfIntents"
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'"
+                    [itemSelected]="buttonAction"
+                    (onSelected)="onChangeGoToBlock($event)">
+                </cds-select>
+                <cds-attributes
+                    *ngIf="buttonAction"
+                    #cds_attributes
+                    id="cds-attributes"
+                    class = "cds-attributes"
+                    [openBlock]="openBlockAttributes"
+                    [attributes]="buttonAttributes"
+                    (changeAttributes)="onChangeAttributes($event)"
+                ></cds-attributes>
+            </div>
+
+        </div>
+       
+    </div> 
+
+</div>
+
+
+
+

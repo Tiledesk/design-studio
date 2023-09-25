@@ -1,0 +1,22 @@
+<div class="section" >
+    <label class="section-label">Url:</label>
+    <mat-radio-group [formControl]="conditionsForm.controls['regexOption']">
+        <mat-radio-button [value]="condition.value" *ngFor="let condition of conditions">{{condition.name}}</mat-radio-button>
+    </mat-radio-group>
+    <cds-text
+        [control]="conditionsForm.controls['text']"
+        [disabled]="conditionsForm.controls['regexOption'].value ==='any'"
+        [customPrefix]="conditionsForm.controls['regexOption'].value ==='custom'">
+    </cds-text>
+</div>
+<div class="section">
+    <label class="section-label">Every:</label>
+    <mat-chip-list aria-label="hours" #chipList [formControl]="conditionsForm.controls['triggerEvery']">
+            <mat-chip #chipRef="matChip" 
+                [value]="chip.value" *ngFor="let chip of chips; let i = index" 
+                (click)="chipRef.selectViaInteraction()"
+                [selected]="chip.selected">
+                {{chip.name}}
+            </mat-chip>   
+    </mat-chip-list>
+</div>

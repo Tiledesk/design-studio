@@ -1,0 +1,136 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+/** LOCAL COLORS **/
+$color-withe: #ffffff;
+$color-blue: #3ea9f5;
+$color-light-gray: #d3d3d3;
+$color-text-select: rgb(118, 149, 165);
+$color-bck-box: #e7f3ff;
+$color-text-box: #566787;
+
+.form-fields {
+    padding: 10px 0px;
+    margin-top: 0px;
+}
+
+.card-content {
+    padding: 0px 0 3px 0;
+}
+
+.form-fields-table {
+    display: block;
+    .col-30 {
+        width:150px;
+        max-width:150px;
+    }
+    .label-field {
+        font-weight: 400;
+        font-size: 13px;
+        white-space: normal;
+        word-wrap: break-word;
+        color: #e8eaed;
+    }
+    .td-order {
+        margin: 0px;
+        padding: 0px;
+        max-width: 20px;
+        width: 20px;
+        display: inline-block;
+        .material-icons {
+            font-size: 18px;
+            vertical-align: middle;
+            color: #ffffff;
+        }
+    }
+    .td-actions {
+        text-align: right;
+        padding: 0px;
+        width:80px;
+        display: table-cell;
+    }
+}
+
+.form-fields-table > thead {
+    width: 100%;
+    display: block;
+    tr {
+        width: 100%; 
+        display: inline-table;
+        border-bottom: 1px solid #e5effe;
+        th {
+            border-bottom: 0px solid #e5effe!important;
+        }
+    }
+    .ff--column-th-span {
+        font-weight: 300;
+        color: #e8eaed;
+    }
+}
+
+
+.form-fields-table > tbody > tr {
+    cursor:pointer;
+    width: 100%;
+    display: inline-table;
+}
+
+.form-fields-table > tbody > tr:hover {
+    background-color: rgba(30, 41, 59, 0.5);
+}
+
+.form-fields-table tr.selected {
+    background-color: rgba(30, 41, 59, 0.5);
+    border: 0px;
+}
+
+
+/** DRAG **/
+.cdk-drag-preview {
+    border-radius: 4px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 16px;
+    position: relative;
+    height: inherit;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    // background-color: yellowgreen;
+    .label-field {
+        font-weight: 400;
+        font-size: 13px;
+        white-space: normal;
+        word-wrap: break-word;
+        color: #e8eaed;
+    }
+
+    td {
+        margin: 0px;
+        padding: 0px;
+        vertical-align: top;
+    }
+    .td-actions {
+        display: none;
+    }
+}
+
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.example-box:last-child {
+    border: none;
+}
+
+.example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cds-edit-field-icon {
+   color: $light-blue;
+}

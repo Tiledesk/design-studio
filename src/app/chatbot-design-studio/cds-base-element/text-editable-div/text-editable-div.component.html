@@ -1,0 +1,95 @@
+<div class="main--wpr" style="position: relative;">
+    <!-- --------------------------------- -->
+    <!-- @ Panel attibute  -->
+    <!-- --------------------------------- -->
+    <div *ngIf="isOpenSetAttributesPanel" class="set--attribrutes-panel">
+        <input type="button" id="set--attribrute" value="first_name" unselectable="on"
+            (click)="setAttribute('${nome}')">
+
+        <input type="button" id="set--attribrute" value="city" unselectable="on" (click)="setAttribute('${city}')">
+
+        <input type="button" id="set--attribrute" value="phone" unselectable="on" (click)="setAttribute('${phone}')">
+    </div>
+    <!-- --------------------------------- -->
+    <!-- ./ Panel attibute  -->
+    <!-- --------------------------------- -->
+
+    <!-- --------------------------------- -->
+    <!-- @ Editor utils  (click)="toggleSetAttributesPanel(isOpenSetAttributesPanel = !isOpenSetAttributesPanel)"  -->
+    <!-- [satPopoverAnchor]="setattributepopover"
+    (click)="setattributepopover.toggle(); $event.stopPropagation()"
+    (document:click)="setattributepopover.close()" -->
+    <!-- --------------------------------- -->
+    <div unselectable="on" tabIndex="-1" class="text-editor-utils">
+        <div *ngIf="setAttributeBtn" class="insert-attribute-btn-wpr">
+            <input type="button" unselectable="on" class="insert-attribute-btn" [satPopoverAnchor]="setattributepopover"
+            (click)="openSetattributePopover();"
+            >
+            <span unselectable="on" class="material-icons material-icons-data-object" style="font-size: 16px;">
+                data_object
+            </span>
+        </div>
+
+        <sat-popover  disabled tabindex="-1" [autoFocus]="false" #setattributepopover id="addConditionFilter"  [restoreFocus]="true" panelClass="set-attributes-panel"
+        verticalAlign="below" interactiveClose="false">
+        <div>
+            <div id="search">
+                <span class="material-icons">search</span>
+                <input type="text" 
+                    placeholder="Type search value" 
+                    [(ngModel)]="textVariable"
+                    (ngModelChange)="onChangeSearch($event)">
+            </div>
+            <div id="scrollMe">
+                <div id="data">
+                    <div class="category-name">USER DATA</div>
+                    <div *ngFor="let variable of variableListMock" (click)="onVariableSelected(variable)" class="category-row">
+                        <span class="material-icons">data_object</span>
+                        <label class="category-row-name">{{variable.name}}</label>
+                    </div>
+                </div>
+                <!-- <div id="data">
+                    <div class="category-name">INTENT ATTRIBUTES</div>
+                    <div *ngFor="let variable of filteredVariableList" (click)="onVariableSelected(variable)" class="category-row">
+                        <span class="material-icons">data_object</span>
+                        <label class="category-row-name">{{variable.name}}</label>
+                    </div>
+                </div> -->
+            </div>
+            <div id="add-attribute" (click)="onAddCustomAttribute()">
+                <span class="material-icons">add</span>
+                Add custom attributes
+            </div>
+        </div>
+    </sat-popover>
+
+        <div *ngIf="emojiPikerBtn" class="emoji-picker">
+            <div class="emoji-picker-button" aria-expanded="false">
+                <span class="material-icons" style="font-size: 16px;">
+                    emoji_emotions
+                </span>
+            </div>
+        </div>
+
+        <div *ngIf="textLimitBtn" data-status="default" class="tpl-text-limit">
+            <div class="num-chars" [ngClass]="{'error' : alertCharsText}">{{leftCharsText}}</div>
+        </div>
+    </div>
+
+    <!-- <div 
+        id="content-editable"
+        [ngStyle]="{'min-height':minHeightContent?minHeightContent+'px':'auto'}"
+        data-focused="true" 
+        spellcheck="false" 
+        (input)="onInput('template')" 
+        (mouseup)="mouseUp()" 
+        contenteditable="true"
+        autofocus>
+    </div> -->
+    <!-- placeholder="{{'CannedResponses.WriteMsgToSendToYourVisitors' | translate}}" form-control  -->
+    <textarea id="canned-response-message"
+    name="canned-response-message" [ngClass]="{'texarea-is-empty' : texareaIsEmpty === true}"
+    [(ngModel)]="cannedResponseMessage" (ngModelChange)="cannedResponseMessageChanged($event)" rows="4"
+    class="canned-response-texarea"
+    > </textarea>
+</div>

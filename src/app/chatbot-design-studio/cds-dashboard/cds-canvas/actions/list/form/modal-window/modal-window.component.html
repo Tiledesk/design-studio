@@ -1,0 +1,47 @@
+
+<!-- ============ MODAL DELETE ============ -->
+<div class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          
+          <button type="button" class="close" aria-label="Close" (click)="closeDelete()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+  
+          <h4 class="modal-title">
+            <i class="material-icons">report_problem</i>
+            <span>
+              <!-- {{ translateMap.deleteField }} -->
+              Delete field
+            </span>
+          </h4>
+  
+        </div>
+  
+        <div class="modal-body">
+            <p>
+            <!-- {{translateMap.confirmDeleteField}} -->
+            Are you sure you want to delete the field? <b>{{translateMap.nameField}}</b>
+            </p>
+        </div>
+  
+        <div class="modal-footer">
+          <!-- Annulla -->
+          <button class="btn btn-white btn-close-delete" (click)="closeDelete()">
+            <!-- {{ translateMap.cancel }} -->
+            Cancel
+          </button>
+          <!-- Confirm -->
+          <button class="btn btn-danger" (click)="confirmDelete()">
+            <!-- {{ translateMap.deleteField }} -->
+            Delete field
+          </button>
+        </div>
+  
+  
+      </div>
+  
+    </div>
+  
+  </div>

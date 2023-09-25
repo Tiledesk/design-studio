@@ -1,0 +1,30 @@
+<label class="title-label">Operations:</label>
+
+<div class="block-wrp">
+    <div *ngFor="let op of list; let index = index; let last = last; trackBy:trackByIndex;">
+        <div *ngIf="index % 2 == 0" class="base-operand">
+            <div class="control-buttons" *ngIf="list && list.length > 0 || index!==0">
+                <div class="filter-remove" (click)="onDeleteGroup(index, last)"><span class="material-icons">delete</span></div>
+            </div>
+            <operand 
+                [operand]="op"
+                [listOfFunctions]="listOfFunctions"
+                (onChangeOperand)="onChangeOperand($event)">
+            </operand>
+        </div>
+
+        <div *ngIf="index % 2 == 1" class="basic-operator">
+            <operator 
+                [operator]="op" 
+                (operatorChange)="onSelectedOperator($event, index)">
+            </operator>   
+        </div>
+       
+       
+    </div>
+</div>
+<div class="add-filter-button" (click)="onClickOperator()">
+    <span class="material-icons">add</span>
+    New operation
+</div>
+

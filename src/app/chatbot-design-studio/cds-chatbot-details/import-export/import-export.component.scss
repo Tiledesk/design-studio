@@ -1,0 +1,204 @@
+@import "./src/assets/sass/md/_variables.scss";
+@import "./src/assets/sass/cds/_variables.scss";
+
+.close-modal-window {
+    float: right;
+    border: unset;
+    font-size: 31px;
+    border-radius: 50%;
+    height: 36px;
+    width: 36px;
+    background-color: rgb(221, 223, 230);
+}
+
+.close-modal-window:hover {
+    background-color: rgb(207, 210, 215) !important;
+}
+
+.chatbot-faq-export-import-wpr,
+.row {
+    margin-right: 0px;
+    margin-left: 8px;
+}
+
+/* MODAL START */
+
+// MODAL BOOTSTRAP BREAKPOINTS
+// from 992 to 1020px
+// @media (min-width: 992px) and (max-width: 1019px){
+//     .modal-dialog {
+//             margin-left: 33%;
+//         }
+//     }
+
+//     @media (min-width: 1020px) and (max-width: 1199px) {
+//         .modal-dialog {
+//             margin-left: 35%;
+//         }
+//     }
+
+//     @media (min-width: 1200px) and (max-width: 1469px)  {
+//         .modal-dialog {
+//             margin-left: 37%;
+//         }
+//     }
+
+//     @media (min-width: 1470px) and (max-width: 1549px) {
+//         .modal-dialog {
+//             margin-left: 38%;
+//         }
+//     }
+
+//     @media (min-width: 1550px) and (max-width: 1649px){
+//         .modal-dialog {
+//             margin-left: 39%;
+//         }
+//     }
+//     @media (min-width: 1650px) {
+//         .modal-dialog {
+//             margin-left: 40%;
+//         }
+//     }
+
+.modal {
+    top: 0;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #999;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px !important;
+    outline: 0;
+    -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.modal-title {
+    margin: 0;
+    line-height: 1.42857143;
+}
+
+button.close {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 0;
+    cursor: pointer;
+    background: 0 0;
+    border: 0;
+}
+.close {
+    float: right;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    filter: alpha(opacity=20);
+    opacity: 0.2;
+}
+
+.modal-body {
+    position: relative;
+    padding-top: 35px;
+    padding-bottom: 35px;
+    padding-right: 0px;
+    padding-left: 15px;
+}
+
+.modal-footer {
+    // padding: 15px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5;
+    // background-color: #edf0f1;
+    background-color: #eeeeee;
+    padding-top: 10px !important;
+}
+
+/* MODAL END */
+
+input[type="file"] {
+    display: none;
+}
+
+.export-import-section-title {
+    margin-left: 22px;
+    color: #9aa0a6;
+}
+
+.cds-dwnld-example-csv {
+    text-align: center;
+    border: 1px solid $light-blue;
+    background-color: $light-blue;
+    color: #202124;
+}
+
+.inport-faq-from-csv {
+    box-shadow: unset !important;
+    text-transform: unset !important;
+    color: #202124 !important;
+    font-weight: 500 !important;
+    background: $light-blue !important;
+    margin-left: 15px;
+}
+
+.inport-faq-from-csv:hover {
+    background: rgba(138, 180, 248, 0.8) !important;
+}
+
+
+
+.cds-blue-button {
+    padding: 12px 30px !important;
+    margin-left: 12px;
+}
+
+.import-faq-from-csv-btn-wpr {
+    margin-left: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+#upload-intents-from-json-overwrite {
+    box-shadow: unset !important;
+    text-transform: unset !important;
+    color: #202124 !important;
+    font-weight: 500 !important;
+    background: $light-blue !important;
+}
+
+#upload-intents-from-json-overwrite:hover {
+    background: rgba(138, 180, 248, 0.8) !important;
+}
+
+#upload-intents-from-json-add {
+    box-shadow: unset !important;
+    text-transform: unset !important;
+    color: #202124 !important;
+    background: $light-blue !important;
+}
+
+#upload-intents-from-json-add :hover {
+    background: rgba(138, 180, 248, 0.8) !important;
+}
+
+#upload-csv-choose-file {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    background: $light-blue !important;
+    box-shadow: unset !important;
+    color: #202124;
+    font-weight: 500 !important;
+}
+
+#upload-csv-choose-file:hover {
+    background: rgba(138, 180, 248, 0.8) !important;
+}

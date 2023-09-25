@@ -1,0 +1,109 @@
+<div class="extensions-response" *ngIf="!previewMode">
+    
+    <div class="text-editor-drop">
+        <em class="material-icons">drag_indicator</em>
+    </div>
+    
+    <div class="response-controls">
+        <div class="control-button delete" (click)="onDeleteActionReply()">
+            <em class="material-icons">delete</em>
+        </div>
+        <div class="control-button" (click)="onMoveUpResponse()">
+            <em class="material-icons">expand_less</em>
+        </div> 
+        <div class="control-button" (click)="onMoveDownResponse()">
+            <em class="material-icons">expand_more</em>
+        </div>
+    </div>
+
+    <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+        <appdashboard-delay-slider
+            [delayTime]="delayTime"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-slider>
+    </div>
+    <div class="filter-wrapper" *ngIf="canShowFilter || response._tdJSONCondition?.conditions?.length > 0">
+        <appdashboard-filter
+            [expression]="response._tdJSONCondition"
+            [booleanOperators]="booleanOperators"
+            [previewMode]="previewMode"
+            (onChangeExpression)="onChangeExpression($event)">
+        </appdashboard-filter>
+    </div>
+</div>
+
+<div class="previewMode text-editor-wrapper" *ngIf="previewMode">
+    
+    <div class="text-editor">
+        <div *ngIf="!response.metadata.src" class="response-frame-panel no-image">
+            <div class="image"><img src="assets/cds/images/icons/add_image.svg"></div>
+            <div class="text">Click to add frame</div>
+        </div>
+        <div *ngIf="response.metadata.src" class="content-frame">
+            <iframe
+                id="contentFrame" 
+                #iframe allowfullscreen
+                style= "border:none;"
+                [width]="frameWidth"
+                [height]="frameHeight"
+                [src]="framePath">
+            </iframe>
+        </div>
+    
+        <div>
+            <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
+            <div class="response-wrp no-text" *ngIf="!response.text">Click to add text ...</div>
+        </div>
+
+    </div>
+
+</div>
+
+    
+<div class="text-editor-wrapper" *ngIf="!previewMode">
+    <div class="text-editor">
+    
+        <div class="response-frame-wrapper"
+            [ngStyle]="{'width':framePath? 'auto' : '100%' }">
+            <div *ngIf="!response.metadata.src" class="response-frame-panel">              
+                <div class="frame-panel">
+                    <cds-element-from-url
+                        [metadata] = response.metadata
+                        (loadPathElement)="onLoadPathElement()">
+                    </cds-element-from-url>
+                </div>
+            </div>
+
+            <div class="content-frame">
+                <iframe *ngIf="response.metadata.src"
+                    id="contentFrame" 
+                    #iframe allowfullscreen
+                    style= "border:none;"
+                    [width]="frameWidth"
+                    [height]="frameHeight"
+                    [src]="framePath">
+                </iframe>
+
+                <div class="control-button delete" (click)="onDeletePathElement()">
+                    <em class="material-icons">clear</em>
+                </div>
+            </div> 
+
+        </div>
+
+       
+        
+        <cds-textarea 
+            class="text-editable-div"
+            [text]="response.text" 
+            [minRow]="1"
+            popoverVerticalAlign="above"
+            (changeTextarea)="onChangeTextarea($event)">
+        </cds-textarea>
+        
+         
+    </div>
+
+</div> 
+

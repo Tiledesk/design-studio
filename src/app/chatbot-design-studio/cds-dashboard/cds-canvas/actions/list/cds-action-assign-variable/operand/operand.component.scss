@@ -1,0 +1,80 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+div.operand-wrp {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 11fr 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 10px;
+    background: rgb(66,85,117);
+    padding: 10px 10px 20px;
+    border-radius: 5px;
+    &.opened {
+        .select-function{
+            display:block;
+        }
+    }
+    .select-function{
+        display:none;
+    }
+
+    .material-icons {
+        font-size: 25px;
+        color: #8ab4f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    div.value-wrp{
+        position: relative;
+        display: block;
+    }        
+
+    .applay-function-button{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        padding: 8px 15px;
+        border: 1px solid #c6cdd4;
+        border-radius: 4px;
+        height: 43px;
+        color: #c6cdd4;
+        cursor: pointer;
+        
+        &:hover{
+            border-color: white;
+            color: white
+        }
+    }
+}
+
+// cds-textarea#operand ::ng-deep {
+//     display: flex;
+//     width: 100%;
+//     textarea {
+//         border: 1px solid rgb(118, 118, 118) !important;
+//         resize: none !important; 
+//         padding: 8px 20px !important;
+//         height: 25px !important;
+//         min-height: 25px !important;
+//         width: calc(100% - 45px);
+//     }
+//     textarea::placeholder {
+//         font-family: 'Poppins','Roboto',Arial,sans-serif;
+//         font-size: 13px;
+//     }
+// }
+
+
+cds-select#selectOperand ::ng-deep {
+    .ng-value-container{
+        font-family: 'Poppins','Roboto',Arial,sans-serif;
+        .ng-placeholder {
+            font-size: 13px;
+        }
+    }
+}

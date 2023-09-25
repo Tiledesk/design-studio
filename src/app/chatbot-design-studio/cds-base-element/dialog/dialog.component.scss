@@ -1,0 +1,119 @@
+::ng-deep .custom-dialog-container {
+    width: 40vw!important;
+    min-width: 500px;
+    max-width: 1000px!important;
+    mat-dialog-container {
+      padding: 0;
+    }
+}
+
+.tpl-modal-box {
+    border-radius: 6px;
+    flex-direction: column;
+    background: rgb(255, 255, 255);
+}
+.tpl-modal-header {
+    align-items: flex-start;
+    align-items: center;
+    border-bottom: 1px solid #dbe1e8;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: center;
+    padding: 15px;
+    width: 100%;
+    i {
+        flex-shrink: 0;
+        font-size: 24px;
+        line-height: 23px;
+        margin-left: auto;
+        cursor: pointer;
+    }
+}
+
+.tpl-modal-header-text {
+    flex-grow: 1;
+    padding-right: 15px;
+    text-align: center;
+    width: 0;
+    span {
+        word-wrap: break-word;
+        display: -webkit-box;
+        line-height: 23px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 69px;
+        font-weight: 600;
+        font-size: 18px;
+    }
+}
+
+.tpl-modal-content {
+    flex-grow: 1;
+    padding: 30px 25px;
+    width: 100%;
+}
+
+.tpl-info {
+    border-radius: 4px;
+    display: flex;
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    width: 100%;
+    color: #333;
+    background: #ecb606b0;
+    .tpl-info-icon {
+        font-size: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        width: 35px;
+    }
+}
+.tpl-label-textarea {
+    margin-bottom: 5px;
+    color: #22272d;
+    font-size: 15px;
+    line-height: 19px;
+}
+
+.tpl-input {
+    background: #fff;
+    border: 2px solid #c6cdd4;
+    border-radius: 6px;
+    color: #22272d;
+    display: block;
+    font-weight: 400;
+    height: 37px;
+    line-height: 35px;
+    padding: 0 15px;
+    -webkit-transition: border .3s;
+    transition: border .3s;
+    width: 100%;
+    &::placeholder {
+        opacity: 0.5;
+    }
+    &.invalid{
+        border: 2px solid red !important;
+        outline: 0px solid red !important;
+        transition: border 0.3s;
+    }
+}
+
+.tpl-modal-buttons {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: flex-end;
+    padding: 0 25px 20px;
+    color: #333;
+    .cds-yellow-button{
+        margin-left: 10px; 
+        min-width: 80px;
+        background-color: #ecb606b0;
+        height: 100%;
+        color: #333;
+    }
+    .btn-cancel {
+        min-width: 80px;
+        border: 0;
+        height: 100%;
+    }
+}

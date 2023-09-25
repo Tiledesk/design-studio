@@ -1,0 +1,149 @@
+<!-- ---------------------------------------------- -->
+<!-- Hook chatbot to a dept modal  -->
+<!-- ---------------------------------------------- -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display': displayModalAttacchBotToDept }"
+    style="background-color: rgba(90,90,90,0.5);">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header custom--modal-header">
+                <button type="button" class="close" aria-label="Close" (click)="onCloseModalAttacchBotToDept()"
+                    style="position: absolute; right: 14px;top: 20px;">
+                    <span aria-hidden="true">
+                        <!-- &times; -->
+                        <svg class="tide-icon" width="24" height="24" viewBox="0 0 24 24">
+                            <path
+                                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+                            </path>
+                        </svg>
+                    </span>
+                </button>
+
+                <h2 class="modal-title custom__modal__title">
+                    <span style="vertical-align: middle;">
+                        {{ "HookTheBot" | translate }}
+                    </span>
+                </h2>
+            </div>
+
+            <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+            <!-- padding-top: 0px; padding-bottom: 0px; padding-right: 34px; padding-left: 34px;  -->
+            <div class="modal-body"
+                [ngClass]="{'modal-body-no-padding-top': DISPLAY_SELECT_DEPTS_WITHOUT_BOT && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false}"
+                style="line-height: 1 !important;height: 161px!important;text-align: center!important; margin: auto!important;">
+
+                <span *ngIf="!DISPLAY_SELECT_DEPTS_WITHOUT_BOT">
+                    <h4 *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                        style="padding-left: 12px; padding-right: 12px;"
+                        [innerHTML]="'DoYouWantToActivateTheBotForNewConversations' | translate: translateparamBotName ">
+                    </h4>
+                    <!-- <h3> {{ 'DoYouWantToActivateTheBotForNewVonversations' | translate: translateparamBotName }} </h3> -->
+                </span>
+
+                <span *ngIf="DISPLAY_SELECT_DEPTS_WITHOUT_BOT">
+                    <h4 *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                        [innerHTML]="'DoYouWantToActivateBotForOneOfTheFollowingDepts' | translate: translateparamBotName ">
+                    </h4>
+                </span>
+
+                <span *ngIf="DISPLAY_SELECT_DEPTS_WITHOUT_BOT" style="text-align: left;">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="select-dept-without-bot-wpr" *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                                style="padding-right: 26px; padding-left: 26px;">
+                                <ng-select [items]="depts_without_bot_array" bindValue="id" bindLabel="name"
+                                    placeholder="{{'SelectDepartment'|translate}}" [(ngModel)]="selected_bot_id"
+                                    (change)="onSelectBotId()">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+
+
+                <div *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT === true">
+
+                    <span *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS">
+
+                        <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 130.2 130.2">
+                            <circle class="path circle" fill="none" stroke="#73AF55" stroke-width="6"
+                                stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                            <polyline class="path check" fill="none" stroke="#73AF55" stroke-width="6"
+                                stroke-linecap="round" stroke-miterlimit="10"
+                                points="100.2,40.2 51.5,88.8 29.8,67.5 " />
+                        </svg>
+                        <h5 style="color:#73AF55;"> {{'BotSuccessfullyActivated' | translate }}</h5>
+
+                    </span>
+                    <span *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT_ERROR">
+
+                        <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 130.2 130.2">
+                            <circle class="path circle" fill="none" stroke="#D06079" stroke-width="6"
+                                stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                            <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
+                                stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+                            <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
+                                stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+                        </svg>
+
+
+                        <h5 style="color:#D06079;"> {{'AnErroOccurredWhileActivatingTheBot' | translate }}</h5>
+                    </span>
+                </div>
+            </div> <!-- /.modal-body -->
+
+            <div class="modal-footer modal-footer-no-bkgrnd">
+
+                <span *ngIf="DISPLAY_SELECT_DEPTS_WITHOUT_BOT">
+                    
+                    <button *ngIf="!selected_bot_id && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                        class="btn btn-gray-no-boxshadow" (click)="onCloseModalAttacchBotToDept()"
+                        style="margin-right:8px">
+                        <span> {{ 'Ignore' | translate}} </span>
+                    </button>
+
+                    <button *ngIf="selected_bot_id &&  HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                        class="btn btn-tdblu-no-boxshadow" (click)="hookBotToDept()" style="margin-right:8px">
+                        <i *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                            class="fa fa-spinner fa-spin"></i>
+                        <span> {{ 'ActivateFor' | translate}} {{selected_bot_name}} </span>
+                    </button>
+
+                    <button *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === true"
+                        class="btn btn-tdblu-no-boxshadow" (click)="onCloseModalAttacchBotToDept()"
+                        style="margin-right: 8px;">
+                        <span> {{ "BotsAddEditPage.Continue" | translate }} </span>
+                    </button>
+
+                </span>
+
+                <span *ngIf="!DISPLAY_SELECT_DEPTS_WITHOUT_BOT">
+
+                    <button *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === false && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                        class="btn btn-gray-no-boxshadow" (click)="onCloseModalAttacchBotToDept()"
+                        style="margin-right:8px">
+                        <span> {{ 'Ignore' | translate}} </span>
+                    </button>
+
+                    <button *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === false && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                        class="btn btn-tdblu-no-boxshadow" (click)="hookBotToDept()" style="margin-right:8px">
+                        <span> {{ 'ActivateBot' | translate}} </span>
+                    </button>
+
+                    <button *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                        class="btn btn-tdblu-no-boxshadow" style="margin-right: 8px;">
+                        <i class="fa fa-spinner fa-spin"></i>
+                        {{'Processing' | translate}}
+                    </button>
+
+                    <button *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === true"
+                        class="btn btn-tdblu-no-boxshadow" (click)="onCloseModalAttacchBotToDept()"
+                        style="margin-right: 8px;">
+                        <span> {{ "BotsAddEditPage.Continue" | translate }} </span>
+                    </button>
+                </span>
+            </div>
+        </div> <!-- /.modal-content -->
+    </div> <!-- /.modal-dialog -->
+</div> <!-- /.modal -->

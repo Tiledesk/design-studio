@@ -1,0 +1,99 @@
+$bck_color_1:  rgba(231, 238, 239, 0.8);
+$bck_color_2: rgba(238, 244, 246, 0.85);
+
+.cds-panel-elements {
+    position: absolute;
+    top: 12px;
+    left: 100%;
+    transform: translateX(12px);
+    padding: 4px;
+    border-radius: 10px;
+    background-color: $bck_color_1;
+    z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+svg {
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+.cds-elements {
+    padding: 4px;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: rgba(19, 33, 68, 0.01) 0px 1px 3px 1px, rgba(19, 33, 68, 0.12) 0px 5px 8px -8px, rgba(19, 33, 68, 0.12) 0px 2px 4px -3px, rgba(19, 33, 68, 0.03) 0px 0px 0px 1px;
+    overflow: hidden;
+    transition: height 0.15s ease 0s;
+}
+
+.cds-button-element {
+    animation: 0.1s ease-in-out 0s 1 normal both running;
+}
+
+.cds-box-button {
+    transition: background-color 0.15s ease 0s;
+    width: 64px;
+    height: 64px;
+    flex-direction: column;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cds-box-button:hover, .cds-box-button:focus {
+    background-color: $bck_color_1;
+}
+
+
+.box-img {
+    transition: opacity 0.15s ease 0s, background-color 0.15s ease 0s, color 0.15s ease 0s, transform 0.15s ease 0s;
+    box-sizing: content-box;
+    width: 22px;
+    height: 22px;
+    color: currentcolor;
+    background: transparent;
+    size:22px;
+}
+
+.box-img > img {
+    display: block;
+    width: inherit;
+    height: inherit;
+    filter: brightness(0) saturate(100%) invert(28%) sepia(8%) saturate(1693%) hue-rotate(156deg) brightness(93%) contrast(87%);
+}
+
+.box-title {
+    padding-top: 3px;
+    font-size: 9px;
+    font-weight: 600; 
+}
+
+
+
+#menuElement {
+    min-width: 100px;
+    max-width: 400px;
+    width: 185px;
+    color: #132144;
+    font-size: 15px;
+    line-height: 18px;
+    list-style: none;
+    overflow: hidden;
+    padding: 0;
+    // box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    border-radius: 6px;
+    background: rgb(255,255,255);
+    will-change: transform;
+    animation: .15s ease 0s 1 normal none running fadein, .15s ease 0s 1 normal none running movein, .1s ease 0s 1 normal none running scaleY;
+    margin: 0;
+    position: absolute;
+    top: 4px;
+    left: 80px;
+}

@@ -1,0 +1,57 @@
+@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/animations.scss";
+
+/* Intent header actions
+/* ***************************** */
+.intent-header-actions-container {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    height: 45px;
+    padding-left: 12px;
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+    transition: 0.25s all ease-in-out;
+  }
+  
+  .panel-intent-content:hover .intent-header-actions-container-on-start {
+    top: -19px !important;
+    right: 12px !important;
+  }
+  
+//   .panel-intent-content:hover .intent-header-actions-container {
+//     top: -28px;
+//     opacity: 1;
+//     transform: translate3d(0, 0, 0);
+//   }
+  
+  .intent-header-actions-wpr {
+    background: #fff;
+    height: 25px;
+    border-radius: 14px;
+    box-shadow: #001b4714 0 3px 8px;
+    display: flex;
+    padding: 3px 0px;
+  }
+  
+  .intent-header-action-btn {
+    cursor: pointer;
+    border-left: solid 1px $border-light;
+    padding: 0 8px;
+  
+  }
+  
+  .intent-header-action-btn:first-child {
+    border-left: unset;
+  }
+  
+  
+  .svg-icon--wh.webhook-enabled  svg {
+    fill: #17B366;
+  }
+  
+  .svg-icon--wh:hover  svg,
+  .svg-icon--delete-intent:hover svg,
+  .svg-icon--play:hover svg {
+    fill: #3ea9f5;
+  }

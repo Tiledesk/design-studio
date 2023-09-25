@@ -1,0 +1,87 @@
+<div class="text-editor-wrapper">
+    <div class="text-editor">
+
+        <mat-form-field class="box-textarea" appearance="fill">
+            <textarea matInput
+                id="text-area"
+                #autosize="cdkTextareaAutosize"
+                [class.invalid]="control.invalid"
+                [maxlength]="limitCharsText"
+                [formControl]="control"
+                [placeholder]="placeholder"
+                cdkTextareaAutosize
+                cdkAutosizeMinRows="{{minRow}}"
+                cdkAutosizeMaxRows="{{maxRow}}"
+                [(ngModel)]="text"
+                [readonly]="readonly"
+                (click)="onClickTextareaOpenSetAttributePopover();"
+                (ngModelChange)="onChangeTextArea($event)">
+            </textarea>
+        </mat-form-field>
+
+        <div *ngIf="showUtils === true" unselectable="on" tabIndex="-1" class="editor-utils">
+
+            <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="addVariable.toggle(); openSetAttributePopover();">
+                <span class="material-icons " style="font-size: 16px;">
+                    data_object
+                </span>
+            </div>
+    
+            <div *ngIf="emojiPikerBtn" class="emoji-picker">
+                <div class="emoji-picker-button" aria-expanded="false" [satPopoverAnchor]="emojiPicker" (click)="emojiPicker.toggle();">
+                    <span class="material-icons" style="font-size: 16px;">
+                        emoji_emotions
+                    </span>
+                </div>
+            </div>
+    
+            <div *ngIf="textLimitBtn" data-status="default" class="tpl-text-limit">
+                <div class="num-chars" [ngClass]="{'error' : alertCharsText}">{{leftCharsText}}</div>
+            </div>
+        </div>
+
+        <div class="tag" *ngIf="textTag">
+            <span class="material-icons close" (click)="onClearSelectedAttribute()">close</span>
+            <div class="tag-content ellips"><span class="tag-text">{{textTag}}</span></div>
+        </div>
+
+    </div>
+</div>
+
+<sat-popover #addVariable id="addVariable"  
+    horizontalAlign="center" 
+    verticalAlign="center"  
+    hasBackdrop 
+    (backdropClicked)="addVariable.close()" 
+    panelClass="texarea-add-filter-panel"  
+    interactiveClose="false">
+    <variable-list
+        (onSelected)="onVariableSelected($event)">
+    </variable-list>
+</sat-popover>
+
+<!--  [style.visibility]="isEmojiPickerVisible?'visible':'hidden'" -->
+<!-- panelClass="texarea-add-filter-panel"   -->
+<sat-popover #emojiPicker id="emojiPicker"
+    horizontalAlign="center" 
+    verticalAlign="center"  
+    hasBackdrop 
+    (backdropClicked)="emojiPicker.close()"
+    interactiveClose="false">
+    <emoji-mart
+        class="box-emoji-mart"
+        [class.picker-visible] = "true"
+        [showPreview]="false" 
+        [perLine]="emojiPerLine" 
+        [include]="emojiiCategories"
+        [color]="emojiColor" 
+        [darkMode]="false"
+        [emojiSize] = "24"
+        (emojiSelect)="onAddEmoji($event)">
+    </emoji-mart>
+</sat-popover> 
+
+
+
+
+

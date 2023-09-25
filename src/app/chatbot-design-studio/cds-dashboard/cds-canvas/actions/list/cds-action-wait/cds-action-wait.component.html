@@ -1,0 +1,38 @@
+
+<div *ngIf="previewMode" class="cds-action-preview">
+    
+    <div class="action-delay-preview"> 
+        <em class="delay--icon material-icons">timelapse</em>
+        <div class="delay--time">+{{action.millis/1000}}s delay</div>
+    </div>
+
+</div>
+
+
+
+
+<div *ngIf="!previewMode" class="content">
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">Delay Time: {{delayTime}}s</label>
+            <div class="action-wait-content">
+
+                <!-- tickInterval="1000" -->
+                <div class="action-wait-slider">
+                    <div class="action-wait-range">0.5s</div>
+                    <mat-slider class="wait-slider" thumbLabel 
+                        [displayWith]="formatLabel"
+                        step="0.5" min="0.5" max="15"
+                        [(ngModel)]="delayTime"
+                        (change)="updateWaitValue($event)"  
+                        aria-label="units">
+                    </mat-slider>
+
+                    <div class="action-wait-range">15s</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

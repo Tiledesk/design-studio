@@ -1,0 +1,103 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="action-row-left">
+       
+        <span class="web-request-action-method" *ngIf="action.method">
+            {{ action.method}}
+        </span>
+
+    </div>
+    <div *ngIf="action.url" class="action-row-right">
+        {{action.url}}
+    </div>
+    <div *ngIf="!action.url" class="action-row-right empty">
+        Enter request URL
+    </div>
+
+
+</div>
+
+
+<!-- Details -->
+<div *ngIf="!previewMode" class="content" #scrollMe id="scrollMe" >
+
+    <div class="input-group cds-input-group">
+        <cds-select id="method"
+            [items]="methods"
+            [bindLabelSelect]="'label'"
+            [bindValueSelect]="'value'"
+            [itemSelected]="action?.method"
+            (onSelected)="onChangeMethodButton($event)">
+        </cds-select>
+        <cds-textarea id="url"
+            class="text-editable-div"
+            [text]="action.url" 
+            [minRow]="1" [maxRow]="1"
+            popoverVerticalAlign="above"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [placeholder]="'Enter request URL'"
+            (changeTextarea)="onChangeTextarea($event, 'url')">
+        </cds-textarea>
+    </div>
+
+    <div class="cds-web-request-row">
+        <div class="add-response" (click)="onChangeParamsButton()">
+            <span [ngClass]="{'cds-action-active': methodSelectedHeader}">Header</span>
+        </div>
+        <div class="add-response" (click)="onChangeParamsButton()">
+            <span [ngClass]="{'cds-action-active': methodSelectedBody}">Body</span>
+        </div>
+        <div  *ngIf="methodSelectedBody" class="cds-rigth">
+            <button id="cds-community-btn" type="button" class="btn btn-primary pull-right cds-blue-button" (click)="onJsonFormatter()">format JSON </button>
+        </div>
+    </div>
+    
+    <div class="cds-web-request-row">
+
+        <cds-attributes
+            *ngIf="methodSelectedHeader"
+            class="cds-attributes"
+            [method]="typeMethodAttribute.INPUT"
+            [attributes]="jsonHeader"
+            (changeAttributes)="onChangeAttributes($event)">
+        </cds-attributes>
+
+        <cds-textarea *ngIf="methodSelectedBody"
+            id="url"
+            [ngClass]="{'jsonError': !jsonIsValid}"
+            class = "text-editable-div"
+            [text]="jsonBody"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [minRow]="5" [maxRow]="10"
+            [readonly]="false"
+            (changeTextarea)="onChangeTextarea($event, 'jsonBody')">
+        </cds-textarea>
+    </div>
+
+    <div *ngIf="methodSelectedBody"
+        class="cds-web-request-row-error center" 
+        [ngClass]="{'json-error-yes': !jsonIsValid}">
+       
+        <span>{{errorMessage}}</span>
+    </div>
+
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">Assign to:</label>
+            <cds-attributes
+                class="cds-attributes"
+                [attributes]="assignments"
+                [method]="typeMethodAttribute.TEXT"
+                [openBlock]="true"
+                (changeAttributes)="onChangeAttributesResponse($event)">
+            </cds-attributes>
+        </div>
+    </div>
+
+    
+</div>

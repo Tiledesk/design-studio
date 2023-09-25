@@ -1,0 +1,769 @@
+<div class="content columns">
+  <main class="column is-8 is-offset-2">
+    <div *ngIf="notify.msg | async as msg" class="notification" [ngClass]="{ 
+        'is-danger': msg.style == 'error',
+        'is-success': msg.style == 'success',
+        'is-info': msg.style == 'info'
+      }" style="margin-top:50px">
+      <button class="delete" (click)="notify.clear()"></button>
+      {{ msg.content }}
+    </div>
+  </main>
+</div>
+
+<!-- MODAL - LOGOUT WINDOWS -->
+<!-- <div class="backdrop" [ngStyle]="{'display':display}"></div> -->
+<div *ngIf="notify.displayExpiredSessionModal" class="modal" tabindex="-1" role="dialog"
+  [ngStyle]="{'display':notify.displayExpiredSessionModal}" style="background-color: rgba(90,90,90,0.5);">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom: 1px solid #e5e5e5; padding:15px">
+        <button type="button" class="close" aria-label="Close" (click)="notify.onCloseExpiredSessionModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+        <h4 class="modal-title">
+          {{ company_name }} {{ "SessionExipired" | translate }}
+        </h4>
+      </div>
+
+      <div class="modal-body" style="padding-bottom: 24px;">
+
+        <p style="margin-top: 0px; text-align:center; color:#566787; font-size:16px; font-weight:400 ">
+          {{ "YourSessionHasExpired" | translate }}
+        </p>
+        <p style="margin-bottom:0px; text-align:center;">
+          {{ "YouWillBeRedirectToLoginPage" | translate }}
+        </p>
+
+
+      </div>
+
+      <div class="modal-footer" style="text-align: center;">
+        <button class="btn btn-primary" (click)="onOkExpiredSessionModal()" style="padding:12px 16px; font-size:12px ">
+          Ok
+        </button>
+      </div>
+
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+
+<!-- ------------------------------------------------------------------------------------------------------------- -->
+<!-- CHECKLIST MODAL - NOT USED -  displayCheckLIstModal IS CALLED IN HOME-COMPONENT.HTML AND FOR NOW IT IS COMMENTED -->
+<!-- ------------------------------------------------------------------------------------------------------------- -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.displayCheckLIstModal}"
+  style="background-color: rgba(90,90,90,0.5);">
+  <!-- modal-lg -->
+  <div class="modal-dialog" role="document">
+
+    <div class="modal-content" style="padding-bottom: 24px;" style="padding-top:0px;">
+      <!-- border-bottom: 1px solid #e5e5e5; -->
+      <div class="modal-header" style=" padding-top:15px; padding-right:15px; padding-left:15px; padding-bottom:0px">
+        <button type="button" class="close" aria-label="Close" (click)="notify.onCloseCheckLIstModal()">
+          <span aria-hidden="true">
+            <!-- &times; -->
+            <svg class="tide-icon " width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+              </path>
+            </svg>
+          </span>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding-top: 0;">
+        <div class="row">
+          <!-- style="background-image: url('https://tiledesk.com/wp-content/uploads/2018/09/ai-powered-live-chat-tiledesk-hero-image.jpg'); background-size: cover; background-size: 300px 100px;background-repeat: no-repeat;"> -->
+          <div class="col-sm-6">
+            <div class="background">
+              <h4 id="checklist-modal" class="modal-title">
+                Getting Started with {{ company_name }}
+              </h4>
+              <!-- <h5 class="custom_title"> 2/3 </h5> -->
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+
+          </div>
+        </div>
+        <loading-spinner *ngIf="showSpinnerInModal"></loading-spinner>
+        <div *ngIf="!showSpinnerInModal" class="row">
+          <div class="col-sm-12" *ngFor="let option of gettingStartedChecklist">
+            <div class="checkbox">
+              <label>
+                <!-- name="optionsCheckboxes" -->
+                <input type="checkbox" [name]="option?.task" (change)="hasClickedChecklist($event)"
+                  [checked]="option?.done" [disabled]="option?.done">
+                <span
+                  style="display:inline-block; color: rgb(10, 91, 255);font-size:16px; line-height: 1.9; font-weight: 400"
+                  [ngClass]="{'option-task-disabled' : option?.done === true}">
+                  {{ option?.task | translate }}
+                  <i class="material-icons" style="font-size:14px; position: relative;top: 2px;">arrow_forward_ios</i>
+                </span>
+                <span style="display:inline-block; color:#394f5a; margin-left: 28px; font-weight: 400; font-size: 13px;"
+                  [ngClass]="{'option-desc-disabled' : option?.done === true}">
+                  {{ option?.taskDesc | translate}}
+                </span>
+
+
+                <!-- <div class="description">
+                                           In your profile settings you can either upload your own profile picture
+                                    </div> -->
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- <p style="margin-top: 0px; text-align:center; color:#566787; font-size:16px; font-weight:400 ">
+                          {{ "YourSessionHasExpired" | translate }}
+                    </p>
+                    <p style="margin-bottom:0px; text-align:center;">
+                          {{ "YouWillBeRedirectToLoginPage" | translate }}
+                    </p> -->
+
+
+      </div>
+
+      <!-- <div class="modal-footer" style="text-align: center;">
+                    <button class="btn btn-primary" (click)="notify.onCloseCheckLIstModal()" style="padding:12px 16px; font-size:12px ">
+                        CANCEL
+                    </button>
+                </div> -->
+
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<!-- ============= YOU SUBSCRIPTION HAS EXPIRED MODAL ============= -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.displayModalSubsExpired}"
+  style="background-color: rgba(90,90,90,0.9);">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-top-left-radius:6px; border-top-right-radius:6px">
+      <div class="modal-header" style="padding:16px!important; border-bottom:none!important;">
+
+        <button type="button" class="close" aria-label="Close" (click)="notify.closeModalSubsExpired()"
+          style="position: absolute; right: 14px;">
+          <span aria-hidden="true">
+            <!-- &times; -->
+            <svg class="tide-icon " width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+              </path>
+            </svg>
+          </span>
+        </button>
+
+        <h2 class="modal-title"
+          style="color: #262f3c; text-align: center; font-family: 'Poppins','Roboto', 'Arial', sans-serif; margin-top: 20px; font-size:28px">
+          <span style="vertical-align: middle;">
+            <!-- {{ "Pricing.SubscriptionExpired" | translate }} -->
+            {{ "Pricing.SubscriptionPaymentProblem" | translate }}
+          </span>
+        </h2>
+
+      </div>
+      <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+      <div class="modal-body"
+        style="padding-top: 0px; padding-bottom: 0px; padding-right: 34px; padding-left: 34px; line-height: 1;">
+
+        <div class="row">
+          <div class="col-sm-12">
+            <h3 style="text-align: center;  color: #8894ab; font-size: 22px; margin-bottom: 20px;">
+              {{ "Pricing.WeWereUnableToAutomaticallyRenewYourSubscription" | translate }}.
+              {{ "Pricing.PleaseContactUs" | translate }}
+              {{ "Pricing.ToUpdateYourPaymentInformation" | translate }}.
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer"
+        style="margin-top: 0px; background-color: #fff; border-top:none; border-bottom-left-radius:6px; border-bottom-right-radius:6px">
+        <div style="text-align: center; margin-bottom: 15px;">
+          <!-- style="background-color:rgb(136, 148, 171);color:#FFF;padding:12px 16px;border:0;border-radius:4px;font-size:17px; margin:6px"  -->
+          <!-- (click)="downgradePlanToFree()" -->
+          <button *ngIf="USER_ROLE === 'owner'" type="button" class="btn btn-danger"
+            (click)="notify.closeThisModalAndDisplayCancelSubscriptionModal()">
+
+            <!-- {{ 'Pricing.DowngradeTo' | translate }} -->
+            {{ "CancelSubscription" | translate }}
+          </button>
+          <!-- style="background-color:#3EA9F5;color:#FFF;padding:12px 16px;border:0;border-radius:4px;font-size:17px; margin:6px" -->
+          <!-- (click)="goToPricing()" (click)="launchWidget()"-->
+          <button *ngIf="USER_ROLE === 'owner'" type="button" class="btn btn-primary" (click)="notify.contacUsViaEmail()" >
+
+            <!-- {{ 'Pricing.UpgradePlan' | translate }} -->
+            <!-- Let's chat -->
+            {{'ContactUs' | translate}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ============= ENTERPRISE PLAN HAS EXPIRED MODAL ============= -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.displayModalEnterpiseSubsExpired}"
+  style="background-color: rgba(90,90,90,0.9);">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-top-left-radius:6px; border-top-right-radius:6px">
+      <div class="modal-header" style="padding:16px!important; border-bottom:none!important;">
+
+        <button type="button" class="close" aria-label="Close" (click)="notify.closeModalEnterpiseSubsExpired()"
+          style="position: absolute; right: 14px;">
+          <span aria-hidden="true">
+            <!-- &times; -->
+            <svg class="tide-icon " width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+              </path>
+            </svg>
+          </span>
+        </button>
+
+        <h2 class="modal-title"
+          style="color: #262f3c; text-align: center; font-family: 'Poppins','Roboto', 'Arial', sans-serif; margin-top: 20px; font-size:28px">
+          <span style="vertical-align: middle;">
+            <!-- {{ "Pricing.SubscriptionExpired" | translate }} -->
+            {{notify.prjct_profile_name}} {{ "Pricing.HasExpired" | translate }}
+          </span>
+        </h2>
+
+      </div>
+      <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+      <div class="modal-body"
+        style="padding-top: 0px; padding-bottom: 0px; padding-right: 34px; padding-left: 34px; line-height: 1;">
+
+        <div class="row">
+          <div class="col-sm-12">
+            <h3 style="text-align: center;  color: #8894ab; font-size: 22px; margin-bottom: 20px;">
+              {{ "Pricing.PleaseContactUs" | translate }}
+              {{ "Pricing.ToUpdateYourPaymentInformation" | translate }}.
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer"
+        style="margin-top: 0px; background-color: #fff; border-top:none; border-bottom-left-radius:6px; border-bottom-right-radius:6px">
+        <div style="text-align: center; margin-bottom: 15px;">
+
+          <!-- <button type="button" class="btn btn-danger"
+            (click)="notify.closeThisModalAndDisplayCancelSubscriptionModal()">
+            {{ "CancelSubscription" | translate }}
+          </button>
+          -->
+          <button *ngIf="USER_ROLE === 'owner'" type="button" class="btn btn-primary" (click)="notify.contacUsViaEmailPlanC()">
+            {{'ContactUs' | translate}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- -----------------------------------------------------------  -->
+<!--  "CONTACT US - TO UPGRADE PLAN  -->
+<!-- -----------------------------------------------------------  -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.displayContactUsModalToUpgradePlan}"
+  style="background-color: rgba(90,90,90,0.9); z-index: 1051 !important;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-top-left-radius:6px; border-top-right-radius:6px">
+      <div class="modal-header" style="padding:16px!important; border-bottom:none!important;">
+
+        <button type="button" class="close" aria-label="Close" (click)="notify.closeContactUsModalToUpgradePlan()">
+          <span aria-hidden="true">
+            <!-- &times; -->
+            <svg class="tide-icon " width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+              </path>
+            </svg>
+          </span>
+        </button>
+        <h2 class="modal-title"
+          style="color: #262f3c; text-align: center; font-family: 'Poppins','Roboto', 'Arial', sans-serif; margin-top: 25px">
+          <span style="vertical-align: middle;">
+            {{ "Pricing.UpgradePlan" | translate }}
+          </span>
+        </h2>
+
+      </div>
+      <hr class="custom-hr" style="margin-top:10px; margin-bottom:10px">
+      <div class="modal-body"
+        style="padding-top: 0px; padding-bottom: 0px; padding-right: 35px; padding-left: 35px; line-height: 1">
+
+        <div class="row">
+          <div class="col-sm-12">
+            <h3 style="text-align: center;  color: #8894ab; font-size: 24px; padding-bottom: 12px;">
+              {{ "ContactUsByEmailToUpdateYourPlan" | translate}}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="margin-top: 0px; background-color: #fff; border-top:none">
+        <div style="text-align: center; margin-bottom: 25px;">
+          <!-- (click)="launchWidget()" -->
+          <button type="button"
+            style="background-color:#3EA9F5;color:#FFF;padding:12px 16px;border:0;border-radius:4px;font-size:18px"
+            id="checkout-button-plan_EjFHNnzJXE3jul" role="link" (click)="notify.contacUsViaEmail()">
+            {{'ContactUs' | translate}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================== 
+     ============= "CONTACT US - LET'S CHAT" MODAL ============= 
+     =========================================================== -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.displayContactUsModal}"
+  style="background-color: rgba(90,90,90,0.9);z-index: 1051 !important;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-top-left-radius:6px; border-top-right-radius:6px">
+      <div class="modal-header" style="padding:16px!important; border-bottom:none!important;">
+
+        <button type="button" class="close" aria-label="Close" (click)="notify.closeContactUsModal()"
+          style="position: absolute; right: 14px;">
+          <span aria-hidden="true">
+            <!-- &times; -->
+            <svg class="tide-icon " width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+              </path>
+            </svg>
+          </span>
+        </button>
+
+        <!-- <div class="close-payment-report-modal" style="font-weight: 100; right: 6px; position: absolute;cursor:pointer" (click)="closeContactUsModal()">
+            <i class="material-icons close-payment-report-icon" style="font-size: 35px; opacity: 0.5;">
+              clear
+            </i>
+          </div> -->
+
+        <h2 class="modal-title"
+          style="color: #262f3c; text-align: center; font-family: 'Poppins','Roboto', 'Arial', sans-serif; margin-top: 20px; font-size: 28px">
+          <span style="vertical-align: middle;">
+            {{ "Pricing.PlanChange" | translate }}
+          </span>
+        </h2>
+
+      </div>
+      <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+      <div class="modal-body"
+        style="padding-top: 0px; padding-bottom: 0px; padding-right: 34px; padding-left: 34px; line-height: 1">
+
+        <div class="row">
+          <div class="col-sm-12">
+            <h3 style="text-align: center;  color: #8894ab; font-size: 22px; margin-bottom: 20px">
+              <!-- Contact us via chat and tell us how many operator seats you want to add to the project -->
+              <!-- {{ "Pricing.ContactUsViaChatAndTellIUsHowManyOperator" | translate}} -->
+              <span *ngIf="notify.showSubtitleAllOperatorsSeatsUsed === true">
+                <!-- You currently are using all active operator seats.  -->
+
+                {{ "Pricing.YouCurrentlyAreUsingAllActiveOperatorSeats" | translate }}.
+              </span>
+              <span style="display: block">
+                <!-- Contact us via chat to upgrade your pricing plan. -->
+                <!-- {{ "Pricing.ContactUsViaChatToUpgradeYourPricingPlan" | translate }}. -->
+                {{ "Pricing.ContactUsViaEmailToUpgradeYourPricingPlan" | translate }}.
+
+              </span>
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer"
+        style="margin-top: 0px; background-color: #fff; border-top:none; border-bottom-left-radius:6px; border-bottom-right-radius:6px">
+        <div style="text-align: center; margin-bottom: 25px;">
+          <!-- style="background-color:#3EA9F5;color:#FFF;padding:12px 16px;border:0;border-radius:4px;font-size:18px"  -->
+          <button class="btn btn-primary" (click)="notify.contacUsViaEmail()">
+            {{'ContactUs' | translate}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ------------------------------------------------------------ -->
+ <!--  CANCEL SUBSCRIPTION -->
+<!-- ------------------------------------------------------------ -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.viewCancelSubscriptionModal}"
+  style="background-color: rgba(90,90,90,0.9);">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-top-left-radius:6px; border-top-right-radius:6px">
+      <!-- background-image: url(assets/img/error_outiline_icon.svg);background-size: contain;background-repeat: no-repeat; -->
+      <div class="modal-header" style="padding:16px!important; border-bottom:none!important; ">
+
+        <button type="button" class="close" aria-label="Close" (click)="notify.closeCancelSubscriptionModal()"
+          style="position: absolute; right: 14px;">
+          <span aria-hidden="true">
+            <svg class="tide-icon " width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+              </path>
+            </svg>
+          </span>
+        </button>
+
+        <h2 class="modal-title"
+          style="color: #f44336; text-align: center; font-family: 'Poppins','Roboto', 'Arial', sans-serif; margin-top: 20px; font-size:28px">
+          <span style="vertical-align: middle;">
+            {{ "CancelSubscription" | translate }}
+          </span>
+        </h2>
+
+      </div>
+      <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+      <div class="modal-body"
+        style="padding-top: 0px; padding-bottom: 0px; padding-right: 34px; padding-left: 34px; line-height: 1">
+
+        <div class="row">
+          <div class="col-sm-12">
+            <h3 style="text-align: center;  color: #8894ab; font-size: 22px; margin-bottom: 20px">
+
+              {{ "DoYouReallyWantToCancelYourSubscription" | translate}}
+
+              <span style="color:#f44336; font-size:18px;line-height: 1.5; display: block; margin-top: 8px;">
+                {{ "OnceYouCancelTheSubscription" | translate: tprojectprofilemane }}.
+              </span>
+
+
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer"
+        style="margin-top: 0px; background-color: #fff; border-top:none; border-bottom-left-radius:6px; border-bottom-right-radius:6px">
+        <div style="text-align: center; margin-bottom: 25px;">
+          <button class="btn btn-default" type="button" (click)="notify.closeCancelSubscriptionModal()">
+            {{ "Close" | translate }}
+          </button>
+
+          <button class="btn btn-danger" type="button" (click)="cancelSubscription()">
+
+            {{ "CancelSubscription" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- --------------------------------------------------------------- -->
+<!-- EXPORT CSV UNAVAILABLE   -->
+<!-- --------------------------------------------------------------- -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.displayDataExportNotAvailable}"
+  style="background-color: rgba(90,90,90,0.9);">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-top-left-radius:6px; border-top-right-radius:6px">
+      <!-- background-image: url(assets/img/error_outiline_icon.svg);background-size: contain;background-repeat: no-repeat; -->
+      <div class="modal-header" style="padding:16px!important; border-bottom:none!important; ">
+
+        <button type="button" class="close" aria-label="Close" (click)="notify.closeDataExportNotAvailable()"
+          style="position: absolute; right: 14px;">
+          <span aria-hidden="true">
+            <svg class="tide-icon " width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+              </path>
+            </svg>
+          </span>
+        </button>
+
+        <h2 class="modal-title"
+          style="color: #262f3c; text-align: center; font-family: 'Poppins','Roboto', 'Arial', sans-serif; margin-top: 20px; font-size:28px">
+          <span style="vertical-align: middle;">
+            {{ "Pricing.PlanChange" | translate }}
+          </span>
+        </h2>
+      </div>
+      <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+      <div class="modal-body"
+        style="padding-top: 0px; padding-bottom: 0px; padding-right: 34px; padding-left: 34px; line-height: 1">
+
+        <div class="row">
+          <div class="col-sm-12">
+            <h3 style="text-align: center;  color: #8894ab; font-size: 22px; margin-bottom: 20px">
+              <!-- Data export is available with the Pro Plan. Update your account to get this feature -->
+              {{ 'DataExportIsAvailableWithTheProPlan' | translate }}.
+              <br>
+              {{ 'UpdateYourAccounToGetThisFeature' | translate }}.
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer"
+        style="margin-top: 0px; background-color: #fff; border-top:none; border-bottom-left-radius:6px; border-bottom-right-radius:6px">
+        <div style="text-align: center; margin-bottom: 25px;">
+          <!-- <button class="btn btn-default" type="button" (click)="notify.closeDataExportNotAvailable()">
+                {{ "Close" | translate }}
+              </button> -->
+
+          <button class="btn btn-primary" type="button" (click)="openModalExpiredSubscOrGoToPricing()">
+            {{ "UpgradeNow" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+ 
+<!-- --------------------------------------------------------------------------------------------------------- -->
+<!-- Success Check modal -->
+<!-- --------------------------------------------------------------------------------------------------------- -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.displaySuccessCheckModal}"
+  style="background-color: rgba(90,90,90,0.9);">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-top-left-radius:6px; border-top-right-radius:6px">
+      <div class="modal-header" style="padding:16px!important; border-bottom:none!important;">
+
+        <button type="button" class="close" aria-label="Close" (click)="notify.closeModalSuccessCheckModal()"
+          style="position: absolute; right: 14px;">
+          <span aria-hidden="true">
+            <!-- &times; -->
+            <svg class="tide-icon" width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+              </path>
+            </svg>
+          </span>
+        </button>
+
+        <h2 class="modal-title custom__modal__title">
+          <span style="vertical-align: middle;">
+            {{ notify.successCheckModalTitleText | translate }}
+          </span>
+        </h2>
+
+      </div>
+      <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+      <div class="modal-body"
+        style="padding-top: 0px; padding-bottom: 0px; padding-right: 34px; padding-left: 34px; line-height: 1;">
+
+        <div class="row">
+          <div class="col-sm-12">
+
+            <div class="success-checkmark">
+              <div class="check-icon">
+                <span class="icon-line line-tip"></span>
+                <span class="icon-line line-long"></span>
+                <div class="icon-circle"></div>
+                <div class="icon-fix"></div>
+              </div>
+            </div>
+
+            <h3 style="text-align: center;  color: #8894ab; font-size: 22px; margin-bottom: 20px;">
+              {{ notify.successCheckModalBodyText | translate }}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer custom__modal__footer">
+        <div style="text-align: center; margin-bottom: 15px;">
+
+          <button style="padding-left: 24px; padding-right: 24px;" type="button" class="btn btn-primary"
+            (click)="notify.closeModalSuccessCheckModal()">
+            OK
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ---------------------------------------------------------------------------------- -->
+<!-- Logout Modal -->
+<!-- ---------------------------------------------------------------------------------- -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.displayLogoutModal}"
+  style="background-color: rgba(90,90,90,0.5);">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" aria-label="Close" (click)="notify.closeLogoutModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+        <h4 class="modal-title">
+          <!-- tiledesk Log Out -->
+          {{ 'NavBar.TiledeskLogOut' | translate: tparams }}
+        </h4>
+      </div>
+
+      <div class="modal-body">
+        <p style="margin-top: 0px; text-align:center; color:#566787; font-size:16px; font-weight:400 ">
+          {{ "NavBar.AreYouSureYouWantToLogOut" | translate }}
+        </p>
+        <p *ngIf="IS_AVAILABLE === true" style="margin-bottom:0px; text-align:center;">
+          <!-- {{ "NavBar.NoteThatThisWillNotChangeYourAvailability" | translate }} -->
+          <i class="material-icons" style="display: block; color:#f44336">warning</i>
+          <span style="color:#f44336"> {{ "NavBar.AttentionIfYouDoNotWantToReceiveRequests" | translate }} </span>
+        </p>
+      </div>
+
+      <div class="modal-footer" style="text-align: center;">
+        <button class="btn btn-white" (click)="notify.closeLogoutModal()" style="padding:12px 16px; font-size:12px ">
+          {{ "Cancel" | translate}}
+        </button>
+        <button class="btn btn-primary" (click)="onLogoutModalHandled()" style="padding:12px 16px; font-size:12px ">
+          <!-- Log Out -->
+          {{ 'NavBar.LogOut' | translate }}
+        </button>
+      </div>
+
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+
+
+
+
+<!-- NOT USED
+=================================================================================== 
+===================== INSTALL TILEDESK TO START CHATTING MODAL ==================== 
+=================================================================================== -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':notify.displayInstallTiledeskModal}"
+  style="background-color: rgba(90,90,90,0.9);">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border-top-left-radius:6px; border-top-right-radius:6px">
+      <!-- background-image: url(assets/img/error_outiline_icon.svg);background-size: contain;background-repeat: no-repeat; -->
+      <div class="modal-header" style="padding:16px!important; border-bottom:none!important; ">
+
+        <button type="button" class="close" aria-label="Close" (click)="notify.closeModalInstallTiledeskModal()"
+          style="position: absolute; right: 14px;">
+          <span aria-hidden="true">
+            <svg class="tide-icon " width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M13.357 11.993l10.256 10.295c0.39 0.391 0.39 1.024 0 1.415-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292l-10.257-10.295-10.256 10.295c-0.194 0.195-0.449 0.292-0.704 0.292s-0.51-0.097-0.705-0.292c-0.39-0.391-0.39-1.024 0-1.415l10.256-10.295-10.256-10.294c-0.39-0.391-0.39-1.024 0-1.415s1.020-0.391 1.409 0l10.256 10.294 10.256-10.294c0.39-0.391 1.020-0.391 1.41 0 0.389 0.391 0.389 1.024 0 1.415l-10.256 10.294z">
+              </path>
+            </svg>
+          </span>
+        </button>
+
+        <h2 class="modal-title"
+          style="color: #262f3c; text-align: center; font-family: 'Poppins','Roboto', 'Arial', sans-serif; margin-top: 20px; font-size:28px">
+          <span style="vertical-align: middle;">
+            {{ 'InstallTiledesk' | translate }}
+          </span>
+        </h2>
+      </div>
+      <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+      <div class="modal-body"
+        style="padding-top: 0px; padding-bottom: 0px; padding-right: 34px; padding-left: 34px; line-height: 1">
+
+        <div class="row">
+          <div class="col-sm-12">
+            <!-- margin-top: 8px; margin-bottom: 8px, -->
+            <h3 style="text-align: center;  color: #8894ab; font-size: 22px;  margin-bottom: 20px">
+              {{ 'InstallTiledeskNowAndStartChatting' | translate: tparams }}
+
+            </h3>
+          </div>
+
+          <div class="col-sm-12">
+
+            <!-- 
+            #######################################################################################################################################
+            ################################# REMEMBER TO UPDATE TEXAREA CODE IF UPDATE SCRIPT CODE IN PRE TAG ####################################
+            ########## !!!!!!! NOTE THAT TEXT AREA IS HIDDEN - IS USED ONLY TO COPY THE CODE WHEN THE USER CLICK ON THE BUTTON COPY CODE ########## 
+            ####################################################################################################################################### -->
+            <!-- <textarea  name="exampleClipboard" class="textarea" readonly rows="18" value="" type="text" style="opacity: .01;height:0; position:absolute; z-index: -1;">
+&lt;script type=&quot;application/javascript&quot;&gt;
+  window.tiledeskSettings = 
+    {
+    projectid: &quot;{{ projectId }}&quot;
+    };
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id; js.async=true;
+      js.src = &quot;{{WIDGET_URL}}&quot;;
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, &#39;script&#39;, &#39;tiledesk-jssdk&#39;));
+&lt;/script&gt;</textarea>  -->
+
+            <!-- 
+              #######################################################################################################################################
+              ################################# REMEMBER TO UPDATE TEXAREA CODE IF UPDATE SCRIPT CODE IN PRE TAG ####################################
+              ####### !!!!!!!  new incorpora WIDGET NOTE THAT: WHEN IS CLICKED THE BUTTON "COPY CODE" IS COPIED THE CODE IN THE ABOVE TEXAREA ####### 
+              ####################################################################################################################################### -->
+
+            <!-- <div class="wrap-description" style="margin-top: 3px; color: #525f7f; font-size:14px; font-weight: 400;line-height: 1.5;"> 
+                  {{ 'Resourcepage.CopyTheFollowingScript...' | translate  }}<code><em>&lt;head&gt;</em></code> tags.
+              </div>
+              <div class="wrap-script" style="margin-top: 10px;"> 
+                <pre style="padding-left:0px; margin-bottom: 0px; height: 100px;">
+                  <span>&lt;script type=&quot;application/javascript&quot;&gt;</span>
+                  <span>  window.tiledeskSettings =</span>
+                  <span>   {{'{'}}</span>
+                  <span>	 projectid: &quot;{{ projectId }}&quot;</span>
+                  <span>   {{'};'}}</span>
+                  <span>   (function(d, s, id) {{'{'}}</span>
+                  <span>    var js, fjs = d.getElementsByTagName(s)[0];    </span>
+                  <span>    if (d.getElementById(id)) return;    </span>
+                  <span>    js = d.createElement(s); js.id = id; js.async=true;;    </span>
+                  <span>    js.src = &quot;{{WIDGET_URL}}&quot;;</span>
+                  <span>    fjs.parentNode.insertBefore(js, fjs);</span>
+                  <span>  {{'}'}}(document, &#39;script&#39;, &#39;tiledesk-jssdk&#39;));</span>
+                  <span>&lt;/script&gt;</span>	
+                </pre>
+    
+                <button (click)="copyToClipboard()" class="btn btn-white copy-script">
+                  <span> 	<i class="material-icons" style="vertical-align: middle; color: #039be5; font-size:13px">file_copy</i>	</span>		
+                  <span style="font-size: 12px"> 	{{ 'Resourcepage.CopyScript' | translate }}</span>
+                </button>
+
+              </div> -->
+
+
+            <div class="copied-to-clipboard-tooltip" style="opacity: 0; text-align: center;
+                position: relative;top: -78px; max-width: 360px;left: 50%;transform: translateX(-50%);padding: 5px"
+              [ngClass]="{'has-copied-text' : has_copied}" class="control-label ">
+              {{ 'Copied' | translate }}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer"
+        style="margin-top: 0px; background-color: #fff; border-top:none; border-bottom-left-radius:6px; border-bottom-right-radius:6px">
+        <div style="text-align: center; margin-bottom: 25px;">
+          <button class="btn btn-default" type="button" (click)="notify.closeModalInstallTiledeskModal()">
+            {{ "Close" | translate }}
+          </button>
+
+          <button class="btn btn-primary" type="button" (click)="goToWidgetPage()">
+            {{ "InstallNow" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
