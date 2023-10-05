@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { TYPE_MATH_OPERATOR, TYPE_MATH_OPERATOR_LIST } from 'app/chatbot-design-studio/utils';
+import { TYPE_MATH_OPERATOR, TYPE_MATH_OPERATOR_LIST } from '../../../../../../utils';
 
 @Component({
     selector: 'operator',

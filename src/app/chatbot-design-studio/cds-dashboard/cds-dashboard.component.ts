@@ -7,7 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
-import { DashboardService } from 'src/app/chatbot-design-studio/services/dashboard.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 // MODEL //
 import { Project } from 'src/app/models/project-model';
@@ -20,6 +20,15 @@ import { Intent } from 'src/app/models/intent-model';
 //LOGGER
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
+import { MultichannelService } from 'src/app/services/multichannel.service';
+import { OpenaiService } from 'src/app/services/openai.service';
+import { UsersService } from 'src/app/services/users.service';
+import { WhatsappService } from 'src/app/services/whatsapp.service';
+import { AppConfigService } from 'src/app/services/app-config';
+import { DepartmentService } from 'src/app/services/department.service';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { FaqService } from 'src/app/services/faq.service';
 
 
 @Component({
@@ -35,12 +44,8 @@ export class CdsDashboardComponent implements OnInit {
   IS_OPEN_INTENTS_LIST: boolean = true;
   IS_OPEN_PANEL_WIDGET: boolean = false;
 
-  id_faq_kb: string;
-  id_faq: string;
-  botType: string;
-  intent_id: string;
+
   project: Project;
-  projectID: string;
   defaultDepartmentId: string;
   selectedChatbot: Chatbot
   activeSidebarSection: string;
@@ -51,15 +56,23 @@ export class CdsDashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
+    private appConfigService: AppConfigService,
     private dashboardService: DashboardService,
     private intentService: IntentService,
     private controllerService: ControllerService,
     private connectorService: ConnectorService,
+    private kbService: KnowledgeBaseService,
+    public departmentService: DepartmentService,
+    public faqKbService: FaqKbService,
+    public faqService: FaqService,
+    private openaiService: OpenaiService,
+    private whatsappService: WhatsappService,
+    
     // private translate: TranslateService
   ) {}
 
   ngOnInit() {
-    this.logger.log("•••• [CDS DSHBRD] ngOnInit ••••");
+    console.log("•••• [CDS DSHBRD] ngOnInit ••••");
     this.executeAsyncFunctionsInSequence();
     this.hideShowWidget('hide')
   }
@@ -73,25 +86,46 @@ export class CdsDashboardComponent implements OnInit {
    */
   async executeAsyncFunctionsInSequence() {
     this.logger.log('[CDS DSHBRD] executeAsyncFunctionsInSequence -------------> ');
+  //   this.route.params.subscribe({ next: (params) => {
+  //     console.log('paramssssss cds-dashboarddd', params)
+  //     // this.id_faq_kb = params['faqkbid'];
+  //     // this.id_faq = params['faqid'];
+  //     // this.botType = params['bottype'];
+  //     // this.intent_id = params['intent_id'];
+  //     // this.logger.log('[CDS DSHBRD] getUrlParams  PARAMS', params);
+  //     // this.logger.log('[CDS DSHBRD] getUrlParams  BOT ID ', this.id_faq_kb);
+  //     // this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.id_faq);
+  //     // this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.intent_id);
+  //     console.log('[CDS DSHBRD] getUrlParams', params);
+  //     // resolve(true);
+  //   }, error: (error) => {
+  //     this.logger.error('ERROR: ', error);
+  //     console.log('ERROR', error);
+  //     // reject(false);
+  //   }, complete: () => {
+  //     console.log('COMPLETE');
+  //   }
+  // });
+  
+
     try {
       const getTranslations = await this.getTranslations();
       this.logger.log('[CDS DSHBRD] Risultato 1:', getTranslations);
-      const getUrlParams = await this.getUrlParams();
+      const getUrlParams = await this.dashboardService.getUrlParams();
       this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
       const getBotById = await this.dashboardService.getBotById();
       this.logger.log('[CDS DSHBRD] Risultato 3:', getBotById, this.selectedChatbot);
       const getCurrentProject = await this.dashboardService.getCurrentProject();
       this.logger.log('[CDS DSHBRD] Risultato 4:', getCurrentProject);
-      const getBrowserVersion = await this.dashboardService.getBrowserVersion();
-      this.logger.log('[CDS DSHBRD] Risultato 5:', getBrowserVersion);
       const getDefaultDepartmentId = this.dashboardService.getDeptsByProjectId();
-      this.logger.log('[CDS DSHBRD] Risultato 6:', getDefaultDepartmentId);
-      if (getTranslations && getUrlParams && getBotById && getCurrentProject && getBrowserVersion && getDefaultDepartmentId) {
+      this.logger.log('[CDS DSHBRD] Risultato 5:', getDefaultDepartmentId);
+      if (getTranslations && getUrlParams && getBotById && getCurrentProject && getDefaultDepartmentId) {
         this.logger.log('[CDS DSHBRD] Ho finito di inizializzare la dashboard');
         this.project = this.dashboardService.project;
         this.selectedChatbot = this.dashboardService.selectedChatbot;
         this.initFinished = true;
       }
+      this.initialize()
     } catch (error) {
       console.error('error: ', error);
     }
@@ -114,27 +148,16 @@ export class CdsDashboardComponent implements OnInit {
     });
   }
 
-  /** getUrlParams **
-   * GET FROM ROUTE PARAMS (PASSED FROM FAQ COMPONENT):
-   * THE FAQ ID - WHEN THE CALLBACK IS COMPLETED RUN GET-FAQ-BY-ID THAT RETURN THE OBJECT FAQ
-   * AND THE FAQ KB ID (THEN USED IN THE GOBACK)
-  */
-  private async getUrlParams(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this.route.params.subscribe((params) => {
-        this.id_faq_kb = params['faqkbid'];
-        this.id_faq = params['faqid'];
-        this.botType = params['bottype'];
-        this.intent_id = params['intent_id'];
-        this.dashboardService.setParams(params);
-        resolve(true);
-      }, (error) => {
-        this.logger.error('ERROR: ', error);
-        reject(false);
-      }, () => {
-        this.logger.log('COMPLETE');
-      });
-    });
+  private initialize(){
+    let serverBaseURL = this.appConfigService.getConfig().apiUrl
+
+    this.departmentService.initialize(serverBaseURL, this.project._id);
+    this.faqKbService.initialize(serverBaseURL, this.project._id)
+    this.faqService.initialize(serverBaseURL, this.project._id)
+    this.kbService.initialize(serverBaseURL, this.project._id)
+    this.openaiService.initialize(serverBaseURL, this.project._id)
+    this.whatsappService.initialize(serverBaseURL, this.project._id)
+
   }
 
   /** hideShowWidget */

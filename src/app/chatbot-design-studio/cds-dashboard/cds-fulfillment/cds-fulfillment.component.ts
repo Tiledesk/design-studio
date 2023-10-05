@@ -1,10 +1,11 @@
 import { TranslateService } from '@ngx-translate/core';
-import { NotifyService } from 'app/core/notify.service';
-import { Chatbot } from 'app/models/faq_kb-model';
-import { FaqKbService } from 'app/services/faq-kb.service';
-import { BrandService } from 'app/services/brand.service';
-import { LoggerService } from '../../../services/logger/logger.service';
+import { NotifyService } from 'src/app/services/notify.service';
+import { Chatbot } from 'src/app/models/faq_kb-model';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { BrandService } from 'src/app/services/brand.service';
 import { Component, Input, OnInit } from '@angular/core';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-fulfillment',
@@ -25,12 +26,14 @@ export class CdsFulfillmentComponent implements OnInit {
   WEBHOOK_URL_IS_VALID: boolean;
   WEBHOOK_URL_IS_HTTP_or_HTTPS: boolean;
   
+  private logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
     private faqKbService: FaqKbService,
     private translate: TranslateService,
     private brandService: BrandService,
-    private notify: NotifyService,
-    private logger: LoggerService) {
+    private notify: NotifyService
+  ) {
 
     const brand = brandService.getBrand();
     this.tparams = brand;

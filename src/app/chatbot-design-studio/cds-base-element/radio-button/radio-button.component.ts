@@ -1,5 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-radio-buttons',
@@ -14,8 +15,8 @@ export class CDSRadioButtonComponent implements OnInit {
   @Input() column: number = 1;
   @Output() changeButtonSelect = new EventEmitter<any>();
 
+  logger: LoggerService = LoggerInstance.getInstance()
   constructor(
-    private logger: LoggerService,
     private elementRef: ElementRef) { }
 
   ngOnInit(): void {

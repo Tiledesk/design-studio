@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NotifyService } from 'app/core/notify.service';
-import { FaqService } from 'app/services/faq.service';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { NotifyService } from 'src/app/services/notify.service';
+import { FaqService } from 'src/app/services/faq.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-detail-import-export',
@@ -25,8 +26,8 @@ export class CDSDetailImportExportComponent implements OnInit {
   parse_err: boolean;
   modalChoosefileDisabled: boolean;
 
+  logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private logger: LoggerService,
     private notify: NotifyService,
     private faqService: FaqService,
   ) { }

@@ -3,91 +3,45 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FaqKb } from '../models/faq_kb-model';
-import { AuthService } from '../core/auth.service';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { AppConfigProvider } from './app-config';
+import { AppConfigService } from './app-config';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 @Injectable()
 export class FaqKbService {
 
   SERVER_BASE_PATH: string;
   TEMPLATES_URL: string;
   COMMUNITY_TEMPLATES_URL: string;
-  DLGFLW_BOT_CREDENTIAL_BASE_URL: string;
-  RASA_BOT_CREDENTIAL_BASE_URL: string;
   FAQKB_URL: any;
-  TOKEN: string;
-  user: any;
-  project: any;
+
+  private tiledeskToken: string;
+  private project_id: string;
+
+
+  // user: any;
   public $nativeBotName: BehaviorSubject<string> = new BehaviorSubject<string>('')
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private auth: AuthService,
-    public appConfigProvider: AppConfigProvider,
+    public appConfigService: AppConfigService,
+    public appStorageService: AppStorageService,
     private _httpClient: HttpClient
   ) {
-
-    // SUBSCRIBE TO USER BS
-    this.user = auth.user_bs.value
-    this.checkIfExistUserAndGetToken()
-
-    this.auth.user_bs.subscribe((user) => {
-      // // tslint:disable-next-line:no-debugger
-      // debugger
-      this.user = user;
-      this.checkIfExistUserAndGetToken()
-    });
-
-    this.getCurrentProject();
-
-    this.getAppConfig();
   }
 
-  getAppConfig() {
-    // this.DLGFLW_BOT_CREDENTIAL_BASE_URL = this.appConfigService.getConfig().botcredendialsURL;
-    this.SERVER_BASE_PATH = this.appConfigProvider.getConfig().SERVER_BASE_URL;
-    this.TEMPLATES_URL = this.appConfigProvider.getConfig().templatesUrl
-    this.COMMUNITY_TEMPLATES_URL = this.appConfigProvider.getConfig().communityTemplatesUrl
-    this.logger.log('AppConfigService getAppConfig (FAQ-KB SERV.) DLGFLW_BOT_CREDENTIAL_BASE_URL ', this.DLGFLW_BOT_CREDENTIAL_BASE_URL);
-    this.logger.log('AppConfigService getAppConfig (FAQ-KB SERV.) SERVER_BASE_PATH ', this.SERVER_BASE_PATH);
-    // console.log('AppConfigService getAppConfig (FAQ-KB SERV.) COMMUNITY_TEMPLATES_URL ', this.COMMUNITY_TEMPLATES_URL);
+  initialize(serverBaseUrl: string, projectId: string){
+    this.logger.log('[FAQ-KB.SERV] initialize', serverBaseUrl);
+    this.SERVER_BASE_PATH = serverBaseUrl;
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    this.project_id = projectId;
+    this.FAQKB_URL = this.SERVER_BASE_PATH + this.project_id + '/faq_kb/'
+    this.TEMPLATES_URL = this.appConfigService.getConfig().templatesUrl
+    this.COMMUNITY_TEMPLATES_URL = this.appConfigService.getConfig().communityTemplatesUrl
   }
-
-  getCurrentProject() {
-    // this.logger.log('FAQ-KB SERV - SUBSCRIBE TO CURRENT PROJ ')
-    // tslint:disable-next-line:no-debugger
-    // debugger
-    this.auth.project_bs.subscribe((project) => {
-      this.project = project
-      // tslint:disable-next-line:no-debugger
-      // debugger
-
-      if (this.project) {
-        this.logger.log('00 -> FAQKB SERVICE project ID from AUTH service subscription  ', this.project._id)
-        this.FAQKB_URL = this.SERVER_BASE_PATH + this.project._id + '/faq_kb/'
-
-
-        this.DLGFLW_BOT_CREDENTIAL_BASE_URL = this.appConfigProvider.getConfig().botcredendialsURL + this.project._id + '/bots/';
-        this.RASA_BOT_CREDENTIAL_BASE_URL = this.appConfigProvider.getConfig().rasaBotCredentialsURL + this.project._id + '/bots/'
-      }
-    });
-  }
-
-  checkIfExistUserAndGetToken() {
-    if (this.user) {
-      this.TOKEN = this.user.token
-      // this.getToken();
-      this.logger.log('[FAQ-KB.SERV] user is signed in');
-    } else {
-      this.logger.log('[FAQ-KB.SERV] No user is signed in');
-    }
-  }
-
-
 
   getTemplates() {
     // 'Authorization': this.TOKEN
@@ -100,8 +54,7 @@ export class FaqKbService {
     const url = this.TEMPLATES_URL
 
     this.logger.log('[GET-TMPLT][FAQ-KB.SERV] - GET-TMPLT - URL ', url);
-    return this._httpClient
-      .get(url, httpOptions)
+    return this._httpClient.get(url, httpOptions)
   }
 
   getChatbotTemplateById(chatbotid) {
@@ -115,8 +68,7 @@ export class FaqKbService {
     const url = this.TEMPLATES_URL + '/windows/' + chatbotid
 
     // console.log('[GET-TMPLT][FAQ-KB.SERV] - GET-CHATBOT-TEMPLATE-BY-ID - URL ', url);
-    return this._httpClient
-      .get(url, httpOptions)
+    return this._httpClient.get(url, httpOptions)
   }
 
   // const url = "https://chatbot-templates.herokuapp.com/chatbots/public/templates/"
@@ -132,23 +84,15 @@ export class FaqKbService {
     const url = this.COMMUNITY_TEMPLATES_URL
 
     this.logger.log('[GET-TMPLT][FAQ-KB.SERV] - GET-TMPLT - URL ', url);
-    return this._httpClient
-      .get(url, httpOptions)
+    return this._httpClient.get(url, httpOptions)
   }
 
   getCommunityTemplateDetail(templateid) {
 
-    // const httpOptions = {
-    //   headers: new HttpHeaders({
-    //     'Content-Type': 'application/json',
-    //   })
-    // };
-
     const url = this.TEMPLATES_URL + '/windows/' + templateid
 
     this.logger.log('[GET-TMPLT][FAQ-KB.SERV] - GET-COMMUNITY-TMPLT-DTLS - URL ', url);
-    return this._httpClient
-      .get(url)
+    return this._httpClient.get(url)
   }
   // https://chatbot-templates-v3.herokuapp.com/chatbots/public/templates
   // https://chatbot-templates-app-v3.herokuapp.com/chatbots/public/templates/windows/63e17ccb426521001330d8d0
@@ -162,15 +106,14 @@ export class FaqKbService {
     };
     // const url = "https://chatbot-templates.herokuapp.com/chatbots/public/templates/" + botid
     const url = this.TEMPLATES_URL + botid
-    return this._httpClient
-      .get(url, httpOptions)
+    return this._httpClient.get(url, httpOptions)
   }
 
   installTemplate(botid: string, projectid: string, ispublic: boolean, landingprojectid) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
     this.logger.log('[BOT-CREATE][FAQ-KB.SERV] -  FORK - BOT ID ', botid);
@@ -179,8 +122,7 @@ export class FaqKbService {
     const url = this.SERVER_BASE_PATH + projectid + "/faq_kb/fork/" + botid + "?public=" + ispublic + "&projectid=" + projectid;
     // console.log('[BOT-CREATE][FAQ-KB.SERV] - FORK - URL ', url);
 
-    return this._httpClient
-      .post(url, null, httpOptions)
+    return this._httpClient.post(url, null, httpOptions)
 
   }
   /**
@@ -192,16 +134,14 @@ export class FaqKbService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     const url = this.FAQKB_URL;
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY PROJECT ID - URL', url);
 
-    return this._httpClient
-      .get<FaqKb[]>(url, httpOptions)
-      .pipe(
+    return this._httpClient.get<FaqKb[]>(url, httpOptions).pipe(
         map(
           (response) => {
             const data = response;
@@ -229,16 +169,14 @@ export class FaqKbService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     const url = this.FAQKB_URL + '?all=true';
     this.logger.log('[FAQ-KB.SERV] - GET *ALL* FAQ-KB BY PROJECT ID - URL', url);
 
-    return this._httpClient
-      .get<FaqKb[]>(url, httpOptions)
-      .pipe(
+    return this._httpClient.get<FaqKb[]>(url, httpOptions).pipe(
         map(
           (response) => {
             const data = response;
@@ -268,14 +206,13 @@ export class FaqKbService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     let url = this.FAQKB_URL + id;
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY ID - URL', url);
-    return this._httpClient
-      .get<FaqKb[]>(url, httpOptions)
+    return this._httpClient.get<FaqKb[]>(url, httpOptions)
   }
 
   public getBotById(id: string): Observable<FaqKb> {
@@ -283,14 +220,13 @@ export class FaqKbService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     let url = this.FAQKB_URL + id;
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY ID - URL', url);
-    return this._httpClient
-      .get<FaqKb>(url, httpOptions)
+    return this._httpClient.get<FaqKb>(url, httpOptions)
   }
 
 
@@ -298,67 +234,19 @@ export class FaqKbService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     const url = this.FAQKB_URL;
     this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - URL ', url);
 
-    const body = { 'name': name, 'type': bottype, 'description': description, 'id_project': this.project._id, };
+    const body = { 'name': name, 'type': bottype, 'description': description, 'id_project': this.project_id, };
     this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - BODY ', body);
 
-    return this._httpClient
-      .post(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
   }
 
-  public connectBotToRasaServer(botid: string, serverurl: string) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
-      })
-    };
-
-    const url = this.RASA_BOT_CREDENTIAL_BASE_URL + botid;
-    this.logger.log('[FAQ-KB.SERV] - connectBotToRasaServer - URL ', url);
-
-    const body = { 'serverUrl': serverurl };
-    this.logger.log('[FAQ-KB.SERV] - connectBotToRasaServer - BODY ', body);
-
-    return this._httpClient
-      .post(url, JSON.stringify(body), httpOptions)
-  }
-
-  public getRasaBotServer(botid: string) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
-      })
-    };
-
-    const url = this.RASA_BOT_CREDENTIAL_BASE_URL + botid;
-    this.logger.log('[FAQ-KB.SERV] - getRasaBotServer - URL ', url);
-
-    return this._httpClient
-      .get(url, httpOptions)
-  }
-
-  public deleteRasaBotData(botid: string) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
-      })
-    };
-
-    const url = this.RASA_BOT_CREDENTIAL_BASE_URL + botid;
-    this.logger.log('[FAQ-KB.SERV] - getRasaBotServer - URL ', url);
-
-    return this._httpClient
-      .delete(url, httpOptions)
-  }
 
   /**
    * @param name 
@@ -371,7 +259,7 @@ export class FaqKbService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -379,15 +267,14 @@ export class FaqKbService {
     this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - URL ', url);
 
     let body = {}
-    body = { 'name': name, 'url': urlfaqkb, 'id_project': this.project._id, 'type': bottype, 'description': description };
+    body = { 'name': name, 'url': urlfaqkb, 'id_project': this.project_id, 'type': bottype, 'description': description };
     if (bottype === 'internal' || bottype === 'tilebot') {
       body['language'] = resbotlanguage
       body['template'] = resbottemplate
     }
     this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - BODY ', body);
 
-    return this._httpClient
-      .post(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
   }
 
 
@@ -395,82 +282,20 @@ export class FaqKbService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     const url = this.FAQKB_URL;
     this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - URL ', url);
 
-    const body = { 'name': botname, 'id_project': this.project._id, 'type': bottype, language: language, template: 'blank' };
+    const body = { 'name': botname, 'id_project': this.project_id, 'type': bottype, language: language, template: 'blank' };
 
     this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - BODY ', body);
 
-    return this._httpClient
-      .post(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
   }
-  // ------------------------------------------------------------------------------------------------
-  // IF THE BOT IS OF TYPE DIALOGFLOW, AFTER THAT A NEW FAQKB WAS CREATED RUN A CALLBACK TO POST THE 
-  // dialogfolw bot CREDENTIAL
-  // ------------------------------------------------------------------------------------------------
-  /**
-   * 
-   * @param botid 
-   * @param formData 
-   * @returns 
-   */
-  uploadDialogflowBotCredetial(botid: string, formData: any) {
-    // const headers = new Headers();
-    // headers.append('Authorization', this.TOKEN);
-    // const options = new RequestOptions({ headers: headers });
-
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Authorization': this.TOKEN
-      })
-    };
-    const url = this.DLGFLW_BOT_CREDENTIAL_BASE_URL + botid
-    this.logger.log('[FAQ-KB.SERV] - uploadDialogflowBotCredetial POST URL ', url)
-    this.logger.log('[FAQ-KB.SERV] - uploadDialogflowBotCredetial formData ', formData)
-
-    return this._httpClient
-      .post(url, formData, httpOptions)
-  }
-
-  getDialogflowBotCredetial(botid: string) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
-      })
-    };
-
-    let url = this.DLGFLW_BOT_CREDENTIAL_BASE_URL + botid;
-    this.logger.log('[FAQ-KB.SERV] - getDialogflowBotCredetial GET URL', url);
-
-    return this._httpClient
-      .get(url, httpOptions)
-  }
-
-
-  public deleteDialogflowBotCredetial(id: string) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
-      })
-    };
-
-    let url = this.DLGFLW_BOT_CREDENTIAL_BASE_URL + id;
-    this.logger.log('[FAQ-KB.SERV] - deleteDialogflowBotCredetial DELETE URL ', url);
-
-    return this._httpClient
-      .delete(url, httpOptions)
-  }
-
-
-
+ 
 
   /**
    * UPDATE (PUT) the BOT WITH trashed = true WHEN THE USER CLICKED THE BTN 'DELETE BOT' 
@@ -484,7 +309,7 @@ export class FaqKbService {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -494,8 +319,7 @@ export class FaqKbService {
     const body = { 'trashed': _trashed };
     this.logger.log('[FAQ-KB.SERV] updateFaqKbAsTrashed - PUT BODY ', body);
 
-    return this._httpClient
-      .put(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.put(url, JSON.stringify(body), httpOptions)
   }
 
   /**
@@ -508,7 +332,7 @@ export class FaqKbService {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -529,8 +353,7 @@ export class FaqKbService {
       body['language'] = resbotlanguage
     }
     this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
-    return this._httpClient
-      .put(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.put(url, JSON.stringify(body), httpOptions)
   }
   // PROJECT_ID/faq_kb/FAQ_KB_ID/language/LANGUAGE
 
@@ -539,7 +362,7 @@ export class FaqKbService {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -550,8 +373,7 @@ export class FaqKbService {
    const body = {  'language': chatbotlanguage };
     
     this.logger.log('[FAQ-KB.SERV] update BOT LANG - BODY ', body);
-    return this._httpClient
-      .put(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.put(url, JSON.stringify(body), httpOptions)
 
   }
 
@@ -560,7 +382,7 @@ export class FaqKbService {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     }
 
@@ -576,7 +398,7 @@ export class FaqKbService {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     }
 
@@ -592,7 +414,7 @@ export class FaqKbService {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     }
 
@@ -600,8 +422,7 @@ export class FaqKbService {
     this.logger.log('publish BOT - URL ', url);
 
 
-    return this._httpClient
-      .put(url, null, httpOptions)
+    return this._httpClient.put(url, null, httpOptions)
   }
 
 
@@ -610,7 +431,7 @@ export class FaqKbService {
     this.logger.log('[FAQ-KB.SERV] - getNumberOfMessages bottype', bottype)
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': this.TOKEN
+      'Authorization': this.tiledeskToken
     })
 
     let botid = ""
@@ -624,7 +445,7 @@ export class FaqKbService {
     // let params = new HttpParams().set('sender', 'bot_' + idBot)
     // this.logger.log('BOT LIST (bot-service) - getNumberOfMessages params', params) 
 
-    return this._httpClient.get(this.SERVER_BASE_PATH + this.project._id + "/analytics/messages/count", { headers: headers, params: params })
+    return this._httpClient.get(this.SERVER_BASE_PATH + this.project_id + "/analytics/messages/count", { headers: headers, params: params })
 
   }
 
@@ -636,10 +457,10 @@ export class FaqKbService {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
-    let url = this.SERVER_BASE_PATH + this.project._id + '/bots/' + idBot + '/attributes';
+    let url = this.SERVER_BASE_PATH + this.project_id + '/bots/' + idBot + '/attributes';
     this.logger.log('addRuleToChatbot BOT - URL ', url);
     let body = { [key]: json }
     this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
@@ -654,11 +475,11 @@ export class FaqKbService {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    let url = this.SERVER_BASE_PATH + this.project._id + '/bots/' + idBot + '/attributes';
+    let url = this.SERVER_BASE_PATH + this.project_id + '/bots/' + idBot + '/attributes';
     this.logger.log('addRuleToChatbot BOT - URL ', url);
 
     let body = { "rules": rule }
@@ -671,7 +492,7 @@ export class FaqKbService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.project_id
       })
     };
     // https://chatbot-templates-app-v3.herokuapp.com/chatbots/public/community
@@ -679,8 +500,7 @@ export class FaqKbService {
     let url = this.COMMUNITY_TEMPLATES_URL + '?text=' + query;
     this.logger.log('[FAQ-KB.SERV] - getDialogflowBotCredetial GET URL', url);
 
-    return this._httpClient
-      .get(url, httpOptions)
+    return this._httpClient.get(url, httpOptions)
   }
 
 
@@ -689,10 +509,10 @@ export class FaqKbService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
-    let url = this.SERVER_BASE_PATH + this.project._id + '/faq_kb/' + id + '/attributes';
+    let url = this.SERVER_BASE_PATH + this.project_id + '/faq_kb/' + id + '/attributes';
     let body = JSON.stringify(attributes);
     console.log('[FAQ-KB.SERV] updateFaqKb - BODY ', url, body);
     return this._httpClient.patch(url, body, httpOptions)

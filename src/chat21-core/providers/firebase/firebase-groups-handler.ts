@@ -18,7 +18,7 @@ import { ConversationModel } from '../../models/conversation';
 
 // utils
 import { CustomLogger } from '../logger/customLogger';
-import { AppConfigProvider } from '../../../app/services/app-config';
+import { AppConfigService } from '../../../app/services/app-config';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { GroupModel } from 'src/chat21-core/models/group';
 import { avatarPlaceholder, getColorBck } from 'src/chat21-core/utils/utils-user';
@@ -53,7 +53,7 @@ export class FirebaseGroupsHandler extends GroupsHandlerService {
 
     constructor(
         public http: HttpClient,
-        public appConfig: AppConfigProvider
+        public appConfig: AppConfigService
     ) {
         super();
     }

@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { TYPE_MATH_OPERATOR } from 'app/chatbot-design-studio/utils';
-import { Operand, Operation } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { TYPE_MATH_OPERATOR } from '../../../../../../utils';
+import { Operand, Operation } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
     selector: 'operation',
@@ -16,9 +17,9 @@ export class OperationComponent implements OnInit {
 
     list: Array< TYPE_MATH_OPERATOR | Operand | ''> = [];
 
-    constructor(
-        private logger: LoggerService
-    ) { }
+    private logger: LoggerService = LoggerInstance.getInstance();
+
+    constructor() { }
 
     ngOnInit(): void {}
 

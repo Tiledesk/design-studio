@@ -7,7 +7,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { WhatsappReceiverComponent } from './whatsapp-receiver.component';
+import { CdsWhatsappReceiverComponent } from './whatsapp-receiver.component';
 
 @NgModule({
   imports: [
@@ -20,7 +20,7 @@ import { WhatsappReceiverComponent } from './whatsapp-receiver.component';
       }
     })
   ],
-  declarations: [WhatsappReceiverComponent],
+  declarations: [CdsWhatsappReceiverComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class SendWhatsappTemplateModalModule {}

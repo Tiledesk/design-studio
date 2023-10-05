@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { LocalDbService } from 'app/services/users-local-db.service';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 
 @Component({
   selector: 'cds-splash-screen',
@@ -18,7 +18,7 @@ export class CdsSplashScreenComponent implements OnInit {
   canShowVideo: boolean = true
   url: SafeResourceUrl = null
   constructor(
-      public usersLocalDbService: LocalDbService,
+      public appStorageService: AppStorageService,
       private sanitizer: DomSanitizer
   ) { }
 
@@ -26,11 +26,11 @@ export class CdsSplashScreenComponent implements OnInit {
   }
 
   ngOnChanges(){
-    let canShowVideo = this.usersLocalDbService.getFromStorage('HAS_WATCHED_'+ this.section+ '_VIDEO')
+    let canShowVideo = this.appStorageService.getItem('HAS_WATCHED_'+ this.section+ '_VIDEO')
     if(!canShowVideo || canShowVideo === 'false'){
       this.url = this.sanitizer.bypassSecurityTrustResourceUrl(this.videoUrl+'?rel=0&autoplay=0&controls=1&showinfo=0')
       this.canShowVideo = true
-      this.usersLocalDbService.setInStorage('HAS_WATCHED_'+ this.section+ '_VIDEO', true)
+      this.appStorageService.setItem('HAS_WATCHED_'+ this.section+ '_VIDEO', true)
     }else{
       this.canShowVideo = false
     }

@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { variableList } from 'app/chatbot-design-studio/utils';
-import { ActionDeleteVariable } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { variableList } from '../../../../../utils';
+import { ActionDeleteVariable } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-delete-variable',
@@ -16,9 +17,9 @@ export class CdsActionDeleteVariableComponent implements OnInit {
   
   variableListUserDefined: Array<{name: string, value: string}>;
   
-  constructor(
-    private logger: LoggerService
-  ) { }
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
+  constructor() { }
 
   ngOnInit(): void {
   }

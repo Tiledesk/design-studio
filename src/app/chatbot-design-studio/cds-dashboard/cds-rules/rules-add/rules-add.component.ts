@@ -1,12 +1,13 @@
-import { LoggerService } from 'app/services/logger/logger.service';
 import { FormGroup, FormBuilder, Validators} from '@angular/forms';
 import { Component, Input, OnInit, SimpleChanges, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
-import { Intent } from 'app/models/intent-model';
-import { Chatbot } from 'app/models/faq_kb-model';
-import { FaqKbService } from 'app/services/faq-kb.service';
-import { Rule } from 'app/models/rule-model';
+import { Intent } from 'src/app/models/intent-model';
+import { Chatbot } from 'src/app/models/faq_kb-model';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { Rule } from 'src/app/models/rule-model';
 import { MatExpansionPanel } from '@angular/material/expansion';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-rules-add',
@@ -30,8 +31,9 @@ export class RulesAddComponent implements OnInit {
   autocompleteOptions: Array<string> = [];
   isPanelExpanded: boolean = false;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(private formBuilder: FormBuilder,
-              private logger: LoggerService,
               private el: ElementRef,
               private faqkbService: FaqKbService) { }
 

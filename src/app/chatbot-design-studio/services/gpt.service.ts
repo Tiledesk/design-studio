@@ -1,6 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AppConfigProvider } from 'src/app/services/app-config';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 

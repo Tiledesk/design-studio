@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { ActionWait } from 'app/models/intent-model';
+import { ActionWait } from 'src/app/models/action-model';
 
 @Component({
   selector: 'cds-action-wait',

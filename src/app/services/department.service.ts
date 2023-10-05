@@ -3,71 +3,41 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Department } from 'src/app//models/department-model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AuthService } from '../core/auth.service';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppConfigProvider } from './app-config';
+import { AppConfigService } from './app-config';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-@Injectable()
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 
+@Injectable()
 export class DepartmentService {
 
   public myDepts_bs: BehaviorSubject<Department[]> = new BehaviorSubject<Department[]>([]);
 
+  // private persistence: string;
+  private SERVER_BASE_URL: string;
+  private URL_TILEDESK_DEPARTMENTS: string;
+
   SERVER_BASE_PATH: string;
-  DEPTS_URL: string;
-  TOKEN: string
-  user: any;
-  project: any;
+  project_id: any;
+
+  private tiledeskToken: string;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     private httpClient: HttpClient,
-    private auth: AuthService,
-    public appConfigProvider: AppConfigProvider,
-  ) {
-    // SUBSCRIBE TO USER BS
-    this.user = auth.user_bs.value
-    this.checkIfUserExistAndGetToken()
+    public appStorageService: AppStorageService,
+  ) {}
 
-    this.auth.user_bs.subscribe((user) => {
-      this.user = user;
-      this.checkIfUserExistAndGetToken()
-    });
 
-    this.getAppConfig();
-    this.getCurrentProjectAndBuildDeptsUrl();
-  }
-
-  getAppConfig() {
-    this.SERVER_BASE_PATH = this.appConfigProvider.getConfig().SERVER_BASE_URL;
-    this.logger.log('[DEPTS-SERV] getAppConfig SERVER_BASE_PATH ', this.SERVER_BASE_PATH);
-  }
-
-  getCurrentProjectAndBuildDeptsUrl() {
-    this.auth.project_bs.subscribe((project) => {
-      this.project = project
-      // tslint:disable-next-line:no-debugger
-      // debugger
-      if (this.project) {
-        this.logger.log('[DEPTS-SERV] - SUBSCRIBE TO CURRENT PROJ this.project._id ', this.project._id);
-        this.DEPTS_URL = this.SERVER_BASE_PATH + this.project._id + '/departments/';
-        this.logger.log('[DEPTS-SERV] - DEPTS_URL (built with SERVER_BASE_PATH) ', this.DEPTS_URL);
-        // FOR TEST - CAUSES ERROR WITH A NO VALID PROJECT ID
-        // this.MONGODB_BASE_URL = this.BASE_URL + '5b3fa93a6f0537d8b01968fX' + '/departments/'
-      }
-    });
-  }
-
-  checkIfUserExistAndGetToken() {
-    if (this.user) {
-      this.TOKEN = this.user.token
-      // this.getToken();
-    } else {
-      this.logger.log('No user is signed in');
-    }
+  initialize(serverBaseUrl: string, projectId: string){
+    this.logger.info('[DEPTS-SERV] initialize')
+    this.SERVER_BASE_URL = serverBaseUrl;
+    this.URL_TILEDESK_DEPARTMENTS = this.SERVER_BASE_PATH + projectId + '/departments/';
+    this.project_id = projectId
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')
   }
 
 
@@ -80,12 +50,12 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
     // const url = `http://localhost:3000/app1/departments/`;
     // const url = `http://api.chat21.org/app1/departments/;
-    const url = this.DEPTS_URL;
+    const url = this.URL_TILEDESK_DEPARTMENTS;
     this.logger.log('[DEPTS-SERV] - GET DEPTS AS OLD WIDGET VERSION', url);
 
     return this.httpClient
@@ -100,11 +70,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    const url = this.SERVER_BASE_PATH + this.project._id + '/widgets'
+    const url = this.SERVER_BASE_PATH + this.project_id + '/widgets'
     this.logger.log('[DEPTS-SERV] - GET DEPTS AS THE NEW WIDGET VERSION URL', url);
 
     return this.httpClient
@@ -119,11 +89,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    const url = this.SERVER_BASE_PATH + this.project._id + '/visitorcounter'
+    const url = this.SERVER_BASE_PATH + this.project_id + '/visitorcounter'
     this.logger.log('[DEPTS-SERV] - GET DEPTS AS THE NEW WIDGET VERSION URL', url);
 
     return this.httpClient
@@ -142,11 +112,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    const url = this.DEPTS_URL + 'allstatus';
+    const url = this.URL_TILEDESK_DEPARTMENTS + 'allstatus';
     this.logger.log('[DEPTS-SERV] GET DEPTS ALL STATUS - DEPTS URL', url);
     return this.httpClient
       .get<Department[]>(url, httpOptions)
@@ -156,7 +126,7 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -171,11 +141,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    const url = this.DEPTS_URL + 'allstatus';
+    const url = this.URL_TILEDESK_DEPARTMENTS + 'allstatus';
     this.logger.log('[DEPTS-SERV] GET DEPTS TO PROMISE - DEPTS URL', url);
 
     return this.httpClient
@@ -197,11 +167,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    let url = this.DEPTS_URL + id;
+    let url = this.URL_TILEDESK_DEPARTMENTS + id;
     // url += `${id}`;
     this.logger.log('[DEPTS-SERV] GET DEPT BY ID - URL', url);
 
@@ -225,18 +195,18 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    const url = this.DEPTS_URL;
+    const url = this.URL_TILEDESK_DEPARTMENTS;
 
     const body = {
       'name': deptName,
       'description': deptDescription,
       'id_group': id_group,
       'routing': routing,
-      'id_project': this.project._id
+      'id_project': this.project_id
     };
 
     if (id_bot) {
@@ -259,13 +229,13 @@ export class DepartmentService {
    */
   public deleteDeparment(id: string) {
 
-    const url = this.DEPTS_URL + id;
+    const url = this.URL_TILEDESK_DEPARTMENTS + id;
     this.logger.log('[DEPTS-SERV] DELETE DEPT URL ', url);
 
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -283,11 +253,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    let url = this.DEPTS_URL + id;
+    let url = this.URL_TILEDESK_DEPARTMENTS + id;
     // url += id;
     this.logger.log('[DEPTS-SERV] UPDATE DEPT - URL ', url);
 
@@ -312,11 +282,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    let url = this.DEPTS_URL + deptid
+    let url = this.URL_TILEDESK_DEPARTMENTS + deptid
     this.logger.log('[DEPTS-SERV] - UPDATE EXISTING DEPT WITH SELECED BOT - URL', url);
 
     const body = { 'id_bot': id_bot };
@@ -337,11 +307,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    const url = this.DEPTS_URL + dept_id;
+    const url = this.URL_TILEDESK_DEPARTMENTS + dept_id;
     this.logger.log('UPDATE DEPT STATUS - URL ', url);
 
     const body = { 'status': status };
@@ -359,11 +329,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    const url = this.DEPTS_URL + id;
+    const url = this.URL_TILEDESK_DEPARTMENTS + id;
     this.logger.log('[DEPTS-SERV] UPDATE DEFAULT DEPARTMENT ONLINE MSG URL  ', url);
 
 
@@ -383,11 +353,11 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    const url = this.DEPTS_URL + id;
+    const url = this.URL_TILEDESK_DEPARTMENTS + id;
     this.logger.log('[DEPTS-SERV] - UPDATE DEFAULT DEPARTMENT OFFLINE MSG - URL ', url);
 
     const body = { 'offline_msg': offlineMsg };
@@ -409,18 +379,18 @@ export class DepartmentService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    let url = this.DEPTS_URL;
+    let url = this.URL_TILEDESK_DEPARTMENTS;
     // + '?nobot=' + true
     url += id + '/operators';
     this.logger.log('-- -- -- URL FOR TEST CHAT21 FUNC ', url);
 
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
-    headers.append('Authorization', this.TOKEN);
+    headers.append('Authorization', this.tiledeskToken);
     // this.logger.log('TOKEN TO COPY ', this.TOKEN)
     return this.httpClient
       .get<Department[]>(url, httpOptions)

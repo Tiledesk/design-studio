@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Operand } from 'app/models/intent-model';
+import { Operand } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 
 @Component({
@@ -19,6 +21,8 @@ export class OperandComponent implements OnInit {
     openSlectFunction: boolean;
     placeholder: string;
 
+    private logger: LoggerService = LoggerInstance.getInstance();
+    
     constructor(private formBuild: FormBuilder) {}
 
     ngOnInit(): void {

@@ -1,8 +1,9 @@
-import { DepartmentService } from 'app/services/department.service';
-import { ActionChangeDepartment } from 'app/models/intent-model';
+import { DepartmentService } from 'src/app/services/department.service';
+import { ActionChangeDepartment } from 'src/app/models/action-model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Department } from 'app/models/department-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { Department } from 'src/app/models/department-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-change-department',
@@ -18,9 +19,10 @@ export class CdsActionChangeDepartmentComponent implements OnInit {
   deps_name_list: Array<{name: string, value: string, icon?:string}>;
   dep_selected: Department;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
     private departmentService: DepartmentService,
-    private logger: LoggerService,
     ) { }
 
   ngOnInit(): void {

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { AppConfigProvider } from './services/app-config';
+import { AppConfigService } from './services/app-config';
 import { TranslateService } from '@ngx-translate/core';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +9,19 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { environment } from 'src/environments/environment';
 import { getParameterByName } from 'src/chat21-core/utils/utils';
 import { tranlatedLanguage } from 'src/chat21-core/utils/constants';
+import { ProjectService } from './services/projects.service';
+import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
+import { DepartmentService } from './services/department.service';
+import { DashboardService } from './services/dashboard.service';
+import { Project } from './models/project-model';
+import { Chatbot } from './models/faq_kb-model';
+import { FaqKbService } from './services/faq-kb.service';
+import { FaqService } from './services/faq.service';
+import { UsersService } from './services/users.service';
+import { KnowledgeBaseService } from './services/knowledge-base.service';
+import { OpenaiService } from './services/openai.service';
+import { WhatsappService } from './services/whatsapp.service';
+import { MultichannelService } from './services/multichannel.service';
 
 @Component({
   selector: 'app-root',
@@ -21,20 +34,30 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   public persistence: string;
   public lang: string; 
   IS_ONLINE: boolean;
+  initFinished:boolean = false;
+
+  private project: Project;
+  private selectedChatbot: Chatbot
 
   constructor(
-    private appConfigProvider: AppConfigProvider,
+    private appConfigService: AppConfigService,
     public translate: TranslateService,
     public tiledeskAuthService: TiledeskAuthService,
     private router: Router,
     private route: ActivatedRoute,
     public appStorageService: AppStorageService,
+    public projectService: ProjectService,
+    // public uploadService: UploadService,
+    // public dashboardService: DashboardService,
+    private userService: UsersService,
+    private multiChannelService: MultichannelService,
+    private uploadService: UploadService
   ){
 
   }
   
   ngOnInit(): void {
-    const appconfig = this.appConfigProvider.getConfig();
+    const appconfig = this.appConfigService.getConfig();
     this.logger.log('[APP-COMP] ngOnInit  appconfig', appconfig)
     this.persistence = appconfig.authPersistence;
     this.appStorageService.initialize(environment.storage_prefix, this.persistence, '')
@@ -59,11 +82,46 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
+    this.initialize()
+    
 
-    this.tiledeskAuthService.initialize(this.appConfigProvider.getConfig().apiUrl);
-    this.setLanguage(null)
 
   }
+
+
+  private async initialize(){
+    let serverBaseURL = this.appConfigService.getConfig().apiUrl
+
+    this.tiledeskAuthService.initialize(serverBaseURL);
+    this.projectService.initialize(serverBaseURL);
+    this.uploadService.initialize();
+    // this.departmentService.initialize(serverBaseURL, this.project._id);
+    // this.faqKbService.initialize(serverBaseURL, this.project._id)
+    // this.faqService.initialize(serverBaseURL, this.project._id)
+    // this.kbService.initialize(serverBaseURL, this.project._id)
+    // this.openaiService.initialize(serverBaseURL, this.project._id)
+    // this.whatsappService.initialize(serverBaseURL, this.project._id)
+    this.multiChannelService.initialize(serverBaseURL)
+    this.userService.initialize(serverBaseURL)
+
+
+
+    // const getUrlParams = await this.dashboardService.getUrlParams();
+    // this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
+
+    this.initAuthentication();
+    this.setLanguage(null);
+
+  }
+
+
+  /**************** CUSTOM FUNCTIONS ****************/
+  /** 
+   * execute Async Functions In Sequence
+   * Le funzioni async sono gestite in maniera sincrona ed eseguite in coda
+   * da aggiungere un loader durante il processo e se tutte vanno a buon fine 
+   * possiamo visualizzare lo stage completo
+   */
 
   signInWithCustomToken(token) {
     // this.isOnline = false;
@@ -216,8 +274,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+
   goToDashboardLogin(){
-    let DASHBOARD_URL = this.appConfigProvider.getConfig().dashboardUrl + '#/login'
+    let DASHBOARD_URL = this.appConfigService.getConfig().dashboardUrl + '#/login'
     const myWindow = window.open(DASHBOARD_URL, '_self');
     myWindow.focus();
   }

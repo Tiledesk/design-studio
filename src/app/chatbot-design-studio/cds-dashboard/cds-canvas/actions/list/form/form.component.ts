@@ -2,9 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Field, Form, Intent } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { Field, Form, Intent } from 'src/app/models/intent-model';
 import { FormModelsFactory } from './form-models-factory';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 const swal = require('sweetalert');
 // import { URL_more_info_chatbot_forms } from 'app/utils/util';
 
@@ -61,11 +62,12 @@ export class CdsFormComponent implements OnInit, OnChanges {
 
   translateparam = { selectedFormName: "", description_key: "" };
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,
     private httpClient: HttpClient,
-    private logger: LoggerService,
   ) {
     this.langBot = this.route.snapshot.params['botlang'];
     if (!this.langBot || this.langBot === undefined) {

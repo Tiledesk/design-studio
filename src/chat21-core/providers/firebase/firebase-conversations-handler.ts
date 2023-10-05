@@ -16,7 +16,7 @@ import { ConversationModel } from '../../models/conversation';
 import { ConversationsHandlerService } from '../abstract/conversations-handler.service';
 import { LoggerService } from '../abstract/logger.service';
 import { LoggerInstance } from '../logger/loggerInstance';
-import { AppConfigProvider } from 'src/app/services/app-config';
+import { AppConfigService } from 'src/app/services/app-config';
 //import { DatabaseProvider } from '../database';
 
 // utils
@@ -60,7 +60,7 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
     constructor(
         //public databaseProvider: DatabaseProvider
         public http: HttpClient,
-        public appConfig: AppConfigProvider
+        public appConfig: AppConfigService
     ) {
         super();
     }

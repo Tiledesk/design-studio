@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { SatPopover } from '@ncstate/sat-popover';
-import { OPERATORS_LIST } from 'app/chatbot-design-studio/utils';
-import { Condition, Expression, Operator } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { OPERATORS_LIST } from '../../utils';
+import { Condition, Expression, Operator } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'appdashboard-filter',
@@ -22,10 +23,9 @@ export class CDSFilterComponent implements OnInit {
   selectedIndex: number;
 
   OPERATORS_LIST = OPERATORS_LIST
-  
-  constructor(
-    public logger: LoggerService
-  ) { }
+
+  logger: LoggerService = LoggerInstance.getInstance()
+  constructor() { }
 
   ngOnInit(): void {
     if(!this.expression){

@@ -29,7 +29,17 @@
     }
 }
 
-
+.trigger-beta-badge {
+    font-weight: 400;
+    background-color: #fff;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    line-height: 13px;
+    color: #6c757d;
+    position: relative;
+    margin: 0px 3px;
+}
 
 .edit-mode-header-buttons {
     float: right;
@@ -80,7 +90,7 @@
         height: 20px;
         border-radius: 4px;
         // margin-right: 6px;
-        align-self: start;
+        // align-self: start;
         color: #718497;
         opacity: .85;
         background: none;

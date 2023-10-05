@@ -1,9 +1,10 @@
 import { FormControl } from '@angular/forms';
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef, HostListener } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { calculatingRemainingCharacters, TEXT_CHARS_LIMIT, variableList } from 'app/chatbot-design-studio/utils';
+import { calculatingRemainingCharacters, TEXT_CHARS_LIMIT, variableList } from '../../../../utils';
 import { SatPopover } from '@ncstate/sat-popover';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-textarea',
@@ -54,9 +55,9 @@ export class CDSTextareaComponent implements OnInit {
   emojiColor: string ="#ac8b2c";
   emojiiCategories = [ 'recent', 'people', 'nature', 'activity', 'flags'];
 
-  constructor(
-    private logger: LoggerService
-  ) { }
+  private logger: LoggerService = LoggerInstance.getInstance()
+  
+  constructor() { }
 
   ngOnInit(): void {
     //this.initialize();

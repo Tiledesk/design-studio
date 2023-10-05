@@ -1,6 +1,6 @@
-import { ACTIONS_LIST } from 'app/chatbot-design-studio/utils';
+import { ACTIONS_LIST } from '../../../../../utils';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ActionAgent } from 'app/models/intent-model';
+import { ActionAgent } from 'src/app/models/action-model';
 
 @Component({
   selector: 'cds-action-agent',

@@ -1,6 +1,5 @@
-import { Form } from './../../../models/intent-model';
-import { FormControl, FormControlName, FormGroup } from '@angular/forms';
-import { Component, Input, OnInit, Output, EventEmitter, ViewChild, ElementRef, Type, Optional } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({

@@ -10,7 +10,7 @@ import { ConversationsHandlerService } from './../providers/abstract/conversatio
 
 import { environment } from '../../environments/environment';
 import { ArchivedConversationsHandlerService } from './../providers/abstract/archivedconversations-handler.service';
-import { AppConfigProvider } from 'src/app/services/app-config';
+import { AppConfigService } from 'src/app/services/app-config';
 
 // Logger
 import { LoggerService } from './abstract/logger.service';
@@ -38,13 +38,13 @@ export class ChatManager {
   constructor(
     public conversationsHandlerService: ConversationsHandlerService,
     public archivedConversationsService: ArchivedConversationsHandlerService,
-    public appConfigProvider: AppConfigProvider,
+    public appConfigService: AppConfigService,
   ) { }
   /**
    * inizializza chatmanager
    */
   initialize() {
-    const appconfig = this.appConfigProvider.getConfig();
+    const appconfig = this.appConfigService.getConfig();
     this.tenant = appconfig.firebaseConfig.tenant;
     this.logger.log('[CHAT MANAGER] - initialize -> firebaseConfig tenant ', this.tenant);
     this.handlers = [];

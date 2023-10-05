@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
-import { ActionOnlineAgent, Intent } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { IntentService } from '../../../../../services/intent.service';
+import { Intent } from 'src/app/models/intent-model';
+import { ActionOnlineAgent } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-online-agents',
@@ -31,9 +33,10 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
   
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
     private formBuilder: FormBuilder,
-    private logger: LoggerService,
     private intentService: IntentService,
   ) { }
 

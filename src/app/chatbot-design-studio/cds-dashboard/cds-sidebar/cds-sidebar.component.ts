@@ -1,16 +1,18 @@
-import { element } from 'protractor';
 import { Component, EventEmitter, Input, OnInit, Output, ElementRef } from '@angular/core';
-import { AuthService } from 'app/core/auth.service';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { UsersService } from 'app/services/users.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 // SERVICES //
-import { DashboardService } from 'app/chatbot-design-studio/services/dashboard.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 // UTILS //
-import { SIDEBAR_PAGES } from 'app/chatbot-design-studio/utils';
+import { SIDEBAR_PAGES } from '../../utils';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { ProjectService } from 'src/app/services/projects.service';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { UserModel } from 'src/chat21-core/models/user';
+import { ProjectUser } from 'src/app/models/project-user';
 
 @Component({
   selector: 'cds-sidebar',
@@ -24,47 +26,38 @@ export class CdsSidebarComponent implements OnInit {
   @Output() onClickItemList = new EventEmitter<string>();
 
   projectID: string;
+  user: UserModel
   SIDEBAR_PAGES = SIDEBAR_PAGES;
   USER_ROLE: any;
   IS_OPEN: boolean = true;
 
   private unsubscribe$: Subject<any> = new Subject<any>();
   
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
-    private logger: LoggerService,
-    private auth: AuthService,
-    private usersService: UsersService,
+    private tiledeskAuthService: TiledeskAuthService,
+    private projectService: ProjectService,
     private el: ElementRef,
     private dashboardService: DashboardService
   ) { }
 
   ngOnInit(): void {
     this.projectID = this.dashboardService.projectID;
+    this.user = this.tiledeskAuthService.getCurrentUser()
     this.getUserRole();
     this.goTo(SIDEBAR_PAGES.INTENTS);
   }
 
 
   getUserRole() {
-    this.usersService.project_user_role_bs.pipe( takeUntil(this.unsubscribe$)).subscribe((userRole) => {
-        //  console.log('[CDS-SIDEBAR] - SUBSCRIPTION TO USER ROLE »»» ', userRole)
-        this.USER_ROLE = userRole;
-      })
-  }
-
-  listenSidebarIsOpened() {
-    this.auth.tilebotSidebarIsOpened.subscribe((isopened) => {
-      this.logger.log('[CDS-SIDEBAR] CDS-SIDEBAR is opened (FROM SUBSCRIPTION) ', isopened)
-      this.IS_OPEN = isopened
+    this.projectService.getProjectUserByUserId(this.projectID, this.user.uid).pipe( takeUntil(this.unsubscribe$)).subscribe((projectUser: ProjectUser) => {
+      //  console.log('[CDS-SIDEBAR] - SUBSCRIPTION TO USER ROLE »»» ', userRole)
+      if (projectUser[0].role !== undefined) {
+        this.USER_ROLE = projectUser[0].role;
+      }
     })
   }
-
-  toggletilebotSidebar(IS_OPEN) {
-    // console.log('[SETTINGS-SIDEBAR] IS_OPEN ', IS_OPEN)
-    this.IS_OPEN = IS_OPEN;
-    this.auth.toggletilebotSidebar(IS_OPEN)
-  }
-
 
   goTo(section: SIDEBAR_PAGES) {
     // console.log('[CDS-SIDEBAR] goTo item ', section)

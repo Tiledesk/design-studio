@@ -1,10 +1,10 @@
 import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { TemplateDetailComponent } from '../../../../../../../bots/templates/template-detail/template-detail.component';
-import { DialogComponent } from 'app/chatbot-design-studio/cds-base-element/dialog/dialog.component';
-import { variableList } from 'app/chatbot-design-studio/utils';
-import { FaqKbService } from 'app/services/faq-kb.service';
+import { DialogComponent } from '../../../../../../cds-base-element/dialog/dialog.component';
+import { variableList } from '../../../../../../utils';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { ActivatedRoute } from '@angular/router';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'variable-list',
@@ -27,6 +27,7 @@ export class VariableListComponent implements OnInit {
     public dialog: MatDialog,
     private faqkbService: FaqKbService,
     private route: ActivatedRoute,
+    private dashboardService: DashboardService
   ) { }
 
   ngOnInit(): void {
@@ -38,7 +39,7 @@ export class VariableListComponent implements OnInit {
   }
 
   private initialize(){
-    this.getIdBot();
+    this.idBot = this.dashboardService.id_faq_kb
     this.variableListUserDefined = variableList.userDefined;
     this.variableListSystemDefined = variableList.systemDefined;
     this.filteredVariableList = [];
@@ -65,13 +66,6 @@ export class VariableListComponent implements OnInit {
         that.variableListUserDefined.push(variable);
         this.saveVariables(this.variableListUserDefined);
       }
-    });
-  }
-
-  private getIdBot(){
-    this.route.params.subscribe((params) => {
-      this.idBot = params.faqkbid;
-
     });
   }
 

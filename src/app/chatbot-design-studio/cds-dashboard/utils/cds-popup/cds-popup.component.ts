@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { LocalDbService } from 'app/services/users-local-db.service';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-popup',
@@ -11,9 +12,10 @@ export class CdsPopupComponent implements OnInit {
 
   popup_visibility = 'none';
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
-    private logger: LoggerService,
-    public usersLocalDbService: LocalDbService
+    public appStorageService: AppStorageService
   ) { }
 
   ngOnInit(): void {
@@ -23,7 +25,7 @@ export class CdsPopupComponent implements OnInit {
 
   /* POP UP */
   diplayPopup() {
-    const hasClosedPopup = this.usersLocalDbService.getFromStorage('hasclosedcdspopup')
+    const hasClosedPopup = this.appStorageService.getItem('hasclosedcdspopup')
     this.logger.log('[CDS DSBRD] hasClosedPopup', hasClosedPopup)
     if (hasClosedPopup === null) {
       this.popup_visibility = 'block'
@@ -37,7 +39,7 @@ export class CdsPopupComponent implements OnInit {
 
   closeRemenberToPublishPopup() {
     this.logger.log('[CDS DSBRD] closeRemenberToPublishPopup')
-    this.usersLocalDbService.setInStorage('hasclosedcdspopup', 'true')
+    this.appStorageService.setItem('hasclosedcdspopup', 'true')
     this.popup_visibility = 'none'
   }
 

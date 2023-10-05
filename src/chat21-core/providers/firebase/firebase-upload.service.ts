@@ -103,4 +103,44 @@ export class FirebaseUploadService extends UploadService {
 
   }
 
+
+  public delete(userId: string, path: string): Promise<any>{
+    const file_name_photo = 'photo.jpg';
+    const file_name_thumb_photo = 'thumb_photo.jpg';
+    // Create a root reference
+    const storageRef = firebase.storage().ref();
+    // const deleteTask = storageRef.child('profiles/' + userid + '/' + file_name)
+    const deleteBotPhoto = storageRef.child('profiles/' + userId + '/' + file_name_photo)
+    const deleteBotThumbPhoto = storageRef.child('profiles/' + userId + '/' + file_name_thumb_photo)
+
+    // ------------------------------------
+    // Delete the file photo
+    // ------------------------------------
+    let photoPromise = deleteBotPhoto.delete().then(() => {
+      this.logger.log('[UPLOAD-IMAGE-FB.SERV] - DELETE BOT PHOTO ')
+
+    }).catch((error) => {
+      this.logger.error('[UPLOAD-IMAGE-FB.SERV] - DELETE BOT PHOTO - ERROR ', error)
+    });
+
+
+    // ------------------------------------
+    // Delete the file thumb_photo
+    // ------------------------------------
+    let thumbPhotoPromise =deleteBotThumbPhoto.delete().then(() => {
+      this.logger.log('[UPLOAD-IMAGE-FB.SERV] - DELETE BOT THUMB-PHOTO ')
+
+    }).catch((error) => {
+      this.logger.error('[UPLOAD-IMAGE-FB.SERV] - DELETE BOT THUMB-PHOTO - ERROR ', error)
+    });
+
+    return new Promise((resolve, reject)=> {
+      Promise.all([photoPromise, thumbPhotoPromise]).then(()=>{
+        resolve(true)
+      }).catch((error)=>{
+        reject(error)
+      })
+    })
+  }
+
 }

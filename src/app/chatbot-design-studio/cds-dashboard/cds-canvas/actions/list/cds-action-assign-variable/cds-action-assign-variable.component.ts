@@ -1,7 +1,8 @@
-import { ActionAssignVariable, Operand } from '../../../../../../models/intent-model';
+import { ActionAssignVariable, Operand } from 'src/app/models/action-model';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { TYPE_MATH_OPERATOR, TYPE_FUNCTION_LIST_FOR_VARIABLES, TYPE_MATH_OPERATOR_LIST } from 'app/chatbot-design-studio/utils';
+import { TYPE_MATH_OPERATOR, TYPE_FUNCTION_LIST_FOR_VARIABLES, TYPE_MATH_OPERATOR_LIST } from '../../../../../utils';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
     selector: 'cds-action-assign-variable',
@@ -20,9 +21,9 @@ export class CdsActionAssignVariableComponent implements OnInit, OnChanges {
     TYPE_FUNCTION_LIST_FOR_VARIABLES = TYPE_FUNCTION_LIST_FOR_VARIABLES
     TYPE_MATH_OPERATOR_LIST = TYPE_MATH_OPERATOR_LIST
 
-    constructor(
-        private logger: LoggerService
-    ) { }
+    private logger: LoggerService = LoggerInstance.getInstance();
+    
+    constructor() { }
 
     ngOnInit(): void {
         this.initialize();

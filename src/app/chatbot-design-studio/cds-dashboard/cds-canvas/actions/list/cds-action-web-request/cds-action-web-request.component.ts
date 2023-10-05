@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ActionWebRequest } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { ActionWebRequest } from 'src/app/models/action-model';
 import { TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT } from '../../../../../utils';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-web-request',
@@ -30,9 +31,9 @@ export class CdsActionWebRequestComponent implements OnInit {
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
   assignments: {} = {}
 
-  constructor(
-    private logger: LoggerService
-  ) { }
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
+  constructor() { }
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {

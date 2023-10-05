@@ -1,69 +1,38 @@
 import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthService } from '../core/auth.service';
 import { Intent } from 'src/app/models/intent-model';
 import { Faq } from 'src/app/models/faq-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { AppConfigProvider } from './app-config';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 @Injectable()
 export class FaqService {
 
   SERVER_BASE_PATH: string;
   FAQ_URL: any;
   EXPORT_FAQ_TO_CSV_URL: string;
-  TOKEN: string
-  user: any;
-  project: any;
+  
+  private tiledeskToken: string;
+  private project_id: string;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
-    private auth: AuthService,
-    public appConfigProvider: AppConfigProvider,
+    public appStorageService: AppStorageService,
     private _httpClient: HttpClient
-  ) {
-    // SUBSCRIBE TO USER BS
-    this.user = auth.user_bs.value
-    this.checkIfUserExistAndGetToken()
+  ) { }
 
-    this.auth.user_bs.subscribe((user) => {
-      this.user = user;
-      this.checkIfUserExistAndGetToken()
-    });
-    this.getAppConfig();
-    this.getCurrentProjectAndBuildFaqUrls();
+
+  initialize(serverBaseUrl: string, projectId: string){
+    this.logger.log('[FAQ-KB.SERV] initialize', serverBaseUrl);
+    this.SERVER_BASE_PATH = serverBaseUrl;
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    this.project_id = projectId;
+    this.FAQ_URL = this.SERVER_BASE_PATH + this.project_id + '/faq/';
+    this.EXPORT_FAQ_TO_CSV_URL = this.SERVER_BASE_PATH + this.project_id + '/faq/csv';
   }
 
-  getAppConfig() {
-    this.SERVER_BASE_PATH = this.appConfigProvider.getConfig().SERVER_BASE_URL;
-    // this.logger.log('[FAQ-SERV] getAppConfig SERVER_BASE_PATH ', this.SERVER_BASE_PATH);
-  }
-  
-  getCurrentProjectAndBuildFaqUrls() {
-    // this.logger.log('[FAQ-SERV] - SUBSCRIBE TO CURRENT PROJCT ')
-    this.auth.project_bs.subscribe((project) => {
-      this.project = project
-
-      if (this.project) {
-        this.logger.log('[FAQ-SERV] project ID ', this.project._id)
-        this.FAQ_URL = this.SERVER_BASE_PATH + this.project._id + '/faq/';
-        this.EXPORT_FAQ_TO_CSV_URL = this.SERVER_BASE_PATH + this.project._id + '/faq/csv';
-        this.logger.log('[FAQ-SERV] - FAQ_URL (built with SERVER_BASE_PATH) ', this.FAQ_URL);
-        this.logger.log('[FAQ-SERV] - EXPORT_FAQ_TO_CSV_URL (built with SERVER_BASE_PATH) ', this.EXPORT_FAQ_TO_CSV_URL);
-      }
-    });
-  }
-
-  checkIfUserExistAndGetToken() {
-    if (this.user) {
-      this.TOKEN = this.user.token
-      // this.getToken();
-    } else {
-      this.logger.log('[FAQ-SERV] - No user is signed in');
-    }
-  }
 
   /**
    * READ DETAIL (GET FAQ BY FAQ ID)
@@ -74,15 +43,14 @@ export class FaqService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     let url = this.FAQ_URL + id;
     this.logger.log('[FAQ-SERV] - GET FAQ BY FAQ-ID URL', url);
 
-    return this._httpClient
-      .get<Faq[]>(url, httpOptions)
+    return this._httpClient.get<Faq[]>(url, httpOptions)
   }
 
   /**
@@ -95,7 +63,7 @@ export class FaqService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -112,8 +80,7 @@ export class FaqService {
     this.logger.log('[FAQ-SERV] - GET PAGINATED FAQ BY BOT-ID - URL', url);
 
 
-    return this._httpClient
-      .get<Faq[]>(url, httpOptions)
+    return this._httpClient.get<Faq[]>(url, httpOptions)
   }
 
   /**
@@ -125,12 +92,12 @@ export class FaqService {
     this.logger.log("[FAQ-SERV] GET COUNT OF REPLIES OF FAQ OF THE BOT-ID: ", botId);
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': this.TOKEN
+      'Authorization': this.tiledeskToken
     })
 
     let params = new HttpParams().set('sender', 'bot_' + botId);
 
-    return this._httpClient.get(this.SERVER_BASE_PATH + this.project._id + '/analytics/requests/aggregate/attributes/_answerid', { headers: headers, params: params });
+    return this._httpClient.get(this.SERVER_BASE_PATH + this.project_id + '/analytics/requests/aggregate/attributes/_answerid', { headers: headers, params: params });
   }
 
   /**
@@ -145,7 +112,7 @@ export class FaqService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -155,8 +122,7 @@ export class FaqService {
     }
     this.logger.log('[FAQ-SERV] - GET ALL SEARCED - URL', url);
 
-    return this._httpClient
-      .get<Faq[]>(url, httpOptions)
+    return this._httpClient.get<Faq[]>(url, httpOptions)
   }
 
   /**
@@ -170,30 +136,28 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
   const httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': this.TOKEN
+      'Authorization': this.tiledeskToken
     })
   };
  
   let url = this.FAQ_URL + '?id_faq_kb=' + id_faq_kb;
   this.logger.log('[FAQ-SERV] - GET FAQ BY FAQ-KB ID (BOT-ID) - URL', url);
 
-  return this._httpClient
-    .get<Intent[]>(url, httpOptions)
+  return this._httpClient.get<Intent[]>(url, httpOptions)
 }
   public getAllFaqByFaqKbId(id_faq_kb: string): Observable<Faq[]> {
 
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     let url = this.FAQ_URL + '?id_faq_kb=' + id_faq_kb;
     this.logger.log('[FAQ-SERV] - GET FAQ BY FAQ-KB ID (BOT-ID) - URL', url);
 
-    return this._httpClient
-      .get<Faq[]>(url, httpOptions)
+    return this._httpClient.get<Faq[]>(url, httpOptions)
   }
 
   /**
@@ -205,15 +169,14 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     let url = this.FAQ_URL + '?text=' + text;
     this.logger.log('[FAQ-SERV] - GET FAQ BY TEXT (CONTAINED IN THE QUESTION OR IN THE ANSWER)', url);
 
-    return this._httpClient
-      .get<Faq[]>(url, httpOptions)
+    return this._httpClient.get<Faq[]>(url, httpOptions)
   }
 
   /**
@@ -225,7 +188,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN,
+        'Authorization': this.tiledeskToken,
       }),
       responseType: 'text' as 'json'
     };
@@ -233,40 +196,37 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const url = this.EXPORT_FAQ_TO_CSV_URL + '?id_faq_kb=' + id_faq_kb;
     this.logger.log('[FAQ-SERV] - EXPORT FAQS AS CSV - URL', url);
 
-    return this._httpClient
-      .get(url, httpOptions)
+    return this._httpClient.get(url, httpOptions)
   }
 
   public exportChatbotToJSON(id_faq_kb: string) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN,
+        'Authorization': this.tiledeskToken,
       }),
       // responseType: 'text' as 'json'
     };
 
-    const url = this.SERVER_BASE_PATH + this.project._id + "/faq_kb/exportjson/" + id_faq_kb;
+    const url = this.SERVER_BASE_PATH + this.project_id + "/faq_kb/exportjson/" + id_faq_kb;
     this.logger.log('[FAQ-SERV] - EXPORT FAQS AS JSON - URL', url);
 
-    return this._httpClient
-      .get(url, httpOptions)
+    return this._httpClient.get(url, httpOptions)
   }
 
   public exportIntentsToJSON(id_faq_kb: string) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN,
+        'Authorization': this.tiledeskToken,
       }),
       // responseType: 'text' as 'json'
     };
 
-    const url = this.SERVER_BASE_PATH + this.project._id + "/faq_kb/exportjson/" + id_faq_kb + "?intentsOnly=true";
+    const url = this.SERVER_BASE_PATH + this.project_id + "/faq_kb/exportjson/" + id_faq_kb + "?intentsOnly=true";
     this.logger.log('[FAQ-SERV] - EXPORT FAQS AS JSON - URL', url);
 
-    return this._httpClient
-      .get(url, httpOptions)
+    return this._httpClient.get(url, httpOptions)
   }
 
 
@@ -274,16 +234,15 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const options = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
 
-    const url = this.SERVER_BASE_PATH + this.project._id + "/faq_kb/importjson/" + id_faq_kb
+    const url = this.SERVER_BASE_PATH + this.project_id + "/faq_kb/importjson/" + id_faq_kb
     this.logger.log('[FAQ-SERV] UPLOAD FAQS CSV - URL ', url);
 
-    return this._httpClient
-      .post(url, jsonfile, options)
+    return this._httpClient.post(url, jsonfile, options)
   }
 
   // ( POST ../PROJECT_ID/bots/importjson/null/?create=true)
@@ -291,23 +250,22 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const options = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
 
-    const url = this.SERVER_BASE_PATH + this.project._id + "/faq_kb/importjson/null/?create=true"
+    const url = this.SERVER_BASE_PATH + this.project_id + "/faq_kb/importjson/null/?create=true"
     this.logger.log('[FAQ-SERV] UPLOAD FAQS CSV - URL ', url);
 
-    return this._httpClient
-      .post(url, jsonfile, options)
+    return this._httpClient.post(url, jsonfile, options)
   }
 
   public importIntentsFromJSON(id_faq_kb: string, jsonfile, action: string) {
     const options = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -318,11 +276,10 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
       qsaction = "&overwrite=true"
     }
 
-    const url = this.SERVER_BASE_PATH + this.project._id + "/faq_kb/importjson/" + id_faq_kb + "?intentsOnly=true" + qsaction
+    const url = this.SERVER_BASE_PATH + this.project_id + "/faq_kb/importjson/" + id_faq_kb + "?intentsOnly=true" + qsaction
     this.logger.log('[FAQ-SERV] UPLOAD FAQS CSV - URL ', url);
 
-    return this._httpClient
-      .post(url, jsonfile, options)
+    return this._httpClient.post(url, jsonfile, options)
   }
 
 
@@ -339,7 +296,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -351,8 +308,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     }
     this.logger.log('[FAQ-SERV] ADD FAQ - POST BODY ', body);
 
-    return this._httpClient
-      .post(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
   }
 
   /**
@@ -368,7 +324,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
     this.logger.log('[FAQ-SERV] UPDATE FAQ - ID ', id);
@@ -377,8 +333,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
 
     const body = { 'question': question, 'answer': answer, 'intent_display_name': intentname, 'form': intentform, 'webhook_enabled': faqwebhookenabled };
     this.logger.log('[FAQ-SERV] UPDATE FAQ - PUT REQUEST BODY ', body);
-    return this._httpClient
-      .put(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.put(url, JSON.stringify(body), httpOptions)
   }
 
 
@@ -398,7 +353,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
     const url = this.FAQ_URL;
@@ -433,7 +388,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
     this.logger.log('[FAQ-SERV] UPDATE FAQ - ID ', id);
@@ -465,7 +420,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -475,8 +430,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const body = { 'question': question, 'answer': answer, 'id_faq_kb': id_faq_kb };
     this.logger.log('[FAQ-SERV] CREATE TRAIN BOT FAQ - BODY ', body);
 
-    return this._httpClient
-      .post(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
   }
 
   /**
@@ -496,15 +450,14 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const options = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     const url = this.FAQ_URL + 'uploadcsv';
     this.logger.log('[FAQ-SERV] UPLOAD FAQS CSV - URL ', url);
 
-    return this._httpClient
-      .post(url, formData, options)
+    return this._httpClient.post(url, formData, options)
   }
 
   /**
@@ -516,15 +469,14 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
     let url = this.FAQ_URL + id;
     this.logger.log('[FAQ-SERV] DELETE FAQ URL ', url);
 
-    return this._httpClient
-      .delete(url, httpOptions)
+    return this._httpClient.delete(url, httpOptions)
   }
 
   /**
@@ -541,7 +493,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
@@ -551,8 +503,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const body = { 'question': question, 'answer': answer };
     this.logger.log('[FAQ-SERV] - UPDATE TRAIN BOT FAQ - BODY ', body);
 
-    return this._httpClient
-      .put(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.put(url, JSON.stringify(body), httpOptions)
   }
 
 
@@ -568,15 +519,14 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
       headers: new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
 
-    const url = this.SERVER_BASE_PATH + this.project._id + '/faq_kb/' + 'askbot';
+    const url = this.SERVER_BASE_PATH + this.project_id + '/faq_kb/' + 'askbot';
     const body = { 'id_faq_kb': botId, 'question': question };
 
-    return this._httpClient
-      .post(url, JSON.stringify(body), httpOptions)
+    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
   }
 
 
@@ -585,14 +535,13 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.TOKEN
+        'Authorization': this.tiledeskToken
       })
     };
-    let url = this.SERVER_BASE_PATH + this.project._id + '/faq/' + id + '/attributes';
+    let url = this.SERVER_BASE_PATH + this.project_id + '/faq/' + id + '/attributes';
     let body = JSON.stringify(attributes);
     console.log('[FAQ.SERV] updateFaq - BODY ', url, body);
-    return this._httpClient
-    .patch<Intent>(url, body, httpOptions)
+    return this._httpClient .patch<Intent>(url, body, httpOptions)
     // return this._httpClient.patch(url, body, httpOptions)
   }
 

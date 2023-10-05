@@ -30,38 +30,43 @@
             </span>
         </div>
 
-        <sat-popover  disabled tabindex="-1" [autoFocus]="false" #setattributepopover id="addConditionFilter"  [restoreFocus]="true" panelClass="set-attributes-panel"
-        verticalAlign="below" interactiveClose="false">
-        <div>
-            <div id="search">
-                <span class="material-icons">search</span>
-                <input type="text" 
-                    placeholder="Type search value" 
-                    [(ngModel)]="textVariable"
-                    (ngModelChange)="onChangeSearch($event)">
-            </div>
-            <div id="scrollMe">
-                <div id="data">
-                    <div class="category-name">USER DATA</div>
-                    <div *ngFor="let variable of variableListMock" (click)="onVariableSelected(variable)" class="category-row">
-                        <span class="material-icons">data_object</span>
-                        <label class="category-row-name">{{variable.name}}</label>
-                    </div>
+        <!-- <sat-popover #setattributepopover id="addConditionFilterOld"
+            disabled tabindex="-1"
+            [autoFocus]="false"  
+            [restoreFocus]="true" 
+            panelClass="set-attributes-panel"
+            verticalAlign="below" 
+            interactiveClose="false">
+            <div>
+                <div id="search">
+                    <span class="material-icons">search</span>
+                    <input type="text" 
+                        placeholder="Type search value" 
+                        [(ngModel)]="textVariable"
+                        (ngModelChange)="onChangeSearch($event)">
                 </div>
-                <!-- <div id="data">
-                    <div class="category-name">INTENT ATTRIBUTES</div>
-                    <div *ngFor="let variable of filteredVariableList" (click)="onVariableSelected(variable)" class="category-row">
-                        <span class="material-icons">data_object</span>
-                        <label class="category-row-name">{{variable.name}}</label>
+                <div id="scrollMe">
+                    <div id="data">
+                        <div class="category-name">USER DATA</div>
+                        <div *ngFor="let variable of variableListMock" (click)="onVariableSelected(variable)" class="category-row">
+                            <span class="material-icons">data_object</span>
+                            <label class="category-row-name">{{variable.name}}</label>
+                        </div>
                     </div>
-                </div> -->
+                    <!- - <div id="data">
+                        <div class="category-name">INTENT ATTRIBUTES</div>
+                        <div *ngFor="let variable of filteredVariableList" (click)="onVariableSelected(variable)" class="category-row">
+                            <span class="material-icons">data_object</span>
+                            <label class="category-row-name">{{variable.name}}</label>
+                        </div>
+                    </div> - ->
+                </div>
+                <div id="add-attribute" (click)="onAddCustomAttribute()">
+                    <span class="material-icons">add</span>
+                    Add custom attributes
+                </div>
             </div>
-            <div id="add-attribute" (click)="onAddCustomAttribute()">
-                <span class="material-icons">add</span>
-                Add custom attributes
-            </div>
-        </div>
-    </sat-popover>
+        </sat-popover> -->
 
         <div *ngIf="emojiPikerBtn" class="emoji-picker">
             <div class="emoji-picker-button" aria-expanded="false">

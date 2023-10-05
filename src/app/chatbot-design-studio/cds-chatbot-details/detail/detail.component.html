@@ -30,12 +30,13 @@
           <div class="bot_avatar" style="width: 80px; height: 80px;margin-right: 20px;">
 
             <img *ngIf="botProfileImageExist === true || botImageHasBeenUploaded === true" class="bot-profile-img"
-              [src]="getBotProfileImage()" onerror="this.src='assets/img/avatar_bot_tiledesk.svg'" />
+              [src]="selectedChatbot?.url" onerror="this.src='assets/img/avatar_bot_tiledesk.svg'" />
             <!-- <img *ngIf="botProfileImageExist === true || botImageHasBeenUploaded === true" class="bot-profile-img"
               [src]="botProfileImageurl" onerror="this.src='assets/img/avatar_bot_tiledesk.svg'" /> -->
 
             <img *ngIf="botProfileImageExist === false && botImageHasBeenUploaded !== true" class="bot-profile-img"
-              src="assets/img/avatar_bot_tiledesk.svg" />
+              src="assets/img/avatar_bot_tiledesk.svg"/>
+
           </div>
 
 
@@ -73,16 +74,16 @@
     <!-- ------------------------------------------------------------------------------------------- -->
     <!--  Bot type  -->
     <!-- ------------------------------------------------------------------------------------------- -->
-    <div class="row" style="margin-bottom: 16px;">
+    <!-- <div class="row" style="margin-bottom: 16px;">
       <label class="col-sm-2 cds-custom-label">
-        <!-- {{ "BotsAddEditPage.Type" | translate }} -->
+        <!- - {{ "BotsAddEditPage.Type" | translate }} - ->
         Type
       </label>
       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-        <input id="bot_type" name="bot_type" [(ngModel)]="botTypeForInput" class="input csd-chatbot-dtls-input"
+        <input id="bot_type" name="bot_type" [(ngModel)]="selectedChatbot.type" class="input csd-chatbot-dtls-input"
           type="text" style="margin-bottom: 0px; color:#808080" disabled>
       </div>
-    </div>
+    </div> -->
 
 
     <!-- ------------------------------------------------------------------------------------------- -->
@@ -94,7 +95,7 @@
         Name
       </label>
       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-        <input id="faqKb_name" name="faqKb_name" [(ngModel)]="faqKb_name" class="input csd-chatbot-dtls-input"
+        <input id="faqKb_name" name="faqKb_name" [(ngModel)]="selectedChatbot.name" class="input csd-chatbot-dtls-input"
           type="text">
       </div>
     </div>
@@ -150,7 +151,7 @@
       <label class="col-xs-2"></label>
       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
         <button id="csd-update-bot-btn" #editbotbtn class="btn btn-primary pull-left cds-blue-button"
-          (click)="editBot()" [disabled]="faqKb_name?.length === 0">
+          (click)="editBot()" [disabled]="selectedChatbot?.name?.length === 0">
           <!-- {{ "BotsAddEditPage.UpdateBotName" | translate }} -->
           Update bot
         </button>

@@ -1,15 +1,17 @@
 import { Component, Input, OnInit, ViewChild, isDevMode } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { CdsPublishOnCommunityModalComponent } from 'app/chatbot-design-studio/cds-dashboard/utils/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
-import { CERTIFIED_TAGS } from 'app/chatbot-design-studio/utils';
-import { AuthService } from 'app/core/auth.service';
-import { NotifyService } from 'app/core/notify.service';
-import { Chatbot } from 'app/models/faq_kb-model';
-import { Project } from 'app/models/project-model';
-import { FaqKbService } from 'app/services/faq-kb.service';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { UsersService } from 'app/services/users.service';
+import { CdsPublishOnCommunityModalComponent } from '../../cds-dashboard/utils/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
+import { CERTIFIED_TAGS } from '../../utils';
+import { NotifyService } from 'src/app/services/notify.service';
+import { Chatbot } from 'src/app/models/faq_kb-model';
+import { Project } from 'src/app/models/project-model';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { UsersService } from 'src/app/services/users.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { UserModel } from 'src/chat21-core/models/user';
 const swal = require('sweetalert');
 
 @Component({
@@ -39,18 +41,19 @@ export class CDSDetailCommunityComponent implements OnInit {
   userWebsite: string;
   userPlublicEmail: string;
   userDescription: string;
-  user: any;
+  user: UserModel;
   userCmntyInfo = false;
   seeAll: any;
   seeUserCmntyInfo: boolean = false;
   hasPersonalCmntyInfo: boolean = false;
+
+  logger: LoggerService = LoggerInstance.getInstance()
   constructor(
-    private logger: LoggerService,
     public dialog: MatDialog,
     private faqKbService: FaqKbService,
     private notify: NotifyService,
     private usersService: UsersService,
-    private auth: AuthService,
+    private tiledeskAuthService: TiledeskAuthService,
   ) { }
 
   displayUserCommunityInfo(seeUserCmntyInfo) {
@@ -76,20 +79,12 @@ export class CDSDetailCommunityComponent implements OnInit {
   }
 
   getLoggedUserAndUserCommunityProfile() {
-    this.auth.user_bs.subscribe((user) => {
-      this.logger.log('[CDS-DETAIL-COMMUNITY] - GET LOGGED USER - USER', user)
-
-      if (user) {
-        this.user = user;
-        this.getUserCommunityProfile(this.user._id)
-      }
-    })
-
+    this.user = this.tiledeskAuthService.getCurrentUser()
+    this.getUserCommunityProfile(this.user.uid)
   }
 
   getUserCommunityProfile(user_id: string) {
-    this.usersService.getCurrentUserCommunityProfile(user_id)
-      .subscribe((userCmntyProfile) => {
+    this.usersService.getCurrentUserCommunityProfile(user_id).subscribe((userCmntyProfile) => {
         this.logger.log('[CDS-DETAIL-COMMUNITY] GET CURRENT  USER CMNTY PROFILE RES ', userCmntyProfile)
         if (userCmntyProfile) {
           if (userCmntyProfile['description']) {
@@ -197,7 +192,7 @@ export class CDSDetailCommunityComponent implements OnInit {
               "first_name": this.user.firstname,
               "last_name": this.user.lastname,
               "email": this.user.email,
-              'userId': this.user._id,
+              'userId': this.user.uid,
               'botId': this.selectedChatbot._id,
               'bot_name': this.selectedChatbot.name,
             });
@@ -239,7 +234,7 @@ export class CDSDetailCommunityComponent implements OnInit {
                   "first_name": this.user.firstname,
                   "last_name": this.user.lastname,
                   "email": this.user.email,
-                  'userId': this.user._id,
+                  'userId': this.user.uid,
                   'botId': this.selectedChatbot._id,
                   'bot_name': this.selectedChatbot.name,
                 });
@@ -368,29 +363,28 @@ export class CDSDetailCommunityComponent implements OnInit {
 
   updateUserProfile() {
     this.logger.log('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE, ')
-    this.usersService.updateUserWithCommunityProfile(this.userWebsite, this.userPlublicEmail, this.userDescription)
-      .subscribe((userProfile) => {
-        this.logger.log('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE RES ', userProfile)
-        if(userProfile['updatedUser']['description'] === "" && userProfile['updatedUser']['public_email'] === "" &&  userProfile['updatedUser']['public_website'] === "") {
-          this.hasPersonalCmntyInfo = false;
-          this.logger.log('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE RES > hasPersonalCmntyInfo', this.hasPersonalCmntyInfo)
-        } else {
-          this.hasPersonalCmntyInfo = true;
-          this.logger.log('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE RES > hasPersonalCmntyInfo', this.hasPersonalCmntyInfo)
-        }
+    this.usersService.updateUserWithCommunityProfile(this.userWebsite, this.userPlublicEmail, this.userDescription).subscribe((userProfile) => {
+      this.logger.log('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE RES ', userProfile)
+      if(userProfile['updatedUser']['description'] === "" && userProfile['updatedUser']['public_email'] === "" &&  userProfile['updatedUser']['public_website'] === "") {
+        this.hasPersonalCmntyInfo = false;
+        this.logger.log('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE RES > hasPersonalCmntyInfo', this.hasPersonalCmntyInfo)
+      } else {
+        this.hasPersonalCmntyInfo = true;
+        this.logger.log('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE RES > hasPersonalCmntyInfo', this.hasPersonalCmntyInfo)
+      }
 
-      
-      }, (error) => {
-        this.logger.error('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE -  ERROR ', error);
-        // =========== NOTIFY ERROR ===========
-        this.notify.showWidgetStyleUpdateNotification('An error occurred while updating your user profile', 4, 'report_problem');
+    
+    }, (error) => {
+      this.logger.error('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE -  ERROR ', error);
+      // =========== NOTIFY ERROR ===========
+      this.notify.showWidgetStyleUpdateNotification('An error occurred while updating your user profile', 4, 'report_problem');
 
-      }, () => {
-        this.logger.log('[CDS-CHATBOT-DTLS] UPDATE USER PROFILE - * COMPLETE *');
-        // =========== NOTIFY SUCCESS===========
-        this.notify.showWidgetStyleUpdateNotification('User profile updated successfully', 2, 'done');
+    }, () => {
+      this.logger.log('[CDS-CHATBOT-DTLS] UPDATE USER PROFILE - * COMPLETE *');
+      // =========== NOTIFY SUCCESS===========
+      this.notify.showWidgetStyleUpdateNotification('User profile updated successfully', 2, 'done');
 
-      })
+    })
 
   }
 

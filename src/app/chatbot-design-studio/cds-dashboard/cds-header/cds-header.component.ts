@@ -2,20 +2,21 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
-import { NotifyService } from 'app/core/notify.service';
 
-import { MultichannelService } from 'app/services/multichannel.service';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { AppConfigService } from 'app/services/app-config.service';
-import { FaqKbService } from 'app/services/faq-kb.service';
+import { NotifyService } from 'src/app/services/notify.service';
+import { MultichannelService } from 'src/app/services/multichannel.service';
+import { AppConfigService } from 'src/app/services/app-config';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
 
 // SERVICES //
-import { DashboardService } from 'app/chatbot-design-studio/services/dashboard.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { IntentService } from '../../services/intent.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
-import { Chatbot } from 'app/models/faq_kb-model';
+import { Chatbot } from 'src/app/models/faq_kb-model';
 import { EXTERNAL_URL, TYPE_INTENT_NAME } from '../../utils';
 import { CdsPublishOnCommunityModalComponent } from '../utils/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
 
 const swal = require('sweetalert');
 
@@ -52,9 +53,10 @@ export class CdsHeaderComponent implements OnInit {
   TRY_ON_WA: boolean;
   displayModalAttacchBotToDept: string;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
     private router: Router,
-    private logger: LoggerService,
     private faqKbService: FaqKbService,
     public dialog: MatDialog,
     public appConfigService: AppConfigService,

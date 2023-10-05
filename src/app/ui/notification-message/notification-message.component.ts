@@ -1,18 +1,21 @@
 import { Component, ViewEncapsulation, OnInit, OnDestroy, isDevMode } from '@angular/core';
 
-import { NotifyService } from '../../core/notify.service';
-import { AuthService } from '../../core/auth.service';
-import { ProjectService } from '../../services/project.service';
+import { NotifyService } from 'src/app/services/notify.service';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { ProjectPlanService } from '../../services/project-plan.service';
 import { Subject, Subscription } from 'rxjs';
-import { AppConfigService } from '../../services/app-config.service';
 import { BrandService } from '../../services/brand.service';
-import { LoggerService } from '../../services/logger/logger.service';
-import { UsersService } from '../../services/users.service';
 import { takeUntil } from 'rxjs/operators';
-import { PLAN_NAME } from 'app/utils/util';
+import { PLAN_NAME } from 'src/app/utils/util';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { AppConfigService } from 'src/app/services/app-config';
+import { ProjectService } from 'src/app/services/projects.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { Project } from 'src/app/models/project-model';
+import { UserModel } from 'src/chat21-core/models/user';
+import { ProjectUser } from 'src/app/models/project-user';
 const swal = require('sweetalert');
 @Component({
   selector: 'notification-message',
@@ -26,7 +29,10 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
   tparams: any;
   company_name: string;
   displayExpiredSessionModal: string;
-  projectId: string;
+
+  project: Project;
+  user: UserModel
+
   gettingStartedChecklist: any;
   CHAT_BASE_URL: string;
   showSpinnerInModal = true;
@@ -49,20 +55,19 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
   learnMoreAboutDefaultRoles: string;
   contactUsEmail: string;
   IS_AVAILABLE: boolean;
-  currentUser: any;
   profile_name_for_segment: string;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
     public notify: NotifyService,
-    public auth: AuthService,
     public projectService: ProjectService,
     private router: Router,
     private translate: TranslateService,
-    private prjctPlanService: ProjectPlanService,
     public appConfigService: AppConfigService,
+    private dashBoardService: DashboardService,
     public brandService: BrandService,
-    private logger: LoggerService,
-    private usersService: UsersService,
+    private tiledeskAuthService: TiledeskAuthService
   ) {
     const brand = brandService.getBrand();
     this.tparams = brand;
@@ -76,52 +81,39 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getBrowserLang();
-    this.getCurrentProject();
+    this.user = this.tiledeskAuthService.getCurrentUser()
+    this.project = this.dashBoardService.project
 
-    // this.getProjectById();
     this.translateMsgSubscriptionCanceledSuccessfully();
     this.translateMsgSubscriptionCanceledError();
-    this.getUserRole();
-    this.getCurrentUser()
+    this.getUserAvailabilityAndRole()
     this.getProjectPlan();
     this.getWidgetUrl();
     this.getChatUrl();
     this.translateModalOnlyOwnerCanManageProjectAccount();
-    this.getUserAvailability()
   }
 
-  getUserAvailability() {
-    this.usersService.user_is_available_bs.subscribe((user_available) => {
-      this.IS_AVAILABLE = user_available;
-      this.logger.log('[NAVBAR]- USER IS AVAILABLE ', this.IS_AVAILABLE);
-    });
+  getUserAvailabilityAndRole() {
+    this.projectService.getProjectUserByUserId(this.project._id, this.user.uid).pipe( takeUntil(this.unsubscribe$)).subscribe((projectUser: ProjectUser) => {
+      //  console.log('[CDS-SIDEBAR] - SUBSCRIPTION TO USER ROLE »»» ', userRole)
+      if (projectUser[0].role !== undefined) {
+        this.USER_ROLE = projectUser[0].role;
+      }
+      if(projectUser[0].user_available !== undefined) {
+        this.IS_AVAILABLE = projectUser[0].user_available;
+      }
+    })
   }
 
 
   translateModalOnlyOwnerCanManageProjectAccount() {
-    this.translate.get('OnlyUsersWithTheOwnerRoleCanManageTheAccountPlan')
-      .subscribe((translation: any) => {
+    this.translate.get('OnlyUsersWithTheOwnerRoleCanManageTheAccountPlan').subscribe((translation: any) => {
         this.onlyOwnerCanManageTheAccountPlanMsg = translation;
       });
 
-    this.translate.get('LearnMoreAboutDefaultRoles')
-      .subscribe((translation: any) => {
+    this.translate.get('LearnMoreAboutDefaultRoles').subscribe((translation: any) => {
         this.learnMoreAboutDefaultRoles = translation;
       });
-  }
-
-
-  getUserRole() {
-    this.usersService.project_user_role_bs
-      .pipe(
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe((userRole) => {
-
-        this.logger.log('[NOTIFICATION-MSG] - SUBSCRIPTION TO USER ROLE »»» ', userRole)
-        // used to display / hide 'WIDGET' and 'ANALITCS' in home.component.html
-        this.USER_ROLE = userRole;
-      })
   }
 
   getChatUrl() {
@@ -133,42 +125,31 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
   }
 
   getProjectPlan() {
-    this.subscription = this.prjctPlanService.projectPlan$.subscribe((projectProfileData: any) => {
-      this.logger.log('[NOTIFICATION-MSG] - GET PROJECT PROFILE', projectProfileData)
-      if (projectProfileData) {
-        this.prjct_name = projectProfileData.name;
-        this.prjct_profile_type = projectProfileData.profile_type;
-        this.logger.log('[NOTIFICATION-MSG] - GET PROJECT PROFILE prjct_profile_type ', this.prjct_profile_type);
-        this.subscription_is_active = projectProfileData.subscription_is_active;
-        this.trial_expired = projectProfileData.trial_expired;
-        this.subscription_end_date = projectProfileData.subscription_end_date;
-        const projectprofile = projectProfileData.profile_name.toUpperCase()
-        this.tprojectprofilemane = { projectprofile: projectprofile }
-        this.profile_name = projectProfileData.profile_name;
-        this.buildPlanName(projectProfileData.profile_name, this.browserLang, this.prjct_profile_type);
+    this.prjct_name = this.project.name
+    this.prjct_profile_type = this.project.profile.type
+    this.subscription_is_active = this.project.isActiveSubscription
+    this.trial_expired = this.project.trialExpired
+    this.subscription_end_date = this.project.profile.subEnd
+    this.tprojectprofilemane = { projectprofile: this.project.profile.name.toUpperCase() }
+    this.profile_name = this.project.profile.name;
+    this.buildPlanName(this.project.profile.name, this.browserLang, this.prjct_profile_type);
 
-
-        if (projectProfileData.profile_type === 'free') {
-          if (projectProfileData.trial_expired === false) {
-            this.profile_name_for_segment = PLAN_NAME.B + " (trial)"
-          } else {
-            this.profile_name_for_segment = "Free"
-          }
-        } else if (projectProfileData.profile_type === 'payment') {
-          if (projectProfileData.profile_name === PLAN_NAME.A) {
-            this.profile_name_for_segment = PLAN_NAME.A
-          } else if (projectProfileData.profile_name === PLAN_NAME.B) {
-            this.profile_name_for_segment = PLAN_NAME.B
-          } else if (projectProfileData.profile_name === PLAN_NAME.C) {
-            this.profile_name_for_segment = PLAN_NAME.C
-          }
-        }
+    if (this.project.profile.type === 'free') {
+      if (this.project.trialExpired === false) {
+        this.profile_name_for_segment = PLAN_NAME.B + " (trial)"
+      } else {
+        this.profile_name_for_segment = "Free"
       }
-    }, err => {
-      this.logger.error('[NOTIFICATION-MSG] GET PROJECT PROFILE - ERROR', err);
-    }, () => {
-      this.logger.log('[NOTIFICATION-MSG] GET PROJECT PROFILE * COMPLETE *');
-    });
+    } else if (this.project.profile.type === 'payment') {
+      if (this.project.profile.name === PLAN_NAME.A) {
+        this.profile_name_for_segment = PLAN_NAME.A
+      } else if (this.project.profile.name === PLAN_NAME.B) {
+        this.profile_name_for_segment = PLAN_NAME.B
+      } else if (this.project.profile.name === PLAN_NAME.C) {
+        this.profile_name_for_segment = PLAN_NAME.C
+      }
+    }
+
   }
 
   ngOnDestroy() {
@@ -219,7 +200,7 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
     if (this.USER_ROLE === 'owner') {
       if (this.prjct_profile_type === 'free' && this.trial_expired === true) {
         this.notify.closeDataExportNotAvailable();
-        this.router.navigate(['project/' + this.projectId + '/pricing']);
+        this.router.navigate(['project/' + this.project._id + '/pricing']);
         // this.notify.presentContactUsModalToUpgradePlan(true);
 
       } else if (this.prjct_profile_type === 'payment' && this.subscription_is_active === false) {
@@ -240,8 +221,7 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
 
   onLogoutModalHandled() {
     this.notify.closeLogoutModal()
-    this.auth.signOut('userdetailsidebar');
-
+    this.tiledeskAuthService.logOut();
   }
 
   getBrowserLang() {
@@ -249,121 +229,25 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
   }
 
   translateMsgSubscriptionCanceledSuccessfully() {
-    this.translate.get('SubscriptionSuccessfullyCanceled')
-      .subscribe((text: string) => {
+    this.translate.get('SubscriptionSuccessfullyCanceled').subscribe((text: string) => {
         this.subscriptionCanceledSuccessfully = text;
       });
   }
 
   translateMsgSubscriptionCanceledError() {
-    this.translate.get('AnErrorOccurredWhileCancellingSubscription')
-      .subscribe((text: string) => {
+    this.translate.get('AnErrorOccurredWhileCancellingSubscription').subscribe((text: string) => {
         this.subscriptionCanceledError = text;
       });
   }
 
-
   onOkExpiredSessionModal() {
     this.notify.onOkExpiredSessionModal();
-    this.auth.signOut('notification-message');
+    this.tiledeskAuthService.logOut();
   }
-
-  getCurrentProject() {
-    this.auth.project_bs.subscribe((project) => {
-      // this.logger.log('[NOTIFICATION-MSG] project from AUTH service subscription  ', project)
-      if (project) {
-        this.projectId = project._id
-        this.logger.log('[NOTIFICATION-MSG] project ID ', this.projectId)
-      }
-    });
-  }
-
-  getCurrentUser() {
-    this.auth.user_bs.subscribe((user) => {
-      this.logger.log('[ActivitiesComponent] - LoggedUser ', user);
-
-      if (user) {
-        this.currentUser = user;
-        this.logger.log('[ActivitiesComponent] - LoggedUser this.currentUser ', this.currentUser);
-      }
-    });
-  }
-
-
-  cancelSubscription() {
-    if (this.USER_ROLE === 'owner') {
-      this.notify.cancelSubscriptionCompleted(false)
-
-      // this.showSpinner = true;
-      this.projectService.cancelSubscription().subscribe((confirmation: any) => {
-        this.logger.log('[NOTIFICATION-MSG] - cancelSubscription RES ', confirmation);
-
-        if (confirmation && confirmation.status === 'canceled') {
-          this.notify.showWidgetStyleUpdateNotification(this.subscriptionCanceledSuccessfully, 2, 'done');
-          if (!isDevMode()) {
-            if (window['analytics']) {
-
-              let userFullname = ''
-              if (this.currentUser.firstname && this.currentUser.lastname)  {
-                userFullname = this.currentUser.firstname + ' ' + this.currentUser.lastname
-              } else if (this.currentUser.firstname && !this.currentUser.lastname) {
-                userFullname = this.currentUser.firstname
-              }
-
-              try {
-                window['analytics'].identify(this.currentUser._id, {
-                  name: userFullname,
-                  email: this.currentUser.email,
-                  logins: 5,
-                  plan: this.profile_name_for_segment,
-                });
-              } catch (err) {
-                this.logger.error('identify [NOTIFICATION-MSG] Cancel subscription error', err);
-              }
-
-              try {
-                window['analytics'].track('Cancel Subscription', {
-                  "email": this.currentUser.email,
-                }, {
-                  "context": {
-                    "groupId": this.projectId
-                  }
-                });
-              } catch (err) {
-                this.logger.error('track [NOTIFICATION-MSG] Cancel subscrption error', err);
-              }
-
-              try {
-                window['analytics'].group(this.projectId, {
-                  name: this.prjct_name,
-                  plan: this.profile_name_for_segment,
-                });
-              } catch (err) {
-                this.logger.error('group [NOTIFICATION-MSG] Cancel subscrption error', err);
-              }
-            }
-          }
-
-          this.notify.cancelSubscriptionCompleted(true);
-        }
-      }, error => {
-        this.logger.error('[NOTIFICATION-MSG] - cancelSubscription - ERROR: ', error);
-        this.notify.showNotification(this.subscriptionCanceledError, 4, 'report_problem');
-
-        this.notify.cancelSubscriptionCompleted(true)
-      }, () => {
-        this.logger.log('[NOTIFICATION-MSG] - cancelSubscription * COMPLETE *');
-
-      });
-    } else {
-      this.notify.presentModalOnlyOwnerCanManageTheAccountPlan(this.onlyOwnerCanManageTheAccountPlanMsg, this.learnMoreAboutDefaultRoles);
-    }
-  }
-
 
   goToPricing() {
-    this.logger.log('goToPricing projectId ', this.projectId);
-    this.router.navigate(['project/' + this.projectId + '/pricing']);
+    this.logger.log('goToPricing projectId ', this.project._id);
+    this.router.navigate(['project/' + this.project._id + '/pricing']);
 
     this.notify.closeModalSubsExpired();
     // this.notify.presentContactUsModalToUpgradePlan(true);
@@ -404,7 +288,7 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
   // TODO: PROBABLY NOT USED - VERIFY BETTER
   // ----------------------------------------
   goToWidgetPage() {
-    this.router.navigate(['project/' + this.projectId + '/widget']);
+    this.router.navigate(['project/' + this.project._id + '/widget']);
     this.notify.closeModalInstallTiledeskModal()
   }
 

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Intent } from 'app/models/intent-model';
+import { Intent } from 'src/app/models/intent-model';
 
 @Component({
   selector: 'cds-event',

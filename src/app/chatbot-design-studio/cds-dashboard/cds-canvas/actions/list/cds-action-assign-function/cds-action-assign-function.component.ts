@@ -1,7 +1,8 @@
-import { ActionAssignFunction } from '../../../../../../models/intent-model';
+import { ActionAssignFunction } from '../../../../../../models/action-model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { TYPE_FUNCTION_LIST_FOR_FUNCTIONS } from 'app/chatbot-design-studio/utils';
+import { TYPE_FUNCTION_LIST_FOR_FUNCTIONS } from '../../../../../utils';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-assign-function',
@@ -16,9 +17,9 @@ export class CdsActionAssignFunctionComponent implements OnInit {
   listOfFunctions: Array<{name: string, value: string, icon?:string}> = [];
   openSlectFunction: boolean = true;
 
-  constructor(
-      private logger: LoggerService
-  ) { }
+  private logger: LoggerService = LoggerInstance.getInstance();
+
+  constructor() { }
 
   ngOnInit(): void {
     // this.logger.log('-------> action:: ', this.action);

@@ -40,6 +40,7 @@
                 <img [src]="element?.src" [title]="element?.name">
             </div>
             <p class="label-action">{{element?.name}}</p>
+            <span *ngIf="!previewMode && element?.status ==='beta'" class="trigger-beta-badge">Beta</span>
         </div>
         
         <div *ngIf="showTip" class="action-description">

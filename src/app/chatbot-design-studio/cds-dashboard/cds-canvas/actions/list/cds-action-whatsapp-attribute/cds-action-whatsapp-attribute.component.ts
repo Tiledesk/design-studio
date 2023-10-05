@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ActionWhatsappAttribute } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { ActionWhatsappAttribute } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-whatsapp-attribute',
@@ -13,9 +14,9 @@ export class CdsActionWhatsappAttributeComponent implements OnInit {
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter();
   
-  constructor(
-    private logger: LoggerService
-  ) { }
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
+  constructor() { }
 
   ngOnInit(): void {
     this.logger.log("action: ", this.action);

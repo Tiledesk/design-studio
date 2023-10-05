@@ -1,12 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
-import { Action, Form, Intent } from 'app/models/intent-model';
+import { Form, Intent } from 'src/app/models/intent-model';
+import { Action } from 'src/app/models/action-model';
 import { Subject, Subscription } from 'rxjs';
 
-import { ACTIONS_LIST, TYPE_ACTION, TYPE_INTENT_NAME, checkInternalIntent, patchActionId } from 'app/chatbot-design-studio/utils';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
+import { ACTIONS_LIST, TYPE_ACTION, TYPE_INTENT_NAME, checkInternalIntent, patchActionId } from '../../../utils';
+import { IntentService } from '../../../services/intent.service';
 // import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
-import { ConnectorService } from 'app/chatbot-design-studio/services/connector.service';
+import { ConnectorService } from '../../../services/connector.service';
 
 
 import {
@@ -19,10 +19,11 @@ import {
   transferArrayItem
 } from '@angular/cdk/drag-drop';
 import { takeUntil } from 'rxjs/operators';
-import { StageService } from 'app/chatbot-design-studio/services/stage.service';
-import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
-
-import { replaceItemInArrayForKey } from 'app/chatbot-design-studio/utils';
+import { StageService } from '../../../services/stage.service';
+import { ControllerService } from '../../../services/controller.service';
+import { replaceItemInArrayForKey } from '../../../utils';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 
 
@@ -86,9 +87,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   webHookTooltipText: string;
   isInternalIntent: boolean = false;
 
-
+  private logger: LoggerService = LoggerInstance.getInstance()
+  
   constructor(
-    private logger: LoggerService,
     public intentService: IntentService,
     private connectorService: ConnectorService,
     private stageService: StageService,
@@ -182,6 +183,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
       this.isStart = true;
      
+      //** set 'start' intent as default selected one */
+      this.intentService.setDefaultIntentSelected()
+      //** center stage on 'start' intent */
+      let startElement = document.getElementById(this.intent.intent_id)
+      this.stageService.centerStageOnHorizontalPosition(startElement)
     }
 
     this.isInternalIntent = checkInternalIntent(this.intent)
@@ -214,7 +220,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   unsubscribe() {
-    this.unsubscribe$.next();
+    this.unsubscribe$.next(null);
     this.unsubscribe$.complete();
 
   }

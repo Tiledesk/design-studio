@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { Intent } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { Intent } from 'src/app/models/intent-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 // import { Question } from 'app/models/intent-model';
 
 @Component({
@@ -17,9 +18,9 @@ export class CdsQuestionComponent implements OnInit {
   questions_array: string[];
   newQuestion: string;
 
-  constructor(
-    private logger: LoggerService
-  ) { }
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
+  constructor() { }
 
   ngOnInit(): void {
   }

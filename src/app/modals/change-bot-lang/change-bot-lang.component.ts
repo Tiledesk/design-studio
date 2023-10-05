@@ -21,6 +21,11 @@ export class ChangeBotLangModalComponent extends BotsBaseComponent implements On
     this.selectedDefaultBotLang = this.botDefaultLanguages[this.getIndexOfbotDefaultLanguages(data.chatbot.language)].name;
     this.intentsEngine = data.chatbot.intentsEngine
   }
+
+
+  ngOnInit() {
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
   }
 

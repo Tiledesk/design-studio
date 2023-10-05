@@ -28,7 +28,7 @@ import { TYPE_INTENT_NAME, NEW_POSITION_ID, TYPE_ACTION, TYPE_COMMAND, removeNod
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
-import { DashboardService } from '../services/dashboard.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 
 

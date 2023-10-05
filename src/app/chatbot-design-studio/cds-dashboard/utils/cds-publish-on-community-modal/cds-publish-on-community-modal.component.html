@@ -24,7 +24,7 @@
                         Name
                     </label>
                     <div class="col-xs-12">
-                        <input placeholder="" id="faqKb_name" name="faqKb_name" [(ngModel)]="faqKb_name" class="input"
+                        <input placeholder="" id="faqKb_name" name="faqKb_name" [(ngModel)]="selectedChatbot?.name" class="input"
                             type="text">
                     </div>
                 </div>
@@ -38,7 +38,7 @@
                         Description
                     </label>
                     <div class="col-xs-12">
-                        <textarea id="bot_description" name="bot_description" [(ngModel)]="faqKb_description" rows="4"
+                        <textarea id="bot_description" name="bot_description" [(ngModel)]="selectedChatbot?.description" rows="4"
                             style="resize: vertical;margin-bottom: 4px;" class="input" type="text"
                             placeholder="{{ 'Description' | translate }}"> </textarea>
                         <span class="bot-description-note">
@@ -54,7 +54,7 @@
 
                     <div class="col-xs-12">
                         <button id="csd-update-bot-btn" #editbotbtn class="btn btn-primary pull-left"
-                            (click)="editBot()" [disabled]="faqKb_name?.length === 0">
+                            (click)="editBot()" [disabled]="selectedChatbot?.name?.length === 0">
                             <!- - {{ "BotsAddEditPage.UpdateBotName" | translate }} - ->
                             Update bot
                         </button>
@@ -88,7 +88,7 @@
                             <div class="bot_avatar" style="width: 80px; height: 80px;margin-right: 20px;">
 
                                 <img *ngIf="botProfileImageExist === true || botImageHasBeenUploaded === true"
-                                    class="bot-profile-img" [src]="getBotProfileImage()"
+                                    class="bot-profile-img" [src]="selectedChatbot.url"
                                     onerror="this.src='assets/img/avatar_bot_tiledesk.svg'" />
 
                                 <img *ngIf="botProfileImageExist === false && botImageHasBeenUploaded !== true"

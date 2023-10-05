@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewChild, ElementRef } from '@angular/core';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { Intent } from 'app/models/intent-model';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
+import { Intent } from 'src/app/models/intent-model';
+import { IntentService } from '../../../../services/intent.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-panel-intent-header',
@@ -22,8 +23,9 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   id_faq_kb: string;
   isFocused: boolean = false;
 
+  private logger: LoggerService = LoggerInstance.getInstance()
+  
   constructor(
-    private logger: LoggerService,
     public intentService: IntentService
   ) { 
     this.intentService.getIntents().subscribe(intents => {

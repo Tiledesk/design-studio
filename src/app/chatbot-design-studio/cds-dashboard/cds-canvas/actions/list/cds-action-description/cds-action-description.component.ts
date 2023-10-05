@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ACTIONS_LIST } from 'app/chatbot-design-studio/utils';
-import { Action } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { ACTIONS_LIST } from '../../../../../utils';
+import { Action } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-description',
@@ -21,9 +22,8 @@ export class CdsActionDescriptionComponent implements OnInit {
   element: any;
   dataInput: string;
 
-  constructor(
-    private logger: LoggerService
-  ) { }
+  private logger: LoggerService = LoggerInstance.getInstance();
+  constructor() { }
 
   ngOnInit(): void {    
   }

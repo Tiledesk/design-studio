@@ -1,3 +1,5 @@
+import { PLAN_NAME } from "../utils/util";
+
 export interface Project {
     _id: string;
     updatedAt?: any;
@@ -11,18 +13,20 @@ export interface Project {
     settings?: any;
     role?: string;
     user_available?: boolean;
-    profile_name?: any;
-    profile_agents?: any;
-    trial_expired?: any;
-    trial_days_left?: number;
-    trial_days?: number;
-    profile_type?: string;
-    subscription_is_active?: any;
-    profile?: any;
-    subscription_end_date?: any;
-    subscription_id?: any;
-    subscription_creation_date?: any;
-    subscription_start_date?: any;
+    
+    trialExpired?: any;
+    trialDaysLeft?: number;
+    isActiveSubscription?: any;
+    profile?: {
+        name: PLAN_NAME;
+        trialDays: number;
+        agents: number;
+        type: string;
+        subStart: string;
+        subEnd: string;
+        subscriptionId: string;
+        subscription_creation_date: string;
+    };
     extra1?: string;
     extra2?: string;
     extra3?: string;

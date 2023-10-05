@@ -4,18 +4,22 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES //
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
-import { StageService } from 'app/chatbot-design-studio/services/stage.service';
-import { ConnectorService } from 'app/chatbot-design-studio/services/connector.service';
-import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
-import { DashboardService } from 'app/chatbot-design-studio/services/dashboard.service';
+import { IntentService } from '../../services/intent.service';
+import { StageService } from '../../services/stage.service';
+import { ConnectorService } from '../../services/connector.service';
+import { ControllerService } from '../../services/controller.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 // MODEL //
-import { Intent, Button, Action, Form } from 'app/models/intent-model';
+import { Intent, Form } from 'src/app/models/intent-model';
+import { Button, Action} from 'src/app/models/action-model';
 
 // UTILS //
-import { checkIFElementExists, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, NEW_POSITION_ID } from 'app/chatbot-design-studio/utils';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { checkIFElementExists, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, NEW_POSITION_ID } from '../../utils';
+
+
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
 const swal = require('sweetalert');
 
@@ -30,7 +34,7 @@ export class CdsCanvasComponent implements OnInit {
   @ViewChild('drawer_of_items_to_zoom_and_drag', { static: false }) drawerOfItemsToZoomAndDrag: ElementRef;
 
   @Output() testItOut = new EventEmitter();
-  @Output() closePanelWidget = new EventEmitter();
+  @Output() closePanelWidget = new EventEmitter<void>();
 
   id_faq_kb: string;
   TYPE_OF_MENU = TYPE_OF_MENU;
@@ -66,14 +70,15 @@ export class CdsCanvasComponent implements OnInit {
   /** panel widget */
   IS_OPEN_PANEL_WIDGET: boolean = false;
   
+  private logger: LoggerService = LoggerInstance.getInstance()
+  
   constructor(
     private intentService: IntentService,
     private stageService: StageService,
     private connectorService: ConnectorService,
     private controllerService: ControllerService,
     private translate: TranslateService,
-    private dashboardService: DashboardService,
-    private logger: LoggerService
+    private dashboardService: DashboardService
   ) {
     this.setSubscriptions();
   }

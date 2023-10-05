@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Chatbot } from 'app/models/faq_kb-model';
-import { Project } from 'app/models/project-model';
-import { FaqKbService } from 'app/services/faq-kb.service';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { Chatbot } from 'src/app/models/faq_kb-model';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-detail-developer',
@@ -14,8 +14,9 @@ export class CDSDetailDeveloperComponent implements OnInit {
   @Input() selectedChatbot: Chatbot
 
   public jwt: string
+
+  logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private logger: LoggerService,
     private faqKbService: FaqKbService,
   ) { }
 

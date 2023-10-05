@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { TYPE_ACTION } from 'app/chatbot-design-studio/utils';
-import { Expression, Message, Wait, Metadata } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { TYPE_ACTION } from '../../../../../../../utils';
+import { Expression, Message, Wait, Metadata } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-reply-redirect',
@@ -30,10 +31,9 @@ export class CdsActionReplyRedirectComponent implements OnInit {
   typeActions = TYPE_ACTION;
   metadata: Metadata;
 
-
-  constructor(
-    private logger: LoggerService
-  ) { }
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
+  constructor() { }
 
 
   ngOnInit(): void {

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { ActionHideMessage } from 'app/models/intent-model';
+import { ActionHideMessage } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-hide-message',
@@ -14,9 +15,9 @@ export class CdsActionHideMessageComponent implements OnInit {
   @Output() updateAndSaveAction = new EventEmitter();
 
 
-  constructor(
-    private logger: LoggerService
-  ) { }
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
+  constructor() { }
 
   ngOnInit(): void {
   }

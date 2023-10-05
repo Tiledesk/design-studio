@@ -7,13 +7,13 @@ import { environment } from '../../environments/environment';
 // import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Injectable({ providedIn: 'root' })
-export class AppConfigProvider {
+export class AppConfigService {
   private appConfig: any;
   // private logger: LoggerService = LoggerInstance.getInstance()
 
   constructor(public http: HttpClient) {
     this.appConfig = environment;
-    // console.log('AppConfigProvider constructor environment:: ', environment);
+    // console.log('appConfigService constructor environment:: ', environment);
   }
 
   /** */

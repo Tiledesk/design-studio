@@ -159,6 +159,24 @@ export class ConnectorService {
             }
           }
 
+          /**  WEB-REQUEST-V2 */
+          if(action._tdActionType === TYPE_ACTION.WEB_REQUESTV2){
+            if(action.trueIntent && action.trueIntent !== ''){
+              const idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+              const idConnectorTo =  action.trueIntent.replace("#", "");
+              console.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorFrom', idConnectorFrom);
+              console.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorTo', idConnectorTo);
+              this.tiledeskConnectors.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            }
+            if(action.falseIntent && action.falseIntent !== ''){
+              const idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+              const idConnectorTo = action.falseIntent.replace("#", "");
+              console.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorFrom', idConnectorFrom);
+              console.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorTo', idConnectorTo);
+              this.tiledeskConnectors.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            }
+          }
+
         });
       }
     });

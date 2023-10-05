@@ -1,5 +1,5 @@
 
-import { Field, Form } from 'app/models/intent-model';
+import { Field, Form } from 'src/app/models/intent-model';
 
 export class FormModelsFactory {
 

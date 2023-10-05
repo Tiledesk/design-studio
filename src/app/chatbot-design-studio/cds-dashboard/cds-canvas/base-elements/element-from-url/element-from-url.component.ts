@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, Input } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser'
-import { getEmbedUrl } from 'app/chatbot-design-studio/utils';
-import { Metadata } from 'app/models/intent-model';
+import { getEmbedUrl } from '../../../..//utils';
+import { Metadata } from 'src/app/models/action-model';
 
 @Component({
   selector: 'cds-element-from-url',

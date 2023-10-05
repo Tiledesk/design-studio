@@ -1,11 +1,12 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ConnectorService } from 'app/chatbot-design-studio/services/connector.service';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
-import { TYPE_ACTION, TYPE_BUTTON, TYPE_URL, generateShortUID } from 'app/chatbot-design-studio/utils';
-import { Button, Expression, GalleryElement, Message, Wait, Metadata, MessageAttributes } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/chat21-core/providers/abstract/logger.service';
+import { ConnectorService } from '../../../../../../../services/connector.service';
+import { IntentService } from '../../../../../../../services/intent.service';
+import { TYPE_ACTION, TYPE_BUTTON, TYPE_URL, generateShortUID } from '../../../../../../../utils';
+import { Button, Expression, GalleryElement, Message, Wait, Metadata, MessageAttributes } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-reply-gallery',
@@ -42,8 +43,9 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   // Buttons //
   buttons: Array<Button>;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
-    private logger: LoggerService,
     private el: ElementRef,
     private sanitizer: DomSanitizer,
     private connectorService: ConnectorService,

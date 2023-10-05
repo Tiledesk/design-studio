@@ -1,12 +1,12 @@
 import { CDSTextComponent } from '../base-elements/text/text.component';
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { Button } from 'app/models/intent-model';
+import { Button } from 'src/app/models/action-model';
 
 
 import { TYPE_BUTTON, TYPE_URL, BUTTON_TYPES, URL_TYPES } from '../../../utils';
-import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
-import { ConnectorService } from 'app/chatbot-design-studio/services/connector.service';
+import { ControllerService } from '../../../services/controller.service';
+import { IntentService } from '../../../services/intent.service';
+import { ConnectorService } from '../../../services/connector.service';
 
 
 

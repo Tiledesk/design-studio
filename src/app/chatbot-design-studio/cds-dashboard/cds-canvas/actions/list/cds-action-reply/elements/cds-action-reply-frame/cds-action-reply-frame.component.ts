@@ -1,8 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser'
-import { Expression, Message, Wait } from 'app/models/intent-model';
-import { TYPE_ACTION, TYPE_MESSAGE, MESSAGE_METADTA_WIDTH, MESSAGE_METADTA_HEIGHT } from 'app/chatbot-design-studio/utils';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { Expression, Message, Wait } from 'src/app/models/action-model';
+import { TYPE_ACTION, TYPE_MESSAGE, MESSAGE_METADTA_WIDTH, MESSAGE_METADTA_HEIGHT } from '../../../../../../../utils';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-reply-frame',
@@ -35,9 +36,9 @@ export class CdsActionReplyFrameComponent implements OnInit {
   canShowFilter: boolean = true;
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
 
+  private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private logger: LoggerService,
     private sanitizer: DomSanitizer
   ) { }
 

@@ -205,7 +205,8 @@
                 <cds-action-web-request-v2 *ngSwitchCase="TYPE_ACTION.WEB_REQUESTV2"    
                     class="panel-response"
                     [intentSelected]="intent" 
-                    [action]="action">
+                    [action]="action"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                 </cds-action-web-request-v2>
 
                 <cds-action-whatsapp-attribute *ngSwitchCase="TYPE_ACTION.WHATSAPP_ATTRIBUTE" 

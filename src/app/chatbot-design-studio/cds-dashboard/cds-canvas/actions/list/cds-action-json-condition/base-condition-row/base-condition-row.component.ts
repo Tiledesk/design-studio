@@ -1,9 +1,10 @@
 import { SatPopover } from '@ncstate/sat-popover';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Component, Input, OnInit, SimpleChanges, EventEmitter, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { OPERATORS_LIST, OperatorValidator } from 'app/chatbot-design-studio/utils';
-import { Condition } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { OPERATORS_LIST, OperatorValidator } from '../../../../../../utils';
+import { Condition } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'base-condition-row',
@@ -26,9 +27,10 @@ export class BaseConditionRowComponent implements OnInit {
   readonlyTextarea: boolean = false;
   setAttributeBtnOperand2: boolean = false;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
-    private formBuilder: FormBuilder,
-    private logger: LoggerService
+    private formBuilder: FormBuilder
   ) { }
 
   ngOnInit(): void {

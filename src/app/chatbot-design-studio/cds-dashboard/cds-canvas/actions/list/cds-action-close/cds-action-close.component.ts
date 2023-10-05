@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ACTIONS_LIST } from 'app/chatbot-design-studio/utils';
-import { ActionClose } from 'app/models/intent-model';
+import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils';
+import { ActionClose } from 'src/app/models/action-model';
 
 @Component({
   selector: 'cds-action-close',

@@ -1,8 +1,9 @@
-import { Chatbot } from 'app/models/faq_kb-model';
-import { ActionReplaceBot } from 'app/models/intent-model';
-import { FaqKbService } from 'app/services/faq-kb.service';
+import { Chatbot } from 'src/app/models/faq_kb-model';
+import { ActionReplaceBot } from 'src/app/models/action-model';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-replace-bot',
@@ -18,10 +19,11 @@ export class CdsActionReplaceBotComponent implements OnInit, OnChanges {
   //bots: Chatbot[] = [];
   chatbots_name_list: Array<{name: string, value: string, icon?:string}>;
   bot_selected: Chatbot;
+
+  private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
-    private chatbotService: FaqKbService,
-    private logger: LoggerService,
+    private chatbotService: FaqKbService
     ) { }
 
   ngOnInit(): void {

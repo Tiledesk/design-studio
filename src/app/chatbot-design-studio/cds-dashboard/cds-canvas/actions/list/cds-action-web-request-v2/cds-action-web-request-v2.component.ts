@@ -1,8 +1,10 @@
 import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
-import { ActionWebRequest, ActionWebRequestV2, Intent } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, variableList } from 'app/chatbot-design-studio/utils';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
+import { Intent } from 'src/app/models/intent-model';
+import { ActionWebRequest, ActionWebRequestV2 } from 'src/app/models/action-model';
+import { TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, variableList } from '../../../../../utils';
+import { IntentService } from '../../../../../services/intent.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-web-request-v2',
@@ -46,8 +48,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
 
   bodyOptions: Array<{label: string, value: string, disabled: boolean, checked: boolean}>= [ {label: 'none', value: 'none', disabled: false, checked: true}, {label: 'Json', value: 'json', disabled: false, checked: false}]
   
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
-    private logger: LoggerService,
     private intentService: IntentService
   ) { }
 

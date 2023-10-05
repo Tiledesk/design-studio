@@ -1,15 +1,13 @@
 import { Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
-import { AppConfigService } from 'app/services/app-config.service';
-import { ENETDOWN } from 'constants';
-import { ObserveOnMessage } from 'rxjs/internal/operators/observeOn';
+import { IntentService } from '../../../services/intent.service';
+import { AppConfigService } from 'src/app/services/app-config';
 
 // SERVICES //
-import { DashboardService } from 'app/chatbot-design-studio/services/dashboard.service';
-import { Intent } from 'app/models/intent-model';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { Intent } from 'src/app/models/intent-model';
+import { Chatbot } from 'src/app/models/faq_kb-model';
 import { skip } from 'rxjs/operators';
-import { Chatbot } from 'app/models/faq_kb-model';
 
 @Component({
   selector: 'cds-panel-widget',

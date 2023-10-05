@@ -1,7 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-addkb-dialog',
@@ -13,8 +14,9 @@ export class AddkbDialogComponent implements OnInit {
   disableSubmit: boolean = true;
   kbForm: FormGroup;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
-    private logger: LoggerService,
     private formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<AddkbDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,

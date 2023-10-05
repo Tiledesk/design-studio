@@ -1,11 +1,12 @@
 import { Component, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { ActionAskGPT, Intent } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { variableList } from 'app/chatbot-design-studio/utils';
+import { ActionAskGPT } from 'src/app/models/action-model';
+import { Intent } from 'src/app/models/intent-model';
+import { variableList } from '../../../../../utils';
 import { MatDialog } from '@angular/material/dialog';
-import { OpenaiService } from 'app/services/openai.service';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
-import { KnowledgeBaseService } from 'app/services/knowledge-base.service';
+import { IntentService } from '../../../../../services/intent.service';
+import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 
 @Component({
@@ -47,8 +48,9 @@ export class CdsActionAskgptComponent implements OnInit {
   variableListUserDefined: Array<{ name: string, value: string }> // = variableList.userDefined 
   spinner: boolean = false;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
-    private logger: LoggerService,
     // private openaikbService: OpenaiService,
     private kbService: KnowledgeBaseService,
     public dialog: MatDialog,

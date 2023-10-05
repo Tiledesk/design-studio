@@ -1,9 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, SimpleChange, SimpleChanges } from '@angular/core';
-import { UploadImageNativeService } from 'app/services/upload-image-native.service';
 import { DomSanitizer} from '@angular/platform-browser';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { Metadata } from 'app/models/intent-model';
+import { Metadata } from 'src/app/models/action-model';
 import { v4 as uuidv4 } from 'uuid';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { UserModel } from 'src/chat21-core/models/user';
 
 @Component({
   selector: 'cds-image-upload',
@@ -21,18 +24,22 @@ export class CDSImageUploadComponent implements OnInit {
   dropEvent: any;
   existAnAttacment: boolean = false;
   isImageSvg = false;
+  private user: UserModel
 
   uuid: string = uuidv4()
   
+  private logger: LoggerService = LoggerInstance.getInstance()
+  
   constructor(
-    private uploadImageNativeService: UploadImageNativeService,
+    private uploadService: UploadService,
+    private tiledeskAuthService: TiledeskAuthService,
     private sanitizer: DomSanitizer,
-    private logger: LoggerService,
   ) { }
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
     this.initializeApp();
+    this.user = this.tiledeskAuthService.getCurrentUser();
   }
 
   initializeApp(){
@@ -69,7 +76,7 @@ export class CDSImageUploadComponent implements OnInit {
     try {
       let selectedFiles = event.target.files[0];
       if (selectedFiles) {
-        this.uploadAttachment_Native(selectedFiles);
+        this.uploadAttachment(selectedFiles);
       }
     } catch (error) {
       this.logger.log("error: ", error);
@@ -77,13 +84,13 @@ export class CDSImageUploadComponent implements OnInit {
   }
 
 
-  private uploadAttachment_Native(uploadedFiles){
+  private uploadAttachment(uploadedFiles){
     if ((uploadedFiles.type.startsWith('image') || uploadedFiles.type.includes('gif')) && uploadedFiles.type.includes('svg')) {
       this.isImageSvg = true;
     } else if ((uploadedFiles.type.startsWith('image') || uploadedFiles.type.includes('gif')) && !uploadedFiles.type.includes('svg')) {
       this.isImageSvg = false;
     }
-    this.uploadImageNativeService.uploadAttachment_Native(uploadedFiles).then(downloadURL => {
+    this.uploadService.upload(this.user.uid, uploadedFiles).then(downloadURL => {
       if (downloadURL) {
         this.existAnAttacment = true
         uploadedFiles['downloadURL'] = downloadURL;
@@ -149,7 +156,7 @@ export class CDSImageUploadComponent implements OnInit {
     let file:any = dataFiles[0];
     try {
       if (file) {
-        this.uploadAttachment_Native(file);
+        this.uploadAttachment(file);
       }
     } catch (error) {
       this.logger.log("error: ", error);
@@ -274,8 +281,8 @@ export class CDSImageUploadComponent implements OnInit {
     return isAcceptFile; 
 
     let accept_files = '*/*';
-    // this.logger.log('[CONVS-DETAIL] > checkAcceptedFile - fileUploadAccept: ',this.appConfigProvider.getConfig().fileUploadAccept)
-    //this.appConfigProvider.getConfig().fileUploadAccept
+    // this.logger.log('[CONVS-DETAIL] > checkAcceptedFile - fileUploadAccept: ',this.appConfigService.getConfig().fileUploadAccept)
+    //this.appConfigService.getConfig().fileUploadAccept
     // this.logger.log('[CONVS-DETAIL] > checkAcceptedFile - mimeType: ',draggedFileMimeType)
     if (accept_files === '*/*') {
       isAcceptFile = true

@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
-import { TYPE_METHOD_ATTRIBUTE } from 'app/chatbot-design-studio/utils';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { TYPE_METHOD_ATTRIBUTE } from '../../utils';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 @Component({
   selector: 'cds-attributes',
   templateUrl: './attributes.component.html',
@@ -18,7 +19,9 @@ export class AttributesComponent implements OnInit {
 
   panelOpenState = true;
 
-  constructor(private logger: LoggerService) { }
+  logger: LoggerService = LoggerInstance.getInstance()
+
+  constructor() { }
 
   ngOnInit(): void {
     // this.initialize();

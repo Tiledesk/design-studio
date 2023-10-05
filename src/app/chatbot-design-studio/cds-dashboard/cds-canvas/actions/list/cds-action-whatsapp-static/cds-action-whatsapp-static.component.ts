@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ActionWhatsappStatic } from 'app/models/intent-model';
-import { LoggerService } from 'app/services/logger/logger.service';
-import { WhatsappService } from 'app/services/whatsapp.service';
+import { ActionWhatsappStatic } from 'src/app/models/action-model';
+import { WhatsappService } from 'src/app/services/whatsapp.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-whatsapp-static',
@@ -26,9 +27,10 @@ export class CdsActionWhatsappStaticComponent implements OnInit {
   selected_template: any;
   payload: any;
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
     private whatsapp: WhatsappService,
-    private logger: LoggerService,
     public el: ElementRef
   ) { }
 

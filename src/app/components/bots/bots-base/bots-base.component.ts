@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './bots-base.component.html',
   styleUrls: ['./bots-base.component.scss']
 })
-export class BotsBaseComponent implements OnInit {
+export class BotsBaseComponent {
 
 
   dialogflowLanguage = [
@@ -55,8 +55,6 @@ export class BotsBaseComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-  }
 
   getIndexOfdialogflowLanguage(langcode: string): number {
     const index = this.dialogflowLanguage.findIndex(x => x.code === langcode);

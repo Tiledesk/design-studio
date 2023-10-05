@@ -1,9 +1,10 @@
-import { element } from 'protractor';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { LoggerInstance } from 'app/services/chat21-core/providers/logger/loggerInstance';
-import { UploadImageNativeService } from 'app/services/upload-image-native.service';
-import { LoggerService } from 'app/services/logger/logger.service';
+import { UserModel } from 'src/chat21-core/models/user';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 
 @Component({
   selector: 'cds-whatsapp-receiver',
@@ -38,18 +39,22 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   fileUploadedName: string;
   displayPreview: Boolean = false;
   phone_number: string;
+  user: UserModel
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
   constructor(
     public sanitizer: DomSanitizer,
     public elementRef: ElementRef,
-    public logger: LoggerService,
-    private uploadImageNativeService: UploadImageNativeService
+    private uploadService: UploadService,
+    private tiledeskAuthService: TiledeskAuthService
   ) {
 
   }
 
   ngOnInit(): void {
     this.logger.log("onInit receiver: ", this.receiver);
+    this.user = this.tiledeskAuthService.getCurrentUser();
     this.onInputTemplate();
   }
 
@@ -357,16 +362,16 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     try {
       let selectedFiles = event.target.files[0];
       if (selectedFiles) {
-        this.uploadAttachment_Native(selectedFiles);
+        this.uploadAttachment(selectedFiles);
       }
     } catch (error) {
       this.logger.error("error: ", error);
     }
   }
 
-  private uploadAttachment_Native(uploadedFiles) {
+  private uploadAttachment (uploadedFiles) {
 
-    this.uploadImageNativeService.uploadAttachment_Native(uploadedFiles).then(downloadURL => {
+    this.uploadService.upload(this.user.uid, uploadedFiles).then(downloadURL => {
       if (downloadURL) {
         if (this.header_params[0].image) {
           this.header_params[0].image.link = downloadURL;

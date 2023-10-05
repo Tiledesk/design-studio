@@ -332,6 +332,7 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
     //EVENT BASE COMPONENT
     CdsEventComponent,
     CdsRuleComponent,
+
   ],
   imports: [
     A11yModule,
@@ -355,15 +356,14 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
     MatButtonModule,
     MatIconModule,
     MatButtonToggleModule,
+    MatDialogModule,
     RouterModule,
     // TranslateModule,
     FormsModule,
     MatInputModule,
     MatExpansionModule,
-    MatDialogModule,
     MatTabsModule,
     MatMenuModule,
-    FormsModule,
     ReactiveFormsModule,
     SatPopoverModule,
     SharedModule,
@@ -378,6 +378,9 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
   providers: [
     WsChatbotService
     // DragDropService
+  ],
+  entryComponents: [
+    ChangeBotLangModalComponent,
   ]
 })
 export class ChatbotDesignStudioModule { }

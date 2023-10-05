@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Chatbot } from 'app/models/faq_kb-model';
-import { Intent } from 'app/models/intent-model';
-import { Rule } from 'app/models/rule-model';
+import { Chatbot } from 'src/app/models/faq_kb-model';
+import { Intent } from 'src/app/models/intent-model';
+import { Rule } from 'src/app/models/rule-model';
 
 @Component({
   selector: 'cds-rules-list',

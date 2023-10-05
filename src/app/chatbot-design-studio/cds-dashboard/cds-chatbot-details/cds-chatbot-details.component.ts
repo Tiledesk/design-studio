@@ -1,20 +1,13 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
-import { Chatbot } from 'app/models/faq_kb-model';
-import { AppConfigService } from 'app/services/app-config.service';
-import { UploadImageNativeService } from 'app/services/upload-image-native.service';
-import { UploadImageService } from 'app/services/upload-image.service';
-import { LoggerService } from '../../../services/logger/logger.service';
-import { FaqKbService } from '../../../services/faq-kb.service';
-import { AuthService } from 'app/core/auth.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DepartmentService } from 'app/services/department.service';
-import { avatarPlaceholder, getColorBck } from 'app/utils/util';
+import { Chatbot } from 'src/app/models/faq_kb-model';
 import { TranslateService } from '@ngx-translate/core';
-import { NotifyService } from 'app/core/notify.service';
-import { Project } from 'app/models/project-model';
-import { FaqService } from 'app/services/faq.service';
-import { BotsBaseComponent } from 'app/bots/bots-base/bots-base.component';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { Project } from 'src/app/models/project-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { AppConfigService } from 'src/app/services/app-config';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { ProjectService } from 'src/app/services/projects.service';
+import { BotsBaseComponent } from 'src/app/components/bots/bots-base/bots-base.component';
 const swal = require('sweetalert');
 
 @Component({
@@ -62,30 +55,22 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
   translationsMap: Map<string, string> = new Map();
 
+  private logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
-    private logger: LoggerService,
     public appConfigService: AppConfigService,
-    private auth: AuthService,
+    private projectService: ProjectService,
     private translate: TranslateService,
   ) { super(); }
 
   ngOnInit(): void {
-    this.auth.checkRoleForCurrentProject();
+    //TODO: check user role with guard
+
     // this.getParamsBotIdAndThenInit();
     this.getOSCODE();
-    this.getCurrentProject();
+    this.project = this.projectService.getCurrentProject()
     this.getTranslations();
   }
-
-  getCurrentProject() {
-    this.auth.project_bs.subscribe((project) => {
-      this.project = project;
-      this.logger.log('[CDS-CHATBOT-DTLS] project from AUTH service subscription  ', this.project)
-    });
-  }
-
-  
-  
 
   toggleTab(section) {
 
@@ -121,39 +106,32 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
     })
 
-    this.translate.get('UpdateBotError')
-      .subscribe((text: string) => {
+    this.translate.get('UpdateBotError').subscribe((text: string) => {
         this.updateBotError = text;
       });
 
-    this.translate.get('UpdateBotSuccess')
-      .subscribe((text: string) => {
+    this.translate.get('UpdateBotSuccess').subscribe((text: string) => {
         this.updateBotSuccess = text;
       });
 
-    this.translate.get('Not a valid JSON file.')
-      .subscribe((text: string) => {
+    this.translate.get('Not a valid JSON file.').subscribe((text: string) => {
         this.notValidJson = text;
       });
 
-    this.translate.get('FaqPage.AnErrorOccurredWhilDeletingTheAnswer')
-      .subscribe((text: string) => {
+    this.translate.get('FaqPage.AnErrorOccurredWhilDeletingTheAnswer').subscribe((text: string) => {
         this.errorDeletingAnswerMsg = text;
       });
 
-    this.translate.get('FaqPage.AnswerSuccessfullyDeleted')
-      .subscribe((text: string) => {
+    this.translate.get('FaqPage.AnswerSuccessfullyDeleted').subscribe((text: string) => {
         this.answerSuccessfullyDeleted = text;
       });
 
-    this.translate.get('Done')
-      .subscribe((text: string) => {
+    this.translate.get('Done').subscribe((text: string) => {
         this.done_msg = text;
       });
 
 
-    this.translate.get('ThereHasBeenAnErrorProcessing')
-      .subscribe((translation: any) => {
+    this.translate.get('ThereHasBeenAnErrorProcessing').subscribe((translation: any) => {
         this.thereHasBeenAnErrorProcessing = translation;
       });
 

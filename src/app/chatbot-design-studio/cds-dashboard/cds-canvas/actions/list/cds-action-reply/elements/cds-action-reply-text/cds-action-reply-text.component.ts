@@ -3,11 +3,10 @@ import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angu
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
-import { Message, Wait, Button, MessageAttributes, Expression } from 'app/models/intent-model';
-import { TYPE_BUTTON, generateShortUID } from 'app/chatbot-design-studio/utils';
-import { IntentService } from 'app/chatbot-design-studio/services/intent.service';
-import { ConnectorService } from 'app/chatbot-design-studio/services/connector.service';
-
+import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/models/action-model';
+import { TYPE_BUTTON, generateShortUID } from '../../../../../../../utils';
+import { IntentService } from '../../../../../../../services/intent.service';
+import { ConnectorService } from '../../../../../../../services/connector.service';
 
 @Component({
   selector: 'cds-action-reply-text',

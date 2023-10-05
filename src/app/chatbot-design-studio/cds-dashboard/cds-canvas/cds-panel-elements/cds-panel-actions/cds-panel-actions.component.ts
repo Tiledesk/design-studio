@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { TYPE_ACTION_CATEGORY, ACTIONS_LIST, TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from 'app/chatbot-design-studio/utils';
+import { TYPE_ACTION_CATEGORY, ACTIONS_LIST, TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from '../../../../utils';
 import { CdkDropList, CdkDragStart, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
-import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
+import { ControllerService } from '../../../../services/controller.service';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({

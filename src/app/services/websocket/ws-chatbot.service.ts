@@ -4,7 +4,7 @@ import { WebSocketJs } from './websocket-js';
 import { HttpClient } from '@angular/common/http';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { AppConfigProvider } from '../app-config';
+import { AppConfigService } from '../app-config';
 
 @Injectable({
   providedIn: 'root'
@@ -23,14 +23,14 @@ export class WsChatbotService {
 
   constructor(
     public webSocketJs: WebSocketJs,
-    public appConfigProvider: AppConfigProvider
+    public appConfigService: AppConfigService
   ) { 
     this.logger.log('[WS-CHATBOT-SERV] - HELLO !!!')
     this.getAppConfig();
   }
 
   getAppConfig() {
-    this.SERVER_BASE_PATH = this.appConfigProvider.getConfig().SERVER_BASE_URL;
+    this.SERVER_BASE_PATH = this.appConfigService.getConfig().apiUrl;
     // console.log('[WS-MSGS-SERV] getAppConfig SERVER_BASE_PATH', this.SERVER_BASE_PATH);
   }
 
