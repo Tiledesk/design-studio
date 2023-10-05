@@ -3,7 +3,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 // SERVICES //
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { AuthService } from 'app/core/auth.service';
 import { DepartmentService } from 'src/app/services/department.service';
 
 // MODEL //
@@ -11,9 +10,10 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 
 // UTILS //
-import { variableList, convertJsonToArray } from '../utils';
+import { variableList, convertJsonToArray } from 'src/app/chatbot-design-studio/utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { ProjectService } from 'src/app/services/projects.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +38,7 @@ export class DashboardService {
   
   constructor(
     private route: ActivatedRoute,
-    private auth: AuthService,
+    private projectService: ProjectService,
     private faqKbService: FaqKbService,
     private departmentService: DepartmentService,
   ) { }
@@ -76,23 +76,25 @@ export class DashboardService {
   async getUrlParams(): Promise<boolean> {
     
     return new Promise((resolve, reject) => {
-      this.route.params.subscribe((params) => {
-        this.id_faq_kb = params['faqkbid'];
-        this.id_faq = params['faqid'];
-        this.botType = params['bottype'];
-        this.intent_id = params['intent_id'];
-        this.logger.log('[CDS DSHBRD] getUrlParams  PARAMS', params);
-        this.logger.log('[CDS DSHBRD] getUrlParams  BOT ID ', this.id_faq_kb);
-        this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.id_faq);
-        this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.intent_id);
-        console.log('[CDS DSHBRD] getUrlParams', params);
-        resolve(true);
-      }, (error) => {
-        this.logger.error('ERROR: ', error);
-        console.log('ERROR', error);
-        reject(false);
-      }, () => {
-        console.log('COMPLETE');
+      this.route.params.subscribe({ next: (params) => {
+          console.log('paramssssss', params)
+          this.id_faq_kb = params['faqkbid'];
+          this.id_faq = params['faqid'];
+          this.botType = params['bottype'];
+          this.intent_id = params['intent_id'];
+          this.logger.log('[CDS DSHBRD] getUrlParams  PARAMS', params);
+          this.logger.log('[CDS DSHBRD] getUrlParams  BOT ID ', this.id_faq_kb);
+          this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.id_faq);
+          this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.intent_id);
+          console.log('[CDS DSHBRD] getUrlParams', params);
+          resolve(true);
+        }, error: (error) => {
+          this.logger.error('ERROR: ', error);
+          console.log('ERROR', error);
+          reject(false);
+        }, complete: () => {
+          console.log('COMPLETE');
+        }
       });
     });
   }
@@ -104,25 +106,26 @@ export class DashboardService {
   async getBotById(): Promise<boolean> {
     console.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', this.id_faq_kb);
     return new Promise((resolve, reject) => {
-      this.faqKbService.getBotById(this.id_faq_kb).subscribe((chatbot: Chatbot) => {
-        console.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', chatbot);
-        if (chatbot) {
-          this.selectedChatbot = chatbot;
-          this.translateparamBotName = { bot_name: this.selectedChatbot.name }
-          if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {
-            variableList.userDefined = convertJsonToArray(this.selectedChatbot.attributes.variables);
-          } else {
-            variableList.userDefined = [];
+      this.faqKbService.getBotById(this.id_faq_kb).subscribe({ next: (chatbot: Chatbot) => {
+          console.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', chatbot);
+          if (chatbot) {
+            this.selectedChatbot = chatbot;
+            this.translateparamBotName = { bot_name: this.selectedChatbot.name }
+            if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {
+              variableList.userDefined = convertJsonToArray(this.selectedChatbot.attributes.variables);
+            } else {
+              variableList.userDefined = [];
+            }
+            resolve(true);
           }
+        }, error: (error) => {
+          this.logger.error('ERROR: ', error);
+          reject(false);
+        }, complete: () => {
+          this.logger.log('COMPLETE ');
           resolve(true);
         }
-      }, (error) => {
-        this.logger.error('ERROR: ', error);
-        reject(false);
-      }, () => {
-        this.logger.log('COMPLETE ');
-        resolve(true);
-      });
+      })
     });
   }
 
@@ -131,47 +134,28 @@ export class DashboardService {
   // ----------------------------------------------------------
   async getCurrentProject(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.auth.project_bs.subscribe((project) => {
+      this.projectService.getProjectById(this.projectID).subscribe({ next: (project: Project)=>{
         if (project) {
           this.project = project;
           this.projectID = project._id;
+          resolve(true);
         }
-        resolve(true);
-      }, (error) => {
+      }, error: (error)=>{
         this.logger.error('ERROR: ', error);
         reject(false);
-      }, () => {
+      }, complete: ()=> {
         this.logger.log('COMPLETE ');
         resolve(true);
-      });
+      }})
     });
   }
-
-  // ----------------------------------------------------------
-  // Get browser version
-  // ----------------------------------------------------------
-  async getBrowserVersion(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this.auth.isChromeVerGreaterThan100.subscribe((isChromeVerGreaterThan100: boolean) => {
-        this.isChromeVerGreaterThan100 = isChromeVerGreaterThan100;
-        resolve(true);
-      }, (error) => {
-        this.logger.error('ERROR: ', error);
-        reject(false);
-      }, () => {
-        this.logger.log('COMPLETE ');
-        resolve(true);
-      });
-    });
-  }
-
 
 
   // ----------------------------------------------------------
   // Get depts
   // ----------------------------------------------------------
   getDeptsByProjectId(){
-   return this.departmentService.getDeptsByProjectId().subscribe((departments: any) => {
+   return this.departmentService.getDeptsByProjectId().subscribe({ next: (departments: any) => {
       this.logger.log('[CDS DSHBRD] - DEPT GET DEPTS ', departments);
       if (departments) {
         departments.forEach((dept: any) => {
@@ -183,12 +167,13 @@ export class DashboardService {
         })
       }
       return false;
-    }, error => {
+    }, error: (error) => {
       this.logger.error('[CDS DSHBRD] - DEPT - GET DEPTS  - ERROR', error);
       return false;
-    }, () => {
+    }, complete: () => {
       this.logger.log('[CDS DSHBRD] - DEPT - GET DEPTS - COMPLETE');
-    });
+    }
+   });
   }
 
 }
