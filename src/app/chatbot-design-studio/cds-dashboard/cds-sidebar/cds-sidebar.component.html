@@ -97,10 +97,10 @@
                 <div class="sidebar-bot-profile-img-wpr" style="width: 0%;">
                     <img *ngIf="botProfileImageExist === true || botImageHasBeenUploaded === true"
                         class="sidebar-bot-profile-img" [src]="botProfileImageurl"
-                        onerror="this.src='assets/img/avatar_bot_tiledesk.svg'" />
+                        onerror="this.src='assets/images/avatar_bot_tiledesk.svg'" />
 
                     <img *ngIf="botProfileImageExist === false && botImageHasBeenUploaded !== true"
-                        class="sidebar-bot-profile-img" src="assets/img/avatar_bot_tiledesk.svg" />
+                        class="sidebar-bot-profile-img" src="assets/images/avatar_bot_tiledesk.svg" />
                 </div>
                 <a>
                     <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph"

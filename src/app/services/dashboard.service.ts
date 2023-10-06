@@ -37,11 +37,12 @@ export class DashboardService {
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
-    private route: ActivatedRoute,
+    // private route: ActivatedRoute,
     private projectService: ProjectService,
     private faqKbService: FaqKbService,
     private departmentService: DepartmentService,
-  ) { }
+  ) { 
+  }
 
   /** GET TRANSLATIONS */
   async getTranslations(): Promise<boolean> {
@@ -66,38 +67,13 @@ export class DashboardService {
     this.id_faq = params.faqid;
     this.botType = params.bottype;
     this.intent_id = params.intent_id;
+    this.projectID = params.projectid
   }
   // // ----------------------------------------------------------
   // // GET FROM ROUTE PARAMS (PASSED FROM FAQ COMPONENT):
   // // THE FAQ ID - WHEN THE CALLBACK IS COMPLETED RUN GET-FAQ-BY-ID THAT RETURN THE OBJECT FAQ
   // // AND THE FAQ KB ID (THEN USED IN THE GOBACK)
   // // ----------------------------------------------------------
-
-  async getUrlParams(): Promise<boolean> {
-    
-    return new Promise((resolve, reject) => {
-      this.route.params.subscribe({ next: (params) => {
-          console.log('paramssssss', params)
-          this.id_faq_kb = params['faqkbid'];
-          this.id_faq = params['faqid'];
-          this.botType = params['bottype'];
-          this.intent_id = params['intent_id'];
-          this.logger.log('[CDS DSHBRD] getUrlParams  PARAMS', params);
-          this.logger.log('[CDS DSHBRD] getUrlParams  BOT ID ', this.id_faq_kb);
-          this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.id_faq);
-          this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.intent_id);
-          console.log('[CDS DSHBRD] getUrlParams', params);
-          resolve(true);
-        }, error: (error) => {
-          this.logger.error('ERROR: ', error);
-          console.log('ERROR', error);
-          reject(false);
-        }, complete: () => {
-          console.log('COMPLETE');
-        }
-      });
-    });
-  }
 
 
   // ----------------------------------------------------------
@@ -119,7 +95,7 @@ export class DashboardService {
             resolve(true);
           }
         }, error: (error) => {
-          this.logger.error('ERROR: ', error);
+          this.logger.error('[ DSHBRD-SERVICE ] getBotById ERROR: ', error);
           reject(false);
         }, complete: () => {
           this.logger.log('COMPLETE ');
@@ -141,7 +117,7 @@ export class DashboardService {
           resolve(true);
         }
       }, error: (error)=>{
-        this.logger.error('ERROR: ', error);
+        this.logger.error(' [ DSHBRD-SERVICE ] getCurrentProject ERROR: ', error);
         reject(false);
       }, complete: ()=> {
         this.logger.log('COMPLETE ');

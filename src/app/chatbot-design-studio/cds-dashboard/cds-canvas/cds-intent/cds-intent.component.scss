@@ -1017,6 +1017,7 @@ cds-panel-intent-header.isStart ::ng-deep{
   gap: 5px;
 
   .option {
+    display: flex;
     &:hover {
       opacity: 0.85;
     }
@@ -1030,6 +1031,7 @@ cds-panel-intent-header.isStart ::ng-deep{
 
   img {
     width: 24px;
+    height: 24px;
     filter: brightness(0) saturate(100%) invert(99%) sepia(8%) saturate(403%) hue-rotate(225deg) brightness(117%) contrast(100%);
   }
 }

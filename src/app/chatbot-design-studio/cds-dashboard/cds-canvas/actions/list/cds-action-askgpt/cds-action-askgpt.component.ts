@@ -7,7 +7,7 @@ import { IntentService } from '../../../../../services/intent.service';
 import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-
+import { AppConfigService } from 'src/app/services/app-config';
 
 @Component({
   selector: 'cds-action-askgpt',
@@ -19,6 +19,7 @@ export class CdsActionAskgptComponent implements OnInit {
   @Input() intentSelected: Intent;
   @Input() action: ActionAskGPT;
   @Input() previewMode: boolean = true;
+  @Input() project_id: string;
   @Output() updateAndSaveAction = new EventEmitter;
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
   
@@ -34,7 +35,6 @@ export class CdsActionAskgptComponent implements OnInit {
 
   kbs_list = [];
   kb_selected_id: string = null;
-  kb_selected_name: string = '';
   status_code: number;
   indexing_hint: string = null;
 
@@ -54,11 +54,15 @@ export class CdsActionAskgptComponent implements OnInit {
     // private openaikbService: OpenaiService,
     private kbService: KnowledgeBaseService,
     public dialog: MatDialog,
-    private intentService: IntentService
+    private intentService: IntentService,
+    private appConfigService: AppConfigService,
   ) { }
 
   ngOnInit(): void {
     this.logger.debug("[ACTION-ASKGPT] action detail: ", this.action);
+    console.log("[ACTION-ASKGPT] action detail: ", this.action);
+    console.log("[ACTION-ASKGPT] action kbid: ", this.action.kbid);
+    console.log("[ACTION-ASKGPT] action kbname: ", this.action.kbName);
 
     this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
@@ -66,16 +70,27 @@ export class CdsActionAskgptComponent implements OnInit {
       this.updateConnector();
     });
 
-    // this.getAllOpenaiKbs();
-    this.getKnowledgeBaseSettings();
-    this.initializeAttributes();
+    if (this.previewMode == false) {
+      this.onDetailModeLoad();
+    }
+
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if(this.intentSelected){
       this.initializeConnector();
     }
+
+    // if (this.previewMode == false) {
+    //   this.onDetailModeLoad();
+    // }
   }
+
+  onDetailModeLoad() {
+    this.getKnowledgeBaseSettings();
+    this.initializeAttributes();
+  }
+
 
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
@@ -129,6 +144,7 @@ export class CdsActionAskgptComponent implements OnInit {
   }
 
   getKnowledgeBaseSettings() {
+    console.log("**** carico solo dopo aver aperto il dettaglio")
     this.kbService.getKbSettings().subscribe((kbSettings: any) => {
       this.logger.debug("[ACTION-ASKGPT] get kbSettings: ", kbSettings);
       this.kbs_list = kbSettings.kbs.map(t => {
@@ -136,8 +152,13 @@ export class CdsActionAskgptComponent implements OnInit {
         return t;
       })
       if (this.action.kbid) {
-        this.kb_selected_id = kbSettings.kbs.find(k => k.url === this.action.kbid)._id;
-        this.kb_selected_name = kbSettings.kbs.find(k => k.url === this.action.kbid).name;
+        let kb_selected = kbSettings.kbs.find(k => k.url === this.action.kbid);
+        if (!kb_selected) {
+          this.action.kbid = null;
+          this.action.kbName = null;
+        } else {
+          this.kb_selected_id = kb_selected._id;
+        }
       }
     }, (error) => {
       this.logger.error("[ACTION-ASKGPT] ERROR get kbSettings: ", error);
@@ -176,11 +197,15 @@ export class CdsActionAskgptComponent implements OnInit {
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
     } else {
+      console.log("event: ", event);
       this.action.kbid = event.url;
-      this.kb_selected_id = this.kbs_list.find(k => k.url === this.action.kbid)._id;
-      this.kb_selected_name = this.kbs_list.find(k => k.url === this.action.kbid).name;
+      this.action.kbName = event.name;
+      let kb_selected = this.kbs_list.find(k => k.url === this.action.kbid);
+      if (kb_selected) {
+        this.kb_selected_id = kb_selected._id;
+      }
       //this.checkKbStatus(this.action.kbid);
-      this.logger.log("[ACTION-ASKGPT] updated action", this.action, this.kb_selected_name);
+      this.logger.log("[ACTION-ASKGPT] updated action", this.action);
       this.updateAndSaveAction.emit();
     }
   }
@@ -226,17 +251,22 @@ export class CdsActionAskgptComponent implements OnInit {
     this.logger.log("action updated: ", this.action)
   }
 
+  // getValue(key: string): string{
+  //   let value = ''
+  //   if(this.kbs_list && this.kbs_list.length > 0)
+  //     value = this.kbs_list.find(el => el.url === this.action.kbid)
+  //     value? value = value[key]: value= ''
+  //   return value   
+  // }
 
-  getValue(key: string): string{
-    let value = ''
-    if(this.kbs_list && this.kbs_list.length > 0)
-      value = this.kbs_list.find(el => el.url === this.action.kbid)[key]
-    return value   
+  goToKNB(){
+    let url = this.appConfigService.getConfig().DASHBOARD_BASE_URL + 'dashboard/#/project/' + this.project_id +'/knowledge-bases'
+    window.open(url, '_blank')
   }
 
   @HostListener('document:visibilitychange')
   visibilitychange() {
-    if (!document.hidden) {
+    if (!document.hidden && this.previewMode == false) {
       this.getKnowledgeBaseSettings();
     }
   }

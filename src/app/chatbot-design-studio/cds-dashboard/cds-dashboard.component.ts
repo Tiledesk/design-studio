@@ -77,6 +77,32 @@ export class CdsDashboardComponent implements OnInit {
     this.hideShowWidget('hide')
   }
 
+  async getUrlParams(): Promise<boolean> {
+    
+    return new Promise((resolve, reject) => {
+      this.route.params.subscribe({ next: (params) => {
+          console.log('paramssssss', params)
+          // this.id_faq_kb = params['faqkbid'];
+          // this.id_faq = params['faqid'];
+          // this.botType = params['bottype'];
+          // this.intent_id = params['intent_id'];
+          this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  PARAMS', params);
+          // this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  BOT ID ', this.id_faq_kb);
+          // this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  FAQ ID ', this.id_faq);
+          // this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  FAQ ID ', this.intent_id);
+          console.log('[ DSHBRD-SERVICE ] getUrlParams', params);
+          this.dashboardService.setParams(params)
+          resolve(true);
+        }, error: (error) => {
+          this.logger.error('[ DSHBRD-SERVICE ] ERROR: ', error);
+          reject(false);
+        }, complete: () => {
+          console.log('COMPLETE');
+        }
+      });
+    });
+  }
+
   /**************** CUSTOM FUNCTIONS ****************/
   /** 
    * execute Async Functions In Sequence
@@ -85,38 +111,19 @@ export class CdsDashboardComponent implements OnInit {
    * possiamo visualizzare lo stage completo
    */
   async executeAsyncFunctionsInSequence() {
-    this.logger.log('[CDS DSHBRD] executeAsyncFunctionsInSequence -------------> ');
-  //   this.route.params.subscribe({ next: (params) => {
-  //     console.log('paramssssss cds-dashboarddd', params)
-  //     // this.id_faq_kb = params['faqkbid'];
-  //     // this.id_faq = params['faqid'];
-  //     // this.botType = params['bottype'];
-  //     // this.intent_id = params['intent_id'];
-  //     // this.logger.log('[CDS DSHBRD] getUrlParams  PARAMS', params);
-  //     // this.logger.log('[CDS DSHBRD] getUrlParams  BOT ID ', this.id_faq_kb);
-  //     // this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.id_faq);
-  //     // this.logger.log('[CDS DSHBRD] getUrlParams  FAQ ID ', this.intent_id);
-  //     console.log('[CDS DSHBRD] getUrlParams', params);
-  //     // resolve(true);
-  //   }, error: (error) => {
-  //     this.logger.error('ERROR: ', error);
-  //     console.log('ERROR', error);
-  //     // reject(false);
-  //   }, complete: () => {
-  //     console.log('COMPLETE');
-  //   }
-  // });
-  
-
+    this.logger.log('[CDS DSHBRD] executeAsyncFunctionsInSequence -------------> ');    
     try {
       const getTranslations = await this.getTranslations();
       this.logger.log('[CDS DSHBRD] Risultato 1:', getTranslations);
-      const getUrlParams = await this.dashboardService.getUrlParams();
+      const getUrlParams = await this.getUrlParams();
       this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
-      const getBotById = await this.dashboardService.getBotById();
-      this.logger.log('[CDS DSHBRD] Risultato 3:', getBotById, this.selectedChatbot);
       const getCurrentProject = await this.dashboardService.getCurrentProject();
-      this.logger.log('[CDS DSHBRD] Risultato 4:', getCurrentProject);
+      this.logger.log('[CDS DSHBRD] Risultato 3:', getCurrentProject);
+      this.project = this.dashboardService.project
+      console.log('ppppppppppp', this.project)
+      this.initialize()
+      const getBotById = await this.dashboardService.getBotById();
+      this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
       const getDefaultDepartmentId = this.dashboardService.getDeptsByProjectId();
       this.logger.log('[CDS DSHBRD] Risultato 5:', getDefaultDepartmentId);
       if (getTranslations && getUrlParams && getBotById && getCurrentProject && getDefaultDepartmentId) {
@@ -125,7 +132,6 @@ export class CdsDashboardComponent implements OnInit {
         this.selectedChatbot = this.dashboardService.selectedChatbot;
         this.initFinished = true;
       }
-      this.initialize()
     } catch (error) {
       console.error('error: ', error);
     }

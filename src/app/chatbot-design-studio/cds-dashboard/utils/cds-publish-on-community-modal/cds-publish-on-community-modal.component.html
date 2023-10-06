@@ -89,10 +89,10 @@
 
                                 <img *ngIf="botProfileImageExist === true || botImageHasBeenUploaded === true"
                                     class="bot-profile-img" [src]="selectedChatbot.url"
-                                    onerror="this.src='assets/img/avatar_bot_tiledesk.svg'" />
+                                    onerror="this.src='assets/images/avatar_bot_tiledesk.svg'" />
 
                                 <img *ngIf="botProfileImageExist === false && botImageHasBeenUploaded !== true"
-                                    class="bot-profile-img" src="assets/img/avatar_bot_tiledesk.svg" />
+                                    class="bot-profile-img" src="assets/images/avatar_bot_tiledesk.svg" />
                             </div>
                         </div>
 

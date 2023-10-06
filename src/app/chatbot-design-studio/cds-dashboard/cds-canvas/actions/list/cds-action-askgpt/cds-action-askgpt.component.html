@@ -20,7 +20,8 @@
             <span class="material-icons-outlined" style="color: #827e71; font-size: 20px;">school</span>
         </div>
         <div *ngIf="action?.kbid" class="action-row-right">
-            {{getValue('name')}}
+            <!-- {{getValue('name')}} -->
+            {{action?.kbName}}
         </div>
         <div *ngIf="!action?.kbid" class="action-row-right empty">
             Select Knowledge Base
@@ -30,7 +31,7 @@
     <div class="previewContent">
         
         <div class="icon-action">
-            <img src="assets/cds/images/icons/if_condition.svg">
+            <img src="assets/images/icons/if_condition.svg">
         </div>
 
         <label class="title-preview-label">Success</label>
@@ -82,7 +83,7 @@
         </cds-select>
     </div>
 
-    <a routerLink="/project/{{ project_id }}/knowledge-bases" routerLinkActive="router-link-active" target="_blank">Manage Knowledge Bases</a>
+    <a (click)="goToKNB()">Manage Knowledge Bases</a>
     
     <hr class="custom-divider">
 
@@ -130,7 +131,7 @@
 
         <div class="condition-container">
             <div class="icon-action">
-                <img src="assets/cds/images/icons/if_condition.svg">
+                <img src="assets/images/icons/if_condition.svg">
             </div>
             <span class="condition-text">Success</span>
         </div>

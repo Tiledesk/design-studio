@@ -25,6 +25,7 @@
     "@ng-select/ng-select": "^9.0.2",
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
+    "bootstrap": "^5.3.2",
     "firebase": "^7.24.0",
     "material-icons": "^1.13.11",
     "moment": "^2.29.4",

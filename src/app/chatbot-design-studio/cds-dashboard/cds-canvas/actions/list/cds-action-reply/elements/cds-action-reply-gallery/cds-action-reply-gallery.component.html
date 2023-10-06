@@ -174,7 +174,7 @@
 <ng-template #placeholder [ngOutletContext]="context">
     <div class="gallery-preview-wrp" id="placeholder">
         <div class="image no-image">
-            <img src="assets/cds/images/icons/add_image.svg">
+            <img src="assets/images/icons/add_image.svg">
         </div>
         <div class="content">
             <span class="text">Type Title</span>
@@ -188,7 +188,7 @@
        <div class="gallery-preview-wrp" [ngStyle]="{ 'border-bottom' : last? 'unset' : 'border-bottom: 1px solid #dcd5ba'}">
             <div class="image" [class.no-image]="galleryEl.preview.src === ''">
                 <img *ngIf="galleryEl.preview.src !== '' " [src]="sanitizerUrlImage(galleryEl.preview.src)" alt="{{galleryEl.preview.name}}">
-                <img *ngIf="galleryEl.preview.src === '' "src="assets/cds/images/icons/add_image.svg">
+                <img *ngIf="galleryEl.preview.src === '' "src="assets/images/icons/add_image.svg">
             </div>
             <div class="content">
                 <span class="text"> {{galleryEl.title}}</span>

@@ -33,10 +33,10 @@ export class DepartmentService {
 
 
   initialize(serverBaseUrl: string, projectId: string){
-    this.logger.info('[DEPTS-SERV] initialize')
     this.SERVER_BASE_URL = serverBaseUrl;
-    this.URL_TILEDESK_DEPARTMENTS = this.SERVER_BASE_PATH + projectId + '/departments/';
     this.project_id = projectId
+    this.URL_TILEDESK_DEPARTMENTS = this.SERVER_BASE_URL + projectId + '/departments/';
+    this.logger.info('[DEPTS-SERV] initialize', serverBaseUrl, this.URL_TILEDESK_DEPARTMENTS)
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')
   }
 

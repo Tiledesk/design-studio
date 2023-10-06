@@ -37,6 +37,25 @@ import { LocalSessionStorage } from 'src/chat21-core/providers/localSessionStora
 import { DepartmentService } from './services/department.service';
 import { WebSocketJs } from './services/websocket/websocket-js';
 import { DatePipe } from '@angular/common';
+import { NotifyService } from './services/notify.service';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTabsModule } from '@angular/material/tabs';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
@@ -77,7 +96,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
-    ChatbotDesignStudioModule,
+    // ChatbotDesignStudioModule,
     UiModule,
     SatPopoverModule,
     TranslateModule.forRoot({
@@ -96,6 +115,27 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
       colorScheme: ['purple', 'yellow', 'gray', 'gray', 'red', 'red', 'red'],
       // serverLoggingUrl: 'https://tiledesk-server-pre.herokuapp.com/logs'
     }),
+    MatSliderModule,
+    MatSidenavModule,
+    MatSelectModule,
+    MatTooltipModule,
+    MatRadioModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatGridListModule,
+    MatAutocompleteModule,
+    MatSlideToggleModule,
+    MatButtonToggleModule,
+    MatListModule,
+    MatButtonModule,
+    MatIconModule,
+    MatButtonToggleModule,
+    MatDialogModule,
+    MatInputModule,
+    MatExpansionModule,
+    MatTabsModule,
+    MatMenuModule,
+    NgSelectModule
   ],
   bootstrap: [AppComponent],
   providers: [
@@ -127,7 +167,8 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     BrandService,
     MultichannelService,
     WebSocketJs,
-    DatePipe
+    DatePipe,
+    NotifyService
   ]
 })
 export class AppModule { }

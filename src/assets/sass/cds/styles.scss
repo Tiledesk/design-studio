@@ -17,6 +17,12 @@ Ellips text
 //     margin: 0;
 // }
 
+img,
+svg {
+  vertical-align: unset;
+}
+
+
 .content-panel-intent-detail {
     padding: 20px 0 30px;
     margin-left: 30px;
@@ -292,3 +298,30 @@ color: white;
     margin: 5px 0px;
     border-top: 2px solid rgba( $base-blue , 0.3);
 }
+
+
+// ::ng-deep
+.cds-mat-tooltip {
+    // background-color: #fff !important;
+    // color: #555555 !important;
+    font-size: 14px !important;
+    // border-radius: 2px !important;
+    font-family: "Poppins", "Roboto", "Arial", sans-serif;
+    // padding-top: 8px !important;
+    // padding-bottom: 8px !important;
+    // border: 1px solid #e5effe !important;
+  }
+  
+  .btn.btn-primary.cds-blue-button {
+    background: $light-blue;
+    color: $light-black;
+    box-shadow: none;
+    font-weight: 500;
+    font-family: "Poppins", Roboto, Arial, sans-serif;
+    text-transform: capitalize;
+    font-size: 14px;
+    padding: 6px 12px;
+    &:hover {
+      background: rgba(138, 180, 248, 0.8);
+    }
+  }

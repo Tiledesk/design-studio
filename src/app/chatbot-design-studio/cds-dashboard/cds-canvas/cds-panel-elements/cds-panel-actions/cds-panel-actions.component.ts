@@ -75,7 +75,7 @@ export class CdsPanelActionsComponent implements OnInit {
           "value": {
             "name": "Form",
             "type": "FORM",
-            "src": "assets/cds/images/form.svg",
+            "src": "assets/images/form.svg",
             "description": ""
           }
         }];
@@ -86,7 +86,7 @@ export class CdsPanelActionsComponent implements OnInit {
             "value": {
               "name": "Train",
               "type": "QUESTION",
-              "src": "assets/cds/images/brain.svg",
+              "src": "assets/images/brain.svg",
               "description": ""
             }
           }];

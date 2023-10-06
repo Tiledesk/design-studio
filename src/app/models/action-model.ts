@@ -242,6 +242,7 @@ export class ActionWait extends Action {
 export class ActionAskGPT extends Action {
     question: string;
     kbid: string;
+    kbName: string;
     assignReplyTo: string;
     assignSourceTo: string;
     trueIntent: string;
