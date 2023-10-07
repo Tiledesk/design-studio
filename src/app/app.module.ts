@@ -56,6 +56,10 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs';
+import { FirebaseInitService } from 'src/chat21-core/providers/firebase/firebase-init-service';
+import { NativeImageRepoService } from 'src/chat21-core/providers/native/native-image-repo';
+import { FirebaseImageRepoService } from 'src/chat21-core/providers/firebase/firebase-image-repo';
+import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
@@ -73,6 +77,20 @@ const appInitializerFn = (appConfig: AppConfigService, logger: NGXLogger) => {
   };
 };
 
+export function imageRepoFactory(appConfig: AppConfigService, http: HttpClient) {
+  const config = appConfig.getConfig()
+  if (config.uploadEngine === UPLOAD_ENGINE_NATIVE) {
+    const imageService = new NativeImageRepoService(http)
+    imageService.setImageBaseUrl(config.baseImageUrl)
+    return imageService
+  } else {
+    const imageService = new FirebaseImageRepoService(http);
+    FirebaseInitService.initFirebase(config.firebaseConfig)
+    imageService.setImageBaseUrl(config.baseImageUrl)
+    return imageService
+  }
+}
+
 export function uploadFactory(http: HttpClient, appConfig: AppConfigService, appStorage: AppStorageService) {
 
   const config = appConfig.getConfig()
@@ -81,6 +99,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     nativeUploadService.setBaseUrl(config.baseImageUrl)
     return nativeUploadService
   } else {
+    FirebaseInitService.initFirebase(config.firebaseConfig)
     return new FirebaseUploadService();
   }
 }
@@ -88,7 +107,8 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
 @NgModule({
   declarations: [
     AppComponent,
-    BotsBaseComponent
+    BotsBaseComponent,
+    UnauthorizedComponent,
   ],
   imports: [
     // TooltipModule.forRoot(CutomTooltipOptions as TooltipOptions),

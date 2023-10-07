@@ -96,11 +96,11 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
   getUserAvailabilityAndRole() {
     this.projectService.getProjectUserByUserId(this.project._id, this.user.uid).pipe( takeUntil(this.unsubscribe$)).subscribe((projectUser: ProjectUser) => {
       //  console.log('[CDS-SIDEBAR] - SUBSCRIPTION TO USER ROLE »»» ', userRole)
-      if (projectUser[0].role !== undefined) {
-        this.USER_ROLE = projectUser[0].role;
+      if (projectUser.role !== undefined) {
+        this.USER_ROLE = projectUser.role;
       }
-      if(projectUser[0].user_available !== undefined) {
-        this.IS_AVAILABLE = projectUser[0].user_available;
+      if(projectUser.user_available !== undefined) {
+        this.IS_AVAILABLE = projectUser.user_available;
       }
     })
   }

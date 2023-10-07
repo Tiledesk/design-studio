@@ -80,10 +80,13 @@
     border: 0;
     background: transparent;
     padding: 6px 0;
+    display: flex;
+    align-items: center;
 }
 .cds-input-group {
     // margin: 10px 10px;
     display: flex;
+    flex-wrap: nowrap;
     input {
         border: 0;
         background: #fff;

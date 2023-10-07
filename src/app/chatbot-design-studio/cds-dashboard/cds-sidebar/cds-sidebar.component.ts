@@ -53,8 +53,8 @@ export class CdsSidebarComponent implements OnInit {
   getUserRole() {
     this.projectService.getProjectUserByUserId(this.projectID, this.user.uid).pipe( takeUntil(this.unsubscribe$)).subscribe((projectUser: ProjectUser) => {
        console.log('[CDS-SIDEBAR] - SUBSCRIPTION TO USER ROLE »»» ', projectUser)
-      if (projectUser[0].role !== undefined) {
-        this.USER_ROLE = projectUser[0].role;
+      if (projectUser.role !== undefined) {
+        this.USER_ROLE = projectUser.role;
       }
     })
   }

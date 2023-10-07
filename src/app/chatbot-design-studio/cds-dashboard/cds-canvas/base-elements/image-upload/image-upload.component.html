@@ -7,7 +7,7 @@
 
     <label class="inputUploadImage" [for]="'uploadImage_'+ uuid">
         <div class="image"><img src="assets/images/icons/add_image.svg"></div>
-        <input style="display:none" type="file" [id]="'uploadImage_'+ uuid" accept=".jpg, .JPEG, .png, .gif, .webp" (change)="selectFile($event)" />
+        <input style="display:none" type="file" [id]="'uploadImage_'+ uuid" accept=".jpg, .JPEG, .png, .gif, .webp" (change)="detectFiles($event)" />
     </label>
 
     <div class="labelDropUploadImage">

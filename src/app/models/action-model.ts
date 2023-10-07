@@ -269,6 +269,15 @@ export class ActionGPTTask extends Action {
     }
 }
 
+export class ActionCaptureUserReply extends Action {
+    assignResultTo: string;
+    goToIntent: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.CAPTURE_USER_REPLY
+    }   
+}
+
 export class Operation {
     operators?: Array<TYPE_MATH_OPERATOR>
     operands: Array<Operand>

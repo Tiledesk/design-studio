@@ -180,6 +180,15 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-gpt-task>
                     
+                    <cds-action-capture-user-reply *ngSwitchCase="typeAction.CAPTURE_USER_REPLY"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-capture-user-reply>
+                    
                     <!-- <cds-action-assign-function *ngSwitchCase="typeAction.ASSIGN_FUNCTION"
                         [action]="elementSelected">
                     </cds-action-assign-function> -->

@@ -1,4 +1,5 @@
 @import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/md/_variables.scss";
 /** GENERIC **/
 
 /*
@@ -22,6 +23,52 @@ svg {
   vertical-align: unset;
 }
 
+.input-group{
+    position: relative;
+    display: table;
+    border-collapse: separate;
+}
+
+.input-group {  // may be in or outside of form-group
+    .input-group-btn {
+      padding: 0 12px; // match addon spacing
+    }
+  
+    .input-group-addon {
+      border: 0;
+      background: transparent;
+      padding: 6px 15px 0px;
+    }
+}
+
+/* Bottom Underline of the titles of the sections */
+.card_title__underlined {
+    text-transform: none;
+    color: #566787;
+    margin-bottom: 0px;
+    height: 40px !important;
+    position: relative;
+    font-family: "Poppins", "Roboto", "Arial", sans-serif;
+    height: 30px;
+    font-size: 16px;
+    margin-top: 10px;
+    // z-index: 0;
+}
+
+.card_title__underline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: -1px;
+    border-bottom: 2px solid $brand-primary;
+    z-index: 1;
+}
+
+.section-subtitle {
+    height: 20px;
+    border-top: 1px solid #ddd;
+    /*  width: calc((100% / 3) + 372px); */
+}
 
 .content-panel-intent-detail {
     padding: 20px 0 30px;
@@ -310,9 +357,9 @@ color: white;
     // padding-top: 8px !important;
     // padding-bottom: 8px !important;
     // border: 1px solid #e5effe !important;
-  }
+}
   
-  .btn.btn-primary.cds-blue-button {
+.btn.btn-primary.cds-blue-button {
     background: $light-blue;
     color: $light-black;
     box-shadow: none;
@@ -324,4 +371,8 @@ color: white;
     &:hover {
       background: rgba(138, 180, 248, 0.8);
     }
-  }
+}
+
+appdashboard-cds-dashboard a {
+    text-decoration: none;
+}

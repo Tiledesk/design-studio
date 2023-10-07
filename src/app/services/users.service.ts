@@ -32,7 +32,7 @@ export class UsersService {
   // public has_clicked_logoutfrom_mobile_sidebar: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   // public has_clicked_logoutfrom_mobile_sidebar_project_undefined: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  SERVER_BASE_PATH: string;
+  // SERVER_BASE_PATH: string;
   PROJECTS_URL: string;
   UPDATE_USER_URL: string;
   CHANGE_PSW_URL: string;
@@ -254,7 +254,7 @@ export class UsersService {
 
   public getCurrentUserCommunityProfile(userid): Observable<UserModel[]> {
 
-    const url = this.SERVER_BASE_PATH + 'users_util/' + userid;
+    const url = this.SERVER_BASE_URL + 'users_util/' + userid;
     this.logger.log('[USER-SERV] - GET CURRENT USER CMNTY PROFILE - URL', url);
 
     const httpOptions = {
@@ -1092,7 +1092,7 @@ export class UsersService {
 
 
   public updateUserWithCommunityProfile(userWebsite: string, userPublicEmail: string, userDescription: string) {
-    const url = this.UPDATE_USER_URL;
+    const url = this.SERVER_BASE_URL + 'users/';
     this.logger.log('[USER-SERV] - UPDATE USER WITH COMMUNITY PROFILE (PUT) URL ', url);
 
    const httpOptions = {

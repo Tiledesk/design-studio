@@ -173,6 +173,7 @@ import { CdsActionWhatsappAttributeComponent } from './cds-dashboard/cds-canvas/
 import { CdsWhatsappReceiverComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-whatsapp-static/whatsapp-receiver/whatsapp-receiver.component';
 import { CdsActionWhatsappStaticComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-whatsapp-static/cds-action-whatsapp-static.component';
 import { CdsActionGPTTaskComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-gpt-task/cds-action-gpt-task.component';
+import { CdsActionCaptureUserReplyComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-capture-user-reply/cds-action-capture-user-reply.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
@@ -194,6 +195,7 @@ import { CdsAnswerComponent } from './cds-dashboard/cds-canvas/actions/list/answ
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CdsEventComponent } from './cds-dashboard/cds-event/cds-event.component';
 import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -279,6 +281,7 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
         CdsWhatsappReceiverComponent,
         CdsActionAskgptComponent,
         CdsActionGPTTaskComponent,
+        CdsActionCaptureUserReplyComponent,
         // action REPLY elements: start //
         CdsActionReplyToolsComponent,
         CdsActionReplyTextComponent,
@@ -335,6 +338,7 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 
   ],
   imports: [
+    BrowserAnimationsModule,
     A11yModule,
     CommonModule,
     DragDropModule,

@@ -3,7 +3,7 @@
     <ng-container *ngSwitchCase="false" [ngTemplateOutlet]="existingRule"></ng-container>
 </ng-container>
 
-<ng-template #addNewRule [ngOutletContext]="context">
+<ng-template #addNewRule>
     <div class="card-wrp new-rule" [formGroup]="ruleFormGroup">
 
             <div class="card-item">
@@ -44,7 +44,7 @@
     </div>
 </ng-template>
 
-<ng-template #existingRule [ngOutletContext]="context">
+<ng-template #existingRule>
     <mat-accordion class="rules-list">
         <div class="card-wrp" [formGroup]="ruleFormGroup">
             <mat-expansion-panel

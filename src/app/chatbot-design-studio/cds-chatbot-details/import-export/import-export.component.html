@@ -151,16 +151,18 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header" style="padding: 8px 15px;">
-        <!-- class="close" -->
-        <button type="button" class="close-modal-window" aria-label="Close" (click)="onCloseModal()">
-          <span aria-hidden="true" style="color: rgb(6, 6, 6) !important;position: relative;">&times;</span>
-        </button>
 
         <h4 class="modal-title" style="line-height: 2!important;">
 
           <!-- {{ 'FaqPage.ImportCsvFile' | translate }} -->
           Import CSV File
         </h4>
+        <!-- class="close" -->
+        <button type="button" class="close-modal-window" aria-label="Close" (click)="onCloseModal()">
+          <span aria-hidden="true" style="color: rgb(6, 6, 6) !important;position: relative;">&times;</span>
+        </button>
+
+        
       </div>
 
       <div class="modal-body" style="padding-bottom: 20px !important; padding-top: 20px;">
@@ -335,14 +337,15 @@
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" aria-label="Close" (click)="onCloseModal()">
-          <span aria-hidden="true">&times;</span>
-        </button>
 
         <h4 class="modal-title">
           Upload CSV
           <!-- {{ 'FaqPage.UploadCsv' | translate }} -->
         </h4>
+        <button type="button" class="close" aria-label="Close" (click)="onCloseModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        
       </div>
 
       <div class="modal-body">
@@ -435,14 +438,14 @@
     <div class="modal-content">
       <div class="modal-header" style="padding: 8px 15px;">
 
-        <button type="button" class="close-modal-window" aria-label="Close" (click)="onCloseImportJSONModal()">
-          <span aria-hidden="true" style="color: rgb(6, 6, 6) !important;position: relative;">&times;</span>
-        </button>
-
         <h4 class="modal-title" style="line-height: 2!important; font-size: 20px; font-weight: 400;">
           <!-- {{'ImportFromJSON' | translate}} -->
           Import from JSON
         </h4>
+        <button type="button" class="close-modal-window" aria-label="Close" (click)="onCloseImportJSONModal()">
+          <span aria-hidden="true" style="color: rgb(6, 6, 6) !important;position: relative;">&times;</span>
+        </button>
+
       </div>
 
       <div class="modal-body import-json-modal-body">

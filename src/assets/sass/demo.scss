@@ -47,6 +47,7 @@ my-app .main-panel .main-content .card {
   display: block;
 }
 
+
 .sidebar .nav > li.active-pro {
   position: absolute;
   width: 100%;
@@ -1038,34 +1039,7 @@ div.card-content > div > div > div > div > div > div > div.txt > p.internal-note
 /* div.card-content > div > div > div > div > div > div > div.txt > div > div > p > p > a
 div.card-content > div > div > div > div > div > div > div.txt > div > div > p > p */
 
-/* Bottom Underline of the titles of the sections */
-.card_title__underlined {
-  text-transform: none;
-  color: #566787;
-  margin-bottom: 0px;
-  height: 40px !important;
-  position: relative;
-  font-family: "Poppins", "Roboto", "Arial", sans-serif;
-  height: 30px;
-  font-size: 16px;
-  margin-top: 10px;
-  // z-index: 0;
-}
 
-.card_title__underline {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: -1px;
-  border-bottom: 2px solid $brand-primary;
-  z-index: 1;
-}
-
-.section-subtitle {
-  height: 20px;
-  border-top: 1px solid #ddd;
-  /*  width: calc((100% / 3) + 372px); */
-}
 
 // -------------------------------------------------
 // Added when the user details sidebar is opened
@@ -1726,3 +1700,5 @@ appdashboard-app-store > div > div > div > div > .card-app-store {
   color: $plan-c-color;
   background: $plan-c-background;
 }
+
+

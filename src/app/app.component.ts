@@ -36,8 +36,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   IS_ONLINE: boolean;
   initFinished:boolean = false;
 
-  private project: Project;
-  private selectedChatbot: Chatbot
 
   constructor(
     private appConfigService: AppConfigService,
@@ -109,7 +107,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     // const getUrlParams = await this.dashboardService.getUrlParams();
     // this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
 
-    this.initAuthentication();
+    await this.initAuthentication();
     this.setLanguage(null);
 
   }
@@ -250,7 +248,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /***************************************************+*/
   /**------- AUTHENTICATION FUNCTIONS --> START <--- +*/
-  private initAuthentication() {
+  initAuthentication() {
     const tiledeskToken = this.appStorageService.getItem('tiledeskToken')
 
     this.logger.log('[APP-COMP] >>> INIT-AUTHENTICATION !!! ')
@@ -263,14 +261,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.logger.log('[APP-COMP] >>> initAuthentication user ', user)
 
         this.updateStoredCurrentUser()
-
+        this.IS_ONLINE = true;
       }).catch(error => {
         this.logger.error('[APP-COMP] initAuthentication SIGNINWITHCUSTOMTOKEN error::', error)
       })
     } else {
       this.logger.warn('[APP-COMP] >>> I AM NOT LOGGED IN <<<')
       this.IS_ONLINE = false;
-      this.goToDashboardLogin()
+      // this.goToDashboardLogin()
     }
   }
 

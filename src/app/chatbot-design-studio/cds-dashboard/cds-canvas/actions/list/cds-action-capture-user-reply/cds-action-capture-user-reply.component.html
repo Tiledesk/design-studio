@@ -1,0 +1,90 @@
+<div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
+
+    <!-- <div class="action-row">
+        <div class="action-row-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
+            </svg>
+        </div>
+
+        <div class="action-row-right"> -->
+            <!-- <div *ngIf="action?.question" class="action-row-right">
+                {{action?.question}}
+            </div>
+            <div *ngIf="!action?.question" class="action-row-right empty">
+                Enter the question
+            </div> -->
+            <!-- Preview something
+        </div>
+
+    </div> -->
+
+    <div id="capture-user-reply" class="previewContent">
+        
+        <label class="title-preview-label">Capture user reply
+            <span *ngIf="action?.assignResultTo">to </span>
+            <span *ngIf="action?.assignResultTo" style="font-weight: 600;">{{ action?.assignResultTo }}</span>
+
+        </label>
+        
+        <cds-connector class="connector"
+            [idConnector] = "idConnector"
+            [isConnected] = "isConnected">
+        </cds-connector>
+    </div>
+
+</div>
+
+
+<div id="content" *ngIf="!previewMode" class="content">
+
+
+    <div class="text-editor-wrapper">
+        <div class="field-box">
+            <label class="title-label">Assign user reply to</label>
+            <div class="value-wrp">
+                <cds-textarea 
+                    id="assignTo" 
+                    [textLimitBtn]="false" 
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="action.assignResultTo"
+                    [placeholder]="'(Optional)'"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+                </cds-textarea>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img src="assets/cds/images/actions/connect_intent.svg">
+            </div>
+            <span class="condition-text">Then go to block</span>
+        </div>
+
+        <div class="select-box" id="intentSelect">
+            <cds-select 
+                id="text-condition" 
+                [items]="listOfIntents" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'" 
+                [itemSelected]="action?.goToIntent" 
+                [placeholder]="'Select a block'"
+                [clearable]="true" 
+                (onSelected)="onChangeBlockSelect($event, 'goToIntent')"
+                (onReset)="onResetBlockSelect($event, 'goToIntent')">
+            </cds-select>
+        </div>
+    </div>
+
+
+
+
+</div>

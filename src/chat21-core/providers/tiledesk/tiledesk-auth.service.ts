@@ -5,6 +5,7 @@ import { UserModel } from 'src/chat21-core/models/user';
 import { avatarPlaceholder, getColorBck } from 'src/chat21-core/utils/utils-user';
 import { AppStorageService } from '../abstract/app-storage.service';
 import { LoggerInstance } from '../logger/loggerInstance';
+import { BehaviorSubject } from 'rxjs';
 // import { BehaviorSubject } from 'rxjs';
 // import { EventsService } from 'src/app/services/events-service';
 
@@ -25,6 +26,8 @@ export class TiledeskAuthService {
   private tiledeskToken: string;
   private currentUser: UserModel;
   private logger: LoggerService = LoggerInstance.getInstance()
+
+  private BS_IsONLINE: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
 
   constructor(
     public http: HttpClient,
@@ -122,6 +125,7 @@ export class TiledeskAuthService {
           // that.appStorage.setItem('tiledeskToken', that.tiledeskToken); // salvarlo esternamente nell'app.component
           this.checkAndSetInStorageTiledeskToken(that.tiledeskToken)
           resolve(this.currentUser)
+          this.BS_IsONLINE.next(true)
         }
       }, error: (error)=>{
         reject(error)
@@ -133,6 +137,7 @@ export class TiledeskAuthService {
     this.logger.log('[TILEDESK-AUTH] - LOGOUT')
     this.appStorage.removeItem('tiledeskToken')
     this.appStorage.removeItem('currentUser')
+    this.BS_IsONLINE.next(false)
     this.setCurrentUser(null);
     // this.isOnline$.next(false) 
     const stored_project = localStorage.getItem('last_project')
@@ -191,6 +196,15 @@ export class TiledeskAuthService {
     } else if (storedTiledeskToken && storedTiledeskToken === tiledeskToken) {
       this.logger.log('[TILEDESK-AUTH] - checkAndSetInStorageTiledeskToken STORED-TOKEN EXIST AND IS = TO TOKEN ')
     }
+  }
+
+  isLoggedIn(): Promise<boolean>{
+    return new Promise<boolean>((resolve, reject)=> {
+      this.BS_IsONLINE.subscribe((status)=> {
+        if(status)
+          resolve(true)
+      })
+    })
   }
 
 

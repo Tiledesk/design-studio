@@ -230,8 +230,15 @@
                     class="panel-response" 
                     [intentSelected]="intent"
                     [action]="action"
-                    (updateAndSaveAction)="onSaveIntent($event)">
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                 </cds-action-gpt-task>
+
+                <cds-action-capture-user-reply *ngSwitchCase="TYPE_ACTION.CAPTURE_USER_REPLY" 
+                    class="panel-response" 
+                    [intentSelected]="intent"
+                    [action]="action"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-capture-user-reply>
 
             </div>
 

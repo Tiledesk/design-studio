@@ -150,19 +150,19 @@ export class CdsActionReplyComponent implements OnInit {
 
   /** */
   drop(event: CdkDragDrop<string[]>) {
+    console.log( 'DROP REPLY ---> ',event, this.arrayResponses);
     this.textGrabbing = false;
-    // moveItemInArray(this.arrayResponses, event.previousIndex, event.currentIndex);
-    // this.onUpdateAndSaveAction();
-    console.log('eventtttttt drop', event)
     try {
-      const newPos1 = this.arrayResponses[event.currentIndex];
-      const newPos0 = this.arrayResponses[event.currentIndex-1];
-      const oldPos1 = this.arrayResponses[event.previousIndex];
-      const oldPos0 = this.arrayResponses[event.previousIndex-1];
-      this.arrayResponses[event.currentIndex-1] = oldPos0;
-      this.arrayResponses[event.currentIndex] = oldPos1;
-      this.arrayResponses[event.previousIndex-1] = newPos0;
-      this.arrayResponses[event.previousIndex] = newPos1;
+      let currentPos = event.currentIndex*2+1;
+      let previousPos = event.previousIndex*2+1;
+      const waitCur = this.arrayResponses[currentPos-1];
+      const msgCur = this.arrayResponses[currentPos];
+      const waitPre = this.arrayResponses[previousPos-1];
+      const msgPre = this.arrayResponses[previousPos];
+      this.arrayResponses[currentPos-1] = waitPre;
+      this.arrayResponses[currentPos] = msgPre;
+      this.arrayResponses[previousPos-1] = waitCur;
+      this.arrayResponses[previousPos] = msgCur;
       // console.log( 'DROP REPLY ---> ', this.arrayResponses);
       this.connectorService.movedConnector(this.intentSelected.id);
       this.onUpdateAndSaveAction();

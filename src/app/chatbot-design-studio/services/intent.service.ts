@@ -20,7 +20,7 @@ import {
   ActionReplaceBot,
   ActionWait,
   ActionWebRequest,
-  Command, Wait, Message, Expression, Attributes, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask } from 'src/app/models/action-model';
+  Command, Wait, Message, Expression, Attributes, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -784,6 +784,9 @@ export class IntentService {
       action.temperature = 0.7;
       action.model = "gpt-3.5-turbo";
       action.assignReplyTo = 'gpt_reply';
+    }
+    if(typeAction === TYPE_ACTION.CAPTURE_USER_REPLY) {
+      action = new ActionCaptureUserReply();
     }
     console.log('ho creato nuova action ', action);
     return action;

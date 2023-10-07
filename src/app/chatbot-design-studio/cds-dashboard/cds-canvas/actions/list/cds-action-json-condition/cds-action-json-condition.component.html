@@ -161,11 +161,11 @@
 </div>
 
 
-<ng-template #placeholder [ngOutletContext]="context">
+<ng-template #placeholder>
     <div class="title-label">Click to add a condition</div>
 </ng-template>
 
-<ng-template #conditions [ngOutletContext]="context">
+<ng-template #conditions>
    <div id="conditions">
         <div *ngFor="let group of action?.groups; let i = index;" class="group">
             
