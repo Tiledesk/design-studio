@@ -23,15 +23,25 @@ svg {
   vertical-align: unset;
 }
 
+.btn-group{
+    margin: 0;
+}
 .input-group{
     position: relative;
-    display: table;
+    display: flex;
     border-collapse: separate;
 }
 
 .input-group {  // may be in or outside of form-group
     .input-group-btn {
       padding: 0 12px; // match addon spacing
+
+      position: relative;
+      font-size: 0;
+      white-space: nowrap;
+
+      display: table-cell;
+      vertical-align: middle;
     }
   
     .input-group-addon {
@@ -360,19 +370,27 @@ color: white;
 }
   
 .btn.btn-primary.cds-blue-button {
-    background: $light-blue;
-    color: $light-black;
+    background: $blu-02;
+    color: white;
     box-shadow: none;
     font-weight: 500;
     font-family: "Poppins", Roboto, Arial, sans-serif;
     text-transform: capitalize;
     font-size: 14px;
     padding: 6px 12px;
+    border-radius: $btn-border-radius;
     &:hover {
-      background: rgba(138, 180, 248, 0.8);
+      background: rgba($blu-02, 0.8);
     }
 }
 
 appdashboard-cds-dashboard a {
     text-decoration: none;
+}
+
+.cds-title{
+    font-size: 18px;
+    position: relative;
+    color: $blu;
+    font-weight: 600;
 }

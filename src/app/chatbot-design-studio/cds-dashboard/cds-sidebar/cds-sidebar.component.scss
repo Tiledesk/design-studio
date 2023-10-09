@@ -167,7 +167,6 @@ li > a {
 ///
 
 .content {
-    margin-top: 20px;
     width: 100%;
     display: flex;
     //display: none;
@@ -195,12 +194,12 @@ li > a {
     justify-content: center;
     align-items: center;
     // margin-bottom: 10px;
-    padding: 5px 12px;
+    // padding: 0px 12px;
     // border-radius: 4px;
     transition: all .3s;
     width: 100%;
     cursor: pointer;
-    height: 60px;
+    height: $sidebar-base-width;
 
     .item-label {
         margin-bottom: 0px;
@@ -209,19 +208,26 @@ li > a {
     }
 
     .item-icon {
-        color: $icon-color;
+        color: $blu-light-02;
+        fill: $blu-light-02;
     }
 
 }
 
 .section:hover {
-    background-color: $icon-color-background;
+    background-color: $blu;
+    .item-icon {
+        color: white;
+        fill: white;
+    }
 }
 
 .is_active {
-    background-color: $icon-active-background;
-
+    // background-color: $icon-active-background;
     .item-icon {
-        color: $icon-active-color;
+        color: $blu;
+        fill: $blu;
+        stroke-width: 25px;
+        stroke: $blu;
     }
 }

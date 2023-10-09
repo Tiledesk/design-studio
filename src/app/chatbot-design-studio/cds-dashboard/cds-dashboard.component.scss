@@ -1,26 +1,24 @@
 @import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/cds/styles.scss";
 
-$mdb-font-family-poppins: 'Poppins', 'Roboto', Arial, sans-serif !default;
 
-.cds-header {
-  height: 60px;
+cds-header {
+  height: $header-height;
   font-family: $mdb-font-family-poppins;
-  line-height: 60px;
+  line-height: $header-height;
   font-size: 21px;
-  color: #fff;
-  background: #1e293b;
+  color: $blu;
+  background: white;
   display: flex;
 }
 
 .chatboat-dashboard {
-  background-color: rgb($bg-color-dark-rgb);
   position: relative;
   display: flex;
   margin-top: 0px;
   padding: 0px;
   width: 100%;
-  height: calc(100vh - 60px);
+  height: calc(100vh - $header-height);
   overflow-x: hidden;
   overflow-y: hidden;
   font-family: $mdb-font-family-poppins;
@@ -40,17 +38,18 @@ cds-fulfillment {
   }
 }
 
-.cds-sidebar {
-  border-right: 2px solid #394f5a;
-  width: 60px;
+cds-sidebar {
+  background-color: $blu-light-01;
+  border-right: 2px solid $blu-light-02;
+  width: $sidebar-base-width;
   transition: 0.3s;
   display: flex;
-  min-width: 60px;
+  min-width: $sidebar-base-width;
 }
 
 .cds-content {
   display: flex;
-  width: calc(100% - 60px);
+  width: calc(100% - $sidebar-base-width);
   overflow: hidden;
 }
 

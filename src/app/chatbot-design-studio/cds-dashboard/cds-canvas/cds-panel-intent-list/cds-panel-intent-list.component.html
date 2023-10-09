@@ -1,23 +1,10 @@
 <div class="content">
 
-    <div class="search-box">
-        <div class="input-box">
-            <div class="input-box-search-icon-wpr">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16px" height="16px">
-                    <path fill="currentColor" fill-rule="evenodd"
-                        d="M7 0a7 7 0 0 1 5.474 11.364l3.224 3.224c.347.348.418.84.07 1.187-.346.347-.838.276-1.185-.071l-3.226-3.225A7 7 0 1 1 7 0zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z">
-                    </path>
-                </svg>
-            </div>
-            <div class="input-box-search-input-wpr">
-                <input class="custom-input truncate" placeholder="search a block..."
-                    (input)="onLiveSearch($event.target.value);">
-            </div>
-        </div>
+    <div class="cds-title list-title">
+        Blocks
     </div>
 
     <div class="intents-list">
-
         <div class="topic-internal">
 
             <div class="intents">
@@ -25,7 +12,7 @@
                     [ngClass]="{'active': idSelectedIntent === intent.intent_id}" [value]="intent.intent_id"
                     (click)="onSelectIntent(intent)">
 
-                    <div class="icon-container" [ngClass]="onGetIconForName(intent.intent_display_name)">
+                    <div class="icon-container">
                         <span class="material-icons">{{onGetIconForName(intent.intent_display_name)}}</span>
                     </div>
 
@@ -54,9 +41,26 @@
             </div>
 
         </div>
+    </div>
 
 
+    <div class="search-box">
+        <div class="input-box">
+            <div class="input-box-search-icon-wpr">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16px" height="16px">
+                    <path fill="currentColor" fill-rule="evenodd"
+                        d="M7 0a7 7 0 0 1 5.474 11.364l3.224 3.224c.347.348.418.84.07 1.187-.346.347-.838.276-1.185-.071l-3.226-3.225A7 7 0 1 1 7 0zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z">
+                    </path>
+                </svg>
+            </div>
+            <div class="input-box-search-input-wpr">
+                <input class="custom-input truncate" placeholder="search a block..."
+                    (input)="onLiveSearch($event.target.value);">
+            </div>
+        </div>
+    </div>
 
+    <div class="intents-list">
 
         <div style="width: 100%; display: flex; justify-content: center;">
             <div class="custom-divider"></div>

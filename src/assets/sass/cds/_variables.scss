@@ -72,8 +72,6 @@ $brown-85: #6c6859d9;
 
 
 // Typography elements
-$mdb-font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !default;
-$mdb-font-family-poppins: "Poppins", "Roboto", Arial, sans-serif !default;
 $font-size-base: 14px;
 
 $height-header: 25px;
@@ -141,3 +139,20 @@ $accent-blue: rgb(62, 169, 245);
 $base-blue: rgb(58, 107, 147);
 $red: #ff4000;
 $icon-bckgrnd-color: #e4e6eb;
+
+
+
+
+/* CDS NEW v2
+/* ******************************* */
+$mdb-font-family-poppins: 'Poppins', 'Roboto', Arial, sans-serif !default;
+$mdb-font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !default;
+
+$blu: rgb(80, 100, 147);
+$blu-02: rgb(91, 114, 167);
+$blu-light-01: rgb(244, 246, 251);
+$blu-light-02: rgb(182, 194, 223);
+
+$header-height: 60px;
+$sidebar-base-width: 60px;
+$btn-border-radius: 16px;

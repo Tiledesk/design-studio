@@ -5,15 +5,17 @@ $width-card-tools: 160px;
 $margin-left-card: 30px;
 $margin-top-card: 30px;
 
+
+
 .header-left {
-    border-right: 2px solid #394f5a;
+    // border-right: 2px solid #394f5a;
     max-width: 60px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: 0.3s;
-    background-color: #0f172a;
+    background-color: $blu;
     img {
         width: 30px;
     }
@@ -31,24 +33,16 @@ $margin-top-card: 30px;
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    padding: 0px 10px;
     .right-opts{
         display: flex;
         align-items: center;
         gap: 10px;
-
-        #cds-test-it-wab-out-btn{
-            img{
-                margin-right: 5px;
-                filter: brightness(0) saturate(100%) invert(99%) sepia(0%) saturate(2%) hue-rotate(182deg) brightness(111%) contrast(101%)
-            }
-        }
     }
 
     .header-go-back {
         cursor: pointer;
-        margin-left: 21px;
         position: relative;
-        top: 4px;
     }
     .toggle-setting-sidebar-icon-wpr {
         position: absolute;
@@ -82,129 +76,53 @@ $margin-top-card: 30px;
     }
 
     .header-title {
-        margin-left: 20px;
-        position: absolute;
-        left: 50%;
-        top: 0px;
-        max-width: 250px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        font-weight: 400;
-    }
-
-    .cds-test-it-out {
-        background-color: transparent;
-        border: 1px solid $light-blue;
-        color: $light-blue;
-        &:hover{
-            opacity: 0.8;
-        }
-    }
-    .cds-beta {
-      border-radius: 50%;
-      background-color: red;
-      color: white;
-      border: 1px solid red;
-      cursor: auto;
+        font-weight: 300;
     }
 }
 
-.go-back-to-my-chatbot-text {
-    font-size: 18px;
-    position: relative;
-    top: -6px;
-    color:#006cff
-}
 
+// #cds-publish-btn-option {
+//     background: #006cff;
+//     color: #fff;
+//     box-shadow: none;
+//     font-weight: 500;
+//     font-family: Poppins, Roboto, Arial, sans-serif;
+//     text-transform: capitalize;
+//     font-size: 14px;
+//     padding: 6px 12px;
+//     border-radius: 10px;
+// } 
 
-.beta-icon {
-  position: absolute;
-  background: #cc0700;
-  right: 0px;
-  top: 50px;
-  padding: 0 10px;
-  margin: auto;
-  text-align: center;
-  vertical-align: middle;
-  line-height: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  z-index: 1;
-  color: white;
-  cursor: auto;
-}
-
-#cds-publish-btn {
-    background: #006cff;
-    color: #fff;
-    box-shadow: none;
-    font-weight: 500;
-    font-family: Poppins, Roboto, Arial, sans-serif;
-    text-transform: capitalize;
-    font-size: 14px;
-    padding: 6px 12px;
-    border-radius: 10px;
-}
-
-#cds-publish-btn:hover { 
-    opacity: .8!important;
-}
-
-#cds-publish-btn-option {
-    background: #006cff;
-    color: #fff;
-    box-shadow: none;
-    font-weight: 500;
-    font-family: Poppins, Roboto, Arial, sans-serif;
-    text-transform: capitalize;
-    font-size: 14px;
-    padding: 6px 12px;
-    border-radius: 10px;
-} 
-
-#cds-publish-btn-option:hover {
-    opacity: .8!important;
-}
+// #cds-publish-btn-option:hover {
+//     opacity: .8!important;
+// }
 
 #cds-test-it-wab-out-btn{
     background-color: #45c351; 
-    color: #fff; 
-    border-color: #fff; 
-    height: 34px; 
-    margin-top: 8px;
-    border-radius: 10px;
-    padding: 5px 12px !important;
+    color: #fff;
     img {
-        margin-top: 1px;
         margin-right: 6px;
+        vertical-align: text-top;
+        filter: brightness(0) saturate(100%) invert(99%) sepia(0%) saturate(2%) hue-rotate(182deg) brightness(111%) contrast(101%)
     }
 
 }
 
 #cds-test-it-out-btn{
     background-color: transparent;
-    border: 1px solid #8ab4f8;
-    color: #8ab4f8;
-    border-radius: 10px;
-    padding: 5px 12px !important;
+    outline: 1px solid $blu-02;
+    outline-offset: -1px;
+    color: $blu-02;
 }
 
-
-.cds-close-btn {
-    padding: 3px !important;
-    border-radius: 50% !important;
-    background-color: transparent !important;
-    box-shadow: unset !important;
-    color: #e8eaed !important;
+#cds-publish-btn:hover,
+#cds-test-it-wab-out-btn:hover,
+#cds-test-it-out-btn:hover{
+    opacity: 0.8;
 }
 
-.cds-close-btn:hover {
-    color: #9aa0a6 !important;
-}
-
-.cds-close-btn-icon {
-    font-size: 40px !important;
-}
 
 

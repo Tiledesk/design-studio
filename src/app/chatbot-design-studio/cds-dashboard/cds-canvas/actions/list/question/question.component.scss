@@ -226,9 +226,11 @@ mat-form-field.box-textarea ::ng-deep {
     border-radius: 0;
     padding-left: 6px;
     padding-right: 6px;
-    padding-top: 4px;
+    padding-top: 0px;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
+    display: flex;
+    align-items: center;
 }
 
 .cds-group-addon-question-right {
@@ -237,11 +239,13 @@ mat-form-field.box-textarea ::ng-deep {
     border-radius: 0;
     // padding-left: 6px;
     // padding-right: 6px;
-    padding-top: 4px;
+    padding-top: 0px;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     cursor: pointer;
     max-width: 47px;
+    display: flex;
+    align-items: center;
 }
 
 .cds-group-addon-question-right:hover {
@@ -267,10 +271,12 @@ mat-form-field.box-textarea ::ng-deep {
     border-radius: 0;
     padding-left: 6px;
     padding-right: 6px;
-    padding-top: 4px;
+    padding-top: 0px;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
 // .cds-group-addon-right-icon:hover {

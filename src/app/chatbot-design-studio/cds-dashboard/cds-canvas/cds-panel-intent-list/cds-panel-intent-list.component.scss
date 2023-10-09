@@ -1,13 +1,13 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 
-$text-color: white;
+$text-color: $blu-light-02;
 $background-color: transparent;
-$text-color-hover: $icon-color;
-$background-color-hover: $icon-color-background;
-$text-color-active: $icon-active-color;
+$text-color-hover: white;
+$background-color-hover: $blu;
+$text-color-active: $blu;
 $background-color-active: $icon-active-background;
-$icon-color-active: $accent-blue;
+$icon-color-active: $blu;
 
 .content {
     width: 100%;
@@ -15,7 +15,11 @@ $icon-color-active: $accent-blue;
     flex-direction: column;
     justify-content: center;
     color: #728087;
-    padding: 4px;
+    padding: 6px;
+}
+
+.list-title{
+    font-size: 13px;
 }
 
 .search-box {
@@ -71,7 +75,6 @@ $icon-color-active: $accent-blue;
 }
 
 .rocket_launch {
-    color: #0aae10;
     font-size: 20px;
     font-weight: 600;
     span {
@@ -83,7 +86,6 @@ $icon-color-active: $accent-blue;
 }
 
 .undo {
-    color: #ff4000;
     font-size: 20px;
     font-weight: 600;
 }
@@ -145,7 +147,9 @@ $icon-color-active: $accent-blue;
 .icon-container {
     width: 38px;
     display: flex;
-    justify-content: flex-start;
+    height: 100%;
+    align-items: center;
+    color: $blu-light-02;
 }
 
 .icon-list {
@@ -172,7 +176,7 @@ $icon-color-active: $accent-blue;
     transition: all 0.3s;
     align-items: flex-start;
     height: 20px;
-    padding-left: 10px;
+    // padding-left: 10px;
 
     .item-box {
         display: flex;
@@ -194,10 +198,9 @@ $icon-color-active: $accent-blue;
     }
 
 
-
     .intent-display-name {
         color: $text-color;
-        font-weight: 500;
+        font-weight: 400;
         margin-bottom: 0px;
         font-size: 14px;
         overflow: hidden;
@@ -208,10 +211,6 @@ $icon-color-active: $accent-blue;
     .icon-list {
         display: flex;
         flex-direction: row;
-
-        .icon {
-            color: #8c989e;
-        }
 
         .ai-icon {
             margin-bottom: 0px;
@@ -251,7 +250,7 @@ $icon-color-active: $accent-blue;
 
 .intent:hover {
     // background-color: #d2d2d2;
-    background-color: $background-color-hover;
+    background-color: $blu;
 
     .delete-box {
         display: block;
@@ -270,55 +269,34 @@ $icon-color-active: $accent-blue;
         }
     }
 
+    .icon-container{
+        color: $text-color-hover;
+    }
+
     .intent-display-name {
         // color: #333;
         color: #fff;
-        font-weight: 500;
+        font-weight: 400;
         margin-bottom: 0px;
         font-size: 14px;
         // max-width: 150px;
     }
 
-    .icon-list {
-        .icon {
-            // color: #333;
-            color: #8c989e;
-        }
-    }
-}
-
-.intent:active {
-    background-color: $background-color-active;
-    border-right: solid 5px $icon-color-active;
-    border-radius: 6px 10px 10px 6px;
-
-    .intent-display-name {
-        // color: #333;
-        color: $text-color-active;
-        font-weight: 500;
-        margin-bottom: 0px;
-    }
-
-    .icon-container,
-    .icon-list .icon{
-        color: $icon-color-active !important;
-    }
 }
 
 .active {
-    background-color: $background-color-active !important;
-    border-right: solid 5px $icon-color-active;
-    border-radius: 6px 10px 10px 6px;
+    // background-color: $background-color-active !important;
+    // border-right: solid 5px $icon-color-active;
+    // border-radius: 6px 10px 10px 6px;
 
     .intent-display-name {
         // color: #333;
         color: $text-color-active;
-        font-weight: 500;
+        font-weight: 600;
         margin-bottom: 0px;
     }
 
-    .icon-container,
-    .icon-list .icon{
+    .icon-container{
         color: $icon-color-active !important;
     }
 
