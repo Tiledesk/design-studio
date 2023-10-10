@@ -14,7 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2	     
       name: Check out the repo
-    - uses: docker/build-push-action@v1
+    - uses: docker/build-push-action@v2
+      name: Login to Docker Hub
       with:	    
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
