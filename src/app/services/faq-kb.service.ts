@@ -13,8 +13,6 @@ import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storag
 export class FaqKbService {
 
   SERVER_BASE_PATH: string;
-  TEMPLATES_URL: string;
-  COMMUNITY_TEMPLATES_URL: string;
   FAQKB_URL: any;
 
   private tiledeskToken: string;
@@ -39,74 +37,6 @@ export class FaqKbService {
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.project_id = projectId;
     this.FAQKB_URL = this.SERVER_BASE_PATH + this.project_id + '/faq_kb/'
-    this.TEMPLATES_URL = this.appConfigService.getConfig().templatesUrl
-    this.COMMUNITY_TEMPLATES_URL = this.appConfigService.getConfig().communityTemplatesUrl
-  }
-
-  getTemplates() {
-    // 'Authorization': this.TOKEN
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      })
-    };
-    // const url = "https://chatbot-templates.herokuapp.com/chatbots/public/templates/"
-    const url = this.TEMPLATES_URL
-
-    this.logger.log('[GET-TMPLT][FAQ-KB.SERV] - GET-TMPLT - URL ', url);
-    return this._httpClient.get(url, httpOptions)
-  }
-
-  getChatbotTemplateById(chatbotid) {
-    // 'Authorization': this.TOKEN
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      })
-    };
-    // const url = "https://chatbot-templates.herokuapp.com/chatbots/public/templates/"
-    const url = this.TEMPLATES_URL + '/windows/' + chatbotid
-
-    // console.log('[GET-TMPLT][FAQ-KB.SERV] - GET-CHATBOT-TEMPLATE-BY-ID - URL ', url);
-    return this._httpClient.get(url, httpOptions)
-  }
-
-  // const url = "https://chatbot-templates.herokuapp.com/chatbots/public/templates/"
-  // const url = "https://chatbot-templates.herokuapp.com/chatbots/public/community"
-  getCommunityTemplates() {
-    // 'Authorization': this.TOKEN
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      })
-    };
-
-    const url = this.COMMUNITY_TEMPLATES_URL
-
-    this.logger.log('[GET-TMPLT][FAQ-KB.SERV] - GET-TMPLT - URL ', url);
-    return this._httpClient.get(url, httpOptions)
-  }
-
-  getCommunityTemplateDetail(templateid) {
-
-    const url = this.TEMPLATES_URL + '/windows/' + templateid
-
-    this.logger.log('[GET-TMPLT][FAQ-KB.SERV] - GET-COMMUNITY-TMPLT-DTLS - URL ', url);
-    return this._httpClient.get(url)
-  }
-  // https://chatbot-templates-v3.herokuapp.com/chatbots/public/templates
-  // https://chatbot-templates-app-v3.herokuapp.com/chatbots/public/templates/windows/63e17ccb426521001330d8d0
-
-  getTemplateById(botid) {
-    // 'Authorization': this.TOKEN
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      })
-    };
-    // const url = "https://chatbot-templates.herokuapp.com/chatbots/public/templates/" + botid
-    const url = this.TEMPLATES_URL + botid
-    return this._httpClient.get(url, httpOptions)
   }
 
   installTemplate(botid: string, projectid: string, ispublic: boolean, landingprojectid) {
@@ -487,23 +417,6 @@ export class FaqKbService {
     // console.log('[FAQ-KB.SERV] updateFaqKb - BODY ', url, body);
     return this._httpClient.patch(url, body, httpOptions)
   }
-
-  searchInCommunityTemplates(query) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.project_id
-      })
-    };
-    // https://chatbot-templates-app-v3.herokuapp.com/chatbots/public/community
-    // https://chatbot-templates-app-v3.herokuapp.com/chatbots/public/community?text=lead
-    let url = this.COMMUNITY_TEMPLATES_URL + '?text=' + query;
-    this.logger.log('[FAQ-KB.SERV] - getDialogflowBotCredetial GET URL', url);
-
-    return this._httpClient.get(url, httpOptions)
-  }
-
-
 
   public patchAttributes(id: string, attributes: any): Observable<FaqKb> {
     const httpOptions = {

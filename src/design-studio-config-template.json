@@ -1,0 +1,24 @@
+{
+  "t2y12PruGU9wUtEGzBJfolMIgK": "${FEATURES_TOKEN}",
+  "widgetBaseUrl": "${WIDGET_LOCATION}",
+  "apiUrl": "${SERVER_BASE_URL}",
+  "wsUrl": "${WS_URL}",
+  "wsUrlRel": "${WS_URL_RELATIVE}",
+  "brandSrc": "${BRAND_SRC}",
+  "globalRemoteJSSrc": "${REMOTE_JS_SRC}",
+  "dashboardBaseUrl": "${DASHBOARD_URL}",
+  "uploadEngine": "${UPLOAD_ENGINE}",
+  "baseImageUrl": "${API_BASEIMAGE_URL}",
+  "logLevel": "${LOG_LEVEL}",
+  "chatStoragePrefix": "${CHAT_STORAGE_PREFIX}",
+  "firebase": {
+    "apiKey": "${FIREBASE_APIKEY}",
+    "authDomain": "${FIREBASE_AUTHDOMAIN}",
+    "databaseURL": "${FIREBASE_DATABASEURL}",
+    "projectId": "${FIREBASE_PROJECT_ID}",
+    "storageBucket": "${FIREBASE_STORAGEBUCKET}",
+    "messagingSenderId": "${FIREBASE_MESSAGINGSENDERID}",
+    "appId": "${FIREBASE_APP_ID}",
+    "vapidKey": "${FIREBASE_VAPID}"
+  }
+}

@@ -274,7 +274,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   goToDashboardLogin(){
-    let DASHBOARD_URL = this.appConfigService.getConfig().dashboardUrl + '#/login'
+    let DASHBOARD_URL = this.appConfigService.getConfig().dashboardBaseUrl + '#/login'
     const myWindow = window.open(DASHBOARD_URL, '_self');
     myWindow.focus();
   }

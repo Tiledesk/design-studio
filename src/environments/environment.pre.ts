@@ -4,14 +4,14 @@ export const environment = {
   VERSION: require('../../package.json').version,
   remoteConfig: false, 
   remoteConfigUrl: './design-studio-config.json',
-  apiUrl: 'http://localhost:3000/',
-  widgetBaseUrl: 'http://localhost:4200/',
-  dashboardBaseUrl: 'http://localhost:4200/',
+  apiUrl: 'CHANGEIT',
+  widgetBaseUrl: 'CHANGEIT',
+  dashboardBaseUrl: 'CHANGEIT',
   wsUrl: 'ws://localhost:3000/',
   uploadEngine: 'native',
   baseImageUrl: 'CHANGEIT',
   logLevel: 'error',
-  storage_prefix: "dashboard_sv6",
+  storage_prefix: "CHANGEIT",
   firebaseConfig: {
     apiKey: 'CHANGEIT',
     authDomain: 'CHANGEIT',
@@ -23,3 +23,12 @@ export const environment = {
     vapidKey: 'CHANGEIT'
   }
 };
+
+
+
+
+
+
+
+
+
