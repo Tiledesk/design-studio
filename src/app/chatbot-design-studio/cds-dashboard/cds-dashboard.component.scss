@@ -1,7 +1,6 @@
 @import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/cds/styles.scss";
 
-
 cds-header {
   height: $header-height;
   font-family: $mdb-font-family-poppins;
@@ -22,7 +21,7 @@ cds-header {
   overflow-x: hidden;
   overflow-y: hidden;
   font-family: $mdb-font-family-poppins;
-  color: #394f5a;
+  color: $blu;
   font-size: 16px;
 }
 

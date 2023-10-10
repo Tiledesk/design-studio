@@ -394,3 +394,14 @@ appdashboard-cds-dashboard a {
     color: $blu;
     font-weight: 600;
 }
+
+img.active-icon {
+    filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+}
+img.base-icon-color{
+    filter: brightness(0) saturate(100%) invert(83%) sepia(87%) saturate(3891%) hue-rotate(177deg) brightness(92%) contrast(89%);
+}
+
+img.hover-icon{
+    filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%);
+}

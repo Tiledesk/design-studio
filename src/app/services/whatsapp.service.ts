@@ -40,7 +40,7 @@ export class WhatsappService {
       })
     }
 
-    const url = this.WHATSAPP_API_URL + "/ext/templates/" + this.project_id;
+    const url = this.WHATSAPP_API_URL + "/api/templates/" + this.project_id;
     this.logger.log('[WHATSAPP.SERV] - GET *ALL* TEMPLATES - URL', url);
 
     return this.httpClient.get<any[]>(url, httpOptions)

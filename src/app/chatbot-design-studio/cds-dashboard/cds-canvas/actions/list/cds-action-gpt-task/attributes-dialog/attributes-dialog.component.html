@@ -1,0 +1,25 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>Set Attributes</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+
+    <form>
+        <div class="tpl-modal-content">
+
+            <div *ngFor="let attr of data.attributes" style="margin-bottom: 14px;">
+                <div class="attr-container">{{ attr.name }}</div>
+                <input class="tpl-input" name="{{attr.name}}" [(ngModel)]="attr.value" (input)="onChangeInput()" (keyup.enter)="setVarBtn.click()">
+            </div>
+
+        </div>
+        <div class="tpl-modal-buttons">
+            <button id="cds-cancel-btn" class="btn btn-cancel" type="button" [mat-dialog-close]="false">Cancel</button>
+            <button #setVarBtn id="cds-publish-btn" class="btn btn-primary set-var-btn" type="button" [disabled]="btn_disabled"
+                (click)="onGenerateClick()">Generate
+            </button>
+        </div>
+    </form>
+</div>

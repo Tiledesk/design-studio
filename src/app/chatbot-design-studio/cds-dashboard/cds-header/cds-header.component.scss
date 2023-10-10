@@ -43,6 +43,10 @@ $margin-top-card: 30px;
     .header-go-back {
         cursor: pointer;
         position: relative;
+
+        .cds-text{
+            font-weight: 700;
+        }
     }
     .toggle-setting-sidebar-icon-wpr {
         position: absolute;
@@ -104,7 +108,7 @@ $margin-top-card: 30px;
     background-color: #45c351; 
     color: #fff;
     img {
-        margin-right: 6px;
+        width: 14px;
         vertical-align: text-top;
         filter: brightness(0) saturate(100%) invert(99%) sepia(0%) saturate(2%) hue-rotate(182deg) brightness(111%) contrast(101%)
     }
@@ -116,6 +120,7 @@ $margin-top-card: 30px;
     outline: 1px solid $blu-02;
     outline-offset: -1px;
     color: $blu-02;
+    border-radius: 50%;
 }
 
 #cds-publish-btn:hover,

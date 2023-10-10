@@ -21,7 +21,7 @@ export class CdsPanelElementsComponent implements OnInit {
   @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
   isOpen: boolean = false;
   isOverMenu: boolean = false;
-  positionMenu: any = {'x': 80, 'y': 0 };
+  positionMenu: any = {'x': 85, 'y': 0 };
   isDraggingMenuElement: boolean = false;
   menuType: string;
   menuCategory: string;
@@ -59,7 +59,7 @@ export class CdsPanelElementsComponent implements OnInit {
       console.log('[CDS-PANEL-ELEMENTS] onMouseOverElement :::: ', y, this.isDraggingMenuElement);
       this.isOpen = true;
       if(this.isDraggingMenuElement == false){
-        this.positionMenu = {'x': 80, 'y': y }
+        this.positionMenu = {'x': 85, 'y': y }
       }
     }, 0);
   }

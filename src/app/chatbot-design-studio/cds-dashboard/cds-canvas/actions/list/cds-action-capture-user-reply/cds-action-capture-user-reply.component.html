@@ -22,8 +22,8 @@
 
     <div id="capture-user-reply" class="previewContent">
         
-        <label class="title-preview-label">Capture user reply
-            <span *ngIf="action?.assignResultTo">to </span>
+        <label class="title-preview-label">Capture user reply to
+            <span *ngIf="!action?.assignResultTo" class="action-row-right empty">select attribute</span>
             <span *ngIf="action?.assignResultTo" style="font-weight: 600;">{{ action?.assignResultTo }}</span>
 
         </label>
@@ -64,7 +64,7 @@
     <div style="margin-top: 40px;">
         <div class="condition-container">
             <div class="icon-action">
-                <img src="assets/cds/images/actions/connect_intent.svg">
+                <img src="assets/images/actions/connect_intent.svg">
             </div>
             <span class="condition-text">Then go to block</span>
         </div>

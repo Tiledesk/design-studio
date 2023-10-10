@@ -100,17 +100,7 @@ cds-fulfillment {
   z-index: 1050;
 }
 
-.toggle-setting-sidebar-icon {
-  background: #1e293b;
-  color: #fff;
-  border: 1px solid #394f5a !important;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  font-size: 18px;
-  display: block;
-}
+
 
 
   .box-left {
@@ -182,20 +172,20 @@ cds-fulfillment {
     }
 
     .toggle-setting-sidebar-icon {
-        background: #1e293b;
-        color: #fff;
-        border: 1px solid #394f5a !important;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        font-size: 18px;
-        display: block;
+      background: $blu;
+      color: #fff;
+      border: 1px solid $blu !important;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      font-size: 18px;
+      display: block;
     }
 
     .toggle-setting-sidebar-icon:hover {
         background: #f5f8fa;
-        color: #1e293b;
+        color:  $blu;
     }
   }
 
@@ -287,7 +277,8 @@ cds-fulfillment {
   position: relative;
   display: block;
   background-size: 16px 16px;
-  background-image: radial-gradient(rgb(218, 226, 226) 1.14286px, rgb(244, 246, 246) 1.14286px);
+  background-image: radial-gradient(rgb(214 226 226 / 60%) 1.14286px, rgb(255 255 255) 1.14286px);
+  // background-image: radial-gradient(rgb(218, 226, 226) 1.14286px, rgb(244, 246, 246) 1.14286px);
   background-position: 593.4px -230.4px;
 }
 

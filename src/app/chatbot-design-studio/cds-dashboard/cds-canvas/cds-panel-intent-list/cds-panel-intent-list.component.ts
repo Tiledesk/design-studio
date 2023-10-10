@@ -39,7 +39,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   idSelectedIntent: string;
 
 
-  ICON_DEFAULT = 'label_important_outline';
+  ICON_DEFAULT = 'package_2';
   ICON_ROCKET = 'rocket_launch';
   ICON_UNDO = 'undo';
 
