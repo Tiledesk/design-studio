@@ -18,5 +18,5 @@ jobs:
       with:	    
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: tiledesk/designStudio
+        repository: tiledesk/design_studio
         tags: latest
