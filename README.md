@@ -1,4 +1,5 @@
-# Tiledesk Design Studio
+#![123 Anywhere St , Any City (1)](https://github.com/Tiledesk/design-studio/assets/113347904/2117541b-fd45-4a15-bdb1-fc0d4baeca3b)
+ Tiledesk Design Studio
 
 Tiledesk is an open-source, no-code development platform for creating chatbots and conversational apps. Our Design Studio, featured in this repository, offers a user-friendly, drag-and-drop interface with pre-ready actions and integrations. This platform combines the power of LLM/GPT AI with a flexible 'graph' approach for creating conversations and automations with ease.
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.6.
