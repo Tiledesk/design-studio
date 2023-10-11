@@ -19,6 +19,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 - **WhatsApp Integration:** Convert website conversations into WhatsApp chats.
 - **Send Email:** Send emails from your platform and set up email triggers that send emails automatically.
 - **Light Integration:** Enhance your existing setup with our seamless and non-disruptive integration feature. Experience an upgrade without upheaval.
+![123 Anywhere St , Any City (3)](https://github.com/Tiledesk/design-studio/assets/113347904/bb52e4ff-6d58-4097-a8fd-e65b16255fe6)
 
 ## Development server
 
