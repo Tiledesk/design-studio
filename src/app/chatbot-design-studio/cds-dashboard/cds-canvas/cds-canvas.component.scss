@@ -5,7 +5,7 @@
 $width-card-tools: 160px;
 $margin-left-card: 30px;
 $margin-top-card: 30px;
-$box-left-width: 250px;
+$box-left-width: 230px;
 $box-left-width-closed: 0px;
 
 
@@ -107,7 +107,8 @@ cds-fulfillment {
     width: $box-left-width;
     max-width: $box-left-width;
     min-width: $box-left-width;
-    background-color: $blu-light-01;
+    background-color: white;
+    border-right: 1px solid $gray-light-02;
     z-index: 10;
     position: relative;
     .panel-intent-list {

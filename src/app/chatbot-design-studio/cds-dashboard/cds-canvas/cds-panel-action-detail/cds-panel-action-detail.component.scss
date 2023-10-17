@@ -11,11 +11,10 @@ $padding: 10px;
     height: 100%; //auto
     max-height: 100%;
     // border-radius: 16px;
-    // border: 2px solid rgb(178,142,38);
-    // border-left: 2px solid rgb(178,142,38);
     overflow: hidden;
     padding: 0;
-    background-color: #51627e;
+    background-color: white;
+    border-left: 1px solid $gray-light-02;
     // margin: 0 auto 0 auto; // nk
     inset: 0 0 0 200px;
 }
@@ -25,12 +24,12 @@ $padding: 10px;
     top: 0;
     left: 0;
     right: 0;
-    background-color: #51627e;
+    background-color: $blu-light-03;
     z-index: 2;
 }
 .content-panel{
     // height: calc(100% - 73px); // nk
-    height: calc(100% - 100px); // nk
+    // height: calc(100% - 100px); // nk
     // overflow: hidden; // nk
     overflow: hidden auto;
 }

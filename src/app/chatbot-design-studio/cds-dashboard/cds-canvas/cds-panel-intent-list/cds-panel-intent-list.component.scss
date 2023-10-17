@@ -141,6 +141,10 @@ $icon-color-active: $blu;
     height: 100%;
     align-items: center;
     color: $blu-light-02;
+
+    img.active-icon {
+        filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+    }
 }
 
 .custom-divider {

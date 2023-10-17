@@ -3,16 +3,18 @@
 :host{
     --cardImageHeight: 150px;
     --cardWidth: 220px;
+    --border-color: #{$blu-light-01};
+    --base-color: #{$blu-light-02};
 }
 
 
 .extensions-response {
     font-size: $font-size-base;
     position: relative;
-    width: 100%;
+    width: calc(100% - 6px);
     height: auto;
-    margin: 27px 0px 0px 0px;
-    padding: 0px 33px;
+    margin: 27px 0px 5px 0px;
+    padding: 0px 30px;
     display: flex;
     flex-wrap: wrap;
     row-gap: 5px;
@@ -31,6 +33,31 @@
         left: 0px;
         opacity: 0;
         transition: opacity 0.3s ease-in-out;
+    }
+
+    .add-filter-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 0px 9px;
+        height: 26px;
+        font-size: .9em;
+        font-weight: 400;
+        border-radius: 13px;
+        transition: all 0.3s ease 0s;
+        background: $blu;
+        color: $blu-light-01;
+    
+        span.material-icons-outlined{
+            font-size: 20px;
+            color: white;
+        }
+    
+        &:hover{
+            opacity: 0.8;
+            cursor: pointer;
+        }
     }
 }
 
@@ -124,17 +151,6 @@
         
     }
 
-    .button-reply{
-        min-width: 200px;
-        padding: 2px 10px;
-    }
-
-    .content-botton-reply {
-        position:relative;
-        height: 26px;
-    }
-
-
 
     /** BUTTONS **/
     .buttons-response {
@@ -161,25 +177,17 @@
         align-items: flex-end;
 
         .button-reply-add{
-            color: $color-txt-2-hex;
-            border-color: $color-txt-2-hex;
+            color: var(--base-color);
+            border-color: var(--base-color);
         }
     }
 
-    .button-reply {
-        margin: 0px; //10px 5px 0;
-        border: 1px solid $color-blue-hex;
-        font-size: 0.7em;
-        font-weight: 500;
-        line-height: $button-height-base;
-        transition: all .3s;
-        &.custom-placeholder {
-            margin: 10px 5px;
-            background: #dfdfdf;
-            border: dotted 0px #999;
-            height: $button-height-base;
-            transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-        }
+    .custom-placeholder {
+        margin: 10px 5px;
+        background: #dfdfdf;
+        border: dotted 0px #999;
+        height: $button-height-base;
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
     }
 
     .button-controls{
@@ -205,20 +213,20 @@
         &.delete{
             height: 24px;
             width: 24px;
-            background: $color-bck-gray-hex;
+            background: var(--base-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             em {
                 font-size: 1.15em;
-                color: $color-withe-hex;
+                color: $blu;
                 transition: color .3s;
             }
         }
     }
     .control-button:hover{
-        color: $color-withe-hex;
+        color: var(--base-color);
         &.delete{
             box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
             em {
@@ -261,9 +269,7 @@
     box-sizing: border-box;
     outline: none;
     background: $color-withe-hex;
-    // border: 1px solid $color-blue-hex;
     border-radius: $button-border-radius-base;
-    color: $color-blue-hex;
     cursor: pointer;
     font-size: 1em;
     font-weight: 500;
@@ -312,7 +318,7 @@
         -ms-flex-align: center;
         align-items: center;
         justify-content: center;
-        border-top: 1px solid $icon-color;
+        border-top: 1px solid var(--base-color);
         cursor: pointer;
         display: -webkit-box;
         display: -ms-flexbox;
@@ -372,16 +378,16 @@
         flex-direction: row;
 
         .gallery-buttons-add-lines{
-            border-top: 1px dashed #b4c0c7;
-            border-bottom: 1px dashed #b4c0c7;
-            width: 28px;
+            border-top: 1px dashed var(--base-color);
+            border-bottom: 1px dashed var(--base-color);
+            width: 20px;
             height: 0;
         }
     }
 
     .gallery-buttons-add-lines{
-        border-left: 1px dashed #b4c0c7;
-        border-right: 1px dashed #b4c0c7;
+        border-left: 1px dashed var(--base-color);
+        border-right: 1px dashed var(--base-color);
         height: 28px;
         width: 0;
     }
@@ -413,31 +419,25 @@
 
         }
 
-        .cds-add-action-btn > span {
-            font-size: 20px;
-            color: $icon-color;
-            top: 0;
+        .cds-add-action-btn {
+            background-color: var(--base-color);
+            color: white;
         }
 
-        .cds-add-action-btn:hover{
-            background: $icon-color;
-            span {
-                color: white;
-            }
+        .cds-add-action-btn:hover,
+        .action--text:hover{
+            opacity: 0.5;
         }
 
         .action--text {
             position: absolute;
             top: 0;
             left: 30px;
-            color: $icon-color;
+            color: var(--base-color);
             font-size: 14px;
             white-space: nowrap;
             // z-index: 1;
             cursor: pointer;
-        }
-        .action--text:hover {
-            color: rgba($icon-color, 0.8);
         }
 
     }
@@ -450,11 +450,12 @@
     height: 100%;
     max-width: var(--cardWidth);
     user-select: none;
-    color: $color-blue-hex;
     cursor: pointer;
     font-size: 1em;
     font-weight: 500;
     line-height: $button-height-base;
+    border: 1px solid var(--border-color);
+    border-radius: $button-border-radius-base;
     text-align: center;
     box-sizing: border-box;
     margin: 0;
@@ -469,7 +470,7 @@
     position: relative;
     -webkit-transition: opacity .3s;
     transition: opacity .3s;
-    width: 220px;
+    width: var(--cardWidth);
 
 }
 
@@ -499,37 +500,36 @@
         bottom: 0;
         right: 0;
         left: 0;
-        background-color: rgba(#b38d27, 0.5);
+        background-color: var(--border-color);
+        display: flex;
 
         &:hover{
             opacity: 0.5;
-            .control-button {
-                &.delete {
-                    // margin-right: -24px;
-                    // margin-top: calc(var(--cardImageHeight)/2);
-                    // margin-right: calc(var(--cardWidth)/2);
-                    opacity: 1;
-                    display: flex;
-                    bottom: 0;
-                    left: 0;
-                    top: 0;
-                    right: 0;
-                    justify-content: center;
-                    align-items: center;
-                }
+            .control-button{
+                opacity: 1;
             }
         }
 
         .control-button {
-            &.delete {
-                color: $color-withe-hex;
+            cursor: pointer;
+            color: $color-bck-gray-hex;
+            transition: color .3s;
+            height: 20px;
+            opacity: 0;
+            &.delete{
+                height: 24px;
+                width: 24px;
+                background: var(--base-color);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 position: absolute;
-                top: 0px;
-                right: 0px;
-                margin-right: 0px;
-                opacity: 0;
-                cursor: pointer;
-                transition: all .3s ease-in-out;
+                em {
+                    font-size: 1.15em;
+                    color: $blu;
+                    transition: color .3s;
+                }
             }
         }
 
@@ -540,13 +540,11 @@
 cds-image-upload ::ng-deep {
     div.dropUploadImage{
         min-height: unset !important;
+        margin: 10px;
     }
     div.image{
         height: 20px !important;
         width: 20px !important;
-        img{
-            filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%) hue-rotate(187deg) brightness(113%) contrast(117%);
-        }
     }
     div.labelDropUploadImage{
         font-size: 12px;
@@ -571,9 +569,9 @@ cds-image-upload ::ng-deep {
     user-select: none;
     box-sizing: border-box;
     outline: none;
-    border: 1px dashed $color-withe-hex;;
+    border: 1px dashed var(--base-color);
     border-radius: $button-border-radius-base;
-    color: $color-withe-hex;
+    color: var(--base-color);
     cursor: pointer;
     font-size: 0.7em;
     font-weight: 400;
@@ -604,8 +602,8 @@ cds-image-upload ::ng-deep {
     }
     .control-button {
         cursor: pointer;
-        background: $color-bck-gray-hex;
-        color: $color-bck-gray-hex;
+        background: $blu-light-02;
+        color: $blu;
         transition: color .3s;
         height: 24px;
         width: 24px;
@@ -616,7 +614,7 @@ cds-image-upload ::ng-deep {
         margin: 0 2px;
         em {
             font-size: 1.15em;
-            color: $color-withe-hex;
+            color: $blu;
             transition: color .3s;
         }
     }
@@ -624,7 +622,7 @@ cds-image-upload ::ng-deep {
         color: $color-withe-hex;
         box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
         em {
-            color: $color-red-hex;
+            opacity: 0.8;
         }
         &.delete{
             em {
@@ -656,7 +654,8 @@ cds-image-upload ::ng-deep {
         -ms-flex-align: center;
         align-items: center;
         justify-content: center;
-        border-top: 1px solid $icon-color;
+        border-top: 1px solid var(--border-color);
+        box-sizing: border-box;
         cursor: pointer;
         display: -webkit-box;
         display: -ms-flexbox;
@@ -739,8 +738,10 @@ cds-textarea#description ::ng-deep {
                 // padding: 0px;
                 .mat-form-field-infix {
                     textarea {
-                        border-bottom: 1px solid rgb(242 205 111)!important;
-                        border-top: 1px solid rgb(242 205 111)!important;
+                        border-left: 0px solid white !important;
+                        border-right: 0px solid white !important;
+                        border-bottom: 1px solid var(--base-color) !important;
+                        border-top: 1px solid var(--base-color) !important;
                         // outline: 0px solid rgb(242 205 111) !important;
                         transition: border 0.3s;
                         
@@ -751,6 +752,8 @@ cds-textarea#description ::ng-deep {
     }
 
     textarea {
+        border-left: 0px solid white !important;
+        border-right: 0px solid white !important;
         border-bottom: 1px solid white!important;
         border-top: 1px solid white!important;
         border-radius: 0px;

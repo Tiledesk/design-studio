@@ -5,10 +5,10 @@ $max-height: 230px;
 .extensions-response {
     font-size: $font-size-base;
     position: relative;
-    width: 100%;
+    width: calc(100% - 6px);
     height: auto;
-    margin: 27px 0 0 0;
-    padding: 0px 33px;
+    margin: 27px 0px 5px 0px;
+    padding: 0px 30px;
     display: flex;
     flex-wrap: wrap;
     row-gap: 5px;
@@ -28,6 +28,31 @@ $max-height: 230px;
         opacity: 0;
         transition: opacity 0.3s ease-in-out;
         z-index: 1;
+    }
+
+    .add-filter-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 0px 9px;
+        height: 26px;
+        font-size: .9em;
+        font-weight: 400;
+        border-radius: 13px;
+        transition: all 0.3s ease 0s;
+        background: $blu;
+        color: $blu-light-01;
+    
+        span.material-icons-outlined{
+            font-size: 20px;
+            color: white;
+        }
+    
+        &:hover{
+            opacity: 0.8;
+            cursor: pointer;
+        }
     }
 }
 
@@ -218,7 +243,7 @@ $max-height: 230px;
 
 
 .response-frame-panel {
-    border: 2px dashed #eeeef1;
+    border: 2px dashed $blu-light-02;
     border-radius: 6px;
     display: flex;
     justify-content: center;
@@ -227,7 +252,7 @@ $max-height: 230px;
     text-align: center;
     margin-left: 30px;
     // margin-top: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     position: relative;
     max-width: calc(100% - 66px);
     width: auto;
@@ -336,11 +361,11 @@ $max-height: 230px;
 cds-textarea.text-editable-div ::ng-deep{
     display: block;
     margin-left: 30px;
-    width: calc(100% - 66px);
-    // margin-left: 20px;
+    margin-right: 30px;
+    // width: calc(100% - 66px);
     textarea {
         line-height: 20px !important; 
-        width: calc(100% - 20px) !important;
+        // width: calc(100% - 20px) !important;
         font-size: 0.9em !important;
     }
 }

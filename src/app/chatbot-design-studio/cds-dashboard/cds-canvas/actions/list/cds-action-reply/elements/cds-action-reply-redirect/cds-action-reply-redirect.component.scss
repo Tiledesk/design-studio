@@ -4,10 +4,10 @@
 .extensions-response {
     font-size: $font-size-base;
     position: relative;
-    width: 100%;
+    width: calc(100% - 6px);
     height: auto;
-    margin: 27px 0px 0px 0px;
-    padding: 0px 33px;
+    margin: 27px 0px 5px 0px;
+    padding: 0px 30px;
     display: flex;
     flex-wrap: wrap;
     row-gap: 5px;
@@ -54,7 +54,6 @@
         .control-label{
             margin: 0px 10px;
             font-size: 0.8em;
-            color: $color-bck-gray-hex;
 
         }
 
@@ -137,20 +136,20 @@
         &.delete{
             height: 24px;
             width: 24px;
-            background: $color-bck-gray-hex;
+            background: $blu-light-02;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             em {
                 font-size: 1.15em;
-                color: $color-withe-hex;
+                color: $blu;
                 transition: color .3s;
             }
         }
     }
     .control-button:hover{
-        color: $color-withe-hex;
+        color: $blu-light-02;
         &.delete{
             box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
             em {
@@ -170,30 +169,6 @@
     // top: -35px;
     color: #dcdcdc;
     cursor: grab;
-}
-
-/** editor-utils **/
-.editor-utils {
-    position: relative;
-    margin: -20px 50px 0px 0px;
-    float: right;
-    .num-chars {
-        // background: $color-light-gray-hex;
-        padding: 0px 8px;
-        border-radius: 12px;
-        font-size: 0.8em;
-        // color: $color-text-box-hex;
-        float: right;
-        &.error {
-            background: $color-orange-hex;
-        }
-    }
-    .text-editor-insert-attribute {
-        float: right;
-    }
-    .moji-picker {
-        float: right;
-    }
 }
 
 .url-wrp{
@@ -217,7 +192,7 @@
 
 .control-label{
     font-family: 'Poppins','Roboto',Arial,sans-serif;
-    color: #e8eaed;
+    color: $blu;
     text-align: left;
     line-height: 20px;
     font-size: 14px;
@@ -229,16 +204,24 @@
     // margin-bottom: 10px;
 }
 
-
 /** box-textarea **/
+.text-editor-wrapper {
+    font-size: $font-size-base;
+    position: relative;
+    width: 100%;
+    height: auto;
+    margin: 0px; //5px 0 0 0;
+    // padding: 0px 33px;
+}
+
 cds-textarea.text-editable-div ::ng-deep{
     display: block;
     margin-left: 30px;
-    width: calc(100% - 66px);
-    // margin-left: 20px;
+    margin-right: 30px;
+    // width: calc(100% - 66px);
     textarea {
         line-height: 20px !important; 
-        width: calc(100% - 20px) !important;
+        // width: calc(100% - 20px) !important;
         font-size: 0.9em !important;
 
         resize: none !important; 
@@ -258,10 +241,15 @@ mat-button-toggle ::ng-deep{
 }
 
 mat-button-toggle-group {
-    border: none;
+    border: 1px solid $gray-light-02;
     margin-left: 30px;
+    border-radius: 8px;
 }
 mat-button-toggle.mat-button-toggle-checked{
-    background-color: $icon-color;
-    color: white;
+    background-color: $blu;
+    color: $blu-light-02;
+}
+
+mat-button-toggle.mat-button-toggle{
+    color: $blu-light-02;
 }

@@ -8,6 +8,7 @@ cds-header {
   font-size: 21px;
   color: $blu;
   background: white;
+  border-bottom: 1px solid $gray-light-02;
   display: flex;
 }
 
@@ -29,6 +30,7 @@ cds-rules,
 cds-chatbot-details,
 cds-fulfillment {
     width: 100%;
+    overflow-y: scroll;
 }
 
 .is_opened_sidebar {
@@ -39,11 +41,12 @@ cds-fulfillment {
 
 cds-sidebar {
   background-color: $blu-light-01;
-  border-right: 2px solid $blu-light-02;
+  border-right: 1px solid $gray-light-02;
   width: $sidebar-base-width;
   transition: 0.3s;
   display: flex;
   min-width: $sidebar-base-width;
+  overflow-y: hidden;
 }
 
 .cds-content {

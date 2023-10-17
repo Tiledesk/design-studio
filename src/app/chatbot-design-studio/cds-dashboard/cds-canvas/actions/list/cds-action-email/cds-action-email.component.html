@@ -93,6 +93,25 @@
         </div>
     </div>
 
+    <div class="text-editor-wrapper">
+        <div class="text-editor">
+            <div class="email-field-box">
+                <label class="title-label">Reply to</label>
+                <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+                <!-- [limitCharsText]="150"  -->
+                <cds-textarea class="to-text-area" 
+                    [emojiPikerBtn]="false" 
+                    [textLimitBtn]="false" 
+                    [text]="action.replyto"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    popoverVerticalAlign="above"
+                    (changeTextarea)="onChangeTextarea($event, 'replyto')">
+                </cds-textarea>
+            </div>
+        </div>
+    </div>
+
     <div class="email-field-box">
         <label class="title-label">Email body</label>
         <cds-textarea class="body-text-area" 

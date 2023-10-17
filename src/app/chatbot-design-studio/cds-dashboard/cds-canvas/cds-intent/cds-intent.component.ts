@@ -633,7 +633,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     console.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', event, this.intent, this.intent.actions);
     console.log('[CDS-INTENT] onUpdateAndSaveAction:::: intent::: ', this.intent);
     // this.intentService.selectAction(this.intent.intent_id, event);
-
     const response = await this.intentService.updateIntent(this.intent);
     if (response) {
       console.log('updateIntent: ', this.intent);

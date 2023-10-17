@@ -340,16 +340,10 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
 
   /**
    * CREATE FAQ (POST)
-   * @param id_faq_kb 
-   * @param question 
-   * @param answer 
-   * @param intent_display_name 
-   * @param intent_form
-   * @param intent_reply
-   * @param webhook_enabled 
+   * @param intent 
    * @returns 
    */
-   public addIntent(id_faq_kb: string, attributes: any, question: any, answer: string, intent_display_name: string, intent_id: string, intent_form: any, intent_actions: any, webhook_enabled: boolean) {
+  public addIntent(intent: any) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -358,54 +352,31 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     };
     const url = this.FAQ_URL;
     this.logger.log('[FAQ-SERV] ADD FAQ -  PUT URL ', url);
-    const body = { 
-      'id_faq_kb': id_faq_kb, 
-      'attributes': attributes,
-      'question': question, 
-      'answer': answer, 
-      'intent_display_name': intent_display_name, 
-      'intent_id': intent_id,
-      'form': intent_form,
-      'actions': intent_actions,
-      'webhook_enabled': webhook_enabled 
-    };
-    this.logger.log('[FAQ-SERV] ADD FAQ - POST BODY ', body);
-    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
+    this.logger.log('[FAQ-SERV] ADD FAQ - POST BODY ', intent);
+    return this._httpClient.post(url, JSON.stringify(intent), httpOptions)
   }
 
   /**
    * UPDATE FAQ (PUT)
-   * @param id 
-   * @param question 
-   * @param answer 
-   * @param intent_display_name 
-   * @param intent_form 
-   * @param intent_reply 
-   * @param webhook_enabled 
+   * @param intent
    * @returns 
    */
-   public updateIntent(id: string, attributes: any, question: any, answer: string, intent_display_name: string, intent_form: any, intent_actions: any, webhook_enabled: boolean) {
+  public updateIntent(intent: any) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': this.tiledeskToken
       })
     };
-    this.logger.log('[FAQ-SERV] UPDATE FAQ - ID ', id);
-    let url = this.FAQ_URL + id; 
+    this.logger.log('[FAQ-SERV] UPDATE FAQ - ID ', intent._id);
+    let url = this.FAQ_URL + intent._id; 
+    if(intent.intent_id) url = this.FAQ_URL + 'intentId' + intent.intent_id; 
+    
     this.logger.log('[FAQ-SERV] UPDATE FAQ - PUT URL ', url);
-    const body = { 
-      'attributes': attributes, 
-      'question': question, 
-      'answer': answer, 
-      'intent_display_name': intent_display_name, 
-      'form': intent_form,
-      'actions': intent_actions,
-      'webhook_enabled': webhook_enabled 
-    };
-    this.logger.log('----------->>>', intent_actions, body);
-    this.logger.log('[FAQ-SERV] UPDATE FAQ - PUT REQUEST BODY ', body);
-    return this._httpClient.put(url, JSON.stringify(body), httpOptions);
+
+    this.logger.log('----------->>>', intent);
+    this.logger.log('[FAQ-SERV] UPDATE FAQ - PUT REQUEST BODY ', intent);
+    return this._httpClient.put(url, JSON.stringify(intent), httpOptions);
   }
 
 

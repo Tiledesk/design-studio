@@ -88,19 +88,7 @@ svg {
     // max-height: calc(100vh - 200px); // nk
 
 }
-.footer-panel-intent-detail {
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    // left: 0;
-    // right: 0;
-    background-color: #51627e;
-    z-index: 2;
-    height: 42px;
-    margin: auto 0;
-    padding: 7px 20px;
-    border-top: 2px solid rgb(66, 85, 117);
-}
+
 
 .cds-custom-tooltip {
     background-color: #fff;
@@ -119,25 +107,6 @@ emoji-mart {
     float: right;
     ::ng-deep section.emoji-mart {
         border: 0;
-    }
-}
-.emoji-picker {
-    .emoji-picker-button {
-        align-items: center;
-        background: #fff;
-        border-radius: 100%;
-        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
-        cursor: pointer;
-        display: flex;
-        height: 23px;
-        justify-content: center;
-        margin-right: 5px;
-        width: 23px;
-        color: #647283;
-        &:hover {
-            background: #006cff;
-            color: #fff;
-        }
     }
 }
 
@@ -395,9 +364,23 @@ appdashboard-cds-dashboard a {
     font-weight: 600;
 }
 
+.footer-panel-intent-detail {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    // left: 0;
+    // right: 0;
+    z-index: 2;
+    height: 42px;
+    margin: auto 0;
+    padding: 7px 20px;
+    border-top: 1px solid $gray-light-02;
+}
+
 img.active-icon {
     filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
 }
+
 img.base-icon-color{
     filter: brightness(0) saturate(100%) invert(83%) sepia(87%) saturate(3891%) hue-rotate(177deg) brightness(92%) contrast(89%);
 }

@@ -10,6 +10,8 @@
   --base-border-radius-preview: #{$border-radius-base-preview};
   --base-padding-preview: #{$padding-base-preview};
   --action-selected-color: #{$accent-blue};
+
+  --startIntentMaxWith: 160px;
 }
 
 
@@ -49,6 +51,8 @@
     background-color: unset;
     padding: 0;
     border-radius: unset;
+    max-width: var(--startIntentMaxWith);
+    outline: unset;
   }
 
 
@@ -182,7 +186,7 @@
     box-shadow: #00000052 0 -1px inset;
     background-color: #4b5052;
     border-radius: 22px;
-    max-width: 160px;
+    max-width: var(--startIntentMaxWith);
     right: 0;
     cursor: pointer;
     opacity: 1;

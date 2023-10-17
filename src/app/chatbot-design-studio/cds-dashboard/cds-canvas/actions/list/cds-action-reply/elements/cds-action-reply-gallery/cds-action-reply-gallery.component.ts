@@ -35,12 +35,14 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   delayTime: number;
   // Filter // 
   canShowFilter: boolean = true;
+  filterConditionExist: boolean = false;
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
   typeActions = TYPE_ACTION;
   gallery: Array<GalleryElement>;
   // Textarea //
   activateEL: { [key: number]: {title: boolean, description: boolean} } = {};
   // Buttons //
+  TYPE_BUTTON = TYPE_BUTTON;
   buttons: Array<Button>;
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -70,6 +72,10 @@ export class CdsActionReplyGalleryComponent implements OnInit {
         this.updateConnector();
       });
       this.idIntent = this.idAction.split('/')[0];
+
+      if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
+        this.filterConditionExist = true
+      }
     } catch (error) {
       this.logger.log('onAddNewResponse ERROR', error);
     }
@@ -247,6 +253,7 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
+    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
     this.changeActionReply.emit();
   }
 
@@ -289,10 +296,26 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     this.openButtonPanel.emit(button);
   }
 
-
+  /** onDeleteButton */ 
   onDeleteButton(indexGallery: number, index){
     this.gallery[indexGallery].buttons.splice(index, 1);
     this.changeActionReply.emit();
+  }
+
+  /** onButtonControl */
+  onButtonControl(action: string, indexGallery: number, index){
+    switch(action){
+      case 'delete': /** onDeleteButton */
+        this.onDeleteButton(indexGallery, index)
+        break;
+      case 'moveLeft':
+        break;
+      case 'moveRight':
+        break;
+      case 'new': /** onCreateNewButton */
+        this.onAddButton(indexGallery);
+        break;
+    }
   }
 
   /** dropButtons */

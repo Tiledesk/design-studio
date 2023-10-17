@@ -37,7 +37,7 @@
     <div class="section">
         <div class="action-title">
             <div class="icon-action">
-                <img [src]="element?.src" [title]="element?.name">
+                <img class="active-icon" [src]="element?.src" [title]="element?.name">
             </div>
             <p class="label-action">{{element?.name}}</p>
             <span *ngIf="!previewMode && element?.status ==='beta'" class="trigger-beta-badge">Beta</span>
@@ -47,7 +47,7 @@
             <div *ngIf="element?.description"
                 [satPopoverAnchor]="descriptionTooltip"
                 (click)="descriptionTooltip.toggle()">
-                <em class="material-icons">info</em>
+                <span class="material-icons-outlined">info</span>
             </div>
         
             <div [innerHtml]="tipText"></div>

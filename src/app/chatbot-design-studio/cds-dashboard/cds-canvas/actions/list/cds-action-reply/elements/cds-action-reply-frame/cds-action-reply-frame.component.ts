@@ -34,6 +34,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
   delayTime: number;
   // Filter // 
   canShowFilter: boolean = true;
+  filterConditionExist: boolean = false;
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -53,7 +54,11 @@ export class CdsActionReplyFrameComponent implements OnInit {
     this.frameHeight = this.response.metadata.height?this.response.metadata.height:MESSAGE_METADTA_HEIGHT;
     if(this.response.metadata.src){
       this.framePath = this.sanitizer.bypassSecurityTrustResourceUrl(this.response.metadata.src?this.response.metadata.src:null);
-    }     
+    }    
+    
+    if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
+      this.filterConditionExist = true
+    }
   }
 
 
@@ -76,6 +81,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
+    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
     this.changeActionReply.emit();
   }
 

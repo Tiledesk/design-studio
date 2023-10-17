@@ -22,14 +22,14 @@
         <div *ngIf="showUtils === true" unselectable="on" tabIndex="-1" class="editor-utils">
 
             <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="addVariable.toggle(); openSetAttributePopover();">
-                <span class="material-icons " style="font-size: 16px;">
+                <span class="material-icons" style="font-size: 16px;">
                     data_object
                 </span>
             </div>
     
             <div *ngIf="emojiPikerBtn" class="emoji-picker">
                 <div class="emoji-picker-button" aria-expanded="false" [satPopoverAnchor]="emojiPicker" (click)="emojiPicker.toggle();">
-                    <span class="material-icons" style="font-size: 16px;">
+                    <span class="material-icons-outlined" style="font-size: 16px;">
                         emoji_emotions
                     </span>
                 </div>

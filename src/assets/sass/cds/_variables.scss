@@ -78,10 +78,6 @@ $height-header: 25px;
 $padding-base: 15px !default;
 $margin-base: 15px !default;
 
-$button-height-base: 20px; //32px;
-$button-max-width-base: 240px;
-$button-border-radius-base: 16px;
-
 $label-height-base: 48px;
 
 $icon-color: #ecb606b0;
@@ -98,8 +94,7 @@ $panel-border-radius: 16px;
 $deep-brown: #6c6859;
 $light-brown: #e8e6dd;
 
-$success-connector: rgb(44, 191, 35);
-$failure-connector: rgb(191, 35, 35);
+
 
 $action-item-color: #d2e3fc;
 $action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
@@ -152,11 +147,23 @@ $blu: #506493;
 $blu-02: rgb(91, 114, 167);
 $blu-light-01: rgb(244, 246, 251);
 $blu-light-02: #b6c2df;
+$blu-light-03: rgb(224, 227, 241);
+$blu-light-04: rgb(237, 239, 248);
 $gray: rgb(112, 112, 112);
 $gray-02: rgb(239,241,245);
 $gray-light-01: rgb(214, 214, 214);
+$gray-light-02: rgb(223, 227, 237);
 
+$success-connector: rgb(44, 191, 35);
+$failure-connector: rgb(191, 35, 35);
 
 $header-height: 60px;
 $sidebar-base-width: 60px;
 $btn-border-radius: 16px;
+
+//reply buttons
+$button-height-base: 20px; //32px;
+$button-max-width-base: 240px;
+$button-min-width-base: 95px;
+$button-min-width-preview: 200px;
+$button-border-radius-base: 16px;

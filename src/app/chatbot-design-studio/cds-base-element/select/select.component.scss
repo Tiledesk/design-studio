@@ -1,5 +1,12 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+.select-itme-wrp{
+    width: 100%; 
+    display: flex; 
+    flex-direction: row;
+    align-items: center;
+}
+
 ::ng-deep{
 
     
@@ -12,7 +19,7 @@
             span.material-icons{
                 font-size: 20px;
                 padding: 0px 4px;
-                color: $icon-color;
+                color: $blu-light-02;
 
                 &.intent-start{
                     color: #0aae10;
@@ -24,6 +31,8 @@
 
             span.label-select {
                 margin-right: 4px;
+                color: $blu;
+                line-height: 17px;
             }
 
             span.label-select-option {
@@ -39,21 +48,21 @@
                 text-overflow: ellipsis;
             }
 
-            &.ng-option-marked {
-                background-color: rgba(#545454, .23) !important;
-            }
+            // &.ng-option-marked {
+            //     // background-color: rgba($blu-light-02, .23) !important;
+            // }
 
-            &.ng-option-selected{
-                background-color: rgba(#545454, .43) !important;
+            // &.ng-option-selected{
+            //     // background-color: rgba($blu-light-02, .43) !important;
 
-                span.label-select-option {
-                    color: #848484;
-                }
+            //     // span.label-select-option {
+            //     //     color: #848484;
+            //     // }
 
-                span.description {
-                    color: #848484;
-                }
-            }
+            //     // span.description {
+            //     //     color: #848484;
+            //     // }
+            // }
 
             &:hover {
                 .icon-container {
@@ -75,7 +84,7 @@
             span.material-icons{
                 font-size: 20px;
                 padding: 0px 4px;
-                color: $icon-color;
+                color: $blu-light-03;
 
                 &.intent-start{
                     color: #0aae10;
@@ -88,6 +97,7 @@
 
             span.label-select {
                 margin-right: 4px;
+                color: $blu
             }
 
             span.label-select-option {
@@ -97,21 +107,24 @@
         }
 
         .ng-clear-wrapper{
-            height: 17px;
-            width: 17px;
+            height: 14px;
+            width: 14px;
+            display: flex;
         }
 
     } 
 
     .ng-value-container .ng-input{
         display: flex;
-        top: 0px !important;
-        height: 43px;
+        // top: 0px !important;
+        // height: 43px;
     }
 
     .ng-clear-wrapper{
-        height: 17px;
-        width: 17px;
+        height: 14px;
+        width: 14px;
+        display: flex;
+
     }
 
     .ng-dropdown-panel .ng-dropdown-footer {

@@ -22,8 +22,8 @@ mat-form-field.mat-focused ::ng-deep {
             padding: 0px;
             .mat-form-field-infix {
                 textarea {
-                    border: 1px solid rgb(242 205 111) !important;
-                    outline: 0px solid rgb(242 205 111) !important;
+                    border: 1px solid $blu-01 !important;
+                    outline: 0px solid $blu-01 !important;
                     transition: border 0.3s;
                     &.invalid{
                         border: 1px solid red !important;
@@ -64,10 +64,10 @@ mat-form-field.box-textarea ::ng-deep {
     textarea {
         border-radius: 8px;
         background: $color-withe-hex;
-        border: 1px solid $color-withe-hex;
+        border: 1px solid $blu-light-02 !important;
         overflow-x: hidden;
         overflow-y: auto;
-        color: $color-text-dark-hex;
+        color: $gray;
         font-size: 1.15em;
         line-height: 25px;
         resize: vertical;
@@ -99,19 +99,20 @@ mat-form-field.box-textarea ::ng-deep {
         pointer-events: none;
         transition: background-color 0.3s, color 0.3s;
         .num-chars {
-            background: $color-light-gray-hex;
+            background: $blu-light-01;
             flex-shrink: 0;
             padding: 0px 8px;
             border-radius: 10px;
             font-size: 0.8em;
-            color: $color-text-box-hex;
+            color: $blu;
             float: right;
-            line-height: 16px;
+            line-height: 24px;
             font-weight: 700;
             width: 40px;
             text-align: center;
             &.error {
-                background: $color-orange-hex;
+                background: red;
+                color: white;
             }
         }
     }
@@ -130,35 +131,35 @@ mat-form-field.box-textarea ::ng-deep {
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;
-        height: 23px;
+        height: 24px;
+        width: 24px;
         justify-content: center;
-        margin-right: 5px;
-        width: 23px;
-        color: #647283;
+        color: $blu;
+        border: 1px solid $blu-light-02;
         &:hover {
-            background: #006cff;
+            background: $blu;
             color:#fff ;
         }
     }
-    // .emoji-picker {
-    //     .emoji-picker-button {
-    //         align-items: center;
-    //         background: #fff;
-    //         border-radius: 100%;
-    //         box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
-    //         cursor: pointer;
-    //         display: flex;
-    //         height: 23px;
-    //         justify-content: center;
-    //         margin-right: 5px;
-    //         width: 23px;
-    //         color: #647283;
-    //         &:hover {
-    //             background: #006cff;
-    //             color:#fff ;
-    //         }
-    //     }
-    // }
+    .emoji-picker {
+        .emoji-picker-button {
+            align-items: center;
+            background: #fff;
+            border-radius: 100%;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
+            cursor: pointer;
+            display: flex;
+            height: 24px;
+            width: 24px;
+            justify-content: center;
+            color: $blu;
+            border: 1px solid $blu-light-02;
+            &:hover {
+                background: $blu;
+                color:#fff ;
+            }
+        }
+    }
     
 }
 

@@ -1,5 +1,13 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+:host{
+    --textColor: #{$blu};
+    --backGroundColor: #{$blu-light-03};
+    --hoverBackgroundColor: #{$blu-light-03};
+
+    --border-radius-base: 8px
+}
+
 .previewContent{
     position: relative;
     display: flex;
@@ -111,7 +119,7 @@
         margin: 0px 10px;
         transition: opacity 0.3s ease 0s;
         span.text{
-            color: $icon-color;
+            color: var(--textColor);
             font-weight: 600;
         }
     }
@@ -131,7 +139,7 @@
         transition: background-color 0.3s ease 0s;
 
         span.material-icons{
-            color: $icon-color;
+            color: var(--textColor);
             font-size: 20px;
             transition: color 0.6s ease 0s;
         }
@@ -143,7 +151,7 @@
         flex-grow: 1;
         height: 0px;
         width: 0px;
-        border-top: 1px solid rgb(204, 204, 204);
+        border-top: 1px solid var(--textColor);
     }
 
     &::after{
@@ -152,7 +160,11 @@
         flex-grow: 1;
         height: 0px;
         width: 0px;
-        border-top: 1px solid rgb(204, 204, 204);
+        border-top: 1px solid var(--textColor);
+    }
+
+    &:hover{
+        opacity: 0.8;
     }
 }
 .add-conditions-group {
@@ -179,12 +191,10 @@
         position: absolute;
         right: -8px;
         top: -14px;
-        
+        transition: opacity 0.3s ease 0s;
         opacity: 0;
-
         height: 28px;
         width: 28px;
-
         -webkit-box-align: center;
         -webkit-box-pack: center;
         align-items: center;
@@ -192,21 +202,19 @@
         cursor: pointer;
         display: flex;
         justify-content: center;
-        background: rgb(255, 255, 255);
+        background: white;
         border-radius: 100%;
         transition: background-color 0.3s ease 0s;
         font-size: 12px;
 
-        span.material-icons{
+        span.material-icons,
+        span.material-icons-outlined{
             font-size: 20px;
-            color: $icon-color;
+            color: var(--textColor);
         }
 
-        &:hover{
-            background-color: $icon-color;
-            span.material-icons{
-                color: white;
-            }
+        &:hover {
+            background-color: var(--hoverBackgroundColor);
         }
     }
 }
@@ -228,7 +236,7 @@
 .condition-text {
     font-size: 14px;
     font-weight: 600;
-    color: white;
+    color: $blu;;
 }
 
   
@@ -254,15 +262,15 @@
   }
   
   ::ng-deep .mat-checkbox.mat-accent .mat-checkbox-frame {
-      border-color: $icon-color!important;
+      border-color: $blu !important;
   }
   
   // overwrite the checkbox background
   ::ng-deep .mat-checkbox-checked .mat-checkbox-background, 
   .mat-checkbox-indeterminate .mat-checkbox-background {
-      background-color: $icon-color!important;
+      background-color: $blu !important;
       .mat-checkbox-checkmark {
-          background: $icon-color!important;;
+          background: $blu !important;;
           .mat-checkbox-checkmark-path {
             stroke: white;
             stroke-width: 5px;

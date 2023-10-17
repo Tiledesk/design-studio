@@ -1,11 +1,6 @@
 @import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/cds/styles.scss";
 
-$width-card-tools: 160px;
-$margin-left-card: 30px;
-$margin-top-card: 30px;
-
-
 
 .header-left {
     // border-right: 2px solid #394f5a;
@@ -16,6 +11,7 @@ $margin-top-card: 30px;
     align-items: center;
     transition: 0.3s;
     background-color: $blu;
+    border-right: 1px solid $gray-light-02;
     img {
         width: 30px;
     }
@@ -34,6 +30,8 @@ $margin-top-card: 30px;
     justify-content: space-between;
     width: 100%;
     padding: 0px 10px;
+    box-sizing: border-box;
+
     .right-opts{
         display: flex;
         align-items: center;

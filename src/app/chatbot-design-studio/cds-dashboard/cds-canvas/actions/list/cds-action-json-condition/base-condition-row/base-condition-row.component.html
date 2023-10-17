@@ -32,7 +32,7 @@
             <div>Condition</div>
             <div class="operators-list">
                 <div class="operator" [class.active]="conditionForm.value.operator === item.type" *ngFor="let item of operatorsList" (click)="onClickOperator(item)">
-                    <img *ngIf="item.src" width="10px" [src]="item.src">
+                    <img class="active-icon" *ngIf="item.src" width="10px" [src]="item.src">
                     <div>{{item.name}}</div>
                 </div>
             </div>

@@ -99,88 +99,16 @@
 .field-box {
     display: flex;
     flex-direction: column;
-    // width: 70%;
-    min-width: 90px;
-    gap: 10px;
+    // min-width: 90px;
+    // gap: 10px;
 }
 
 .title-label {
-    color: white;
-    font-size: 18px;
+    color: $blu;
+    font-size: 16px;
     margin-bottom: 0px;
 }
 
-
-/** TEXT AREA **/
-mat-form-field.mat-focused ::ng-deep {
-    .mat-form-field-wrapper {
-        .mat-form-field-flex {
-            .mat-form-field-infix {
-                textarea {
-                    border: 1px solid $color-blue-hex!important;
-                    outline: 1px solid $color-blue-hex!important;
-                    transition: border .3s;
-                }
-            }
-        }
-    }
-}
-mat-form-field.box-textarea ::ng-deep {
-    .mat-form-field-wrapper {
-        padding-bottom:0;
-        .mat-form-field-flex {
-            border-radius: 4px 4px 0 0;
-            //padding: 0 0.75em 0 0.75em;
-            padding: 0px;
-            margin: 0;
-        }
-    }
-    .mat-form-field-underline {
-        display: none;
-    }    
-}
-
-/** box-textarea **/
-.box-textarea {
-    width: calc(100% - 40px);
-    textarea {
-        border-radius: 8px;
-        background: $color-withe-hex;
-        border: 1px solid $color-withe-hex;
-        overflow-x: hidden;
-        overflow-y: auto;
-        width: calc(100% - 2.5em);
-        padding: 20px 20px;
-        color: $color-text-dark-hex;
-        font-size: 1.15em;
-        line-height: 25px;
-        resize: vertical;
-    }
-}
-
-/** editor-utils **/
-.editor-utils {
-    position: relative;
-    margin: -20px 50px 0px 0px;
-    float: right;
-    .num-chars {
-        background: $color-light-gray-hex;
-        padding: 0px 8px;
-        border-radius: 12px;
-        font-size: 0.8em;
-        color: $color-text-box-hex;
-        float: right;
-        &.error {
-            background: $color-orange-hex;
-        }
-    }
-    .text-editor-insert-attribute {
-        float: right;
-    }
-    .moji-picker {
-        float: right;
-    }
-}
 
 /** NG-SELECT **/
 .ng-select.ng-select-focused>.ng-select-container {
@@ -188,103 +116,7 @@ mat-form-field.box-textarea ::ng-deep {
     box-shadow: inset 0 1px 1px #00000013,0 0 0 3px #007eff1a;
 }
 
-/** FORM GROUP **/
-.form-group {
-    .form-control {
-        background-size: 0 2px,0% 1px;
-    }
-}
-.form-group.is-focused {
-    .form-control {
-        background-size: 100% 2px,100% 1px;
-    }
-}
-
-.form-group.is-error {
-    .form-control {
-        outline: none;
-        background-image: linear-gradient($color-red-hex,$color-red-hex),linear-gradient($color-light-gray-hex,$color-light-gray-hex);
-        background-size: 100% 2px,100% 1px;
-        box-shadow: none;
-        transition-duration: .3s;
-    }
-    .ng-select {
-        &.form-control-select ::ng-deep .ng-select-container  { 
-            display: flex;
-            outline: none;
-            background-image: linear-gradient($color-red-hex,$color-red-hex),linear-gradient($color-light-gray-hex,$color-light-gray-hex);
-            background-size: 100% 2px,100% 1px;
-            box-shadow: none;
-            transition-duration: .3s;
-        }
-    }
-}
-
-.form-group label.control-label {
-    top: -35px; 
-    left: 0;
-    font-size: 0.8em;
-    line-height: normal;
-    position: absolute;
-    pointer-events: none;
-    transition: .3s ease all;
-    color: $color-txt-4-hex;
-
-}
-.form-group.is-empty label.control-label {
-    top: -6px;
-    left: 6px;
-    font-size: 1em;
-    line-height: normal;
-    position: absolute;
-    color: $color-txt-3-hex;
-    z-index:1;
-    pointer-events: none;
-}
-.form-group.is-focused label.control-label {
-    top: -35px; 
-    left: 0;
-    font-size: 0.8em;
-    line-height: normal;
-    position: absolute;
-    pointer-events: none;
-    transition: .3s ease all;
-    color: $color-txt-4-hex;
-}
-
-.select-intent-box {
-    width: 70%;
-    // min-width: 900px;
-}
 
 
 
-// .title-label {
-//     color: white;
-//     margin-bottom: 0px;
-//     // margin-left: 30px;
-// }
 
-.title-label {
-    color: white;
-    font-size: 18px;
-    margin-bottom: 0px;
-    // margin-left: 30px;
-}
-
-.text-action {
-    color: $icon-color;
-    margin-right: 10px;
-    margin-bottom: 0px;
-}
-
-.custom-icon {
-    color: $icon-color;
-    margin-right: 6px;
-}
-
-
-.action-type {
-    margin-bottom: 0px;
-    color: white;
-}

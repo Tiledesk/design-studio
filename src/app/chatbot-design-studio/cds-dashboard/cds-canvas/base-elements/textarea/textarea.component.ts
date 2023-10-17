@@ -52,7 +52,7 @@ export class CDSTextareaComponent implements OnInit {
   public isEmojiPickerVisible: boolean = false;
   IS_ON_MOBILE_DEVICE = false;
   emojiPerLine: number = 8;
-  emojiColor: string ="#ac8b2c";
+  emojiColor: string ="#506493";
   emojiiCategories = [ 'recent', 'people', 'nature', 'activity', 'flags'];
 
   private logger: LoggerService = LoggerInstance.getInstance()

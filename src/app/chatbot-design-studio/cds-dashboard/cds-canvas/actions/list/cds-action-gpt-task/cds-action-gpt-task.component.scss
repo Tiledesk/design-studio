@@ -624,6 +624,16 @@ div.value-wrp {
     }
 }
 
+.gpt-setting-input {
+    color: black;
+    text-align: center;
+    width: 45px;
+    border: none;
+    height: 26px;
+    border-radius: 12px;
+    background-color: aliceblue;
+}
+
 mat-expansion-panel ::ng-deep {
     background-color: transparent;
     box-shadow: none;
@@ -694,7 +704,6 @@ mat-expansion-panel ::ng-deep {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 40px;
 
     .close-button {
         cursor: pointer;
@@ -785,6 +794,17 @@ mat-expansion-panel ::ng-deep {
     margin: 0px 0px 0px 6px !important;
 }
 
+.content#variables {
+    // position: absolute;
+    // left: 440px;
+    // transition: all 0.3s ease-in;
+}
+
+// .content#variables .opened {
+//     left: 0px;
+// }
+
+
 
 .variables-content-header {
     display: flex;
@@ -823,4 +843,15 @@ mat-expansion-panel ::ng-deep {
         margin-right: 10px;
     }
 
+}
+
+.usage-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding: 0px 4px;
+    color: #a6a6a6;
+    font-size: 11px;
+    width: 100%;
 }

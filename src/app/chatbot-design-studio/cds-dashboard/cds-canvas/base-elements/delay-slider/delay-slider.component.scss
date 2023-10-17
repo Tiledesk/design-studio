@@ -1,9 +1,11 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+$background-color: $blu-light-01;
+$text-color: $blu;
 
 .delay {
     align-items: center;
-    background: $color-bck-gray-hex;
+    background: $background-color;
     border-radius: 13px;
     display: inline-flex;
     position: relative;
@@ -13,11 +15,16 @@
     text-align: center;
     transition: width .3s ease-in;
     font-size: $font-size-base;
+
+    &:hover{
+        opacity: 0.8;
+        cursor: pointer;
+    }
     // margin-top: 30px;
     .delay-current{
         display: contents;
         width: auto;
-        color: $color-light-gray-hex;
+        color: $text-color;
         cursor: pointer;
         font-size: 0.8em;
         font-weight: 400;
@@ -32,7 +39,7 @@
     }
     .delay-range {
         display: inline-flex;
-        color: $color-withe-hex;
+        color: $text-color;
         font-size: 0.8em;
         font-weight: 600;
     }
@@ -51,14 +58,14 @@
 
 .delay-button {
     padding-right: 4px;
-    color: $icon-color;
+    color: $text-color;
     cursor: pointer;
 }
 
 
 
 .delay-icon {
-    color: $color-withe-hex;;
+    color: $text-color;
     font-size: 1em;
     font-weight: 700;
     margin-right: 9px;
@@ -84,13 +91,17 @@ mat-slider {
 
 .vue-slider ::ng-deep{
     .mat-accent .mat-slider-track-fill {
-        background-color: $icon-color !important;
+        background-color: $text-color !important;
     }
     .mat-slider-thumb-label {
-        background-color: $icon-color !important;
-
+        background-color: $text-color !important;
+        
+    }
+    .mat-slider-thumb-label-text{
+        color: $background-color !important;
     }
     .mat-slider-thumb {
-        background-color: $icon-color !important;
+        background-color: $text-color !important;
     }
+
 }

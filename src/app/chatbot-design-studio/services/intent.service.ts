@@ -382,17 +382,18 @@ export class IntentService {
     return new Promise((resolve, reject) => {
       console.log("[INTENT SERVICE]  salva ");
       const that = this;
-      this.faqService.addIntent(
-        id_faq_kb,
-        newIntent.attributes,
-        newIntent.question,
-        newIntent.answer,
-        newIntent.intent_display_name,
-        newIntent.intent_id,
-        newIntent.form,
-        newIntent.actions,
-        newIntent.webhook_enabled
-      ).subscribe((intent:any) => {
+      const intentToAdd = { 
+        'id_faq_kb': id_faq_kb, 
+        'attributes': newIntent.attributes,
+        'question': newIntent.question, 
+        'answer': newIntent.answer, 
+        'intent_display_name': newIntent.intent_display_name,
+        'intent_id': newIntent.intent_id,
+        'form': newIntent.form,
+        'actions': newIntent.actions,
+        'webhook_enabled': newIntent.webhook_enabled
+      };
+      this.faqService.addIntent(intentToAdd).subscribe((intent:any) => {
         console.log("[INTENT SERVICE]  ho salvato in remoto l'intent ", intent.intent_id);
         this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
         resolve(intent);
@@ -439,17 +440,22 @@ export class IntentService {
       } else {
         this.idIntentUpdating = intent.intent_id;
       }
+
+      let intentToUpdate = {
+        '_id': intent.id,
+        'attributes': attributes, 
+        'question': questionIntent, 
+        'answer': answerIntent, 
+        'intent_display_name': displayNameIntent, 
+        'form': formIntent,
+        'actions': actionsIntent,
+        'webhook_enabled': webhookEnabledIntent,
+        "id_faq_kb": intent.id_faq_kb,
+        "intent_id":intent.intent_id
+      };
+
       this.setTimeoutChangeEvent = setTimeout(() => {
-        this.faqService.updateIntent(
-          id,
-          attributes,
-          questionIntent,
-          answerIntent,
-          displayNameIntent,
-          formIntent,
-          actionsIntent,
-          webhookEnabledIntent
-        ).subscribe((intent: Intent) => {
+        this.faqService.updateIntent(intentToUpdate).subscribe((intent: Intent) => {
           console.log('[INTENT-SERVICE] UPDATED INTENT ', intent);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           resolve(true);

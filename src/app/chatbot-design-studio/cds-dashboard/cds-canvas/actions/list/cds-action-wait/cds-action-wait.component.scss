@@ -1,5 +1,9 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+
+$background-color: $blu-light-01;
+$text-color: $blu;
+
 .content {
     //padding: 10px 30px;
     padding: 20px 0px;
@@ -25,8 +29,8 @@
 }
 
 .title-label {
-    color: white;
-    font-size: 18px;
+    color: $blu;
+    font-size: 16px;
     margin-bottom: 0px;
     // margin-left: 30px;
 }
@@ -36,7 +40,7 @@
 }
 .action-wait-slider {
     align-items: center;
-    background: #647283;
+    background: $background-color;
     border-radius: 13px;
     display: inline-flex;
     position: relative;
@@ -45,7 +49,7 @@
     width: 100%;
     text-align: center;
     transition: width 0.3s ease-in;
-    font-size: 14px;
+    font-size: $font-size-base;
 }
 
 .action-wait-slider > mat-slider {
@@ -54,7 +58,7 @@
 }
 
 .action-wait-range {
-    color: #e8eaed;
+    color: $text-color;
     font-size: 11px;
     font-weight: 400;
     padding-left: 6px;
@@ -68,14 +72,16 @@
 
 .action-wait-slider ::ng-deep{
     .mat-accent .mat-slider-track-fill {
-        background-color: $icon-color !important;
+        background-color: $text-color !important;
     }
     .mat-slider-thumb-label {
-        background-color: $icon-color !important;
-
+        background-color: $text-color !important;
+    }
+    .mat-slider-thumb-label-text{
+        color: $background-color !important;
     }
     .mat-slider-thumb {
-        background-color: $icon-color !important;
+        background-color: $text-color !important;
     }
 }
 

@@ -32,6 +32,12 @@
     width: auto;
     padding: 8px;
     display: inline-block;
+    background-color: $blu-02;
+
+    &:hover{
+        background-color: $blu;
+        box-shadow: 0 14px 26px -12px rgba($blu, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba($blu, 0.2);
+    }
 }
 
 .form-group {
@@ -49,7 +55,7 @@
     }
     input {
         border-radius: 8px;
-        background-color: aliceblue;
+        background-color: $blu-light-03;
         line-height: normal;
         padding: 0 10px;
         height: 30px;
@@ -73,7 +79,7 @@
 
 .control-label{
     font-family: 'Poppins','Roboto',Arial,sans-serif;
-    color: #e8eaed;
+    color: $gray-light-01;
     text-align: left;
     line-height: 20px;
     font-size: 14px;
@@ -96,7 +102,7 @@
         display: block;
         width: 100%;
         margin: 0;
-        background: #e8eaed;
+        background: $blu-light-03;
         border: none;
         padding: 5px;
         border-radius: 4px;

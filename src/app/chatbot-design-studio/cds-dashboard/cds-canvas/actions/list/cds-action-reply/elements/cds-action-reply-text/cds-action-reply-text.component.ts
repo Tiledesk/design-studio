@@ -38,8 +38,10 @@ export class CdsActionReplyTextComponent implements OnInit {
   delayTime: number;
   // Filter // 
   canShowFilter: boolean = true;
+  filterConditionExist: boolean = false;
   booleanOperators = [ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},];
   // Buttons //
+  TYPE_BUTTON = TYPE_BUTTON;
   buttons: Array<Button>;
 
 
@@ -71,6 +73,10 @@ export class CdsActionReplyTextComponent implements OnInit {
     // this.buttons = this.response?.attributes?.attachment?.buttons;
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);
     this.idIntent = this.idAction.split('/')[0];
+    
+    if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
+      this.filterConditionExist = true
+    }
   }
 
   private checkButtons(){
@@ -163,6 +169,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
+    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
     this.changeActionReply.emit();
   }
 
@@ -199,14 +206,20 @@ export class CdsActionReplyTextComponent implements OnInit {
     this.openButtonPanel.emit(button);
   }
 
-  /** onCreateNewButton */
-  onCreateNewButton(){
-    this.createNewButton.emit(this.index);
-  }
-
-  /** onDeleteButton */
-  onDeleteButton(index: number){
-    this.deleteButton.emit({index: index, buttons: this.buttons});
+  /** onButtonControl */
+  onButtonControl(action: string, index: number ){
+    switch(action){
+      case 'delete': /** onDeleteButton */
+        this.deleteButton.emit({index: index, buttons: this.buttons});
+        break;
+      case 'moveLeft':
+        break;
+      case 'moveRight':
+        break;
+      case 'new': /** onCreateNewButton */
+        this.createNewButton.emit(this.index);
+        break;
+    }
   }
 
   /** dropButtons */

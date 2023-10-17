@@ -142,6 +142,8 @@
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
+                            <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens}}" disabled>
+                            <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
                         </div>
                     </div>
                 </div>
@@ -166,6 +168,7 @@
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
+                            <input type="text" class="slider-input gpt-setting-input" value="{{action.temperature}}" disabled>
                         </div>
                     </div>
                 </div>

@@ -11,7 +11,7 @@
                 </span>
             </span>
             <input [(ngModel)]="newQuestion" (keydown.enter)='onAddQuestion()' type="text"
-                class="cds-add-question-input" aria-label="question"
+                class="cds-question-input" aria-label="question"
                 placeholder="Add user expression and press enter or click ADD">
             <span class="input-group-addon cds-group-addon-question-right" (click)="onAddQuestion()"
                 [ngClass]="{'add-question-btn-disabled': !newQuestion || newQuestion?.length === 0}">
@@ -34,7 +34,7 @@
             <input [value]="q" (input)="onChangeText($event.target.value, index)" type="text" class="cds-question-input"
                 aria-label="question">
             <span class="input-group-addon cds-group-addon-right" (click)="onRemoveQuestion(index)">
-                <span class="material-icons cds-group-addon-right-icon">
+                <span class="material-icons-outlined cds-group-addon-right-icon">
                     delete
                 </span>
             </span>

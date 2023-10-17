@@ -154,16 +154,10 @@
     }
 }
 
-.cds-web-request-row-error {
+.cds-web-request-row-body {
     display: flex;
     font-size: 0.8em;
     line-height: normal;
-    border-radius: 4px;
-    color: rgb(209, 47, 25);
-    background: rgb(251, 227, 228);
-    border-color: rgb(251, 194, 196);
-    opacity: 1;
-    height: 0px;
     padding: 0px;
     margin: 0px;
     span{
@@ -181,9 +175,11 @@
     &.json-error-yes {
         transition-delay: 0s;
         transition: all 0.3s;
-        height: auto;
         padding: 10px;
         margin: 10px 0px;
+        color: rgb(209, 47, 25);
+        background: rgb(251, 227, 228);
+        border-color: rgb(251, 194, 196);
     } 
 }
 

@@ -7,8 +7,7 @@
     width: 100%;
     justify-content: space-between;
     gap: 10px;
-    padding: 30px 20px 20px;
-    border-bottom: 2px solid $action-item-background;
+    padding: 10px;
 }
 
 .preview {
@@ -20,7 +19,7 @@
     }
 
     .icon-action {
-        background: #6c6859 !important;
+        // background: #6c6859 !important;
 
         img {
             width: 18px;
@@ -91,8 +90,7 @@
         border-radius: 4px;
         // margin-right: 6px;
         // align-self: start;
-        color: #718497;
-        opacity: .85;
+        color: $blu;
         background: none;
 
         display: flex;
@@ -111,8 +109,9 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         font-size: 14px;
+        font-weight: 500;
         margin: 0;
-        color: #fff;
+        color: $blu;
     }
 }
 
@@ -122,12 +121,11 @@
     align-items: center;
     justify-content: flex-start;
     font-size: 11px;
-    color: $action-item-color;
+    color: $blu-light-02;
     line-height: 1.5;
 
-    em {
+    span {
         display: flex;
-        margin-right: 10px;
     }
 
     &:hover {

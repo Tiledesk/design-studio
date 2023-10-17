@@ -6,48 +6,8 @@
     margin-right: 30px;
 }
 
-.action-title {
-    display: flex;
-    align-items: center;
-    //margin-left: 28px;
-    margin-bottom: 40px;
-    justify-content: flex-start;
-}
-
-// #text-condition{
-//     position: relative;
-//     top: -4px;
-//     right: -45px;
-//     width: 88%;
-//     display: block;
-// }
-
-.custom-icon {
-    color: $icon-color;
-    margin-right: 6px;
-}
-
-.text-action {
-    color: $icon-color;
-    margin-right: 10px;
+.title-label {
+    color: $blu;
+    font-size: 16px;
     margin-bottom: 0px;
 }
-
-.action-type {
-    margin-bottom: 0px;
-    color: white;
-}
-
-
-.title-box {
-    width: 100%;
-    text-align: center;
-    color: white;
-    font-size: 20px;
-    padding: 0px 20px;
-    margin-bottom: 40px;
-}
-
-// .select-bot-box {
-//     width: 100%;
-// }

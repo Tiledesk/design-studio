@@ -21,7 +21,7 @@
 }
 
 .material-icons{
-    color: $icon-color;
+    color: $blu-light-02;
     font-size: 18px;
 }
 
@@ -52,20 +52,27 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        height: 32px;
+        height: 30px;
         padding: 0 15px;
         transition: background-color .2s,opacity .2s;
 
         &:hover{
             background: #f0f4f7;
             cursor: pointer;
+
+            .category-row-name {
+                font-weight: 500;
+            }
+            .material-icons {
+                color: $blu;
+            }
         }
     }
 
     .category-row-name{
-        color: #444a51;
+        color: $blu;
         font-size: 16px;
-        font-weight: 500;
+        font-weight: 400;
         line-height: 20px;
         margin-right: 20px;
         margin-bottom: 0px;
@@ -128,12 +135,12 @@
     justify-content: center;
     .material-icons{
         margin-right: 15px;
-        color: $icon-color;
+        color: $blu;
         font-size: 24px;
         font-weight: 500;
     }
     div {
-        color: #22272d;
+        color: $blu;
         font-size: 16px;
         font-weight: 600;
         line-height: 20px;

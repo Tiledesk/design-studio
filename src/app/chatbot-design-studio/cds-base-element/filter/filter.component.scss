@@ -1,5 +1,12 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+:host{
+    --textColor: #{$blu};
+    --backGroundColor: #{$blu-light-04};
+    --hoverBackgroundColor: #{$blu-light-03};
+
+    --border-radius-base: 8px
+}
 
 .previewMode{
     .filter-row{
@@ -26,15 +33,10 @@
         }
     }
 }
-.content{
-    // background: $action-item-background;
-    // margin: 0 30px;
-    // padding: 20px;
-    border-radius: 4px;
-}
 
 .filter-row{
     display: grid;
+    width: 100%;
     // grid-template-columns: minmax(0px, 1fr) 100px;
     grid-column-gap: 10px;
     grid-row-gap: 10px;
@@ -64,20 +66,20 @@
         cursor: pointer;
         display: flex;
         justify-content: center;
-        background: rgb(255, 255, 255);
+        background: var(--textColor);
         border-radius: 100%;
         transition: background-color 0.3s ease 0s;
         font-size: 12px;
 
         span.material-icons{
             font-size: 20px;
-            color: $icon-color;
+            color: var(--backGroundColor);
         }
 
         &:hover{
-            background-color: $icon-color;
+            background-color: var(--textColor);
             span.material-icons{
-                color: white;
+                color: var(--backGroundColor);
             }
         }
     }
@@ -89,22 +91,40 @@
     align-items: center;
     justify-content: center;
     gap: 5px;
-    padding: 0px 9px;
     height: 26px;
-    font-size: .9em;
-    font-weight: 400;
-    border-radius: 13px;
+    // padding: 0px 9px;
+    // font-size: .9em;
+    // font-weight: 400;
+    // border-radius: 13px;
     transition: all 0.3s ease 0s;
-    background: rgb(104, 106, 211);
-    color: white;
+    // background: $background-color;
+    // color: $text-color;
 
-    span.material-icons{
+    user-select: none;
+    box-sizing: border-box;
+    outline: none;
+    border: 1px dashed $blu-light-02;
+    border-radius: $button-border-radius-base;
+    color: $blu-light-02;
+    cursor: pointer;
+    font-size: 0.7em;
+    font-weight: 400;
+    line-height: $button-height-base;
+    // margin: 0px 5px 0;
+    order: 1;
+    padding: 0 10px;
+    transition: all .3s;
+    min-width: 100px;
+    text-align: center;
+    width: fit-content;
+
+    span.material-icons-outlined{
         font-size: 20px;
-        color: white;
     }
 
     &:hover{
-        opacity: 0.8;
+        border-color: var(--textColor);
+        color: var(--textColor);
         cursor: pointer;
     }
 }
@@ -123,18 +143,29 @@
         align-items: center;
         justify-content: center;
         width: 100%;
-        font-weight: 600;
-        // padding: 8px 15px;
-        // margin: 5px;
-        // border: 1px solid #c6cdd4;
-        border-radius: 4px;
-        color: #c6cdd4;
+
+        user-select: none;
+        box-sizing: border-box;
+        outline: none;
+        border: 1px dashed $blu-light-02;
+        border-radius: $button-border-radius-base;
+        color: $blu-light-02;
         cursor: pointer;
+        font-size: 0.7em;
+        font-weight: 400;
+        line-height: $button-height-base;
+        // margin: 0px 5px 0;
+        order: 1;
+        padding: 0 10px;
+        transition: all .3s;
+        min-width: 100px;
+        text-align: center;
+        width: fit-content;
 
         
         &:hover{
-            // border-color: white;
-            color: white;
+            border-color: var(--textColor);
+            color: var(--textColor);
         }
     }
     
@@ -187,18 +218,19 @@
     align-items: center;
     display: flex;
     position: relative;
-    border-radius: 4px;
-    padding: 8px 15px;
+    border-radius: var(--border-radius-base);
+    padding: 6px 15px;
     transition: background-color 0.3s ease 0s, border 0.3s ease 0s, opacity 0.3s ease 0s;
     cursor: pointer;
-    background: rgb(245, 245, 245);
+    background: var(--backGroundColor);
     border-width: 1px;
     border-style: solid;
-    border-color: rgb(245, 245, 245);
+    border-color: var(--backGroundColor);
     border-image: initial;
+    font-size: 12px;
     &:hover{
-        background: #c6cdd4;
-        border-color: #c6cdd4;
+        background: var(--hoverBackgroundColor);
+        border-color: var(--textColor);
         div.remove{
             opacity: 1;
         }
@@ -219,19 +251,17 @@
         cursor: pointer;
         display: flex;
         justify-content: center;
-        background: rgb(255, 255, 255);
+        background: white;
         border-radius: 100%;
         transition: background-color 0.3s ease 0s;
         font-size: 12px;
-        span.material-icons {
+        span.material-icons,
+        span.material-icons-outlined {
             font-size: 20px;
-            color: $icon-color;
+            color: var(--textColor);
         }
         &:hover {
-            background-color: $icon-color;
-            span.material-icons{
-                color: white;
-            }
+            background-color: var(--hoverBackgroundColor);
         }
     }
 
@@ -239,9 +269,9 @@
         -webkit-box-align: center;
         -webkit-box-pack: center;
         align-items: center;
-        color: $icon-color;
+        color: var(--textColor);
         display: flex;
-        font-size: 15px;
+        // font-size: 12px;
         justify-content: center;
         margin-right: 10px;
         width: 15px;

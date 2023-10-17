@@ -27,6 +27,7 @@ export class CdsActionReplyRedirectComponent implements OnInit {
   delayTime: number;
   // Filter // 
   canShowFilter: boolean = true;
+  filterConditionExist: boolean = false;
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
   typeActions = TYPE_ACTION;
   metadata: Metadata;
@@ -44,6 +45,11 @@ export class CdsActionReplyRedirectComponent implements OnInit {
     this.delayTime = (this.wait && this.wait.time)? (this.wait.time/1000) : 500;
     try {
       this.metadata = this.response.metadata;
+
+      if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
+        this.filterConditionExist = true
+      }
+
     } catch (error) {
       this.logger.log("error ", error);
     }
@@ -69,6 +75,7 @@ export class CdsActionReplyRedirectComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
+    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
     this.changeActionReply.emit();
   }
 

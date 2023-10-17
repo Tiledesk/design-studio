@@ -23,7 +23,13 @@
             (clickDelayTime)="onClickDelayTime($event)">
         </appdashboard-delay-slider>
     </div>
-    <div class="filter-wrapper" *ngIf="canShowFilter || response._tdJSONCondition?.conditions?.length > 0">
+    <!-- ||  -->
+    <div class="add-filter-btn" *ngIf="canShowFilter && filterConditionExist">
+        <span class="material-icons-outlined">filter_alt</span>
+        Filter
+    </div>
+    <div class="filter-wrapper" *ngIf="canShowFilter"
+        [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
         <appdashboard-filter
             [expression]="response._tdJSONCondition"
             [booleanOperators]="booleanOperators"
@@ -86,38 +92,23 @@
 
 <div class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
     
-    <div *ngFor="let button of buttons; let i = index;" class="tpl-drop-down content-botton-reply" cdkDragBoundary=".button-replies" cdkDrag> 
+    <div *ngFor="let button of buttons; let i = index;" cdkDragBoundary=".button-replies" cdkDrag style="position: relative;"> 
    
-        <div class="button-reply custom-placeholder" *cdkDragPlaceholder>
-            <div class="button-reply-text">
-                {{button.value}}
-            </div>
-        </div>
+        <!-- DRAG PLACEHOLDER -->
+        <cds-action-reply-button class="custom-placeholder" *cdkDragPlaceholder
+            (click)="$event.stopPropagation(); onOpenButtonPanel(button)"
+            [button]="button"
+            [previewMode]="previewMode">
+        </cds-action-reply-button>
 
-        <div class="button-reply" cdkDragHandle>
-            <div class="button-reply-text single-btn-reply"
-                (click)="$event.stopPropagation(); onOpenButtonPanel(button)">
-                {{button.value}}
-            </div>
-            <div class="button-controls">
-                
-                <!-- <div class="buttonsToMove">
-                    <div class="control-button" (click)="onMoveLeftButton(i)">
-                        <em class="material-icons">chevron_left</em>
-                    </div> 
-                    <div class="control-button" (click)="onMoveRightButton(i)">
-                        <em class="material-icons">chevron_right</em>
-                    </div>
-                </div> -->
+        <cds-action-reply-button [class.connected]='button.__isConnected' cdkDragHandle
+            (click)="$event.stopPropagation(); onOpenButtonPanel(button)"
+            [button]="button"
+            [previewMode]="previewMode"
+            (onButtonControl)="onButtonControl($event, i)">
+        </cds-action-reply-button>
 
-                <div class="control-button delete" (click)="$event.stopPropagation();onDeleteButton(i)">
-                    <em class="material-icons">delete</em>
-                </div>
-
-           </div>
-        </div>
-
-        <cds-connector *ngIf="previewMode"
+        <cds-connector *ngIf="previewMode && button.type !== TYPE_BUTTON.URL"
             class="button-connector"
             cdkDragDisabled
             [idConnector]="button.__idConnector"
@@ -126,7 +117,7 @@
         
     </div>
 
-    <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onCreateNewButton()">
+    <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', index)">
     + Add button
     </div>
 </div>

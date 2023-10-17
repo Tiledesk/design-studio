@@ -21,8 +21,7 @@
                             <p class="intent-display-name truncate">{{intent.intent_display_name}}</p>
                             <div class="icon-list">
                                 <p *ngIf="intent.questions" class="ai-icon icon" style="margin-bottom: 0px">Ai</p>
-                                <span *ngIf="intent.webhook_enabled"
-                                    class="material-icons icon webhook-icon">webhook</span>
+                                <span *ngIf="intent.webhook_enabled" class="material-icons icon webhook-icon">webhook</span>
                                 <span *ngIf="intent.form" class="material-icons icon list-alt-icon">list_alt</span>
                                 <div *ngIf="intent?.actions && intent?.actions?.length > 0" class="actions">
                                     <span class="material-icons icon bolt-icon">bolt</span>
@@ -68,8 +67,8 @@
 
                 <div class="icon-container">
                     <img src="assets/images/icons/block.svg"
-                        class="base-icon-color"
-                        [class.active-icon]="idSelectedIntent === intent.intent_id">
+                        [class.active-icon]="idSelectedIntent === intent.intent_id"
+                        class="base-icon-color">
                 </div>
 
                 <div class="item-box" *ngIf="IS_OPEN">

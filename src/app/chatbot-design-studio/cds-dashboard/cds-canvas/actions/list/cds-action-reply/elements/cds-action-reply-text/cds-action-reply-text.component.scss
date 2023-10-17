@@ -12,10 +12,10 @@
 .extensions-response {
     font-size: $font-size-base;
     position: relative;
-    width: 100%;
+    width: calc(100% - 6px);
     height: auto;
-    margin: 27px 0px 0px 0px;
-    padding: 0px 33px;
+    margin: 27px 0px 5px 0px;
+    padding: 0px 30px;
     display: flex;
     flex-wrap: wrap;
     row-gap: 5px;
@@ -38,7 +38,37 @@
         z-index: 1;
     }
 
+    .add-filter-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 0px 9px;
+        height: 26px;
+        font-size: .9em;
+        font-weight: 400;
+        border-radius: 13px;
+        transition: all 0.3s ease 0s;
+        background: $blu;
+        color: $blu-light-01;
+    
+        span.material-icons-outlined{
+            font-size: 20px;
+            color: white;
+        }
+    
+        &:hover{
+            opacity: 0.8;
+            cursor: pointer;
+        }
+    }
 
+
+}
+
+appdashboard-delay-slider,
+appdashboard-filter{
+    display: flex;
 }
 
 .extensions-response:hover{
@@ -76,6 +106,7 @@
             line-height: 20px;
             font-size: .8em;
             margin: auto;
+            white-space: pre-wrap;
     
             &.no-text{
                 color: rgb(141, 162, 181)
@@ -90,15 +121,11 @@
         flex-wrap: nowrap;
         align-items: flex-end;
         .button-reply-add{
-            color: $color-txt-2-hex;
-            border-color: $color-txt-2-hex;
+            color: $blu-light-02;
+            border-color: $blu-light-02;
         }
     }
 
-    .button-reply{
-        min-width: 200px;
-        padding: 2px 10px;
-    }
 }
 
 /* ./ Preview mode 
@@ -132,20 +159,20 @@
         &.delete{
             height: 24px;
             width: 24px;
-            background: $color-bck-gray-hex;
+            background: $blu-light-02;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             em {
                 font-size: 1.15em;
-                color: $color-withe-hex;
+                color: $blu;
                 transition: color .3s;
             }
         }
     }
     .control-button:hover{
-        color: $color-withe-hex;
+        color: $blu-light-02;
         &.delete{
             box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
             em {
@@ -190,12 +217,6 @@
 }
 
 
-.content-botton-reply {
-    position:relative;
-    height: 26px;
-}
-
-
 
 /** BUTTONS **/
 .buttons-response {
@@ -221,59 +242,13 @@
     align-items: baseline;
 }
 
-.button-reply {
-    // float: right;
-    display: flex;
-    position: relative;
-    min-width: 100px;
-    text-align: center;
-    // margin: 0px 5px 0px; //10px 5px 0;
-    padding: 0px 10px;
-    user-select: none;
-    box-sizing: border-box;
-    outline: none;
-    background: $color-withe-hex;
-    border: 1px solid $color-blue-hex;
-    border-radius: $button-border-radius-base;
-    color: $color-blue-hex;
-    cursor: pointer;
-    font-size: 0.7em;
-    font-weight: 500;
-    line-height: $button-height-base;
-    transition: all .3s;
-    &.custom-placeholder {
-        margin: 10px 5px;
-        background: #dfdfdf;
-        border: dotted 0px #999;
-        height: $button-height-base;
-        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+.custom-placeholder {
+    margin: 10px 5px;
+    background: #dfdfdf;
+    border: dotted 0px #999;
+    height: $button-height-base;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 
-    }
-}
-.button-reply:hover {
-    .button-controls {
-        opacity: 1;
-    }
-}
-
-.button-reply-text {
-    width: 100%;
-    height: 100%;
-    max-width: $button-max-width-base;
-    user-select: none;
-    color: $color-blue-hex;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: 500;
-    line-height: $button-height-base;
-    text-align: center;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    outline: none;
-    overflow: hidden!important;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .button-reply-add {
@@ -281,9 +256,9 @@
     user-select: none;
     box-sizing: border-box;
     outline: none;
-    border: 1px dashed $color-withe-hex;;
+    border: 1px dashed $blu-light-02;
     border-radius: $button-border-radius-base;
-    color: $color-withe-hex;
+    color: $blu-light-02;
     cursor: pointer;
     font-size: 0.7em;
     font-weight: 400;
@@ -298,89 +273,44 @@
     // margin-right: 10px;
 }
 
-.button-controls {
-    justify-content: space-between;
-    display: inline-flex;
-    width: 28px;
-    height: 24px;
-    position: absolute;
-    left: 0;
-    top: -40%;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-    .buttonsToMove{
-        display: inline-flex;
-    }
-    .control-button {
-        cursor: pointer;
-        background: $color-bck-gray-hex;
-        color: $color-bck-gray-hex;
-        transition: color .3s;
-        height: 24px;
-        width: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 2px;
-        em {
-            font-size: 1.15em;
-            color: $color-withe-hex;
-            transition: color .3s;
-        }
-    }
-    .control-button:hover{
-        color: $color-withe-hex;
-        box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
-        em {
-            color: $color-red-hex;
-        }
-        &.delete{
-            em {
-                color: $color-red-hex;
-            }
-        }
-    }
-}
-
 
 /** box-textarea **/
 cds-textarea.text-editable-div ::ng-deep{
     display: block;
     margin-left: 30px;
-    width: calc(100% - 66px);
-    // margin-left: 20px;
+    margin-right: 30px;
+    // width: calc(100% - 66px);
     textarea {
         line-height: 20px !important; 
-        width: calc(100% - 20px) !important;
+        // width: calc(100% - 20px) !important;
         font-size: 0.9em !important;
     }
 }
 
 /** TEXT AREA **/
-mat-form-field.mat-focused ::ng-deep {
-    .mat-form-field-wrapper {
-        .mat-form-field-flex {
-            .mat-form-field-infix {
-                textarea {
-                    border: 1px solid $color-blue-hex!important;
-                    outline: 1px solid $color-blue-hex!important;
-                    transition: border .3s;
-                }
-            }
-        }
-    }
-}
-mat-form-field.box-textarea ::ng-deep {
-    .mat-form-field-wrapper {
-        padding-bottom:0;
-        .mat-form-field-flex {
-            border-radius: 4px 4px 0 0;
-            padding: 0 0.75em 0 0.75em;
-            margin: 0;
-        }
-    }
-    .mat-form-field-underline {
-        display: none;
-    }    
-}
+// mat-form-field.mat-focused ::ng-deep {
+//     .mat-form-field-wrapper {
+//         .mat-form-field-flex {
+//             .mat-form-field-infix {
+//                 textarea {
+//                     border: 1px solid $color-blue-hex!important;
+//                     outline: 1px solid $color-blue-hex!important;
+//                     transition: border .3s;
+//                 }
+//             }
+//         }
+//     }
+// }
+// mat-form-field.box-textarea ::ng-deep {
+//     .mat-form-field-wrapper {
+//         padding-bottom:0;
+//         .mat-form-field-flex {
+//             border-radius: 4px 4px 0 0;
+//             padding: 0 0.75em 0 0.75em;
+//             margin: 0;
+//         }
+//     }
+//     .mat-form-field-underline {
+//         display: none;
+//     }    
+// }

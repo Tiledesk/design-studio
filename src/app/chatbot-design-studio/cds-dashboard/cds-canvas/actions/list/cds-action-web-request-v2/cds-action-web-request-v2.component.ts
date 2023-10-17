@@ -136,9 +136,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
       return { label: key, value: key }
     })
     this.jsonHeader = this.action.headersString;
-    this.jsonIsValid = this.isValidJson(this.action.body);
-    if(this.jsonIsValid && this.action.body){
-      this.body = this.action.body;
+    this.jsonIsValid = this.isValidJson(this.action.jsonBody);
+    if(this.jsonIsValid && this.action.jsonBody){
+      this.body = this.action.jsonBody;
       this.body = this.formatJSON(this.body, "\t");
     }
     this.assignments = this.action.assignments
@@ -194,22 +194,23 @@ export class CdsActionWebRequestV2Component implements OnInit {
 
   onChangeButtonSelect(event: {label: string, value: string, disabled: boolean, checked: boolean}){
     this.bodyOptions.forEach(el => { el.value ===event.value? el.checked= true: el.checked = false })
+    this.action.bodyType= event.value
     switch (event.value){
       case 'none':
-        this.body = null
+        this.body = JSON.stringify({})
         break;
       case 'json':
-        this.body = JSON.stringify({})
+        this.body = this.action.jsonBody
     }
-    console.log('onChangeButtonSelect-->', event, this.body)
+    console.log('onChangeButtonSelect-->', event, this.body, this.action)
   }
 
   onChangeTextarea(e, type: 'url' | 'body'){
-   console.log('onChangeTextarea:', e, type );
+    console.log('onChangeTextarea:', e, type );
     switch(type){
       case 'body': {
         this.body = e;
-        this.action.body = this.body;
+        this.action.jsonBody = this.body;
         setTimeout(() => {
           this.jsonIsValid = this.isValidJson(this.body);
           this.updateAndSaveAction.emit()

@@ -2,8 +2,14 @@
 
 
 :host{
-    --content-background: rgb(66, 85, 117);
-    --icon-color: #{$icon-color};
+    --icon-color: #{$blu};
+    --textColor: #{$blu};
+    --backGroundColor: #{$blu-light-04};
+    --hoverBackgroundColor: #{$blu-light-03};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --border-radius-base: 8px
+    
 
 }
 .base-filter{
@@ -15,10 +21,13 @@
     }
 }
 .content{
-    background: var(--content-background);
-    // margin: 0 30px;
+    background-color: var(--content-background);
+    border: 1px solid $gray-light-02;
     padding: 20px;
     border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .control-buttons{
@@ -45,20 +54,22 @@
         cursor: pointer;
         display: flex;
         justify-content: center;
-        background: rgb(255, 255, 255);
+        background: white;
         border-radius: 100%;
         transition: background-color 0.3s ease 0s;
         font-size: 12px;
 
-        span.material-icons{
+        span.material-icons,
+        span.material-icons-outlined{
             font-size: 20px;
-            color:  var(--icon-color);
+            color: var(--backGroundColor);
         }
 
         &:hover{
-            background-color: var(--icon-color);
-            span.material-icons{
-                color: white;
+            background-color: var(--textColor);
+            span.material-icons,
+            span.material-icons-outlined{
+                color: var(--backGroundColor);
             }
         }
     }
@@ -67,27 +78,40 @@
 .basic-filter-wrp{
     // background: #fff;
     // margin: 0 30px;
-    padding: 20px 0px;
+    // padding: 20px 0px 0px;
     grid-row-gap: 15px;
     border-radius: 4px;
     display: flex;
+    justify-content: center;
 
     .add-filter-button{
         display: flex;
         align-items: center;
         justify-content: center;
         width: 100%;
-        font-weight: 600;
-        padding: 8px 15px;
-        border: 1px solid #c6cdd4;
-        border-radius: 4px;
-        color: #c6cdd4;
+        
+        user-select: none;
+        box-sizing: border-box;
+        outline: none;
+        border: 1px dashed $blu-light-02;
+        border-radius: $button-border-radius-base;
+        color: $blu-light-02;
         cursor: pointer;
+        font-size: 0.7em;
+        font-weight: 400;
+        line-height: $button-height-base;
+        // margin: 0px 5px 0;
+        order: 1;
+        padding: 0 10px;
+        transition: all .3s;
+        min-width: 100px;
+        text-align: center;
+        width: fit-content;
 
         
         &:hover{
-            border-color: white;
-            color: white
+            border-color: var(--textColor);
+            color: var(--textColor);
         }
     }
     
@@ -135,18 +159,18 @@
     align-items: center;
     display: flex;
     position: relative;
-    border-radius: 4px;
-    padding: 8px 15px;
+    border-radius: var(--border-radius-base);
+    padding: 4px 15px;
     transition: background-color 0.3s ease 0s, border 0.3s ease 0s, opacity 0.3s ease 0s;
     cursor: pointer;
-    background: rgb(245, 245, 245);
+    background: var(--backGroundColor);
     border-width: 1px;
     border-style: solid;
-    border-color: rgb(245, 245, 245);
+    border-color: var(--backGroundColor);
     border-image: initial;
     &:hover{
-        background: #c6cdd4;
-        border-color: #c6cdd4;
+        background: var(--hoverBackgroundColor);
+        border-color: var(--textColor);
         div.remove{
             opacity: 1;
         }
@@ -167,19 +191,16 @@
         cursor: pointer;
         display: flex;
         justify-content: center;
-        background: rgb(255, 255, 255);
+        background:white;
         border-radius: 100%;
         transition: background-color 0.3s ease 0s;
         font-size: 12px;
         span.material-icons {
             font-size: 20px;
-            color:  var(--icon-color);
+            color: var(--textColor);
         }
         &:hover {
-            background-color:  var(--icon-color);
-            span.material-icons{
-                color: white;
-            }
+            background-color: var(--hoverBackgroundColor);
         }
     }
 
@@ -187,7 +208,7 @@
         -webkit-box-align: center;
         -webkit-box-pack: center;
         align-items: center;
-        color: $icon-color;
+        color: var(--textColor);
         display: flex;
         font-size: 15px;
         justify-content: center;

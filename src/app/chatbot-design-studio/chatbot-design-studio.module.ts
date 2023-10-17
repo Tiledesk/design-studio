@@ -136,6 +136,7 @@ import { CdsActionReplyImageComponent } from './cds-dashboard/cds-canvas/actions
 import { CdsActionReplyFrameComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-reply/elements/cds-action-reply-frame/cds-action-reply-frame.component';
 import { CdsActionReplyRedirectComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-reply/elements/cds-action-reply-redirect/cds-action-reply-redirect.component';
 import { CdsActionReplyGalleryComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-reply/elements/cds-action-reply-gallery/cds-action-reply-gallery.component';
+import { CdsActionReplyButtonComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button.component';
 
 //ACTION ASSIGN-VARIABLE: elements
 import { OperatorComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable/operator/operator.component';
@@ -289,6 +290,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         CdsActionReplyFrameComponent,
         CdsActionReplyRedirectComponent,
         CdsActionReplyGalleryComponent,
+        CdsActionReplyButtonComponent,
         // action REPLY elements: end //
         // action ASSIGN-VARIABLE elements: start //
         OperationComponent,
