@@ -3,6 +3,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { IntentService } from '../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { preDisplayName } from '../../../../utils';
 
 @Component({
   selector: 'cds-panel-intent-header',
@@ -24,7 +25,6 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   isFocused: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance()
-  
   constructor(
     public intentService: IntentService
   ) { 
@@ -74,20 +74,21 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   private checkIntentName(name: string) {
     this.intentNameResult = true;
     this.intentNameAlreadyExist = false;
-    if(!this.intentName || this.intentName.trim().length == 0) {
+    if(!this.intentName || this.intentName.trim().length == 0 || this.intentName === preDisplayName) {
       console.log("[PANEL-INTENT-HEADER] error 1");
       this.intentNameResult = false;
     }
     for (let i = 0; i < this.listOfIntents.length; i++) {
-      if (this.listOfIntents[i].intent_display_name === name) {
+      // console.log("[PANEL-INTENT-HEADER] checkIntentName::: ", this.listOfIntents[i], name, this.intent);
+      if (this.listOfIntents[i].intent_display_name === name && this.listOfIntents[i].intent_id !== this.intent.intent_id) { 
         this.intentNameAlreadyExist = true;
         this.intentNameResult = false;
-        break; // Possiamo uscire dal ciclo una volta trovato l'oggetto cercato
+        break;
       }
     }
     this.intentNameNotHasSpecialCharacters = this.checkIntentNameMachRegex(name);
     if(!this.intentNameNotHasSpecialCharacters){
-      console.log("[PANEL-INTENT-HEADER] error 3");
+      this.logger.log("[PANEL-INTENT-HEADER] error 3");
       this.intentNameResult = false;
     }
     return this.intentNameResult;
@@ -111,11 +112,21 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   /** onChangeIntentName */
   onChangeIntentName(event) {
-    console.log("[PANEL-INTENT-HEADER] onChangeIntentName",event, this.intent);
+    this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName",event, this.intent);
     const result = this.checkIntentName(event);
     if(result){
+      this.intentName = event;
+      // this.onSaveIntent();
+      // this.intentService.setIntentSelected(this.intent.intent_id);
+    }
+  }
+
+  onBlur(event){
+    console.log('[PANEL-INTENT-HEADER] onBlur', event, this.intentName)
+    this.myInput.nativeElement.blur();
+    const result = this.checkIntentName(this.intentName);
+    if(result){
       this.onSaveIntent();
-      this.intentService.setIntentSelected(this.intent.intent_id);
     }
   }
 
@@ -132,7 +143,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   /** doubleClickFunction */
   doubleClickFunction(event){
     this.logger.log("[PANEL-INTENT-HEADER] doubleClickFunction");
-    // this.myInput.nativeElement.select();
+    this.myInput.nativeElement.select();
     // this.intentService.selectIntent(this.intent);
   }
 

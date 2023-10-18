@@ -133,6 +133,7 @@ $margin-bottom: 15px;
         margin: 0; 
         display: flex;
         flex-direction: column;
+        overflow: unset;
         // gap: 5px;
     }
     .content{
@@ -158,11 +159,6 @@ $margin-bottom: 15px;
     }
 }
 
-#scrollMe {
-    scroll-behavior: smooth;
-    margin-bottom: 30px;
-    padding-bottom: 40px;
-}
 .content {
     position: relative;
     display: block;

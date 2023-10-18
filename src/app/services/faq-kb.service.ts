@@ -71,15 +71,12 @@ export class FaqKbService {
     const url = this.FAQKB_URL;
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY PROJECT ID - URL', url);
 
-    return this._httpClient.get<FaqKb[]>(url, httpOptions).pipe(
-        map(
-          (response) => {
+    return this._httpClient.get<FaqKb[]>(url, httpOptions).pipe(map((response) => {
             const data = response;
             // Does something on data.data
             this.logger.log('[FAQ-KB.SERV] GET FAQ-KB BY PROJECT ID - data', data);
 
             data.forEach(d => {
-              this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY PROJECT ID URL data d', d);
               if (d.description) {
                 let stripHere = 20;
                 d['truncated_desc'] = d.description.substring(0, stripHere) + '...';

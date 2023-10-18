@@ -32,120 +32,8 @@ export class FaqService {
     this.FAQ_URL = this.SERVER_BASE_PATH + this.project_id + '/faq/';
     this.EXPORT_FAQ_TO_CSV_URL = this.SERVER_BASE_PATH + this.project_id + '/faq/csv';
   }
-
-
-  /**
-   * READ DETAIL (GET FAQ BY FAQ ID)
-   * @param id 
-   * @returns 
-   */
-  public getFaqById(id: string): Observable<Faq[]> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    let url = this.FAQ_URL + id;
-    this.logger.log('[FAQ-SERV] - GET FAQ BY FAQ-ID URL', url);
-
-    return this._httpClient.get<Faq[]>(url, httpOptions)
-  }
-
-  /**
-   * GET FAQ BY FAQ-KB ID (alias BY BOT ID)
-   * @param id_faq_kb 
-   * @returns 
-   */
-  public getPaginatedFaqByFaqKbId(id_faq_kb: string, pagenum: number, faqxpagelimit: number, textosearch: string): Observable<Faq[]> {
-
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    this.logger.log('[FAQ-SERV] - GET PAGINATED FAQ BY BOT-ID - pagenum', pagenum);
-    this.logger.log('[FAQ-SERV] - GET PAGINATED FAQ BY BOT-ID - faqxpagelimit', faqxpagelimit);
-    this.logger.log('[FAQ-SERV] - GET PAGINATED FAQ BY BOT-ID - textosearch', textosearch);
-
-    let url = ''
-    if (textosearch === undefined) {
-      url = this.FAQ_URL + '?id_faq_kb=' + id_faq_kb + '&page=' + pagenum + '&limit=' + faqxpagelimit;
-    } else {
-      url = this.FAQ_URL + '?id_faq_kb=' + id_faq_kb + '&page=' + pagenum + '&limit=' + faqxpagelimit + '&text=' + textosearch;
-    }
-    this.logger.log('[FAQ-SERV] - GET PAGINATED FAQ BY BOT-ID - URL', url);
-
-
-    return this._httpClient.get<Faq[]>(url, httpOptions)
-  }
-
-  /**
- * GET COUNT OF REPLIES OF BOT 
- * @param botId 
- * @returns 
- */
-  getCountOfFaqReplies(botId) {
-    this.logger.log("[FAQ-SERV] GET COUNT OF REPLIES OF FAQ OF THE BOT-ID: ", botId);
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': this.tiledeskToken
-    })
-
-    let params = new HttpParams().set('sender', 'bot_' + botId);
-
-    return this._httpClient.get(this.SERVER_BASE_PATH + this.project_id + '/analytics/requests/aggregate/attributes/_answerid', { headers: headers, params: params });
-  }
-
-  /**
-   * Get count of all searced faq
-   * @param id_faq_kb 
-   * @param textosearch 
-   * @returns 
-   */
-  public getCountOfAllSearcedFaq(id_faq_kb: string, textosearch: string): Observable<Faq[]> {
-    this.logger.log('[FAQ-SERV] - GET ALL SEARCED - textosearch', textosearch);
-
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    let url = ''
-    if (textosearch !== undefined) {
-      url = this.FAQ_URL + '?id_faq_kb=' + id_faq_kb + '&text=' + textosearch;
-    }
-    this.logger.log('[FAQ-SERV] - GET ALL SEARCED - URL', url);
-
-    return this._httpClient.get<Faq[]>(url, httpOptions)
-  }
-
-  /**
- * GET FAQ BY FAQ-KB ID (alias BY BOT ID)
- * @param id_faq_kb 
- * @returns 
- */
-
-public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
-
-  const httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': this.tiledeskToken
-    })
-  };
- 
-  let url = this.FAQ_URL + '?id_faq_kb=' + id_faq_kb;
-  this.logger.log('[FAQ-SERV] - GET FAQ BY FAQ-KB ID (BOT-ID) - URL', url);
-
-  return this._httpClient.get<Intent[]>(url, httpOptions)
-}
-  public getAllFaqByFaqKbId(id_faq_kb: string): Observable<Faq[]> {
+  
+  public getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
 
     const httpOptions = {
       headers: new HttpHeaders({
@@ -157,26 +45,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
     let url = this.FAQ_URL + '?id_faq_kb=' + id_faq_kb;
     this.logger.log('[FAQ-SERV] - GET FAQ BY FAQ-KB ID (BOT-ID) - URL', url);
 
-    return this._httpClient.get<Faq[]>(url, httpOptions)
-  }
-
-  /**
-   * GET FAQ BY TEXT (CONTAINED IN THE QUESTION OR IN THE ANSWER)
-   * @param text 
-   * @returns 
-   */
-  public getFaqsByText(text: string): Observable<Faq[]> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    let url = this.FAQ_URL + '?text=' + text;
-    this.logger.log('[FAQ-SERV] - GET FAQ BY TEXT (CONTAINED IN THE QUESTION OR IN THE ANSWER)', url);
-
-    return this._httpClient.get<Faq[]>(url, httpOptions)
+    return this._httpClient.get<Intent[]>(url, httpOptions)
   }
 
   /**
@@ -238,7 +107,6 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
       })
     };
 
-
     const url = this.SERVER_BASE_PATH + this.project_id + "/faq_kb/importjson/" + id_faq_kb
     this.logger.log('[FAQ-SERV] UPLOAD FAQS CSV - URL ', url);
 
@@ -281,63 +149,7 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
 
     return this._httpClient.post(url, jsonfile, options)
   }
-
-
-  /**
-   * CREATE FAQ (POST)
-   * @param question 
-   * @param answer 
-   * @param id_faq_kb 
-   * @param intentname 
-   * @param faqwebhookenabled 
-   * @returns 
-   */
-  public addFaq(question: string, answer: string, id_faq_kb: string, intentname: string, intentform: any, faqwebhookenabled: boolean) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    const url = this.FAQ_URL;
-    this.logger.log('[FAQ-SERV] ADD FAQ -  PUT URL ', url);
-    const body = { 'question': question, 'answer': answer, 'id_faq_kb': id_faq_kb, 'intent_display_name': intentname, 'webhook_enabled': faqwebhookenabled };
-    if (intentform && intentform.fields && intentform.fields.length > 0) {
-      body['form'] = intentform;
-    }
-    this.logger.log('[FAQ-SERV] ADD FAQ - POST BODY ', body);
-
-    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
-  }
-
-  /**
-   * UPDATE FAQ (PUT)
-   * @param id 
-   * @param question 
-   * @param answer 
-   * @param intentname 
-   * @param faqwebhookenabled 
-   * @returns 
-   */
-  public updateFaq(id: string, question: string, answer: string, intentname: string, intentform: any, faqwebhookenabled: boolean) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-    this.logger.log('[FAQ-SERV] UPDATE FAQ - ID ', id);
-    let url = this.FAQ_URL + id;
-    this.logger.log('[FAQ-SERV] UPDATE FAQ - PUT URL ', url);
-
-    const body = { 'question': question, 'answer': answer, 'intent_display_name': intentname, 'form': intentform, 'webhook_enabled': faqwebhookenabled };
-    this.logger.log('[FAQ-SERV] UPDATE FAQ - PUT REQUEST BODY ', body);
-    return this._httpClient.put(url, JSON.stringify(body), httpOptions)
-  }
-
-
-
+  
   /**
    * CREATE FAQ (POST)
    * @param intent 
@@ -436,17 +248,16 @@ public _getAllFaqByFaqKbId(id_faq_kb: string): Observable<Intent[]> {
    * @param id 
    * @returns 
    */
-  public deleteFaq(id: string) {
+  public deleteFaq(id: string, intent_id?: string) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': this.tiledeskToken
       })
     };
-
     let url = this.FAQ_URL + id;
+    // if(intent_id) url = this.FAQ_URL + 'intentId' + intent_id; 
     this.logger.log('[FAQ-SERV] DELETE FAQ URL ', url);
-
     return this._httpClient.delete(url, httpOptions)
   }
 

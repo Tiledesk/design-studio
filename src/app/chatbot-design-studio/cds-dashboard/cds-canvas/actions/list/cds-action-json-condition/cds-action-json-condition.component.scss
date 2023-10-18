@@ -8,6 +8,11 @@
     --border-radius-base: 8px
 }
 
+/* customize scrollbar */
+::-webkit-scrollbar {
+    width: 0px;
+}
+
 .previewContent{
     position: relative;
     display: flex;

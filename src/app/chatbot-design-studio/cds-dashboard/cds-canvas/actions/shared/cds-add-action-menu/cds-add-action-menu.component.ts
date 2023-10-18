@@ -11,7 +11,7 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
 
   @Input() menuType: string;
   // @Input() tdsContainerEleHeight: any;
-  @Output() addingActionToStage = new EventEmitter();
+  @Output() addActionFromActionMenu = new EventEmitter();
   // ACTIONS_LIST = ACTIONS_LIST
   menuItemsList: any;
   filterMenuItemsList: any;
@@ -21,14 +21,6 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnInit(): void {
-
-    // this.menuItemsList = Object.keys(ACTIONS_LIST).map(key => {
-    //   return {
-    //     type: key,
-    //     value: ACTIONS_LIST[key]
-    //   };
-    // });
-
   
     console.log('[CDS-ADD-ACTION-MENU] menuItemsList (oninit): ', this.menuItemsList);
     console.log('[CDS-ADD-ACTION-MENU] contentHeight (oninit): ', this.contentHeight);
@@ -129,7 +121,7 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
 
   // return it.toLocaleLowerCase().includes(searchText);
 
-  onAddingActionToStage(item){
+  onAddActionFromActionMenu(item){
     console.log('[CDS-ADD-ACTION-MENU] ON ADDING ACTION - TO STAGE - item: ', item);
     // console.log('[CDS-ADD-ACTION-MENU] ON ADDING ACTION - TO STAGE - actionToSearch 1: ',this.actionToSearch);
     let event = { 
@@ -137,7 +129,7 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
     }
     this.actionToSearch = undefined;
     this.filterMenuItemsList = this.menuItemsList;
-    this.addingActionToStage.emit(event);
+    this.addActionFromActionMenu.emit(event);
     //console.log('[CDS-ADD-ACTION-MENU] ON ADDING ACTION - TO STAGE - actionToSearch 2: ',this.actionToSearch);
   }
 

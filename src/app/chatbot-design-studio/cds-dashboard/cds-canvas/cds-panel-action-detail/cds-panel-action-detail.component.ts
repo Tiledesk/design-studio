@@ -16,7 +16,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   @Input() elementIntentSelected: any;
   @Input() showSpinner: boolean;
-  @Output() onUpdateIntent = new EventEmitter();
+  @Output() savePanelIntentDetail = new EventEmitter();
   
   project_id: string;
   intentSelected: Intent;
@@ -112,7 +112,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
       this.intentSelected.form = this.elementSelected;
     }
     console.log('----> onSaveIntent:: ', this.elementIntentSelectedType, this.intentSelected);
-    this.onUpdateIntent.emit(this.intentSelected);
+    this.savePanelIntentDetail.emit(this.intentSelected);
   }
 
   onCloseIntent(){
@@ -120,26 +120,31 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     // this.closeAndSavePanelIntentDetail.emit();
   }
 
-
+ /**
+   * onConnectorChange
+   * @param type 
+   * @param idConnector 
+   * @param toIntentId 
+   * 
+   * IMPORTANTE: questa funzione deve SOLO aggiornare i connettori e NON deve salvare e NON deve aggiungere UNDO.
+   */
   onConnectorChange(type: 'create' | 'delete', idConnector: string, toIntentId: string){
     console.log('createOrUpdateConnector-->', type, idConnector, toIntentId)
     const fromId = idConnector;
     let toId = '';
-    const posId = toIntentId.indexOf("#");
-    if (posId !== -1) {
-      toId = toIntentId.slice(posId+1);
-    }
-
+    
     switch(type){
       case 'create':
-        console.log('createNewConnector: ', fromId);
-        this.connectorService.deleteConnectorWithIDStartingWith(fromId);
-        this.connectorService.createNewConnector(fromId, toId);
+        const posId = toIntentId.indexOf("#");
+        if (posId !== -1) {
+          toId = toIntentId.slice(posId+1);
+        }
+        this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false);
+        this.connectorService.createNewConnector(fromId, toId, true, false);
         break;
       case 'delete':
-        this.connectorService.deleteConnectorWithIDStartingWith(fromId);
+        this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false);
         break;
-
     }
   }
 

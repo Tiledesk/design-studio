@@ -15,7 +15,6 @@ export class CdsActionWhatsappAttributeComponent implements OnInit {
   @Output() updateAndSaveAction = new EventEmitter();
   
   private logger: LoggerService = LoggerInstance.getInstance();
-  
   constructor() { }
 
   ngOnInit(): void {

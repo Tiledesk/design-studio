@@ -2,6 +2,8 @@ import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angu
 import { TYPE_ACTION_CATEGORY, ACTIONS_LIST, TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from '../../../../utils';
 import { CdkDropList, CdkDragStart, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
 import { ControllerService } from '../../../../services/controller.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -28,7 +30,7 @@ export class CdsPanelActionsComponent implements OnInit {
   // connectedLists: CdkDropList[];
   // connectedIDLists: string[];
   
-
+  private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private controllerService: ControllerService,
     // public dragDropService: DragDropService
@@ -114,7 +116,7 @@ export class CdsPanelActionsComponent implements OnInit {
   }
 
   onDragStarted(event:CdkDragStart, currentIndex: number) {
-    console.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);
+    this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);
     this.controllerService.closeActionDetailPanel();
     this.isDragging = true;
     this.indexDrag = currentIndex;
@@ -125,21 +127,21 @@ export class CdsPanelActionsComponent implements OnInit {
     // Bug fix: When an action is dragged, the "drag placeholder" moves up and changes size to full width
     // --------------------------------------------------------------------------------------------------
     const actionDragPlaceholder = <HTMLElement>document.querySelector('.action-drag-placeholder');
-    console.log('[CDS-PANEL-ACTIONS] onDragStarted actionDragPlaceholder', actionDragPlaceholder)
+    this.logger.log('[CDS-PANEL-ACTIONS] onDragStarted actionDragPlaceholder', actionDragPlaceholder)
  
     const addActionPlaceholderEl = <HTMLElement>document.querySelector('.add--action-placeholder');
-    console.log('[CDS-PANEL-ACTIONS] onDragStarted addActionPlaceholderEl ', addActionPlaceholderEl)
+    this.logger.log('[CDS-PANEL-ACTIONS] onDragStarted addActionPlaceholderEl ', addActionPlaceholderEl)
 
     const myObserver = new ResizeObserver(entries => {
       // this will get called whenever div dimension changes
        entries.forEach(entry => {
         const actionDragPlaceholderWidth  = entry.contentRect.width
-        console.log('[CDS-PANEL-ACTIONS] actionDragPlaceholderWidth width', actionDragPlaceholderWidth);
+        this.logger.log('[CDS-PANEL-ACTIONS] actionDragPlaceholderWidth width', actionDragPlaceholderWidth);
         let hideActionDragPlaceholder = null;
         if (actionDragPlaceholderWidth === 258) {
           hideActionDragPlaceholder = false;
           this.hideActionPlaceholderOfActionPanel.emit(false)
-          console.log('[CDS-PANEL-ACTIONS] Hide action drag placeholder', hideActionDragPlaceholder);
+          this.logger.log('[CDS-PANEL-ACTIONS] Hide action drag placeholder', hideActionDragPlaceholder);
           if (actionDragPlaceholder) {
             actionDragPlaceholder.style.opacity = '1';
           }
@@ -149,7 +151,7 @@ export class CdsPanelActionsComponent implements OnInit {
         } else {
           hideActionDragPlaceholder = true;
           this.hideActionPlaceholderOfActionPanel.emit(true)
-          console.log('[CDS-PANEL-ACTIONS] Hide action drag placeholder', hideActionDragPlaceholder);
+          this.logger.log('[CDS-PANEL-ACTIONS] Hide action drag placeholder', hideActionDragPlaceholder);
           if (actionDragPlaceholder) {
             actionDragPlaceholder.style.opacity = '0';
           }
@@ -157,7 +159,7 @@ export class CdsPanelActionsComponent implements OnInit {
             addActionPlaceholderEl.style.opacity = '1';
           }
         }
-        //  console.log('height', entry.contentRect.height);
+        //  this.logger.log('height', entry.contentRect.height);
        });
      });
   
@@ -166,19 +168,19 @@ export class CdsPanelActionsComponent implements OnInit {
   }
 
   onDragEnd(event: CdkDragEnd) {
-    console.log('[CDS-PANEL-ACTIONS] Drag End!', event);
+    this.logger.log('[CDS-PANEL-ACTIONS] Drag End!', event);
     this.isDragging = false;
     this.indexDrag = null;
     this.isDraggingMenuElement.emit(this.isDragging);
   }
 
   onDragMoved(event: CdkDragMove) {
-    // console.log('Drag Moved!', event);
+    // this.logger.log('Drag Moved!', event);
     // const element = event.source.element.nativeElement;
   }
 
   onDragOver(event: DragEvent) {
-    console.log('Drag dragOver!', event);
+    this.logger.log('Drag dragOver!', event);
     // event.preventDefault(); // Annulla l'evento di default che consente il drop
   }
 

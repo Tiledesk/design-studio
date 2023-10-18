@@ -7,6 +7,8 @@ import { SatPopover } from '@ncstate/sat-popover';
 import { IntentService } from '../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 
 @Component({
   selector: 'cds-action-json-condition',
@@ -35,6 +37,7 @@ export class CdsActionJsonConditionComponent implements OnInit {
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
+  private subscriptionChangedConnector: Subscription;
   
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
@@ -42,15 +45,23 @@ export class CdsActionJsonConditionComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private intentService: IntentService
+    private intentService: IntentService,
+    private connectorService: ConnectorService
     ) { }
 
   ngOnInit(): void {
-    this.intentService.isChangedConnector$.subscribe((connector: any) => {
+    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.log('CdsActionJsonConditionComponent isChangedConnector-->', connector);
       this.connector = connector;
       this.updateConnector();
     });
+  }
+
+  /** */
+  ngOnDestroy() {
+    if (this.subscriptionChangedConnector) {
+      this.subscriptionChangedConnector.unsubscribe();
+    }
   }
 
   ngOnChanges() {
@@ -90,16 +101,20 @@ export class CdsActionJsonConditionComponent implements OnInit {
             this.action.falseIntent = null
             this.isConnectedFalse = false;
           }
-          this.updateAndSaveAction.emit();
+          // if(this.connector.notify)
+          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+          // this.updateAndSaveAction.emit();
         } else { //TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
           // ADD / EDIT
-          this.logger.log(' updateConnector :: json-condition', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
+          console.log(' updateConnector :: json-condition', this.connector, this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
           if(array[array.length -1] === 'true'){
             // this.action.trueIntent = '#'+this.connector.toId;
             this.isConnectedTrue = true
             if(this.action.trueIntent !== '#'+this.connector.toId){ 
               this.action.trueIntent = '#'+this.connector.toId;
-              this.updateAndSaveAction.emit();
+              // if(this.connector.notify)
+              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+              // this.updateAndSaveAction.emit();
             } 
           }        
           if(array[array.length -1] === 'false'){
@@ -107,7 +122,9 @@ export class CdsActionJsonConditionComponent implements OnInit {
             this.isConnectedFalse = true;
             if(this.action.falseIntent !== '#'+this.connector.toId){ 
               this.action.falseIntent = '#'+this.connector.toId;
-              this.updateAndSaveAction.emit();
+              // if(this.connector.notify)
+              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+              // this.updateAndSaveAction.emit();
             } 
           }
         }
@@ -215,20 +232,21 @@ export class CdsActionJsonConditionComponent implements OnInit {
   onChangeForm(event:{name: string, value: string}, type : 'trueIntent' | 'falseIntent'){
     if(event){
       this.action[type]=event.value
-    }
 
-    switch(type){
-      case 'trueIntent':
-        this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
-        break;
-      case 'falseIntent':
-        this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
-        break;
+      switch(type){
+        case 'trueIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
+          break;
+        case 'falseIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
+          break;
+      }
+      this.updateAndSaveAction.emit();
     }
-    this.updateAndSaveAction.emit();
   }
 
   onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
+    console.log('onResetBlockSelect', event )
     switch(type){
       case 'trueIntent':
         this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
@@ -242,7 +260,7 @@ export class CdsActionJsonConditionComponent implements OnInit {
   }
 
   onChangeExpression(event){
-    console.log('eventtttttttt', event)
+    this.connectorService.updateConnector(this.intentSelected.intent_id);
     this.updateAndSaveAction.emit();
   }
 

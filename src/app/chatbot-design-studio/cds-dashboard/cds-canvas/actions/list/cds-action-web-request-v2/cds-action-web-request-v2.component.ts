@@ -5,6 +5,7 @@ import { TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, variableL
 import { IntentService } from '../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
   selector: 'cds-action-web-request-v2',
@@ -28,6 +29,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
+  private subscriptionChangedConnector: Subscription;
   
   methods: Array<{label: string, value: string}>;
   optionSelected: 'header' | 'body' = 'header'
@@ -49,7 +51,6 @@ export class CdsActionWebRequestV2Component implements OnInit {
   bodyOptions: Array<{label: string, value: string, disabled: boolean, checked: boolean}>= [ {label: 'none', value: 'none', disabled: false, checked: true}, {label: 'Json', value: 'json', disabled: false, checked: false}]
   
   private logger: LoggerService = LoggerInstance.getInstance();
-  
   constructor(
     private intentService: IntentService
   ) { }
@@ -58,13 +59,20 @@ export class CdsActionWebRequestV2Component implements OnInit {
   ngOnInit(): void {
     this.logger.debug("[ACTION-ASKGPT] action detail: ", this.action);
 
-    this.intentService.isChangedConnector$.subscribe((connector: any) => {
+    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
       this.connector = connector;
       this.updateConnector();
     });
 
     this.initializeAttributes();
+  }
+
+  /** */
+  ngOnDestroy() {
+    if (this.subscriptionChangedConnector) {
+      this.subscriptionChangedConnector.unsubscribe();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -92,8 +100,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
       const array = this.connector.fromId.split("/");
       const idAction= array[1];
       if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){ 
-          //TODO: verificare quale dei due connettori è stato eliminato e impostare isConnected a false
+        if(this.connector.deleted){
           // DELETE 
           if(array[array.length -1] === 'true'){
             this.action.trueIntent = null
@@ -103,22 +110,28 @@ export class CdsActionWebRequestV2Component implements OnInit {
             this.action.falseIntent = null
             this.isConnectedFalse = false;
           }
-          this.updateAndSaveAction.emit();
-        } else { //TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
+          // if(this.connector.notify)
+          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+          // this.updateAndSaveAction.emit();
+        } else { 
           // ADD / EDIT
           this.logger.debug('[ACTION-ASKGPT] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
           if(array[array.length -1] === 'true'){
             this.isConnectedTrue = true;
-            if(this.action.trueIntent !== '#'+this.connector.toId){
+            // if(this.action.trueIntent !== '#'+this.connector.toId){
               this.action.trueIntent = '#'+this.connector.toId;
-              this.updateAndSaveAction.emit();
-            } 
+              // if(this.connector.notify)
+              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+              // this.updateAndSaveAction.emit();
+            // } 
           }        
           if(array[array.length -1] === 'false'){
             this.isConnectedFalse = true;
             if(this.action.falseIntent !== '#'+this.connector.toId){
               this.action.falseIntent = '#'+this.connector.toId;
-              this.updateAndSaveAction.emit();
+              // if(this.connector.notify)
+              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+              // this.updateAndSaveAction.emit();
             } 
           }
         }
@@ -136,6 +149,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
       return { label: key, value: key }
     })
     this.jsonHeader = this.action.headersString;
+    this.bodyOptions.forEach(el => { el.value ===this.action.bodyType? el.checked= true: el.checked = false })
     this.jsonIsValid = this.isValidJson(this.action.jsonBody);
     if(this.jsonIsValid && this.action.jsonBody){
       this.body = this.action.jsonBody;
@@ -222,7 +236,6 @@ export class CdsActionWebRequestV2Component implements OnInit {
         this.updateAndSaveAction.emit()
       }
     }
-
   }
 
   onChangeOption(event: 'header'|'body'){
@@ -257,17 +270,17 @@ export class CdsActionWebRequestV2Component implements OnInit {
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
     if(event){
       this.action[type]=event.value
-    }
 
-    switch(type){
-      case 'trueIntent':
-        this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
-        break;
-      case 'falseIntent':
-        this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
-        break;
+      switch(type){
+        case 'trueIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
+          break;
+        case 'falseIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
+          break;
+      }
+      this.updateAndSaveAction.emit();
     }
-    this.updateAndSaveAction.emit();
   }
 
   onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {

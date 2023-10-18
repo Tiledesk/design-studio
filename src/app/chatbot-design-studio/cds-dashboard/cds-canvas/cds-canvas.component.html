@@ -67,7 +67,7 @@
     [style.left.px]="positionFloatMenu.x"
     [style.display]="IS_OPEN_ADD_ACTIONS_MENU?'block':'none'"
     [menuType]="TYPE_OF_MENU.ACTION"
-    (addingActionToStage)="onAddingActionToStage($event)">
+    (addActionFromActionMenu)="onAddActionFromActionMenu($event)">
 </cds-add-action-menu>
 
 <cds-panel-button-configuration  *ngIf="IS_OPEN_PANEL_BUTTON_CONFIG" 
@@ -83,5 +83,14 @@
     class="cds-generic-panel"
     [project_id]="projectID"
     [elementIntentSelected]="elementIntentSelected"
-    (onUpdateIntent)="onSavePanelIntentDetail($event)">
+    (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-action-detail> 
+
+<!-- *ngIf="IS_OPEN_PANEL_WIDGET" -->
+<cds-panel-widget  *ngIf="testitOutFirstClick"
+    [class.isVisible]="IS_OPEN_PANEL_WIDGET"
+    [class.isHidden]="!IS_OPEN_PANEL_WIDGET"
+    [isPanelVisible]="IS_OPEN_PANEL_WIDGET"
+    id="widget-preview" 
+    class="cds-generic-panel">
+</cds-panel-widget>

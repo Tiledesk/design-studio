@@ -42,7 +42,6 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   user: UserModel
 
   private logger: LoggerService = LoggerInstance.getInstance();
-  
   constructor(
     public sanitizer: DomSanitizer,
     public elementRef: ElementRef,
@@ -80,8 +79,8 @@ export class CdsWhatsappReceiverComponent implements OnInit {
           hp.document.link = this.receiver.header_params[i].document.link;
         }
         // hp.text = this.receiver.header_params[i].text;
-        //console.log("this.receiver.header_params", this.receiver.header_params);
-        //console.log("this.header_params", this.header_params);
+        //this.logger.log("this.receiver.header_params", this.receiver.header_params);
+        //this.logger.log("this.header_params", this.header_params);
       })
     }
 
@@ -129,7 +128,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     })
 
     this.buttons_params.forEach((param, i) => {
-      //console.log("buttons_params - param: ", param);
+      //this.logger.log("buttons_params - param: ", param);
       let index = i + 1;
       let regex = '{{' + index + '}}';
       if (param.text) {
@@ -281,7 +280,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
 
     if ((!text_header_result || !media_header_result) && !body_result && !url_buttton_result) {
       if (this.invalidUrl === false) {
-        //console.log(" ** PARAMETRI COMPLETI **")
+        //this.logger.log(" ** PARAMETRI COMPLETI **")
         this.emitParams();
         let preview_container = this.elementRef.nativeElement.querySelector('#parameters-container');
         preview_container.classList.remove('highlighted');
@@ -301,7 +300,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     const new_buttons_param = this.buttons_params.map(({ index, ...keepAttrs }) => keepAttrs)
 
     this.body_params.forEach(param => {
-      console.log("param: ", param);
+      this.logger.log("param: ", param);
     });
 
 
@@ -321,7 +320,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     if (new_buttons_param.length > 0) {
       receiver_out.buttons_params = new_buttons_param;
     }
-    console.log("receiver_out: ", receiver_out);
+    this.logger.log("receiver_out: ", receiver_out);
     this.receiverValue.emit(receiver_out);
   }
 

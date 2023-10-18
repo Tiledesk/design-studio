@@ -22,7 +22,6 @@ export class CdsActionAssignVariableComponent implements OnInit, OnChanges {
     TYPE_MATH_OPERATOR_LIST = TYPE_MATH_OPERATOR_LIST
 
     private logger: LoggerService = LoggerInstance.getInstance();
-    
     constructor() { }
 
     ngOnInit(): void {

@@ -12,6 +12,13 @@ Ellips text
     overflow: hidden !important;
 }
 
+#scrollMe{
+    scroll-behavior: smooth;
+    // margin-bottom: 30px;
+    padding-bottom: 40px;
+    overflow-y: scroll;
+}
+
 /* PANEL INTENT DETAIL */
 // .content-panel-intent-detail {
 //     padding: 0;
@@ -80,13 +87,22 @@ svg {
     /*  width: calc((100% / 3) + 372px); */
 }
 
+/* PANEL INTENT DETAIL */
 .content-panel-intent-detail {
-    padding: 20px 0 30px;
-    margin-left: 30px;
-    margin-right: 30px;
+    padding: 20px 30px 30px;
+    position: absolute;
+    top: $haeder-panel-action-detail-height;
+    right: 0;
+    left: 0;
+    bottom: $footer-panel-action-detail-height;
     // overflow: auto; // nk
     // max-height: calc(100vh - 200px); // nk
+}
 
+.title-label{
+    color: $blu;
+    font-size: 14px;
+    // margin-bottom: 5px;
 }
 
 
@@ -371,7 +387,7 @@ appdashboard-cds-dashboard a {
     // left: 0;
     // right: 0;
     z-index: 2;
-    height: 42px;
+    height: $footer-panel-action-detail-height;
     margin: auto 0;
     padding: 7px 20px;
     border-top: 1px solid $gray-light-02;

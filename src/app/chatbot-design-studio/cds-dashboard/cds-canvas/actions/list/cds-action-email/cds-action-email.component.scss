@@ -1,13 +1,6 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 
-#scrollMe {
-    scroll-behavior: smooth;
-    overflow-y: scroll;
-    // max-height: calc(100vh - 200px);
-}
-
-
 .text-editor-wrapper {
     font-size: $font-size-base;
     position: relative;
@@ -44,14 +37,6 @@
     // width: 70%;
     // min-width: 900px;
     // max-width: 1400px;
-}
-
-.title-label {
-    color: $blu;
-    font-size: 14px;
-    margin-bottom: 3px;
-    // margin-left: 30px;
-    // margin-left: 13px;
 }
 
 

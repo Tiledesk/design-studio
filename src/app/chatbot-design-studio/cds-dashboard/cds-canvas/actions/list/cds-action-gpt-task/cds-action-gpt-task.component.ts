@@ -5,6 +5,9 @@ import { variableList } from '../../../../../utils';
 import { OpenaiService } from 'src/app/services/openai.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { MatDialog } from '@angular/material/dialog';
+import { AppConfigService } from 'src/app/services/app-config';
+import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog.component';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -15,13 +18,19 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   @Input() intentSelected: Intent;
   @Input() action: ActionGPTTask;
+  @Input() project_id: string; 
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter;
 
   panelOpenState = false;
-  models_list = [{ name: "GPT-3 (DaVinci)", value: "text-davinci-003" }, { name: "GPT-3.5 Turbo (ChatGPT)", value: "gpt-3.5-turbo" }, { name: "GPT-4 (ChatGPT)", value: "gpt-4" }];
+  models_list = [
+    { name: "GPT-3 (DaVinci)", value: "text-davinci-003" }, 
+    { name: "GPT-3.5 Turbo (ChatGPT)", value: "gpt-3.5-turbo" }, 
+    { name: "GPT-4 (ChatGPT)", value: "gpt-4" }
+  ];
   ai_response: string = "";
-  ai_error: string = "Oops! Something went wrong. Please wait some minutes and retry."
+  ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
+  // ai_error: string = "Oops! Something went wrong."
 
   showPreview: boolean = false;
   missingVariables: boolean = true;
@@ -32,14 +41,19 @@ export class CdsActionGPTTaskComponent implements OnInit {
   temp_variables = [];
 
   private logger: LoggerService = LoggerInstance.getInstance();
-  
   constructor(
-    private openaiService: OpenaiService
+    private dialog: MatDialog,
+    private openaiService: OpenaiService,
+    private appConfigService: AppConfigService,
   ) { }
 
   ngOnInit(): void {
     this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
     this.initializeAttributes();
+
+    if (!this.action.preview) {
+      this.action.preview = []; // per retrocompatibilità
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -59,7 +73,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.logger.debug("[ACTION GPT-TASK] changeTextarea event: ", $event);
     this.logger.debug("[ACTION GPT-TASK] changeTextarea propery: ", property);
     this.action[property] = $event;
-    this.checkVariables();
+    // this.checkVariables();
     this.updateAndSaveAction.emit();
   }
 
@@ -80,108 +94,21 @@ export class CdsActionGPTTaskComponent implements OnInit {
   updateSliderValue(event, target) {
     this.logger.debug("[ACTION GPT-TASK] updateSliderValue event: ", event)
     this.logger.debug("[ACTION GPT-TASK] updateSliderValue target: ", target)
-
-    console.log("[ACTION GPT-TASK] updateSliderValue event: ", event)
-    console.log("[ACTION GPT-TASK] updateSliderValue target: ", target)
-
     this.action[target] = event;
-
-    // if (event.value) {
-    //   this.action[target] = Number(event.value);
-    // } else if (event) {
-    //   this.action[target] = Number(event);
-    // } else {
-    //   if (target === 'temperature') {
-    //     this.action[target] = 0.7
-    //   } else {
-    //     this.action[target] = 128
-    //   }
-    // }
-
-    // if (target === 'max_tokens') {
-    //   if (event) {
-    //     if (event < 1) {
-    //       this.action[target] = 1
-    //     } else if (event > 512) {
-    //       this.action[target] = 512
-    //     } else {
-    //       this.action[target] = Number(event);
-    //     }
-    //   } else {
-    //     this.action[target] = 128
-    //   }
-    // }
-
-    // if (target === 'temperature') {
-    //   if (event) {
-    //     if (event < 0) {
-    //       this.action[target] = 0
-    //     } else if (event > 1) {
-    //       this.action[target] = 1
-    //     } else {
-    //       this.action[target] = Number(event);
-    //     }
-    //   } else {
-    //     this.action[target] = 0.7
-    //   }
-    // }
 
     this.updateAndSaveAction.emit();
   }
 
-  getResponsePreview() {
-
-    this.showPreview = true;
-    this.showAiError = false;
-
+  execPreview() {
     this.checkVariables().then((resp) => {
 
-      if (resp === false) {
-        this.missingVariables = true;
+      if (resp === true) {
+        this.getResponse(this.action.question);
 
       } else {
-        let temp_question = this.action.question;
-        this.temp_variables.forEach((tv) => {
-          let old_value = "{{" + tv.name + "}}";
-          temp_question = temp_question.replace(old_value, tv.value);
-        })
-
-        this.searching = true;
-        this.missingVariables = false;
-        
-        setTimeout(() => {
-          let element = document.getElementById("preview-container");
-          element.classList.remove('preview-container-extended')
-        }, 200)
-
-        let data = {
-          question: temp_question,
-          context: this.action.context,
-          model: this.action.model,
-          max_tokens: this.action.max_tokens,
-          temperature: this.action.temperature
-        }
-
-        this.openaiService.previewPrompt(data).subscribe((ai_response: any) => {
-          this.searching = false;
-          setTimeout(() => {
-            let element = document.getElementById("preview-container");
-            element.classList.add('preview-container-extended')
-          }, 200)
-          this.ai_response = ai_response;
-        }, (error) => {
-          this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", error);
-          setTimeout(() => {
-            let element = document.getElementById("preview-container");
-            element.classList.add('preview-container-extended')
-          }, 200)
-          this.showAiError = true;
-          this.searching = false;
-        }, () => {
-          this.logger.error("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
-          this.searching = false;
-        })
+        this.openAttributesDialog();
       }
+
     })
   }
 
@@ -193,58 +120,224 @@ export class CdsActionGPTTaskComponent implements OnInit {
       let response: boolean = true;
 
       if (!matches || matches.length == 0) {
-        this.showVariablesBtn = false;
-        resolve(response);
-      }
+        resolve(true);
 
-      if (matches.length > 0) {
-        if (!this.action.preview) {
-          this.action.preview = [];
-        }
-        this.showVariablesBtn = true;
+      } else {
+
         this.temp_variables = [];
-
         matches.forEach((m) => {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
+
           if (attr && attr.value) {
             this.temp_variables.push({ name: name, value: attr.value });
+
           } else if (attr && !attr.value) {
-            response = false;
             this.temp_variables.push({ name: name, value: null });
+
           } else {
-            response = false;
             this.temp_variables.push({ name: name, value: null });
             this.action.preview.push({ name: name, value: null });
           }
         })
-        resolve(response);
+        resolve(false);
       }
-
     })
   }
 
-  showHideVariablesSection() {
-    this.showVariablesSection = !this.showVariablesSection;
-    if (this.showVariablesSection == false) {
-      this.getResponsePreview();
+  getResponse(question) {
+    this.logger.log("getResponse called...")
+
+    let data = {
+      question: question,
+      context: this.action.context,
+      model: this.action.model,
+      max_tokens: this.action.max_tokens,
+      temperature: this.action.temperature
     }
+
+    this.showAiError = false;
+    this.searching = true;
+    this.showPreview = true;
+
+    setTimeout(() => {
+      let element = document.getElementById("preview-container");
+      element.classList.remove('preview-container-extended')
+    }, 200)
+
+    this.openaiService.previewPrompt(data).subscribe((ai_response: any) => {
+      this.searching = false;
+      setTimeout(() => {
+        let element = document.getElementById("preview-container");
+        element.classList.add('preview-container-extended')
+      }, 200)
+      this.ai_response = ai_response;
+    }, (error) => {
+      this.searching = false;
+      this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", error);
+      setTimeout(() => {
+        let element = document.getElementById("preview-container");
+        element.classList.add('preview-container-extended')
+      }, 200)
+      this.showAiError = true;
+    }, () => {
+      this.logger.debug("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
+      this.searching = false;
+    })
+
   }
 
-  onChangeVar(event, name) {
-    let index = this.action.preview.findIndex(v => v.name === name);
-    if (index != -1) {
-      this.action.preview[index].value = event;
-    }
-    this.updateAndSaveAction.emit();
+
+  // getResponsePreview() {
+
+  //   this.showPreview = true;
+  //   this.showAiError = false;
+
+  //   this.checkVariables().then((resp) => {
+
+  //     if (resp === false) {
+  //       this.missingVariables = true;
+
+  //     } else {
+  //       let temp_question = this.action.question;
+  //       this.temp_variables.forEach((tv) => {
+  //         let old_value = "{{" + tv.name + "}}";
+  //         temp_question = temp_question.replace(old_value, tv.value);
+  //       })
+
+  //       this.searching = true;
+  //       this.missingVariables = false;
+
+  //       setTimeout(() => {
+  //         let element = document.getElementById("preview-container");
+  //         element.classList.remove('preview-container-extended')
+  //       }, 200)
+
+  //       let data = {
+  //         question: temp_question,
+  //         context: this.action.context,
+  //         model: this.action.model,
+  //         max_tokens: this.action.max_tokens,
+  //         temperature: this.action.temperature
+  //       }
+
+  //       this.openaiService.previewPrompt(data).subscribe((ai_response: any) => {
+  //         this.searching = false;
+  //         setTimeout(() => {
+  //           let element = document.getElementById("preview-container");
+  //           element.classList.add('preview-container-extended')
+  //         }, 200)
+  //         this.ai_response = ai_response;
+  //       }, (error) => {
+  //         this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", error);
+  //         setTimeout(() => {
+  //           let element = document.getElementById("preview-container");
+  //           element.classList.add('preview-container-extended')
+  //         }, 200)
+  //         this.showAiError = true;
+  //         this.searching = false;
+  //       }, () => {
+  //         this.logger.error("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
+  //         this.searching = false;
+  //       })
+  //     }
+  //   })
+  // }
+
+  // _checkVariables() {
+  //   return new Promise((resolve, reject) => {
+  //     let regex: RegExp = /{{[^{}]*}}/g;
+  //     let string = this.action.question;
+  //     let matches = string.match(regex);
+  //     let response: boolean = true;
+
+  //     if (!matches || matches.length == 0) {
+  //       this.showVariablesBtn = false;
+  //       resolve(response);
+  //     }
+
+  //     if (matches.length > 0) {
+  //       if (!this.action.preview) {
+  //         this.action.preview = [];
+  //       }
+  //       this.showVariablesBtn = true;
+  //       this.temp_variables = [];
+
+  //       matches.forEach((m) => {
+  //         let name = m.slice(2, m.length - 2);
+  //         let attr = this.action.preview.find(v => v.name === name);
+  //         if (attr && attr.value) {
+  //           this.temp_variables.push({ name: name, value: attr.value });
+  //         } else if (attr && !attr.value) {
+  //           response = false;
+  //           this.temp_variables.push({ name: name, value: null });
+  //         } else {
+  //           response = false;
+  //           this.temp_variables.push({ name: name, value: null });
+  //           this.action.preview.push({ name: name, value: null });
+  //         }
+  //       })
+  //       this.logger.log("temp_variables: ", this.temp_variables)
+  //       resolve(response);
+  //     }
+
+  //   })
+  // }
+
+  // showHideVariablesSection() {
+  //   this.showVariablesSection = !this.showVariablesSection;
+  //   if (this.showVariablesSection == false) {
+  //     this.getResponsePreview();
+  //   }
+  // }
+
+  // onChangeVar(event, name) {
+  //   let index = this.action.preview.findIndex(v => v.name === name);
+  //   if (index != -1) {
+  //     this.action.preview[index].value = event;
+  //   }
+  //   this.updateAndSaveAction.emit();
+  // }
+
+  // closePreview() {
+  //   let element = document.getElementById("preview-container");
+  //   element.classList.remove('preview-container-extended')
+
+  //   this.showPreview = false;
+  //   this.searching = false;
+  // }
+
+  openAttributesDialog() {
+    this.logger.log("temp_variables: ", this.temp_variables);
+    const dialogRef = this.dialog.open(AttributesDialogComponent, {
+      panelClass: 'custom-dialog-container',
+      data: { attributes: this.temp_variables, question: this.action.question }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.logger.log("AttributesDialogComponent result: ", result);
+      if (result !== false) {
+        this.getResponse(result.question);
+        this.saveAttributes(result.attributes);
+      }
+    });
   }
 
-  closePreview() {
-    let element = document.getElementById("preview-container");
-    element.classList.remove('preview-container-extended')
+  saveAttributes(attributes) {
+    this.logger.log("attributes: ", attributes);
+    attributes.forEach(a => {
+      let index = this.action.preview.findIndex(v => v.name === a.name)
+      if (index != -1) {
+        this.action.preview[index].value = a.value;
+      } else {
+        this.action.preview.push({ name: a.name, value: a.value })
+      }
+      this.updateAndSaveAction.emit();
+    })
+  }
 
-    this.showPreview = false;
-    this.searching = false;
+  goToKNB(){
+    let url = this.appConfigService.getConfig().DASHBOARD_BASE_URL + 'dashboard/#/project/' + this.project_id +'/knowledge-bases'
+    window.open(url, '_blank')
   }
 
 

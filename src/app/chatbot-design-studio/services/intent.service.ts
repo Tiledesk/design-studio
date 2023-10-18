@@ -24,14 +24,11 @@ import {
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { TYPE_INTENT_NAME, NEW_POSITION_ID, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, checkIFElementExists} from '../utils';
+import { TYPE_INTENT_NAME, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemIntoPositionInTheArray} from '../utils';
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
-
-
-
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -55,7 +52,7 @@ export class IntentService {
   // intentSelectedID: string;
 
   previousIntentId: string = '';
-  preDisplayName: string = 'untitled_block_';
+  // preDisplayName: string = 'untitled_block_';
   
   botAttributes: any = {};
   listOfPositions: any = {};
@@ -64,7 +61,6 @@ export class IntentService {
   idIntentUpdating: string;
 
   intentNameAlreadyExist: boolean;
-
 
   // newPosition: any = {'x':0, 'y':0};
   
@@ -76,6 +72,7 @@ export class IntentService {
 
   public arrayUNDO: Array<any> = [];
   public arrayREDO: Array<any> = [];
+  public lastActionUndoRedo: boolean;
 
   constructor(
     private faqService: FaqService,
@@ -93,7 +90,7 @@ export class IntentService {
    * per notificare alle actions che i connettori sono cambiati
    */
   public onChangedConnector(connector){
-    console.log('onChangedConnector:: ', connector);
+    // console.log('[INTENT SERVICE] ::: onChangedConnector:: ', connector);
     this.changedConnector.next(connector);
   }
 
@@ -105,17 +102,10 @@ export class IntentService {
         this.intentSelected = startIntent[0];
       }
     }
-    console.log('[INTENT SERVICE] ::: setDefaultIntentSelected ::: ', this.intentSelected);
+    // console.log('[INTENT SERVICE] ::: setDefaultIntentSelected ::: ', this.intentSelected);
     this.behaviorIntent.next(this.intentSelected);
     //this.liveActiveIntent.next(this.intentSelected);
   }
-
-  // public setIntentSelected(intent){
-  //   this.intentSelected = intent;
-  //   console.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
-  //   this.behaviorIntent.next(this.intentSelected);
-  //   //this.liveActiveIntent.next(this.selectedIntent);
-  // }
 
   public setLiveActiveIntent(intentName: string){
     let intent = this.listOfIntents.find((intent) => intent.intent_display_name === intentName);
@@ -123,97 +113,11 @@ export class IntentService {
   }
 
 
-  /** checkIntentNameMachRegex */
-  // checkIntentNameMachRegex(intentname) {
-  //   const regex = /^[ _0-9a-zA-Z]+$/
-  //   return regex.test(intentname);
-  // }
-
-  // private checkIntentName(name: string, ) {
-  //   this.intentNameAlreadyExist = false;
-  //   if (name !== this.intent.intent_display_name) {
-  //     this.intentNameAlreadyExist = this.listOfIntents.some((el) => {
-  //       return el.intent_display_name === name;
-  //     });
-  //   }
-
-  //   this.intentNameNotHasSpecialCharacters = this.checkIntentNameMachRegex(name);
-  //   this.intentNameResult = true;
-  //   if (!this.intentName || this.intentName.trim().length === 0) {
-  //     this.intentNameResult = false;
-  //   }
-  //   return this.intentNameResult;
-  // }
-  
-
-  /** setDragAndListnerEvent */
-  // public setListnerEvent(intent) {
-  //   let that = this;
-  //   let elem = document.getElementById(intent.intent_id);
-  //   if(elem){
-  //     const panelIntentContent = elem.getElementsByClassName('panel-intent-content')[0];
-  //     const picHeader = panelIntentContent.getElementsByClassName('pic-header')[0];
-  //     if(picHeader){
-  //       console.log("imposto il listner per la selezione/deselezione dell'elemento ");
-  //       // **************** !!!!!!!! aggiungo listner !!!!!!! *******************//
-  //       // Aggiungi l'event listener con i parametri
-  //       // console.log("2.1 --- hasListenerMouseup -> ", elem.dataset.hasListenerMouseup ,intent.intent_id);
-  //       if (elem.dataset.hasListenerMouseup !== 'true') {
-  //         picHeader.addEventListener('mouseup', function () {
-  //           elem.dataset.hasListenerMouseup = 'true';
-  //           that.onMouseUpIntent(intent, elem);
-  //         });
-  //       }
-  //       // Aggiungi l'event listener con i parametri
-  //       // console.log("2.2 --- hasListenerMousedown -> ",elem.dataset.hasListenerMousedown, intent.intent_id);
-  //       if (elem.dataset.hasListenerMousedown !== 'true') {
-  //         picHeader.addEventListener('mousedown', function () {
-  //           elem.dataset.hasListenerMousedown = 'true';
-  //           that.onMouseDownIntent(elem);
-  //         });
-  //       }
-  //       // Aggiungi l'event listener con i parametri
-  //       // console.log("2.3 --- hasListenerMousemove -> ",elem.dataset.hasListenerMousemove, intent.intent_id);
-  //       if (elem.dataset.hasListenerMousemove !== 'true') {
-  //         picHeader.addEventListener('mousemove', function () {
-  //           elem.dataset.hasListenerMousemove = 'true';
-  //           that.onMouseMoveIntent(elem);
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
-
-  // /** */
-  // onMouseDownIntent(element): void {
-  //   // console.log("onMouseDownIntent:  element: ",element);
-  //   const x = element.offsetLeft;
-  //   const y = element.offsetTop;
-  //   element.style.zIndex = 2;
-  // }
-
-  // /** */
-  // onMouseUpIntent(intent: any, element: any) {
-  //   console.log("onMouseUpIntent: ", intent, " element: ", element);
-  //   let newPos = { 'x': element.offsetLeft, 'y': element.offsetTop };
-  //   let pos = intent.attributes.position; // this.intentService.getIntentPosition(intent.id);
-  //   if (newPos.x != pos.x || newPos.y != pos.y) {
-  //     element.style.zIndex = '1';
-  //     // console.log("setIntentPosition x:", newPos.x, " y: ",newPos.y);
-  //     this.setIntentPosition(intent.id, newPos);
-  //   }
-  // }
-
-  // /** */
-  // onMouseMoveIntent(element: any) {
-  // }
-
-
   /** 
    * restituisce tutti gli intents
    */
   getIntents() {
-    console.log('getIntents: ',  this.behaviorIntents);
+    // console.log('getIntents: ',  this.behaviorIntents);
     return this.behaviorIntents.asObservable();
   }
 
@@ -221,31 +125,13 @@ export class IntentService {
 
   // START DASHBOARD FUNCTIONS //
 
-  // //** recupero le posizioni degli intent sullo stage */
-  // setDashboardAttributes(idBot, attributes){
-  //   this.botAttributes = attributes;
-  //   this.idBot = idBot;
-  //   if(attributes && attributes['positions']){
-  //     this.listOfPositions = attributes['positions'];
-  //   }
-  // }
-
-
-  // /** imposta le posizioni degli elementi sullo stage */
-  // setPositionsInDashboardAttributes(json){
-  //   this.listOfPositions = json;
-  //   this.botAttributes['positions'] = this.listOfPositions;
-  //   // this.patchAttributes(this.botAttributes);
-  // }
-
-
   refreshIntents(){
-    console.log("aggiorno elenco intent: ", this.listOfIntents);
+    // console.log("aggiorno elenco intent: ", this.listOfIntents);
     this.behaviorIntents.next(this.listOfIntents);
   }
 
   refreshIntent(intentSelected){
-    console.log("aggiorno singolo intent")
+    // console.log("aggiorno singolo intent")
     this.behaviorIntent.next(intentSelected);
   }
   
@@ -259,22 +145,10 @@ export class IntentService {
   }
 
   getPreviousIntent(){
-    console.log("getPreviousIntent: ", this.listOfIntents, this.previousIntentId)
+    // console.log("getPreviousIntent: ", this.listOfIntents, this.previousIntentId)
     return this.listOfIntents.find((intent) => intent.intent_id === this.previousIntentId);
   }
 
-
-
-  // /** Get Intent position */    
-  // OLD_getIntentPosition(id: string){
-  //   let pos = {'x':0, 'y':0};
-  //   const positions = this.listOfPositions;
-  //   if(!positions)return pos;
-  //   if(positions && positions[id]){
-  //     return positions[id];
-  //   }
-  //   return pos;
-  // }
 
   getIntentPosition(intentId: string){
     let pos = {'x':0, 'y':0};
@@ -284,32 +158,8 @@ export class IntentService {
     return intent.attributes.position;
     
   }
-
-  // /** Set intent position */
-  // OLD_setIntentPosition(id:string, newPos: any){
-  //   const positions = this.listOfPositions;
-  //   if(positions){
-  //     if(!newPos && positions[id]){
-  //       delete positions[id];
-  //     } else {
-  //       positions[id] =  {'x': newPos.x, 'y': newPos.y};
-  //     }
-  //     this.setPositionsInDashboardAttributes(positions);
-  //   }
-  // }
-
-  setIntentPosition(intentId:string, newPos: any){
-    console.log('setIntentPosition:: ',intentId, newPos);
-    // this.listOfIntents = this.behaviorIntents.getValue();
-    let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === intentId);
-    if(!intentToUpdate)return; 
-    // if(!intentToUpdate.attributes){intentToUpdate.attributes = {};
-    intentToUpdate['attributes']['position'] = {'x': newPos.x, 'y': newPos.y};
-    this.patchAttributes(intentId, intentToUpdate.attributes);
-  }
   // END DASHBOARD FUNCTIONS //
 
-  
 
 
   // START INTENT FUNCTIONS //
@@ -317,7 +167,7 @@ export class IntentService {
   /** GET ALL INTENTS  */
   public async getAllIntents(id_faq_kb): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.faqService._getAllFaqByFaqKbId(id_faq_kb).subscribe((faqs: Intent[]) => {
+      this.faqService.getAllFaqByFaqKbId(id_faq_kb).subscribe((faqs: Intent[]) => {
         // console.log('getAllIntents: ', faqs);
         if (faqs) {
           this.listOfIntents = JSON.parse(JSON.stringify(faqs));
@@ -330,10 +180,10 @@ export class IntentService {
         this.refreshIntents();
         resolve(true);
       }, (error) => {
-        console.error('ERROR: ', error);
+        // console.error('ERROR: ', error);
         reject(false);
       }, () => {
-        console.log('COMPLETE ');
+        // console.log('COMPLETE ');
         resolve(true);
       });
     });
@@ -347,23 +197,23 @@ export class IntentService {
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
     intent.actions.push(action);
-    console.log("ho creato un nuovo intent contenente l'azione ", action, " in posizione ", pos);
+    console.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", action, " in posizione ", pos);
     return intent;
   }
 
   /** generate display name of intent */
   public setDisplayName(){
     // let listOfIntents = this.behaviorIntents.getValue();
-    let displayNames = this.listOfIntents.filter((element) => element.intent_display_name.startsWith(this.preDisplayName))
-                                          .map((element) => element.intent_display_name.replace(this.preDisplayName, ''));
+    let displayNames = this.listOfIntents.filter((element) => element.intent_display_name.startsWith(preDisplayName))
+                                          .map((element) => element.intent_display_name.replace(preDisplayName, ''));
     // displayNames = displayNames.slice().sort();
     const numbers = displayNames.filter(el => el !== '').map((name) => parseInt(name, 10));
     numbers.sort((a, b) => a - b);
     const lastNumber = numbers[numbers.length - 1];
     if(numbers.length>0){
-      return this.preDisplayName+(lastNumber+1);
+      return preDisplayName+(lastNumber+1);
     } else {
-      return this.preDisplayName+1;
+      return preDisplayName+1;
     }
     // const filteredArray = this.listOfIntents.filter((element) => element.intent_display_name.startsWith(this.preDisplayName));
     // if(filteredArray.length>0){
@@ -375,12 +225,90 @@ export class IntentService {
     // }
   }
   
+  /************************************************/
+  /** START FUNCTIONS: PUSH DEL PUT PATCH         */
+  /************************************************/
+  /**
+   * patchAttributes
+   * @param intent 
+   * @param UndoRedo 
+   * 
+   * verifica se devo o meno aggiungere l'azione ad UNDO 
+   * verifico se effettivamente c'è stato uno spostamento altrimenti esco
+   * aggiungo PUT ad UNDO
+   * imposto un timeout di 1/2 secondo prima di salvare la patch (questo per evitare molteplici salvataggi ravvicinati)
+   */
+  patchAttributes( intent: Intent, UndoRedo:boolean = true) {
+    const intentID = intent.id;
+    const attributes = intent.attributes;
+    console.log('[INTENT SERVICE] -> patchAttributes, ', intent);
+    let intentPrev = this.prevListOfIntent.find((item) => item.intent_id === intent.intent_id);
+    if(JSON.stringify(intentPrev.attributes) === JSON.stringify(intent.attributes))return;
+    // if(intentPrev.attributes.position.x === intent.attributes.position.x && intentPrev.attributes.position.y === intent.attributes.position.y)return;
+
+    if(UndoRedo){
+      const prevIntents = JSON.parse(JSON.stringify(this.prevListOfIntent));
+      const nowIntents = JSON.parse(JSON.stringify(this.listOfIntents));
+      let intentsToUpdateUndo = this.setListOfintentsToUpdate(intent, prevIntents);
+      let intentsToUpdateRedo = this.setListOfintentsToUpdate(intent, nowIntents);
+      let intentPrev = prevIntents.find((item) => item.intent_id === intent.intent_id)?prevIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      let intentNow = nowIntents.find((item) => item.intent_id === intent.intent_id)?nowIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      this.addIntentToUndoRedo('PUT', intentPrev, intentNow, intentsToUpdateUndo, intentsToUpdateRedo);
+    }
+    clearTimeout(this.setTimeoutChangeEvent);
+    this.setTimeoutChangeEvent = setTimeout(() => {
+      this.faqService.patchAttributes(intentID, attributes).subscribe((data) => {
+        if (data) {
+          this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
+          // data['attributesChanged'] = true;
+          // console.log('[INTENT SERVICE] patchAttributes OK: ', data);
+          // this.behaviorIntent.next(data);
+        }
+      }, (error) => {
+        console.log('error:   ', error);
+      }, () => {
+        console.log('complete');
+      });
+    }, 500);
+  }
+
+  /**
+   * saveNewIntent
+   * @param intent 
+   * @param nowIntent 
+   * @param prevIntent 
+   * @param UndoRedo 
+   * @returns 
+   * set and save the action in UNDO
+   * save the intent on the server
+   */
+  async saveNewIntent(intent:Intent, nowIntent: Intent, prevIntent: Intent, UndoRedo:boolean = true){
+    if(UndoRedo){
+      let intentsToUpdateUndo = prevIntent?[JSON.parse(JSON.stringify(prevIntent))]:[];
+      let intentsToUpdateRedo = nowIntent?[JSON.parse(JSON.stringify(nowIntent))]:[];
+      console.log('[INTENT SERVICE] -> saveNewIntent, ',intentsToUpdateUndo, intentsToUpdateRedo);
+      this.addIntentToUndoRedo('PUSH', intent, intent, intentsToUpdateUndo, intentsToUpdateRedo);
+    }
+    const savedIntent = await this.addIntent(intent);
+    if (savedIntent) {
+      console.log('[CDS-CANVAS] Intent salvato correttamente: ', savedIntent, this.listOfIntents);
+      // this.replaceNewIntentToListOfIntents(savedIntent);
+      this.listOfIntents = this.replaceIntent(savedIntent, this.listOfIntents);
+      this.refreshIntents();
+      this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
+      this.setDragAndListnerEventToElement(savedIntent.intent_id);
+      return savedIntent;
+    } else {
+      return false;
+    }
+  }
+
   /** save a New Intent, created on drag action on stage */
-  public async saveNewIntent(id_faq_kb, newIntent, parentUD?): Promise<any> { 
+  public async addIntent(newIntent: Intent): Promise<any> { 
+    let id_faq_kb = this.dashboardService.id_faq_kb;
     console.log('[INTENT SERVICE] -> saveNewIntent, ');
-    if(!parentUD)this.addUNDOtoList();
     return new Promise((resolve, reject) => {
-      console.log("[INTENT SERVICE]  salva ");
+      // console.log("[INTENT SERVICE]  salva ");
       const that = this;
       const intentToAdd = { 
         'id_faq_kb': id_faq_kb, 
@@ -394,52 +322,171 @@ export class IntentService {
         'webhook_enabled': newIntent.webhook_enabled
       };
       this.faqService.addIntent(intentToAdd).subscribe((intent:any) => {
-        console.log("[INTENT SERVICE]  ho salvato in remoto l'intent ", intent.intent_id);
-        this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
+        // console.log("[INTENT SERVICE]  ho salvato in remoto l'intent ", intent, newIntent, this.listOfIntents);
         resolve(intent);
       }, (error) => {
         console.error('[INTENT SERVICE]  ERROR: ', error);
         reject(false);
       }, () => {
-        // console.log('COMPLETE ');
         resolve(false);
       });
     });
   }
 
+  /** deleteIntent */
+  deleteIntent(intent: Intent, UndoRedo:boolean = true){
+    console.log('[INTENT SERVICE] -> deleteIntent, ', intent);
+    if(UndoRedo){
+      const prevIntents = JSON.parse(JSON.stringify(this.prevListOfIntent));
+      const nowIntents = JSON.parse(JSON.stringify(this.listOfIntents));
+      let intentsToUpdateUndo = this.setListOfintentsToUpdate(intent, prevIntents);
+      let intentsToUpdateRedo = this.setListOfintentsToUpdate(intent, nowIntents);
+      let intentPrev = prevIntents.find((item) => item.intent_id === intent.intent_id)?prevIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      let intentNow = nowIntents.find((item) => item.intent_id === intent.intent_id)?nowIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      this.addIntentToUndoRedo('DEL', intentPrev, intentNow, intentsToUpdateUndo, intentsToUpdateRedo);
+    }
+    this.deleteFaq(intent);
+    // this.updateIntents(intentsToUpdateRedo);
+  }
+  /** deleteFaq */
+  public async deleteFaq(intent: Intent): Promise<boolean> { 
+    console.log('[INTENT SERVICE] -> deleteFaq, ');
+    return new Promise((resolve, reject) => {
+      this.faqService.deleteFaq(intent.id, intent.intent_id).subscribe((data) => {
+        this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
+        resolve(true);
+      }, (error) => {
+        // console.error('ERROR: ', error);
+        reject(false);
+      }, () => {
+        resolve(true);
+      });
+    });
+  }
+
+  /**
+   * onUpdateIntentWithTimeout
+   * @param originalIntent 
+   * @param timeout 
+   * @param UndoRedo 
+   * @param connector 
+   * @returns 
+   */
+  public async onUpdateIntentWithTimeout(originalIntent: Intent, timeout: number=0, undo:boolean = false, connector?: any): Promise<boolean> { 
+    const thereIsIntent = this.listOfIntents.some((intent) => intent.intent_id === originalIntent.intent_id);
+    console.log('[INTENT SERVICE] -> onUpdateIntentWithTimeout, ', originalIntent, connector);
+    if(!thereIsIntent)return;
+    let intent = JSON.parse(JSON.stringify(originalIntent));
+    const prevIntents = JSON.parse(JSON.stringify(this.prevListOfIntent));
+    const nowIntents = JSON.parse(JSON.stringify(this.listOfIntents));
+    // console.log('[INTENT SERVICE] -> onUpdateIntentWithTimeout2, ',prevIntents, nowIntents);
+    if(undo){
+      let intentPrev = prevIntents.find((item) => item.intent_id === intent.intent_id)?prevIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      let intentNow = nowIntents.find((item) => item.intent_id === intent.intent_id)?nowIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      let intentsToUpdateUndo = [intentPrev];
+      let intentsToUpdateRedo = [intentNow];
+      if(!connector)this.addIntentToUndoRedo('PUT', intentPrev, intentNow, intentsToUpdateUndo, intentsToUpdateRedo);
+      else if(connector) this.addIntentToUndoRedo('CONN', intentPrev, intentNow, intentsToUpdateUndo, intentsToUpdateRedo, connector);
+    }
+    if(!timeout)timeout = 0;
+    return new Promise((resolve, reject) => {
+      if(this.idIntentUpdating == intent.intent_id){
+        clearTimeout(this.setTimeoutChangeEvent);
+      } else {
+        this.idIntentUpdating = intent.intent_id;
+      }
+      this.setTimeoutChangeEvent = setTimeout(async () => {
+        const response = await this.updateIntent(intent);
+        if (response) {
+          resolve(true);
+        } else {
+          reject(false);
+        }
+      }, timeout);
+    });
+  }
+
+  public updateIntentInMoveActionBetweenDifferentIntents(action, currentIntent, UndoRedo:boolean = true){
+    const thereIsIntent = this.listOfIntents.some((intent) => intent.intent_id === currentIntent.intent_id);
+    console.log('[INTENT SERVICE] -> updateIntentInMoveActionBetweenDifferentIntents, ', thereIsIntent, currentIntent);
+    if(!thereIsIntent)return;
+    let intent = JSON.parse(JSON.stringify(currentIntent));
+    const prevIntents = JSON.parse(JSON.stringify(this.prevListOfIntent));
+    const nowIntents = JSON.parse(JSON.stringify(this.listOfIntents));
+    console.log('[INTENT SERVICE] -> updateIntentInMoveActionBetweenDifferentIntents, ',prevIntents, nowIntents);
+    if(UndoRedo){
+      const tdAction = action._tdActionId;
+      let intentOriginActionPrev = prevIntents.find((obj) => obj.actions.some((action) => action._tdActionId === tdAction));
+      let intentOriginActionNow = nowIntents.find((obj) => obj.intent_id === intentOriginActionPrev.intent_id);
+      let intentPrev = prevIntents.find((item) => item.intent_id === intent.intent_id)?prevIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      let intentNow = nowIntents.find((item) => item.intent_id === intent.intent_id)?nowIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      this.addIntentToUndoRedo('PUT', intentPrev, intentNow, [intentOriginActionPrev], [intentOriginActionNow]);
+    }
+    const response = this.updateIntent(intent);
+  }
+
+  
+  public onUpdateIntentFromActionPanel(currentIntent, UndoRedo:boolean = true){
+    const thereIsIntent = this.listOfIntents.some((intent) => intent.intent_id === currentIntent.intent_id);
+    console.log('[INTENT SERVICE] -> onUpdateIntentFromActionPanel, ', thereIsIntent, currentIntent);
+    if(!thereIsIntent)return;
+    let intent = JSON.parse(JSON.stringify(currentIntent));
+    const prevIntents = JSON.parse(JSON.stringify(this.prevListOfIntent));
+    const nowIntents = JSON.parse(JSON.stringify(this.listOfIntents));
+    console.log('[INTENT SERVICE] -> onUpdateIntentFromActionPanel, ',prevIntents, nowIntents);
+    if(UndoRedo){
+      let intentPrev = prevIntents.find((item) => item.intent_id === intent.intent_id)?prevIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      let intentNow = nowIntents.find((item) => item.intent_id === intent.intent_id)?nowIntents.find((item) => item.intent_id === intent.intent_id):intent;
+      this.addIntentToUndoRedo('PUT', intentPrev, intentNow, [], []);
+    }
+    const response = this.updateIntent(intent);
+  }
 
 
+  /**
+   * deleteActionFromPreviousIntentOnMovedAction
+   * @param action 
+   * @returns 
+   * 
+   * on move action from intent to stage
+   * set previousIntentId on dragStarted
+   * cancello la action dall'intent che la conteneva precedentemente
+   */
+  public deleteActionFromPreviousIntentOnMovedAction(action){
+    const actionId = action._tdActionId;
+    let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.previousIntentId);
+    if(intentToUpdate){
+      const actions = intentToUpdate.actions.filter((action: any) => action._tdActionId !== actionId);
+      intentToUpdate.actions = actions;
+      // console.log("[CDS-INTENT-SERVICES] ho eliminato la action dall'intent che la conteneva ",actionId, intentToUpdate);
+      this.connectorService.deleteConnectorsFromActionByActionId(actionId);
+      console.log('[CDS-INTENT-SERVICES] aggiorno intent di partenza', intentToUpdate);
+      // const responseIntent = this.updateIntent(intentToUpdate);
+      const responseIntent = this.onUpdateIntentWithTimeout(intentToUpdate);
+      if(responseIntent){
+        // console.log('[CDS-INTENT-SERVICES] update Intent: OK');
+        this.behaviorIntent.next(intentToUpdate);
+      }
+      return intentToUpdate;
+    } else {
+      return;
+    }
+  }
 
 
   /** updateIntent */
-  public async updateIntent(originalIntent: Intent, timeout?: number, parentUD?:boolean): Promise<boolean> { 
-    
-    // mi assicuro chi l'intent che sto cercando di salvare esiste
-    const esisteOggetto = this.listOfIntents.some((intent) => intent.intent_id === originalIntent.intent_id);
-    if(!esisteOggetto)return;
-    if(!timeout)timeout = 0;
-    let intent = JSON.parse(JSON.stringify(originalIntent));
+  private async updateIntent(intent: Intent): Promise<boolean> { 
+    console.log('[INTENT SERVICE] -> updateIntent, ', intent);
     intent = removeNodesStartingWith(intent, '__');
-    console.log('[INTENT SERVICE] -> updateIntent, ', originalIntent);
-  
-    // if(!parentUD)this.addUNDOtoList();
     return new Promise((resolve, reject) => {
       let id = intent.id;
       let attributes = intent.attributes?intent.attributes:{};
       let questionIntent = intent.question?intent.question:'';
       let answerIntent = intent.answer?intent.answer:'';
       let displayNameIntent = intent.intent_display_name?intent.intent_display_name:'';
-      let formIntent = {};
-      if (intent.form !== null) {
-        formIntent = intent.form;
-      }
+      let formIntent = intent.form?intent.form:{};
       let actionsIntent = intent.actions?intent.actions:[];
       let webhookEnabledIntent = intent.webhook_enabled?intent.webhook_enabled:false;
-      if(this.idIntentUpdating == intent.intent_id){
-        clearTimeout(this.setTimeoutChangeEvent);
-      } else {
-        this.idIntentUpdating = intent.intent_id;
-      }
 
       let intentToUpdate = {
         '_id': intent.id,
@@ -454,43 +501,31 @@ export class IntentService {
         "intent_id":intent.intent_id
       };
 
-      this.setTimeoutChangeEvent = setTimeout(() => {
-        this.faqService.updateIntent(intentToUpdate).subscribe((intent: Intent) => {
-          console.log('[INTENT-SERVICE] UPDATED INTENT ', intent);
-          this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
-          resolve(true);
-        }, (error) => {
-          console.error('ERROR: ', error);
-          reject(false);
-        }, () => {
-          // console.log('COMPLETE ');
-          resolve(true);
-        });
-      }, timeout);
-    });
-  }
-
-  /** deleteIntent */
-  public async deleteIntent(intent: Intent, parentUD?:boolean): Promise<boolean> { 
-    this.deleteIntentToListOfIntents(intent.intent_id);
-    console.log('[INTENT SERVICE] -> deleteIntent, ');
-    if(!parentUD)this.addUNDOtoList();
-    return new Promise((resolve, reject) => {
-      this.faqService.deleteFaq(intent.id).subscribe((data) => {
+      this.faqService.updateIntent(intentToUpdate).subscribe((intent: Intent) => {
         this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
+        this.setDragAndListnerEventToElement(intent.intent_id);
         resolve(true);
       }, (error) => {
         console.error('ERROR: ', error);
         reject(false);
       }, () => {
-        // console.log('COMPLETE ');
         resolve(true);
       });
     });
   }
+  /************************************************/
+  /** END FUNCTIONS: PUSH DEL PUT PATCH           */
+  /************************************************/
+
+  public updateIntents(listOfIntents, intent){
+    const intents = JSON.parse(JSON.stringify(listOfIntents));
+    let intentsToUpdate = this.setListOfintentsToUpdate(intent, intents);
+    // aggiorna gli intent connessi all'intent eliminato
+    intentsToUpdate.forEach(element => {
+      this.updateIntent(element);
+    });
+  }
   // END INTENT FUNCTIONS //
-
-
 
 
 
@@ -499,28 +534,33 @@ export class IntentService {
   /** update title of intent */
   public changeIntentName(intent){
     setTimeout(async () => {
-      const response = await this.updateIntent(intent, 2000);
-      if(response){
-        this.behaviorIntents.next(this.listOfIntents);
+      let prevIntent = this.prevListOfIntent.find((obj) => obj.intent_id === intent.intent_id);
+      if(intent.intent_display_name !== prevIntent.intent_display_name){
+        const response = await this.onUpdateIntentWithTimeout(intent, 500);
+        if(response){
+          // this.behaviorIntents.next(this.listOfIntents);
+          // this.refreshIntent(intent);
+          this.setDragAndListnerEventToElement(intent.intent_id);
+        }
       }
-    }, 0);
+    }, 500);
   }
 
   // moving new action in intent from panel elements
   public moveNewActionIntoIntent(event, action, currentIntentId): any {
-    console.log('[INTENT-SERVICE] moveNewActionIntoIntent');
+    // console.log('[INTENT-SERVICE] moveNewActionIntoIntent');
     let newAction = this.createNewAction(action.value.type);
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
     currentIntent.actions.splice(event.currentIndex, 0, newAction);
     this.behaviorIntent.next(currentIntent);
-    this.connectorService.movedConnector(currentIntent.intent_id);
+    this.connectorService.updateConnector(currentIntent.intent_id);
     setTimeout(async () => {
-      const responseCurrentIntent = await this.updateIntent(currentIntent);
+      const responseCurrentIntent = await this.onUpdateIntentWithTimeout(currentIntent);
       if(responseCurrentIntent){
         // const fromEle = document.getElementById(currentIntent.intent_id);
-        // this.connectorService.movedConnector(currentIntent.intent_id);
+        // this.connectorService.updateConnector(currentIntent.intent_id);
         console.log('update current Intent: OK');
         //this.behaviorIntent.next(currentIntent);
       }
@@ -530,94 +570,58 @@ export class IntentService {
 
   // on move action from different intents
   public moveActionBetweenDifferentIntents(event, action, currentIntentId){
-    console.log('[INTENT-SERVICE] moveActionBetweenDifferentIntents');
+    // console.log('[INTENT-SERVICE] moveActionBetweenDifferentIntents');
     const that = this;
-    console.log('moving action from another intent - action: ', currentIntentId);
+    // console.log('moving action from another intent - action: ', currentIntentId);
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
     let previousIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === that.previousIntentId;
     });
-    console.log('moveActionBetweenDifferentIntents: ', event, this.listOfIntents, currentIntentId, currentIntent, previousIntent);
+    // console.log('moveActionBetweenDifferentIntents: ', event, this.listOfIntents, currentIntentId, currentIntent, previousIntent);
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);
-    this.connectorService.movedConnector(currentIntent.intent_id);
-    this.connectorService.movedConnector(previousIntent.intent_id);
+    this.connectorService.updateConnector(currentIntent.intent_id);
+    this.connectorService.updateConnector(previousIntent.intent_id);
     this.connectorService.deleteConnectorsFromActionByActionId(action._tdActionId);
-    const responseCurrentIntent = this.updateIntent(currentIntent);
-    if(responseCurrentIntent){
-      console.log('update current Intent: OK');
-    }
-    const responsePreviousIntent = this.updateIntent(previousIntent);
-    if(responsePreviousIntent){
-      console.log('update previous Intent: OK');
-    }  
-    // this.controllerService.closeAllPanels();
-    // this.behaviorIntent.next(currentIntent);
-    // this.behaviorIntent.next(previousIntent);
+
+    const responsePreviousIntent = this.onUpdateIntentWithTimeout(previousIntent, 0, false);
+    const responseCurrentIntent = this.updateIntentInMoveActionBetweenDifferentIntents(action,currentIntent);
+    // devo fare una funzione che passa anche lo stato di intent prev onUpdateIntentWithTimeout NON va bene
+    // const responseCurrentIntent = this.onUpdateIntentWithTimeout(currentIntent);
   }
 
 
-  
-  // on move action from intent to stage
-  // set previousIntentId on dragStarted
-  // cancello la action dall'intent che la conteneva precedentemente
-  public deleteActionFromPreviousIntentOnMovedAction(event, action){
-    const actionId = action._tdActionId;
-    let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.previousIntentId);
-    if(intentToUpdate){
-      const actions = intentToUpdate.actions.filter((action: any) => action._tdActionId !== actionId);
-      intentToUpdate.actions = actions;
-      console.log("[CDS-INTENT-SERVICES] ho eliminato la action dall'intent che la conteneva ",actionId, intentToUpdate);
-      this.connectorService.deleteConnectorsFromActionByActionId(actionId);
-      console.log('[CDS-INTENT-SERVICES] aggiorno intent di partenza', intentToUpdate);
-      const responseIntent = this.updateIntent(intentToUpdate);
-      if(responseIntent){
-        console.log('[CDS-INTENT-SERVICES] update Intent: OK');
-        this.behaviorIntent.next(intentToUpdate);
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-
-  addNewIntentToListOfIntents(intent){
-    console.log("[CDS-INTENT-SERVICES] aggiungo l'intent alla lista di intent");
+  /**
+   * addNewIntentToListOfIntents
+   * @param intent 
+   */
+  public addNewIntentToListOfIntents(intent){
+    // console.log("[CDS-INTENT-SERVICES] aggiungo l'intent alla lista di intent");
     this.listOfIntents.push(intent);
     this.refreshIntents();
     // this.behaviorIntents.next(this.listOfIntents);
   }
 
-  replaceNewIntentToListOfIntents(intent, oldID){
-    this.listOfIntents = this.listOfIntents.map((obj) => {
-      if (obj.id === oldID) {
-        return intent;
-      }
-      return obj;
-    });
-    console.log("[CDS-INTENT-SERVICES] sostituisco l'intent con id NEW con l'intent salvato nella lista degli intent");
-    // this.behaviorIntents.next(this.listOfIntents);
-    this.refreshIntents();
-  }
-
-  deleteIntentToListOfIntents(intentId){
-    console.log("[CDS-INTENT-SERVICES] elimino l'intent alla lista di intent", intentId);
+  /**
+   * 
+   * @param intentId 
+   */
+  public deleteIntentToListOfIntents(intentId){
+    // console.log("[CDS-INTENT-SERVICES] elimino l'intent alla lista di intent", intentId);
     this.listOfIntents = this.listOfIntents.filter((intent: any) => intent.intent_id !== intentId);
-    this.refreshIntents();
   }
-
 
   /** getListOfActions */
   public getListOfActions(){
     return this.listActions;
   }
 
-
+  /**
+   * getListOfIntents
+   * @returns 
+   */
   public getListOfIntents(): Array<{name: string, value: string, icon?:string}>{
     return this.listOfIntents.map(a => {
       if (a.intent_display_name.trim() === 'start') {
@@ -633,7 +637,7 @@ export class IntentService {
 
   /** selectIntent */
   public selectIntent(intentID){
-    console.log('[INTENT SERVICE] --> selectIntent',  this.listOfIntents, intentID);
+    // console.log('[INTENT SERVICE] --> selectIntent',  this.listOfIntents, intentID);
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
     if(this.intentSelected)this.stageService.setDragElement(this.intentSelected.intent_id);
    
@@ -645,7 +649,7 @@ export class IntentService {
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
     this.listActions = this.intentSelected.actions;
     this.selectedAction = this.listActions.find(action => action._tdActionId === actionId);
-    console.log('[INTENT SERVICE] --> selectAction: ', intentID, actionId);
+    // console.log('[INTENT SERVICE] --> selectAction: ', intentID, actionId);
     this.behaviorIntent.next(this.intentSelected);
   }
 
@@ -655,7 +659,7 @@ export class IntentService {
     this.actionSelectedID = null;
     this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
     this.selectedAction = null;
-    console.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
+    // console.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
     this.behaviorIntent.next(this.intentSelected);
     // if(!this.intentSelected)return;
     // chiudo tutti i pannelli
@@ -670,9 +674,16 @@ export class IntentService {
   }
 
   /** deleteSelectedAction 
+   * deleteConnectorsFromActionByActionId: elimino i connettori in uscita della action
+   * aggiorno l'intent con la nuova action 
+   * aggiorno la lista degli intents
+   * refreshIntent: aggiorno gli attributi della action (pallini)
+   * updateConnector: aggiorno i connettori
+   * closeAllPanels: chiudo i pannelli
+   * onUpdateIntentWithTimeout: salvo l'intent
   */
   public deleteSelectedAction(){
-    console.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
+    // console.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
     if(this.intentSelected.intent_id && this.actionSelectedID){
       this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
       let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
@@ -683,23 +694,26 @@ export class IntentService {
         }
         return intent;
       });
-      this.behaviorIntent.next(intentToUpdate);
-      this.connectorService.movedConnector(intentToUpdate.intent_id);
+      this.refreshIntent(intentToUpdate);
+      this.connectorService.updateConnector(intentToUpdate.intent_id);
       this.controllerService.closeAllPanels();
       // this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
-      const responseIntent = this.updateIntent(intentToUpdate);
+      const responseIntent = this.onUpdateIntentWithTimeout(intentToUpdate);
       if(responseIntent){
         // this.connectorService.movedConnector(intentToUpdate.intent_id);
         console.log('update Intent: OK');
-        // this.behaviorIntent.next(intentToUpdate);
       }
       this.unselectAction();
-      console.log('deleteSelectedAction', intentToUpdate);
+      // console.log('deleteSelectedAction', intentToUpdate);
     }
   } 
 
 
-  /** createNewAction */
+  /**
+   * createNewAction
+   * @param typeAction 
+   * @returns 
+   */
   public createNewAction(typeAction: TYPE_ACTION) {
     // console.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
     let action: any;
@@ -761,6 +775,7 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.CHANGE_DEPARTMENT) {
       action = new  ActionChangeDepartment();
+      action.triggerBot = true;
     }
     if(typeAction === TYPE_ACTION.HIDE_MESSAGE){
       action = new ActionHideMessage();
@@ -790,11 +805,11 @@ export class IntentService {
       action.temperature = 0.7;
       action.model = "gpt-3.5-turbo";
       action.assignReplyTo = 'gpt_reply';
+      action.preview = [];
     }
     if(typeAction === TYPE_ACTION.CAPTURE_USER_REPLY) {
       action = new ActionCaptureUserReply();
     }
-    console.log('ho creato nuova action ', action);
     return action;
   }
   // END ATTRIBUTE FUNCTIONS //
@@ -803,173 +818,359 @@ export class IntentService {
 
 
   public patchButtons(buttons, idAction){
-    console.log('patchButtons:: ', buttons);
+    // console.log('patchButtons:: ', buttons);
     buttons.forEach((button, index) => {
       const checkUid = buttons.filter(btn => btn.uid === button.uid);
       if (checkUid.length > 1 || !button.uid && button.uid == undefined) {
         button.uid = generateShortUID(index);
       } 
-      const idActionConnector = idAction+'/'+button.uid;
-      button.__idConnector = idActionConnector;
-      if(button.action && button.action !== ''){
-        button.__isConnected = true;
-      } else {
-        button.__isConnected = false;
-      }
+      buttons[index] = this.patchButton(button, idAction);
     }); 
     return buttons;
   }
   
 
-  // OLD_patchAttributes(attributes: any) {
-  //   console.log('-----------> patchAttributes, ', this.idBot);
-  //   this.faqKbService.patchAttributes(this.idBot, attributes).subscribe((data) => {
-  //       if (data) {
-  //         console.log('data:   ', data);
-  //       }
-  //     }, (error) => {
-  //       console.log('error:   ', error);
-  //     }, () => {
-  //       console.log('complete');
-  //     });
-  // }
-
-  patchAttributes(intentID: string, attributes: any) {
-    clearTimeout(this.setTimeoutChangeEvent);
-    this.setTimeoutChangeEvent = setTimeout(() => {
-      console.log('[INTENT SERVICE] -> patchAttributes, ', intentID, attributes);
-      // let intentToUpdate = this.listOfIntents.find((intent) => intent.id === intentID);
-      // this.addUNDOtoList();
-      this.faqService.patchAttributes(intentID, attributes).subscribe((data) => {
-        this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
-        if (data) {
-          // this.listOfIntents = this.listOfIntents.map((obj) => (obj.id === intentID ? data : obj));
-          // data['attributesChanged'] = true;
-          console.log('[INTENT SERVICE] patchAttributes OK: ', data);
-          // this.behaviorIntent.next(data);
-        }
-      }, (error) => {
-        console.log('error:   ', error);
-      }, () => {
-        console.log('complete');
-      });
-    }, 2000);
+  public patchButton(button, idAction){
+    console.log('patchButton:: ', button);
+    const idActionConnector = idAction+'/'+button.uid;
+    button.__idConnector = idActionConnector;
+    if(button.action && button.action !== ''){
+      button.__isConnected = true;
+    } else {
+      button.__isConnected = false;
+    }
+    return button;
   }
 
 
+  
 
-  /** setDragAndListnerEventToElement */
-  public setDragAndListnerEventToElement(intent) {
-    let intervalId = setInterval(async () => {
-      const result = checkIFElementExists(intent.intent_id);
-      if (result === true) {
-        console.log('[INTENT SERVICE] Condition is true ', intent.intent_id);
-        this.stageService.setDragElement(intent.intent_id);
-        // this.intentService.setListnerEvent(intent);
-        clearInterval(intervalId);
+  /**
+   * setDragAndListnerEventToElement
+   * @param intent 
+   * after the element is on the stage, set the drag on the element
+   */
+  public async setDragAndListnerEventToElement(intent_id) {
+    let isOnTheStage = await isElementOnTheStage(intent_id); // sync
+    if(isOnTheStage){
+      this.stageService.setDragElement(intent_id);
+    }
+  }
+
+
+  /**
+   * replaceIntent
+   * @param intent 
+   * @param listOfIntents 
+   * @returns 
+   */
+  private replaceIntent(intent, listOfIntents){
+    for (let i = 0; i < listOfIntents.length; i++) {
+      // console.log('[INTENT SERVICE] -> replaceIntent:', intent.intent_id, listOfIntents[i].intent_id);
+      if (listOfIntents[i].intent_id === intent.intent_id) {
+        listOfIntents[i] = intent;
+        // console.log('[INTENT SERVICE] -> SOSTITUISCO:', intent);
+        break;
       }
-    }, 100); 
-    // Chiamiamo la funzione ogni 100 millisecondi (0.1 secondo)
-    // Termina l'intervallo dopo 2 secondi (2000 millisecondi)
-    setTimeout(() => {
-      console.log('Timeout: 2 secondo scaduto.');
-      clearInterval(intervalId);
-    }, 2000);
+    }
+    return listOfIntents;
   }
 
+  /**
+   * setListOfintentsToUpdate
+   * @param intent 
+   * @param listOfIntents 
+   * @returns 
+   */
+  private setListOfintentsToUpdate(intent, listOfIntents){
+    let intentsToUpdate = [];
+    const connectorsID = this.connectorService.searchConnectorsInOfIntent(intent.intent_id);
+    const nowIntents = JSON.parse(JSON.stringify(listOfIntents));
+    console.log('setListOfintentsToUpdate', nowIntents, connectorsID);
+    connectorsID.forEach(connector => {
+      let splitFromId = connector['id'].split('/');
+      let intent_id = splitFromId[0];
+      const idEsistente = intentsToUpdate.some((obj) => obj.intent_id === intent_id);
+      if (!idEsistente) {
+        const intentUpdate = nowIntents.find((obj) => obj.intent_id === intent_id);
+        intentsToUpdate.push(intentUpdate);
+      }
+    });
+    console.log('setListOfintentsToUpdate', intentsToUpdate);
+    return intentsToUpdate;
+  }
+
+
+
+  /************************************************
+   * UNDO / REDO
+   * 
+   * 
   /************************************************/
-  /** UNDO / REDO */
-  /************************************************/
-  public addUNDOtoList(){
-    // const cloneIntents = JSON.parse(JSON.stringify(intents));
-    this.arrayUNDO.push(this.prevListOfIntent);
-    console.log('[INTENT SERVICE] -> addUNDO', this.arrayUNDO);
+
+  /**
+   * addIntentToUndoRedo
+   * @param type 
+   * @param intent 
+   * @param intentsToUpdateUndo 
+   * @param intentsToUpdateRedo 
+   */
+  public addIntentToUndoRedo(type: string, intentPre: Intent, intentNow: Intent, intentsToUpdateUndo: Array<Intent>, intentsToUpdateRedo: Array<Intent>, connector?: string){
+    let typeUNDO = type;
+    let typeREDO = type;
+    if(type === 'PUSH'){typeUNDO = 'DEL';}
+    if(type === 'DEL'){typeUNDO = 'PUSH';}
+    let pos =  this.listOfIntents.findIndex((element) => { return element.intent_id === intentPre.intent_id });
+    if(!pos || pos<0)pos = this.listOfIntents.length;
+    let UNDO = this.setUndoRedoObject(type, typeUNDO, typeREDO, pos, intentPre, intentNow, intentsToUpdateUndo, intentsToUpdateRedo, connector);
+    this.arrayUNDO.push(UNDO);
+    console.log('[INTENT SERVICE] ***** AGGIUNGO ', UNDO, this.arrayUNDO );
     // this.arrayUNDO = this.arrayUNDO.slice(10);
+    this.lastActionUndoRedo = false;
     this.arrayREDO = [];
   }
 
 
-  private async confrontaArray(arrayLIVE, arrayUNDO_REDO) {
-    for (const itemUNDOREDO of arrayUNDO_REDO) {
-      // console.log('[INTENT SERVICE] addUNDO -> intent_id',  itemUNDO.intent_id);
-      const itemLive = arrayLIVE.find((element) => element.intent_id === itemUNDOREDO.intent_id);
-      if (itemLive) {
-        if(JSON.stringify(itemLive) !== JSON.stringify(itemUNDOREDO)){
-          // update intent
-          console.log('[INTENT SERVICE] ->  UPDATE INTENT',  itemUNDOREDO);
-          // this.connectorService.deleteConnectorsOfBlock(itemUNDOREDO.intent_id);
-          this.updateIntent(itemUNDOREDO, 0, true);
-        }
-      } else {
-        // insert new intent
-        // caso in cui arrayUNDO contiene un item in più dell'array attualmente visualizzato
-        // quindi bisogna creare un item
-        console.log('[INTENT SERVICE] -> SALVO NEW INTENT',  itemUNDOREDO);
-        let id_faq_kb = this.dashboardService.id_faq_kb;
-        // const oldId = itemUNDOREDO.id?itemUNDOREDO.id:null;
-        const newIntent = await this.saveNewIntent(id_faq_kb, itemUNDOREDO, true);
-        if (newIntent) {
-          this.intentSelected.id = newIntent.id;
-          this.replaceNewIntentToListOfIntents(newIntent, itemUNDOREDO.id);
-          this.setDragAndListnerEventToElement(newIntent);
-
-          this.connectorService.createConnectors(this.listOfIntents);
-        }
+  /**
+   * 
+   * @param type 
+   * @param typeUNDO 
+   * @param typeREDO 
+   * @param pos 
+   * @param intentPre 
+   * @param intentNow 
+   * @param intentsToUpdateUndo 
+   * @param intentsToUpdateRedo 
+   * @param connector 
+   * @returns 
+   */
+  private setUndoRedoObject(type, typeUNDO, typeREDO, pos, intentPre, intentNow, intentsToUpdateUndo, intentsToUpdateRedo, connector?){
+    console.log('[INTENT SERVICE] -> setUndoRedoObject ',intentNow, intentPre, intentsToUpdateUndo, intentsToUpdateRedo, connector);
+    let obj = {
+      type: type,
+      pos: pos,
+      undo:{
+        type: typeUNDO,
+        connector: connector,
+        intent: JSON.parse(JSON.stringify(intentPre)),
+        intentsToUpdate: JSON.parse(JSON.stringify(intentsToUpdateUndo)),
+      },
+      redo:{
+        type: typeREDO,
+        connector: connector,
+        intent: JSON.parse(JSON.stringify(intentNow)),
+        intentsToUpdate: JSON.parse(JSON.stringify(intentsToUpdateRedo)),
       }
     }
-
-
-    // Estrai tutti gli intent_id da array1
-    const intentIdsArrayUNDOREDO = arrayUNDO_REDO.map((obj) => obj.intent_id);
-    // Filtra gli oggetti in array2 che non hanno un corrispondente intent_id in array1
-    const missingItemsInUNDOREDO = arrayLIVE.filter(
-      (item) => !intentIdsArrayUNDOREDO.includes(item.intent_id)
-    );
-    console.log('[INTENT SERVICE] -> ELIMINO INTENT 1',  missingItemsInUNDOREDO);
-    if(missingItemsInUNDOREDO && missingItemsInUNDOREDO.length>0){
-      // caso in cui array attuale contiene un item in più dell'array UNDO REDO
-      // quindi bisogna eliminare un item
-      missingItemsInUNDOREDO.forEach(element => {
-        console.log('[INTENT SERVICE] -> ELIMINO INTENT 2',  element);
-        this.deleteIntent(element, true);
-        this.connectorService.deleteConnectorsOfBlock(element.intent_id);
-      });
-    }
-    // return true; // Tutti gli oggetti con lo stesso ID sono equivalenti
+    // console.log('[INTENT SERVICE] -> setUndoRedoObject', obj);
+    return obj;
   }
 
-
-
+  /** */
   public restoreLastUNDO(){
+    this.lastActionUndoRedo = true;
+    // console.log('[INTENT SERVICE] -> restoreLastUNDO', this.arrayUNDO);
     if(this.arrayUNDO && this.arrayUNDO.length>0){
-      const listOfIntentsUNDO = this.arrayUNDO.pop();
-      console.log('[INTENT SERVICE] -> restoreLastUNDO', listOfIntentsUNDO, this.arrayUNDO);
-      const listOfIntentsLIVE = JSON.parse(JSON.stringify(this.listOfIntents));
-      this.arrayREDO.push(listOfIntentsLIVE);
-      this.confrontaArray(listOfIntentsLIVE, listOfIntentsUNDO);
-      
-      this.listOfIntents = listOfIntentsUNDO;
-      this.refreshIntents();
-      // this.connectorService.deleteAllConnectors();
-      // this.connectorService.createConnectors(this.listOfIntents);
-      // this.refreshIntents();
+      const objUNDO = JSON.parse(JSON.stringify(this.arrayUNDO.pop()));
+      this.arrayREDO.push(objUNDO);
+      // console.log('[INTENT SERVICE] -> RESTORE UNDO: ', this.arrayREDO);
+      this.restoreIntent(objUNDO.pos, objUNDO.undo);
+      console.log('[INTENT SERVICE] -> ho aggiornato gli array dopo UNDO ', this.arrayUNDO, this.arrayREDO);
     }
   }
 
+  /** */
   public restoreLastREDO(){
+    this.lastActionUndoRedo = true;
+    // console.log('[INTENT SERVICE] -> restoreLastREDO', this.arrayREDO);
     if(this.arrayREDO && this.arrayREDO.length>0){
-      const listOfIntentsREDO = this.arrayREDO.pop();
-      console.log('[INTENT SERVICE] -> restoreLastREDO', listOfIntentsREDO);
-      const listOfIntentsLIVE = JSON.parse(JSON.stringify(this.listOfIntents));
-      this.arrayUNDO.push(listOfIntentsLIVE);
-      this.confrontaArray(listOfIntentsLIVE, listOfIntentsREDO);
-      
-      this.listOfIntents = listOfIntentsREDO;
-      this.refreshIntents();
-      // this.connectorService.deleteAllConnectors();
-      // this.connectorService.createConnectors(this.listOfIntents);
-      
+      const objREDO = JSON.parse(JSON.stringify(this.arrayREDO.pop()));
+      this.arrayUNDO.push(objREDO);
+      // console.log('[INTENT SERVICE] -> RESTORE REDO: ', objREDO);
+      this.restoreIntent(objREDO.pos, objREDO.redo);
+      console.log('[INTENT SERVICE] -> ho aggiornato gli array dopo REDO ', this.arrayUNDO, this.arrayREDO);
     }
+  }
+
+  /**
+   * restoreIntent
+   * @param pos 
+   * @param object 
+   * @returns 
+   */
+  async restoreIntent(pos, obj){
+    const object = JSON.parse(JSON.stringify(obj));
+    const restoreAction = object.type;
+    const intent = object.intent;
+    const intentsToUpdate = object.intentsToUpdate;
+    const connector = object.connector;
+    this.lastActionUndoRedo = intent.intent_id;
+    console.log('[INTENT SERVICE] -> restoreAction : typeAction:', object, intentsToUpdate);
+    if(restoreAction == 'DEL'){
+      this.restoreDel(intent, intentsToUpdate);
+      return;
+    } 
+    if(restoreAction == 'PUSH'){
+      this.restorePush(intent, pos, intentsToUpdate);
+      return
+    }
+    if(restoreAction == 'PUT'){ 
+      this.restorePut(intent, intentsToUpdate);
+      return;
+    } 
+    if(restoreAction == 'CONN' && connector){ 
+      this.restoreConnector(intent, connector);
+      return;
+    } 
+  }
+
+  /**
+   * restorePush
+   * @param intent 
+   * @param pos 
+   * @param intentsToUpdate 
+   * @returns 
+   * 
+   * insertItemIntoPositionInTheArray: inserisco l'intent (precedentemente eliminato), nella lista degli intents (listOfIntents) nella posizione corretta
+   * refreshIntent: aggiorna i pallini delle actions a seconda che abbiano o meno un connettore in uscita, successivamente verrà creato il connettore
+   * isElementOnTheStage: aspetto che l'intent sia effettivamente sullo stage e procedo
+   * replaceIntent: sostituisce l'intent modificato nell'elenco degli intents
+   * deleteConnectorsOfBlockThatDontExist: elimina i connettori che puntano ad un intent che non esiste sullo stage 
+   * * il caso è: ...
+   * createConnectorsOfIntent: crea i connettori in uscita verso l'intent creato
+   * updateIntent: salva l'intent modificato
+   * refreshIntents: fa scattare l'evento e aggiorna l'elenco degli intents (listOfIntents) in tutti i componenti sottoscritti, come cds-panel-intent-list 
+   * saveNewIntent: salva in remoto l'intent creato 
+   */
+  private async restorePush(intent, pos, intentsToUpdate){
+    this.listOfIntents = insertItemIntoPositionInTheArray(this.listOfIntents, intent, pos);
+    this.refreshIntent(intent);
+    let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
+    if(isOnTheStage){
+      this.connectorService.createConnectorsOfIntent(intent);
+      intentsToUpdate.forEach(element => {
+        console.log('[INTENT SERVICE] -> REPLACE ', element);
+        this.listOfIntents = this.replaceIntent(element, this.listOfIntents);
+        // this.refreshIntent(element); 
+        setTimeout(()=> {
+          // ATTENZIONE!!! le seguenti azioni devono essere svolte solo dopo che l'elemento è stato aggiornato (gli attributi __ dovrebbero essere generati quando carichiamo i dati dal server!!!)
+          this.connectorService.deleteConnectorsOfBlockThatDontExist(element.intent_id);
+          this.connectorService.createConnectorsOfIntent(element);
+          // this.connectorService.updateConnector(element.intent_id, false);
+        }, 100);
+        this.updateIntent(element); // async
+      });
+      // console.log('[INTENT SERVICE] -> restoreAction', isOnTheStage, intent.intent_id);
+      this.refreshIntents();
+      this.saveNewIntent(intent, null, null, false); // async
+      return;
+    }
+  }
+
+  /**
+   * restoreDel
+   * @param intent 
+   * @param intentsToUpdate 
+   * @returns 
+   * 
+   * deleteIntentToListOfIntents: cancello l'intent dall'elenco degli intents (listOfIntents)
+   * deleteConnectorsOfBlock: cancello tutti i connettori IN e OUT dall'intent eliminato
+   * replaceIntent: per ogni intent collegato (tramite connettore) all'intent eliminato, sostituisco la vecchia versione nell'elenco degli intent
+   * // refreshIntent: faccio scattare l'evento per comunicare a tutti i componenti sottoscritti che l'intent è stato modificato (fa scattare updateConnector in tutte le azioni coinvolte e aggiorna i pallini dei connettori)
+   * createConnectorsOfIntent: creo i connettori dell'intent (se esistono li sostituisco)
+   * // updateConnector: aggiorno i connettori perchè può cambiare la posizione delle actions
+   * updateIntent: salva l'intent modificato in remoto
+   * deleteIntent: elimina l'intent in remoto
+   * refreshIntents: fa scattare l'evento e aggiorna l'elenco degli intents (listOfIntents) in tutti i componenti sottoscritti, come cds-panel-intent-list 
+   */
+  private async restoreDel(intent, intentsToUpdate){
+    this.deleteIntentToListOfIntents(intent.intent_id);
+    this.connectorService.deleteConnectorsOfBlock(intent.intent_id); // cancello tutti i connettori IN e OUT
+    intentsToUpdate.forEach(element => {
+      console.log('[INTENT SERVICE] -> REPLACE ', element);
+      this.listOfIntents = this.replaceIntent(element, this.listOfIntents);
+      setTimeout(()=> {
+        // ATTENZIONE!!! le seguenti azioni devono essere svolte solo dopo che l'elemento è stato aggiornato (gli attributi __ dovrebbero essere generati quando carichiamo i dati dal server!!!)
+        this.connectorService.createConnectorsOfIntent(element);
+        // this.connectorService.deleteConnectorsOfBlockThatDontExist(element.intent_id, false);
+        // this.connectorService.updateConnector(element.intent_id, false);
+      }, 100);
+      this.updateIntent(element); // async
+    });
+    this.deleteIntent(intent, false); // async
+    this.refreshIntents();
+    return;
+  }
+
+  /**
+   * restorePut
+   * @param intent 
+   * @param intentsToUpdate 
+   * @returns 
+   * 
+   * replaceIntent: per ogni intent collegato (tramite connettore) all'intent eliminato, sostituisco la vecchia versione nell'elenco degli intent
+   * refreshIntent: faccio scattare l'evento per comunicare a tutti i componenti sottoscritti che l'intent è stato modificato 
+   *  * (fa scattare updateConnector in tutte le azioni coinvolte e aggiorna i pallini dei connettori cioè tutti gli attributi custom __) !!! DA ELIMINARE !!!
+   * updateConnector: aggiorno i connettori dell'elemento modificato perchè può cambiare la posizione delle actions
+   * updateConnector: aggiorno i connettori di tutti gli intent collegati all'intent modificato
+   * updateIntent: salva l'intent modificato in remoto
+   * refreshIntents: fa scattare l'evento e aggiorna l'elenco degli intents (listOfIntents) in tutti i componenti sottoscritti, come cds-panel-intent-list 
+   */
+  private async restorePut(intent, intentsToUpdate){
+    this.listOfIntents = this.replaceIntent(intent, this.listOfIntents);
+    console.log('[INTENT SERVICE] -> REPLACE INTENT: ', intent);
+    // this.refreshIntent(intent); // aggiorno gli attributi custom ex: __isConnected !!! DA RIFATTORIZZARE !!!
+    setTimeout(()=> {
+      this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id); // false, false
+      this.connectorService.deleteConnectorsBrokenOutOfBlock(intent.intent_id); // false, false
+      this.connectorService.createConnectorsOfIntent(intent); // false, false
+      this.connectorService.updateConnector(intent.intent_id);
+    }, 100);
+  
+    intentsToUpdate.forEach(element => {
+      this.listOfIntents = this.replaceIntent(element, this.listOfIntents);
+      console.log('[INTENT SERVICE] -> REPLACE ELEMENT: ', element);
+      // this.refreshIntent(element);
+      setTimeout(()=> {
+        this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id); // false, false
+        this.connectorService.deleteConnectorsBrokenOutOfBlock(element.intent_id); // false, false
+        this.connectorService.createConnectorsOfIntent(element); // false, false
+        this.connectorService.updateConnector(element.intent_id);
+      }, 100);
+      this.updateIntent(element); // async
+    });
+    this.updateIntent(intent); // async
+    this.refreshIntents();
+    return;
+  }
+
+  /**
+   * restoreConnector
+   * @param intent 
+   * @param connector 
+   * @returns 
+   * 
+   * replaceIntent: per ogni intent collegato (tramite connettore) all'intent eliminato, sostituisco la vecchia versione nell'elenco degli intent
+   * mi assicuro che il connettore è sullo stage 
+   * deleteConnector: elimino il connettore
+   * createNewConnector: ricreo il connettore
+   * updateIntent: salva l'intent modificato in remoto
+   * refreshIntents: fa scattare l'evento e aggiorna l'elenco degli intents (listOfIntents) in tutti i componenti sottoscritti, come cds-panel-intent-list 
+   */
+  private async restoreConnector(intent, connector){
+    
+    // setTimeout(()=> {
+        const arrow = document.getElementById(connector.id);
+        console.log('[INTENT SERVICE] -> arrow: ', arrow, connector);
+        if(arrow)this.connectorService.deleteConnector(connector.id);
+        else this.connectorService.createNewConnector(connector.fromId, connector.toId);
+      // this.connectorService.updateConnector(intent.intent_id, false);
+    // }, 100);
+
+    // this.listOfIntents = this.replaceIntent(intent, this.listOfIntents); /// Arggggg!! questa mmerda ricarica tutte le action e mi svuota tutti i connettori true false
+    this.updateIntent(intent); // async
+    // this.refreshIntent(intent);
+    return;
   }
   /************************************************/
 

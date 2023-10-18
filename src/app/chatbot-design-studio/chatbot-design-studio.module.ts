@@ -123,7 +123,6 @@ import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/chan
 import { CdsPopupComponent } from './cds-dashboard/utils/cds-popup/cds-popup.component';
 import { CdsModalActivateBotComponent } from './cds-dashboard/utils/cds-modal-activate-bot/cds-modal-activate-bot.component';
 import { CdsPanelElementsComponent } from './cds-dashboard/cds-canvas/cds-panel-elements/cds-panel-elements.component';
-// import { CdsPanelDetailComponent } from './cds-dashboard/cds-panel-detail/cds-panel-detail.component';
 import { CdsPanelActionsComponent } from './cds-dashboard/cds-canvas/cds-panel-elements/cds-panel-actions/cds-panel-actions.component';
 import { CdsPanelIntentListComponent } from './cds-dashboard/cds-canvas/cds-panel-intent-list/cds-panel-intent-list.component';
 
@@ -150,6 +149,9 @@ import { BaseFilterComponent } from './cds-dashboard/cds-canvas/actions/list/cds
 
 //ACTION ASK-GPT: elements
 import { AddkbDialogComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-askgpt/addkb-dialog/addkb-dialog.component';
+
+//ACTION GPT-TASK: elements
+import { AttributesDialogComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
 
 //CDS- ACTIONS
 import { CdsActionDescriptionComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-description/cds-action-description.component';
@@ -305,6 +307,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         // action ASKGPT elements: start //
         AddkbDialogComponent,
         // action ASKGPT elements: end //
+        // action GptTask elements: start //
+        AttributesDialogComponent,
+        // action GptTask elements: end //
 
     // ******* CDS CANVAS:: end *******
 

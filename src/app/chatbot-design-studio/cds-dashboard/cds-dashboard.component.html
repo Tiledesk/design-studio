@@ -13,8 +13,7 @@
         class="chatboat-dashboard" 
         [class.is_opened_sidebar]="IS_OPEN_SIDEBAR">
        
-        <cds-sidebar 
-            class="cds-sidebar" 
+        <cds-sidebar class="cds-sidebar" 
             [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 
             (onClickItemList)="onClickItemList($event)" 
             (goToBck)="goBack()">
@@ -22,8 +21,7 @@
         
         <cds-canvas *ngIf="activeSidebarSection == SIDEBAR_PAGES.INTENTS && initFinished" 
             class="cds-content"
-            (closePanelWidget)="onClosePanelWidget()"
-            (testItOut)="onTestItOut($event)">
+            [onHeaderTestItOut]="eventTestItOutHeader.asObservable()">
         </cds-canvas>
 
         <cds-chatbot-details *ngIf="activeSidebarSection == SIDEBAR_PAGES.SETTINGS && initFinished" 
@@ -38,14 +36,13 @@
             [selectedChatbot]="selectedChatbot">
         </cds-rules>
 
-        <cds-panel-widget *ngIf="IS_OPEN_PANEL_WIDGET" 
-            id="widget-preview" 
-            class="cds-generic-panel">
-        </cds-panel-widget>
         
     </div>
 
-    <cds-modal-activate-bot [selectedChatbot]="selectedChatbot"></cds-modal-activate-bot>
+    <cds-modal-activate-bot 
+        [selectedChatbot]="selectedChatbot">
+    </cds-modal-activate-bot>
+    
     <cds-popup></cds-popup>
 
 </div>

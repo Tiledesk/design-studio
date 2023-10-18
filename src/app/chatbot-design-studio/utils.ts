@@ -2,6 +2,7 @@ import { AbstractControl } from "@angular/forms";
 import { Intent } from "src/app/models/intent-model";
 import { v4 as uuidv4 } from 'uuid';
 
+export const preDisplayName:string  = 'untitled_block_';
 
 export enum TYPE_INTENT_NAME {
     TOPIC_INTERNAL = 'internal',
@@ -195,7 +196,7 @@ export enum TYPE_OF_MENU {
     QUESTION = 'question'
 }
 
-export const NEW_POSITION_ID = 'new';
+export const INTENT_TEMP_ID = '';
 
 export const MESSAGE_METADTA_WIDTH = '100%';
 export const MESSAGE_METADTA_HEIGHT = 230;
@@ -377,13 +378,21 @@ export function convertJsonToArray(jsonData:any){
     return arrayOfObjs;
 }
 
-export function checkIFElementExists(elementId:string){
-    var element = document.getElementById(elementId);
-    if(!element){
-      return false;
-    } else {
-      return true;
-    }
+export async function isElementOnTheStage(elementId:string): Promise<any>{
+    // if(document.getElementById(elementId)) return true;
+    return new Promise((resolve) => {
+        let intervalId = setInterval(async () => {
+            const result = document.getElementById(elementId);
+            if (result) {
+                clearInterval(intervalId);
+                resolve(result);
+            }
+        }, 0);
+        setTimeout(() => {
+            clearInterval(intervalId);
+            resolve(false);
+        }, 1000);
+    });
 }
 
 export function removeNodesStartingWith(obj, start) {
@@ -395,6 +404,14 @@ export function removeNodesStartingWith(obj, start) {
         }
     }
     return obj;
+}
+
+export function insertItemIntoPositionInTheArray(array, item, pos = array.length) {
+    if (pos < 0 || pos > array.length) {
+      pos = array.length;
+    }
+    array.splice(pos, 0, item);
+    return array;
 }
 
 // export function retriveListOfVariables(intents: Array<Intent>) {
@@ -437,4 +454,35 @@ export function replaceItemInArrayForKey(key, array, item) {
 
 export function checkInternalIntent(intent: Intent): boolean{
     return intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START ||  intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK ? true: false
+}
+
+export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
+    let arrayCoord = []
+    listOfIntents.forEach(el => arrayCoord.push(el.attributes.position))
+    let minX = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x < curr.attributes.position.x ? prev : curr}).attributes.position.x
+    let minY = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).attributes.position.y
+    let maxX = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).attributes.position.x
+    let maxY = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y > curr.attributes.position.y ? prev : curr}).attributes.position.y
+    
+    let rightIntentWith = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).intent_id).getBoundingClientRect().width
+    let bottomIntentHeight = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).intent_id).getBoundingClientRect().height
+
+    var width = (maxX - minX) + rightIntentWith
+    var height = maxY - minY + bottomIntentHeight
+    
+    // let calcCenter = { x:  Math.round(((minX + maxWidth)/2)), y: Math.round(((minY + maxHeight)/2)) };
+    console.log('arrayyyyyyyy', arrayCoord)
+    // console.log('centerrrr', calcCenter)
+    console.log('width heightttt', width, height)
+
+    const stage = document.getElementById('tds_container').getBoundingClientRect()
+    var scale = Math.min(stage.width / width, stage.height / height);
+    console.log('scaleeeee', scale)
+
+    var translationX = Math.round((stage.width - (width * scale)) / 2) - rightIntentWith;
+    var translationY = Math.round((stage.height - (height * scale)) / 2) - bottomIntentHeight;
+    
+    console.log('translateeee x- y ', translationX, translationY)
+    return { scale: scale, width : width, height: height }
+    // return { width: srcWidth*ratio, height: srcHeight*ratio };
 }

@@ -29,6 +29,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { DepartmentService } from 'src/app/services/department.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { FaqService } from 'src/app/services/faq.service';
+import { Subject } from 'rxjs';
 
 
 @Component({
@@ -44,7 +45,8 @@ export class CdsDashboardComponent implements OnInit {
   IS_OPEN_INTENTS_LIST: boolean = true;
   IS_OPEN_PANEL_WIDGET: boolean = false;
 
-
+  eventTestItOutHeader: Subject<Intent | boolean> = new Subject<Intent | boolean>();
+  
   project: Project;
   defaultDepartmentId: string;
   selectedChatbot: Chatbot
@@ -52,23 +54,16 @@ export class CdsDashboardComponent implements OnInit {
   isBetaUrl: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
-  
   constructor(
-    private router: Router,
     private route: ActivatedRoute,
     private appConfigService: AppConfigService,
     private dashboardService: DashboardService,
-    private intentService: IntentService,
-    private controllerService: ControllerService,
-    private connectorService: ConnectorService,
     private kbService: KnowledgeBaseService,
     public departmentService: DepartmentService,
     public faqKbService: FaqKbService,
     public faqService: FaqService,
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
-    
-    // private translate: TranslateService
   ) {}
 
   ngOnInit() {
@@ -210,36 +205,31 @@ export class CdsDashboardComponent implements OnInit {
   */
   onTestItOut(event: Intent | boolean) {
     this.logger.log('[CDS DSHBRD] onTestItOut intent ', event);
-    if(typeof event === "boolean"){
-      this.IS_OPEN_PANEL_WIDGET = true;
-    } else {
-      this.IS_OPEN_PANEL_WIDGET = !this.IS_OPEN_PANEL_WIDGET;
-    }
-    if(this.IS_OPEN_PANEL_WIDGET){
-      this.controllerService.closeActionDetailPanel();
-      this.controllerService.closeButtonPanel();
-      // this.intentService.setLiveActiveIntent(null);
-      this.controllerService.closeAddActionMenu();
-      this.connectorService.removeConnectorDraft();
-    }
+    // if(typeof event === "boolean"){
+    //   this.IS_OPEN_PANEL_WIDGET = true;
+    // } else {
+    //   this.IS_OPEN_PANEL_WIDGET = !this.IS_OPEN_PANEL_WIDGET;
+    // }
+    // if(this.IS_OPEN_PANEL_WIDGET){
+    //   this.controllerService.closeActionDetailPanel();
+    //   this.controllerService.closeButtonPanel();
+    //   // this.intentService.setLiveActiveIntent(null);
+    //   this.controllerService.closeAddActionMenu();
+    //   this.connectorService.removeConnectorDraft();
+    // }
+
+    this.eventTestItOutHeader.next(event);
   }
   /*****************************************************/
 
 
   /**************** START EVENTS PANEL INTENT ****************/
-
-  /** onClosePanelWidget */
-  onClosePanelWidget(){
-    this.logger.log('[CDS DSHBRD] onClosePanelWidget');
-    this.IS_OPEN_PANEL_WIDGET = false;
-  }
-
   /** SIDEBAR OUTPUT EVENTS */
   onClickItemList(event: string) {
     this.logger.log('[CDS DSHBRD] active section-->', event);
     if(event !== 'cds-sb-intents'){
       // this.connectorService.initializeConnectors();
-      this.IS_OPEN_PANEL_WIDGET = false;
+      this.eventTestItOutHeader.next(false);
     }
     this.activeSidebarSection = event;
   }

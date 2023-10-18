@@ -5,6 +5,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionOnlineAgent } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
   selector: 'cds-action-online-agents',
@@ -30,22 +31,29 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
+  private subscriptionChangedConnector: Subscription;
   
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   private logger: LoggerService = LoggerInstance.getInstance();
-
   constructor(
     private formBuilder: FormBuilder,
     private intentService: IntentService,
   ) { }
 
   ngOnInit(): void {
-    this.intentService.isChangedConnector$.subscribe((connector: any) => {
+    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       // console.log('CdsActionIntentComponent isChangedConnector-->', connector);
       this.connector = connector;
       this.updateConnector();
     });
+  }
+
+  /** */
+  ngOnDestroy() {
+    if (this.subscriptionChangedConnector) {
+      this.subscriptionChangedConnector.unsubscribe();
+    }
   }
 
   ngOnChanges() {
@@ -72,7 +80,7 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
       const array = this.connector.fromId.split("/");
       const idAction= array[1];
       if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){ //TODO: verificare quale dei due connettori è stato eliminato e impostare isConnected a false
+        if(this.connector.deleted){
           // DELETE 
           // this.logger.log(' deleteConnector :: ', this.connector.id);
           // this.action.intentName = null;
@@ -84,7 +92,9 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
             this.action.falseIntent = null
             this.isConnectedFalse = false;
           }
-          this.updateAndSaveAction.emit();
+          // if(this.connector.notify)
+          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+          // this.updateAndSaveAction.emit();
         } else { //TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
           // ADD / EDIT
           this.logger.log(' updateConnector :: onlineagents', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
@@ -92,15 +102,19 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
             this.isConnectedTrue = true;
             if(this.action.trueIntent !== '#'+this.connector.toId){
               this.action.trueIntent = '#'+this.connector.toId;
-              this.updateAndSaveAction.emit();
+              // if(this.connector.notify)
+              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+              // this.updateAndSaveAction.emit();
             } 
           }    
 
           if(array[array.length -1] === 'false'){
             this.isConnectedFalse = true;
             if(this.action.falseIntent !== '#'+this.connector.toId){
-              this.action.falseIntent = '#'+this.connector.toId
-              this.updateAndSaveAction.emit();
+              this.action.falseIntent = '#'+this.connector.toId;
+              // if(this.connector.notify)
+              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+              // this.updateAndSaveAction.emit();
             } 
           }
         }
@@ -143,16 +157,17 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
   onChangeSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent'){
     if(event){
       this.action[type]=event.value
+
+      switch(type){
+        case 'trueIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
+          break;
+        case 'falseIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
+          break;
+      }
+      this.updateAndSaveAction.emit();
     }
-    switch(type){
-      case 'trueIntent':
-        this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
-        break;
-      case 'falseIntent':
-        this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
-        break;
-    }
-    this.updateAndSaveAction.emit();
   }
 
   onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {

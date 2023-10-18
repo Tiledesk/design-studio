@@ -25,41 +25,40 @@ export class ControllerService {
   public isOpenAddActionMenu$ = this.addActionMenu.asObservable();
 
   constructor() {
-    
   }
 
 
   // Buttons s
   public openButtonPanel(button){
-    console.log('openButtonPanel:: ', button);
+    // console.log('openButtonPanel:: ', button);
     this.buttonSource.next(button);
   }
 
   public closeButtonPanel(){
-    console.log('closeButtonPanel:: ');
+    // console.log('closeButtonPanel:: ');
     this.buttonSource.next(null);
   }
 
   // action detail panel
   public openActionDetailPanel(type: TYPE_INTENT_ELEMENT, element: Action | string | Form){
-    console.log('openButtonPanel:: ', type, element);
+    // console.log('openButtonPanel:: ', type, element);
     this.actionSource.next({type, element});
   }
 
   public closeActionDetailPanel(){
-    console.log('closeActionDetailPanel:: ');
+    // console.log('closeActionDetailPanel:: ');
     this.actionSource.next({type: null, element: null});
   }
 
   /** closeAddActionMenu */
   public closeAddActionMenu(){
-    console.log('closeAddActionMenu:: ');
+    // console.log('closeAddActionMenu:: ');
     this.addActionMenu.next(null);
   }
 
 
   public closeAllPanels(){
-    console.log('closeAllPanels:: ');
+    // console.log('closeAllPanels:: ');
     this.addActionMenu.next(null);
     this.buttonSource.next(null);
     this.actionSource.next({type: null, element: null});

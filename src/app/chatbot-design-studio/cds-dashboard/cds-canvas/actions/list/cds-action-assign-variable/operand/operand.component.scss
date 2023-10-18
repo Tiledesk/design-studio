@@ -1,14 +1,26 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+:host{
+    --icon-color: #{$blu};
+    --textColor: #{$blu};
+    --backGroundColor: #{$blu-light-04};
+    --hoverBackgroundColor: #{$blu-light-03};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --border-radius-base: 8px
+    
+}
+
 div.operand-wrp {
     display: grid;
     align-items: center;
     grid-template-columns: 11fr 1fr;
     grid-column-gap: 0px;
     grid-row-gap: 10px;
-    background: rgb(66,85,117);
+    background-color: var(--content-background);
+    border: 1px solid $gray-light-02;
     padding: 10px 10px 20px;
-    border-radius: 5px;
+    border-radius: 4px;
     &.opened {
         .select-function{
             display:block;
@@ -20,7 +32,7 @@ div.operand-wrp {
 
     .material-icons {
         font-size: 25px;
-        color: #8ab4f8;
+        color: var(--icon-color);
         display: flex;
         justify-content: center;
         align-items: center;

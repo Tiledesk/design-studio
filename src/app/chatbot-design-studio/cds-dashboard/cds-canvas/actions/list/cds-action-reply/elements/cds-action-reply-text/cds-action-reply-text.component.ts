@@ -7,6 +7,9 @@ import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/mo
 import { TYPE_BUTTON, generateShortUID } from '../../../../../../../utils';
 import { IntentService } from '../../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../../services/connector.service';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-reply-text',
@@ -16,6 +19,7 @@ import { ConnectorService } from '../../../../../../../services/connector.servic
 export class CdsActionReplyTextComponent implements OnInit {
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   
+  @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
   @Output() deleteActionReply = new EventEmitter();
   @Output() moveUpResponse = new EventEmitter();
@@ -33,6 +37,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   // Connector //
   idIntent: string;
   connector: any;
+  private subscriptionChangedConnector: Subscription;
   // Textarea //
   // Delay //
   delayTime: number;
@@ -45,6 +50,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   buttons: Array<Button>;
 
 
+  private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private connectorService: ConnectorService,
     private intentService: IntentService
@@ -52,11 +58,27 @@ export class CdsActionReplyTextComponent implements OnInit {
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
+    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
+      console.log('[CdsActionReplyTextComponent] - subcribe to isChangedConnector$ >>', connector);
+      this.connector = connector;
+      this.updateConnector();
+    });
     this.initialize();
   }
 
   // ngOnChanges(changes: SimpleChanges): void {
-  //   console.log('CdsActionReplyTextComponent ngOnChanges:: ', this.response);
+  //   console.log('[CDS-ACTION-INTENT] >>', changes);
+  // }
+
+  /** */
+  ngOnDestroy() {
+    if (this.subscriptionChangedConnector) {
+      this.subscriptionChangedConnector.unsubscribe();
+    }
+  }
+  
+  // ngOnChanges(changes: SimpleChanges): void {
+  //   this.logger.log('CdsActionReplyTextComponent ngOnChanges:: ', this.response);
   // }
 
   // PRIVATE FUNCTIONS //
@@ -64,16 +86,10 @@ export class CdsActionReplyTextComponent implements OnInit {
   private initialize(){
     this.delayTime = (this.wait && this.wait.time)? (this.wait.time/1000) : 500;
     this.checkButtons();
-    this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      console.log('[CdsActionReplyTextComponent] isChangedConnector-->', connector);
-      this.connector = connector;
-      this.updateConnector();
-    });
-    // this.patchButtons();
-    // this.buttons = this.response?.attributes?.attachment?.buttons;
+    // console.log('[CDS-ACTION-REPLY] - buttons >>', this.response, this.buttons);
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);
     this.idIntent = this.idAction.split('/')[0];
-    
+
     if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
       this.filterConditionExist = true
     }
@@ -91,7 +107,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   }
 
   // private async patchButtons(){
-  //   console.log('patchButtons:: ', this.response);
+  //   this.logger.log('patchButtons:: ', this.response);
   //   let buttons = this.response?.attributes?.attachment?.buttons;
   //   if(!buttons)return;
   //   buttons.forEach(button => {
@@ -105,7 +121,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   //     } else {
   //       button.__isConnected = false;
   //     }
-  //     console.log('[cds-action-reply-text ]:: button: ', button, button.__uid);
+  //     this.logger.log('[cds-action-reply-text ]:: button: ', button, button.__uid);
   //     // button.__isConnected = true;
       
   //   }); 
@@ -116,36 +132,38 @@ export class CdsActionReplyTextComponent implements OnInit {
       const array = this.connector.fromId.split("/");
       const idButton = array[array.length - 1];
       const idConnector = this.idAction+'/'+idButton;
-      console.log(' updateConnector [CdsActionReplyTextComponent]:: connector.fromId: ', this.connector.fromId);
-      // console.log(' updateConnector [CdsActionReplyTextComponent]:: idConnector: ', idConnector);
-      // console.log(' updateConnector [CdsActionReplyTextComponent]:: idButton: ', idButton);
-      // console.log(' updateConnector [CdsActionReplyTextComponent]:: connector.id: ', this.connector.id);
       const buttonChanged = this.buttons.find(obj => obj.uid === idButton);
+      // console.log('updateConnector [CdsActionReplyTextComponent]:: buttonChanged: ', this.connector, buttonChanged, this.buttons, idButton);
+      // console.log('updateConnector [CdsActionReplyTextComponent]:: connector.fromId: ', idConnector, idButton, this.connector.fromId);
       if(idConnector === this.connector.fromId && buttonChanged){
         if(this.connector.deleted){
           // DELETE 
-          console.log(' deleteConnector :: ', this.connector.fromId);
+          console.log('[CdsActionReplyTextComponent] deleteConnector :: ', this.connector.fromId);
           buttonChanged.__isConnected = false;
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.action = '';
           buttonChanged.type = TYPE_BUTTON.TEXT;
-          this.changeActionReply.emit();
+          // if(this.connector.notify)
+          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+          // this.changeActionReply.emit();
         } else {
           // ADD / EDIT
           // buttonChanged.__isConnected = true;
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.action = buttonChanged.action? buttonChanged.action : '#' + this.connector.toId;
           buttonChanged.type = TYPE_BUTTON.ACTION;
-          console.log(' -> updateConnector :: ', this.buttons);
+          console.log('[CdsActionReplyTextComponent] updateConnector :: ', buttonChanged);
           if(!buttonChanged.__isConnected){
             buttonChanged.__isConnected = true;
-            this.changeActionReply.emit();
+            // if(this.connector.notify)
+            if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+            // this.changeActionReply.emit();
           } 
         }
         // this.changeActionReply.emit();
       }
     } catch (error) {
-      console.log('error: ', error);
+      this.logger.error('error: ', error);
     }
   }
 
@@ -192,13 +210,16 @@ export class CdsActionReplyTextComponent implements OnInit {
   onChangeTextarea(text:string) {
     if(!this.previewMode){
       this.response.text = text;
-      this.changeActionReply.emit();
+      // this.changeActionReply.emit();
     }
   }
 
+  onBlur(event){
+    // console.log('[ACTION REPLY TEXT] onBlur', event);
+    this.changeActionReply.emit();
+  }
+
   onSelectedAttribute(variableSelected: {name: string, value: string}){
-    // console.log('atttttttttt', variableSelected)
-    // console.log('textttttttt', this.checkForVariablesInsideText(this.response.text))
   }
 
   /** onOpenButtonPanel */
@@ -225,7 +246,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   /** dropButtons */
   dropButtons(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.buttons, event.previousIndex, event.currentIndex);
-    this.connectorService.movedConnector(this.idIntent);
+    this.connectorService.updateConnector(this.idIntent);
     this.changeActionReply.emit();
   }  
 

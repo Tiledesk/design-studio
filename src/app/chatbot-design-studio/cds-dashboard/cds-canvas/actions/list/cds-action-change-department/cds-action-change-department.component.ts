@@ -20,7 +20,6 @@ export class CdsActionChangeDepartmentComponent implements OnInit {
   dep_selected: Department;
 
   private logger: LoggerService = LoggerInstance.getInstance();
-  
   constructor(
     private departmentService: DepartmentService,
     ) { }
@@ -31,14 +30,14 @@ export class CdsActionChangeDepartmentComponent implements OnInit {
   }
 
   getAllDepartments() {
-    this.departmentService.getDeptsByProjectId().subscribe((deps) => {
+    this.departmentService.getDeptsByProjectId().subscribe({ next: (deps) => {
       this.logger.log("[ACTION CHANGE DEPARTMENT] deps: ", deps);
       this.deps_name_list = deps.map(a => ({ name: a.name, value: a.name }));
-    }, (error) => {
+    }, error: (error) => {
       this.logger.error("[ACTION CHANGE DEPARTMENT] error get deps: ", error);
-    }, () => {
+    }, complete: () => {
       this.logger.log("[ACTION CHANGE DEPARTMENT] get all deps completed.");
-    })
+    }})
   }
 
   onChangeSelect(event: {name: string, value: string}) {

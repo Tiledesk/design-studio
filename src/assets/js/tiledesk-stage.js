@@ -79,7 +79,6 @@ export class TiledeskStage {
 
 
     moveAndZoom(event) {
-        // console.log("moveAndZoom:", event, this.tx);
         event.preventDefault();
         const dx = event.deltaX;
         const dy = event.deltaY;
@@ -153,7 +152,7 @@ export class TiledeskStage {
     setDragElement(element) {
         let pos_mouse_x;
         let pos_mouse_y;
-        console.log('setDragElement::: ', element);
+        // console.log('setDragElement::: ', element);
         element.onmousedown = (function(event) {
             this.isDraggingElement = true;
             console.log('dragMouseDown', event, this.classDraggable, element);
@@ -293,6 +292,7 @@ export class TiledeskStage {
         }
     }
 
+
     centerStageOnHorizontalPosition(stageElement){
         if(stageElement){
             // var stageElement = document.getElementById(intent.intent_id);
@@ -327,6 +327,5 @@ export class TiledeskStage {
         } else {
             return false;
         }
-    }
-  
+    }  
   }

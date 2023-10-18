@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { IntentService } from '../../../services/intent.service';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -14,10 +14,11 @@ import { skip } from 'rxjs/operators';
   templateUrl: './cds-panel-widget.component.html',
   styleUrls: ['./cds-panel-widget.component.scss']
 })
-export class CdsPanelWidgetComponent implements OnInit {
+export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   @ViewChild('widgetIframe', {static:true}) widgetIframe:ElementRef;
 
+  @Input() isPanelVisible: boolean = false
   // @Input() projectID: string;
   // @Input() id_faq_kb: string;
   // @Input() defaultDepartmentId: string;
@@ -55,7 +56,8 @@ export class CdsPanelWidgetComponent implements OnInit {
      *  - notify iframe with a postMessage about the changes
      */
     this.intentService.behaviorIntent.pipe(skip(1)).subscribe((intent: Intent)=> {
-      if(intent && intent.intent_display_name !== this.intentName){
+      console.log('[CDS-PANEL-WIDGET] behaviorIntent-->', intent, this.intentName)
+      if(intent && intent.intent_display_name !== this.intentName && this.isPanelVisible){
         this.intentName = intent.intent_display_name
         this.widgetIframe.nativeElement.contentWindow.postMessage(
             {action: 'restart', intentName: this.intentName}, "*");
@@ -69,9 +71,11 @@ export class CdsPanelWidgetComponent implements OnInit {
   }
 
   setIframeUrl(){
-    this.WIDGET_BASE_URL = this.appConfigService.getConfig().widgetBaseUrl;
-    // const testItOutBaseUrl = "https://widget.tiledesk.com/v6/5.0.71/assets/twp"; // nk for test publication
-    const testItOutUrl = this.WIDGET_BASE_URL + 'assets/twp/chatbot-panel.html'
+    console.log('[CDS-PANEL-WIDGET] setIframeUrl parameters ---> ', this.projectID, this.selectedChatbot, this.defaultDepartmentId, this.intentName)
+    this.WIDGET_BASE_URL = this.appConfigService.getConfig().WIDGET_BASE_URL;
+    // const testItOutBaseUrl = this.TESTSITE_BASE_URL.substring(0, this.TESTSITE_BASE_URL.lastIndexOf('/')); 
+    const testItOutUrl = this.WIDGET_BASE_URL + "assets/twp" + '/chatbot-panel.html'
+    // const testItOutUrl = "https://widget.tiledesk.com/v6/5.0.71/assets/twp"+ '/chatbot-panel.html'
     // const testItOutUrl = 'http://localhost:4203/assets/twp'+ '/chatbot-panel.html'
     let url = testItOutUrl + '?tiledesk_projectid=' + this.projectID + 
                               '&tiledesk_participants=bot_' + this.selectedChatbot._id + 
@@ -109,5 +113,10 @@ export class CdsPanelWidgetComponent implements OnInit {
 
   startTest(){
     this.iframeVisibility = !this.iframeVisibility
+  }
+
+
+  ngOnDestroy(): void {
+    console.log('[CDS-PANEL-WIDGET] destroyyyyyyyy')
   }
 }

@@ -8,6 +8,7 @@ import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppConfigService } from 'src/app/services/app-config';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
   selector: 'cds-action-askgpt',
@@ -32,7 +33,8 @@ export class CdsActionAskgptComponent implements OnInit {
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
-
+  private subscriptionChangedConnector: Subscription;
+  
   kbs_list = [];
   kb_selected_id: string = null;
   status_code: number;
@@ -60,11 +62,8 @@ export class CdsActionAskgptComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug("[ACTION-ASKGPT] action detail: ", this.action);
-    console.log("[ACTION-ASKGPT] action detail: ", this.action);
-    console.log("[ACTION-ASKGPT] action kbid: ", this.action.kbid);
-    console.log("[ACTION-ASKGPT] action kbname: ", this.action.kbName);
 
-    this.intentService.isChangedConnector$.subscribe((connector: any) => {
+    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
       this.connector = connector;
       this.updateConnector();
@@ -92,6 +91,13 @@ export class CdsActionAskgptComponent implements OnInit {
   }
 
 
+  /** */
+  ngOnDestroy() {
+    if (this.subscriptionChangedConnector) {
+      this.subscriptionChangedConnector.unsubscribe();
+    }
+  }
+
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
@@ -114,7 +120,9 @@ export class CdsActionAskgptComponent implements OnInit {
             this.action.falseIntent = null
             this.isConnectedFalse = false;
           }
-          this.updateAndSaveAction.emit();
+          // if(this.connector.notify)
+          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+          // this.updateAndSaveAction.emit();
         } else { 
           // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
           // ADD / EDIT
@@ -124,7 +132,9 @@ export class CdsActionAskgptComponent implements OnInit {
             this.isConnectedTrue = true;
             if(this.action.trueIntent !== '#'+this.connector.toId){ 
               this.action.trueIntent = '#'+this.connector.toId;
-              this.updateAndSaveAction.emit();
+              // if(this.connector.notify)
+              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+              // this.updateAndSaveAction.emit();
             } 
           }        
           if(array[array.length -1] === 'false'){
@@ -132,7 +142,9 @@ export class CdsActionAskgptComponent implements OnInit {
             this.isConnectedFalse = true;
             if(this.action.falseIntent !== '#'+this.connector.toId){ 
               this.action.falseIntent = '#'+this.connector.toId;
-              this.updateAndSaveAction.emit();
+              // if(this.connector.notify)
+              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+              // this.updateAndSaveAction.emit();
             } 
           }
         }
@@ -213,17 +225,17 @@ export class CdsActionAskgptComponent implements OnInit {
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
     if(event){
       this.action[type]=event.value
-    }
 
-    switch(type){
-      case 'trueIntent':
-        this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
-        break;
-      case 'falseIntent':
-        this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
-        break;
+      switch(type){
+        case 'trueIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
+          break;
+        case 'falseIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
+          break;
+      }
+      this.updateAndSaveAction.emit();
     }
-    this.updateAndSaveAction.emit();
   }
 
   onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
@@ -260,7 +272,7 @@ export class CdsActionAskgptComponent implements OnInit {
   // }
 
   goToKNB(){
-    let url = this.appConfigService.getConfig().dashboardBaseUrl + 'dashboard/#/project/' + this.project_id +'/knowledge-bases'
+    let url = this.appConfigService.getConfig().DASHBOARD_BASE_URL + 'dashboard/#/project/' + this.project_id +'/knowledge-bases'
     window.open(url, '_blank')
   }
 
@@ -270,140 +282,5 @@ export class CdsActionAskgptComponent implements OnInit {
       this.getKnowledgeBaseSettings();
     }
   }
-
-
-  // -----------------
-  // TO CHECK / DELETE
-  // -----------------
-
-
-  // getAllOpenaiKbs() {
-  //   this.openaikbService.getAllOpenaikbs().subscribe((kbs: any[]) => {
-  //     this.kbs_list = kbs.map(t => {
-  //       t.icon = "language"
-  //       return t;
-  //     })
-  //     if (this.action.kbid) {
-  //       this.kb_selected_id = this.kbs_list.find(k => k.url === this.action.kbid)._id;
-  //       this.kb_selected_name = this.kbs_list.find(k => k.url === this.action.kbid).name;
-  //       //this.checkKbStatus(this.action.kbid);
-  //     }
-  //     //this.checkLimit();
-  //   }, (error) => {
-  //     this.logger.error("[ACTION ASKGPT] ERROR get openai kbs: ", error);
-  //   }, () => {
-  //     this.logger.info("[ACTION ASKGPT] get openai kbs *COMPLETED*");
-  //   })
-  // }
-
-  // openAddKbDialog() {
-  //   const dialogRef = this.dialog.open(AddkbDialogComponent, {
-  //     panelClass: 'custom-dialog-container',
-  //     data: { name: '', url: '' }
-  //   });
-  //   dialogRef.afterClosed().subscribe(result => {
-  //     this.logger.info("[ACTION ASKGPT] Dialog result - new openai kb: ", result);
-  //     if (result && result.name && result.url) {
-  //       this.saveOpenaiKb(result);
-  //     }
-  //   });
-  // }
-
-  // saveOpenaiKb(new_kb) {
-  //   this.openaikbService.addOpenaiKb(new_kb).subscribe((savedKb) => {
-  //     this.getAllOpenaiKbs();
-  //   }, (error) => {
-  //     this.logger.error("[ACTION ASKGPT] ERROR add new kb: ", error);
-  //   }, () => {
-  //     this.logger.info("[ACTION ASKGPT] add new kb *COMPLETED*");
-  //   })
-  // }
-
-  // onDeleteSelect(id) {
-  //   this.openDeleteDialog(id);
-  // }
-
-  // openDeleteDialog(id) {
-  //   const dialogRef = this.dialog.open(DialogYesNoComponent, {
-  //     panelClass: 'custom-dialog-container',
-  //     data: { title: 'Delete Knowledge base', text: 'Are you sure you want to delete permanently this Knwoledge base?', yes: 'Delete', no: 'Cancel' }
-  //   })
-  //   dialogRef.afterClosed().subscribe(result => {
-  //     if (result && result !== undefined && result !== false) {
-  //       this.deleteKb(id);
-  //     }
-  //   })
-  // }
-
-  // deleteKb(id: string) {
-  //   if (this.kb_selected_id === id) {
-  //     this.action.kbid = null;
-  //     this.kb_selected_id = null;
-  //     this.status_code = null;
-  //   }
-  //   this.openaikbService.deleteOpenaiKb(id).subscribe((deletedKb) => {
-  //     this.logger.info("deletedKb response ", deletedKb);
-  //     this.logger.log("deletedKb response ", deletedKb);
-  //     this.getAllOpenaiKbs();
-  //   }, (error) => {
-  //     this.logger.error("[ACTION ASKGPT] ERROR delete kb: ", error);
-  //   }, () => {
-  //     this.logger.info("[ACTION ASKGPT] delete kb *COMPLETE*");
-  //   })
-  // }
-
-  // checkKbStatus(kbid) {
-  //   let data = {
-  //     full_url: kbid 
-  //   }
-  //   this.gptService.checkScrapingStatus(data).subscribe((status: any) => {
-  //     this.spinner = false;
-  //     this.logger.log("[ACTION ASKGPT] Scraping status: ", status);
-  //     this.status_code = status.status_code;;
-  //   }, (error) => {
-  //     this.logger.error("[ACTION ASKGPT] error getting scraping status: ", error);
-  //   }, () => {
-  //     this.logger.log("[ACTION ASKGPT] get scraping status *COMPLETE*")
-  //   })
-  // }
-
-  // startKbIndexing() {
-
-  //   this.spinner = true;
-  //   if (!this.action.gptkey) {
-  //     this.indexing_hint = "Missing GPT Key"
-  //     this.spinner = false;
-  //   } else {
-  //     let data = {
-  //       full_url: this.action.kbid,
-  //       gptkey: this.action.gptkey
-  //     }
-
-  //     this.gptService.startScraping(data).subscribe((response: any) => {
-  //       if (response.message === 'Invalid Openai API key') {
-  //         this.indexing_hint = response.message;
-  //       }
-  //       this.checkKbStatus(this.action.kbid);
-  //     }, (error) => {
-  //       this.logger.error("[ACTION ASKGPT] error start indexing: ", error);
-  //       this.indexing_hint = error.message;
-  //       this.spinner = false;
-  //     }, () => {
-  //       this.logger.log("[ACTION ASKGPT] start indexing *COMPLETE*");
-  //     })
-  //   }
-  // }
-
-  // checkLimit() {
-  //   if (this.kbs_list.length >= 3) {
-  //     this.buttonDisabled = true;
-  //     this.buttonIcon = null;
-  //     this.buttonText = "Maximum number of Knwoledge Bases reached"
-  //   } else {
-  //     this.buttonDisabled = false;
-  //     this.buttonIcon = "add";
-  //     this.buttonText = "Add Knowledge Bases"
-  //   }
-  // }
 
 }

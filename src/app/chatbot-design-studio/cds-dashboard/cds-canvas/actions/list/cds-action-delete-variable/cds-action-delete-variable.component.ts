@@ -18,7 +18,6 @@ export class CdsActionDeleteVariableComponent implements OnInit {
   variableListUserDefined: Array<{name: string, value: string}>;
   
   private logger: LoggerService = LoggerInstance.getInstance();
-  
   constructor() { }
 
   ngOnInit(): void {
