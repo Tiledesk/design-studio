@@ -37,54 +37,44 @@
 </div>
 
 
-<div id="content" *ngIf="!previewMode" class="content">
+<div id="content" *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
 
 
-    <div class="text-editor-wrapper">
-        <div class="field-box">
-            <label class="title-label">Assign user reply to</label>
-            <div class="value-wrp">
-                <cds-textarea 
-                    id="assignTo" 
-                    [textLimitBtn]="false" 
-                    [emojiPikerBtn]="false" 
-                    [setAttributeBtn]="true"
-                    [minRow]="1" 
-                    [maxRow]="1" 
-                    [readonly]="true" 
-                    [text]="action.assignResultTo"
-                    [placeholder]="'(Optional)'"
-                    (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
-                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
-                </cds-textarea>
-            </div>
-        </div>
+    <div class="field-box">
+        <label class="title-label">Assign user reply to</label>
+        <cds-textarea 
+            id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" 
+            [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignResultTo"
+            [placeholder]="'(Optional)'"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+        </cds-textarea>
     </div>
 
-    <div style="margin-top: 40px;">
+
+    <div class="field-box">
         <div class="condition-container">
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/actions/connect_intent.svg">
             </div>
-            <span class="title-label">Then go to block</span>
+            <label class="title-label">Then go to block</label>
         </div>
-
-        <div class="select-box" id="intentSelect">
-            <cds-select 
-                id="text-condition" 
-                [items]="listOfIntents" 
-                [bindLabelSelect]="'name'"
-                [bindValueSelect]="'value'" 
-                [itemSelected]="action?.goToIntent" 
-                [placeholder]="'Select a block'"
-                [clearable]="true" 
-                (onSelected)="onChangeBlockSelect($event, 'goToIntent')"
-                (onReset)="onResetBlockSelect($event, 'goToIntent')">
-            </cds-select>
-        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.goToIntent" 
+            [placeholder]="'Select a block'"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'goToIntent')"
+            (onReset)="onResetBlockSelect($event, 'goToIntent')">
+        </cds-select>
     </div>
-
-
-
-
+    
 </div>

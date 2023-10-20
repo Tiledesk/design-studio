@@ -1,38 +1,15 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 
-$background-color: $blu-light-01;
-$text-color: $blu;
-
-.content {
-    //padding: 10px 30px;
-    padding: 20px 0px;
-    margin-left: 30px;
-    margin-right: 30px;
+:host {
+    --background-color: #{$blu-light-01};
+    --text-color: #{$blu};
 }
 
-.text-editor-wrapper {
-    font-size: $font-size-base;
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 0px;    
-}
 
-.field-box {
-    display: flex;
-    flex-direction: column;
-    // width: 70%;
-    min-width: 90px;
-}
 
 .title-label {
-    color: $blu;
     font-size: 16px;
-    margin-bottom: 0px;
-    // margin-left: 30px;
 }
 
 .action-wait-content{
@@ -40,7 +17,7 @@ $text-color: $blu;
 }
 .action-wait-slider {
     align-items: center;
-    background: $background-color;
+    background: var(--background-color);
     border-radius: 13px;
     display: inline-flex;
     position: relative;
@@ -58,7 +35,7 @@ $text-color: $blu;
 }
 
 .action-wait-range {
-    color: $text-color;
+    color: var(--text-color);
     font-size: 11px;
     font-weight: 400;
     padding-left: 6px;
@@ -72,16 +49,16 @@ $text-color: $blu;
 
 .action-wait-slider ::ng-deep{
     .mat-accent .mat-slider-track-fill {
-        background-color: $text-color !important;
+        background-color: var(--text-color) !important;
     }
     .mat-slider-thumb-label {
-        background-color: $text-color !important;
+        background-color: var(--text-color) !important;
     }
     .mat-slider-thumb-label-text{
-        color: $background-color !important;
+        color: var(--background-color) !important;
     }
     .mat-slider-thumb {
-        background-color: $text-color !important;
+        background-color: var(--text-color) !important;
     }
 }
 

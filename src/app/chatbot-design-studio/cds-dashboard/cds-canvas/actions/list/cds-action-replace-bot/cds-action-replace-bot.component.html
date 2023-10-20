@@ -28,8 +28,8 @@
 
 <div *ngIf="!previewMode" class="content-panel-intent-detail">
 
-    <label class="title-label">Choose a bot</label>
-    <div class="select-bot-box">
+    <div class="field-box">
+        <label class="title-label">Choose a bot</label>
         <cds-select id="text-condition" 
             [items]="chatbots_name_list" 
             [bindLabelSelect]="'name'"

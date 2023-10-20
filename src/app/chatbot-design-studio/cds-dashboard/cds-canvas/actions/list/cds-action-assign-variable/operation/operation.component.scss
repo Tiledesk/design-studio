@@ -93,7 +93,8 @@
         border-radius: 100%;
         transition: background-color 0.3s ease 0s;
         font-size: 12px;
-        span.material-icons {
+        span.material-icons,
+        span.material-icons-outlined {
             font-size: 20px;
             color: var(--textColor);
         }

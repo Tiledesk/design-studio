@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Intent } from 'src/app/models/intent-model';
 import { ActionGPTTask } from 'src/app/models/action-model';
 import { variableList } from '../../../../../utils';
@@ -16,6 +16,8 @@ import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog
 })
 export class CdsActionGPTTaskComponent implements OnInit {
 
+  @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
+  
   @Input() intentSelected: Intent;
   @Input() action: ActionGPTTask;
   @Input() project_id: string; 
@@ -99,7 +101,19 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.updateAndSaveAction.emit();
   }
 
+  scrollToBottom(): void {
+    setTimeout(() => {
+      try {
+        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+        this.scrollContainer.nativeElement.animate({ scrollTop: 0 }, '500');
+      } catch (error) {
+        this.logger.log('scrollToBottom ERROR: ', error);
+      }
+    }, 300);
+  }
+
   execPreview() {
+    this.scrollToBottom();
     this.checkVariables().then((resp) => {
 
       if (resp === true) {
@@ -336,7 +350,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   }
 
   goToKNB(){
-    let url = this.appConfigService.getConfig().DASHBOARD_BASE_URL + 'dashboard/#/project/' + this.project_id +'/knowledge-bases'
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + 'dashboard/#/project/' + this.project_id +'/knowledge-bases'
     window.open(url, '_blank')
   }
 

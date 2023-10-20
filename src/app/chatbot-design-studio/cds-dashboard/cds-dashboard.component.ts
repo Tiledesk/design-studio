@@ -151,13 +151,14 @@ export class CdsDashboardComponent implements OnInit {
 
   private initialize(){
     let serverBaseURL = this.appConfigService.getConfig().apiUrl
+    let whatsappBaseUrl = this.appConfigService.getConfig().whatsappApiUrl
 
     this.departmentService.initialize(serverBaseURL, this.project._id);
     this.faqKbService.initialize(serverBaseURL, this.project._id)
     this.faqService.initialize(serverBaseURL, this.project._id)
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
-    this.whatsappService.initialize(serverBaseURL, this.project._id)
+    this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
 
   }
 
@@ -187,8 +188,8 @@ export class CdsDashboardComponent implements OnInit {
 
   /** Go back to previous page */
   goBack() {
-    let dashbordBaseUrl = this.appConfigService.getConfig().DASHBOARD_BASE_URL + 'dashboard/#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
-    console.log('[CDS DSHBRD] goBack ', dashbordBaseUrl, this.appConfigService.getConfig().DASHBOARD_BASE_URL);
+    let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + 'dashboard/#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
+    console.log('[CDS DSHBRD] goBack ', dashbordBaseUrl, this.appConfigService.getConfig().dashboardBaseUrl);
     window.open(dashbordBaseUrl, '_self')
     // this.location.back()
     // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);

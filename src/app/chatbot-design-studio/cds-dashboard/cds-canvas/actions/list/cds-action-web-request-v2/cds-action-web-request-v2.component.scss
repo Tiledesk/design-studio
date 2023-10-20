@@ -210,7 +210,6 @@ cds-select#method ::ng-deep{
     .ng-select-container{
         height: 37px;
         border-radius: 8px 0px 0px 8px;
-        border: 1px solid rgb(118, 118, 118) !important;
     }
 }
 
@@ -230,7 +229,6 @@ cds-textarea#url ::ng-deep {
     width: 100%;
     // padding: 6px 0px 0px 0;
     textarea {
-        border: 1px solid rgb(118, 118, 118) !important;
         border-radius: 0px 8px 8px 0px;
         resize: none !important; 
         padding: 6px 16px !important;
@@ -255,12 +253,14 @@ mat-button-toggle-group ::ng-deep{
 mat-button-toggle{
     background-color: transparent;
     border: none;
-    color: #abadaf;
+    color: $blu-light-02;
     border-bottom: 2px solid transparent;
 
     &.mat-button-toggle-checked{
-        border-color: white;
-        color: white;
+        border-color: $blu;
+        color: $blu;
+        font-weight: 400;
+
     }
     
     &.mat-button-toggle+mat-button-toggle.mat-button-toggle{
@@ -274,21 +274,3 @@ mat-button-toggle{
     
 }
 
-div.value-wrp {
-    min-height: 50px;
-}
-
-
-.condition-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 0px;
-}
-
-.condition-text {
-    font-size: 14px;
-    font-weight: 600;
-    color: white;
-}

@@ -1,8 +1,16 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-.cds-action-content {
-    padding: 16px;
+
+:host {
+    --background-color: #{$blu-light-01};
+    --slider-background-color: #{$blu-light-03};
+    --text-color: #{$blu};
 }
+
+::-webkit-scrollbar {
+    width: 0px;
+}
+
 
 .previewContent {
     position: relative;
@@ -25,71 +33,16 @@
 
 }
 
-.icon-action {
-    transition: opacity .15s ease 0s;
-    opacity: .85;
-    background: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    filter: brightness(0) saturate(100%) invert(52%) sepia(7%) saturate(525%) hue-rotate(8deg) brightness(93%) contrast(90%);
-
-    img {
-        height: 16px;
-    }
-}
-
-// .icon-acion#gpt-icon {
-//     img {
-//         height:px;
-//     }
-// }
-.content {
-    max-height: calc(100vh - 200px);
-    padding: 20px 40px;
-    overflow-y: scroll;
-    scroll-behavior: smooth;
-}
 
 .custom-divider {
     margin-top: 40x;
     margin-bottom: 20px;
     border: 0;
-    border-top: 1px solid #eeeeee1c;
-}
-
-.text-editor-wrapper {
-    font-size: $font-size-base;
-    position: relative;
-    width: 100%;
-    //height: auto;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: row;
-}
-
-.field-box {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    // width: 70%;
-    // min-width: 90px;
-    // gap: 10px;
+    border-top: 1px solid $blu;
 }
 
 
-.select-box {
-    margin-bottom: 24px;
-}
-
-.select-box#intentSelect {
-    margin-bottom: 10px;
-}
-
-div.value-wrp {
-    position: relative;
+div {
 
     .flex {
         position: absolute;
@@ -138,282 +91,6 @@ div.value-wrp {
 }
 
 
-
-.textarea-editor-wrapper {
-    font-size: $font-size-base;
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 24px;
-
-    .text-editor {
-        position: relative;
-        margin: 0;
-        padding: 0;
-
-        .response-controls {
-            position: absolute;
-            top: 10px;
-            left: 0px;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-
-            .control-button {
-                cursor: pointer;
-                color: $color-bck-gray-hex;
-                transition: color 0.3s;
-                height: 20px;
-
-                &.delete {
-                    height: 24px;
-                    width: 24px;
-                    background: $color-bck-gray-hex;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-
-                    em {
-                        font-size: 1.15em;
-                        color: $color-withe-hex;
-                        transition: color 0.3s;
-                    }
-                }
-            }
-
-            .control-button:hover {
-                color: $color-withe-hex;
-
-                &.delete {
-                    box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
-
-                    em {
-                        color: $color-red-hex;
-                    }
-                }
-            }
-        }
-
-        .box-textarea {
-
-            // width: calc(100% - 40px);
-            // margin-left: 20px;
-            input {
-                border-radius: 8px;
-                background: $color-withe-hex;
-                border: 1px solid $color-withe-hex;
-                overflow-x: hidden;
-                overflow-y: auto;
-                width: calc(100% - 2.5em);
-                padding: 20px;
-                color: $color-text-dark-hex;
-                font-size: 1.15em;
-                line-height: 25px;
-                resize: vertical;
-
-                &.customPrefix {
-                    padding-left: 20px;
-                    width: calc(100% - 2.5em - 20px);
-                }
-            }
-
-            .input-prefix {
-                position: absolute;
-                top: 14px;
-                left: 8px;
-                color: #7d7d7d;
-                font-weight: 800;
-            }
-
-            .input-suffix {
-                position: absolute;
-                top: 14px;
-                right: 8px;
-                color: #7d7d7d;
-                font-weight: 800;
-                margin-right: 40px;
-            }
-        }
-
-        .text-editor-drop {
-            position: absolute;
-            display: inline-flex;
-            margin: 0;
-            left: 0;
-            top: -30px;
-            color: #dcdcdc;
-            cursor: grab;
-        }
-    }
-
-    .editor-utils {
-        position: relative;
-        margin: -20px 50px 0px 0px;
-        float: right;
-
-        .num-chars {
-            background: $color-light-gray-hex;
-            padding: 0px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            color: $color-text-box-hex;
-            float: right;
-
-            &.error {
-                background: $color-orange-hex;
-            }
-        }
-
-        .text-editor-insert-attribute {
-            float: right;
-        }
-
-        .moji-picker {
-            float: right;
-        }
-    }
-}
-
-
-.text-editor-wrapper {
-    font-size: $font-size-base;
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 24px;
-
-    .text-editor {
-        position: relative;
-        margin: 0;
-        padding: 0;
-
-        .response-controls {
-            position: absolute;
-            top: 10px;
-            left: 0px;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-
-            .control-button {
-                cursor: pointer;
-                color: $color-bck-gray-hex;
-                transition: color 0.3s;
-                height: 20px;
-
-                &.delete {
-                    height: 24px;
-                    width: 24px;
-                    background: $color-bck-gray-hex;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-
-                    em {
-                        font-size: 1.15em;
-                        color: $color-withe-hex;
-                        transition: color 0.3s;
-                    }
-                }
-            }
-
-            .control-button:hover {
-                color: $color-withe-hex;
-
-                &.delete {
-                    box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
-
-                    em {
-                        color: $color-red-hex;
-                    }
-                }
-            }
-        }
-
-        .box-textarea {
-
-            // width: calc(100% - 40px);
-            // margin-left: 20px;
-            input {
-                border-radius: 8px;
-                background: $color-withe-hex;
-                border: 1px solid $color-withe-hex;
-                overflow-x: hidden;
-                overflow-y: auto;
-                width: calc(100% - 2.5em);
-                padding: 20px;
-                color: $color-text-dark-hex;
-                font-size: 1.15em;
-                line-height: 25px;
-                resize: vertical;
-
-                &.customPrefix {
-                    padding-left: 20px;
-                    width: calc(100% - 2.5em - 20px);
-                }
-            }
-
-            .input-prefix {
-                position: absolute;
-                top: 14px;
-                left: 8px;
-                color: #7d7d7d;
-                font-weight: 800;
-            }
-
-            .input-suffix {
-                position: absolute;
-                top: 14px;
-                right: 8px;
-                color: #7d7d7d;
-                font-weight: 800;
-                margin-right: 40px;
-            }
-        }
-
-        .text-editor-drop {
-            position: absolute;
-            display: inline-flex;
-            margin: 0;
-            left: 0;
-            top: -30px;
-            color: #dcdcdc;
-            cursor: grab;
-        }
-    }
-
-    .editor-utils {
-        position: relative;
-        margin: -20px 50px 0px 0px;
-        float: right;
-
-        .num-chars {
-            background: $color-light-gray-hex;
-            padding: 0px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            color: $color-text-box-hex;
-            float: right;
-
-            &.error {
-                background: $color-orange-hex;
-            }
-        }
-
-        .text-editor-insert-attribute {
-            float: right;
-        }
-
-        .moji-picker {
-            float: right;
-        }
-    }
-}
-
 #cds-addkb-btn {
     background: #006cff;
     color: #fff;
@@ -445,37 +122,7 @@ div.value-wrp {
     }
 }
 
-.play-button {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    color: #cbcbcb;
-}
 
-.play-button:hover {
-    cursor: pointer;
-
-    .button-text {
-        text-decoration: underline;
-    }
-
-    .play-icon {
-        font-size: 17px;
-    }
-}
-
-.sync-div {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    color: #cbcbcb;
-}
-
-.indexing-hint {
-    color: #ff4e4e;
-    font-size: 14px;
-    filter: drop-shadow(2px 2px 6px black);
-}
 
 .variable-container {
     display: flex;
@@ -489,23 +136,12 @@ div.value-wrp {
     font-size: 14px;
 }
 
-.condition-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 0px;
-}
-
-.condition-text {
-    font-size: 14px;
-    font-weight: 600;
-    color: white;
-}
+///////////////////////////////////////
+///////////////////////////////////////
 
 
 
-
+// *********** AI SETTINGS --start *********** //
 
 .custom-expansion-panel {
     background-color: transparent;
@@ -513,126 +149,10 @@ div.value-wrp {
     color: white;
 }
 
-///////////////////////////////////////
-///////////////////////////////////////
-
-
-
-// .mat-expansion-panel-header {
-//     padding: 0;
-
-//     &:hover {
-//         background-color: transparent;
-//     }
-// }
-
-// .mat-expansion-panel-header-title {
-//     color: white;
-// }
-
-// .mat-expansion-indicator::after {
-//     color: white !important;
-// }
-
-// .mat-expansion-panel-header-description, .mat-expansion-indicator:after {
-//     color: white;
-// }
-
-// ::ng-deep .mat-expansion-indicator, .mat-expansion-indicator:after {
-//     color: white;
-// }
-
-// .mat-expansion-panel-header.mat-expanded {
-//     height: 48px;
-// }
-
-// .disable_ripple:hover{
-//     background: transparent !important;
-// }
-
-// .mat-expansion-panel-body {
-//     padding: 0 !important;
-// }
-
-
-
-
-.action-wait-content {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.action-wait-slider {
-    align-items: center;
-    background: #647283;
-    border-radius: 13px;
-    display: inline-flex;
-    position: relative;
-    height: 26px;
-    padding: 0 9px 0 3px;
-    width: 100%;
-    text-align: center;
-    transition: width 0.3s ease-in;
-    font-size: 14px;
-    margin-right: 10px;
-}
-
-.action-wait-slider>mat-slider {
-    width: 100%;
-    margin-left: 6px;
-}
-
-.action-wait-range {
-    color: #e8eaed;
-    font-size: 11px;
-    font-weight: 400;
-    padding-left: 6px;
-}
-
-.wait-action-title {
-    font-family: "Poppins", "Roboto", "Arial", sans-serif;
-    color: #e8eaed;
-}
-
-
-.action-wait-slider ::ng-deep {
-    .mat-accent .mat-slider-track-fill {
-        background-color: $icon-color !important;
-    }
-
-    .mat-slider-thumb-label {
-        background-color: $icon-color !important;
-
-    }
-
-    .mat-slider-thumb {
-        background-color: $icon-color !important;
-    }
-}
-
-.slider-input ::ng-deep {
-    width: 60px;
-
-    input {
-        text-align: center;
-    }
-}
-
-.gpt-setting-input {
-    color: black;
-    text-align: center;
-    width: 45px;
-    border: none;
-    height: 26px;
-    border-radius: 12px;
-    background-color: aliceblue;
-}
-
 mat-expansion-panel ::ng-deep {
     background-color: transparent;
     box-shadow: none;
-    color: white;
+    color: $blu;
 
     .mat-expansion-panel-header {
         padding: 0;
@@ -643,21 +163,22 @@ mat-expansion-panel ::ng-deep {
     }
 
     .mat-expansion-panel-header-title {
-        color: white;
+        color: $blu;
     }
 
     .mat-expansion-indicator::after {
-        color: white !important;
+        color: $blu !important;
     }
 
     .mat-expansion-panel-header-description,
     .mat-expansion-indicator:after {
-        color: white;
+        color: $blu;
+        margin: 5px;
     }
 
     ::ng-deep .mat-expansion-indicator,
     .mat-expansion-indicator:after {
-        color: white;
+        color: $blu;
     }
 
     .mat-expansion-panel-header.mat-expanded {
@@ -677,8 +198,77 @@ mat-expansion-panel ::ng-deep {
     }
 }
 
+
+.action-wait-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.action-wait-range {
+    color: var(--text-color);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.action-wait-slider {
+    align-items: center;
+    background: var(--slider-background-color);
+    border-radius: 13px;
+    display: inline-flex;
+    position: relative;
+    height: 26px;
+    padding: 0 9px 0 9px;
+    width: 100%;
+    text-align: center;
+    transition: width 0.3s ease-in;
+    font-size: 14px;
+}
+
+.action-wait-slider>mat-slider {
+    width: 100%;
+    margin-left: 6px;
+}
+
+.action-wait-slider ::ng-deep{
+    .mat-accent .mat-slider-track-fill {
+        background-color: var(--text-color) !important;
+    }
+    .mat-slider-thumb-label {
+        background-color: var(--text-color) !important;
+    }
+    .mat-slider-thumb-label-text{
+        color: var(--background-color) !important;
+    }
+    .mat-slider-thumb {
+        background-color: var(--text-color) !important;
+    }
+}
+
+.gpt-setting-input {
+    color: var(--text-color);
+    text-align: center;
+    width: 45px;
+    border: none;
+    height: 26px;
+    border-radius: 12px;
+    background-color: white;
+    border: 1px solid $blu-01;
+}
+
+.slider-input ::ng-deep {
+    width: 60px;
+
+    input {
+        text-align: center;
+    }
+}
+
+// *********** AI SETTINGS --end *********** //
+
 #cds-publish-btn {
-    background: #006cff;
+    background: $blu;
     color: #fff;
     box-shadow: none;
     font-weight: 500;
@@ -714,16 +304,7 @@ mat-expansion-panel ::ng-deep {
 }
 
 
-
-.prompt-preview {
-    width: 100%;
-    border-radius: 8px;
-    background-color: white;
-    padding: 6px 12px;
-    font-size: 14px;
-
-}
-
+// PREVIEW SECTION --- start **************** //
 .preview-container {
     width: 100%;
     max-height: 37px;
@@ -733,6 +314,8 @@ mat-expansion-panel ::ng-deep {
     background-color: white;
     padding: 6px 12px;
     font-size: 14px;
+    border: 1px solid $blu-01;
+    color: $gray;
 }
 
 .preview-container-extended {
@@ -754,13 +337,13 @@ mat-expansion-panel ::ng-deep {
 
 ::ng-deep .custom-spinner {
     .sk-fading-circle {
-        width: 20px;
-        height: 20px;
-        margin: 0px;
+        width: 20px !important;
+        height: 20px !important;
+        margin: 0px !important;
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: rgb(98, 119, 140) !important;
+        background-color: $blu !important;
     }
 
 }
@@ -850,3 +433,5 @@ mat-expansion-panel ::ng-deep {
     font-size: 11px;
     width: 100%;
 }
+
+// PREVIEW SECTION --- start **************** //

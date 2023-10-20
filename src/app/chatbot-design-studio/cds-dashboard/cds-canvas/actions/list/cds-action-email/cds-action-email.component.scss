@@ -1,45 +1,6 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 
-.text-editor-wrapper {
-    font-size: $font-size-base;
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 20px;
-    .text-editor {
-        position: relative;
-        margin: 0;
-        padding: 0;
-
-       
-        .text-editor-drop {
-            position: absolute;
-            display: inline-flex;
-            margin: 0;
-            left: 0;
-            top: -30px;
-            color: #dcdcdc;
-            cursor: grab;
-        }
-    }
-}
-
-
-
-
-.email-field-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    // width: 70%;
-    // min-width: 900px;
-    // max-width: 1400px;
-}
-
-
 cds-textarea.subject-text-area ::ng-deep  {
     textarea {
         resize: none !important;
@@ -143,9 +104,4 @@ cds-textarea.to-text-area ::ng-deep  {
 
 #set--attribrute:hover {
     background-color: #f0f4f7;
-}
-
-.email-action-detail{
-    padding-left: 21px;
-    padding-top: 30px;
 }

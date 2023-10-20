@@ -47,23 +47,19 @@
 </div>
 
 
-<div *ngIf="!previewMode" class="content-panel-intent-detail">
-    <div class="text-editor-wrapper">
-        <div class="field-box">
-            <label class="title-label">Assign to:</label>
-            <div class="value-wrp">
-                <cds-textarea id="assignTo" 
-                    [textLimitBtn]="false" 
-                    [emojiPikerBtn]="false" 
-                    [setAttributeBtn]="true"
-                    [minRow]="1" [maxRow]="1" 
-                    [readonly]="true" 
-                    [text]="action.destination"
-                    (selectedAttribute)="onSelectedAttribute($event)"
-                    (clearSelectedAttribute)="onSelectedAttribute($event)">
-                </cds-textarea>
-            </div>
-        </div>
+<div *ngIf="!previewMode" id="scrollMe" class="content-panel-intent-detail no-footer">
+    <div class="field-box">
+        <label class="title-label">Assign to:</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.destination"
+            (selectedAttribute)="onSelectedAttribute($event)"
+            (clearSelectedAttribute)="onSelectedAttribute($event)">
+        </cds-textarea>
     </div>
 
     <operation 

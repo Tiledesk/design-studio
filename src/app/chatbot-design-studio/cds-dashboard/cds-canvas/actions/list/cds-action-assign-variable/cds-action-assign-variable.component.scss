@@ -1,31 +1,17 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-
-.text-editor-wrapper {
-    font-size: $font-size-base;
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 20px;
+::-webkit-scrollbar {
+    width: 0px;
 }
 
-.field-box {
-    display: flex;
-    flex-direction: column;
-    // width: 70%;
-    min-width: 90px;
-    gap: 5px;
-}
+
 
 .material-icons {
     color: $blu;
     font-size: 16px;
 }
 
-div.value-wrp {
-    position: relative;
+div {
 
     .flex {
         position: absolute;

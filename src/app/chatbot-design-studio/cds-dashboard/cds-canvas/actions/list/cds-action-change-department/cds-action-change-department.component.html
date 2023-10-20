@@ -22,22 +22,18 @@
 </div>
 
 
-<div *ngIf="!previewMode" class="content-panel-intent-detail">
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
 
-    <div class="text-editor-wrapper">
-        <div class="field-box">
-            <label class="title-label">Choose a department</label>
-            <div class="select-bot-box">
-                <cds-select id="select" 
-                    [items]="deps_name_list" 
-                    [bindLabelSelect]="'name'"
-                    [bindValueSelect]="'value'" 
-                    [searchable]=true
-                    [itemSelected]="action?.depName" 
-                    (onSelected)="onChangeSelect($event)">
-                </cds-select>
-            </div>
-        </div>
+    <div class="field-box">
+        <label class="title-label">Choose a department</label>
+        <cds-select id="select" 
+            [items]="deps_name_list" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [searchable]=true
+            [itemSelected]="action?.depName" 
+            (onSelected)="onChangeSelect($event)">
+        </cds-select>
     </div>
 
 </div>

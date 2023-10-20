@@ -25,7 +25,6 @@ import { UsersService } from './services/users.service';
 import { KnowledgeBaseService } from './services/knowledge-base.service';
 import { OpenaiService } from './services/openai.service';
 import { WhatsappService } from './services/whatsapp.service';
-import { UiModule } from './ui/shared/ui.module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { BrandService } from './services/brand.service';
 import { MultichannelService } from './services/multichannel.service';
@@ -60,6 +59,7 @@ import { FirebaseInitService } from 'src/chat21-core/providers/firebase/firebase
 import { NativeImageRepoService } from 'src/chat21-core/providers/native/native-image-repo';
 import { FirebaseImageRepoService } from 'src/chat21-core/providers/firebase/firebase-image-repo';
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
@@ -117,8 +117,9 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     AppRoutingModule,
     HttpClientModule,
     // ChatbotDesignStudioModule,
-    UiModule,
     SatPopoverModule,
+    FormsModule,
+    ReactiveFormsModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

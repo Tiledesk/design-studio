@@ -55,64 +55,55 @@
 
 
 <!--  -->
-<div *ngIf ="!previewMode" class="content-panel-intent-detail email-action-detail" #scrollMe id="scrollMe">
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer" #scrollMe id="scrollMe">
 
-    <div class="text-editor-wrapper">
-        <div class="text-editor">
-            <div class="email-field-box">
-                <label class="title-label">To</label>
-                <!-- <div class="text-editor-wpr" style="position: relative;"> -->
-                <!-- [limitCharsText]="150"  -->
-                <cds-textarea class="to-text-area" 
-                    [emojiPikerBtn]="false" 
-                    [textLimitBtn]="false" 
-                    [text]="action.to"
-                    [minRow]="1" 
-                    [maxRow]="1" 
-                    popoverVerticalAlign="above"
-                    (changeTextarea)="onChangeTextarea($event, 'to')">
-                </cds-textarea>
-            </div>
-        </div>
+
+    <div class="field-box">
+        <label class="title-label">To</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="to-text-area" 
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="action.to"
+            [minRow]="1" 
+            [maxRow]="1" 
+            popoverVerticalAlign="above"
+            (changeTextarea)="onChangeTextarea($event, 'to')">
+        </cds-textarea>
     </div>
 
-    <div class="text-editor-wrapper">
-        <div class="text-editor">
-            <div class="email-field-box">
-                <label class="title-label">Subject</label>
-                <cds-textarea class="subject-text-area" 
-                    [emojiPikerBtn]="false" 
-                    [limitCharsText]="150"
-                    [text]="action.subject" 
-                    [minRow]="1" 
-                    [maxRow]="1" 
-                    popoverVerticalAlign="above"
-                    (changeTextarea)="onChangeTextarea($event, 'subject')">
-                </cds-textarea>
-            </div>
-        </div>
+
+    <div class="field-box">
+        <label class="title-label">Subject</label>
+        <cds-textarea class="subject-text-area" 
+            [emojiPikerBtn]="false" 
+            [limitCharsText]="150"
+            [text]="action.subject" 
+            [minRow]="1" 
+            [maxRow]="1" 
+            popoverVerticalAlign="above"
+            (changeTextarea)="onChangeTextarea($event, 'subject')">
+        </cds-textarea>
     </div>
 
-    <div class="text-editor-wrapper">
-        <div class="text-editor">
-            <div class="email-field-box">
-                <label class="title-label">Reply to</label>
-                <!-- <div class="text-editor-wpr" style="position: relative;"> -->
-                <!-- [limitCharsText]="150"  -->
-                <cds-textarea class="to-text-area" 
-                    [emojiPikerBtn]="false" 
-                    [textLimitBtn]="false" 
-                    [text]="action.replyto"
-                    [minRow]="1" 
-                    [maxRow]="1" 
-                    popoverVerticalAlign="above"
-                    (changeTextarea)="onChangeTextarea($event, 'replyto')">
-                </cds-textarea>
-            </div>
-        </div>
+    <div class="field-box">
+        <label class="title-label">Reply to</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="to-text-area" 
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="action.replyto"
+            [minRow]="1" 
+            [maxRow]="1" 
+            popoverVerticalAlign="above"
+            (changeTextarea)="onChangeTextarea($event, 'replyto')">
+        </cds-textarea>
     </div>
 
-    <div class="email-field-box">
+
+    <div class="field-box">
         <label class="title-label">Email body</label>
         <cds-textarea class="body-text-area" 
             [limitCharsText]="1024" 

@@ -55,13 +55,12 @@
     </div>
 </div> -->
 
-<div id="content" *ngIf="!previewMode && !showVariablesSection" class="content">
+<div id="scrollMe" #scrollMe *ngIf="!previewMode && !showVariablesSection" class="content-panel-intent-detail" >
 
 
-    <div class="textarea-editor-wrapper">
+    <div class="field-box">
         <label class="title-label">Prompt</label>
-        <cds-textarea 
-            id="question" 
+        <cds-textarea id="question" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
@@ -73,24 +72,20 @@
         </cds-textarea>
     </div>
 
-    <div class="text-editor-wrapper">
-        <div class="field-box">
-            <label class="title-label">GPT Reply</label>
-            <div class="value-wrp">
-                <cds-textarea 
-                    id="assignTo" 
-                    [textLimitBtn]="false" 
-                    [emojiPikerBtn]="false" 
-                    [setAttributeBtn]="true"
-                    [minRow]="1" 
-                    [maxRow]="1" 
-                    [readonly]="true" 
-                    [text]="action.assignReplyTo"
-                    (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
-                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')">
-                </cds-textarea>
-            </div>
-        </div>
+    <div class="field-box">
+        <label class="title-label">GPT Reply</label>
+        <cds-textarea 
+            id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" 
+            [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignReplyTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')">
+        </cds-textarea>
     </div>
 
     <a (click)="goToKNB()" routerLinkActive="router-link-active" target="_blank">Manage GPT Key</a>
@@ -108,43 +103,38 @@
             <div>
 
                 <!-- // model select -->
-                <div>
-                    <div class="select-box">
-                        <cds-select 
-                            id="text-condition" 
-                            [items]="models_list" 
-                            [itemSelected]="action.model"
-                            [bindLabelSelect]="'name'" 
-                            [bindValueSelect]="'value'"
-                            (onSelected)="onChangeSelect($event, 'model')">
-                        </cds-select>
-                    </div>
+                <div class="field-box">
+                    <cds-select id="text-condition" 
+                        [items]="models_list" 
+                        [itemSelected]="action.model"
+                        [bindLabelSelect]="'name'" 
+                        [bindValueSelect]="'value'"
+                        (onSelected)="onChangeSelect($event, 'model')">
+                    </cds-select>
                 </div>
 
                 <!-- // max_tokens slider -->
-                <div class="text-editor-wrapper">
-                    <div class="field-box">
-                        <label class="title-label">Max Tokens</label>
-                        <div class="action-wait-content">
+                <div class="field-box">
+                    <label class="title-label">Max Tokens</label>
+                    <div class="action-wait-content">
 
-                            <div class="action-wait-slider ">
-                                <div class="action-wait-range">1</div>
-                                <mat-slider 
-                                    class="wait-slider" 
-                                    thumbLabel 
-                                    [displayWith]="formatLabel" 
-                                    step="1"  min="1" max="512"
-                                    [(ngModel)]="action.max_tokens"
-                                    (change)="updateSliderValue($event.value, 'max_tokens')" 
-                                    aria-label="units">
-                                </mat-slider>
-                                <div class="action-wait-range">512</div>
-                            </div>
-                            <!-- // doesn't work propely -->
-                            <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
-                            <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens}}" disabled>
-                            <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
+                        <div class="action-wait-slider ">
+                            <div class="action-wait-range">1</div>
+                            <mat-slider 
+                                class="wait-slider" 
+                                thumbLabel 
+                                [displayWith]="formatLabel" 
+                                step="1"  min="1" max="512"
+                                [(ngModel)]="action.max_tokens"
+                                (change)="updateSliderValue($event.value, 'max_tokens')" 
+                                aria-label="units">
+                            </mat-slider>
+                            <div class="action-wait-range">512</div>
                         </div>
+                        <!-- // doesn't work propely -->
+                        <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
+                        <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens}}" disabled>
+                        <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
                     </div>
                 </div>
 
@@ -173,10 +163,9 @@
                     </div>
                 </div>
 
-                <div class="textarea-editor-wrapper">
+                <div class="field-box">
                     <label class="title-label">System context</label>
-                    <cds-textarea 
-                        id="context" 
+                    <cds-textarea id="context" 
                         [textLimitBtn]="false" 
                         [emojiPikerBtn]="false" 
                         [setAttributeBtn]="false"
@@ -187,7 +176,6 @@
                     </cds-textarea>
                 </div>
 
-
             </div>
         </mat-expansion-panel>
     </mat-accordion>
@@ -195,8 +183,8 @@
     <hr class="custom-divider">
 
     <div style="width: 100%; display: flex; justify-content: flex-end;">
-        <button id="cds-publish-btn" class="btn btn-primary" type="button" [disabled]="!action.question"
-            (click)="execPreview()">
+        <button id="cds-publish-btn" class="btn btn-primary" type="button" 
+            [disabled]="!action.question" (click)="execPreview()">
             <span class="material-icons">preview</span>
             Preview
         </button>

@@ -17,23 +17,18 @@
     </div>
 </div>
 
-<div *ngIf="!previewMode" class="content-panel-intent-detail">
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
 
-    <div class="text-editor-wrapper">
-        <div class="field-box">
-            <label class="title-label">Hidden message:</label>
-            <!-- <cds-textarea id="text-condition"
-                [control]="actionHideMessageFormGroup.controls['text']">
-            </cds-textarea> -->
-            <cds-textarea 
-                class="text-editable-div" 
-                [text]="action?.text" 
-                [minRow]="1" 
-                popoverVerticalAlign="above"
-                [emojiPikerBtn]="true" 
-                (changeTextarea)="onChangeTextArea($event)">
-            </cds-textarea>
-        </div>
+    <div class="field-box">
+        <label class="title-label">Hidden message:</label>
+        <cds-textarea 
+            class="text-editable-div" 
+            [text]="action?.text" 
+            [minRow]="1" 
+            popoverVerticalAlign="above"
+            [emojiPikerBtn]="true" 
+            (changeTextarea)="onChangeTextArea($event)">
+        </cds-textarea>
     </div>
 
 </div>

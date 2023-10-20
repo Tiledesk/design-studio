@@ -33,28 +33,24 @@
     <div class="content-panel-intent-detail">
 
         <!-- trueIntent -->
-        <div style="margin-bottom: 20px;">
-
+        <div class="field-box">
             <div class="condition-container">
                 <div class="icon-action">
                     <img class="active-icon" src="assets/images/icons/if_condition.svg">
                 </div>
                 <span class="condition-text">OPEN</span>
             </div>
-    
-            <div class="select-box" id="intentSelect">
-                <cds-select 
-                    id="text-condition" 
-                    [items]="listOfIntents" 
-                    [bindLabelSelect]="'name'"
-                    [bindValueSelect]="'value'" 
-                    [itemSelected]="action?.trueIntent" 
-                    [placeholder]="'Select a block'"
-                    [clearable]="true" 
-                    (onSelected)="onChangeSelect($event, 'trueIntent')"
-                    (onReset)="onResetBlockSelect($event, 'trueIntent')">
-                </cds-select>
-            </div>
+
+            <cds-select id="text-condition" 
+                [items]="listOfIntents" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'" 
+                [itemSelected]="action?.trueIntent" 
+                [placeholder]="'Select a block'"
+                [clearable]="true" 
+                (onSelected)="onChangeSelect($event, 'trueIntent')"
+                (onReset)="onResetBlockSelect($event, 'trueIntent')">
+            </cds-select>
             <!-- <cds-attributes 
                 class="cds-attributes" 
                 [attributes]="trueIntentAttributes"
@@ -64,23 +60,20 @@
         </div>
     
         <!-- falseIntent -->
-        <div>
+        <div class="field-box">
             <div class="condition-container">
                 <span class="condition-text">Else</span>
             </div>
-            <div class="select-box" id="intentSelect">
-                <cds-select 
-                    id="text-condition" 
-                    [items]="listOfIntents" 
-                    [bindLabelSelect]="'name'"
-                    [bindValueSelect]="'value'" 
-                    [itemSelected]="action?.falseIntent" 
-                    [placeholder]="'Select a block'"
-                    [clearable]="true" 
-                    (onSelected)="onChangeSelect($event, 'falseIntent')"
-                    (onReset)="onResetBlockSelect($event, 'falseIntent')">
-                </cds-select>
-            </div>
+            <cds-select id="text-condition" 
+                [items]="listOfIntents" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'" 
+                [itemSelected]="action?.falseIntent" 
+                [placeholder]="'Select a block'"
+                [clearable]="true" 
+                (onSelected)="onChangeSelect($event, 'falseIntent')"
+                (onReset)="onResetBlockSelect($event, 'falseIntent')">
+            </cds-select>
             <!-- <cds-attributes 
                 class="cds-attributes" 
                 [attributes]="action.falseIntentAttributes"

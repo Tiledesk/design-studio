@@ -98,12 +98,44 @@ svg {
     // overflow: auto; // nk
     // max-height: calc(100vh - 200px); // nk
 }
+.no-footer{
+    bottom: 0px
+}
 
 .title-label{
     color: $blu;
     font-size: 14px;
-    // margin-bottom: 5px;
 }
+.condition-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: $blu;
+}
+.condition-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+.field-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+.icon-action {
+    transition: opacity .15s ease 0s;
+    opacity: .85;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+        height: 20px;
+    }
+} 
+
+
 
 
 .cds-custom-tooltip {

@@ -207,7 +207,7 @@ mat-form-field.box-textarea ::ng-deep {
         height: fit-content;
         padding: 2px;
         max-width: calc(100% - 25px);
-        background-color: #ecb606;
+        background-color: $blu;
         color: #fff;
         .close{
             position: absolute;
@@ -219,8 +219,8 @@ mat-form-field.box-textarea ::ng-deep {
             font-size: 13px;
             border-radius: 50%;
             background: #fff;
-            border: 1px solid #ecb606;
-            color: #ecb606;
+            border: 1px solid $blu;
+            color: $blu;
             cursor: pointer;
             opacity: 1;
             justify-content: center;
@@ -228,8 +228,7 @@ mat-form-field.box-textarea ::ng-deep {
             padding: 0;
             margin: 0;
             &:hover{
-                background: #ecb606;
-                color: white;
+                background: $blu-light-03;
             }
         }
     }
