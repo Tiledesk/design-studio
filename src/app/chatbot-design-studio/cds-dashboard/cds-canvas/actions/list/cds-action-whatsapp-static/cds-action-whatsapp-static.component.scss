@@ -1,10 +1,5 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-.container-wrap {
-    padding: 20px 0 0;
-    max-height: calc(100vh - 170px);
-    overflow-y: scroll;
-}
 
 .loader-container {
     display: flex;
@@ -54,9 +49,7 @@ input::placeholder {
     box-shadow: 0px 0px 4px 1px red;
 }
 
-.select-template-container {
-    margin-bottom: 16px;
-}
+
 
 
 .select-template-box {

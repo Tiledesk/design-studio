@@ -32,7 +32,7 @@
 </div>
 
 
-<div *ngIf="!previewMode" class="container-wrap">
+<div *ngIf="!previewMode" id="scrollMe" class="content-panel-intent-detail no-footer">
 
     <div *ngIf="templates_list.length > 0 && !showLoader" id="select-template-box" class="select-template-box">
 
@@ -47,8 +47,8 @@
         </div>
 
         <!-- // Select template -->
-        <div class="select-template-container">
-            <label class="title-label" style="margin-top: 6px;">Choose a template</label>
+        <div class="field-box">
+            <label class="title-label">Choose a template</label>
             <cds-select id="template-select" 
                 [items]="templates_list" 
                 [bindLabelSelect]="'name'"

@@ -70,11 +70,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       this.logger.log('[APP-COMP] ngOnInit AUTOLOGIN token get with getParameterByName  ', token)
       // save token in local storage then 
 
-      const storedToken = this.appStorageService.getItem('tiledeskToken');
+      const storedToken = localStorage.getItem('tiledesk_token');
       this.logger.log('[APP-COMP] ngOnInit AUTOLOGIN storedToken ', storedToken)
       this.logger.log('[APP-COMP] ngOnInit AUTOLOGIN SAVE THE PARAMS TOKEN ', token)
       if (storedToken !== token) {
-        this.appStorageService.setItem('tiledeskToken', token);
+        localStorage.setItem('tiledesk_token', token);
       } else {
         this.logger.log('[APP-COMP] ngOnInit AUTOLOGIN the current user already exist DON\'T SAVE ')
       }
@@ -249,7 +249,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   /***************************************************+*/
   /**------- AUTHENTICATION FUNCTIONS --> START <--- +*/
   initAuthentication() {
-    const tiledeskToken = this.appStorageService.getItem('tiledeskToken')
+    const tiledeskToken = localStorage.getItem('tiledesk_token')
 
     this.logger.log('[APP-COMP] >>> INIT-AUTHENTICATION !!! ')
     this.logger.log('[APP-COMP] >>> initAuthentication tiledeskToken ', tiledeskToken)
@@ -268,7 +268,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.logger.warn('[APP-COMP] >>> I AM NOT LOGGED IN <<<')
       this.IS_ONLINE = false;
-      // this.goToDashboardLogin()
+      this.goToDashboardLogin()
     }
   }
 

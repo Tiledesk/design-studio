@@ -1,25 +1,7 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-.text-editor-wrapper {
-    font-size: $font-size-base;
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 20px;    
-}
 
-.field-box {
-    display: flex;
-    flex-direction: column;
-    // width: 70%;
-    min-width: 90px;
-    gap: 10px;
-}
-
-div.value-wrp{
-    position: relative;
+div{
     .flex{
         position: absolute;
         top: 0px;
