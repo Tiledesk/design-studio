@@ -295,9 +295,9 @@ export class ConnectorService {
    * @param intent_id 
    * @param dispatch 
    */
-  public deleteConnectorsOutOfBlock(intent_id){
-    this.tiledeskConnectors.deleteConnectorsOutOfBlock(intent_id);
-    console.log('[CONNECTOR-SERV] deleteConnectorsOutOfBlock intent_id ' ,intent_id);
+  public deleteConnectorsOutOfBlock(intent_id, save=false, undo=false, notify=true){
+    this.tiledeskConnectors.deleteConnectorsOutOfBlock(intent_id, save, undo, notify);
+    // console.log('[CONNECTOR-SERV] deleteConnectorsOutOfBlock intent_id ' ,intent_id);
   }
 
   /**
