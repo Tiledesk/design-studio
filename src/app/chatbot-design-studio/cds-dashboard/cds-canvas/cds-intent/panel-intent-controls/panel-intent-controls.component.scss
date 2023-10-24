@@ -37,7 +37,8 @@
   .intent-header-action-btn {
     cursor: pointer;
     border-left: solid 1px $border-light;
-    padding: 0 8px;
+    padding: 2px 8px;
+    display: flex;
   
   }
   
@@ -45,13 +46,15 @@
     border-left: unset;
   }
   
-  
-  .svg-icon--wh.webhook-enabled  svg {
-    fill: #17B366;
+  .icon.webhook-enabled  img {
+    filter: brightness(0) saturate(100%) invert(41%) sepia(79%) saturate(1263%) hue-rotate(121deg) brightness(101%) contrast(82%);
   }
   
-  .svg-icon--wh:hover  svg,
-  .svg-icon--delete-intent:hover svg,
-  .svg-icon--play:hover svg {
-    fill: #3ea9f5;
+  .icon img {
+    filter: brightness(0) saturate(100%) invert(46%) sepia(0%) saturate(0%) hue-rotate(216deg) brightness(94%) contrast(91%);
+  }
+  .icon:hover {
+    img {
+      filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+    }
   }

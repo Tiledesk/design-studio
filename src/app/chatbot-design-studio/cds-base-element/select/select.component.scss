@@ -1,10 +1,11 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-.select-itme-wrp{
+.select-item-wrp{
     width: 100%; 
     display: flex; 
     flex-direction: row;
     align-items: center;
+    font-size: 14px;
 }
 
 ::ng-deep{

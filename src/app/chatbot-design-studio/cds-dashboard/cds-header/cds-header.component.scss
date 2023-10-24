@@ -115,10 +115,16 @@
 
 #cds-test-it-out-btn{
     background-color: transparent;
-    outline: 1px solid $blu-02;
+    outline: 2px solid $blu-02;
     outline-offset: -1px;
     color: $blu-02;
     border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4px 6px 6px;
+
 }
 
 #cds-publish-btn:hover,

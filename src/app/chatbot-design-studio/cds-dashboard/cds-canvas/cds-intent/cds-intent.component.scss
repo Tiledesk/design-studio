@@ -1022,6 +1022,8 @@ cds-panel-intent-header.isStart ::ng-deep{
 
   .option {
     display: flex;
+    cursor: pointer;
+    
     &:hover {
       opacity: 0.85;
     }

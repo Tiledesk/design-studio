@@ -34,10 +34,10 @@
 
 <div *ngIf="!previewMode" id="scrollMe" class="content-panel-intent-detail no-footer">
 
-    <div *ngIf="templates_list.length > 0 && !showLoader" id="select-template-box" class="select-template-box">
+    <div *ngIf="templates_list.length > 0 && !showLoader" id="select-template-box">
 
         <!-- // Phone number id -->
-        <div class="phone-number-id-container">
+        <div class="field-box">
             <label class="title-label">Phone number id</label>
             <input id="phone-number-id" 
                 type="text" 
@@ -82,7 +82,7 @@
         </div>
     </div>
 
-    <div *ngIf="templates_list.length == 0 && !showLoader" id="select-template-box" class="select-template-box">
+    <div *ngIf="templates_list.length == 0 && !showLoader" id="select-template-box">
         <p>Oops, looks like there is no template. <a
                 href="https://www.facebook.com/business/help/2055875911147364?id=2129163877102343"
                 target="_blank">Create one now!</a></p>

@@ -17,7 +17,7 @@
         (change) = "onChangeActionButton($event)">
 
         <ng-template ng-label-tmp let-item="item">
-            <div class="select-itme-wrp">
+            <div class="select-item-wrp">
                 <span class="material-icons" *ngIf="item['icon']"
                     [class.intent-start]="item[bindLabelSelect] === 'start'"
                     [class.intent-defaultFallback]="item[bindLabelSelect] === 'defaultFallback'">{{item['icon']}}</span>
@@ -27,16 +27,16 @@
         </ng-template>
 
         <ng-template ng-option-tmp let-item="item" let-index="index">
-            <div class="select-itme-wrp" style="justify-content: space-between;">
+            <div class="select-item-wrp" style="justify-content: space-between;">
                 <div style="width: 100%; display: flex; flex-direction: column;">
-                    <div class="select-itme-wrp">
+                    <div class="select-item-wrp">
                         <span class="material-icons" *ngIf="item['icon']"
                             [class.intent-start]="item[bindLabelSelect] === 'start'"
                             [class.intent-defaultFallback]="item[bindLabelSelect] === 'defaultFallback'">{{item['icon']}}</span>
                         <span class="label-select">{{item[bindLabelSelect]}}</span>
                         <span *ngIf="optionalBindAdditionalText" class="label-select-option">{{item[optionalBindAdditionalText]}}</span>
                     </div>
-                    <div class="select-itme-wrp">
+                    <div class="select-item-wrp">
                         <span *ngIf="optionalBindDescription" class="label-select-option description">{{item[optionalBindDescription]}}</span>
                     </div>
                 </div>
