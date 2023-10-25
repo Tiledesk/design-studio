@@ -95,15 +95,15 @@ export class CDSImageUploadComponent implements OnInit {
 
     if (event) {
       this.selectedFiles = event.target.files;
-      this.logger.debug('[[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles', this.selectedFiles);
+      this.logger.debug('[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles', this.selectedFiles);
       // this.onAttachmentButtonClicked.emit(this.selectedFiles)
       if (this.selectedFiles == null) {
         this.isFilePendingToUpload = false;
       } else {
         this.isFilePendingToUpload = true;
       }
-      this.logger.debug('[[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles::isFilePendingToUpload', this.isFilePendingToUpload);
-      this.logger.debug('[[IMAGE-UPLOAD] fileChange: ', event.target.files);
+      this.logger.debug('[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles::isFilePendingToUpload', this.isFilePendingToUpload);
+      this.logger.debug('[IMAGE-UPLOAD] fileChange: ', event.target.files);
       if (event.target.files.length <= 0) {
         this.isFilePendingToUpload = false;
       } else {
@@ -115,44 +115,44 @@ export class CDSImageUploadComponent implements OnInit {
           const nameFile = event.target.files[0].name;
           const typeFile = event.target.files[0].type;
           const reader = new FileReader();
-            that.logger.debug('[[IMAGE-UPLOAD] OK preload: ', nameFile, typeFile, reader);
-            reader.addEventListener('load', function () {
-              that.logger.debug('[[IMAGE-UPLOAD] addEventListener load', reader.result);
-              // that.isFileSelected = true;
-              // se inizia con image
-              if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
-                const imageXLoad = new Image;
-                that.logger.debug('[[IMAGE-UPLOAD] onload ', imageXLoad);
-                imageXLoad.src = reader.result.toString();
-                imageXLoad.title = nameFile;
-                imageXLoad.onload = function () {
-                  that.logger.debug('[[IMAGE-UPLOAD] onload image');
-                  // that.arrayFilesLoad.push(imageXLoad);
-                  const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
-                  that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: typeFile };
-                  that.logger.debug('[[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
-                  // SEND MESSAGE
-                  that.loadFile();
-                };
-              } else {
-                that.logger.debug('[[IMAGE-UPLOAD] onload file');
-                const fileXLoad = {
-                  src: reader.result.toString(),
-                  title: nameFile
-                };
+          that.logger.debug('[IMAGE-UPLOAD] OK preload: ', nameFile, typeFile, reader);
+          reader.addEventListener('load', function () {
+            that.logger.debug('[IMAGE-UPLOAD] addEventListener load', reader.result);
+            // that.isFileSelected = true;
+            // se inizia con image
+            if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
+              const imageXLoad = new Image;
+              that.logger.debug('[IMAGE-UPLOAD] onload ', imageXLoad);
+              imageXLoad.src = reader.result.toString();
+              imageXLoad.title = nameFile;
+              imageXLoad.onload = function () {
+                that.logger.debug('[IMAGE-UPLOAD] onload image');
                 // that.arrayFilesLoad.push(imageXLoad);
                 const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
-                that.arrayFilesLoad[0] = { uid: uid, file: fileXLoad, type: typeFile };
-                that.logger.debug('[[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+                that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: typeFile };
+                that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
                 // SEND MESSAGE
                 that.loadFile();
-              }
-            }, false);
-
-            if (event.target.files[0]) {
-              reader.readAsDataURL(event.target.files[0]);
-              that.logger.debug('[[IMAGE-UPLOAD] reader-result: ', event.target.files[0]);
+              };
+            } else {
+              that.logger.debug('[[IMAGE-UPLOAD] onload file');
+              const fileXLoad = {
+                src: reader.result.toString(),
+                title: nameFile
+              };
+              // that.arrayFilesLoad.push(imageXLoad);
+              const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
+              that.arrayFilesLoad[0] = { uid: uid, file: fileXLoad, type: typeFile };
+              that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+              // SEND MESSAGE
+              that.loadFile();
             }
+          }, false);
+
+          if (event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+            that.logger.debug('[IMAGE-UPLOAD] reader-result: ', event.target.files[0]);
+          }
       }
     }
   }

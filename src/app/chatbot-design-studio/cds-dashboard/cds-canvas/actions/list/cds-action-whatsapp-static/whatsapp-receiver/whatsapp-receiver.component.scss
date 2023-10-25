@@ -1,5 +1,17 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+
+:host{
+    --icon-color: #{$blu};
+    --textColor: #{$blu};
+    --backGroundColor: #{$blu-light-04};
+    --hoverBackgroundColor: #{$blu-light-03};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --border-radius-base: 8px
+
+}
+
 ::placeholder {
     color: rgb(198, 198, 198);
     opacity: 1; /* Firefox */
@@ -8,7 +20,8 @@
 .whatsapp-receiver {
     display: flex;
     flex-direction: row;
-    padding: 0px 30px 0px 0px;
+    padding: 0px 24px 0px 0px;
+    position: relative;
 }
 
 .whatsapp-receiver:hover {
@@ -24,71 +37,54 @@
 .response-controls {
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
-    width: 33px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    // position: relative;
-    // //left: 3px;
-
-    // left: -27px;
-    // top: 50px;
+    
+    
+    // height: 100%;
+    // left: -44px;
+    // position: absolute;
+    // top: 0px;
+    // width: 44px;
 
     .control-button {
         cursor: pointer;
-        color: $color-bck-gray-hex;
-        transition: color 0.3s;
-        height: 20px;
-        margin-bottom: 2px;
-        &.delete {
+        &.delete,
+        &.copy  {
             height: 24px;
             width: 24px;
-            background: $color-bck-gray-hex;
+            background: white;
             border-radius: 50%;
+            transition: background-color 0.3s ease 0s;
+            box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
             display: flex;
             align-items: center;
             justify-content: center;
             em {
                 font-size: 1.15em;
-                color: $color-withe-hex;
-                transition: color 0.3s;
-            }
-        }
-        &.copy {
-            height: 24px;
-            width: 24px;
-            background: $color-bck-gray-hex;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            em {
-                font-size: 1.15em;
-                color: $color-withe-hex;
+                color: var(--textColor);
                 transition: color 0.3s;
             }
         }
     }
     .control-button:hover {
-        color: $color-withe-hex;
-        &.delete {
-            box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
+        color: $blu-light-02;
+        &.delete{
             em {
                 color: $color-red-hex;
             }
         }
         &.copy {
-            box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
-            em {
-                color: $color-blue-hex;
-            }
+            background-color: var(--hoverBackgroundColor);
         }
     }
 }
 
 .parameters-container {
     //margin-top: 16px;
-    background-color: #ffffff91;
+    background-color: var(--content-background);
+    border: 1px solid $gray-light-02;
     border-radius: 4px;
     padding: 6px;
     //border: 2px solid transparent;
@@ -132,8 +128,8 @@
     .param-number {
         height: 36px;
         width: 40px;
-        background-color: #50627e;
-        color: $icon-color;
+        background-color: var(--textColor);
+        color: var(--backGroundColor);
         display: flex;
         align-items: center;
         margin-right: 10px;
@@ -146,8 +142,10 @@
     input {
         width: 100%;
         height: 36px;
-        border-radius: 6px;
-        border: none;
+        border-radius: 8px;
+        background: $color-withe-hex;
+        border: 1px solid $blu-light-02 !important;
+        color: $gray;
         padding: 4px 8px;
         font-size: 14px;
     }
@@ -297,14 +295,18 @@
 button.icon-only {
     height: 36px;
     width: 40px;
-    border-radius: 6px;
     margin-left: 4px;
-    background-color: white;
-    color: #50617e;
-    border: none;
+    border-radius: 8px;
+    background: $blu-light-02;
+    border: 1px solid $blu-light-02 !important;
+    color: $color-withe-hex;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
-        background-color: white;
+        opacity: 0.8;
     }
 }
 

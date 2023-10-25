@@ -17,6 +17,8 @@ import { avatarPlaceholder, getColorBck } from 'src/chat21-core/utils/utils-user
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
+import { UploadModel } from 'src/chat21-core/models/upload';
+import { User } from 'firebase';
 const swal = require('sweetalert');
 
 @Component({
@@ -35,10 +37,10 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   @Input() translationsMap: Map<string, string> = new Map();
 
   botProfileImageExist: boolean;
-  botImageHasBeenUploaded = false;
   // id_faq_kb: string;
-  storageBucket: string;
-  showSpinnerInUploadImageBtn = false;
+
+  selectedFiles: FileList;
+  isFilePendingToUpload = false;
   // botProfileImageurl: string;
   // timeStamp: any;
 
@@ -69,12 +71,12 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   selected_dept_name: string;
   botHasBeenAssociatedWithDept: string;
 
+  user: UserModel
+
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private uploadService: UploadService,
-    // private tiledeskAuthService: TiledeskAuthService,
-    // private uploadImageService: UploadImageService,
-    // private uploadImageNativeService: UploadImageNativeService,
+    private tiledeskAuthService: TiledeskAuthService,
     private faqKbService: FaqKbService,
     private departmentService: DepartmentService,
     private router: Router,
@@ -86,6 +88,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
   ngOnInit(): void {
     this.getDeptsByProjectId();
+    this.user = this.tiledeskAuthService.getCurrentUser()
     // this.checkBotImageUploadIsComplete();
   }
 
@@ -405,20 +408,81 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   // ---------------------------------------------------
   upload(event) {
     this.logger.log('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE  upload')
-    this.showSpinnerInUploadImageBtn = true;
-    const file = event.target.files[0]
+    if (event) {
+      this.selectedFiles = event.target.files;
+      this.logger.debug('[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles', this.selectedFiles);
+      // this.onAttachmentButtonClicked.emit(this.selectedFiles)
+      if (this.selectedFiles == null) {
+        this.isFilePendingToUpload = false;
+      } else {
+        this.isFilePendingToUpload = true;
+      }
+      this.logger.debug('[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles::isFilePendingToUpload', this.isFilePendingToUpload);
+      this.logger.debug('[IMAGE-UPLOAD] fileChange: ', event.target.files);
+      if (event.target.files.length <= 0) {
+        this.isFilePendingToUpload = false;
+      } else {
+        this.isFilePendingToUpload = true;
+      }
 
-    this.uploadService.upload(this.selectedChatbot._id, file).then((downloadUrl)=> {
-      this.logger.log('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE upload with native service - RES downoloadurl', downloadUrl);
+      const that = this;
+      if (event.target.files && event.target.files[0]) {
+        const nameFile = event.target.files[0].name;
+        const typeFile = event.target.files[0].type;
+        const reader = new FileReader();
+        that.logger.debug('[IMAGE-UPLOAD] OK preload: ', nameFile, typeFile, reader);
+        reader.addEventListener('load', function () {
+          that.logger.debug('[IMAGE-UPLOAD] addEventListener load', reader.result);
+          // that.isFileSelected = true;
+          // se inizia con image
+          if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
+            const imageXLoad = new Image;
+            that.logger.debug('[IMAGE-UPLOAD] onload ', imageXLoad);
+            imageXLoad.src = reader.result.toString();
+            imageXLoad.title = nameFile;
+            imageXLoad.onload = function () {
+              that.logger.debug('[IMAGE-UPLOAD] onload image');
+              // that.arrayFilesLoad.push(imageXLoad);
+              const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
+              that.uploadSingle(that.selectedFiles.item(0)) //GABBBBBBBB
+            };
+          }
+        }, false);
 
-      this.selectedChatbot.url = downloadUrl
-      this.showSpinnerInUploadImageBtn = false;
+        if (event.target.files[0]) {
+          reader.readAsDataURL(event.target.files[0]);
+          that.logger.debug('[IMAGE-UPLOAD] reader-result: ', event.target.files[0]);
+        }
+      }
 
-    }, (error) => {
+      
+    }
 
-      this.logger.error('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE upload with native service - ERR ', error);
-    })
-    this.fileInputBotProfileImage.nativeElement.value = '';
+  }
+
+
+  uploadSingle(file) {
+    const that = this;
+    // const send_order_btn = <HTMLInputElement>document.getElementById('chat21-start-upload-doc');
+    // send_order_btn.disabled = true;
+    that.logger.debug('[IMAGE-UPLOAD] AppComponent::uploadSingle::', file);
+    // const file = this.selectedFiles.item(0);
+    const currentUpload = new UploadModel(file);
+ 
+    this.uploadService.upload(this.user.uid, currentUpload).then(downloadURL => {
+      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
+
+      that.selectedChatbot.url = downloadURL;
+      this.botProfileImageExist = true
+      that.isFilePendingToUpload = false;
+      // return downloadURL;
+    }).catch(error => {
+      // Use to signal error if something goes wrong.
+      that.logger.error(`[IMAGE-UPLOAD] uploadSingle:: Failed to upload file and get link - ${error}`);
+      that.isFilePendingToUpload = false;
+    });
+    that.fileInputBotProfileImage.nativeElement.value = '';
+    that.logger.debug('[IMAGE-UPLOAD] reader-result: ', file);
   }
 
 
@@ -428,9 +492,8 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   deleteBotProfileImage() {
     // const file = event.target.files[0]
     this.logger.log('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE (FAQ-COMP) deleteBotProfileImage')
-    this.uploadService.delete(this.selectedChatbot._id, this.selectedChatbot.url).then((result)=>{
+    this.uploadService.delete(this.user.uid, this.selectedChatbot.url).then((result)=>{
       this.botProfileImageExist = false;
-      this.botImageHasBeenUploaded = false;
 
       const delete_bot_image_btn = <HTMLElement>document.querySelector('.delete_bot_image_btn');
       delete_bot_image_btn.blur();
@@ -446,26 +509,24 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     // this.logger.log('[CDS-CHATBOT-DTLS] FAQ KB NAME TO UPDATE ', this.faqKb_name);
 
 
-    this.faqKbService.updateFaqKb(this.selectedChatbot._id, this.selectedChatbot.name, this.faqKbUrlToUpdate, this.selectedChatbot.type, this.selectedChatbot.description, this.selectedChatbot.webhook_enabled, this.selectedChatbot.webhook_url, this.selectedChatbot.language)
-      .subscribe((faqKb) => {
-        this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - FAQ KB UPDATED ', faqKb);
-        if (faqKb) {
-          this.selectedChatbot.name = faqKb['name']
-          this.selectedChatbot.description = faqKb['description']
-        }
-      }, (error) => {
-        this.logger.error('[CDS-CHATBOT-DTLS] EDIT BOT -  ERROR ', error);
+    this.faqKbService.updateFaqKb(this.selectedChatbot._id, this.selectedChatbot.name, this.selectedChatbot.url, this.selectedChatbot.type, this.selectedChatbot.description, this.selectedChatbot.webhook_enabled, this.selectedChatbot.webhook_url, this.selectedChatbot.language).subscribe({next:(faqKb) => {
+      this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - FAQ KB UPDATED ', faqKb);
+      if (faqKb) {
+        this.selectedChatbot.name = faqKb['name']
+        this.selectedChatbot.description = faqKb['description']
+      }
+    }, error: (error) => {
+      this.logger.error('[CDS-CHATBOT-DTLS] EDIT BOT -  ERROR ', error);
 
+      // =========== NOTIFY ERROR ===========
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('UpdateBotError'), 4, 'report_problem');
 
-        // =========== NOTIFY ERROR ===========
-        this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('UpdateBotError'), 4, 'report_problem');
-
-      }, () => {
-        this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - * COMPLETE *');
-        // =========== NOTIFY SUCCESS===========
-        this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('UpdateBotSuccess'), 2, 'done');
-        this.selectedChatbot.name
-      });
+    }, complete: () => {
+      this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - * COMPLETE *');
+      // =========== NOTIFY SUCCESS===========
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('UpdateBotSuccess'), 2, 'done');
+      this.selectedChatbot.name
+    }});
   }
 
   // let dialogRef = dialog.open(UserProfileComponent, {

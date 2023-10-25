@@ -1,5 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { UploadModel } from 'src/chat21-core/models/upload';
 import { UserModel } from 'src/chat21-core/models/user';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
@@ -356,34 +357,87 @@ export class CdsWhatsappReceiverComponent implements OnInit {
 
 
   onFileSelected(event: any): void {
-    this.displayFileUploaded = true;
-    this.fileUploadedName = event.target.files.item(0).name;
-    try {
-      let selectedFiles = event.target.files[0];
-      if (selectedFiles) {
-        this.uploadAttachment(selectedFiles);
+    this.logger.log('[WHATSAPP-RECEIVER] onFileSelected IMAGE  upload')
+    if (event) {
+      let selectedFiles = event.target.files;
+      this.logger.debug('[WHATSAPP-RECEIVER] AppComponent:detectFiles::selectedFiles', selectedFiles);
+      // this.onAttachmentButtonClicked.emit(this.selectedFiles)
+      if (selectedFiles == null) {
+        this.displayFileUploaded = false;
+      } else {
+        this.displayFileUploaded = true;
       }
-    } catch (error) {
-      this.logger.error("error: ", error);
+      this.logger.debug('[WHATSAPP-RECEIVER] AppComponent:detectFiles::selectedFiles::isFilePendingToUpload', this.displayFileUploaded);
+      this.logger.debug('[WHATSAPP-RECEIVER] fileChange: ', event.target.files);
+      if (event.target.files.length <= 0) {
+        this.displayFileUploaded = false;
+      } else {
+        this.displayFileUploaded = true;
+      }
+
+      const that = this;
+      if (event.target.files && event.target.files[0]) {
+        const nameFile = event.target.files[0].name;
+        const typeFile = event.target.files[0].type;
+        this.fileUploadedName = event.target.files.item(0).name;
+        const reader = new FileReader();
+        that.logger.debug('[WHATSAPP-RECEIVER] OK preload: ', nameFile, typeFile, reader);
+        reader.addEventListener('load', function () {
+          that.logger.debug('[WHATSAPP-RECEIVER] addEventListener load', reader.result);
+          // that.isFileSelected = true;
+          // se inizia con image
+          if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
+            const imageXLoad = new Image;
+            that.logger.debug('[WHATSAPP-RECEIVER] onload ', imageXLoad);
+            imageXLoad.src = reader.result.toString();
+            imageXLoad.title = nameFile;
+            imageXLoad.onload = function () {
+              that.logger.debug('[WHATSAPP-RECEIVER] onload image');
+              // that.arrayFilesLoad.push(imageXLoad);
+              const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
+              that.uploadSingle(selectedFiles.item(0)) //GABBBBBBBB
+            };
+          }
+        }, false);
+
+        if (event.target.files[0]) {
+          reader.readAsDataURL(event.target.files[0]);
+          that.logger.debug('[WHATSAPP-RECEIVER] reader-result: ', event.target.files[0]);
+        }
+      }
+
+
     }
+    
   }
 
-  private uploadAttachment (uploadedFiles) {
+  private uploadSingle(file) {
+    const that = this;
+    // const send_order_btn = <HTMLInputElement>document.getElementById('chat21-start-upload-doc');
+    // send_order_btn.disabled = true;
+    that.logger.debug('[IMAGE-UPLOAD] AppComponent::uploadSingle::', file);
+    // const file = this.selectedFiles.item(0);
+    const currentUpload = new UploadModel(file);
+ 
+    this.uploadService.upload(this.user.uid, currentUpload).then(downloadURL => {
+      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
 
-    this.uploadService.upload(this.user.uid, uploadedFiles).then(downloadURL => {
-      if (downloadURL) {
-        if (this.header_params[0].image) {
-          this.header_params[0].image.link = downloadURL;
-        }
-        if (this.header_params[0].document) {
-          this.header_params[0].document.link = downloadURL;
-          this.sanitizeUrl(downloadURL);
-        }
-        this.invalidUrl = false;
+      if (this.header_params[0].image) {
+        this.header_params[0].image.link = downloadURL;
       }
+      if (this.header_params[0].document) {
+        this.header_params[0].document.link = downloadURL;
+        this.sanitizeUrl(downloadURL);
+      }
+      this.invalidUrl = false;
+      this.displayFileUploaded = true
+      // return downloadURL;
     }).catch(error => {
-      this.logger.error("error", error);
+      // Use to signal error if something goes wrong.
+      that.logger.error(`[IMAGE-UPLOAD] uploadSingle:: Failed to upload file and get link - ${error}`);
+      that.displayFileUploaded = false;
     });
+    that.logger.debug('[IMAGE-UPLOAD] reader-result: ', file);
   }
 
   removeHeaderFile() {

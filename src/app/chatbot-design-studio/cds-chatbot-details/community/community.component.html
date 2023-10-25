@@ -10,14 +10,13 @@
             <!-- displayBtnLabelSeeYourRequets
             displayBtnLabelSeeYourRequets
             displayBtnLabelSeeYourRequets -->
-            <div class="community-tab">
+            <div class="cds-bottom-nav">
                 <div (click)="displayUserCommunityInfo(seeUserCmntyInfo = !seeUserCmntyInfo)" class="btn-with-border--effect" [ngClass]="
                 { 'disabled-li' : seeUserCmntyInfo === false, 
                     'border-from-center' : seeUserCmntyInfo === true,
                     'li-active' : seeUserCmntyInfo === false
                 }">
-
-                    <a style="position: relative;top: 20px;" href="javascript:;" role="button"> Chatbot info</a>
+                    <a href="javascript:;" role="button"> Chatbot info</a>
                 </div>
 
                 <div (click)="displayUserCommunityInfo(seeUserCmntyInfo = !seeUserCmntyInfo)" class="btn-with-border--effect" [ngClass]="
@@ -25,7 +24,7 @@
                         'border-from-center' : seeUserCmntyInfo === false, 
                         'li-active' : seeUserCmntyInfo === true
                     }">
-                    <a style="position: relative;top: 20px;" href="javascript:;" role="button"> Personal info </a>
+                    <a href="javascript:;" role="button"> Personal info </a>
                 </div>
             </div>
             <div class="cds-community-btns-wrp">

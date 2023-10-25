@@ -1,75 +1,58 @@
-<div class="form-fields">
-    <div *ngIf="fields.length > 0" class="card-content">
+<div *ngIf="fields.length > 0" class="card-content">
 
-        <table class="table table-hover form-fields-table">
-            <thead>
-              <tr>
+    <table class="table table-hover form-fields-table">
+        <thead>
+            <tr>
                 <th class="col-30">
-                    <span class="ff--column-th-span">
-                        <!-- {{ "Name" | translate }} -->
-                        Name
-                    </span>
+                    {{ "Name" | translate }}
                 </th>
                 <th style="width:auto">
-                    <span class="ff--column-th-span ">
-                        <!-- {{ "AddIntentPage.Label" | translate }} -->
-                        Label
-                    </span>
+                    {{ "AddIntentPage.Label" | translate }}
                 </th>
-                <th style="width:80px">
-                    <span class="ff--column-th-span">
-                        <!-- {{ "Actions" | translate }} -->
-                        Actions
-                    </span>
+                <th style="width:85px">
+                    {{ "Actions" | translate }}
                 </th>
-              </tr>
-            </thead>
+            </tr>
+        </thead>
 
-            <tbody cdkDropList (cdkDropListDropped)="drop($event)" style="display:block">
-                
-                <tr *ngFor="let field of fields; let i = index;" 
+        <tbody cdkDropList (cdkDropListDropped)="drop($event)" style="display:block">
+            
+            <tr *ngFor="let field of fields; let i = index;" 
                 [ngClass]="{'selected':selectedObjectId === i}" 
                 cdkDrag cdkDragLockAxis="y">
-                    <!-- ------------------- -->
-                    <!-- FIELS NAME -->
-                    <!-- ------------------- -->
-                    <td class="ellips" class="col-30" (click)='editField(i)'>
-                        <span class="label-field">
-                            {{ field.name }}
-                        </span>
-                    </td>
-                    <!-- LABEL -->
-                    <td style="width:auto" (click)='editField(i)'>
-                        <span class="label-field">
-                            {{ field?.label }}
-                        </span>
-                    </td>
-                    <!-- ------------------------------------------------ -->
-                    <!-- ACTIONS -->
-                    <!-- ------------------------------------------------ -->
-                    <td class="td-actions">
-                        <!-- EDIT -->
-                        <button 
-                            type="button" 
-                            class="btn btn-primary btn-simple btn-xs" 
-                            (click)='editField(i)'>
-                            <i class="material-icons cds-edit-field-icon">edit</i>
-                            <span class="tooltiptext-custom" style="text-transform:none"></span>
-                        </button>
-                        <!-- DELETE -->
-                        <button type="button" 
-                            class="btn btn-danger btn-simple btn-xs"
-                            (click)='deleteFieldModal(i)'>
-                            <i class="material-icons">close</i>
-                        </button>
-                        <!-- DRAG INDICATOR -->
-                        <div class="td-order">
-                            <i class="material-icons">drag_indicator</i>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
+                <!-- ------------------- -->
+                <!-- FIELS NAME -->
+                <!-- ------------------- -->
+                <td class="ellips col-30" (click)='editField(i)'>
+                    <span class="label-field">
+                        {{ field.name }}
+                    </span>
+                </td>
+                <!-- LABEL -->
+                <td style="width:auto" (click)='editField(i)'>
+                    <span class="label-field">
+                        {{ field?.label }}
+                    </span>
+                </td>
+                <!-- ------------------------------------------------ -->
+                <!-- ACTIONS -->
+                <!-- ------------------------------------------------ -->
+                <td class="td-actions">
+                    <!-- EDIT -->
+                    <button type="button" class="btn btn-primary btn-simple btn-xs" (click)='editField(i)'>
+                        <span class="material-icons cds-edit-field-icon">edit</span>
+                    </button>
+                    <!-- DELETE -->
+                    <button type="button" class="btn btn-danger btn-simple btn-xs" (click)='deleteFieldModal(i)'>
+                        <span class="material-icons">close</span>
+                    </button>
+                    <!-- DRAG INDICATOR -->
+                    <button type="button" class="btn btn-danger btn-simple btn-xs">
+                        <span class="material-icons">drag_indicator</span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
 
-        </table>
-    </div>
+    </table>
 </div>

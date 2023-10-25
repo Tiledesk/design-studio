@@ -76,32 +76,29 @@ input::placeholder {
         padding: 4px;
         border-radius: 50%;
         box-shadow: unset;
-        background-color: $color-withe-hex;
+        background-color: $blu-light-02;
+        color: white;
         cursor: pointer;
     }
 
     .add-block-btn > span {
         font-size: 24px;
-        color: $icon-color;
         position: relative;
         top: 0px;
     }
 
-    .add-block-btn:hover > span {
-        color: rgba($icon-color, 0.8);
-    }
 
     .add-btn-text {
         cursor: pointer;
-        color: $icon-color;
+        color: $blu-light-02;
         position: relative;
         width: 130px;
         top: -27px;
-        left: 246px;
-
-        &:hover {
-            color: rgba($icon-color, 0.8);
-        }
+        left: 225px;
+    }
+    .add-block-btn:hover,
+    .action--text:hover{
+        opacity: 0.5;
     }
 }
 

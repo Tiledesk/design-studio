@@ -15,7 +15,6 @@ import { Subscription } from 'rxjs/internal/Subscription';
 })
 export class CdsActionReplyImageComponent implements OnInit {
   
-  // @Output() updateIntentFromConnectorModification = new EventEmitter();
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
   @Output() deleteActionReply = new EventEmitter();
