@@ -281,7 +281,7 @@ export class CdsActionReplyImageComponent implements OnInit {
   }
 
   /** */
-  onDeletePathElement(){
+  onDeletedMetadata(event){
     this.response.metadata.src = null;
     this.changeActionReply.emit();
   }

@@ -3,11 +3,11 @@ import { BehaviorSubject } from 'rxjs';
 
 // firebase
 // import * as firebase from 'firebase/app';
-import firebase from "firebase/app";
-import 'firebase/messaging';
-import 'firebase/database';
-import 'firebase/storage';
-import 'firebase/firestore';
+// import firebase from "firebase/app";
+// import 'firebase/messaging';
+// import 'firebase/database';
+// import 'firebase/storage';
+// import 'firebase/firestore';
 
 // services
 import { UploadService } from '../abstract/upload.service';
@@ -30,6 +30,8 @@ export class FirebaseUploadService extends UploadService {
   //private
   private url: string;
   private logger: LoggerService = LoggerInstance.getInstance()
+  private firebase: any;
+
   private urlStorageBucket = environment.firebaseConfig.storageBucket
   
   constructor() {
@@ -44,8 +46,12 @@ export class FirebaseUploadService extends UploadService {
     });
   }
 
-  public initialize() {
+  public async initialize() {
     this.logger.log('[FIREBASEUploadSERVICE] initialize');
+
+    const { default: firebase} = await import("firebase/app");
+    await Promise.all([import("firebase/storage")]);
+    this.firebase = firebase
   }
   
   public upload(userId: string, upload: UploadModel): Promise<any> {
@@ -55,7 +61,7 @@ export class FirebaseUploadService extends UploadService {
     this.logger.debug('[FIREBASEUploadSERVICE] pushUpload ', urlImagesNodeFirebase, upload.file);
 
     // Create a root reference
-    const storageRef = firebase.storage().ref();
+    const storageRef = this.firebase.storage().ref();
     this.logger.debug('[FIREBASEUploadSERVICE] storageRef', storageRef);
     
     // Create a reference to 'mountains.jpg'
@@ -81,11 +87,11 @@ export class FirebaseUploadService extends UploadService {
         that.BSStateUpload.next({ upload: progress, type: upload.file.type });
         
         switch (snapshot.state) {
-          case firebase.storage.TaskState.PAUSED: // or 'paused'
+          case that.firebase.storage.TaskState.PAUSED: // or 'paused'
             that.logger.debug('[FIREBASEUploadSERVICE] Upload is paused');
             
             break;
-          case firebase.storage.TaskState.RUNNING: // or 'running'
+          case that.firebase.storage.TaskState.RUNNING: // or 'running'
             that.logger.debug('[FIREBASEUploadSERVICE] Upload is running');
             
             break;
@@ -117,7 +123,7 @@ export class FirebaseUploadService extends UploadService {
     let imageName = path.split(uid + '%2F')[1].split('?')[0];
 
     // Create a root reference
-    const storageRef = firebase.storage().ref();
+    const storageRef = this.firebase.storage().ref();
     const ref = storageRef.child('public/images/' + userId + '/'+ uid + '/')
     let arrayPromise = []
     await ref.listAll().then((dir => {
@@ -140,7 +146,7 @@ export class FirebaseUploadService extends UploadService {
   // // Delete the file photo
   // // ------------------------------------
   private deleteFile(pathToFile, fileName){
-    const ref = firebase.storage().ref(pathToFile);
+    const ref = this.firebase.storage().ref(pathToFile);
     const childRef = ref.child(fileName);
     return childRef.delete()
   }

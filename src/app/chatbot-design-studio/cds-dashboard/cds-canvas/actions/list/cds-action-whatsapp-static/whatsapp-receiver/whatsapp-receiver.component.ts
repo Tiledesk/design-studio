@@ -36,7 +36,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   fileUploadAccept: string = "image/*";
   invalidUrl: Boolean = false;
   src: any;
-  displayFileUploaded: Boolean = false;
+  isFilePendingToUpload = false;
   fileUploadedName: string;
   displayPreview: Boolean = false;
   phone_number: string;
@@ -71,7 +71,6 @@ export class CdsWhatsappReceiverComponent implements OnInit {
         }
         if (this.receiver.header_params[i].type === 'IMAGE') {
           hp.image.link = this.receiver.header_params[i].image.link;
-          this.displayFileUploaded = true;
 
           let decoded_url = decodeURIComponent(this.receiver.header_params[i].image.link);
           this.fileUploadedName = decoded_url.substring(decoded_url.lastIndexOf('/') + 1);
@@ -363,23 +362,22 @@ export class CdsWhatsappReceiverComponent implements OnInit {
       this.logger.debug('[WHATSAPP-RECEIVER] AppComponent:detectFiles::selectedFiles', selectedFiles);
       // this.onAttachmentButtonClicked.emit(this.selectedFiles)
       if (selectedFiles == null) {
-        this.displayFileUploaded = false;
+        this.isFilePendingToUpload = false;
       } else {
-        this.displayFileUploaded = true;
+        this.isFilePendingToUpload = true;
       }
-      this.logger.debug('[WHATSAPP-RECEIVER] AppComponent:detectFiles::selectedFiles::isFilePendingToUpload', this.displayFileUploaded);
+      this.logger.debug('[WHATSAPP-RECEIVER] AppComponent:detectFiles::selectedFiles::isFilePendingToUpload', this.isFilePendingToUpload);
       this.logger.debug('[WHATSAPP-RECEIVER] fileChange: ', event.target.files);
       if (event.target.files.length <= 0) {
-        this.displayFileUploaded = false;
+        this.isFilePendingToUpload = false;
       } else {
-        this.displayFileUploaded = true;
+        this.isFilePendingToUpload = true;
       }
 
       const that = this;
       if (event.target.files && event.target.files[0]) {
         const nameFile = event.target.files[0].name;
         const typeFile = event.target.files[0].type;
-        this.fileUploadedName = event.target.files.item(0).name;
         const reader = new FileReader();
         that.logger.debug('[WHATSAPP-RECEIVER] OK preload: ', nameFile, typeFile, reader);
         reader.addEventListener('load', function () {
@@ -422,6 +420,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     this.uploadService.upload(this.user.uid, currentUpload).then(downloadURL => {
       that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
 
+      this.fileUploadedName = file.name;
       if (this.header_params[0].image) {
         this.header_params[0].image.link = downloadURL;
       }
@@ -430,26 +429,34 @@ export class CdsWhatsappReceiverComponent implements OnInit {
         this.sanitizeUrl(downloadURL);
       }
       this.invalidUrl = false;
-      this.displayFileUploaded = true
+      this.isFilePendingToUpload = false
       // return downloadURL;
     }).catch(error => {
       // Use to signal error if something goes wrong.
       that.logger.error(`[IMAGE-UPLOAD] uploadSingle:: Failed to upload file and get link - ${error}`);
-      that.displayFileUploaded = false;
+      that.isFilePendingToUpload = false;
     });
     that.logger.debug('[IMAGE-UPLOAD] reader-result: ', file);
   }
 
   removeHeaderFile() {
-    this.displayFileUploaded = false;
-    this.fileUploadedName = "";
+    this.isFilePendingToUpload = true;
+    this.uploadService.delete(this.user.uid, this.header_params[0].image.link).then((result)=>{
+      
+      this.isFilePendingToUpload = false;
+      this.fileUploadedName = "";
 
-    if (this.header_params[0].image) {
-      this.header_params[0].image.link = "";
-    }
-    if (this.header_params[0].document) {
-      this.header_params[0].document.link = "";
-    }
+      if (this.header_params[0].image) {
+        this.header_params[0].image.link = "";
+      }
+      if (this.header_params[0].document) {
+        this.header_params[0].document.link = "";
+      }
+
+    }).catch((error)=> {
+      this.logger.error('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE (FAQ-COMP) deleteUserProfileImage ERORR:', error)
+      this.isFilePendingToUpload = false;
+    })     
   }
 
 }

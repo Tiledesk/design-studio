@@ -1,17 +1,8 @@
 import { Injectable } from '@angular/core';
 // firebase
-// import * as firebase from 'firebase/app';
-import firebase from "firebase/app";
-import 'firebase/app';
-/*
-  Generated class for the AuthService provider.
-  See https://angular.io/docs/ts/latest/guide/dependency-injection.html
-  for more info on providers and Angular 2 DI.
-*/
+// import firebase from "firebase/app";
+// import 'firebase/app';
 @Injectable()
-/**
- * DESC PROVIDER
- */
 export class FirebaseInitService {
 
   public static firebaseInit: any;
@@ -19,12 +10,13 @@ export class FirebaseInitService {
   constructor() {
   }
 
-  public static initFirebase(firebaseConfig: any) {
+  public static async initFirebase(firebaseConfig: any) {
+    const { default: firebase} = await import("firebase/app");
     if(!FirebaseInitService.firebaseInit){
-        if (!firebaseConfig || firebaseConfig.apiKey === 'CHANGEIT') {
-            throw new Error('Firebase config is not defined. Please create your chat-config.json. See the chat21-ionic Installation Page');
-          } 
-          FirebaseInitService.firebaseInit = firebase.initializeApp(firebaseConfig); 
+      if (!firebaseConfig || firebaseConfig.apiKey === 'CHANGEIT') {
+        throw new Error('Firebase config is not defined. Please create your widget-config.json. See the Chat21-Web_widget Installation Page');
+      } 
+      FirebaseInitService.firebaseInit = firebase.initializeApp(firebaseConfig); 
     }
     return FirebaseInitService.firebaseInit
   }

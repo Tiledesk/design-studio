@@ -124,8 +124,12 @@
                     <span>{{ i + 1 }}</span>
                 </div>
                 <div class="field-wrapper">
-                    <input type="text" placeholder="{{hp}}" value="{{header_params[i].text}}"
-                        (input)="onParamHeaderChange($event.target.value, i+1)" (blur)="onBlur()" (focus)="onFocus()">
+                    <input type="text" 
+                        placeholder="{{hp}}" 
+                        value="{{header_params[i].text}}"
+                        (input)="onParamHeaderChange($event.target.value, i+1)" 
+                        (blur)="onBlur()" 
+                        (focus)="onFocus()">
                 </div>
             </div>
 
@@ -137,23 +141,35 @@
                 </div>
                 <div class="field-wrapper large">
                     <!-- <input type="text" placeholder="{{hp}}" (input)="onParamHeaderChange($event.target.value, i+1)"> -->
-                    <input *ngIf="!displayFileUploaded" type="text" placeholder="Insert a valid URL or update a file"
-                        (input)="onParamHeaderChange($event.target.value, i+1)" (blur)="onBlur()" (focus)="onFocus()">
-                    <input *ngIf="displayFileUploaded" type="text" placeholder="{{ fileUploadedName }}"
-                        value="{{fileUploadedName}}" disabled>
+                    <input *ngIf="!fileUploadedName" 
+                        type="text" 
+                        placeholder="Insert a valid URL or update a file"
+                        (input)="onParamHeaderChange($event.target.value, i+1)" 
+                        (blur)="onBlur()" 
+                        (focus)="onFocus()">
+                    <input *ngIf="fileUploadedName" 
+                        type="text" 
+                        placeholder="{{ fileUploadedName }}"
+                        value="{{fileUploadedName}}" 
+                        disabled>
                 </div>
-                <button *ngIf="!displayFileUploaded" type="submit" class="icon-only" (click)="fileInput.click()">
+                <loading-spinner  class="custom-spinner" *ngIf="isFilePendingToUpload"></loading-spinner>
+               
+                <button *ngIf="!isFilePendingToUpload && !fileUploadedName" type="submit" class="icon-only" (click)="fileInput.click()">
                     <span class="material-icons-outlined">
                         cloud_upload
                     </span>
-                    <!-- <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" capture="camera"
-                id="file-input" style="display: none;"> -->
-                    <input #fileInput type="file" [accept]="fileUploadAccept" (change)="onFileSelected($event)"
-                        capture="camera" id="file-input" style="display: none;">
+                    
+                    <input #fileInput type="file" 
+                        [accept]="fileUploadAccept" 
+                        (change)="onFileSelected($event)"
+                        capture="camera" 
+                        id="file-input" 
+                        style="display: none;">
 
                 </button>
 
-                <button *ngIf="displayFileUploaded" type="submit" class="icon-only" (click)="removeHeaderFile()">
+                <button *ngIf="!isFilePendingToUpload && fileUploadedName" type="submit" class="icon-only" (click)="removeHeaderFile()">
                     <span class="material-icons-outlined" style="color: #e22828;">
                         delete
                     </span>
@@ -205,8 +221,12 @@
 
                 </div>
                 <div class="field-wrapper">
-                    <input type="text" placeholder="{{bp}}" value="{{body_params[i].text}}"
-                        (input)="onParamBodyChange($event.target.value, i+1)" (blur)="onBlur()" (focus)="onFocus()">
+                    <input type="text" 
+                        placeholder="{{bp}}" 
+                        value="{{body_params[i].text}}"
+                        (input)="onParamBodyChange($event.target.value, i+1)" 
+                        (blur)="onBlur()" 
+                        (focus)="onFocus()">
                 </div>
             </div>
         </div>
@@ -226,8 +246,12 @@
                     <span>{{ i + 1 }}</span>
                 </div>
                 <div class="field-wrapper large">
-                    <input type="text" placeholder="Insert a valid URL" value="{{buttons_params[i].text}}"
-                        (input)="onParamButtonChange($event.target.value, i+1)" (blur)="onBlur()" (focus)="onFocus()">
+                    <input type="text" 
+                        placeholder="Insert a valid URL" 
+                        value="{{buttons_params[i].text}}"
+                        (input)="onParamButtonChange($event.target.value, i+1)" 
+                        (blur)="onBlur()" 
+                        (focus)="onFocus()">
                 </div>
 
             </div>

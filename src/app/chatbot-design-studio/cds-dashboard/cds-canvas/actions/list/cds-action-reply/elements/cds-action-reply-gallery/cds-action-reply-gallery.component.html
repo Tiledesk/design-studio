@@ -41,8 +41,8 @@
 
 
 <div *ngIf="previewMode" [class.previewMode]="previewMode">
-    <ng-container *ngIf="gallery.length === 1 && gallery[0].preview.src === ''" [ngTemplateOutlet]="placeholder"></ng-container>
-    <ng-container *ngIf="(gallery.length === 1 && gallery[0].preview.src !== '') ||  gallery.length > 1" [ngTemplateOutlet]="galleryElement"></ng-container>
+    <ng-container *ngIf="gallery.length === 1 && gallery[0].preview && gallery[0].preview.src === ''" [ngTemplateOutlet]="placeholder"></ng-container>
+    <ng-container *ngIf="(gallery.length === 1 && gallery[0].preview && gallery[0].preview.src !== '') ||  gallery.length > 1" [ngTemplateOutlet]="galleryElement"></ng-container>
 </div>
 
 
@@ -63,11 +63,12 @@
                                     class="image-upload"
                                     [index]="i"
                                     [metadata] = galleryEl.preview
-                                    (onChangeMetadata)="onChangeMetadata($event, i)">
+                                    (onChangeMetadata)="onChangeMetadata($event, i)"
+                                    (onDeletedMetadata)="onDeletedMetadata($event, i)">
                                 </cds-image-upload>
-                                <div *ngIf="galleryEl.preview.src" class="control-button delete" (click)="onDeleteImage(i)">
+                                <!-- <div *ngIf="galleryEl.preview.src" class="control-button delete" (click)="onDeleteImage(i)">
                                     <em class="material-icons">clear</em>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                         <div class="gallery-title" (click)="initElement();activateEL[i].title=true"> 

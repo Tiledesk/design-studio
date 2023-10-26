@@ -251,10 +251,11 @@ $max-height: 230px;
     padding: 10px; //10px 20px 20px;
     text-align: center;
     margin-left: 30px;
+    margin-right: 30px;
     // margin-top: 10px;
     margin-bottom: 10px;
     position: relative;
-    max-width: calc(100% - 66px);
+    // max-width: calc(100% - 66px);
     width: auto;
     // width: calc(100% - 30px);
 }
@@ -262,6 +263,8 @@ $max-height: 230px;
 
 .frame-panel {
     position: relative;
+    display: flex;
+    width: 100%;
 }
 
 .text-editable-div {

@@ -139,6 +139,12 @@
             }
         }
 
+        cds-image-upload ::ng-deep {
+            .image-wrp:hover .control-button{
+                opacity: 0;
+            }
+        }
+
 
     }
 
@@ -274,12 +280,13 @@
     display: block;
     border-radius: 8px; 
     margin-left: 30px;
+    margin-right: 30px;
     // margin-top: 10px;
     margin-bottom: 10px;
     padding: 0px;
     background: rgba(255, 255, 255, 0.383);
     overflow: visible;
-    max-width: calc(100% - 66px);
+    // max-width: calc(100% - 66px);
     width: auto;
     height: auto;
     .image-upload {

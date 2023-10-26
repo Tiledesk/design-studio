@@ -22,8 +22,8 @@ mat-form-field.mat-focused ::ng-deep {
             padding: 0px;
             .mat-form-field-infix {
                 textarea {
-                    border: 1px solid $blu-01 !important;
-                    outline: 0px solid $blu-01 !important;
+                    border: 1px solid $blu ;
+                    outline: 0px solid $blu;
                     transition: border 0.3s;
                     &.invalid{
                         border: 1px solid red !important;
@@ -64,7 +64,7 @@ mat-form-field.box-textarea ::ng-deep {
     textarea {
         border-radius: 8px;
         background: $color-withe-hex;
-        border: 1px solid $blu-light-02 !important;
+        border: 1px solid $blu-light-02;
         overflow-x: hidden;
         overflow-y: auto;
         color: $gray;
@@ -74,12 +74,12 @@ mat-form-field.box-textarea ::ng-deep {
 
         // width: calc(100% - 2.5em);
         padding: 10px;
-        padding-top: 8px;
-        padding-bottom: 8px;
+        padding-top: 4px;
+        padding-bottom: 4px;
         margin: 0px;
         // resize: none;
-        height: 25px;
-        min-height: 25px;
+        height: 26px;
+        min-height: 26px;
 
     }
 }
@@ -193,11 +193,13 @@ mat-form-field.box-textarea ::ng-deep {
     .tag-content {
         overflow: hidden;
         margin: auto 10px;
+        font-size: 12px;
+        line-height: 22px;
     }
     .tag {
         position: absolute;
         top: 3px;
-        bottom: 5px;
+        bottom: 3px;
         left: 5px;
         display: flex;
         align-items: center;
@@ -212,10 +214,10 @@ mat-form-field.box-textarea ::ng-deep {
         .close{
             position: absolute;
             display: flex;
-            top: -7px;
-            right: -10px;
-            width: 19px;
-            height: 19px;
+            top: -5px;
+            right: -7px;
+            width: 17px;
+            height: 17px;
             font-size: 13px;
             border-radius: 50%;
             background: #fff;

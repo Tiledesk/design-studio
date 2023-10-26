@@ -81,6 +81,21 @@
     }
 }
 
+::ng-deep .custom-spinner {
+    margin-left: 4px;
+    width: 40px;
+    .sk-fading-circle {
+        width: 20px !important;
+        height: 20px !important;
+        margin: 0px !important;
+    }
+
+    .sk-fading-circle .sk-circle:before {
+        background-color: $blu !important;
+    }
+
+}
+
 .parameters-container {
     //margin-top: 16px;
     background-color: var(--content-background);

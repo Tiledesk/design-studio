@@ -36,8 +36,10 @@
     flex-direction: column;
     font-size: 16px;
     justify-content: center;
+    align-items: center;
     padding: 30px 20px;
     text-align: center;
+    cursor: pointer;
     // margin: 15px;
     position: relative;
     // width: calc(100% - 30px);
@@ -54,4 +56,41 @@
     height: auto;
     position: relative;
     vertical-align: middle;
+}
+
+.image-wrp{
+    .control-button {
+        &.delete {
+            color: $blu;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            margin-right: 0px;
+            opacity: 0;
+            cursor: pointer;
+            transition: all .3s ease-in-out;
+        }
+    }
+    &:hover{
+        .control-button {
+            &.delete {
+                margin-right: -24px;
+                opacity: 1;
+            }
+        }
+    }
+}
+
+::ng-deep .custom-spinner {
+    padding: 17px 0px;
+    .sk-fading-circle {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 0px !important;
+    }
+
+    .sk-fading-circle .sk-circle:before {
+        background-color: $blu !important;
+    }
+
 }

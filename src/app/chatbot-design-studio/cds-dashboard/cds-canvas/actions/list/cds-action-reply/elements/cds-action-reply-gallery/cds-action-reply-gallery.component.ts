@@ -342,6 +342,13 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     this.changeActionReply.emit();
   }
 
+  onDeletedMetadata(metadata: Metadata, index: number){
+    console.log('deleteeeeeeeee')
+    this.gallery[index].preview = { src: ''};
+    this.response.attributes.attachment.gallery = this.gallery
+    this.changeActionReply.emit();
+  }
+
   /** onBlur */
   onBlur(event){
     console.log('[ACTION REPLY GALLERY] onBlur', event);
@@ -374,17 +381,6 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   onSelectedAttribute(variableSelected: { name: string, value: string }, element: 'title' | 'description', index: number){
     this.activateEL[index][element] = false
   }
-
-
-
-
-
-
-  onDeleteImage(index){
-    this.gallery[index].preview = { src: ''}
-  }
-
-  
 
 
   // ----- DRAG FUNCTIONS: GALLERY ELEMENT: start
