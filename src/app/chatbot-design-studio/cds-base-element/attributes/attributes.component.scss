@@ -1,3 +1,15 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+
+:host {
+    --background-color: #{$blu-light-01};
+    --column-color: #{$blu-02};
+    --text-color: #{$blu};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --base-radius: 8px
+}
+
 .cds-attributes {
     // max-width: 400px;
     .header__center {
@@ -8,7 +20,7 @@
         align-items: center;
         padding-left: 12px;
         padding-right: 12px;
-        color:#f2f2f2;
+        color: var(--text-color);
         max-width: 400px;
         width: 100%;
     }
@@ -24,7 +36,7 @@
     .key-value-form-column {
         font-size: 1em;
         width: 50%;
-        color:#f2f2f2;
+        color: var(--column-color);
         text-align: center;
     }
     
@@ -37,12 +49,12 @@
 
     /**** PANEL *****/
     ::ng-deep .mat-expansion-indicator:after {
-        color: #f2f2f2;
+        color: var(--text-color);
     }
     mat-expansion-panel {
         box-shadow: none;
-        background: rgb(48 63 92);
-        border: 1px solid #5f6368;
+        background-color: var(--content-background);
+        border: 1px solid $gray-light-02;
         overflow: visible;
         &.open-block {
             pointer-events: none;
@@ -71,7 +83,7 @@
         position: relative;
         width: 150px;
         height: 26px;
-        border-radius: 4px 0 0 4px;
+        border-radius: var(--base-radius) 0 0 var(--base-radius);
         background: #f2f2f2;
         font-weight: 500;
         font-size: 14px;
@@ -91,19 +103,21 @@
         background: #fff;
         margin: 3px 0;
         font-size: 14px;
-        height: 26px;
+        height: 28px;
         width: 50%;
         padding: 0 10px;
-        border-radius: 0 4px 4px 0;
-        color: #1e293b;
+        border-radius: 0 var(--base-radius) var(--base-radius) 0;
+        color: $gray;
+        border: 1px solid $blu-light-02;
         width: calc(50% - 2px);
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        
     }
     
     .dx-input:focus, .sx-input:focus {
-        outline: 2px solid rgba(236,182,6,1);
+        border-color: $blu
     }
 
 
@@ -117,9 +131,7 @@
         width: calc(50% - 2px);
         textarea {
             padding: 0 0 0 10px !important;
-            border: 0!important;
-            outline: 0!important;
-            border-radius: 0 4px 4px 0;
+            border-radius: 0 var(--base-radius) var(--base-radius) 0;
         }
     }
 
@@ -128,8 +140,6 @@
         textarea {
             background: transparent;
             padding: 0!important;
-            border: 0!important;
-            outline: 0!important;
         }
     }
 
@@ -151,28 +161,22 @@
             cursor: default;
             display: flex;
             position: relative;
-            border-radius: 4px 0 0 4px;
-            background: rgb(242,242,242);
+            border-radius: var(--base-radius) 0 0 var(--base-radius);
             font-weight: 500;
             font-size: 14px;
             margin: 3px 0px 3px 0;
-            color: #1e293b;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
             padding: 0!important;
-            width: calc(100% - 2px);
-            border: 0px!important;
-            outline: 0px!important;
-            height: 26px!important;
             resize: none!important;
         }
 
         .text-editor-wrapper {
             position: relative;
             .tag {
-                inset: 0 2px 0 0;
-                border-radius: 4px 0 0 4px;
+                inset: 0 1px 0 0;
+                border-radius: var(--base-radius) 0 0 var(--base-radius);
                 margin: 3px 0;
                 padding: 3px 0;
                 justify-content: initial;

@@ -9,7 +9,7 @@
     position: relative;
     display: block;
     height: 53px;
-    border-bottom: 3px solid $blu-light-02;
+    border-bottom: 2px solid $blu-light-02;
     cursor: pointer;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .li-active {
-    border-bottom: 3px solid $blu !important;
+    border-bottom: 2px solid $blu !important;
     pointer-events: none;
 }
 .li-active a {
@@ -59,7 +59,7 @@
 
 .csd-chatbot-dtls-input {
     // max-width: 400px;
-    max-width: 50%;
+    // max-width: 50%;
 }
 
 input[type="text"] {
@@ -131,6 +131,14 @@ input[type="text"]:disabled::placeholder {
     /* Microsoft Edge */
     color: #a0a0a0 !important;
     font-weight: 300 !important;
+}
+
+.flex-div{
+    display: flex;
+    & div.cds--custom-label{
+        width: 50%;
+        height: unset;
+    }
 }
 
 ng-select {
@@ -242,6 +250,9 @@ ng-select {
 
 .cds-chatbot-tag-delete-icon-wpr {
     height: 16px;
+    display: flex;
+    align-items: center;
+    justify-items: center;
 }
 
 .bot-description-note {

@@ -343,7 +343,6 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
 
   onDeletedMetadata(metadata: Metadata, index: number){
-    console.log('deleteeeeeeeee')
     this.gallery[index].preview = { src: ''};
     this.response.attributes.attachment.gallery = this.gallery
     this.changeActionReply.emit();

@@ -152,7 +152,7 @@ div {
 mat-expansion-panel ::ng-deep {
     background-color: transparent;
     box-shadow: none;
-    color: $blu;
+    color: var(--text-color);
 
     .mat-expansion-panel-header {
         padding: 0;
@@ -163,22 +163,22 @@ mat-expansion-panel ::ng-deep {
     }
 
     .mat-expansion-panel-header-title {
-        color: $blu;
+        color: var(--text-color);
     }
 
     .mat-expansion-indicator::after {
-        color: $blu !important;
+        color: var(--text-color) !important;
     }
 
     .mat-expansion-panel-header-description,
     .mat-expansion-indicator:after {
-        color: $blu;
+        color: var(--text-color);
         margin: 5px;
     }
 
     ::ng-deep .mat-expansion-indicator,
     .mat-expansion-indicator:after {
-        color: $blu;
+        color: var(--text-color);
     }
 
     .mat-expansion-panel-header.mat-expanded {

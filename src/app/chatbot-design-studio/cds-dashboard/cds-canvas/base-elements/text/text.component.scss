@@ -19,42 +19,6 @@
         margin: 0;
         padding: 0;
 
-        .response-controls {
-            position: absolute;
-            top: 10px;
-            left: 0px;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            .control-button {
-                cursor: pointer;
-                color: $color-bck-gray-hex;
-                transition: color .3s;
-                height: 20px;
-                &.delete{
-                    height: 24px;
-                    width: 24px;
-                    background: $color-bck-gray-hex;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    em {
-                        font-size: 1.15em;
-                        color: $color-withe-hex;
-                        transition: color .3s;
-                    }
-                }
-            }
-            .control-button:hover{
-                color: $color-withe-hex;
-                &.delete{
-                    box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
-                    em {
-                        color: $color-red-hex;
-                    }
-                }
-            }
-        }
 
         .box-input {
             // width: calc(100% - 40px);
@@ -63,16 +27,20 @@
             input {
                 border-radius: 8px;
                 background: $color-withe-hex;
-                border: 1px solid $color-withe-hex;
+                border: 1px solid $blu-light-02;
                 overflow-x: hidden;
                 overflow-y: auto;
                 // width: calc(100% - 2.5em);
                 width: 100%;
-                padding: 5px 5px;
-                color: $color-text-dark-hex;
+                color: $gray;
                 font-size: 1.15em;
                 line-height: 25px;
                 resize: vertical;
+
+                padding: 10px;
+                padding-top: 4px;
+                padding-bottom: 4px;
+                margin: 0px;
 
                 &.customPrefix{
                     padding-left: 20px;
@@ -97,15 +65,6 @@
             }
         }
 
-        .text-editor-drop {
-            position: absolute;
-            display: inline-flex;
-            margin: 0;
-            left: 0;
-            top: -30px;
-            color: #dcdcdc;
-            cursor: grab;
-        }
     }
 
     .editor-utils {
@@ -113,14 +72,15 @@
         margin: -20px 50px 0px 0px;
         float: right;
         .num-chars {
-            background: $color-light-gray-hex;
+            background: $blu-light-01;
             padding: 0px 8px;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 0.8em;
-            color: $color-text-box-hex;
+            color: $blu;
             float: right;
             &.error {
-                background: $color-orange-hex;
+                background: red;
+                color: white;
             }
         }
         .text-editor-insert-attribute {
@@ -134,11 +94,6 @@
     
 }
 
-.text-editor-wrapper:hover .text-editor {
-    .response-controls {
-        opacity: 1;
-    }
-}
 
 /** TEXT **/
 mat-form-field.mat-form-field ::ng-deep {
@@ -146,8 +101,8 @@ mat-form-field.mat-form-field ::ng-deep {
         border-top: 0px !important;
         input{
             &:hover{
-                border: 1px solid $icon-color !important;
-                outline: 1px solid $icon-color !important;
+                border: 1px solid $blu !important;
+                outline: 0px solid $blu !important;
             }
         }
     }
@@ -159,10 +114,14 @@ mat-form-field.mat-focused ::ng-deep {
             .mat-form-field-infix {
                 display: flex;
                 input {
-                    border: 1px solid $icon-color!important;
-                    outline: 1px solid $icon-color!important;
+                    border: 1px solid $blu!important;
+                    outline: 0px solid $blu!important;
                     transition: border .3s;
-
+                    &.invalid{
+                        border: 1px solid red !important;
+                        outline: 0px solid red !important;
+                        transition: border 0.3s;
+                    }
                     
                 }
             }

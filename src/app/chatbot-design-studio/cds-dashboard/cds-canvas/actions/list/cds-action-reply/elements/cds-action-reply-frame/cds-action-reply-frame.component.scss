@@ -62,6 +62,11 @@ $max-height: 230px;
     }
 }
 
+appdashboard-delay-slider,
+appdashboard-filter{
+    display: flex;
+}
+
 .previewMode{
     &.extensions-response{
         margin: 0;
@@ -368,7 +373,7 @@ cds-textarea.text-editable-div ::ng-deep{
     // width: calc(100% - 66px);
     textarea {
         line-height: 20px !important; 
-        // width: calc(100% - 20px) !important;
+        width: calc(100% - 20px) !important;
         font-size: 0.9em !important;
     }
 }

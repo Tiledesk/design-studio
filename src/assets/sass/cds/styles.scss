@@ -93,7 +93,8 @@ svg {
 }
 
 /* PANEL INTENT DETAIL */
-.content-panel-intent-detail {
+.content-panel-intent-detail,
+.content-panel-button-configuration {
     padding: 20px 30px 30px;
     position: absolute;
     top: $haeder-panel-action-detail-height;
