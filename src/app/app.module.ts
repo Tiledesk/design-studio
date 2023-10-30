@@ -35,7 +35,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LocalSessionStorage } from 'src/chat21-core/providers/localSessionStorage';
 import { DepartmentService } from './services/department.service';
 import { WebSocketJs } from './services/websocket/websocket-js';
-import { DatePipe } from '@angular/common';
+import { DatePipe, HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { NotifyService } from './services/notify.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -60,6 +60,8 @@ import { NativeImageRepoService } from 'src/chat21-core/providers/native/native-
 import { FirebaseImageRepoService } from 'src/chat21-core/providers/firebase/firebase-image-repo';
 import { UnauthorizedComponent } from './components/unauthorized/unauthorized.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HomeComponent } from './components/home/home.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
@@ -109,6 +111,8 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     AppComponent,
     BotsBaseComponent,
     UnauthorizedComponent,
+    HomeComponent,
+    NotFoundComponent,
   ],
   imports: [
     // TooltipModule.forRoot(CutomTooltipOptions as TooltipOptions),
@@ -189,7 +193,8 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     MultichannelService,
     WebSocketJs,
     DatePipe,
-    NotifyService
+    NotifyService,
+    { provide: LocationStrategy, useClass: HashLocationStrategy }
   ]
 })
 export class AppModule { }
