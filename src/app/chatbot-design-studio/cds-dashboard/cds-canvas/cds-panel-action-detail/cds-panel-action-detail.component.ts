@@ -101,9 +101,9 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     // console.log("onUpdateQuestionsIntentSelected:::: ", $event);
   }
 
-  onSaveIntent(){
+  onSaveIntent(event?){
     if(this.elementIntentSelectedType === this.typeIntentElement.ACTION){
-      // this.intentSelected.actions[this.elementSelectedIndex] = this.elementSelected;
+      //this.intentSelected.actions[this.elementSelectedIndex] = this.elementSelected;
       const index = this.intentSelected.actions.findIndex(el => el._tdActionId === this.elementSelected._tdActionId);
       this.intentSelected.actions[index] = this.elementSelected;
     } else if(this.elementIntentSelectedType === this.typeIntentElement.ANSWER){
@@ -113,7 +113,8 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     } else if(this.elementIntentSelectedType === this.typeIntentElement.FORM){
       this.intentSelected.form = this.elementSelected;
     }
-    console.log('----> onSaveIntent:: ', this.elementIntentSelectedType, this.intentSelected);
+    console.log('----> onSaveIntent:: ', event, this.elementIntentSelectedType, this.intentSelected);
+    // elimino connettori della action e poi li ricreo
     this.savePanelIntentDetail.emit(this.intentSelected);
   }
 

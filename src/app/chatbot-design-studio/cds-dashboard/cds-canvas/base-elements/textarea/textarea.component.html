@@ -15,6 +15,7 @@
                 [(ngModel)]="text"
                 [readonly]="readonly"
                 (click)="onClickTextareaOpenSetAttributePopover();"
+                (blur)="onBlur($event)"
                 (ngModelChange)="onChangeTextArea($event)">
             </textarea>
         </mat-form-field>
