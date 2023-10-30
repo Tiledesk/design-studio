@@ -3,11 +3,11 @@ import { BehaviorSubject } from 'rxjs';
 
 // firebase
 // import * as firebase from 'firebase/app';
-import firebase from "firebase/app";
-import 'firebase/messaging';
-import 'firebase/database';
-import 'firebase/storage';
-import 'firebase/firestore';
+// import firebase from "firebase/app";
+// import 'firebase/messaging';
+// import 'firebase/database';
+// import 'firebase/storage';
+// import 'firebase/firestore';
 
 // services
 import { UploadService } from '../abstract/upload.service';
@@ -16,6 +16,7 @@ import { LoggerService } from '../abstract/logger.service';
 
 // models
 import { UploadModel } from '../../models/upload';
+import { environment } from 'src/environments/environment';
 
 // @Injectable({
 //   providedIn: 'root'
@@ -29,7 +30,10 @@ export class FirebaseUploadService extends UploadService {
   //private
   private url: string;
   private logger: LoggerService = LoggerInstance.getInstance()
+  private firebase: any;
 
+  private urlStorageBucket = environment.firebaseConfig.storageBucket
+  
   constructor() {
     super();
   }
@@ -42,8 +46,12 @@ export class FirebaseUploadService extends UploadService {
     });
   }
 
-  public initialize() {
+  public async initialize() {
     this.logger.log('[FIREBASEUploadSERVICE] initialize');
+
+    const { default: firebase} = await import("firebase/app");
+    await Promise.all([import("firebase/storage")]);
+    this.firebase = firebase
   }
   
   public upload(userId: string, upload: UploadModel): Promise<any> {
@@ -53,7 +61,7 @@ export class FirebaseUploadService extends UploadService {
     this.logger.debug('[FIREBASEUploadSERVICE] pushUpload ', urlImagesNodeFirebase, upload.file);
 
     // Create a root reference
-    const storageRef = firebase.storage().ref();
+    const storageRef = this.firebase.storage().ref();
     this.logger.debug('[FIREBASEUploadSERVICE] storageRef', storageRef);
     
     // Create a reference to 'mountains.jpg'
@@ -79,11 +87,11 @@ export class FirebaseUploadService extends UploadService {
         that.BSStateUpload.next({ upload: progress, type: upload.file.type });
         
         switch (snapshot.state) {
-          case firebase.storage.TaskState.PAUSED: // or 'paused'
+          case that.firebase.storage.TaskState.PAUSED: // or 'paused'
             that.logger.debug('[FIREBASEUploadSERVICE] Upload is paused');
             
             break;
-          case firebase.storage.TaskState.RUNNING: // or 'running'
+          case that.firebase.storage.TaskState.RUNNING: // or 'running'
             that.logger.debug('[FIREBASEUploadSERVICE] Upload is running');
             
             break;
@@ -104,43 +112,43 @@ export class FirebaseUploadService extends UploadService {
   }
 
 
-  public delete(userId: string, path: string): Promise<any>{
+  public async delete(userId: string, path: string): Promise<any>{
+    const that = this;
     const file_name_photo = 'photo.jpg';
     const file_name_thumb_photo = 'thumb_photo.jpg';
+
+    that.logger.debug('[FIREBASEUploadSERVICE] delete image for USER', userId, path);
+
+    let uid = path.split(userId)[1].split('%2F')[1]; // get the UID of the image
+    let imageName = path.split(uid + '%2F')[1].split('?')[0];
+
     // Create a root reference
-    const storageRef = firebase.storage().ref();
-    // const deleteTask = storageRef.child('profiles/' + userid + '/' + file_name)
-    const deleteBotPhoto = storageRef.child('profiles/' + userId + '/' + file_name_photo)
-    const deleteBotThumbPhoto = storageRef.child('profiles/' + userId + '/' + file_name_thumb_photo)
+    const storageRef = this.firebase.storage().ref();
+    const ref = storageRef.child('public/images/' + userId + '/'+ uid + '/')
+    let arrayPromise = []
+    await ref.listAll().then((dir => {
+      dir.items.forEach(fileRef => arrayPromise.push(this.deleteFile(ref.fullPath, fileRef.name)));
+    })).catch(error => {
+      that.logger.error('[FIREBASEUploadSERVICE] delete: listAll error', error)
+    })
 
-    // ------------------------------------
-    // Delete the file photo
-    // ------------------------------------
-    let photoPromise = deleteBotPhoto.delete().then(() => {
-      this.logger.log('[UPLOAD-IMAGE-FB.SERV] - DELETE BOT PHOTO ')
-
-    }).catch((error) => {
-      this.logger.error('[UPLOAD-IMAGE-FB.SERV] - DELETE BOT PHOTO - ERROR ', error)
-    });
-
-
-    // ------------------------------------
-    // Delete the file thumb_photo
-    // ------------------------------------
-    let thumbPhotoPromise =deleteBotThumbPhoto.delete().then(() => {
-      this.logger.log('[UPLOAD-IMAGE-FB.SERV] - DELETE BOT THUMB-PHOTO ')
-
-    }).catch((error) => {
-      this.logger.error('[UPLOAD-IMAGE-FB.SERV] - DELETE BOT THUMB-PHOTO - ERROR ', error)
-    });
-
+    //AWAIT to return ALL the promise delete()
     return new Promise((resolve, reject)=> {
-      Promise.all([photoPromise, thumbPhotoPromise]).then(()=>{
+      Promise.all(arrayPromise).then(()=>{
         resolve(true)
       }).catch((error)=>{
         reject(error)
       })
     })
+  }
+
+  // // ------------------------------------
+  // // Delete the file photo
+  // // ------------------------------------
+  private deleteFile(pathToFile, fileName){
+    const ref = this.firebase.storage().ref(pathToFile);
+    const childRef = ref.child(fileName);
+    return childRef.delete()
   }
 
 }

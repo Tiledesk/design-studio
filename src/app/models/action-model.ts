@@ -357,6 +357,7 @@ export class Metadata {
     height?: number | string; 
     type?: string;
     target?: string;
+    size?: string;
 }
 
 export class Attachment {

@@ -121,35 +121,6 @@
 //     width: 120px;
 // }
 
-.add-response { 
-    text-align: center;
-    cursor: pointer;
-    box-sizing: border-box;
-    outline: none;
-    margin: 0px 2px;
-    padding: 0;
-    span {
-        align-items: center;
-        display: flex;
-        width: 80px;
-        padding: 8px;
-        justify-content: center;
-        background: $action-item-background;
-        color: $action-item-color;
-        border-radius: 6px;
-        height: 40px;
-        font-size: 0.8em;
-        border: 1px solid #0F172A;
-        font-weight: 400;
-        &:hover {
-            outline: 2px solid rgba(236,182,6,.6901960784)!important;
-        }
-        &.cds-action-active {
-            outline: 2px solid rgba(236,182,6,.6901960784)!important;
-        }
-    }
-}
-
 .cds-web-request-row-body {
     display: flex;
     font-size: 0.8em;

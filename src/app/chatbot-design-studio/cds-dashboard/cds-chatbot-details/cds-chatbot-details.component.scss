@@ -812,14 +812,14 @@ and also iPads specifically.
 
 .border-from-center {
     &:hover {
-        color: $brand-primary;
+        color: $blu;
     }
 
     // Set up base styles, we're going to scale instead of animating width/height
     &::before,
     &::after {
-        //   top: 3px;
-        top: 0px;
+        top: 3px;
+        // top: 0px;
         left: 0;
         height: 100%;
         width: 100%;
@@ -829,7 +829,7 @@ and also iPads specifically.
     // scale3d(<scale-horizontal>, <scale-vertical>, <scale-depth>);
     &::before {
         // border-top: 2px solid $purple;
-        border-bottom: 3px solid $brand-primary;
+        border-bottom: 3px solid $blu;
         transform: scale3d(0, 1, 1); // Shrink only width
     }
 
@@ -845,8 +845,6 @@ and also iPads specifically.
     width: 100%;
     // z-index: 1028;
     position: relative;
-    top: -5px;
-    box-shadow: 0 2px 2px rgba(0, 0, 60, 0.08);
     padding-bottom: 5px;
     float: left;
     height: 50px;
@@ -862,12 +860,13 @@ and also iPads specifically.
     position: relative;
     display: block;
     height: 52px;
+    border-bottom: 3px solid $blu-light-02;
     cursor: pointer;
 }
 
 .cds-bottom-nav li a {
-    padding: 18px 15px;
-    color: #e8eaed;
+    padding: 0px 15px;
+    color: $blu-light-02;
     line-height: 20px;
 }
 
@@ -877,11 +876,11 @@ and also iPads specifically.
 }
 
 .li-active {
-    border-bottom: 3px solid $brand-primary !important;
+    border-bottom: 3px solid $blu !important;
     pointer-events: none;
 }
 .li-active a {
-    color: $brand-primary !important;
+    color: $blu !important;
 }
 .disabled-li {
     pointer-events: none;

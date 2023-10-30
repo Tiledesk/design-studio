@@ -73,12 +73,10 @@
         <div class="response-frame-wrapper"
             [ngStyle]="{'width':framePath? 'auto' : '100%' }">
             <div *ngIf="!response.metadata.src" class="response-frame-panel">              
-                <div class="frame-panel">
-                    <cds-element-from-url
-                        [metadata] = response.metadata
-                        (loadPathElement)="onLoadPathElement()">
-                    </cds-element-from-url>
-                </div>
+                <cds-element-from-url class="frame-panel"
+                    [metadata] = response.metadata
+                    (loadPathElement)="onLoadPathElement()">
+                </cds-element-from-url>
             </div>
 
             <div class="content-frame">

@@ -152,6 +152,9 @@ export class CdsFormComponent implements OnInit, OnChanges {
     }, 500);
   }
 
+  onChangeBlockSelect(event:{name: string, id: number}){
+    this.getFieldFromId(event.id)
+  }
 
   getFieldFromId(idForm: number) {
     console.log('[FORM-COMP] getFieldFromId idForm ', idForm)

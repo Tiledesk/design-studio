@@ -1,17 +1,14 @@
-<div class="main-content" style="padding-top:0px; padding-left: 5px;padding-right: 5px;margin-top: 0px;">
-  <div class="container-fluid" style="padding-left: 5px;padding-right: 5px;">
+<div class="main-content">
+  <div class="container-fluid">
     <div class="row">
       <div class="chatbot-general-setting-tab-wpr">
-        <ul class="cds-bottom-nav"
-          style="margin-bottom: 16px;     background: #0f172a;   box-shadow: 0 2px 0px #00003c14 !important;">
-          <li (click)="toggleTab('bot_detail')" class="btn-with-border-effect" [ngClass]="
-                        { 'border-from-center' : activeSection !== 'bot_detail',
-                          'li-active' :          activeSection === 'bot_detail'
-                        }">
+        <ul class="cds-bottom-nav">
+          <li (click)="toggleTab('bot_detail')" class="btn-with-border-effect" 
+          [ngClass]="{ 'border-from-center' : activeSection !== 'bot_detail',
+                                'li-active' : activeSection === 'bot_detail' }">
 
             <a href="javascript:;" role="button">
-              Bot details
-              <!-- {{ "BotDetails" | translate }}-->
+              {{ "BotDetails" | translate }}
             </a>
           </li>
 

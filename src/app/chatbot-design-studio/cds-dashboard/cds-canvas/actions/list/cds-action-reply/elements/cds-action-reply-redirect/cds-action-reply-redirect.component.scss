@@ -36,6 +36,11 @@
     }
 }
 
+appdashboard-delay-slider,
+appdashboard-filter{
+    display: flex;
+}
+
 .previewMode{
     &.extensions-response{
         margin: 0;

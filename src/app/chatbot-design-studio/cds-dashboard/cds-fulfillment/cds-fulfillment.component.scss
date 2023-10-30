@@ -6,7 +6,7 @@
 }
 
 .fulfillment {
-    width: 50%;
+    width: 70%;
     min-width: 600px;
     // display: flex;
     // flex-direction: row;
@@ -21,7 +21,7 @@
 }
 
 .title {
-    color: white !important;
+    color: $blu !important;
 }
 
 .fulfillment-description {
@@ -37,11 +37,21 @@
 .custom-link:hover {
     text-decoration: underline;
 }
-// .onoffswitch-wrapper {
-//     float: right;
-//     position: relative;
-//     top: 9px;
-// }
+.onoffswitch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    .label span{
+        text-transform: uppercase; 
+        font-weight: 400;
+        color: $gray;
+
+        &.active{
+            color: $blu
+        }
+    }
+}
 
 // --------------------
 // SWITCH BTN
@@ -86,11 +96,11 @@
     transition: all 0.3s ease-in 0s;
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
-    background-color: $light-blue;
+    background-color: $blu;
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
-    border-color: $light-blue;
+    border-color: $blu;
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
     right: 0px;

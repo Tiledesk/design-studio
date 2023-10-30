@@ -1,3 +1,5 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
 .section-title {
     margin-left: 15px;
     color: #9aa0a6;
@@ -20,24 +22,20 @@ input[type="text"] {
     height: 36px;
     font-size: 14px;
     width: 100%;
-    margin-bottom: 10px;
+    // margin-bottom: 10px;
     appearance: none;
     -webkit-appearance: none;
-    background: #fff;
-    border: 1px solid #d9d9d9 !important;
-    border-top: 1px solid #c0c0c0;
     /* border-radius: 2px; */
     padding: 0 8px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    border-radius: 5px;
-    background-color: #fff !important;
-    border: solid 1px #ddd;
+    border-radius: 8px;
+    background-color: $color-withe-hex;
+    border: solid 1px $blu-light-02;
 }
 
 .csd-chatbot-dtls-input {
     max-width: 400px;
-    height: 44px !important;
     padding: 0 30px 0 8px !important;
     text-overflow: ellipsis;
 }
@@ -46,7 +44,7 @@ input[type="text"] {
     position: absolute;
     top: 0;
     bottom: 0;
-    color: black;
+    color: $blu;
     right: 0px;
     display: flex;
     align-items: center;
@@ -68,9 +66,6 @@ input[type="text"] {
     100%    {color:#8ab4f8;}
 }
 
-.cds-blue-button{
-    padding: 12px 30px !important;
-}
 
 .chatbot-developer-wpr,
 .row {

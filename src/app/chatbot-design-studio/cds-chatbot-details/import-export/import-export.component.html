@@ -32,8 +32,7 @@
             cloud_upload
           </span>
         </span>
-        <!-- {{'ImportFromCSV' | translate }} -->
-        Import from CSV
+        {{'ImportFromCSV' | translate }}
       </button>
     </div>
 
@@ -118,8 +117,7 @@
           </span>
         </span>
         <!-- Export Chatbot to JSON -->
-        <!-- {{'ExportAsJSON' | translate}} -->
-        Export as JSON
+        {{'ExportAsJSON' | translate}}
       </button>
     </div>
     <!-- ---------------------------------------------------- -->
@@ -153,29 +151,24 @@
       <div class="modal-header" style="padding: 8px 15px;">
 
         <h4 class="modal-title" style="line-height: 2!important;">
-
-          <!-- {{ 'FaqPage.ImportCsvFile' | translate }} -->
-          Import CSV File
+          {{ 'FaqPage.ImportCsvFile' | translate }}
         </h4>
         <!-- class="close" -->
         <button type="button" class="close-modal-window" aria-label="Close" (click)="onCloseModal()">
           <span aria-hidden="true" style="color: rgb(6, 6, 6) !important;position: relative;">&times;</span>
         </button>
-
         
       </div>
 
-      <div class="modal-body" style="padding-bottom: 20px !important; padding-top: 20px;">
+      <div class="modal-body">
 
-        <div class="row" style="margin-right: 0px; margin-bottom:8px">
+        <div class="row" style="margin-right: 0px; margin-left:0px">
           <div class="col-xs-10 col-xs-offset-1 cds-dwnld-example-csv">
             <p (click)="downloadExampleCsv()" style="margin:5px; cursor:pointer"> <i class="material-icons"
                 style="font-size:18px; top: 4px; position: relative;">save_alt</i>
-              <!-- {{ 'download' | translate }}  -->
-              download
+              {{ 'download' | translate }} 
               <span style="font-weight:400">
-                <!-- {{ 'examplecsv' | translate }}  -->
-                example.csv
+                {{ 'examplecsv' | translate }}
               </span>
             </p>
           </div>
@@ -189,29 +182,21 @@
               <!-- Question -->
               <!-- --------------------- -->
               <span>
-                <em>
-                  <!-- {{ 'FaqPage.Question' | translate }}* -->
-                  Question*
-                </em>
+                <em>{{ 'FaqPage.Question' | translate }}*</em>
               </span>
 
               <!-- --------------------- -->
               <!-- Columns Delimiter -->
               <!-- --------------------- -->
               <span>
-                <strong>
-                  {{csvColumnsDelimiter}}
-                </strong>
+                <strong>{{csvColumnsDelimiter}}</strong>
               </span>
 
               <!-- --------------------- -->
               <!-- Answer -->
               <!-- --------------------- -->
               <span>
-                <em>
-                  <!-- {{ 'FaqPage.Answer' | translate }}* -->
-                  Answer*
-                </em>
+                <em> {{ 'FaqPage.Answer' | translate }}*</em>
               </span>
 
               <!-- --------------------- -->
@@ -276,14 +261,11 @@
           </div>
 
         </div>
-        <div class="row" style="margin-right: 0px;">
-          <div class="col-sm-12">
-            <label
-              style="height: 36px; padding-left:16px; padding-right:16px; text-align:right; color: #7695a5;font-weight: 300 !important;"
+        <div class="row" style="margin-left: 0px; margin-right: 0px;">
+          <div style="display:flex">
+            <label style="padding-right:16px; text-align:right; color: #7695a5;font-weight: 300 !important;"
               class="col-xs-6 col-sm-6 ">
-
-              <!-- {{ 'InTheCSVFileToBeUploadedTheColumnsAreSeparatedBy' | translate}}: -->
-              In the CSV file to be uploaded, the columns are separated by:
+              {{ 'InTheCSVFileToBeUploadedTheColumnsAreSeparatedBy' | translate}}:
             </label>
             <div class="col-xs-6 col-sm-6" style="text-align:start">
               <input style="padding-left:5px; margin-top:7px; width:55px; border-radius: 5px;
@@ -293,12 +275,10 @@
             </div>
 
           </div>
-          <div class="col-sm-12" style="text-align: center">
+          <div style="text-align: center">
 
             <span *ngIf="modalChoosefileDisabled" style="color:#ff5252">
-
-              <!-- {{ 'FaqPage.DelimiterOptionMustBe' | translate }} -->
-              Delimiter option must be one character long
+              {{ 'FaqPage.DelimiterOptionMustBe' | translate }}
             </span>
           </div>
 
@@ -307,21 +287,14 @@
 
       </div>
 
-      <div class="modal-footer" style="text-align: center;
-        padding-top: 0px !important;
-        padding-bottom: 10px;
-        background-color: #fff;
-        border-top: unset;
-        border-bottom-left-radius: 6px;
-        border-bottom-right-radius: 6px;">
+      <div class="modal-footer" >
 
         <input name="fileChangeUploadCSV" id="fileChangeUploadCSV" class="inputfile" type="file"
           (change)="fileChangeUploadCSV($event)" accept=".csv" />
         <label id="upload-csv-choose-file" class="btn btn-primary" for="fileChangeUploadCSV"
           [ngClass]="{'disabled': modalChoosefileDisabled }">
 
-          <!-- {{ 'FaqPage.ChooseFile' | translate }} -->
-          CHOOSE FILE
+          {{ 'FaqPage.ChooseFile' | translate }}
         </label>
       </div>
 

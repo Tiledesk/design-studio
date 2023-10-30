@@ -48,8 +48,8 @@ export class FormEditAddComponent implements OnInit, OnChanges {
   regexResult = true;
   errorLabelResult = true;
   showRegexField = true;
-  displayInfoMessage = false;
-  inputTypePlaceholderClass = true;
+  // displayInfoMessage = false;
+  // inputTypePlaceholderClass = true;
   panelOpenState = false;
   hasSelectedVariable: boolean = false;
 
@@ -102,7 +102,7 @@ export class FormEditAddComponent implements OnInit, OnChanges {
       this.fieldRegex = this.field.regex?this.field.regex:TYPE_REGEX.customRGEX;
       this.fieldLabel = this.field.label;
       this.fieldErrorLabel = this.field.errorLabel;
-      this.inputTypePlaceholderClass = false;
+      // this.inputTypePlaceholderClass = false;
     }
     // this.setRegex();
     this.getCurrentTranslation();
@@ -203,21 +203,21 @@ export class FormEditAddComponent implements OnInit, OnChanges {
     this.fieldName = parameterName.replace(/[^A-Z0-9_]+/ig, "");
   }
 
-  displayPlaceholder(event) {
-    if (event === true && this.fieldType) {
-      this.inputTypePlaceholderClass = false;
-    } else if (event === false) {
-      this.inputTypePlaceholderClass = false;
-    } else {
-      this.inputTypePlaceholderClass = true;
-    }
-  }
+  // displayPlaceholder(event) {
+  //   if (event === true && this.fieldType) {
+  //     this.inputTypePlaceholderClass = false;
+  //   } else if (event === false) {
+  //     this.inputTypePlaceholderClass = false;
+  //   } else {
+  //     this.inputTypePlaceholderClass = true;
+  //   }
+  // }
 
 
   save() {
     // this.logger.log('[TILEBOT-EDIT-ADD] save ')
     if (this.checkFields()) {
-      this.displayInfoMessage = false;
+      // this.displayInfoMessage = false;
       this.showForm = false;
       this.field.name = this.fieldName ? this.fieldName : '';
       this.field.type = this.fieldType ? this.fieldType.toUpperCase() : null;
@@ -243,7 +243,7 @@ export class FormEditAddComponent implements OnInit, OnChanges {
     this.displayAddForm = false;
     this.displayEditForm = false;
     this.showForm = false;
-    this.displayInfoMessage = false;
+    // this.displayInfoMessage = false;
     this.closeAddEditForm.emit();
   }
 
@@ -288,41 +288,41 @@ export class FormEditAddComponent implements OnInit, OnChanges {
     }
   }
   onChangeValidationErrorMessage(errorLabel){
-    this.field.errorLabel = this.fieldErrorLabel.trim();
+    this.field.errorLabel = this.fieldErrorLabel = errorLabel.trim();
     if(this.displayAddForm === false){
       this.changedFormFields.emit(this.field);
       console.log('onChangeValidationErrorMessage:: ', errorLabel.data,  this.fieldErrorLabel);
     }
   }
   onChangeValidationRegex(regex){
-    this.field.regex = this.fieldRegex.trim();
+    this.field.regex = this.fieldRegex = regex.trim();
     if(this.displayAddForm === false){
       this.changedFormFields.emit(this.field);
       console.log('onChangeValidationRegex:: ', regex.data, this.fieldRegex);
     }
   }
   /** */
-  onChangeValidationType(typeFieldValue) {
-    this.field.type = typeFieldValue;
+  onChangeValidationType(event: {label: string, value: string}) {
+    this.field.type = event.value;
     this.setRegex();
     if(this.displayAddForm === false){
       this.changedFormFields.emit(this.field);
     }
   }
   
-  displayMessage(field?) {
-    this.displayInfoMessage = false;
-    if(field){
-      if (this.infoMessages[field]) {
-        this.infoMessage = this.infoMessages[field];
-        this.displayInfoMessage = true;
-      }
-      if (field === 'field_label') {
-        this.infoMessage += " " + this.markbotLabel;
-      }
-    }
-    this.onScrollToBottom();
-  }
+  // displayMessage(field?) {
+  //   this.displayInfoMessage = false;
+  //   if(field){
+  //     if (this.infoMessages[field]) {
+  //       this.infoMessage = this.infoMessages[field];
+  //       this.displayInfoMessage = true;
+  //     }
+  //     if (field === 'field_label') {
+  //       this.infoMessage += " " + this.markbotLabel;
+  //     }
+  //   }
+  //   this.onScrollToBottom();
+  // }
   /** END ACTIONS CDS-TEXTAREA */
 
 }

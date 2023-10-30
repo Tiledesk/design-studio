@@ -11,13 +11,12 @@
             </div>
             <div>
                 <div class="onoffswitch-wrapper">
-                    <div style="display: inline-block;position: relative;top: -13px;margin-right: 12px;">
-                        <span *ngIf="selectedChatbot.webhook_enabled === true"
-                            style="color:#8ab4f8; text-transform: uppercase; font-weight: 400;">
+                    <div class="label">
+                        <span *ngIf="selectedChatbot.webhook_enabled === true" 
+                          [class.active]="selectedChatbot.webhook_enabled === true">
                             {{'Enabled' | translate}}
                         </span>
-                        <span *ngIf="selectedChatbot.webhook_enabled === false"
-                            style="color:#818895; text-transform: uppercase; font-weight: 400;">
+                        <span *ngIf="selectedChatbot.webhook_enabled === false">
                             {{'Disabled' | translate}}
                         </span>
                     </div>

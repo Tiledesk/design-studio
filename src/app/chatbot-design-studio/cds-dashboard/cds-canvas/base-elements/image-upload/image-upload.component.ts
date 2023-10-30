@@ -20,6 +20,7 @@ export class CDSImageUploadComponent implements OnInit {
   
   @Input() metadata: Metadata;
   @Output() onChangeMetadata = new EventEmitter<Metadata>();
+  @Output() onDeletedMetadata = new EventEmitter<any>();
 
   isHovering: boolean = false;
   dropEvent: any;
@@ -95,15 +96,15 @@ export class CDSImageUploadComponent implements OnInit {
 
     if (event) {
       this.selectedFiles = event.target.files;
-      this.logger.debug('[[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles', this.selectedFiles);
+      this.logger.debug('[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles', this.selectedFiles);
       // this.onAttachmentButtonClicked.emit(this.selectedFiles)
       if (this.selectedFiles == null) {
         this.isFilePendingToUpload = false;
       } else {
         this.isFilePendingToUpload = true;
       }
-      this.logger.debug('[[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles::isFilePendingToUpload', this.isFilePendingToUpload);
-      this.logger.debug('[[IMAGE-UPLOAD] fileChange: ', event.target.files);
+      this.logger.debug('[IMAGE-UPLOAD] AppComponent:detectFiles::selectedFiles::isFilePendingToUpload', this.isFilePendingToUpload);
+      this.logger.debug('[IMAGE-UPLOAD] fileChange: ', event.target.files);
       if (event.target.files.length <= 0) {
         this.isFilePendingToUpload = false;
       } else {
@@ -114,58 +115,60 @@ export class CDSImageUploadComponent implements OnInit {
       if (event.target.files && event.target.files[0]) {
           const nameFile = event.target.files[0].name;
           const typeFile = event.target.files[0].type;
+          const size = event.target.files[0].size
           const reader = new FileReader();
-            that.logger.debug('[[IMAGE-UPLOAD] OK preload: ', nameFile, typeFile, reader);
-            reader.addEventListener('load', function () {
-              that.logger.debug('[[IMAGE-UPLOAD] addEventListener load', reader.result);
-              // that.isFileSelected = true;
-              // se inizia con image
-              if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
-                const imageXLoad = new Image;
-                that.logger.debug('[[IMAGE-UPLOAD] onload ', imageXLoad);
-                imageXLoad.src = reader.result.toString();
-                imageXLoad.title = nameFile;
-                imageXLoad.onload = function () {
-                  that.logger.debug('[[IMAGE-UPLOAD] onload image');
-                  // that.arrayFilesLoad.push(imageXLoad);
-                  const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
-                  that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: typeFile };
-                  that.logger.debug('[[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
-                  // SEND MESSAGE
-                  that.loadFile();
-                };
-              } else {
-                that.logger.debug('[[IMAGE-UPLOAD] onload file');
-                const fileXLoad = {
-                  src: reader.result.toString(),
-                  title: nameFile
-                };
+          that.logger.debug('[IMAGE-UPLOAD] OK preload: ', nameFile, typeFile, reader);
+          reader.addEventListener('load', function () {
+            that.logger.debug('[IMAGE-UPLOAD] addEventListener load', reader.result);
+            // that.isFileSelected = true;
+            // se inizia con image
+            if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
+              const imageXLoad = new Image;
+              that.logger.debug('[IMAGE-UPLOAD] onload ', imageXLoad);
+              imageXLoad.src = reader.result.toString();
+              imageXLoad.title = nameFile;
+              imageXLoad.onload = function () {
+                that.logger.debug('[IMAGE-UPLOAD] onload image');
                 // that.arrayFilesLoad.push(imageXLoad);
                 const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
-                that.arrayFilesLoad[0] = { uid: uid, file: fileXLoad, type: typeFile };
-                that.logger.debug('[[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+                that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: typeFile, size: size };
+                that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
                 // SEND MESSAGE
                 that.loadFile();
-              }
-            }, false);
-
-            if (event.target.files[0]) {
-              reader.readAsDataURL(event.target.files[0]);
-              that.logger.debug('[[IMAGE-UPLOAD] reader-result: ', event.target.files[0]);
+              };
+            } else {
+              that.logger.debug('[[IMAGE-UPLOAD] onload file');
+              const fileXLoad = {
+                src: reader.result.toString(),
+                title: nameFile
+              };
+              // that.arrayFilesLoad.push(imageXLoad);
+              const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
+              that.arrayFilesLoad[0] = { uid: uid, file: fileXLoad, type: typeFile, size: size };
+              that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+              // SEND MESSAGE
+              that.loadFile();
             }
+          }, false);
+
+          if (event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+            that.logger.debug('[IMAGE-UPLOAD] reader-result: ', event.target.files[0]);
+          }
       }
     }
   }
 
 
   loadFile() {
-    this.logger.debug('[[IMAGE-UPLOAD] that.fileXLoad: ', this.arrayFilesLoad);
+    this.logger.debug('[IMAGE-UPLOAD] that.fileXLoad: ', this.arrayFilesLoad);
     // at the moment I only manage the upload of one image at a time
     if (this.arrayFilesLoad[0] && this.arrayFilesLoad[0].file) {
       const fileXLoad = this.arrayFilesLoad[0].file;
       const uid = this.arrayFilesLoad[0].uid;
       const type = this.arrayFilesLoad[0].type;
-      this.logger.debug('[[IMAGE-UPLOAD] that.fileXLoad: ', type);
+      const size = this.arrayFilesLoad[0].size
+      this.logger.debug('[IMAGE-UPLOAD] that.fileXLoad: ', type);
       let metadata;
       if (type.startsWith('image') && !type.includes('svg')) {
           metadata = {
@@ -174,17 +177,19 @@ export class CDSImageUploadComponent implements OnInit {
               'width': fileXLoad.width,
               'height': fileXLoad.height,
               'type': type,
-              'uid': uid
+              'uid': uid,
+              'size': size
           };
       } else {
           metadata = {
               'name': fileXLoad.title,
               'src': fileXLoad.src,
               'type': type,
-              'uid': uid
+              'uid': uid,
+              'size': size
           };
       }
-      this.logger.debug('[[IMAGE-UPLOAD] metadata -------> ', metadata);
+      this.logger.debug('[IMAGE-UPLOAD] metadata -------> ', metadata);
       // this.scrollToBottom();
       // 1 - aggiungo messaggio localmente
       // this.addLocalMessageImage(metadata);
@@ -200,12 +205,12 @@ export class CDSImageUploadComponent implements OnInit {
     const that = this;
     // const send_order_btn = <HTMLInputElement>document.getElementById('chat21-start-upload-doc');
     // send_order_btn.disabled = true;
-    that.logger.debug('[[IMAGE-UPLOAD] AppComponent::uploadSingle::', metadata, file);
+    that.logger.debug('[IMAGE-UPLOAD] AppComponent::uploadSingle::', metadata, file);
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
  
     this.uploadService.upload(this.user.uid, currentUpload).then(downloadURL => {
-      that.logger.debug(`[[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
+      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
 
       metadata.src = downloadURL;
       this.metadata = metadata
@@ -214,10 +219,10 @@ export class CDSImageUploadComponent implements OnInit {
       // return downloadURL;
     }).catch(error => {
       // Use to signal error if something goes wrong.
-      that.logger.error(`[[IMAGE-UPLOAD] uploadSingle:: Failed to upload file and get link - ${error}`);
+      that.logger.error(`[IMAGE-UPLOAD] uploadSingle:: Failed to upload file and get link - ${error}`);
       that.isFilePendingToUpload = false;
     });
-    that.logger.debug('[[IMAGE-UPLOAD] reader-result: ', file);
+    that.logger.debug('[IMAGE-UPLOAD] reader-result: ', file);
   }
 
 
@@ -345,6 +350,20 @@ export class CDSImageUploadComponent implements OnInit {
     //   this.logger.log( '[LOADER-PREVIEW-PAGE] - readAsDataURL - USE CASE FILE - FILE NAME', file_name)
     //   // this.createFile()
     // }
+  }
+
+
+  onDeletePathElement(event){
+    console.log('[IMAGE-UPLOAD] onDeletePathElement', event)
+    this.uploadService.delete(this.user.uid, this.metadata.src).then((result)=>{
+      
+      this.isFilePendingToUpload = false;
+      this.onDeletedMetadata.emit();
+    }).catch((error)=> {
+      this.logger.error('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE (FAQ-COMP) deleteUserProfileImage ERORR:', error)
+      this.isFilePendingToUpload = false;
+    }) 
+
   }
 
 

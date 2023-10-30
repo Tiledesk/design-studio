@@ -68,14 +68,12 @@
         <div class="image-editor">
     
             <div class="response-image-uploader-wrapper">
-                <cds-image-upload
+                <cds-image-upload 
                     class="image-upload"
                     [metadata] = response.metadata
-                    (onChangeMetadata)="onChangeMetadata($event)">
+                    (onChangeMetadata)="onChangeMetadata($event)"
+                    (onDeletedMetadata)="onDeletedMetadata($event)">
                 </cds-image-upload>
-                <div *ngIf="response.metadata.src" class="control-button delete" (click)="$event.stopPropagation();onDeletePathElement()">
-                    <em class="material-icons">clear</em>
-                </div>
             </div>
 
             <cds-textarea 

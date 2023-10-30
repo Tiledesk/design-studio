@@ -17,7 +17,6 @@ import { Subscription } from 'rxjs/internal/Subscription';
 export class CdsActionReplyGalleryComponent implements OnInit {
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
   
-  // @Output() updateIntentFromConnectorModification = new EventEmitter();
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
   @Output() deleteActionReply = new EventEmitter();
@@ -343,6 +342,12 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     this.changeActionReply.emit();
   }
 
+  onDeletedMetadata(metadata: Metadata, index: number){
+    this.gallery[index].preview = { src: ''};
+    this.response.attributes.attachment.gallery = this.gallery
+    this.changeActionReply.emit();
+  }
+
   /** onBlur */
   onBlur(event){
     console.log('[ACTION REPLY GALLERY] onBlur', event);
@@ -375,17 +380,6 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   onSelectedAttribute(variableSelected: { name: string, value: string }, element: 'title' | 'description', index: number){
     this.activateEL[index][element] = false
   }
-
-
-
-
-
-
-  onDeleteImage(index){
-    this.gallery[index].preview = { src: ''}
-  }
-
-  
 
 
   // ----- DRAG FUNCTIONS: GALLERY ELEMENT: start

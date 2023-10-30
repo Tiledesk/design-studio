@@ -1,7 +1,42 @@
 @import "./src/assets/sass/md/_variables.scss";
+@import "./src/assets/sass/cds/_variables.scss";
+
+
+.cds-bottom-nav div {
+    float: left;
+    padding: 15px;
+    list-style: none;
+    position: relative;
+    display: block;
+    height: 53px;
+    border-bottom: 2px solid $blu-light-02;
+    cursor: pointer;
+}
+
+.cds-bottom-nav div a {
+    padding: 0px 15px;
+    color: $blu-light-02;
+    line-height: 20px;
+}
+
+.cds-bottom-nav div a:hover {
+    text-decoration: none;
+    //  background-color: #eee;
+}
+
+.li-active {
+    border-bottom: 2px solid $blu !important;
+    pointer-events: none;
+}
+.li-active a {
+    color: $blu !important;
+}
+.disabled-li {
+    pointer-events: none;
+}
 
 .cds--custom-label {
-    color: #9aa0a6;
+    color: $blu;
     height: 30px;
     padding-top: 7px;
     padding-left: 16px;
@@ -23,7 +58,8 @@
 }
 
 .csd-chatbot-dtls-input {
-    max-width: 400px;
+    // max-width: 400px;
+    // max-width: 50%;
 }
 
 input[type="text"] {
@@ -35,15 +71,11 @@ input[type="text"] {
     appearance: none;
     -webkit-appearance: none;
     background: #fff;
-    border: 1px solid #d9d9d9 !important;
-    border-top: 1px solid #c0c0c0;
-    /* border-radius: 2px; */
+    border: 1px solid $blu-light-02;
     padding: 0 8px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    border-radius: 5px;
-    background-color: #fff !important;
-    border: solid 1px #ddd;
+    border-radius: 8px;
 }
 
 textarea[type="text"] {
@@ -55,18 +87,14 @@ textarea[type="text"] {
     appearance: none;
     -webkit-appearance: none;
     background: #fff;
-    border: 1px solid #d9d9d9 !important;
-    border-top: 1px solid #c0c0c0;
-    /* border-radius: 2px; */
+    border: 1px solid $blu-light-02;
     padding-right: 8px;
     padding-top: 5px;
     padding-left: 8px;
 
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    border-radius: 5px;
-    background-color: #fff !important;
-    border: solid 1px #ddd;
+    border-radius: 8px;
 }
 
 input[type="text"]:disabled {
@@ -105,6 +133,14 @@ input[type="text"]:disabled::placeholder {
     font-weight: 300 !important;
 }
 
+.flex-div{
+    display: flex;
+    & div.cds--custom-label{
+        width: 50%;
+        height: unset;
+    }
+}
+
 ng-select {
     font-size: 14px;
     width: 100%;
@@ -112,9 +148,8 @@ ng-select {
     appearance: none;
     -webkit-appearance: none;
     background: #fff;
-    // border: 1px solid #d9d9d9 !important;
     // border-top: 1px solid #c0c0c0;
-    /* border-radius: 2px; */
+    border-radius: 8px;
     padding-right: 8px;
     padding-top: 5px;
     padding-left: 8px;
@@ -122,13 +157,21 @@ ng-select {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     border-radius: 5px;
-    background-color: #fff !important;
     // border: solid 1px #ddd;
     margin: 0px;
     padding: 0px;
 
     &.ng-select-opened {
         border-radius: 5px 5px 0px 0px;
+    }
+
+    
+}
+
+::ng-deep {
+    .ng-select .ng-select-container {
+        border-radius: 8px;
+        border: 1px solid $blu-light-02;
     }
 }
 
@@ -207,6 +250,9 @@ ng-select {
 
 .cds-chatbot-tag-delete-icon-wpr {
     height: 16px;
+    display: flex;
+    align-items: center;
+    justify-items: center;
 }
 
 .bot-description-note {
@@ -268,14 +314,14 @@ ng-select {
 
 .border-from-center {
     &:hover {
-        color: $brand-primary;
+        color: $blu;
     }
 
     // Set up base styles, we're going to scale instead of animating width/height
     &::before,
     &::after {
-        //   top: 3px;
-        top: 0px;
+        top: 3px;
+        // top: 0px;
         left: 0;
         height: 100%;
         width: 100%;
@@ -285,7 +331,7 @@ ng-select {
     // scale3d(<scale-horizontal>, <scale-vertical>, <scale-depth>);
     &::before {
         // border-top: 2px solid $purple;
-        border-bottom: 3px solid $brand-primary;
+        border-bottom: 3px solid $blu;
         transform: scale3d(0, 1, 1); // Shrink only width
     }
 
@@ -296,13 +342,6 @@ ng-select {
     }
 }
 
-.disabled-li {
-    pointer-events: none;
-}
-
-.li-active {
-    border-bottom: 3px solid $brand-primary !important;
-}
 
 .community-tab {
     display: flex;

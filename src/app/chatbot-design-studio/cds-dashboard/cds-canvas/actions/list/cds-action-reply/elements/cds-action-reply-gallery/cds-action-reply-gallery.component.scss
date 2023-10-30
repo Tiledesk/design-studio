@@ -67,6 +67,11 @@
     }
 }
 
+appdashboard-delay-slider,
+appdashboard-filter{
+    display: flex;
+}
+
 .previewMode{
     display: flex;
     flex-direction: column;
@@ -503,34 +508,9 @@
         background-color: var(--border-color);
         display: flex;
 
-        &:hover{
-            opacity: 0.5;
-            .control-button{
-                opacity: 1;
-            }
-        }
-
-        .control-button {
-            cursor: pointer;
-            color: $color-bck-gray-hex;
-            transition: color .3s;
-            height: 20px;
-            opacity: 0;
-            &.delete{
-                height: 24px;
-                width: 24px;
-                background: var(--base-color);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                position: absolute;
-                em {
-                    font-size: 1.15em;
-                    color: $blu;
-                    transition: color .3s;
-                }
-            }
+        .image-upload{
+            width: 100%;
+            height: 100%;
         }
 
     }
@@ -558,7 +538,43 @@ cds-image-upload ::ng-deep {
             -o-object-fit: cover;
             object-fit: cover;
         }
+
+        &:hover{
+            img{ opacity: 0.5; }
+            .control-button {
+                &.delete {
+                    margin-right: 5px !important;
+                    margin-top: 5px !important;
+                    opacity: 1;
+                }
+            }
+        }
+
+        .control-button {
+            cursor: pointer;
+            color: $color-bck-gray-hex;
+            transition: color .3s;
+            height: 20px;
+            opacity: 0;
+            &.delete{
+                height: 24px;
+                width: 24px;
+                background: var(--base-color);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                em {
+                    font-size: 1.15em;
+                    color: $blu;
+                    transition: color .3s;
+                }
+            }
+        }
     }
+
+
     
 }
 // --- PREVIEW SECTION: end ---

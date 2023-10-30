@@ -39,11 +39,16 @@
         <!-- // Phone number id -->
         <div class="field-box">
             <label class="title-label">Phone number id</label>
-            <input id="phone-number-id" 
-                type="text" 
-                placeholder="109***********67" 
-                value="{{phone_number_id}}"
-                (input)="onPhoneNumberIdChange($event)">
+            <cds-textarea id="phone-number-id"  
+                [emojiPikerBtn]="false" 
+                [textLimitBtn]="false" 
+                [setAttributeBtn]="false"
+                [text]="action?.payload?.phone_number_id"
+                [minRow]="1" [maxRow]="1" 
+                [placeholder]="'109***********67'" 
+                popoverVerticalAlign="above"
+                (changeTextarea)="onChangeTextarea($event)">
+            </cds-textarea>
         </div>
 
         <!-- // Select template -->
@@ -82,7 +87,7 @@
         </div>
     </div>
 
-    <div *ngIf="templates_list.length == 0 && !showLoader" id="select-template-box">
+    <div *ngIf="templates_list.length == 0 && !showLoader" id="select-template-box" class="select-template-box">
         <p>Oops, looks like there is no template. <a
                 href="https://www.facebook.com/business/help/2055875911147364?id=2129163877102343"
                 target="_blank">Create one now!</a></p>

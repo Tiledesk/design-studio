@@ -58,10 +58,14 @@ svg {
     }
 }
 
+.modal-content .modal-footer button + button{
+    margin-bottom: unset;
+}
+
 /* Bottom Underline of the titles of the sections */
 .card_title__underlined {
     text-transform: none;
-    color: #566787;
+    color: $blu;
     margin-bottom: 0px;
     height: 40px !important;
     position: relative;
@@ -77,7 +81,8 @@ svg {
     top: 0;
     left: 0;
     bottom: -1px;
-    border-bottom: 2px solid $brand-primary;
+    border-bottom: 2px solid $blu;
+    color: $blu;
     z-index: 1;
 }
 
@@ -88,7 +93,8 @@ svg {
 }
 
 /* PANEL INTENT DETAIL */
-.content-panel-intent-detail {
+.content-panel-intent-detail,
+.content-panel-button-configuration {
     padding: 20px 30px 30px;
     position: absolute;
     top: $haeder-panel-action-detail-height;
@@ -365,7 +371,8 @@ color: white;
     padding: 6px 12px;
     border-radius: $btn-border-radius;
     &:hover {
-      background: rgba($blu-02, 0.8);
+        opacity: 0.8;
+    //   background: rgba($blu-02, 0.8);
     }
 }
 

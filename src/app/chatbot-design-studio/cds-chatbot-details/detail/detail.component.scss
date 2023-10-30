@@ -9,16 +9,13 @@ input[type="text"] {
     // margin-bottom: 10px;
     appearance: none;
     -webkit-appearance: none;
-    background: #fff;
-    border: 1px solid #d9d9d9 !important;
-    border-top: 1px solid #c0c0c0;
     /* border-radius: 2px; */
     padding: 0 8px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    border-radius: 5px;
-    background-color: #fff !important;
-    border: solid 1px #ddd;
+    border-radius: 8px;
+    background-color: $color-withe-hex;
+    border: solid 1px $blu-light-02;
 }
 textarea[type="text"] {
     // min-width: 307px !important;
@@ -28,9 +25,6 @@ textarea[type="text"] {
     // margin-bottom: 10px;
     appearance: none;
     -webkit-appearance: none;
-    background: #fff;
-    border: 1px solid #d9d9d9 !important;
-    border-top: 1px solid #c0c0c0;
     /* border-radius: 2px; */
     padding-right: 8px;
     padding-top: 5px;
@@ -38,9 +32,9 @@ textarea[type="text"] {
 
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    border-radius: 5px;
-    background-color: #fff !important;
-    border: solid 1px #ddd;
+    border-radius: 8px;
+    background-color: $color-withe-hex;
+    border: solid 1px $blu-light-02;
 }
 
 input[type="text"]:disabled {
@@ -107,12 +101,12 @@ input[type="file"] {
 }
 
 .custom-file-upload {
-    border: 1px solid $light-blue;
+    border: 1px solid $blu;
     display: inline-block;
     padding: 11px 12px;
     cursor: pointer;
-    background: $light-blue !important;
-    color: #000;
+    background: $blu !important;
+    color: $color-withe-hex;
     border-radius: 4px;
     font-weight: 500;
     // margin-top: 14px;
@@ -137,7 +131,11 @@ input[type="file"] {
 }
 
 #csd-update-bot-btn {
-    border-radius: 3px;
+    border: 0px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding: 6px 12px; 
+    margin: 0px;
 }
 
 .cds-custom-label {
@@ -204,7 +202,7 @@ input[type="file"] {
 .dept-name-in-bot-dtl {
     position: relative;
     top: 2px;
-    font-weight: 400;
+    font-weight: 500;
 }
 
 .chatbot-details-wpr,

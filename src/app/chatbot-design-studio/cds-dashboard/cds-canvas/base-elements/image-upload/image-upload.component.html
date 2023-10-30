@@ -5,23 +5,34 @@
     (dragover)="allowDrop($event)" 
     (dragleave)="drag($event)">    
 
-    <label class="inputUploadImage" [for]="'uploadImage_'+ uuid">
-        <div class="image"><img class="base-icon-color" src="assets/images/icons/add_image.svg"></div>
-        <input style="display:none" type="file" [id]="'uploadImage_'+ uuid" accept=".jpg, .JPEG, .png, .gif, .webp" (change)="detectFiles($event)" />
-    </label>
-
-    <div class="labelDropUploadImage">
-        <span *ngIf="isHovering === false">
-            {{'drag an image here or click to select them' | translate}}
-        </span>
-        <span *ngIf="isHovering === true">
-            {{'image dragging' | translate}}
-        </span>
+    <!--  -->
+    <div *ngIf="!isFilePendingToUpload">
+        <label class="inputUploadImage" [for]="'uploadImage_'+ uuid">
+            <div class="image"><img class="base-icon-color" src="assets/images/icons/add_image.svg"></div>
+            <input #imageInput style="display:none" type="file" [id]="'uploadImage_'+ uuid" accept=".jpg, .JPEG, .png, .gif, .webp" (change)="detectFiles($event)" />
+        </label>
+    
+        <div class="labelDropUploadImage">
+            <span *ngIf="isHovering === false">
+                {{'drag an image here or click to select them' | translate}}
+            </span>
+            <span *ngIf="isHovering === true">
+                {{'image dragging' | translate}}
+            </span>
+        </div>
     </div>
+    <!-- -->
+    <loading-spinner  *ngIf="isFilePendingToUpload"
+        class="custom-spinner">
+    </loading-spinner>
+               
     
 </div>
 
 <div *ngIf="metadata.src" class="image-wrp">
     <img *ngIf="!isImageSvg" #imageUploaded id="imageUploaded" [src]="sanitizerUrlImage()" (change)="getDimensionImage()">
     <!-- <img *ngIf="isImageSvg" #imageUploaded id="imageUploaded" [src]="sanitizerUrlImage()" (change)="getDimensionImage()"> -->
+    <div class="control-button delete" (click)="onDeletePathElement($event)">
+        <em class="material-icons">clear</em>
+    </div>
 </div>

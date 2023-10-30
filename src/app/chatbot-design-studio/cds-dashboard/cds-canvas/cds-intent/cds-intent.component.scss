@@ -9,7 +9,7 @@
   --intent-header-background: transparent; //#{$deep-brown};
   --base-border-radius-preview: #{$border-radius-base-preview};
   --base-padding-preview: #{$padding-base-preview};
-  --action-selected-color: #{$accent-blue};
+  --action-selected-color: #{$action-color-selected};
 
   --startIntentMaxWith: 160px;
 }
@@ -1023,7 +1023,7 @@ cds-panel-intent-header.isStart ::ng-deep{
   .option {
     display: flex;
     cursor: pointer;
-    
+
     &:hover {
       opacity: 0.85;
     }

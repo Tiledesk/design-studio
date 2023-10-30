@@ -24,7 +24,6 @@ export class CdsActionReplyComponent implements OnInit {
   @Input() action: ActionReply;
   @Input() intentSelected: Intent;
   @Input() previewMode: boolean = true
-  @Output() updateIntentFromConnectorModification = new EventEmitter();
   @Output() updateAndSaveAction = new EventEmitter();
   
 
@@ -265,11 +264,6 @@ export class CdsActionReplyComponent implements OnInit {
     }
     this.logger.log('onDeleteActionReply', this.arrayResponses);
     this.onUpdateAndSaveAction();
-  }
-
-
-  onUpdateIntentFromConnectorModification(connectorID){
-    this.updateIntentFromConnectorModification.emit(connectorID);
   }
 
   /** onChangingReplyAction */

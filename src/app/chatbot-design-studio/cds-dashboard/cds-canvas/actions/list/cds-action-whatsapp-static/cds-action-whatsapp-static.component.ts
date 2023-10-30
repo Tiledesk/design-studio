@@ -150,20 +150,23 @@ export class CdsActionWhatsappStaticComponent implements OnInit {
     this.updateJsonPreview();
   }
 
-  onPhoneNumberIdChange(event) {
-    let element = document.getElementById('phone-number-id');
-    element.classList.remove('highlighted');
-    this.phone_number_id = (event.target as HTMLInputElement).value;
-    var reg = new RegExp('^[0-9]+$');
-    if (!reg.test(this.phone_number_id)) {
-      element.classList.add('highlighted');
-    } else {
-      this.action.payload.phone_number_id = this.phone_number_id;
-      this.updateAndSaveAction.emit();
-    }
 
-    this.logger.debug("[ACTION WHATSAPP] Action updated ", this.action.payload);
-    this.updateJsonPreview();
+  onChangeTextarea(event){
+    if(event){
+      this.phone_number_id = event
+      let element = document.getElementById('phone-number-id');
+      element.classList.remove('is-invalid');
+      var reg = new RegExp('^[0-9]+$');
+      if (!reg.test(this.phone_number_id)) {
+        element.classList.add('is-invalid');
+      } else {
+        this.action.payload.phone_number_id = this.phone_number_id;
+        this.updateAndSaveAction.emit();
+      }
+
+      this.logger.debug("[ACTION WHATSAPP] Action updated ", this.action.payload);
+      this.updateJsonPreview();
+    }
   }
 
   updateJsonPreview() {

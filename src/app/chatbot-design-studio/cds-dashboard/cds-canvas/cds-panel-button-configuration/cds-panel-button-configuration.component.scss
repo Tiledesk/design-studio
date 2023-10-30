@@ -1,5 +1,15 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+.panel-button-configuration{
+    display: flex;
+    width: 450px;
+    height: 100%;
+    flex-direction: column;
+    animation: width 0.9s ease-in-out;
+    background-color: white;
+    border-left: 1px solid $gray-light-02;
+}
+
 .emoji-picker {
     position: absolute;
     right: 10px;
@@ -15,70 +25,95 @@
     }
 }
 
-.button-tab {
-    position: absolute;
-    top:0;
-    right: 0;
-    z-index: 1;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background-color: #4d5e79;
-    border-left: solid 2px #b28e26;
-    // box-shadow: 0 0 42px 2px #000000c7;
-    animation: width 0.9s ease-in-out;
-}
 
 
 
-.button-tab-header:before {
-    content: "";
-    position: absolute;
+
+// .header-panel:before {
+//     content: "";
+//     position: absolute;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     z-index: 0;
+//     height: 1px;
+//     background-color: #6474913d;
+// }
+
+.header-panel {
+    position: sticky;
+    top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    z-index: 0;
-    height: 1px;
-    background-color: #6474913d;
-}
-
-.button-tab-header {
-    position: relative;
-    border-top-left-radius: 1em;
-    border-top-right-radius: 1em;
-    margin: 0;
-    padding: 0;
-    font-weight: 400;
-    line-height: 50px;
-    min-height: 50px;
-    color: $color-txt-3-hex;
-    .button-tab-title {
-        font-size: 18px;
-        font-weight: 400;
-        color: #fff;
-        text-align: left;
-        padding-left: 20px;
-        cursor: default;
-    }
+    background-color: $blu-light-03;
+    z-index: 2;
+    padding: 10px;
+    padding-left: 20px;
     .button-tab-close {
         display: flex;
         justify-content: right;
-        margin: 12px;
+        align-items: center;
         position: absolute;
         top: 0;
-        left: -22px;
+        bottom: 0;
+        left: -12px;
         cursor: pointer;
-        em {
-            background: #303f5c;
-            border: 2px solid #b28e26!important;
+        span {
+            background: white;
+            box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
             border-radius: 50%;
             width: 22px;
             height: 22px;
             cursor: pointer;
             font-size: 18px;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $blu;
+            transition: background-color 0.3s ease 0s;
+        }
+        &:hover{
+            span.material-icons,
+            span.material-icons-outlined{
+                background-color: $blu;
+                color: $blu-light-04;
+            }
         }
     }    
+}
+
+.action-title {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    max-width: calc(100% - 70px);
+
+    .icon-action {
+        transition: opacity .15s ease 0s;
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        // margin-right: 6px;
+        // align-self: start;
+        color: $blu;
+        background: none;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+    }
+
+    .label-action {
+        overflow-x: clip;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0;
+        color: $blu;
+    }
 }
 
 
@@ -88,38 +123,8 @@
 
 
 
-.button-tab-content {
-    position: relative;
-    flex: 1;
-    min-height: 100px;
-    height: auto;
-    overflow-y: auto;
-    .section {
-        padding: 0 3em;
-        opacity: 0;
-        height: 0;
-        overflow: hidden;
-        transition: height 0.5s ease-out, opacity 0.2s linear;
-        .form-group {
-            input {
-                background-color: $color-withe-hex;
-                border: 0px solid $color-light-gray-hex;
-                padding: 0 6px;
-                border-radius: 4px;
-            }
-        }
-        &.displayed {
-            padding: 1em 2em;
-            height: auto;
-            opacity: 1;
-            overflow: visible;
-            display: inline-block;
-            width: 100%;
-        }
-        &.titleField{
-            padding: 0em 3em;
-        }
-    }
+.content-panel-button-configuration {
+    
     .cds-attributes {
         margin-top: 20px;
         display: block;

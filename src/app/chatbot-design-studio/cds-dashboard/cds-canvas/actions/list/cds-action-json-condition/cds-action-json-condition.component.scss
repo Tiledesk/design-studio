@@ -170,6 +170,20 @@
     }
 }
 
+form > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+cds-select.operator ::ng-deep{
+    min-width:70px;
+    .ng-select.ng-select-single .ng-select-container{
+        height: 28px;
+        min-height: 28px;
+    }
+}
+
 .control-buttons{
     height: 100%;
     left: -44px;
