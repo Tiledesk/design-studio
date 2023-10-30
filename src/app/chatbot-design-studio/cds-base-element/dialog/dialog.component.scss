@@ -1,3 +1,5 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
 ::ng-deep .custom-dialog-container {
     width: 40vw!important;
     min-width: 500px;
@@ -77,7 +79,7 @@
 
 .tpl-input {
     background: #fff;
-    border: 2px solid #c6cdd4;
+    border: 1px solid #c6cdd4;
     border-radius: 6px;
     color: #22272d;
     display: block;
@@ -92,7 +94,7 @@
         opacity: 0.5;
     }
     &.invalid{
-        border: 2px solid red !important;
+        border: 1px solid red !important;
         outline: 0px solid red !important;
         transition: border 0.3s;
     }
@@ -100,20 +102,11 @@
 
 .tpl-modal-buttons {
     display: flex;
-    flex-shrink: 0;
+    gap: 5px;
     justify-content: flex-end;
     padding: 0 25px 20px;
-    color: #333;
-    .cds-yellow-button{
-        margin-left: 10px; 
-        min-width: 80px;
-        background-color: #ecb606b0;
-        height: 100%;
-        color: #333;
-    }
-    .btn-cancel {
-        min-width: 80px;
-        border: 0;
-        height: 100%;
+    .cancel {
+        background-color: $gray;
+        color: $color-withe-hex;
     }
 }
