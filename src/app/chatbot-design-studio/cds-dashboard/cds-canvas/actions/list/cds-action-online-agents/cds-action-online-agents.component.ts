@@ -6,6 +6,8 @@ import { ActionOnlineAgent } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { TYPE_UPDATE_ACTION } from '../../../../../utils';
+
 
 @Component({
   selector: 'cds-action-online-agents',
@@ -47,6 +49,7 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
       this.connector = connector;
       this.updateConnector();
     });
+    this.initialize();
   }
 
   /** */
@@ -56,77 +59,16 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
     }
   }
 
-  ngOnChanges() {
-    this.initialize();
-    if(this.intentSelected){
-      this.initializeConnector();
-    }
-    if (this.action && this.action.trueIntent) {
-      this.setFormValue();
-    }
-  }
+  // ngOnChanges() {
+  //   this.initialize();
+  //   if(this.intentSelected){
+  //     this.initializeConnector();
+  //   }
+  //   if (this.action && this.action.trueIntent) {
+  //     this.setFormValue();
+  //   }
+  // }
 
-  private initializeConnector() {
-    // this.isConnected = false;
-    this.idIntentSelected = this.intentSelected.intent_id;
-    this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
-    this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
-
-    this.listOfIntents = this.intentService.getListOfIntents()
-  }
-
-  private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idAction= array[1];
-      if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){
-          // DELETE 
-          // this.logger.log(' deleteConnector :: ', this.connector.id);
-          // this.action.intentName = null;
-          if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null
-            this.isConnectedTrue = false
-          }        
-          if(array[array.length -1] === 'false'){
-            this.action.falseIntent = null
-            this.isConnectedFalse = false;
-          }
-          // if(this.connector.notify)
-          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-          // this.updateAndSaveAction.emit();
-        } else { //TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
-          // ADD / EDIT
-          this.logger.log(' updateConnector :: onlineagents', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-          if(array[array.length -1] === 'true'){
-            this.isConnectedTrue = true;
-            if(this.action.trueIntent !== '#'+this.connector.toId){
-              this.action.trueIntent = '#'+this.connector.toId;
-              // if(this.connector.notify)
-              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-              // this.updateAndSaveAction.emit();
-            } 
-          }    
-
-          if(array[array.length -1] === 'false'){
-            this.isConnectedFalse = true;
-            if(this.action.falseIntent !== '#'+this.connector.toId){
-              this.action.falseIntent = '#'+this.connector.toId;
-              // if(this.connector.notify)
-              if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-              // this.updateAndSaveAction.emit();
-            } 
-          }
-        }
-        
-      }
-    } catch (error) {
-      this.logger.log('error: ', error);
-    }
-  }
-  
-
-  
 
   private initialize() {
     this.actionOnlineAgentsFormGroup = this.buildForm();
@@ -137,7 +79,80 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
     })
     this.trueIntentAttributes = this.action.trueIntentAttributes;
     this.falseIntentAttributes = this.action.falseIntentAttributes;
+    if(this.intentSelected){
+      this.initializeConnector();
+    }
+    if (this.action && this.action.trueIntent) {
+      this.setFormValue();
+    }
   }
+  
+
+  private initializeConnector() {
+    // this.isConnected = false;
+    this.idIntentSelected = this.intentSelected.intent_id;
+    this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
+    this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
+    this.listOfIntents = this.intentService.getListOfIntents();
+    this.checkConnectionStatus();
+  }
+
+
+
+  private checkConnectionStatus(){
+    if(this.action.trueIntent){
+     this.isConnectedTrue = true;
+    } else {
+     this.isConnectedTrue = false;
+    }
+    if(this.action.falseIntent){
+      this.isConnectedFalse = true;
+     } else {
+      this.isConnectedFalse = false;
+     }
+  }
+
+  private updateConnector(){
+    try {
+      const array = this.connector.fromId.split("/");
+      const idAction= array[1];
+      if(idAction === this.action._tdActionId){
+        if(this.connector.deleted){
+          if(array[array.length -1] === 'true'){
+            this.action.trueIntent = null
+            this.isConnectedTrue = false
+          }        
+          if(array[array.length -1] === 'false'){
+            this.action.falseIntent = null
+            this.isConnectedFalse = false;
+          }
+          if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+        } else {
+          this.logger.log(' updateConnector :: onlineagents', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
+          if(array[array.length -1] === 'true'){
+            this.isConnectedTrue = true;
+            if(this.action.trueIntent !== '#'+this.connector.toId){
+              this.action.trueIntent = '#'+this.connector.toId;
+              if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+            } 
+          }    
+          if(array[array.length -1] === 'false'){
+            this.isConnectedFalse = true;
+            if(this.action.falseIntent !== '#'+this.connector.toId){
+              this.action.falseIntent = '#'+this.connector.toId;
+              if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+            } 
+          }
+        }
+      }
+    } catch (error) {
+      this.logger.log('error: ', error);
+    }
+  }
+  
+
+  
+
 
 
   buildForm(): FormGroup {
@@ -157,7 +172,6 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
   onChangeSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent'){
     if(event){
       this.action[type]=event.value
-
       switch(type){
         case 'trueIntent':
           this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
@@ -166,7 +180,7 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
           this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
           break;
       }
-      this.updateAndSaveAction.emit();
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   }
 
@@ -180,7 +194,7 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
         break;
     }
     this.action[type]=null
-    this.updateAndSaveAction.emit();
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
 
@@ -191,7 +205,7 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
     if(type === 'falseIntent'){
       this.action.falseIntentAttributes = attributes;
     }
-    this.updateAndSaveAction.emit();
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
   
 
@@ -203,5 +217,6 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
       this.logger.log("Error: ", error);
     }
   }
+
   
 }

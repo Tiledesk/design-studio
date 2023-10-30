@@ -5,6 +5,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ActionCaptureUserReply } from 'src/app/models/action-model';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 
 @Component({
   selector: 'cds-action-capture-user-reply',
@@ -56,7 +57,16 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
     this.logger.debug("Intent Selected: ", this.intentSelected);
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnector = this.idIntentSelected+'/'+this.action._tdActionId;
-    this.listOfIntents = this.intentService.getListOfIntents()
+    this.listOfIntents = this.intentService.getListOfIntents();
+    this.checkConnectionStatus();
+  }
+
+  private checkConnectionStatus(){
+    if(this.action.goToIntent){
+     this.isConnected = true;
+    } else {
+     this.isConnected = false;
+    }
   }
 
   private updateConnector(){
@@ -75,7 +85,7 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
             this.action.goToIntent = "#"+this.connector.toId;
           } 
         };
-        if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+        if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
       }
     } catch (error) {
       this.logger.error('[ACTION-CAPTURE-USER-REPLY] updateConnector error: ', error);
@@ -86,22 +96,23 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
     this.logger.log("[ACTION-CAPTURE-USER-REPLY] onEditableDivTextChange event", event)
     this.logger.log("[ACTION-CAPTURE-USER-REPLY] onEditableDivTextChange property", property)
     this.action[property] = event.value;
-    this.updateAndSaveAction.emit();
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
   onChangeBlockSelect(event:{name: string, value: string}, type: string) {
     if(event){
       this.action[type] = event.value;
       this.onConnectorChange.emit({ type: 'create', fromId: this.idConnector, toId: this.action.goToIntent });
-      this.updateAndSaveAction.emit();
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   }
 
   onResetBlockSelect(event:{name: string, value: string}, type: string) {
     this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnector, toId: this.action.goToIntent });
     this.action[type] = null;
-    this.updateAndSaveAction.emit();
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
+
 
 
 
