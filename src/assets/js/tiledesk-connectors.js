@@ -99,9 +99,9 @@ export class TiledeskConnectors {
 
   createConnector(fromId, toId, fromPoint, toPoint, save=false, undo=false) {
     const id = fromId + "/" + toId;
-    // console.log('createConnector: fromId-> ', fromId);
-    // console.log('createConnector: toId-> ', toId);
-    // console.log('createConnector: point-> ', fromPoint, toPoint);
+    // // console.log('createConnector: fromId-> ', fromId);
+    // // console.log('createConnector: toId-> ', toId);
+    // // console.log('createConnector: point-> ', fromPoint, toPoint);
     let connector = {
       id: id,
       fromId: fromId,
@@ -127,11 +127,11 @@ export class TiledeskConnectors {
       this.blocks[inblock.id] = inblock;
     }
     inblock.inConnectors[connector.id] = connector.id;
-    // console.log("blocks:", this.blocks);
+    // // console.log("blocks:", this.blocks);
    
     this.#drawConnector(id, fromPoint, toPoint);
     this.removeConnectorDraft();
-    console.log("connector CREATED id, save, undo:", id, save, undo);
+    // console.log("connector CREATED id, save, undo:", id, save, undo);
     connector['save']=save;
     connector['undo']=undo;
     const event = new CustomEvent("connector-created", { detail: { connector: connector } });
@@ -142,59 +142,59 @@ export class TiledeskConnectors {
 
   /* ***************************  DELETE *************************** */
   deleteAllConnectors() {
-    console.log('deleteAllConnectors::: ', this.connectors);
+    // console.log('deleteAllConnectors::: ', this.connectors);
     for (const [key, connector] of Object.entries(this.connectors)) {
       this.deleteConnector(connector.id);
     };
   }
 
   deleteConnectorsThatGoToTheBlockWithId(blockId) {
-    console.log("[JS] deleteConnectorsThatGoToTheBlockWithId ----> ", blockId);
+    // console.log("[JS] deleteConnectorsThatGoToTheBlockWithId ----> ", blockId);
     for (var connectorId in this.connectors) {
       if (connectorId.includes(blockId) && !connectorId.startsWith(blockId)) {
         this.deleteConnector(connectorId);
       }
     }
-    console.log("[JS] blocks :---> ", this.blocks);
-    console.log("[JS] connectors :---> ", this.connectors);
+    // console.log("[JS] blocks :---> ", this.blocks);
+    // console.log("[JS] connectors :---> ", this.connectors);
   }
 
   deleteConnectorsOutOfBlock(blockId, save=false, undo=false, notify=true) {
-    console.log("[JS] deleteConnectorsOutOfBlock ----> ", blockId);
+    // console.log("[JS] deleteConnectorsOutOfBlock ----> ", blockId);
     for (var connectorId in this.connectors) {
       if (connectorId.startsWith(blockId)) {
         this.deleteConnector(connectorId, save, undo, notify);
       }
     }
     // delete this.blocks[blockId];
-    console.log("[JS] blocks :---> ", this.blocks);
-    console.log("[JS] connectors :---> ", this.connectors);
+    // console.log("[JS] blocks :---> ", this.blocks);
+    // console.log("[JS] connectors :---> ", this.connectors);
   }
 
 
   deleteConnectorsOfBlockThatDontExist(blockId) {
-    console.log("[JS] deleteConnectorsOfBlockThatDontExist ----> ", blockId);
+    // console.log("[JS] deleteConnectorsOfBlockThatDontExist ----> ", blockId);
     for (var connectorId in this.connectors) {
-      // console.log("[JS] connectorId ----> ", connectorId);
+      // // console.log("[JS] connectorId ----> ", connectorId);
       if (connectorId.startsWith(blockId)) {
-        console.log("[JS] INIZIA PER ----> ", blockId);
+        // console.log("[JS] INIZIA PER ----> ", blockId);
         // connettore in uscita, non notificare la cancellazione
         const lastIndex = connectorId.lastIndexOf("/");
         const idConnectorElement = connectorId.substring(0, lastIndex);
-        console.log("[JS] idConnectorElement ----> ", idConnectorElement);
+        // console.log("[JS] idConnectorElement ----> ", idConnectorElement);
         let connectorElement = document.getElementById(idConnectorElement);
-        console.log("[JS] connectorElement ----> ", connectorElement);
+        // console.log("[JS] connectorElement ----> ", connectorElement);
         if(!connectorElement)this.deleteConnector(connectorId);
       }
     }
-    console.log("[JS] blocks :---> ", this.blocks);
-    console.log("[JS] connectors :---> ", this.connectors);
+    // console.log("[JS] blocks :---> ", this.blocks);
+    // console.log("[JS] connectors :---> ", this.connectors);
   }
 
 
   /**  */
   deleteConnectorsOfBlock(blockId, save=false, undo=false) {
-    console.log("[JS] deleteConnectorsOfBlock ----> ", blockId);
+    // console.log("[JS] deleteConnectorsOfBlock ----> ", blockId);
     let arrayOfDeletedConnectors = [];
     for (var connectorId in this.connectors) {
       if (connectorId.startsWith(blockId)) {
@@ -203,25 +203,25 @@ export class TiledeskConnectors {
       } else if (connectorId.includes(blockId)) {
         // connettore in entrata
         arrayOfDeletedConnectors.push(connectorId);
-        console.log("[JS] cancello connettore in Entrata ----> ", connectorId, save, undo);
+        // console.log("[JS] cancello connettore in Entrata ----> ", connectorId, save, undo);
         this.deleteConnector(connectorId, save, undo);
       }
     }
     delete this.blocks[blockId];
-    console.log("[JS] blocks :---> ", this.blocks);
-    console.log("[JS] connectors :---> ", this.connectors);
-    console.log("[JS] arrayOfDeletedConnectors :---> ", arrayOfDeletedConnectors);
+    // console.log("[JS] blocks :---> ", this.blocks);
+    // console.log("[JS] connectors :---> ", this.connectors);
+    // console.log("[JS] arrayOfDeletedConnectors :---> ", arrayOfDeletedConnectors);
     return arrayOfDeletedConnectors; 
   }
 
 
 
   deleteConnector(connectorId, save=false, undo=false, notify=true) {
-    console.log('[JS] connectorId: ', connectorId);
-    console.log('[JS] this.blocks: ', this.blocks);
-    console.log('[JS] this.connectors: ', this.connectors);
+    // console.log('[JS] connectorId: ', connectorId);
+    // console.log('[JS] this.blocks: ', this.blocks);
+    // console.log('[JS] this.connectors: ', this.connectors);
     let connectorElement = document.getElementById(connectorId);
-    console.log('[JS] this.connectorElement: ', connectorElement);
+    // console.log('[JS] this.connectorElement: ', connectorElement);
     if (connectorElement) {
       connectorElement.remove();
       const connectorDeleted = this.connectors[connectorId];
@@ -238,20 +238,20 @@ export class TiledeskConnectors {
 
 
   deleteConnectorInBlock(connectorId) {
-    console.log("deleteConnectorInBlock ----> ", this.blocks, connectorId, this.selectedConnector);
+    // console.log("deleteConnectorInBlock ----> ", this.blocks, connectorId, this.selectedConnector);
     for (var key in this.blocks) {
       var node = this.blocks[key];
       for (var connectorKey in node.outConnectors) {
-        console.log('connectorKey: ', connectorKey);
+        // console.log('connectorKey: ', connectorKey);
         if (connectorKey === connectorId) {
-          console.log('CANCELLO : ', node.outConnectors[connectorKey]);
+          // console.log('CANCELLO : ', node.outConnectors[connectorKey]);
           delete node.outConnectors[connectorKey];
         }
       }
       for (var connectorKey in node.inConnectors) {
-        console.log('connectorKey: ', connectorKey);
+        // console.log('connectorKey: ', connectorKey);
         if (connectorKey === connectorId) {
-          console.log('CANCELLO : ', node.inConnectors[connectorKey]);
+          // console.log('CANCELLO : ', node.inConnectors[connectorKey]);
           delete node.inConnectors[connectorKey];
         }
       }
@@ -264,7 +264,7 @@ export class TiledeskConnectors {
   // }
 
   onKeyPressDeleteConnector(event) {
-    console.log('onKeyPressDeleteConnector:::: ', event, this.selectedConnector);
+    // console.log('onKeyPressDeleteConnector:::: ', event, this.selectedConnector);
     if (event.key === 'Delete' || event.key === 'Backspace' && this.selectedConnector) {
       this.deleteConnector(this.selectedConnector.id, true, true);
     }
@@ -272,9 +272,9 @@ export class TiledeskConnectors {
 
 
   deleteConnectorFromAction(blockId, connId) {
-    console.log("deleteConnectorFromAction ----> ", connId, blockId);
-    console.log("blocks :---> ", this.blocks);
-    console.log("connectors :---> ", this.connectors);
+    // console.log("deleteConnectorFromAction ----> ", connId, blockId);
+    // console.log("blocks :---> ", this.blocks);
+    // console.log("connectors :---> ", this.connectors);
     let block = this.blocks[blockId];
     if (!block) return;
     for (var connectorKey in block.outConnectors) {
@@ -286,14 +286,14 @@ export class TiledeskConnectors {
   }
 
   deleteConnectorByToId(intentId) {
-    console.log("deleteConnectorByToId ----> ", intentId);
-    console.log("blocks :---> ", this.blocks);
-    console.log("connectors :---> ", this.connectors);
+    // console.log("deleteConnectorByToId ----> ", intentId);
+    // console.log("blocks :---> ", this.blocks);
+    // console.log("connectors :---> ", this.connectors);
     for (var key in this.blocks) {
       var node = this.blocks[key];
       for (var connectorKey in node.outConnectors) {
         if (connectorKey.includes(intentId)) {
-          // console.log('DEL CONNECTOR : ', node.outConnectors[connectorKey]);
+          // // console.log('DEL CONNECTOR : ', node.outConnectors[connectorKey]);
           delete node.outConnectors[connectorKey];
           this.deleteConnector(connectorKey);
         }
@@ -304,16 +304,16 @@ export class TiledeskConnectors {
 
 
   deleteConnectorsFromActionByActionId(actionId) {
-    // console.log("deleteConnectorsFromActionByActionId ----> ", actionId);
-    // console.log("blocks :---> ", this.blocks);
-    // console.log("connectors :---> ", this.connectors);
+    // // console.log("deleteConnectorsFromActionByActionId ----> ", actionId);
+    // // console.log("blocks :---> ", this.blocks);
+    // // console.log("connectors :---> ", this.connectors);
     for (var key in this.blocks) {
       var node = this.blocks[key];
-      // console.log('outConnectors: ', node, key);
+      // // console.log('outConnectors: ', node, key);
       for (var connectorKey in node.outConnectors) {
-        // console.log('connectorKey: ', connectorKey);
+        // // console.log('connectorKey: ', connectorKey);
         if (connectorKey.includes(actionId)) {
-          // console.log('CANCELLO : ', node.outConnectors[connectorKey]);
+          // // console.log('CANCELLO : ', node.outConnectors[connectorKey]);
           delete node.outConnectors[connectorKey];
           this.deleteConnector(connectorKey);
           // let connector = document.getElementById(connectorKey);
@@ -332,12 +332,12 @@ export class TiledeskConnectors {
 
 
   deleteConnectorsBrokenOutOfBlock(blockId) {
-    // console.log("[JS] deleteConnectorsBrokenOutOfBlock ----> ", this.connectors);
+    // // console.log("[JS] deleteConnectorsBrokenOutOfBlock ----> ", this.connectors);
     for (var connectorId in this.connectors) {
       if (connectorId.startsWith(blockId)) {
-        // console.log("[JS] deleteConnectorsBrokenOutOfBlock ----> ", connectorId, blockId);
+        // // console.log("[JS] deleteConnectorsBrokenOutOfBlock ----> ", connectorId, blockId);
         let connector = this.connectors[connectorId];
-        // console.log("[JS] deleteConnectorsBrokenOutOfBlock ----> ", connector);
+        // // console.log("[JS] deleteConnectorsBrokenOutOfBlock ----> ", connector);
         const fromEle = document.getElementById(connector['fromId']);
         const toEle = document.getElementById(connector['toId']);
         if(!fromEle || !toEle){
@@ -345,8 +345,8 @@ export class TiledeskConnectors {
         }
       }
     }
-    console.log("[JS] blocks :---> ", this.blocks);
-    console.log("[JS] connectors :---> ", this.connectors);
+    // console.log("[JS] blocks :---> ", this.blocks);
+    // console.log("[JS] connectors :---> ", this.connectors);
   }
 
   /** */
@@ -371,17 +371,17 @@ export class TiledeskConnectors {
   /** */
   mousedown(target) {
     this.target = target;
-    // console.log("mousedown");
+    // // console.log("mousedown");
     this.connectableId = null;
     if (target.addEventListener) {
       target.addEventListener("mousedown", (event) => {
-        console.log("mousedown  el.id:", event.target.id);
+        // console.log("mousedown  el.id:", event.target.id);
         let el = event.target;
         this.#removeSelection(el);
         let elConnectable = this.#searchClassInParents(el, this.classes["connectable"]);
-        // console.log("connectable? ", elConnectable);
+        // // console.log("connectable? ", elConnectable);
         if (elConnectable) {
-          // console.log("connectable", elConnectable.id);
+          // // console.log("connectable", elConnectable.id);
           this.fromId = elConnectable.id;
           this.drawingBack = this.elementLogicCenter(elConnectable);
           this.ref_handleMouseMove;
@@ -390,17 +390,17 @@ export class TiledeskConnectors {
           target.addEventListener("mouseup", this.ref_handleMouseUp = this.#handleMouseUp.bind(this), false);
         }
         else {
-          console.log("un-connectable");
+          // console.log("un-connectable");
         }
       }, false);
       /* 
       target.addEventListener("click", (event) => {
-          console.log("clicked el.id:", event.target.id)
+          // console.log("clicked el.id:", event.target.id)
           let el = event.target;
           this.#removeSelection(el);
       }, false);
       */
-      // console.log("mouse down added");
+      // // console.log("mouse down added");
     }
   }
 
@@ -416,23 +416,23 @@ export class TiledeskConnectors {
 
 
   moved(element, x, y) {
-    // console.log("moving ----> ", element.id, x, y);
+    // // console.log("moving ----> ", element.id, x, y);
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) {
       return;
     }
-    // console.log("block:---> ", block)
+    // // console.log("block:---> ", block)
     //block.outConnectors.forEach((conn_id, key) => {
     for (const [key, conn_id] of Object.entries(block.outConnectors)) {
       // for (k in block.outConnectors.keys) {
       // c_id = block.outConnectors[k];
       let conn = this.connectors[conn_id];
-      // console.log("OUT :---> ", conn);
+      // // console.log("OUT :---> ", conn);
       if (conn) {
         const el = document.getElementById(conn.fromId);
         conn.fromPoint = this.elementLogicCenter(el);
-        // console.log("conn.fromPoint :---> ", conn.fromPoint);
+        // // console.log("conn.fromPoint :---> ", conn.fromPoint);
         this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
       }
     };
@@ -509,7 +509,7 @@ export class TiledeskConnectors {
 
   /** createConnectors */
   #createConnectors() {
-    //console.log('createConnectors: ', this.connectors);
+    //// console.log('createConnectors: ', this.connectors);
     for (const [key, value] of Object.entries(this.connectors)) {
       this.createConnector(value.fromId, value.toId, value.fromPoint, value.toPoint, false, false);
     }
@@ -520,7 +520,7 @@ export class TiledeskConnectors {
     if (el && el.classList && el.classList.contains(keyClass)) {
       return el;
     }
-    // console.log('[TILEDESK-CONNECTORS] searchClassInParents ->', keyClass);
+    // // console.log('[TILEDESK-CONNECTORS] searchClassInParents ->', keyClass);
     let parent = el.parentElement;
     while (parent !== null) {
       if (parent && parent.classList && parent.classList.contains(keyClass)) {
@@ -532,13 +532,13 @@ export class TiledeskConnectors {
         parent = null;
       }
     }
-    // console.log("Nessun elemento parent contiene la classe 'pippo'.");
+    // // console.log("Nessun elemento parent contiene la classe 'pippo'.");
     return null;
   }
 
   /** removeSelection */
   #removeSelection(target) {
-    // console.log("---> resetting connector selection?", this.selectedConnector, target)
+    // // console.log("---> resetting connector selection?", this.selectedConnector, target)
     if (this.selectedConnector) {
       if (!target.id || (this.selectedConnector.id !== target.id)) {
         this.selectedConnector.setAttributeNS(null, "class", this.classes["connector"]);
@@ -552,12 +552,12 @@ export class TiledeskConnectors {
 
   /** handleMouseMove */
   #handleMouseMove(event) {
-    // console.log("move...", event.target.id);
+    // // console.log("move...", event.target.id);
     let mouse_pos_logic;
     const target = event.target;
     let elConnectable = this.#searchClassInParents(target, this.classes["input_block"]);
     if (elConnectable && elConnectable.id && this.fromId) {
-      console.log("1 connectable? ", this.fromId, elConnectable.id);
+      // console.log("1 connectable? ", this.fromId, elConnectable.id);
       if (this.fromId.startsWith(elConnectable.id)) {
         elConnectable = null;
       }
@@ -581,7 +581,7 @@ export class TiledeskConnectors {
           })
 
         document.dispatchEvent(connectorMovedOverIntent);
-        console.log("connector-moved-over-intent!");
+        // console.log("connector-moved-over-intent!");
       }
     }
     else {
@@ -597,7 +597,7 @@ export class TiledeskConnectors {
           }
         })
       document.dispatchEvent(connectorMovedOutOfIntent);
-      console.log("connector-moved-out-of-intent!");
+      // console.log("connector-moved-out-of-intent!");
       this.connectableId = null;
     }
     this.drawingFront = mouse_pos_logic;
@@ -606,13 +606,13 @@ export class TiledeskConnectors {
 
   /** handleMouseUp */
   #handleMouseUp(event) {
-    console.log("mouse up event...", event);
+    // console.log("mouse up event...", event);
     this.target.removeEventListener("mousemove", this.ref_handleMouseMove, false);
     this.target.removeEventListener("mouseup", this.ref_handleMouseUp, false);
-    console.log('handleMouseUp ------> ', event.target, event.srcElement);
+    // console.log('handleMouseUp ------> ', event.target, event.srcElement);
     let elConnectable = this.#searchClassInParents(event.target, this.classes["input_block"]);
     if (elConnectable && elConnectable.id && this.fromId) {
-      console.log("2 connectable? ", this.fromId, elConnectable.id);
+      // console.log("2 connectable? ", this.fromId, elConnectable.id);
       if (this.fromId.startsWith(elConnectable.id)) {
         elConnectable = null;
       }
@@ -635,7 +635,7 @@ export class TiledeskConnectors {
     else if (this.drawingBack && this.toPoint) {
       // quando rilascio il connector sullo stage e apro il float menu
       // quando rilascio il connector in un altro punto qualsiasi
-      // console.log("connector released on an unsupported element!");
+      // // console.log("connector released on an unsupported element!");
       // this.removeConnectorDraft();
       const fire_event = new CustomEvent("connector-draft-released",
         {
@@ -648,7 +648,7 @@ export class TiledeskConnectors {
           }
         });
       document.dispatchEvent(fire_event);
-      console.log("connector-draft-released fired!");
+      // console.log("connector-draft-released fired!");
     }
   }
 
@@ -707,7 +707,7 @@ export class TiledeskConnectors {
       connector.setAttributeNS(null, "class", "connector");
       connector.setAttributeNS(null, "pointer-events", "stroke");
       connector.addEventListener('mouseover', (e) => {
-        //console.log("mouseover e", e.currentTarget);
+        //// console.log("mouseover e", e.currentTarget);
         if (this.selectedConnector !== null) { // jump highlighting current selection
           if (this.selectedConnector.id !== e.currentTarget.id) {
             e.currentTarget.setAttributeNS(null, "class", this.classes["connector_over"]);
@@ -720,14 +720,14 @@ export class TiledeskConnectors {
         }
       });
       connector.addEventListener('mouseleave', (e) => {
-        //console.log("mouseleave e", e.currentTarget);
+        //// console.log("mouseleave e", e.currentTarget);
         if (!e.currentTarget.classList.contains(this.classes["connector_selected"])) {
           e.currentTarget.setAttributeNS(null, "class", this.classes["connector"]);
           connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
         }
       });
       connector.addEventListener('click', (e) => {
-        // console.log("clicked e", e.currentTarget);
+        // // console.log("clicked e", e.currentTarget);
         if (this.selectedConnector) {
           this.selectedConnector.setAttributeNS(null, "class", this.classes["connector"]);
           this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
@@ -774,22 +774,22 @@ export class TiledeskConnectors {
   /** elementLogicCenter */
   elementLogicCenter(element) {
     const rect = element.getBoundingClientRect();
-    //console.log("Logic center of phisical rect:", rect);
+    //// console.log("Logic center of phisical rect:", rect);
     let logic_rect_pos = this.logicPoint({ x: rect.left, y: rect.top })
-    //console.log("center: logic_rect_pos:", logic_rect_pos);
+    //// console.log("center: logic_rect_pos:", logic_rect_pos);
     const logic_width = this.#toLogicScale(rect.width);
-    //console.log("center: logic_width:", logic_width);
+    //// console.log("center: logic_width:", logic_width);
     const logic_height = this.#toLogicScale(rect.height);
-    //console.log("center: logic_height:", logic_height);
+    //// console.log("center: logic_height:", logic_height);
     let center_x = logic_rect_pos.x + logic_width / 2;
     let center_y = logic_rect_pos.y + logic_height / 2;
-    //console.log("center_x:", center_x);
-    //console.log("center_y:", center_y);
+    //// console.log("center_x:", center_x);
+    //// console.log("center_y:", center_y);
     return { x: center_x, y: center_y };
   }
 
   elementLogicTopLeft(element) {
-    console.log('elementLogicTopLeft');
+    // console.log('elementLogicTopLeft');
     let elConnectable = this.#searchClassInParents(element, this.classes["input_block"]);
     if (elConnectable) {
       const block_rect = elConnectable.getBoundingClientRect();
@@ -797,9 +797,9 @@ export class TiledeskConnectors {
       let pos_y_phis = block_rect.top;
       let mouse_pos_logic = this.logicPoint({ x: pos_x_phis, y: pos_y_phis });
       mouse_pos_logic.y = mouse_pos_logic.y + 20;
-      // console.log("toPoint? ", elConnectable);
-      // console.log("mouse_pos_logic? ", mouse_pos_logic);
-      // console.log("pos_y_phis? ", pos_y_phis);
+      // // console.log("toPoint? ", elConnectable);
+      // // console.log("mouse_pos_logic? ", mouse_pos_logic);
+      // // console.log("pos_y_phis? ", pos_y_phis);
       return mouse_pos_logic;
     }
   }
@@ -809,7 +809,7 @@ export class TiledeskConnectors {
 
 
   createConnectorFromId(fromId, toId, save=false, undo=false) {
-    console.log("createConnectorFromId fromId - toId:", fromId, toId);
+    // console.log("createConnectorFromId fromId - toId:", fromId, toId);
     const fromEle = document.getElementById(fromId);
     const toEle = document.getElementById(toId);
     if (toEle && fromEle) {
@@ -824,23 +824,23 @@ export class TiledeskConnectors {
 
 
   updateConnectorsOutOfItent(element) {
-    console.log("updateConnectorsOutOfItent ----> ", this.blocks, element.id);
+    // console.log("updateConnectorsOutOfItent ----> ", this.blocks, element.id);
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) { return; }
     for (const [key, conn_id] of Object.entries(block.outConnectors)) {
       let conn = this.connectors[conn_id];
       if (conn) {
-        console.log("OUT :---> ", conn, conn.fromPoint);
+        // console.log("OUT :---> ", conn, conn.fromPoint);
         const elFrom = document.getElementById(conn.fromId);
         if (elFrom) {
           conn.fromPoint = this.elementLogicCenter(elFrom);
-          console.log("conn.fromPoint :---> ", elFrom, conn.fromId, conn.fromPoint);
+          // console.log("conn.fromPoint :---> ", elFrom, conn.fromId, conn.fromPoint);
         }
         const elToId = document.getElementById(conn.toId);
         if (elToId) {
           conn.toPoint = this.elementLogicTopLeft(elToId);
-          console.log("conn.toPoint :---> ", elToId, conn.toId, conn.toPoint);
+          // console.log("conn.toPoint :---> ", elToId, conn.toId, conn.toPoint);
         }
         this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
         conn['notify']='';
@@ -854,7 +854,7 @@ export class TiledeskConnectors {
   }
 
   updateConnectorsOfItent(element) {
-    console.log("updateConnectorsOfItent ----> ", this.blocks, element.id);
+    // console.log("updateConnectorsOfItent ----> ", this.blocks, element.id);
     this.updateConnectorsOutOfItent(element);
   }
 

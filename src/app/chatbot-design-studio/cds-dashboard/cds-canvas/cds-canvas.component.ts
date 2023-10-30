@@ -984,7 +984,7 @@ export class CdsCanvasComponent implements OnInit {
       console.log("[CDS-CANVAS] ho premuto + quindi creo una nuova action e la aggiungo all'intent", this.intentSelected);
       const newAction = this.intentService.createNewAction(event.type);
       this.intentSelected.actions.push(newAction);
-      this.updateIntent(this.intentSelected, 0);
+      this.updateIntent(this.intentSelected, 0, true);
       this.controllerService.closeAddActionMenu();
     }
     
