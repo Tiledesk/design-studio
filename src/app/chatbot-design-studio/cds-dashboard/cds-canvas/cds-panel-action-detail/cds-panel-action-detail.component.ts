@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ChangeDetectorRef, TemplateRef, ViewContainerRef, HostListener } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, TemplateRef, ViewContainerRef, HostListener } from '@angular/core';
 import { ConnectorService } from '../../../services/connector.service';
 import { IntentService } from '../../../services/intent.service';
 import { TYPE_ACTION, TYPE_INTENT_ELEMENT } from '../../../utils';
@@ -40,7 +40,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.project_id = this.dashboardService.projectID;
-  //  console.log('[PANEL-INTENT-DETAIL] (ngOnInit) @Input elementIntentSelected ', this.elementIntentSelected, this.intentSelected);
+  //  this.logger.log('[PANEL-INTENT-DETAIL] (ngOnInit) @Input elementIntentSelected ', this.elementIntentSelected, this.intentSelected);
   //   try {
   //     this.elementSelected = JSON.parse(JSON.stringify(this.elementIntentSelected.element));
   //     this.elementIntentSelectedType = this.elementIntentSelected.type;
@@ -48,9 +48,11 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   //   } catch (error) {
   //     this.logger.log('[PANEL-INTENT-DETAIL] (OnInit) ERROR', error);
   //   }
+  // this.initialize();
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('[PANEL-INTENT-DETAIL] (OnChanges)', changes, this.elementIntentSelected);
     this.initialize();
   }
 
@@ -129,21 +131,21 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
    * IMPORTANTE: questa funzione deve SOLO aggiornare i connettori e NON deve salvare e NON deve aggiungere UNDO.
    */
   onConnectorChange(type: 'create' | 'delete', idConnector: string, toIntentId: string){
-    console.log('createOrUpdateConnector-->', type, idConnector, toIntentId)
+    console.log('createOrUpdateConnector-->', type, idConnector, toIntentId);
     const fromId = idConnector;
-    let toId = '';
     
+    let toId = '';
     switch(type){
       case 'create':
         const posId = toIntentId.indexOf("#");
         if (posId !== -1) {
           toId = toIntentId.slice(posId+1);
         }
-        this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false);
-        this.connectorService.createNewConnector(fromId, toId, true, false);
+        this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false, false);
+        this.connectorService.createNewConnector(fromId, toId, false, false);
         break;
       case 'delete':
-        this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false);
+        this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false, true);
         break;
     }
   }

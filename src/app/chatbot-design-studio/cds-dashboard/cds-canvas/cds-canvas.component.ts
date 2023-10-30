@@ -15,7 +15,7 @@ import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
 
 // UTILS //
-import { TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID } from '../../utils';
+import { isElementOnTheStage, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID } from '../../utils';
 
 
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -117,14 +117,30 @@ export class CdsCanvasComponent implements OnInit {
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
     this.addEventListener();
-
-
     // setTimeout(()=> {
     //   let newPos = scaleAndcenterStageOnCenterPosition(this.listOfIntents) 
     // }, 1000)
   }
 
+  private async setStartIntent(){
+    let intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
+    console.log('setStartIntent:: ', intentSelected);
+    if(intentSelected){
+      // this.setIntentSelected();
+      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
+      //** set 'start' intent as default selected one */
+      this.intentService.setDefaultIntentSelected();
+      //** center stage on 'start' intent */
+      let startElement = await isElementOnTheStage(intentSelected.intent_id); // sync
+      if(startElement){
+        this.stageService.centerStageOnHorizontalPosition(startElement);
+      }
+      // let startElement = document.getElementById(intentSelected.intent_id);
+      // }
+    }
+  }
 
+  
   /** ************************* **/
   /** START CUSTOM FUNCTIONS 
   /** ************************* **/
@@ -185,8 +201,8 @@ export class CdsCanvasComponent implements OnInit {
 
   }
 
-  /** initialize */
-  private async initialize(){
+   /** initialize */
+   private async initialize(){
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
     const getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
@@ -194,10 +210,12 @@ export class CdsCanvasComponent implements OnInit {
     if (getAllIntents) {
       this.listOfIntents = this.intentService.listOfIntents;
       this.initListOfIntents();
+      this.setStartIntent();
       // scaleAndcenterStageOnCenterPosition(this.listOfIntents)
     }
     this.subscriptionOpenWidgetPanel = this.onHeaderTestItOut.subscribe((event) => this.onTestItOut(event));
   }
+
  
 
   /** closeAllPanels */
@@ -552,12 +570,12 @@ export class CdsCanvasComponent implements OnInit {
   }
 
   /**  updateIntent 
-   * chiamata da cds-panel-action-detail
+   * chiamata da cds-panel-action-detail e da cds-panel-button-configuration
    * quando modifico un intent da pannello ex: cambio il testo, aggiungo un bottone ecc.
   */
-  private async updateIntent(intent, time=0, save=false, undo=false) {
+  private async updateIntent(intent, time=0, undo=false) {
     console.log('[CDS-CANVAS] updateIntent: ');
-    const response = await this.intentService.onUpdateIntentWithTimeout(intent, time, save, undo);
+    const response = await this.intentService.onUpdateIntentWithTimeout(intent, time, undo);
     if (response) {
       this.logger.log('[CDS-CANVAS] OK: intent aggiornato con successo sul server', this.intentSelected);
     } else {
@@ -914,13 +932,14 @@ export class CdsCanvasComponent implements OnInit {
   // --------------------------------------------------------- //
   /** onSaveButton */
   onSaveButton(button: Button) {
-    
     const arrayId = button.__idConnector.split("/");
-    const idConnector = arrayId[0] ? arrayId[0] : null;
-    this.logger.log('onSaveButton: ', idConnector, this.listOfIntents);
-    if (idConnector) {
-      this.intentSelected = this.listOfIntents.find(obj => obj.intent_id === idConnector);
-      this.updateIntent(this.intentSelected, 0);
+    const intentIdIntentToUpdate = arrayId[0] ? arrayId[0] : null;
+    console.log('onSaveButton: ', button, intentIdIntentToUpdate, this.listOfIntents);
+    if (intentIdIntentToUpdate) {
+      this.intentSelected = this.listOfIntents.find(obj => obj.intent_id === intentIdIntentToUpdate);
+      // forse conviene fare come in onSavePanelIntentDetail passando intent aggiornato (con action corretta)!!!!
+      // this.intentService.onUpdateIntentWithTimeout(this.intentSelected, 0, true);
+      this.intentService.onUpdateIntentFromActionPanel(this.intentSelected);
     }
   }
   // --------------------------------------------------------- //
@@ -934,8 +953,6 @@ export class CdsCanvasComponent implements OnInit {
     this.logger.log('[CDS-CANVAS] onSavePanelIntentDetail intentSelected ', intentSelected)
     if (intentSelected && intentSelected != null) {
       this.intentSelected = intentSelected;
-      this.intentService.refreshIntent(this.intentSelected);
-      // this.updateIntent(intentSelected, 1000);
       this.intentService.onUpdateIntentFromActionPanel(intentSelected);
     } else {
       // this.onOpenDialog();
