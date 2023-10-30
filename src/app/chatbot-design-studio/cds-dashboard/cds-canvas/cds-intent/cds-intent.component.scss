@@ -6,6 +6,7 @@
   --action-background: #{$action-item-background};
   --action-no-featured-backgroud: #{$action-no-featured-item-background};
   --intent-background: #{$intent-preview-background};
+  --intent-border-color: #{$intent-preview-borderColor};
   --intent-header-background: transparent; //#{$deep-brown};
   --base-border-radius-preview: #{$border-radius-base-preview};
   --base-padding-preview: #{$padding-base-preview};
@@ -25,6 +26,7 @@
   background-color: var(--intent-background);
   padding: var(--base-padding-preview);
   border-radius: var(--base-border-radius-preview);
+  outline: 1px solid var(--intent-border-color);
   &::before {
     display: block;
     border-radius: 10px;
@@ -51,6 +53,7 @@
     background-color: unset;
     padding: 0;
     border-radius: unset;
+    border: unset;
     max-width: var(--startIntentMaxWith);
     outline: unset;
   }
@@ -361,7 +364,7 @@
   position: relative;
   min-height: 54px;
   /* padding: 0px 10px; */
-  padding: 5px 0px;
+  padding: 0px 0px;
   width: 100%;
   position: relative;
   display: flex;
@@ -1030,7 +1033,7 @@ cds-panel-intent-header.isStart ::ng-deep{
 
     &[active=true] {
       img {
-        filter: brightness(0) saturate(100%) invert(68%) sepia(36%) saturate(6687%) hue-rotate(182deg) brightness(104%) contrast(92%);
+        filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
       }
     }
   }

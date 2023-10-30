@@ -18,7 +18,7 @@
         <input placeholder="Type attribute name" class="tpl-input" [class.invalid]="btnDisabled" [(ngModel)]="data.text" (ngModelChange)="onChangeTextInput($event)">
     </div>
     <div class="tpl-modal-buttons">
-        <button type="button" class="btn btn-cancel" [mat-dialog-close]="false">Cancel</button>
-        <button type="button" class="btn btn-warning cds-yellow-button" [disabled]="btnDisabled" [mat-dialog-close]="data.text">Add attribute</button>
+        <button type="button" class="btn btn-primary cds-blue-button cancel" [mat-dialog-close]="false">Cancel</button>
+        <button type="button" class="btn btn-primary cds-blue-button" [disabled]="btnDisabled" [mat-dialog-close]="data.text">Add attribute</button>
     </div>
 </div>

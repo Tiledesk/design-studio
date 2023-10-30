@@ -69,6 +69,14 @@ export class VariableListComponent implements OnInit {
     });
   }
 
+  onVariableDelete(variableSelected: {name: string, value: string}){
+    let index = this.variableListUserDefined.findIndex(el => el.name = variableSelected.name)
+    if(index > -1){
+      this.variableListUserDefined.splice(index, 1)
+      this.saveVariables(this.variableListUserDefined)
+    }
+  }
+
   private saveVariables(variables){
     let jsonVar = {};
     variables.forEach(element => {

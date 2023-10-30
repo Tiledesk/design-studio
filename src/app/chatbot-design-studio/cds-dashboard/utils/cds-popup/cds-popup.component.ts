@@ -11,6 +11,12 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 export class CdsPopupComponent implements OnInit {
 
   popup_visibility = 'none';
+  position: { left: number, right: number, top: number, bottom: number;} = {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0
+  }
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -19,6 +25,7 @@ export class CdsPopupComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+   
     this.diplayPopup();
   }
 
@@ -28,6 +35,7 @@ export class CdsPopupComponent implements OnInit {
     const hasClosedPopup = this.appStorageService.getItem('hasclosedcdspopup')
     this.logger.log('[CDS DSBRD] hasClosedPopup', hasClosedPopup)
     if (hasClosedPopup === null) {
+      this.setPosition()
       this.popup_visibility = 'block'
       this.logger.log('[CDS DSBRD] popup_visibility', this.popup_visibility)
     }
@@ -41,6 +49,21 @@ export class CdsPopupComponent implements OnInit {
     this.logger.log('[CDS DSBRD] closeRemenberToPublishPopup')
     this.appStorageService.setItem('hasclosedcdspopup', 'true')
     this.popup_visibility = 'none'
+  }
+
+  setPosition(){
+    let publishBtnEl = document.getElementById('cds-publish-btn-wrp')
+    if(publishBtnEl){
+      let btnPosition = publishBtnEl.getBoundingClientRect()
+      this.position = {
+        top: btnPosition.top + btnPosition.height,
+        bottom: btnPosition.bottom,
+        left: btnPosition.left + Math.floor(btnPosition.width / 2) - 160,
+        right: 110
+        // right: btnPosition.right - Math.floor(btnPosition.width / 2) - 160
+      }
+      // console.log('positionnnnnnnn -->', btnPosition,  Math.floor(btnPosition.width / 2))
+    }
   }
 
 }

@@ -1,6 +1,7 @@
 
 <div class="cds-dialog-popup-wpr" role="alertdialog" aria-describedby="popup-academy"
-    style="right: 264px; top: 66px; opacity: 1;" [ngStyle]="{'display': popup_visibility }">
+    [style.right]="position?.right+ 'px'" [style.top]="position.top+ 'px'"
+    [ngStyle]="{'display': popup_visibility }">
     <div>
         <div class="cds-dialog-popup-img" role="img">
             <!-- <div class="cds-dialog-popup-img-wpr">

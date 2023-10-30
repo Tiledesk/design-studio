@@ -11,6 +11,7 @@
         <div *ngFor="let variable of filteredVariableList" (click)="onVariableSelected(variable)" class="category-row">
             <span class="material-icons">data_object</span>
             <label class="category-row-name ellips">{{variable?.name}}</label>
+            <span class="material-icons-outlined delete" (click)="onVariableDelete(variable)">delete</span>
         </div>
     </div>
     <div id="data" *ngIf="filteredIntentVariableList && filteredIntentVariableList.length > 0">

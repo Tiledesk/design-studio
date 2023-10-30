@@ -21,7 +21,7 @@ export class CDSTextareaComponent implements OnInit {
   @Input() text: string = '';
   @Input() limitCharsText: number = TEXT_CHARS_LIMIT;
   // @Input() textMessage: string;
-  @Input() control: FormControl<string> = new FormControl();
+  @Input() control: FormControl<string> = new FormControl('');
   @Input() showUtils: boolean = true;
   @Input() emojiPikerBtn: boolean = true;
   @Input() setAttributeBtn: boolean = true;

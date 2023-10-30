@@ -1,4 +1,6 @@
- /** ---- V1 ---- **/
+@import "./src/assets/sass/cds/_variables.scss";
+
+/** ---- V1 ---- **/
 .cds-action-arrow-down-icon-wpr {
     transition: width 0.15s ease 0s, color 0.15s ease 0s;
     width: 9px;
@@ -11,7 +13,7 @@
     height: 6px;
     position: relative;
     overflow: hidden;
-    color: #6c6859; 
+    color: $blu; 
     transform: rotate(90deg);
     top: 15px;
 }
@@ -49,5 +51,5 @@
 
 .cds-action-arrow-icon{
     font-size: 25px;
-    color: #6c6859;
+    color: $blu;
 }

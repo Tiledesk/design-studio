@@ -32,7 +32,7 @@
     <div class="header-title">{{ selectedChatbot?.name }}</div>
     <div class="right-opts">
 
-        <div class="btn-group"  [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
+        <div class="btn-group" id="cds-publish-btn-wrp" [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
             <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="publish()">
                 <span class="material-icons">
                     cached

@@ -17,7 +17,8 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/cds",
+            "outputPath": "dist",
+            "baseHref":"/",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -47,7 +48,9 @@
               "src/assets/sass/cds/styles.scss"
             ],
             "scripts": [
+              "node_modules/jquery/dist/jquery.js",
               "node_modules/bootstrap/dist/js/bootstrap.js",
+              "node_modules/bootstrap-notify/bootstrap-notify.js",
               "src/assets/js/mqtt/4.1.0/mqtt.min.js",
               "node_modules/moment/moment.js"
             ]
