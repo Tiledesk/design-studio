@@ -87,7 +87,7 @@ export class UsersService {
   }
 
   initialize(serverBaseUrl: string){
-    this.logger.log('[TILEDESK-AUTH-SERV] - initialize serverBaseUrl', serverBaseUrl);
+    this.logger.log('[USER-SERV] - initialize serverBaseUrl', serverBaseUrl);
     this.SERVER_BASE_URL = serverBaseUrl;
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')
   }

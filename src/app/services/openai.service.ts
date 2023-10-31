@@ -30,7 +30,7 @@ export class OpenaiService {
   }
 
   initialize(serverBaseUrl: string, project_id: string){
-    this.logger.log('[TILEDESK-AUTH-SERV] - initialize serverBaseUrl', serverBaseUrl);
+    this.logger.log('[OPENAI.SERVICE] - initialize serverBaseUrl', serverBaseUrl);
     this.project_id = project_id;
     this.SERVER_BASE_URL = serverBaseUrl;
     this.URL_TILEDESK_OPENAI = this.SERVER_BASE_URL + this.project_id

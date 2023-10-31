@@ -91,24 +91,22 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     let serverBaseURL = this.appConfigService.getConfig().apiUrl
 
     this.tiledeskAuthService.initialize(serverBaseURL);
-    this.projectService.initialize(serverBaseURL);
-    this.uploadService.initialize();
+    
     // this.departmentService.initialize(serverBaseURL, this.project._id);
     // this.faqKbService.initialize(serverBaseURL, this.project._id)
     // this.faqService.initialize(serverBaseURL, this.project._id)
     // this.kbService.initialize(serverBaseURL, this.project._id)
     // this.openaiService.initialize(serverBaseURL, this.project._id)
     // this.whatsappService.initialize(serverBaseURL, this.project._id)
-    this.multiChannelService.initialize(serverBaseURL)
-    this.userService.initialize(serverBaseURL)
-
-
-
     // const getUrlParams = await this.dashboardService.getUrlParams();
     // this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
 
     await this.initAuthentication();
     this.setLanguage(null);
+    // this.projectService.initialize(serverBaseURL);
+    // this.multiChannelService.initialize(serverBaseURL)
+    // this.userService.initialize(serverBaseURL)
+    // this.uploadService.initialize();
 
   }
 
@@ -251,6 +249,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   initAuthentication() {
     const tiledeskToken = localStorage.getItem('tiledesk_token')
 
+    let serverBaseURL = this.appConfigService.getConfig().apiUrl
+
     this.logger.log('[APP-COMP] >>> INIT-AUTHENTICATION !!! ')
     this.logger.log('[APP-COMP] >>> initAuthentication tiledeskToken ', tiledeskToken)
     // const currentUser = JSON.parse(this.appStorageService.getItem('currentUser'));
@@ -261,6 +261,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.logger.log('[APP-COMP] >>> initAuthentication user ', user)
 
         this.updateStoredCurrentUser()
+        this.projectService.initialize(serverBaseURL);
+        this.multiChannelService.initialize(serverBaseURL)
+        this.userService.initialize(serverBaseURL)
+        this.uploadService.initialize();
+
         this.IS_ONLINE = true;
       }).catch(error => {
         this.logger.error('[APP-COMP] initAuthentication SIGNINWITHCUSTOMTOKEN error::', error)

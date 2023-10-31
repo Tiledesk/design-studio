@@ -36,7 +36,7 @@ export class ProjectService {
   }
 
   initialize(serverBaseUrl: string) {
-    this.logger.log('[TILEDESK-AUTH-SERV] - initialize serverBaseUrl', serverBaseUrl);
+    this.logger.log('[TILEDESK-PROJECTS-SERV] - initialize serverBaseUrl', serverBaseUrl);
     this.SERVER_BASE_URL = serverBaseUrl;
     this.URL_TILEDESK_PROJECTS = this.SERVER_BASE_URL + 'projects/';
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')

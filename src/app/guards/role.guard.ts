@@ -29,7 +29,9 @@ export class RoleGuard implements CanActivate {
 
     /** CHECK USER IS LOGGED IN */
     const queryParams = route.queryParams['jwt']
-    const storedTiledeskoken = this.appStorageService.getItem('tiledeskToken')
+    console.log('[ROLE-GUARD] -->', queryParams)
+
+    const storedTiledeskoken = localStorage.getItem('tiledesk_token')
     if(!queryParams && !storedTiledeskoken){
       //goToSignIn Dashboard
       return false
@@ -44,7 +46,7 @@ export class RoleGuard implements CanActivate {
     const projectId= route.params.projectid
     const user = this.tiledeskAuthService.getCurrentUser()
     const userIsInProject = await this.getProjectUserInProject(projectId, user.uid)
-    console.log('userIsInProject-->', userIsInProject)
+    console.log('[ROLE-GUARD] userIsInProject-->', userIsInProject)
     if(!userIsInProject){
       this.router.navigate([`project/${projectId}/unauthorized`]);
       return false

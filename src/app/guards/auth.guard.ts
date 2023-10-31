@@ -27,14 +27,14 @@ export class AuthGuard implements CanActivate {
     // if(!queryParams){
     //   return false
     // }
-    const storedTiledeskoken = this.appStorageService.getItem('tiledeskToken')
+    const storedTiledeskoken = localStorage.getItem('tiledesk_token')
     if(!queryParams && !storedTiledeskoken){
       //goToSignIn Dashboard
       return false
     }    
 
     var isAuthenticated = await this.tiledeskAuthService.isLoggedIn(); 
-    console.log('isAuthenticated-->', isAuthenticated)
+    console.log('[AUTH-GUARD] isAuthenticated-->', isAuthenticated)
     if (!isAuthenticated) { 
       //goToSignIn Dashboard
       return false
