@@ -80,15 +80,20 @@ export class CdsActionReplyComponent implements OnInit {
     } catch (error) {
       this.logger.log("error ", error);
     }
-    this.initialize();
+    // this.initialize();
   }
 
 
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   console.log('ActionReplyComponent ngOnChanges:: ', this.action);
-  //   if(this.action && this.intentSelected)this.initialize();
-  // }
+  /**
+   * 
+   * @param changes 
+   * IMPORTANT! serve per aggiornare il dettaglio della action nel pannello
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('ActionReplyComponent ngOnChanges:: ', changes);
+    if(this.action && this.intentSelected) this.initialize();
+  }
 
 
 

@@ -215,7 +215,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   }
 
   onBlur(event){
-    console.log('[ACTION REPLY TEXT] onBlur', event);
+    // console.log('[ACTION REPLY TEXT] onBlur', event);
     this.changeActionReply.emit();
   }
 

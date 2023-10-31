@@ -246,6 +246,10 @@ export class TiledeskStage {
             // console.log("tcmd:", tcmd);
             // console.log("transform:", tcmd);
 
+            this.scale = 1;
+            this.tx = newX;
+            this.ty = newY;
+
             setTimeout(() => {
                 this.drawer.style.removeProperty('transition');
                 // remove class animation
