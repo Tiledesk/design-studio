@@ -184,9 +184,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
       //** set 'start' intent as default selected one */
       this.intentService.setDefaultIntentSelected()
-      //** center stage on 'start' intent */
-      let startElement = document.getElementById(this.intent.intent_id)
-      this.stageService.centerStageOnHorizontalPosition(startElement)
+      // //** center stage on 'start' intent */
+      // let startElement = document.getElementById(this.intent.intent_id)
+      // this.stageService.centerStageOnHorizontalPosition(startElement)
      
     }
 
@@ -622,15 +622,23 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
 
-  /**  onUpdateAndSaveAction: 
+    /**  onUpdateAndSaveAction: 
    * function called by all actions in @output whenever they are modified!
+   * called when the connector is created or deleted
+   * OR 
+   * called when the action is modified
    * */
-  public async onUpdateAndSaveAction(connector) {
-    // se event non è nullo sostituisco in this.intent.actions la action con _tdActionId 
-    if(connector && connector._tdActionId){
-      replaceItemInArrayForKey('_tdActionId', this.intent.actions, connector);
+  public async onUpdateAndSaveAction(object) {
+    let connector = null;
+    if(object && object.type && object.type === 'connector'){
+      connector = object.element;
+    } else if(object && object.type && object.type === 'action'){
+      const action  = object.element;
+      if(action && action._tdActionId){
+        replaceItemInArrayForKey('_tdActionId', this.intent.actions, action);
+      }
     }
-    console.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', connector, this.intent, this.intent.actions);
+    console.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
     this.intentService.onUpdateIntentWithTimeout(this.intent, 0, true, connector);
   }
 

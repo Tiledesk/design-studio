@@ -248,7 +248,7 @@ export class FaqService {
    * @param id 
    * @returns 
    */
-  public deleteFaq(id: string, intent_id?: string) {
+  public deleteFaq(id: string, intent_id?: string, id_faq_kb?: string) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -256,6 +256,7 @@ export class FaqService {
       })
     };
     let url = this.FAQ_URL + id;
+    if(intent_id) url = this.FAQ_URL + 'intentId' + intent_id + '?id_faq_kb=' + id_faq_kb; 
     // if(intent_id) url = this.FAQ_URL + 'intentId' + intent_id; 
     this.logger.log('[FAQ-SERV] DELETE FAQ URL ', url);
     return this._httpClient.delete(url, httpOptions)

@@ -71,6 +71,7 @@
                     popoverVerticalAlign="above"
                     [emojiPikerBtn]="false"
                     [textLimitBtn]="false"
+                    (blur)="onBlur($event)"
                     (changeTextarea)="onChangeTextarea($event)">
             </cds-textarea>
             </div>

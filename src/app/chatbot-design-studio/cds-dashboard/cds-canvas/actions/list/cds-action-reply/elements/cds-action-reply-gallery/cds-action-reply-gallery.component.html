@@ -82,6 +82,7 @@
                                 (selectedAttribute)="onSelectedAttribute($event,'title',i)"
                                 (selectedEmoji)="onSelectedAttribute($event,'title',i)"
                                 (clearSelectedAttribute)="onClearSelectedAttribute()"
+                                (blur)="onBlur($event)"
                                 (changeTextarea)="onChangeText($event, 'title', i)">
                             </cds-textarea>
                         </div>
@@ -97,6 +98,7 @@
                                 (selectedAttribute)="onSelectedAttribute($event,'description', i)"
                                 (selectedEmoji)="onSelectedAttribute($event,'description',i)"
                                 (clearSelectedAttribute)="onClearSelectedAttribute()"
+                                (blur)="onBlur($event)"
                                 (changeTextarea)="onChangeText($event, 'description', i)">
                             </cds-textarea>
                         </div>

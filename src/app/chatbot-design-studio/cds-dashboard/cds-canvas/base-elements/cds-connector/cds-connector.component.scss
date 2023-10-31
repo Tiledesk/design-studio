@@ -32,7 +32,7 @@
     align-items: center;
     -webkit-box-pack: center;
     justify-content: center;
-    cursor: copy;
+    // cursor: copy;
 }
 
 
@@ -69,6 +69,7 @@
     width: 16px; //14px
     height: 16px; //14px
     background-color: rgb(221,221,221,1);
+    cursor: copy;
     &::before {
         inset: 0px;
         border: 1px solid rgb(98, 119, 140);
@@ -76,6 +77,9 @@
         position: absolute;
         content: "";
         border-radius: 50%;
+    }
+    &.isConnected{
+        cursor: default;
     }
 }
 

@@ -81,6 +81,7 @@
                 [text]="response.text" 
                 [minRow]="1"
                 popoverVerticalAlign="above"
+                (blur)="onBlur($event)"
                 (changeTextarea)="onChangeTextarea($event)">
             </cds-textarea>
 

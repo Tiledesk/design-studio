@@ -196,8 +196,14 @@ export enum TYPE_OF_MENU {
     QUESTION = 'question'
 }
 
-export const INTENT_TEMP_ID = '';
 
+export enum TYPE_UPDATE_ACTION {
+    CONNECTOR = 'connector',
+    ACTION = 'action',
+    INTENT = 'intent',
+}
+
+export const INTENT_TEMP_ID = '';
 export const MESSAGE_METADTA_WIDTH = '100%';
 export const MESSAGE_METADTA_HEIGHT = 230;
 export const TIME_WAIT_DEFAULT = 500;
