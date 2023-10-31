@@ -27,6 +27,7 @@
     "@ngx-translate/http-loader": "^7.0.0",
     "bootstrap": "^5.3.2",
     "firebase": "^7.24.0",
+    "jquery": "^3.7.1",
     "material-icons": "^1.13.11",
     "moment": "^2.29.4",
     "ngx-logger": "^5.0.12",
