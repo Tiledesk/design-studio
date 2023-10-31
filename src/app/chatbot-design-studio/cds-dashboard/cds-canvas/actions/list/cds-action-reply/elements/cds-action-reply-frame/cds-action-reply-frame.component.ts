@@ -104,10 +104,14 @@ export class CdsActionReplyFrameComponent implements OnInit {
   onChangeTextarea(text:string) {
     if(!this.previewMode){
       this.response.text = text;
-      this.changeActionReply.emit();
+      // this.changeActionReply.emit();
     }
   }
 
+  onBlur(event){
+    console.log('[ACTION REPLY TEXT] onBlur', event);
+    this.changeActionReply.emit();
+  }
   
   
   /** */
