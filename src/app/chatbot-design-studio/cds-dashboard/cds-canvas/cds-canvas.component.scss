@@ -8,6 +8,7 @@ $margin-top-card: 30px;
 $box-left-width: 230px;
 $box-left-width-closed: 0px;
 
+$toogle-sidebar-width: 22px;
 
 // .menu--context--add{
 //   height: auto;
@@ -100,6 +101,39 @@ cds-fulfillment {
   z-index: 1050;
 }
 
+.cds-toggle-setting-sidebar-icon-left-wpr {
+  display: none;
+  position: absolute;
+  z-index: 1050;
+  width: $toogle-sidebar-width;
+  height: $toogle-sidebar-width;
+  // background: #1e293b;
+  right: calc(0px - $toogle-sidebar-width/2);
+  top: 50%;
+  transition: 0.3s;
+
+  &.is_opened {
+      right: calc(0px - $toogle-sidebar-width/2);
+      transition: 0.3s;
+  }
+}
+
+.toggle-setting-sidebar-icon {
+  background: $blu;
+  color: #fff;
+  border: 1px solid $blu !important;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 18px;
+  display: block;
+}
+
+.toggle-setting-sidebar-icon:hover {
+    background: #f5f8fa;
+    color:  $blu;
+}
 
 
 
@@ -124,11 +158,12 @@ cds-fulfillment {
       align-items: flex-start;
       overflow-y: scroll;
 
-      &::-webkit-scrollbar {
-        width: 3px;
-      }
+      
 
       &:hover{
+        &::-webkit-scrollbar {
+          width: 3px;
+        }
         &::-webkit-scrollbar-track {
           background-color: $blu-light-01;
         }
@@ -147,47 +182,13 @@ cds-fulfillment {
     }
 
 
-    $toogle-sidebar-width: 22px;
-
     &:hover{
       .cds-toggle-setting-sidebar-icon-left-wpr{
         display: block;
       }
     }
 
-    .cds-toggle-setting-sidebar-icon-left-wpr {
-        display: none;
-        position: absolute;
-        z-index: 1050;
-        width: $toogle-sidebar-width;
-        height: $toogle-sidebar-width;
-        // background: #1e293b;
-        right: calc(0px - $toogle-sidebar-width/2);
-        top: 50%;
-        transition: 0.3s;
-
-        &.is_opened {
-            right: calc(0px - $toogle-sidebar-width/2);
-            transition: 0.3s;
-        }
-    }
-
-    .toggle-setting-sidebar-icon {
-      background: $blu;
-      color: #fff;
-      border: 1px solid $blu !important;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      font-size: 18px;
-      display: block;
-    }
-
-    .toggle-setting-sidebar-icon:hover {
-        background: #f5f8fa;
-        color:  $blu;
-    }
+    
   }
 
 

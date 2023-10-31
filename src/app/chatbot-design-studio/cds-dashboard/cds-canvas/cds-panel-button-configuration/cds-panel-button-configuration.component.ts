@@ -9,6 +9,7 @@ import { IntentService } from '../../../services/intent.service';
 import { ConnectorService } from '../../../services/connector.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { Intent } from 'src/app/models/intent-model';
 
 
 
@@ -22,6 +23,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
 
   @Input() isOpenPanel: boolean;
   @Input() button: Button;
+  @Input() elementIntentSelected: Intent;
   @Output() saveButton = new EventEmitter();
   // @Output() closeButtonPanel = new EventEmitter();
 
@@ -66,6 +68,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
 
   ngOnChanges() {
     this.initialize();
+    console.log('intenttttt', this.elementIntentSelected)
   }
 
 
@@ -251,6 +254,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
    * @param event 
    */
   public onBlur(event){
+    console.log('blurrrrrrrrr', event)
     this.checkAndSaveButton();
   }
 

@@ -15,6 +15,7 @@
                 cdkAutosizeMinRows="1"
                 cdkAutosizeMaxRows="5"
                 [(ngModel)]="text"
+                (blur)="onBlur($event)"
                 (ngModelChange)="onChangeText($event)"/>
             <div class="input-suffix" *ngIf="customPrefix"> / </div>
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">

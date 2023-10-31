@@ -175,10 +175,10 @@
         .text-editor-wrapper {
             position: relative;
             .tag {
-                inset: 0 1px 0 0;
+                inset: 4px 1px 1px 0px;
                 border-radius: var(--base-radius) 0 0 var(--base-radius);
-                margin: 2px 0;
-                padding: 3px 0;
+                margin: 0px 0;
+                padding: 2px 0;
                 justify-content: initial;
                 max-width: 100%;
                 .close {

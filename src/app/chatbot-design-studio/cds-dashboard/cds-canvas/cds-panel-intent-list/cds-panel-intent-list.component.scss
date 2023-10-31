@@ -1,9 +1,9 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 
-$text-color: $blu-light-02;
+$text-color: $gray;
 $background-color: transparent;
-$text-color-hover: white;
+$text-color-hover: $blu;
 $background-color-hover: $blu;
 $text-color-active: $blu;
 $background-color-active: $icon-active-background;
@@ -35,11 +35,11 @@ $icon-color-active: $blu;
             background-color: transparent;
             border-radius: 6px;
             border: none;
-            color: $text-color;
+            color: $icon-color-active;
             text-align: left;
 
             &::placeholder {
-                color: $text-color;
+                color: $icon-color-active;
                 font-weight: 300;
                 opacity: 1; /* Firefox */
               }
@@ -58,15 +58,6 @@ $icon-color-active: $blu;
 //     }
 // }
 
-
-
-
-.truncate {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 190px;
-}
 
 .rocket_launch {
     font-size: 20px;
@@ -136,14 +127,24 @@ $icon-color-active: $blu;
 
 
 .icon-container {
-    width: 38px;
+    width: 30px;
     display: flex;
     height: 100%;
     align-items: center;
-    color: $blu-light-02;
+    color: $icon-color-active;
+
+    img {
+        width: 18px;
+        filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+    }
+    .material-icons{
+        font-size: 18px;
+        color: $text-color;
+    }
 
     img.active-icon {
         filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+       
     }
 }
 
@@ -167,6 +168,7 @@ $icon-color-active: $blu;
     align-items: flex-start;
     height: 20px;
     padding-left: 10px;
+    opacity: 0.7;
 
     .item-box {
         display: flex;
@@ -188,7 +190,7 @@ $icon-color-active: $blu;
     }
     
     .intent-display-name {
-        color: $text-color;
+        color: rgba($color: $text-color, $alpha: 0.5);
         font-weight: 300;
         margin-bottom: 0px;
         font-size: 14px;
@@ -224,9 +226,9 @@ $icon-color-active: $blu;
 }
 
 .intent:hover {
-    // background-color: #d2d2d2;
-    background-color: $blu;
-
+    // background-color: $blu;
+    box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    opacity: 1;
     .delete-box {
         display: block;
 
@@ -248,7 +250,10 @@ $icon-color-active: $blu;
         color: $text-color-hover !important;
 
         img{
-            filter: brightness(0) saturate(100%) invert(78%) sepia(100%) saturate(1%) hue-rotate(122deg) brightness(107%) contrast(101%);
+            filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+        }
+        .material-icons{
+            color: $text-color-hover !important;
         }
     }
 
@@ -270,7 +275,7 @@ $icon-color-active: $blu;
     // background-color: $background-color-active !important;
     // border-right: solid 5px $icon-color-active;
     // border-radius: 6px 10px 10px 6px;
-
+    opacity: 1;
     .intent-display-name {
         // color: #333;
         color: $text-color-active;
@@ -280,6 +285,11 @@ $icon-color-active: $blu;
 
     .icon-container{
         color: $icon-color-active !important;
+
+        .material-icons{
+            color: $icon-color-active !important;
+        }
+        
     }
 
 }

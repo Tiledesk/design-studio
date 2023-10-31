@@ -10,7 +10,7 @@
         [ngClass]="{'is-error':intentNameResult === false || intentNameAlreadyExist}">
         <input 
             #myInput type="text" 
-            class="input form-control tds_draggable"
+            class="input ellips form-control tds_draggable"
             [(ngModel)]="intentName"
             [readonly]="intentName === 'start' || intentName === 'defaultFallback'"
             [placeholder]="'EnterIntentName' | translate"

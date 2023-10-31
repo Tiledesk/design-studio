@@ -173,8 +173,9 @@ export class CdsCanvasComponent implements OnInit {
     });
 
     /** SUBSCRIBE TO THE STATE ACTION REPLY BUTTON PANEL */
-    this.subscriptionOpenButtonPanel = this.controllerService.isOpenButtonPanel$.subscribe((button: Button) => {
+    this.subscriptionOpenButtonPanel = this.controllerService.isOpenButtonPanel$.subscribe((button: Button ) => {
       this.buttonSelected = button;
+      this.elementIntentSelected = this.intentService.intentSelected;
       if (button) {
         // this.closeAllPanels(); // nk the action detail panel is not closed when the button detail panel is opened
         this.IS_OPEN_PANEL_WIDGET = false;
