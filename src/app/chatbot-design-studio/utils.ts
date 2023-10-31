@@ -385,7 +385,7 @@ export function convertJsonToArray(jsonData:any){
 }
 
 export async function isElementOnTheStage(elementId:string): Promise<any>{
-    // if(document.getElementById(elementId)) return true;
+    
     return new Promise((resolve) => {
         let intervalId = setInterval(async () => {
             const result = document.getElementById(elementId);

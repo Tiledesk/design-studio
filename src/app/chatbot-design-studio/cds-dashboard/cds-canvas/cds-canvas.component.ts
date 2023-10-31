@@ -34,8 +34,6 @@ export class CdsCanvasComponent implements OnInit {
   @ViewChild('drawer_of_items_to_zoom_and_drag', { static: false }) drawerOfItemsToZoomAndDrag: ElementRef;
 
   @Output() testItOut = new EventEmitter();
-  // @Output() closePanelWidget = new EventEmitter();
-
   @Input() onHeaderTestItOut: Observable<Intent | boolean>
 
   id_faq_kb: string;
@@ -117,9 +115,6 @@ export class CdsCanvasComponent implements OnInit {
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
     this.addEventListener();
-    // setTimeout(()=> {
-    //   let newPos = scaleAndcenterStageOnCenterPosition(this.listOfIntents) 
-    // }, 1000)
   }
 
   private async setStartIntent(){
@@ -135,8 +130,6 @@ export class CdsCanvasComponent implements OnInit {
       if(startElement){
         this.stageService.centerStageOnHorizontalPosition(startElement);
       }
-      // let startElement = document.getElementById(intentSelected.intent_id);
-      // }
     }
   }
 
@@ -235,12 +228,9 @@ export class CdsCanvasComponent implements OnInit {
   private initListOfIntents() {
     this.listOfIntents.forEach(intent => {
       if (intent.actions) {
-        intent.actions = intent.actions.filter(obj => obj !== null); //patch if action is null
+        intent.actions = intent.actions.filter(obj => obj !== null);
       }
     });
-    // this.updatePanelIntentList = !this.updatePanelIntentList;
-    /* variabile booleana aggiunta per far scattare l'onchange nei componenti importati dalla dashboard
-    * ngOnChanges funziona bene solo sugli @import degli elementi primitivi!!!  */
     this.refreshIntents();
   }
 

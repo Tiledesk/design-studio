@@ -77,39 +77,13 @@ export class ConnectorService {
    * 
    */
   public createConnectors(intents){
-    this.logger.log('[CONNECTOR-SERV] -----> createConnectors::: ', intents);
+    // this.logger.log('[CONNECTOR-SERV] -----> createConnectors::: ', intents);
     intents.forEach(intent => {
       this.createConnectorsOfIntent(intent);
     });
   }
 
-  // /**
-  //  * createConnectorFromId
-  //  * @param fromId 
-  //  * @param toId 
-  //  * @returns 
-  //  */
-  // public async createConnectorFromId_old(fromId, toId, save=false, undo=false) {
-  //   this.logger.log('[CONNECTOR-SERV] createConnectorFromId fromId ', fromId, ' toId ', toId);
-  //   const connectorID = fromId+'/'+toId;
-  //   // let connector = await isElementOnTheStage(connectorID); // sync
-  //   const isConnector = document.getElementById(connectorID);
-  //   if (isConnector) {
-  //     this.logger.log('[CONNECTOR-SERV] il connettore esiste già', connectorID);
-  //     // this.deleteConnector(connectorID);
-  //     // return true;
-  //   }
-  //   let isOnTheStageFrom = await isElementOnTheStage(fromId); // sync
-  //   this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', isOnTheStageFrom);
-  //   let isOnTheStageTo = await isElementOnTheStage(toId); // sync
-  //   this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', isOnTheStageFrom);
-  //   if(isOnTheStageFrom && isOnTheStageTo){
-  //     const result = await this.tiledeskConnectors.createConnectorFromId(fromId, toId, save, undo);
-  //    return result;
-  //   } else {
-  //     return false;
-  //   }
-  // }
+
 
   /**
    * createConnectorFromId
@@ -127,13 +101,22 @@ export class ConnectorService {
       this.tiledeskConnectors.updateConnectorsOutOfItent(connectorID);
       return true;
     } 
-    let isOnTheStageFrom = await isElementOnTheStage(fromId); // sync
-    this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', isOnTheStageFrom);
-    let isOnTheStageTo = await isElementOnTheStage(toId); // sync
-    this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', isOnTheStageFrom);
-    if(isOnTheStageFrom && isOnTheStageTo){
-      const fromEle = document.getElementById(fromId);
-      const toEle = document.getElementById(toId);
+
+    let fromEle = document.getElementById(fromId);
+    if(!fromEle) {
+      fromEle = await isElementOnTheStage(fromId); // sync
+      this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', fromEle);
+    }
+
+    let toEle = document.getElementById(toId);
+    if(!toEle) {
+      toEle = await isElementOnTheStage(toId); // sync
+      this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle);
+    }
+   
+    if(fromEle && toEle){
+      // const fromEle = document.getElementById(fromId);
+      // const toEle = document.getElementById(toId);
       const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
       const toPoint = this.tiledeskConnectors.elementLogicTopLeft(toEle);
       this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, save, undo);
@@ -142,6 +125,29 @@ export class ConnectorService {
       return false;
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   /**
