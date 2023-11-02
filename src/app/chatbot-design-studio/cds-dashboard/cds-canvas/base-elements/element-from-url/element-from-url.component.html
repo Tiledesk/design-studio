@@ -1,38 +1,55 @@
-<div class="row-upload">
-    <div class="response-image-uploader-overlay">
 
-        <div class="form-group">
-            <label class="control-label">
-                {{ 'Add path' | translate }}
-            </label>
-            <input type = "text" 
-                [(ngModel)] = "pathElement"
-                class="input form-control"/>
-        </div> 
 
-        <button 
-            type="button" 
-            class="btn btn-primary cds-blue-button" 
-            (click)="onLoadPathElement()">
-            {{ 'load frame' | translate }}
-        </button>
+<div *ngIf="!metadata.src" class="response-frame-panel">
+    <div class="row-upload">
+        <div class="response-image-uploader-overlay">
+    
+            <div class="form-group">
+                <label class="control-label">
+                    {{ 'Add path' | translate }}
+                </label>
+                <input type = "text" 
+                    [(ngModel)] = "pathElement"
+                    class="input form-control"/>
+            </div> 
+    
+            <button 
+                type="button" 
+                class="btn btn-primary cds-blue-button" 
+                (click)="onLoadPathElement()">
+                {{ 'load frame' | translate }}
+            </button>
+        </div>
+    
     </div>
 
+    
+    <!-- <div class="row-dimension">
+    
+        <div class="row-info">
+            <span class="control-label">{{ 'width' | translate }}:</span>
+            <input [(ngModel)] = "widthElement" type="text" class="input ng-untouched ng-pristine ng-valid">
+        </div>
+        <div class="row-info">
+            <span class="control-label">{{ 'height' | translate }}:</span>
+            <input [(ngModel)] = "heightElement" type="text" class="input ng-untouched ng-pristine ng-valid">
+        </div>
+    
+    
+    </div> -->
 </div>
 
+<div *ngIf="metadata.src" class="content-frame">
+    <iframe 
+        id="contentFrame" 
+        #iframe allowfullscreen
+        style= "border:none;"
+        [width]="widthElement"
+        [height]="heightElement"
+        [src]="sanitizerUrl()">
+    </iframe>
 
-
-
-<!-- <div class="row-dimension">
-
-    <div class="row-info">
-        <span class="control-label">{{ 'width' | translate }}:</span>
-        <input [(ngModel)] = "widthElement" type="text" class="input ng-untouched ng-pristine ng-valid">
+    <div class="control-button delete" (click)="onDeletePathElement()">
+        <em class="material-icons">clear</em>
     </div>
-    <div class="row-info">
-        <span class="control-label">{{ 'height' | translate }}:</span>
-        <input [(ngModel)] = "heightElement" type="text" class="input ng-untouched ng-pristine ng-valid">
-    </div>
-
-
-</div> -->
+</div>

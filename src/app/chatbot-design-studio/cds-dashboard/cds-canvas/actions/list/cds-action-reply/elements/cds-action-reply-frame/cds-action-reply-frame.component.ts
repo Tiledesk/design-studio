@@ -100,6 +100,12 @@ export class CdsActionReplyFrameComponent implements OnInit {
     this.moveDownResponse.emit(this.index);
   }
 
+   /** */
+   onDeletedMetadata(event){
+    this.response.metadata.src = null;
+    this.changeActionReply.emit();
+  }
+
   /** onChangeTextarea */
   onChangeTextarea(text:string) {
     if(!this.previewMode){

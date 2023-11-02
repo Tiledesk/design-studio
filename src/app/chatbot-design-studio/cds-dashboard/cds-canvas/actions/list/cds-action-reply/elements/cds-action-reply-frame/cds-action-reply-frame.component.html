@@ -47,14 +47,10 @@
             <div class="text">Click to add frame</div>
         </div>
         <div *ngIf="response.metadata.src" class="content-frame">
-            <iframe
-                id="contentFrame" 
-                #iframe allowfullscreen
-                style= "border:none;"
-                [width]="frameWidth"
-                [height]="frameHeight"
-                [src]="framePath">
-            </iframe>
+            <cds-element-from-url 
+                class="frame-panel"
+                [metadata] = response.metadata>
+            </cds-element-from-url>
         </div>
     
         <div>
@@ -68,35 +64,16 @@
 
     
 <div class="text-editor-wrapper" *ngIf="!previewMode">
+   
     <div class="text-editor">
     
-        <div class="response-frame-wrapper"
-            [ngStyle]="{'width':framePath? 'auto' : '100%' }">
-            <div *ngIf="!response.metadata.src" class="response-frame-panel">              
-                <cds-element-from-url class="frame-panel"
-                    [metadata] = response.metadata
-                    (loadPathElement)="onLoadPathElement()">
-                </cds-element-from-url>
-            </div>
-
-            <div class="content-frame">
-                <iframe *ngIf="response.metadata.src"
-                    id="contentFrame" 
-                    #iframe allowfullscreen
-                    style= "border:none;"
-                    [width]="frameWidth"
-                    [height]="frameHeight"
-                    [src]="framePath">
-                </iframe>
-
-                <div class="control-button delete" (click)="onDeletePathElement()">
-                    <em class="material-icons">clear</em>
-                </div>
-            </div> 
-
+        <div class="response-frame-wrapper">
+            <cds-element-from-url class="frame-panel"
+                [metadata] = response.metadata
+                (onChangeMetadata)="onLoadPathElement()"
+                (onDeletedMetadata)="onDeletedMetadata($event)">
+            </cds-element-from-url>
         </div>
-
-       
         
         <cds-textarea 
             class="text-editable-div"
@@ -106,8 +83,7 @@
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event)">
         </cds-textarea>
-        
-         
+            
     </div>
 
 </div> 

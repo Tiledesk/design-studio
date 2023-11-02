@@ -10,17 +10,19 @@ import { Metadata } from 'src/app/models/action-model';
 })
 export class CDSElementFromUrlComponent implements OnInit {
   @ViewChild('imageUploaded', { static: false }) myIdentifier: ElementRef;
-  @Output() loadPathElement = new EventEmitter();
+  
   @Input() metadata: Metadata;
+  @Output() onChangeMetadata = new EventEmitter();
+  @Output() onDeletedMetadata = new EventEmitter<any>();
 
   // showAddImage = false;
   pathElement: string;
   pathElementUrl: any;
-  widthElement: string;
+  widthElement: string = '100%';
   heightElement: string;
 
   constructor(
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) { }
 
   ngOnInit(): void {
@@ -52,14 +54,19 @@ export class CDSElementFromUrlComponent implements OnInit {
     // this.showAddImage = false;
   }
 
-  onRemoveImage(){
-    
+  onDeletePathElement(event){
+    console.log('[IFRAME-UPLOAD] onDeletePathElement', event)
+    this.onDeletedMetadata.emit()
+  }
+
+  sanitizerUrl(){
+    return this.sanitizer.bypassSecurityTrustResourceUrl(this.metadata.src);
   }
 
   onLoadPathElement(){
     this.metadata.width = this.widthElement;
     this.metadata.height = this.heightElement;
     this.metadata.src = getEmbedUrl(this.pathElement);
-    this.loadPathElement.emit();
+    this.onChangeMetadata.emit();
   }
 }
