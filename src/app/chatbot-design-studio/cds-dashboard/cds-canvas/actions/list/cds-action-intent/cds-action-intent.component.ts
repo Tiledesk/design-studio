@@ -3,7 +3,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionIntentConnected  } from 'src/app/models/action-model';
 import { IntentService } from '../../../../../services/intent.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { TYPE_UPDATE_ACTION } from '../../../../../utils';
+import { TYPE_UPDATE_ACTION, ACTIONS_LIST } from '../../../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -28,6 +28,7 @@ export class CdsActionIntentComponent implements OnInit {
   idConnector: string;
   isConnected: boolean = false;
   connector: any;
+  element: any;
   private subscriptionChangedConnector: Subscription;
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -74,6 +75,7 @@ export class CdsActionIntentComponent implements OnInit {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnector = this.idIntentSelected+'/'+this.action._tdActionId;
     this.intents = this.intentService.getListOfIntents();
+    this.element = Object.values(ACTIONS_LIST).find(el => el.type === this.action._tdActionType);
     this.logger.log('[CDS-ACTION-INTENT] - initialize - idIntentSelected ', this.idIntentSelected);
     this.logger.log('[CDS-ACTION-INTENT] - initialize - idConnector ', this.idConnector);
     this.logger.log('[CDS-ACTION-INTENT] - initialize - intents ', this.intents);

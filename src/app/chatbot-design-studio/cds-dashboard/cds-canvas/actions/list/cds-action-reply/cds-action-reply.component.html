@@ -1,7 +1,5 @@
 <div class="cds-action-content" [class.cds-action-preview]="previewMode">
-    <!-- <cds-action-description
-        [elementType]="action._tdActionType">
-    </cds-action-description> -->
+
     <div class="box-up" *ngIf="!previewMode">
 
         <cds-action-reply-tools
@@ -30,7 +28,7 @@
             cdkDropList 
             (cdkDropListDropped)="drop($event)">
             
-            <div *ngFor="let command of arrayResponses; let i = index; let odd= odd; let length = count">
+            <div *ngFor="let command of arrayResponses; let i = index; let odd = odd; let length = count">
 
                 <div *ngIf="odd" cdkDrag
                     class="draggable-box"

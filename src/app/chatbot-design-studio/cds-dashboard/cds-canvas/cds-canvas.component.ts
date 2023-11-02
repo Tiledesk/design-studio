@@ -199,7 +199,7 @@ export class CdsCanvasComponent implements OnInit {
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
     const getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
-    this.logger.log('[CDS-CANVAS] getAllIntents', getAllIntents);
+    // console.log('[CDS-CANVAS] getAllIntents', this.intentService.listOfIntents);
     if (getAllIntents) {
       this.listOfIntents = this.intentService.listOfIntents;
       this.initListOfIntents();

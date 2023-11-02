@@ -80,6 +80,8 @@ export class CdsActionReplyComponent implements OnInit {
     } catch (error) {
       this.logger.log("error ", error);
     }
+    this.action._tdActionId = this.action._tdActionId?this.action._tdActionId:generateShortUID();
+     this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
     // this.initialize();
   }
 
@@ -103,9 +105,9 @@ export class CdsActionReplyComponent implements OnInit {
   // CUSTOM FUNCTIONS //
   /** */
   private initialize() {
-    this.logger.log('initialize:::: ', this.intentSelected);
-    this.action._tdActionId = this.action._tdActionId?this.action._tdActionId:generateShortUID();
-    this.idAction =this.intentSelected.intent_id+'/'+this.action._tdActionId;
+    console.log('initialize:::: ', this.action);
+    // this.action._tdActionId = this.action._tdActionId?this.action._tdActionId:generateShortUID();
+    // this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
 
     this.openCardButton = false;
     this.arrayResponses = [];

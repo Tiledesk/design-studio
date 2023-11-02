@@ -1,5 +1,14 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+.cds-action-preview {
+    padding: 0px;
+    margin: 0px;
+    position: relative;
+    &.isStart{
+        padding: 5px 10px;
+    }
+}
+
 
 .previewContent{
     position: relative;

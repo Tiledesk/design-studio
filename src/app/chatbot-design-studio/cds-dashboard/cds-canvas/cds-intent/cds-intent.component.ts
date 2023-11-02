@@ -87,6 +87,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   webHookTooltipText: string;
   isInternalIntent: boolean = false;
 
+  actionIntent: Action;
+
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     public intentService: IntentService,
@@ -172,7 +174,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-    // this.logger.log('CdsPanelIntentComponent ngAfterViewInit-->');
+    console.log('CdsPanelIntentComponent ngAfterViewInit-->', this.intent);
     this.setIntentSelected();
     if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
       this.startAction = this.intent.actions[0];
@@ -181,17 +183,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.intent.actions = [this.startAction];
       }
       this.isStart = true;
-
       //** set 'start' intent as default selected one */
-      this.intentService.setDefaultIntentSelected()
+      this.intentService.setDefaultIntentSelected();
       // //** center stage on 'start' intent */
       // let startElement = document.getElementById(this.intent.intent_id)
       // this.stageService.centerStageOnHorizontalPosition(startElement)
-     
     }
-
+    
     this.isInternalIntent = checkInternalIntent(this.intent)
-
+    this.actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
     this.addEventListener();
   }
 
@@ -298,9 +298,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.questionCount = 0;
     try {
       if (this.intent) {
+        console.log("setIntentSelected:: ", this.intent.actions);
         this.patchAllActionsId();
         this.patchAttributesPosition();
+        // this.listOfActions = this.intent.actions.filter(function(obj) {
+        //   return obj._tdActionType !== TYPE_ACTION.INTENT;
+        // });
         this.listOfActions = this.intent.actions;
+        // console.log("[CDS-INTENT] listOfActions: ", this.listOfActions);
         // this.form = this.intent.form;
         // this.actions = this.intent.actions;
         // this.answer = this.intent.answer;
@@ -330,8 +335,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   private patchAllActionsId() {
     if (this.listOfActions && this.listOfActions.length > 0) {
       this.listOfActions.forEach(function (action, index, object) {
+        console.log('[CDS-INTENT] patchAllActionsId action: ', action);
         if (!action._tdActionId) {
-          object[index] = patchActionId(action);
+         object[index] = patchActionId(action);
+         console.log('[CDS-INTENT] object: ', object[index]);
         }
       });
     }

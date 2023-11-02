@@ -147,6 +147,7 @@ export class IntentService {
       this.faqService.getAllFaqByFaqKbId(id_faq_kb).subscribe((faqs: Intent[]) => {
         // console.log('getAllIntents: ', faqs);
         if (faqs) {
+          this.patchActionId(faqs);
           this.listOfIntents = JSON.parse(JSON.stringify(faqs));
           this.prevListOfIntent = JSON.parse(JSON.stringify(faqs));
         } else {
@@ -166,6 +167,23 @@ export class IntentService {
     });
   }
 
+
+  /**
+   * patchActionId
+   * @param faqs 
+   * quando creo un nuovo bot gli elementi welcome e defaultfallback non hanno un _tdActionId
+   * perchè generati dal server. In questo caso è necessario assegnarne uno.
+   */
+  private patchActionId(faqs){
+    faqs.forEach(element => {
+      element.actions.forEach(action => {
+        if(!action._tdActionId){
+          action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();
+        }
+      });
+    });
+  }
+ 
 
   /** create a new intent when drag an action on the stage */
   public createNewIntent(id_faq_kb: string, action: any, pos:any){

@@ -1,10 +1,14 @@
-<div *ngIf="previewMode" class="cds-action-preview">
+<div *ngIf="previewMode" class="cds-action-preview"  [class.isStart]="isStart">
 
     <div  *ngIf="!isStart" class="previewContent">
-        <label class="title-label">
+
+        <div class="icon-action">
+            <img class="active-icon" [src]="element?.src" [title]="element?.name">
+        </div>
+        <!-- <label class="title-label">
             go to
         </label>
-        
+         -->
         <cds-connector class="connector"
             [idConnector] = "idConnector"
             [isConnected] = "isConnected">

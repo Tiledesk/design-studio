@@ -32,7 +32,8 @@
 
     <div *ngIf="isStart" class="cds-start-content">
         <cds-action-intent class="panel-response" 
-            [isStart]="isStart" [intentSelected]="intent"
+            [isStart]="isStart" 
+            [intentSelected]="intent"
             [action]="listOfActions[0]" 
             (updateAndSaveAction)="onUpdateAndSaveAction($event)">
         </cds-action-intent>
@@ -94,7 +95,8 @@
 
             <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
-            <cds-action-description  class="header-action" 
+            <cds-action-description 
+                class="header-action" 
                 cdkDragHandle
                 [elementType]="action._tdActionType">
             </cds-action-description>
@@ -241,7 +243,7 @@
                 </cds-action-capture-user-reply>
 
             </div>
-
+           
             <!-- [ngStyle]="{'display':isDragging === false ? 'block' : 'none' }" -->
             <cds-action-arrow id="action-arrow-{{i}}" *ngIf="!last" class="cds-action-arrow">
             </cds-action-arrow>
@@ -256,7 +258,14 @@
             </div>
 
         </div>
-
+        
     </div>
+    
+    <cds-action-intent *ngIf="!isStart && intent && actionIntent"
+        class="panel-response action-intent" 
+        [intentSelected]="intent"
+        [action]="actionIntent"
+        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+    </cds-action-intent>
 
 </div>
