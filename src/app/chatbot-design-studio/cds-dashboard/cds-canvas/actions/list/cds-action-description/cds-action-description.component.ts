@@ -47,7 +47,7 @@ export class CdsActionDescriptionComponent implements OnInit {
       }
       // this.element = ELEMENTS_LIST.find(item => item.type === this.elementType);
       
-      if(this.actionSelected._tdActionTitle && this.actionSelected._tdActionTitle != ""){
+      if(this.actionSelected && this.actionSelected._tdActionTitle && this.actionSelected._tdActionTitle != ""){
         this.dataInput = this.actionSelected._tdActionTitle;
       }
       this.logger.log('ActionDescriptionComponent action:: ', this.element);

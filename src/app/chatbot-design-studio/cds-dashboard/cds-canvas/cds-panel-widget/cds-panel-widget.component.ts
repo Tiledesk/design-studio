@@ -72,7 +72,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   setIframeUrl(){
     console.log('[CDS-PANEL-WIDGET] setIframeUrl parameters ---> ', this.projectID, this.selectedChatbot, this.defaultDepartmentId, this.intentName)
-    this.WIDGET_BASE_URL = this.appConfigService.getConfig().WIDGET_BASE_URL;
+    this.WIDGET_BASE_URL = this.appConfigService.getConfig().widgetBaseUrl;
     // const testItOutBaseUrl = this.TESTSITE_BASE_URL.substring(0, this.TESTSITE_BASE_URL.lastIndexOf('/')); 
     const testItOutUrl = this.WIDGET_BASE_URL + "assets/twp" + '/chatbot-panel.html'
     // const testItOutUrl = "https://widget.tiledesk.com/v6/5.0.71/assets/twp"+ '/chatbot-panel.html'

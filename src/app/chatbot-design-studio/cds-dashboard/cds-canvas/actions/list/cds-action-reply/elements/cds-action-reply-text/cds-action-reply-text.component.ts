@@ -152,7 +152,6 @@ export class CdsActionReplyTextComponent implements OnInit {
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.action = buttonChanged.action? buttonChanged.action : '#' + this.connector.toId;
           buttonChanged.type = TYPE_BUTTON.ACTION;
-          console.log('[CdsActionReplyTextComponent] updateConnector :: ', buttonChanged);
           if(!buttonChanged.__isConnected){
             buttonChanged.__isConnected = true;
             // if(this.connector.notify)

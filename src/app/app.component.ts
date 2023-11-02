@@ -51,7 +51,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private multiChannelService: MultichannelService,
     private uploadService: UploadService
   ){
-
+    let version = environment.VERSION
+    const style = 'background-color: rgb(255,75,80); color: white; font-style: italic; border: 5px solid rgb(255,220,221); font-size: 1.5em; padding: 10px 30px; width: 100%; text-align: center'
+    console.log(`%c TILEDESK DESIGN STUDIO (v ${version})`,style);
   }
   
   ngOnInit(): void {
@@ -273,7 +275,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.logger.warn('[APP-COMP] >>> I AM NOT LOGGED IN <<<')
       this.IS_ONLINE = false;
-      this.goToDashboardLogin()
+      // this.goToDashboardLogin()
     }
   }
 

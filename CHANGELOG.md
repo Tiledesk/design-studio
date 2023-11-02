@@ -10,7 +10,8 @@
 - added: 404 not found component
 - changed: minor UI improvements
 - bug-fixed: not sent null text if textarea is null in action-reply image and gallery elements
-
+- bug-fixed: text-area changes not saved
+- bug-fixed: emoji not saved in panel-button-configuration component
 
 ### 0.0.1
 - first deploy

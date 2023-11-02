@@ -41,7 +41,7 @@ export class CdsActionIntentComponent implements OnInit {
   ngOnInit(): void {
     // console.log("[CDS-ACTION-INTENT] elementSelected: ", this.action, this.intentSelected)
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      // console.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
+      console.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
       this.connector = connector;
       this.updateConnector();
     });

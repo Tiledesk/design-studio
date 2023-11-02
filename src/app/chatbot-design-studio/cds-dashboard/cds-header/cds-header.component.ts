@@ -17,6 +17,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { EXTERNAL_URL, TYPE_INTENT_NAME } from '../../utils';
 import { CdsPublishOnCommunityModalComponent } from '../utils/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
+import { environment } from 'src/environments/environment';
 
 const swal = require('sweetalert');
 
@@ -53,6 +54,7 @@ export class CdsHeaderComponent implements OnInit {
   TRY_ON_WA: boolean;
   displayModalAttacchBotToDept: string;
 
+  version: string;
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -78,6 +80,8 @@ export class CdsHeaderComponent implements OnInit {
     if(this.router.url.includes('beta')){
       this.isBetaUrl = true;
     }
+
+    this.version = environment.VERSION
   }
 
   getOSCODE() {
@@ -112,7 +116,7 @@ export class CdsHeaderComponent implements OnInit {
   }
 
   getTestSiteUrl() {
-    this.TESTSITE_BASE_URL = this.appConfigService.getConfig().testsiteBaseUrl;
+    this.TESTSITE_BASE_URL = this.appConfigService.getConfig().widgetBaseUrl;
     this.logger.log('[CDS DSBRD] AppConfigService getAppConfig TESTSITE_BASE_URL', this.TESTSITE_BASE_URL);
   }
 
