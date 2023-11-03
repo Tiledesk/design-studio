@@ -10,7 +10,7 @@ import { Metadata } from 'src/app/models/action-model';
 })
 export class CDSElementFromUrlComponent implements OnInit {
   @ViewChild('imageUploaded', { static: false }) myIdentifier: ElementRef;
-  @Output() loadPathElement = new EventEmitter();
+  @Output() onChangeMetadata = new EventEmitter();
   @Input() metadata: Metadata;
 
   // showAddImage = false;
@@ -60,6 +60,7 @@ export class CDSElementFromUrlComponent implements OnInit {
     this.metadata.width = this.widthElement;
     this.metadata.height = this.heightElement;
     this.metadata.src = getEmbedUrl(this.pathElement);
-    this.loadPathElement.emit();
+    this.metadata.type = 'frame'
+    this.onChangeMetadata.emit();
   }
 }

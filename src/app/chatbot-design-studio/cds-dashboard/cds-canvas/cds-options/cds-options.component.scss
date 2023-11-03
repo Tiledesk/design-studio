@@ -1,0 +1,51 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+.container{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.cds-elements {
+    padding: 4px;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: rgba(19, 33, 68, 0.01) 0px 1px 3px 1px, rgba(19, 33, 68, 0.12) 0px 5px 8px -8px, rgba(19, 33, 68, 0.12) 0px 2px 4px -3px, rgba(19, 33, 68, 0.03) 0px 0px 0px 1px;
+    overflow: hidden;
+    transition: height 0.15s ease 0s;
+    border: 2px solid $gray-02;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.cds-button-element {
+    animation: 0.1s ease-in-out 0s 1 normal both running;
+}
+
+.cds-box-button {
+    transition: background-color 0.15s ease 0s;
+    width: 35px;
+    height: 35px;
+    flex-direction: column;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cds-box-button:hover, 
+.cds-box-button:focus {
+    background-color: $gray-02;
+}
+
+.box-img {
+    transition: opacity 0.15s ease 0s, background-color 0.15s ease 0s, color 0.15s ease 0s, transform 0.15s ease 0s;
+    box-sizing: content-box;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+}

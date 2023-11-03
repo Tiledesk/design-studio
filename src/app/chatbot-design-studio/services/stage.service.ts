@@ -66,6 +66,14 @@ export class StageService {
   physicPointCorrector(point){
     return this.tiledeskStage.physicPointCorrector(point);
   }
+
+  zoom(event: 'in' | 'out'){
+    this.tiledeskStage.zoom(event)
+  }
+
+  scaleAndCenter(){
+    console.log("[STAGE SERVICE] scaleAndCenter ");
+  }
   
 
   // getScale(){

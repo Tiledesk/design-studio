@@ -27,7 +27,15 @@ $box-left-width-closed: 0px;
     z-index: 11
   }
   &#widget-preview{
-    z-index: 12
+    z-index: 12;
+
+    &.isVisible{
+      width: 0;
+      visibility: visible;
+    }
+    &.isHidden{
+      visibility: hidden;
+    }
   }
 }
 
@@ -270,6 +278,11 @@ cds-fulfillment {
 
 .cds-panel-elements {
   position: absolute;
+}
+
+#cds-options-panel{
+  bottom: 12px;
+  right: 12px;
 }
 
 

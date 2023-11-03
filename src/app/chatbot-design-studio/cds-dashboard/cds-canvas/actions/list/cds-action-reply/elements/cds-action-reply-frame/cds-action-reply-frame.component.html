@@ -75,7 +75,7 @@
             <div *ngIf="!response.metadata.src" class="response-frame-panel">              
                 <cds-element-from-url class="frame-panel"
                     [metadata] = response.metadata
-                    (loadPathElement)="onLoadPathElement()">
+                    (onChangeMetadata)="onLoadPathElement()">
                 </cds-element-from-url>
             </div>
 

@@ -199,6 +199,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { CdsEventComponent } from './cds-dashboard/cds-event/cds-event.component';
 import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
 
 @NgModule({
   declarations: [
@@ -342,6 +343,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     //EVENT BASE COMPONENT
     CdsEventComponent,
     CdsRuleComponent,
+    CdsOptionsComponent,
 
   ],
   imports: [

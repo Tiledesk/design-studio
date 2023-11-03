@@ -1,0 +1,44 @@
+<div class="container">
+    <div size="4" class="cds-elements" mat-button>
+
+        <!-- + -->
+        <div class="cds-element" (click)="onOptionClick(OPTIONS.ZOOM_IN)" #div3>
+            <div class="cds-button-element">
+                <div class="cds-box-button">
+                    <span class="box-img">
+                        <span class="material-icons">add</span>
+                    </span>
+                    <!-- <span class="box-title">{{actionCategory.name}}</span> -->
+                </div>
+            </div>
+        </div>
+
+
+        <!-- - -->
+        <div class="cds-element" (click)="onOptionClick(OPTIONS.ZOOM_OUT)" #div3>
+            <div class="cds-button-element">
+                <div class="cds-box-button">
+                    <span class="box-img">
+                        <span class="material-icons">remove</span>
+                    </span>
+                    <!-- <span class="box-title">{{actionCategory.name}}</span> -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div size="4" class="cds-elements" mat-button>
+        <!-- CENTER -->
+        <div class="cds-element" (click)="onOptionClick(OPTIONS.CENTER)" #divEvent>
+            <div class="cds-button-element">
+                <div class="cds-box-button">
+                    <span class="box-img">
+                        <span class="material-icons">control_camera</span>
+                    </span>
+                    <!-- <span class="box-title">Event</span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

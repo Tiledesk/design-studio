@@ -203,6 +203,13 @@ export enum TYPE_UPDATE_ACTION {
     INTENT = 'intent',
 }
 
+export enum OPTIONS {
+    ZOOM_IN ='zoom-in',
+    ZOOM_OUT = 'zoom-out',
+    CENTER = 'center'
+  
+  }
+
 export const INTENT_TEMP_ID = '';
 export const MESSAGE_METADTA_WIDTH = '100%';
 export const MESSAGE_METADTA_HEIGHT = 230;
@@ -355,7 +362,17 @@ export var variableList = {
         { name: 'chat_url', value: 'chat_url', src: '', icon: 'laptop' },
         { name: 'user_ip_address', value: 'user_ip_address', src: '', icon: 'laptop' },
         { name: 'user_country', value: 'user_country', src: '', icon: 'language' },
-        { name: 'user_city', value: 'user_city', src: '', icon: 'language' }
+        { name: 'user_city', value: 'user_city', src: '', icon: 'language' },
+        { name: 'transcript', value: 'transcript', src: '', icon: 'description'},
+        { name: 'lastUserDocumentURL', value: 'lastUserDocumentURL', src: '', icon:'upload_file'},
+        { name: 'lastUserDocumentName', value: 'lastUserDocumentName', src: '', icon:'upload_file'},
+        { name: 'lastUserDocumentType', value: 'lastUserDocumentType', src: '', icon:'upload_file'},
+        { name: 'lastUserImageURL', value: 'lastUserImageURL', src: '', icon:'image'},
+        { name: 'lastUserImageName', value: 'lastUserImageName', src: '', icon:'image'},
+        { name: 'lastUserImageWidth', value: 'lastUserImageWidth', src: '', icon:'image'},
+        { name: 'lastUserImageHeight', value: 'lastUserImageHeight', src: '', icon:'image'},
+        { name: 'lastUserImageType', value: 'lastUserImageType', src: '', icon:'image'}
+
     ]
 }
 
