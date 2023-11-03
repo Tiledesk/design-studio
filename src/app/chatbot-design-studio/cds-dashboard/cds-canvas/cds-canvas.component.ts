@@ -71,6 +71,10 @@ export class CdsCanvasComponent implements OnInit {
   private subscriptionOpenWidgetPanel: Subscription;
   testitOutFirstClick: boolean = false;
   IS_OPEN_PANEL_WIDGET: boolean = false;
+
+  /** panel options */
+  private subscriptionUndoRedo: Subscription;
+  stateUndoRedo: any = {undo:false, redo: false};
   
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
@@ -105,6 +109,9 @@ export class CdsCanvasComponent implements OnInit {
     }
     if (this.subscriptionOpenWidgetPanel) {
       this.subscriptionOpenWidgetPanel.unsubscribe();
+    }
+    if (this.subscriptionUndoRedo) {
+      this.subscriptionUndoRedo.unsubscribe();
     }
   }
 
@@ -142,6 +149,13 @@ export class CdsCanvasComponent implements OnInit {
   /** SUBSCRIBE TO THE INTENT LIST */
   // --------------------------------------------------------- //
   private setSubscriptions(){
+
+    this.subscriptionUndoRedo = this.intentService.behaviorUndoRedo.subscribe((undoRedo: any) => {
+      console.log('[cds-panel-intent-list] --- AGGIORNATO undoRedo ',undoRedo);
+      if (undoRedo) {
+        this.stateUndoRedo = undoRedo;
+      }
+    });
 
     /** SUBSCRIBE TO THE LIST OF INTENTS **
      * Creo una sottoscrizione all'array di INTENT per averlo sempre aggiornato
@@ -932,6 +946,14 @@ export class CdsCanvasComponent implements OnInit {
       }
       case OPTIONS.CENTER: {
         this.stageService.scaleAndCenter()
+        break;
+      }
+      case OPTIONS.UNDO: {
+        this.intentService.restoreLastUNDO();
+        break;
+      }
+      case OPTIONS.REDO: {
+        this.intentService.restoreLastREDO();
         break;
       }
     }

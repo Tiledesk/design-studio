@@ -22,6 +22,7 @@ export class IntentService {
   behaviorIntents = new BehaviorSubject <Intent[]>([]);
   behaviorIntent = new BehaviorSubject <Intent>(null);
   liveActiveIntent = new BehaviorSubject<Intent>(null);
+  behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
@@ -55,6 +56,8 @@ export class IntentService {
   public arrayUNDO: Array<any> = [];
   public arrayREDO: Array<any> = [];
   public lastActionUndoRedo: boolean;
+
+
 
   constructor(
     private faqService: FaqService,
@@ -979,6 +982,7 @@ export class IntentService {
     // this.arrayUNDO = this.arrayUNDO.slice(10);
     this.lastActionUndoRedo = false;
     this.arrayREDO = [];
+    this.behaviorUndoRedo.next({ undo: true, redo: false });
   }
 
 
@@ -1026,6 +1030,10 @@ export class IntentService {
       this.arrayREDO.push(objUNDO);
       // console.log('[INTENT SERVICE] -> RESTORE UNDO: ', this.arrayREDO);
       this.restoreIntent(objUNDO.pos, objUNDO.undo);
+
+      let stateUndo = true;
+      if(this.arrayUNDO.length == 0)stateUndo = false;
+      this.behaviorUndoRedo.next({ undo: stateUndo, redo: true });
       console.log('[INTENT UNDO] -> ho aggiornato gli array dopo UNDO ', this.arrayUNDO, this.arrayREDO);
     }
   }
@@ -1039,6 +1047,7 @@ export class IntentService {
       this.arrayUNDO.push(objREDO);
       // console.log('[INTENT SERVICE] -> RESTORE REDO: ', objREDO);
       this.restoreIntent(objREDO.pos, objREDO.redo);
+      if(this.arrayREDO.length == 0)this.behaviorUndoRedo.next({ undo: true, redo: false });
       console.log('[INTENT UNDO] -> ho aggiornato gli array dopo REDO ', this.arrayUNDO, this.arrayREDO);
     }
   }

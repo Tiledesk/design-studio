@@ -21,6 +21,9 @@
 
 .cds-button-element {
     animation: 0.1s ease-in-out 0s 1 normal both running;
+    &.is_disabled {
+        opacity: 0.2;
+    }
 }
 
 .cds-box-button {
@@ -49,3 +52,4 @@
     height: 24px;
     background: transparent;
 }
+
