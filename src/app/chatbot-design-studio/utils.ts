@@ -206,8 +206,10 @@ export enum TYPE_UPDATE_ACTION {
 export enum OPTIONS {
     ZOOM_IN ='zoom-in',
     ZOOM_OUT = 'zoom-out',
-    CENTER = 'center'
-}
+    CENTER = 'center',
+    UNDO = "undo",
+    REDO = "redo"
+  }
 
 export const INTENT_TEMP_ID = '';
 export const MESSAGE_METADTA_WIDTH = '100%';

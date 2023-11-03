@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
 import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
@@ -8,12 +8,18 @@ import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
 })
 export class CdsOptionsComponent implements OnInit {
 
+  @Input() stateUndoRedo: any;
   @Output() onOptionClicked = new EventEmitter<OPTIONS>();
   OPTIONS = OPTIONS
+
+
+
+  
 
   constructor() { }
 
   ngOnInit(): void {
+
   }
 
   onOptionClick(option){
