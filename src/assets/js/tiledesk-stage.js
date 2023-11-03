@@ -288,9 +288,9 @@ export class TiledeskStage {
             // console.log('newX:', newY);
 
             let tcmd = `translate(${newX}px, ${newY}px)`;
-            // let scmd = `scale(${1})`;
+            let scmd = `scale(${1})`;
             // let scmd = `scale(${this.scale})`;
-            const cmd = tcmd; //+ " " + scmd;
+            const cmd = tcmd + " " + scmd;
             this.drawer.style.transform = cmd;
 
             // console.log("tcmd:", tcmd);
