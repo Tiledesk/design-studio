@@ -3,6 +3,7 @@ export class TiledeskStage {
     tx = 0;
     ty = 0;
     scale = 1;
+    scaleStep = 0.2;
     torigin = `0 0`;
 
     containerId;
@@ -114,6 +115,15 @@ export class TiledeskStage {
             document.dispatchEvent(customEvent);
         }, 0)
         
+    }
+
+    zoom(event){
+        if (event === 'in'){
+            this.scale += this.scaleStep
+        }else if (event === 'out'){
+            this.scale -= this.scaleStep
+        }
+        this.transform();
     }
     
     transform() {
@@ -278,9 +288,9 @@ export class TiledeskStage {
             // console.log('newX:', newY);
 
             let tcmd = `translate(${newX}px, ${newY}px)`;
-            let scmd = `scale(${1})`;
+            // let scmd = `scale(${1})`;
             // let scmd = `scale(${this.scale})`;
-            const cmd = tcmd + " " + scmd;
+            const cmd = tcmd; //+ " " + scmd;
             this.drawer.style.transform = cmd;
 
             // console.log("tcmd:", tcmd);
