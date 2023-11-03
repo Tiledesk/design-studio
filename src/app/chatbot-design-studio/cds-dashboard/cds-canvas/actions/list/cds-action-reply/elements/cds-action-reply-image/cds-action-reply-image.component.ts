@@ -211,6 +211,7 @@ export class CdsActionReplyImageComponent implements OnInit {
   onChangeTextarea(text:string) {
     if(!this.previewMode){
       this.response.text = text;
+
       // this.changeActionReply.emit();
     }
   }

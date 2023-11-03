@@ -46,6 +46,7 @@
     width: 18px;
     height: 18px;
     background: rgb(0 0 0 / 50%);
+    cursor: copy;
     &::before {
         inset: 1px;
         border: 4px solid rgb(255, 255, 255);
@@ -69,7 +70,7 @@
     width: 16px; //14px
     height: 16px; //14px
     background-color: rgb(221,221,221,1);
-    cursor: copy;
+    cursor: default;
     &::before {
         inset: 0px;
         border: 1px solid rgb(98, 119, 140);
@@ -78,9 +79,4 @@
         content: "";
         border-radius: 50%;
     }
-    &.isConnected{
-        cursor: default;
-    }
 }
-
-

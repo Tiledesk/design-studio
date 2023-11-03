@@ -10,7 +10,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 //MATERIAL ELEMENTS
@@ -198,7 +198,7 @@ import { CdsAnswerComponent } from './cds-dashboard/cds-canvas/actions/list/answ
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CdsEventComponent } from './cds-dashboard/cds-event/cds-event.component';
 import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
 
 @NgModule({

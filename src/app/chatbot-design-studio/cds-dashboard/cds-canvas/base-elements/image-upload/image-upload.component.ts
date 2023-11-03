@@ -73,7 +73,7 @@ export class CDSImageUploadComponent implements OnInit {
     }
   }
 
-  sanitizerUrlImage(){
+  sanitizerUrl(){
     return this.sanitizer.bypassSecurityTrustUrl(this.metadata.src);
   }
 

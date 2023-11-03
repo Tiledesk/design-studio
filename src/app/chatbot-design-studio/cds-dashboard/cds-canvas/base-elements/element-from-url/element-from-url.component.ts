@@ -10,13 +10,15 @@ import { Metadata } from 'src/app/models/action-model';
 })
 export class CDSElementFromUrlComponent implements OnInit {
   @ViewChild('imageUploaded', { static: false }) myIdentifier: ElementRef;
-  @Output() onChangeMetadata = new EventEmitter();
+  
   @Input() metadata: Metadata;
+  @Output() onChangeMetadata = new EventEmitter();
+  @Output() onDeletedMetadata = new EventEmitter<any>();
 
   // showAddImage = false;
   pathElement: string;
   pathElementUrl: any;
-  widthElement: string;
+  widthElement: string = '100%';
   heightElement: string;
 
   constructor(
@@ -52,8 +54,14 @@ export class CDSElementFromUrlComponent implements OnInit {
     // this.showAddImage = false;
   }
 
-  onRemoveImage(){
-    
+  onDeletePathElement(event){
+    this.pathElement = null
+    console.log('[IFRAME-UPLOAD] onDeletePathElement', event)
+    this.onDeletedMetadata.emit()
+  }
+
+  sanitizerUrl(){
+    return this.sanitizer.bypassSecurityTrustResourceUrl(this.metadata.src);
   }
 
   onLoadPathElement(){

@@ -81,7 +81,7 @@ export class CdsActionReplyComponent implements OnInit {
       this.logger.log("error ", error);
     }
     this.action._tdActionId = this.action._tdActionId?this.action._tdActionId:generateShortUID();
-     this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
+    this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
     // this.initialize();
   }
 
