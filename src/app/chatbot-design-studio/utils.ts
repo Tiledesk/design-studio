@@ -207,8 +207,7 @@ export enum OPTIONS {
     ZOOM_IN ='zoom-in',
     ZOOM_OUT = 'zoom-out',
     CENTER = 'center'
-  
-  }
+}
 
 export const INTENT_TEMP_ID = '';
 export const MESSAGE_METADTA_WIDTH = '100%';

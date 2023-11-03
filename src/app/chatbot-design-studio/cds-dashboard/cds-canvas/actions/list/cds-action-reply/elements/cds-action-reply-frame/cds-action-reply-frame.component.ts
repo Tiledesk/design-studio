@@ -25,7 +25,6 @@ export class CdsActionReplyFrameComponent implements OnInit {
 
   // frame //
   typeActions = TYPE_ACTION;
-  framePath: any;
   frameWidth: number | string;
   frameHeight: number | string;
   typeMessage =  TYPE_MESSAGE;
@@ -40,7 +39,6 @@ export class CdsActionReplyFrameComponent implements OnInit {
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -50,12 +48,6 @@ export class CdsActionReplyFrameComponent implements OnInit {
 
   private initialize(){
     this.delayTime = this.wait.time? (this.wait.time/1000) : 500;
-    this.frameWidth = this.response.metadata.width?this.response.metadata.width:MESSAGE_METADTA_WIDTH;
-    this.frameHeight = this.response.metadata.height?this.response.metadata.height:MESSAGE_METADTA_HEIGHT;
-    if(this.response.metadata.src){
-      this.framePath = this.sanitizer.bypassSecurityTrustResourceUrl(this.response.metadata.src?this.response.metadata.src:null);
-    }    
-    
     if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
       this.filterConditionExist = true
     }
@@ -115,38 +107,28 @@ export class CdsActionReplyFrameComponent implements OnInit {
   
   
   /** */
-  onCloseFramePanel(event){
-    //if(event.url){
-      this.framePath = event.url;
-      this.response.metadata.src = event.url;
-    //}
-    //if(event.width){
-      this.frameWidth = event.width;
-      this.response.metadata.width = event.width;
-    //}
-    //if(event.height){
-      this.frameHeight = event.height;
-      this.response.metadata.height = event.height;
-    //}
-    // console.log('onCloseframePanel:: ', event);
-  }
+  // onCloseFramePanel(event){
+  //   //if(event.url){
+  //     this.response.metadata.src = event.url;
+  //   //}
+  //   //if(event.width){
+  //     this.response.metadata.width = event.width;
+  //   //}
+  //   //if(event.height){
+  //     this.response.metadata.height = event.height;
+  //   //}
+  //   // console.log('onCloseframePanel:: ', event);
+  // }
 
   /** */
-  onDeletePathElement(){
-    this.framePath = null;
+  onDeletedMetadata(){
     this.response.metadata.src = '';
     this.changeActionReply.emit();
   }
 
   /** */
   onLoadPathElement(){
-    try {
-      this.framePath = this.sanitizer.bypassSecurityTrustResourceUrl(this.response.metadata.src);
-      console.log('responseeeeeeeee', this.response, this.framePath)
-      this.changeActionReply.emit();
-    } catch (error) {
-      this.logger.log('onAddNewResponse ERROR', error);
-    }
+    this.changeActionReply.emit();
   }
 
 }

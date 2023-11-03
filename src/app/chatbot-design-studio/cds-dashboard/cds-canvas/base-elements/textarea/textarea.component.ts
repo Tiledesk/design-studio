@@ -101,7 +101,7 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   onChangeTextArea(event) {
-    this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
+    // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
     this.calculatingleftCharsText();
     // console.log('onChangeTextarea!! ',event);
     if(this.readonly && event){
@@ -127,7 +127,6 @@ export class CDSTextareaComponent implements OnInit {
     console.log('onVariableSelected:: ', this.elTextarea.placeholder);
     let valueTextArea = {name: '', value: ''};
     if (this.elTextarea) {
-      this.elTextarea.focus();
       this.insertAtCursorPos(this.elTextarea, '{{' + variableSelected.value + '}}');
       valueTextArea.name = this.elTextarea.value;
       valueTextArea.value = this.elTextarea.value;
@@ -138,7 +137,7 @@ export class CDSTextareaComponent implements OnInit {
       valueTextArea.value = variableSelected.value;
       this.elTextarea.placeholder = '';
     } else {
-      this.onChangeTextArea(valueTextArea.name);
+      // this.onChangeTextArea(valueTextArea.name);
     }
     this.addVariable.close();
     this.selectedAttribute.emit(variableSelected);
@@ -171,11 +170,13 @@ export class CDSTextareaComponent implements OnInit {
     elem.value = textarea_txt.substring(0, cursor_pos) + txt_to_add + textarea_txt.substring(cursor_pos);
     elem.focus();
     elem.selectionEnd = cursor_pos + txt_to_add.length;
+    this.text = elem.value;
   }
 
   onAddEmoji(event){
     if(this.text){
-      this.text = `${this.text}${event.emoji.native}`;
+      // this.text = `${this.text} ${event.emoji.native}`;
+      this.insertAtCursorPos(this.elTextarea, event.emoji.native);
     } else {
       this.text = `${event.emoji.native}`;
     }

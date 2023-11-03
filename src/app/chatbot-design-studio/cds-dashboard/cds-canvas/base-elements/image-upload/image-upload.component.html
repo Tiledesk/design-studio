@@ -30,7 +30,7 @@
 </div>
 
 <div *ngIf="metadata.src" class="image-wrp">
-    <img *ngIf="!isImageSvg" #imageUploaded id="imageUploaded" [src]="sanitizerUrlImage()" (change)="getDimensionImage()">
+    <img *ngIf="!isImageSvg" #imageUploaded id="imageUploaded" [src]="sanitizerUrl()" (change)="getDimensionImage()">
     <!-- <img *ngIf="isImageSvg" #imageUploaded id="imageUploaded" [src]="sanitizerUrlImage()" (change)="getDimensionImage()"> -->
     <div class="control-button delete" (click)="onDeletePathElement($event)">
         <em class="material-icons">clear</em>
