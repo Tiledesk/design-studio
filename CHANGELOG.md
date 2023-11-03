@@ -1,6 +1,8 @@
 # **DESIGN STUDIO - Changelog**
 
-### **Author**: *Gabriele Panico*
+### **Authors**: 
+    *Gabriele Panico*
+    *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 0.0.3
