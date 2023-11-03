@@ -301,10 +301,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         console.log("setIntentSelected:: ", this.intent.actions);
         this.patchAllActionsId();
         this.patchAttributesPosition();
-        // this.listOfActions = this.intent.actions.filter(function(obj) {
-        //   return obj._tdActionType !== TYPE_ACTION.INTENT;
-        // });
-        this.listOfActions = this.intent.actions;
+        this.listOfActions = this.intent.actions.filter(function(obj) {
+          return obj._tdActionType !== TYPE_ACTION.INTENT;
+        });
+        // this.listOfActions = this.intent.actions;
         // console.log("[CDS-INTENT] listOfActions: ", this.listOfActions);
         // this.form = this.intent.form;
         // this.actions = this.intent.actions;
