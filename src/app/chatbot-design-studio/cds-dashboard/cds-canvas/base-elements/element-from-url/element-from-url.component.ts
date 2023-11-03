@@ -67,6 +67,7 @@ export class CDSElementFromUrlComponent implements OnInit {
     this.metadata.width = this.widthElement;
     this.metadata.height = this.heightElement;
     this.metadata.src = getEmbedUrl(this.pathElement);
+    this.metadata.type = 'frame'
     this.onChangeMetadata.emit();
   }
 }

@@ -15,7 +15,7 @@ import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
 
 // UTILS //
-import { isElementOnTheStage, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID } from '../../utils';
+import { isElementOnTheStage, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
 
 
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -916,6 +916,27 @@ export class CdsCanvasComponent implements OnInit {
     // onActionDeleted
   }
   // --------------------------------------------------------- //
+
+
+   // --------------------------------------------------------- // 
+  // EVENT > PANEL OPTIONS 
+  // --------------------------------------------------------- //
+  onOptionClicked(option: OPTIONS){
+    switch(option){
+      case OPTIONS.ZOOM_IN: {
+          this.stageService.zoom('in')
+        break;
+      }
+      case OPTIONS.ZOOM_OUT: {
+        this.stageService.zoom('out')
+        break;
+      }
+      case OPTIONS.CENTER: {
+        this.stageService.scaleAndCenter()
+        break;
+      }
+    }
+  } 
 
 
   // --------------------------------------------------------- // 

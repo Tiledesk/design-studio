@@ -118,7 +118,8 @@ export class CdsActionReplyToolsComponent implements OnInit {
             type: TYPE_MESSAGE.REDIRECT,
             metadata: {
               src : '',
-              target: TYPE_URL.BLANK
+              target: TYPE_URL.BLANK,
+              type: TYPE_MESSAGE.REDIRECT
             }
           },
         } 
