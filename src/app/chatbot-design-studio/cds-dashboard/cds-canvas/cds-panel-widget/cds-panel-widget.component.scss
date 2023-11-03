@@ -1,3 +1,5 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
 #panel-tab{
     position: absolute;
     top:0;
@@ -7,7 +9,8 @@
     width: 400px;
     display: flex;
     flex-direction: column;
-    background-color: #4d5e79;
+    background-color: white;
+    border-left: 1px solid $gray-light-02;
     // border-left: solid 2px #b28e26;
     // box-shadow: 0 0 42px 2px #000000c7;
     animation: width 0.9s ease-in-out;
@@ -105,20 +108,4 @@
         font-size: 13px;
         line-height: 1.54;
     }
-}
-
-#cds-play-btn {
-    background: #006cff;
-    color: #fff;
-    box-shadow: none;
-    font-weight: 500;
-    font-family: Poppins, Roboto, Arial, sans-serif;
-    text-transform: capitalize;
-    font-size: 14px;
-    padding: 6px 12px;
-    border-radius: 10px;
-}
-
-#cds-play-btn:hover { 
-    opacity: .8!important;
 }
