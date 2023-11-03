@@ -166,7 +166,7 @@ export class ConnectorService {
           // this.logger.log('[CONNECTOR-SERV] intent_display_name', intent.intent_display_name);
           if(action.intentName && action.intentName !== ''){
             const idConnectorFrom = intent.intent_id+'/'+action._tdActionId;
-            const idConnectorTo = action.intentName.replace("#", ""); ;
+            const idConnectorTo = action.intentName.replace("#", "");
             this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
             this.createConnectorFromId(idConnectorFrom, idConnectorTo);
           }
