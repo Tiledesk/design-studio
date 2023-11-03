@@ -32,7 +32,7 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
             type: key,
             value: ACTIONS_LIST[key]
           };
-        });
+        }).filter(el => el.value.status !== 'inactive');
         break;
       case TYPE_OF_MENU.EVENT:
         this.menuItemsList = [];
@@ -57,7 +57,7 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
             type: key,
             value: ACTIONS_LIST[key]
           };
-        });
+        }).filter(el => el.value.status !== 'inactive');
         break;
     }
   }
@@ -68,7 +68,7 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
         type: key,
         value: ACTIONS_LIST[key]
       };
-    });
+    }).filter(el => el.value.status !== 'inactive');;
 
     // console.log('[CDS-ADD-ACTION-MENU] tdsContainerEleHeight (onchanges): ', this.tdsContainerEleHeight);
     // this.contentHeight = this.tdsContainerEleHeight - 40;
