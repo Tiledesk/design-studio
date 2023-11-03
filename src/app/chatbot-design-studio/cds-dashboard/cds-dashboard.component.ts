@@ -188,8 +188,7 @@ export class CdsDashboardComponent implements OnInit {
 
   /** Go back to previous page */
   goBack() {
-    let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + 'dashboard/#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
-    console.log('[CDS DSHBRD] goBack ', dashbordBaseUrl, this.appConfigService.getConfig().dashboardBaseUrl);
+    let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
     window.open(dashbordBaseUrl, '_self')
     // this.location.back()
     // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);

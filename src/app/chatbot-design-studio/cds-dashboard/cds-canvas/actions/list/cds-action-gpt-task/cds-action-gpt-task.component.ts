@@ -350,7 +350,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   }
 
   goToKNB(){
-    let url = this.appConfigService.getConfig().dashboardBaseUrl + 'dashboard/#/project/' + this.project_id +'/knowledge-bases'
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/knowledge-bases'
     window.open(url, '_blank')
   }
 
