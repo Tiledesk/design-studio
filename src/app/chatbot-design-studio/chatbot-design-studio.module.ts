@@ -200,6 +200,7 @@ import { CdsEventComponent } from './cds-dashboard/cds-event/cds-event.component
 import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 
 import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
+import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
 
 @NgModule({
   declarations: [
@@ -344,6 +345,7 @@ import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-
     CdsEventComponent,
     CdsRuleComponent,
     CdsOptionsComponent,
+    CdsPanelConnectorMenuComponent,
 
   ],
   imports: [

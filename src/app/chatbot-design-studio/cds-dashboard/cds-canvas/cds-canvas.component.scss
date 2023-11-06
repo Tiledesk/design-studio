@@ -236,6 +236,21 @@ cds-fulfillment {
 
   }
 
+.panel--connector--menu{
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  padding: 0;
+  margin: 0;
+  // background-color: brown;
+  display: block;
+  position: absolute;
+  // overflow: hidden;
+  z-index: 1;
+}
+
 
 .panel-action-backdrop {
   display: flex;
@@ -285,6 +300,8 @@ cds-fulfillment {
   bottom: 12px;
   right: 12px;
 }
+
+
 
 
 /*********** START Draggable  *************/

@@ -727,7 +727,13 @@ export class TiledeskConnectors {
         }
       });
       connector.addEventListener('click', (e) => {
-        // // console.log("clicked e", e.currentTarget);
+
+        let pos_x_phis = e.clientX;
+        let pos_y_phis = e.clientY;
+        let mouse_pos_logic = this.logicPoint({ x: pos_x_phis, y: pos_y_phis });
+        let toPointPhis = { x: pos_x_phis, y: pos_y_phis };
+        // console.log("clicked e", e, toPointPhis, mouse_pos_logic);
+        // console.log("clicked e", e.currentTarget);
         if (this.selectedConnector) {
           this.selectedConnector.setAttributeNS(null, "class", this.classes["connector"]);
           this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
@@ -736,7 +742,7 @@ export class TiledeskConnectors {
         this.selectedConnector.setAttributeNS(null, "class", this.classes["connector_selected"]);
         this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow_selected'] + ")");
 
-        const event = new CustomEvent("connector-selected", { detail: { connector: connector } });
+        const event = new CustomEvent("connector-selected", { detail: { connector: connector, mouse_pos: mouse_pos_logic } });
         document.dispatchEvent(event);
       });
       this.svgContainer.appendChild(connector);

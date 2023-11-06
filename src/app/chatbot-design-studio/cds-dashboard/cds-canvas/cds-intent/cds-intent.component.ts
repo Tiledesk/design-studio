@@ -274,7 +274,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     document.addEventListener(
       "connector-moved-over-intent", (e: CustomEvent) => {
-        // this.logger.log('[CDS-INTENT] Connector Moved over intent e ', e)
+        console.log('[CDS-INTENT] Connector Moved over intent e ', e);
         // movingBorder
         // flashBorder
         if (e.detail.toId === this.intent.intent_id) {
@@ -293,7 +293,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     document.addEventListener(
       "connector-moved-out-of-intent", (e: CustomEvent) => {
-        // this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e)
+        console.log('[CDS-INTENT] Connector Moved out of intent e ', e);
         if (e.detail.toId === this.intent.intent_id) {
           // this.logger.log('[CDS-INTENT] Connector Moved out of intent e id ', e.detail.toId)
           const intentContentEl = <HTMLElement>document.querySelector(`#intent-content-${e.detail.toId}`);
