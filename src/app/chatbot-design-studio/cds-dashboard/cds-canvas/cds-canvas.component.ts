@@ -520,7 +520,7 @@ export class CdsCanvasComponent implements OnInit {
   */
   @HostListener('document:mouseup', ['$event']) 
   onMouseUpHandler(event: KeyboardEvent) {
-    this.logger.log('[CDS-CANVAS] MOUSE UP CLOSE FLOAT MENU', this.hasClickedAddAction)
+    this.logger.log('[CDS-CANVAS] MOUSE UP CLOSE FLOAT MENU', this.hasClickedAddAction);
   }
 
 
@@ -630,6 +630,7 @@ export class CdsCanvasComponent implements OnInit {
   onToogleSidebarIntentsList() {
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList  ')
     this.IS_OPEN_INTENTS_LIST = !this.IS_OPEN_INTENTS_LIST;
+    this.removeConnectorDraftAndCloseFloatMenu();
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ',  this.IS_OPEN_INTENTS_LIST)
   }
 
