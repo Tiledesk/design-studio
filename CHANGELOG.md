@@ -5,6 +5,15 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 0.0.4
+- added: new cds-modal-activate-bot while publishing a chatbot
+- added: options on cds-connector
+- added: drag icon in cds-description component only for previewMode
+- changed: background and icon colors in cds-sidebar and cds-panel-intents-list
+- changed: cds-action padding increased 
+- changed: cds-action-reply text element background and padding increased
+- removed: webhook option from panel-intent-controls component
+
 ### 0.0.3
 - added: cds-option zoom-in zoom-out and centerStage
 - added: type in metadata element in cds-action-reply components

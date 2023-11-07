@@ -39,10 +39,10 @@
         color: #394f5a;
         padding: 0;
         vertical-align: middle;
-        margin: 0 6px;
-        cursor: grab;
+        // margin: 0 6px;
         .btn-tdblu-no-boxshadow {
             margin: 0;
+            cursor: grab;
             padding: 0!important;
             background: transparent !important;
             font-size: 12px;
@@ -53,7 +53,11 @@
             align-items: center;
             box-shadow: none;
         }
+        .drag-btn img{
+            width: 16px;
+        }
     }
+    
 }
 
 .trigger-beta-badge {
