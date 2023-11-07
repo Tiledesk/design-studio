@@ -119,10 +119,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             delete intent['attributesChanged'];
           } else { // if(this.intent.actions.length !== intent.actions.length && intent.actions.length>0)
             this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
-            // this.listOfActions = this.intent.actions;
-            this.listOfActions = this.intent.actions.filter(function(obj) {
-              return obj._tdActionType !== TYPE_ACTION.INTENT;
-            });
+            this.listOfActions = this.intent.actions;
+            // cerca il primo connect to block e fissalo in fondo
+            // this.listOfActions = this.intent.actions.filter(function(obj) {
+            //   return obj._tdActionType !== TYPE_ACTION.INTENT;
+            // });
           }
 
           //UPDATE QUESTIONS
@@ -194,22 +195,32 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       this.setIntentSelected();
     }
-
     this.setActionIntentInIntent();
     this.isInternalIntent = checkInternalIntent(this.intent)
     this.addEventListener();
   }
 
   private setActionIntentInIntent(){
-    let actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
-    this.intent.actions = this.intent.actions.map(function(action) {
-      if(action._tdActionType === TYPE_ACTION.INTENT){
-        actionIntent = action;
+
+    // recupero l'ultimo action intent
+    this.actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
+    for (let i = this.intent.actions.length - 1; i >= 0; i--) {
+      if (this.intent.actions[i]._tdActionType === TYPE_ACTION.INTENT) {
+        this.actionIntent = this.intent.actions[i];
+        // console.log('setActionIntentInIntent:: ', this.intent.actions[i]);
+        this.intent.actions.splice(i, 1);
+        break; // Rimuoviamo solo l'ultimo corrispondente
       }
-      return action;
-    });
-    this.actionIntent = actionIntent;
-    if(this.actionIntent.intentName){
+    }
+    // this.intent.actions = this.intent.actions.map(function(action) {
+    //   if(action._tdActionType === TYPE_ACTION.INTENT){
+    //     actionIntent = action;
+    //   }
+    //   return action;
+    // });
+    // this.actionIntent = actionIntent;
+    // console.log('setActionIntentInIntent:: ', this.actionIntent);
+    if(this.actionIntent && this.actionIntent.intentName){
       const fromId = this.intent.intent_id+'/'+this.actionIntent._tdActionId;
       const toId = this.actionIntent.intentName.replace("#", "");
       this.connectorService.createConnectorFromId(fromId, toId, false, false); //Sync
@@ -320,10 +331,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         console.log("setIntentSelected:: ", this.intent.actions);
         this.patchAllActionsId();
         this.patchAttributesPosition();
-        this.listOfActions = this.intent.actions.filter(function(obj) {
-          return obj._tdActionType !== TYPE_ACTION.INTENT;
-        });
-        // this.listOfActions = this.intent.actions;
+        // this.listOfActions = this.intent.actions.filter(function(obj) {
+        //   return obj._tdActionType !== TYPE_ACTION.INTENT;
+        // });
+        this.listOfActions = this.intent.actions;
         // console.log("[CDS-INTENT] listOfActions: ", this.listOfActions);
         // this.form = this.intent.form;
         // this.actions = this.intent.actions;

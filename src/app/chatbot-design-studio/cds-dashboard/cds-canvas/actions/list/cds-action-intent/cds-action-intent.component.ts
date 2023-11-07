@@ -18,6 +18,7 @@ export class CdsActionIntentComponent implements OnInit {
   @Input() isStart: boolean;
   @Input() action: ActionIntentConnected;
   @Input() previewMode: boolean = true;
+  @Input() isLast: boolean = false;
   
   @Output() updateIntentFromConnectorModification = new EventEmitter();
   @Output() updateAndSaveAction = new EventEmitter();

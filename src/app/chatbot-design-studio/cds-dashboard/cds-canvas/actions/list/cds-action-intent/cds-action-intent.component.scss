@@ -16,14 +16,29 @@
     flex-direction: row;
     align-items: flex-end;
     justify-content: flex-end;
-    gap: 5px;
-    padding: 0px;
-    
+    gap: 5px; 
+    padding: 5px 10px;
+    .connector {
+        position: absolute;
+        right: -12px;
+        top: calc(50% - 10px);
+    }
+    &.isLast{
+        padding: 0px;
+        .connector {
+            right: -22px;
+            top: calc(50% - 10px);
+        }
+    }
+
     .title-label{
      color: #6c6859;
      font-size: 12px; 
     }
 }
+
+
+
 
 
 /** NG-SELECT **/

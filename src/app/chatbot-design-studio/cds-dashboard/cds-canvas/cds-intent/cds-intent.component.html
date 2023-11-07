@@ -124,12 +124,12 @@
                     (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                 </cds-action-reply>
 
-                <!-- <cds-action-intent *ngSwitchCase="TYPE_ACTION.INTENT" 
+                <cds-action-intent *ngSwitchCase="TYPE_ACTION.INTENT" 
                     class="panel-response" 
                     [intentSelected]="intent"
                     [action]="action"
                     (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                </cds-action-intent> -->
+                </cds-action-intent>
 
                 <cds-action-email *ngSwitchCase="TYPE_ACTION.EMAIL" 
                     class="panel-response" 
@@ -265,6 +265,7 @@
         class="panel-response action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"
+        [isLast]="true"
         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
     </cds-action-intent>
 

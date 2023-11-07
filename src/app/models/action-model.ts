@@ -183,7 +183,7 @@ export class ActionJsonCondition extends Action {
 }
 
 export class ActionIntentConnected extends Action {
-    intentName: string;
+    intentName?: string;
     json_payload?: Object;
     constructor() {
         super();
