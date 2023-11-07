@@ -16,7 +16,10 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { EXTERNAL_URL, TYPE_INTENT_NAME } from '../../utils';
-import { CdsPublishOnCommunityModalComponent } from '../utils/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
+import { CdsPublishOnCommunityModalComponent } from '../../../modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { environment } from 'src/environments/environment';
+import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
 
 const swal = require('sweetalert');
 
@@ -35,7 +38,6 @@ export class CdsHeaderComponent implements OnInit {
   @Output() toggleSidebarWith = new EventEmitter();
   @Output() goToBck = new EventEmitter();
   @Output() onTestItOut = new EventEmitter();
-  @Output() goToGetBotById = new EventEmitter();
 
 
   id_faq_kb: string;
@@ -44,14 +46,11 @@ export class CdsHeaderComponent implements OnInit {
   selectedChatbot: Chatbot;
 
 
-
-  PRESENTS_MODAL_ATTACH_BOT_TO_DEPT: boolean = false;
   isBetaUrl: boolean = false;
   popup_visibility: string = 'none';
   public TESTSITE_BASE_URL: string;
   public_Key: string;
   TRY_ON_WA: boolean;
-  displayModalAttacchBotToDept: string;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -63,13 +62,14 @@ export class CdsHeaderComponent implements OnInit {
     private multichannelService: MultichannelService,
     private notify: NotifyService,
     private dashboardService: DashboardService,
-    private intentService: IntentService
+    private intentService: IntentService,
+    private tiledeskAuthService: TiledeskAuthService
   ) { }
 
   ngOnInit(): void {
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.projectID = this.dashboardService.projectID;
-    this.defaultDepartmentId = this.dashboardService.defaultDepartmentId;
+    this.defaultDepartmentId = this.dashboardService.defaultDepartment._id;
     this.selectedChatbot = this.dashboardService.selectedChatbot;
 
     this.getTestSiteUrl();
@@ -126,6 +126,20 @@ export class CdsHeaderComponent implements OnInit {
   }
 
 
+  onClickPublish(){
+    this.logger.log('[CDS DSBRD] click on PUBLISH --> open  - CdsPublishOnCommunityModalComponent ', this.selectedChatbot)
+    const dialogRef = this.dialog.open(CdsModalActivateBotComponent, {
+      data: {
+        chatbot: this.selectedChatbot,
+        departments: this.dashboardService.departments,
+        project_id: this.projectID
+      },
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.logger.log(`Dialog result: ${result}`);
+      // this.publish()
+    });
+  }
 
   publish() {
     this.faqKbService.publish(this.selectedChatbot).subscribe((data) => {
@@ -137,30 +151,7 @@ export class CdsHeaderComponent implements OnInit {
       this.logger.log('[CDS DSBRD] publish * COMPLETE *');
       this.notify.showWidgetStyleUpdateNotification('Successfully published', 2, 'done');
       // this.getBotById(this.id_faq_kb);
-      this.goToGetBotById.emit(this.id_faq_kb);
-    });
-    if (this.PRESENTS_MODAL_ATTACH_BOT_TO_DEPT === true) {
-      this.present_modal_attacch_bot_to_dept()
-    }
-  }
-
-
-  present_modal_attacch_bot_to_dept() {
-    this.PRESENTS_MODAL_ATTACH_BOT_TO_DEPT = false;
-    this.displayModalAttacchBotToDept = 'block';
-  }
-
-
-  onPublishOnCommunity(){
-    this.logger.log('openDialog')
-    const dialogRef = this.dialog.open(CdsPublishOnCommunityModalComponent, {
-      data: {
-        chatbot: this.selectedChatbot,
-        projectId: this.projectID
-      },
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      this.logger.log(`Dialog result: ${result}`);
+      // this.segmentChatbotPublished()
     });
   }
 
@@ -236,6 +227,44 @@ export class CdsHeaderComponent implements OnInit {
     let intentStart = this.intentService.listOfIntents.find(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
     this.intentService.setIntentSelected(intentStart.intent_id);
     this.onTestItOut.emit(true);
+  }
+
+
+  private segmentChatbotPublished(){
+    const that = this
+    let user = this.tiledeskAuthService.getCurrentUser();
+    let countIntents = this.intentService.listOfIntents.length;
+    if(window['analytics']){
+      try {
+        window['analytics'].page("CDS Button Publish, Publish Chatbot", {
+          version: environment.VERSION
+        });
+      } catch (err) {
+        this.logger.error('Event:Publish Chatbot [page] error', err);
+      }
+  
+      try {
+        window['analytics'].identify(user.uid, {
+          name: user.firstname + ' ' + user.lastname,
+          email: user.email,
+        });
+      } catch (err) {
+        this.logger.error('Event:Publish Chatbot [identify] error', err);
+      }
+      // Segments
+      try {
+        window['analytics'].track('Publish Chatbot', {
+          "username": user.firstname + ' ' + user.lastname,
+          "userId": user.uid,
+          "countBlocks": countIntents,
+          "chatbot_id": that.selectedChatbot._id,
+          "chatbot_type": that.selectedChatbot.type,
+          "project_id": that.projectID
+        });
+      } catch (err) {
+        this.logger.error('Event: Publish Chatbot [track] error', err);
+      }
+    }
   }
 
 }

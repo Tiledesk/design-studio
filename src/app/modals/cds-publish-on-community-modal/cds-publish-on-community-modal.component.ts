@@ -19,6 +19,7 @@ export class CdsPublishOnCommunityModalComponent implements OnInit {
 
   @ViewChild('Selecter', { static: false }) ngselect: NgSelectComponent;
   @ViewChild(NgSelectComponent, { static: false }) ngSelect: NgSelectComponent
+  
   tagsList: Array<any> = []
   tag: any;
   tagcolor: any;

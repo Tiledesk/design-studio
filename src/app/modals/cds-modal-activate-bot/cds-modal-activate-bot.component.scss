@@ -1,0 +1,158 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+:host{
+    --content-background: rgb(244, 246, 251, 0.4);
+}
+.cds-modal-content{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 550px;
+    height: 300px
+}
+
+.cds-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    h1 {
+        margin:0px;
+    }
+    mat-dialog-actions{
+        text-align: right;
+        padding: 0;
+        min-height: auto;
+        margin: 0;
+    }
+    button {
+        background: transparent;
+        border: unset;
+        position: relative;
+        padding: 0px;
+    }
+}
+
+.cds-modal-body{
+    display: flex;
+    height: 100%;
+
+    .modal-flex{
+        height: 100%;
+        width: 100%;
+        padding: 10px 30px;
+    }
+
+    .bot_name_bold {
+        font-weight: 400 !important;
+    }
+
+    span{
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.cds-modal-footer{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+
+    #ignoreBtn{
+        background-color: $blu-light-02;
+    }
+
+    #installBtn{
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+.cds-modal-footer#publishStep{
+    justify-content: center;
+}
+
+pre ::ng-deep{
+    background-color: var(--content-background);
+    border: 1px solid $gray-light-02;
+    line-height: 16px;
+    margin-bottom: 0px;
+    overflow: hidden;
+    border-radius: 4px;
+    font-size: 13px;
+    display: flex;
+    position: relative;
+
+    p{
+      margin: 5px 0px;
+      overflow-x: auto;  
+    }
+    span.material-icons{
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        color: $blu;
+        font-size: 14px;
+        &:hover{
+            cursor: pointer;
+            opacity: 0.8;
+        }
+    }
+}
+
+// ------------------------------------------------
+// for the svg in the modal Hook The Bot
+// ------------------------------------------------
+.path {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 0;
+    &.circle {
+      -webkit-animation: dash 0.9s ease-in-out;
+      animation: dash 0.9s ease-in-out;
+    }
+    &.line {
+      stroke-dashoffset: 1000;
+      -webkit-animation: dash 0.9s 0.35s ease-in-out forwards;
+      animation: dash 0.9s 0.35s ease-in-out forwards;
+    }
+    &.check {
+      stroke-dashoffset: -100;
+      -webkit-animation: dash-check 0.9s 0.35s ease-in-out forwards;
+      animation: dash-check 0.9s 0.35s ease-in-out forwards;
+    }
+  }
+  
+  @-webkit-keyframes dash {
+    0% {
+      stroke-dashoffset: 1000;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  @keyframes dash {
+    0% {
+      stroke-dashoffset: 1000;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  @-webkit-keyframes dash-check {
+    0% {
+      stroke-dashoffset: -100;
+    }
+    100% {
+      stroke-dashoffset: 900;
+    }
+  }
+  
+  @keyframes dash-check {
+    0% {
+      stroke-dashoffset: -100;
+    }
+    100% {
+      stroke-dashoffset: 900;
+    }
+  }

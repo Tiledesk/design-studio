@@ -10,10 +10,12 @@
     justify-content: center;
     align-items: center;
     transition: 0.3s;
-    background-color: $blu;
+    // background-color: $blu;
     border-right: 1px solid $gray-light-02;
     img {
         width: 30px;
+        filter: brightness(0) saturate(100%) invert(35%) sepia(68%) saturate(2709%) hue-rotate(333deg) brightness(103%) contrast(100%);
+
     }
     &.is_opened{
         max-width: 175px;
