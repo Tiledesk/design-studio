@@ -599,6 +599,7 @@
     "UserProfile": {
         "Profile": "Profile",
         "UploadImage": "Upload image",
+        "Avatar":"Avatar",
         "Name": "Name",
         "Lastname": "Lastname",
         "UserId": "User Id",

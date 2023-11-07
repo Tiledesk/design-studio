@@ -58,6 +58,12 @@ svg {
     }
 }
 
+//notification close icon
+button.close{
+    background-color: transparent;
+    border-color: transparent;
+}
+
 .modal-content .modal-footer button + button{
     margin-bottom: unset;
 }
@@ -328,15 +334,6 @@ cds-connector.connector-false {
 }
 
 
-::ng-deep .cds-mat-tooltip {
-    background-color: #2d323e !important;
-    font-size: 12px !important;
-    border-radius: 6px !important;
-    font-family: "Poppins", "Roboto", "Arial", sans-serif !important;
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-  }
-
 ::ng-deep .mat-expansion-indicator::after {
 color: white;
 }
@@ -369,6 +366,7 @@ color: white;
     text-transform: capitalize;
     font-size: 14px;
     padding: 6px 12px;
+    margin: 0;
     border-radius: $btn-border-radius;
     &:hover {
         opacity: 0.8;
