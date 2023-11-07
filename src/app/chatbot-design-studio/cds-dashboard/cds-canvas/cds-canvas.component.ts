@@ -402,6 +402,7 @@ export class CdsCanvasComponent implements OnInit {
         delete connector['created'];
         this.connectorService.deleteConnectorToList(connector.id);
         this.intentService.onChangedConnector(connector);
+        this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
       },
       true
     );

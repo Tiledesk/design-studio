@@ -16,11 +16,17 @@
 }
 
 
+
 .action-intent {
   padding: 0 12px 0 0;
   margin: 7px 0 -4px 0;
   display: block;
 }
+
+.action-element{
+  width: 100%;
+}
+
 
 .panel-intent-content {
   transition: background-color 0.15s ease 0s;
@@ -278,7 +284,11 @@
   border-radius: var(--base-border-radius-preview);
   border: 2px solid rgb(255, 255, 255);
   // padding: 0 10px 10px 10px;
-  background-color: var(--action-background)
+  background-color: var(--action-background);
+  &.isLast{
+    // height: 1px!important;
+    display: none;
+  }
 }
 
 /* Drag placeholder 
@@ -381,6 +391,9 @@
   // border-radius: 6px;
   // background-color: rgb(255 255 255 / 50%);
   // box-shadow: rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+  &.isLast{
+    display: none;
+  }
 }
 
 .icon-action {
