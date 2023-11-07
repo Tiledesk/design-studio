@@ -29,8 +29,9 @@ export class CdsModalActivateBotComponent implements OnInit {
   // PRESENTS_MODAL_ATTACH_BOT_TO_DEPT: boolean = false;
   depts_without_bot_array = [];
 
-  selected_bot_name: string;
-  dept_id: string;
+  selected_dept_name: string;
+  // dept_id: string;
+  deptSelected: { id: string, name: string}
   HAS_CLICKED_HOOK_BOOT_TO_DEPT: boolean = false;
   HAS_COMPLETED_HOOK_BOOT_TO_DEPT: boolean = false;
   HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS: boolean = false;
@@ -70,7 +71,7 @@ export class CdsModalActivateBotComponent implements OnInit {
 
   checkDepartmentsForProjectIdHasBot(){
     if(this.departments){
-      this.departments.forEach((dept: any) => {
+      this.departments.forEach((dept: Department) => {
         // this.logger.log('[CDS DSBRD] - DEPT', dept);
         if (dept.default === true) {
           this.defaultDepartmentId = dept._id;
@@ -82,7 +83,7 @@ export class CdsModalActivateBotComponent implements OnInit {
 
       if (depts_length === 1) {
         this.DISPLAY_SELECT_DEPTS_WITHOUT_BOT = false;
-        this.dept_id = this.departments[0]['_id']
+        this.deptSelected = {id: this.departments[0]._id, name: this.departments[0].name}
 
         this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT]  --->  DEFAULT DEPT HAS BOT ', this.departments[0].hasBot);
         if (this.departments[0].hasBot === true) {
@@ -114,20 +115,13 @@ export class CdsModalActivateBotComponent implements OnInit {
   }
 
   onSelectDept(event: {id: string, name: string}){
-    this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT] --->  onSelectBotId ', event);
-    this.dept_id = event.id
-    const hasFound = this.depts_without_bot_array.filter((obj: any) => {
-      return obj.id === this.dept_id;
-    });
-    this.logger.log('[CDS DSBRD]  onSelectBotId found', hasFound);
-    if (hasFound.length > 0) {
-      this.selected_bot_name = hasFound[0]['name']
-    }
+    this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT] --->  onSelectDept ', event);
+    this.deptSelected = event
   }
 
   hookBotToDept() {
     this.HAS_CLICKED_HOOK_BOOT_TO_DEPT = true;
-    this.departmentService.updateExistingDeptWithSelectedBot(this.dept_id, this.selectedChatbot._id).subscribe((res) => {
+    this.departmentService.updateExistingDeptWithSelectedBot(this.deptSelected.id, this.selectedChatbot._id).subscribe((res) => {
       this.logger.log('[BOT-CREATE] Bot Create - UPDATE EXISTING DEPT WITH SELECED BOT - RES ', res);
     }, (error) => {
       this.logger.error('[BOT-CREATE] Bot Create - UPDATE EXISTING DEPT WITH SELECED BOT - ERROR ', error);
@@ -149,13 +143,12 @@ export class CdsModalActivateBotComponent implements OnInit {
     this.faqKbService.publish(this.selectedChatbot).subscribe((data) => {
       this.logger.log('[CDS DSBRD] publish  - RES ', data)
     }, (error) => {
-      this.HAS_COMPLETED_HOOK_BOOT_TO_DEPT = true
+      this.HAS_COMPLETED_PUBLISH = true
       this.HAS_COMPLETED_PUBLISH_ERROR = true
       this.logger.error('[CDS DSBRD] publish ERROR ', error);
     }, () => {
-      this.HAS_COMPLETED_HOOK_BOOT_TO_DEPT = true
+      this.HAS_COMPLETED_PUBLISH = true
       this.HAS_COMPLETED_PUBLISH_SUCCESS = true
-      
       this.logger.log('[CDS DSBRD] publish * COMPLETE *');
     });
   }

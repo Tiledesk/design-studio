@@ -90,16 +90,16 @@
                 <span> {{ "Install" | translate }} </span>
             </div>
 
-            <button *ngIf="!dept_id && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false && !DISPLAY_INSTALL_SCRIPT" id="ignoreBtn"
+            <button *ngIf="!deptSelected && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false && !DISPLAY_INSTALL_SCRIPT" id="ignoreBtn"
                 class="btn btn-primary cds-blue-button" (click)="DEPTS_HAS_NOT_A_BOT = !DEPTS_HAS_NOT_A_BOT">
                 <span> {{ 'Ignore' | translate}} </span>
             </button>
 
-            <button *ngIf="dept_id &&  HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+            <button *ngIf="deptSelected &&  HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
                 class="btn btn-primary cds-blue-button" (click)="hookBotToDept()">
                 <i *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
                     class="fa fa-spinner fa-spin"></i>
-                <span> {{ 'ActivateFor' | translate}} <b>{{selected_bot_name}}</b> </span>
+                <span> {{ 'ActivateFor' | translate}} <b>{{deptSelected.name}}</b> </span>
             </button>
 
             <button *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === true"
@@ -118,7 +118,7 @@
 
 <ng-template #publishStep>
     <div class="cds-modal-body" id="publishStep">   
-        <div class="field-box modal-flex">
+        <div *ngIf="!HAS_COMPLETED_PUBLISH" class="field-box modal-flex">
             <label class="title-label"></label>
             Publish your flow?
             <!-- <h3> {{ 'DoYouWantToActivateTheBotForNewVonversations' | translate: translateparamBotName }} </h3> -->
@@ -136,7 +136,7 @@
                         stroke-linecap="round" stroke-miterlimit="10"
                         points="100.2,40.2 51.5,88.8 29.8,67.5 " />
                 </svg>
-                <h5 style="color:#73AF55;"> {{'BotSuccessfullyActivated' | translate }}</h5>
+                <h5 style="color:#73AF55;"> {{'BotSuccessFullyPublished' | translate }}</h5>
             </span>
 
             <span *ngIf="HAS_COMPLETED_PUBLISH_ERROR" class="field-box modal-flex">
@@ -150,14 +150,14 @@
                     <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
                         stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
                 </svg>
-                <h5 style="color:#D06079;"> {{'AnErroOccurredWhileActivatingTheBot' | translate }}</h5>
+                <h5 style="color:#D06079;"> {{'AnErroOccurredWhilePublishingTheBot' | translate }}</h5>
             </span>
         </div>
     </div> <!-- /.modal-body -->
 
     <div class="cds-modal-footer" id="publishStep">
 
-        <button *ngIf="!HAS_COMPLETED_PUBLISH"
+        <button *ngIf="!HAS_COMPLETED_PUBLISH" (click)="publish()"
             class="btn btn-primary cds-blue-button">
             <span> {{ "Publish" | translate }} </span>
         </button>
