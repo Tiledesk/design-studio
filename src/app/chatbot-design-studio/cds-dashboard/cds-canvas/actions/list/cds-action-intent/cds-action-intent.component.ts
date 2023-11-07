@@ -3,7 +3,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionIntentConnected  } from 'src/app/models/action-model';
 import { IntentService } from '../../../../../services/intent.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { TYPE_UPDATE_ACTION, ACTIONS_LIST } from '../../../../../utils';
+import { TYPE_UPDATE_ACTION, ACTIONS_LIST, TYPE_ACTION } from '../../../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -18,6 +18,7 @@ export class CdsActionIntentComponent implements OnInit {
   @Input() isStart: boolean;
   @Input() action: ActionIntentConnected;
   @Input() previewMode: boolean = true;
+  @Input() isLast: boolean = false;
   
   @Output() updateIntentFromConnectorModification = new EventEmitter();
   @Output() updateAndSaveAction = new EventEmitter();
@@ -40,7 +41,7 @@ export class CdsActionIntentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // console.log("[CDS-ACTION-INTENT] elementSelected: ", this.action, this.intentSelected)
+    console.log("[CDS-ACTION-INTENT] elementSelected: ", this.action, this.intentSelected)
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       // console.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
       this.connector = connector;
@@ -85,6 +86,8 @@ export class CdsActionIntentComponent implements OnInit {
   private updateConnector(){
     this.isConnected = this.action.intentName?true:false;
     try {
+      if(!this.action.intentName)this.isConnected = false;
+      else this.isConnected = true;
       const array = this.connector.fromId.split("/");
       const idAction= array[1];
       // console.log('[CDS-ACTION-INTENT] 2 - updateConnector :: ', idAction, this.action._tdActionId, this.connector);
@@ -93,6 +96,7 @@ export class CdsActionIntentComponent implements OnInit {
           this.action.intentName = null;
           this.isConnected = false;
         } else {
+          // console.log('[CDS-ACTION-INTENT] connettore creato - PALLINO PIENO :: ', this.connector);
           this.isConnected = true;
           this.action.intentName = "#"+this.connector.toId;
         }

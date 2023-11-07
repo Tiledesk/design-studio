@@ -58,6 +58,14 @@
             [style.left.px]="getIntentPosition(intent.intent_id).x" 
             [intent]="intent">
         </cds-event>
+
+        <cds-panel-connector-menu *ngIf="IS_OPEN_PANEL_CONNECTOR_MENU"
+            class="panel--connector--menu" 
+            [style.top.px]="mousePosition.y" 
+            [style.left.px]="mousePosition.x"
+            (addActionFromConnectorMenu)="onAddActionFromConnectorMenu($event)">
+        </cds-panel-connector-menu>
+
     </div> 
 
     <cds-options class="cds-panel-elements" 
@@ -65,6 +73,8 @@
         [stateUndoRedo]="stateUndoRedo"
         (onOptionClicked)="onOptionClicked($event)">
     </cds-options>
+    
+
     
 </div>
 
@@ -100,3 +110,6 @@
     id="widget-preview" 
     class="cds-generic-panel">
 </cds-panel-widget>
+
+
+

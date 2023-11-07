@@ -34,7 +34,7 @@
         <cds-action-intent class="panel-response" 
             [isStart]="isStart" 
             [intentSelected]="intent"
-            [action]="listOfActions[0]" 
+            [action]="startAction" 
             (updateAndSaveAction)="onUpdateAndSaveAction($event)">
         </cds-action-intent>
     </div>
@@ -265,6 +265,7 @@
         class="panel-response action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"
+        [isLast]="true"
         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
     </cds-action-intent>
 

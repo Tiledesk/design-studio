@@ -21,7 +21,7 @@ import { isElementOnTheStage, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID,
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
-const swal = require('sweetalert');
+// const swal = require('sweetalert');
 
 @Component({
   selector: 'cds-canvas',
@@ -75,6 +75,11 @@ export class CdsCanvasComponent implements OnInit {
   /** panel options */
   private subscriptionUndoRedo: Subscription;
   stateUndoRedo: any = {undo:false, redo: false};
+
+  /** panel connector */
+  IS_OPEN_PANEL_CONNECTOR_MENU: boolean = false;
+  mousePosition: any;
+  connectorSelected: any;
   
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
@@ -230,6 +235,7 @@ export class CdsCanvasComponent implements OnInit {
     this.IS_OPEN_PANEL_WIDGET = false;
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
+    this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     // this.closePanelWidget.next();
   }
 
@@ -420,7 +426,14 @@ export class CdsCanvasComponent implements OnInit {
     */
     document.addEventListener(
       "connector-selected", (e: CustomEvent) => {
-        this.logger.log("[CDS-CANVAS] connector-selected:", e);
+      //  console.log("[CDS-CANVAS] connector-selected:", e, e.detail.mouse_pos);
+        this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
+        this.mousePosition = e.detail.mouse_pos;
+        this.mousePosition.x -= 15;
+        this.mousePosition.y -= 15;
+        this.connectorSelected =  e.detail.connector;
+        // this.IS_OPEN_ADD_ACTIONS_MENU = true;
+        // this.positionFloatMenu = e.detail.mouse_pos;
         this.intentService.unselectAction();
       },
       true
@@ -507,7 +520,7 @@ export class CdsCanvasComponent implements OnInit {
   */
   @HostListener('document:mouseup', ['$event']) 
   onMouseUpHandler(event: KeyboardEvent) {
-    this.logger.log('[CDS-CANVAS] MOUSE UP CLOSE FLOAT MENU', this.hasClickedAddAction)
+    this.logger.log('[CDS-CANVAS] MOUSE UP CLOSE FLOAT MENU', this.hasClickedAddAction);
   }
 
 
@@ -617,6 +630,7 @@ export class CdsCanvasComponent implements OnInit {
   onToogleSidebarIntentsList() {
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList  ')
     this.IS_OPEN_INTENTS_LIST = !this.IS_OPEN_INTENTS_LIST;
+    this.removeConnectorDraftAndCloseFloatMenu();
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ',  this.IS_OPEN_INTENTS_LIST)
   }
 
@@ -806,18 +820,20 @@ export class CdsCanvasComponent implements OnInit {
     if (!this.hasClickedAddAction) {
       this.removeConnectorDraftAndCloseFloatMenu();
     }
-    swal({
-      title: this.translate.instant('AreYouSure'),
-      text: "The block " + intent.intent_display_name + " will be deleted",
-      icon: "warning",
-      buttons: ["Cancel", "Delete"],
-      dangerMode: true,
-    }).then((WillDelete) => {
-      if (WillDelete) {
-        this.closeAllPanels();
-        this.deleteIntent(intent);
-      }
-    })
+    this.closeAllPanels();
+    this.deleteIntent(intent);
+    // swal({
+    //   title: this.translate.instant('AreYouSure'),
+    //   text: "The block " + intent.intent_display_name + " will be deleted",
+    //   icon: "warning",
+    //   buttons: ["Cancel", "Delete"],
+    //   dangerMode: true,
+    // }).then((WillDelete) => {
+    //   if (WillDelete) {
+    //     this.closeAllPanels();
+    //     this.deleteIntent(intent);
+    //   }
+    // })
   }
   // --------------------------------------------------------- //
  
@@ -891,6 +907,8 @@ export class CdsCanvasComponent implements OnInit {
     const pos = { 'x': event.x, 'y': event.y }
     this.intentSelected = event.intent;
     this.positionFloatMenu = pos;
+
+
     this.logger.log('[CDS-CANVAS] showPanelActions intentSelected ', this.intentSelected);
     this.logger.log('[CDS-CANVAS] showPanelActions positionFloatMenu ', this.positionFloatMenu)
   }
@@ -1025,4 +1043,18 @@ export class CdsCanvasComponent implements OnInit {
   // --------------------------------------------------------- //
 
 
+
+  /**
+   * onAddActionFromConnectorMenu
+   * @param event 
+   */
+  async onAddActionFromConnectorMenu(event) {
+    const connector = this.connectorSelected;
+    // console.log('[CDS-CANVAS] onAddActionFromConnectorMenu:: ', event, connector.id);
+    if(event.type === "delete"){
+      this.connectorService.deleteConnector(connector.id, true, true);
+      this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+    }
+  }
+  // --------------------------------------------------------- //
 }

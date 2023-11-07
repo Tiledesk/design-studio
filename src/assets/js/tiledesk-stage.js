@@ -173,7 +173,6 @@ export class TiledeskStage {
             event.preventDefault();
             pos_mouse_x = event.clientX;
             pos_mouse_y = event.clientY;
-
             const custom_event = new CustomEvent("start-dragging", {
                 detail: {
                     element: element
