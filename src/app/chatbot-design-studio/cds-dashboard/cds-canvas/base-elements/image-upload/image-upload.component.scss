@@ -81,16 +81,15 @@
     }
 }
 
-::ng-deep .custom-spinner {
+loading-spinner.custom-spinner ::ng-deep{
     padding: 17px 0px;
     .sk-fading-circle {
-        width: 40px !important;
-        height: 40px !important;
-        margin: 0px !important;
+        width: 40px ;
+        height: 40px ;
+        margin: 0px ;
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: $blu !important;
+        background-color: $blu ;
     }
-
 }

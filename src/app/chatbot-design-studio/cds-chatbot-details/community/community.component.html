@@ -73,7 +73,7 @@
                     <!-- ------------------------------------------------------------------------------------------- -->
                     <!--  Main Category  -->
                     <!-- ------------------------------------------------------------------------------------------- -->
-                    <label class="col-xs-12 cds--custom-label">
+                    <label class="col-xs-12">
                         <!-- {{ 'Description' | translate }} -->
                         Main Category <span>*</span>
                     </label>
@@ -98,11 +98,11 @@
                     <!-- ------------------------------------------------------------------------------------------- -->
                     <!--  Bot title  -->
                     <!-- ------------------------------------------------------------------------------------------- -->
-                        <label class="col-xs-12 cds--custom-label">
+                        <label class="col-xs-12">
                             <!-- {{ "BotsAddEditPage.Type" | translate }} -->
                             <!-- {{ 'Title' | translate }} -->
                             Title <span>*</span>
-                        </label>
+                        </label> 
                         <div class="col-xs-12">
                             <input id="bot_type" name="bot_type" [(ngModel)]="selectedChatbot.title"
                                 (ngModelChange)="onChangeTitle($event)" class="input csd-chatbot-dtls-input" type="text"

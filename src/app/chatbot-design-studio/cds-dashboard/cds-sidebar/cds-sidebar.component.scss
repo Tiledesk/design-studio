@@ -208,13 +208,14 @@ li > a {
     }
 
     .item-icon {
-        color: $blu-light-02;
-        fill: $blu-light-02;
+        color: $blu;
+        fill: $blu;
     }
 
 }
 
-.section:hover {
+.section:hover,
+.is_active {
     background-color: $blu;
     .item-icon {
         color: white;
@@ -222,10 +223,10 @@ li > a {
     }
 }
 
-.is_active {
-    // background-color: $icon-active-background;
-    .item-icon {
-        color: $blu;
-        fill: $blu;
-    }
-}
+// .is_active {
+//     // background-color: $icon-active-background;
+//     .item-icon {
+//         color: $blu;
+//         fill: $blu;
+//     }
+// }

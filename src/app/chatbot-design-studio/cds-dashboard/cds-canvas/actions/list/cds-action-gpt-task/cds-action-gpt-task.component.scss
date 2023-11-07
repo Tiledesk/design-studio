@@ -267,23 +267,6 @@ mat-expansion-panel ::ng-deep {
 
 // *********** AI SETTINGS --end *********** //
 
-#cds-publish-btn {
-    background: $blu;
-    color: #fff;
-    box-shadow: none;
-    font-weight: 500;
-    font-family: Poppins, Roboto, Arial, sans-serif;
-    text-transform: capitalize;
-    font-size: 14px;
-    padding: 6px 12px;
-    border-radius: 10px;
-}
-
-#cds-publish-btn:hover {
-    opacity: .8 !important;
-}
-
-
 .header-answer-preview {
     width: 100%;
     display: flex;
@@ -325,6 +308,7 @@ mat-expansion-panel ::ng-deep {
 
 .placeholder-container {
     display: flex;
+    align-items: center;
 }
 
 .generating-placeholder {
@@ -335,17 +319,16 @@ mat-expansion-panel ::ng-deep {
     border-radius: 8px;
 }
 
-::ng-deep .custom-spinner {
+loading-spinner.custom-spinner ::ng-deep {
     .sk-fading-circle {
-        width: 20px !important;
-        height: 20px !important;
-        margin: 0px !important;
+        width: 20px ;
+        height: 20px ;
+        margin: 0px ;
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: $blu !important;
+        background-color: $blu ;
     }
-
 }
 
 .label-and-button-container {

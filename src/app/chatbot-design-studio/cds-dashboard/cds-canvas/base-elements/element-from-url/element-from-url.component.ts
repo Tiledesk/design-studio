@@ -55,7 +55,7 @@ export class CDSElementFromUrlComponent implements OnInit {
   }
 
   onDeletePathElement(event){
-    this.pathElement = null
+    this.pathElement = ''
     console.log('[IFRAME-UPLOAD] onDeletePathElement', event)
     this.onDeletedMetadata.emit()
   }

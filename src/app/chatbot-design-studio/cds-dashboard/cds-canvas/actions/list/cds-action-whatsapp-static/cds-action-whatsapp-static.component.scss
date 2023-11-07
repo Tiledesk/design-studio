@@ -139,7 +139,7 @@ cds-textarea#phone-number-id.is-invalid ::ng-deep {
 }
 
 
-::ng-deep pre {
+pre ::ng-deep{
     color: $color-withe-hex;
     line-height: 16px;
     margin-bottom: 0px;

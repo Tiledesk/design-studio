@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild, isDevMode } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NgSelectComponent } from '@ng-select/ng-select';
-import { CdsPublishOnCommunityModalComponent } from '../../cds-dashboard/utils/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
+import { CdsPublishOnCommunityModalComponent } from '../../../modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
 import { CERTIFIED_TAGS } from '../../utils';
 import { NotifyService } from 'src/app/services/notify.service';
 import { Chatbot } from 'src/app/models/faq_kb-model';

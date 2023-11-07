@@ -1,14 +1,25 @@
 @import "./src/assets/sass/cds/_variables.scss";
+
+:host {
+  --background-color: #{$blu-light-01};
+  --column-color: #{$blu-02};
+  --text-color: #{$blu};
+
+  --content-background: rgb(244, 246, 251, 0.4);
+  --base-radius: 8px
+}
+
 .card-wrp{
     // width: 100%;
     min-width: 400px;
     height: auto;
     max-height: 100%;
-    border-radius: $panel-border-radius;
+    border-radius: var(--base-radius);
     overflow: hidden;
     margin: 10px 50px;
     padding: 0;
-    background-color: #293445;
+    background-color: var(--content-background);
+    border: 1px solid rgb(223, 227, 237);
 
     &.new-rule{
       opacity: 0;
@@ -33,8 +44,9 @@
     .card-title{
         // width: calc(100% - 40px);
         margin-bottom: 10px;
-        color: white;
+        color: var(--text-color);
         font-size: 20px;
+        font-weight: 400;
 
         &.no-margin{
           margin: 0px
@@ -44,7 +56,7 @@
     .card-subtitle{
         // width: calc(100% - 40px);
         // margin-left: 30px;
-        color: white;
+        color: var(--column-color);
     }
 
 }
@@ -58,7 +70,7 @@
 mat-accordion{
     width: 100%;
 }
-mat-expansion-panel {
+mat-expansion-panel ::ng-deep {
     background-color: transparent;
         .mat-expansion-panel-header {
         //    height: auto;
@@ -75,13 +87,22 @@ mat-expansion-panel {
 
         &.card-title{
             .material-icons{
-                color: $icon-color;
+                color: var(--text-color);
             }
         }
 
         cds-text{
             width: 100%;
         }
+    }
+
+    .mat-expansion-indicator::after {
+      color: var(--text-color) !important;
+    }
+
+    ::ng-deep .mat-expansion-indicator,
+    .mat-expansion-indicator:after {
+        color: var(--text-color);
     }
 
 }

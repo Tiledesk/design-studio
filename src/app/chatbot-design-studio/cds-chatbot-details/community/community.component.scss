@@ -42,6 +42,9 @@
     padding-left: 16px;
     padding-right: 16px;
     // text-align: right !important;
+    label{
+        color: $blu;
+    }
 }
 
 @media (max-width: 768px) {

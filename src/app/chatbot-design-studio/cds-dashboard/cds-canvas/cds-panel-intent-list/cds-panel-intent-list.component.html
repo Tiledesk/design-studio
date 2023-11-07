@@ -18,7 +18,7 @@
 
                     <div class="item-box" *ngIf="IS_OPEN">
                         <div>
-                            <p class="intent-display-name truncate">{{intent.intent_display_name}}</p>
+                            <p class="intent-display-name ellips">{{intent.intent_display_name}}</p>
                             <div class="icon-list">
                                 <p *ngIf="intent.questions" class="ai-icon icon" style="margin-bottom: 0px">Ai</p>
                                 <span *ngIf="intent.webhook_enabled" class="material-icons icon webhook-icon">webhook</span>
@@ -48,7 +48,7 @@
             <span class="material-icons">search</span>
         </div>
         <div class="input-box-search-input-wpr">
-            <input class="custom-input truncate" placeholder="search a block..."
+            <input class="custom-input ellips" placeholder="search a block..."
                 (input)="onLiveSearch($event.target.value);">
         </div>
     </div>
@@ -73,7 +73,7 @@
 
                 <div class="item-box" *ngIf="IS_OPEN">
                     <div>
-                        <p class="intent-display-name truncate">{{intent.intent_display_name}}</p>
+                        <p class="intent-display-name ellips">{{intent.intent_display_name}}</p>
                         <div class="icon-list">
                             <p *ngIf="intent.questions" class="ai-icon icon" style="margin-bottom: 0px">Ai</p>
                             <span *ngIf="intent.webhook_enabled" class="material-icons icon webhook-icon">webhook</span>

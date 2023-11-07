@@ -215,7 +215,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.logger.log('[CDS-CHATBOT-DTLS] --->  onSelectDept id_faq_kb', this.selectedChatbot._id);
     this.dept_id = this.selected_dept_id
 
-
     const hasFound = this.depts_without_bot_array.filter((obj: any) => {
       return obj.id === this.selected_dept_id;
     });

@@ -20,7 +20,7 @@
     <!--  {{ botProfileImageExist }} -->
     <div class="row">
       <label class="col-sm-2 cds-bot_avatar_label">
-        Avatar
+        {{ "UserProfile.Avatar" | translate }}
       </label>
       <div class="col-sm-10">
         <!-- [ngStyle]="{'margin-left':botType === 'dialogflow' ? '35px' : 0 }" -->
@@ -42,7 +42,7 @@
               {{ "UserProfile.UploadImage" | translate }}
             </span>
             <span *ngIf="isFilePendingToUpload">
-              {{ 'VisitorsPage.Loading' | translate }}
+              {{ "Loading" | translate }}
               <i class="fa fa-spinner fa-spin"></i>
             </span>
           </label>
