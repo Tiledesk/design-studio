@@ -114,16 +114,16 @@ export class CdsDashboardComponent implements OnInit {
       this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
       const getCurrentProject = await this.dashboardService.getCurrentProject();
       this.logger.log('[CDS DSHBRD] Risultato 3:', getCurrentProject);
+
+
       this.project = this.dashboardService.project
-      console.log('ppppppppppp', this.project)
       this.initialize()
       const getBotById = await this.dashboardService.getBotById();
       this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
-      const getDefaultDepartmentId = this.dashboardService.getDeptsByProjectId();
+      const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();
       this.logger.log('[CDS DSHBRD] Risultato 5:', getDefaultDepartmentId);
       if (getTranslations && getUrlParams && getBotById && getCurrentProject && getDefaultDepartmentId) {
         this.logger.log('[CDS DSHBRD] Ho finito di inizializzare la dashboard');
-        this.project = this.dashboardService.project;
         this.selectedChatbot = this.dashboardService.selectedChatbot;
         this.initFinished = true;
       }

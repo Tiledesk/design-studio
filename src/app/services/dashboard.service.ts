@@ -14,6 +14,7 @@ import { variableList, convertJsonToArray } from 'src/app/chatbot-design-studio/
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ProjectService } from 'src/app/services/projects.service';
+import { Department } from '../models/department-model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,8 +32,8 @@ export class DashboardService {
   project: Project;
   projectID: string;
 
-  isChromeVerGreaterThan100: boolean;
-  defaultDepartmentId: string;
+  departments: Department[]
+  defaultDepartment: Department;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -130,26 +131,30 @@ export class DashboardService {
   // ----------------------------------------------------------
   // Get depts
   // ----------------------------------------------------------
-  getDeptsByProjectId(){
-   return this.departmentService.getDeptsByProjectId().subscribe({ next: (departments: any) => {
+  getDeptsByProjectId(): Promise<boolean>{
+   return new Promise((resolve, reject)=>{
+    this.departmentService.getDeptsByProjectId().subscribe({ next: (departments: any) => {
       this.logger.log('[CDS DSHBRD] - DEPT GET DEPTS ', departments);
       if (departments) {
+        this.departments = departments
         departments.forEach((dept: any) => {
           // this.logger.log('[CDS DSHBRD] - DEPT', dept);
           if (dept.default === true) {
-            this.defaultDepartmentId = dept._id;
-            return this.defaultDepartmentId;
+            this.defaultDepartment = dept._id;
+            return
           }
         })
+        resolve(true);
       }
-      return false;
     }, error: (error) => {
       this.logger.error('[CDS DSHBRD] - DEPT - GET DEPTS  - ERROR', error);
-      return false;
+      reject(false);
     }, complete: () => {
       this.logger.log('[CDS DSHBRD] - DEPT - GET DEPTS - COMPLETE');
-    }
-   });
+      resolve(true);
+    }});
+
+   })
   }
 
 }
