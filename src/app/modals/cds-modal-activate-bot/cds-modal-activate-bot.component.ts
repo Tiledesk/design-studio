@@ -8,6 +8,7 @@ import { Chatbot } from 'src/app/models/faq_kb-model';
 import { Department } from 'src/app/models/department-model';
 import { getWidgetWebInstallationScript } from 'src/app/utils/util';
 import { AppConfigService } from 'src/app/services/app-config';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
 
 @Component({
   selector: 'cds-modal-activate-bot',
@@ -35,6 +36,10 @@ export class CdsModalActivateBotComponent implements OnInit {
   HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS: boolean = false;
   HAS_COMPLETED_HOOK_BOOT_TO_DEPT_ERROR: boolean = false;
 
+  HAS_COMPLETED_PUBLISH: boolean = false
+  HAS_COMPLETED_PUBLISH_SUCCESS: boolean = false
+  HAS_COMPLETED_PUBLISH_ERROR: boolean = false
+
   translateparamBotName: any
   DEPTS_HAS_NOT_A_BOT: boolean = false
 
@@ -45,8 +50,8 @@ export class CdsModalActivateBotComponent implements OnInit {
   
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public dialogRef: MatDialogRef<CdsModalActivateBotComponent>,
     private departmentService: DepartmentService,
+    private faqKbService: FaqKbService,
     private appConfigService: AppConfigService,
   ) { 
     this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT] data ', data)
@@ -60,10 +65,6 @@ export class CdsModalActivateBotComponent implements OnInit {
     const config = this.appConfigService.getConfig()
     this.translateparamBotName = { bot_name: this.selectedChatbot.name }
     this.webScript = getWidgetWebInstallationScript(this.project_id, config.widgetBaseUrl)
-  }
-
-  onCloseModalAttacchBotToDept() {
-    this.dialogRef.close()
   }
 
 
@@ -141,6 +142,21 @@ export class CdsModalActivateBotComponent implements OnInit {
       this.HAS_COMPLETED_HOOK_BOOT_TO_DEPT = true
       this.HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS = true;
       this.logger.log('[BOT-CREATE] Bot Create - UPDATE EXISTING DEPT WITH SELECED BOT - COMPLETE - HAS_COMPLETED_HOOK_BOOT_TO_DEPT', this.HAS_COMPLETED_HOOK_BOOT_TO_DEPT);
+    });
+  }
+
+  publish() {
+    this.faqKbService.publish(this.selectedChatbot).subscribe((data) => {
+      this.logger.log('[CDS DSBRD] publish  - RES ', data)
+    }, (error) => {
+      this.HAS_COMPLETED_HOOK_BOOT_TO_DEPT = true
+      this.HAS_COMPLETED_PUBLISH_ERROR = true
+      this.logger.error('[CDS DSBRD] publish ERROR ', error);
+    }, () => {
+      this.HAS_COMPLETED_HOOK_BOOT_TO_DEPT = true
+      this.HAS_COMPLETED_PUBLISH_SUCCESS = true
+      
+      this.logger.log('[CDS DSBRD] publish * COMPLETE *');
     });
   }
 
