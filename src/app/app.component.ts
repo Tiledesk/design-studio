@@ -22,6 +22,7 @@ import { KnowledgeBaseService } from './services/knowledge-base.service';
 import { OpenaiService } from './services/openai.service';
 import { WhatsappService } from './services/whatsapp.service';
 import { MultichannelService } from './services/multichannel.service';
+import { ScriptService } from 'src/chat21-core/providers/scripts/script.service';
 
 @Component({
   selector: 'app-root',
@@ -49,7 +50,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     // public dashboardService: DashboardService,
     private userService: UsersService,
     private multiChannelService: MultichannelService,
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    private scriptService: ScriptService,
   ){
 
   }
@@ -82,6 +84,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.initialize()
     
+    this.loadCustomScript(appconfig)
 
 
   }
@@ -166,7 +169,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       this.translate.setDefaultLang('en');
       this.translate.use('en');
     }
-    this.lang=chat_lang
+    this.translate.use('en');
+    this.lang='en'
+
+    // this.lang=chat_lang
 
   }
 
@@ -284,8 +290,13 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     myWindow.focus();
   }
 
+  private loadCustomScript(config){
+    if(config.hasOwnProperty("globalRemoteJSSrc")){
+      this.scriptService.buildScriptArray(config['globalRemoteJSSrc'])
+    }
+}
+
   ngAfterViewInit(): void {
-    
   }
 
   ngOnDestroy(): void {
