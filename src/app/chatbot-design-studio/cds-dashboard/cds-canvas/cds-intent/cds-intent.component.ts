@@ -201,41 +201,30 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setActionIntentInIntent(){
-
-    let actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
-    let lastPos = -1;
-    this.intent.actions.forEach((element, index) => {
-      if (element._tdActionType === TYPE_ACTION.INTENT) {
-        lastPos = index;
-        actionIntent = element;
-        // actionIntent['__isLast'] = true;
+    this.actionIntent = null;
+    for (let i = this.intent.actions.length - 1; i >= 0; i--) {
+      if (this.intent.actions[i]._tdActionType === TYPE_ACTION.INTENT) {
+        if(!this.actionIntent){
+          this.actionIntent = JSON.parse(JSON.stringify(this.intent.actions[i]));
+        }
+        // console.log('setActionIntentInIntent:: ', this.intent.actions[i]);
+        this.intent.actions.splice(i, 1);
+        // this.intent.actions.push(this.actionIntent);
+        // break;
       }
-    });
-    if(lastPos>0) this.intent.actions.splice(lastPos, 1);
-    actionIntent['__isLast'] = true;
-    this.intent.actions.push(actionIntent);
-
-    // for (let i = this.intent.actions.length - 1; i >= 0; i--) {
-    //   if (this.intent.actions[i]._tdActionType === TYPE_ACTION.INTENT) {
-    //     this.intent.actions[i]['__isLast'] = true;
-    //     this.actionIntent = JSON.parse(JSON.stringify(this.intent.actions[i]));
-    //     // console.log('setActionIntentInIntent:: ', this.intent.actions[i]);
-    //     this.intent.actions.splice(i, 1);
-    //     // this.intent.actions.push(this.actionIntent);
-    //     break;
-    //   }
-    // }
-
+    }
+    if(!this.actionIntent){
+      this.actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
+    }
+    this.actionIntent['__isLast'] = true;
+    this.intent.actions.push(this.actionIntent);
     // this.intent.actions = this.intent.actions.map(function(action) {
     //   if(action._tdActionType === TYPE_ACTION.INTENT){
     //     actionIntent = action;
     //   }
     //   return action;
     // });
-
-    this.actionIntent = actionIntent;
     // console.log('setActionIntentInIntent:: ', this.intent, this.actionIntent);
-
     if(this.actionIntent && this.actionIntent.intentName){
       const fromId = this.intent.intent_id+'/'+this.actionIntent._tdActionId;
       const toId = this.actionIntent.intentName.replace("#", "");
