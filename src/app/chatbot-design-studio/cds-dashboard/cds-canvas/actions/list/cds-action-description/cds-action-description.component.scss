@@ -17,6 +17,7 @@
     .label-action {
         font-size: 12px !important;
         color: $blu !important;
+        width: 100%;
     }
 
     .icon-action {
@@ -25,6 +26,32 @@
         img {
             width: 18px;
             height: auto;
+        }
+    }
+
+    .action-title{
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .action-btn-icon {
+        display: inline-flex;
+        color: #394f5a;
+        padding: 0;
+        vertical-align: middle;
+        margin: 0 6px;
+        cursor: grab;
+        .btn-tdblu-no-boxshadow {
+            margin: 0;
+            padding: 0!important;
+            background: transparent !important;
+            font-size: 12px;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: none;
         }
     }
 }

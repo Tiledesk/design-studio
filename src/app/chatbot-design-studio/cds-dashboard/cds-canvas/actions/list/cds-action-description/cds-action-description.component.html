@@ -41,6 +41,11 @@
             </div>
             <p class="label-action">{{element?.name}}</p>
             <span *ngIf="!previewMode && element?.status ==='beta'" class="trigger-beta-badge">Beta</span>
+            <div *ngIf="previewMode" class="action-btn-icon">
+                <button class="btn btn-tdblu-no-boxshadow drag-btn">
+                    <img class="active-icon" src="assets/images/icons/drag_indicator.svg" title="Drag">
+                </button>
+            </div>
         </div>
         
         <div *ngIf="showTip" class="action-description">
