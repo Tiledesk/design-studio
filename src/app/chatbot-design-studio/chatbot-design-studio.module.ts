@@ -30,11 +30,10 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
-
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 
 
@@ -95,7 +94,6 @@ import { PanelIntentControlsComponent } from './cds-dashboard/cds-canvas/cds-int
 
 
 
-import { CdsPublishOnCommunityModalComponent } from './cds-dashboard/utils/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
 import { SelectComponent } from './cds-base-element/select/select.component';
 // import { VariableListComponent } from './cds-dashboard/cds-canvas/panel-intent-detail/actions/action-json-condition/variable-list/variable-list.component';
 import { TextEditableDivComponent } from './cds-base-element/text-editable-div/text-editable-div.component';
@@ -109,7 +107,6 @@ import { CDSRadioButtonComponent } from './cds-base-element/radio-button/radio-b
 import { CDSDetailBotDetailComponent } from './cds-chatbot-details/detail/detail.component';
 import { CDSDetailImportExportComponent } from './cds-chatbot-details/import-export/import-export.component';
 import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service';
-import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/change-bot-lang.component';
 // import { ActionWhatsappStaticComponent } from './cds-dashboard/panel-intent-detail/actions/action-whatsapp-static/action-whatsapp-static.component';
 // import { ActionWhatsappAttributeComponent } from './cds-dashboard/panel-intent-detail/actions/action-whatsapp-attribute/action-whatsapp-attribute.component';
 // import { ActionWhatsappSegmentComponent } from './cds-dashboard/panel-intent-detail/actions/action-whatsapp-segment/action-whatsapp-segment.component';
@@ -121,7 +118,6 @@ import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/chan
 
 
 import { CdsPopupComponent } from './cds-dashboard/utils/cds-popup/cds-popup.component';
-import { CdsModalActivateBotComponent } from './cds-dashboard/utils/cds-modal-activate-bot/cds-modal-activate-bot.component';
 import { CdsPanelElementsComponent } from './cds-dashboard/cds-canvas/cds-panel-elements/cds-panel-elements.component';
 import { CdsPanelActionsComponent } from './cds-dashboard/cds-canvas/cds-panel-elements/cds-panel-actions/cds-panel-actions.component';
 import { CdsPanelIntentListComponent } from './cds-dashboard/cds-canvas/cds-panel-intent-list/cds-panel-intent-list.component';
@@ -189,6 +185,11 @@ import { FormFieldComponent } from './cds-dashboard/cds-canvas/actions/list/form
 import { FormEditAddComponent } from './cds-dashboard/cds-canvas/actions/list/form/form-edit-add/form-edit-add.component';
 import { ModalWindowComponent } from './cds-dashboard/cds-canvas/actions/list/form/modal-window/modal-window.component';
 
+//MODALS
+import { CdsPublishOnCommunityModalComponent } from '../modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
+import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/change-bot-lang.component';
+import { CdsModalActivateBotComponent } from '../modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
+
 
 import { CdsActionArrowComponent } from './cds-dashboard/cds-canvas/actions/shared/cds-action-controls/cds-action-arrow/cds-action-arrow.component';
 import { CdsActionControlsComponent } from './cds-dashboard/cds-canvas/actions/shared/cds-action-controls/cds-action-controls/cds-action-controls.component';
@@ -200,6 +201,7 @@ import { CdsEventComponent } from './cds-dashboard/cds-event/cds-event.component
 import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 
 import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
+
 
 @NgModule({
   declarations: [
@@ -329,16 +331,16 @@ import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-
     CDSDetailImportExportComponent,
     CDSDetailCommunityComponent,
     CDSDetailDeveloperComponent,
-    ChangeBotLangModalComponent,
     // ******* CDS CHATBOT DETAIL:: end *******
 
     //UTILS
     CdsPopupComponent,
+    CdsSplashScreenComponent,
+    
+    //MODALS
     CdsModalActivateBotComponent,
     CdsPublishOnCommunityModalComponent,
-    CdsSplashScreenComponent,
-
-
+    ChangeBotLangModalComponent,
 
     //EVENT BASE COMPONENT
     CdsEventComponent,
@@ -389,7 +391,7 @@ import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-
     })
   ],
   providers: [
-    WsChatbotService
+    WsChatbotService,
     // DragDropService
   ],
   entryComponents: [

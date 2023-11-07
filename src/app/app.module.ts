@@ -28,7 +28,7 @@ import { WhatsappService } from './services/whatsapp.service';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { BrandService } from './services/brand.service';
 import { MultichannelService } from './services/multichannel.service';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SatPopoverModule } from '@ncstate/sat-popover';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -194,7 +194,9 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     WebSocketJs,
     DatePipe,
     NotifyService,
-    { provide: LocationStrategy, useClass: HashLocationStrategy }
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
+    { provide: MAT_DIALOG_DATA, useValue: {} },
+    { provide: MatDialogRef, useValue: {} }
   ]
 })
 export class AppModule { }

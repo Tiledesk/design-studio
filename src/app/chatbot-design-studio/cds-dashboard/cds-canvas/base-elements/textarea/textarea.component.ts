@@ -110,11 +110,11 @@ export class CDSTextareaComponent implements OnInit {
       if(this.elTextarea)this.elTextarea.value = '';
       // console.log("SI::  readonly -- text --", this.text, " -- textTag --", this.textTag);
     } else {
-      this.text = event;
+      this.text = event.trim();
       // console.log("NO::  readonly -- text --", this.text, " -- textTag --", this.textTag);
     }
     if(!this.isSelected || !this.readonly){
-      this.changeTextarea.emit(event);
+      this.changeTextarea.emit(event.trim());
     }
   }
 

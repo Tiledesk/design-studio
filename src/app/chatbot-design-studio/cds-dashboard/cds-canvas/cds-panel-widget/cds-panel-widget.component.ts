@@ -66,7 +66,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
     this.projectID = this.dashboardService.projectID;
     this.selectedChatbot = this.dashboardService.selectedChatbot;
-    this.defaultDepartmentId = this.dashboardService.defaultDepartmentId;
+    this.defaultDepartmentId = this.dashboardService.defaultDepartment._id;
     this.setIframeUrl()
   }
 
