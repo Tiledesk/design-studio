@@ -190,8 +190,8 @@ $icon-color-active: $blu;
     }
     
     .intent-display-name {
-        color: rgba($color: $text-color, $alpha: 0.5);
-        font-weight: 300;
+        color: rgba($color: $text-color, $alpha: 1);
+        font-weight: 500;
         margin-bottom: 0px;
         font-size: 14px;
         overflow: hidden;

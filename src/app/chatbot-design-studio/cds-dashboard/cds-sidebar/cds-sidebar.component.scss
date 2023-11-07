@@ -208,8 +208,9 @@ li > a {
     }
 
     .item-icon {
-        color: $blu;
-        fill: $blu;
+        color: $blu-03;
+        fill: $blu-03;
+        display: flex;
     }
 
 }
