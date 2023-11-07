@@ -124,15 +124,15 @@ appdashboard-filter{
 
         .response-wrp{
             border-radius: 8px;
-            background: transparent; // #ffffff;
-            border: unset; //1px solid #ffffff;
+            background: $color-withe-hex; // #ffffff;
+            border: 1px solid $gray-light-02; //1px solid #ffffff;
             overflow-x: hidden;
             overflow-y: auto;
             color: #22272d;
             font-size: 1.15em;
             line-height: 25px;
-            width: calc(100% - 20px);
-            padding: 8px 10px;
+            width: calc(100% - 5px); //calc(100% - 20px);
+            padding: 4px 10px;
     
             line-height: 20px;
             font-size: .8em;

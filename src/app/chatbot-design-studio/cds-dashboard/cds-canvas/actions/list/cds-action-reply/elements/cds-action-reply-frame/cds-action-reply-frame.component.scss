@@ -72,22 +72,12 @@ appdashboard-filter{
         padding: 0 10px 0px 25px;
     }
 
-    &.text-editor-wrapper{
-        // padding: 0;
-        margin: 0px;
-        
-        cds-textarea.text-editable-div{
-            width: calc(100% - 20px);
-            margin: 5px auto;
-        }
-    }
-
     .response-frame-panel{
         margin: 0;
         max-width: 100%;
         border-color: #8da2b5;
         margin: 5px auto;
-        max-width: calc(100% - 20px);
+        max-width: calc(100% - 5px); //calc(100% - 20px);
 
         &.no-image{
             display: flex;
@@ -127,20 +117,20 @@ appdashboard-filter{
         max-width: 100%;
         border-color: #647283;
         margin: 5px auto;
-        max-width: calc(100% - 20px);
+        max-width: calc(100% - 5px); //calc(100% - 20px);
     }
 
     .response-wrp{
         border-radius: 8px;
-        background: transparent; // #ffffff;
-        border: unset; //1px solid #ffffff;
+        background: $color-withe-hex; // #ffffff;
+        border: 1px solid $gray-light-02; //1px solid #ffffff;
         overflow-x: hidden;
         overflow-y: auto;
         color: #22272d;
         font-size: 1.15em;
         line-height: 25px;
-        width: calc(100% - 20px);
-        padding: 8px 10px;
+        width: calc(100% - 5px); //calc(100% - 20px);
+        padding: 4px 10px;
 
         line-height: 20px;
         font-size: .8em;
