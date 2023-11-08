@@ -301,13 +301,15 @@
 .footer-intent {
   cursor: pointer;
   margin-bottom: -10px;
-  .last-action-intent {
-    padding: 0 12px 0 0;
-    margin: 7px 0 -4px 0;
-    display: block;
-  }
+  min-height: 30px;
 }
 
+.last-action-intent {
+  display: block;
+  float: inline-end;
+  margin: 6px -12px 0 0;
+  padding: 0 24px 0 0;
+}
 /* Btn add action
 /* --------------------------------- */
 .csd-open-action-menu-btn-wpr {

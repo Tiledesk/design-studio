@@ -266,15 +266,16 @@
         
     </div>
     
+    <cds-action-intent *ngIf="!isStart && intent && actionIntent"
+        class="panel-response last-action-intent" 
+        [intentSelected]="intent"
+        [action]="actionIntent"
+        [isLast]="true"
+        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+    </cds-action-intent>
+
     <div class="footer-intent">
-        <cds-action-intent *ngIf="!isStart && intent && actionIntent"
-            class="panel-response last-action-intent" 
-            [intentSelected]="intent"
-            [action]="actionIntent"
-            [isLast]="true"
-            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-        </cds-action-intent>
-        
+       
         <div class="csd-open-action-menu-btn-wpr">
             <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="btn cds-add-action-btn">
