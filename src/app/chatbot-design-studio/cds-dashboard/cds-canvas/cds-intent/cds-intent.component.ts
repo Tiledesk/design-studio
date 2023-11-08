@@ -201,25 +201,30 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setActionIntentInIntent(){
-
-    // recupero l'ultimo action intent
-    this.actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
+    this.actionIntent = null;
     for (let i = this.intent.actions.length - 1; i >= 0; i--) {
       if (this.intent.actions[i]._tdActionType === TYPE_ACTION.INTENT) {
-        this.actionIntent = this.intent.actions[i];
+        if(!this.actionIntent){
+          this.actionIntent = JSON.parse(JSON.stringify(this.intent.actions[i]));
+        }
         // console.log('setActionIntentInIntent:: ', this.intent.actions[i]);
         this.intent.actions.splice(i, 1);
-        break; // Rimuoviamo solo l'ultimo corrispondente
+        // this.intent.actions.push(this.actionIntent);
+        // break;
       }
     }
+    if(!this.actionIntent){
+      this.actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
+    }
+    this.actionIntent['__isLast'] = true;
+    this.intent.actions.push(this.actionIntent);
     // this.intent.actions = this.intent.actions.map(function(action) {
     //   if(action._tdActionType === TYPE_ACTION.INTENT){
     //     actionIntent = action;
     //   }
     //   return action;
     // });
-    // this.actionIntent = actionIntent;
-    // console.log('setActionIntentInIntent:: ', this.actionIntent);
+    // console.log('setActionIntentInIntent:: ', this.intent, this.actionIntent);
     if(this.actionIntent && this.actionIntent.intentName){
       const fromId = this.intent.intent_id+'/'+this.actionIntent._tdActionId;
       const toId = this.actionIntent.intentName.replace("#", "");
@@ -620,8 +625,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // this.logger.log('event:', event, 'previousContainer:', event.previousContainer, 'event.container:', event.container);
     if (event.previousContainer === event.container) {
       // moving action in the same intent
-      this.logger.log("[CDS-INTENT] onDropAction sto spostando una action all'interno dello stesso intent: ", event);
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      
+      //  event.container.data
+      moveItemInArray(this.intent.actions, event.previousIndex-1, event.currentIndex-1);
+      this.logger.log("[CDS-INTENT] onDropAction sto spostando una action all'interno dello stesso intent: ", event, this.intent.actions); 
       this.controllerService.closeAllPanels();
       this.intentService.setIntentSelected(this.intent.intent_id);
       this.connectorService.updateConnector(this.intent.intent_id);
@@ -685,6 +692,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   private setActionIntentInListOfActions(){
     let actionIntent = this.actionIntent;
     let addIntentAction = true; 
+    // for (let i = this.intent.actions.length - 1; i >= 0; i--) {
+    //   if (this.intent.actions[i]._tdActionType === TYPE_ACTION.INTENT) {
+    //     // this.actionIntent = this.intent.actions[i];
+    //     // console.log('setActionIntentInIntent:: ', this.intent.actions[i]);
+    //     // this.intent.actions.splice(i, 1);
+    //     addIntentAction = true;
+    //     this.intent.actions[i] = actionIntent;
+    //     break; 
+    //   }
+    // }
+
     this.intent.actions = this.intent.actions.map(function(action) {
       if(action._tdActionType === TYPE_ACTION.INTENT){
         addIntentAction = false;
@@ -692,6 +710,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
       return action;
     });
+
     if (addIntentAction) {
       this.intent.actions.push(this.actionIntent);
     }

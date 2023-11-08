@@ -42,7 +42,7 @@ export class CdsModalActivateBotComponent implements OnInit {
   HAS_COMPLETED_PUBLISH_ERROR: boolean = false
 
   translateparamBotName: any
-  DEPTS_HAS_NOT_A_BOT: boolean = false
+  DEPTS_HAS_NOT_A_BOT: boolean = true
 
 
   webScript: string;

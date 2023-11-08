@@ -18,6 +18,9 @@
     justify-content: flex-end;
     gap: 5px; 
     padding: 5px 10px;
+
+    top: calc(50% - 14px);
+
     .connector {
         position: absolute;
         right: -12px;
@@ -28,6 +31,13 @@
         .connector {
             right: -22px;
             top: calc(50% - 10px);
+        }
+    }
+    &.isStart{
+        .connector {
+            position: absolute;
+            right: -12px;
+            top: calc(50% - 13px);
         }
     }
 
