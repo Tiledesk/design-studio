@@ -532,7 +532,8 @@ export class CdsCanvasComponent implements OnInit {
   private openFloatMenuOnConnectorDraftReleased(detail){
     this.logger.log("[CDS CANVAS] ho rilasciato in un punto qualsiasi dello stage e quindi apro il float menu", detail);
     this.positionFloatMenu = this.stageService.physicPointCorrector(detail.menuPoint);
-    this.positionFloatMenu.x = this.positionFloatMenu.x + 300;
+    let marginLeft = this.IS_OPEN_INTENTS_LIST?290:60;
+    this.positionFloatMenu.x = this.positionFloatMenu.x+marginLeft;
     detail.menuPoint = this.positionFloatMenu;
     this.closeAllPanels();
     this.IS_OPEN_ADD_ACTIONS_MENU = true;
