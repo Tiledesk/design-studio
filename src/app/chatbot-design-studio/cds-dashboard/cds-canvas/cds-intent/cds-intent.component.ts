@@ -216,6 +216,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if(!this.actionIntent){
       this.actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
     }
+    // set __isLast as true only for the last 'intent' action type in the list 
     this.actionIntent['__isLast'] = true;
     this.intent.actions.push(this.actionIntent);
     // this.intent.actions = this.intent.actions.map(function(action) {
