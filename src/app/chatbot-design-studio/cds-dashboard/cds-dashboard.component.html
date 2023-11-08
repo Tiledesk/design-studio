@@ -1,3 +1,6 @@
+<div *ngIf="!initFinished" class="loader">
+</div>
+
 <div *ngIf="initFinished">
 
     <cds-header 
@@ -32,6 +35,10 @@
             [selectedChatbot]="selectedChatbot">
         </cds-fulfillment>
 
+        <cds-secrets *ngIf="activeSidebarSection == SIDEBAR_PAGES.SECRETS && initFinished" 
+            [selectedChatbot]="selectedChatbot">
+        </cds-secrets>
+        
         <cds-rules *ngIf="activeSidebarSection == SIDEBAR_PAGES.RULES && initFinished" 
             [selectedChatbot]="selectedChatbot">
         </cds-rules>
