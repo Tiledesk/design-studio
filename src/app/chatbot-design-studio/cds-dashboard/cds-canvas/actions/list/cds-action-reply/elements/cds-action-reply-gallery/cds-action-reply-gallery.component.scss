@@ -159,14 +159,6 @@ appdashboard-filter{
 
     /** BUTTONS **/
     .buttons-response {
-        // display: block;
-        // margin: 12px 0 0;
-        // width: 100%;
-        // font-size: 14px;
-        // padding: 0 5px;
-        // flex-direction: row;
-        // float: right;
-
         display: flex;
         margin: 0px; //15px 0 0;
         padding: 0px 0px 0px 0px;
@@ -241,17 +233,6 @@ appdashboard-filter{
     }
 }
 
-/** text-editor-drop **/
-.text-editor-drop {
-    position: absolute;
-    display: inline-flex;
-    margin: 0;
-    left: 0;
-    top: 0;
-    // top: -35px;
-    color: #dcdcdc;
-    cursor: grab;
-}
 
 
 /** BUTTONS **/
@@ -731,39 +712,18 @@ cds-image-upload ::ng-deep {
 cds-textarea#title ::ng-deep,
 cds-textarea#description ::ng-deep {
 
-    // .text-editor-wrapper{
-    //     margin: 5px 0px;
-    // }
     .text-editor{
         display: flex;
     }
 
-    textarea {
-        line-height: 20px !important;
-        font-size: 0.9em !important;
-    }
-
-    // mat-form-field{
-    //     line-height: unset;
-    // }
-    // display: flex;
     mat-form-field.mat-focused,
     mat-form-field:hover {
-        .mat-form-field-wrapper {
-            .mat-form-field-flex {
-                // padding: 0px;
-                .mat-form-field-infix {
-                    textarea {
-                        border-left: 0px solid white !important;
-                        border-right: 0px solid white !important;
-                        border-bottom: 1px solid var(--base-color) !important;
-                        border-top: 1px solid var(--base-color) !important;
-                        // outline: 0px solid rgb(242 205 111) !important;
-                        transition: border 0.3s;
-                        
-                    }
-                }
-            }
+        textarea {
+            border-bottom: 1px solid var(--base-color) !important;
+            border-top: 1px solid var(--base-color) !important;
+            // outline: 0px solid rgb(242 205 111) !important;
+            transition: border 0.3s;
+            
         }
     }
 
@@ -776,6 +736,8 @@ cds-textarea#description ::ng-deep {
         resize: none !important; 
         padding: 5px 20px !important;
         min-height: 25px !important;
+        line-height: 20px !important;
+        font-size: 0.9em !important;
 
     }
 }
@@ -800,17 +762,6 @@ cds-textarea#description.noButtons ::ng-deep{
             font-weight: 600;
         }
     }
-
-    textarea {
-        border-bottom: 1px solid white!important;
-        border-top: 1px solid white!important;
-        border-radius: 0px;
-        resize: none !important; 
-        padding: 5px 20px !important;
-        min-height: 25px !important;
-    }
-
-    
 
     cds-image-upload {
         div.dropUploadImage{
