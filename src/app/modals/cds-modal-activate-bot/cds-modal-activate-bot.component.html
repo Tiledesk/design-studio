@@ -86,7 +86,7 @@
 
     <div class="cds-modal-footer">
  
-            <div *ngIf="!DISPLAY_INSTALL_SCRIPT" (click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT" id="installBtn">
+            <div (click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT" id="installBtn">
                 <span> {{ "Install" | translate }} </span>
             </div>
 
@@ -99,7 +99,8 @@
                 class="btn btn-primary cds-blue-button" (click)="hookBotToDept()">
                 <i *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
                     class="fa fa-spinner fa-spin"></i>
-                <span> {{ 'ActivateFor' | translate}} <b>{{deptSelected.name}}</b> </span>
+                <span> {{ 'ActivateFor' | translate}}</span>
+                <!-- <b>{{deptSelected.name}}</b> -->
             </button>
 
             <button *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === true"
@@ -119,8 +120,7 @@
 <ng-template #publishStep>
     <div class="cds-modal-body" id="publishStep">   
         <div *ngIf="!HAS_COMPLETED_PUBLISH" class="field-box modal-flex">
-            <label class="title-label"></label>
-            Publish your flow?
+            <label class="title-label">Publish your flow?</label>
             <!-- <h3> {{ 'DoYouWantToActivateTheBotForNewVonversations' | translate: translateparamBotName }} </h3> -->
         </div>
 
