@@ -61,6 +61,9 @@ import { CDSDetailDeveloperComponent } from './cds-chatbot-details/developer/dev
 import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.component';
 
 
+//CDS-SECRETS
+import { CdsSecretsComponent } from './cds-dashboard/cds-secrets/cds-secrets.component';
+
 
 //SERVICES
 // import { DragDropService } from './services/drag-drop.service';
@@ -213,6 +216,7 @@ import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-p
     RulesComponent,
     CdsFulfillmentComponent,
     CdsChatbotDetailsComponent,
+    CdsSecretsComponent,
     //CDS-ROOT-ELEMENTS: end
 
     AttributesComponent,

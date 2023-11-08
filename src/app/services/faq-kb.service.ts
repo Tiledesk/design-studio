@@ -39,22 +39,6 @@ export class FaqKbService {
     this.FAQKB_URL = this.SERVER_BASE_PATH + this.project_id + '/faq_kb/'
   }
 
-  installTemplate(botid: string, projectid: string, ispublic: boolean, landingprojectid) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-    this.logger.log('[BOT-CREATE][FAQ-KB.SERV] -  FORK - BOT ID ', botid);
-    // / (dovrebbe funzionare anche con POST ../PROJECT_ID/bots/fork/ID_FAQ_FB/)
-    // const url = this.SERVER_BASE_PATH + "635b97cc7d7275001a2ab3e0/bots/fork/" + botid;
-    const url = this.SERVER_BASE_PATH + projectid + "/faq_kb/fork/" + botid + "?public=" + ispublic + "&projectid=" + projectid;
-    // console.log('[BOT-CREATE][FAQ-KB.SERV] - FORK - URL ', url);
-
-    return this._httpClient.post(url, null, httpOptions)
-
-  }
   /**
    * READ (GET ALL FAQKB WITH THE CURRENT PROJECT ID)
    * NOTE: chat21-api-node.js READ THE CURRENT PROJECT ID FROM THE URL SO IT SO NO LONGER NECESSARY TO PASS THE PROJECT 
@@ -123,24 +107,6 @@ export class FaqKbService {
       );
   }
 
-  /**
-   * READ DETAIL (GET BY ID)
-   * @param id 
-   * @returns 
-   */
-  public getFaqKbById(id: string): Observable<FaqKb[]> {
-
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    let url = this.FAQKB_URL + id;
-    this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY ID - URL', url);
-    return this._httpClient.get<FaqKb[]>(url, httpOptions)
-  }
 
   public getBotById(id: string): Observable<FaqKb> {
 
@@ -155,100 +121,7 @@ export class FaqKbService {
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY ID - URL', url);
     return this._httpClient.get<FaqKb>(url, httpOptions)
   }
-
-
-  public createRasaBot(name: string, bottype: string, description: string) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    const url = this.FAQKB_URL;
-    this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - URL ', url);
-
-    const body = { 'name': name, 'type': bottype, 'description': description, 'id_project': this.project_id, };
-    this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - BODY ', body);
-
-    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
-  }
-
-
-  /**
-   * @param name 
-   * @param urlfaqkb 
-   * @param bottype 
-   * @param description 
-   * @returns 
-   */
-  public createFaqKb(name: string, urlfaqkb: string, bottype: string, description: string, resbotlanguage: string, resbottemplate: string) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    const url = this.FAQKB_URL;
-    this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - URL ', url);
-
-    let body = {}
-    body = { 'name': name, 'url': urlfaqkb, 'id_project': this.project_id, 'type': bottype, 'description': description };
-    if (bottype === 'internal' || bottype === 'tilebot') {
-      body['language'] = resbotlanguage
-      body['template'] = resbottemplate
-    }
-    this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - BODY ', body);
-
-    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
-  }
-
-
-  createChatbotFromScratch(botname, bottype, language) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    const url = this.FAQKB_URL;
-    this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - URL ', url);
-
-    const body = { 'name': botname, 'id_project': this.project_id, 'type': bottype, language: language, template: 'blank' };
-
-    this.logger.log('[BOT-CREATE][FAQ-KB.SERV] - CREATE FAQ-KB - BODY ', body);
-
-    return this._httpClient.post(url, JSON.stringify(body), httpOptions)
-  }
  
-
-  /**
-   * UPDATE (PUT) the BOT WITH trashed = true WHEN THE USER CLICKED THE BTN 'DELETE BOT' 
-   * 
-   * @param id 
-   * @param _trashed 
-   * @returns 
-   */
-  public updateFaqKbAsTrashed(id: string, _trashed: boolean) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    let url = this.FAQKB_URL + id
-    this.logger.log('[FAQ-KB.SERV] updateFaqKbAsTrashed - PUT URL ', url);
-
-    const body = { 'trashed': _trashed };
-    this.logger.log('[FAQ-KB.SERV] updateFaqKbAsTrashed - PUT BODY ', body);
-
-    return this._httpClient.put(url, JSON.stringify(body), httpOptions)
-  }
-
   /**
    * UPDATE (PUT)
    * @param id
@@ -352,32 +225,6 @@ export class FaqKbService {
     return this._httpClient.put(url, null, httpOptions)
   }
 
-
-  getNumberOfMessages(idBot, bottype) {
-    this.logger.log('[FAQ-KB.SERV] - getNumberOfMessages idBot ', idBot)
-    this.logger.log('[FAQ-KB.SERV] - getNumberOfMessages bottype', bottype)
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': this.tiledeskToken
-    })
-
-    let botid = ""
-    if (bottype === 'internal') {
-      botid = 'bot_' + idBot
-    } else {
-      botid = idBot
-    }
-
-    let params = new HttpParams().set('sender', botid)
-    // let params = new HttpParams().set('sender', 'bot_' + idBot)
-    // this.logger.log('BOT LIST (bot-service) - getNumberOfMessages params', params) 
-
-    return this._httpClient.get(this.SERVER_BASE_PATH + this.project_id + "/analytics/messages/count", { headers: headers, params: params })
-
-  }
-
-
-  
   addNodeToChatbotAttributes(idBot: string, key:string,  json:any) {
     this.logger.log('[FAQ-KB.SERV] - addNodeToAttributesChatbot idBot ', idBot)
     const httpOptions = {
@@ -425,6 +272,24 @@ export class FaqKbService {
     let url = this.SERVER_BASE_PATH + this.project_id + '/faq_kb/' + id + '/attributes';
     let body = JSON.stringify(attributes);
     console.log('[FAQ-KB.SERV] updateFaqKb - BODY ', url, body);
+    return this._httpClient.patch(url, body, httpOptions)
+  }
+
+  addSecretToChatbot(idBot: string, secrets: any[]) {
+    this.logger.log('[FAQ-KB.SERV] - addSecretToChatbot idBot ', idBot)
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+
+    let url = this.SERVER_BASE_PATH + this.project_id + '/bots/' + idBot + '/attributes';
+    this.logger.log('addSecretToChatbot BOT - URL ', url);
+
+    let body = { "secrets": secrets }
+    this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
     return this._httpClient.patch(url, body, httpOptions)
   }
 
