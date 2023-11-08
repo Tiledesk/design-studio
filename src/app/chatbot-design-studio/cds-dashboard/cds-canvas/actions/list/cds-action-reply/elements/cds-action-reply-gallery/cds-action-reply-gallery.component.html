@@ -206,7 +206,7 @@
             </div>
        </div>
         <div class="buttons-response button-replies" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)">
-            <div *ngFor="let button of galleryEl.buttons; let j= index;" cdkDragBoundary=".button-replies" style="position: relative;"> 
+            <div *ngFor="let button of galleryEl.buttons; let j= index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies"> 
                 
                 <!-- DRAG PLACEHOLDER -->
                 <!-- <cds-action-reply-button class="custom-placeholder" *cdkDragPlaceholder
