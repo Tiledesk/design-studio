@@ -28,6 +28,7 @@
     }
     &.isLast{
         padding: 0px;
+        min-height: 20px;
         .connector {
             right: -22px;
             top: calc(50% - 10px);

@@ -251,25 +251,40 @@
             <cds-action-arrow id="action-arrow-{{i}}" *ngIf="!last" class="cds-action-arrow">
             </cds-action-arrow>
 
-            <div *ngIf="last" class="csd-open-action-menu-btn-wpr">
+            <!-- <div *ngIf="last" class="csd-open-action-menu-btn-wpr">
                 <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                     class="btn cds-add-action-btn">
                     <span class="material-icons">
                         add
                     </span>
                 </button>
-            </div>
+            </div> -->
 
         </div>
         
     </div>
     
-    <cds-action-intent *ngIf="!isStart && intent && actionIntent"
-        class="panel-response action-intent" 
-        [intentSelected]="intent"
-        [action]="actionIntent"
-        [isLast]="true"
-        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-    </cds-action-intent>
+    <div class="footer-intent">
+        <cds-action-intent *ngIf="!isStart && intent && actionIntent"
+            class="panel-response last-action-intent" 
+            [intentSelected]="intent"
+            [action]="actionIntent"
+            [isLast]="true"
+            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+        </cds-action-intent>
+        
+        <div class="csd-open-action-menu-btn-wpr">
+            <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+                class="btn cds-add-action-btn">
+                <span class="material-icons">
+                    add
+                </span>
+            </button>
+        </div>
+    </div>
+    
+
+
+   
 
 </div>
