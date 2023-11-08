@@ -20,7 +20,7 @@ RUN npm run ng build -- --configuration="prod" --output-path=dist --base-href=".
 
 ### STAGE 2: Setup ###
 
-FROM nginx:1.14.1-alpine
+FROM nginx:14.21.2-alpine
 
 ## Copy our default nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
