@@ -53,13 +53,16 @@ import { ConditionComponent } from './cds-dashboard/cds-rules/rules-add/conditio
 import { ActionComponent } from './cds-dashboard/cds-rules/rules-add/action/action.component';
 
 //SETTINGS COMPONENT
-import { CdsChatbotDetailsComponent } from './cds-dashboard/cds-chatbot-details/cds-chatbot-details.component';
+import { CdsChatbotDetailsComponent } from './cds-chatbot-details/cds-chatbot-details.component';
 import { CDSDetailCommunityComponent } from './cds-chatbot-details/community/community.component';
 import { CDSDetailDeveloperComponent } from './cds-chatbot-details/developer/developer.component';
 
 //CDS CANVAS
 import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.component';
 
+
+//CDS-SECRETS
+import { CdsSecretsComponent } from './cds-dashboard/cds-secrets/cds-secrets.component';
 
 
 //SERVICES
@@ -213,6 +216,7 @@ import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-p
     RulesComponent,
     CdsFulfillmentComponent,
     CdsChatbotDetailsComponent,
+    CdsSecretsComponent,
     //CDS-ROOT-ELEMENTS: end
 
     AttributesComponent,

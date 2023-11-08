@@ -1,0 +1,146 @@
+@import "./src/assets/sass/md/_variables.scss";
+@import "./src/assets/sass/cds/_variables.scss";
+
+
+::ng-deep .custom-mat-tooltip-in-faq-table {
+    background-color: #555555 !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    border-radius: 2px !important;
+    font-family: "Poppins", "Roboto", "Arial", sans-serif;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    border: 1px solid #555555 !important;
+}
+
+
+// tab in general route
+.btn-with-border-effect {
+    background: none;
+    border: 0;
+    box-sizing: border-box;
+    // margin: 1em;
+    // padding: 1em 2em;
+    //   padding-bottom: 37px;
+    font-size: 14px;
+    font-weight: 300;
+
+    // Required, since we're setting absolute on pseudo-elements
+    position: relative;
+    vertical-align: middle;
+
+    &::before,
+    &::after {
+        box-sizing: inherit;
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.border-from-center {
+    &:hover {
+        color: $blu;
+    }
+
+    // Set up base styles, we're going to scale instead of animating width/height
+    &::before,
+    &::after {
+        top: 3px;
+        // top: 0px;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        transform-origin: center; // Ensure scaling is done from the center (expands outwards)
+    }
+
+    // scale3d(<scale-horizontal>, <scale-vertical>, <scale-depth>);
+    &::before {
+        // border-top: 2px solid $purple;
+        border-bottom: 3px solid $blu;
+        transform: scale3d(0, 1, 1); // Shrink only width
+    }
+
+    &:hover::before,
+    &:hover::after {
+        transform: scale3d(1, 1, 1); // Show full-size
+        transition: transform 0.5s;
+    }
+}
+
+.cds-bottom-nav {
+    background-color: #fff;
+    width: 100%;
+    // z-index: 1028;
+    position: relative;
+    padding-bottom: 5px;
+    float: left;
+    height: 50px;
+    padding-left: 0px;
+    // display: flex;
+    // flex-grow: 1;
+}
+
+.cds-bottom-nav li {
+    float: left;
+    padding: 15px;
+    list-style: none;
+    position: relative;
+    display: block;
+    height: 52px;
+    border-bottom: 3px solid $blu-light-02;
+    cursor: pointer;
+}
+
+.cds-bottom-nav li a {
+    padding: 0px 15px;
+    color: $blu-light-02;
+    line-height: 20px;
+}
+
+.cds-bottom-nav li a:hover {
+    text-decoration: none;
+    //  background-color: #eee;
+}
+
+.li-active {
+    border-bottom: 3px solid $blu !important;
+    pointer-events: none;
+}
+.li-active a {
+    color: $blu !important;
+}
+.disabled-li {
+    pointer-events: none;
+}
+
+@media (max-width: 991px) {
+    .bottom-nav {
+        top: -2px !important;
+    }
+
+    .cds-bottom-nav li {
+        z-index: 1049;
+    }
+}
+
+@media (max-width: 370px) {
+    .cds-bottom-nav {
+        height: 37px !important;
+    }
+
+    .cds-bottom-nav li {
+        padding: 6px !important;
+        height: 39px;
+    }
+}
+
+.chatbot-details-wpr,
+.row {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+
+

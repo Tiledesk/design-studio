@@ -400,3 +400,56 @@
      background: $intent-preview-background;
   }
 }
+
+
+/**
+ * ----------------------------------------
+ * animation flash_border: when connector is connected to an intent
+ * ----------------------------------------
+ */
+@keyframes flash_border {
+  0% {
+    border-color: #006cff // #f0806f;
+  }
+
+  // 50% {
+  //   border-color: #fff;
+  // }
+  100% {
+    // border-color: #f0806f;
+    border-color: #fff;
+  }
+}
+
+@-webkit-keyframes flash_border {
+  0% {
+    border-color: #006cff // #f0806f;
+
+  }
+
+  // 50% {
+  //   border-color: #fff;
+
+  // }
+  100% {
+    // border-color: #f0806f;
+    border-color: #fff;
+  }
+}
+
+@-moz-keyframes flash_border {
+  0% {
+    border-color: #006cff //  #f0806f;//  ;
+
+  }
+
+  // 50% {
+  //   border-color: #fff;
+
+  // }
+  100% {
+    //border-color:  #006cff; // #f0806f;
+    border-color: #fff;
+
+  }
+}

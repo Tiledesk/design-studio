@@ -14,7 +14,8 @@ export enum SIDEBAR_PAGES {
     INTENTS = 'cds-sb-intents',
     SETTINGS = 'cds-sb-settings',
     FULFILLMENT = 'cds-sb-fulfillment',
-    RULES = 'cds-sb-rules'
+    RULES = 'cds-sb-rules',
+    SECRETS = 'cds-sb-secrets'
 }
 
 export enum EXTERNAL_URL {

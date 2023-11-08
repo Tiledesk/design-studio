@@ -248,7 +248,9 @@
             
            
             <!-- [ngStyle]="{'display':isDragging === false ? 'block' : 'none' }" -->
-            <cds-action-arrow id="action-arrow-{{i}}" *ngIf="!last" class="cds-action-arrow">
+            <cds-action-arrow *ngIf="!last" 
+                id="action-arrow-{{i}}"
+                class="cds-action-arrow">
             </cds-action-arrow>
 
             <!-- <div *ngIf="last" class="csd-open-action-menu-btn-wpr">

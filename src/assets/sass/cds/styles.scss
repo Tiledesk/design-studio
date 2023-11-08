@@ -409,3 +409,19 @@ img.base-icon-color{
 img.hover-icon{
     filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%);
 }
+
+/** text-editor-drop: drop icon cds-action-reply elements**/
+.text-editor-drop {
+    position: absolute;
+    display: inline-flex;
+    margin: 0;
+    left: 0;
+    top: 0;
+    // top: -35px;
+    color: #dcdcdc;
+    cursor: grab;
+}
+
+.cds-reply-button-element{
+    position: relative;
+}

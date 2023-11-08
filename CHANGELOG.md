@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 0.0.5
+- added: cds-secrets component in cds-sidebar
+
 ### 0.0.4
 - added: new cds-modal-activate-bot while publishing a chatbot
 - added: options on cds-connector

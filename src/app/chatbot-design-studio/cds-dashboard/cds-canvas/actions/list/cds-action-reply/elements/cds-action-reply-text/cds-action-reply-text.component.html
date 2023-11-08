@@ -64,7 +64,7 @@
 
 <div class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
     
-    <div *ngFor="let button of buttons; let i = index;" cdkDragBoundary=".button-replies" cdkDrag style="position: relative;"> 
+    <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies" cdkDrag > 
         
         <!-- DRAG PLACEHOLDER -->
         <cds-action-reply-button class="custom-placeholder" *cdkDragPlaceholder
