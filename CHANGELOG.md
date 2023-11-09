@@ -6,7 +6,9 @@
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 0.0.5
-- added: cds-secrets component in cds-sidebar
+- added: loader on cds-dashboard
+- added: cds-secrets component in cds-sidebar (beta)
+- bug-fixed: buttons connector not aligned with button-container while dragging
 
 ### 0.0.4
 - added: new cds-modal-activate-bot while publishing a chatbot
