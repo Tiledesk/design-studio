@@ -4,14 +4,14 @@ on:
   push:
     tags:
       - '**'           # Push events to every tag including hierarchical tags like
-jobs:
 
+jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
 
     steps:
-     - name: Check out the repo
+    - name: Check out the repo
        uses: actions/checkout@v4
 
     - name: Login to Docker Hub
@@ -23,5 +23,13 @@ jobs:
         repository: tiledesk/design-studio
         tag_with_ref: true
 
-     - name: Build and push
+    - name: Build and push
        uses: docker/build-push-action@v4
+
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: latest
