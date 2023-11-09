@@ -17,11 +17,7 @@
 
 
 
-.action-intent {
-  padding: 0 12px 0 0;
-  margin: 7px 0 -4px 0;
-  display: block;
-}
+
 
 .action-element{
   width: 100%;
@@ -301,22 +297,47 @@
   background-color: var(--action-no-featured-backgroud);
 }
 
+
+.footer-intent {
+  cursor: pointer;
+  margin-bottom: -10px;
+  min-height: 30px;
+}
+
+.last-action-intent {
+  display: block;
+  float: inline-end;
+  margin: 6px -12px 0 0;
+  padding: 0 24px 0 0;
+}
 /* Btn add action
 /* --------------------------------- */
 .csd-open-action-menu-btn-wpr {
   // height: 32px;
+  // bottom: -50px;
   text-align: center;
   position: absolute;
-  bottom: -50px;
+  display: block;
+  bottom: -36px;
+  left: 118px;
 }
 
-.cds-last-action>.csd-open-action-menu-btn-wpr {
+.footer-intent>.csd-open-action-menu-btn-wpr {
   opacity: 0;
 }
 
-.cds-last-action:hover>.csd-open-action-menu-btn-wpr {
+.footer-intent:hover>.csd-open-action-menu-btn-wpr {
   opacity: 1;
 }
+
+
+// .cds-last-action>.csd-open-action-menu-btn-wpr {
+//   opacity: 0;
+// }
+
+// .cds-last-action:hover>.csd-open-action-menu-btn-wpr {
+//   opacity: 1;
+// }
 
 .body-action {
   position: relative;
