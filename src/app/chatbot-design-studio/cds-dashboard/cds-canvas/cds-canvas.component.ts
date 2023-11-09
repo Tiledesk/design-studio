@@ -430,8 +430,8 @@ export class CdsCanvasComponent implements OnInit {
       //  console.log("[CDS-CANVAS] connector-selected:", e, e.detail.mouse_pos);
         this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
         this.mousePosition = e.detail.mouse_pos;
-        this.mousePosition.x -= 15;
-        this.mousePosition.y -= 15;
+        this.mousePosition.x -= -10;
+        this.mousePosition.y -= 25;
         this.connectorSelected =  e.detail.connector;
         // this.IS_OPEN_ADD_ACTIONS_MENU = true;
         // this.positionFloatMenu = e.detail.mouse_pos;

@@ -4,8 +4,16 @@
 
 .isLast{
     .connector {
-        right: -22px;
-        top: calc(50% - 10px);
+        right: -24px;
+        top: calc(50% - 18px);
+        &:hover{
+            cursor: default;
+            .point-connector-empty {
+                background: #506493;
+                border: 0px;
+                cursor: copy;
+            }
+        }
     }
     .connector .point-connector {
         // background: #e4e4e7;
@@ -22,6 +30,7 @@
         width: 10px;
         height: 10px;
     }
+
     .connector .point-connector-empty::before {
         border: 0px;
     }
