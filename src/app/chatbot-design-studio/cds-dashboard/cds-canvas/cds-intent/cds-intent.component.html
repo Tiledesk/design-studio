@@ -248,7 +248,7 @@
             
            
             <!-- [ngStyle]="{'display':isDragging === false ? 'block' : 'none' }" -->
-            <cds-action-arrow *ngIf="!last" 
+            <cds-action-arrow *ngIf="(listOfActions?.length-2) > i" 
                 id="action-arrow-{{i}}"
                 class="cds-action-arrow">
             </cds-action-arrow>
