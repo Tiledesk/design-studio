@@ -3,15 +3,26 @@
 
 
 .isLast{
-
+    .connector {
+        right: -32px;
+        top: calc(50% - 10px);
+    }
+    .connector .point-connector {
+        width: 10px;
+        height: 10px;
+        border: 0; 
+    }
     .connector .point-connector-empty {
         border: 1px solid;
-        border-color: rgba(0, 0, 0, 0.5);
-        width: 12px;
-        height: 12px;
+        border-color: #d2d2d2;
         background: #ffffff;
+        width: 10px;
+        height: 10px;
     }
     .connector .point-connector-empty::before {
+        border: 0px;
+    }
+    .connector .point-connector::before {
         border: 0px;
     }
 }

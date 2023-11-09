@@ -674,6 +674,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * called when the action is modified
    * */
   public async onUpdateAndSaveAction(object) {
+    console.log('[CDS-INTENT] onUpdateAndSaveAction::::', object);
     let connector = null;
     if(object && object.type && object.type === 'connector'){
       connector = object.element;
@@ -682,6 +683,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       if(action && action._tdActionId){
         replaceItemInArrayForKey('_tdActionId', this.intent.actions, action);
       }
+      setTimeout(()=> {
+        // ATTENZIONE!!! trovare il modo di refreshare i connettori SOLO quando la action viene eliminata fisicamente dallo stage!!!
+        this.connectorService.updateConnector(this.intent.intent_id);
+      }, 0);
     }
     this.setActionIntentInListOfActions();
     // console.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
