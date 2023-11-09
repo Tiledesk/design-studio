@@ -3,7 +3,7 @@
 <!-- ---------------------------------------------- -->
 <div class="cds-modal-content">
     <div class="cds-modal-header">
-        <h1 mat-dialog-title>{{ "HookTheBot" | translate }}</h1>
+        <h1>{{ "HookTheBot" | translate }}</h1>
         <mat-dialog-actions>
             <button mat-button mat-dialog-close>
                 <span class="material-icons">
@@ -26,12 +26,7 @@
 
     <div class="cds-modal-body" id="deptsChoise">
 
-        <div *ngIf="!DISPLAY_SELECT_DEPTS_WITHOUT_BOT && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false && !DISPLAY_INSTALL_SCRIPT" class="field-box modal-flex">
-            <label class="title-label" [innerHTML]="'DoYouWantToActivateTheBotForNewConversations' | translate: translateparamBotName "></label>
-            <!-- <h3> {{ 'DoYouWantToActivateTheBotForNewVonversations' | translate: translateparamBotName }} </h3> -->
-        </div>
-
-        <div *ngIf="DISPLAY_SELECT_DEPTS_WITHOUT_BOT && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false && !DISPLAY_INSTALL_SCRIPT" class="field-box modal-flex">
+        <div class="field-box modal-flex">
             <label class="title-label" [innerHTML]="'DoYouWantToActivateBotForOneOfTheFollowingDepts' | translate: translateparamBotName "></label>
             <cds-select
                 [items]="depts_without_bot_array"
@@ -45,7 +40,7 @@
         </div>
 
 
-        <div *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT && !DISPLAY_INSTALL_SCRIPT" class="modal-flex">
+        <!-- <div *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT && !DISPLAY_INSTALL_SCRIPT" class="modal-flex">
 
             <span *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS" class="field-box modal-flex">
 
@@ -73,7 +68,7 @@
                 </svg>
                 <h5 style="color:#D06079;"> {{'AnErroOccurredWhileActivatingTheBot' | translate }}</h5>
             </span>
-        </div>
+        </div> -->
 
 
         <div *ngIf="DISPLAY_INSTALL_SCRIPT" class="modal-flex">
@@ -86,16 +81,12 @@
 
     <div class="cds-modal-footer">
  
-            <div (click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT" id="installBtn">
-                <span> {{ "Install" | translate }} </span>
-            </div>
-
-            <button *ngIf="!deptSelected && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false && !DISPLAY_INSTALL_SCRIPT" id="ignoreBtn"
+            <button id="ignoreBtn"
                 class="btn btn-primary cds-blue-button" (click)="DEPTS_HAS_NOT_A_BOT = !DEPTS_HAS_NOT_A_BOT">
                 <span> {{ 'Ignore' | translate}} </span>
             </button>
 
-            <button *ngIf="deptSelected &&  HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+            <button *ngIf="deptSelected && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
                 class="btn btn-primary cds-blue-button" (click)="hookBotToDept()">
                 <i *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
                     class="fa fa-spinner fa-spin"></i>
@@ -108,10 +99,7 @@
                 <span> {{ "BotsAddEditPage.Continue" | translate }} </span>
             </button>
 
-            <button *ngIf="DISPLAY_INSTALL_SCRIPT"
-                class="btn btn-primary cds-blue-button" (click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT">
-                <span> < {{ "Back" | translate }} </span>
-            </button>
+            
     </div> <!-- /.modal-footer -->
 
 </ng-template>
@@ -119,8 +107,10 @@
 
 <ng-template #publishStep>
     <div class="cds-modal-body" id="publishStep">   
-        <div *ngIf="!HAS_COMPLETED_PUBLISH" class="field-box modal-flex">
-            <label class="title-label">Publish your flow?</label>
+        <div class="field-box modal-flex">
+            <label class="title-label">Complimenti! Stai per pubblicare il tuo Chatbot 🚀 </label>
+
+            <label class="title-label"> <a>Segui</a> queste semplici istruzioni per attivarlo sul tuo sito web </label>
             <!-- <h3> {{ 'DoYouWantToActivateTheBotForNewVonversations' | translate: translateparamBotName }} </h3> -->
         </div>
 
@@ -156,6 +146,15 @@
     </div> <!-- /.modal-body -->
 
     <div class="cds-modal-footer" id="publishStep">
+
+        <div *ngIf="!DISPLAY_INSTALL_SCRIPT" (click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT" id="installBtn">
+            <span> {{ "Install" | translate }} </span>
+        </div>
+
+        <button *ngIf="DISPLAY_INSTALL_SCRIPT"
+            class="btn btn-primary cds-blue-button" (click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT">
+            <span> < {{ "Back" | translate }} </span>
+        </button>
 
         <button *ngIf="!HAS_COMPLETED_PUBLISH" (click)="publish()"
             class="btn btn-primary cds-blue-button">

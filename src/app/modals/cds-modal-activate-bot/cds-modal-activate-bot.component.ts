@@ -24,7 +24,7 @@ export class CdsModalActivateBotComponent implements OnInit {
 
 
   defaultDepartmentId: string;
-  DISPLAY_SELECT_DEPTS_WITHOUT_BOT: boolean;
+  // DISPLAY_SELECT_DEPTS_WITHOUT_BOT: boolean;
   DISPLAY_INSTALL_SCRIPT: boolean = false;
   // PRESENTS_MODAL_ATTACH_BOT_TO_DEPT: boolean = false;
   depts_without_bot_array = [];
@@ -42,7 +42,7 @@ export class CdsModalActivateBotComponent implements OnInit {
   HAS_COMPLETED_PUBLISH_ERROR: boolean = false
 
   translateparamBotName: any
-  DEPTS_HAS_NOT_A_BOT: boolean = true
+  DEPTS_HAS_NOT_A_BOT: boolean = false
 
 
   webScript: string;
@@ -82,30 +82,26 @@ export class CdsModalActivateBotComponent implements OnInit {
       this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT] ---> GET DEPTS DEPTS LENGHT ', depts_length);
 
       if (depts_length === 1) {
-        this.DISPLAY_SELECT_DEPTS_WITHOUT_BOT = false;
+        // this.DISPLAY_SELECT_DEPTS_WITHOUT_BOT = false;
         this.deptSelected = {id: this.departments[0]._id, name: this.departments[0].name}
 
         this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT]  --->  DEFAULT DEPT HAS BOT ', this.departments[0].hasBot);
-        if (this.departments[0].hasBot === true) {
-          this.DEPTS_HAS_NOT_A_BOT = false
+        if (!this.departments[0].hasBot) {
+          this.DEPTS_HAS_NOT_A_BOT = true
+          this.hookBotToDept()
           this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT] --->  DEFAULT DEPT HAS BOT ');
           // this.DISPLAY_BTN_ACTIVATE_BOT_FOR_NEW_CONV = false;
           // this.logger.log('Bot Create --->  DEFAULT DEPT HAS BOT DISPLAY_BTN_ACTIVATE_BOT_FOR_NEW_CONV ', this.DISPLAY_BTN_ACTIVATE_BOT_FOR_NEW_CONV);
         }
       }
 
+
       if (depts_length > 1) {
-        this.DISPLAY_SELECT_DEPTS_WITHOUT_BOT = true;
-        this.DEPTS_HAS_NOT_A_BOT = false
         this.departments.forEach(dept => {
-          if (dept.hasBot === true) {
-           
-            // this.logger.log('[CDS DSBRD] --->  DEPT HAS BOT ');
-          } else {
+          if (!dept.hasBot) {
             this.DEPTS_HAS_NOT_A_BOT = true
             this.depts_without_bot_array.push({ id: dept._id, name: dept.name })
-          }
-
+          } 
         });
 
         // this.logger.log('[CDS DSBRD] --->  DEPT ARRAY OF DEPT WITHOUT BOT ', this.depts_without_bot_array);
