@@ -11,16 +11,7 @@ import { getParameterByName } from 'src/chat21-core/utils/utils';
 import { tranlatedLanguage } from 'src/chat21-core/utils/constants';
 import { ProjectService } from './services/projects.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
-import { DepartmentService } from './services/department.service';
-import { DashboardService } from './services/dashboard.service';
-import { Project } from './models/project-model';
-import { Chatbot } from './models/faq_kb-model';
-import { FaqKbService } from './services/faq-kb.service';
-import { FaqService } from './services/faq.service';
 import { UsersService } from './services/users.service';
-import { KnowledgeBaseService } from './services/knowledge-base.service';
-import { OpenaiService } from './services/openai.service';
-import { WhatsappService } from './services/whatsapp.service';
 import { MultichannelService } from './services/multichannel.service';
 import { ScriptService } from 'src/chat21-core/providers/scripts/script.service';
 
