@@ -26,10 +26,11 @@ jobs:
     - name: Generate Docker metadata
         id: meta
         uses: docker/metadata-action@v3
-        tags: |
-          type=ref,event=branch
-          type=semver,pattern={{version}}
-          
+        with:
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
     - name: Build and push
        uses: docker/build-push-action@v4
 
