@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { AppConfigService } from './app-config';
 
 const swal = require('sweetalert');
 
@@ -63,10 +64,11 @@ export class BrandService {
   
   constructor(
     private httpClient: HttpClient,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private appConfig: AppConfigService
   ) {
     this.getTranslations()
-
+    this.brand = this._brand
   }
 
   getTranslations() {
@@ -90,77 +92,78 @@ export class BrandService {
   // }
 
 
-  async loadBrand() {
 
+  async loadBrand() {
     // this.getData()
     //   .subscribe(data => {
     //     this.assetBrand = data
     //     console.log('[BRAND-SERV] BRAND RETIEVED FROM ASSET assetBrand ', this.assetBrand);
     //   });
 
-    let url = ''
-    if (environment.remoteConfig === false) {
+    // let url = ''
+    // if (environment.remoteConfig === false) {
 
-      if (environment.hasOwnProperty("brandSrc")) {
+    //   if (environment.hasOwnProperty("brandSrc")) {
 
-        this.logger.log('[BRAND-SERV] loadBrand remoteConfig is false - env has Property brandSrc');
-        const remoteBrandUrl = this.isEmpty(environment['brandSrc']);
+    //     this.logger.log('[BRAND-SERV] loadBrand remoteConfig is false - env has Property brandSrc');
+    //     const remoteBrandUrl = this.isEmpty(environment['brandSrc']);
 
-        if (!remoteBrandUrl) {
-          this.logger.log('[BRAND-SERV] loadBrand remoteConfig is false - env brandSrc is empty ? ', remoteBrandUrl);
-          url = environment['brandSrc']
-        } else {
-          this.logger.log('[BRAND-SERV] loadBrand remoteConfig is false - env brandSrc is empty ? ', remoteBrandUrl, ' -> load from assets')
-          this.brand =  this._brand;
-        }
-      } else {
-        this.logger.log('[BRAND-SERV] loadBrand remoteConfig is false - env NOT has Property brandSrc -> load from assets');
-        this.brand = this._brand;
-      }
-    } else {
-      const res = await this.httpClient.get(environment['remoteConfigUrl']).toPromise();
-      this.logger.log('[BRAND-SERV] loadBrand - remoteConfig -> true get remoteConfig response ', res);
+    //     if (!remoteBrandUrl) {
+    //       this.logger.log('[BRAND-SERV] loadBrand remoteConfig is false - env brandSrc is empty ? ', remoteBrandUrl);
+    //       url = environment['brandSrc']
+    //     } else {
+    //       this.logger.log('[BRAND-SERV] loadBrand remoteConfig is false - env brandSrc is empty ? ', remoteBrandUrl, ' -> load from assets')
+    //       this.brand =  this._brand;
+    //     }
+    //   } else {
+    //     this.logger.log('[BRAND-SERV] loadBrand remoteConfig is false - env NOT has Property brandSrc -> load from assets');
+    //     this.brand = this._brand;
+    //   }
+    // } else {
+    //   const res = await this.httpClient.get(environment['remoteConfigUrl']).toPromise();
+    //   this.logger.log('[BRAND-SERV] loadBrand - remoteConfig -> true get remoteConfig response ', res);
 
-      // const remoteConfigData = JSON.parse(res['_body'])
-      const remoteConfigData = res
-      // this.logger.log('BrandService loadBrand - remoteConfig is true - get remoteConfigData  res ', remoteConfigData);
+    //   // const remoteConfigData = JSON.parse(res['_body'])
+    //   const remoteConfigData = res
+    //   // this.logger.log('BrandService loadBrand - remoteConfig is true - get remoteConfigData  res ', remoteConfigData);
 
-      if (remoteConfigData.hasOwnProperty("brandSrc")) {
-        this.logger.log('[BRAND-SERV] loadBrand remoteConfig is true - remoteConfigData has Property brandSrc');
+    //   if (remoteConfigData.hasOwnProperty("brandSrc")) {
+    //     this.logger.log('[BRAND-SERV] loadBrand remoteConfig is true - remoteConfigData has Property brandSrc');
 
-        const remoteBrandUrl = this.isEmpty(remoteConfigData['brandSrc']);
-        if (!remoteBrandUrl) {
-          this.logger.log('[BRAND-SERV] loadBrand remoteConfig is true - remoteConfigData brandSrc is empty ?', remoteBrandUrl);
+    //     const remoteBrandUrl = this.isEmpty(remoteConfigData['brandSrc']);
+    //     if (!remoteBrandUrl) {
+    //       this.logger.log('[BRAND-SERV] loadBrand remoteConfig is true - remoteConfigData brandSrc is empty ?', remoteBrandUrl);
 
-          url = remoteConfigData['brandSrc']
+    //       url = remoteConfigData['brandSrc']
 
 
-        } else {
-          this.logger.log('[BRAND-SERV] loadBrand remoteConfig is true - remoteConfigData brandSrc is empty ?', remoteBrandUrl, ' -> load from assets');
+    //     } else {
+    //       this.logger.log('[BRAND-SERV] loadBrand remoteConfig is true - remoteConfigData brandSrc is empty ?', remoteBrandUrl, ' -> load from assets');
 
-          this.brand = this._brand;
-        }
+    //       this.brand = this._brand;
+    //     }
 
-      } else {
-        this.logger.log('[BRAND-SERV] loadBrand remoteConfig is true - remoteConfigData NOT has Property brandSrc -> load from assets');
-        // this.setBrand(this.local_url)
-        // url = this.local_url
-        this.brand = this._brand;
-      }
-    }
+    //   } else {
+    //     this.logger.log('[BRAND-SERV] loadBrand remoteConfig is true - remoteConfigData NOT has Property brandSrc -> load from assets');
+    //     // this.setBrand(this.local_url)
+    //     // url = this.local_url
+    //     this.brand = this._brand;
+    //   }
+    // }
 
     try {
+      let url = this.appConfig.getConfig().brandSrc
       if (url) {
         const data = await this.httpClient.get(url).toPromise();
 
-        this.logger.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
+        console.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
 
-        this.brand = JSON.parse(data['_body'])
+        this.brand =data
 
-        this.logger.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
+        console.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
       }
     } catch (err) {
-      this.logger.error('[BRAND-SERV] loadBrand error : ', err);
+      console.error('[BRAND-SERV] loadBrand error : ', err);
 
       this.brand = this._brand;
       // this.notify.showNotificationChangeProject('ops', 2, 'done');
@@ -179,7 +182,7 @@ export class BrandService {
   }
 
   getBrand() {
-    // this.logger.log('BrandService getBrand has been called - brand: ', this.brand);
+    console.log('BrandService getBrand has been called - brand: ', this.brand);
     return this.brand;
     
   }

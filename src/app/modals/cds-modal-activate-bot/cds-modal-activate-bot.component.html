@@ -3,9 +3,9 @@
 <!-- ---------------------------------------------- -->
 <div class="cds-modal-content">
     <div class="cds-modal-header">
-        <h1>{{ "HookTheBot" | translate }}</h1>
+        <div class="header-title">{{ "CDSModalActivateBot.HookTheBot" | translate }}</div>
         <mat-dialog-actions>
-            <button mat-button mat-dialog-close>
+            <button mat-dialog-close>
                 <span class="material-icons">
                     close
                 </span>
@@ -26,57 +26,61 @@
 
     <div class="cds-modal-body" id="deptsChoise">
 
-        <div class="field-box modal-flex">
-            <label class="title-label" [innerHTML]="'DoYouWantToActivateBotForOneOfTheFollowingDepts' | translate: translateparamBotName "></label>
-            <cds-select
-                [items]="depts_without_bot_array"
-                [bindLabelSelect]="'name'"
-                [bindValueSelect]="'id'"
-                placeholder="{{'SelectDepartment'|translate}}"
-                [itemSelected]="de"
-                [clearable]="true"
-                (onSelected)="onSelectDept($event)" >
-            </cds-select>
+        <div class="modal-flex">
+            <label class="title-label" [innerHTML]="'CDSModalActivateBot.DoYouWantToActivateBotForOneOfTheFollowingDepts' | translate: selectedChatbot "></label>
+            <div class="input-group cds-input-group">
+                <cds-select id="departments"
+                    [items]="depts_without_bot_array"
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'id'"
+                    placeholder="{{'SelectDepartment'|translate}}"
+                    [itemSelected]="deptSelected?.id"
+                    [clearable]="true"
+                    (onSelected)="onSelectDept($event)" >
+                </cds-select>
+                <button [disabled]="!deptSelected && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                    class="btn btn-primary cds-blue-button" (click)="hookBotToDept()">
+                    <i *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                        class="fa fa-spinner fa-spin"></i>
+                    <span> {{ 'CDSModalActivateBot.ActivateBot' | translate}}</span>
+                    <!-- <b>{{deptSelected.name}}</b> -->
+                </button>
+            </div>
+
+            <div *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT" class="modal-flex">
+
+                <span *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS" class="field-box modal-flex">
+    
+                    <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 130.2 130.2">
+                        <circle class="path circle" fill="none" stroke="#73AF55" stroke-width="6"
+                            stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                        <polyline class="path check" fill="none" stroke="#73AF55" stroke-width="6"
+                            stroke-linecap="round" stroke-miterlimit="10"
+                            points="100.2,40.2 51.5,88.8 29.8,67.5 " />
+                    </svg>
+                    <h5 style="color:#73AF55;" [innerHTML]="'CDSModalActivateBot.BotSuccessfullyActivated' | translate:deptSelected "> </h5>
+                </span>
+    
+                <span *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT_ERROR" class="field-box modal-flex">
+    
+                    <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 130.2 130.2">
+                        <circle class="path circle" fill="none" stroke="#D06079" stroke-width="6"
+                            stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                        <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
+                            stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+                        <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
+                            stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+                    </svg>
+                    <h5 style="color:#D06079;"> {{'AnErroOccurredWhileActivatingTheBot' | translate }}</h5>
+                </span>
+            </div>
+
         </div>
 
 
-        <!-- <div *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT && !DISPLAY_INSTALL_SCRIPT" class="modal-flex">
-
-            <span *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS" class="field-box modal-flex">
-
-                <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 130.2 130.2">
-                    <circle class="path circle" fill="none" stroke="#73AF55" stroke-width="6"
-                        stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
-                    <polyline class="path check" fill="none" stroke="#73AF55" stroke-width="6"
-                        stroke-linecap="round" stroke-miterlimit="10"
-                        points="100.2,40.2 51.5,88.8 29.8,67.5 " />
-                </svg>
-                <h5 style="color:#73AF55;"> {{'BotSuccessfullyActivated' | translate }}</h5>
-            </span>
-
-            <span *ngIf="HAS_COMPLETED_HOOK_BOOT_TO_DEPT_ERROR" class="field-box modal-flex">
-
-                <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 130.2 130.2">
-                    <circle class="path circle" fill="none" stroke="#D06079" stroke-width="6"
-                        stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
-                    <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
-                        stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
-                    <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
-                        stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
-                </svg>
-                <h5 style="color:#D06079;"> {{'AnErroOccurredWhileActivatingTheBot' | translate }}</h5>
-            </span>
-        </div> -->
-
-
-        <div *ngIf="DISPLAY_INSTALL_SCRIPT" class="modal-flex">
-            <pre>
-                <span class="material-icons" (click)="onCopyScript()">content_copy</span>
-                <p>{{webScript}}</p>
-            </pre>
-        </div>
+        
     </div> <!-- /.modal-body -->
 
     <div class="cds-modal-footer">
@@ -86,17 +90,16 @@
                 <span> {{ 'Ignore' | translate}} </span>
             </button>
 
-            <button *ngIf="deptSelected && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+            <!-- <button *ngIf="deptSelected && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
                 class="btn btn-primary cds-blue-button" (click)="hookBotToDept()">
                 <i *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
                     class="fa fa-spinner fa-spin"></i>
-                <span> {{ 'ActivateBot' | translate}}</span>
-                <!-- <b>{{deptSelected.name}}</b> -->
-            </button>
+                <span> {{ 'CDSModalActivateBot.ActivateBot' | translate}}</span>
+            </button> -->
 
             <button *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === true"
                 class="btn btn-primary cds-blue-button" (click)="DEPTS_HAS_NOT_A_BOT = !DEPTS_HAS_NOT_A_BOT">
-                <span> {{ "BotsAddEditPage.Continue" | translate }} </span>
+                <span> {{ "Continue" | translate }} </span>
             </button>
 
             
@@ -107,63 +110,78 @@
 
 <ng-template #publishStep>
     <div class="cds-modal-body" id="publishStep">   
-        <div class="field-box modal-flex">
-            <label class="title-label">Complimenti! Stai per pubblicare il tuo Chatbot 🚀 </label>
+        <div *ngIf="!DISPLAY_INSTALL_SCRIPT" class=" modal-flex">
+            <label class="title-label main-text">{{ 'CDSModalActivateBot.WellDonePublishingChatbot' | translate }}</label>
+            <label class="title-label">{{ 'CDSModalActivateBot.FollowTheseSimpleInstructions' | translate }}</label>
 
-            <label class="title-label"> <a>Segui</a> queste semplici istruzioni per attivarlo sul tuo sito web </label>
-            <!-- <h3> {{ 'DoYouWantToActivateTheBotForNewVonversations' | translate: translateparamBotName }} </h3> -->
+            <div class="install-wrp"(click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT">
+                <span class="material-icons-outlined">code</span>
+                <div class="header__center" style="width: 90%;">
+                    <div class="title">{{ 'CDSModalActivateBot.Installation' | translate }}</div>
+                    <div class="subtitle">{{ 'CDSModalActivateBot.AddTheInstallationCodeToYourWebsite' | translate }}</div>
+                </div>
+                <span class="material-icons-outlined">navigate_next</span>
+            </div>
+
+            <div *ngIf="HAS_COMPLETED_PUBLISH" class="modal-flex">
+
+                <span *ngIf="HAS_COMPLETED_PUBLISH_SUCCESS" class="modal-flex">
+    
+                    <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 130.2 130.2">
+                        <circle class="path circle" fill="none" stroke="#73AF55" stroke-width="6"
+                            stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                        <polyline class="path check" fill="none" stroke="#73AF55" stroke-width="6"
+                            stroke-linecap="round" stroke-miterlimit="10"
+                            points="100.2,40.2 51.5,88.8 29.8,67.5 " />
+                    </svg>
+                    <h5 style="color:#73AF55;"> {{ 'CDSModalActivateBot.BotSuccessFullyPublished' | translate }}</h5>
+                </span>
+    
+                <span *ngIf="HAS_COMPLETED_PUBLISH_ERROR" class="modal-flex">
+    
+                    <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 130.2 130.2">
+                        <circle class="path circle" fill="none" stroke="#D06079" stroke-width="6"
+                            stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                        <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
+                            stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+                        <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
+                            stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+                    </svg>
+                    <h5 style="color:#D06079;"> {{ 'CDSModalActivateBot.AnErroOccurredWhilePublishingTheBot' | translate }}</h5>
+                </span>
+            </div>
         </div>
 
-        <div *ngIf="HAS_COMPLETED_PUBLISH" class="modal-flex">
-
-            <span *ngIf="HAS_COMPLETED_PUBLISH_SUCCESS" class="field-box modal-flex">
-
-                <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 130.2 130.2">
-                    <circle class="path circle" fill="none" stroke="#73AF55" stroke-width="6"
-                        stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
-                    <polyline class="path check" fill="none" stroke="#73AF55" stroke-width="6"
-                        stroke-linecap="round" stroke-miterlimit="10"
-                        points="100.2,40.2 51.5,88.8 29.8,67.5 " />
-                </svg>
-                <h5 style="color:#73AF55;"> {{'BotSuccessFullyPublished' | translate }}</h5>
-            </span>
-
-            <span *ngIf="HAS_COMPLETED_PUBLISH_ERROR" class="field-box modal-flex">
-
-                <svg style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 130.2 130.2">
-                    <circle class="path circle" fill="none" stroke="#D06079" stroke-width="6"
-                        stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
-                    <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
-                        stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
-                    <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
-                        stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
-                </svg>
-                <h5 style="color:#D06079;"> {{'AnErroOccurredWhilePublishingTheBot' | translate }}</h5>
-            </span>
+        <div *ngIf="DISPLAY_INSTALL_SCRIPT" class=" modal-flex">
+            <label class="title-label" innerHtml="{{ 'CDSModalActivateBot.CopyTheFollowingScript' | translate }}"></label>
+            <div class="code">
+                <pre>
+                    <code class="javascript" style="white-space: pre;" [innerHTML]="webScript.html"></code>
+                </pre>
+                <span class="material-icons" (click)="onCopyScript()">content_copy</span>
+            </div>
         </div>
+
+       
     </div> <!-- /.modal-body -->
 
     <div class="cds-modal-footer" id="publishStep">
-
-        <div *ngIf="!DISPLAY_INSTALL_SCRIPT" (click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT" id="installBtn">
-            <span> {{ "Install" | translate }} </span>
-        </div>
 
         <button *ngIf="DISPLAY_INSTALL_SCRIPT"
             class="btn btn-primary cds-blue-button" (click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT">
             <span> < {{ "Back" | translate }} </span>
         </button>
 
-        <button *ngIf="!HAS_COMPLETED_PUBLISH" (click)="publish()"
+        <button *ngIf="!HAS_COMPLETED_PUBLISH && !DISPLAY_INSTALL_SCRIPT" (click)="publish()"
             class="btn btn-primary cds-blue-button">
             <span> {{ "Publish" | translate }} </span>
         </button>
 
         <button *ngIf="HAS_COMPLETED_PUBLISH_SUCCESS"
             class="btn btn-primary cds-blue-button" mat-dialog-close>
-            <span> {{ "BotsAddEditPage.Continue" | translate }} </span>
+            <span> {{ "Close" | translate }} </span>
         </button>
 
     </div> <!-- /.modal-footer -->

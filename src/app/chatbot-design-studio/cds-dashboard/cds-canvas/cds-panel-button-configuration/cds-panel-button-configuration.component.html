@@ -5,7 +5,7 @@
             <div class="icon-action">
                 <span class="material-icons-outlined">smart_button</span>
             </div>
-            <p class="label-action">Button</p>
+            <p class="label-action">{{ 'CDSPanelButtons.Button' | translate}}</p>
         </div>
         <div class="button-tab-close" (click)="onCloseButtonPanel()">
             <span class="material-icons">chevron_right</span>
@@ -18,7 +18,7 @@
        
         <div class="field-box">
             <label class="title-label">
-                {{ 'Button title' | translate }}
+                {{ 'CDSPanelButtons.ButtonTitle' | translate}}
             </label>
             <cds-textarea 
                 class="text-editable-div"
@@ -33,7 +33,7 @@
         
         <div class="field-box">
             <label class="title-label">
-                {{ 'Type' | translate }}
+                {{ 'CDSPanelButtons.Type' | translate}}
             </label>
             <cds-select #select_action id="select-action"
                 [items]="buttonTypes"
@@ -48,7 +48,7 @@
 
             <div class="field-box">
                 <label class="title-label">
-                    {{ 'Open in' | translate }}
+                    {{ 'CDSPanelButtons.OpenIn' | translate}}
                 </label>
                 <cds-select #select_action id="select-action"
                     [items]="urlTypes"
@@ -75,7 +75,7 @@
         <div *ngIf="buttonType === typeOfButton.ACTION">
             <div class="field-box">
                 <label class="title-label">
-                    {{ 'Go to block' | translate }}
+                    {{ 'CDSPanelButtons.GoToBlock' | translate}}
                 </label>
                 <cds-select #select_action id="select-action"
                     [items]="listOfIntents"

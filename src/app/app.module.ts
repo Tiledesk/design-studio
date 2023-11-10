@@ -69,13 +69,14 @@ export function createTranslateLoader(http: HttpClient) {
 
 }
 
-const appInitializerFn = (appConfig: AppConfigService, logger: NGXLogger) => {
-  return () => {
+const appInitializerFn =  (appConfig: AppConfigService, brandService: BrandService, logger: NGXLogger) => {
+  return async() => {
     let customLogger = new CustomLogger(logger);
     LoggerInstance.setInstance(customLogger);
     if (environment.remoteConfig) {
-      return appConfig.loadAppConfig();
+      await appConfig.loadAppConfig();
     }
+    await brandService.loadBrand();
   };
 };
 
@@ -169,7 +170,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
       provide: APP_INITIALIZER,
       useFactory: appInitializerFn,
       multi: true,
-      deps: [AppConfigService, NGXLogger]
+      deps: [AppConfigService, BrandService, NGXLogger]
     },
     {
       provide: UploadService,

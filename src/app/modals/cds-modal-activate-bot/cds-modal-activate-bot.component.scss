@@ -7,16 +7,18 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 550px;
-    height: 300px
+    width: 750px;
+    height: 400px
 }
 
 .cds-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    h1 {
+    div.header-title {
         margin:0px;
+        color: $blu;
+        font-weight: 600;
     }
     mat-dialog-actions{
         text-align: right;
@@ -37,8 +39,11 @@
     height: 100%;
 
     .modal-flex{
+        display: flex;
+        flex-direction: column;
         height: 100%;
         width: 100%;
+        gap: 10px;
         padding: 10px 30px;
     }
 
@@ -46,10 +51,46 @@
         font-weight: 400 !important;
     }
 
+    .main-text{
+      font-weight: 500;
+      font-size: 18px;
+      text-align: center;
+    }
+
     span{
         align-items: center;
         justify-content: center;
     }
+
+    .install-wrp{
+      display: flex;
+      align-items: center;
+      width: 100%;
+      background-color: var(--content-background);
+      border: 1px solid $gray-light-02;
+      border-radius: 8px;
+      padding: 10px;
+      gap: 20px;
+
+      .title{
+        font-size: 17px;
+        line-height: 17px;
+        font-weight: 500;
+        color: $blu;
+      }
+      .subtitle{
+        font-size: 13px;
+        color: $gray;
+      }
+      span.material-icons-outlined{
+        color: $blu;
+      }
+      &:hover{
+        cursor: pointer;
+        opacity: 0.8;
+      }
+    }
+
 }
 
 .cds-modal-footer{
@@ -58,47 +99,76 @@
     align-items: center;
     flex-direction: row-reverse;
     gap: 10px;
-    
+
     #ignoreBtn{
         background-color: $blu-light-02;
     }
 
-    #installBtn{
-        text-decoration: underline;
-        cursor: pointer;
-    }
-}
-.cds-modal-footer#publishStep{
-    justify-content: center;
 }
 
-pre ::ng-deep{
-    background-color: var(--content-background);
-    border: 1px solid $gray-light-02;
-    line-height: 16px;
-    margin-bottom: 0px;
-    overflow: hidden;
-    border-radius: 4px;
+div.code{
+  // background-color: var(--content-background);
+  background-color: rgb(43, 47, 50);
+  border: 1px solid $gray-light-02;
+  overflow: hidden;
+  position: relative;
+  border-radius: 8px;
+
+  pre {
+    display: block;
+    overflow-x: auto;
+    padding: 0px 24px;
+    color: rgb(116, 116, 116);
+    font-family: "Fira Code";
     font-size: 13px;
-    display: flex;
-    position: relative;
+    margin: 0px;
+    line-height: 16px;
+  }
 
-    p{
-      margin: 5px 0px;
-      overflow-x: auto;  
+  code{
+    display: block;
+
+    ::ng-deep {
+      .fNZzEh{
+        color: rgb(228, 163, 152);
+      }
+      .eKLHPw{
+        color: rgb(101, 159, 253)
+      }
+      .dSxEd{
+        color: rgb(214, 215, 164)
+      }
+      .qwEds{
+        color: rgb(134, 211, 247)
+      }
     }
-    span.material-icons{
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        color: $blu;
-        font-size: 14px;
-        &:hover{
-            cursor: pointer;
-            opacity: 0.8;
-        }
+  }
+
+  span.material-icons{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: $color-withe-hex;
+    font-size: 22px;
+    &:hover{
+        cursor: pointer;
+        opacity: 0.8;
     }
+  }
 }
+
+
+cds-select#departments ::ng-deep{
+  // padding: 6px 0;
+  width: 80%;
+  .ng-select-container{
+      height: 37px;
+      border-radius: 8px 0px 0px 8px;
+      border: 1px solid rgb(118, 118, 118) !important;
+  }
+}
+
+
 
 // ------------------------------------------------
 // for the svg in the modal Hook The Bot

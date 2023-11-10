@@ -196,11 +196,17 @@ export class CdsFormComponent implements OnInit, OnChanges {
 
 
   getCurrentTranslation() {
-    let jsonWidgetLangURL = 'assets/i18n/' + this.langBot + '.json';
-    this.httpClient.get(jsonWidgetLangURL).subscribe(data => {
-      this.translations = data['AddIntentPage'];
+    let keys = [
+      'Cancel',
+      'CancelReply',
+      'DeleteField',
+      'ConfirmDeleteField',
+      'DeleteForm',
+      'ConfirmDeleteForm'
+    ]
+    this.translate.get(keys).subscribe(data => {
+      this.translations = data
       let cancel = this.translations['Cancel'] ? this.translations['Cancel'] : 'cancel';
-      this.translateMap.cancel = cancel;
       this.logger.log('[FORM-COMP]  getCurrentTranslation intentForm 1', this.intentForm);
       this.intentFormSize = Object.keys(this.intentForm).length;
       if (this.intentFormSize === 0) {

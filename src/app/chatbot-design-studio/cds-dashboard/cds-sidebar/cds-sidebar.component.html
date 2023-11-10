@@ -7,7 +7,7 @@
         <!-- ------------------------------------------------------- -->
         <ng-container *ngIf="USER_ROLE !== 'agent'">
             <li [ngClass]="{'active-item': INTENTS_ROUTE_IS_ACTIVE}" (click)="goTo(SIDEBAR_PAGES.INTENTS)"
-                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="Blocks" #tooltip="matTooltip"
+                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="{{ 'Blocks' | translate }}" #tooltip="matTooltip"
                 matTooltipPosition='right' matTooltipHideDelay="100" [matTooltipDisabled]="IS_OPEN_SIDEBAR">
                 <a>
                     <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false"
@@ -15,7 +15,7 @@
                         textsms
                     </i>
                     <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
-                        Blocks
+                        {{ 'Blocks' | translate }}
                     </p>
                 </a>
             </li>
@@ -26,7 +26,7 @@
         <!-- ------------------------------------------------------- -->
         <ng-container *ngIf="USER_ROLE !== 'agent'">
             <li [ngClass]="{'active-item': FULFILLMENT_ROUTE_IS_ACTIVE }" (click)="goTo(SIDEBAR_PAGES.FULFILLMENT)"
-                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="Fulfillment" #tooltip="matTooltip"
+                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="{{ 'Fulfillment' | translate }}" #tooltip="matTooltip"
                 matTooltipPosition='right' matTooltipHideDelay="100" [matTooltipDisabled]="IS_OPEN_SIDEBAR">
                 <a>
                     <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false"
@@ -34,7 +34,7 @@
                         offline_bolt
                     </i>
                     <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
-                        Fulfillment
+                        {{ 'Fulfillment' | translate }}
                     </p>
                 </a>
             </li>
@@ -129,7 +129,7 @@
 
     <div id="cds-sb-intents" name="intents" class="section" (click)="goTo(SIDEBAR_PAGES.INTENTS)"
         matTooltipClass="cds-mat-tooltip" 
-        matTooltip="Blocks" 
+        matTooltip="{{ 'Blocks' | translate }}" 
         #tooltip="matTooltip"
         matTooltipPosition='right' 
         matTooltipHideDelay="100" 
@@ -140,13 +140,13 @@
             </svg>
         </span>
         <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-            Blocks
+            {{ 'Blocks' | translate }}
         </p>
     </div>
 
     <div id="cds-sb-fulfillment" name="fulfillment" class="section" (click)="goTo(SIDEBAR_PAGES.FULFILLMENT)"
             matTooltipClass="cds-mat-tooltip" 
-            matTooltip="Fulfillment" 
+            matTooltip="{{'Fulfillment' | translate}}" 
             #tooltip="matTooltip"
             matTooltipPosition='right' 
             matTooltipHideDelay="100" 
@@ -157,7 +157,7 @@
             </svg>
         </span>
         <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-            Fulfillment
+            {{'Fulfillment' | translate}}
         </p>
     </div>
 
@@ -180,7 +180,7 @@
 
     <div id="cds-sb-secrets" name="secrets" class="section" (click)="goTo(SIDEBAR_PAGES.SECRETS)"
         matTooltipClass="cds-mat-tooltip" 
-        matTooltip="{{'KbPage.Secrets' | translate}}"
+        matTooltip="{{'Secrets' | translate}}"
         #tooltip="matTooltip" 
         matTooltipPosition='right' 
         matTooltipHideDelay="100"
@@ -189,13 +189,13 @@
             <span class="material-icons">lock</span>
         </i>
         <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-            Secrets
+            {{'Secrets' | translate}}
         </p>
     </div>
 
     <div id="cds-sb-settings" name="settings" class="section" (click)="goTo(SIDEBAR_PAGES.SETTINGS)"
         matTooltipClass="cds-mat-tooltip" 
-        matTooltip="{{'General' | translate}}"
+        matTooltip="{{'Settings' | translate}}"
         #tooltip="matTooltip" 
         matTooltipPosition='right' 
         matTooltipHideDelay="100"
@@ -206,7 +206,7 @@
             </svg>
         </span>
         <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-            Settings
+            {{'Settings' | translate}}
         </p>
     </div>
 

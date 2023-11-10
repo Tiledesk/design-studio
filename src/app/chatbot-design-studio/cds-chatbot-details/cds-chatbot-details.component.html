@@ -6,9 +6,7 @@
           [ngClass]="{ 'border-from-center' : activeSection !== 'bot_detail',
                                 'li-active' : activeSection === 'bot_detail' }">
 
-            <a href="javascript:;" role="button">
-              {{ "BotDetails" | translate }}
-            </a>
+            <a href="javascript:;" role="button">{{ "BotDetails" | translate }}</a>
           </li>
 
           <li (click)="toggleTab('import_export')" class="btn-with-border-effect" [ngClass]="
@@ -29,7 +27,7 @@
                     { 'border-from-center' :  activeSection !== 'developer', 
                       'li-active' :           activeSection === 'developer'
                     }">
-            <a href="javascript:;" role="button"> Developer </a>
+            <a href="javascript:;" role="button"> {{ "Developer" | translate }} </a>
           </li>
         </ul>
     </div>
@@ -55,7 +53,6 @@
     <cds-detail-developer *ngIf="activeSection==='developer'"
       [selectedChatbot]="selectedChatbot">
     </cds-detail-developer>
-
   </div>
 </div>
 

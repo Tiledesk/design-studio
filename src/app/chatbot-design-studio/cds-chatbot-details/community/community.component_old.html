@@ -4,9 +4,7 @@
         <div class="col-sm-10 col-md-10 title-buttons">
             <h3 class="card_title__underlined" style="color: #e8eaed;">
                 <span class="card_title__underline buttons-inside">
-
-                    <!-- {{ "UserProfile.Profile" | translate }} -->
-                    Setup Chatbot community info
+                    {{ "CDSCommunity.SetUpCOmmunityInfo" | translate }}
                 </span>
             </h3>
             <div class="cds-community-btns-wrp">
@@ -15,12 +13,12 @@
                     id="csd-update-bot-btn" #editbotbtn class="btn btn-primary pull-left cds-blue-button"
                     (click)="publishOnCommunity()" [disabled]="(!selectedChatbot.hasOwnProperty('short_description') || selectedChatbot.short_description === '') || 
                                                                 (!selectedChatbot.hasOwnProperty('title') || selectedChatbot.title === '') || !certifiedTag ">
-                    Go live on Community
+                    {{ "CDSCommunity.GoLiveOnCommunity" | translate }}
                 </button>
                 <button *ngIf="selectedChatbot?.public === true"
                     id="csd-update-bot-btn" #editbotbtn class="btn btn-primary pull-left cds-blue-button"
                     (click)="removeFromCommunity()">
-                    Remove from community
+                    {{ "CDSCommunity.RemoveFromCommunity" | translate }}
                 </button>
                 <label class="link">
                     <a (click)="goToCommunityChatbotDetail(selectedChatbot?._id)" *ngIf="selectedChatbot?.public === true">
@@ -39,12 +37,11 @@
     <!-- ------------------------------------------------------------------------------------------- -->
     <div class="row" style="margin-bottom: 16px;">
         <label class="col-sm-2 cds-custom-label">
-            <!-- {{ 'Description' | translate }} -->
-            Main Category <span>*</span>
+            {{ 'CDSCommunity.MainCategory' | translate }} <span>*</span>
         </label>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
             <ng-select class="csd-chatbot-dtls-input" id="select-tag" #ngSelectTags [items]="certifiedTags" bindLabel="name"
-                    [clearable]="true" placeholder="Select a category and press enter" [(ngModel)]="certifiedTag"
+                    [clearable]="true" placeholder="{{ 'CDSCommunity.SelectCategory' | translate }}" [(ngModel)]="certifiedTag"
                     (change)="addMainCategory($event)" (keyup.enter)="ngSelectTags.close()">
 
                     <ng-template ng-label-tmp let-item="item">
@@ -63,15 +60,13 @@
     <!-- ------------------------------------------------------------------------------------------- -->
     <div class="row" style="margin-bottom: 16px;">
         <label class="col-sm-2 cds-custom-label">
-            <!-- {{ "BotsAddEditPage.Type" | translate }} -->
-            <!-- {{ 'Title' | translate }} -->
-            Title <span>*</span>
+            {{ 'Title' | translate }} <span>*</span>
         </label>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
             <input id="bot_type" name="bot_type" [(ngModel)]="selectedChatbot.title" (ngModelChange)="onChangeTitle($event)" 
             class="input csd-chatbot-dtls-input"
             type="text" style="margin-bottom: 0px; color:#808080"
-            placeholder="Title">
+            placeholder="{{ 'Title' | translate }}">
             <span *ngIf="titleIsEmpty" class="csd-community-required-field">Required</span>
         </div>
        
@@ -82,14 +77,12 @@
     <!-- ------------------------------------------------------------------------------------------- -->
     <div class="row" style="margin-bottom: 16px;">
         <label class="col-sm-2 cds-custom-label">
-            <!-- {{ 'Description' | translate }} -->
-            Short Description <span>*</span>
+            {{ 'ShortDescription' | translate }} <span>*</span>
         </label>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
             <textarea id="bot_description" name="bot_description" [(ngModel)]="selectedChatbot.short_description" (ngModelChange)="onChangeShortDescription($event)" 
-            rows="4"
-                style="resize: vertical; margin-bottom: 0px; color:#808080" class="input csd-chatbot-dtls-input" type="text"
-                placeholder="Short Description">
+                rows="4" placeholder="{{ 'ShortDescription' | translate }}"
+                style="resize: vertical; margin-bottom: 0px; color:#808080" class="input csd-chatbot-dtls-input" type="text">
             </textarea>
             <span *ngIf="shortDescriptionIsEmpty" style="margin-top: -5px;" class="csd-community-required-field">Required</span>
         </div>
@@ -101,14 +94,12 @@
     <!-- ------------------------------------------------------------------------------------------- -->
     <div class="row" style="margin-bottom: 16px;">
         <label class="col-sm-2 cds-custom-label">
-            <!-- {{ 'Description' | translate }} -->
-            Description
-            <span class="bot-description-note"> Markdown supported - use the Markdow language to enrich your text</span>
+            {{ 'Description' | translate }} <span class="bot-description-note"> {{ 'MarkdownSupported' | translate }} </span>
         </label>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
             <textarea id="bot_description" name="bot_description" [(ngModel)]="selectedChatbot.description" rows="6"
                 style="resize: vertical; margin-bottom: 0px; color:#808080; " class="input csd-chatbot-dtls-input" type="text"
-                placeholder="Description">
+                placeholder="{{ 'Description' | translate }}">
             </textarea>
         </div>
     </div>
@@ -118,15 +109,14 @@
     <!-- ------------------------------------------------------------------------------------------- -->
     <div class="row" style="margin-bottom: 16px;">
         <label class="col-sm-2 cds-custom-label">
-            <!-- {{ 'Description' | translate }} -->
-            Tags
+            {{ 'Tags' | translate }}
         </label>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
             <ng-select class="csd-chatbot-dtls-input" id="select-tag" #ngSelect [items]="tags" bindLabel="tag"
                     bindValue="_id" [clearable]="false" [clearSearchOnAdd]="true" [hideSelected]="true"
-                    placeholder="Type to create a tag and press enter" [(ngModel)]="tag" addTagText="Create New"
+                    placeholder="{{ 'TagPlaceholder' | translate }}" [(ngModel)]="tag" addTagText="{{ 'CreateNew' | translate }}"
                     [addTag]="createNewTag" (keyup.enter)="ngSelect.close()"
-                    notFoundText="Type to create a tag and press enter">
+                    notFoundText="{{ 'TagPlaceholder' | translate }}">
 
                     <ng-template ng-label-tmp let-item="item">
                         {{item.tag}}

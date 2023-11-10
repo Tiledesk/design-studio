@@ -129,10 +129,9 @@ export class FormEditAddComponent implements OnInit, OnChanges {
     if (this.translate.currentLang) {
       this.langDashboard = this.translate.currentLang;
     }
-    let jsonWidgetLangURL = 'assets/i18n/' + this.langDashboard + '.json';
-    this.httpClient.get(jsonWidgetLangURL).subscribe(data => {
-      this.infoMessages = data['AddIntentPage'].InfoMessages;
-      this.markbotLabel = data['AddIntentPage']['MarkbotLabel'];
+    this.translate.get(['CDSForm.InfoMessages', 'CDSForm.MarkbotLabel']).subscribe(data => {
+      this.infoMessages = data['CDSForm.InfoMessages'];
+      this.markbotLabel = data['CDSForm.MarkbotLabel'];
     })
   }
 

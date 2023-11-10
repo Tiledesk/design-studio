@@ -46,12 +46,12 @@
         <div class="url-wrp">
             <span class="control-label">{{ 'url' | translate }}:</span>
             <div class="response-wrp" *ngIf="metadata.src">{{metadata.src}}</div>
-            <div class="response-wrp no-text" *ngIf="!metadata.src">Click to add url ...</div>
+            <div class="response-wrp no-text" *ngIf="!metadata.src">{{ 'ClickToAddUrl' | translate }}</div>
         </div>
         <div class="url-wrp">
-            <span class="control-label">{{ 'Open in' | translate }}:</span>
-            <span class="control-label" *ngIf="metadata.target === 'parent'"><b>Same widget window</b></span>
-            <span class="control-label"  *ngIf="metadata.target === 'blank'"><b>New Tab window</b></span>
+            <span class="control-label">{{ 'OpenIn' | translate }}:</span>
+            <span class="control-label" *ngIf="metadata.target === 'parent'"><b>{{ 'SameWidgetWindow' | translate }}</b></span>
+            <span class="control-label"  *ngIf="metadata.target === 'blank'"><b>{{ 'NewTabWindow' | translate }}</b></span>
         </div>
     </div>
 </div>
@@ -78,10 +78,10 @@
         </div>
 
         <div class="url-wrp toogle">
-            <span class="control-label">{{ 'Open in' | translate }}:</span>
+            <span class="control-label">{{ 'OpenIn' | translate }}:</span>
             <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [value]="metadata.target" (change)="onButtonToogleChange($event)">
-                <mat-button-toggle value="parent">Same widget window</mat-button-toggle>
-                <mat-button-toggle value="blank">New Tab window</mat-button-toggle>
+                <mat-button-toggle value="parent">{{ 'SameWidgetWindow' | translate }}</mat-button-toggle>
+                <mat-button-toggle value="blank">{{ 'NewTabWindow' | translate }}</mat-button-toggle>
             </mat-button-toggle-group>
         </div>
         

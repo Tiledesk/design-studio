@@ -7,7 +7,7 @@
           
           <div class="modal-title">
             <span class="material-icons">report_problem</span>
-            Delete field
+            {{ translateMap.deleteField }}
           </div>
           <button type="button" class="close" aria-label="Close" (click)="closeDelete()">
             <span class="material-icons">close</span>
@@ -17,21 +17,19 @@
   
         <div class="modal-body">
             <p>
-            <!-- {{translateMap.confirmDeleteField}} -->
-            Are you sure you want to delete the field? <b>{{translateMap.nameField}}</b>
+            {{translateMap.confirmDeleteField}} <b>{{translateMap.nameField}}</b>
             </p>
         </div>
   
         <div class="modal-footer">
           <!-- Annulla -->
           <button class="btn btn-white btn-close-delete" (click)="closeDelete()">
-            <!-- {{ translateMap.cancel }} -->
-            Cancel
+            {{ 'Cancel' | translate }}
+            
           </button>
           <!-- Confirm -->
           <button class="btn btn-danger" (click)="confirmDelete()">
-            <!-- {{ translateMap.deleteField }} -->
-            Delete field
+            {{ translateMap.deleteField }}
           </button>
         </div>
   

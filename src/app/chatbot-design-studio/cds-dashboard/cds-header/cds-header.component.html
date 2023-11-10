@@ -16,7 +16,7 @@
     <div class="header-go-back"  
         (click)="goToBack()" 
         style="cursor:pointer"
-        matTooltip="Go back" 
+        matTooltip="{{ 'GoBack' | translate}}" 
         matTooltipClass="custom-mat-tooltip"
         matTooltipHideDelay="100"
         matTooltipPosition='below'
@@ -37,7 +37,7 @@
                 <span class="material-icons">
                     cached
                 </span>
-                Publish
+                {{ 'Publish' | translate}}
             </button>
             <!-- (click)="isOpenDropdown(isOpen = !isOpen)"  [ngClass]="{'caret-rotate-0': is0penDropDown === true, 'caret-rotate-180': is0penDropDown === false}" -->
             <!-- <button id="cds-publish-btn-option" type="button" class="btn btn-primary dropdown-toggle"
@@ -78,17 +78,14 @@
         <div *ngIf="TRY_ON_WA === true" class="btn-group">
             <button id="cds-test-it-wab-out-btn" class="btn btn-primary cds-blue-button" type="button" (click)="openWhatsappPage()">
                 <img width="18px" height="18px" src="assets/images/channel_icons/whatsapp-logo_green.svg">
-                Try on WhatsApp
+                {{ 'TryOnWhatsapp' | translate}}
             </button>
         </div>
         <div class="btn-group"
                 matTooltipClass="custom-mat-tooltip"
-                matTooltip="Test it" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltip="{{ 'TestIt' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
                 matTooltipHideDelay="100">
             <button id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" (click)="openTestSiteInPopupWindow()">
-                <!-- <span class="material-icons">
-                    play_arrow
-                </span> -->
                 <img class="active-icon" width="18px" height="18px" src="assets/images/icons/play.svg">
             </button>
         </div>

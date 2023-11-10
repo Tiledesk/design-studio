@@ -44,8 +44,8 @@ export class CdsModalActivateBotComponent implements OnInit {
   translateparamBotName: any
   DEPTS_HAS_NOT_A_BOT: boolean = false
 
-
-  webScript: string;
+  panelOpenState:boolean = false
+  webScript: {html, javascript}
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -151,6 +151,6 @@ export class CdsModalActivateBotComponent implements OnInit {
 
 
   onCopyScript(){
-    navigator.clipboard.writeText(this.webScript)
+    navigator.clipboard.writeText(this.webScript.javascript)
   }
 }

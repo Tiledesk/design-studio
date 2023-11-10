@@ -1,5 +1,5 @@
 <div class="cds-publish-on-community-modal-header">
-    <h1 mat-dialog-title>Publish your chatbot on the tiledesk community</h1>
+    <h1 mat-dialog-title>{{ 'CDSModalPublishOnCommunity.PublishYouChatbotToCommunity' | translate }}</h1>
     <mat-dialog-actions>
         <button mat-button mat-dialog-close>
             <span class="material-icons">
@@ -210,22 +210,19 @@
         <!-- -------------------------- -->
         <!-- Publishing  -->
         <!-- -------------------------- -->
-        <mat-tab label="Publishing">
+        <mat-tab label="{{ 'CDSModalPublishOnCommunity.Publishing' | translate }}">
             <div class="publishing-wpr">
 
                 <div class="row" style="margin-right: 0px;margin-left: 0px;width: 639px;">
                     <div class="col-xs-12">
                         <div class="deploy-to-community-text" style="margin-top: 30px;">
                             <h3 style="line-height: 22px;">
-                                Publish your chatbot on the tiledesk community. Allow other users to clone and customize
-                                your chatbot.
-                                Collect accolades and become part of the world's largest conversation designer
-                                community.
+                                {{ 'CDSModalPublishOnCommunity.PublishChatbotCommunityDescription' | translate }}
                             </h3>
                         </div>
                         <div *ngIf="!hasPersonalCmntyInfo"  class="no-user-cmnty-info">
                             <h3 style=" margin-bottom: 0px;">
-                                Be Heard, Be Known: complete the form available in the Personal info before publishing!
+                                {{ 'CDSModalPublishOnCommunity.BeHeardBeKnow' | translate }}
                             </h3>
                         </div>
                     </div>
@@ -234,12 +231,10 @@
 
                 <div class="row" style="margin-right: 0px;margin-left: 0px;">
                     <div class="col-xs-12">
-                        <div class="publish-bot-to-community-btn-wpr" style="    display: flex;
-                        justify-content: center;
-                        align-items: center;">
-                            <button id="csd-publish-bot-to-community-btn" class="btn btn-primary "
+                        <div class="publish-bot-to-community-btn-wpr" style="display: flex; justify-content: center; align-items: center;">
+                            <button id="csd-publish-bot-to-community-btn" class="btn btn-primary"
                                 (click)="publishOnCommunity()">
-                                Deploy to community
+                                {{ 'CDSModalPublishOnCommunity.DeployToCommunity' | translate }}
                             </button>
                         </div>
                     </div>

@@ -11,14 +11,14 @@
 
             <div class="btn-wrp" [style.display]="iframeVisibility? 'none':'flex'">
                 <img src="assets/images/chatbot.svg" width="80">
-                <div id="text" class="title"> Test your Chatbot</div>
-                <div id="text" class="description"> Start trying your chatbot and interact with it</div>
+                <div id="text" class="title"> {{ 'TestYourChatbot' | translate }}</div>
+                <div id="text" class="description"> {{ 'StartTryingYourChatbot' | translate }}</div>
                 <!-- style="margin-left: 14px;" -->
                 <button id="cds-play-btn" class="btn btn-primary cds-blue-button" type="button"  (click)="startTest()">
                     <span class="material-icons">
                         play_arrow
                     </span>
-                    Test it
+                    {{ 'TestIt' | translate }}
                 </button>
             </div>
            <iframe allowfullscreen [style.display]="iframeVisibility? 'block':'none'"

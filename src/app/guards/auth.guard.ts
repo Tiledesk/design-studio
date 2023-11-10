@@ -23,13 +23,14 @@ export class AuthGuard implements CanActivate {
     const _url = route['_routerState'].url
 
     const queryParams = route.queryParams['jwt']
-    console.log('[AUTH-GUARD] -->', queryParams)
+    console.log('[AUTH-GUARD] -->', queryParams, route, state)
     // if(!queryParams){
     //   return false
     // }
     const storedTiledeskoken = localStorage.getItem('tiledesk_token')
     if(!queryParams && !storedTiledeskoken){
       //goToSignIn Dashboard
+      // localStorage.setItem('dshbrd----'+'wannago', state.url)
       return false
     }    
 

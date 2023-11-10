@@ -13,14 +13,14 @@
             class="input ellips form-control tds_draggable"
             [(ngModel)]="intentName"
             [readonly]="intentName === 'start' || intentName === 'defaultFallback'"
-            [placeholder]="'EnterIntentName' | translate"
+            [placeholder]="'CDSCanvas.EnterIntentName' | translate"
             (ngModelChange)="onChangeIntentName($event)"
             (mouseup)="onMouseUpInput($event)" 
             (dblclick)="doubleClickFunction($event)"
             (blur)="onBlur($event)"
             (keydown.enter)="onEnterButtonPressed($event)">
-        <div *ngIf="intentNameAlreadyExist" class="error---msg"> The block name must be unique </div>
-        <div *ngIf="intentNameNotHasSpecialCharacters === false" class="error---msg"> The block name cannot contain special characters </div>
+        <div *ngIf="intentNameAlreadyExist" class="error---msg">{{ 'CDSCanvas.ErrorBlockName' | translate }}</div>
+        <div *ngIf="intentNameNotHasSpecialCharacters === false" class="error---msg">{{ 'CDSCanvas.ErrorBlockCharacter' | translate }}</div>
 
     </div> 
 

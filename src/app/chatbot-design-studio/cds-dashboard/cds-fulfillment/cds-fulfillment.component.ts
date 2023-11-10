@@ -57,12 +57,12 @@ export class CdsFulfillmentComponent implements OnInit {
       // console.error('[CDS-FULFILLMENT] EDIT BOT -  ERROR ', error);
       this.logger.error('[CDS-FULFILLMENT] EDIT BOT -  ERROR ', error);
       // =========== NOTIFY ERROR ===========
-      this.notify.showWidgetStyleUpdateNotification(this.translate.instant('UpdateBotError'), 4, 'report_problem');
+      this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSSetting.UpdateBotError'), 4, 'report_problem');
     }, () => {
       // console.log('[TILEBOT] EDIT BOT - * COMPLETE *');
       this.logger.log('[TILEBOT] EDIT BOT - * COMPLETE *');
       // =========== NOTIFY SUCCESS===========
-      this.notify.showWidgetStyleUpdateNotification(this.translate.instant('UpdateBotSuccess'), 2, 'done');
+      this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSSetting.UpdateBotSuccess'), 2, 'done');
     })
 
 

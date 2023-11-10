@@ -26,7 +26,8 @@
             [text]="action?.text" 
             [minRow]="1" 
             popoverVerticalAlign="above"
-            [emojiPikerBtn]="true" 
+            [emojiPikerBtn]="true"
+            (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextArea($event)">
         </cds-textarea>
     </div>

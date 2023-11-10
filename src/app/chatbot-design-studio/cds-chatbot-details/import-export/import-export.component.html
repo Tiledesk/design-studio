@@ -21,7 +21,7 @@
     <!-- CSV Section title -->
     <!-- --------------------------------------------------- -->
     <div class="export-import-section-title">
-      Frequently Asked Questions
+      {{ 'CDSSetting.FrequentlyAskedQuestions' | translate }}
     </div>
 
 
@@ -32,7 +32,7 @@
             cloud_upload
           </span>
         </span>
-        {{'ImportFromCSV' | translate }}
+        {{ 'CDSSetting.ImportFromCSV' | translate }}
       </button>
     </div>
 
@@ -117,7 +117,7 @@
           </span>
         </span>
         <!-- Export Chatbot to JSON -->
-        {{'ExportAsJSON' | translate}}
+        {{'CDSSetting.ExportAsJSON' | translate}}
       </button>
     </div>
     <!-- ---------------------------------------------------- -->
@@ -151,7 +151,7 @@
       <div class="modal-header" style="padding: 8px 15px;">
 
         <h4 class="modal-title" style="line-height: 2!important;">
-          {{ 'FaqPage.ImportCsvFile' | translate }}
+          {{ 'CDSSetting.ImportCsvFile' | translate }}
         </h4>
         <!-- class="close" -->
         <button type="button" class="close-modal-window" aria-label="Close" (click)="onCloseModal()">
@@ -166,9 +166,9 @@
           <div class="col-xs-10 col-xs-offset-1 cds-dwnld-example-csv">
             <p (click)="downloadExampleCsv()" style="margin:5px; cursor:pointer"> <i class="material-icons"
                 style="font-size:18px; top: 4px; position: relative;">save_alt</i>
-              {{ 'download' | translate }} 
+              {{ 'CDSSetting.download' | translate }} 
               <span style="font-weight:400">
-                {{ 'examplecsv' | translate }}
+                {{ 'CDSSetting.examplecsv' | translate }}
               </span>
             </p>
           </div>
@@ -182,7 +182,7 @@
               <!-- Question -->
               <!-- --------------------- -->
               <span>
-                <em>{{ 'FaqPage.Question' | translate }}*</em>
+                <em>{{ 'CDSSetting.Question' | translate }}*</em>
               </span>
 
               <!-- --------------------- -->
@@ -196,7 +196,7 @@
               <!-- Answer -->
               <!-- --------------------- -->
               <span>
-                <em> {{ 'FaqPage.Answer' | translate }}*</em>
+                <em> {{ 'CDSSetting.Answer' | translate }}*</em>
               </span>
 
               <!-- --------------------- -->
@@ -265,7 +265,7 @@
           <div style="display:flex">
             <label style="padding-right:16px; text-align:right; color: #7695a5;font-weight: 300 !important;"
               class="col-xs-6 col-sm-6 ">
-              {{ 'InTheCSVFileToBeUploadedTheColumnsAreSeparatedBy' | translate}}:
+              {{ 'CDSSetting.InTheCSVFileToBeUploadedTheColumnsAreSeparatedBy' | translate}}:
             </label>
             <div class="col-xs-6 col-sm-6" style="text-align:start">
               <input style="padding-left:5px; margin-top:7px; width:55px; border-radius: 5px;
@@ -278,7 +278,7 @@
           <div style="text-align: center">
 
             <span *ngIf="modalChoosefileDisabled" style="color:#ff5252">
-              {{ 'FaqPage.DelimiterOptionMustBe' | translate }}
+              {{ 'CDSSetting.DelimiterOptionMustBe' | translate }}
             </span>
           </div>
 
@@ -294,7 +294,7 @@
         <label id="upload-csv-choose-file" class="btn btn-primary" for="fileChangeUploadCSV"
           [ngClass]="{'disabled': modalChoosefileDisabled }">
 
-          {{ 'FaqPage.ChooseFile' | translate }}
+          {{ 'CDSSetting.ChooseFile' | translate }}
         </label>
       </div>
 
@@ -312,8 +312,7 @@
       <div class="modal-header">
 
         <h4 class="modal-title">
-          Upload CSV
-          <!-- {{ 'FaqPage.UploadCsv' | translate }} -->
+          {{ 'CDSSetting.UploadCsv' | translate }}
         </h4>
         <button type="button" class="close" aria-label="Close" (click)="onCloseModal()">
           <span aria-hidden="true">&times;</span>
@@ -331,9 +330,7 @@
 
           </div>
           <p style="margin-top: 50px; text-align: center;">
-            <!-- {{ "FaqPage.Processing" | translate }} -->
-            <!-- {{ "Processing" | translate }} -->
-            Processing
+            {{ "CDSSetting.Processing" | translate }}
           </p>
         </span>
 
@@ -344,8 +341,7 @@
             <span *ngIf="parse_done">
               <i class="material-icons" style="color:#70b665">done</i>
               <span style="color:#70b665; position: relative; left: -14px;">
-                <!-- {{ "FaqPage.Completed" | translate }} -->
-                Completed
+                {{ "CDSSetting.Completed" | translate }}
               </span>
             </span>
 
@@ -354,9 +350,7 @@
               <i class="material-icons" style="color:#ff5252">report_problem</i>
               <br>
               <span style="color:#ff5252">
-
-                <!-- {{ "Error" | translate }} -->
-                Error
+                {{ "Error" | translate }}
               </span>
             </span>
 
@@ -366,16 +360,14 @@
           <span *ngIf="parse_done">
             <p style="margin-top: 50px; text-align: center;">
               <!-- FAQs successfully uploaded -->
-              <!-- {{ "FaqPage.FaqsSuccessfullyUploaded" | translate }} -->
-              Blocks Successfully Uploaded
+              {{ "CDSSetting.FaqsSuccessfullyUploaded" | translate }}
             </p>
           </span>
 
           <!-- // IF AN ERROR OCCURRED DURING THE UPLOAD -->
           <span *ngIf="parse_err">
             <p style="margin-top: 50px; text-align: center;">
-              An error occurred during the upload
-              <!-- {{ "FaqPage.AnErrorOccurredDuringTheUpload" | translate }} -->
+              {{ "CDSSetting.AnErrorOccurredDuringTheUpload" | translate }}
             </p>
           </span>
 
@@ -390,8 +382,7 @@
         </button>
         <button *ngIf="parse_err" class="btn btn-primary" [disabled]="SHOW_CIRCULAR_SPINNER"
           (click)="onCloseInfoModalHandledError()">
-          Continue
-          <!-- {{ "FaqPage.Continue" | translate }} -->
+          {{ "Continue" | translate }}
         </button>
       </div>
 
@@ -412,8 +403,7 @@
       <div class="modal-header" style="padding: 8px 15px;">
 
         <h4 class="modal-title" style="line-height: 2!important; font-size: 20px; font-weight: 400;">
-          <!-- {{'ImportFromJSON' | translate}} -->
-          Import from JSON
+          {{'CDSSetting.ImportFromJSON' | translate}}
         </h4>
         <button type="button" class="close-modal-window" aria-label="Close" (click)="onCloseImportJSONModal()">
           <span aria-hidden="true" style="color: rgb(6, 6, 6) !important;position: relative;">&times;</span>
@@ -422,9 +412,7 @@
       </div>
 
       <div class="modal-body import-json-modal-body">
-
-        You can import Intents by overwriting or keeping existing Intents
-
+        {{'CDSSetting.YouCanImportBlocks' | translate}}
       </div>
 
       <div class="modal-footer" style="text-align: center;
@@ -445,8 +433,7 @@
               cloud_upload
             </span>
 
-
-            Upload and overwrite
+            {{'CDSSetting.UploadAndOverwrite' | translate}}
           </label>
         </span>
 
@@ -458,8 +445,7 @@
               cloud_upload
             </span>
 
-
-            Upload
+            {{'Uploade' | translate}}
           </label>
         </span>
       </div>

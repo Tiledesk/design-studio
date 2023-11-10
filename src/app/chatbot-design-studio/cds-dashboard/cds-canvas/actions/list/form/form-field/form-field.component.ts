@@ -16,7 +16,6 @@ export class FormFieldComponent implements OnInit, OnChanges {
 
   // modal
   displayMODAL = false;
-  translateMap: any;
   selectedObjectId: number;
 
   // add edit form

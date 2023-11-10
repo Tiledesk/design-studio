@@ -169,10 +169,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       this.translate.setDefaultLang('en');
       this.translate.use('en');
     }
-    this.translate.use('en');
-    this.lang='en'
-
-    // this.lang=chat_lang
+    this.lang=chat_lang
 
   }
 

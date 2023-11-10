@@ -83,9 +83,7 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
     this.getBrowserLang();
     this.user = this.tiledeskAuthService.getCurrentUser()
     this.project = this.dashBoardService.project
-
-    this.translateMsgSubscriptionCanceledSuccessfully();
-    this.translateMsgSubscriptionCanceledError();
+    
     this.getUserAvailabilityAndRole()
     this.getProjectPlan();
     this.getWidgetUrl();
@@ -226,18 +224,6 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
 
   getBrowserLang() {
     this.browserLang = this.translate.getBrowserLang();
-  }
-
-  translateMsgSubscriptionCanceledSuccessfully() {
-    this.translate.get('SubscriptionSuccessfullyCanceled').subscribe((text: string) => {
-        this.subscriptionCanceledSuccessfully = text;
-      });
-  }
-
-  translateMsgSubscriptionCanceledError() {
-    this.translate.get('AnErrorOccurredWhileCancellingSubscription').subscribe((text: string) => {
-        this.subscriptionCanceledError = text;
-      });
   }
 
   onOkExpiredSessionModal() {

@@ -2,7 +2,7 @@
     <!-- SPLASH SCREEN  -->
     <div *ngIf="displayNewFormButton" class="splash-screen--form">
         <div class="field-box">
-            <span>Add a Form to ask user data</span>
+            <span>{{ 'CDSForm.AddForm' | translate }}</span>
         </div>
 
         <!-- <div class="field-box">
@@ -14,7 +14,7 @@
 
         <button id="add-form-btn" class="btn btn-primary cds-blue-button" (click)="openBoxNewFormForm()">
             <span class="material-icons">add</span>
-                {{ "AddIntentPage.AddForm" | translate }}
+                {{ 'CDSForm.AddForm' | translate }}
         </button>
     </div>
 
@@ -42,7 +42,7 @@
     <!-- SETTINGS FORM -->
     <div *ngIf="displayBoxNewForm && intentFormSize === 0">
         <div class="field-box">
-            {{ "AddIntentPage.SelectTemplateForm" | translate }}
+            {{ 'CDSForm.SelectTemplateForm' | translate }}
         </div>
         <div class="field-box">
             <cds-select id="form-model" 
@@ -50,7 +50,7 @@
                 [bindLabelSelect]="'name'"
                 [bindValueSelect]="'id'" 
                 [itemSelected]="selectedFormId" 
-                [placeholder]="'Select a form'"
+                [placeholder]="'CDSForm.SelectAForm' | translate"
                 [clearable]="false" 
                 (onSelected)="onChangeBlockSelect($event)">
             </cds-select>
@@ -58,7 +58,7 @@
         </div>
         <div class="field-box add-form">
             <button id="create-intent-form" class="btn btn-primary cds-blue-button" (click)="generateJsonIntentForm()">
-                {{ "AddIntentPage.CreateForm" | translate }}
+                {{ 'CDSForm.CreateForm' | translate }}
             </button>
         </div>
     </div>
@@ -99,8 +99,7 @@
             class="btn btn-primary cds-blue-button" 
             (click)="eventAddField()">
             <span class="material-icons">add</span>
-            {{ "AddIntentPage.AddField" | translate }}
-
+            {{ 'CDSForm.AddField' | translate }}
         </button>
     </div>
     <!-- ------------------------------ -->

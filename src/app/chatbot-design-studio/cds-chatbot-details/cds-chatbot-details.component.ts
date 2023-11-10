@@ -86,54 +86,25 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
   getTranslations() {
 
     let keys = [
-      'UpdateBotError',
-      'UpdateBotSuccess',
-      'Not a valid JSON file.',
-      'FaqPage.AnErrorOccurredWhilDeletingTheAnswer',
-      'FaqPage.AnswerSuccessfullyDeleted',
+      'CDSSetting.UpdateBotError',
+      'CDSSetting.UpdateBotSuccess',
+      'CDSSetting.Not a valid JSON file.',
+      'CDSSetting.AnErrorOccurredWhilDeletingTheAnswer',
+      'CDSSetting.AnswerSuccessfullyDeleted',
       'Done',
-      'ThereHasBeenAnErrorProcessing'
+      'CDSSetting.ThereHasBeenAnErrorProcessing'
     ]
 
     this.translate.get(keys).subscribe((text)=>{
-      this.translationsMap.set('UpdateBotError', text['UpdateBotError'])
-                          .set('UpdateBotSuccess', text['UpdateBotSuccess'])
-                          .set('Not a valid JSON file.', text['Not a valid JSON file.'])
-                          .set('FaqPage.AnErrorOccurredWhilDeletingTheAnswer', text['FaqPage.AnErrorOccurredWhilDeletingTheAnswer'])
-                          .set('FaqPage.AnswerSuccessfullyDeleted', text['FaqPage.AnswerSuccessfullyDeleted'])
+      this.translationsMap.set('CDSSetting.UpdateBotError', text['CDSSetting.UpdateBotError'])
+                          .set('CDSSetting.UpdateBotSuccess', text['CDSSetting.UpdateBotSuccess'])
+                          .set('CDSSetting.Not a valid JSON file.', text['CDSSetting.Not a valid JSON file.'])
+                          .set('CDSSetting.AnErrorOccurredWhilDeletingTheAnswer', text['CDSSetting.AnErrorOccurredWhilDeletingTheAnswer'])
+                          .set('CDSSetting.AnswerSuccessfullyDeleted', text['CDSSetting.AnswerSuccessfullyDeleted'])
                           .set('Done', text['Done'])
-                          .set('ThereHasBeenAnErrorProcessing', text['ThereHasBeenAnErrorProcessing'])
+                          .set('CDSSetting.ThereHasBeenAnErrorProcessing', text['CDSSetting.ThereHasBeenAnErrorProcessing'])
 
     })
-
-    this.translate.get('UpdateBotError').subscribe((text: string) => {
-        this.updateBotError = text;
-      });
-
-    this.translate.get('UpdateBotSuccess').subscribe((text: string) => {
-        this.updateBotSuccess = text;
-      });
-
-    this.translate.get('Not a valid JSON file.').subscribe((text: string) => {
-        this.notValidJson = text;
-      });
-
-    this.translate.get('FaqPage.AnErrorOccurredWhilDeletingTheAnswer').subscribe((text: string) => {
-        this.errorDeletingAnswerMsg = text;
-      });
-
-    this.translate.get('FaqPage.AnswerSuccessfullyDeleted').subscribe((text: string) => {
-        this.answerSuccessfullyDeleted = text;
-      });
-
-    this.translate.get('Done').subscribe((text: string) => {
-        this.done_msg = text;
-      });
-
-
-    this.translate.get('ThereHasBeenAnErrorProcessing').subscribe((translation: any) => {
-        this.thereHasBeenAnErrorProcessing = translation;
-      });
 
   }
 
