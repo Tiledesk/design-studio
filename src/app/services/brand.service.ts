@@ -153,7 +153,7 @@ export class BrandService {
 
     try {
       let url = this.appConfig.getConfig().brandSrc
-      if (url) {
+      if (url && url !== 'CHANGEIT') {
         const data = await this.httpClient.get(url).toPromise();
 
         console.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);

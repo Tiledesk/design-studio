@@ -5,6 +5,10 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 0.0.6
+- added: translations
+- added: brandService 
+
 ### 0.0.5
 - added: loader on cds-dashboard
 - added: cds-secrets component in cds-sidebar (beta)
