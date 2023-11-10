@@ -41,4 +41,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: tiledesk/design-studio:${{ steps.meta.outputs.tags }}
