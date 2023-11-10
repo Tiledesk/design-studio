@@ -24,12 +24,12 @@ jobs:
         tag_with_ref: true
 
     - name: Generate Docker metadata
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        tags: |
+          type=ref,event=branch
+          type=semver,pattern={{version}}
 
     - name: Build and push
        uses: docker/build-push-action@v4
