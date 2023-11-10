@@ -32,4 +32,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: latest
+        tags: tiledesk/design-studio:latest
