@@ -207,6 +207,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     let checkLabel = this.checkButtonLabel();
     let checkType = this.checkTypeButton();
     console.log('checkAndSaveButton: ', checkLabel, checkType);
+
     if (checkLabel && checkType) {
       this.saveButton.emit(this.button);
     }
@@ -224,6 +225,8 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   /** */
   onChangeTitle(text: string) {
     this.buttonLabel = text;
+    this.checkButtonLabel();
+    this.checkTypeButton();
     // this.checkAndSaveButton();
   }
 

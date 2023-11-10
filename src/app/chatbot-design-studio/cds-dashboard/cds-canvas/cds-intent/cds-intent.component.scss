@@ -301,14 +301,16 @@
 .footer-intent {
   cursor: pointer;
   margin-bottom: -10px;
-  min-height: 30px;
+  min-height: 18px;
 }
 
 .last-action-intent {
   display: block;
   float: inline-end;
-  margin: 6px -12px 0 0;
-  padding: 0 24px 0 0;
+  // margin: 6px -12px 0 0;
+  // padding: 0 24px 0 0;
+  margin: 6px 0 0 0;
+  padding: 0;
 }
 /* Btn add action
 /* --------------------------------- */

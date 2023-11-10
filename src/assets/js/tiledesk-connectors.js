@@ -20,7 +20,7 @@ export class TiledeskConnectors {
       "connector_draft": "tds_connector_draft",
     }
     this.colors = {
-      "black": "black",
+      "black": "#b1b1b7",
       "gray": "gray",
       "blue": "#3ea9f5"
     }
@@ -497,8 +497,8 @@ export class TiledeskConnectors {
     const gElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
     gElement.id = this.svgConnectorsId;
     gElement.setAttribute("fill", "white");
-    gElement.setAttribute("stroke", "black");
-    gElement.setAttribute("stroke-width", "2");
+    gElement.setAttribute("stroke", this.colors['black']);
+    gElement.setAttribute("stroke-width", "3");
     svgContainer.appendChild(gElement);
 
     // Add the `<g>` come figlio di <svg>
