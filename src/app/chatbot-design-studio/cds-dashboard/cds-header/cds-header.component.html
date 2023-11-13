@@ -1,4 +1,9 @@
-<div class="header-left" [class.is_opened]="IS_OPEN_SIDEBAR">
+<div class="header-left" [class.is_opened]="IS_OPEN_SIDEBAR" 
+        matTooltip="v. {{version}}" 
+        matTooltipClass="custom-mat-tooltip"
+        matTooltipHideDelay="100"
+        matTooltipPosition='below'
+        #tooltip="matTooltip">
     <img *ngIf="!IS_OPEN_SIDEBAR" src="assets/logos/tiledesk_logo_white_small.svg">
     <img *ngIf="IS_OPEN_SIDEBAR" src="assets/logos/tiledesk-logo_new_white.svg">
 </div>
