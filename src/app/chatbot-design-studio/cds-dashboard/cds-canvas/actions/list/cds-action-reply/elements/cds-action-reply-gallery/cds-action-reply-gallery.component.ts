@@ -302,7 +302,7 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   //   this.openButtonPanel.emit(button);
   // }
 
-  onOpenButtonPanel(indexGallery: number, indexButton: number, button?){
+  onOpenButtonPanel(button){
     this.openButtonPanel.emit(button);
   }
 
