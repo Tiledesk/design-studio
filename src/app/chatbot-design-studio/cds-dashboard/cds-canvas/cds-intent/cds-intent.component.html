@@ -248,7 +248,7 @@
             
            
             <!-- [ngStyle]="{'display':isDragging === false ? 'block' : 'none' }" -->
-            <cds-action-arrow *ngIf="(listOfActions?.length-2) > i && !isStart" 
+            <cds-action-arrow *ngIf="(listOfActions?.length-2) > i" 
                 id="action-arrow-{{i}}"
                 class="cds-action-arrow">
             </cds-action-arrow>
@@ -276,7 +276,7 @@
 
     <div class="footer-intent">
        
-        <div class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart" class="csd-open-action-menu-btn-wpr">
             <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="btn cds-add-action-btn">
                 <span class="material-icons">
