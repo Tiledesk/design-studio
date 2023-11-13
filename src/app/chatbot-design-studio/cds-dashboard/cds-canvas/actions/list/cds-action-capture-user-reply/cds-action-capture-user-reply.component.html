@@ -25,7 +25,6 @@
         <label class="title-preview-label">Capture user reply to
             <span *ngIf="!action?.assignResultTo" class="action-row-right empty">select attribute</span>
             <span *ngIf="action?.assignResultTo" style="font-weight: 600;">{{ action?.assignResultTo }}</span>
-
         </label>
 
         <cds-connector *ngIf="action?.goToIntent" class="connector"
