@@ -19,6 +19,8 @@
 - bug-fixed: cds-action-reply-gallery preview not open button on click
 - bug-fixed: cds-panel-button-configuration not save url changes
 - bug-fixed: start intent show 'add action' button on hover
+- bug-fixed: cannot drag action from an existing block to a new one
+- bug-fixed: cds-panel-action-detail not change action data on action change
 
 ### 0.0.6
 - added: translations
