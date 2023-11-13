@@ -1,5 +1,9 @@
 name: Publish Docker Community image tags
 
+env:
+  REGISTRY: tiledesk
+  IMAGE_NAME: design-studio
+
 on:
   push:
     tags:
@@ -20,7 +24,7 @@ jobs:
       with:	    
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: tiledesk/design-studio
+        repository: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tag_with_ref: true
 
     - name: Generate Docker metadata
@@ -41,4 +45,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: tiledesk/design-studio:${{ steps.meta.outputs.tags }}
+        tags: ${{ steps.meta.outputs.tags }}

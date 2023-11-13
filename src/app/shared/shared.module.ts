@@ -21,7 +21,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
   exports: [
     LoadingSpinnerComponent,
     NotificationMessageComponent,
-    TranslateModule,
+    // TranslateModule,
     // DirectivesModule
   ],
 })

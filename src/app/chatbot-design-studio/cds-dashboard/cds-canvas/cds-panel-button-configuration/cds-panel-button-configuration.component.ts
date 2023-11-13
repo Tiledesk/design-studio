@@ -259,7 +259,6 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
 
   /** */
   onChangeUrl(text: string) {
-    // this.logger.log('onChangeUrl: ');
     this.buttonUrl = text;
     // this.checkAndSaveButton();
   }

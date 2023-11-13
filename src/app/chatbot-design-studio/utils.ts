@@ -117,7 +117,7 @@ export enum TYPE_ACTION {
 }
 
 export enum TYPE_ACTION_CATEGORY {
-    MOST_USED = 'Most used',
+    MOST_USED = 'Most Used',
     FLOW = 'Flow',
     INTEGRATIONS = 'Integrations',
     SPECIAL = 'Special',
@@ -130,10 +130,10 @@ export enum TYPE_EVENT_CATEGORY {
 }
 
 export const ACTION_CATEGORY =[
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.MOST_USED, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.MOST_USED, src: 'assets/images/actions_category/most_used.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.FLOW, src: 'assets/images/actions_category/flow.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.INTEGRATIONS, src: 'assets/images/actions_category/integrations.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.SPECIAL, src: 'assets/images/actions_category/special.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.MOST_USED, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.MostUsed', src: 'assets/images/actions_category/most_used.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Flow', src: 'assets/images/actions_category/flow.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Special', src: 'assets/images/actions_category/special.svg'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
 ]
 

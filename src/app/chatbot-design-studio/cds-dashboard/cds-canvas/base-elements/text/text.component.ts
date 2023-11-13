@@ -20,6 +20,7 @@ export class CDSTextComponent implements OnInit {
   @Input() disabled: boolean = false;
   @Input() autocompleteOptions: string[] = [];
   @Input() inputType: string = "text";
+  @Output() blur = new EventEmitter();
   @Output() onChange = new EventEmitter<string>();
   
   filteredOptions: Observable<string[]>;
@@ -45,6 +46,10 @@ export class CDSTextComponent implements OnInit {
       this.text = event
     }
     this.onChange.emit(this.text)
+  }
+
+  onBlur(event){
+    this.blur.emit(event);
   }
 
 

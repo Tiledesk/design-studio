@@ -140,7 +140,7 @@ export class DashboardService {
         departments.forEach((dept: any) => {
           // this.logger.log('[CDS DSHBRD] - DEPT', dept);
           if (dept.default === true) {
-            this.defaultDepartment = dept._id;
+            this.defaultDepartment = dept;
             return
           }
         })

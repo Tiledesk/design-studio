@@ -1,5 +1,13 @@
-<div class="header-left" [class.is_opened]="IS_OPEN_SIDEBAR">
-    <img *ngIf="!IS_OPEN_SIDEBAR" src="assets/logos/tiledesk_logo_white_small.svg">
+<div class="header-left" [class.is_opened]="IS_OPEN_SIDEBAR" 
+        matTooltip="{{ 'GoBack' | translate}}"  
+        matTooltipClass="custom-mat-tooltip"
+        matTooltipHideDelay="100"
+        matTooltipPosition='below'
+        #tooltip="matTooltip">
+    <div *ngIf="!IS_OPEN_SIDEBAR">
+        <img class="logo" src="assets/logos/tiledesk_logo.svg">
+        <span class="material-icons" (click)="goToBack()">arrow_back</span>
+    </div>
     <img *ngIf="IS_OPEN_SIDEBAR" src="assets/logos/tiledesk-logo_new_white.svg">
 </div>
 <div class="header-right">
@@ -13,10 +21,9 @@
         </span>
     </div> -->
     <!-- <i class="material-icons cds-btn-back" (click)="goBack()">keyboard_arrow_left</i> -->
-    <div class="header-go-back"  
-        (click)="goToBack()" 
+    <div class="header-go-back"
         style="cursor:pointer"
-        matTooltip="{{ 'GoBack' | translate}}" 
+        matTooltip="v. {{version}}" 
         matTooltipClass="custom-mat-tooltip"
         matTooltipHideDelay="100"
         matTooltipPosition='below'

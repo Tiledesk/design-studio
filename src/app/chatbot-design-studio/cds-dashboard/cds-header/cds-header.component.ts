@@ -52,6 +52,7 @@ export class CdsHeaderComponent implements OnInit {
   public_Key: string;
   TRY_ON_WA: boolean;
 
+  version: string;
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -78,6 +79,8 @@ export class CdsHeaderComponent implements OnInit {
     if(this.router.url.includes('beta')){
       this.isBetaUrl = true;
     }
+
+    this.version = environment.VERSION
   }
 
   getOSCODE() {
@@ -112,7 +115,7 @@ export class CdsHeaderComponent implements OnInit {
   }
 
   getTestSiteUrl() {
-    this.TESTSITE_BASE_URL = this.appConfigService.getConfig().testsiteBaseUrl;
+    this.TESTSITE_BASE_URL = this.appConfigService.getConfig().widgetBaseUrl;
     this.logger.log('[CDS DSBRD] AppConfigService getAppConfig TESTSITE_BASE_URL', this.TESTSITE_BASE_URL);
   }
 

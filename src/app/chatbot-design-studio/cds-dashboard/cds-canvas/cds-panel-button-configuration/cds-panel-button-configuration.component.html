@@ -65,6 +65,7 @@
                 </label>
                 <cds-text
                     [text]="buttonUrl"
+                    (blur)="onBlur($event)"
                     (onChange)="onChangeUrl($event)">
                 </cds-text>
             </div> 

@@ -12,7 +12,7 @@
                     <span class="box-img">
                         <img class="active-icon" [src]="actionCategory.src">
                     </span>
-                    <span class="box-title">{{actionCategory.name}}</span>
+                    <span class="box-title">{{ actionCategory.name | translate}}</span>
                 </div>
             </div>
         </div>
@@ -65,7 +65,7 @@
                         </svg> -->
                         <img class="active-icon" src="assets/images/icons/event.svg">
                     </span>
-                    <span class="box-title">Event</span>
+                    <span class="box-title">{{ 'Event' | translate}}</span>
                 </div>
             </div>
         </div>
