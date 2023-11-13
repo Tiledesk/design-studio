@@ -107,28 +107,22 @@ input[type="file"] {
     cursor: pointer;
     background: $blu !important;
     color: $color-withe-hex;
-    border-radius: 4px;
+    border-radius: $btn-border-radius;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
     font-weight: 500;
     // margin-top: 14px;
     // width: 145px;
 }
 
 #cds-delete-bot-img-btn {
-    padding: 9px 15px;
-    // margin-top: 21px;
     color: #fff;
     background: #f44336 !important;
-    box-shadow: none !important;
-    font-weight: 500 !important;
-    font-family: Poppins, Roboto, Arial, sans-serif !important;
-    text-transform: capitalize !important;
-    font-size: 14px !important;
     height: 44px;
-    margin-left: 6px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
-#cds-delete-bot-img-btn:hover {
-    background: rgba(244, 67, 54, 0.8) !important;
-}
+
 
 #csd-update-bot-btn {
     border: 0px;
