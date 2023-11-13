@@ -149,6 +149,7 @@
         "FrequentlyAskedQuestions":"Frequently Asked Questions",
         "Question": "Question",
         "Answer": "Answer",
+        "Form":"Form",
         "DelimiterOptionMustBe": "Delimiter option must be one character long",
         "ChooseFile": "CHOOSE FILE",
         "UploadCsv": "Upload CSV",
@@ -169,7 +170,8 @@
         "PublicEmail":"Public email",
         "YourPublicEmail":"Your public email",
         "UpdateYourProfile":"Update your profile",
-        "Processing": "Processing..."
+        "Processing": "Processing...",
+        "SearchABlock":"search a block..."
     },
     "BotDetails": "Bot details",
     "Developer": "Developer",
@@ -239,6 +241,46 @@
             "field_label": "Write a clear label that helps users to enter the correct data (ex: what's your name?)",
             "field_error": "Write an error message if the data entered by the user is not correct"
         }
-    }
+    },
+    "CDSActionCategory":{
+        "MostUsed":"Most used",
+        "Flow":"Flow",
+        "Integrations":"Integrations",
+        "Special":"Special"
+    },
+    "CDSActionList": {
+        "NAME": {
+            "Reply":"Reply",
+            "RandomReply":"Random Reply",
+            "AgentHandoff":"Agent Handoff",
+            "Close":"Close",
+            "IfOperatingHours":"If Operating Hours",
+            "IfOnlineAgent":"If Online Agent",
+            "Condition":"Condition",
+            "Connect block":"Connect block",
+            "SetAttribute":"Set attribute",
+            "DeleteAttribute":"Delete attribute",
+            "ReplaceBot":"Replace bot",
+            "Wait":"Wait",
+            "WebRequest":"Web Request",
+            "SendEmail":"Send email",
+            "WhatsAppStatic":"'WhatsApp Static",
+            "WhatsAppByAttribute":"WhatsApp by Attribute",
+            "WhatsAppBySegment":"WhatsApp by Segment",
+            "AskTheKnowledgeBase":"Ask the KnowledgeBase",
+            "GPTTask":"GPT Task",
+            "HiddenMessage":"Hidden message",
+            "ChangeDept":"Change dept",
+            "SetFunction":"Set function",
+            "CaptureUserReply":"Capture User Reply"
+
+
+        },
+        "DESCRIPTION":{
+
+        }
+    },
+    "New":"New",
+    "Event":"Event"
     
 }
