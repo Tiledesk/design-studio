@@ -27,7 +27,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v3
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        images: tiledesk/design-studio
         tags: |
           type=ref,event=branch
           type=semver,pattern={{version}}
@@ -41,4 +41,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: tiledesk/design-studio:${{ steps.meta.outputs.tags }}
+        tags: {{ steps.meta.outputs.tags }}
