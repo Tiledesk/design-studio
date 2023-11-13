@@ -88,6 +88,10 @@
         "GetToken":"Get token",
         "ClickToGetToken":" Click the 'Get Token' button to generate the chatbot token"
     },
+    "CDSSplashScreen":{
+        "YouHaveNoRules":"You have no rules set for this Chatbot <br><br> Rules allow your Chatbot to proactively write to your visitor based on specific events (i.e. visitor lands on a specific page)",
+        "LearnAboutAI":"Learn about AI rules and how to apply them here"
+    },
     "CDSModalActivateBot":{
         "HookTheBot": "Activate this bot",
         "ActivateBot": "Activate bot",
@@ -201,7 +205,17 @@
         "DragAnImageOrClick":"drag an image here or click to select them",
         "ImageDragging":"image dragging",
         "AddPath":"Add path",
-        "LoadFrame":"load frame"
+        "LoadFrame":"load frame",
+        "Value":"Value",
+        "Attributes":"Attributes",
+        "Key":"Key",
+        "AddCustomAttributes":"Add a custom attribute",
+        "AddAttribute":"Add attribute",
+        "TheAttributesNameMustBe":" The attribute’s name can only contain alphanumeric <br> characters which are letters A-Z, numbers 0-9 and <br> underscore.",
+        "AttributeName":"Attribute name",
+        "TypeAttributeName":"Type attribute name",
+        "Filter":"Filter",
+        "AddFilter":"Add filter"
     },
     "Name":"Name",
     "Label": "Label",
@@ -241,6 +255,11 @@
             "field_label": "Write a clear label that helps users to enter the correct data (ex: what's your name?)",
             "field_error": "Write an error message if the data entered by the user is not correct"
         }
+    },
+    "CDSButtonTypes":{
+        "text":"text",
+        "url":"url",
+        "goToBlock":"go to block"
     },
     "CDSActionCategory":{
         "MostUsed":"Most used",
@@ -282,5 +301,7 @@
     },
     "New":"New",
     "Event":"Event"
+    
+
     
 }

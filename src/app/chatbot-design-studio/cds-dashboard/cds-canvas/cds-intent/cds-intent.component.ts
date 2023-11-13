@@ -177,8 +177,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit(): void {
     console.log('CdsPanelIntentComponent ngAfterViewInit-->', this.intent);
-
-
+    this.patchActionIntent();
     if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
       console.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
       this.startAction = this.intent.actions[0];
@@ -195,37 +194,25 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       this.setIntentSelected();
     }
-    this.setActionIntentInIntent();
+    
     this.isInternalIntent = checkInternalIntent(this.intent)
     this.addEventListener();
   }
 
-  private setActionIntentInIntent(){
+  private patchActionIntent(){
     this.actionIntent = null;
     for (let i = this.intent.actions.length - 1; i >= 0; i--) {
       if (this.intent.actions[i]._tdActionType === TYPE_ACTION.INTENT) {
         if(!this.actionIntent){
           this.actionIntent = JSON.parse(JSON.stringify(this.intent.actions[i]));
         }
-        // console.log('setActionIntentInIntent:: ', this.intent.actions[i]);
         this.intent.actions.splice(i, 1);
-        // this.intent.actions.push(this.actionIntent);
-        // break;
       }
     }
     if(!this.actionIntent){
       this.actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
     }
-    // set __isLast as true only for the last 'intent' action type in the list 
-    this.actionIntent['__isLast'] = true;
-    this.intent.actions.push(this.actionIntent);
-    // this.intent.actions = this.intent.actions.map(function(action) {
-    //   if(action._tdActionType === TYPE_ACTION.INTENT){
-    //     actionIntent = action;
-    //   }
-    //   return action;
-    // });
-    // console.log('setActionIntentInIntent:: ', this.intent, this.actionIntent);
+    this.intent.actions.unshift(this.actionIntent);
     if(this.actionIntent && this.actionIntent.intentName){
       const fromId = this.intent.intent_id+'/'+this.actionIntent._tdActionId;
       const toId = this.actionIntent.intentName.replace("#", "");
@@ -622,13 +609,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * 3 - moving new action in intent from panel elements
    */
   async onDropAction(event: CdkDragDrop<string[]>) {
-   console.log('[CDS-INTENT] onDropAction: ', event);
+   console.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
     // this.logger.log('event:', event, 'previousContainer:', event.previousContainer, 'event.container:', event.container);
     if (event.previousContainer === event.container) {
       // moving action in the same intent
-      
       //  event.container.data
-      moveItemInArray(this.intent.actions, event.previousIndex-1, event.currentIndex-1);
+      moveItemInArray(this.intent.actions, event.previousIndex, event.currentIndex);
       this.logger.log("[CDS-INTENT] onDropAction sto spostando una action all'interno dello stesso intent: ", event, this.intent.actions); 
       this.controllerService.closeAllPanels();
       this.intentService.setIntentSelected(this.intent.intent_id);

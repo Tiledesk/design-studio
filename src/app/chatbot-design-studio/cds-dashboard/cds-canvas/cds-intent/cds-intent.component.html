@@ -51,7 +51,7 @@
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
-        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
+        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 1" 
             cdkDrag
             [cdkDragDisabled]="dragDisabled">
             <!-- add-action-placeholder  -->
@@ -76,7 +76,7 @@
             </div>
         </div>
 
-        <div *ngFor="let action of listOfActions; let i = index, let last = last;" 
+        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
             cdkDrag
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
             (cdkDragReleased)="onDragEnded($event, i)"
@@ -88,12 +88,12 @@
             'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY,
             'cds-last-action': last
             }" 
-            [class.isLast]="action.__isLast"
+            [class.isFirst]="first"
             (keydown)="onKeydown($event)" 
             (click)="onSelectAction(action, i, action._tdActionId)">
             <!-- [ngClass]="{'hide-drag-action-palceholder': hideActionDragPlaceholder}" -->
             <!-- [ngStyle]="{'opacity':hideActionDragPlaceholder === true ? '1' : '0' }" -->
-            <span *ngIf="!action.__isLast" class="action-element">
+            <span *ngIf="!first" class="action-element">
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
                 <cds-action-description 

@@ -34,7 +34,7 @@
                     [bindLabelSelect]="'name'"
                     [bindValueSelect]="'id'"
                     placeholder="{{'SelectDepartment'|translate}}"
-                    [itemSelected]="deptSelected?.id"
+                    [itemSelected]="deptSelected"
                     [clearable]="true"
                     (onSelected)="onSelectDept($event)" >
                 </cds-select>
@@ -158,7 +158,7 @@
             <label class="title-label" innerHtml="{{ 'CDSModalActivateBot.CopyTheFollowingScript' | translate }}"></label>
             <div class="code">
                 <pre>
-                    <code class="javascript" style="white-space: pre;" [innerHTML]="webScript.html"></code>
+                    <code class="javascript" style="white-space: pre;" [innerHTML]="webScript?.html"></code>
                 </pre>
                 <span class="material-icons" (click)="onCopyScript()">content_copy</span>
             </div>

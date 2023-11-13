@@ -194,10 +194,30 @@ export class IntentService {
     intent.id_faq_kb = id_faq_kb;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
+    let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
+    intent.actions.push(actionIntent);
     intent.actions.push(action);
     console.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", action, " in posizione ", pos);
     return intent;
   }
+
+
+  // public updateActionIntent(intent){
+  //   let actionIntent = null;
+  //   for (let i = this.intentSelected.actions.length - 1; i >= 0; i--) {
+  //     if (this.intentSelected.actions[i]._tdActionType === TYPE_ACTION.INTENT) {
+  //       if(!actionIntent){
+  //         actionIntent = JSON.parse(JSON.stringify(this.intentSelected.actions[i]));
+  //       }
+  //       this.intentSelected.actions.splice(i, 1);
+  //     }
+  //   }
+  //   if(!actionIntent){
+  //     actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
+  //   }
+  //   this.intentSelected.actions.push(actionIntent);
+  //   return actionIntent;
+  // } 
 
   /** generate display name of intent */
   public setDisplayName(){

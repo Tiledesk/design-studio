@@ -59,6 +59,7 @@ export class CdsModalActivateBotComponent implements OnInit {
     this.selectedChatbot = data.chatbot
     this.departments = data.departments
     this.project_id = data.project_id
+
   }
 
   ngOnInit(): void {
@@ -66,6 +67,7 @@ export class CdsModalActivateBotComponent implements OnInit {
     const config = this.appConfigService.getConfig()
     this.translateparamBotName = { bot_name: this.selectedChatbot.name }
     this.webScript = getWidgetWebInstallationScript(this.project_id, config.widgetBaseUrl)
+    console.log('weeeeee', this.webScript)
   }
 
 
