@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 0.0.8
+- added: retrocompatibility with intent that already contains an action of type 'connect block'
+- changed: routing path /cds/ to /chatbot/
+- changed: base href into intex.html
+
 ### 0.0.7
 - added: translations on action_category panel-element
 - added: disabled text highlight on zoom-in/zoom-out icon double click event
