@@ -60,7 +60,7 @@ $toogle-sidebar-width: 22px;
   .tds_path {
     animation: dash 30s linear infinite;
     stroke-dasharray: 6;
-    stroke-width: 2px;
+    stroke-width: 3px;
     stroke: gray;
   }
 
@@ -73,12 +73,12 @@ $toogle-sidebar-width: 22px;
   
   .tds_connector_over {
     stroke: gray;
-    stroke-width: 2px;
+    stroke-width: 3px;
   }
   
   .tds_connector_selected {
     stroke: #3ea9f5;
-    stroke-width: 2px;
+    stroke-width: 3px;
   }
 }
 

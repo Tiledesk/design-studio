@@ -17,13 +17,11 @@
     align-items: flex-end;
     justify-content: flex-end;
     gap: 5px; 
-    padding: 5px 10px;
-
+    padding: 5px 5px;
     top: calc(50% - 14px);
-
     .connector {
         position: absolute;
-        right: -12px;
+        right: -20px;
         top: calc(50% - 10px);
     }
     &.isLast{

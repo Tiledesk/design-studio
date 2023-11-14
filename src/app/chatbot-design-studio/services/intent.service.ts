@@ -194,10 +194,10 @@ export class IntentService {
     intent.id_faq_kb = id_faq_kb;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
-    let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
-    intent.actions.push(actionIntent);
+    // let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
+    // intent.actions.push(actionIntent);
     intent.actions.push(action);
-    console.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", action, " in posizione ", pos);
+    console.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
   }
 
@@ -492,6 +492,7 @@ export class IntentService {
       this.connectorService.deleteConnectorsFromActionByActionId(actionId);
       console.log('[CDS-INTENT-SERVICES] aggiorno intent di partenza', intentToUpdate);
       // const responseIntent = this.updateIntent(intentToUpdate);
+      
       const responseIntent = this.onUpdateIntentWithTimeout(intentToUpdate, 0, true);
       if(responseIntent){
         // console.log('[CDS-INTENT-SERVICES] update Intent: OK');
