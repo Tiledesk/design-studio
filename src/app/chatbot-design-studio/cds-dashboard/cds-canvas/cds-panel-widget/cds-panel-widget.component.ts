@@ -56,7 +56,6 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
      *  - notify iframe with a postMessage about the changes
      */
     this.intentService.behaviorIntent.pipe(skip(1)).subscribe((intent: Intent)=> {
-      console.log('[CDS-PANEL-WIDGET] behaviorIntent-->', intent, this.intentName)
       if(intent && intent.intent_display_name !== this.intentName && this.isPanelVisible){
         this.intentName = intent.intent_display_name
         this.widgetIframe.nativeElement.contentWindow.postMessage(
@@ -71,9 +70,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   }
 
   setIframeUrl(){
-    console.log('[CDS-PANEL-WIDGET] setIframeUrl parameters ---> ', this.projectID, this.selectedChatbot, this.defaultDepartmentId, this.intentName)
     this.WIDGET_BASE_URL = this.appConfigService.getConfig().widgetBaseUrl;
-    // const testItOutBaseUrl = this.TESTSITE_BASE_URL.substring(0, this.TESTSITE_BASE_URL.lastIndexOf('/')); 
     const testItOutUrl = this.WIDGET_BASE_URL + "assets/twp" + '/chatbot-panel.html'
     // const testItOutUrl = "https://widget.tiledesk.com/v6/5.0.71/assets/twp"+ '/chatbot-panel.html'
     // const testItOutUrl = 'http://localhost:4203/assets/twp'+ '/chatbot-panel.html'

@@ -88,6 +88,18 @@ $icon-hover-color: $blu;
     width: 100%
 }
 
+.trigger-beta-badge {
+    font-weight: 400;
+    background-color: #fff;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    line-height: 13px;
+    color: #6c757d;
+    position: relative;
+    margin: 0px 3px;
+}
+
 .action-btn img{
     filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
 }

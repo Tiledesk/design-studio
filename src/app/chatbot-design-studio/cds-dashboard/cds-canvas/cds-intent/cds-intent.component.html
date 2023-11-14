@@ -233,8 +233,7 @@
                     <cds-action-gpt-task *ngSwitchCase="TYPE_ACTION.GPT_TASK" 
                         class="panel-response" 
                         [intentSelected]="intent"
-                        [action]="action"
-                        (updateAndSaveAction)="onSaveIntent($event)">
+                        [action]="action">
                     </cds-action-gpt-task>
     
                     <cds-action-capture-user-reply *ngSwitchCase="TYPE_ACTION.CAPTURE_USER_REPLY" 

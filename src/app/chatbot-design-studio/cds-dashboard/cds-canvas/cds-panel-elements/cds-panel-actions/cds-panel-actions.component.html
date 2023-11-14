@@ -36,6 +36,7 @@
                         </button>
                     </div>
                     <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name}}</div>
+                    <!-- <span *ngIf="item?.value?.status ==='beta'" class="trigger-beta-badge">Beta</span> -->
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <button class="btn btn-tdblu-no-boxshadow drag-btn">
                             <img class="active-icon" src="assets/images/icons/drag_indicator.svg" title="Drag">
