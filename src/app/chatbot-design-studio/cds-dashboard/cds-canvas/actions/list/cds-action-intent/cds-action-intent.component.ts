@@ -62,6 +62,8 @@ export class CdsActionIntentComponent implements OnInit {
   //   // this.checkConnectionStatus();
   // }
 
+  
+
   private checkConnectionStatus(){
     if(this.action.intentName){
      this.isConnected = true;
@@ -72,6 +74,7 @@ export class CdsActionIntentComponent implements OnInit {
 
   private initialize() {
     this.checkConnectionStatus();
+    this.logger.log('[CDS-ACTION-INTENT] - initialize - isConnected ', this.action.intentName);
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnector = this.idIntentSelected+'/'+this.action._tdActionId;
     this.intents = this.intentService.getListOfIntents();

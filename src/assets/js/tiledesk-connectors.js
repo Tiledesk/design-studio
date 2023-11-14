@@ -727,7 +727,6 @@ export class TiledeskConnectors {
         }
       });
       connector.addEventListener('click', (e) => {
-
         let pos_x_phis = e.clientX;
         let pos_y_phis = e.clientY;
         let mouse_pos_logic = this.logicPoint({ x: pos_x_phis, y: pos_y_phis });
@@ -741,7 +740,6 @@ export class TiledeskConnectors {
         this.selectedConnector = e.currentTarget;
         this.selectedConnector.setAttributeNS(null, "class", this.classes["connector_selected"]);
         this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow_selected'] + ")");
-
         const event = new CustomEvent("connector-selected", { detail: { connector: connector, mouse_pos: mouse_pos_logic } });
         document.dispatchEvent(event);
       });
