@@ -320,9 +320,9 @@ export const CERTIFIED_TAGS: Array<{color: string, name: string}> = [
 ]
 
 export const BUTTON_TYPES: Array<{ label: string, value: TYPE_BUTTON }> = [
-    { label: "text", value: TYPE_BUTTON.TEXT },
-    { label: "url", value: TYPE_BUTTON.URL },
-    { label: "go to block", value: TYPE_BUTTON.ACTION }
+    { label: "CDSButtonTypes.text", value: TYPE_BUTTON.TEXT },
+    { label: "CDSButtonTypes.url", value: TYPE_BUTTON.URL },
+    { label: "CDSButtonTypes.goToBlock", value: TYPE_BUTTON.ACTION }
 ]
 
 export const URL_TYPES: Array<{ label: string, value: TYPE_URL }> = [
@@ -349,32 +349,38 @@ export function getEmbedUrl(url: string) {
 
 export var variableList = {
     userDefined: [],
+    mostUsed: [
+        { name: 'last_user_text', value: 'last_user_text', description: 'The last text the user typed. This is overwritten on each user reply', src: '', icon: 'send' },
+        { name: 'user_country', value: 'user_country', description: 'The user Country as decoded by Tiledesk',src: '', icon: 'language' },
+        { name: 'user_city', value: 'user_city', description: 'The user City as decoded by Tiledesk', src: '', icon: 'language' },
+        { name: 'user_language', value: 'user_language', description: 'The user language decoded on channel', src: '', icon: 'language' },
+        { name: 'transcript', value: 'transcript', description: 'All the conversation messages exchanged with this chatbot during the chat', src: '', icon: 'description'},
+    ],
     systemDefined: [
-        { name: 'department_id', value: 'department_id', src: '', icon: 'domain' },
-        { name: 'department_name', value: 'department_name', src: '', icon: 'domain' },
-        { name: 'project_id', value: 'project_id', src: '', icon: 'domain' },
-        { name: 'last_message_id', value: 'last_message_id', src: '', icon: 'textsms' },
-        { name: 'conversation_id', value: 'conversation_id', src: '', icon: 'textsms' },
-        { name: 'last_user_text', value: 'last_user_text', src: '', icon: 'send' },
-        { name: 'chatbot_name', value: 'chatbot_name', src: '', icon: 'person' },
-        { name: 'user_id', value: 'user_id', src: '', icon: 'person' },
-        { name: 'user_agent', value: 'user_agent', src: '', icon: 'person' },
-        { name: 'user_source_page', value: 'user_source_page', src: '', icon: 'language' },
-        { name: 'user_language', value: 'user_language', src: '', icon: 'language' },
-        { name: 'chat_url', value: 'chat_url', src: '', icon: 'laptop' },
-        { name: 'user_ip_address', value: 'user_ip_address', src: '', icon: 'laptop' },
-        { name: 'user_country', value: 'user_country', src: '', icon: 'language' },
-        { name: 'user_city', value: 'user_city', src: '', icon: 'language' },
-        { name: 'transcript', value: 'transcript', src: '', icon: 'description'},
-        { name: 'lastUserDocumentURL', value: 'lastUserDocumentURL', src: '', icon:'upload_file'},
-        { name: 'lastUserDocumentName', value: 'lastUserDocumentName', src: '', icon:'upload_file'},
-        { name: 'lastUserDocumentType', value: 'lastUserDocumentType', src: '', icon:'upload_file'},
-        { name: 'lastUserImageURL', value: 'lastUserImageURL', src: '', icon:'image'},
-        { name: 'lastUserImageName', value: 'lastUserImageName', src: '', icon:'image'},
-        { name: 'lastUserImageWidth', value: 'lastUserImageWidth', src: '', icon:'image'},
-        { name: 'lastUserImageHeight', value: 'lastUserImageHeight', src: '', icon:'image'},
-        { name: 'lastUserImageType', value: 'lastUserImageType', src: '', icon:'image'}
-
+        { name: 'department_id', value: 'department_id', description: 'The ID of the department where this chatbot is activated', src: '', icon: 'domain' },
+        { name: 'department_name', value: 'department_name', description: 'The name of the department where this chatbot is activated', src: '', icon: 'domain' },
+        { name: 'project_id', value: 'project_id', description: 'The name of the project where this chatbot belongs to', src: '', icon: 'domain' },
+        { name: 'last_message_id', value: 'last_message_id', description: 'The unique ID of the last message sent', src: '', icon: 'textsms' },
+        { name: 'conversation_id', value: 'conversation_id', description: 'This conversation unique ID', src: '', icon: 'textsms' },
+        { name: 'chatbot_name', value: 'chatbot_name', description: 'This chatbot name', src: '', icon: 'person' },
+        { name: 'user_id', value: 'user_id', description: 'The user unique ID inside Tiledesk database', src: '', icon: 'person' },
+        { name: 'user_agent', value: 'user_agent', description: 'The web user agent where this conversation initiated', src: '', icon: 'person' },
+        { name: 'chatChannel', value: 'chatChannel', description: 'The channel where this conversation belongs to. Ex. "web", "whatsapp", "facebook", "telegram"', src: '', icon: 'language' },
+        { name: 'user_source_page', value: 'user_source_page', description: 'The page where this conversations is runinng. Only available on channel "web"', src: '', icon: 'language' },
+        { name: 'chat_url', value: 'chat_url', description: 'The url of the Chat to send to a colleague to chat with this user. Use "Invite human" action to invite the human to this chat.', src: '', icon: 'laptop' },
+        { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available',src: '', icon: 'laptop' },
+    ],
+    uploadedDocument: [
+        { name: 'lastUserDocumentURL', value: 'lastUserDocumentURL', description: 'The public URL to access the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+        { name: 'lastUserDocumentName', value: 'lastUserDocumentName', description: 'The name of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+        { name: 'lastUserDocumentType', value: 'lastUserDocumentType', description: 'The type of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+    ],
+    uploadedImage: [
+        { name: 'lastUserImageURL', value: 'lastUserImageURL', description: 'The public URL to access the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+        { name: 'lastUserImageName', value: 'lastUserImageName', description: 'The name of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+        { name: 'lastUserImageType', value: 'lastUserImageType', description: 'The type of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+        { name: 'lastUserImageWidth', value: 'lastUserImageWidth', description: 'The height in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+        { name: 'lastUserImageHeight', value: 'lastUserImageHeight', description: 'The wdth in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'}
     ]
 }
 

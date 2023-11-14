@@ -11,7 +11,7 @@ export const environment = {
   uploadEngine: 'native',
   baseImageUrl: 'CHANGEIT',
   logLevel: 'error',
-  storage_prefix: "dashboard_sv6",
+  storage_prefix: "cds_sv6",
   firebaseConfig: {
     apiKey: 'CHANGEIT',
     authDomain: 'CHANGEIT',

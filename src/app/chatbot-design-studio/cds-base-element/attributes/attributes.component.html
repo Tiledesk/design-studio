@@ -6,7 +6,7 @@
                 <input *ngIf="method == typeMethodAttribute.INPUT"
                     [(ngModel)]="attribute.key" 
                     type="text" 
-                    placeholder="Key" 
+                    [placeholder]="'CDSCanvas.Key' | translate"
                     class="sx-input" 
                     (ngModelChange)="onChangeAttributes(attribute, i)">
                     
@@ -17,7 +17,7 @@
                     [emojiPikerBtn]="false"
                     [setAttributeBtn]="true"
                     [minRow]="1" [maxRow]="1"
-                    [placeholder]="'Value'"
+                    [placeholder]="'CDSCanvas.Value' | translate"
                     (selectedAttribute)="onSelectedAttribute($event,i, 'value')"
                     (changeTextarea)="onChangeTextarea($event, i)">
                 </cds-textarea>
@@ -32,16 +32,16 @@
             <mat-expansion-panel [expanded]="openBlock" (opened)="panelOpenState = true" (closed)="panelOpenState = false">
                 <mat-expansion-panel-header class="specific-class">
                     <mat-panel-title>
-                        <div class="header__center ng-star-inserted">Attributes</div>
+                        <div class="header__center ng-star-inserted">{{ 'CDSCanvas.Attributes' | translate }}</div>
                     </mat-panel-title>
                     <!-- <i class="icon-setting material-icons">settings</i>  -->
                 </mat-expansion-panel-header>
                 <div class="auto-suggest-group">
                     <div class="key-value-form-column">
-                        <div class="key-value-cell__placeholder">Key</div>
+                        <div class="key-value-cell__placeholder">{{ 'CDSCanvas.Key' | translate }}</div>
                     </div>
                     <div class="key-value-form-column">
-                        <div class="key-value-cell__placeholder">Value</div>
+                        <div class="key-value-cell__placeholder">{{ 'CDSCanvas.Value' | translate }}</div>
                     </div>
                 </div>
                 <div *ngFor="let attribute of newAttributes; let i = index;">
@@ -59,7 +59,12 @@
                                 (selectedAttribute)="onSelectedAttribute($event,i)">
                             </cds-textarea>
                         </div> 
-                        <input [(ngModel)]="attribute.value" type="text" placeholder="Value" class="dx-input" (ngModelChange)="onChangeAttributes(attribute, i)">
+                        <input 
+                            type="text" 
+                            class="dx-input" 
+                            [(ngModel)]="attribute.value" 
+                            placeholder="{{ 'CDSCanvas.Value' | translate }}" 
+                            (ngModelChange)="onChangeAttributes(attribute, i)">
                     </div>
                 </div>
             </mat-expansion-panel>

@@ -1,7 +1,7 @@
 {
   "name": "@tiledesk/cds",
   "author": "Tiledesk SRL",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "license": "MIT",
   "homepage": "https://www.tiledesk.com",
   "repository": {
@@ -15,7 +15,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "^14.2.0",
     "@angular/cdk": "^14.2.5",

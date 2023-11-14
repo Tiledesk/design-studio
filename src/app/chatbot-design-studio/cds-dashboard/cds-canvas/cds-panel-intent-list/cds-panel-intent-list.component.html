@@ -1,7 +1,7 @@
 <div class="content">
 
     <div class="cds-title list-title">
-        Blocks
+        {{ 'Blocks' | translate }}
     </div>
 
     <div class="intents-list">
@@ -48,7 +48,7 @@
             <span class="material-icons">search</span>
         </div>
         <div class="input-box-search-input-wpr">
-            <input class="custom-input ellips" placeholder="{{ 'SearchABlock' | translate }}"
+            <input class="custom-input ellips" placeholder="{{ 'CDSSetting.SearchABlock' | translate }}"
                 (input)="onLiveSearch($event.target.value);">
         </div>
     </div>

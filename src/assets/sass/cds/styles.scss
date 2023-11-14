@@ -316,20 +316,20 @@ cds-connector.connector-false {
 
 cds-connector.connector {
     position: absolute;
-    right: -22px;
+    right: -28px;
     top: calc(50% - 10px);
 }
 
 cds-connector.button-connector {
     position: absolute;
-    right: -13px;
+    right: -19px;
     top: calc(50% - 10px);
 }
 
 cds-connector.connector-true,
 cds-connector.connector-false {
     position: absolute;
-    right: -22px;
+    right: -28px;
     top: calc(50% - 10px);
 }
 
@@ -424,4 +424,10 @@ img.hover-icon{
 
 .cds-reply-button-element{
     position: relative;
+}
+
+.previewMode .cds-reply-button-element {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }

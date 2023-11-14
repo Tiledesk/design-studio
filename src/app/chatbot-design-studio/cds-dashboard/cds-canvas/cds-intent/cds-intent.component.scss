@@ -12,6 +12,7 @@
   --base-padding-preview: #{$padding-base-preview};
   --action-selected-color: #{$action-color-selected};
 
+  --base-color: #{$blu};
   --startIntentMaxWith: 160px;
 }
 
@@ -553,8 +554,8 @@
   padding: 4px;
   border-radius: 50%;
   box-shadow: unset;
-  background: #6c6859;
-
+  background: transparent;
+  outline: 2px solid var(--base-color) !important;
   // z-index: 2;
   // background-color: $icon-color-background;
 }
@@ -562,14 +563,13 @@
 .cds-add-action-btn>span {
   font-size: 20px;
   // color: $icon-color;
-  color: #fff;
+  color: var(--base-color);
   position: relative;
   top: 0px;
 }
 
-.cds-add-action-btn:hover>span {
-  // color: rgba($icon-color, 0.8);
-  color: #3ea9f5
+.cds-add-action-btn:hover {
+  opacity: 0.8;
 }
 
 cds-action-description.header-action ::ng-deep{

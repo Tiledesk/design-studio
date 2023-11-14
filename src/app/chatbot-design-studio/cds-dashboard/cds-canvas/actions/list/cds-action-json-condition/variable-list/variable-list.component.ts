@@ -16,10 +16,10 @@ export class VariableListComponent implements OnInit {
   @Output() onSelected = new EventEmitter()
 
   variableListUserDefined: Array<{name: string, value: string}> // = variableList.userDefined 
-  variableListSystemDefined: Array<{name: string, value: string, src?: string}> //= variableList.systemDefined
+  variableListSystemDefined: Array<{name: string, value: string, description: string, src?: string}> //= variableList.systemDefined
   
   filteredVariableList: Array<{name: string, value: string}> //= []
-  filteredIntentVariableList: Array<{name: string, value: string, src?: string}>
+  filteredIntentVariableList: Array<{name: string, value: string, description: string, src?: string}>
   textVariable: string = '';
   idBot: string;
 

@@ -59,6 +59,7 @@ export class CdsModalActivateBotComponent implements OnInit {
     this.selectedChatbot = data.chatbot
     this.departments = data.departments
     this.project_id = data.project_id
+
   }
 
   ngOnInit(): void {

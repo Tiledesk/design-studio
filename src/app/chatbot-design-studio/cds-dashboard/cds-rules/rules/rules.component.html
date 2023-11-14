@@ -10,9 +10,9 @@
 
     <div class="welcome_message_wrp" *ngIf="showWelcome">
         <cds-splash-screen *ngIf=!intentSelected
-            [text]="'You have no rules set for this Chatbot <br><br> Rules allow your Chatbot to proactively write to your visitor based on specific events (i.e. visitor lands on a specific page)'"
+            [text]="'CDSSplashScreen.YouHaveNoRules' | translate"
             [videoUrl]="'https://www.youtube.com/embed/SgDGwvVoqWE'"
-            [videoDescription]="'Learn about AI rules and how to apply them here'"
+            [videoDescription]="'CDSSplashScreen.LearnAboutAI' | translate"
             [section]="'cds-sb-rules'"
             (onClickBtn)="addNew($event)" > 
         </cds-splash-screen>

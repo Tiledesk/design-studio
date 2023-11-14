@@ -5,9 +5,29 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 0.0.7
+- added: translations on action_category panel-element
+- added: disabled text highlight on zoom-in/zoom-out icon double click event
+- added: limit scale zoom
+- changed: intent base padding
+- changed: hide secrets section
+- changed: restored version on logo mouse hover 
+- changed: preview label on cds-action-gpt-task component
+- changed: increased minRow cds-action-hide-message
+- changed: preview label in favour of icon in cds-action-close and cds-action-agent-handoff
+- changed: cds-settings detail section button UI
+- bug-fixed: cds-action-reply-gallery preview not open button on click
+- bug-fixed: cds-panel-button-configuration not save url changes
+- bug-fixed: start intent show 'add action' button on hover
+- bug-fixed: cannot drag action from an existing block to a new one
+- bug-fixed: cds-panel-action-detail not change action data on action change
+
 ### 0.0.6
 - added: translations
-- added: brandService 
+- added: brandService
+- added: remove connect to block from Capture user reply
+- changed: thicken the connectors by one px
+- changed: gray connector color
 
 ### 0.0.5
 - added: loader on cds-dashboard

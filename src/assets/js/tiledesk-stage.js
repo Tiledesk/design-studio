@@ -119,9 +119,9 @@ export class TiledeskStage {
 
     zoom(event){
         if (event === 'in'){
-            this.scale += this.scaleStep
-        }else if (event === 'out'){
-            this.scale -= this.scaleStep
+            this.scale = Math.min(Math.max(0.125, this.scale += this.scaleStep), 4);
+        } else if (event === 'out'){
+            this.scale = Math.min(Math.max(0.125, this.scale -= this.scaleStep), 4);
         }
         this.transform();
     }

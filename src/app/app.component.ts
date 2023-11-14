@@ -149,18 +149,21 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       chat_lang = stored_preferred_lang
     }
 
-    if (tranlatedLanguage.includes(chat_lang)) {
-      this.logger.log('[APP-COMP] tranlatedLanguage includes', chat_lang, ': ', tranlatedLanguage.includes(chat_lang))
-      this.translate.setDefaultLang(chat_lang)
-      this.translate.use(chat_lang);
-    }
-    else {
-      this.logger.log('[APP-COMP] tranlatedLanguage not includes', chat_lang, ': ', tranlatedLanguage.includes(chat_lang))
-      chat_lang = 'en'
-      this.translate.setDefaultLang('en');
-      this.translate.use('en');
-    }
+    // if (tranlatedLanguage.includes(chat_lang)) {
+    //   this.logger.log('[APP-COMP] tranlatedLanguage includes', chat_lang, ': ', tranlatedLanguage.includes(chat_lang))
+    //   this.translate.setDefaultLang(chat_lang)
+    //   this.translate.use(chat_lang);
+    // }
+    // else {
+    //   this.logger.log('[APP-COMP] tranlatedLanguage not includes', chat_lang, ': ', tranlatedLanguage.includes(chat_lang))
+    //   chat_lang = 'en'
+    //   this.translate.setDefaultLang('en');
+    //   this.translate.use('en');
+    // }
     this.lang=chat_lang
+
+    this.translate.setDefaultLang('en');
+    this.translate.use('en');
 
   }
 
