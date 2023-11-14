@@ -247,7 +247,6 @@ export class CdsActionReplyImageComponent implements OnInit {
 
   /** onBlur */
   onBlur(event){
-    console.log('[ACTION REPLY IMAGE] onBlur', event);
     this.changeActionReply.emit();
   }
 

@@ -158,7 +158,6 @@ export class CdsActionWebRequestV2Component implements OnInit {
       this.body = this.formatJSON(this.body, "\t");
     }
     this.assignments = this.action.assignments
-    console.log('actionnnnnnnn', this.action);
     if(this.intentSelected){
       this.initializeConnector();
     }
@@ -222,11 +221,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
       case 'json':
         this.body = this.action.jsonBody
     }
-    console.log('onChangeButtonSelect-->', event, this.body, this.action)
   }
 
   onChangeTextarea(e, type: 'url' | 'body'){
-    console.log('onChangeTextarea:', e, type );
     switch(type){
       case 'body': {
         this.body = e;

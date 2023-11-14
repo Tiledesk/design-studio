@@ -58,7 +58,6 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
   initialize(){
     this.intentSelected = this.intentService.intentSelected;
-    console.log('[PANEL-INTENT-DETAIL] (OnChanges) @Input elementIntentSelected ', this.intentSelected, this.elementIntentSelected);
     try{
       this.elementIntentSelectedType = this.elementIntentSelected.type;
       this.elementSelected = this.elementIntentSelected.element;
@@ -132,7 +131,6 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
    * IMPORTANTE: questa funzione deve SOLO aggiornare i connettori e NON deve salvare e NON deve aggiungere UNDO.
    */
   onConnectorChange(type: 'create' | 'delete', idConnector: string, toIntentId: string){
-    console.log('createOrUpdateConnector-->', type, idConnector, toIntentId);
     const fromId = idConnector;
     
     let toId = '';

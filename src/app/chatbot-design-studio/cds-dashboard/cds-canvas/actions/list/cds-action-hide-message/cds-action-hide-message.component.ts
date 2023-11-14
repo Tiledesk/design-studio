@@ -28,7 +28,6 @@ export class CdsActionHideMessageComponent implements OnInit {
   }
 
   onBlur(event){
-    console.log('[ACTION REPLY TEXT] onBlur', event);
     this.updateAndSaveAction.emit()
   }
 }

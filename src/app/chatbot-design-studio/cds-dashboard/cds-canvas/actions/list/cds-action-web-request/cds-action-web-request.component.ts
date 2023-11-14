@@ -43,7 +43,6 @@ export class CdsActionWebRequestComponent implements OnInit {
   ngOnChanges() {
     // on change
     this.initialize();
-    console.log('CDS-ACTION-WEB-REQUEST ACTION' , this.action )
     if (this.action && this.action.assignTo) {
       this.hasSelectedVariable = true
     }

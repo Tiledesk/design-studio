@@ -76,16 +76,7 @@ export class CdsDashboardComponent implements OnInit {
     
     return new Promise((resolve, reject) => {
       this.route.params.subscribe({ next: (params) => {
-          console.log('paramssssss', params)
-          // this.id_faq_kb = params['faqkbid'];
-          // this.id_faq = params['faqid'];
-          // this.botType = params['bottype'];
-          // this.intent_id = params['intent_id'];
           this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  PARAMS', params);
-          // this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  BOT ID ', this.id_faq_kb);
-          // this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  FAQ ID ', this.id_faq);
-          // this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  FAQ ID ', this.intent_id);
-          console.log('[ DSHBRD-SERVICE ] getUrlParams', params);
           this.dashboardService.setParams(params)
           resolve(true);
         }, error: (error) => {

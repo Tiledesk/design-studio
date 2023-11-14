@@ -101,25 +101,9 @@ export class CdsActionReplyFrameComponent implements OnInit {
   }
 
   onBlur(event){
-    console.log('[ACTION REPLY TEXT] onBlur', event);
     this.changeActionReply.emit();
   }
   
-  
-  /** */
-  // onCloseFramePanel(event){
-  //   //if(event.url){
-  //     this.response.metadata.src = event.url;
-  //   //}
-  //   //if(event.width){
-  //     this.response.metadata.width = event.width;
-  //   //}
-  //   //if(event.height){
-  //     this.response.metadata.height = event.height;
-  //   //}
-  //   // console.log('onCloseframePanel:: ', event);
-  // }
-
   /** */
   onDeletedMetadata(){
     this.response.metadata.src = '';

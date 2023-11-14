@@ -150,7 +150,7 @@ export class CdsActionAskgptComponent implements OnInit {
   }
 
   getKnowledgeBaseSettings() {
-    console.log("**** carico solo dopo aver aperto il dettaglio")
+    this.logger.log("**** carico solo dopo aver aperto il dettaglio")
     this.kbService.getKbSettings().subscribe((kbSettings: any) => {
       this.logger.debug("[ACTION-ASKGPT] get kbSettings: ", kbSettings);
       this.kbs_list = kbSettings.kbs.map(t => {
@@ -202,7 +202,7 @@ export class CdsActionAskgptComponent implements OnInit {
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
     } else {
-      console.log("event: ", event);
+      this.logger.log("event: ", event);
       this.action.kbid = event.url;
       this.action.kbName = event.name;
       let kb_selected = this.kbs_list.find(k => k.url === this.action.kbid);

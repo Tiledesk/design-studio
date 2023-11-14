@@ -131,7 +131,7 @@ export class CdsCanvasComponent implements OnInit {
 
   private async setStartIntent(){
     let intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
-    console.log('setStartIntent:: ', intentSelected);
+    this.logger.log('setStartIntent:: ', intentSelected);
     if(intentSelected){
       // this.setIntentSelected();
       // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
@@ -156,7 +156,7 @@ export class CdsCanvasComponent implements OnInit {
   private setSubscriptions(){
 
     this.subscriptionUndoRedo = this.intentService.behaviorUndoRedo.subscribe((undoRedo: any) => {
-      console.log('[cds-panel-intent-list] --- AGGIORNATO undoRedo ',undoRedo);
+      this.logger.log('[cds-panel-intent-list] --- AGGIORNATO undoRedo ',undoRedo);
       if (undoRedo) {
         this.stateUndoRedo = undoRedo;
       }
@@ -595,7 +595,7 @@ export class CdsCanvasComponent implements OnInit {
    * quando modifico un intent da pannello ex: cambio il testo, aggiungo un bottone ecc.
   */
   private async updateIntent(intent, time=0, undo=false) {
-    console.log('[CDS-CANVAS] updateIntent: ');
+    this.logger.log('[CDS-CANVAS] updateIntent: ');
     this.connectorService.updateConnector(intent.intent_id);
     const response = await this.intentService.onUpdateIntentWithTimeout(intent, time, undo);
     if (response) {
@@ -616,7 +616,7 @@ export class CdsCanvasComponent implements OnInit {
    * 
    */
   private async deleteIntent(intent) {
-    console.log('[CDS-CANVAS]  deleteIntent', intent);
+    this.logger.log('[CDS-CANVAS]  deleteIntent', intent);
     this.intentSelected = null;
     this.intentService.deleteIntentToListOfIntents(intent.intent_id);
     this.intentService.refreshIntents();
@@ -645,17 +645,17 @@ export class CdsCanvasComponent implements OnInit {
    * chiamata quando aggiungo (droppandola) una action sullo stage spostandola da un altro intent  
    * */
   async onDroppedElementToStage(event: CdkDragDrop<string[]>) {
-    console.log('[CDS-CANVAS] droppedElementOnStage:: ', event);
+    this.logger.log('[CDS-CANVAS] droppedElementOnStage:: ', event);
     let pos = this.connectorService.tiledeskConnectors.logicPoint(event.dropPoint);
     pos.x = pos.x - 132;
     let action: any = event.previousContainer.data[event.previousIndex];
     if (action.value && action.value.type) {
-      console.log('[CDS-CANVAS] ho draggato una action da panel element sullo stage');
+      this.logger.log('[CDS-CANVAS] ho draggato una action da panel element sullo stage');
       this.closeAllPanels();
       this.removeConnectorDraftAndCloseFloatMenu();  
       this.createNewIntentFromPanelElement(pos, action.value.type);
     } else if (action) {
-      console.log('[CDS-CANVAS] ho draggato una action da un intent sullo stage');
+      this.logger.log('[CDS-CANVAS] ho draggato una action da un intent sullo stage');
       let intentPrevious = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
       intentPrevious.actions = intentPrevious.actions.filter((act) => act._tdActionId !== action._tdActionId);
       this.connectorService.deleteConnectorsFromActionByActionId(action._tdActionId);
@@ -694,7 +694,7 @@ export class CdsCanvasComponent implements OnInit {
     this.removeConnectorDraftAndCloseFloatMenu();
     const fromId = connectorDraft.fromId;
     const toId = intent.intent_id;
-    console.log('[CDS-CANVAS] sto per creare il connettore ', connectorDraft, fromId, toId);
+    this.logger.log('[CDS-CANVAS] sto per creare il connettore ', connectorDraft, fromId, toId);
     const resp = await this.connectorService.createConnectorFromId(fromId, toId, false, false); //Sync
     if(resp){
       let splitFromId = fromId.split('/');
@@ -702,9 +702,9 @@ export class CdsCanvasComponent implements OnInit {
       let prevIntent = this.intentService.prevListOfIntent.find((intent) => intent.intent_id === intent_id);
       let nowIntent = this.listOfIntents.find((intent) => intent.intent_id === intent_id);
       let pos = this.listOfIntents.length-1;
-      console.log('[CDS-CANVAS] sto per chiamare settingAndSaveNewIntent ', prevIntent, nowIntent);
+      this.logger.log('[CDS-CANVAS] sto per chiamare settingAndSaveNewIntent ', prevIntent, nowIntent);
       this.settingAndSaveNewIntent(pos, intent, nowIntent, prevIntent);
-      console.log("[CDS-CANVAS] sto per aggiornare l'intent ", nowIntent);
+      this.logger.log("[CDS-CANVAS] sto per aggiornare l'intent ", nowIntent);
       this.updateIntent(nowIntent, 0, false);
     }
   }
@@ -738,7 +738,7 @@ export class CdsCanvasComponent implements OnInit {
   async createNewIntentDraggingActionFromAnotherIntent(pos, action, nowIntent){
     let prevIntent = this.intentService.prevListOfIntent.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
     // let nowIntent = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
-    console.log('[CDS-CANVAS] createNewIntentDraggingActionFromAnotherIntent: ', prevIntent, nowIntent, this.listOfIntents);
+    this.logger.log('[CDS-CANVAS] createNewIntentDraggingActionFromAnotherIntent: ', prevIntent, nowIntent, this.listOfIntents);
     let intent = this.intentService.createNewIntent(this.id_faq_kb, action, pos);
     this.intentService.addNewIntentToListOfIntents(intent);
     const newIntent = await this.settingAndSaveNewIntent(pos, intent, nowIntent, prevIntent);
@@ -929,7 +929,7 @@ export class CdsCanvasComponent implements OnInit {
   onTestItOut(event: Intent | boolean) {
     // this.testItOut.emit(true);
     this.testitOutFirstClick = true;
-    console.log('[CDS DSHBRD] onTestItOut intent ', event);
+    this.logger.log('[CDS DSHBRD] onTestItOut intent ', event);
     this.IS_OPEN_PANEL_WIDGET = true
     // if(typeof event === "boolean"){
     //   this.IS_OPEN_PANEL_WIDGET = true;
@@ -990,7 +990,7 @@ export class CdsCanvasComponent implements OnInit {
   onSaveButton(button: Button) {
     const arrayId = button.__idConnector.split("/");
     const intentIdIntentToUpdate = arrayId[0] ? arrayId[0] : null;
-    console.log('onSaveButton: ', button, intentIdIntentToUpdate, this.listOfIntents);
+    this.logger.log('onSaveButton: ', button, intentIdIntentToUpdate, this.listOfIntents);
     if (intentIdIntentToUpdate) {
       this.intentSelected = this.listOfIntents.find(obj => obj.intent_id === intentIdIntentToUpdate);
       // forse conviene fare come in onSavePanelIntentDetail passando intent aggiornato (con action corretta)!!!!
@@ -1027,17 +1027,17 @@ export class CdsCanvasComponent implements OnInit {
   /** chiamata quando premo + sull'intent per aggiungere una nuova action */
   
   async onAddActionFromActionMenu(event) {
-    console.log('[CDS-CANVAS] onAddActionFromActionMenu:: ', event);
+    this.logger.log('[CDS-CANVAS] onAddActionFromActionMenu:: ', event);
     this.IS_OPEN_ADD_ACTIONS_MENU = true;
     const connectorDraft = this.connectorService.connectorDraft;
 
     if (connectorDraft && connectorDraft.toPoint && !this.hasClickedAddAction) {
-      console.log("[CDS-CANVAS] ho trascinato il connettore e sto per creare un intent", this.intentSelected);
+      this.logger.log("[CDS-CANVAS] ho trascinato il connettore e sto per creare un intent", this.intentSelected);
       this.createNewIntentFromConnectorDraft(event.type, connectorDraft);
       this.removeConnectorDraftAndCloseFloatMenu();
     } 
     else if (this.hasClickedAddAction) {
-      console.log("[CDS-CANVAS] ho premuto + quindi creo una nuova action e la aggiungo all'intent", this.intentSelected);
+      this.logger.log("[CDS-CANVAS] ho premuto + quindi creo una nuova action e la aggiungo all'intent", this.intentSelected);
       const newAction = this.intentService.createNewAction(event.type);
       this.intentSelected.actions.push(newAction);
       this.updateIntent(this.intentSelected, 0, true);

@@ -29,7 +29,7 @@ export class CdsActionAssignVariableComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        console.log('[CDS-ACTION-ASSIGN-VARIABLE] action ', this.action)
+        this.logger.log('[CDS-ACTION-ASSIGN-VARIABLE] action ', this.action)
         const operands = this.action.operation.operands
         const operators = this.action.operation.operators
         this.logger.log('[CDS-ACTION-ASSIGN-VARIABLE] operands ', operands)

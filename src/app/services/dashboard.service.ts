@@ -81,10 +81,10 @@ export class DashboardService {
   // Get bot by id
   // ----------------------------------------------------------
   async getBotById(): Promise<boolean> {
-    console.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', this.id_faq_kb);
+    this.logger.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', this.id_faq_kb);
     return new Promise((resolve, reject) => {
       this.faqKbService.getBotById(this.id_faq_kb).subscribe({ next: (chatbot: Chatbot) => {
-          console.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', chatbot);
+          this.logger.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', chatbot);
           if (chatbot) {
             this.selectedChatbot = chatbot;
             this.translateparamBotName = { bot_name: this.selectedChatbot.name }

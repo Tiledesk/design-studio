@@ -76,11 +76,10 @@ export class CdsFormComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    console.log('[FORM-COMP] ngOnInit::::: ', this.intentForm);
   }
 
   ngOnChanges() {
-    console.log('[FORM-COMP] (OnChanges) intentForm ', this.intentForm);
+    this.logger.log('[FORM-COMP] (OnChanges) intentForm ', this.intentForm);
     this.initialize();
   }
 
@@ -146,8 +145,7 @@ export class CdsFormComponent implements OnInit, OnChanges {
         this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
         this.scrollContainer.nativeElement.animate({ scrollTop: 0 }, '500');
       } catch (error) {
-        this.logger.log('scrollToBottom ERROR: ', error);
-        console.log(error);
+        this.logger.error('scrollToBottom ERROR: ', error);
       }
     }, 500);
   }
@@ -157,10 +155,10 @@ export class CdsFormComponent implements OnInit, OnChanges {
   }
 
   getFieldFromId(idForm: number) {
-    console.log('[FORM-COMP] getFieldFromId idForm ', idForm)
+    this.logger.log('[FORM-COMP] getFieldFromId idForm ', idForm)
     // this.selectedForm = new FormModelsFactory().getModels()[0]
     this.selectedForm = new FormModelsFactory().getModels().find(({ id }) => id === idForm);
-    console.log('[FORM-COMP] getFieldFromId selectedForm ', this.selectedForm)
+    this.logger.log('[FORM-COMP] getFieldFromId selectedForm ', this.selectedForm)
     // this.translateparam = { selectedFormName: this.selectedForm.name, description_key: this.selectedForm.description_key };
   }
 
@@ -237,7 +235,7 @@ export class CdsFormComponent implements OnInit, OnChanges {
   }
 
   jsonGenerator() {
-    console.log('[FORM-COMP] jsonGenerator this.intentForm:: ', this.intentForm);
+    this.logger.log('[FORM-COMP] jsonGenerator this.intentForm:: ', this.intentForm);
     // this.intentSelected.form = this.intentForm;
     this.updateIntentForm.emit(this.intentForm);
     // this.logger.log('[FORM-COMP] jsonGenerator this.intentSelected:: ', this.intentSelected);
@@ -421,7 +419,6 @@ export class CdsFormComponent implements OnInit, OnChanges {
       this.displayEditForm = true;
       this.openAddEditForm();
     }, 300);
-    console.log('eventEditField:: ', this.selectedField, i, this.fields);
     this.logger.log('[FORM-COMP] eventEditField selectedField ', this.selectedField)
     this.logger.log('[FORM-COMP] eventEditField displayAddForm ', this.displayAddForm)
     this.logger.log('[FORM-COMP] eventEditField displayEditForm ', this.displayEditForm)
@@ -494,7 +491,6 @@ export class CdsFormComponent implements OnInit, OnChanges {
   /** START EVENTS */
   /** Events of FORM EDIT ADD */
   onChangedFormFields(event:any){
-    console.log('eventttttttt', event)
     try {
       const objIndex = this.fields.findIndex(obj => obj.name === event.name);
       if (objIndex === -1) {

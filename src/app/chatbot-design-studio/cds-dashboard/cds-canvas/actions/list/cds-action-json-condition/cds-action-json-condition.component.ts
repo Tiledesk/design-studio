@@ -115,7 +115,6 @@ export class CdsActionJsonConditionComponent implements OnInit {
             }
             if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
           } else {
-            console.log(' updateConnector :: json-condition', this.connector, this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
             if(array[array.length -1] === 'true'){
               this.isConnectedTrue = true;
               this.action.trueIntent = '#'+this.connector.toId;
@@ -250,7 +249,6 @@ export class CdsActionJsonConditionComponent implements OnInit {
     }
   
     onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
-      console.log('onResetBlockSelect', event )
       switch(type){
         case 'trueIntent':
           this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.action.trueIntent})

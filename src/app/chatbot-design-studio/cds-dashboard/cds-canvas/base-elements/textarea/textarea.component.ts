@@ -93,7 +93,7 @@ export class CDSTextareaComponent implements OnInit {
 
   /** */
   onClickTextareaOpenSetAttributePopover(){
-    console.log('onClickTextareaOpenSetAttributePopover', this.readonly, this.setAttributeBtn);
+    this.logger.log('onClickTextareaOpenSetAttributePopover', this.readonly, this.setAttributeBtn);
     if(this.readonly === true  && this.setAttributeBtn == true){
       this.addVariable.toggle();
       this.openSetAttributePopover();
@@ -103,15 +103,12 @@ export class CDSTextareaComponent implements OnInit {
   onChangeTextArea(event) {
     // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
     this.calculatingleftCharsText();
-    // console.log('onChangeTextarea!! ',event);
     if(this.readonly && event){
       this.textTag = event;
       this.text = '';
       if(this.elTextarea)this.elTextarea.value = '';
-      // console.log("SI::  readonly -- text --", this.text, " -- textTag --", this.textTag);
     } else {
       this.text = event.trim();
-      // console.log("NO::  readonly -- text --", this.text, " -- textTag --", this.textTag);
     }
     if(!this.isSelected || !this.readonly){
       this.changeTextarea.emit(event.trim());
@@ -124,7 +121,6 @@ export class CDSTextareaComponent implements OnInit {
 
   onVariableSelected(variableSelected: { name: string, value: string }) {
     this.isSelected = true;
-    console.log('onVariableSelected:: ', this.elTextarea.placeholder);
     let valueTextArea = {name: '', value: ''};
     if (this.elTextarea) {
       this.insertAtCursorPos(this.elTextarea, '{{' + variableSelected.value + '}}');
@@ -144,7 +140,6 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   onClearSelectedAttribute() {
-    console.log('onClearSelectedAttribute:: ', this.elTextarea.placeholder);
     this.textTag = '';
     this.isSelected = false;
     this.elTextarea.placeholder = this.placeholder;

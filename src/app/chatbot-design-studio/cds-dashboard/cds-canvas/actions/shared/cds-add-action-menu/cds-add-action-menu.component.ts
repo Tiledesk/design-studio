@@ -21,10 +21,6 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnInit(): void {
-  
-    console.log('[CDS-ADD-ACTION-MENU] menuItemsList (oninit): ', this.menuItemsList);
-    console.log('[CDS-ADD-ACTION-MENU] contentHeight (oninit): ', this.contentHeight);
-    console.log('[CDS-ADD-ACTION-MENU] menuType (on init) ', this.menuType)
     switch (this.menuType) {
       case TYPE_OF_MENU.ACTION:
         this.menuItemsList = Object.keys(ACTIONS_LIST).map(key => {
@@ -76,7 +72,6 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
 
     if(this.menuItemsList){
       this.filterMenuItemsList = this.menuItemsList;
-      console.log('[CDS-ADD-ACTION-MENU] filterMenuItemsList ', this.filterMenuItemsList);
     }
   }
 
@@ -89,29 +84,11 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
   // }
 
   onSearchAction(searchText) {
-    console.log('[CDS-ADD-ACTION-MENU] ON SEARCH ACTION searchText: ', searchText);
-    console.log('[CDS-ADD-ACTION-MENU] ON SEARCH ACTION menuItemsList: ', this.menuItemsList);
     searchText = searchText.toLocaleLowerCase()
-    // this.menuItemsList =  this.menuItemsList.filter(
-    //   housingLocation => housingLocation?.city.toLowerCase().includes(text.toLowerCase())
-    // );
     if (!searchText) {
-      console.log('[CDS-ADD-ACTION-MENU] !searchText')
      this.filterMenuItemsList = this.menuItemsList
     }
-
     this.filterMenuItemsList = this._filter(searchText, this.menuItemsList)
-
-   
-
-
-  //  let cloneMenuItemsList = JSON.parse(JSON.stringify(this.menuItemsList))
-  //  this.menuItemsList = cloneMenuItemsList.filter((obj: any) => {
-  //     console.log('[CDS-ADD-ACTION-MENU] obj',  obj.value.name.toLowerCase().includes(searchText)) 
-  //     // console.log('[CDS-ADD-ACTION-MENU] menuItemsList',  this.menuItemsList) 
-  //      return obj.value.name.toLowerCase().includes(searchText);
-  //   });
-
   }
 
   private _filter(value: string, array: Array<any>): Array<any> {

@@ -103,13 +103,11 @@ export class CdsActionReplyRedirectComponent implements OnInit {
   }
 
   onBlur(event){
-    console.log('[ACTION REPLY TEXT] onBlur', event);
     this.changeActionReply.emit();
   }
 
   /** onButtonToogleChange */
   onButtonToogleChange(event){
-    console.log('onButtonToogleChange::: event', event)
     this.metadata.target = event.value;
     this.changeActionReply.emit();
   }

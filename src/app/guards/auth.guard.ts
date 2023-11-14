@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
     const _url = route['_routerState'].url
 
     const queryParams = route.queryParams['jwt']
-    console.log('[AUTH-GUARD] -->', queryParams, route, state)
+    // console.log('[AUTH-GUARD] -->', queryParams, route, state)
     // if(!queryParams){
     //   return false
     // }
@@ -35,7 +35,7 @@ export class AuthGuard implements CanActivate {
     }    
 
     var isAuthenticated = await this.tiledeskAuthService.isLoggedIn(); 
-    console.log('[AUTH-GUARD] isAuthenticated-->', isAuthenticated)
+    // console.log('[AUTH-GUARD] isAuthenticated-->', isAuthenticated)
     if (!isAuthenticated) { 
       //goToSignIn Dashboard
       return false

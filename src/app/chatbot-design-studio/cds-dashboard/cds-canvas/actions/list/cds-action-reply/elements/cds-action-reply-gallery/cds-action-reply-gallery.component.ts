@@ -350,7 +350,6 @@ export class CdsActionReplyGalleryComponent implements OnInit {
 
   /** onBlur */
   onBlur(event){
-    console.log('[ACTION REPLY GALLERY] onBlur', event);
     this.changeActionReply.emit();
   }
   // EVENT FUNCTIONS //

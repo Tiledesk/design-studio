@@ -19,6 +19,24 @@
         <div *ngFor="let variable of filteredIntentVariableList" (click)="onVariableSelected(variable)" class="category-row">
             <span class="material-icons">{{variable?.icon}}</span>
             <label class="category-row-name ellips">{{variable?.name}}</label>
+            <!-- <div *ngIf="variable?.description"
+                [satPopoverAnchor]="descriptionTooltip"
+                (mouseover)="$event.stopPropagation();descriptionTooltip.toggle()">
+                <span class="material-icons-outlined">info</span>
+            </div>
+
+            <sat-popover #descriptionTooltip id="descriptionTooltip" 
+                hasBackdrop 
+                verticalAlign="center" 
+                horizontalAlign="after" 
+                (backdropClicked)="descriptionTooltip.close()" 
+                panelClass="description-tooltip">
+                <div class="tooltip-wrp">
+                    <div class="caret_tooltip"></div>
+                    <span [innerHTML]="variable?.description"></span>
+                </div>
+            </sat-popover> -->
+
         </div>
     </div>
     <div id="no-data" *ngIf="filteredVariableList.length === 0 && filteredIntentVariableList.length == 0">
@@ -33,3 +51,5 @@
     <span class="material-icons">add</span>
     <div>Add custom attributes</div>
 </div>
+
+

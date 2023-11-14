@@ -29,7 +29,7 @@ export class RoleGuard implements CanActivate {
 
     /** CHECK USER IS LOGGED IN */
     const queryParams = route.queryParams['jwt']
-    console.log('[ROLE-GUARD] -->', queryParams)
+    // console.log('[ROLE-GUARD] -->', queryParams)
 
     const storedTiledeskoken = localStorage.getItem('tiledesk_token')
     if(!queryParams && !storedTiledeskoken){

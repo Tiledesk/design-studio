@@ -93,7 +93,6 @@ export class CdsActionReplyComponent implements OnInit {
    * IMPORTANT! serve per aggiornare il dettaglio della action nel pannello
    */
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('ActionReplyComponent ngOnChanges:: ', changes);
     if(this.action && this.intentSelected) this.initialize();
   }
 
@@ -105,10 +104,6 @@ export class CdsActionReplyComponent implements OnInit {
   // CUSTOM FUNCTIONS //
   /** */
   private initialize() {
-    console.log('initialize:::: ', this.action);
-    // this.action._tdActionId = this.action._tdActionId?this.action._tdActionId:generateShortUID();
-    // this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
-
     this.openCardButton = false;
     this.arrayResponses = [];
 

@@ -75,7 +75,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     this.intentNameResult = true;
     this.intentNameAlreadyExist = false;
     if(!this.intentName || this.intentName.trim().length == 0 || this.intentName === preDisplayName) {
-      console.log("[PANEL-INTENT-HEADER] error 1");
+      this.logger.log("[PANEL-INTENT-HEADER] error 1");
       this.intentNameResult = false;
     }
     for (let i = 0; i < this.listOfIntents.length; i++) {
@@ -99,7 +99,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   /******************* EVENT FUNCTIONS *******************/ 
 
   onSelectIntent(event){
-    console.log("[PANEL-INTENT-HEADER] onSelectIntent",event, this.intent);
+    this.logger.log("[PANEL-INTENT-HEADER] onSelectIntent",event, this.intent);
     // this.intentService.setIntentSelected(this.intent.intent_id);
   }
 

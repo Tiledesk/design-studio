@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TiledeskStage } from 'src/assets/js/tiledesk-stage.js';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +10,7 @@ export class StageService {
 
   tiledeskStage: any;
 
+  private logger: LoggerService = LoggerInstance.getInstance()
   constructor() { }
 
 
@@ -58,7 +61,7 @@ export class StageService {
 
   setDragElement(elementId:string) {
     const element = document.getElementById(elementId);
-    console.log("[STAGE SERVICE] imposto il drag sull'elemento ", elementId, element);
+    this.logger.log("[STAGE SERVICE] imposto il drag sull'elemento ", elementId, element);
     if(element)this.tiledeskStage.setDragElement(element);
   }
   

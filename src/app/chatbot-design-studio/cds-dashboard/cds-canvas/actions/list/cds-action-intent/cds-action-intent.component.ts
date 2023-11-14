@@ -41,7 +41,6 @@ export class CdsActionIntentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log("[CDS-ACTION-INTENT] elementSelected: ", this.action, this.intentSelected)
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       // console.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
       this.connector = connector;
@@ -133,7 +132,6 @@ export class CdsActionIntentComponent implements OnInit {
   }
 
   onResetSelect(event:{name: string, value: string}) {
-    console.log('CDS-ACTION-INTENT onResetSelect-->', event);
     let connector = { type: 'delete', fromId: this.idConnector, toId: this.action.intentName };
     this.action.intentName = null;
     this.onConnectorChange.emit(connector);

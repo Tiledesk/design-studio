@@ -191,14 +191,12 @@ export class FormEditAddComponent implements OnInit, OnChanges {
         this.field.regex = TYPE_REGEX.textRGEX;
     }
     this.fieldRegex = this.field.regex;
-    console.log('setRegex:: ', this.field.type, this.fieldRegex);
   }
 
   // ON EVENT //
   /** */
   onChangeParameterName(parameterName) {
     parameterName.toString();
-    console.log('onChangeParameterName', parameterName);
     this.fieldName = parameterName.replace(/[^A-Z0-9_]+/ig, "");
   }
 
@@ -233,8 +231,7 @@ export class FormEditAddComponent implements OnInit, OnChanges {
       }
       // this.fieldRegex = this.field.regex.toString();
       this.logger.log('[TILEBOT-EDIT-ADD] checkFields field ',  this.field);
-      console.log("save*********** ", this.field);
-      this.saveAddEditForm.emit(this.field);
+       this.saveAddEditForm.emit(this.field);
     }
   }
 

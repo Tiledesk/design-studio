@@ -176,10 +176,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-    console.log('CdsPanelIntentComponent ngAfterViewInit-->', this.intent);
     this.patchActionIntent();
     if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
-      console.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
+      this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
       this.startAction = this.intent.actions[0];
       if (!this.startAction._tdActionId) {
         this.startAction = patchActionId(this.intent.actions[0]);
@@ -321,7 +320,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.questionCount = 0;
     try {
       if (this.intent) {
-        console.log("setIntentSelected:: ", this.intent.actions);
+        this.logger.log("setIntentSelected:: ", this.intent.actions);
         this.patchAllActionsId();
         this.patchAttributesPosition();
         // this.listOfActions = this.intent.actions.filter(function(obj) {
