@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, timeout } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -174,14 +174,16 @@ export class CdsCanvasComponent implements OnInit {
     /** SUBSCRIBE TO THE STATE ACTION DETAIL PANEL */
     this.subscriptionOpenDetailPanel = this.controllerService.isOpenActionDetailPanel$.subscribe((element: { type: TYPE_INTENT_ELEMENT, element: Action | string | Form }) => {
       this.elementIntentSelected = element;
-      this.logger.log('[CDS-CANVAS]  isOpenActionDetailPanel ', element);
       if (element.type) {
         this.closeAllPanels();
         this.removeConnectorDraftAndCloseFloatMenu();
-        this.IS_OPEN_PANEL_ACTION_DETAIL = true;
+        setTimeout(() => {
+          this.IS_OPEN_PANEL_ACTION_DETAIL = true;
+        }, 0);
       } else {
         this.IS_OPEN_PANEL_ACTION_DETAIL = false;
       }
+      this.logger.log('[CDS-CANVAS]  isOpenActionDetailPanel ', element, this.IS_OPEN_PANEL_ACTION_DETAIL);
     });
 
     /** SUBSCRIBE TO THE STATE ACTION REPLY BUTTON PANEL */
@@ -594,6 +596,7 @@ export class CdsCanvasComponent implements OnInit {
   */
   private async updateIntent(intent, time=0, undo=false) {
     console.log('[CDS-CANVAS] updateIntent: ');
+    this.connectorService.updateConnector(intent.intent_id);
     const response = await this.intentService.onUpdateIntentWithTimeout(intent, time, undo);
     if (response) {
       this.logger.log('[CDS-CANVAS] OK: intent aggiornato con successo sul server', this.intentSelected);

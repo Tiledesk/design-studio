@@ -577,6 +577,7 @@ export class IntentService {
     // setTimeout(async () => {
       let prevIntent = this.prevListOfIntent.find((obj) => obj.intent_id === intent.intent_id);
       if(intent.intent_display_name !== prevIntent.intent_display_name){
+        // this.connectorService.updateConnector(intent.intent_id);
         const response = await this.onUpdateIntentWithTimeout(intent, 0, true);
         if(response){
           // this.behaviorIntents.next(this.listOfIntents);

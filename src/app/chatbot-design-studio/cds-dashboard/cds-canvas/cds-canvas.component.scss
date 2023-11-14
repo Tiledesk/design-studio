@@ -14,12 +14,21 @@ $toogle-sidebar-width: 22px;
 //   height: auto;
 // }
 
+
+
+
+
+
+
 .cds-generic-panel{
   position: absolute;
   right: 0;
   top: 0;
   width: auto;
   height: 100%;
+  transform: translateX(100%);
+  animation: slide-in 0.3s ease-in-out forwards;
+  animation-delay: 0.2s;
 
   &#action-detail{
     z-index: 10
@@ -37,6 +46,12 @@ $toogle-sidebar-width: 22px;
     &.isHidden{
       visibility: hidden;
     }
+  }
+}
+
+@keyframes slide-in {
+  to {
+    transform: translateX(0);
   }
 }
 
