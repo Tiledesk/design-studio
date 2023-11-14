@@ -14,8 +14,8 @@ const routes: Routes = [
   // { path: 'project/', component: CdsDashboardComponent, canActivate:[AuthGuard] },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
 
-  { path: 'project/:projectid/cds/:faqkbid', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
-  { path: 'project/:projectid/cds/:faqkbid/intent/:intent_id', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
+  { path: 'project/:projectid/chatbot/:faqkbid', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
+  { path: 'project/:projectid/chatbot/:faqkbid/intent/:intent_id', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
 
   { path: 'project/:projectid/unauthorized', component: UnauthorizedComponent },
 
