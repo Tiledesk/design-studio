@@ -6,6 +6,6 @@ if [ "$version" != "" ]; then
     git tag -a "$version" -m "`git log -1 --format=%s`"
     echo "Created a new tag, $version"
     git push remote --tags
-    npm publish
+    npm publish --access=public
 fi
 

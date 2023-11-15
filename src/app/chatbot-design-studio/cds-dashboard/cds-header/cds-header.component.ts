@@ -140,7 +140,7 @@ export class CdsHeaderComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       this.logger.log(`Dialog result: ${result}`);
-      // this.publish()
+      this.segmentChatbotPublished()
     });
   }
 
