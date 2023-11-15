@@ -475,6 +475,9 @@ export class IntentService {
       this.addIntentToUndoRedo('PUT', intentPrev, intent, [intentPrev], [intentNow]);
     }
     const response = this.updateIntent(intent);
+    if(response){
+      this.refreshIntent(intent)
+    }
   }
 
   /**
