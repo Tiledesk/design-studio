@@ -189,6 +189,15 @@
                         (updateAndSaveAction)="onSaveIntent($event)"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-capture-user-reply>
+
+                    <cds-action-qapla *ngSwitchCase="typeAction.QAPLA" 
+                        class="panel-response" 
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-qapla>
                     
                     <!-- <cds-action-assign-function *ngSwitchCase="typeAction.ASSIGN_FUNCTION"
                         [action]="elementSelected">

@@ -1,0 +1,15 @@
+
+.block-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 60px;
+
+
+    .lock-icon {
+        font-size: 40px;
+        margin-bottom: 16px;
+        color: #506493b0;
+    }
+}
