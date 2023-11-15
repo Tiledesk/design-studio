@@ -8,6 +8,10 @@
     --selected-row-color:  #{$blu-light-03};
 }
 
+.card-content{
+    max-height: 40vh;
+}
+
 .form-fields-table {
     display: block;
     .col-30 {

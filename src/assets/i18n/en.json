@@ -246,6 +246,10 @@
         "AddCustomRegex": "Add a custom regex",
         "ErrorMessage": "Error message",
         "DeleteField": "Delete field",
+        "CancelReply": "Form deleted",
+        "ConfirmDeleteField": "Are you sure you want to delete the field?",
+        "DeleteForm": "Delete form",
+        "ConfirmDeleteForm": "Are you sure you want to delete the form?",
         "AreYouSureDeleteField":"Are you sure you want to delete the field?",
         "MarkbotLabel": "You can use <a href='https://gethelp.tiledesk.com/articles/sending-images-videos-quick-replies-and-more/' target='_blank'>Markbot</a> to format your labels.",
         "InfoMessages": {
