@@ -4,15 +4,15 @@
   "newProjectRoot": "projects",
   "projects": {
     "cds": {
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "cds",
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
         }
       },
-      "root": "",
-      "sourceRoot": "src",
-      "prefix": "cds",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
