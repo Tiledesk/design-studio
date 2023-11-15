@@ -88,7 +88,6 @@ export class CdsModalActivateBotComponent implements OnInit {
 
         this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT]  --->  DEFAULT DEPT HAS BOT ', this.departments[0].hasBot);
         if (!this.departments[0].hasBot) {
-          this.DEPTS_HAS_NOT_A_BOT = true
           this.hookBotToDept()
           this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT] --->  DEFAULT DEPT HAS BOT ');
           // this.DISPLAY_BTN_ACTIVATE_BOT_FOR_NEW_CONV = false;

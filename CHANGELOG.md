@@ -5,6 +5,18 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.1 in PROD
+
+### 1.0.1-rc.1
+- added: cds-action-qapla
+- changed: select and button in department choise in chatbot detail section
+- bug-fixed: modal-window not show translated labels
+- bug-fixed: question/form button in cds-intent canvas element not updated in realtime
+- bug-fixed: form-add-field height not fixed and change cds-dashboard main height
+- bug-fixed: connectors not adapted on cds-intent height changes
+- bug-fixed: afterviewinit stage is traslated and hides 'start' intent
+- bug-fixed: if only default department exist and not has a bot, do not show choise department section 
+- removed: possibility to add a new action on the selected intent from bottom section of the same intent
 
 ### 1.0.0 in PROD
 
