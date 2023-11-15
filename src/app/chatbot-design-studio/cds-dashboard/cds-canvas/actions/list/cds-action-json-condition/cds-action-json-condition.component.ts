@@ -262,7 +262,7 @@ export class CdsActionJsonConditionComponent implements OnInit {
     }
   
     onChangeExpression(event){
-      this.connectorService.updateConnector(this.intentSelected.intent_id);
+      // this.connectorService.updateConnector(this.intentSelected.intent_id);
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   

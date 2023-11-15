@@ -113,7 +113,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     BotsBaseComponent,
     UnauthorizedComponent,
     HomeComponent,
-    NotFoundComponent,
+    NotFoundComponent
   ],
   imports: [
     // TooltipModule.forRoot(CutomTooltipOptions as TooltipOptions),

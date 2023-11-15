@@ -106,7 +106,6 @@ export class CdsActionReplyComponent implements OnInit {
   private initialize() {
     this.openCardButton = false;
     this.arrayResponses = [];
-
     this.intentName = '';
     this.intentNameResult = true;
     this.textGrabbing = false;

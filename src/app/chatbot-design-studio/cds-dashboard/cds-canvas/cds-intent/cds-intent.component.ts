@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
+import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
 import { Subject, Subscription } from 'rxjs';
@@ -54,6 +54,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() testItOut = new EventEmitter<Intent>();
   @Output() deleteIntent = new EventEmitter();
 
+  @ViewChild('resizeElement', { static: false }) resizeElement: ElementRef;
   @ViewChild('openActionMenuBtn', { static: false }) openActionMenuBtnRef: ElementRef;
 
   subscriptions: Array<{ key: string, value: Subscription }> = [];
@@ -95,7 +96,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     private connectorService: ConnectorService,
     private stageService: StageService,
     private controllerService: ControllerService,
-    private elemenRef: ElementRef
+    private elemenRef: ElementRef,
+    private renderer: Renderer2
   ) {
     this.initSubscriptions()
   }
@@ -233,6 +235,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+
     // Fixed bug where an empty intent's action placeholder remains visible if an action is dragged from the left action menu
     this.logger.log('[CDS-INTENT] hideActionPlaceholderOfActionPanel (dragged from sx panel) ', this.hideActionPlaceholderOfActionPanel)
     if (this.hideActionPlaceholderOfActionPanel === false) {
@@ -249,6 +252,22 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
   }
+
+
+  ngAfterViewInit() {
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const nuovaAltezza = entry.contentRect.height;
+        // console.log('Nuova altezza del div:', nuovaAltezza);
+        this.connectorService.updateConnector(this.intent.intent_id);
+      }
+    });
+    const elementoDom = this.resizeElement.nativeElement;
+    resizeObserver.observe(elementoDom);
+    // Per smettere di osservare, puoi chiamare resizeObserver.disconnect();
+    // nel lifecycle hook ngOnDestroy o in un'altra posizione appropriata.
+  }
+
 
   ngOnDestroy() {
     this.unsubscribe();
@@ -628,7 +647,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.logger.log("[CDS-INTENT] onDropAction sto spostando una action all'interno dello stesso intent: ", event, this.intent.actions); 
       this.controllerService.closeAllPanels();
       this.intentService.setIntentSelected(this.intent.intent_id);
-      this.connectorService.updateConnector(this.intent.intent_id);
+      // this.connectorService.updateConnector(this.intent.intent_id);
       const response = await this.intentService.onUpdateIntentWithTimeout(this.intent);
       if (response) {
         // this.connectorService.updateConnector(this.intent.intent_id);
@@ -681,7 +700,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
       setTimeout(()=> {
         // ATTENZIONE!!! trovare il modo di refreshare i connettori SOLO quando la action viene eliminata fisicamente dallo stage!!!
-        this.connectorService.updateConnector(this.intent.intent_id);
+        // this.connectorService.updateConnector(this.intent.intent_id);
       }, 0);
     }
     this.setActionIntent();
@@ -775,6 +794,4 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** ******************************
    * intent controls options: END 
    * ****************************** */
-
-
 }
