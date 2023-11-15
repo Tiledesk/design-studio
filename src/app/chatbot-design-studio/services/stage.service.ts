@@ -70,8 +70,17 @@ export class StageService {
     return this.tiledeskStage.physicPointCorrector(point);
   }
 
-  zoom(event: 'in' | 'out'){
-    this.tiledeskStage.zoom(event)
+  zoom(event: 'in' | 'out', elementId){
+    const element = document.getElementById(elementId);
+    let intervalId = setInterval(async () => {
+      const result = await this.tiledeskStage.zoom(event, element);
+      if (result === true) {
+        clearInterval(intervalId);
+      }
+    }, 100);
+    setTimeout(() => {
+      clearInterval(intervalId);
+    }, 1000);
   }
 
   scaleAndCenter(){

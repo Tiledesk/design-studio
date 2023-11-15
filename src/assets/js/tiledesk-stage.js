@@ -117,13 +117,15 @@ export class TiledeskStage {
         
     }
 
-    zoom(event){
+    zoom(event, stageElement){
         if (event === 'in'){
             this.scale = Math.min(Math.max(0.125, this.scale += this.scaleStep), 4);
         } else if (event === 'out'){
             this.scale = Math.min(Math.max(0.125, this.scale -= this.scaleStep), 4);
         }
-        this.transform();
+        return this.centerStageOnPosition(stageElement, this.scale)
+        // this.drawer.style.transition = "transform 0.3s ease-in-out"
+        // this.transform();
     }
     
     transform() {
@@ -229,13 +231,14 @@ export class TiledeskStage {
     }
 
 
-    centerStageOnPosition(stageElement){
+    centerStageOnPosition(stageElement, scale=1){
         if(stageElement){
+            this.scale = scale;
             // var stageElement = document.getElementById(intent.intent_id);
-            var w = stageElement.offsetWidth;
-            var h = stageElement.offsetHeight;
-            var x = stageElement.offsetLeft;
-            var y = stageElement.offsetTop;
+            var w = stageElement.offsetWidth*scale;
+            var h = stageElement.offsetHeight*scale;
+            var x = stageElement.offsetLeft*scale;
+            var y = stageElement.offsetTop*scale;
 
             this.drawer.style.transition = "transform 0.3s ease-in-out";
             var originRec = this.container.getBoundingClientRect();
@@ -247,18 +250,14 @@ export class TiledeskStage {
             // console.log('newX:', newY);
 
             let tcmd = `translate(${newX}px, ${newY}px)`;
-            let scmd = `scale(${1})`;
+            let scmd = `scale(${this.scale})`;
             // let scmd = `scale(${this.scale})`;
             const cmd = tcmd + " " + scmd;
             this.drawer.style.transform = cmd;
-
             // console.log("tcmd:", tcmd);
             // console.log("transform:", tcmd);
-
-            this.scale = 1;
             this.tx = newX;
             this.ty = newY;
-
             setTimeout(() => {
                 this.drawer.style.removeProperty('transition');
                 // remove class animation

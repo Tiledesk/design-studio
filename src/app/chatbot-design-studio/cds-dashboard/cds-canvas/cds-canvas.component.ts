@@ -130,15 +130,15 @@ export class CdsCanvasComponent implements OnInit {
   }
 
   private async setStartIntent(){
-    let intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
-    this.logger.log('setStartIntent:: ', intentSelected);
-    if(intentSelected){
+    this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
+    this.logger.log('[CDS-CANVAS]  intentSelected: ', this.intentSelected);
+    if(this.intentSelected){
       // this.setIntentSelected();
       // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
       //** set 'start' intent as default selected one */
       this.intentService.setDefaultIntentSelected();
       //** center stage on 'start' intent */
-      let startElement = await isElementOnTheStage(intentSelected.intent_id); // sync
+      let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
       if(startElement){
         this.stageService.centerStageOnHorizontalPosition(startElement);
       }
@@ -960,11 +960,11 @@ export class CdsCanvasComponent implements OnInit {
   onOptionClicked(option: OPTIONS){
     switch(option){
       case OPTIONS.ZOOM_IN: {
-          this.stageService.zoom('in')
+          this.stageService.zoom('in', this.intentSelected.intent_id);
         break;
       }
       case OPTIONS.ZOOM_OUT: {
-        this.stageService.zoom('out')
+        this.stageService.zoom('out', this.intentSelected.intent_id);
         break;
       }
       case OPTIONS.CENTER: {
