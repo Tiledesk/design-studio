@@ -167,7 +167,7 @@
       </div>
 
       <!-- USE CASE: THE BOT IS ASSOCIATED -->
-      <div *ngIf="DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY.length > 0" class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+      <div *ngIf="DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY.length > 0" class="col-sm-10 col-md-10">
         <span>{{ 'DepartmentsThisBotIsAssociatedWith' | translate }}</span>
         <div *ngFor="let dept of DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY" style="margin-bottom: 8px;">
           <span class="dept-avatar-wrapper" (click)="goToEditAddPage_EDIT_DEPT(dept?._id, dept?.default)">
@@ -183,18 +183,17 @@
       </div>
 
       <!-- USE CASE: THIS BOT IS NOT ASSOCIATED BUT ALL DEPARTMENTS ALREADY HAVE A BOT -->
-      <div *ngIf="DEPTS_HAVE_BOT_BUT_NOT_THIS === true && depts_without_bot_array?.length === 0"
-        class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+      <div *ngIf="DEPTS_HAVE_BOT_BUT_NOT_THIS === true && depts_without_bot_array?.length === 0" class="col-sm-10 col-md-10">
         <span>{{ 'NoDeptsAreAssociatedWithThisBot' | translate}}</span>
       </div>
 
       <!-- USE CASE: THIS BOT IS NOT ASSOCIATED AND SOME DEPARTMENTS DON'T HAVE A BOT -->
-      <div *ngIf="depts_without_bot_array?.length > 0 && DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY?.length === 0"
-        class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+      <div *ngIf="depts_without_bot_array?.length > 0 && DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY?.length === 0" class="col-sm-10 col-md-10">
         <span>{{ 'NoDeptsAreAssociatedWithThisBot' | translate}}</span>
 
-        <div class="input-group" style="max-width: 540px; margin-top: 6px;" *ngIf="depts_without_bot_array?.length > 0">
-          <ng-select [items]="depts_without_bot_array" 
+        <div class="input-group" style="margin-top: 6px;" *ngIf="depts_without_bot_array?.length > 0">
+          <ng-select id="depSelect"
+            [items]="depts_without_bot_array" 
             bindValue="id" 
             bindLabel="name"
             placeholder="{{'SelectDepartment'|translate}}" 
@@ -202,12 +201,10 @@
             (change)="onSelectDept()">
           </ng-select>
 
-          <span class="input-group-btn">
-            <button id="activate-bot" class="btn btn-tdblu-no-boxshadow" (click)="hookBotToDept()"
+            <button id="activate-bot" class="btn btn-primary cds-blue-button" (click)="hookBotToDept()"
               [disabled]="!selected_dept_id">
               <span>{{ 'CDSModalActivateBot.ActivateBot' | translate}}</span>
             </button>
-          </span>
         </div>
       </div>
 

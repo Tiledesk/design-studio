@@ -72,6 +72,36 @@ input[type="text"]:disabled::placeholder {
     font-weight: 300 !important;
 }
 
+ng-select {
+    font-size: 14px;
+    width: 40%;
+    margin-bottom: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: #fff;
+    // border-top: 1px solid #c0c0c0;
+    padding-right: 8px;
+    padding-top: 5px;
+    padding-left: 8px;
+
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    // border: solid 1px #ddd;
+    margin: 0px;
+    padding: 0px;
+
+    &.ng-select-opened {
+        border-radius: 5px 5px 0px 0px;
+    }    
+}
+
+::ng-deep .ng-select .ng-select-container {
+    border-radius: 8px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border: 1px solid $blu-light-02;
+}
+
 .cds-bot_avatar_label {
     height: 36px;
     padding-top: 20px;
@@ -123,6 +153,11 @@ input[type="file"] {
     border-bottom-left-radius: 0;
 }
 
+#activate-bot {
+    border: 0;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
 
 #csd-update-bot-btn {
     border: 0px;
@@ -204,18 +239,7 @@ input[type="file"] {
     margin-right: 0px;
     margin-left: 8px;
 }
-#activate-bot {
-    margin-top: 0px;
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-    margin-bottom: 0px;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
-    background: #8ab4f8 !important;
-    box-shadow: unset !important;
-    color: #202124;
-    font-weight: 500 !important;
-}
+
 
 
 .custom-link {
