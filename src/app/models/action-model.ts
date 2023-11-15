@@ -461,3 +461,15 @@ export class WhatsappBroadcast {
     }
     receiver_list: Array<any>;
 }
+
+export class ActionQapla extends Action {
+    trackingNumber: string;
+    apiKey: string;
+    assignStatusTo: string;
+    assignResultTo: string;
+    assignErrorTo: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.QAPLA
+    }
+}

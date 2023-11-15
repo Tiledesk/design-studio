@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -11,6 +11,9 @@ import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { environment } from 'src/environments/environment';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -57,7 +60,7 @@ export class IntentService {
   public arrayREDO: Array<any> = [];
   public lastActionUndoRedo: boolean;
 
-
+  private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     private faqService: FaqService,
@@ -66,6 +69,7 @@ export class IntentService {
     private controllerService: ControllerService,
     private stageService: StageService,
     private dashboardService: DashboardService,
+    private tiledeskAuthService: TiledeskAuthService
   ) { }
 
 
@@ -887,11 +891,55 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.CAPTURE_USER_REPLY) {
       action = new ActionCaptureUserReply();
     }
+    if(typeAction === TYPE_ACTION.QAPLA) {
+      action = new ActionQapla();
+      action.assignStatusTo = 'qapla_status';
+      action.assignResultTo = 'qapla_result';
+      action.assignErrorTo = 'qapla_error';
+      this.segmentActionAdded(TYPE_ACTION.QAPLA);
+    }
     return action;
   }
   // END ATTRIBUTE FUNCTIONS //
   
 
+  private segmentActionAdded(action_type: string){
+    let chatbot = this.dashboardService.selectedChatbot;
+    let id_project = this.dashboardService.projectID;
+    const that = this
+    let user = this.tiledeskAuthService.getCurrentUser();
+
+    if(window['analytics']){
+      try {
+        window['analytics'].page("CDS, Added Action", {
+          version: environment.VERSION
+        });
+      } catch (err) {
+        this.logger.error('Event: CDS Added Action ', action_type, ' [page] error', err);
+      }
+  
+      try {
+        window['analytics'].identify(user.uid, {
+          name: user.firstname + ' ' + user.lastname,
+          email: user.email,
+        });
+      } catch (err) {
+        this.logger.error('Event: CDS Added Action ', action_type, ' [identify] error', err);
+      }
+      // Segments
+      try {
+        window['analytics'].track('Action Added', {
+          "username": user.firstname + ' ' + user.lastname,
+          "userId": user.uid,
+          "chatbot_id": chatbot._id,
+          "project_id": id_project,
+          "action_type": action_type
+        });
+      } catch (err) {
+        this.logger.error('Event: CDS Added Action ', action_type, ' [track] error', err);
+      }
+    }
+  }
 
 
   public patchButtons(buttons, idAction){
