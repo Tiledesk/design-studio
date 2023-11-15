@@ -201,22 +201,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.addEventListener();
   }
 
-
-  ngAfterViewInit(){
-    new ResizeObserver(function(entries) {
-      // since we are observing only a single element, so we access the first element in entries array
-      let rect = entries[0].contentRect;
-    
-      // current width & height
-      let width = rect.width;
-      let height = rect.height;
-    
-      console.log('Current Width : ' + width);
-      console.log('Current Height : ' + height);
-    }).observe(document.querySelector(`#intent-content-${this.intent.intent_id}`));
-    
-  }
-
   private setActionIntent(){
     try {
       let connectorID = '';
@@ -275,8 +259,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.complete();
 
   }
-
-  ngAfter
 
   // ---------------------------------------------------------
   // Event listener
@@ -339,10 +321,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       },
       true
     );
-
-    document.addEventListener('load', (event)=>{
-      console.log('event loadeddddddd')
-    })
   }
 
 
