@@ -106,9 +106,9 @@ export class CdsFormComponent implements OnInit, OnChanges {
     this.logger.log('[FORM-COMP] (OnInit) selectedForm ', this.selectedForm)
     this.logger.log('[FORM-COMP] (OnInit) modelsOfForm ', this.modelsOfForm)
     this.logger.log('[FORM-COMP] (OnInit) selectedFormId ', this.selectedFormId)
-    this.getCurrentTranslation();
     this.translateMap = {};
     this.translations = {};
+    this.getCurrentTranslation();
     this.intentFormSize = Object.keys(this.intentForm).length;
     if (this.intentFormSize > 0) {
       this.displayNewFormButton = false;
@@ -196,11 +196,11 @@ export class CdsFormComponent implements OnInit, OnChanges {
   getCurrentTranslation() {
     let keys = [
       'Cancel',
-      'CancelReply',
-      'DeleteField',
-      'ConfirmDeleteField',
-      'DeleteForm',
-      'ConfirmDeleteForm'
+      'CDSForm.CancelReply',
+      'CDSForm.DeleteField',
+      'CDSForm.ConfirmDeleteField',
+      'CDSForm.DeleteForm',
+      'CDSForm.ConfirmDeleteForm'
     ]
     this.translate.get(keys).subscribe(data => {
       this.translations = data
@@ -210,7 +210,7 @@ export class CdsFormComponent implements OnInit, OnChanges {
       if (this.intentFormSize === 0) {
         this.logger.log('[FORM-COMP] getCurrentTranslation intentForm 2', this.intentForm)
         this.cancelCommands.push(cancel);
-        this.cancelReply = this.translations['CancelReply'] ? this.translations['CancelReply'] : '';
+        this.cancelReply = this.translations['CDSForm.CancelReply'] ? this.translations['CDSForm.CancelReply'] : '';
       }
       this.logger.log('[FORM-COMP] getCurrentTranslation this.cancelReply::', this.cancelReply);
       this.logger.log('[FORM-COMP] getCurrentTranslation cancel::', cancel);
@@ -289,8 +289,8 @@ export class CdsFormComponent implements OnInit, OnChanges {
     // this.logger.log('this.translations:::: ', this.translations);
     let i: number = +index;
     this.displayMODAL = true;
-    this.translateMap.deleteField = this.translations['DeleteField'] ? this.translations['DeleteField'] : '';
-    this.translateMap.confirmDeleteField = this.translations['ConfirmDeleteField'] ? this.translations['ConfirmDeleteField'] : '';
+    this.translateMap.deleteField = this.translations['CDSForm.DeleteField'] ? this.translations['CDSForm.DeleteField'] : '';
+    this.translateMap.confirmDeleteField = this.translations['CDSForm.ConfirmDeleteField'] ? this.translations['CDSForm.ConfirmDeleteField'] : '';
     this.translateMap.nameField = this.fields[i].name;
     this.selectedObjectId = index;
   }
@@ -373,8 +373,8 @@ export class CdsFormComponent implements OnInit, OnChanges {
     this.displayEditForm = false
     this.displayCancelButton = false;
     this.displaySettingsButton = false;
-    //this.intentForm = new Form();
-    this.intentForm = null;
+    this.intentForm = new Form();
+    // this.intentForm = null;
     this.fields = [];
     this.intentFormSize = 0;
     this.logger.log('[FORM-COM] deleteForm - displayBoxNewForm ', this.displayBoxNewForm, 'intentForm', this.intentForm);
@@ -471,8 +471,8 @@ export class CdsFormComponent implements OnInit, OnChanges {
 
   openDeleteForm() {
     this.logger.log('[FORM-COMP] openDeleteForm this.translations:::: ', this.translations);
-    this.translateMap.deleteField = this.translations['DeleteForm'] ? this.translations['DeleteForm'] : '';
-    this.translateMap.confirmDeleteField = this.translations['ConfirmDeleteForm'] ? this.translations['ConfirmDeleteForm'] : '';
+    this.translateMap.deleteField = this.translations['CDSForm.DeleteForm'] ? this.translations['CDSForm.DeleteForm'] : '';
+    this.translateMap.confirmDeleteField = this.translations['CDSForm.ConfirmDeleteForm'] ? this.translations['CDSForm.ConfirmDeleteForm'] : '';
     this.displayMODAL = true;
     this.selectedObjectId = this.idForm;
     this.logger.log('[FORM-COMP] openDeleteForm displayMODAL', this.displayMODAL)
