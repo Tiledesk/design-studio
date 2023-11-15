@@ -242,6 +242,12 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-capture-user-reply>
+                    
+                    <cds-action-qapla *ngSwitchCase="TYPE_ACTION.QAPLA" 
+                        class="panel-response" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-qapla>
     
                 </div>
             </span>

@@ -113,7 +113,8 @@ export enum TYPE_ACTION {
     OPEN_HOURS = 'ifopenhours',
     HIDE_MESSAGE = 'hmessage',
     JSON_CONDITION = 'jsoncondition',
-    CAPTURE_USER_REPLY = 'capture_user_reply'
+    CAPTURE_USER_REPLY = 'capture_user_reply',
+    QAPLA = "qapla"
 }
 
 export enum TYPE_ACTION_CATEGORY {
@@ -263,6 +264,7 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     CHANGE_DEPARTMENT: { name: 'Change dept', category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CHANGE_DEPARTMENT, src: "assets/images/actions/change_department.svg", status: "active" },
     // ASSIGN_FUNCTION: { name: 'Set function', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY: { name: 'Capture User Reply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: 'This action allow to capture the user reply' },
+    QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", description: 'This action allow to connect with Qapla' },
 }
 
 export const EVENTS_LIST = {
