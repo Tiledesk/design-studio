@@ -243,7 +243,7 @@ export class CDSImageUploadComponent implements OnInit {
       // this.logger.log(`[WS-REQUESTS-MSGS] - upload native metadata `, this.metadata);
       // this.fileUpload.nativeElement.value = '';
     }).catch(error => {
-      this.logger.log("error", error);
+      this.logger.log("[IMAGE-UPLOAD] error", error);
       // this.logger.error(`[WS-REQUESTS-MSGS] - upload native Failed to upload file and get link `, error);
     });
   }

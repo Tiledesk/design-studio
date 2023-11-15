@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+
+### 1.0.0 in PROD
+
 ### 0.0.8
 - added: retrocompatibility with intent that already contains an action of type 'connect block'
 - changed: routing path /cds/ to /chatbot/

@@ -29,9 +29,13 @@ export class CdsActionDescriptionComponent implements OnInit {
   }
 
   ngOnChanges(){
-    this.logger.log('ActionDescriptionComponent ngOnChanges:: ', this.actionSelected, this.elementType);
+    this.logger.log('[ActionDescriptionComponent] ngOnChanges:: ', this.actionSelected, this.elementType);
     if(this.actionSelected){
       this.elementType = this.actionSelected._tdActionType;
+
+      if(this.actionSelected._tdActionTitle && this.actionSelected._tdActionTitle != ""){
+        this.dataInput = this.actionSelected._tdActionTitle;
+      }
     }
     try {
 
@@ -46,13 +50,9 @@ export class CdsActionDescriptionComponent implements OnInit {
           break;
       }
       // this.element = ELEMENTS_LIST.find(item => item.type === this.elementType);
-      
-      if(this.actionSelected._tdActionTitle && this.actionSelected._tdActionTitle != ""){
-        this.dataInput = this.actionSelected._tdActionTitle;
-      }
-      this.logger.log('ActionDescriptionComponent action:: ', this.element);
+      this.logger.log('[ActionDescriptionComponent] action:: ', this.element);
     } catch (error) {
-      this.logger.log("error ", error);
+      this.logger.log("[ActionDescriptionComponent] error ", error);
     }
   }
 
@@ -65,7 +65,7 @@ export class CdsActionDescriptionComponent implements OnInit {
   // }
 
   onChangeText(text: string){
-    this.logger.log('ActionDescriptionComponent onChangeText:: ', text);
+    this.logger.log('[ActionDescriptionComponent] onChangeText:: ', text);
     this.actionSelected._tdActionTitle = text;
   }
 

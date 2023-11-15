@@ -177,7 +177,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-    console.log('CdsPanelIntentComponent ngAfterViewInit-->', this.intent);
+    console.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
     // this.patchActionIntent();
     if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
       this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
@@ -199,6 +199,22 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.setActionIntent();
     this.isInternalIntent = checkInternalIntent(this.intent)
     this.addEventListener();
+  }
+
+
+  ngAfterViewInit(){
+    new ResizeObserver(function(entries) {
+      // since we are observing only a single element, so we access the first element in entries array
+      let rect = entries[0].contentRect;
+    
+      // current width & height
+      let width = rect.width;
+      let height = rect.height;
+    
+      console.log('Current Width : ' + width);
+      console.log('Current Height : ' + height);
+    }).observe(document.querySelector(`#intent-content-${this.intent.intent_id}`));
+    
   }
 
   private setActionIntent(){
@@ -259,6 +275,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.complete();
 
   }
+
+  ngAfter
 
   // ---------------------------------------------------------
   // Event listener
@@ -321,6 +339,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       },
       true
     );
+
+    document.addEventListener('load', (event)=>{
+      console.log('event loadeddddddd')
+    })
   }
 
 
