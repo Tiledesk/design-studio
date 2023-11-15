@@ -80,7 +80,7 @@ export class CdsCanvasComponent implements OnInit {
   IS_OPEN_PANEL_CONNECTOR_MENU: boolean = false;
   mousePosition: any;
   connectorSelected: any;
-  
+
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private intentService: IntentService,
@@ -596,7 +596,7 @@ export class CdsCanvasComponent implements OnInit {
   */
   private async updateIntent(intent, time=0, undo=false) {
     this.logger.log('[CDS-CANVAS] updateIntent: ');
-    this.connectorService.updateConnector(intent.intent_id);
+    // this.connectorService.updateConnector(intent.intent_id);
     const response = await this.intentService.onUpdateIntentWithTimeout(intent, time, undo);
     if (response) {
       this.logger.log('[CDS-CANVAS] OK: intent aggiornato con successo sul server', this.intentSelected);
@@ -666,7 +666,7 @@ export class CdsCanvasComponent implements OnInit {
       this.updateIntent(intentPrevious, 0, false);
       setTimeout(()=> {
         // ATTENZIONE!!! trovare il modo di refreshare i connettori SOLO quando la action viene eliminata fisicamente dallo stage!!!
-        this.connectorService.updateConnector(intentPrevious.intent_id);
+        // this.connectorService.updateConnector(intentPrevious.intent_id);
       }, 0);
     }
   }
@@ -1062,4 +1062,5 @@ export class CdsCanvasComponent implements OnInit {
     }
   }
   // --------------------------------------------------------- //
+
 }

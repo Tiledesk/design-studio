@@ -848,11 +848,8 @@ export class TiledeskConnectors {
         }
         this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
         conn['notify']='';
-
         const event = new CustomEvent("connector-updated", { detail: { connector: conn } });
         document.dispatchEvent(event);
-        
-        
       }
     };
   }

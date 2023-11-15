@@ -605,7 +605,7 @@ export class IntentService {
     });
     currentIntent.actions.splice(event.currentIndex, 0, newAction);
     this.behaviorIntent.next(currentIntent);
-    this.connectorService.updateConnector(currentIntent.intent_id);
+    // this.connectorService.updateConnector(currentIntent.intent_id);
     this.onUpdateIntentWithTimeout(currentIntent, 0, true);
     // setTimeout(async () => {
       // const responseCurrentIntent = await this.onUpdateIntentWithTimeout(currentIntent, 0, true);
@@ -633,8 +633,8 @@ export class IntentService {
     // console.log('moveActionBetweenDifferentIntents: ', event, this.listOfIntents, currentIntentId, currentIntent, previousIntent);
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);
-    this.connectorService.updateConnector(currentIntent.intent_id);
-    this.connectorService.updateConnector(previousIntent.intent_id);
+    // this.connectorService.updateConnector(currentIntent.intent_id);
+    // this.connectorService.updateConnector(previousIntent.intent_id);
     this.connectorService.deleteConnectorsFromActionByActionId(action._tdActionId);
     const responsePreviousIntent = this.onUpdateIntentWithTimeout(previousIntent, 0, false);
     if(responsePreviousIntent){
@@ -779,7 +779,7 @@ export class IntentService {
         return intent;
       });
       this.refreshIntent(intentToUpdate);
-      this.connectorService.updateConnector(intentToUpdate.intent_id);
+      // this.connectorService.updateConnector(intentToUpdate.intent_id);
       this.controllerService.closeAllPanels();
       // this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
       const responseIntent = this.onUpdateIntentWithTimeout(intentToUpdate, 0, true);
@@ -946,7 +946,7 @@ export class IntentService {
 
 
   public patchButtons(buttons, idAction){
-    // console.log('patchButtons:: ', buttons);
+    console.log('patchButtons:: ', buttons);
     buttons.forEach((button, index) => {
       const checkUid = buttons.filter(btn => btn.uid === button.uid);
       if (checkUid.length > 1 || !button.uid && button.uid == undefined) {
@@ -1262,7 +1262,7 @@ export class IntentService {
       this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id, false, false, false); // false, false
       // this.connectorService.deleteConnectorsBrokenOutOfBlock(intent.intent_id); // false, false
       this.connectorService.createConnectorsOfIntent(intent); // false, false
-      this.connectorService.updateConnector(intent.intent_id);
+      // this.connectorService.updateConnector(intent.intent_id);
       // cancello tutti i connettori in uscita e li ricreo
     }, 100);
     this.intentSelected = intent;
@@ -1275,7 +1275,7 @@ export class IntentService {
           this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id, false, false, false); // false, false
           // this.connectorService.deleteConnectorsBrokenOutOfBlock(element.intent_id); // false, false
           this.connectorService.createConnectorsOfIntent(element); // false, false
-          this.connectorService.updateConnector(element.intent_id);
+          // this.connectorService.updateConnector(element.intent_id);
         }, 100);
         this.updateIntent(element); // async
       }

@@ -83,7 +83,6 @@ export class CdsActionReplyTextComponent implements OnInit {
     this.checkButtons();
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);
     this.idIntent = this.idAction.split('/')[0];
-
     if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
       this.filterConditionExist = true
     }
