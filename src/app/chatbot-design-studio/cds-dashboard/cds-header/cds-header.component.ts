@@ -144,20 +144,6 @@ export class CdsHeaderComponent implements OnInit {
     });
   }
 
-  publish() {
-    this.faqKbService.publish(this.selectedChatbot).subscribe((data) => {
-      this.logger.log('[CDS DSBRD] publish  - RES ', data)
-    }, (error) => {
-
-      this.logger.error('[CDS DSBRD] publish ERROR ', error);
-    }, () => {
-      this.logger.log('[CDS DSBRD] publish * COMPLETE *');
-      this.notify.showWidgetStyleUpdateNotification('Successfully published', 2, 'done');
-      // this.getBotById(this.id_faq_kb);
-      // this.segmentChatbotPublished()
-    });
-  }
-
 
   onGoToCommunity(){
     let url = EXTERNAL_URL.getchatbotinfo+this.selectedChatbot._id;
