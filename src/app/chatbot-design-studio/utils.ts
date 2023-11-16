@@ -490,32 +490,44 @@ export function checkInternalIntent(intent: Intent): boolean{
 }
 
 export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
-    let arrayCoord = []
-    listOfIntents.forEach(el => arrayCoord.push(el.attributes.position))
-    let minX = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x < curr.attributes.position.x ? prev : curr}).attributes.position.x
-    let minY = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).attributes.position.y
-    let maxX = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).attributes.position.x
-    let maxY = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y > curr.attributes.position.y ? prev : curr}).attributes.position.y
-    
-    let rightIntentWith = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).intent_id).getBoundingClientRect().width
-    let bottomIntentHeight = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).intent_id).getBoundingClientRect().height
-
-    var width = (maxX - minX) + rightIntentWith
-    var height = maxY - minY + bottomIntentHeight
-    
-    // let calcCenter = { x:  Math.round(((minX + maxWidth)/2)), y: Math.round(((minY + maxHeight)/2)) };
-    console.log('arrayyyyyyyy', arrayCoord)
-    // console.log('centerrrr', calcCenter)
-    console.log('width heightttt', width, height)
-
+    let arrayCoord = [];
+    listOfIntents.forEach(intent => {
+        const element = document.getElementById(intent.intent_id);
+        // console.log('element', intent.intent_id, element);
+        arrayCoord.push({maxX:element.offsetLeft+element.offsetWidth, minX:element.offsetLeft, maxY:element.offsetTop+element.offsetHeight, minY:element.offsetTop});
+    });
+    // console.log('arrayCoord ', arrayCoord);
+    // listOfIntents.forEach(el => arrayCoord.push(el.attributes.position))
+    // let minX = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x < curr.attributes.position.x ? prev : curr}).attributes.position.x
+    // let minY = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).attributes.position.y
+    // let maxX = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).attributes.position.x
+    // let maxY = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y > curr.attributes.position.y ? prev : curr}).attributes.position.y
+    // let rightIntentWith = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).intent_id).getBoundingClientRect().width;
+    // let bottomIntentHeight = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).intent_id).getBoundingClientRect().height;
+    // const container = document.getElementById('tds_drawer').getBoundingClientRect();
+    var maxX = Math.max(...arrayCoord.map(obj => obj.maxX));
+    var minX = Math.min(...arrayCoord.map(obj => obj.minX));
+    var maxY = Math.max(...arrayCoord.map(obj => obj.maxY));
+    var minY = Math.min(...arrayCoord.map(obj => obj.minY));
+    // console.log('coordinate', minX, maxX, minY, maxY);
+    // console.log("Coordinata x maggiore:", maxX, maxX_ );
+    // console.log("Coordinata x minore:", minX, minX_);
+    // console.log("Coordinata y maggiore:", maxY, maxY_);
+    // console.log("Coordinata y minore:", minY, minY_);
+    // let rightIntentWith = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).intent_id).offsetWidth;
+    // let bottomIntentHeight = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).intent_id).offsetHeight;
+    // console.log('rightIntentWith', rightIntentWith, rightIntentWith_)
+    // console.log('bottomIntentHeight', bottomIntentHeight, bottomIntentHeight_)
+    var width = (maxX - minX);
+    var height = (maxY - minY);
     const stage = document.getElementById('tds_container').getBoundingClientRect()
     var scale = Math.min(stage.width / width, stage.height / height);
-    console.log('scaleeeee', scale)
-
-    var translationX = Math.round((stage.width - (width * scale)) / 2) - rightIntentWith;
-    var translationY = Math.round((stage.height - (height * scale)) / 2) - bottomIntentHeight;
-    
-    console.log('translateeee x- y ', translationX, translationY)
-    return { scale: scale, width : width, height: height }
-    // return { width: srcWidth*ratio, height: srcHeight*ratio };
+    // console.log('scaleeeee: ', scale, (stage.width / width), (stage.height / height));
+    width = width*scale;
+    height = height*scale;
+    // console.log('dimensione: ', width, height);
+    let centerPointX = (minX + (maxX-minX)/2)*scale;
+    let centerPointY = (minY + (maxY-minY)/2)*scale;
+    // console.log('translateeee x- y ', translationX, translationY)
+    return { point: { x: centerPointX, y: centerPointY }, scale: scale }
 }

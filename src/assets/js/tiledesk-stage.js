@@ -233,29 +233,31 @@ export class TiledeskStage {
 
     centerStageOnPosition(stageElement, scale=1){
         if(stageElement){
-            this.scale = scale;
-            // var stageElement = document.getElementById(intent.intent_id);
             var w = stageElement.offsetWidth*scale;
             var h = stageElement.offsetHeight*scale;
             var x = stageElement.offsetLeft*scale;
             var y = stageElement.offsetTop*scale;
+            const posX = x+w/2;
+            const posY = y+h/2;
+            const pos = {x: posX, y: posY}
+            // console.log(pos);
+            return this.translateAndScale(pos, scale);
+        } else {
+            return false;
+        }
+    }
 
+    translateAndScale(pos, scale=1){
+        if(pos){
+            this.scale = scale;
             this.drawer.style.transition = "transform 0.3s ease-in-out";
             var originRec = this.container.getBoundingClientRect();
-
-            let newX = (originRec.width/2)-(x+w/2);
-            // console.log('newX:', newX);
-
-            let newY = (originRec.height/2)-(y+h/2);
-            // console.log('newX:', newY);
-
+            let newX = (originRec.width/2)-pos.x;
+            let newY = (originRec.height/2)-pos.y;
             let tcmd = `translate(${newX}px, ${newY}px)`;
             let scmd = `scale(${this.scale})`;
-            // let scmd = `scale(${this.scale})`;
             const cmd = tcmd + " " + scmd;
             this.drawer.style.transform = cmd;
-            // console.log("tcmd:", tcmd);
-            // console.log("transform:", tcmd);
             this.tx = newX;
             this.ty = newY;
             setTimeout(() => {

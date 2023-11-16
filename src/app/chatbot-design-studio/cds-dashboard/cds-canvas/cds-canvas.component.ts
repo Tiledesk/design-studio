@@ -15,7 +15,7 @@ import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
 
 // UTILS //
-import { isElementOnTheStage, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
+import { scaleAndcenterStageOnCenterPosition, isElementOnTheStage, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
 
 
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -957,18 +957,27 @@ export class CdsCanvasComponent implements OnInit {
    // --------------------------------------------------------- // 
   // EVENT > PANEL OPTIONS 
   // --------------------------------------------------------- //
-  onOptionClicked(option: OPTIONS){
+  async onOptionClicked(option: OPTIONS){
     switch(option){
       case OPTIONS.ZOOM_IN: {
-          this.stageService.zoom('in', this.intentSelected.intent_id);
+        const result = await  this.stageService.zoom('in', this.intentSelected.intent_id);
+        if (result) {
+          this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
+        }
         break;
       }
       case OPTIONS.ZOOM_OUT: {
-        this.stageService.zoom('out', this.intentSelected.intent_id);
+        const result = await this.stageService.zoom('out', this.intentSelected.intent_id);
+        if (result) {
+          this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
+        }
         break;
       }
       case OPTIONS.CENTER: {
-        this.stageService.scaleAndCenter()
+        const result = await this.stageService.scaleAndCenter(this.listOfIntents);
+        if (result) {
+          this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
+        }
         break;
       }
       case OPTIONS.UNDO: {

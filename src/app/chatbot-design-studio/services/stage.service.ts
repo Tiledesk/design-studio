@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { TiledeskStage } from 'src/assets/js/tiledesk-stage.js';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { scaleAndcenterStageOnCenterPosition } from '../utils';
 
 @Injectable({
   providedIn: 'root'
@@ -70,25 +71,34 @@ export class StageService {
     return this.tiledeskStage.physicPointCorrector(point);
   }
 
+
   zoom(event: 'in' | 'out', elementId){
-    const element = document.getElementById(elementId);
-    let intervalId = setInterval(async () => {
-      const result = await this.tiledeskStage.zoom(event, element);
-      if (result === true) {
+    return new Promise((resolve) => {
+      const element = document.getElementById(elementId);
+      let intervalId = setInterval(async () => {
+        const result = await this.tiledeskStage.zoom(event, element);
+        if (result === true) {
+          clearInterval(intervalId);
+          resolve(result);
+        }
+      }, 100);
+      setTimeout(() => {
         clearInterval(intervalId);
-      }
-    }, 100);
-    setTimeout(() => {
-      clearInterval(intervalId);
-    }, 1000);
+        resolve(false);
+      }, 1000);
+    });
   }
 
-  scaleAndCenter(){
+  scaleAndCenter(listOfintents){
     console.log("[STAGE SERVICE] scaleAndCenter ");
+    let resp = scaleAndcenterStageOnCenterPosition(listOfintents);
+    console.log("[STAGE SERVICE] resp ", resp);
+    return this.tiledeskStage.translateAndScale(resp.point, resp.scale);
+    // this.logger.log('[CDS-CANVAS] moved-and-scaled ', el)
   }
   
 
-  // getScale(){
-  //   return this.tiledeskStage.scale;
-  // }
+  getScale(){
+    return this.tiledeskStage.scale;
+  }
 }
