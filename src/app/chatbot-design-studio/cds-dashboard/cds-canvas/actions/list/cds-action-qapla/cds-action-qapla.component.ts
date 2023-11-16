@@ -39,11 +39,11 @@ export class CdsActionQaplaComponent implements OnInit {
   }
 
   availabilityCheck() {
-    console.log("availabilityCheck profile plan: ", this.project.profile.name)
-    if (this.project.profile.name !== 'Scale' && this.project.profile.name !== 'Plus') {
-      console.log("availabilityCheck BLOCK ACTION!!");
-      this.action_locked = true;
-    }
+    console.log("availabilityCheck profile plan: ", this.project.profile)
+    // if (this.project.profile.name !== 'Scale' && this.project.profile.name !== 'Plus') {
+    //   console.log("availabilityCheck BLOCK ACTION!!");
+    //   this.action_locked = true;
+    // }
   }
   
   private initializeAttributes() {

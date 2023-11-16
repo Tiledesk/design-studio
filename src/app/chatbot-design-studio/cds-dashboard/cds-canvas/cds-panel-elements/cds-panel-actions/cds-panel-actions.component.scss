@@ -70,8 +70,6 @@ $icon-hover-color: $blu;
         margin: 0;
         padding: 0!important;
         background: transparent !important;
-        font-size: 12px;
-        width: 20px;
         height: 20px;
         display: flex;
         justify-content: center;
@@ -90,12 +88,12 @@ $icon-hover-color: $blu;
 
 .trigger-beta-badge {
     font-weight: 400;
-    background-color: #fff;
+    background-color: $text-color;
     padding: 1px 8px;
     border-radius: 10px;
     font-size: 10px;
     line-height: 13px;
-    color: #6c757d;
+    color: #fff;
     position: relative;
     margin: 0px 3px;
 }

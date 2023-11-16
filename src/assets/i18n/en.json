@@ -133,7 +133,7 @@
     },
     "CDSSetting":{
         "ChatbotInfo":"Chatbot info",
-        "PersonalInfo":"PersonalInfo",
+        "PersonalInfo":"Personal Info",
         "GoLiveOnCommunity":"Go live on Community",
         "RemoveFromCommunity":"Remove from community",
         "ChatbotCommunityInfo":"Chatbot community info",
