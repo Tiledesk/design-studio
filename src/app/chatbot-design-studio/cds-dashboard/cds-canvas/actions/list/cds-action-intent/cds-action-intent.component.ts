@@ -102,7 +102,8 @@ export class CdsActionIntentComponent implements OnInit {
           this.isConnected = true;
           this.action.intentName = "#"+this.connector.toId;
         }
-        if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+        if(this.connector.save)
+          this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
       }
     } catch (error) {
       this.logger.log('error: ', error);

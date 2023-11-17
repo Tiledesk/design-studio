@@ -34,9 +34,9 @@ export class IntentAttributes {
     constructor() {
         this.position = {x:0, y:0};
         this.nextBlockAction = {
-            "_tdActionId": uuidv4(),
-            "_tdActionType": "intent",
-            "intentName": ""
+            _tdActionId: uuidv4(),
+            _tdActionType: "intent",
+            intentName: ""
         }
     }
 }

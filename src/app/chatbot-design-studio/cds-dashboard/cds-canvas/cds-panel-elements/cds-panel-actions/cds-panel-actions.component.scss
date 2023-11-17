@@ -98,11 +98,11 @@ $icon-hover-color: $blu;
     margin: 0px 3px;
 }
 
-.action-btn img{
+.action-btn-icon img{
     filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
 }
 
-.action-btn img,
+.action-btn-icon img,
 .drag-btn img{
     width: 16px;
 }

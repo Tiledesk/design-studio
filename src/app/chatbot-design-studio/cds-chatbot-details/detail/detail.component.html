@@ -17,20 +17,17 @@
     <!--  Bot avatar (for all bot type) -->
     <!--  --------------------------------------------------------------------------------------------------- -->
 
-    <div class="row">
+    <div class="row" style="margin-bottom: 16px;">
       <label class="col-sm-2 cds-bot_avatar_label">
         {{ 'UserProfile.Avatar' | translate }}
       </label>
       <div class="col-sm-10">
         <!-- [ngStyle]="{'margin-left':botType === 'dialogflow' ? '35px' : 0 }" -->
-        <div class="card-avatar" style="padding-bottom:15px; display: flex;align-items: center;">
-          <div class="bot_avatar" style="width: 80px; height: 80px;margin-right: 20px;">
+        <div class="card-avatar" style="display: flex;align-items: center;">
+          <div class="bot_avatar">
 
-            <img *ngIf="botProfileImageExist === true" class="bot-profile-img"
-              [src]="selectedChatbot?.url" onerror="this.src='assets/images/avatar_bot_tiledesk.svg'" />
-
-            <img *ngIf="botProfileImageExist === false" class="bot-profile-img"
-              src="assets/images/avatar_bot_tiledesk.svg"/>
+            <img class="bot-profile-img" [src]="selectedChatbot?.url" onerror="this.src='assets/images/avatar_bot_tiledesk.svg'" />
+            <!-- <img *ngIf="botProfileImageExist === false" class="bot-profile-img" src="assets/images/avatar_bot_tiledesk.svg"/> -->
 
           </div>
 
