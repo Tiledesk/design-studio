@@ -96,27 +96,18 @@ import { PanelIntentHeaderComponent } from './cds-dashboard/cds-canvas/cds-inten
 import { PanelIntentControlsComponent } from './cds-dashboard/cds-canvas/cds-intent/panel-intent-controls/panel-intent-controls.component';
 
 
-
+//CDS-BASE-ELEMENT
 import { SelectComponent } from './cds-base-element/select/select.component';
-// import { VariableListComponent } from './cds-dashboard/cds-canvas/panel-intent-detail/actions/action-json-condition/variable-list/variable-list.component';
 import { TextEditableDivComponent } from './cds-base-element/text-editable-div/text-editable-div.component';
-// import { ActionWebRequestComponent } from './cds-dashboard/panel-intent-detail/actions/action-web-request/action-web-request.component';
 import { AttributesComponent } from './cds-base-element/attributes/attributes.component';
 import { DialogComponent } from './cds-base-element/dialog/dialog.component';
-// import { ActionAssignFunctionComponent } from './cds-dashboard/panel-intent-detail/actions/action-assign-function/action-assign-function.component';
 import { DialogYesNoComponent } from './cds-base-element/dialog-yes-no/dialog-yes-no.component';
 import { CDSFilterComponent } from './cds-base-element/filter/filter.component';
+import { CDSMenuComponent } from './cds-base-element/menu/menu.component';
 import { CDSRadioButtonComponent } from './cds-base-element/radio-button/radio-button.component';
 import { CDSDetailBotDetailComponent } from './cds-chatbot-details/detail/detail.component';
 import { CDSDetailImportExportComponent } from './cds-chatbot-details/import-export/import-export.component';
 import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service';
-// import { ActionWhatsappStaticComponent } from './cds-dashboard/panel-intent-detail/actions/action-whatsapp-static/action-whatsapp-static.component';
-// import { ActionWhatsappAttributeComponent } from './cds-dashboard/panel-intent-detail/actions/action-whatsapp-attribute/action-whatsapp-attribute.component';
-// import { ActionWhatsappSegmentComponent } from './cds-dashboard/panel-intent-detail/actions/action-whatsapp-segment/action-whatsapp-segment.component';
-// import { WhatsappReceiverComponent } from './cds-dashboard/panel-intent-detail/actions/action-whatsapp-static/whatsapp-receiver/whatsapp-receiver.component';
-// import { GalleryResponseComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/reply-types/gallery-response/gallery-response.component';
-// import { RedirectResponseComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/reply-types/redirect-response/redirect-response.component';
-// import { ActionAskgptComponent } from './cds-dashboard/panel-intent-detail/actions/action-askgpt/action-askgpt.component';
 
 
 
@@ -176,6 +167,7 @@ import { CdsWhatsappReceiverComponent } from './cds-dashboard/cds-canvas/actions
 import { CdsActionWhatsappStaticComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-whatsapp-static/cds-action-whatsapp-static.component';
 import { CdsActionGPTTaskComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-gpt-task/cds-action-gpt-task.component';
 import { CdsActionCaptureUserReplyComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-capture-user-reply/cds-action-capture-user-reply.component';
+import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-qapla/cds-action-qapla.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
@@ -205,7 +197,6 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 
 import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
 import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
-import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-qapla/cds-action-qapla.component';
 
 @NgModule({
   declarations: [
@@ -224,6 +215,7 @@ import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list
     DialogComponent,
     DialogYesNoComponent,
     CDSFilterComponent,
+    CDSMenuComponent,
     CDSRadioButtonComponent,
     SelectComponent,
     TextEditableDivComponent,
@@ -293,6 +285,7 @@ import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list
         CdsActionAskgptComponent,
         CdsActionGPTTaskComponent,
         CdsActionCaptureUserReplyComponent,
+        CdsActionQaplaComponent,
         // action REPLY elements: start //
         CdsActionReplyToolsComponent,
         CdsActionReplyTextComponent,
@@ -352,7 +345,7 @@ import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list
     CdsRuleComponent,
     CdsOptionsComponent,
     CdsPanelConnectorMenuComponent,
-    CdsActionQaplaComponent,
+    
 
   ],
   imports: [
