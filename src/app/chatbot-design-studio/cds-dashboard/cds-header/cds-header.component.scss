@@ -160,4 +160,33 @@
 
 }
 
+::ng-deep .mat-menu-panel.menuElement {
+    min-width: 100px;
+    max-width: 400px;
+    width: 185px;
+    color: $blu;
+    font-size: 15px;
+    line-height: 18px;
+    list-style: none;
+    overflow: hidden;
+    padding: 0;
+    // box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    border-radius: 8px;
+    background: rgb(255,255,255);
+    will-change: transform;
+    animation: .15s ease 0s 1 normal none running fadein, .15s ease 0s 1 normal none running movein, .1s ease 0s 1 normal none running scaleY;
+    margin: 0;
+    position: absolute;
+    top: -35px;
+    left: 35px;
+    border: 2px solid $gray-02;
+    box-shadow: none;
+}
+
+::ng-deep {
+    .mat-menu-content{
+        padding: 0 !important;
+    }
+}
+
 

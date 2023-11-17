@@ -1,0 +1,34 @@
+<div id="panel_actions_div" class="actions-drawer" #panel_menu_div >
+ 
+        <div class="action-box">
+            <div class="menu-btns-wpr" (click)="onGoBack()">
+                <div class="menu-btn-icon">
+                    <span class="material-icons-outlined">arrow_back</span>
+                </div>
+                <div class="menu-btn-text truncate">Go to dashbaord</div>
+            </div>
+        </div>
+        <div class="action-box" (click)="exportChatbotToJSON()">
+            <div class="menu-btns-wpr">
+                <div class="menu-btn-icon">
+                    <span class="material-icons-outlined"> file_download</span>
+                </div>
+                <div class="menu-btn-text truncate">Export</div>
+            </div>
+        </div>
+        <div class="action-box" (click)="onGoBack()">
+            <div class="menu-btns-wpr">
+                <div class="menu-btn-icon">
+                    <span class="material-icons-outlined">logout</span>
+                </div>
+                <div class="menu-btn-text truncate">Logout</div>
+            </div>
+        </div>
+
+        <hr class="custom-divider">
+
+        <div class="menu-btn-text current-user">
+            {{loggedUser?.email}}
+        </div>
+
+</div>

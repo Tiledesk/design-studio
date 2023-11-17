@@ -3,6 +3,7 @@ import { NotifyService } from 'src/app/services/notify.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { downloadObjectAsJson } from 'src/app/utils/util';
 
 @Component({
   selector: 'cds-detail-import-export',
@@ -51,7 +52,7 @@ export class CDSDetailImportExportComponent implements OnInit {
       // this.logger.log('[TILEBOT] - EXPORT CHATBOT TO JSON - FAQS', faq)
       // this.logger.log('[TILEBOT] - EXPORT FAQ TO JSON - FAQS INTENTS', faq.intents)
       if (faq) {
-        this.downloadObjectAsJson(faq, faq.name);
+        downloadObjectAsJson(faq, faq.name);
       }
     }, (error) => {
       this.logger.error('[TILEBOT] - EXPORT BOT TO JSON - ERROR', error);
@@ -71,7 +72,7 @@ export class CDSDetailImportExportComponent implements OnInit {
       // this.logger.log('[TILEBOT] - EXPORT BOT TO JSON - FAQS', faq)
       // this.logger.log('[TILEBOT] - EXPORT FAQ TO JSON - FAQS INTENTS', faq.intents)
       if (faq) {
-        this.downloadObjectAsJson(faq, this.faqKb_name + ' intents');
+        downloadObjectAsJson(faq, this.faqKb_name + ' intents');
       }
     }, (error) => {
       this.logger.error('[TILEBOT] - EXPORT BOT TO JSON - ERROR', error);
@@ -82,15 +83,7 @@ export class CDSDetailImportExportComponent implements OnInit {
   }
 
 
-  downloadObjectAsJson(exportObj, exportName) {
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
-    var downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", exportName + ".json");
-    document.body.appendChild(downloadAnchorNode); // required for firefox
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-  }
+  
 
 
    // --------------------------------------------------------------------------

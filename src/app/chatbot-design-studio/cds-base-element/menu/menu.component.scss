@@ -1,0 +1,90 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+$text-color: $blu;
+$icon-color: $gray-light-01;
+$text-hover-color: $blu;
+$icon-hover-color: $blu;
+
+#panel_actions_div{
+    padding: 6px;
+    box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+
+
+    .section-title {
+        padding-top: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: Poppins,Roboto,Arial,sans-serif;
+        color: #394f5a;
+        height: 30px;
+        padding: 6px;
+        background-color: #e7eeefcc;
+        margin: 2px;
+        border-radius: 6px;
+    }
+}
+
+
+.menu-btns-wpr {
+    // width: 136px; // dp
+    width: 100%; // nk
+    height: 30px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+
+    
+
+    &:hover{
+        cursor: pointer;
+        box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+        
+        span.material-icons-outlined,
+        img{
+            color: $text-hover-color;
+            filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%); 
+            cursor: pointer; 
+        }
+
+        .menu-btn-text{
+            color: $text-hover-color
+        }
+    }
+
+}
+
+.menu-btn-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    span.material-icons-outlined,
+    img{
+        width: 16px;
+        font-size: 16px;
+        color: $icon-color;
+        filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+    }
+
+
+}
+.menu-btn-text{
+    display: inline-flex;
+    color: $text-color;
+    padding: 0;
+    vertical-align: middle;
+    font-size: 10px;
+    font-weight: 400;
+}
+
+.custom-divider {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border: 0;
+    border-top: 1px solid $blu;
+}
+
+.current-user{
+    color: $icon-color
+}
