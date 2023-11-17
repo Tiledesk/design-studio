@@ -114,6 +114,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   onChangeIntentName(event) {
     this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName",event, this.intent);
     const result = this.checkIntentName(event);
+    this.intent.intent_display_name = event.trim();
     if(result){
       this.intentName = event;
       // this.onSaveIntent();
