@@ -115,7 +115,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] sto modifico l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
-          this.setActionIntent();
+          // this.setActionIntent();
           if (intent['attributesChanged']) {
             this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
             delete intent['attributesChanged'];
