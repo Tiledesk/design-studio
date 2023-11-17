@@ -99,4 +99,29 @@ export class NativeUploadService extends UploadService {
             });
         });
     }
+
+
+    uploadProfile(userId: string, upload: UploadModel): Promise<any> {
+        this.logger.log('[NATIVE UPLOAD] - upload new photo profile  ... upload', upload)
+        const headers = new HttpHeaders({
+          Authorization: this.tiledeskToken,
+          // 'Content-Type': 'multipart/form-data',
+        });
+        const requestOptions = { headers: headers };
+        const formData = new FormData();
+        formData.append('file', upload.file);
+
+        // USE IMAGE API
+        const that = this;
+        const url = this.URL_TILEDESK_IMAGES + `/users/photo?force=true&user_id=${userId}`
+        return new Promise((resolve, reject) => {
+            that.http.put(url, formData, requestOptions).subscribe(data => {
+                const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['thumbnail'];
+                resolve(downloadURL)
+                // that.BSStateUpload.next({upload: upload});
+            }, (error) => {
+                reject(error)
+            });
+        });
+    }
 }
