@@ -496,15 +496,6 @@ export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
         // console.log('element', intent.intent_id, element);
         arrayCoord.push({maxX:element.offsetLeft+element.offsetWidth, minX:element.offsetLeft, maxY:element.offsetTop+element.offsetHeight, minY:element.offsetTop});
     });
-    // console.log('arrayCoord ', arrayCoord);
-    // listOfIntents.forEach(el => arrayCoord.push(el.attributes.position))
-    // let minX = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x < curr.attributes.position.x ? prev : curr}).attributes.position.x
-    // let minY = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).attributes.position.y
-    // let maxX = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).attributes.position.x
-    // let maxY = listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y > curr.attributes.position.y ? prev : curr}).attributes.position.y
-    // let rightIntentWith = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).intent_id).getBoundingClientRect().width;
-    // let bottomIntentHeight = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).intent_id).getBoundingClientRect().height;
-    // const container = document.getElementById('tds_drawer').getBoundingClientRect();
     var maxX = Math.max(...arrayCoord.map(obj => obj.maxX));
     var minX = Math.min(...arrayCoord.map(obj => obj.minX));
     var maxY = Math.max(...arrayCoord.map(obj => obj.maxY));

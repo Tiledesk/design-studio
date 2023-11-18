@@ -78,29 +78,6 @@ export class NativeUploadService extends UploadService {
         
     }
 
-    delete(userId: string, path: string): Promise<any>{
-        this.logger.log('[NATIVE UPLOAD] - delete image ... upload', userId)
-        const headers = new HttpHeaders({
-            Authorization: this.tiledeskToken,
-            //'Content-Type': 'multipart/form-data',
-        });
-        const requestOptions = { headers: headers };
-
-        //USE IMAGE API
-        const that = this;
-        const url = this.URL_TILEDESK_IMAGES + '/users' + '?path=' + path
-        return new Promise((resolve, reject) => {
-            that.http.delete(url, requestOptions).subscribe(data => {
-                // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
-                resolve(true)
-                // that.BSStateUpload.next({upload: upload});
-            }, (error) => {
-                reject(error)
-            });
-        });
-    }
-
-
     uploadProfile(userId: string, upload: UploadModel): Promise<any> {
         this.logger.log('[NATIVE UPLOAD] - upload new photo profile  ... upload', upload)
         const headers = new HttpHeaders({
@@ -118,6 +95,28 @@ export class NativeUploadService extends UploadService {
             that.http.put(url, formData, requestOptions).subscribe(data => {
                 const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['thumbnail'];
                 resolve(downloadURL)
+                // that.BSStateUpload.next({upload: upload});
+            }, (error) => {
+                reject(error)
+            });
+        });
+    }
+
+    delete(userId: string, path: string): Promise<any>{
+        this.logger.log('[NATIVE UPLOAD] - delete image ... upload', userId)
+        const headers = new HttpHeaders({
+            Authorization: this.tiledeskToken,
+            //'Content-Type': 'multipart/form-data',
+        });
+        const requestOptions = { headers: headers };
+
+        //USE IMAGE API
+        const that = this;
+        const url = this.URL_TILEDESK_IMAGES + '/users' + '?path=' + path
+        return new Promise((resolve, reject) => {
+            that.http.delete(url, requestOptions).subscribe(data => {
+                // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
+                resolve(true)
                 // that.BSStateUpload.next({upload: upload});
             }, (error) => {
                 reject(error)

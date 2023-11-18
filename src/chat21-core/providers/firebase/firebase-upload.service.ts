@@ -168,7 +168,6 @@ export class FirebaseUploadService extends UploadService {
   }
 
 
-
   public async delete(userId: string, path: string): Promise<any>{
     const that = this;
     const file_name_photo = 'photo.jpg';
