@@ -5,6 +5,17 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.4-rc.1
+- added: network offline modal
+- added: menu component on left header tiledesk hover icon click
+- bug-fixed: goToKNB dashboard link 
+
+### 1.0.3 in PROD
+- added: menu component on left header tiledesk hover icon click
+- bug-fixed: attribute.nextActionIntent not updated after change intent obj
+- bug-fixed: intent name not updated on intent-list component
+- bug-fixed: goToKNB dashboard link 
+
 ### 1.0.2 in PROD
 
 ### 1.0.2-rc.1
