@@ -197,6 +197,7 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 
 import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
 import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
+import { NetworkOfflineComponent } from '../modals/network-offline/network-offline.component';
 
 @NgModule({
   declarations: [
@@ -345,6 +346,7 @@ import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-p
     CdsRuleComponent,
     CdsOptionsComponent,
     CdsPanelConnectorMenuComponent,
+    NetworkOfflineComponent,
     
 
   ],

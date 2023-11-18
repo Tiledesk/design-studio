@@ -14,6 +14,9 @@ import { UploadService } from 'src/chat21-core/providers/abstract/upload.service
 import { UsersService } from './services/users.service';
 import { MultichannelService } from './services/multichannel.service';
 import { ScriptService } from 'src/chat21-core/providers/scripts/script.service';
+import { NetworkService } from './services/network.service';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
 
 @Component({
   selector: 'app-root',
@@ -33,8 +36,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private appConfigService: AppConfigService,
     public translate: TranslateService,
     public tiledeskAuthService: TiledeskAuthService,
-    private router: Router,
-    private route: ActivatedRoute,
+    public dialog: MatDialog,
     public appStorageService: AppStorageService,
     public projectService: ProjectService,
     // public uploadService: UploadService,
@@ -43,6 +45,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private multiChannelService: MultichannelService,
     private uploadService: UploadService,
     private scriptService: ScriptService,
+    private networkService: NetworkService,
   ){
 
   }
@@ -83,24 +86,15 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async initialize(){
     let serverBaseURL = this.appConfigService.getConfig().apiUrl
-
     this.tiledeskAuthService.initialize(serverBaseURL);
-    
-    // this.departmentService.initialize(serverBaseURL, this.project._id);
-    // this.faqKbService.initialize(serverBaseURL, this.project._id)
-    // this.faqService.initialize(serverBaseURL, this.project._id)
-    // this.kbService.initialize(serverBaseURL, this.project._id)
-    // this.openaiService.initialize(serverBaseURL, this.project._id)
-    // this.whatsappService.initialize(serverBaseURL, this.project._id)
-    // const getUrlParams = await this.dashboardService.getUrlParams();
-    // this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
+
+    // ---------------------------------------
+    // Watch to network status
+    // ---------------------------------------
+    this.watchToConnectionStatus();
 
     await this.initAuthentication();
     this.setLanguage(null);
-    // this.projectService.initialize(serverBaseURL);
-    // this.multiChannelService.initialize(serverBaseURL)
-    // this.userService.initialize(serverBaseURL)
-    // this.uploadService.initialize();
 
   }
 
@@ -165,6 +159,20 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.translate.setDefaultLang('en');
     this.translate.use('en');
 
+  }
+
+
+  watchToConnectionStatus() {
+    this.networkService.networkStatus$.subscribe((isOnline)=>{
+      this.logger.log('[APP-COMP] watchToConnectionStatus IS ONLINEEEEE-->', isOnline)
+      if(!isOnline){
+         const dialog = this.dialog.open(NetworkOfflineComponent, {
+          data: {},
+          panelClass: 'custom-dialog-container',
+          position: {bottom:'10px'} 
+        });
+      }
+    })
   }
 
   updateStoredCurrentUser() {

@@ -62,6 +62,7 @@ import { UnauthorizedComponent } from './components/unauthorized/unauthorized.co
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeComponent } from './components/home/home.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { NetworkService } from './services/network.service';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
@@ -197,7 +198,8 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     NotifyService,
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     { provide: MAT_DIALOG_DATA, useValue: {} },
-    { provide: MatDialogRef, useValue: {} }
+    { provide: MatDialogRef, useValue: {} },
+    NetworkService
   ]
 })
 export class AppModule { }

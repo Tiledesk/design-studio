@@ -304,7 +304,8 @@
         }
     },
     "New":"New",
-    "Event":"Event"
+    "Event":"Event",
+    "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network"
     
 
     
