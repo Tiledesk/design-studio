@@ -18,7 +18,6 @@ import { UploadService } from 'src/chat21-core/providers/abstract/upload.service
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
-import { User } from 'firebase';
 const swal = require('sweetalert');
 
 @Component({

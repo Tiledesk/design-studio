@@ -41,7 +41,8 @@ export class CDSMenuComponent implements OnInit {
   // -------------------------------------------------------------------------------------- 
   onGoBack() {
     let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
-    window.open(dashbordBaseUrl, '_self')
+    const myWindow = window.open(dashbordBaseUrl, '_self')
+    myWindow.focus();
     // this.location.back()
     // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);
   }
@@ -50,9 +51,10 @@ export class CDSMenuComponent implements OnInit {
   // Export chatbot to JSON
   // -------------------------------------------------------------------------------------- 
   onLogOut(){
+    this.tiledeskAuthService.logOut()
+    this.goToDashboardLogin()
 
   }
-
 
   // -------------------------------------------------------------------------------------- 
   // Export chatbot to JSON
@@ -71,6 +73,12 @@ export class CDSMenuComponent implements OnInit {
     }, () => {
       this.logger.log('[TILEBOT] - EXPORT BOT TO JSON - COMPLETE');
     });
+  }
+
+  goToDashboardLogin(){
+    let DASHBOARD_URL = this.appConfigService.getConfig().dashboardBaseUrl + '#/login'
+    const myWindow = window.open(DASHBOARD_URL, '_self');
+    myWindow.focus();
   }
 
 }
