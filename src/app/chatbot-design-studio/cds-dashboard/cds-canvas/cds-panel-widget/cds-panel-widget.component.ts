@@ -98,7 +98,8 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     window.addEventListener('message', (event_data)=> {
       if(event_data && event_data.origin.includes('widget')){
         let message = event_data.data.message
-        if(message && message.attributes && message.attributes.intentName){
+        //publish ACTIVE INTENT only if widget-panel is visible
+        if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
           let intentName = message.attributes.intentName
           this.intentService.setLiveActiveIntent(intentName)
         }else{
