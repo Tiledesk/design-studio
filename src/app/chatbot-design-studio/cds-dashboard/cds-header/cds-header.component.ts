@@ -61,7 +61,6 @@ export class CdsHeaderComponent implements OnInit {
     public dialog: MatDialog,
     public appConfigService: AppConfigService,
     private multichannelService: MultichannelService,
-    private notify: NotifyService,
     private dashboardService: DashboardService,
     private intentService: IntentService,
     private tiledeskAuthService: TiledeskAuthService

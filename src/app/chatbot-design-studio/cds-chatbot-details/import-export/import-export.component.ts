@@ -111,7 +111,7 @@ export class CDSDetailImportExportComponent implements OnInit {
     }, (error) => {
       this.logger.error('[TILEBOT] -  IMPORT CHATBOT FROM JSON- ERROR', error);
 
-      this.notify.showWidgetStyleUpdateNotification("thereHasBeenAnErrorProcessing", 4, 'report_problem');
+      this.notify.showWidgetStyleUpdateNotification("CDSSetting.ThereHasBeenAnErrorProcessing", 4, 'report_problem');
     }, () => {
       this.logger.log('[TILEBOT] - IMPORT CHATBOT FROM JSON - COMPLETE');
     });
@@ -145,10 +145,10 @@ export class CDSDetailImportExportComponent implements OnInit {
     }, (error) => {
       this.logger.error('[TILEBOT] -  IMPORT INTENTS FROM JSON- ERROR', error);
 
-      this.notify.showWidgetStyleUpdateNotification("thereHasBeenAnErrorProcessing", 4, 'report_problem');
+      this.notify.showWidgetStyleUpdateNotification("CDSSetting.ThereHasBeenAnErrorProcessing", 4, 'report_problem');
     }, () => {
       this.logger.log('[TILEBOT] - IMPORT INTENTS FROM JSON - * COMPLETE *');
-      this.notify.showWidgetStyleUpdateNotification("File was uploaded succesfully", 2, 'done');
+      this.notify.showWidgetStyleUpdateNotification("CDSSetting.FileUploadedSuccessfully", 2, 'done');
 
       this.onCloseImportJSONModal();
       

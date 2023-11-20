@@ -169,6 +169,8 @@
         "AnErrorOccurredWhilDeletingTheAnswer": "An error occurred while deleting the Answer",
         "AnswerSuccessfullyDeleted": "Answer successfully deleted",
         "ThereHasBeenAnErrorProcessing": "There has been an error processing your request",
+        "FileUploadedSuccessfully":"File was uploaded succesfully",
+        "SuccessfullyDeployed":"Successfully deployed",
         "Website":"Website",
         "YourWebSite":"Your Website",
         "PublicEmail":"Public email",
