@@ -217,6 +217,7 @@ export class CdsActionReplyTextComponent implements OnInit {
 
   /** onOpenButtonPanel */
   onOpenButtonPanel(button){
+    console.log('[ACTION REPLY TEXT] onOpenButtonPanel ', button, this.response.attributes.attachment.buttons);
     this.openButtonPanel.emit(button);
   }
 
