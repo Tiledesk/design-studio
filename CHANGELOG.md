@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.5-rc.1
+- bug-fixed: cds-reply button element not
+
+### 1.0.4 in PROD
+
 ### 1.0.4-rc.1
 - added: network offline modal
 - added: menu component on left header tiledesk hover icon click

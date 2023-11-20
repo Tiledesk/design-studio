@@ -169,7 +169,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
          const dialog = this.dialog.open(NetworkOfflineComponent, {
           data: {},
           panelClass: 'custom-dialog-container',
-          position: {bottom:'10px'} 
+          position: {bottom:'10px'},
+          disableClose: true
         });
       }
     })
