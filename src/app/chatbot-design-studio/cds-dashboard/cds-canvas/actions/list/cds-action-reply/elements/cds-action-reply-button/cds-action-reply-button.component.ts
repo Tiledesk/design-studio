@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output, SimpleChanges } from '@angular/core';
 import { TYPE_BUTTON } from '../../../../../../../utils';
 
 @Component({

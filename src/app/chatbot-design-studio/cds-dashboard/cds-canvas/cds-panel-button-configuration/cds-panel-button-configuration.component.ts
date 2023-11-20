@@ -65,6 +65,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   }
 
   ngOnChanges() {
+    console.log('CdsPanelButtonConfigurationComponent: ', this.button);
     this.initialize();
   }
 
@@ -206,8 +207,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   private checkAndSaveButton(){
     let checkLabel = this.checkButtonLabel();
     let checkType = this.checkTypeButton();
-    console.log('checkAndSaveButton: ', checkLabel, checkType);
-
+    // console.log('checkAndSaveButton: ', checkLabel, checkType);
     if (checkLabel && checkType) {
       this.saveButton.emit(this.button);
     }
@@ -254,7 +254,10 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
    * @param event 
    */
   public onBlur(event){
-    this.checkAndSaveButton();
+    // setTimeout(() => {
+      console.log('onBlur: ', event);
+      this.checkAndSaveButton();
+    // }, 100);
   }
 
   /** */
@@ -265,7 +268,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
 
   /** */
   onChangeGoToBlock(event: {name: string, value: string}){
-    console.log('onChangeGoToBlock: ', event);
+    this.logger.log('onChangeGoToBlock: ', event);
     this.buttonAction = event.value;
     if(this.buttonAttributes && this.buttonAttributes !== '{}'){
       this.button.action = this.buttonAction + JSON.stringify(this.buttonAttributes);
@@ -279,7 +282,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     if (posId !== -1) {
       toId = this.button.action.slice(posId+1);
     }
-    console.log('onChangeGoToBlock: ', this.button);
+    this.logger.log('onChangeGoToBlock: ', this.button);
     // IMPORTANT! non salvare la modifica dei connettori ma solo la modifica della action!
     this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false, false);
     this.connectorService.createNewConnector(fromId, toId, false, false);
@@ -287,6 +290,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   }
 
   private deleteConnector(){
+    this.logger.log('deleteConnector: ', this.button);
     const fromId = this.button.__idConnector;
     this.connectorService.deleteConnectorWithIDStartingWith(fromId);
     this.button.__isConnected = false;
@@ -313,8 +317,6 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     this.checkAndSaveButton();
     // this.saveButton.emit(this.button);
   }
-
-
 
 
   /** */
