@@ -56,7 +56,7 @@
             ]
           },
           "configurations": {
-            "prod": {
+            "production": {
               "budgets": [
                 {
                   "type": "initial",
