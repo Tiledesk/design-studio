@@ -16,9 +16,10 @@
         
     </div>
 
-    <hr class="preview-divider">
 
-    <div class="previewContent">   
+    <hr *ngIf="!action?.noelse" class="preview-divider">
+
+    <div *ngIf="!action?.noelse" class="previewContent">   
         <label class="title-preview-label">else</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
@@ -102,7 +103,7 @@
             </div>
         
             <!-- falseIntent -->
-            <div class="field-box">
+            <div *ngIf="!action?.noelse" class="field-box">
                 <div class="condition-container">
                     <span class="condition-text">Else</span>
                 </div>

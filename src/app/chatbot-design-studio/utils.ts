@@ -103,7 +103,6 @@ export enum TYPE_ACTION {
     GPT_TASK = 'gpt_task',
     WAIT = 'wait',
     INTENT = 'intent',
-    // CONDITION = 'condition',
     ASSIGN_VARIABLE = 'setattribute',
     ASSIGN_FUNCTION = 'setfunction',
     DELETE_VARIABLE = 'delete',
@@ -113,6 +112,7 @@ export enum TYPE_ACTION {
     OPEN_HOURS = 'ifopenhours',
     HIDE_MESSAGE = 'hmessage',
     JSON_CONDITION = 'jsoncondition',
+    CONDITION = 'condition',
     CAPTURE_USER_REPLY = 'capture_user_reply',
     QAPLA = "qapla"
 }
@@ -246,7 +246,8 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     CLOSE : { name: 'Close', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.CLOSE, src:"assets/images/actions/close.svg", status: "active", description: 'This action instantly closes the current conversation'},
     OPEN_HOURS: { name: 'If Operating Hours', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.OPEN_HOURS, src: "assets/images/actions/open_hours.svg", status: "active", description: 'This action moves the flow to different blocks, based on the operating hours status.<br>During working hours the <b>TRUE block</b> will be triggered.<br>During offline hours the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset the same option.' },
     ONLINE_AGENTS: { name: 'If Online Agent', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.ONLINE_AGENTS, src: "assets/images/actions/online_agents.svg", status: "active", description: 'This action moves the flow to different blocks, based on the agents’ availability.<br>If there are agents available the <b>TRUE block</b> will be triggered.<br>If there are no agents available the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset Stop on met condition.' },
-    JSON_CONDITION: { name: 'Condition', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.JSON_CONDITION, src: "assets/images/actions/condition.svg", status: "active", },
+    CONDITION: { name: 'Condition', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CONDITION, src: "assets/images/actions/condition.svg", status: "active", },
+    JSON_CONDITION: { name: 'Condition w/ else', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.JSON_CONDITION, src: "assets/images/actions/condition.svg", status: "active", },
     INTENT : { name: 'Connect block', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.INTENT, src:"assets/images/actions/connect_intent.svg", status: "inactive", description: 'This action moves the flow to the specified block.<br> Keep in mind that if there are other actions in the current block actions-pipeline they will be executed too, generating a parallel-execution of all the branches affering to each block triggered through this Connect-block action.'},
     ASSIGN_VARIABLE: { name: 'Set attribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.ASSIGN_VARIABLE, src: "assets/images/actions/assign_var.svg", status: "active",  },
     DELETE_VARIABLE: { name: 'Delete attribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.DELETE_VARIABLE, src: "assets/images/actions/delete_var.svg", status: "active",  },
