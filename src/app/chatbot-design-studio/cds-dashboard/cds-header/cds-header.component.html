@@ -6,8 +6,8 @@
         #tooltip="matTooltip">
     <div *ngIf="!IS_OPEN_SIDEBAR">
         <img class="logo" src="assets/logos/tiledesk_logo.svg">
-        <!-- <span class="material-icons" (click)="goToBack()">arrow_back</span> -->
-        <span class="material-icons" [matMenuTriggerFor]="menu">more_vert</span>
+        <span class="material-icons" (click)="goToBack()">arrow_back</span>
+        <!-- <span class="material-icons" [matMenuTriggerFor]="menu">more_vert</span> -->
     </div>
     <img *ngIf="IS_OPEN_SIDEBAR" src="assets/logos/tiledesk-logo_new_white.svg">
 </div>

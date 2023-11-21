@@ -8,20 +8,6 @@ $icon-hover-color: $blu;
 #panel_actions_div{
     padding: 6px;
     box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
-
-
-    .section-title {
-        padding-top: 3px;
-        font-size: 11px;
-        font-weight: 600;
-        font-family: Poppins,Roboto,Arial,sans-serif;
-        color: #394f5a;
-        height: 30px;
-        padding: 6px;
-        background-color: #e7eeefcc;
-        margin: 2px;
-        border-radius: 6px;
-    }
 }
 
 
@@ -83,6 +69,7 @@ $icon-hover-color: $blu;
     margin-bottom: 5px;
     border: 0;
     border-top: 1px solid $blu;
+    font-family: Poppins,Roboto,Arial,sans-serif;
 }
 
 .current-user{

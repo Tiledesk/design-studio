@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.5 in PROD
+
+### 1.0.5-rc.3
+- bug-fixed: unable to restart widget flow if panel is already opened once (you had to click twice to restart the flow: first time to open panel and the second to restart the flow )
+
 ### 1.0.5-rc.2
 - added: cds-action-condition(w/out else branch)
 - bug-fixed: cds-reply button element not
