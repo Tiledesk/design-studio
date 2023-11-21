@@ -182,6 +182,21 @@ export class ActionJsonCondition extends Action {
     }
 }
 
+export class ActionCondition extends Action {
+    noelse: boolean;
+    trueIntent: string;
+    stopOnConditionMet: boolean;
+    groups: Array<Expression | Operator>;
+    trueIntentAttributes?: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.JSON_CONDITION;
+        this.groups = [];
+        this.stopOnConditionMet = true;
+        this.noelse = true;
+    }
+}
+
 export class ActionIntentConnected extends Action {
     intentName?: string;
     json_payload?: Object;
