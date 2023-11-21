@@ -181,10 +181,10 @@ export class IntentService {
    * quando creo un nuovo bot gli elementi welcome e defaultfallback non hanno un _tdActionId
    * perchè generati dal server. In questo caso è necessario assegnarne uno.
    */
-  private patchActionId(faqs){
+  public patchActionId(faqs){
     faqs.forEach(element => {
       element.actions.forEach(action => {
-        if(!action._tdActionId){
+        if(!action._tdActionId || action._tdActionId == "UUIDV4"){
           action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();
         }
       });
@@ -476,7 +476,7 @@ export class IntentService {
     }
     const response = this.updateIntent(intent);
     if(response){
-      this.refreshIntent(intent)
+      // this.refreshIntent(intent)
     }
   }
 

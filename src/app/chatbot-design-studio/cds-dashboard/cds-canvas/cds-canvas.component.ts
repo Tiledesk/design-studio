@@ -190,14 +190,12 @@ export class CdsCanvasComponent implements OnInit {
     this.subscriptionOpenButtonPanel = this.controllerService.isOpenButtonPanel$.subscribe((button: Button) => {
       this.buttonSelected = button;
       if (button) {
-        // this.closeAllPanels(); // nk the action detail panel is not closed when the button detail panel is opened
-        this.IS_OPEN_PANEL_WIDGET = false;
-        // this.closePanelWidget.next();
-        // this.IS_OPEN_PANEL_ACTION_DETAIL = false;
-        // this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
-        // this.IS_OPEN_ADD_ACTIONS_MENU = true;
+        this.closeAllPanels(); // nk the action detail panel is not closed when the button detail panel is opened
+        // this.IS_OPEN_PANEL_WIDGET = false;
         this.removeConnectorDraftAndCloseFloatMenu();
-        this.IS_OPEN_PANEL_BUTTON_CONFIG = true;
+        setTimeout(() => {
+          this.IS_OPEN_PANEL_BUTTON_CONFIG = true;
+        }, 0);
       } else {
         this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
       }
@@ -997,15 +995,17 @@ export class CdsCanvasComponent implements OnInit {
   // --------------------------------------------------------- //
   /** onSaveButton */
   onSaveButton(button: Button) {
-    const arrayId = button.__idConnector.split("/");
-    const intentIdIntentToUpdate = arrayId[0] ? arrayId[0] : null;
-    this.logger.log('onSaveButton: ', button, intentIdIntentToUpdate, this.listOfIntents);
-    if (intentIdIntentToUpdate) {
-      this.intentSelected = this.listOfIntents.find(obj => obj.intent_id === intentIdIntentToUpdate);
-      // forse conviene fare come in onSavePanelIntentDetail passando intent aggiornato (con action corretta)!!!!
-      // this.intentService.onUpdateIntentWithTimeout(this.intentSelected, 0, true);
-      this.intentService.onUpdateIntentFromActionPanel(this.intentSelected);
-    }
+    this.logger.log('onSaveButton: ', this.intentService.intentSelected);
+    this.intentService.onUpdateIntentFromActionPanel(this.intentService.intentSelected);
+    // const arrayId = button.__idConnector.split("/");
+    // const intentIdIntentToUpdate = arrayId[0] ? arrayId[0] : null;
+    // this.logger.log('onSaveButton: ', button, intentIdIntentToUpdate, this.listOfIntents, this.intentService.intentSelected);
+    // if (intentIdIntentToUpdate) {
+    //   this.intentSelected = this.listOfIntents.find(obj => obj.intent_id === intentIdIntentToUpdate);
+    //   // forse conviene fare come in onSavePanelIntentDetail passando intent aggiornato (con action corretta)!!!!
+    //   // this.intentService.onUpdateIntentWithTimeout(this.intentSelected, 0, true);
+    //   this.intentService.onUpdateIntentFromActionPanel(this.intentService.intentSelected);
+    // }
   }
   // --------------------------------------------------------- //
 

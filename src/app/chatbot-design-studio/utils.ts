@@ -388,16 +388,18 @@ export var variableList = {
 }
 
 
-export function patchActionId(action) {
-    try {
-        if(!action._tdActionId || action._tdActionId == "UUIDV4"){
-            action._tdActionId = uuidv4();
-        }
-    } catch (error) {
-       // error 
-    }
-    return action;
-}
+// export function patchActionId(action) {
+//     try {
+//         if(!action._tdActionId || action._tdActionId == "UUIDV4"){
+//             action._tdActionId = uuidv4();
+//         }
+//     } catch (error) {
+//        // error 
+//     }
+//     return action;
+// }
+
+
 
 
 export function generateShortUID(index?) {

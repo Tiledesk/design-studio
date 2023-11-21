@@ -3,7 +3,7 @@ import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
 import { Subject, Subscription } from 'rxjs';
 
-import { ACTIONS_LIST, TYPE_ACTION, TYPE_INTENT_NAME, checkInternalIntent, patchActionId } from '../../../utils';
+import { ACTIONS_LIST, TYPE_ACTION, TYPE_INTENT_NAME, checkInternalIntent } from '../../../utils';
 import { IntentService } from '../../../services/intent.service';
 // import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
 import { ConnectorService } from '../../../services/connector.service';
@@ -184,10 +184,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
       this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
       this.startAction = this.intent.actions[0];
-      if (!this.startAction._tdActionId) {
-        this.startAction = patchActionId(this.intent.actions[0]);
-        this.intent.actions = [this.startAction];
-      }
+      // if (!this.startAction._tdActionId) {
+      //   this.startAction = patchActionId(this.intent.actions[0]);
+      //   this.intent.actions = [this.startAction];
+      // }
       this.isStart = true;
       //** set 'start' intent as default selected one */
       // this.intentService.setDefaultIntentSelected();
@@ -353,7 +353,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     try {
       if (this.intent) {
         this.logger.log("setIntentSelected:: ", this.intent.actions);
-        this.patchAllActionsId();
+        // this.patchAllActionsId();
         this.patchAttributesPosition();
         // this.listOfActions = this.intent.actions.filter(function(obj) {
         //   return obj._tdActionType !== TYPE_ACTION.INTENT;
@@ -386,17 +386,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * retrocompatibility patch.
    * Check if the action has a ._tdActionId attribute
    * otherwise it generates it on the fly */
-  private patchAllActionsId() {
-    if (this.listOfActions && this.listOfActions.length > 0) {
-      this.listOfActions.forEach(function (action, index, object) {
-        console.log('[CDS-INTENT] patchAllActionsId action: ', action);
-        if (!action._tdActionId) {
-         object[index] = patchActionId(action);
-         console.log('[CDS-INTENT] object: ', object[index]);
-        }
-      });
-    }
-  }
+  // private patchAllActionsId() {
+  //   if (this.listOfActions && this.listOfActions.length > 0) {
+  //     this.listOfActions.forEach(function (action, index, object) {
+  //       console.log('[CDS-INTENT] patchAllActionsId action: ', action);
+  //       if (!action._tdActionId) {
+  //       object[index] = patchActionId(action);
+  //       console.log('[CDS-INTENT] object: ', object[index]);
+  //       }
+  //     });
+  //   }
+  // }
 
   /**
    * patchAttributesPosition

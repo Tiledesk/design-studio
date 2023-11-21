@@ -15,7 +15,7 @@ COPY . .
 
 ## Build the angular app in production mode and store the artifacts in dist folder
 
-RUN npm run ng build --configuration="prod" --output-path=dist --base-href="./" --output-hashing=none --build-optimizer=true --vendor-chunk
+RUN npm run ng build --configuration="prod" --output-path=dist --base-href="./" 
 
 
 ### STAGE 2: Setup ###

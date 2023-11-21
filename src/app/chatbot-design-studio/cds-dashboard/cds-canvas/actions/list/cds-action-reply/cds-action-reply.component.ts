@@ -379,7 +379,6 @@ export class CdsActionReplyComponent implements OnInit {
     this.logger.log('onOpenButtonPanel 2 :: ', buttonSelected);
     // this.intentService.setIntentSelected(this.intentSelected.intent_id);
     this.intentService.selectAction(this.intentSelected.intent_id, this.action._tdActionId);
-    this.controllerService.closeAllPanels();
     this.controllerService.openButtonPanel(buttonSelected);
   }
 
