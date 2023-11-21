@@ -194,7 +194,7 @@ export class CdsDashboardComponent implements OnInit {
    * - actions context menu' (static & float),
    * - button configuration panel  
   */
-  onTestItOut(event: Intent | boolean) {
+  onTestItOut(event: Intent) {
     this.logger.log('[CDS DSHBRD] onTestItOut intent ', event);
     // if(typeof event === "boolean"){
     //   this.IS_OPEN_PANEL_WIDGET = true;
@@ -220,7 +220,7 @@ export class CdsDashboardComponent implements OnInit {
     this.logger.log('[CDS DSHBRD] active section-->', event);
     if(event !== 'cds-sb-intents'){
       // this.connectorService.initializeConnectors();
-      this.eventTestItOutHeader.next(false);
+      this.eventTestItOutHeader.next(null);
     }
     this.activeSidebarSection = event;
   }

@@ -19,12 +19,14 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   @ViewChild('widgetIframe', {static:true}) widgetIframe:ElementRef;
 
   @Input() isPanelVisible: boolean = false
+  @Input() intent: Intent;
   // @Input() projectID: string;
   // @Input() id_faq_kb: string;
   // @Input() defaultDepartmentId: string;
   // @Input() intentName: string;
 
   intentName: string;
+  
   projectID: string;
   selectedChatbot: Chatbot;
   defaultDepartmentId: string;
@@ -56,10 +58,8 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
      *  - notify iframe with a postMessage about the changes
      */
     this.intentService.behaviorIntent.pipe(skip(1)).subscribe((intent: Intent)=> {
-      if(intent && intent.intent_display_name !== this.intentName && this.isPanelVisible){
+      if(intent && intent.intent_display_name !== this.intentName){
         this.intentName = intent.intent_display_name
-        this.widgetIframe.nativeElement.contentWindow.postMessage(
-            {action: 'restart', intentName: this.intentName}, "*");
       }
     })
 
@@ -67,6 +67,14 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     this.selectedChatbot = this.dashboardService.selectedChatbot;
     this.defaultDepartmentId = this.dashboardService.defaultDepartment._id;
     this.setIframeUrl()
+  }
+
+  ngOnChanges(changes: SimpleChanges ){
+    //fix-bug: if panel is closed, you have to click twice to restart the flow from selected intent
+    if(this.isPanelVisible && changes['intent'] && changes['intent'].currentValue !== undefined){
+      this.widgetIframe.nativeElement.contentWindow.postMessage(
+        {action: 'restart', intentName: this.intentName}, "*");
+    }
   }
 
   setIframeUrl(){
