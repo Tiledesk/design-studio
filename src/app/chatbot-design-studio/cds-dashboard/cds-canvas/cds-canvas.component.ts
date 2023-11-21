@@ -941,6 +941,9 @@ export class CdsCanvasComponent implements OnInit {
       // this.intentService.setLiveActiveIntent(null);
       this.controllerService.closeAddActionMenu();
       this.connectorService.removeConnectorDraft();
+    }
+
+    if(intent){
       this.intentSelected = intent;
       this.intentService.setIntentSelected(intent.intent_id);
     }

@@ -9,7 +9,8 @@
         [selectedChatbot]="selectedChatbot"
         (goToBck)="goBack()"
         (onTestItOut)="onTestItOut($event)" 
-        (toggleSidebarWith)="onToggleSidebarWith($event)">
+        (toggleSidebarWith)="onToggleSidebarWith($event)"
+        (onMenuOption)="onMenuOption($event)">
     </cds-header>
 
     <div id="chatbot--dashboard" 
@@ -17,6 +18,7 @@
         [class.is_opened_sidebar]="IS_OPEN_SIDEBAR">
        
         <cds-sidebar class="cds-sidebar" 
+            [activeSidebarSection]="activeSidebarSection"
             [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 
             (onClickItemList)="onClickItemList($event)" 
             (goToBck)="goBack()">
@@ -28,7 +30,8 @@
         </cds-canvas>
 
         <cds-chatbot-details *ngIf="activeSidebarSection == SIDEBAR_PAGES.SETTINGS && initFinished" 
-            [selectedChatbot]="selectedChatbot">
+            [selectedChatbot]="selectedChatbot"
+            [activeSection]="activeDetailSection">
         </cds-chatbot-details>
 
         <cds-fulfillment *ngIf="activeSidebarSection == SIDEBAR_PAGES.FULFILLMENT && initFinished" 
@@ -42,7 +45,6 @@
         <cds-rules *ngIf="activeSidebarSection == SIDEBAR_PAGES.RULES && initFinished" 
             [selectedChatbot]="selectedChatbot">
         </cds-rules>
-
         
     </div>
     

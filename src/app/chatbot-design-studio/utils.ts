@@ -18,6 +18,13 @@ export enum SIDEBAR_PAGES {
     SECRETS = 'cds-sb-secrets'
 }
 
+export enum SETTINGS_SECTION {
+    DETAIL = 'bot_detail',
+    IMPORT_EXPORT = 'import_export',
+    COMMUNITY = 'community',
+    DEVELOPER = 'developer'
+}
+
 export enum EXTERNAL_URL {
     getchatbotinfo = "https://tiledesk.com/community/getchatbotinfo/chatbotId/"
 }

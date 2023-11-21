@@ -38,7 +38,7 @@ export class CdsHeaderComponent implements OnInit {
   @Output() toggleSidebarWith = new EventEmitter();
   @Output() goToBck = new EventEmitter();
   @Output() onTestItOut = new EventEmitter();
-
+  @Output() onMenuOption = new EventEmitter();
 
   id_faq_kb: string;
   projectID: string;
@@ -204,7 +204,9 @@ export class CdsHeaderComponent implements OnInit {
     })
   }
 
-
+  onMenuOptionFN(event){
+    this.onMenuOption.emit(event)
+  }
 
   openTestSiteInPopupWindow() {
     // const testItOutBaseUrl = this.TESTSITE_BASE_URL.substring(0, this.TESTSITE_BASE_URL.lastIndexOf('/'));

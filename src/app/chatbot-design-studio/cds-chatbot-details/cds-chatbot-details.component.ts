@@ -8,6 +8,8 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { ProjectService } from 'src/app/services/projects.service';
 import { BotsBaseComponent } from 'src/app/components/bots/bots-base/bots-base.component';
+import { SETTINGS_SECTION } from '../utils';
+import { Observable, Subscription } from 'rxjs';
 const swal = require('sweetalert');
 
 @Component({
@@ -16,44 +18,20 @@ const swal = require('sweetalert');
   styleUrls: ['./cds-chatbot-details.component.scss']
 })
 export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnInit {
+  
   @Input() selectedChatbot: Chatbot;
+  @Input() activeSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
 
-  activeSection: 'bot_detail' | 'import_export' | 'community' | 'developer' = 'bot_detail'
-
-
+  
+  SETTINGS_SECTION = SETTINGS_SECTION
   isVisibleDEP: boolean;
-  public_Key: string;
 
-
-  depts_length: number;
-
-
-
-  done_msg: string;
-
-  showSpinner = true;
-  showSpinnerInUpdateBotCard = true;
- 
-  updateBotError: string;
-  uploadedFile: any;
-
-  updateBotSuccess: string;
-  notValidJson: string;
-  errorDeletingAnswerMsg: string;
-  answerSuccessfullyDeleted: string;
-  thereHasBeenAnErrorProcessing: string;
   project: Project;
 
 
-
-  botDefaultSelectedLangCode: string
-
-
-  faq_kb_remoteKey: string;
-
-  details: any
-
   translationsMap: Map<string, string> = new Map();
+
+  private subscriptionOpenWidgetPanel: Subscription;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -61,7 +39,8 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     public appConfigService: AppConfigService,
     private projectService: ProjectService,
     private translate: TranslateService,
-  ) { super(); }
+  ) { super(); 
+  }
 
   ngOnInit(): void {
     //TODO: check user role with guard
@@ -70,10 +49,11 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     this.getOSCODE();
     this.project = this.projectService.getCurrentProject()
     this.getTranslations();
+
+    
   }
 
   toggleTab(section) {
-
     this.logger.log('[CDS-CHATBOT-DTLS] displaydetails', section)
     this.activeSection = section
   }
@@ -109,9 +89,9 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
   }
 
   getOSCODE() {
-    this.public_Key = this.appConfigService.getConfig().t2y12PruGU9wUtEGzBJfolMIgK;
+    let public_Key = this.appConfigService.getConfig().t2y12PruGU9wUtEGzBJfolMIgK;
 
-    let keys = this.public_Key.split("-");
+    let keys = public_Key.split("-");
 
     keys.forEach(key => {
 
@@ -150,7 +130,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
     });
 
-    if (!this.public_Key.includes("DEP")) {
+    if (!public_Key.includes("DEP")) {
       this.isVisibleDEP = false;
     }
 
