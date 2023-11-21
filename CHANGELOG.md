@@ -5,8 +5,10 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
-### 1.0.5-rc.1
+### 1.0.5-rc.2
+- added: cds-action-condition(w/out else branch)
 - bug-fixed: cds-reply button element not
+- bug-fixed: unable to delete bot avatar image profile
 
 ### 1.0.4 in PROD
 
