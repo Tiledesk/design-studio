@@ -165,17 +165,17 @@ export class CdsActionWebRequestV2Component implements OnInit {
 
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.userDefined.elements.some(v => v.name === 'result')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'result')) {
       new_attributes.push({ name: "result", value: "result" });
     }
-    if (!variableList.userDefined.elements.some(v => v.name === 'status')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'status')) {
       new_attributes.push({ name: "status", value: "status" });
     }
-    if (!variableList.userDefined.elements.some(v => v.name === 'error')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'error')) {
       new_attributes.push({ name: "error", value: "error" });
     }
-    variableList.userDefined.elements = [ ...variableList.userDefined.elements, ...new_attributes];
-    this.logger.debug("[ACTION ASKGPT] Initialized variableList.userDefined: ", variableList.userDefined);
+    variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
+    this.logger.debug("[ACTION ASKGPT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
 

@@ -174,14 +174,14 @@ export class CdsActionAskgptComponent implements OnInit {
   }
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.userDefined.elements.some(v => v.name === 'kb_reply')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_reply')) {
       new_attributes.push({ name: "kb_reply", value: "kb_reply" });
     }
-    if (!variableList.userDefined.elements.some(v => v.name === 'kb_source')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_source')) {
       new_attributes.push({ name: "kb_source", value: "kb_source" });
     }
-    variableList.userDefined.elements = [ ...variableList.userDefined.elements, ...new_attributes];
-    this.logger.debug("[ACTION ASKGPT] Initialized variableList.userDefined: ", variableList.userDefined);
+    variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
+    this.logger.debug("[ACTION ASKGPT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
   changeTextarea($event: string, property: string) {

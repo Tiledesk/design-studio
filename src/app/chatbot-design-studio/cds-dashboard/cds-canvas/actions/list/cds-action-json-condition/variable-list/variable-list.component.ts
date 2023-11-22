@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../../../../../../cds-base-element/dialog/dialog.component';
-import { variableList, variableList2 } from '../../../../../../utils';
+import { variableList } from '../../../../../../utils';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { ActivatedRoute } from '@angular/router';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -41,14 +41,14 @@ export class VariableListComponent implements OnInit {
 
   private initialize(){
     this.idBot = this.dashboardService.id_faq_kb
-    this.variableListUserDefined = variableList2.find(el => el.key === 'userDefined');
-    this.variableListSystemDefined = variableList2.filter(el => el.key !== 'userDefined');
+    this.variableListUserDefined = variableList.find(el => el.key === 'userDefined');
+    this.variableListSystemDefined = variableList.filter(el => el.key !== 'userDefined');
     this.filteredVariableList = []
     this.filteredIntentVariableList = [];
     if(this.variableListUserDefined){
       this.filteredVariableList.push(this.variableListUserDefined)
     }
-    variableList2.filter(el => el.key !== 'userDefined').map(el => {
+    variableList.filter(el => el.key !== 'userDefined').map(el => {
       this.filteredIntentVariableList.push( { key: el.key, elements: el.elements })
     })
     // if(this.variableListSystemDefined){

@@ -10,7 +10,7 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 
 // UTILS //
-import { variableList, convertJsonToArray, variableList2 } from 'src/app/chatbot-design-studio/utils';
+import { variableList, convertJsonToArray } from 'src/app/chatbot-design-studio/utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ProjectService } from 'src/app/services/projects.service';
@@ -89,9 +89,9 @@ export class DashboardService {
             this.selectedChatbot = chatbot;
             this.translateparamBotName = { bot_name: this.selectedChatbot.name }
             if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {
-              variableList2.find(el => el.key ==='userDefined').elements = convertJsonToArray(this.selectedChatbot.attributes.variables);
+              variableList.find(el => el.key ==='userDefined').elements = convertJsonToArray(this.selectedChatbot.attributes.variables);
             } else {
-              variableList2.find(el => el.key ==='userDefined').elements = [];
+              variableList.find(el => el.key ==='userDefined').elements = [];
             }
             resolve(true);
           }
