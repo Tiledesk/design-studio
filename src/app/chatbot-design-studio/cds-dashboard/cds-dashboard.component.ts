@@ -51,7 +51,7 @@ export class CdsDashboardComponent implements OnInit {
   defaultDepartmentId: string;
   selectedChatbot: Chatbot
   activeSidebarSection: SIDEBAR_PAGES;
-  activeDetailSection: SETTINGS_SECTION
+  activeDetailSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
   isBetaUrl: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
