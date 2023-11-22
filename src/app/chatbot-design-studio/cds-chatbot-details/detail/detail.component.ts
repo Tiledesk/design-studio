@@ -470,7 +470,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.uploadService.uploadProfile(this.selectedChatbot._id, currentUpload).then(downloadURL => {
       that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
 
-      that.selectedChatbot.url = downloadURL;
+      // that.selectedChatbot.url = downloadURL;
       this.botProfileImageExist = true
       that.isFilePendingToUpload = false;
       // return downloadURL;

@@ -64,10 +64,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.userDefined.some(v => v.name === 'gpt_reply')) {
+    if (!variableList.userDefined.elements.some(v => v.name === 'gpt_reply')) {
       new_attributes.push({ name: "gpt_reply", value: "gpt_reply" });
     }
-    variableList.userDefined = [...variableList.userDefined, ...new_attributes];
+    variableList.userDefined.elements = [...variableList.userDefined.elements, ...new_attributes];
     this.logger.debug("[ACTION GPT-TASK] Initialized variableList.userDefined: ", variableList.userDefined);
   }
 

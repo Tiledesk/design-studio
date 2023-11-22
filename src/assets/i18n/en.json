@@ -308,6 +308,14 @@
         "DESCRIPTION":{
 
         }
+        
+    },
+    "CDSvariablesList": {
+        "userDefined":"User defined",
+        "mostUsed":"Most used",
+        "systemDefined":"System defined",
+        "uploadedDocument":"Uploaded document",
+        "uploadedImage":"Uploaded image"
     },
     "New":"New",
     "Event":"Event",

@@ -47,7 +47,7 @@ export class DialogComponent implements OnInit {
 
   private _checkIfExist(value: string): boolean {
     const filterValue = value.toLowerCase();
-    const filter = this.userDefined.filter(option => option.name.toLowerCase() === filterValue);
+    const filter = this.userDefined.elements.filter(option => option.name.toLowerCase() === filterValue);
     if(filter.length === 0)
       return false
     return true

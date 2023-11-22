@@ -48,16 +48,16 @@ export class CdsActionQaplaComponent implements OnInit {
   
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.userDefined.some(v => v.name === 'qapla_status')) {
+    if (!variableList.userDefined.elements.some(v => v.name === 'qapla_status')) {
       new_attributes.push({ name: "qapla_status", value: "qapla_status" });
     }
-    if (!variableList.userDefined.some(v => v.name === 'qapla_result')) {
+    if (!variableList.userDefined.elements.some(v => v.name === 'qapla_result')) {
       new_attributes.push({ name: "qapla_result", value: "qapla_result" });
     }
-    if (!variableList.userDefined.some(v => v.name === 'qapla_error')) {
+    if (!variableList.userDefined.elements.some(v => v.name === 'qapla_error')) {
       new_attributes.push({ name: "qapla_error", value: "qapla_error" });
     }
-    variableList.userDefined = [...variableList.userDefined, ...new_attributes];
+    variableList.userDefined.elements = [...variableList.userDefined.elements, ...new_attributes];
     this.logger.debug("[ACTION GPT-TASK] Initialized variableList.userDefined: ", variableList.userDefined);
   }
 
