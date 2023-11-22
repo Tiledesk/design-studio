@@ -18,6 +18,7 @@ import { UploadService } from 'src/chat21-core/providers/abstract/upload.service
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
+import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 const swal = require('sweetalert');
 
 @Component({
@@ -80,7 +81,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     private departmentService: DepartmentService,
     private router: Router,
     private notify: NotifyService,
-    private sanitizer: DomSanitizer,
+    private imageRepoService: ImageRepoService,
     private translate: TranslateService,
     public dialog: MatDialog,
   ) {  super(); }
@@ -260,8 +261,10 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   destructureSelectedChatbot(selectedChatbot: Chatbot) {
     this.logger.log('[CDS-CHATBOT-DTLS] - selectedChatbot', this.selectedChatbot)
     if (this.selectedChatbot._id) {
-      this.checkImageExists(this.selectedChatbot.url, (existImage)=> {
-        existImage? this.botProfileImageExist = true: this.botProfileImageExist= false; 
+      let url = this.imageRepoService.getImagePhotoUrl(this.selectedChatbot._id)
+      console.log('urlllll', url)
+      this.checkImageExists(url, (existImage)=> {
+        existImage? this.selectedChatbot.imageURL = url: null; 
       })
     }
 
@@ -470,7 +473,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.uploadService.uploadProfile(this.selectedChatbot._id, currentUpload).then(downloadURL => {
       that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
 
-      // that.selectedChatbot.url = downloadURL;
+      that.selectedChatbot.imageURL = downloadURL;
       this.botProfileImageExist = true
       that.isFilePendingToUpload = false;
       // return downloadURL;
@@ -492,8 +495,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.logger.log('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE (FAQ-COMP) deleteBotProfileImage')
     this.uploadService.deleteProfile(this.selectedChatbot._id, this.selectedChatbot.url).then((result)=>{
       this.botProfileImageExist = false;
-      this.selectedChatbot.url = null
-
+      this.selectedChatbot.imageURL = null
       const delete_bot_image_btn = <HTMLElement>document.querySelector('#cds-delete-bot-img-btn');
       delete_bot_image_btn.blur();
     }).catch((error)=> {

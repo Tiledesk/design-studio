@@ -63,6 +63,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeComponent } from './components/home/home.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { NetworkService } from './services/network.service';
+import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
@@ -96,7 +97,6 @@ export function imageRepoFactory(appConfig: AppConfigService, http: HttpClient) 
 }
 
 export function uploadFactory(http: HttpClient, appConfig: AppConfigService, appStorage: AppStorageService) {
-
   const config = appConfig.getConfig()
   if (config.uploadEngine === UPLOAD_ENGINE_NATIVE) {
     const nativeUploadService = new NativeUploadService(http, appStorage)
@@ -177,6 +177,11 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
       provide: UploadService,
       useFactory: uploadFactory,
       deps: [HttpClient, AppConfigService, AppStorageService]
+    },
+    {
+      provide: ImageRepoService,
+      useFactory: imageRepoFactory,
+      deps: [AppConfigService, HttpClient]
     },
     {
       provide: AppStorageService,

@@ -17,6 +17,7 @@ import { ScriptService } from 'src/chat21-core/providers/scripts/script.service'
 import { NetworkService } from './services/network.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
+import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 
 @Component({
   selector: 'app-root',
@@ -44,6 +45,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private userService: UsersService,
     private multiChannelService: MultichannelService,
     private uploadService: UploadService,
+    private imageRepoService: ImageRepoService,
     private scriptService: ScriptService,
     private networkService: NetworkService,
   ){
