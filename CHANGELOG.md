@@ -5,6 +5,13 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.6-rc.1
+- added: Export/import redirect function on header menu option
+- added: extension panel on variable list
+- added: baseHref into angular.json
+- added: imageRepoService abstract service to recover chatbot profile image
+- bug-fixed: set default value for activeDetailSection
+
 ### 1.0.5 in PROD
 
 ### 1.0.5-rc.3
