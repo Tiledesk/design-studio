@@ -326,4 +326,18 @@ export class FaqService {
   }
 
 
+  public opsUpdate(payload: any) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    let url = this.SERVER_BASE_PATH + this.project_id + '/faq/ops_update'; 
+    let body = JSON.stringify(payload);
+    this.logger.log('[FAQ-SERV] ops_update FAQ - URL ', url);
+    this.logger.log('[FAQ-SERV] ops_update FAQ - PUT REQUEST BODY ', payload);
+    return this._httpClient.post(url, body, httpOptions);
+  }
+
 }

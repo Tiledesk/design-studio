@@ -128,7 +128,6 @@ export class TiledeskConnectors {
     }
     inblock.inConnectors[connector.id] = connector.id;
     // // console.log("blocks:", this.blocks);
-   
     this.#drawConnector(id, fromPoint, toPoint);
     this.removeConnectorDraft();
     // console.log("connector CREATED id, save, undo:", id, save, undo);
@@ -285,14 +284,14 @@ export class TiledeskConnectors {
     }
   }
 
-  deleteConnectorByToId(intentId) {
+  deleteConnectorsToIntentById(intentId) {
     // console.log("deleteConnectorByToId ----> ", intentId);
     // console.log("blocks :---> ", this.blocks);
     // console.log("connectors :---> ", this.connectors);
     for (var key in this.blocks) {
       var node = this.blocks[key];
       for (var connectorKey in node.outConnectors) {
-        if (connectorKey.includes(intentId)) {
+        if (connectorKey.includes(intentId) && !connectorKey.startsWith(intentId)) {
           // // console.log('DEL CONNECTOR : ', node.outConnectors[connectorKey]);
           delete node.outConnectors[connectorKey];
           this.deleteConnector(connectorKey);
@@ -699,6 +698,7 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint) {
+    console.log("drawConnector:::::  ", backPoint, frontPoint);
     let connector = document.getElementById(id);
     if (!connector) {
       connector = document.createElementNS("http://www.w3.org/2000/svg", "path");

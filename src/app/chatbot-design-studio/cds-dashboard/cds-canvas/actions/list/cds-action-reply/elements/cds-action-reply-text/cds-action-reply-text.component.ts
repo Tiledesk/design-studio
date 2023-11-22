@@ -59,6 +59,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
+      // console.log('[CDS-ACTION-REPLY-TEXT] - subcribe to isChangedConnector$ >>', connector);
       this.connector = connector;
       this.updateConnector();
     });

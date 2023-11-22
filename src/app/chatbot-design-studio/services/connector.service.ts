@@ -101,19 +101,16 @@ export class ConnectorService {
       this.tiledeskConnectors.updateConnectorsOutOfItent(connectorID);
       return true;
     } 
-
     let fromEle = document.getElementById(fromId);
     if(!fromEle) {
       fromEle = await isElementOnTheStage(fromId); // sync
       this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', fromEle);
     }
-
     let toEle = document.getElementById(toId);
     if(!toEle) {
       toEle = await isElementOnTheStage(toId); // sync
       this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle);
     }
-   
     if(fromEle && toEle){
       // const fromEle = document.getElementById(fromId);
       // const toEle = document.getElementById(toId);
@@ -190,9 +187,7 @@ export class ConnectorService {
               }
               this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
               this.logger.log('[CONNECTOR-SERV] -> idConnectorTo', idConnectorTo);
-              if(idConnectorFrom && idConnectorTo){
-                this.createConnectorFromId(idConnectorFrom, idConnectorTo);
-              } 
+              this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             }
           });
         }
@@ -374,10 +369,11 @@ export class ConnectorService {
     this.logger.log('[CONNECTOR-SERV] deleteConnectorsFromActionByActionId actionId ' ,actionId )
   }
 
-  // deleteConnectorByToId(intentId){
-  //   this.tiledeskConnectors.deleteConnectorByToId(intentId);
-  //   this.logger.log('[CONNECTOR-SERV] deleteConnectorByToId intentId ' ,intentId );
-  // }
+
+  public deleteConnectorsToIntentById(intentId){
+    this.tiledeskConnectors.deleteConnectorsToIntentById(intentId);
+    this.logger.log('[CONNECTOR-SERV] deleteConnectorsToIntentById intentId ' ,intentId );
+  }
 
 
   /**

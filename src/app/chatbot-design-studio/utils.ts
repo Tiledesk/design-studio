@@ -414,7 +414,6 @@ export function convertJsonToArray(jsonData:any){
 }
 
 export async function isElementOnTheStage(elementId:string): Promise<any>{
-    
     return new Promise((resolve) => {
         let intervalId = setInterval(async () => {
             const result = document.getElementById(elementId);
@@ -441,7 +440,7 @@ export function removeNodesStartingWith(obj, start) {
     return obj;
 }
 
-export function insertItemIntoPositionInTheArray(array, item, pos = array.length) {
+export function insertItemInArray(array, item, pos = array.length) {
     if (pos < 0 || pos > array.length) {
       pos = array.length;
     }
@@ -449,18 +448,13 @@ export function insertItemIntoPositionInTheArray(array, item, pos = array.length
     return array;
 }
 
-// export function retriveListOfVariables(intents: Array<Intent>) {
-//     variableList.userDefined = []
-//     intents.forEach(intent => {
-//         intent.actions.filter(action => action._tdActionType === TYPE_ACTION.ASSIGN_VARIABLE).forEach(((actionAssignVariable: ActionAssignVariable) => {
-//             if(!actionAssignVariable.hasOwnProperty('assignTo')) return; 
-//             if(actionAssignVariable.assignTo === null || actionAssignVariable.assignTo === '') return;
-//             if(variableList.userDefined.some(el => el.value === actionAssignVariable.assignTo)) return;
-//             if(variableList.systemDefined.some(el => el.value === actionAssignVariable.assignTo)) return;
-//             variableList.userDefined.push({ name: actionAssignVariable.assignTo, value: actionAssignVariable.assignTo })
-//         }))
-//     })
-// }
+export function replaceItemInArray(array, item, pos = array.length) {
+    if (pos < 0 || pos > array.length) {
+      pos = array.length;
+    }
+    array.splice(pos, 0, item);
+    return array;
+}
 
 export function moveItemToPosition(array, DISPLAY_NAME, position) {
     if (position < 0 || position >= array.length) {
@@ -477,15 +471,34 @@ export function moveItemToPosition(array, DISPLAY_NAME, position) {
 }
 
 export function replaceItemInArrayForKey(key, array, item) {
-    let keyValue = item[key];
-    for (let i = 0; i < array.length; i++) {
-        if (array[i][key] === keyValue) {
-          array[i] = item;
-          i=array.length
+    array.forEach(function(obj, index) {
+        if (obj.hasOwnProperty(key) && obj[key] === item[key]) {
+          array[index] = item;
+          return;
         }
-    }
+    });
+    // for (let i = 0; i < array.length; i++) {
+    //     if (array[i][key] === keyValue) {
+    //       array[i] = item;
+    //       i=array.length;
+    //     }
+    // }
     return array;
 }
+
+export function deleteItemInArrayForKey(key, array, item) {
+    return array.filter((obj: any) => obj[key] !== item[key]);
+    // let keyValue = item[key];
+    // for (let i = 0; i < array.length; i++) {
+    //     if (array[i][key] === keyValue) {
+    //       delete array[i];
+    //       i=array.length;
+    //     }
+    // }
+    // return array;
+}
+
+
 
 export function checkInternalIntent(intent: Intent): boolean{
     return intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START ||  intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK ? true: false

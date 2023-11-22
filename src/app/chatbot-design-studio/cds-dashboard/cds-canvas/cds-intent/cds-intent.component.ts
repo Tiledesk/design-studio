@@ -198,7 +198,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       this.setIntentSelected();
     }
-    this.setActionIntent();
+    // il setTimeout evita l'effetto che crea un connettore e poi lo sposta nel undo
+    setTimeout(() => {
+      this.setActionIntent();
+    }, 100); 
     this.isInternalIntent = checkInternalIntent(this.intent)
     this.addEventListener();
   }
@@ -259,7 +262,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       for (const entry of entries) {
         const nuovaAltezza = entry.contentRect.height;
         // console.log('Nuova altezza del div:', nuovaAltezza);
-        this.connectorService.updateConnector(this.intent.intent_id);
+        if(!this.isDragging)this.connectorService.updateConnector(this.intent.intent_id);
       }
     });
     const elementoDom = this.resizeElement.nativeElement;
@@ -698,12 +701,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       if(action && action._tdActionId){
         replaceItemInArrayForKey('_tdActionId', this.intent.actions, action);
       }
-      setTimeout(()=> {
-        // ATTENZIONE!!! trovare il modo di refreshare i connettori SOLO quando la action viene eliminata fisicamente dallo stage!!!
-        // this.connectorService.updateConnector(this.intent.intent_id);
-      }, 0);
     }
     this.setActionIntent();
+
+    
     // this.setActionIntentInListOfActions();
     // console.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
     this.intentService.onUpdateIntentWithTimeout(this.intent, 0, true, connector);
@@ -787,7 +788,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onDeleteIntent(intent: Intent) {
-    this.intentService.setIntentSelected(this.intent.intent_id);
+    // this.intentService.setIntentSelected(this.intent.intent_id);
     this.deleteIntent.emit(intent);
   }
 
