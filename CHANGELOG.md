@@ -5,6 +5,8 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.6 in PROD
+
 ### 1.0.6-rc.1
 - added: Export/import redirect function on header menu option
 - added: extension panel on variable list
