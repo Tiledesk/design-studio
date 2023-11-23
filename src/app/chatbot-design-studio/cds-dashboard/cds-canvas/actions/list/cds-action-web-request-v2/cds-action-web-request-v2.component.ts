@@ -57,9 +57,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    this.logger.debug("[ACTION-ASKGPT] action detail: ", this.action);
+    this.logger.debug("[ACTION-WEB-REQUEST-v2] action detail: ", this.action);
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
+      this.logger.debug('[ACTION-WEB-REQUEST-v2] isChangedConnector -->', connector);
       this.connector = connector;
       this.updateConnector();
     });
@@ -122,7 +122,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
           }
           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
         } else { 
-          this.logger.debug('[ACTION-ASKGPT] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
+          this.logger.debug('[ACTION-WEB-REQUEST-v2] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
           if(array[array.length -1] === 'true'){
             this.isConnectedTrue = true;
             this.action.trueIntent = '#'+this.connector.toId;
@@ -175,7 +175,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
       new_attributes.push({ name: "error", value: "error" });
     }
     variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
-    this.logger.debug("[ACTION ASKGPT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
+    this.logger.debug("[ACTION-WEB-REQUEST-v2] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
 
