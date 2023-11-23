@@ -34,7 +34,9 @@
               "src/favicon.ico",
               "src/assets",
               "src/design-studio-config-template.json",
-              "src/design-studio-config.json"
+              "src/design-studio-config.json",
+              "src/environments/real_data/cds-config-firebase.json",
+              "src/environments/real_data/cds-config-native-prod.json"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",

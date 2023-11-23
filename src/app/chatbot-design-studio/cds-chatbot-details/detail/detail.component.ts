@@ -493,7 +493,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   deleteBotProfileImage() {
     // const file = event.target.files[0]
     this.logger.log('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE (FAQ-COMP) deleteBotProfileImage')
-    this.uploadService.deleteProfile(this.selectedChatbot._id, this.selectedChatbot.url).then((result)=>{
+    this.uploadService.deleteProfile(this.selectedChatbot._id, this.selectedChatbot.imageURL).then((result)=>{
       this.botProfileImageExist = false;
       this.selectedChatbot.imageURL = null
       const delete_bot_image_btn = <HTMLElement>document.querySelector('#cds-delete-bot-img-btn');
