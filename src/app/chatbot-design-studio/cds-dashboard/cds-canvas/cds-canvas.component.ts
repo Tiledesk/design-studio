@@ -592,16 +592,16 @@ export class CdsCanvasComponent implements OnInit {
    * chiamata da cds-panel-action-detail e da cds-panel-button-configuration
    * quando modifico un intent da pannello ex: cambio il testo, aggiungo un bottone ecc.
   */
-  private async updateIntent(intent, time=0, undo=false) {
-    this.logger.log('[CDS-CANVAS] updateIntent: ');
-    // this.connectorService.updateConnector(intent.intent_id);
-    const response = await this.intentService.onUpdateIntentWithTimeout(intent, time, undo);
-    if (response) {
-      this.logger.log('[CDS-CANVAS] OK: intent aggiornato con successo sul server', this.intentSelected);
-    } else {
-      this.logger.log("[CDS-CANVAS] ERRORE: aggiornamento intent sul server non riuscito", this.intentSelected);
-    }
-  }
+  // private async updateIntent(intent, time=0, undo=false) {
+  //   this.logger.log('[CDS-CANVAS] updateIntent: ');
+  //   // this.connectorService.updateConnector(intent.intent_id);
+  //   const response = await this.intentService.onUpdateIntentWithTimeout(intent, time, undo);
+  //   if (response) {
+  //     this.logger.log('[CDS-CANVAS] OK: intent aggiornato con successo sul server', this.intentSelected);
+  //   } else {
+  //     this.logger.log("[CDS-CANVAS] ERRORE: aggiornamento intent sul server non riuscito", this.intentSelected);
+  //   }
+  // }
 
   /** Delete Intent **
    * deleteIntentToListOfIntents: per cancellare l'intent dalla lista degli intents (listOfIntents), quindi in automatico per rimuovere l'intent dallo stage
@@ -765,7 +765,7 @@ export class CdsCanvasComponent implements OnInit {
     intent.id = INTENT_TEMP_ID;
     this.intentService.setDragAndListnerEventToElement(intent.intent_id);
     this.intentService.setIntentSelected(intent.intent_id);
-    this.intentSelected = intent;
+    // this.intentSelected = intent;
     // const savedIntent = await this.intentService.saveNewIntent(intent, nowIntent, prevIntent);
     const savedIntent = await this.intentService.saveNewIntentNew(intent, nowIntent, prevIntent);
   }
@@ -997,7 +997,9 @@ export class CdsCanvasComponent implements OnInit {
   /** onSaveButton */
   onSaveButton(button: Button) {
     this.logger.log('onSaveButton: ', this.intentService.intentSelected);
-    this.intentService.onUpdateIntentFromActionPanel(this.intentService.intentSelected);
+    // this.intentService.onUpdateIntentFromActionPanel(this.intentService.intentSelected);
+    this.intentService.updateIntentNew(this.intentService.intentSelected);
+
     // const arrayId = button.__idConnector.split("/");
     // const intentIdIntentToUpdate = arrayId[0] ? arrayId[0] : null;
     // this.logger.log('onSaveButton: ', button, intentIdIntentToUpdate, this.listOfIntents, this.intentService.intentSelected);
@@ -1019,7 +1021,8 @@ export class CdsCanvasComponent implements OnInit {
     this.logger.log('[CDS-CANVAS] onSavePanelIntentDetail intentSelected ', intentSelected)
     if (intentSelected && intentSelected != null) {
       this.intentSelected = intentSelected;
-      this.intentService.onUpdateIntentFromActionPanel(intentSelected);
+      // this.intentService.onUpdateIntentFromActionPanel(intentSelected);
+      this.intentService.updateIntentNew(intentSelected);
     } else {
       // this.onOpenDialog();
     }
