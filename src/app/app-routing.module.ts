@@ -17,7 +17,7 @@ const routes: Routes = [
   { path: 'project/:projectid/chatbot/:faqkbid', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
   { path: 'project/:projectid/chatbot/:faqkbid/intent/:intent_id', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
 
-  { path: 'project/:projectid/unauthorized', component: UnauthorizedComponent },
+  { path: 'project/unauthorized', component: UnauthorizedComponent },
 
   // Wildcard route for a 404 page
   { path: '**', component: NotFoundComponent }

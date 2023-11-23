@@ -24,7 +24,8 @@
         height: 10px;
     }
     .connector .point-connector-empty {
-        border: 1px solid;
+        outline: 2px solid;
+        border: 0px;
         border-color: #00000061;
         background: #ffffff;
         width: 10px;

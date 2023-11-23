@@ -38,6 +38,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     public translate: TranslateService,
     public tiledeskAuthService: TiledeskAuthService,
     public dialog: MatDialog,
+    private router: Router,
     public appStorageService: AppStorageService,
     public projectService: ProjectService,
     // public uploadService: UploadService,
@@ -277,6 +278,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.IS_ONLINE = true;
       }).catch(error => {
         this.logger.error('[APP-COMP] initAuthentication SIGNINWITHCUSTOMTOKEN error::', error)
+        if(error.status && error.status === 401){
+          this.router.navigate(['project/unauthorized'])
+        }
       })
     } else {
       this.logger.warn('[APP-COMP] >>> I AM NOT LOGGED IN <<<')
