@@ -122,7 +122,7 @@ export class AttributesComponent implements OnInit {
         break;
       }
       case 'value':{
-        this.newAttributes[index].value += variableSelected.value;
+        this.newAttributes[index].value += '{{' + variableSelected.value + '}}'
         if(!this.newAttributes[index].value){
           this.newAttributes.push({key:"", value:""});
         }
