@@ -66,9 +66,7 @@ export class AttributesComponent implements OnInit {
   }
 
   onChangeTextarea(event, index){
-    if(event){
-      this.newAttributes[index].value = event
-    }
+    this.newAttributes[index].value = event
     this.setChangedAttributes();
   }
 
@@ -122,6 +120,7 @@ export class AttributesComponent implements OnInit {
         break;
       }
       case 'value':{
+        console.log('vaaaaaaaa', this.newAttributes[index])
         this.newAttributes[index].value += '{{' + variableSelected.value + '}}'
         if(!this.newAttributes[index].value){
           this.newAttributes.push({key:"", value:""});
