@@ -466,7 +466,7 @@ export class ConnectorService {
    * @param elementID 
    */
   public async updateConnectorsOfBlock(elementID){
-    this.logger.log('[CONNECTOR-SERV] updateConnector2 elementID ' ,elementID );
+    this.logger.log('[CONNECTOR-SERV] updateConnector2 elementID ' ,elementID);
     const elem = await isElementOnTheStage(elementID);
     if(elem){
       var cdsConnectors = elem.querySelectorAll('[connector]');

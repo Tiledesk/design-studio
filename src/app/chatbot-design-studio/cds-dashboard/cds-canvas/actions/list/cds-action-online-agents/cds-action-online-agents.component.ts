@@ -102,14 +102,26 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
 
   private checkConnectionStatus(){
     if(this.action.trueIntent){
-     this.isConnectedTrue = true;
+      this.isConnectedTrue = true;
+      const posId = this.action.trueIntent.indexOf("#");
+      if (posId !== -1) {
+        const toId = this.action.trueIntent.slice(posId+1);
+        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
+      }
     } else {
      this.isConnectedTrue = false;
+     this.idConnectionTrue = null;
     }
     if(this.action.falseIntent){
       this.isConnectedFalse = true;
+      const posId = this.action.falseIntent.indexOf("#");
+      if (posId !== -1) {
+        const toId = this.action.falseIntent.slice(posId+1);
+        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
+      }
      } else {
       this.isConnectedFalse = false;
+      this.idConnectionFalse = null;
      }
   }
 
@@ -134,17 +146,17 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
           this.logger.log(' updateConnector :: onlineagents', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
           if(array[array.length -1] === 'true'){
             this.isConnectedTrue = true;
+            this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
             if(this.action.trueIntent !== '#'+this.connector.toId){
               this.action.trueIntent = '#'+this.connector.toId;
-              this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
               if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
             } 
           }    
           if(array[array.length -1] === 'false'){
             this.isConnectedFalse = true;
+            this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
             if(this.action.falseIntent !== '#'+this.connector.toId){
               this.action.falseIntent = '#'+this.connector.toId;
-              this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
               if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
             } 
           }
