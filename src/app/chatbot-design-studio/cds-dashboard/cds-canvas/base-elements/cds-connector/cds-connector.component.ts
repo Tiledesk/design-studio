@@ -7,6 +7,7 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class CdsConnectorComponent implements OnInit {
   @Input() idConnector: string;
+  @Input() idConnection: string;
   @Input() isConnected: boolean;
 
   constructor() { }

@@ -29,16 +29,14 @@ export class CdsActionDescriptionComponent implements OnInit {
   }
 
   ngOnChanges(){
-    this.logger.log('[ActionDescriptionComponent] ngOnChanges:: ', this.actionSelected, this.elementType);
+    // this.logger.log('[ActionDescriptionComponent] ngOnChanges:: ', this.actionSelected, this.elementType);
     if(this.actionSelected){
       this.elementType = this.actionSelected._tdActionType;
-
       if(this.actionSelected._tdActionTitle && this.actionSelected._tdActionTitle != ""){
         this.dataInput = this.actionSelected._tdActionTitle;
       }
     }
     try {
-
       switch(this.elementType){
         case 'form':
         case 'question':

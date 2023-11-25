@@ -50,7 +50,7 @@ export class CdsActionReplyImageComponent implements OnInit {
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
   
   // Buttons //
-  buttons: Array<Button>;
+  buttons: Array<any>;
   TYPE_BUTTON = TYPE_BUTTON;
   
   
@@ -137,11 +137,13 @@ export class CdsActionReplyImageComponent implements OnInit {
           // DELETE 
           buttonChanged.__isConnected = false;
           buttonChanged.__idConnector = this.connector.fromId;
+          buttonChanged.__idConnection = null;
           buttonChanged.action = '';
           buttonChanged.type = TYPE_BUTTON.TEXT;
           // if(this.connector.notify)
-          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+          // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
           // this.changeActionReply.emit();
+          this.updateAndSaveAction.emit();
         } else {
           // ADD / EDIT
           // buttonChanged.__isConnected = true;
@@ -150,9 +152,11 @@ export class CdsActionReplyImageComponent implements OnInit {
           buttonChanged.type = TYPE_BUTTON.ACTION;
           if(!buttonChanged.__isConnected){
             buttonChanged.__isConnected = true;
+            buttonChanged.__idConnection = this.connector.fromId+"/"+this.connector.toId;
             // if(this.connector.notify)
-            if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+            // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
             // this.changeActionReply.emit();
+            this.updateAndSaveAction.emit();
           } 
         }
         // this.changeActionReply.emit();

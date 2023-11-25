@@ -3,7 +3,7 @@
         <!-- <svg shape-rendering="geometricPrecision" class="pre-line"><path d="M 0 4 L 13 4" class="sc-eGiIjr kEjIty sc-bTQVhO kjXfPj"></path></svg> -->
     </div>
     <div class="block-connector">
-        <div #connectorRef *ngIf="!isConnected" [id]="idConnector" class="point-connector-empty tds_connectable"></div>
-        <div #connectorRef *ngIf="isConnected" [id]="idConnector" class="point-connector"></div>
+        <div connector *ngIf="!isConnected" [id]="idConnector" class="point-connector-empty tds_connectable"></div>
+        <div connector *ngIf="isConnected" [id]="idConnector" [attr.idConnection]="idConnection" class="point-connector"></div>
     </div>
 </div>

@@ -681,14 +681,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   public async onUpdateAndSaveAction(object) {
     this.logger.log('[CDS-INTENT] onUpdateAndSaveAction::::', object);
     let connector = null;
-    if(object && object.type && object.type === 'connector'){
-      connector = object.element;
-      this.setActionIntent();
-    } else if(object && object.type && object.type === 'action'){
-      const action  = object.element;
-      if(action && action._tdActionId){
-        replaceItemInArrayForKey('_tdActionId', this.intent.actions, action);
-      }
+    // if(object && object.type && object.type === 'connector'){
+    //   connector = object.element;
+    //   this.setActionIntent();
+    // } else if(object && object.type && object.type === 'action'){
+    //   const action  = object.element;
+    //   if(action && action._tdActionId){
+    //     replaceItemInArrayForKey('_tdActionId', this.intent.actions, action);
+    //   }
+    // }
+
+    // const action  = object.element;
+    if(object && object._tdActionId){
+      replaceItemInArrayForKey('_tdActionId', this.intent.actions, object);
     }
     
     // this.setActionIntentInListOfActions();

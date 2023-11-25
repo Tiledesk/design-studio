@@ -30,6 +30,8 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
+  idConnectionTrue: string;
+  idConnectionFalse: string;
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
@@ -118,12 +120,14 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
       if(idAction === this.action._tdActionId){
         if(this.connector.deleted){
           if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null
-            this.isConnectedTrue = false
+            this.action.trueIntent = null;
+            this.isConnectedTrue = false;
+            this.idConnectionTrue = null;
           }        
           if(array[array.length -1] === 'false'){
-            this.action.falseIntent = null
+            this.action.falseIntent = null;
             this.isConnectedFalse = false;
+            this.idConnectionFalse = null;
           }
           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
         } else {
@@ -132,6 +136,7 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
             this.isConnectedTrue = true;
             if(this.action.trueIntent !== '#'+this.connector.toId){
               this.action.trueIntent = '#'+this.connector.toId;
+              this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
               if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
             } 
           }    
@@ -139,6 +144,7 @@ export class CdsActionOnlineAgentsComponent implements OnInit {
             this.isConnectedFalse = true;
             if(this.action.falseIntent !== '#'+this.connector.toId){
               this.action.falseIntent = '#'+this.connector.toId;
+              this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
               if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
             } 
           }

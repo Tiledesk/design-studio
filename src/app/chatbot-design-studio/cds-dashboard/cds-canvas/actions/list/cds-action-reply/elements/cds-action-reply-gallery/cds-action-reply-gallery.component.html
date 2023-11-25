@@ -222,13 +222,6 @@
                     (onButtonControl)="onButtonControl($event, i, j)">
                 </cds-action-reply-button>
         
-                <!-- <cds-connector *ngIf="button.type !== TYPE_BUTTON.URL"
-                    class="button-connector"
-                    cdkDragDisabled
-                    [idConnector]="button.__idConnector"
-                    [isConnected]="button.__isConnected">
-                </cds-connector> -->
-        
             </div>
             <div *ngIf="galleryEl.buttons.length < 3" class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', i, null)">
                 + Add button

@@ -21,7 +21,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   @ViewChild('input_title', { static: true }) input_topic: CDSTextComponent;
 
   @Input() isOpenPanel: boolean;
-  @Input() button: Button;
+  @Input() button: any;
   @Output() saveButton = new EventEmitter();
   // @Output() closeButtonPanel = new EventEmitter();
 
@@ -282,6 +282,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     if (posId !== -1) {
       toId = this.button.action.slice(posId+1);
     }
+    this.button.__idConnection = fromId+"/"+toId;
     this.logger.log('onChangeGoToBlock: ', this.button);
     // IMPORTANT! non salvare la modifica dei connettori ma solo la modifica della action!
     this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false, false);
@@ -294,6 +295,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     const fromId = this.button.__idConnector;
     this.connectorService.deleteConnectorWithIDStartingWith(fromId);
     this.button.__isConnected = false;
+    this.button.__idConnection = null;
     this.button.action = '';
   }
 

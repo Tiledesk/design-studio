@@ -112,38 +112,49 @@ export class ConnectorService {
       this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle);
     }
     if(fromEle && toEle){
-      // const fromEle = document.getElementById(fromId);
-      // const toEle = document.getElementById(toId);
       const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
       const toPoint = this.tiledeskConnectors.elementLogicTopLeft(toEle);
-      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, save, undo);
+      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, save, undo, false);
       return true;
     } else {
       return false;
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  public async createConnectorById(connectorID) {
+    const isConnector = document.getElementById(connectorID);
+    if (isConnector) {
+      this.logger.log('[CONNECTOR-SERV] createConnectorById il connettore esiste già', connectorID);
+      this.tiledeskConnectors.updateConnectorsOutOfItent(connectorID);
+      return true;
+    } 
+    var lastIndex = connectorID.lastIndexOf("/");
+    if (lastIndex !== -1) {
+      const fromId = connectorID.substring(0, lastIndex);
+      const toId = connectorID.substring(lastIndex + 1);
+      let fromEle = document.getElementById(fromId);
+      if(!fromEle) {
+        fromEle = await isElementOnTheStage(fromId); // sync
+        this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', fromEle);
+      }
+      let toEle = document.getElementById(toId);
+      if(!toEle) {
+        toEle = await isElementOnTheStage(toId); // sync
+        this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle);
+      }
+      if (toEle && fromEle) {
+        const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
+        const toPoint = this.tiledeskConnectors.elementLogicTopLeft(toEle);
+        this.logger.log('[CONNECTOR-SERV] createConnectorById createConnector', connectorID);
+        this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, false, false, false);
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 
 
 
@@ -381,9 +392,9 @@ export class ConnectorService {
    * @param connectorID 
    * 
    */
-  public deleteConnector(connectorID, save=false, undo=false) {
+  public deleteConnector(connectorID, save=false, undo=false, notify=true) {
     this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', connectorID)
-    this.tiledeskConnectors.deleteConnector(connectorID, save, undo);
+    this.tiledeskConnectors.deleteConnector(connectorID, save, undo, notify);
   }
 
 
@@ -449,6 +460,52 @@ export class ConnectorService {
     }
   }
 
+
+  /**
+   * 
+   * @param elementID 
+   */
+  public async updateConnectorsOfBlock(elementID){
+    this.logger.log('[CONNECTOR-SERV] updateConnector2 elementID ' ,elementID );
+    const elem = await isElementOnTheStage(elementID);
+    if(elem){
+      var cdsConnectors = elem.querySelectorAll('[connector]');
+      const elements = Array.from(cdsConnectors).map((element: HTMLElement) => element);
+      elements.forEach(element => {
+        const fromId = element.id;
+        const connectionId = element.getAttribute('idConnection');
+        this.logger.log('[CONNECTOR-SERV] element::', element, connectionId, fromId);
+        for (var connectorId in this.tiledeskConnectors.connectors) {
+          if (connectorId.startsWith(fromId)) {
+            this.deleteConnectorById(connectorId);
+          }
+        }
+        if(connectionId){
+          this.createConnectorById(connectionId);
+        }
+      });
+    }
+  }
+
+
+
+
+  public deleteConnectorById(connectorId) {
+    // for (var connectorKey in this.tiledeskConnectors.connectors) {
+    //   console.log("[JS] deleteConnectorWithFromId ----> ", fromId, connectorKey);
+    //   if (connectorKey.startsWith(fromId)) {
+    //     const connectorId = this.tiledeskConnectors.connectors[connectorKey].id;
+        let connectorElement = document.getElementById(connectorId);
+        if(connectorElement){
+          console.log("[JS] deleteConnectorWithFromId ----> ID",connectorId);
+          this.deleteConnector(connectorId, false, false, false);
+        }
+    //   }
+    // }
+  }
+
+
+  
   /**
    * moved
    * @param element 

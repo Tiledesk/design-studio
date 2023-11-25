@@ -4,7 +4,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/models/action-model';
-import { TYPE_BUTTON, generateShortUID } from '../../../../../../../utils';
+import { TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../../utils';
 import { IntentService } from '../../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../../services/connector.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -47,7 +47,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   booleanOperators = [ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},];
   // Buttons //
   TYPE_BUTTON = TYPE_BUTTON;
-  buttons: Array<Button>;
+  buttons: Array<any>;
 
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -135,10 +135,12 @@ export class CdsActionReplyTextComponent implements OnInit {
           this.logger.log('[CdsActionReplyTextComponent] deleteConnector :: ', this.connector.fromId);
           buttonChanged.__isConnected = false;
           buttonChanged.__idConnector = this.connector.fromId;
+          buttonChanged.__idConnection = null;
           buttonChanged.action = '';
           buttonChanged.type = TYPE_BUTTON.TEXT;
           // if(this.connector.notify)
-          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+          this.updateAndSaveAction.emit();
+          // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
           // this.changeActionReply.emit();
         } else {
           // ADD / EDIT
@@ -149,8 +151,10 @@ export class CdsActionReplyTextComponent implements OnInit {
           this.logger.log('[CdsActionReplyTextComponent] updateConnector :: ', buttonChanged);
           if(!buttonChanged.__isConnected){
             buttonChanged.__isConnected = true;
+            buttonChanged.__idConnection = this.connector.fromId+"/"+this.connector.toId;
             // if(this.connector.notify)
-            if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+            this.updateAndSaveAction.emit();
+            // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
             // this.changeActionReply.emit();
           } 
         }
