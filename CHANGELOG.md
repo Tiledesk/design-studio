@@ -5,6 +5,14 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+
+### 1.0.7-rc.1
+- added: redirect to unauthorized page if signInWithCustomtoken response with 401 error
+- bug-fixed: cannot delete chatbot profile image in PROD
+- bug-fixed: action-web-requestv2 headers attributes variable not saved with double curly brackets
+- bug-fixed: cannot delete first button into cds-action-reply elements
+- bug-fixed: cannot clear header attriibutes on cds-web-request-v2
+
 ### 1.0.6 in PROD
 
 ### 1.0.6-rc.1

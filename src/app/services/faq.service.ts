@@ -320,8 +320,7 @@ export class FaqService {
     };
     let url = this.SERVER_BASE_PATH + this.project_id + '/faq/' + id + '/attributes';
     let body = JSON.stringify(attributes);
-    console.log('[FAQ.SERV] updateFaq - BODY ', url, body);
-    return this._httpClient .patch<Intent>(url, body, httpOptions)
+    return this._httpClient.patch<Intent>(url, body, httpOptions)
     // return this._httpClient.patch(url, body, httpOptions)
   }
 
