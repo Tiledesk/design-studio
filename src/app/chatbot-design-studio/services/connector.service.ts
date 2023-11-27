@@ -470,6 +470,7 @@ export class ConnectorService {
     const elem = await isElementOnTheStage(elementID);
     if(elem){
       var cdsConnectors = elem.querySelectorAll('[connector]');
+      this.logger.log('[CONNECTOR-SERV] elem::', Array.from(cdsConnectors));
       const elements = Array.from(cdsConnectors).map((element: HTMLElement) => element);
       elements.forEach(element => {
         const fromId = element.id;

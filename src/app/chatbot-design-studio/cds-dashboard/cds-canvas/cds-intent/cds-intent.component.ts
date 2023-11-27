@@ -115,13 +115,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] sto modifico l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
-          // this.setActionIntent();
           if (intent['attributesChanged']) {
             this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
             delete intent['attributesChanged'];
           } else { // if(this.intent.actions.length !== intent.actions.length && intent.actions.length>0)
             this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
             this.listOfActions = this.intent.actions;
+            this.setActionIntent();
             // cerca il primo connect to block e fissalo in fondo
             // this.listOfActions = this.intent.actions.filter(function(obj) {
             //   return obj._tdActionType !== TYPE_ACTION.INTENT;

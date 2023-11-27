@@ -26,6 +26,7 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
   // Connectors
   idIntentSelected: string;
   idConnector: string;
+  idConnection: string;
   isConnected: boolean = false;
   connector: any;
   private subscriptionChangedConnector: Subscription;
@@ -64,8 +65,14 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
   private checkConnectionStatus(){
     if(this.action.goToIntent){
      this.isConnected = true;
+     const posId = this.action.goToIntent.indexOf("#");
+      if (posId !== -1) {
+        const toId = this.action.goToIntent.slice(posId+1);
+        this.idConnection = this.idConnector+"/"+toId;
+      }
     } else {
      this.isConnected = false;
+     this.idConnection = null;
     }
   }
 
@@ -76,14 +83,14 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
       if(idAction === this.action._tdActionId){
         if(this.connector.deleted){ 
           // DELETE 
-          this.action.goToIntent = null
-          this.isConnected = false
+          this.action.goToIntent = null;
+          this.isConnected = false;
+          this.idConnection = null;
         } else { 
           // ADD / EDIT
           this.isConnected = true;
-          if(this.action.goToIntent !== "#"+this.connector.toId){ 
-            this.action.goToIntent = "#"+this.connector.toId;
-          } 
+          this.idConnection = this.connector.fromId+"/"+this.connector.toId;
+          this.action.goToIntent = "#"+this.connector.toId;
         };
         if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
       }

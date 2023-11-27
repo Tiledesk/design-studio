@@ -27,6 +27,7 @@ export class CdsActionIntentComponent implements OnInit {
   intents: Array<{name: string, value: string, icon?:string}>
   idIntentSelected: string;
   idConnector: string;
+  idConnection: string;
   isConnected: boolean = false;
   connector: any;
   element: any;
@@ -36,9 +37,7 @@ export class CdsActionIntentComponent implements OnInit {
   
   constructor(
     private intentService: IntentService
-  ) {
-    
-  }
+  ) {}
 
   ngOnInit(): void {
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
@@ -59,16 +58,21 @@ export class CdsActionIntentComponent implements OnInit {
 
   // ngOnChanges(changes: SimpleChanges): void {
   //   console.log('[CDS-ACTION-INTENT] >> ngOnChanges', changes);
-  //   // this.checkConnectionStatus();
+  //   this.checkConnectionStatus();
   // }
 
-  
 
   private checkConnectionStatus(){
     if(this.action.intentName){
      this.isConnected = true;
+     const posId = this.action.intentName.indexOf("#");
+      if (posId !== -1) {
+        const toId = this.action.intentName.slice(posId+1);
+        this.idConnection = this.idConnector+"/"+toId;
+      }
     } else {
      this.isConnected = false;
+     this.idConnection = null;
     }
   }
 
@@ -97,9 +101,10 @@ export class CdsActionIntentComponent implements OnInit {
         if(this.connector.deleted){
           this.action.intentName = null;
           this.isConnected = false;
+          this.idConnection = null;
         } else {
-          // console.log('[CDS-ACTION-INTENT] connettore creato - PALLINO PIENO :: ', this.connector);
           this.isConnected = true;
+          this.idConnection = this.connector.fromId+"/"+this.connector.toId;
           this.action.intentName = "#"+this.connector.toId;
         }
         if(this.connector.save)

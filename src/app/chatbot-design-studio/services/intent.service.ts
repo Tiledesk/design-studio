@@ -1166,7 +1166,7 @@ export class IntentService {
   async restoreIntentNew(operations){
     operations.forEach(async ele => {
       let intent = JSON.parse(JSON.stringify(ele.intent));
-      // console.log('restoreIntentNew', ele);
+      
       if(ele.type === 'post'){
         this.listOfIntents = insertItemInArray(this.listOfIntents, intent);
       }
@@ -1176,7 +1176,9 @@ export class IntentService {
       else if(ele.type === 'put'){
         this.listOfIntents = replaceItemInArrayForKey('intent_id', this.listOfIntents, intent);
       }
+
       let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
+      console.log('[INTENT SERVICE] -> restoreIntentNew isOnTheStage: ', isOnTheStage, intent.intent_id);
       if(isOnTheStage){
         this.refreshIntents();
         this.setIntentSelected(intent.intent_id);
@@ -1184,7 +1186,7 @@ export class IntentService {
         this.setDragAndListnerEventToElement(intent.intent_id);
       }
     });
-    console.log('[INTENT SERVICE] -> restore operations: ', operations, this.listOfIntents);
+    // console.log('[INTENT SERVICE] -> restore operations: ', operations, this.listOfIntents);
   }
 
 
