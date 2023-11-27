@@ -34,6 +34,8 @@ export class CdsActionJsonConditionComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
+  idConnectionTrue: string;
+  idConnectionFalse: string;
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
@@ -85,16 +87,41 @@ export class CdsActionJsonConditionComponent implements OnInit {
       this.checkConnectionStatus();
     }
   
+    // private checkConnectionStatus(){
+    //   if(this.action.trueIntent){
+    //    this.isConnectedTrue = true;
+    //   } else {
+    //    this.isConnectedTrue = false;
+    //   }
+    //   if(this.action.falseIntent){
+    //     this.isConnectedFalse = true;
+    //    } else {
+    //     this.isConnectedFalse = false;
+    //    }
+    // }
+
     private checkConnectionStatus(){
       if(this.action.trueIntent){
-       this.isConnectedTrue = true;
+        this.isConnectedTrue = true;
+        const posId = this.action.trueIntent.indexOf("#");
+        if (posId !== -1) {
+          const toId = this.action.trueIntent.slice(posId+1);
+          this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
+        }
       } else {
        this.isConnectedTrue = false;
+       this.idConnectionTrue = null;
       }
       if(this.action.falseIntent){
         this.isConnectedFalse = true;
+        const posId = this.action.falseIntent.indexOf("#");
+        if (posId !== -1) {
+          const toId = this.action.falseIntent.slice(posId+1);
+          this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
+        }
        } else {
         this.isConnectedFalse = false;
+        this.idConnectionFalse = null;
        }
     }
   
@@ -106,22 +133,26 @@ export class CdsActionJsonConditionComponent implements OnInit {
           if(this.connector.deleted){
             // this.action.intentName = null;
             if(array[array.length -1] === 'true'){
-              this.action.trueIntent = null
-              this.isConnectedTrue = false
+              this.action.trueIntent = null;
+              this.isConnectedTrue = false;
+              this.idConnectionTrue = null;
             }        
             if(array[array.length -1] === 'false'){
               this.action.falseIntent = null
               this.isConnectedFalse = false;
+              this.idConnectionFalse = null;
             }
             if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
           } else {
             if(array[array.length -1] === 'true'){
               this.isConnectedTrue = true;
+              this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
               this.action.trueIntent = '#'+this.connector.toId;
               if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
             }        
             if(array[array.length -1] === 'false'){
               this.isConnectedFalse = true;
+              this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
               this.action.falseIntent = '#'+this.connector.toId;
               if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
             }
