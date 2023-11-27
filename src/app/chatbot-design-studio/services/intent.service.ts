@@ -1166,25 +1166,36 @@ export class IntentService {
   async restoreIntentNew(operations){
     operations.forEach(async ele => {
       let intent = JSON.parse(JSON.stringify(ele.intent));
-      
       if(ele.type === 'post'){
         this.listOfIntents = insertItemInArray(this.listOfIntents, intent);
+        let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
+        if(isOnTheStage){
+          this.connectorService.updateConnectorsOfBlock(intent.intent_id);
+          this.refreshIntents();
+          this.setIntentSelected(intent.intent_id);
+          this.setDragAndListnerEventToElement(intent.intent_id);  
+        }
       }
       else if(ele.type === 'delete'){
-        this.listOfIntents = deleteItemInArrayForKey('intent_id', this.listOfIntents, intent);
+        let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
+        if(isOnTheStage){
+          this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id);
+          this.listOfIntents = deleteItemInArrayForKey('intent_id', this.listOfIntents, intent);
+          this.refreshIntents();
+          this.setDefaultIntentSelected();
+        }
       }
       else if(ele.type === 'put'){
         this.listOfIntents = replaceItemInArrayForKey('intent_id', this.listOfIntents, intent);
+        let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
+        if(isOnTheStage){
+          this.connectorService.updateConnectorsOfBlock(intent.intent_id);
+          this.refreshIntents();
+          this.setIntentSelected(intent.intent_id);
+          this.setDragAndListnerEventToElement(intent.intent_id);  
+        }
       }
-
-      let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
-      console.log('[INTENT SERVICE] -> restoreIntentNew isOnTheStage: ', isOnTheStage, intent.intent_id);
-      if(isOnTheStage){
-        this.refreshIntents();
-        this.setIntentSelected(intent.intent_id);
-        this.connectorService.updateConnectorsOfBlock(intent.intent_id);
-        this.setDragAndListnerEventToElement(intent.intent_id);
-      }
+      console.log('[INTENT SERVICE] -> restoreIntentNew: ', ele.type, intent.intent_id);
     });
     // console.log('[INTENT SERVICE] -> restore operations: ', operations, this.listOfIntents);
   }
@@ -1505,6 +1516,7 @@ export class IntentService {
       intentsToUpdate.forEach(ele => {
         this.checkEndsWith(ele, intent.intent_id, this.operationsRedo, ele);
       });
+
       this.listOfIntents = deleteItemInArrayForKey('intent_id', this.listOfIntents, intent);
       this.connectorService.deleteConnectorsOfBlock(intent.intent_id);
       // this.connectorService.deleteConnectorsToIntentById(intent.intent_id);

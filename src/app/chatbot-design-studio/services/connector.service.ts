@@ -467,7 +467,7 @@ export class ConnectorService {
    */
   public async updateConnectorsOfBlock(elementID){
     this.logger.log('[CONNECTOR-SERV] updateConnector2 elementID ' ,elementID);
-    const elem = await isElementOnTheStage(elementID);
+    const elem = await isElementOnTheStage(elementID); //sync
     if(elem){
       var cdsConnectors = elem.querySelectorAll('[connector]');
       this.logger.log('[CONNECTOR-SERV] elem::', Array.from(cdsConnectors));
@@ -485,7 +485,9 @@ export class ConnectorService {
           this.createConnectorById(connectionId);
         }
       });
+      return true;
     }
+    return true;
   }
 
 

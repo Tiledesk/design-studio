@@ -132,15 +132,15 @@ export class CdsActionReplyTextComponent implements OnInit {
       if(idConnector === this.connector.fromId && buttonChanged){
         if(this.connector.deleted){
           // DELETE 
-          this.logger.log('[CdsActionReplyTextComponent] deleteConnector :: ', this.connector.fromId);
+          this.logger.log('[CdsActionReplyTextComponent] deleteConnector :: ', this.connector);
           buttonChanged.__isConnected = false;
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.__idConnection = null;
           buttonChanged.action = '';
           buttonChanged.type = TYPE_BUTTON.TEXT;
           // if(this.connector.notify)
-          this.updateAndSaveAction.emit();
-          // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+          // this.updateAndSaveAction.emit();
+          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
           // this.changeActionReply.emit();
         } else {
           // ADD / EDIT
@@ -153,8 +153,8 @@ export class CdsActionReplyTextComponent implements OnInit {
             buttonChanged.__isConnected = true;
             buttonChanged.__idConnection = this.connector.fromId+"/"+this.connector.toId;
             // if(this.connector.notify)
-            this.updateAndSaveAction.emit();
-            // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
+            // this.updateAndSaveAction.emit();
+            if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
             // this.changeActionReply.emit();
           } 
         }
