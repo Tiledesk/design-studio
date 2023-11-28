@@ -632,6 +632,9 @@ export class IntentService {
     // console.log('moveActionBetweenDifferentIntents: ', event, this.listOfIntents, currentIntentId, currentIntent, previousIntent);
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);
+
+    this.updateIntentNew(currentIntent, previousIntent);
+    return;
     // this.connectorService.updateConnector(currentIntent.intent_id);
     // this.connectorService.updateConnector(previousIntent.intent_id);
     this.connectorService.deleteConnectorsFromActionByActionId(action._tdActionId);
@@ -1392,7 +1395,7 @@ export class IntentService {
   /************************************************/
   /** */
   public async updateIntentNew(intent: Intent, fromIntent?: Intent){
-    console.log('[INTENT SERVICE] -> updateIntentNew, ', intent);
+    console.log('[INTENT SERVICE] -> updateIntentNew, ', intent, fromIntent);
     const intentPrev = this.prevListOfIntent.find((obj) => obj.intent_id === intent.intent_id);
     this.operationsUndo = [];
     this.operationsRedo = [];
