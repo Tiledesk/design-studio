@@ -93,7 +93,7 @@ export class ConnectorService {
    * @param undo 
    * @returns 
    */
-  public async createConnectorFromId(fromId, toId, save=false, undo=false) {
+  public async createConnectorFromId(fromId, toId, save=false, undo=false, notify=false) {
     const connectorID = fromId+'/'+toId;
     const isConnector = document.getElementById(connectorID);
     if (isConnector) {
@@ -104,17 +104,17 @@ export class ConnectorService {
     let fromEle = document.getElementById(fromId);
     if(!fromEle) {
       fromEle = await isElementOnTheStage(fromId); // sync
-      this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', fromEle);
+      this.logger.log('[CONNECTOR-SERV] isOnTheStage fromEle:', fromEle);
     }
     let toEle = document.getElementById(toId);
     if(!toEle) {
       toEle = await isElementOnTheStage(toId); // sync
-      this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle);
+      this.logger.log('[CONNECTOR-SERV] isOnTheStage toEle:', toEle);
     }
     if(fromEle && toEle){
       const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
       const toPoint = this.tiledeskConnectors.elementLogicTopLeft(toEle);
-      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, save, undo, false);
+      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, save, undo, notify);
       return true;
     } else {
       return false;
@@ -491,8 +491,6 @@ export class ConnectorService {
   }
 
 
-
-
   public deleteConnectorById(connectorId) {
     // for (var connectorKey in this.tiledeskConnectors.connectors) {
     //   console.log("[JS] deleteConnectorWithFromId ----> ", fromId, connectorKey);
@@ -565,7 +563,7 @@ export class ConnectorService {
    * @param intent_id 
    * @returns 
    */
-  public searchConnectorsInOfIntent(intent_id: string): Array<any>{
+  public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // this.logger.log('[CONNECTOR-SERV] -----> searchConnectorsInOfIntent::: ', intent_id);
     // this.logger.log('[CONNECTOR-SERV] -----> searchConnectorsInOfIntent::: ', this.tiledeskConnectors.connectors);
     const connectors = Object.keys(this.tiledeskConnectors.connectors)

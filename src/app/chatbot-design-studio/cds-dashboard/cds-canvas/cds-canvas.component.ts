@@ -340,7 +340,8 @@ export class CdsCanvasComponent implements OnInit {
         this.logger.log('[CDS-CANVAS] end-dragging ', el);
         el.style.zIndex = 1;
         if(this.intentSelected){
-          this.intentService.patchAttributes(this.intentSelected);
+          this.intentService.updateIntentNew(this.intentSelected);
+          // this.intentService.patchAttributes(this.intentSelected);
         }
       },
       false
@@ -692,8 +693,9 @@ export class CdsCanvasComponent implements OnInit {
     const fromId = connectorDraft.fromId;
     const toId = intent.intent_id;
     this.logger.log('[CDS-CANVAS] sto per creare il connettore ', connectorDraft, fromId, toId);
-    const resp = await this.connectorService.createConnectorFromId(fromId, toId, false, false); //Sync
+    const resp = await this.connectorService.createConnectorFromId(fromId, toId, false, false, true); //Sync
     if(resp){
+      // aggiorno action di partenza 
       let splitFromId = fromId.split('/');
       let intent_id = splitFromId[0];
       let prevIntent = this.intentService.prevListOfIntent.find((obj) => obj.intent_id === intent_id);

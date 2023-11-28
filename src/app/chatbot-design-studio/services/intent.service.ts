@@ -1018,7 +1018,7 @@ export class IntentService {
    */
   private setListOfintentsToUpdate(intent, listOfIntents){
     let intentsToUpdate = [];
-    const connectorsID = this.connectorService.searchConnectorsInOfIntent(intent.intent_id);
+    const connectorsID = this.connectorService.searchConnectorsInByIntent(intent.intent_id);
     const nowIntents = JSON.parse(JSON.stringify(listOfIntents));
     console.log('setListOfintentsToUpdate', nowIntents, connectorsID);
     connectorsID.forEach(connector => {
@@ -1186,9 +1186,11 @@ export class IntentService {
         }
       }
       else if(ele.type === 'put'){
+        console.log('[INTENT SERVICE] -> PUT: ', intent);
         this.listOfIntents = replaceItemInArrayForKey('intent_id', this.listOfIntents, intent);
         let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
         if(isOnTheStage){
+          this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id, false, false, false);
           this.connectorService.updateConnectorsOfBlock(intent.intent_id);
           this.refreshIntents();
           this.setIntentSelected(intent.intent_id);
@@ -1406,7 +1408,9 @@ export class IntentService {
       type: "put", 
       intent: JSON.parse(JSON.stringify(intentPrev)) 
     });
+
     if(fromIntent){
+      // MAI!!! da verificare!!!
       const fromIntentPrev = this.prevListOfIntent.find((obj) => obj.intent_id === fromIntent.intent_id);
       this.operationsRedo.push({
         type: "put", 
@@ -1415,6 +1419,19 @@ export class IntentService {
       this.operationsUndo.push({
         type: "put", 
         intent: JSON.parse(JSON.stringify(fromIntentPrev)) 
+      });
+    } else {
+      // quando sposto un intent sullo stage
+      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id);
+      intentsToUpdate.forEach(ele => {
+        this.operationsUndo.push({
+          type: "put", 
+          intent: JSON.parse(JSON.stringify(ele))
+        }); 
+        this.operationsRedo.push({
+          type: "put", 
+          intent: JSON.parse(JSON.stringify(ele))
+        });
       });
     }
     this.payload.operations = this.operationsRedo;
@@ -1534,7 +1551,7 @@ export class IntentService {
     /** */
     private findsIntentsToUpdate(intent_id){
       let intentsToUpdate = [];
-      let listConnectors = this.connectorService.searchConnectorsInOfIntent(intent_id);
+      let listConnectors = this.connectorService.searchConnectorsInByIntent(intent_id);
       listConnectors.forEach(element => {
         const splitFromId = element.fromId.split('/');
         const intentToUpdateId = splitFromId[0];
