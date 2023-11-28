@@ -248,7 +248,13 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-qapla>
-    
+                    <!-- ADD INTENT MAKE-->
+                    <cds-action-make *ngSwitchCase="TYPE_ACTION.MAKE"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-make>
                 </div>
             </span>
             

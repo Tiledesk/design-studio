@@ -168,6 +168,7 @@ import { CdsActionWhatsappStaticComponent } from './cds-dashboard/cds-canvas/act
 import { CdsActionGPTTaskComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-gpt-task/cds-action-gpt-task.component';
 import { CdsActionCaptureUserReplyComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-capture-user-reply/cds-action-capture-user-reply.component';
 import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-qapla/cds-action-qapla.component';
+import { CdsActionMakeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-make/cds-action-make.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
@@ -280,6 +281,7 @@ import { NetworkOfflineComponent } from '../modals/network-offline/network-offli
         CdsActionHideMessageComponent,
         CdsActionWebRequestComponent,
         CdsActionWebRequestV2Component,
+        CdsActionMakeComponent,
         CdsActionWhatsappAttributeComponent,
         CdsActionWhatsappStaticComponent,
         CdsWhatsappReceiverComponent,

@@ -151,6 +151,28 @@ export class ActionWebRequestV2 extends Action {
     }
 }
 
+export class ActionMake extends Action {
+    url: string;
+    bodyParameters: string;
+    //bodyType: string;
+    //assignResultTo: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    assignments: {}
+    constructor(){
+        super();
+        this.url = '';
+        this.bodyParameters = "";
+        //this.bodyType = 'none'
+        this.assignStatusTo = '';
+        this.assignErrorTo = '';
+        this.assignments = {};
+        this._tdActionType = TYPE_ACTION.MAKE;
+    }
+}
+
 export class ActionReplaceBot extends Action {
     botName: string;
     constructor(){

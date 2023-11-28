@@ -286,6 +286,24 @@ export class ConnectorService {
             this.createConnectorFromId(idConnectorFrom, idConnectorTo);
           }
         }
+        /**  WEB-MAKE */
+        if(action._tdActionType === TYPE_ACTION.MAKE){
+          if(action.trueIntent && action.trueIntent !== ''){
+            const idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            const idConnectorTo =  action.trueIntent.replace("#", "");
+            this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            const idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            const idConnectorTo = action.falseIntent.replace("#", "");
+            this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+          }
+        }
+        
 
         /**  CAPTURE USER_REPLY */
         if(action._tdActionType === TYPE_ACTION.CAPTURE_USER_REPLY){
