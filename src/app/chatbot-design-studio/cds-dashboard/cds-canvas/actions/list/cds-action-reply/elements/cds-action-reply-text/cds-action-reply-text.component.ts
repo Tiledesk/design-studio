@@ -245,7 +245,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   }  
 
   checkForVariablesInsideText(text: string){
-    text.match(new RegExp(/(?<=\$\{)(.*)(?=\})/g, 'g')).forEach(match => {
+    text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g, 'g')).forEach(match => {
       let createTag = '<span class="tag">' + match + '</span>'
       text = text.replace('{' + match + '}',createTag)
     });
