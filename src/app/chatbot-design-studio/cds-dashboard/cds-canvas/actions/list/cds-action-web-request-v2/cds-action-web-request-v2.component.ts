@@ -258,16 +258,19 @@ export class CdsActionWebRequestV2Component implements OnInit {
         this.action.jsonBody = this.body;
         setTimeout(() => {
           this.jsonIsValid = this.isValidJson(this.body);
-          this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        }, 500);
+          // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+        }, 0);
         break;
       }
       case 'url' : {
         this.action.url = e;
-        this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+        // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
       }
     }
+  }
 
+  onBlur(event){
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
   onChangeOption(event: 'header'|'body'){
@@ -281,7 +284,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
   }
 
   onChangeAttributes(attributes:any){
-    // this.logger.log('onChangeAttributes');
+    this.logger.log('onChangeAttributes');
     this.action.headersString = attributes;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }

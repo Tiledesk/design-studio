@@ -56,6 +56,12 @@ export class AttributesComponent implements OnInit {
     }
   }
 
+
+  onBlur(event){
+    this.logger.log('[ATTRIBUTES]  onBlur:: ', event);
+    this.setChangedAttributes();
+  }
+
   private isValidJson(json) {
     try {
       JSON.parse(json);
@@ -67,7 +73,7 @@ export class AttributesComponent implements OnInit {
 
   onChangeTextarea(event, index){
     this.newAttributes[index].value = event
-    this.setChangedAttributes();
+    // this.setChangedAttributes();
   }
 
   onChangeAttributes(attribute: any, index: number){
@@ -85,7 +91,7 @@ export class AttributesComponent implements OnInit {
         }
       });
     }
-    this.setChangedAttributes();
+    // this.setChangedAttributes();
   }
 
   private setChangedAttributes(){
@@ -95,8 +101,11 @@ export class AttributesComponent implements OnInit {
         attributes[item.key] = item.value;
       }
     });
-    // console.log("------- >>>> ", this.attributes);
-    this.changeAttributes.emit(attributes);
+    if(JSON.stringify(attributes) !== JSON.stringify(this.attributes)){
+      console.log("[ATTRIBUTES] ------- >>>> ", this.attributes, attributes);
+      this.attributes = attributes;
+      this.changeAttributes.emit(attributes);
+    }
   }
 
   onClearSelectedAttribute(index){

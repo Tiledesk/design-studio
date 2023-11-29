@@ -65,6 +65,7 @@
             [emojiPikerBtn]="false"
             [setAttributeBtn]="true"
             [placeholder]="'Enter request URL'"
+            (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'url')">
         </cds-textarea>
     </div>
@@ -112,6 +113,7 @@
             [setAttributeBtn]="true"
             [minRow]="5" [maxRow]="10"
             [readonly]="false"
+            (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'body')">
         </cds-textarea>
 
