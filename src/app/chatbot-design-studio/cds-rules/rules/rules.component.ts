@@ -1,10 +1,10 @@
 import { Intent } from 'src/app/models/intent-model';
-import { Chatbot } from '../../../../models/faq_kb-model';
+import { Chatbot } from '../../../models/faq_kb-model';
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { Rule } from 'src/app/models/rule-model';
 
 // SERVICES //
-import { IntentService } from '../../../services/intent.service';
+import { IntentService } from '../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 

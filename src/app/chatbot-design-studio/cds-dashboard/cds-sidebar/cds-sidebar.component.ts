@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ElementRef, SimpleChanges } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -22,6 +22,7 @@ import { ProjectUser } from 'src/app/models/project-user';
 export class CdsSidebarComponent implements OnInit {
 
   @Input() IS_OPEN_SIDEBAR: boolean;
+  @Input() activeSidebarSection: SIDEBAR_PAGES;
   // @Input() projectID: string;
   @Output() onClickItemList = new EventEmitter<string>();
 
@@ -47,6 +48,12 @@ export class CdsSidebarComponent implements OnInit {
     this.user = this.tiledeskAuthService.getCurrentUser()
     this.getUserRole();
     this.goTo(SIDEBAR_PAGES.INTENTS);
+  }
+
+  ngOnChanges(changes: SimpleChanges){
+    if(changes && changes['activeSidebarSection'] && changes['activeSidebarSection'].currentValue !== changes['activeSidebarSection'].previousValue ){
+      this.goTo(this.activeSidebarSection)
+    }
   }
 
 

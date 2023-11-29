@@ -43,6 +43,12 @@ export class CdsActionDescriptionComponent implements OnInit {
         case 'answer':
           this.element = Object.values(INTENT_ELEMENT).find(el => el.type === this.elementType)
           break;
+        case 'jsoncondition':
+          this.element = ACTIONS_LIST.JSON_CONDITION 
+          if('noelse' in this.actionSelected) {
+            this.element = ACTIONS_LIST.CONDITION
+          }
+          break;
         default:
           this.element = Object.values(ACTIONS_LIST).find(el => el.type === this.elementType)
           break;

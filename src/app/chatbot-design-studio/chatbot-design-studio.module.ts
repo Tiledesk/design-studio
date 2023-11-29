@@ -43,14 +43,14 @@ import { CdsHeaderComponent } from './cds-dashboard/cds-header/cds-header.compon
 import { CdsSplashScreenComponent } from './cds-dashboard/utils/cds-splash-screen/cds-splash-screen.component';
 
 //FULLFILLMENT 
-import { CdsFulfillmentComponent } from './cds-dashboard/cds-fulfillment/cds-fulfillment.component';
+import { CdsFulfillmentComponent } from './cds-fulfillment/cds-fulfillment.component';
 
 //RULES COMPONENT
-import { RulesComponent } from './cds-dashboard/cds-rules/rules/rules.component';
-import { RulesAddComponent } from './cds-dashboard/cds-rules/rules-add/rules-add.component';
-import { RulesListComponent } from './cds-dashboard/cds-rules/rules-list/rules-list.component';
-import { ConditionComponent } from './cds-dashboard/cds-rules/rules-add/condition/condition.component';
-import { ActionComponent } from './cds-dashboard/cds-rules/rules-add/action/action.component';
+import { RulesComponent } from './cds-rules/rules/rules.component';
+import { RulesAddComponent } from './cds-rules/rules-add/rules-add.component';
+import { RulesListComponent } from './cds-rules/rules-list/rules-list.component';
+import { ConditionComponent } from './cds-rules/rules-add/condition/condition.component';
+import { ActionComponent } from './cds-rules/rules-add/action/action.component';
 
 //SETTINGS COMPONENT
 import { CdsChatbotDetailsComponent } from './cds-chatbot-details/cds-chatbot-details.component';
@@ -62,7 +62,7 @@ import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.compon
 
 
 //CDS-SECRETS
-import { CdsSecretsComponent } from './cds-dashboard/cds-secrets/cds-secrets.component';
+import { CdsSecretsComponent } from './cds-secrets/cds-secrets.component';
 
 
 //SERVICES

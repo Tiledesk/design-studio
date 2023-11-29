@@ -34,7 +34,7 @@ export class CdsCanvasComponent implements OnInit {
   @ViewChild('drawer_of_items_to_zoom_and_drag', { static: false }) drawerOfItemsToZoomAndDrag: ElementRef;
 
   @Output() testItOut = new EventEmitter();
-  @Input() onHeaderTestItOut: Observable<Intent | boolean>
+  @Input() onHeaderTestItOut: Observable<Intent>
 
   id_faq_kb: string;
   TYPE_OF_MENU = TYPE_OF_MENU;
@@ -927,10 +927,10 @@ export class CdsCanvasComponent implements OnInit {
   // - actions context menu' (static & float),
   // - button configuration panel  
   // -------------------------------------------------------
-  onTestItOut(event: Intent | boolean) {
+  onTestItOut(intent: Intent) {
     // this.testItOut.emit(true);
     this.testitOutFirstClick = true;
-    this.logger.log('[CDS DSHBRD] onTestItOut intent ', event);
+    this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
     this.IS_OPEN_PANEL_WIDGET = true
     // if(typeof event === "boolean"){
     //   this.IS_OPEN_PANEL_WIDGET = true;
@@ -944,6 +944,11 @@ export class CdsCanvasComponent implements OnInit {
       // this.intentService.setLiveActiveIntent(null);
       this.controllerService.closeAddActionMenu();
       this.connectorService.removeConnectorDraft();
+    }
+
+    if(intent){
+      this.intentSelected = intent;
+      this.intentService.setIntentSelected(intent.intent_id);
     }
 
   }

@@ -64,25 +64,26 @@ export class OperandComponent implements OnInit {
 
     /** START EVENTS TEXTAREA **/
     onChangeTextArea(text: string) {
-        if(text && text.match(new RegExp(/(?<=\$\{)(.*)(?=\})/g))){
-            text = text.replace(text, text.match(new RegExp(/(?<=\$\{)(.*)(?=\})/g))[0]);
-            this.operandForm.get('value').setValue(text);
-            this.operandForm.get('isVariable').setValue(true);
-            this.onChangeOperand.emit(this.operand)
-        }
-        if(text){
-            this.onChangeOperand.emit(this.operand)
-        }
-    }  
+        // if(text && text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))){
+        //     text = text.replace(text, text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))[0]);
+        //     this.operandForm.get('value').setValue(text);
+        //     this.operandForm.get('isVariable').setValue(true);
+        //     this.onChangeOperand.emit(this.operand)
+        // }
+        // if(text){
+        //     this.onChangeOperand.emit(this.operand)
+        // }
+    }
 
     onBlur(event){
-        // this.onChangeOperand.emit(this.operand);
+        // console.log('[ACTION REPLY TEXT] onBlur', event);
+        this.onChangeOperand.emit(this.operand);
     }
 
     onSelectedAttribute(variableSelected: { name: string, value: string }){
         this.operandForm.get('isVariable').setValue(true);
-        this.operandForm.get('value').setValue(variableSelected.name);
-        this.onChangeOperand.emit(this.operand)
+        this.operandForm.get('value').setValue('{{'+variableSelected.name + '}}');
+        // this.onChangeOperand.emit(this.operand) 
     }
     onClearSelectedAttribute(){
         this.operandForm.get('value').setValue('');

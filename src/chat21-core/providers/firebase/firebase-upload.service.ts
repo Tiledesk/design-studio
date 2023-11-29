@@ -170,8 +170,6 @@ export class FirebaseUploadService extends UploadService {
 
   public async delete(userId: string, path: string): Promise<any>{
     const that = this;
-    const file_name_photo = 'photo.jpg';
-    const file_name_thumb_photo = 'thumb_photo.jpg';
 
     that.logger.debug('[FIREBASEUploadSERVICE] delete image for USER', userId, path);
 
@@ -197,6 +195,34 @@ export class FirebaseUploadService extends UploadService {
       })
     })
   }
+
+  public async deleteProfile(userId: string, path: string): Promise<any>{
+    const that = this;
+    const file_name_photo = 'photo.jpg';
+    const file_name_thumb_photo = 'thumb_photo.jpg';
+
+    that.logger.debug('[FIREBASEUploadSERVICE] delete image for USER', userId, path);
+
+    // Create a root reference
+    const storageRef = this.firebase.storage().ref();
+    const ref = storageRef.child('profiles/' + userId + '/')
+    let arrayPromise = []
+    await ref.listAll().then((dir => {
+      dir.items.forEach(fileRef => arrayPromise.push(this.deleteFile(ref.fullPath, fileRef.name)));
+    })).catch(error => {
+      that.logger.error('[FIREBASEUploadSERVICE] delete: listAll error', error)
+    })
+
+    //AWAIT to return ALL the promise delete()
+    return new Promise((resolve, reject)=> {
+      Promise.all(arrayPromise).then(()=>{
+        resolve(true)
+      }).catch((error)=>{
+        reject(error)
+      })
+    })
+  }
+
 
   // // ------------------------------------
   // // Delete the file photo

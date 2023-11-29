@@ -6,40 +6,51 @@
         (ngModelChange)="onChangeSearch($event)">
 </div>
 <div id="variable-list-scrollMe">
-    <div id="data" *ngIf="filteredVariableList && filteredVariableList.length > 0">
-        <div class="category-name" >USER DATA</div>
-        <div *ngFor="let variable of filteredVariableList" (click)="onVariableSelected(variable)" class="category-row">
-            <span class="material-icons">data_object</span>
-            <label class="category-row-name ellips">{{variable?.name}}</label>
-            <span class="material-icons-outlined delete" (click)="onVariableDelete(variable)">delete</span>
-        </div>
-    </div>
-    <div id="data" *ngIf="filteredIntentVariableList && filteredIntentVariableList.length > 0">
-        <div class="category-name" >SYSTEM ATTRIBUTES</div>
-        <div *ngFor="let variable of filteredIntentVariableList" (click)="onVariableSelected(variable)" class="category-row">
-            <span class="material-icons">{{variable?.icon}}</span>
-            <label class="category-row-name ellips">{{variable?.name}}</label>
-            <!-- <div *ngIf="variable?.description"
-                [satPopoverAnchor]="descriptionTooltip"
-                (mouseover)="$event.stopPropagation();descriptionTooltip.toggle()">
-                <span class="material-icons-outlined">info</span>
+    <div id="data" *ngIf="filteredVariableList && filteredVariableList[0].elements.length > 0">
+        <mat-expansion-panel expanded="true">
+            <mat-expansion-panel-header class="specific-class">
+                <mat-panel-title>
+                    <div class="category-name">{{ 'CDSvariablesList.'+filteredVariableList[0].key | translate}}</div>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div *ngFor="let variable of filteredVariableList[0].elements" (click)="onVariableSelected(variable)" class="category-row">
+                <span class="material-icons">data_object</span>
+                <label class="category-row-name ellips">{{variable?.name}}</label>
+                <span class="material-icons-outlined delete" (click)="$event.stopPropagation(); onVariableDelete(variable)">delete</span>
             </div>
-
-            <sat-popover #descriptionTooltip id="descriptionTooltip" 
-                hasBackdrop 
-                verticalAlign="center" 
-                horizontalAlign="after" 
-                (backdropClicked)="descriptionTooltip.close()" 
-                panelClass="description-tooltip">
-                <div class="tooltip-wrp">
-                    <div class="caret_tooltip"></div>
-                    <span [innerHTML]="variable?.description"></span>
-                </div>
-            </sat-popover> -->
-
-        </div>
+        </mat-expansion-panel>
     </div>
-    <div id="no-data" *ngIf="filteredVariableList.length === 0 && filteredIntentVariableList.length == 0">
+    <div id="data" *ngFor="let item of filteredIntentVariableList; let index= index">
+        <mat-expansion-panel [expanded]="(index===0 || isSearching)? true: false" *ngIf="item && item.elements.length > 0">
+            <mat-expansion-panel-header class="specific-class">
+                <mat-panel-title>
+                    <div class="category-name">{{ 'CDSvariablesList.'+item.key | translate}}</div>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div *ngFor="let variable of item.elements" (click)="onVariableSelected(variable)" class="category-row">
+                <span class="material-icons">{{variable?.icon}}</span>
+                <label class="category-row-name ellips">{{variable?.name}}</label>   
+                <!-- <div *ngIf="variable?.description"
+                    [satPopoverAnchor]="descriptionTooltip"
+                    (mouseover)="$event.stopPropagation();descriptionTooltip.toggle()">
+                    <span class="material-icons-outlined">info</span>
+                </div>
+
+                <sat-popover #descriptionTooltip id="descriptionTooltip" 
+                    hasBackdrop 
+                    verticalAlign="center" 
+                    horizontalAlign="after" 
+                    (backdropClicked)="descriptionTooltip.close()" 
+                    panelClass="description-tooltip">
+                    <div class="tooltip-wrp">
+                        <div class="caret_tooltip"></div>
+                        <span [innerHTML]="variable?.description"></span>
+                    </div>
+                </sat-popover> --> 
+            </div>
+        </mat-expansion-panel>
+    </div>
+    <div id="no-data" *ngIf="isEmpty">
        <div class="no-result">
             <span class="material-icons">search</span>
             <span class="text ellips">Nothing found. Please consider changing your search query.</span>

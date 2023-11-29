@@ -11,19 +11,19 @@
         </cds-connector>
     </div>
 
-    <div  *ngIf="isLast" class="previewContent isLast">
+    <div *ngIf="isLast" class="previewContent isLast">
         <!-- <div class="icon-action">
             <img class="active-icon" [src]="element?.src" [title]="element?.name">
         </div> -->
-        <cds-connector class="connector"
+        <cds-connector class="connector-isLast"
             [idConnector] = "idConnector"
             [idConnection] = "idConnection"
             [isConnected] = "isConnected">
         </cds-connector>
     </div>
     
-    <div *ngIf="isStart" class="previewContent isStart">
-        <cds-connector class="connector"
+    <div *ngIf="isStart" class="previewContent">
+        <cds-connector class="connector-isStart"
             [idConnector] = "idConnector"
             [idConnection] = "idConnection"
             [isConnected] = "isConnected">

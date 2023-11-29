@@ -89,9 +89,9 @@ export class DashboardService {
             this.selectedChatbot = chatbot;
             this.translateparamBotName = { bot_name: this.selectedChatbot.name }
             if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {
-              variableList.userDefined = convertJsonToArray(this.selectedChatbot.attributes.variables);
+              variableList.find(el => el.key ==='userDefined').elements = convertJsonToArray(this.selectedChatbot.attributes.variables);
             } else {
-              variableList.userDefined = [];
+              variableList.find(el => el.key ==='userDefined').elements = [];
             }
             resolve(true);
           }

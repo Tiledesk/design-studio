@@ -38,7 +38,7 @@ export class CdsHeaderComponent implements OnInit {
   @Output() toggleSidebarWith = new EventEmitter();
   @Output() goToBck = new EventEmitter();
   @Output() onTestItOut = new EventEmitter();
-
+  @Output() onMenuOption = new EventEmitter();
 
   id_faq_kb: string;
   projectID: string;
@@ -204,7 +204,9 @@ export class CdsHeaderComponent implements OnInit {
     })
   }
 
-
+  onMenuOptionFN(event){
+    this.onMenuOption.emit(event)
+  }
 
   openTestSiteInPopupWindow() {
     // const testItOutBaseUrl = this.TESTSITE_BASE_URL.substring(0, this.TESTSITE_BASE_URL.lastIndexOf('/'));
@@ -213,8 +215,7 @@ export class CdsHeaderComponent implements OnInit {
     // let params = `toolbar=no,menubar=no,width=815,height=727,left=100,top=100`;
     // window.open(url, '_blank', params);
     let intentStart = this.intentService.listOfIntents.find(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
-    this.intentService.setIntentSelected(intentStart.intent_id);
-    this.onTestItOut.emit(true);
+    this.onTestItOut.emit(intentStart);
   }
 
 

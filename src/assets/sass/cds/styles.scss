@@ -319,6 +319,49 @@ cds-connector.connector {
     right: -28px;
     top: calc(50% - 10px);
 }
+cds-connector.connector-isStart {
+    position: absolute;
+    right: -20px;
+    top: calc(50% - 13px);
+}
+cds-connector.connector-isLast {
+    position: absolute;
+    right: -32px;
+    top: calc(50% - 18px);
+
+    .point-connector-empty {
+        outline: 2px solid;
+        border: 0px;
+        background: #ffffff;
+        color: rgb(168, 168, 174);
+        width: 10px;
+        height: 10px;
+    }
+    .point-connector {
+        // background: #e4e4e7;
+        border: 0px solid;
+        // border-color: rgba(0,0,0,.12);
+        // background: #b1b1b7;
+        width: 10px;
+        height: 10px;
+    }
+
+    &:hover{
+        cursor: default;
+        .point-connector-empty {
+            background: rgb(168, 168, 174);
+            border: 0px;
+            cursor: copy;
+        }
+        .point-connector-empty::before {
+            border: 0px;
+        }
+        .point-connector::before {
+            border: 0px;
+        }
+    }
+}
+
 
 cds-connector.button-connector {
     position: absolute;
@@ -332,6 +375,8 @@ cds-connector.connector-false {
     right: -28px;
     top: calc(50% - 10px);
 }
+
+
 
 
 ::ng-deep .mat-expansion-indicator::after {

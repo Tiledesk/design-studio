@@ -48,17 +48,17 @@ export class CdsActionQaplaComponent implements OnInit {
   
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.userDefined.some(v => v.name === 'qapla_status')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'qapla_status')) {
       new_attributes.push({ name: "qapla_status", value: "qapla_status" });
     }
-    if (!variableList.userDefined.some(v => v.name === 'qapla_result')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'qapla_result')) {
       new_attributes.push({ name: "qapla_result", value: "qapla_result" });
     }
-    if (!variableList.userDefined.some(v => v.name === 'qapla_error')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'qapla_error')) {
       new_attributes.push({ name: "qapla_error", value: "qapla_error" });
     }
-    variableList.userDefined = [...variableList.userDefined, ...new_attributes];
-    this.logger.debug("[ACTION GPT-TASK] Initialized variableList.userDefined: ", variableList.userDefined);
+    variableList.find(el => el.key ==='userDefined').elements = [...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
+    this.logger.debug("[ACTION GPT-TASK] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
   changeTextarea($event: string, property: string) {

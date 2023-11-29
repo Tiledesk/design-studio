@@ -23,7 +23,6 @@
     </div> -->
     <!-- <i class="material-icons cds-btn-back" (click)="goBack()">keyboard_arrow_left</i> -->
     <div class="header-go-back"
-        style="cursor:pointer"
         matTooltip="v. {{version}}" 
         matTooltipClass="custom-mat-tooltip"
         matTooltipHideDelay="100"
@@ -115,6 +114,7 @@
 <!-- HEADER MENU OPTIONS-->
 <mat-menu #menu="matMenu" class="menuElement" xPosition="after">
     <ng-template matMenuContent>
-        <cds-menu></cds-menu>
+        <cds-menu
+            (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
     </ng-template>
 </mat-menu>

@@ -5,6 +5,39 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7-rc.2
+- changed: cds-connector color on start and isLast intent elements
+- changed: aligned component to new Regex for variables with {{<var>}}
+- changed: cds-action-assign-variable enable possibility to add custom text on operand2 property
+
+### 1.0.7-rc.1
+- added: redirect to unauthorized page if signInWithCustomtoken response with 401 error
+- bug-fixed: cannot delete chatbot profile image in PROD
+- bug-fixed: action-web-requestv2 headers attributes variable not saved with double curly brackets
+- bug-fixed: cannot delete first button into cds-action-reply elements
+- bug-fixed: cannot clear header attriibutes on cds-web-request-v2
+
+### 1.0.6 in PROD
+
+### 1.0.6-rc.1
+- added: Export/import redirect function on header menu option
+- added: extension panel on variable list
+- added: baseHref into angular.json
+- added: imageRepoService abstract service to recover chatbot profile image
+- bug-fixed: set default value for activeDetailSection
+
+### 1.0.5 in PROD
+
+### 1.0.5-rc.3
+- bug-fixed: unable to restart widget flow if panel is already opened once (you had to click twice to restart the flow: first time to open panel and the second to restart the flow )
+
+### 1.0.5-rc.2
+- added: cds-action-condition(w/out else branch)
+- bug-fixed: cds-reply button element not
+- bug-fixed: unable to delete bot avatar image profile
+
+### 1.0.4 in PROD
+
 ### 1.0.4-rc.1
 - added: network offline modal
 - added: menu component on left header tiledesk hover icon click

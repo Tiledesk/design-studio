@@ -20,6 +20,9 @@
     "Warning": "Attention!",
     "Back":"Back",
     "GoBack":"Go back",
+    "GoToDashboard":"Go to dashboard",
+    "LogOut": "Logout",
+    "Export":"Export",
     "Departments": "Departments",
     "ActivateFor": "Activate for",
     "ActivateForBot": "Activate bot for",
@@ -217,7 +220,8 @@
         "AttributeName":"Attribute name",
         "TypeAttributeName":"Type attribute name",
         "Filter":"Filter",
-        "AddFilter":"Add filter"
+        "AddFilter":"Add filter",
+        "StopOnConditionMet":"Stop on condition met"
     },
     "Name":"Name",
     "Label": "Label",
@@ -304,6 +308,14 @@
         "DESCRIPTION":{
 
         }
+        
+    },
+    "CDSvariablesList": {
+        "userDefined":"User defined",
+        "mostUsed":"Most used",
+        "systemDefined":"System defined",
+        "uploadedDocument":"Uploaded document",
+        "uploadedImage":"Uploaded image"
     },
     "New":"New",
     "Event":"Event",

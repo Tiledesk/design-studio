@@ -83,7 +83,7 @@ export class BaseConditionRowComponent implements OnInit {
       this.disableSubmit = true;
       this.setAttributeBtnOperand2 = true;
     }
-    if(text && text.match(new RegExp(/(?<=\$\{)(.*)(?=\})/g))){
+    if(text && text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))){
       text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g)).forEach(match => {
         text = text.replace(text,match)
         this.conditionForm.patchValue({ operand2: {type: 'const', name: text}}, {emitEvent: false})

@@ -10,7 +10,7 @@ import { variableList } from '../../utils';
 export class DialogComponent implements OnInit {
   btnDisabled: boolean = true;
 
-  userDefined = variableList.userDefined
+  userDefined = variableList.find(el => el.key ==='userDefined').elements
   
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,

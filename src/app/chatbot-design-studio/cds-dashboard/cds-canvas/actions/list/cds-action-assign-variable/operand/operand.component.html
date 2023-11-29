@@ -14,13 +14,12 @@
                 [emojiPikerBtn]="false"
                 [text]="operandForm.value.value"
                 [limitCharsText]="10000"
-                
-                [setAttributeBtn]="operandForm.value.value? false : true"
-                [readonly]="operandForm.value.isVariable? true : false" 
+                [setAttributeBtn]="true"
                 [minRow]="1" [maxRow]="4"
                 [control]="operandForm.get('value')"
                 (clearSelectedAttribute)="onClearSelectedAttribute()"
                 (selectedAttribute)="onSelectedAttribute($event)"
+                (blur)="onBlur($event)"
                 (changeTextarea)="onChangeTextArea($event)">
             </cds-textarea>
         </div>

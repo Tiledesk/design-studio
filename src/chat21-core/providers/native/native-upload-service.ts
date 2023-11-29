@@ -123,4 +123,26 @@ export class NativeUploadService extends UploadService {
             });
         });
     }
+
+    deleteProfile(userId: string, path: string): Promise<any>{
+        this.logger.log('[NATIVE UPLOAD] - delete image ... upload', userId)
+        const headers = new HttpHeaders({
+            Authorization: this.tiledeskToken,
+            //'Content-Type': 'multipart/form-data',
+        });
+        const requestOptions = { headers: headers };
+
+        //USE IMAGE API
+        const that = this;
+        const url = this.URL_TILEDESK_IMAGES + '/users' + '?path=' + "uploads/users/"+ userId + "/images/photo.jpg"
+        return new Promise((resolve, reject) => {
+            that.http.delete(url, requestOptions).subscribe(data => {
+                // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
+                resolve(true)
+                // that.BSStateUpload.next({upload: upload});
+            }, (error) => {
+                reject(error)
+            });
+        });
+    }
 }

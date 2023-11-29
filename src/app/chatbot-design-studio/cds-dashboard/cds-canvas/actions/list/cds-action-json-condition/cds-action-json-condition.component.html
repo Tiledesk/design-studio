@@ -17,9 +17,10 @@
         
     </div>
 
-    <hr class="preview-divider">
 
-    <div class="previewContent">   
+    <hr *ngIf="!action?.noelse" class="preview-divider">
+
+    <div *ngIf="!action?.noelse" class="previewContent">   
         <label class="title-preview-label">else</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
@@ -104,7 +105,7 @@
             </div>
         
             <!-- falseIntent -->
-            <div class="field-box">
+            <div *ngIf="!action?.noelse" class="field-box">
                 <div class="condition-container">
                     <span class="condition-text">Else</span>
                 </div>
@@ -130,17 +131,17 @@
     
     </div>
     
-    <div class="footer-panel-intent-detail">    
+    <!-- <div class="footer-panel-intent-detail">    
         <div class="disable-input-message">
             <section class="disable-input-message-section">
                 <mat-checkbox 
                     [checked]="action.stopOnConditionMet"
                     (change)="onStopConditionMeet()">
-                    {{"StopOnConditionMet" | translate}}
+                    {{"CDSCanvas.StopOnConditionMet" | translate}}
                 </mat-checkbox>
             </section>
         </div>
-    </div>
+    </div> -->
 </div>
 
 

@@ -135,6 +135,12 @@ export enum PLAN_NAME {
     C = 'Plus',
 }
 
+export enum TYPE_BUTTON {
+    TEXT = 'text',
+    URL = 'url',
+    ACTION = 'action'
+}
+
 export const tranlatedLanguage = ['it', 'en', 'de', 'es', 'pt', 'fr', 'ru', 'tr', 'sr', 'ar', 'uk', 'sv', 'az', 'kk', 'uz']
 
 

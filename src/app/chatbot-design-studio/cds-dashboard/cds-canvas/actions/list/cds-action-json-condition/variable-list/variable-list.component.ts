@@ -15,18 +15,19 @@ export class VariableListComponent implements OnInit {
   
   @Output() onSelected = new EventEmitter()
 
-  variableListUserDefined: Array<{name: string, value: string}> // = variableList.userDefined 
-  variableListSystemDefined: Array<{name: string, value: string, description: string, src?: string}> //= variableList.systemDefined
-  
-  filteredVariableList: Array<{name: string, value: string}> //= []
-  filteredIntentVariableList: Array<{name: string, value: string, description: string, src?: string}>
+  variableListUserDefined: { key: string, elements: Array<{name: string, value: string}>} // = variableList.userDefined 
+  variableListSystemDefined: Array<{ key: string, elements: Array<{name: string, value: string, description: string, src?: string}>}> //= variableList.systemDefined
+
+  filteredVariableList: Array<{ key: string, elements: Array<{name: string, value: string}>}> //= []
+  filteredIntentVariableList: Array<{ key: string, elements: Array<{name: string, value: string, description: string, src?: string}>}>
   textVariable: string = '';
   idBot: string;
 
+  isEmpty: boolean = false
+  isSearching: boolean = false
   constructor(
     public dialog: MatDialog,
     private faqkbService: FaqKbService,
-    private route: ActivatedRoute,
     private dashboardService: DashboardService
   ) { }
 
@@ -40,17 +41,19 @@ export class VariableListComponent implements OnInit {
 
   private initialize(){
     this.idBot = this.dashboardService.id_faq_kb
-    this.variableListUserDefined = variableList.userDefined;
-    this.variableListSystemDefined = variableList.systemDefined;
-    this.filteredVariableList = [];
+    this.variableListUserDefined = variableList.find(el => el.key === 'userDefined');
+    this.variableListSystemDefined = variableList.filter(el => el.key !== 'userDefined');
+    this.filteredVariableList = []
     this.filteredIntentVariableList = [];
     if(this.variableListUserDefined){
-      this.filteredVariableList = this.variableListUserDefined
+      this.filteredVariableList.push(this.variableListUserDefined)
     }
-    if(this.variableListSystemDefined){
-      this.filteredIntentVariableList = this.variableListSystemDefined
-    }
-    //this.logger.log('variable-list initialize:: ', variableList.userDefined);
+    variableList.filter(el => el.key !== 'userDefined').map(el => {
+      this.filteredIntentVariableList.push( { key: el.key, elements: el.elements })
+    })
+    // if(this.variableListSystemDefined){
+    //   this.filteredIntentVariableList = this.variableListSystemDefined
+    // }
   }
 
   openDialog() {
@@ -63,17 +66,17 @@ export class VariableListComponent implements OnInit {
       // this.logger.log(`Dialog result: ${result}`);
       if(result && result !== undefined && result !== false){
         let variable = {name: result, value: result};
-        that.variableListUserDefined.push(variable);
-        this.saveVariables(this.variableListUserDefined);
+        that.variableListUserDefined.elements.push(variable);
+        this.saveVariables(this.variableListUserDefined.elements);
       }
     });
   }
 
   onVariableDelete(variableSelected: {name: string, value: string}){
-    let index = this.variableListUserDefined.findIndex(el => el.name = variableSelected.name)
+    let index = this.variableListUserDefined.elements.findIndex(el => el.name === variableSelected.name)
     if(index > -1){
-      this.variableListUserDefined.splice(index, 1)
-      this.saveVariables(this.variableListUserDefined)
+      this.variableListUserDefined.elements.splice(index, 1)
+      this.saveVariables(this.variableListUserDefined.elements)
     }
   }
 
@@ -103,13 +106,21 @@ export class VariableListComponent implements OnInit {
     }else {
       this.textVariable = event
     }
-    this.filteredVariableList = this._filter(this.textVariable, this.variableListUserDefined)
-    this.filteredIntentVariableList = this._filter(this.textVariable, this.variableListSystemDefined)
+    this.filteredVariableList = this._filter2(this.textVariable, [this.variableListUserDefined])
+    this.filteredIntentVariableList = this._filter2(this.textVariable, this.variableListSystemDefined)
+
+    this.isEmpty = (this.filteredIntentVariableList.every(el => el.elements.length === 0) && this.filteredVariableList[0].elements.length === 0 ) 
+    this.isSearching = (this.textVariable !== '')
   }
 
   private _filter(value: string, array: Array<any>): Array<any> {
     const filterValue = value.toLowerCase();
     return array.filter(option => option.name.toLowerCase().includes(filterValue));
+  }
+
+  private _filter2(value: string, array: Array<{key: string, elements: Array<any>}>): Array<any> {
+    const filterValue = value.toLowerCase();
+    return array.map(el => { return { key: el.key, elements: el.elements.filter(option => option.name.toLowerCase().includes(filterValue))}});
   }
 
   onAddCustomAttribute(){

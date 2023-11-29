@@ -14,7 +14,7 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 
 // UTILS //
-import { SIDEBAR_PAGES } from 'src/app/chatbot-design-studio/utils';
+import { SETTINGS_SECTION, SIDEBAR_PAGES } from 'src/app/chatbot-design-studio/utils';
 import { Intent } from 'src/app/models/intent-model';
 
 //LOGGER
@@ -46,11 +46,12 @@ export class CdsDashboardComponent implements OnInit {
   IS_OPEN_PANEL_WIDGET: boolean = false;
 
   eventTestItOutHeader: Subject<Intent | boolean> = new Subject<Intent | boolean>();
-  
+
   project: Project;
   defaultDepartmentId: string;
   selectedChatbot: Chatbot
-  activeSidebarSection: string;
+  activeSidebarSection: SIDEBAR_PAGES;
+  activeDetailSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
   isBetaUrl: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -194,7 +195,7 @@ export class CdsDashboardComponent implements OnInit {
    * - actions context menu' (static & float),
    * - button configuration panel  
   */
-  onTestItOut(event: Intent | boolean) {
+  onTestItOut(event: Intent) {
     this.logger.log('[CDS DSHBRD] onTestItOut intent ', event);
     // if(typeof event === "boolean"){
     //   this.IS_OPEN_PANEL_WIDGET = true;
@@ -211,16 +212,25 @@ export class CdsDashboardComponent implements OnInit {
 
     this.eventTestItOutHeader.next(event);
   }
+
+  onMenuOption(event){
+    switch(event){
+      case 'export':
+        this.activeSidebarSection = SIDEBAR_PAGES.SETTINGS
+        this.activeDetailSection = SETTINGS_SECTION.IMPORT_EXPORT
+        break;
+    }
+  }
   /*****************************************************/
 
 
   /**************** START EVENTS PANEL INTENT ****************/
   /** SIDEBAR OUTPUT EVENTS */
-  onClickItemList(event: string) {
+  onClickItemList(event: SIDEBAR_PAGES) {
     this.logger.log('[CDS DSHBRD] active section-->', event);
     if(event !== 'cds-sb-intents'){
       // this.connectorService.initializeConnectors();
-      this.eventTestItOutHeader.next(false);
+      // this.eventTestItOutHeader.next(null);
     }
     this.activeSidebarSection = event;
   }

@@ -1,7 +1,7 @@
 {
   "name": "@tiledesk/cds",
   "author": "Tiledesk SRL",
-  "version": "1.0.4-rc.1",
+  "version": "1.0.7-rc.2",
   "license": "MIT",
   "homepage": "https://www.tiledesk.com",
   "repository": {
@@ -11,7 +11,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --output-path=dist --base-href ./",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
