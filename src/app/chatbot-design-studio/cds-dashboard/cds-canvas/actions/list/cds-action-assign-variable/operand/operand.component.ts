@@ -27,12 +27,14 @@ export class OperandComponent implements OnInit {
 
     ngOnInit(): void {
         this.openSlectFunction = false;
-        // for (let key in TYPE_FUNCTION_LIST) {
-        //     this.listOfFunctions.push({name: TYPE_FUNCTION_LIST[key].name, value: TYPE_FUNCTION_LIST[key].type})
-        // }
+        this.initialize();
     }
 
-    ngOnChanges() {
+    // ngOnChanges() {
+       
+    // }
+
+    private initialize(){
         this.placeholder = 'Insert a constant value or choose an attribute';
         this.operandForm = this.createOperandGroup();
         this.operandForm.valueChanges.subscribe(data => {
@@ -71,8 +73,12 @@ export class OperandComponent implements OnInit {
         if(text){
             this.onChangeOperand.emit(this.operand)
         }
-       
-    }   
+    }  
+
+    onBlur(event){
+        // this.onChangeOperand.emit(this.operand);
+    }
+
     onSelectedAttribute(variableSelected: { name: string, value: string }){
         this.operandForm.get('isVariable').setValue(true);
         this.operandForm.get('value').setValue(variableSelected.name);

@@ -221,7 +221,11 @@ export class CdsActionAskgptComponent implements OnInit {
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
     this.action[property] = $event
-    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
+  onBlur(event){
+    this.updateAndSaveAction.emit();
   }
 
   onSelectedAttribute(event, property) {

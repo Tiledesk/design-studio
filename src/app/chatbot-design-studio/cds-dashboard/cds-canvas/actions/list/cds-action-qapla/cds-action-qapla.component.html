@@ -29,6 +29,7 @@
             [readonly]="false" 
             [text]="action.trackingNumber"
             [placeholder]="'Tracking number to search'"
+            (blur)="onBlur($event)"
             (changeTextarea)="changeTextarea($event, 'trackingNumber')">
         </cds-textarea>
     </div>
@@ -43,6 +44,7 @@
             [readonly]="false" 
             [text]="action.apiKey"
             [placeholder]="'Your Api Key'"
+            (blur)="onBlur($event)"
             (changeTextarea)="changeTextarea($event, 'apiKey')">
         </cds-textarea>
     </div>

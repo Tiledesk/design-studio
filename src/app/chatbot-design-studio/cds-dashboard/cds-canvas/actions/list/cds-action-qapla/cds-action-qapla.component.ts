@@ -66,7 +66,7 @@ export class CdsActionQaplaComponent implements OnInit {
     this.logger.debug("[ACTION QAPLA] changeTextarea propery: ", property);
     this.action[property] = $event;
     console.log("[ACTION QAPLA] Action updated: ", this.action);
-    this.updateAndSaveAction.emit();  
+    // this.updateAndSaveAction.emit();  
   }
 
   onSelectedAttribute(event, property) {
@@ -83,4 +83,7 @@ export class CdsActionQaplaComponent implements OnInit {
     //this.hideShowWidget('show');
   }
   
+  onBlur(event){
+    this.updateAndSaveAction.emit();
+  }
 }

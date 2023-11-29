@@ -76,6 +76,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.logger.debug("[ACTION GPT-TASK] changeTextarea propery: ", property);
     this.action[property] = $event;
     // this.checkVariables();
+    // this.updateAndSaveAction.emit();
+  }
+
+  onBlur(event){
     this.updateAndSaveAction.emit();
   }
 
@@ -353,6 +357,5 @@ export class CdsActionGPTTaskComponent implements OnInit {
     let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/knowledge-bases'
     window.open(url, '_blank')
   }
-
 
 }

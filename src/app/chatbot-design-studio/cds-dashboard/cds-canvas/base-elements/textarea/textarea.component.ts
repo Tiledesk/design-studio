@@ -47,6 +47,8 @@ export class CDSTextareaComponent implements OnInit {
   texareaIsEmpty = false;
   textTag: string = '';
   isSelected: boolean = false;
+  textIsChanged: boolean = false;
+  startText: string;
   // strPlaceholder: string;
 
   public textArea: string = '';
@@ -61,18 +63,20 @@ export class CDSTextareaComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    //this.initialize();
-  }
-
-  ngOnChanges() {
     this.initialize();
   }
+
+  // ngOnChanges() {
+  //   this.initialize();
+  // }
 
   ngAfterViewInit() {
     this.getTextArea();
   }
 
   initialize(){
+    this.startText = this.text;
+    this.textIsChanged = false;
     if (this.text) {
       this.control.patchValue(this.text);
     } else {
@@ -108,7 +112,11 @@ export class CDSTextareaComponent implements OnInit {
       this.text = '';
       if(this.elTextarea)this.elTextarea.value = '';
     } else {
-      this.text = event.trim();
+      if(this.startText !== event){
+        this.textIsChanged = true;
+        this.text = event;
+        // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', this.text, this.textIsChanged);
+      }
     }
     if(!this.isSelected || !this.readonly){
       this.changeTextarea.emit(event.trim());
@@ -116,7 +124,12 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   onBlur(event){
-    this.blur.emit(event);
+    // this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen());
+    if(!this.addVariable.isOpen() && !this.emojiPicker.isOpen() && this.textIsChanged){
+      this.textIsChanged = false;
+      this.startText = this.text;
+      this.blur.emit(event);
+    }
   }
 
   onVariableSelected(variableSelected: { name: string, value: string }) {

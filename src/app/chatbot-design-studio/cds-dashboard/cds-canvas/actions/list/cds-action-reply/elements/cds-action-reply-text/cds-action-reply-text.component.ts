@@ -213,8 +213,10 @@ export class CdsActionReplyTextComponent implements OnInit {
   }
 
   onBlur(event){
-    // console.log('[ACTION REPLY TEXT] onBlur', event);
-    this.changeActionReply.emit();
+    console.log('[ACTION REPLY TEXT] onBlur', event.target.value, this.response.text);
+    // if(event.target.value !== this.response.text){
+      this.changeActionReply.emit();
+    // }
   }
 
   onSelectedAttribute(variableSelected: {name: string, value: string}){

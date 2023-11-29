@@ -69,6 +69,7 @@
             [maxRow]="4" 
             [text]="action?.question" 
             [placeholder]="'Question to submit'"
+            (blur)="onBlur($event)"
             (changeTextarea)="changeTextarea($event, 'question')">
         </cds-textarea>
     </div>
