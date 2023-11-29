@@ -110,6 +110,7 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
+              "baseHref":"./",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
