@@ -19,26 +19,6 @@
     gap: 5px; 
     padding: 5px 5px;
     top: calc(50% - 14px);
-    .connector {
-        position: absolute;
-        right: -20px;
-        top: calc(50% - 10px);
-    }
-    &.isLast{
-        padding: 0px;
-        min-height: 20px;
-        .connector {
-            right: -35px;
-            top: calc(50% - 18px);
-        }
-    }
-    &.isStart{
-        .connector {
-            position: absolute;
-            right: -12px;
-            top: calc(50% - 13px);
-        }
-    }
 
     .title-label{
      color: #6c6859;
