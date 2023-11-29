@@ -5,6 +5,10 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7-rc.2
+- changed: cds-connector color on start and isLast intent elements
+- changed: aligned component to new Regex for variables with {{<var>}}
+- changed: cds-action-assign-variable enable possibility to add custom text on operand2 property
 
 ### 1.0.7-rc.1
 - added: redirect to unauthorized page if signInWithCustomtoken response with 401 error
