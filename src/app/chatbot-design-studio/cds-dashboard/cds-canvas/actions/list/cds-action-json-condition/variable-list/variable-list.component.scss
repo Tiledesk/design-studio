@@ -238,3 +238,18 @@ mat-expansion-panel {
         }
     }
 }
+
+mat-expansion-panel#userDefined {
+    ::ng-deep {
+        .mat-expansion-panel-content{
+            height: unset !important;
+            visibility: visible !important;
+        }
+        .mat-expansion-panel-content[style*="visibility: hidden"] * {
+            visibility: visible !important;
+        }
+        .mat-expansion-panel-body{
+            opacity: 1 !important;
+        }
+    }
+}

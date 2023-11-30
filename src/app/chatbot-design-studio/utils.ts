@@ -611,11 +611,3 @@ export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     // console.log('translateeee x- y ', translationX, translationY)
     return { point: { x: centerPointX, y: centerPointY }, scale: scale }
 }
-
-export function getVariableName(key: string): string{
-    let value= key
-    if(key.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))){
-       
-    }
-    return value
-}

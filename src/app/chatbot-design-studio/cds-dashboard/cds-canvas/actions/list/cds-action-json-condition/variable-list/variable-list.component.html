@@ -7,7 +7,7 @@
 </div>
 <div id="variable-list-scrollMe">
     <div id="data" *ngIf="filteredVariableList && filteredVariableList[0].elements.length > 0">
-        <mat-expansion-panel expanded="true">
+        <mat-expansion-panel [expanded]="true" id="userDefined">
             <mat-expansion-panel-header class="specific-class">
                 <mat-panel-title>
                     <div class="category-name">{{ 'CDSvariablesList.'+filteredVariableList[0].key | translate}}</div>

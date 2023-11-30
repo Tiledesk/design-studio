@@ -32,10 +32,12 @@ export class VariableListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('[VARIABLE-LSIT] onInit')
     this.initialize();
   }
 
   ngOnChanges(){
+    console.log('[VARIABLE-LSIT] ngOnChanges')
     //this.initialize();
   }
 
