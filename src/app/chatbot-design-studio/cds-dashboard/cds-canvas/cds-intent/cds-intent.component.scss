@@ -14,6 +14,8 @@
 
   --base-color: #{$blu};
   --startIntentMaxWith: 160px;
+
+  --base-border-radius-base: #{$button-border-radius-base};
 }
 
 
@@ -320,8 +322,9 @@
   text-align: center;
   position: absolute;
   display: block;
-  bottom: -36px;
-  left: 118px;
+  bottom: -28px;
+  left: 0px;
+  right: 0px;
 }
 
 .footer-intent>.csd-open-action-menu-btn-wpr {
@@ -550,19 +553,26 @@
 
 .cds-add-action-btn {
   margin: 0px;
-  padding: 4px;
+  padding: 0 10px;
   border-radius: 50%;
   box-shadow: unset;
   background: transparent;
-  outline: 2px solid var(--base-color) !important;
+  border: 1px dashed $blu-light-02;
+  border-radius: var(--base-border-radius-base);
+  color: $blu-light-02;
+  cursor: pointer;
+  font-size: 0.7em;
+  font-weight: 400;
+  transition: all .3s;
+  // outline: 2px solid var(--base-color) !important;
   // z-index: 2;
   // background-color: $icon-color-background;
 }
 
 .cds-add-action-btn>span {
-  font-size: 20px;
+  font-size: 16px;
   // color: $icon-color;
-  color: var(--base-color);
+  color: $blu-light-02;
   position: relative;
   top: 0px;
 }
