@@ -5,6 +5,13 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7-rc.3
+- added: close behaviour on mouse-tips modal close header icon
+- bug fixed: close the add-actions-menu by clicking Backspace
+- bug fixed: added an action from the floating menu
+- bug fixed: changed the field type in the form email field
+- bug-fixed: cannot be able to restart the same intent while testing it on widget page
+
 ### 1.0.7-rc.2
 - added: mouse/trackpad tips
 - added: ability to add action from floating 'add action' button on each block
