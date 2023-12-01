@@ -495,16 +495,17 @@ export class CdsCanvasComponent implements OnInit {
   */
   @HostListener('document:keydown', ['$event']) 
   onKeydownHandler(event: KeyboardEvent) {
+    // event.key === 'Backspace' ||
     // console.log('[CDS-CANVAS] MOUSE KEYDOWN CLOSE FLOAT MENU hasClickedAddAction ', this.hasClickedAddAction)
-    if (event.key === 'Backspace' || event.key === 'Escape' || event.key === 'Canc' && !this.hasClickedAddAction) {
+    if (event.key === 'Escape' || event.key === 'Canc' && !this.hasClickedAddAction) {
       if (!this.hasClickedAddAction) {
         // case: FLOAT MENU
         this.removeConnectorDraftAndCloseFloatMenu();
       }
-      // else{
-      //   // case: STATIC MENU
-      //   this.IS_OPEN_ADD_ACTIONS_MENU = false;
-      // } 
+      else{
+        // case: STATIC MENU
+        this.IS_OPEN_ADD_ACTIONS_MENU = false;
+      } 
     }
   }
 

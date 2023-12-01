@@ -554,7 +554,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       entries.forEach(entry => {
         this.actionDragPlaceholderWidth = entry.contentRect.width
         this.logger.log('[CDS-INTENT] width actionDragPlaceholderWidth', this.actionDragPlaceholderWidth);
-        if (this.actionDragPlaceholderWidth === 258) {
+        if (this.actionDragPlaceholderWidth <= 270) {
           this.hideActionDragPlaceholder = false;
           this.logger.log('[CDS-INTENT] Hide action drag placeholder', this.hideActionDragPlaceholder);
           actionDragPlaceholder.style.opacity = '1';
