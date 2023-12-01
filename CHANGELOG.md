@@ -6,10 +6,14 @@
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 1.0.7-rc.2
+- added: mouse/trackpad tips
+- added: ability to add action from floating 'add action' button on each block
 - changed: cds-connector color on start and isLast intent elements
 - changed: aligned component to new Regex for variables with {{<\var>}}
 - changed: cds-action-assign-variable enable possibility to add custom text on operand2 property
 - changed: cds-intent footer 'Add action' button UI
+- changed: new services for updating an intent with multimple operations 
+- bug-fixed: variable-list userDefined expansion panel not opened from the second time
 
 ### 1.0.7-rc.1
 - added: redirect to unauthorized page if signInWithCustomtoken response with 401 error
