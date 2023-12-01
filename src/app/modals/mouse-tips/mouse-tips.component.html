@@ -2,7 +2,7 @@
     <div class="cds-modal-header">
         <div class="header-title">{{ "CDSModalMouseTrackPad.HowToMove" | translate }}</div>
         <mat-dialog-actions>
-            <button mat-dialog-close>
+            <button (click)="onClose()">
                 <span class="material-icons">
                     close
                 </span>

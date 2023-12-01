@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'cds-mouse-tips',
@@ -7,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MouseTipsComponent implements OnInit {
 
+  @Output() close = new EventEmitter();
+  
   optionSelected: 'mouse' | 'trackpad' = 'mouse'
 
   constructor() { }
@@ -15,7 +17,11 @@ export class MouseTipsComponent implements OnInit {
   }
 
   onChangeOption(option){
-    
+
+  }
+
+  onClose(){
+    this.close.emit();
   }
 
 }
