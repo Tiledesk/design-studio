@@ -661,7 +661,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           } else if (action.value && action.value.type) {
             // moving new action in intent from panel elements
             this.logger.log("[CDS-INTENT] onDropAction aggiungo una nuova action all'intent da panel elements - action ", this.newActionCreated);
-            this.intentService.moveNewActionIntoIntent(event, action, this.intent.intent_id);
+            this.intentService.moveNewActionIntoIntent(event.currentIndex, action, this.intent.intent_id);
             //this.onSelectAction(newAction, event.currentIndex, newAction._tdActionId)
           }
         }

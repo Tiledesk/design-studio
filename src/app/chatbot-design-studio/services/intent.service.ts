@@ -595,13 +595,13 @@ export class IntentService {
 
 
   // moving new action in intent from panel elements
-  public moveNewActionIntoIntent(event, action, currentIntentId): any {
+  public moveNewActionIntoIntent(currentActionIndex, action, currentIntentId): any {
     // console.log('[INTENT-SERVICE] moveNewActionIntoIntent');
     let newAction = this.createNewAction(action.value.type);
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
-    currentIntent.actions.splice(event.currentIndex, 0, newAction);
+    currentIntent.actions.splice(currentActionIndex, 0, newAction);
     this.behaviorIntent.next(currentIntent);
     // this.connectorService.updateConnector(currentIntent.intent_id);
     // this.onUpdateIntentWithTimeout2(currentIntent, 0, true);
