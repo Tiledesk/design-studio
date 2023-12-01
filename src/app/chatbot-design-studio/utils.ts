@@ -217,7 +217,8 @@ export enum OPTIONS {
     ZOOM_OUT = 'zoom-out',
     CENTER = 'center',
     UNDO = "undo",
-    REDO = "redo"
+    REDO = "redo",
+    MOUSE = "mouse"
   }
 
 export const INTENT_TEMP_ID = '';

@@ -109,6 +109,14 @@
         "WellDonePublishingChatbot":"Well done! You are about to publish your Chatbot 🚀",
         "FollowTheseSimpleInstructions":"Follow these simple instructions to activate it on your website"
     },
+    "CDSModalMouseTrackPad":{
+        "HowToMove":"How to move",
+        "ClickWhellDragToMove" :"Click whell button & drag \n to move around",
+        "ScrollMouseWheel":"Scroll mouse wheel \n to move up/down",
+        "CtrlButtonWheelToZoom":"CRTL + Mouse whell button \n to zoom in/out",
+        "PinchToZoom":"Pinch to zoom",
+        "SlideToMove":"Slide two fingers \n to move around"
+    },
     "Ignore": "Ignore",
     "Publish":"Publish",
     "TestIt":"Test it",

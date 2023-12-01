@@ -198,6 +198,7 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
 import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
 import { NetworkOfflineComponent } from '../modals/network-offline/network-offline.component';
+import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
 
 @NgModule({
   declarations: [
@@ -340,13 +341,15 @@ import { NetworkOfflineComponent } from '../modals/network-offline/network-offli
     CdsModalActivateBotComponent,
     CdsPublishOnCommunityModalComponent,
     ChangeBotLangModalComponent,
-
+    NetworkOfflineComponent,
+    MouseTipsComponent,
+    
     //EVENT BASE COMPONENT
     CdsEventComponent,
     CdsRuleComponent,
     CdsOptionsComponent,
     CdsPanelConnectorMenuComponent,
-    NetworkOfflineComponent,
+    
     
 
   ],
