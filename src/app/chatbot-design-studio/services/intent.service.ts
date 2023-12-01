@@ -25,6 +25,7 @@ export class IntentService {
   behaviorIntents = new BehaviorSubject <Intent[]>([]);
   behaviorIntent = new BehaviorSubject <Intent>(null);
   liveActiveIntent = new BehaviorSubject<Intent>(null);
+  testIntent = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
 
   listOfIntents: Array<Intent> = [];
@@ -914,45 +915,6 @@ export class IntentService {
   // END ATTRIBUTE FUNCTIONS //
   
 
-  private segmentActionAdded(action_type: string){
-    let chatbot = this.dashboardService.selectedChatbot;
-    let id_project = this.dashboardService.projectID;
-    const that = this
-    let user = this.tiledeskAuthService.getCurrentUser();
-
-    if(window['analytics']){
-      try {
-        window['analytics'].page("CDS, Added Action", {
-          version: environment.VERSION
-        });
-      } catch (err) {
-        this.logger.error('Event: CDS Added Action ', action_type, ' [page] error', err);
-      }
-  
-      try {
-        window['analytics'].identify(user.uid, {
-          name: user.firstname + ' ' + user.lastname,
-          email: user.email,
-        });
-      } catch (err) {
-        this.logger.error('Event: CDS Added Action ', action_type, ' [identify] error', err);
-      }
-      // Segments
-      try {
-        window['analytics'].track('Action Added', {
-          "username": user.firstname + ' ' + user.lastname,
-          "userId": user.uid,
-          "chatbot_id": chatbot._id,
-          "project_id": id_project,
-          "action_type": action_type
-        });
-      } catch (err) {
-        this.logger.error('Event: CDS Added Action ', action_type, ' [track] error', err);
-      }
-    }
-  }
-
-
   public patchButtons(buttons, idAction){
     console.log('patchButtons:: ', buttons);
     buttons.forEach((button, index) => {
@@ -1604,6 +1566,50 @@ export class IntentService {
           resolve(true);
         });
       });
+    }
+
+
+    public startTestWithIntent(intent: Intent){
+      this.testIntent.next(intent)
+    }
+
+
+    private segmentActionAdded(action_type: string){
+      let chatbot = this.dashboardService.selectedChatbot;
+      let id_project = this.dashboardService.projectID;
+      const that = this
+      let user = this.tiledeskAuthService.getCurrentUser();
+  
+      if(window['analytics']){
+        try {
+          window['analytics'].page("CDS, Added Action", {
+            version: environment.VERSION
+          });
+        } catch (err) {
+          this.logger.error('Event: CDS Added Action ', action_type, ' [page] error', err);
+        }
+    
+        try {
+          window['analytics'].identify(user.uid, {
+            name: user.firstname + ' ' + user.lastname,
+            email: user.email,
+          });
+        } catch (err) {
+          this.logger.error('Event: CDS Added Action ', action_type, ' [identify] error', err);
+        }
+        // Segments
+        try {
+          window['analytics'].track('Action Added', {
+            "username": user.firstname + ' ' + user.lastname,
+            "userId": user.uid,
+            "chatbot_id": chatbot._id,
+            "project_id": id_project,
+            "action_type": action_type
+          });
+        } catch (err) {
+          this.logger.error('Event: CDS Added Action ', action_type, ' [track] error', err);
+        }
+      }
     }
 
 }

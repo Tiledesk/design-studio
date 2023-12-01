@@ -933,6 +933,7 @@ export class CdsCanvasComponent implements OnInit {
     this.testitOutFirstClick = true;
     this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
     this.IS_OPEN_PANEL_WIDGET = true
+    this.intentService.startTestWithIntent(intent)
     // if(typeof event === "boolean"){
     //   this.IS_OPEN_PANEL_WIDGET = true;
     // } else {
