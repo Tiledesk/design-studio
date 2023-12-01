@@ -98,5 +98,7 @@
     (backdropClicked)="mouseTips.close()"
     panelClass="mouse-trackpad-tips-panel"
     interactiveClose="false">
-    <cds-mouse-tips></cds-mouse-tips>
+    <cds-mouse-tips
+        (close)="mouseTips.close()">
+    </cds-mouse-tips>
 </sat-popover>
