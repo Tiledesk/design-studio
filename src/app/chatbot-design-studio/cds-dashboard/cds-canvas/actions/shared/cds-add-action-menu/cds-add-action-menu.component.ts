@@ -84,6 +84,8 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
   // }
 
   onSearchAction(searchText) {
+
+    console.log('[CDS-ADD-ACTION-MENU] onSearchAction', searchText);
     searchText = searchText.toLocaleLowerCase()
     if (!searchText) {
      this.filterMenuItemsList = this.menuItemsList

@@ -500,10 +500,11 @@ export class CdsCanvasComponent implements OnInit {
       if (!this.hasClickedAddAction) {
         // case: FLOAT MENU
         this.removeConnectorDraftAndCloseFloatMenu();
-      }else{
-        // case: STATIC MENU
-        this.IS_OPEN_ADD_ACTIONS_MENU = false;
-      } 
+      }
+      // else{
+      //   // case: STATIC MENU
+      //   this.IS_OPEN_ADD_ACTIONS_MENU = false;
+      // } 
     }
   }
 
