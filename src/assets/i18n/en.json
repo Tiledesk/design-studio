@@ -111,9 +111,9 @@
     },
     "CDSModalMouseTrackPad":{
         "HowToMove":"How to move",
-        "ClickWhellDragToMove" :"Click whell button & drag \n to move around",
+        "ClickWhellDragToMove" :"Click wheel button & drag \n to move around",
         "ScrollMouseWheel":"Scroll mouse wheel \n to move up/down",
-        "CtrlButtonWheelToZoom":"CRTL + Mouse whell button \n to zoom in/out",
+        "CtrlButtonWheelToZoom":"CRTL + Mouse wheel button \n to zoom in/out",
         "PinchToZoom":"Pinch to zoom",
         "SlideToMove":"Slide two fingers \n to move around"
     },
