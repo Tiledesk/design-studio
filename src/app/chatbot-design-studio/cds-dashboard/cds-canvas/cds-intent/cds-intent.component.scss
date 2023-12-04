@@ -20,6 +20,14 @@
 
 
 
+#customDragPreview {
+  display: block;
+  position:absolute;
+  pointer-events: none;
+  user-select: none;
+  max-width: 244px;
+  width: 100%;
+}
 
 
 .action-element{

@@ -16,7 +16,8 @@ import {
   CdkDropList,
   CdkDropListGroup,
   moveItemInArray,
-  transferArrayItem
+  transferArrayItem,
+  CdkDragMove
 } from '@angular/cdk/drag-drop';
 import { takeUntil } from 'rxjs/operators';
 import { StageService } from '../../../services/stage.service';
@@ -24,8 +25,6 @@ import { ControllerService } from '../../../services/controller.service';
 import { replaceItemInArrayForKey } from '../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-
-
 
 
 export enum HAS_SELECTED_TYPE {
@@ -90,7 +89,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   actionIntent: ActionIntentConnected;
   isActionIntent: boolean = false;
 
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
     public intentService: IntentService,
     private connectorService: ConnectorService,
@@ -496,6 +496,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+
+
+  public onDragMove(event: CdkDragMove): void {
+    const element = document.getElementById('customDragPreview');
+    if (element) {
+    //const nodeMovePreview = new ElementRef<HTMLElement>(document.getElementById(this.storageNode.barcode + 'preview'));
+      const xPos = event.pointerPosition.x - 122;
+      const yPos = event.pointerPosition.y - 20;
+      element.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+    }
+}
+
+
   /** !!! IMPORTANT 
    * when the drag of an action starts, I save the starting intent. 
    * Useful in case I move an action between different intents 
@@ -525,7 +538,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     const addActionPlaceholderEl = <HTMLElement>document.querySelector('.add--action-placeholder');
     this.logger.log('[CDS-INTENT] onDragStarted addActionPlaceholderEl ', addActionPlaceholderEl)
-
 
     // const myObserver = new ResizeObserver(entries => {
     //   // this will get called whenever div dimension changes
