@@ -20,6 +20,16 @@
 
 
 
+#customDragPreview {
+  display: block;
+  position:absolute;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.8;
+  background-color: #ffffff;
+  max-width: 244px;
+  width: 100%;
+}
 
 
 .action-element{
@@ -67,8 +77,6 @@
     max-width: var(--startIntentMaxWith);
     outline: unset;
   }
-
-
 
 
   .pic-header {

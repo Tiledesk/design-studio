@@ -156,23 +156,20 @@ export class IntentService {
   public async getAllIntents(id_faq_kb): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.faqService.getAllFaqByFaqKbId(id_faq_kb).subscribe((faqs: Intent[]) => {
-        // console.log('getAllIntents: ', faqs);
         if (faqs) {
           this.patchActionId(faqs);
           this.listOfIntents = JSON.parse(JSON.stringify(faqs));
           this.prevListOfIntent = JSON.parse(JSON.stringify(faqs));
         } else {
-          // console.log('EMPTY: ', faqs);
           this.listOfIntents = [];
           this.prevListOfIntent = [];
         }
         this.refreshIntents();
         resolve(true);
       }, (error) => {
-        // console.error('ERROR: ', error);
+        console.error('ERROR: ', error);
         reject(false);
       }, () => {
-        // console.log('COMPLETE ');
         resolve(true);
       });
     });
@@ -1049,27 +1046,27 @@ export class IntentService {
    * @param connector 
    * @returns 
    */
-  private setUndoRedoObject(type, typeUNDO, typeREDO, pos, intentPre, intentNow, intentsToUpdateUndo, intentsToUpdateRedo, connector?){
-    console.log('[INTENT UNDO] -> setUndoRedoObject ',intentNow, intentPre, intentsToUpdateUndo, intentsToUpdateRedo, connector);
-    let obj = {
-      type: type,
-      pos: pos,
-      undo:{
-        type: typeUNDO,
-        connector: connector,
-        intent: JSON.parse(JSON.stringify(intentPre)),
-        intentsToUpdate: JSON.parse(JSON.stringify(intentsToUpdateUndo)),
-      },
-      redo:{
-        type: typeREDO,
-        connector: connector,
-        intent: JSON.parse(JSON.stringify(intentNow)),
-        intentsToUpdate: JSON.parse(JSON.stringify(intentsToUpdateRedo)),
-      }
-    }
-    // console.log('[INTENT SERVICE] -> setUndoRedoObject', obj);
-    return obj;
-  }
+  // private setUndoRedoObject(type, typeUNDO, typeREDO, pos, intentPre, intentNow, intentsToUpdateUndo, intentsToUpdateRedo, connector?){
+  //   console.log('[INTENT UNDO] -> setUndoRedoObject ',intentNow, intentPre, intentsToUpdateUndo, intentsToUpdateRedo, connector);
+  //   let obj = {
+  //     type: type,
+  //     pos: pos,
+  //     undo:{
+  //       type: typeUNDO,
+  //       connector: connector,
+  //       intent: JSON.parse(JSON.stringify(intentPre)),
+  //       intentsToUpdate: JSON.parse(JSON.stringify(intentsToUpdateUndo)),
+  //     },
+  //     redo:{
+  //       type: typeREDO,
+  //       connector: connector,
+  //       intent: JSON.parse(JSON.stringify(intentNow)),
+  //       intentsToUpdate: JSON.parse(JSON.stringify(intentsToUpdateRedo)),
+  //     }
+  //   }
+  //   // console.log('[INTENT SERVICE] -> setUndoRedoObject', obj);
+  //   return obj;
+  // }
 
   /** */
   public restoreLastUNDO(){
