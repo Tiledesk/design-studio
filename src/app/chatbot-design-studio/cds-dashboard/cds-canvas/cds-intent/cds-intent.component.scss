@@ -25,6 +25,8 @@
   position:absolute;
   pointer-events: none;
   user-select: none;
+  opacity: 0.8;
+  background-color: #ffffff;
   max-width: 244px;
   width: 100%;
 }
@@ -75,8 +77,6 @@
     max-width: var(--startIntentMaxWith);
     outline: unset;
   }
-
-
 
 
   .pic-header {
