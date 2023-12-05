@@ -62,7 +62,7 @@ import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.compon
 
 
 //CDS-SECRETS
-import { CdsSecretsComponent } from './cds-secrets/cds-secrets.component';
+import { CdsGlobalsComponent } from './cds-globals/cds-globals.component';
 
 
 //SERVICES
@@ -210,7 +210,7 @@ import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
     RulesComponent,
     CdsFulfillmentComponent,
     CdsChatbotDetailsComponent,
-    CdsSecretsComponent,
+    CdsGlobalsComponent,
     //CDS-ROOT-ELEMENTS: end
 
     AttributesComponent,

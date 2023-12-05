@@ -14,8 +14,11 @@
     "Cancel":"Cancel",
     "Continue": "Continue",
     "Add":"Add",
+    "Edit":"Edit",
+    "Update":"Update",
     "Close": "Close",
     "Upload": "Upload",
+    "Delete":"Delete",
     "Error":"Error",
     "Warning": "Attention!",
     "Back":"Back",
@@ -320,6 +323,7 @@
     },
     "CDSvariablesList": {
         "userDefined":"User defined",
+        "globals":"Globals",
         "mostUsed":"Most used",
         "systemDefined":"System defined",
         "uploadedDocument":"Uploaded document",
@@ -327,7 +331,14 @@
     },
     "New":"New",
     "Event":"Event",
-    "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network"
+    "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
+    "CDSGlobals":{
+        "Globals":"Globas",
+        "NoGlobalVariables":"No global variables",
+        "GlobalVariablesDescription" : "Global variables are a set of variables that are always available in a workspac",
+        "GLOBAL_KEY" :"GLOBAL_KEY",
+        "value":"value"
+    }
     
 
     

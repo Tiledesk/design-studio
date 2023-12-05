@@ -38,9 +38,9 @@
             [selectedChatbot]="selectedChatbot">
         </cds-fulfillment>
 
-        <cds-secrets *ngIf="activeSidebarSection == SIDEBAR_PAGES.SECRETS && initFinished" 
+        <cds-globals *ngIf="activeSidebarSection == SIDEBAR_PAGES.GLOBALS && initFinished" 
             [selectedChatbot]="selectedChatbot">
-        </cds-secrets>
+        </cds-globals>
         
         <cds-rules *ngIf="activeSidebarSection == SIDEBAR_PAGES.RULES && initFinished" 
             [selectedChatbot]="selectedChatbot">

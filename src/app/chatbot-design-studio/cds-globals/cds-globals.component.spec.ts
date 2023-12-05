@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CdsSecretsComponent } from './cds-secrets.component';
+import { CdsGlobalsComponent } from './cds-globals.component';
 
-describe('CdsSecretsComponent', () => {
-  let component: CdsSecretsComponent;
-  let fixture: ComponentFixture<CdsSecretsComponent>;
+describe('CdsGlobalsComponent', () => {
+  let component: CdsGlobalsComponent;
+  let fixture: ComponentFixture<CdsGlobalsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CdsSecretsComponent ]
+      declarations: [ CdsGlobalsComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CdsSecretsComponent);
+    fixture = TestBed.createComponent(CdsGlobalsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

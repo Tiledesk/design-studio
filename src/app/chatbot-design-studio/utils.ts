@@ -15,7 +15,7 @@ export enum SIDEBAR_PAGES {
     SETTINGS = 'cds-sb-settings',
     FULFILLMENT = 'cds-sb-fulfillment',
     RULES = 'cds-sb-rules',
-    SECRETS = 'cds-sb-secrets'
+    GLOBALS = 'cds-sb-globals'
 }
 
 export enum SETTINGS_SECTION {
@@ -219,7 +219,7 @@ export enum OPTIONS {
     UNDO = "undo",
     REDO = "redo",
     MOUSE = "mouse"
-  }
+}
 
 export const INTENT_TEMP_ID = '';
 export const MESSAGE_METADTA_WIDTH = '100%';
@@ -413,6 +413,10 @@ export function getEmbedUrl(url: string) {
 export var variableList: Array<{key: string, elements: Array<any>}> = [ 
     {
         key: 'userDefined',
+        elements: []
+    },
+    {
+        key: 'globals',
         elements: []
     },
     {
