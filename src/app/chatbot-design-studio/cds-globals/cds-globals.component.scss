@@ -11,15 +11,17 @@
 }
 
 
-.container-fluid {
-    padding-top: 10px;
+.cds-container {
     height: 100%;
+    overflow: hidden;
 }
 
 .header {
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    margin: 10px;
 
     .cds-row {
         display: flex;
@@ -40,8 +42,9 @@
 }
 
 .content {
-    width: 100%;
     height: calc(100vh - var(--header-height) - var(--footer-height));
+    overflow-y: scroll;
+    margin: 10px;
 }
 
 .footer{

@@ -335,7 +335,7 @@
     "Event":"Event",
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
     "CDSGlobals":{
-        "Globals":"Globas",
+        "Globals":"Globals",
         "NoGlobalVariables":"No global variables",
         "GlobalVariablesDescription" : "Global variables are a set of variables that are always available in a workspac",
         "GLOBAL_KEY" :"GLOBAL_KEY",
