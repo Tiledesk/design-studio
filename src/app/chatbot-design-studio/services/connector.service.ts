@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
 import { StageService } from '../services/stage.service';
-import { TYPE_ACTION, TYPE_BUTTON, isElementOnTheStage } from '../utils';
+import { TYPE_ACTION, TYPE_BUTTON, isElementOnTheStage, generateShortUID } from '../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 /** CLASSE DI SERVICES PER GESTIRE I CONNETTORI **/
@@ -188,6 +188,9 @@ export class ConnectorService {
             // this.logger.log('[CONNECTOR-SERV] button   ----- > ', button, button.__idConnector);
             if(button.type === TYPE_BUTTON.ACTION && button.action){
               // const idConnectorFrom = button.__idConnector;
+              if(!button.uid || button.uid === "UUIDV4"){
+                button.uid = generateShortUID();
+              }
               const idConnectorFrom = intent.intent_id+"/"+action._tdActionId+"/"+button.uid;
               this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
               var startIndex = button.action.indexOf('#') + 1;

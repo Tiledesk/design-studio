@@ -340,7 +340,7 @@ export class CdsCanvasComponent implements OnInit {
         this.logger.log('[CDS-CANVAS] end-dragging ', el);
         el.style.zIndex = 1;
         if(this.intentSelected){
-          this.intentService.updateIntentNew(this.intentSelected);
+          this.intentService.updateIntent(this.intentSelected);
           // this.intentService.patchAttributes(this.intentSelected);
         }
       },
@@ -770,8 +770,7 @@ export class CdsCanvasComponent implements OnInit {
     this.intentService.setDragAndListnerEventToElement(intent.intent_id);
     this.intentService.setIntentSelected(intent.intent_id);
     // this.intentSelected = intent;
-    // const savedIntent = await this.intentService.saveNewIntent(intent, nowIntent, prevIntent);
-    const savedIntent = await this.intentService.saveNewIntentNew(intent, nowIntent, prevIntent);
+    const savedIntent = await this.intentService.saveNewIntent(intent, nowIntent, prevIntent);
   }
 
 
@@ -1008,7 +1007,7 @@ export class CdsCanvasComponent implements OnInit {
   onSaveButton(button: Button) {
     this.logger.log('onSaveButton: ', this.intentService.intentSelected);
     // this.intentService.onUpdateIntentFromActionPanel(this.intentService.intentSelected);
-    this.intentService.updateIntentNew(this.intentService.intentSelected);
+    this.intentService.updateIntent(this.intentService.intentSelected);
 
     // const arrayId = button.__idConnector.split("/");
     // const intentIdIntentToUpdate = arrayId[0] ? arrayId[0] : null;
@@ -1032,7 +1031,7 @@ export class CdsCanvasComponent implements OnInit {
     if (intentSelected && intentSelected != null) {
       this.intentSelected = intentSelected;
       // this.intentService.onUpdateIntentFromActionPanel(intentSelected);
-      this.intentService.updateIntentNew(intentSelected);
+      this.intentService.updateIntent(intentSelected);
     } else {
       // this.onOpenDialog();
     }
@@ -1063,7 +1062,7 @@ export class CdsCanvasComponent implements OnInit {
       this.logger.log("[CDS-CANVAS] ho premuto + quindi creo una nuova action e la aggiungo all'intent", this.intentSelected);
       const newAction = this.intentService.createNewAction(event.type);
       this.intentSelected.actions.push(newAction);
-      this.intentService.updateIntentNew(this.intentSelected);
+      this.intentService.updateIntent(this.intentSelected);
       // this.updateIntent(this.intentSelected, 0, true);
       this.controllerService.closeAddActionMenu();
     }

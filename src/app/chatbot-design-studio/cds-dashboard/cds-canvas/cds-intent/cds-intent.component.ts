@@ -660,7 +660,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (event.previousContainer === event.container) {
       // moving action in the same intent 
       moveItemInArray(this.intent.actions, event.previousIndex, event.currentIndex);
-      this.intentService.updateIntentNew(this.intent, null);
+      this.intentService.updateIntent(this.intent, null);
       // const response = await this.intentService.onUpdateIntentWithTimeout(this.intent);
     } else {
       try {
@@ -710,7 +710,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     
     // this.setActionIntentInListOfActions();
     // this.logger.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
-    this.intentService.updateIntentNew(this.intent);
+    this.intentService.updateIntent(this.intent);
     // this.intentService.onUpdateIntentWithTimeout(this.intent, 0, true, connector);
   }
 
@@ -788,7 +788,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // this.webHookTooltipText = "Disable webhook"
     // this.webHookTooltipText = "Enable webhook"
     // this.intentService.onUpdateIntentWithTimeout(intent);
-    this.intentService.updateIntentNew(this.intent, null);
+    this.intentService.updateIntent(this.intent, null);
   }
 
   onDeleteIntent(intent: Intent) {
