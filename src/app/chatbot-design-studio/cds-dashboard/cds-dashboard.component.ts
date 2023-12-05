@@ -50,7 +50,7 @@ export class CdsDashboardComponent implements OnInit {
   project: Project;
   defaultDepartmentId: string;
   selectedChatbot: Chatbot
-  activeSidebarSection: SIDEBAR_PAGES;
+  activeSidebarSection: SIDEBAR_PAGES = SIDEBAR_PAGES.INTENTS;
   activeDetailSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
   isBetaUrl: boolean = false;
 

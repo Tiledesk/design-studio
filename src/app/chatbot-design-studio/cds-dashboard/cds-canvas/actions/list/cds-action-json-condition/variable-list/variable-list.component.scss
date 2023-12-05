@@ -47,7 +47,7 @@
 
 #data{
     // padding: 15px 0px;  
-    overflow-x: hidden;
+    // overflow-x: hidden;
     // &:first-child{
     //     margin-bottom: 20px;
     //     padding-top: 15px;
@@ -200,9 +200,9 @@
 }
 
 mat-expansion-panel {
-    box-shadow: none;
+    box-shadow: none !important;
     // background-color: var(--content-background);
-    border: 1px solid $gray-light-02;
+    border-bottom: 1px solid $gray-light-02;
     overflow: visible;
     border-radius: 0 !important;
     &.open-block {
@@ -239,7 +239,8 @@ mat-expansion-panel {
     }
 }
 
-mat-expansion-panel#userDefined {
+mat-expansion-panel#userDefined,
+mat-expansion-panel#globals {
     ::ng-deep {
         .mat-expansion-panel-content{
             height: unset !important;
@@ -250,6 +251,9 @@ mat-expansion-panel#userDefined {
         }
         .mat-expansion-panel-body{
             opacity: 1 !important;
+        }
+        .mat-expansion-indicator::after {
+            display: none;
         }
     }
 }

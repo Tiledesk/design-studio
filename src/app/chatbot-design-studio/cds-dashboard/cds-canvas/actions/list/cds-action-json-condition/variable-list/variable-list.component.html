@@ -20,6 +20,19 @@
             </div>
         </mat-expansion-panel>
     </div>
+    <div id="data" *ngIf="filteredGlobalsList && filteredGlobalsList[0].elements.length > 0">
+        <mat-expansion-panel [expanded]="true" id="globals">
+            <mat-expansion-panel-header class="specific-class">
+                <mat-panel-title>
+                    <div class="category-name">{{ 'CDSvariablesList.'+filteredGlobalsList[0].key | translate}}</div>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div *ngFor="let variable of filteredGlobalsList[0].elements" (click)="onVariableSelected(variable)" class="category-row">
+                <span class="material-icons">lock</span>
+                <label class="category-row-name ellips">{{variable?.name}}</label>
+            </div>
+        </mat-expansion-panel>
+    </div>
     <div id="data" *ngFor="let item of filteredIntentVariableList; let index= index">
         <mat-expansion-panel [expanded]="(index===0 || isSearching)? true: false" *ngIf="item && item.elements.length > 0">
             <mat-expansion-panel-header class="specific-class">

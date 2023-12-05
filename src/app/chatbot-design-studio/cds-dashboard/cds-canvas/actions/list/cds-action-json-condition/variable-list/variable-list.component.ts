@@ -16,9 +16,11 @@ export class VariableListComponent implements OnInit {
   @Output() onSelected = new EventEmitter()
 
   variableListUserDefined: { key: string, elements: Array<{name: string, value: string}>} // = variableList.userDefined 
+  variableListGlobals: { key: string, elements: Array<{name: string, value: string}>}
   variableListSystemDefined: Array<{ key: string, elements: Array<{name: string, value: string, description: string, src?: string}>}> //= variableList.systemDefined
 
   filteredVariableList: Array<{ key: string, elements: Array<{name: string, value: string}>}> //= []
+  filteredGlobalsList: Array<{ key: string, elements: Array<{name: string, value: string}>}> //= []
   filteredIntentVariableList: Array<{ key: string, elements: Array<{name: string, value: string, description: string, src?: string}>}>
   textVariable: string = '';
   idBot: string;
@@ -44,15 +46,21 @@ export class VariableListComponent implements OnInit {
   private initialize(){
     this.idBot = this.dashboardService.id_faq_kb
     this.variableListUserDefined = variableList.find(el => el.key === 'userDefined');
-    this.variableListSystemDefined = variableList.filter(el => el.key !== 'userDefined');
+    this.variableListGlobals = variableList.find(el => el.key === 'globals');
+    this.variableListSystemDefined = variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals'));
     this.filteredVariableList = []
+    this.filteredGlobalsList = []
     this.filteredIntentVariableList = [];
     if(this.variableListUserDefined){
       this.filteredVariableList.push(this.variableListUserDefined)
     }
-    variableList.filter(el => el.key !== 'userDefined').map(el => {
+    if(this.variableListGlobals){
+      this.filteredGlobalsList.push(this.variableListGlobals)
+    }
+    variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals')).map(el => {
       this.filteredIntentVariableList.push( { key: el.key, elements: el.elements })
     })
+    console.log('sssssss-->', this.filteredGlobalsList, this.variableListGlobals)
     // if(this.variableListSystemDefined){
     //   this.filteredIntentVariableList = this.variableListSystemDefined
     // }
@@ -109,6 +117,7 @@ export class VariableListComponent implements OnInit {
       this.textVariable = event
     }
     this.filteredVariableList = this._filter2(this.textVariable, [this.variableListUserDefined])
+    this.filteredGlobalsList = this._filter2(this.textVariable, [this.variableListGlobals])
     this.filteredIntentVariableList = this._filter2(this.textVariable, this.variableListSystemDefined)
 
     this.isEmpty = (this.filteredIntentVariableList.every(el => el.elements.length === 0) && this.filteredVariableList[0].elements.length === 0 ) 
