@@ -117,15 +117,14 @@ export class TiledeskStage {
         
     }
 
-    zoom(event, stageElement){
+    zoom(event){
+        let scale = 1;
         if (event === 'in'){
-            this.scale = Math.min(Math.max(0.125, this.scale += this.scaleStep), 4);
+            scale = Math.min(Math.max(0.125, (this.scale + this.scaleStep)), 4);
         } else if (event === 'out'){
-            this.scale = Math.min(Math.max(0.125, this.scale -= this.scaleStep), 4);
+            scale = Math.min(Math.max(0.125, (this.scale - this.scaleStep)), 4);
         }
-        return this.centerStageOnPosition(stageElement, this.scale)
-        // this.drawer.style.transition = "transform 0.3s ease-in-out"
-        // this.transform();
+        return this.centerStageOnCenterPosition(scale);
     }
     
     transform() {
@@ -240,11 +239,24 @@ export class TiledeskStage {
             const posX = x+w/2;
             const posY = y+h/2;
             const pos = {x: posX, y: posY}
-            // console.log(pos);
             return this.translateAndScale(pos, scale);
         } else {
             return false;
         }
+    }
+
+    centerStageOnCenterPosition(scale=1){
+        var originRec = this.container.getBoundingClientRect();
+        var originDrawer = this.drawer.getBoundingClientRect();
+        let diffX = (originRec.x - originDrawer.x);
+        let diffY = (originRec.y - originDrawer.y);
+        let percScale = scale/this.scale;
+        //console.log('originRec', originRec, originDrawer, diffX, ((originRec.width/2)*scale/this.scale), this.scale);
+        let x1 = ((originRec.width/2)*percScale)+diffX*percScale;
+        let y1 = ((originRec.height/2)*percScale)+diffY*percScale;
+        const pos = {x: x1, y: y1}
+        // console.log('centerStageOnPosition', x1, scale, this.scale, percScale);
+        return this.translateAndScale(pos, scale);
     }
 
     translateAndScale(pos, scale=1){
@@ -255,7 +267,7 @@ export class TiledeskStage {
             let newX = (originRec.width/2)-pos.x;
             let newY = (originRec.height/2)-pos.y;
             let tcmd = `translate(${newX}px, ${newY}px)`;
-            let scmd = `scale(${this.scale})`;
+            let scmd = `scale(${scale})`;
             const cmd = tcmd + " " + scmd;
             this.drawer.style.transform = cmd;
             this.tx = newX;
@@ -282,7 +294,6 @@ export class TiledeskStage {
             var originRec = this.container.getBoundingClientRect();
 
             let newX = (originRec.width/2)-(x+w/2);
-            // console.log('newX:', newX);
 
             let newY = (50)-(y);
             // console.log('newX:', newY);
@@ -321,9 +332,10 @@ export class TiledeskStage {
             // console.log('newX:', newX);
             let newY = (originRec.height/2)-(y+h/2)-20;
             // console.log('newX:', newY);
+
             let tcmd = `translate(${newX}px, ${newY}px)`;
             let scmd = `scale(${1})`;
-            // let scmd = `scale(${this.scale})`;
+            //  let scmd = `scale(${this.scale})`;
             const cmd = tcmd + " " + scmd;
             this.drawer.style.transform = cmd;
             // console.log("tcmd:", tcmd);
