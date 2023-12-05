@@ -68,21 +68,28 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     let keys = [
       'CDSSetting.UpdateBotError',
       'CDSSetting.UpdateBotSuccess',
-      'CDSSetting.Not a valid JSON file.',
+      'CDSSetting.NotAValidJSON',
       'CDSSetting.AnErrorOccurredWhilDeletingTheAnswer',
       'CDSSetting.AnswerSuccessfullyDeleted',
       'Done',
-      'CDSSetting.ThereHasBeenAnErrorProcessing'
+      'CDSSetting.ThereHasBeenAnErrorProcessing',
+      'CDSSetting.FileUploadedSuccessfully',
+      'CDSSetting.AnErrorOccurredUpdatingProfile',
+      'CDSSetting.UserProfileUpdated'
+
     ]
 
     this.translate.get(keys).subscribe((text)=>{
       this.translationsMap.set('CDSSetting.UpdateBotError', text['CDSSetting.UpdateBotError'])
                           .set('CDSSetting.UpdateBotSuccess', text['CDSSetting.UpdateBotSuccess'])
-                          .set('CDSSetting.Not a valid JSON file.', text['CDSSetting.Not a valid JSON file.'])
+                          .set('CDSSetting.NotAValidJSON', text['CDSSetting.NotAValidJSON'])
                           .set('CDSSetting.AnErrorOccurredWhilDeletingTheAnswer', text['CDSSetting.AnErrorOccurredWhilDeletingTheAnswer'])
                           .set('CDSSetting.AnswerSuccessfullyDeleted', text['CDSSetting.AnswerSuccessfullyDeleted'])
                           .set('Done', text['Done'])
                           .set('CDSSetting.ThereHasBeenAnErrorProcessing', text['CDSSetting.ThereHasBeenAnErrorProcessing'])
+                          .set('CDSSetting.FileUploadedSuccessfully', text['CDSSetting.FileUploadedSuccessfully'])
+                          .set('CDSSetting.ThereHasBeenAnErrorProcessing', text['CDSSetting.AnErrorOccurredUpdatingProfile'])
+                          .set('CDSSetting.ThereHasBeenAnErrorProcessing', text['CDSSetting.UserProfileUpdated'])
 
     })
 

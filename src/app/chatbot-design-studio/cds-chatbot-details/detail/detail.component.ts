@@ -566,12 +566,12 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
 
       // =========== NOTIFY ERROR ===========
-      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('UpdateBotError'), 4, 'report_problem');
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotError'), 4, 'report_problem');
 
     }, () => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT LANG - * COMPLETE *');
       // =========== NOTIFY SUCCESS===========
-      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('UpdateBotSuccess'), 2, 'done');
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotSuccess'), 2, 'done');
       this.updateChatbot(this.selectedChatbot, langCode)
     });
 

@@ -41,7 +41,8 @@
 
     <cds-detail-import-export *ngIf="activeSection===SETTINGS_SECTION.IMPORT_EXPORT"
       [id_faq_kb]="selectedChatbot?._id"
-      [faqKb_name]="faqKb_name">
+      [faqKb_name]="faqKb_name"
+      [translationsMap]="translationsMap">
     </cds-detail-import-export>
 
     <cds-detail-community *ngIf="activeSection===SETTINGS_SECTION.COMMUNITY"

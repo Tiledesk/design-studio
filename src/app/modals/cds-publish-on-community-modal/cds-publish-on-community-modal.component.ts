@@ -9,6 +9,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'appdashboard-cds-publish-on-community-modal',
@@ -49,6 +50,7 @@ export class CdsPublishOnCommunityModalComponent implements OnInit {
     private uploadService: UploadService,
     private sanitizer: DomSanitizer,
     private notify: NotifyService,
+    private translate: TranslateService,
   ) {
     this.logger.log('[PUBLISH-ON-COMMUNITY-MODAL-COMPONENT] data ', data)
     this.selectedChatbot = data.chatbot;
@@ -292,7 +294,7 @@ export class CdsPublishOnCommunityModalComponent implements OnInit {
     }, () => {
 
       this.logger.log('[PUBLISH-ON-COMMUNITY-MODAL-COMPONENT] publishOnCommunity * COMPLETE * ');
-      this.notify.showWidgetStyleUpdateNotification('CDSSetting.SuccessfullyDeployed', 2, 'done');
+      this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSSetting.SuccessfullyDeployed'), 2, 'done');
       this.dialogRef.close('has-published-on-cmnty');
 
     });

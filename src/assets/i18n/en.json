@@ -178,6 +178,8 @@
         "AnErrorOccurredDuringTheUpload": "An error occurred during the upload",
         "InTheCSVFileToBeUploadedTheColumnsAreSeparatedBy": "In the CSV file to be uploaded, the columns are separated by",
         "UpdateBotError": "An error occurred while updating the bot",
+        "UserProfileUpdated":"User profile updated successfully",
+        "AnErrorOccurredUpdatingProfile":"An error occurred while updating your user profile",
         "Not a valid JSON file.": "Not a valid JSON file",
         "UpdateBotSuccess": " bot successfully updated",
         "AnErrorOccurredWhilDeletingTheAnswer": "An error occurred while deleting the Answer",

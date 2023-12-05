@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 
-import { NotifyService } from 'src/app/services/notify.service';
 import { MultichannelService } from 'src/app/services/multichannel.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
