@@ -1079,25 +1079,12 @@ export class IntentService {
       this.payload.operations = objUNDO.undo;
       this.restoreIntentNew(objUNDO.undo);
       let stateUndo = true;
-      if(this.arrayUNDO.length == 0)stateUndo = false;
-      this.behaviorUndoRedo.next({ undo: stateUndo, redo: true });
+      // if(this.arrayUNDO.length == 0)stateUndo = false;
+      // this.behaviorUndoRedo.next({ undo: stateUndo, redo: true });
+      this.setBehaviorUndoRedo();
       console.log('[INTENT UNDO] -> ho aggiornato gli array dopo UNDO ', this.payload, this.arrayUNDO, this.arrayREDO);
       this.opsUpdate(this.payload);
     }
-
-    // i connettori vengono aggiornati dopo
-    // console.log('[INTENT SERVICE] -> restoreLastUNDO', this.listOfIntents);
-    // this.lastActionUndoRedo = true;
-    // if(this.arrayUNDO && this.arrayUNDO.length>0){
-    //   const objUNDO = JSON.parse(JSON.stringify(this.arrayUNDO.pop()));
-    //   this.arrayREDO.push(objUNDO);
-    //   // console.log('[INTENT SERVICE] -> RESTORE UNDO: ', this.arrayREDO);
-    //   this.restoreIntent(objUNDO.pos, objUNDO.undo);
-    //   let stateUndo = true;
-    //   if(this.arrayUNDO.length == 0)stateUndo = false;
-    //   this.behaviorUndoRedo.next({ undo: stateUndo, redo: true });
-    //   console.log('[INTENT UNDO] -> ho aggiornato gli array dopo UNDO ', this.arrayUNDO, this.arrayREDO);
-    // }
   }
 
   /** */
@@ -1111,21 +1098,19 @@ export class IntentService {
       // console.log('[INTENT SERVICE] -> RESTORE REDO: ', objREDO);
       this.payload.operations = objREDO.redo;
       this.restoreIntentNew(objREDO.redo);
-      if(this.arrayREDO.length == 0)this.behaviorUndoRedo.next({ undo: true, redo: false });
+      // if(this.arrayREDO.length == 0)this.behaviorUndoRedo.next({ undo: true, redo: false });
+      this.setBehaviorUndoRedo();
       console.log('[INTENT UNDO] -> ho aggiornato gli array dopo REDO ', this.arrayUNDO, this.arrayREDO);
       this.opsUpdate(this.payload);
     }
+  }
 
-    // this.lastActionUndoRedo = true;
-    // // console.log('[INTENT SERVICE] -> restoreLastREDO', this.arrayREDO);
-    // if(this.arrayREDO && this.arrayREDO.length>0){
-    //   const objREDO = JSON.parse(JSON.stringify(this.arrayREDO.pop()));
-    //   this.arrayUNDO.push(objREDO);
-    //   // console.log('[INTENT SERVICE] -> RESTORE REDO: ', objREDO);
-    //   this.restoreIntent(objREDO.pos, objREDO.redo);
-    //   if(this.arrayREDO.length == 0)this.behaviorUndoRedo.next({ undo: true, redo: false });
-    //   console.log('[INTENT UNDO] -> ho aggiornato gli array dopo REDO ', this.arrayUNDO, this.arrayREDO);
-    // }
+  private setBehaviorUndoRedo(){
+    let stateUndo = true;
+    let stateRedo = true;
+    if(this.arrayUNDO.length == 0)stateUndo = false;
+    if(this.arrayREDO.length == 0)stateRedo = false;
+    this.behaviorUndoRedo.next({ undo: stateUndo, redo: stateRedo });
   }
 
 
@@ -1404,6 +1389,7 @@ export class IntentService {
     let operations = {undo:this.operationsUndo, redo:this.operationsRedo};
     this.arrayUNDO.push(operations);
     this.arrayREDO = [];
+    this.setBehaviorUndoRedo();
     console.log('[INTENT SERVICE] updateIntentNew -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
     this.refreshIntents();
 
@@ -1466,6 +1452,7 @@ export class IntentService {
     let operations = {undo:this.operationsUndo, redo:this.operationsRedo};
     this.arrayUNDO.push(operations);
     this.arrayREDO = [];
+    this.setBehaviorUndoRedo();
     console.log('[INTENT SERVICE] -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
     this.refreshIntents();
     this.opsUpdate(this.payload);
@@ -1507,6 +1494,7 @@ export class IntentService {
       let operations = {undo:this.operationsUndo, redo:this.operationsRedo};
       this.arrayUNDO.push(operations);
       this.arrayREDO = [];
+      this.setBehaviorUndoRedo();
       console.log('[INTENT SERVICE] -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
       this.refreshIntents();
       this.opsUpdate(this.payload);
