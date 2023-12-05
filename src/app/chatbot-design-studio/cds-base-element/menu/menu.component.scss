@@ -1,9 +1,12 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-$text-color: $blu;
-$icon-color: $gray-light-01;
-$text-hover-color: $blu;
-$icon-hover-color: $blu;
+
+:host {
+    --text-color: #{$blu};
+    --icon-color: #{$gray-light-01};
+    --text-hover-color: #{$blu};
+    --icon-hover-color: #{$blu};
+}
 
 #panel_actions_div{
     padding: 6px;
@@ -29,13 +32,13 @@ $icon-hover-color: $blu;
         
         span.material-icons-outlined,
         img{
-            color: $text-hover-color;
+            color: var(--text-hover-color);
             filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%); 
             cursor: pointer; 
         }
 
         .menu-btn-text{
-            color: $text-hover-color
+            color: var(--text-hover-color);
         }
     }
 
@@ -49,7 +52,7 @@ $icon-hover-color: $blu;
     img{
         width: 16px;
         font-size: 16px;
-        color: $icon-color;
+        color: var(--icon-color);
         filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
     }
 
@@ -57,7 +60,7 @@ $icon-hover-color: $blu;
 }
 .menu-btn-text{
     display: inline-flex;
-    color: $text-color;
+    color: var(--text-color);
     padding: 0;
     vertical-align: middle;
     font-size: 10px;
@@ -73,5 +76,5 @@ $icon-hover-color: $blu;
 }
 
 .current-user{
-    color: $icon-color
+    color: var(--icon-color);
 }

@@ -33,6 +33,7 @@ export class CDSMenuComponent implements OnInit {
    }
 
   ngOnInit(): void {
+    this.loggedUser = this.tiledeskAuthService.getCurrentUser();
   }
 
 
