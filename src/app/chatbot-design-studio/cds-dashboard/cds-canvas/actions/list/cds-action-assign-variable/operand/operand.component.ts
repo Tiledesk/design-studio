@@ -81,9 +81,10 @@ export class OperandComponent implements OnInit {
     }
 
     onSelectedAttribute(variableSelected: { name: string, value: string }){
-        this.operandForm.get('isVariable').setValue(true);
+        // this.operandForm.get('isVariable').setValue(true);
         this.operandForm.get('value').setValue('{{'+variableSelected.name + '}}');
         // this.onChangeOperand.emit(this.operand) 
+        console.log('operand formrrrrrr', this.operandForm)
     }
     onClearSelectedAttribute(){
         this.operandForm.get('value').setValue('');
