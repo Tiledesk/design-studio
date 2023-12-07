@@ -4,17 +4,15 @@
     <div class="textarea-value">
         <div class="value-wrp">
             <label>Value</label>
-            <!-- 
-                [setAttributeBtn]="true"
-                [readonly]="true"
-            -->
+            {{operandForm.value.isVariable}}
             <cds-textarea id="operand"
                 [placeholder]="operandForm.value.isVariable? '' : placeholder"
                 [textLimitBtn]="false"
                 [emojiPikerBtn]="false"
                 [text]="operandForm.value.value"
                 [limitCharsText]="10000"
-                [setAttributeBtn]="true"
+                [setAttributeBtn]="operandForm.value.value? false : true"
+                [readonly]="operandForm.value.isVariable? true : false" 
                 [minRow]="1" [maxRow]="4"
                 [control]="operandForm.get('value')"
                 (clearSelectedAttribute)="onClearSelectedAttribute()"
