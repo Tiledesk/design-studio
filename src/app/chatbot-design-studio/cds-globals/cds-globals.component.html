@@ -3,7 +3,7 @@
     <!-- // HEADER - START -->
     <div class="header">
         <div class="cds-row">
-            <p class="header-title">{{ "CDSGlobals.Globals" | translate }}</p>
+            <label class="header-title">{{ "CDSGlobals.Globals" | translate }}</label>
             <button type="button" class="btn btn-primary cds-blue-button"
                 (click)="showHideNewSection(true)">
                 <span class="material-icons icon plus-icon">add</span>
@@ -15,11 +15,12 @@
     </div>
     <!-- // HEADER - END -->
 
+    <!-- // CONTENT - END -->
     <div class="content">
         <!-- // ADD NEW SECRET SECTION - START -->
         <div *ngIf="newSectionVisible" class="secret-container">
 
-            <form [formGroup]="globalForm" (ngSubmit)="onSubmitForm()" (keydown.enter)="onSubmitForm()">
+            <form [formGroup]="globalForm" (submit)="onSubmitForm()" (keydown.enter)="onSubmitForm()">
                 <div class="secret-inner-container">
                     <div class="field-box" style="width: 50%;">
                         <label class="title-label">{{ "CDSCanvas.Key" | translate }}</label>
@@ -41,14 +42,15 @@
                         </cds-text>
                     </div>
                 </div>
-            </form>
+            
 
-            <div class="buttons-container">
-                <button id="cancel-button" type="button" class="btn btn-primary cds-blue-button"
-                    (click)="showHideNewSection(false)">{{ "Cancel" | translate }}</button>
-                <button id="add-button" type="submit" class="btn btn-primary cds-blue-button"
-                    [disabled]="!globalForm.valid">{{ "Add" | translate }}</button>
-            </div>
+                <div class="buttons-container">
+                    <button id="cancel-button" type="button" class="btn btn-primary cds-blue-button"
+                        (click)="showHideNewSection(false)">{{ "Cancel" | translate }}</button>
+                    <button id="add-button" type="submit" class="btn btn-primary cds-blue-button"
+                        [disabled]="!globalForm.valid">{{ "Add" | translate }}</button>
+                </div>
+            </form>
         </div>
         <!-- // ADD NEW SECRET SECTION - END -->
 
@@ -169,12 +171,19 @@
 
         </div>
     </div>
+    <!-- // CONTENT - END -->
 
 
     <!-- // FOOTER - START -->
-    <!-- <div class="footer">
-        footer
-    </div> -->
+    <div class="footer">
+        <div class="container-wrp">
+            <span class="material-icons-outlined">info</span>
+            <div>
+                <label> Use variables to reuse values and protect sensitive data</label>
+                <label> Store sensitive data in variables type secret to keep its values masked on the screen. <br> Work with the current value of a variable to prevent sharing sensitive values with your team</label>
+            </div>
+        </div>
+    </div>
     <!-- // FOOTER - END -->
 </div>
 

@@ -65,7 +65,7 @@ export class CdsGlobalsComponent implements OnInit {
     if(this.globalForm.valid){
       this.list.push(this.globalForm.value);
       this.saveAttributes();
-      this.newSectionVisible = false;
+      this.newSectionVisible = false
     }
   }
 
@@ -104,6 +104,7 @@ export class CdsGlobalsComponent implements OnInit {
         key: '',
         value: ''
       }
+      this.globalForm.reset();
       
       //Update local list (for variable-list component)
       variableList.find(el => el.key ==='globals').elements = this.selectedChatbot.attributes.globals.map(({
@@ -133,6 +134,7 @@ export class CdsGlobalsComponent implements OnInit {
   }
 
   showHideNewSection(visible: boolean) {
+    this.showUpdateSecret(null, null);
     this.newSectionVisible = visible;
   }
 
