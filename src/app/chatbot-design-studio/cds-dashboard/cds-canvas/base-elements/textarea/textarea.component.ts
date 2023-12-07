@@ -1,5 +1,5 @@
 import { FormControl } from '@angular/forms';
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef, HostListener, SimpleChanges, SimpleChange } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { calculatingRemainingCharacters, TEXT_CHARS_LIMIT, variableList } from '../../../../utils';
 import { SatPopover } from '@ncstate/sat-popover';
@@ -66,9 +66,12 @@ export class CDSTextareaComponent implements OnInit {
     this.initialize();
   }
 
-  // ngOnChanges() {
-  //   this.initialize();
-  // }
+  ngOnChanges(changes: SimpleChange) {
+    if(changes && changes['readonly'] && changes['readonly'].previousValue !== changes['readonly'].currentValue){
+      this.textTag = this.text
+    }
+    // this.initialize();
+  }
 
   ngAfterViewInit() {
     this.getTextArea();
@@ -105,7 +108,7 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   onChangeTextArea(event) {
-    // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
+    this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
     this.calculatingleftCharsText();
     if(this.readonly && event){
       this.textTag = event;
