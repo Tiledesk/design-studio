@@ -5,12 +5,16 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7-rc.5
+- added: cds-action-assign-variable-v2
+
 ### 1.0.7-rc.4
 - added: cdkDragPreview UI while dragging an action into the same block
 - added: cds-globals component to manage global attributes variables into chatbot obj
 - added: global variables to variablesList utils obj
 - bug-fixed: patch in action reply buttons without UUIDV4
-
+- bug-fixed: if clear operand variable inside cds-action-assign-variable, operation obj is not updated 
+- bug-fixed: if 'readonly' input variable is updated in parent cds-textarea component, tag badge is not created 
 ### 1.0.7-rc.3
 - added: close behaviour on mouse-tips modal close header icon
 - bug fixed: close the add-actions-menu by clicking Backspace
