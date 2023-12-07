@@ -116,6 +116,13 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-assign-variable>
 
+                    <cds-action-assign-variable-v2 *ngSwitchCase="typeAction.ASSIGN_VARIABLE_V2"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-assign-variable-v2>
+
                     <cds-action-delete-variable *ngSwitchCase="typeAction.DELETE_VARIABLE"
                         class="panel-response"
                         [action]="elementSelected"

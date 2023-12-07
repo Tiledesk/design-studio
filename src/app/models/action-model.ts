@@ -23,6 +23,22 @@ export class ActionAssignVariable extends Action {
     }
 }
 
+export class ActionAssignVariableV2 extends Action {
+    destination: string;
+    operation: Operation;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.ASSIGN_VARIABLE_V2;
+        this.operation = {
+            operands: [{
+                value: '',
+                isVariable: false
+            }],
+            operators: []
+        };
+    }
+}
+
 export class ActionAssignFunction extends Action {
     functionName: string;
     assignTo: string;

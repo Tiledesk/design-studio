@@ -60,7 +60,6 @@ export class VariableListComponent implements OnInit {
     variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals')).map(el => {
       this.filteredIntentVariableList.push( { key: el.key, elements: el.elements })
     })
-    console.log('sssssss-->', this.filteredGlobalsList, this.variableListGlobals)
     // if(this.variableListSystemDefined){
     //   this.filteredIntentVariableList = this.variableListSystemDefined
     // }

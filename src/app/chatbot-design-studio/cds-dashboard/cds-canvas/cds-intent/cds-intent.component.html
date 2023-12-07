@@ -199,6 +199,11 @@
                         class="panel-response"
                         [action]="action">
                     </cds-action-assign-variable>
+
+                    <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE_V2" 
+                        class="panel-response"
+                        [action]="action">
+                    </cds-action-assign-variable>
     
                     <cds-action-delete-variable *ngSwitchCase="TYPE_ACTION.DELETE_VARIABLE" 
                         class="panel-response"
