@@ -132,6 +132,11 @@ import { OperatorComponent } from './cds-dashboard/cds-canvas/actions/list/cds-a
 import { OperationComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable/operation/operation.component';
 import { OperandComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable/operand/operand.component';
 
+//ACTION ASSIGN-VARIABLE: elements
+import { OperatorV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/operator/operator.component';
+import { OperationV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/operation/operation.component';
+import { OperandV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/operand/operand.component';
+
 //ACTION JSON-CONDITION: elements
 import { BaseConditionRowComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-json-condition/base-condition-row/base-condition-row.component';
 import { VariableListComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-json-condition/variable-list/variable-list.component';
@@ -158,6 +163,7 @@ import { CdsActionJsonConditionComponent } from './cds-dashboard/cds-canvas/acti
 import { CdsActionDeleteVariableComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-delete-variable/cds-action-delete-variable.component';
 import { CdsActionReplaceBotComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-replace-bot/cds-action-replace-bot.component';
 import { CdsActionAssignVariableComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable/cds-action-assign-variable.component';
+import { CdsActionAssignVariableV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/cds-action-assign-variable-v2.component';
 import { CdsActionHideMessageComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-hide-message/cds-action-hide-message.component';
 import { CdsActionWebRequestComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-web-request/cds-action-web-request.component';
 import { CdsActionWebRequestV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-web-request-v2/cds-action-web-request-v2.component';
@@ -199,6 +205,7 @@ import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-
 import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
 import { NetworkOfflineComponent } from '../modals/network-offline/network-offline.component';
 import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
+import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 
 @NgModule({
   declarations: [
@@ -278,6 +285,7 @@ import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
         CdsActionDeleteVariableComponent,
         CdsActionReplaceBotComponent,
         CdsActionAssignVariableComponent,
+        CdsActionAssignVariableV2Component,
         CdsActionHideMessageComponent,
         CdsActionWebRequestComponent,
         CdsActionWebRequestV2Component,
@@ -302,6 +310,11 @@ import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
         OperatorComponent,
         OperandComponent,
         // action ASSIGN-VARIABLE elements: end //
+         // action ASSIGN-VARIABLE-V2 elements: start //
+         OperationV2Component,
+         OperatorV2Component,
+         OperandV2Component,
+         // action ASSIGN-VARIABLE-V2 elements: end //
         // action JSON-CONDITION elements: start //
         BaseConditionRowComponent,
         BaseFilterComponent,
@@ -350,7 +363,7 @@ import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
     CdsOptionsComponent,
     CdsPanelConnectorMenuComponent,
     
-    
+    GetVariableNamePipe
 
   ],
   imports: [
