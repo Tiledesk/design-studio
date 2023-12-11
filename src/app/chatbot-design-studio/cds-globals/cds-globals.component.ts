@@ -1,31 +1,30 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { variableList } from '../../utils';
+import { variableList } from '../utils';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
-  selector: 'cds-secrets',
-  templateUrl: './cds-secrets.component.html',
-  styleUrls: ['./cds-secrets.component.scss']
+  selector: 'cds-globals',
+  templateUrl: './cds-globals.component.html',
+  styleUrls: ['./cds-globals.component.scss']
 })
-export class CdsSecretsComponent implements OnInit {
+export class CdsGlobalsComponent implements OnInit {
 
   @Input() selectedChatbot: Chatbot;
 
-  newSecretSectionVisible: boolean = false;
-  newSecretVisible: boolean = false;
+  newSectionVisible: boolean = false;
   updateSecretVisible: boolean = false;
 
-  newSecret = {
+  newGlobal = {
     key: '',
     value: ''
   }
-  secretForm: FormGroup;
+  globalForm: FormGroup;
 
-  secretsList = [];
+  list = [];
   updateIndex: any;
   currentValue: string;
 
@@ -37,20 +36,18 @@ export class CdsSecretsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.secretForm = this.createSecretsGroup();
+    this.globalForm = this.createSecretsGroup();
   }
 
   ngOnChanges(): void {
-    console.log("----> (onchanges) chatbot: ", this.selectedChatbot);
-    if(this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.secrets){
-      this.selectedChatbot.attributes.secrets.sort((a, b) => {
+    this.logger.log("[CDS-GLOBALS] ngOnChanges -- selectedChatbot::", this.selectedChatbot);
+    if(this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals){
+      this.selectedChatbot.attributes.globals.sort((a, b) => {
         return a.key.toLowerCase().localeCompare(b.key.toLowerCase());;
       })
-      this.secretsList = this.selectedChatbot.attributes.secrets.map(s => ({ ...s, visible: false }));;
-      this.logger.debug("[CDS SECRETS] Secrets list: ", this.secretsList)
+      this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));;
+      this.logger.debug("[CDS-GLOBALS] globals list: ", this.list)
   
-      console.log("----> (oninit) secrets list: ", this.secretsList[0]);
-      console.log("----> (oninit) chatbot: ", this.selectedChatbot.attributes.secrets[0]);
     }
   }
 
@@ -63,10 +60,13 @@ export class CdsSecretsComponent implements OnInit {
 
   }
 
-  addNewSecret() {
-    this.secretsList.push(this.newSecret);
-    this.saveAttributes();
-    this.newSecretSectionVisible = false;
+  onSubmitForm() {
+    console.log('[CDS-GLOBALS] onSubmitForm:', this.globalForm)
+    if(this.globalForm.valid){
+      this.list.push(this.globalForm.value);
+      this.saveAttributes();
+      this.newSectionVisible = false
+    }
   }
 
   updateSecret() {
@@ -76,59 +76,49 @@ export class CdsSecretsComponent implements OnInit {
 
   showUpdateSecret(index, secret) {
     this.updateIndex = index;
-    console.log("secret: ", secret)
     if (secret) {
-      this.secretForm.patchValue({ 'key': secret.key })
-      this.secretForm.patchValue({ 'value': secret.value })
+      this.globalForm.patchValue({ 'key': secret.key, 'value': secret.value })
     }
+    this.newSectionVisible = false
   }
 
   cancelUpdateSecret(index) {
     this.updateIndex = null;
-    console.log("----> (cancel) secrets list: ", this.secretsList[0]);
-    console.log("----> (cancel) chatbot: ", this.selectedChatbot.attributes.secrets[0]);
-    this.secretsList[index] = this.selectedChatbot.attributes.secrets[index];
-    console.log("----> (cancel) secrets list: ", this.secretsList[0]);
+    console.log("[CDS-GLOBALS]  ----> (cancel) globals list: ", this.list);
+    this.list[index] = this.selectedChatbot.attributes.globals[index];
   }
 
-  deleteSecrect(key) {
-    let index = this.secretsList.findIndex(s => s.key === key);
-    this.secretsList.splice(index, 1);
+  deleteElement(key) {
+    this.newSectionVisible = false;
+    let index = this.list.findIndex(s => s.key === key);
+    this.list.splice(index, 1);
 
     this.saveAttributes();
   }
 
   saveAttributes() {
-    let data = this.secretsList.map(({ visible, ...keepAttrs }) => keepAttrs);
+    let data = this.list.map(({ visible, ...keepAttrs }) => keepAttrs);
 
-    this.faqKbService.addSecretToChatbot(this.selectedChatbot._id, data).subscribe((resp) => {
-      this.newSecret = {
+    this.faqKbService.addNodeToChatbotAttributes(this.selectedChatbot._id, 'globals', data).subscribe((resp) => {
+      this.newGlobal = {
         key: '',
         value: ''
       }
-      this.newSecretVisible = false;
-      console.log("----> (cancel) secrets list: ", this.secretsList[0]);
-      console.log("----> (cancel) chatbot: ", this.selectedChatbot.attributes.secrets[0]);
+      this.globalForm.reset();
+      
+      //Update local list (for variable-list component)
+      variableList.find(el => el.key ==='globals').elements = this.selectedChatbot.attributes.globals.map(({
+        key: name,
+        ...rest
+      }) => ({
+        name,
+        value: name
+      }))
     }, (error) => {
-      this.logger.error("[CDS SECRETS] addSecretToChatbot error: ", error);
+      this.logger.error("[CDS-GLOBALS ] addSecretToChatbot error: ", error);
     }, () => {
-      this.logger.debug("[CDS SECRETS]  addSecretToChatbot *COMPLETE*");
+      this.logger.debug("[CDS-GLOBALS]  addSecretToChatbot *COMPLETE*");
     })
-  }
-
-  showHideNewSecret() {
-    this.newSecretVisible = !this.newSecretVisible;
-    let el = <HTMLInputElement>document.getElementById("secret-value");
-    if (el) {
-      if (this.newSecretVisible == true) {
-        el.type = 'text';
-        el.placeholder = 'value';
-      } else {
-        el.type = 'password';
-        el.placeholder = '•••••';
-      }
-
-    }
   }
 
   showHideUpdateSecret(secret) {
@@ -143,8 +133,9 @@ export class CdsSecretsComponent implements OnInit {
     navigator.clipboard.writeText(value)
   }
 
-  showHideNewSecretSection(visible: boolean) {
-    this.newSecretSectionVisible = visible;
+  showHideNewSection(visible: boolean) {
+    this.showUpdateSecret(null, null);
+    this.newSectionVisible = visible;
   }
 
   // private initializeAttributes() {

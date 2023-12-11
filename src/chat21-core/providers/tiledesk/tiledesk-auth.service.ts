@@ -196,6 +196,8 @@ export class TiledeskAuthService {
     } else if (storedTiledeskToken && storedTiledeskToken === tiledeskToken) {
       this.logger.log('[TILEDESK-AUTH] - checkAndSetInStorageTiledeskToken STORED-TOKEN EXIST AND IS = TO TOKEN ')
     }
+
+    localStorage.setItem('tiledesk_token', tiledeskToken)
   }
 
   isLoggedIn(): Promise<boolean>{

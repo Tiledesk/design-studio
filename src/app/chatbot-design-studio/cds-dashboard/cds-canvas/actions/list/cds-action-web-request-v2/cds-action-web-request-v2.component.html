@@ -3,7 +3,7 @@
     <div class="action-row-left">
        
         <span class="web-request-action-method" *ngIf="action.method">
-            {{ action.method}}
+            {{action.method}}
         </span>
 
     </div>
@@ -25,6 +25,7 @@
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
             [isConnected] = "isConnectedTrue">
         </cds-connector>
     </div>
@@ -35,6 +36,7 @@
        <label class="title-preview-label">else</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
             [isConnected] = "isConnectedFalse">
         </cds-connector>
     </div>
@@ -63,6 +65,7 @@
             [emojiPikerBtn]="false"
             [setAttributeBtn]="true"
             [placeholder]="'Enter request URL'"
+            (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'url')">
         </cds-textarea>
     </div>
@@ -110,6 +113,7 @@
             [setAttributeBtn]="true"
             [minRow]="5" [maxRow]="10"
             [readonly]="false"
+            (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'body')">
         </cds-textarea>
 
@@ -117,7 +121,7 @@
             <span>This request does not have a body</span>
         </div>
 
-        <div class="cds-web-request-row-body center json-error-yes" *ngIf="!jsonIsValid">
+        <div class="cds-web-request-row-body center json-error-yes" *ngIf="action?.bodyType === 'body' && !jsonIsValid">
             <span>{{errorMessage}}</span>
         </div>
 

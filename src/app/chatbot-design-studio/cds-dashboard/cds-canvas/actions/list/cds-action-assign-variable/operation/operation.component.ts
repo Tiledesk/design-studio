@@ -53,7 +53,8 @@ export class OperationComponent implements OnInit {
         this.onChangeOperation.emit();
     }
 
-    onChangeOperand(event) {
+    onChangeOperand(event: any, index: string) {
+        this.operation.operands[index]= event
         this.onChangeOperation.emit();
     }
 

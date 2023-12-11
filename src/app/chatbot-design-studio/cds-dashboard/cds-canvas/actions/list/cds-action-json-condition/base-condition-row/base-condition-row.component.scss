@@ -152,7 +152,7 @@ section.header{
     label{
         font-size: 16px;
         line-height: 20px;
-        font-weight: 500;
+        font-weight: 600;
         color: #22272d;
         margin: 0;
     }
@@ -179,12 +179,12 @@ section.attribute{
         display: block;
         font-family: Source Sans Pro,sans-serif;
         font-weight: 400;
-        line-height: 35px;
-        padding: 0 15px;
+        line-height: 26px;
+        padding: 4px 15px;
         transition: border .3s;
         width: 100%;
         font-size: 15px;
-        height: 37px;
+        height: 36px;
     }
     .operand-attribute{
         position: relative;
@@ -270,12 +270,12 @@ section.value{
         display: block;
         font-family: Source Sans Pro,sans-serif;
         font-weight: 400;
-        line-height: 35px;
-        padding: 0 15px;
+        line-height: 26px;
+        padding: 4px 15px;
         transition: border .3s;
         width: 100%;
         font-size: 15px;
-        height: 37px;
+        height: 36px;
 
         &[readonly=true]{
             pointer-events: none;
@@ -354,9 +354,9 @@ cds-textarea#operand2 ::ng-deep {
     textarea {
         // border: 1px solid rgb(118, 118, 118) !important;
         resize: none !important; 
-        padding: 8px 20px !important;
+        // padding: 8px 20px !important;
 
-        height: 25px !important;
-        min-height: 25px !important;
+        // height: 25px !important;
+        // min-height: 25px !important;
     }
 }

@@ -1,5 +1,14 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+:host {
+    --background-color: #{$blu-light-01};
+    --column-color: #{$blu-02};
+    --text-color: #{$blu};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --base-radius: 8px
+}
+
 #search {
     display: flex;
     flex-shrink: 0;
@@ -38,14 +47,13 @@
 
 #data{
     // padding: 15px 0px;  
-    overflow-x: hidden;
-    &:first-child{
-        margin-bottom: 20px;
-        padding-top: 15px;
-    }
+    // overflow-x: hidden;
+    // &:first-child{
+    //     margin-bottom: 20px;
+    //     padding-top: 15px;
+    // }
 
     .category-name{
-        margin-bottom: 10px;
         padding: 0 15px;
         color: #9ba6b3;
         font-weight: 600;
@@ -76,7 +84,7 @@
     }
 
     .category-row-name{
-        color: $blu;
+        color: var(--text-color);
         font-size: 16px;
         font-weight: 400;
         line-height: 20px;
@@ -189,4 +197,63 @@
     background: #fff;
     transform: translateY(-50%) rotate(45deg);
     background: #fff;
+}
+
+mat-expansion-panel {
+    box-shadow: none !important;
+    // background-color: var(--content-background);
+    border-bottom: 1px solid $gray-light-02;
+    overflow: visible;
+    border-radius: 0 !important;
+    &.open-block {
+        pointer-events: none;
+    }
+    mat-expansion-panel-header {
+        height: 40px;
+    }
+    &.mat-expanded {
+        ::ng-deep .mat-expansion-panel-body {
+            opacity: 1;
+        }
+    }
+    ::ng-deep {
+
+        .mat-expansion-panel-body {
+            opacity: 0;
+            padding: 0;
+        }
+        .mat-expansion-indicator::after {
+            color: var(--text-color) !important;
+        }
+    
+        .mat-expansion-panel-header-description,
+        .mat-expansion-indicator:after {
+            color: var(--text-color);
+            margin: 5px;
+        }
+    
+        ::ng-deep .mat-expansion-indicator,
+        .mat-expansion-indicator:after {
+            color: var(--text-color);
+        }
+    }
+}
+
+mat-expansion-panel#userDefined,
+mat-expansion-panel#globals {
+    ::ng-deep {
+        .mat-expansion-panel-content{
+            height: unset !important;
+            visibility: visible !important;
+        }
+        .mat-expansion-panel-content[style*="visibility: hidden"] * {
+            visibility: visible !important;
+        }
+        .mat-expansion-panel-body{
+            opacity: 1 !important;
+        }
+        .mat-expansion-indicator::after {
+            display: none;
+        }
+    }
 }

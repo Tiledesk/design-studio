@@ -275,22 +275,4 @@ export class FaqKbService {
     return this._httpClient.patch(url, body, httpOptions)
   }
 
-  addSecretToChatbot(idBot: string, secrets: any[]) {
-    this.logger.log('[FAQ-KB.SERV] - addSecretToChatbot idBot ', idBot)
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    let url = this.SERVER_BASE_PATH + this.project_id + '/bots/' + idBot + '/attributes';
-    this.logger.log('addSecretToChatbot BOT - URL ', url);
-
-    let body = { "secrets": secrets }
-    this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
-    return this._httpClient.patch(url, body, httpOptions)
-  }
-
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ElementRef } from '@angular/core';
 import { variableList } from '../../../../../utils';
 import { ActionDeleteVariable } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -29,7 +29,7 @@ export class CdsActionDeleteVariableComponent implements OnInit {
 
   private initialize() {
     // this.logger.log('action: ', variableList.userDefined);
-    this.variableListUserDefined = variableList.userDefined;
+    this.variableListUserDefined = variableList.find(el => el.key ==='userDefined').elements;
   }
 
   onChangeSelect(variableSelected: {name: string, value: string}){

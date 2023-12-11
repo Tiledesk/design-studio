@@ -8,6 +8,7 @@
                     type="text" 
                     [placeholder]="'CDSCanvas.Key' | translate"
                     class="sx-input" 
+                    (blur)="onBlur($event)"
                     (ngModelChange)="onChangeAttributes(attribute, i)">
                     
                 <cds-textarea id="value"
@@ -19,6 +20,7 @@
                     [minRow]="1" [maxRow]="1"
                     [placeholder]="'CDSCanvas.Value' | translate"
                     (selectedAttribute)="onSelectedAttribute($event,i, 'value')"
+                    (blur)="onBlur($event)"
                     (changeTextarea)="onChangeTextarea($event, i)">
                 </cds-textarea>
 
@@ -64,7 +66,8 @@
                             class="dx-input" 
                             [(ngModel)]="attribute.value" 
                             placeholder="{{ 'CDSCanvas.Value' | translate }}" 
-                            (ngModelChange)="onChangeAttributes(attribute, i)">
+                            (ngModelChange)="onChangeAttributes(attribute, i)"
+                            (blur)="onBlur($event)">
                     </div>
                 </div>
             </mat-expansion-panel>

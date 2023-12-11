@@ -1,0 +1,252 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+:host {
+    --text-color: #{$blu};
+    --icon-color: #{$gray-light-01};
+    --text-hover-color: #{$blu};
+    --icon-hover-color: #{$blu};
+
+    --header-height: 40px;
+    --footer-height: 60px;
+}
+
+
+.cds-container {
+    height: 100%;
+    overflow: hidden;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin: 10px;
+
+    .cds-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    .header-title {
+        color: var(--text-color);
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .header-subtitle{
+        font-weight: 500;
+    }
+}
+
+.content {
+    height: 80%;
+    padding: 10px;
+    display: grid;
+}
+
+.footer{
+    padding: 10px;
+    position: absolute;
+    bottom: 0;
+
+    .container-wrp{
+        background-color: rgba( $gray-light-02, 0.4);
+        display: flex;
+        padding: 10px;
+        border-radius: 8px;
+        gap: 5px;
+
+        label:first-child{
+            font-weight: 600;
+            font-size: 20px;
+            color: $blu
+        }
+    }
+}
+
+.secret-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.secrets-list {
+    margin-top: 20px;
+    overflow-y: scroll;
+}
+
+.secret-inner-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+
+/** **** MAT-MENU : start **** **/
+::ng-deep .mat-menu-panel.menuOptions {
+    min-width: 100px;
+    max-width: 400px;
+    width: 185px;
+    color: $blu;
+    font-size: 15px;
+    line-height: 18px;
+    list-style: none;
+    overflow: hidden;
+    padding: 0;
+    // box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    border-radius: 8px;
+    background: rgb(255,255,255);
+    will-change: transform;
+    animation: .15s ease 0s 1 normal none running fadein, .15s ease 0s 1 normal none running movein, .1s ease 0s 1 normal none running scaleY;
+    margin: 0;
+    border: 2px solid $gray-02;
+    box-shadow: none;
+
+    position: absolute;
+    top: -36px;
+    right: 26px;
+    margin: 0px 5px
+}
+
+::ng-deep {
+    .mat-menu-content{
+        padding: 5px !important;
+    }
+}
+
+.menu-btns-wpr {
+    // width: 136px; // dp
+    width: 100%; // nk
+    height: 30px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+
+    
+
+    &:hover{
+        cursor: pointer;
+        box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+        
+        span.material-icons-outlined,
+        img{
+            color: var(--text-hover-color);
+            filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%); 
+            cursor: pointer; 
+        }
+
+        .menu-btn-text{
+            color: var(--text-hover-color);
+        }
+    }
+
+}
+
+.menu-btn-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    span.material-icons-outlined,
+    img{
+        width: 16px;
+        font-size: 16px;
+        color: var(--icon-color);
+        filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+    }
+
+
+}
+.menu-btn-text{
+    display: inline-flex;
+    color: var(--text-color);
+    padding: 0;
+    vertical-align: middle;
+    font-size: 10px;
+    font-weight: 400;
+}
+/** **** MAT-MENU : end **** **/
+
+.update-view {
+    padding: 20px 0px;
+}
+
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+cds-text#custom-input.invalid ::ng-deep {
+    input{
+        border: 2px solid red !important;
+        outline: 0px solid red !important;
+        transition: border 0.3s;
+    }
+}
+
+cds-text#custom-input.disabled{
+    pointer-events: none;
+}
+
+.field-box.password{
+    position: relative;
+    span.material-icons,
+    span.material-icons-outlined{
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        cursor: pointer;
+
+        &:hover{
+            opacity: 0.8;
+        }
+    }
+}
+
+.buttons-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+}
+
+.buttons-container#updatediv {
+    justify-content: space-between;
+}
+
+#add-button {
+    background: $blu;
+    color: $color-withe-hex;
+}
+#delete-button {
+    background: $red;
+    color: $color-withe-hex;
+}
+#cancel-button {
+    background: #b1b1b1;
+    color: $color-withe-hex;
+}
+#cds-custom-icon-button {
+    border-radius: 8px;
+    height: 36px;
+    width: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.copy-icon:hover {
+    font-weight: 600 !important;
+}

@@ -27,6 +27,7 @@ export class CdsActionIntentComponent implements OnInit {
   intents: Array<{name: string, value: string, icon?:string}>
   idIntentSelected: string;
   idConnector: string;
+  idConnection: string;
   isConnected: boolean = false;
   connector: any;
   element: any;
@@ -36,13 +37,11 @@ export class CdsActionIntentComponent implements OnInit {
   
   constructor(
     private intentService: IntentService
-  ) {
-    
-  }
+  ) {}
 
   ngOnInit(): void {
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      // console.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
+      console.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
       this.connector = connector;
       this.updateConnector();
     });
@@ -59,26 +58,31 @@ export class CdsActionIntentComponent implements OnInit {
 
   // ngOnChanges(changes: SimpleChanges): void {
   //   console.log('[CDS-ACTION-INTENT] >> ngOnChanges', changes);
-  //   // this.checkConnectionStatus();
+  //   this.checkConnectionStatus();
   // }
 
-  
 
   private checkConnectionStatus(){
     if(this.action.intentName){
      this.isConnected = true;
+     const posId = this.action.intentName.indexOf("#");
+      if (posId !== -1) {
+        const toId = this.action.intentName.slice(posId+1);
+        this.idConnection = this.idConnector+"/"+toId;
+      }
     } else {
      this.isConnected = false;
+     this.idConnection = null;
     }
   }
 
   private initialize() {
-    this.checkConnectionStatus();
     this.logger.log('[CDS-ACTION-INTENT] - initialize - isConnected ', this.action.intentName);
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnector = this.idIntentSelected+'/'+this.action._tdActionId;
     this.intents = this.intentService.getListOfIntents();
     this.element = Object.values(ACTIONS_LIST).find(el => el.type === this.action._tdActionType);
+    this.checkConnectionStatus();
     this.logger.log('[CDS-ACTION-INTENT] - initialize - idIntentSelected ', this.idIntentSelected);
     this.logger.log('[CDS-ACTION-INTENT] - initialize - idConnector ', this.idConnector);
     this.logger.log('[CDS-ACTION-INTENT] - initialize - intents ', this.intents);
@@ -92,14 +96,15 @@ export class CdsActionIntentComponent implements OnInit {
       else this.isConnected = true;
       const array = this.connector.fromId.split("/");
       const idAction= array[1];
-      // console.log('[CDS-ACTION-INTENT] 2 - updateConnector :: ', idAction, this.action._tdActionId, this.connector);
+      console.log('[CDS-ACTION-INTENT] - updateConnector :: ', idAction, this.action._tdActionId, this.connector);
       if(idAction === this.action._tdActionId){
         if(this.connector.deleted){
           this.action.intentName = null;
           this.isConnected = false;
+          this.idConnection = null;
         } else {
-          // console.log('[CDS-ACTION-INTENT] connettore creato - PALLINO PIENO :: ', this.connector);
           this.isConnected = true;
+          this.idConnection = this.connector.fromId+"/"+this.connector.toId;
           this.action.intentName = "#"+this.connector.toId;
         }
         if(this.connector.save)

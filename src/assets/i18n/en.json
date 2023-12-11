@@ -14,8 +14,11 @@
     "Cancel":"Cancel",
     "Continue": "Continue",
     "Add":"Add",
+    "Edit":"Edit",
+    "Update":"Update",
     "Close": "Close",
     "Upload": "Upload",
+    "Delete":"Delete",
     "Error":"Error",
     "Warning": "Attention!",
     "Back":"Back",
@@ -109,6 +112,14 @@
         "WellDonePublishingChatbot":"Well done! You are about to publish your Chatbot 🚀",
         "FollowTheseSimpleInstructions":"Follow these simple instructions to activate it on your website"
     },
+    "CDSModalMouseTrackPad":{
+        "HowToMove":"How to move",
+        "ClickWhellDragToMove" :"Click wheel button & drag \n to move around",
+        "ScrollMouseWheel":"Scroll mouse wheel \n to move up/down",
+        "CtrlButtonWheelToZoom":"CRTL + Mouse wheel button \n to zoom in/out",
+        "PinchToZoom":"Pinch to zoom",
+        "SlideToMove":"Slide two fingers \n to move around"
+    },
     "Ignore": "Ignore",
     "Publish":"Publish",
     "TestIt":"Test it",
@@ -167,6 +178,8 @@
         "AnErrorOccurredDuringTheUpload": "An error occurred during the upload",
         "InTheCSVFileToBeUploadedTheColumnsAreSeparatedBy": "In the CSV file to be uploaded, the columns are separated by",
         "UpdateBotError": "An error occurred while updating the bot",
+        "UserProfileUpdated":"User profile updated successfully",
+        "AnErrorOccurredUpdatingProfile":"An error occurred while updating your user profile",
         "Not a valid JSON file.": "Not a valid JSON file",
         "UpdateBotSuccess": " bot successfully updated",
         "AnErrorOccurredWhilDeletingTheAnswer": "An error occurred while deleting the Answer",
@@ -308,10 +321,26 @@
         "DESCRIPTION":{
 
         }
+        
+    },
+    "CDSvariablesList": {
+        "userDefined":"User defined",
+        "globals":"Globals",
+        "mostUsed":"Most used",
+        "systemDefined":"System defined",
+        "uploadedDocument":"Uploaded document",
+        "uploadedImage":"Uploaded image"
     },
     "New":"New",
     "Event":"Event",
-    "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network"
+    "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
+    "CDSGlobals":{
+        "Globals":"Globals",
+        "NoGlobalVariables":"No global variables",
+        "GlobalVariablesDescription" : "Global variables are a set of variables that are always available in a workspace",
+        "GLOBAL_KEY" :"GLOBAL_KEY",
+        "value":"value"
+    }
     
 
     

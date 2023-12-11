@@ -14,6 +14,7 @@ export class CDSDetailImportExportComponent implements OnInit {
 
   @Input() id_faq_kb: string;
   @Input() faqKb_name: string;
+  @Input() translationsMap: Map<string, string> = new Map();
   
   displayImportModal = 'none';
   displayInfoModal = 'none';
@@ -111,7 +112,7 @@ export class CDSDetailImportExportComponent implements OnInit {
     }, (error) => {
       this.logger.error('[TILEBOT] -  IMPORT CHATBOT FROM JSON- ERROR', error);
 
-      this.notify.showWidgetStyleUpdateNotification("CDSSetting.ThereHasBeenAnErrorProcessing", 4, 'report_problem');
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.ThereHasBeenAnErrorProcessing'), 4, 'report_problem');
     }, () => {
       this.logger.log('[TILEBOT] - IMPORT CHATBOT FROM JSON - COMPLETE');
     });
@@ -145,10 +146,10 @@ export class CDSDetailImportExportComponent implements OnInit {
     }, (error) => {
       this.logger.error('[TILEBOT] -  IMPORT INTENTS FROM JSON- ERROR', error);
 
-      this.notify.showWidgetStyleUpdateNotification("CDSSetting.ThereHasBeenAnErrorProcessing", 4, 'report_problem');
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.ThereHasBeenAnErrorProcessing'), 4, 'report_problem');
     }, () => {
       this.logger.log('[TILEBOT] - IMPORT INTENTS FROM JSON - * COMPLETE *');
-      this.notify.showWidgetStyleUpdateNotification("CDSSetting.FileUploadedSuccessfully", 2, 'done');
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.FileUploadedSuccessfully'), 2, 'done');
 
       this.onCloseImportJSONModal();
       

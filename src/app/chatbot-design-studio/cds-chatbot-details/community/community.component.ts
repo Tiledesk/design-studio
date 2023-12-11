@@ -377,12 +377,12 @@ export class CDSDetailCommunityComponent implements OnInit {
     }, (error) => {
       this.logger.error('[CDS-DETAIL-COMMUNITY] UPDATE USER PROFILE -  ERROR ', error);
       // =========== NOTIFY ERROR ===========
-      this.notify.showWidgetStyleUpdateNotification('An error occurred while updating your user profile', 4, 'report_problem');
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.AnErrorOccurredUpdatingProfile'), 4, 'report_problem');
 
     }, () => {
       this.logger.log('[CDS-CHATBOT-DTLS] UPDATE USER PROFILE - * COMPLETE *');
       // =========== NOTIFY SUCCESS===========
-      this.notify.showWidgetStyleUpdateNotification('User profile updated successfully', 2, 'done');
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UserProfileUpdated'), 2, 'done');
 
     })
 

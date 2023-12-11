@@ -64,11 +64,11 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.userDefined.some(v => v.name === 'gpt_reply')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'gpt_reply')) {
       new_attributes.push({ name: "gpt_reply", value: "gpt_reply" });
     }
-    variableList.userDefined = [...variableList.userDefined, ...new_attributes];
-    this.logger.debug("[ACTION GPT-TASK] Initialized variableList.userDefined: ", variableList.userDefined);
+    variableList.find(el => el.key ==='userDefined').elements = [...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
+    this.logger.debug("[ACTION GPT-TASK] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
   changeTextarea($event: string, property: string) {
@@ -76,6 +76,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.logger.debug("[ACTION GPT-TASK] changeTextarea propery: ", property);
     this.action[property] = $event;
     // this.checkVariables();
+    // this.updateAndSaveAction.emit();
+  }
+
+  onBlur(event){
     this.updateAndSaveAction.emit();
   }
 
@@ -353,6 +357,5 @@ export class CdsActionGPTTaskComponent implements OnInit {
     let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/knowledge-bases'
     window.open(url, '_blank')
   }
-
 
 }

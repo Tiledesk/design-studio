@@ -1,6 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { variableList } from '../../utils';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-dialog',
@@ -10,7 +12,9 @@ import { variableList } from '../../utils';
 export class DialogComponent implements OnInit {
   btnDisabled: boolean = true;
 
-  userDefined = variableList.userDefined
+  userDefined = variableList.find(el => el.key ==='userDefined').elements
+  
+  private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
@@ -23,8 +27,14 @@ export class DialogComponent implements OnInit {
   onChangeTextInput($event):void {
     const regexPattern = "/^[a-zA-Z0-9_]*$/";
     let REGEX = new RegExp(regexPattern.replace(/\//gi, ''));
-    // this.logger.log('[TILEBOT-EDIT-ADD] checkFields nameRGEX REGEX ', REGEX)
+    this.logger.log('[TILEBOT-EDIT-ADD] checkFields nameRGEX REGEX ', REGEX, REGEX.test(this.data.text))
     
+    let exist = this._checkIfExist(this.data.text)
+    if(exist)
+      this.btnDisabled = true;
+    else 
+      this.btnDisabled = false;
+
     if(REGEX.test(this.data.text) && this.data.text !== ''){
       this.btnDisabled = false;
     } else {
@@ -32,11 +42,7 @@ export class DialogComponent implements OnInit {
     }
 
 
-    let exist = this._checkIfExist(this.data.text)
-    if(exist)
-      this.btnDisabled = true;
-    else 
-      this.btnDisabled = false;
+    
     
   }
 

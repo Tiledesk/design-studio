@@ -2,55 +2,56 @@
   <div class="container-fluid">
     <div class="row">
         <ul class="cds-bottom-nav">
-          <li (click)="toggleTab('bot_detail')" class="btn-with-border-effect" 
-          [ngClass]="{ 'border-from-center' : activeSection !== 'bot_detail',
-                                'li-active' : activeSection === 'bot_detail' }">
+          <li (click)="toggleTab(SETTINGS_SECTION.DETAIL)" class="btn-with-border-effect" 
+          [ngClass]="{ 'border-from-center' : activeSection !== SETTINGS_SECTION.DETAIL,
+                                'li-active' : activeSection === SETTINGS_SECTION.DETAIL }">
 
             <a href="javascript:;" role="button">{{ "BotDetails" | translate }}</a>
           </li>
 
-          <li (click)="toggleTab('import_export')" class="btn-with-border-effect" [ngClass]="
-                    { 'border-from-center' :  activeSection !== 'import_export', 
-                      'li-active' :           activeSection === 'import_export'
+          <li (click)="toggleTab(SETTINGS_SECTION.IMPORT_EXPORT)" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== SETTINGS_SECTION.IMPORT_EXPORT, 
+                      'li-active' :           activeSection === SETTINGS_SECTION.IMPORT_EXPORT
                     }">
             <a href="javascript:;" role="button"> Import Export </a>
           </li>
 
-          <li (click)="toggleTab('community')" class="btn-with-border-effect" [ngClass]="
-                    { 'border-from-center' :  activeSection !== 'community', 
-                      'li-active' :           activeSection === 'community'
+          <li (click)="toggleTab(SETTINGS_SECTION.COMMUNITY)" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== SETTINGS_SECTION.COMMUNITY, 
+                      'li-active' :           activeSection === SETTINGS_SECTION.COMMUNITY
                     }">
             <a href="javascript:;" role="button"> Community </a>
           </li>
 
-          <li (click)="toggleTab('developer')" class="btn-with-border-effect" [ngClass]="
-                    { 'border-from-center' :  activeSection !== 'developer', 
-                      'li-active' :           activeSection === 'developer'
+          <li (click)="toggleTab(SETTINGS_SECTION.DEVELOPER)" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== SETTINGS_SECTION.DEVELOPER, 
+                      'li-active' :           activeSection === SETTINGS_SECTION.DEVELOPER
                     }">
             <a href="javascript:;" role="button"> {{ "Developer" | translate }} </a>
           </li>
         </ul>
     </div>
 
-    <cds-detail-botdetail *ngIf="activeSection==='bot_detail'"
+    <cds-detail-botdetail *ngIf="activeSection===SETTINGS_SECTION.DETAIL"
       [selectedChatbot]="selectedChatbot"
       [project]="project"
       [isVisibleDEP]="isVisibleDEP"
       [translationsMap]="translationsMap">
     </cds-detail-botdetail>
 
-    <cds-detail-import-export *ngIf="activeSection==='import_export'"
+    <cds-detail-import-export *ngIf="activeSection===SETTINGS_SECTION.IMPORT_EXPORT"
       [id_faq_kb]="selectedChatbot?._id"
-      [faqKb_name]="faqKb_name">
+      [faqKb_name]="faqKb_name"
+      [translationsMap]="translationsMap">
     </cds-detail-import-export>
 
-    <cds-detail-community *ngIf="activeSection==='community'"
+    <cds-detail-community *ngIf="activeSection===SETTINGS_SECTION.COMMUNITY"
       [project]="project"
       [selectedChatbot]="selectedChatbot"
       [translationsMap]="translationsMap">
     </cds-detail-community>
 
-    <cds-detail-developer *ngIf="activeSection==='developer'"
+    <cds-detail-developer *ngIf="activeSection===SETTINGS_SECTION.DEVELOPER"
       [selectedChatbot]="selectedChatbot">
     </cds-detail-developer>
   </div>

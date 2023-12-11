@@ -139,14 +139,14 @@ export class CdsActionMakeComponent implements OnInit {
     //if (!variableList.userDefined.some(v => v.name === 'result')) {
       //new_attributes.push({ name: "result", value: "result" });
     //}
-    if (!variableList.userDefined.some(v => v.name === 'make_status')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'make_status')) {
       new_attributes.push({ name: "make_status", value: "make_status" });
     }
-    if (!variableList.userDefined.some(v => v.name === 'make_error')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'make_error')) {
       new_attributes.push({ name: "make_error", value: "make_error" });
     }
-    variableList.userDefined = [ ...variableList.userDefined, ...new_attributes];
-    this.logger.debug("[ACTION MAKE] Initialized variableList.userDefined: ", variableList.userDefined);
+    variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
+    this.logger.debug("[ACTION MAKE] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined').elements);
   }
 
 

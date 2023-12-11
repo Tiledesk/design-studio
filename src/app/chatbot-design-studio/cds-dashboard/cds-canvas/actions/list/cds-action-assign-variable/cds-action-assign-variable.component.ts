@@ -99,6 +99,6 @@ export class CdsActionAssignVariableComponent implements OnInit, OnChanges {
         // this.action.operation.operators.push(TYPE_MATH_OPERATOR['addAsNumber']);
         // this.action.operation.operands.push(new Operand());
         // this.action.operation = Object.assign({}, temp);
-        this.updateAndSaveAction.emit()
+        this.updateAndSaveAction.emit();
     }
 }

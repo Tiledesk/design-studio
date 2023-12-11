@@ -27,12 +27,10 @@ export class OperandComponent implements OnInit {
 
     ngOnInit(): void {
         this.openSlectFunction = false;
-        // for (let key in TYPE_FUNCTION_LIST) {
-        //     this.listOfFunctions.push({name: TYPE_FUNCTION_LIST[key].name, value: TYPE_FUNCTION_LIST[key].type})
-        // }
+        this.initialize();
     }
 
-    ngOnChanges() {
+    private initialize(){
         this.placeholder = 'Insert a constant value or choose an attribute';
         this.operandForm = this.createOperandGroup();
         this.operandForm.valueChanges.subscribe(data => {
@@ -62,25 +60,31 @@ export class OperandComponent implements OnInit {
 
     /** START EVENTS TEXTAREA **/
     onChangeTextArea(text: string) {
-        if(text && text.match(new RegExp(/(?<=\$\{)(.*)(?=\})/g))){
-            text = text.replace(text, text.match(new RegExp(/(?<=\$\{)(.*)(?=\})/g))[0]);
-            this.operandForm.get('value').setValue(text);
-            this.operandForm.get('isVariable').setValue(true);
-            this.onChangeOperand.emit(this.operand)
-        }
-        if(text){
-            this.onChangeOperand.emit(this.operand)
-        }
-       
-    }   
+    //     if(text && text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))){
+    //         text = text.replace(text, text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))[0]);
+    //         this.operandForm.get('value').setValue(text);
+    //         this.operandForm.get('isVariable').setValue(true);
+    //         this.onChangeOperand.emit(this.operand)
+    //     }
+    //     if(text){
+    //         this.onChangeOperand.emit(this.operand)
+    //     }
+    }
+
+    onBlur(event){
+        // console.log('[ACTION REPLY TEXT] onBlur', event);
+        this.onChangeOperand.emit(this.operand);
+    }
+
     onSelectedAttribute(variableSelected: { name: string, value: string }){
         this.operandForm.get('isVariable').setValue(true);
         this.operandForm.get('value').setValue(variableSelected.name);
-        this.onChangeOperand.emit(this.operand)
+        this.onChangeOperand.emit(this.operand) 
     }
     onClearSelectedAttribute(){
         this.operandForm.get('value').setValue('');
         this.operandForm.get('isVariable').setValue(false);
+        this.operand = this.operandForm.value
         this.onChangeOperand.emit(this.operand)
     }
     /** END EVENTS TEXTAREA */

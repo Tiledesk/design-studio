@@ -72,21 +72,22 @@ export class StageService {
   }
 
 
-  zoom(event: 'in' | 'out', elementId){
-    return new Promise((resolve) => {
-      const element = document.getElementById(elementId);
-      let intervalId = setInterval(async () => {
-        const result = await this.tiledeskStage.zoom(event, element);
-        if (result === true) {
-          clearInterval(intervalId);
-          resolve(result);
-        }
-      }, 100);
-      setTimeout(() => {
-        clearInterval(intervalId);
-        resolve(false);
-      }, 1000);
-    });
+  async zoom(event: 'in' | 'out', elementId){
+    return await this.tiledeskStage.zoom(event);
+    // return new Promise((resolve) => {
+    //   const element = document.getElementById(elementId);
+    //   let intervalId = setInterval(async () => {
+    //     const result = await this.tiledeskStage.zoom(event, element);
+    //     if (result === true) {
+    //       clearInterval(intervalId);
+    //       resolve(result);
+    //     }
+    //   }, 100);
+    //   setTimeout(() => {
+    //     clearInterval(intervalId);
+    //     resolve(false);
+    //   }, 1000);
+    // });
   }
 
   scaleAndCenter(listOfintents){

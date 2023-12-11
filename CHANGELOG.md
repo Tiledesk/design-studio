@@ -5,6 +5,57 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7-rc.6
+- added: JSONparse function into cds-action-assing-variable-v2
+- added: padding to scaleAndCenter bottom-right button icon
+- bug-fixed: cds-action-assign-variable-v2 operand create double value obj
+- bug-fixed: cds-attributes not save changes in input component
+- bug-fixed: do not permit special chars when adding new variable 
+
+
+### 1.0.7-rc.5
+- added: cds-action-assign-variable-v2
+
+### 1.0.7-rc.4
+- added: cdkDragPreview UI while dragging an action into the same block
+- added: cds-globals component to manage global attributes variables into chatbot obj
+- added: global variables to variablesList utils obj
+- bug-fixed: patch in action reply buttons without UUIDV4
+- bug-fixed: if clear operand variable inside cds-action-assign-variable, operation obj is not updated 
+- bug-fixed: if 'readonly' input variable is updated in parent cds-textarea component, tag badge is not created 
+### 1.0.7-rc.3
+- added: close behaviour on mouse-tips modal close header icon
+- bug fixed: close the add-actions-menu by clicking Backspace
+- bug fixed: added an action from the floating menu
+- bug fixed: changed the field type in the form email field
+- bug-fixed: cannot be able to restart the same intent while testing it on widget page
+
+### 1.0.7-rc.2
+- added: mouse/trackpad tips
+- added: ability to add action from floating 'add action' button on each block
+- changed: cds-connector color on start and isLast intent elements
+- changed: aligned component to new Regex for variables with {{<\var>}}
+- changed: cds-action-assign-variable enable possibility to add custom text on operand2 property
+- changed: cds-intent footer 'Add action' button UI
+- changed: new services for updating an intent with multimple operations 
+- bug-fixed: variable-list userDefined expansion panel not opened from the second time
+
+### 1.0.7-rc.1
+- added: redirect to unauthorized page if signInWithCustomtoken response with 401 error
+- bug-fixed: cannot delete chatbot profile image in PROD
+- bug-fixed: action-web-requestv2 headers attributes variable not saved with double curly brackets
+- bug-fixed: cannot delete first button into cds-action-reply elements
+- bug-fixed: cannot clear header attriibutes on cds-web-request-v2
+
+### 1.0.6 in PROD
+
+### 1.0.6-rc.1
+- added: Export/import redirect function on header menu option
+- added: extension panel on variable list
+- added: baseHref into angular.json
+- added: imageRepoService abstract service to recover chatbot profile image
+- bug-fixed: set default value for activeDetailSection
+
 ### 1.0.5 in PROD
 
 ### 1.0.5-rc.3

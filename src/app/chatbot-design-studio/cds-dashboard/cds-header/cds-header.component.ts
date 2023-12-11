@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 
-import { NotifyService } from 'src/app/services/notify.service';
 import { MultichannelService } from 'src/app/services/multichannel.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -38,7 +37,7 @@ export class CdsHeaderComponent implements OnInit {
   @Output() toggleSidebarWith = new EventEmitter();
   @Output() goToBck = new EventEmitter();
   @Output() onTestItOut = new EventEmitter();
-
+  @Output() onMenuOption = new EventEmitter();
 
   id_faq_kb: string;
   projectID: string;
@@ -204,7 +203,9 @@ export class CdsHeaderComponent implements OnInit {
     })
   }
 
-
+  onMenuOptionFN(event){
+    this.onMenuOption.emit(event)
+  }
 
   openTestSiteInPopupWindow() {
     // const testItOutBaseUrl = this.TESTSITE_BASE_URL.substring(0, this.TESTSITE_BASE_URL.lastIndexOf('/'));

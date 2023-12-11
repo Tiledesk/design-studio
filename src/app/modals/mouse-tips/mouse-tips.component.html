@@ -1,0 +1,52 @@
+<div class="container">
+    <div class="cds-modal-header">
+        <div class="header-title">{{ "CDSModalMouseTrackPad.HowToMove" | translate }}</div>
+        <mat-dialog-actions>
+            <button (click)="onClose()">
+                <span class="material-icons">
+                    close
+                </span>
+            </button>
+            <!-- <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Install</button> -->
+        </mat-dialog-actions>
+    </div>
+
+    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+
+    <div class="content">
+        <mat-button-toggle-group [(ngModel)]="optionSelected" (change)="onChangeOption($event)">
+            <mat-button-toggle value="trackpad">Trackpad mode</mat-button-toggle>
+            <mat-button-toggle value="mouse">Mouse mode</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <div *ngIf="optionSelected === 'mouse'" class="tips-container">
+            <div class="section">
+                <img src="assets/images/icons/mouse_trackpad/whell_and_drag.svg">
+                <label>{{ "CDSModalMouseTrackPad.ClickWhellDragToMove" | translate }}</label>
+            </div>   
+            <div class="section">
+                <img src="assets/images/icons/mouse_trackpad/whell_scroll.svg">
+                <label>{{ "CDSModalMouseTrackPad.ScrollMouseWheel" | translate }}</label>
+            </div>
+            <div class="section">
+                <img src="assets/images/icons/mouse_trackpad/mouse_and_whell_zoom.svg">
+                <label>{{ "CDSModalMouseTrackPad.CtrlButtonWheelToZoom" | translate }}</label>
+            </div>
+        </div>
+
+        <div *ngIf="optionSelected === 'trackpad'" class="tips-container">
+            <div class="section">
+                <img src="assets/images/icons/mouse_trackpad/pinch_to_zoom.svg">
+                <label>{{ "CDSModalMouseTrackPad.PinchToZoom" | translate }}</label>
+            </div>
+            <div class="section">
+                <img src="assets/images/icons/mouse_trackpad/slide_to_move.svg">
+                <label>{{ "CDSModalMouseTrackPad.SlideToMove" | translate }}</label>
+            </div>
+            <div class="section">
+                <!-- <img src="assets/images/icons/mouse_trackpad/whell_and_drag.svg">
+                <label>Slide two fingers to move around</label> -->
+            </div>
+        </div>
+    </div>
+</div>

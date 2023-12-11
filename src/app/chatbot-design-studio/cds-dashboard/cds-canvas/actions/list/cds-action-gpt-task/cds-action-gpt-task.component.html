@@ -68,6 +68,7 @@
             [maxRow]="10" 
             [text]="action.question" 
             [placeholder]="'Enter prompt'"
+            (blur)="onBlur($event)"
             (changeTextarea)="changeTextarea($event, 'question')">
         </cds-textarea>
     </div>
@@ -88,7 +89,7 @@
         </cds-textarea>
     </div>
 
-    <a (click)="goToKNB()" routerLinkActive="router-link-active" target="_blank">Manage GPT Key</a>
+    <a (click)="goToKNB()" id="router-link" routerLinkActive="router-link-active" target="_blank">Manage GPT Key</a>
 
     <hr class="custom-divider">
 
@@ -172,6 +173,7 @@
                         [minRow]="1" [maxRow]="3" 
                         [text]="action.context" 
                         [placeholder]="'You are an awesome assistant'"
+                        (blur)="onBlur($event)"
                         (changeTextarea)="changeTextarea($event, 'context')">
                     </cds-textarea>
                 </div>

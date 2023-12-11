@@ -45,7 +45,8 @@
     transition: width 0.1s ease 0s, height 0.1s ease 0s, background-color 0.1s ease 0s, border 0.1s ease 0s;
     width: 18px;
     height: 18px;
-    background: rgb(0 0 0 / 50%);
+    // background: rgb(0 0 0 / 50%);
+    background: rgb(168, 168, 174);
     cursor: copy;
     &::before {
         inset: 1px;
@@ -73,7 +74,7 @@
     cursor: default;
     &::before {
         inset: 0px;
-        border: 1px solid rgb(98, 119, 140);
+        border: 1px solid rgb(168, 168, 174);
         transition: inset 0.1s ease 0s, border 0.1s ease 0s;
         position: absolute;
         content: "";

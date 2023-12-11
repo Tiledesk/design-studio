@@ -24,7 +24,8 @@ export class FormModelsFactory {
         let field1 = new Field()
         field1.name = 'userEmail';
         field1.type = 'text';
-        field1.regex = "/^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/";
+        field1.regex = '^.{1,}$'
+        //field1.regex = "/^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/";
         field1.label = "Hi ${userFullname}\n\nJust one last question\n\nYour email "
         field1.errorLabel = "${userFullname} this email address is invalid\n\nCan you insert a correct email address?"
         form_base.fields.push(field0)
@@ -56,7 +57,8 @@ export class FormModelsFactory {
         field5.name = 'userEmail';
         field5.type = 'text';
         field5.label =  "Hi ${userFullname} \n\nJust one last question\n\nYour email 🙂";
-        field5.regex = "/^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/"
+        field5.regex = '^.{1,}$'
+        //field5.regex = "/^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/"
         field5.errorLabel = "${userFullname} this email address is invalid\n\nCan you insert a correct email address?";
         form_advanced.fields.push(field2)
         form_advanced.fields.push(field3)

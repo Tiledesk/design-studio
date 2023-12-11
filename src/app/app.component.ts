@@ -17,6 +17,7 @@ import { ScriptService } from 'src/chat21-core/providers/scripts/script.service'
 import { NetworkService } from './services/network.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
+import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 
 @Component({
   selector: 'app-root',
@@ -37,6 +38,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     public translate: TranslateService,
     public tiledeskAuthService: TiledeskAuthService,
     public dialog: MatDialog,
+    private router: Router,
     public appStorageService: AppStorageService,
     public projectService: ProjectService,
     // public uploadService: UploadService,
@@ -44,6 +46,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private userService: UsersService,
     private multiChannelService: MultichannelService,
     private uploadService: UploadService,
+    private imageRepoService: ImageRepoService,
     private scriptService: ScriptService,
     private networkService: NetworkService,
   ){
@@ -275,6 +278,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.IS_ONLINE = true;
       }).catch(error => {
         this.logger.error('[APP-COMP] initAuthentication SIGNINWITHCUSTOMTOKEN error::', error)
+        if(error.status && error.status === 401){
+          this.router.navigate(['project/unauthorized'])
+        }
       })
     } else {
       this.logger.warn('[APP-COMP] >>> I AM NOT LOGGED IN <<<')

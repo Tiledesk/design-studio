@@ -1,0 +1,189 @@
+<div class="cds-container">
+
+    <!-- // HEADER - START -->
+    <div class="header">
+        <div class="cds-row">
+            <label class="header-title">{{ "CDSGlobals.Globals" | translate }}</label>
+            <button type="button" class="btn btn-primary cds-blue-button"
+                (click)="showHideNewSection(true)">
+                <span class="material-icons icon plus-icon">add</span>
+                {{ "Add" | translate }}
+            </button>
+        </div>
+        <p *ngIf="list && list.length === 0" class="header-subtitle">{{ "CDSGlobals.NoGlobalVariables" | translate }}</p>
+        <p *ngIf="list && list.length === 0" class="header-description">{{ "CDSGlobals.GlobalVariablesDescription" | translate }}</p>
+    </div>
+    <!-- // HEADER - END -->
+
+    <!-- // CONTENT - END -->
+    <div class="content">
+        <!-- // ADD NEW SECRET SECTION - START -->
+        <div *ngIf="newSectionVisible" class="secret-container">
+
+            <form [formGroup]="globalForm" (submit)="onSubmitForm()" (keydown.enter)="onSubmitForm()">
+                <div class="secret-inner-container">
+                    <div class="field-box" style="width: 40%;">
+                        <label class="title-label">{{ "CDSCanvas.Key" | translate }}</label>
+                        <cds-text id="custom-input"
+                            class="text-editable-div" 
+                            [class.invalid]="(globalForm.controls.key.errors?.pattern || globalForm.controls.key.errors?.required) && (globalForm.controls.key.dirty || globalForm.controls.key.touched)"
+                            [control]="globalForm.get('key')"
+                            [placeholder]="'CDSGlobals.GLOBAL_KEY' | translate">
+                        </cds-text>
+                    </div>
+
+                    <div class="field-box" style="width: 40%;">
+                        <label class="title-label">{{ "CDSGlobals.value" | translate | uppercase}}</label>
+                        <cds-text id="custom-input"
+                            class="text-editable-div" 
+                            [class.invalid]="(globalForm.controls.value.errors?.pattern || globalForm.controls.value.errors?.required) && globalForm.controls.value.touched"
+                            [control]="globalForm.get('value')"
+                            [placeholder]="'CDSGlobals.value' | translate">
+                        </cds-text>
+                    </div>
+                </div>
+            
+
+                <div class="buttons-container">
+                    <button id="cancel-button" type="button" class="btn btn-primary cds-blue-button"
+                        (click)="showHideNewSection(false)">{{ "Cancel" | translate }}</button>
+                    <button id="add-button" type="submit" class="btn btn-primary cds-blue-button"
+                        [disabled]="!globalForm.valid">{{ "Add" | translate }}</button>
+                </div>
+            </form>
+        </div>
+        <!-- // ADD NEW SECRET SECTION - END -->
+
+
+        <div class="secrets-list">
+
+            <div *ngFor="let global of list; let i = index;">
+
+                <!-- // UPDATE OPTION - START -->
+                <div class="secret-container update-view" *ngIf="i === updateIndex">
+                    <form [formGroup]="globalForm">
+                        <div class="secret-inner-container">
+
+                            <div class="field-box" style="width: 40%;">
+                                <label class="title-label">{{ "CDSCanvas.Key" | translate }}</label>
+                                <cds-text id="custom-input"
+                                    class="text-editable-div" 
+                                    [class.invalid]="(globalForm.controls.key.errors?.pattern || globalForm.controls.key.errors?.required) && (globalForm.controls.key.dirty || globalForm.controls.key.touched)"
+                                    [control]="globalForm.get('key')"
+                                    [placeholder]="'CDSGlobals.GLOBAL_KEY' | translate">
+                                </cds-text>
+                            </div>
+
+                            <div class="field-box" style="width: 40%;">
+                                <label class="title-label">{{ "CDSGlobals.value" | translate | uppercase}}</label>
+                                <cds-text id="custom-input"
+                                    class="text-editable-div" 
+                                    [class.invalid]="(globalForm.controls.value.errors?.pattern || globalForm.controls.value.errors?.required) && globalForm.controls.value.touched"
+                                    [control]="globalForm.get('value')"
+                                    [placeholder]="'CDSGlobals.value' | translate">
+                                </cds-text>
+                            </div>
+
+                        </div>
+                    </form>
+                    <div id="updatediv" class="buttons-container">
+                        <button id="delete-button" class="btn btn-primary cds-blue-button" 
+                            (click)="deleteElement(global.key)">{{ "Delete" | translate}}</button>
+                        <div class="buttons-container">
+                            <button id="cancel-button" class="btn btn-primary cds-blue-button"
+                                (click)="cancelUpdateSecret(i)">{{ "Cancel" | translate}}</button>
+                                
+                            <button id="add-button" class="btn btn-primary cds-blue-button" 
+                                (click)="updateSecret()" 
+                                [disabled]="!globalForm.valid">{{ "Update" | translate}}</button>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- // UPDATE OPTION - END -->
+
+                <div class="secret-inner-container" *ngIf="i !== updateIndex">
+                    <div class="field-box" style="width: 40%;">
+                        <cds-text id="custom-input"
+                            class="text-editable-div disabled" 
+                            [text]="global.key"
+                            [placeholder]="'CDSGlobals.GLOBAL_KEY' | translate">
+                        </cds-text>
+                    </div>
+
+                    <div class="field-box password" style="width: 40%;">
+                        <cds-text id="custom-input"
+                            class="text-editable-div disabled" 
+                            [text]="global.value"
+                            [placeholder]="'CDSGlobals.value' | translate">
+                        </cds-text>
+                        <span class="material-icons-outlined copy-icon" (click)="copyToClipboard(global.value)">content_copy</span>
+                    </div>
+
+                    <!-- <div class="input-container">
+                        <div class="fake-input">
+                            <span class="material-icons-outlined copy-icon"
+                                (click)="copyToClipboard(secret.value)">content_copy</span>
+                            <input type="text" *ngIf="!secret.visible" placeholder="value" value="•••••••••••••••"
+                                class="password" disabled>
+                            <input type="text" *ngIf="secret.visible" placeholder="value" value="{{secret.value}}" disabled>
+                            <div (click)="showHideSecret(secret)">
+                                <span *ngIf="secret.visible"
+                                    class="material-icons-outlined visibility-icon">visibility_off</span>
+                                <span *ngIf="!secret.visible"
+                                    class="material-icons-outlined visibility-icon">visibility</span>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <div class="field-box">
+                        <button id="cds-custom-icon-button"
+                            class="btn btn-primary cds-blue-button" 
+                            [matMenuTriggerFor]="menu" aria-label="Actions">
+                            <span class="material-icons">more_vert</span>
+                        </button>
+                    </div>
+
+                    
+                    <mat-menu #menu="matMenu" xPosition="before" yPosition="below" class="menuOptions">
+                        <ng-template matMenuContent>
+                            <div class="action-box">
+                                <div class="menu-btns-wpr" (click)="showUpdateSecret(i, global)">
+                                    <div class="menu-btn-icon">
+                                        <span class="material-icons-outlined">edit</span>
+                                    </div>
+                                    <div class="menu-btn-text truncate">{{ "Edit" | translate}}</div>
+                                </div>
+                            </div>
+                            <div class="action-box">
+                                <div class="menu-btns-wpr" (click)="deleteElement(global.key)">
+                                    <div class="menu-btn-icon">
+                                        <span class="material-icons-outlined">delete</span>
+                                    </div>
+                                    <div class="menu-btn-text truncate">{{ "Delete" | translate}}</div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </mat-menu>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- // CONTENT - END -->
+
+
+    <!-- // FOOTER - START -->
+    <div class="footer">
+        <div class="container-wrp">
+            <span class="material-icons-outlined">info</span>
+            <div>
+                <label> Use variables to reuse values and protect sensitive data</label>
+                <label> Store sensitive data in variables type secret to keep its values masked on the screen. <br> Work with the current value of a variable to prevent sharing sensitive values with your team</label>
+            </div>
+        </div>
+    </div>
+    <!-- // FOOTER - END -->
+</div>
+

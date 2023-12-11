@@ -1,4 +1,19 @@
 <div class="container">
+
+    <div size="4" class="cds-elements" mat-button>
+        <!-- MOUSE -->
+        <div class="cds-element" *ngIf="true" [satPopoverAnchor]="mouseTips"  (click)="mouseTips.toggle()" #divEvent>
+            <div class="cds-button-element">
+                <div class="cds-box-button">
+                    <span class="box-img">
+                        <span class="material-icons-outlined">mouse</span>
+                    </span>
+                    <!-- <span class="box-title">Event</span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div size="4" class="cds-elements" mat-button>
 
         <!-- + -->
@@ -73,3 +88,17 @@
    
 
 </div>
+
+
+<sat-popover #mouseTips 
+    id="mouseTips"
+    horizontalAlign="center" 
+    verticalAlign="above" 
+    hasBackdrop 
+    (backdropClicked)="mouseTips.close()"
+    panelClass="mouse-trackpad-tips-panel"
+    interactiveClose="false">
+    <cds-mouse-tips
+        (close)="mouseTips.close()">
+    </cds-mouse-tips>
+</sat-popover>

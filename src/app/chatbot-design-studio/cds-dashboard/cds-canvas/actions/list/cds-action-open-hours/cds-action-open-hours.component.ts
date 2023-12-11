@@ -29,6 +29,8 @@ export class CdsActionOpenHoursComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
+  idConnectionTrue: string;
+  idConnectionFalse: string;
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
@@ -88,19 +90,31 @@ export class CdsActionOpenHoursComponent implements OnInit {
 
   private checkConnectionStatus(){
     if(this.action.trueIntent){
-     this.isConnectedTrue = true;
+      this.isConnectedTrue = true;
+      const posId = this.action.trueIntent.indexOf("#");
+      if (posId !== -1) {
+        const toId = this.action.trueIntent.slice(posId+1);
+        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
+      }
     } else {
      this.isConnectedTrue = false;
+     this.idConnectionTrue = null;
     }
     if(this.action.falseIntent){
       this.isConnectedFalse = true;
+      const posId = this.action.falseIntent.indexOf("#");
+      if (posId !== -1) {
+        const toId = this.action.falseIntent.slice(posId+1);
+        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
+      }
      } else {
       this.isConnectedFalse = false;
+      this.idConnectionFalse = null;
      }
   }
 
+
   private initializeConnector() {
-    // this.isConnected = false;
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
@@ -114,18 +128,21 @@ export class CdsActionOpenHoursComponent implements OnInit {
       if(idAction === this.action._tdActionId){
         if(this.connector.deleted){
           if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null
-            this.isConnectedTrue = false
+            this.action.trueIntent = null;
+            this.isConnectedTrue = false;
+            this.idConnectionTrue = null;
           }        
           if(array[array.length -1] === 'false'){
             this.action.falseIntent = null
             this.isConnectedFalse = false;
+            this.idConnectionFalse = null;
           }
           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
         } else { 
           this.logger.log(' updateConnector :: onlineagents', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
           if(array[array.length -1] === 'true'){
             this.isConnectedTrue = true;
+            this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
             if(this.action.trueIntent !== '#'+this.connector.toId){
               this.action.trueIntent = '#'+this.connector.toId;
               if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
@@ -133,6 +150,7 @@ export class CdsActionOpenHoursComponent implements OnInit {
           }        
           if(array[array.length -1] === 'false'){
             this.isConnectedFalse = true;
+            this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
             if(this.action.falseIntent !== '#'+this.connector.toId){
               this.action.falseIntent = '#'+this.connector.toId;
               if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});

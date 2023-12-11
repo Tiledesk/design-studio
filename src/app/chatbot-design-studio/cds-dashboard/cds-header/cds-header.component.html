@@ -6,8 +6,8 @@
         #tooltip="matTooltip">
     <div *ngIf="!IS_OPEN_SIDEBAR">
         <img class="logo" src="assets/logos/tiledesk_logo.svg">
-        <span class="material-icons" (click)="goToBack()">arrow_back</span>
-        <!-- <span class="material-icons" [matMenuTriggerFor]="menu">more_vert</span> -->
+        <!-- <span class="material-icons" (click)="goToBack()">arrow_back</span> -->
+        <span class="material-icons" [matMenuTriggerFor]="menu">more_vert</span>
     </div>
     <img *ngIf="IS_OPEN_SIDEBAR" src="assets/logos/tiledesk-logo_new_white.svg">
 </div>
@@ -23,7 +23,6 @@
     </div> -->
     <!-- <i class="material-icons cds-btn-back" (click)="goBack()">keyboard_arrow_left</i> -->
     <div class="header-go-back"
-        style="cursor:pointer"
         matTooltip="v. {{version}}" 
         matTooltipClass="custom-mat-tooltip"
         matTooltipHideDelay="100"
@@ -115,6 +114,7 @@
 <!-- HEADER MENU OPTIONS-->
 <mat-menu #menu="matMenu" class="menuElement" xPosition="after">
     <ng-template matMenuContent>
-        <cds-menu></cds-menu>
+        <cds-menu
+            (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
     </ng-template>
 </mat-menu>

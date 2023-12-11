@@ -11,11 +11,12 @@
                 [text]="operandForm.value.value"
                 [limitCharsText]="10000"
                 [setAttributeBtn]="operandForm.value.value? false : true"
+                [readonly]="operandForm.value.isVariable? true : false" 
                 [minRow]="1" [maxRow]="4"
-                [readonly]="operandForm.value.isVariable? true : false"
                 [control]="operandForm.get('value')"
                 (clearSelectedAttribute)="onClearSelectedAttribute()"
                 (selectedAttribute)="onSelectedAttribute($event)"
+                (blur)="onBlur($event)"
                 (changeTextarea)="onChangeTextArea($event)">
             </cds-textarea>
         </div>

@@ -112,7 +112,6 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   /** onChangeIntentName */
   onChangeIntentName(event) {
-    this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName",event, this.intent);
     const result = this.checkIntentName(event);
     this.intent.intent_display_name = event.trim();
     if(result){
@@ -123,7 +122,6 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   }
 
   onBlur(event){
-    console.log('[PANEL-INTENT-HEADER] onBlur', event, this.intentName)
     this.myInput.nativeElement.blur();
     const result = this.checkIntentName(this.intentName);
     if(result){
@@ -164,7 +162,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   /** */
   onSaveIntent() {
-    console.log("[PANEL-INTENT-HEADER] SALVO!!!");
+    this.logger.log("[PANEL-INTENT-HEADER] SALVO!!!");
     // this.intentService.setIntentSelected(this.intent.intent_id);
     this.intent.intent_display_name = this.intentName.trim();
     this.intentService.changeIntentName(this.intent);

@@ -48,7 +48,7 @@ export class RoleGuard implements CanActivate {
     const userIsInProject = await this.getProjectUserInProject(projectId, user.uid)
     console.log('[ROLE-GUARD] userIsInProject-->', userIsInProject)
     if(!userIsInProject){
-      this.router.navigate([`project/${projectId}/unauthorized`]);
+      this.router.navigate([`project/unauthorized`]);
       return false
     }
     return true;

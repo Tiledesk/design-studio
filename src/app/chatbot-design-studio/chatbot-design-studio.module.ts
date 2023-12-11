@@ -43,14 +43,14 @@ import { CdsHeaderComponent } from './cds-dashboard/cds-header/cds-header.compon
 import { CdsSplashScreenComponent } from './cds-dashboard/utils/cds-splash-screen/cds-splash-screen.component';
 
 //FULLFILLMENT 
-import { CdsFulfillmentComponent } from './cds-dashboard/cds-fulfillment/cds-fulfillment.component';
+import { CdsFulfillmentComponent } from './cds-fulfillment/cds-fulfillment.component';
 
 //RULES COMPONENT
-import { RulesComponent } from './cds-dashboard/cds-rules/rules/rules.component';
-import { RulesAddComponent } from './cds-dashboard/cds-rules/rules-add/rules-add.component';
-import { RulesListComponent } from './cds-dashboard/cds-rules/rules-list/rules-list.component';
-import { ConditionComponent } from './cds-dashboard/cds-rules/rules-add/condition/condition.component';
-import { ActionComponent } from './cds-dashboard/cds-rules/rules-add/action/action.component';
+import { RulesComponent } from './cds-rules/rules/rules.component';
+import { RulesAddComponent } from './cds-rules/rules-add/rules-add.component';
+import { RulesListComponent } from './cds-rules/rules-list/rules-list.component';
+import { ConditionComponent } from './cds-rules/rules-add/condition/condition.component';
+import { ActionComponent } from './cds-rules/rules-add/action/action.component';
 
 //SETTINGS COMPONENT
 import { CdsChatbotDetailsComponent } from './cds-chatbot-details/cds-chatbot-details.component';
@@ -62,7 +62,7 @@ import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.compon
 
 
 //CDS-SECRETS
-import { CdsSecretsComponent } from './cds-dashboard/cds-secrets/cds-secrets.component';
+import { CdsGlobalsComponent } from './cds-globals/cds-globals.component';
 
 
 //SERVICES
@@ -132,6 +132,11 @@ import { OperatorComponent } from './cds-dashboard/cds-canvas/actions/list/cds-a
 import { OperationComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable/operation/operation.component';
 import { OperandComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable/operand/operand.component';
 
+//ACTION ASSIGN-VARIABLE: elements
+import { OperatorV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/operator/operator.component';
+import { OperationV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/operation/operation.component';
+import { OperandV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/operand/operand.component';
+
 //ACTION JSON-CONDITION: elements
 import { BaseConditionRowComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-json-condition/base-condition-row/base-condition-row.component';
 import { VariableListComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-json-condition/variable-list/variable-list.component';
@@ -158,6 +163,7 @@ import { CdsActionJsonConditionComponent } from './cds-dashboard/cds-canvas/acti
 import { CdsActionDeleteVariableComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-delete-variable/cds-action-delete-variable.component';
 import { CdsActionReplaceBotComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-replace-bot/cds-action-replace-bot.component';
 import { CdsActionAssignVariableComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable/cds-action-assign-variable.component';
+import { CdsActionAssignVariableV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/cds-action-assign-variable-v2.component';
 import { CdsActionHideMessageComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-hide-message/cds-action-hide-message.component';
 import { CdsActionWebRequestComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-web-request/cds-action-web-request.component';
 import { CdsActionWebRequestV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-web-request-v2/cds-action-web-request-v2.component';
@@ -199,6 +205,8 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
 import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
 import { NetworkOfflineComponent } from '../modals/network-offline/network-offline.component';
+import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
+import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 
 @NgModule({
   declarations: [
@@ -210,7 +218,7 @@ import { NetworkOfflineComponent } from '../modals/network-offline/network-offli
     RulesComponent,
     CdsFulfillmentComponent,
     CdsChatbotDetailsComponent,
-    CdsSecretsComponent,
+    CdsGlobalsComponent,
     //CDS-ROOT-ELEMENTS: end
 
     AttributesComponent,
@@ -278,6 +286,7 @@ import { NetworkOfflineComponent } from '../modals/network-offline/network-offli
         CdsActionDeleteVariableComponent,
         CdsActionReplaceBotComponent,
         CdsActionAssignVariableComponent,
+        CdsActionAssignVariableV2Component,
         CdsActionHideMessageComponent,
         CdsActionWebRequestComponent,
         CdsActionWebRequestV2Component,
@@ -303,6 +312,11 @@ import { NetworkOfflineComponent } from '../modals/network-offline/network-offli
         OperatorComponent,
         OperandComponent,
         // action ASSIGN-VARIABLE elements: end //
+         // action ASSIGN-VARIABLE-V2 elements: start //
+         OperationV2Component,
+         OperatorV2Component,
+         OperandV2Component,
+         // action ASSIGN-VARIABLE-V2 elements: end //
         // action JSON-CONDITION elements: start //
         BaseConditionRowComponent,
         BaseFilterComponent,
@@ -342,14 +356,16 @@ import { NetworkOfflineComponent } from '../modals/network-offline/network-offli
     CdsModalActivateBotComponent,
     CdsPublishOnCommunityModalComponent,
     ChangeBotLangModalComponent,
-
+    NetworkOfflineComponent,
+    MouseTipsComponent,
+    
     //EVENT BASE COMPONENT
     CdsEventComponent,
     CdsRuleComponent,
     CdsOptionsComponent,
     CdsPanelConnectorMenuComponent,
-    NetworkOfflineComponent,
     
+    GetVariableNamePipe
 
   ],
   imports: [

@@ -1,0 +1,9 @@
+<cds-select
+    [items]="listOfOperators"
+    [itemSelected]="operator"
+    [bindLabelSelect]="'name'"
+    [bindValueSelect]="'value'"
+    [placeholder]="'Select a operator'"
+    [clearable]="false"
+    (onSelected)="onSelectedOperator($event)">
+</cds-select>

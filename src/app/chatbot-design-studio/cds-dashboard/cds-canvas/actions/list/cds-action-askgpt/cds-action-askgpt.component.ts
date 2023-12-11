@@ -30,6 +30,8 @@ export class CdsActionAskgptComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
+  idConnectionTrue: string;
+  idConnectionFalse: string;
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
@@ -99,18 +101,45 @@ export class CdsActionAskgptComponent implements OnInit {
     this.checkConnectionStatus();
   }
 
+  // private checkConnectionStatus(){
+  //   if(this.action.trueIntent){
+  //    this.isConnectedTrue = true;
+  //   } else {
+  //    this.isConnectedTrue = false;
+  //   }
+  //   if(this.action.falseIntent){
+  //     this.isConnectedFalse = true;
+  //    } else {
+  //     this.isConnectedFalse = false;
+  //    }
+  // }
+
+
   private checkConnectionStatus(){
     if(this.action.trueIntent){
-     this.isConnectedTrue = true;
+      this.isConnectedTrue = true;
+      const posId = this.action.trueIntent.indexOf("#");
+      if (posId !== -1) {
+        const toId = this.action.trueIntent.slice(posId+1);
+        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
+      }
     } else {
-     this.isConnectedTrue = false;
+      this.isConnectedTrue = false;
+      this.idConnectionTrue = null;
     }
     if(this.action.falseIntent){
       this.isConnectedFalse = true;
+      const posId = this.action.falseIntent.indexOf("#");
+      if (posId !== -1) {
+        const toId = this.action.falseIntent.slice(posId+1);
+        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
+      }
      } else {
       this.isConnectedFalse = false;
+      this.idConnectionFalse = null;
      }
   }
+
 
   private updateConnector(){
     try {
@@ -121,10 +150,12 @@ export class CdsActionAskgptComponent implements OnInit {
           if(array[array.length -1] === 'true'){
             this.action.trueIntent = null;
             this.isConnectedTrue = false;
+            this.idConnectionTrue = null;
           }        
           if(array[array.length -1] === 'false'){
             this.action.falseIntent = null;
             this.isConnectedFalse = false;
+            this.idConnectionFalse = null;
           }
           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
         } else { 
@@ -133,12 +164,14 @@ export class CdsActionAskgptComponent implements OnInit {
           if(array[array.length -1] === 'true'){
             // this.action.trueIntent = '#'+this.connector.toId;
             this.isConnectedTrue = true;
+            this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
             this.action.trueIntent = '#'+this.connector.toId;
             if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
           }        
           if(array[array.length -1] === 'false'){
             // this.action.falseIntent = '#'+this.connector.toId;
             this.isConnectedFalse = true;
+            this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
             this.action.falseIntent = '#'+this.connector.toId;
             if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
           }
@@ -174,21 +207,25 @@ export class CdsActionAskgptComponent implements OnInit {
   }
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.userDefined.some(v => v.name === 'kb_reply')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_reply')) {
       new_attributes.push({ name: "kb_reply", value: "kb_reply" });
     }
-    if (!variableList.userDefined.some(v => v.name === 'kb_source')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_source')) {
       new_attributes.push({ name: "kb_source", value: "kb_source" });
     }
-    variableList.userDefined = [ ...variableList.userDefined, ...new_attributes];
-    this.logger.debug("[ACTION ASKGPT] Initialized variableList.userDefined: ", variableList.userDefined);
+    variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
+    this.logger.debug("[ACTION ASKGPT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
   changeTextarea($event: string, property: string) {
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
     this.action[property] = $event
-    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
+  onBlur(event){
+    this.updateAndSaveAction.emit();
   }
 
   onSelectedAttribute(event, property) {

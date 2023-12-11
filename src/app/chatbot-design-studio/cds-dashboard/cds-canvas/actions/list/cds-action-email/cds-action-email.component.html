@@ -69,6 +69,7 @@
             [minRow]="1" 
             [maxRow]="1" 
             popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'to')">
         </cds-textarea>
     </div>
@@ -83,6 +84,7 @@
             [minRow]="1" 
             [maxRow]="1" 
             popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'subject')">
         </cds-textarea>
     </div>
@@ -98,6 +100,7 @@
             [minRow]="1" 
             [maxRow]="1" 
             popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'replyto')">
         </cds-textarea>
     </div>
@@ -110,6 +113,7 @@
             [emojiPikerBtn]="false" 
             [text]="action.text"
             [minRow]="4" 
+            (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'text')">
         </cds-textarea>
     </div>

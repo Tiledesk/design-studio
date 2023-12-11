@@ -1,0 +1,107 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+:host{
+    --icon-color: #{$blu};
+    --textColor: #{$blu};
+    --backGroundColor: #{$blu-light-04};
+    --hoverBackgroundColor: #{$blu-light-03};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --border-radius-base: 8px
+
+}
+
+.block-wrp {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    gap: 25px;
+}
+
+.add-filter-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: auto;
+
+    user-select: none;
+    box-sizing: border-box;
+    outline: none;
+    border: 1px dashed $blu-light-02;
+    border-radius: $button-border-radius-base;
+    color: $blu-light-02;
+    cursor: pointer;
+    font-size: 0.7em;
+    font-weight: 400;
+    line-height: $button-height-base;
+    // margin: 0px 5px 0;
+    order: 1;
+    padding: 0 10px;
+    transition: all .3s;
+    min-width: 100px;
+    text-align: center;
+    width: fit-content;
+
+    
+    &:hover{
+        border-color: var(--textColor);
+        color: var(--textColor);
+    }
+}
+
+.base-operand {
+    position: relative;
+    &:hover{
+        div.filter-remove{
+            opacity: 1;
+            transition: opacity 0.3s ease 0s;
+        }
+    }
+}
+
+.basic-operator{
+    display: flex;
+    justify-content: center;
+}
+
+
+.control-buttons{
+    height: 100%;
+    left: -44px;
+    position: absolute;
+    top: 0px;
+    width: 44px;
+
+    div.filter-remove{
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        transition: opacity 0.3s ease 0s;
+        opacity: 0;
+        height: 28px;
+        width: 28px;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background:white;
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+        span.material-icons,
+        span.material-icons-outlined {
+            font-size: 20px;
+            color: var(--textColor);
+        }
+        &:hover {
+            background-color: var(--hoverBackgroundColor);
+        }
+    }
+}
+
+

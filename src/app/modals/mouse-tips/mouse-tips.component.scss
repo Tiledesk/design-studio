@@ -1,0 +1,106 @@
+@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/styles.scss";
+
+.container{
+    background: rgb(255, 255, 255);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.cds-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    div.header-title {
+        margin:0px;
+        color: #22272d;
+        font-weight: 600;
+    }
+    mat-dialog-actions{
+        text-align: right;
+        padding: 0;
+        min-height: auto;
+        margin: 0;
+    }
+    button {
+        background: transparent;
+        border: unset;
+        position: relative;
+        padding: 0px;
+    }
+}
+
+.title-label{
+   font-size: 20px;
+}
+
+.tips-container{
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 8px;
+    background-color: rgb(243, 244, 246);
+    box-shadow: none;
+    border-radius: 8px;
+    padding: 10px;
+
+    label {
+        text-align: center;
+        flex: 1 1 0%;
+        font-size: 0.75rem;
+    }
+
+    .section{
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        width: 150px;
+
+        img {
+            height: 80px;
+            // filter: drop-shadow(5px 5px 10px #00000030)
+        }
+    }
+
+    hr {
+        background-color: rgb(210, 213, 218);
+        border: none;
+        margin: 0px;
+        padding: 0px;
+        width: 2px;
+        height: 100%;
+    }
+
+}
+
+/** button TOOGLE */
+mat-button-toggle-group ::ng-deep{
+    border: unset;
+    border-radius: 0px;
+    margin-bottom: 5px;
+}
+
+mat-button-toggle{
+    background-color: transparent;
+    border: none;
+    color: $blu-light-02;
+    border-bottom: 2px solid transparent;
+
+    &.mat-button-toggle-checked{
+        border-color: $blu;
+        color: $blu;
+        font-weight: 400;
+
+    }
+    
+    &.mat-button-toggle+mat-button-toggle.mat-button-toggle{
+        border-left: none;
+    }
+
+    &::ng-deep .mat-button-toggle-label-content {
+        line-height: 36px;
+        font-size: 12px;
+    }
+
+    
+}

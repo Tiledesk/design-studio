@@ -60,7 +60,6 @@
             </div> -->
             <div class="add--action-placeholder-text">
                 Add an action to this block
-
                 <span style="display: block;font-size: 12px;">
                     Actions are executed in sequence starting from the top block action
                 </span>
@@ -80,6 +79,7 @@
             cdkDrag
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
             (cdkDragReleased)="onDragEnded($event, i)"
+            (cdkDragMoved)="onDragMove($event)"
             [id]="action._tdActionId" 
             class="box-action" 
             tabindex="0" 
@@ -94,7 +94,17 @@
             <!-- [ngClass]="{'hide-drag-action-palceholder': hideActionDragPlaceholder}" -->
             <!-- [ngStyle]="{'opacity':hideActionDragPlaceholder === true ? '1' : '0' }" -->
             <!-- <span *ngIf="!first" class="action-element"> -->
+
             <span class="action-element">
+
+                <div *cdkDragPreview id="customDragPreview">
+                    <cds-action-description 
+                        class="header-action" 
+                        [previewMode]="false"
+                        [elementType]="action._tdActionType">
+                    </cds-action-description>
+                </div>
+            
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
                 <cds-action-description 
@@ -186,6 +196,11 @@
                     </cds-action-replace-bot>
     
                     <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE" 
+                        class="panel-response"
+                        [action]="action">
+                    </cds-action-assign-variable>
+
+                    <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE_V2" 
                         class="panel-response"
                         [action]="action">
                     </cds-action-assign-variable>
@@ -286,17 +301,16 @@
         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
     </cds-action-intent>
 
-    <!-- <div class="footer-intent">
+    <div class="footer-intent">
        
         <div *ngIf="!isStart" class="csd-open-action-menu-btn-wpr">
-            <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                class="btn cds-add-action-btn">
-                <span class="material-icons">
-                    add
-                </span>
-            </button>
+            <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+                class="cds-add-action-btn">
+                
+                + Add action
+            </div>
         </div>
-    </div> -->
+    </div>
     
 
 

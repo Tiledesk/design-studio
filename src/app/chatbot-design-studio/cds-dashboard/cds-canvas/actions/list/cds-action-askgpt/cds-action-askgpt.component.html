@@ -38,6 +38,7 @@
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
             [isConnected] = "isConnectedTrue">
         </cds-connector>
     </div>
@@ -48,6 +49,7 @@
        <label class="title-preview-label">else</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
             [isConnected] = "isConnectedFalse">
         </cds-connector>
     </div>
@@ -67,6 +69,7 @@
             [maxRow]="4" 
             [text]="action?.question" 
             [placeholder]="'Question to submit'"
+            (blur)="onBlur($event)"
             (changeTextarea)="changeTextarea($event, 'question')">
         </cds-textarea>
     </div>

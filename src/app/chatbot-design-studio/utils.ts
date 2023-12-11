@@ -15,7 +15,14 @@ export enum SIDEBAR_PAGES {
     SETTINGS = 'cds-sb-settings',
     FULFILLMENT = 'cds-sb-fulfillment',
     RULES = 'cds-sb-rules',
-    SECRETS = 'cds-sb-secrets'
+    GLOBALS = 'cds-sb-globals'
+}
+
+export enum SETTINGS_SECTION {
+    DETAIL = 'bot_detail',
+    IMPORT_EXPORT = 'import_export',
+    COMMUNITY = 'community',
+    DEVELOPER = 'developer'
 }
 
 export enum EXTERNAL_URL {
@@ -38,7 +45,8 @@ export enum TYPE_FUNCTION_VAR {
     absAsNumber = "absAsNumber",
     ceilAsNumber = "ceilAsNumber",
     floorAsNumber = "floorAsNumber",
-    roundAsNumber = "roundAsNumber"
+    roundAsNumber = "roundAsNumber",
+    JSONparse = 'JSONparse'
 }
 
 export enum TYPE_FUNCTION_FUNC {
@@ -105,6 +113,7 @@ export enum TYPE_ACTION {
     WAIT = 'wait',
     INTENT = 'intent',
     ASSIGN_VARIABLE = 'setattribute',
+    ASSIGN_VARIABLE_V2 = 'setattribute-v2',
     ASSIGN_FUNCTION = 'setfunction',
     DELETE_VARIABLE = 'delete',
     REPLACE_BOT = 'replacebot',
@@ -211,8 +220,9 @@ export enum OPTIONS {
     ZOOM_OUT = 'zoom-out',
     CENTER = 'center',
     UNDO = "undo",
-    REDO = "redo"
-  }
+    REDO = "redo",
+    MOUSE = "mouse"
+}
 
 export const INTENT_TEMP_ID = '';
 export const MESSAGE_METADTA_WIDTH = '100%';
@@ -241,16 +251,17 @@ export const INTENT_ELEMENT = {
 
 
 export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_CATEGORY, type: TYPE_ACTION, src: string, status: 'active' | 'inactive' | 'beta', plan?: string, description?: string}}= {
-    REPLY : { name: 'Reply', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.REPLY, src:"assets/images/actions/reply.svg", status: "active" ,description: '<b>Pro tip</b>: Turn this block into a programmed proactive message. <a href=https://www.youtube.com/embed/SgDGwvVoqWE target=_blank>Here is how!</a> '},
+    REPLY : { name: 'Reply', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.REPLY, src:"assets/images/actions/reply.svg", status: "active" ,description: '<b>Pro tip</b>: Turn this block into a programmed proactive message. <a href=https://www.youtube.com/embed/p0ux-86Y4_I target=_blank>Here is how!</a> '},
     RANDOM_REPLY : { name: 'Random Reply', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.RANDOM_REPLY, src:"assets/images/actions/random_reply.svg", status: "active", description: 'Create some replies that will be randomly selected'},
     AGENT : { name: 'Agent Handoff', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.AGENT, src:"assets/images/actions/agent_handoff.svg", status: "active", description: 'This action replaces the current chatbot with an agent.<br>The upcoming agent is assigned to the conversation following the department rules'},
     CLOSE : { name: 'Close', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.CLOSE, src:"assets/images/actions/close.svg", status: "active", description: 'This action instantly closes the current conversation'},
     OPEN_HOURS: { name: 'If Operating Hours', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.OPEN_HOURS, src: "assets/images/actions/open_hours.svg", status: "active", description: 'This action moves the flow to different blocks, based on the operating hours status.<br>During working hours the <b>TRUE block</b> will be triggered.<br>During offline hours the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset the same option.' },
     ONLINE_AGENTS: { name: 'If Online Agent', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.ONLINE_AGENTS, src: "assets/images/actions/online_agents.svg", status: "active", description: 'This action moves the flow to different blocks, based on the agents’ availability.<br>If there are agents available the <b>TRUE block</b> will be triggered.<br>If there are no agents available the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset Stop on met condition.' },
-    CONDITION: { name: 'Condition', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CONDITION, src: "assets/images/actions/condition.svg", status: "active", },
-    JSON_CONDITION: { name: 'Condition w/ else', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.JSON_CONDITION, src: "assets/images/actions/condition.svg", status: "active", },
+    CONDITION: { name: 'Condition', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CONDITION, src: "assets/images/actions/condition.svg", status: "active" },
+    JSON_CONDITION: { name: 'Condition w/ else', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.JSON_CONDITION, src: "assets/images/actions/condition.svg", status: "active" },
     INTENT : { name: 'Connect block', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.INTENT, src:"assets/images/actions/connect_intent.svg", status: "inactive", description: 'This action moves the flow to the specified block.<br> Keep in mind that if there are other actions in the current block actions-pipeline they will be executed too, generating a parallel-execution of all the branches affering to each block triggered through this Connect-block action.'},
-    ASSIGN_VARIABLE: { name: 'Set attribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.ASSIGN_VARIABLE, src: "assets/images/actions/assign_var.svg", status: "active",  },
+    ASSIGN_VARIABLE: { name: 'Set attribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.ASSIGN_VARIABLE, src: "assets/images/actions/assign_var.svg", status: "inactive"},
+    ASSIGN_VARIABLE_V2: { name: 'Set attribute v2', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.ASSIGN_VARIABLE_V2, src: "assets/images/actions/assign_var.svg", status: "active" },
     DELETE_VARIABLE: { name: 'Delete attribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.DELETE_VARIABLE, src: "assets/images/actions/delete_var.svg", status: "active",  },
     REPLACE_BOT: { name: 'Replace bot', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.REPLACE_BOT, src: "assets/images/actions/replace_bot.svg", status: "active", description: "Choose a chatbot to replace the current one in the conversation" },
     WAIT : { name: 'Wait', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.WAIT, src:"assets/images/actions/wait.svg", status: "active", description: 'This action waits the specified amount of milliseconds before moving to the next one along the block actions-pipeline'},
@@ -267,7 +278,6 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     // ASSIGN_FUNCTION: { name: 'Set function', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY: { name: 'Capture User Reply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: 'This action allow to capture the user reply' },
     QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: 'PRE', description: 'This action allow to connect with Qapla' },
-    //ADD INTENT MAKE
     MAKE : { name: 'Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/web_request.svg", status: "beta", description: ''},
 }
 
@@ -304,13 +314,14 @@ export const TYPE_MATH_OPERATOR_LIST: { [key: string]: { name: string, type: TYP
 }
 
 export const TYPE_FUNCTION_LIST_FOR_VARIABLES: { [key: string]: { name: string, type: TYPE_FUNCTION_VAR, src?: string } } = {
-    "upperCaseAsStrings": { name: "Upper case", type: TYPE_FUNCTION_VAR.upperCaseAsString, src: "assets/images/operators/upperCase.svg" },
-    "lowerCaseAsStrings": { name: "Lower case", type: TYPE_FUNCTION_VAR.lowerCaseAsString, src: "assets/images/operators/lowerCase.svg" },
-    "capitalizeAsStrings": { name: "Capitalize", type: TYPE_FUNCTION_VAR.capitalizeAsString, src: "assets/images/operators/capitalize.svg" },
-    "absAsNumbers": { name: "Absolute value", type: TYPE_FUNCTION_VAR.absAsNumber, src: "assets/images/operators/abs.svg" },
-    "roundAsNumbers": { name: "Round", type: TYPE_FUNCTION_VAR.roundAsNumber, src: "assets/images/operators/round.svg" },
-    "floorAsNumbers": { name: "Floor", type: TYPE_FUNCTION_VAR.floorAsNumber, src: "assets/images/operators/floor.svg" },
-    "ceilAsNumbers": { name: "Ceil", type: TYPE_FUNCTION_VAR.ceilAsNumber, src: "assets/images/operators/ceil.svg" },
+    "upperCaseAsStrings": { name: "Upper case", type: TYPE_FUNCTION_VAR.upperCaseAsString, src: "assets/images/functions/upperCase.svg" },
+    "lowerCaseAsStrings": { name: "Lower case", type: TYPE_FUNCTION_VAR.lowerCaseAsString, src: "assets/images/functions/lowerCase.svg" },
+    "capitalizeAsStrings": { name: "Capitalize", type: TYPE_FUNCTION_VAR.capitalizeAsString, src: "assets/images/functions/capitalize.svg" },
+    "absAsNumbers": { name: "Absolute value", type: TYPE_FUNCTION_VAR.absAsNumber, src: "assets/images/functions/abs.svg" },
+    "roundAsNumbers": { name: "Round", type: TYPE_FUNCTION_VAR.roundAsNumber, src: "assets/images/functions/round.svg" },
+    "floorAsNumbers": { name: "Floor", type: TYPE_FUNCTION_VAR.floorAsNumber, src: "assets/images/functions/floor.svg" },
+    "ceilAsNumbers": { name: "Ceil", type: TYPE_FUNCTION_VAR.ceilAsNumber, src: "assets/images/functions/ceil.svg" },
+    "JSONparse":  { name: "JSON.parse", type: TYPE_FUNCTION_VAR.JSONparse, src: "assets/images/functions/jsonParse.svg" },
 }
 
 export const TYPE_FUNCTION_LIST_FOR_FUNCTIONS: { [key: string]: { name: string, type: TYPE_FUNCTION_FUNC, src?: string } } = {
@@ -353,42 +364,112 @@ export function getEmbedUrl(url: string) {
         : url;
 }
 
-export var variableList = {
-    userDefined: [],
-    mostUsed: [
-        { name: 'last_user_text', value: 'last_user_text', description: 'The last text the user typed. This is overwritten on each user reply', src: '', icon: 'send' },
-        { name: 'user_country', value: 'user_country', description: 'The user Country as decoded by Tiledesk',src: '', icon: 'language' },
-        { name: 'user_city', value: 'user_city', description: 'The user City as decoded by Tiledesk', src: '', icon: 'language' },
-        { name: 'user_language', value: 'user_language', description: 'The user language decoded on channel', src: '', icon: 'language' },
-        { name: 'transcript', value: 'transcript', description: 'All the conversation messages exchanged with this chatbot during the chat', src: '', icon: 'description'},
-    ],
-    systemDefined: [
-        { name: 'department_id', value: 'department_id', description: 'The ID of the department where this chatbot is activated', src: '', icon: 'domain' },
-        { name: 'department_name', value: 'department_name', description: 'The name of the department where this chatbot is activated', src: '', icon: 'domain' },
-        { name: 'project_id', value: 'project_id', description: 'The name of the project where this chatbot belongs to', src: '', icon: 'domain' },
-        { name: 'last_message_id', value: 'last_message_id', description: 'The unique ID of the last message sent', src: '', icon: 'textsms' },
-        { name: 'conversation_id', value: 'conversation_id', description: 'This conversation unique ID', src: '', icon: 'textsms' },
-        { name: 'chatbot_name', value: 'chatbot_name', description: 'This chatbot name', src: '', icon: 'person' },
-        { name: 'user_id', value: 'user_id', description: 'The user unique ID inside Tiledesk database', src: '', icon: 'person' },
-        { name: 'user_agent', value: 'user_agent', description: 'The web user agent where this conversation initiated', src: '', icon: 'person' },
-        { name: 'chatChannel', value: 'chatChannel', description: 'The channel where this conversation belongs to. Ex. "web", "whatsapp", "facebook", "telegram"', src: '', icon: 'language' },
-        { name: 'user_source_page', value: 'user_source_page', description: 'The page where this conversations is runinng. Only available on channel "web"', src: '', icon: 'language' },
-        { name: 'chat_url', value: 'chat_url', description: 'The url of the Chat to send to a colleague to chat with this user. Use "Invite human" action to invite the human to this chat.', src: '', icon: 'laptop' },
-        { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available',src: '', icon: 'laptop' },
-    ],
-    uploadedDocument: [
-        { name: 'lastUserDocumentURL', value: 'lastUserDocumentURL', description: 'The public URL to access the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
-        { name: 'lastUserDocumentName', value: 'lastUserDocumentName', description: 'The name of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
-        { name: 'lastUserDocumentType', value: 'lastUserDocumentType', description: 'The type of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
-    ],
-    uploadedImage: [
-        { name: 'lastUserImageURL', value: 'lastUserImageURL', description: 'The public URL to access the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-        { name: 'lastUserImageName', value: 'lastUserImageName', description: 'The name of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-        { name: 'lastUserImageType', value: 'lastUserImageType', description: 'The type of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-        { name: 'lastUserImageWidth', value: 'lastUserImageWidth', description: 'The height in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-        { name: 'lastUserImageHeight', value: 'lastUserImageHeight', description: 'The wdth in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'}
-    ]
-}
+// export var variableList: { [key: string]: {label: string, elements: Array<any>}} = {
+//     userDefined: {
+//         label: 'User defined',
+//         elements: []
+//     },
+//     mostUsed: {
+//         label: 'Most used',
+//         elements: [
+//             { name: 'last_user_text', value: 'last_user_text', description: 'The last text the user typed. This is overwritten on each user reply', src: '', icon: 'send' },
+//             { name: 'user_country', value: 'user_country', description: 'The user Country as decoded by Tiledesk',src: '', icon: 'language' },
+//             { name: 'user_city', value: 'user_city', description: 'The user City as decoded by Tiledesk', src: '', icon: 'language' },
+//             { name: 'user_language', value: 'user_language', description: 'The user language decoded on channel', src: '', icon: 'language' },
+//             { name: 'transcript', value: 'transcript', description: 'All the conversation messages exchanged with this chatbot during the chat', src: '', icon: 'description'},
+//         ]
+//     },
+//     systemDefined: {
+//         label: 'System defined',
+//         elements: [
+//             { name: 'department_id', value: 'department_id', description: 'The ID of the department where this chatbot is activated', src: '', icon: 'domain' },
+//             { name: 'department_name', value: 'department_name', description: 'The name of the department where this chatbot is activated', src: '', icon: 'domain' },
+//             { name: 'project_id', value: 'project_id', description: 'The name of the project where this chatbot belongs to', src: '', icon: 'domain' },
+//             { name: 'last_message_id', value: 'last_message_id', description: 'The unique ID of the last message sent', src: '', icon: 'textsms' },
+//             { name: 'conversation_id', value: 'conversation_id', description: 'This conversation unique ID', src: '', icon: 'textsms' },
+//             { name: 'chatbot_name', value: 'chatbot_name', description: 'This chatbot name', src: '', icon: 'person' },
+//             { name: 'user_id', value: 'user_id', description: 'The user unique ID inside Tiledesk database', src: '', icon: 'person' },
+//             { name: 'user_agent', value: 'user_agent', description: 'The web user agent where this conversation initiated', src: '', icon: 'person' },
+//             { name: 'chatChannel', value: 'chatChannel', description: 'The channel where this conversation belongs to. Ex. "web", "whatsapp", "facebook", "telegram"', src: '', icon: 'language' },
+//             { name: 'user_source_page', value: 'user_source_page', description: 'The page where this conversations is runinng. Only available on channel "web"', src: '', icon: 'language' },
+//             { name: 'chat_url', value: 'chat_url', description: 'The url of the Chat to send to a colleague to chat with this user. Use "Invite human" action to invite the human to this chat.', src: '', icon: 'laptop' },
+//             { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available',src: '', icon: 'laptop' },
+//         ]
+//     },
+//     uploadedDocument: {
+//         label: 'Uploaded document',
+//         elements: [
+//             { name: 'lastUserDocumentURL', value: 'lastUserDocumentURL', description: 'The public URL to access the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+//             { name: 'lastUserDocumentName', value: 'lastUserDocumentName', description: 'The name of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+//             { name: 'lastUserDocumentType', value: 'lastUserDocumentType', description: 'The type of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+//         ]
+//     },
+//     uploadedImage: {
+//         label: 'Uploaded image',
+//         elements: [
+//             { name: 'lastUserImageURL', value: 'lastUserImageURL', description: 'The public URL to access the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+//             { name: 'lastUserImageName', value: 'lastUserImageName', description: 'The name of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+//             { name: 'lastUserImageType', value: 'lastUserImageType', description: 'The type of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+//             { name: 'lastUserImageWidth', value: 'lastUserImageWidth', description: 'The height in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+//             { name: 'lastUserImageHeight', value: 'lastUserImageHeight', description: 'The wdth in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'}
+//         ]
+//     }
+// }
+
+export var variableList: Array<{key: string, elements: Array<any>}> = [ 
+    {
+        key: 'userDefined',
+        elements: []
+    },
+    {
+        key: 'globals',
+        elements: []
+    },
+    {
+        key: 'mostUsed',
+        elements: [
+            { name: 'last_user_text', value: 'last_user_text', description: 'The last text the user typed. This is overwritten on each user reply', src: '', icon: 'send' },
+            { name: 'user_country', value: 'user_country', description: 'The user Country as decoded by Tiledesk',src: '', icon: 'language' },
+            { name: 'user_city', value: 'user_city', description: 'The user City as decoded by Tiledesk', src: '', icon: 'language' },
+            { name: 'user_language', value: 'user_language', description: 'The user language decoded on channel', src: '', icon: 'language' },
+            { name: 'transcript', value: 'transcript', description: 'All the conversation messages exchanged with this chatbot during the chat', src: '', icon: 'description'},
+        ]
+    },
+    {
+        key: 'systemDefined',
+        elements: [
+            { name: 'department_id', value: 'department_id', description: 'The ID of the department where this chatbot is activated', src: '', icon: 'domain' },
+            { name: 'department_name', value: 'department_name', description: 'The name of the department where this chatbot is activated', src: '', icon: 'domain' },
+            { name: 'project_id', value: 'project_id', description: 'The name of the project where this chatbot belongs to', src: '', icon: 'domain' },
+            { name: 'last_message_id', value: 'last_message_id', description: 'The unique ID of the last message sent', src: '', icon: 'textsms' },
+            { name: 'conversation_id', value: 'conversation_id', description: 'This conversation unique ID', src: '', icon: 'textsms' },
+            { name: 'chatbot_name', value: 'chatbot_name', description: 'This chatbot name', src: '', icon: 'person' },
+            { name: 'user_id', value: 'user_id', description: 'The user unique ID inside Tiledesk database', src: '', icon: 'person' },
+            { name: 'user_agent', value: 'user_agent', description: 'The web user agent where this conversation initiated', src: '', icon: 'person' },
+            { name: 'chatChannel', value: 'chatChannel', description: 'The channel where this conversation belongs to. Ex. "web", "whatsapp", "facebook", "telegram"', src: '', icon: 'language' },
+            { name: 'user_source_page', value: 'user_source_page', description: 'The page where this conversations is runinng. Only available on channel "web"', src: '', icon: 'language' },
+            { name: 'chat_url', value: 'chat_url', description: 'The url of the Chat to send to a colleague to chat with this user. Use "Invite human" action to invite the human to this chat.', src: '', icon: 'laptop' },
+            { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available',src: '', icon: 'laptop' },
+        ]
+    },
+    {
+        key: 'uploadedDocument',
+        elements: [
+            { name: 'lastUserDocumentURL', value: 'lastUserDocumentURL', description: 'The public URL to access the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+            { name: 'lastUserDocumentName', value: 'lastUserDocumentName', description: 'The name of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+            { name: 'lastUserDocumentType', value: 'lastUserDocumentType', description: 'The type of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+        ]
+    },
+    {   key: 'uploadedImage',
+        elements: [
+            { name: 'lastUserImageURL', value: 'lastUserImageURL', description: 'The public URL to access the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+            { name: 'lastUserImageName', value: 'lastUserImageName', description: 'The name of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+            { name: 'lastUserImageType', value: 'lastUserImageType', description: 'The type of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+            { name: 'lastUserImageWidth', value: 'lastUserImageWidth', description: 'The height in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
+            { name: 'lastUserImageHeight', value: 'lastUserImageHeight', description: 'The wdth in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'}
+        ]
+    }
+]
 
 
 // export function patchActionId(action) {
@@ -418,7 +499,6 @@ export function convertJsonToArray(jsonData:any){
 }
 
 export async function isElementOnTheStage(elementId:string): Promise<any>{
-    
     return new Promise((resolve) => {
         let intervalId = setInterval(async () => {
             const result = document.getElementById(elementId);
@@ -445,7 +525,7 @@ export function removeNodesStartingWith(obj, start) {
     return obj;
 }
 
-export function insertItemIntoPositionInTheArray(array, item, pos = array.length) {
+export function insertItemInArray(array, item, pos = array.length) {
     if (pos < 0 || pos > array.length) {
       pos = array.length;
     }
@@ -453,18 +533,13 @@ export function insertItemIntoPositionInTheArray(array, item, pos = array.length
     return array;
 }
 
-// export function retriveListOfVariables(intents: Array<Intent>) {
-//     variableList.userDefined = []
-//     intents.forEach(intent => {
-//         intent.actions.filter(action => action._tdActionType === TYPE_ACTION.ASSIGN_VARIABLE).forEach(((actionAssignVariable: ActionAssignVariable) => {
-//             if(!actionAssignVariable.hasOwnProperty('assignTo')) return; 
-//             if(actionAssignVariable.assignTo === null || actionAssignVariable.assignTo === '') return;
-//             if(variableList.userDefined.some(el => el.value === actionAssignVariable.assignTo)) return;
-//             if(variableList.systemDefined.some(el => el.value === actionAssignVariable.assignTo)) return;
-//             variableList.userDefined.push({ name: actionAssignVariable.assignTo, value: actionAssignVariable.assignTo })
-//         }))
-//     })
-// }
+export function replaceItemInArray(array, item, pos = array.length) {
+    if (pos < 0 || pos > array.length) {
+      pos = array.length;
+    }
+    array.splice(pos, 0, item);
+    return array;
+}
 
 export function moveItemToPosition(array, DISPLAY_NAME, position) {
     if (position < 0 || position >= array.length) {
@@ -481,15 +556,34 @@ export function moveItemToPosition(array, DISPLAY_NAME, position) {
 }
 
 export function replaceItemInArrayForKey(key, array, item) {
-    let keyValue = item[key];
-    for (let i = 0; i < array.length; i++) {
-        if (array[i][key] === keyValue) {
-          array[i] = item;
-          i=array.length
+    array.forEach(function(obj, index) {
+        if (obj.hasOwnProperty(key) && obj[key] === item[key]) {
+          array[index] = item;
+          return;
         }
-    }
+    });
+    // for (let i = 0; i < array.length; i++) {
+    //     if (array[i][key] === keyValue) {
+    //       array[i] = item;
+    //       i=array.length;
+    //     }
+    // }
     return array;
 }
+
+export function deleteItemInArrayForKey(key, array, item) {
+    return array.filter((obj: any) => obj[key] !== item[key]);
+    // let keyValue = item[key];
+    // for (let i = 0; i < array.length; i++) {
+    //     if (array[i][key] === keyValue) {
+    //       delete array[i];
+    //       i=array.length;
+    //     }
+    // }
+    // return array;
+}
+
+
 
 export function checkInternalIntent(intent: Intent): boolean{
     return intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START ||  intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK ? true: false
@@ -515,8 +609,9 @@ export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     // let bottomIntentHeight = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).intent_id).offsetHeight;
     // console.log('rightIntentWith', rightIntentWith, rightIntentWith_)
     // console.log('bottomIntentHeight', bottomIntentHeight, bottomIntentHeight_)
-    var width = (maxX - minX);
-    var height = (maxY - minY);
+    const padding = 100
+    var width = (maxX - minX)+ padding;
+    var height = (maxY - minY) + padding;
     const stage = document.getElementById('tds_container').getBoundingClientRect()
     var scale = Math.min(stage.width / width, stage.height / height);
     // console.log('scaleeeee: ', scale, (stage.width / width), (stage.height / height));

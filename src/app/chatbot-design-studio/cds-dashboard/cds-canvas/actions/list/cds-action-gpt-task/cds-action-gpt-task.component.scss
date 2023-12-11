@@ -90,6 +90,13 @@ div {
     }
 }
 
+a#router-link{
+    cursor: pointer;
+    &:hover{
+        text-decoration: underline;
+    }
+}
+
 
 #cds-addkb-btn {
     background: #006cff;

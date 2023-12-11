@@ -1,3 +1,4 @@
+import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -88,10 +89,19 @@ export class DashboardService {
           if (chatbot) {
             this.selectedChatbot = chatbot;
             this.translateparamBotName = { bot_name: this.selectedChatbot.name }
+            variableList.find(el => el.key ==='userDefined').elements = [];
             if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {
-              variableList.userDefined = convertJsonToArray(this.selectedChatbot.attributes.variables);
-            } else {
-              variableList.userDefined = [];
+              variableList.find(el => el.key ==='userDefined').elements = convertJsonToArray(this.selectedChatbot.attributes.variables);
+            }
+            if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals) {
+              variableList.find(el => el.key ==='globals').elements = this.selectedChatbot.attributes.globals.map(({
+                key: name,
+                ...rest
+              }) => ({
+                name,
+                value: name
+              }))
+              console.log('variableeeeee', variableList)
             }
             resolve(true);
           }

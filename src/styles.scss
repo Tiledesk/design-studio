@@ -2,39 +2,3 @@
 
 
 
-.isLast{
-    .connector {
-        right: -24px;
-        top: calc(50% - 18px);
-        &:hover{
-            cursor: default;
-            .point-connector-empty {
-                background: #506493;
-                border: 0px;
-                cursor: copy;
-            }
-        }
-    }
-    .connector .point-connector {
-        // background: #e4e4e7;
-        border: 0px solid;
-        // border-color: rgba(0,0,0,.12);
-        // background: #b1b1b7;
-        width: 10px;
-        height: 10px;
-    }
-    .connector .point-connector-empty {
-        border: 1px solid;
-        border-color: #00000061;
-        background: #ffffff;
-        width: 10px;
-        height: 10px;
-    }
-
-    .connector .point-connector-empty::before {
-        border: 0px;
-    }
-    .connector .point-connector::before {
-        border: 0px;
-    }
-}

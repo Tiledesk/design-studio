@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
 import { StageService } from '../services/stage.service';
-import { TYPE_ACTION, TYPE_BUTTON, isElementOnTheStage } from '../utils';
+import { TYPE_ACTION, TYPE_BUTTON, isElementOnTheStage, generateShortUID } from '../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 /** CLASSE DI SERVICES PER GESTIRE I CONNETTORI **/
@@ -93,7 +93,7 @@ export class ConnectorService {
    * @param undo 
    * @returns 
    */
-  public async createConnectorFromId(fromId, toId, save=false, undo=false) {
+  public async createConnectorFromId(fromId, toId, save=false, undo=false, notify=false) {
     const connectorID = fromId+'/'+toId;
     const isConnector = document.getElementById(connectorID);
     if (isConnector) {
@@ -101,52 +101,60 @@ export class ConnectorService {
       this.tiledeskConnectors.updateConnectorsOutOfItent(connectorID);
       return true;
     } 
-
     let fromEle = document.getElementById(fromId);
     if(!fromEle) {
       fromEle = await isElementOnTheStage(fromId); // sync
-      this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', fromEle);
+      this.logger.log('[CONNECTOR-SERV] isOnTheStage fromEle:', fromEle);
     }
-
     let toEle = document.getElementById(toId);
     if(!toEle) {
       toEle = await isElementOnTheStage(toId); // sync
-      this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle);
+      this.logger.log('[CONNECTOR-SERV] isOnTheStage toEle:', toEle);
     }
-   
     if(fromEle && toEle){
-      // const fromEle = document.getElementById(fromId);
-      // const toEle = document.getElementById(toId);
       const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
       const toPoint = this.tiledeskConnectors.elementLogicTopLeft(toEle);
-      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, save, undo);
+      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, save, undo, notify);
       return true;
     } else {
       return false;
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  public async createConnectorById(connectorID) {
+    const isConnector = document.getElementById(connectorID);
+    if (isConnector) {
+      this.logger.log('[CONNECTOR-SERV] createConnectorById il connettore esiste già', connectorID);
+      this.tiledeskConnectors.updateConnectorsOutOfItent(connectorID);
+      return true;
+    } 
+    var lastIndex = connectorID.lastIndexOf("/");
+    if (lastIndex !== -1) {
+      const fromId = connectorID.substring(0, lastIndex);
+      const toId = connectorID.substring(lastIndex + 1);
+      let fromEle = document.getElementById(fromId);
+      if(!fromEle) {
+        fromEle = await isElementOnTheStage(fromId); // sync
+        this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', fromEle);
+      }
+      let toEle = document.getElementById(toId);
+      if(!toEle) {
+        toEle = await isElementOnTheStage(toId); // sync
+        this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle);
+      }
+      if (toEle && fromEle) {
+        const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
+        const toPoint = this.tiledeskConnectors.elementLogicTopLeft(toEle);
+        this.logger.log('[CONNECTOR-SERV] createConnectorById createConnector', connectorID);
+        this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, false, false, false);
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 
 
 
@@ -180,6 +188,9 @@ export class ConnectorService {
             // this.logger.log('[CONNECTOR-SERV] button   ----- > ', button, button.__idConnector);
             if(button.type === TYPE_BUTTON.ACTION && button.action){
               // const idConnectorFrom = button.__idConnector;
+              if(!button.uid || button.uid === "UUIDV4"){
+                button.uid = generateShortUID();
+              }
               const idConnectorFrom = intent.intent_id+"/"+action._tdActionId+"/"+button.uid;
               this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
               var startIndex = button.action.indexOf('#') + 1;
@@ -190,9 +201,7 @@ export class ConnectorService {
               }
               this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
               this.logger.log('[CONNECTOR-SERV] -> idConnectorTo', idConnectorTo);
-              if(idConnectorFrom && idConnectorTo){
-                this.createConnectorFromId(idConnectorFrom, idConnectorTo);
-              } 
+              this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             }
           });
         }
@@ -392,10 +401,11 @@ export class ConnectorService {
     this.logger.log('[CONNECTOR-SERV] deleteConnectorsFromActionByActionId actionId ' ,actionId )
   }
 
-  // deleteConnectorByToId(intentId){
-  //   this.tiledeskConnectors.deleteConnectorByToId(intentId);
-  //   this.logger.log('[CONNECTOR-SERV] deleteConnectorByToId intentId ' ,intentId );
-  // }
+
+  public deleteConnectorsToIntentById(intentId){
+    this.tiledeskConnectors.deleteConnectorsToIntentById(intentId);
+    this.logger.log('[CONNECTOR-SERV] deleteConnectorsToIntentById intentId ' ,intentId );
+  }
 
 
   /**
@@ -403,9 +413,9 @@ export class ConnectorService {
    * @param connectorID 
    * 
    */
-  public deleteConnector(connectorID, save=false, undo=false) {
+  public deleteConnector(connectorID, save=false, undo=false, notify=true) {
     this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', connectorID)
-    this.tiledeskConnectors.deleteConnector(connectorID, save, undo);
+    this.tiledeskConnectors.deleteConnector(connectorID, save, undo, notify);
   }
 
 
@@ -471,6 +481,53 @@ export class ConnectorService {
     }
   }
 
+
+  /**
+   * 
+   * @param elementID 
+   */
+  public async updateConnectorsOfBlock(elementID){
+    this.logger.log('[CONNECTOR-SERV] updateConnector2 elementID ' ,elementID);
+    const elem = await isElementOnTheStage(elementID); //sync
+    if(elem){
+      var cdsConnectors = elem.querySelectorAll('[connector]');
+      this.logger.log('[CONNECTOR-SERV] elem::', Array.from(cdsConnectors));
+      const elements = Array.from(cdsConnectors).map((element: HTMLElement) => element);
+      elements.forEach(element => {
+        const fromId = element.id;
+        const connectionId = element.getAttribute('idConnection');
+        this.logger.log('[CONNECTOR-SERV] element::', element, connectionId, fromId);
+        for (var connectorId in this.tiledeskConnectors.connectors) {
+          if (connectorId.startsWith(fromId)) {
+            this.deleteConnectorById(connectorId);
+          }
+        }
+        if(connectionId){
+          this.createConnectorById(connectionId);
+        }
+      });
+      return true;
+    }
+    return true;
+  }
+
+
+  public deleteConnectorById(connectorId) {
+    // for (var connectorKey in this.tiledeskConnectors.connectors) {
+    //   console.log("[JS] deleteConnectorWithFromId ----> ", fromId, connectorKey);
+    //   if (connectorKey.startsWith(fromId)) {
+    //     const connectorId = this.tiledeskConnectors.connectors[connectorKey].id;
+        let connectorElement = document.getElementById(connectorId);
+        if(connectorElement){
+          console.log("[JS] deleteConnectorWithFromId ----> ID",connectorId);
+          this.deleteConnector(connectorId, false, false, false);
+        }
+    //   }
+    // }
+  }
+
+
+  
   /**
    * moved
    * @param element 
@@ -527,7 +584,7 @@ export class ConnectorService {
    * @param intent_id 
    * @returns 
    */
-  public searchConnectorsInOfIntent(intent_id: string): Array<any>{
+  public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // this.logger.log('[CONNECTOR-SERV] -----> searchConnectorsInOfIntent::: ', intent_id);
     // this.logger.log('[CONNECTOR-SERV] -----> searchConnectorsInOfIntent::: ', this.tiledeskConnectors.connectors);
     const connectors = Object.keys(this.tiledeskConnectors.connectors)
