@@ -45,7 +45,8 @@ export enum TYPE_FUNCTION_VAR {
     absAsNumber = "absAsNumber",
     ceilAsNumber = "ceilAsNumber",
     floorAsNumber = "floorAsNumber",
-    roundAsNumber = "roundAsNumber"
+    roundAsNumber = "roundAsNumber",
+    JSONparse = 'JSONparse'
 }
 
 export enum TYPE_FUNCTION_FUNC {
@@ -311,13 +312,14 @@ export const TYPE_MATH_OPERATOR_LIST: { [key: string]: { name: string, type: TYP
 }
 
 export const TYPE_FUNCTION_LIST_FOR_VARIABLES: { [key: string]: { name: string, type: TYPE_FUNCTION_VAR, src?: string } } = {
-    "upperCaseAsStrings": { name: "Upper case", type: TYPE_FUNCTION_VAR.upperCaseAsString, src: "assets/images/operators/upperCase.svg" },
-    "lowerCaseAsStrings": { name: "Lower case", type: TYPE_FUNCTION_VAR.lowerCaseAsString, src: "assets/images/operators/lowerCase.svg" },
-    "capitalizeAsStrings": { name: "Capitalize", type: TYPE_FUNCTION_VAR.capitalizeAsString, src: "assets/images/operators/capitalize.svg" },
-    "absAsNumbers": { name: "Absolute value", type: TYPE_FUNCTION_VAR.absAsNumber, src: "assets/images/operators/abs.svg" },
-    "roundAsNumbers": { name: "Round", type: TYPE_FUNCTION_VAR.roundAsNumber, src: "assets/images/operators/round.svg" },
-    "floorAsNumbers": { name: "Floor", type: TYPE_FUNCTION_VAR.floorAsNumber, src: "assets/images/operators/floor.svg" },
-    "ceilAsNumbers": { name: "Ceil", type: TYPE_FUNCTION_VAR.ceilAsNumber, src: "assets/images/operators/ceil.svg" },
+    "upperCaseAsStrings": { name: "Upper case", type: TYPE_FUNCTION_VAR.upperCaseAsString, src: "assets/images/functions/upperCase.svg" },
+    "lowerCaseAsStrings": { name: "Lower case", type: TYPE_FUNCTION_VAR.lowerCaseAsString, src: "assets/images/functions/lowerCase.svg" },
+    "capitalizeAsStrings": { name: "Capitalize", type: TYPE_FUNCTION_VAR.capitalizeAsString, src: "assets/images/functions/capitalize.svg" },
+    "absAsNumbers": { name: "Absolute value", type: TYPE_FUNCTION_VAR.absAsNumber, src: "assets/images/functions/abs.svg" },
+    "roundAsNumbers": { name: "Round", type: TYPE_FUNCTION_VAR.roundAsNumber, src: "assets/images/functions/round.svg" },
+    "floorAsNumbers": { name: "Floor", type: TYPE_FUNCTION_VAR.floorAsNumber, src: "assets/images/functions/floor.svg" },
+    "ceilAsNumbers": { name: "Ceil", type: TYPE_FUNCTION_VAR.ceilAsNumber, src: "assets/images/functions/ceil.svg" },
+    "JSONparse":  { name: "JSON.parse", type: TYPE_FUNCTION_VAR.JSONparse, src: "assets/images/functions/jsonParse.svg" },
 }
 
 export const TYPE_FUNCTION_LIST_FOR_FUNCTIONS: { [key: string]: { name: string, type: TYPE_FUNCTION_FUNC, src?: string } } = {
