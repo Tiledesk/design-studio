@@ -15,8 +15,8 @@ export class CdsActionAssignVariableV2Component implements OnInit {
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter();
   
-  listOfMathOperators: Array<{ name: string, value: string, src?: string }> = [];
-  listOfFunctions: Array<{ name: string, value: string, src?: string }> = [];
+  listOfMathOperators: Array<{ name: string, value: string, icon?: string }> = [];
+  listOfFunctions: Array<{ name: string, value: string, icon?: string }> = [];
 
 
   TYPE_FUNCTION_LIST_FOR_VARIABLES = TYPE_FUNCTION_LIST_FOR_VARIABLES
@@ -83,10 +83,10 @@ export class CdsActionAssignVariableV2Component implements OnInit {
 
   initialize() {
       for (let key in TYPE_FUNCTION_LIST_FOR_VARIABLES) {
-          this.listOfFunctions.push({ name: TYPE_FUNCTION_LIST_FOR_VARIABLES[key].name, value: TYPE_FUNCTION_LIST_FOR_VARIABLES[key].type, src:  TYPE_FUNCTION_LIST_FOR_VARIABLES[key].src});
+          this.listOfFunctions.push({ name: TYPE_FUNCTION_LIST_FOR_VARIABLES[key].name, value: TYPE_FUNCTION_LIST_FOR_VARIABLES[key].type});
       }
       for (let key in TYPE_MATH_OPERATOR_LIST) {
-          this.listOfMathOperators.push({ name: TYPE_MATH_OPERATOR_LIST[key].name, value: TYPE_MATH_OPERATOR_LIST[key].type, src:  TYPE_MATH_OPERATOR_LIST[key].src});
+          this.listOfMathOperators.push({ name: TYPE_MATH_OPERATOR_LIST[key].name, value: TYPE_MATH_OPERATOR_LIST[key].type, icon:  TYPE_MATH_OPERATOR_LIST[key].src});
       }
   }
 
