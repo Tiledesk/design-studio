@@ -5,6 +5,14 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7-rc.6
+- added: JSONparse function into cds-action-assing-variable-v2
+- added: padding to scaleAndCenter bottom-right button icon
+- bug-fixed: cds-action-assign-variable-v2 operand create double value obj
+- bug-fixed: cds-attributes not save changes in input component
+- bug-fixed: do not permit special chars when adding new variable 
+
+
 ### 1.0.7-rc.5
 - added: cds-action-assign-variable-v2
 
