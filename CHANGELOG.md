@@ -6,6 +6,7 @@
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 1.0.7-rc.6
+- added: cds-action-make
 - added: JSONparse function into cds-action-assing-variable-v2
 - added: padding to scaleAndCenter bottom-right button icon
 - bug-fixed: cds-action-assign-variable-v2 operand create double value obj
