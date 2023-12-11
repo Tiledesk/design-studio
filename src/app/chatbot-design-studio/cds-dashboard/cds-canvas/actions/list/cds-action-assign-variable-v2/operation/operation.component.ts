@@ -54,7 +54,6 @@ export class OperationV2Component implements OnInit {
     }
 
     onChangeOperand(event: any, index: string) {
-        this.operation.operands[index]= event
         this.onChangeOperation.emit();
     }
 
