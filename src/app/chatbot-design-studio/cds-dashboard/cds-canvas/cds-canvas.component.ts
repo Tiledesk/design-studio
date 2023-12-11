@@ -433,7 +433,8 @@ export class CdsCanvasComponent implements OnInit {
         this.mousePosition = e.detail.mouse_pos;
         this.mousePosition.x -= -10;
         this.mousePosition.y -= 25;
-        this.connectorSelected =  e.detail.connector;
+        //this.connectorSelected =  e.detail.connector;
+        this.setConnectorSelected(e.detail.connector.id);
         // this.IS_OPEN_ADD_ACTIONS_MENU = true;
         // this.positionFloatMenu = e.detail.mouse_pos;
         this.intentService.unselectAction();
@@ -695,7 +696,7 @@ export class CdsCanvasComponent implements OnInit {
     const fromId = connectorDraft.fromId;
     const toId = intent.intent_id;
     this.logger.log('[CDS-CANVAS] sto per creare il connettore ', connectorDraft, fromId, toId);
-    const resp = await this.connectorService.createConnectorFromId(fromId, toId, false, false, true); //Sync
+    const resp = await this.connectorService.createConnectorFromId(fromId, toId, true, null); //Sync
     if(resp){
       // aggiorno action di partenza 
       let splitFromId = fromId.split('/');
@@ -1071,18 +1072,48 @@ export class CdsCanvasComponent implements OnInit {
   // --------------------------------------------------------- //
 
 
+  /**
+   * setConnectorSelected
+   * @param idConnector 
+   */
+  setConnectorSelected(idConnector){
+    this.connectorSelected = {};
+    const intentId = idConnector.split('/')[0];
+    let intent = this.intentService.getIntentFromId(intentId);
+    if(intent.attributes.connectors[idConnector]){
+      this.connectorSelected = intent.attributes.connectors[idConnector];
+    }
+    this.connectorSelected.id = idConnector;
+  }
+
 
   /**
    * onAddActionFromConnectorMenu
    * @param event 
    */
   async onAddActionFromConnectorMenu(event) {
-    const connector = this.connectorSelected;
+
     // console.log('[CDS-CANVAS] onAddActionFromConnectorMenu:: ', event, connector.id);
     if(event.type === "delete"){
-      this.connectorService.deleteConnector(connector.id, true, true);
+      this.connectorService.deleteConnector( this.connectorSelected.id, true, true);
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     }
+    if(event.type === "line-text"){
+      if(event.label){
+        const intentId = this.connectorSelected.id.split('/')[0];
+        let intent = this.intentService.getIntentFromId(intentId);
+        if(!intent.attributes.connectors){
+          intent.attributes['connectors'] = {};
+        } 
+        if(!intent.attributes.connectors[this.connectorSelected.id]){
+          intent.attributes.connectors[this.connectorSelected.id] = {};
+        }
+        intent.attributes.connectors[this.connectorSelected.id]['label'] = event.label;
+        this.intentService.updateIntent(intent);
+      }
+      this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+    }
+    
   }
   // --------------------------------------------------------- //
 

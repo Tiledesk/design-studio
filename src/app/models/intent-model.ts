@@ -31,12 +31,19 @@ export class Intent {
 export class IntentAttributes {
     position?: any;
     nextBlockAction?: any;
+    connectors?: any;
     constructor() {
         this.position = {x:0, y:0};
         this.nextBlockAction = {
             _tdActionId: uuidv4(),
             _tdActionType: "intent",
             intentName: ""
+        };
+        this.connectors = {
+            "123456": {
+                label: "test",
+                color: "red"
+            }
         }
     }
 }

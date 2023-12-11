@@ -138,13 +138,9 @@ export class CdsActionReplyTextComponent implements OnInit {
           buttonChanged.__idConnection = null;
           buttonChanged.action = '';
           buttonChanged.type = TYPE_BUTTON.TEXT;
-          // if(this.connector.notify)
-          // this.updateAndSaveAction.emit();
           if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-          // this.changeActionReply.emit();
         } else {
           // ADD / EDIT
-          // buttonChanged.__isConnected = true;
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.action = buttonChanged.action? buttonChanged.action : '#' + this.connector.toId;
           buttonChanged.type = TYPE_BUTTON.ACTION;

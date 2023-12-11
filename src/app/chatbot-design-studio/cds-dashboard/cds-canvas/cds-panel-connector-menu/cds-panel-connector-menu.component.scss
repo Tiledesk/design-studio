@@ -1,6 +1,18 @@
 @import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/animations.scss";
 
+
+::ng-deep .line-text {
+  display: block;
+  position: absolute;
+  margin: 5px 0;
+  textarea, .box-textarea textarea {
+    resize: none !important;
+  }
+}
+
+
+
 /* Intent header actions
 /* ***************************** */
 .intent-header-actions-container {
