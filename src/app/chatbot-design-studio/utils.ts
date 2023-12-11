@@ -605,8 +605,9 @@ export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     // let bottomIntentHeight = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).intent_id).offsetHeight;
     // console.log('rightIntentWith', rightIntentWith, rightIntentWith_)
     // console.log('bottomIntentHeight', bottomIntentHeight, bottomIntentHeight_)
-    var width = (maxX - minX);
-    var height = (maxY - minY);
+    const padding = 100
+    var width = (maxX - minX)+ padding;
+    var height = (maxY - minY) + padding;
     const stage = document.getElementById('tds_container').getBoundingClientRect()
     var scale = Math.min(stage.width / width, stage.height / height);
     // console.log('scaleeeee: ', scale, (stage.width / width), (stage.height / height));
