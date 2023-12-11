@@ -337,7 +337,7 @@
     "CDSGlobals":{
         "Globals":"Globals",
         "NoGlobalVariables":"No global variables",
-        "GlobalVariablesDescription" : "Global variables are a set of variables that are always available in a workspac",
+        "GlobalVariablesDescription" : "Global variables are a set of variables that are always available in a workspace",
         "GLOBAL_KEY" :"GLOBAL_KEY",
         "value":"value"
     }

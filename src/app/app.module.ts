@@ -64,7 +64,6 @@ import { HomeComponent } from './components/home/home.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { NetworkService } from './services/network.service';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
-import { GetVariableNamePipe } from './pipe/get-variable-name.pipe';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
