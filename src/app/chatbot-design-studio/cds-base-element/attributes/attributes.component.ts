@@ -72,7 +72,7 @@ export class AttributesComponent implements OnInit {
   }
 
   onChangeTextarea(event, index){
-    this.newAttributes[index].value = event
+    this.newAttributes[index].value = event;
     // this.setChangedAttributes();
   }
 
