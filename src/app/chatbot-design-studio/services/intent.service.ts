@@ -114,6 +114,12 @@ export class IntentService {
   }
 
 
+  getIntentFromId(intentId) {
+    let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
+    return intent;
+  }
+
+
 
   // START DASHBOARD FUNCTIONS //
 

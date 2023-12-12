@@ -14,6 +14,7 @@
 .cds-container {
     height: 100%;
     overflow: hidden;
+    position: relative;
 }
 
 .header {
@@ -51,6 +52,8 @@
     padding: 10px;
     position: absolute;
     bottom: 0;
+    left: 0;
+    right: 0;
 
     .container-wrp{
         background-color: rgba( $gray-light-02, 0.4);
@@ -58,7 +61,11 @@
         padding: 10px;
         border-radius: 8px;
         gap: 5px;
-
+       
+        div{
+            display: flex;
+            flex-direction: column;
+        }
         label:first-child{
             font-weight: 600;
             font-size: 20px;

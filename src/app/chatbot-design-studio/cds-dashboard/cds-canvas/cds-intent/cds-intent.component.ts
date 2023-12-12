@@ -229,7 +229,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         }
       }  else {
         if(fromId && toId && fromId !== '' && toId !== ''){
-          this.connectorService.createConnectorFromId(fromId, toId, false, false); //Sync
+          this.connectorService.createConnectorFromId(fromId, toId); //Sync
         }
       }
     } catch (error) {
@@ -702,12 +702,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     //     replaceItemInArrayForKey('_tdActionId', this.intent.actions, action);
     //   }
     // }
-
     // const action  = object.element;
     if(object && object._tdActionId){
       replaceItemInArrayForKey('_tdActionId', this.intent.actions, object);
     }
-    
     // this.setActionIntentInListOfActions();
     // this.logger.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
     this.intentService.updateIntent(this.intent);

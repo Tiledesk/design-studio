@@ -141,7 +141,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
           toId = toIntentId.slice(posId+1);
         }
         this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false, false);
-        this.connectorService.createNewConnector(fromId, toId, false, false);
+        this.connectorService.createNewConnector(fromId, toId);
         break;
       case 'delete':
         this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false, true);

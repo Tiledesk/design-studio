@@ -69,22 +69,25 @@ export class CdsGlobalsComponent implements OnInit {
     }
   }
 
-  updateSecret() {
-    this.saveAttributes();
-    this.showUpdateSecret(null, null);
+  updateSecret(index) {
+    console.log('[CDS-GLOBALS] updateSecret:', this.globalForm)
+    if(this.globalForm.valid){
+      this.list[index] = this.globalForm.value
+      this.saveAttributes();
+      this.updateIndex = null;
+    }
   }
 
-  showUpdateSecret(index, secret) {
+  showUpdateSecret(index, global) {
     this.updateIndex = index;
-    if (secret) {
-      this.globalForm.patchValue({ 'key': secret.key, 'value': secret.value })
+    if (global) {
+      this.globalForm.patchValue({ 'key': global.key, 'value': global.value })
     }
     this.newSectionVisible = false
   }
 
   cancelUpdateSecret(index) {
     this.updateIndex = null;
-    console.log("[CDS-GLOBALS]  ----> (cancel) globals list: ", this.list);
     this.list[index] = this.selectedChatbot.attributes.globals[index];
   }
 
