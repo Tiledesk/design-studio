@@ -509,18 +509,24 @@ export class ConnectorService {
       lineText.textContent = label;
     }
     // update position lineText
-    this.updateLineTextPosition(elementID);
+    this.updateLineTextPosition(elementID, label);
   }
 
   
-  updateLineTextPosition(id){
+  updateLineTextPosition(id, label){
     let lineText = document.getElementById("label_"+id);
     let rect = document.getElementById("rect_"+id);
     var rectLabel = lineText.getBoundingClientRect();
     // console.log("lineText.style:::::  ", rectLabel);
     if (lineText && rect) {
-      const rectWidth = rectLabel.width + 10;
-      const rectHeight = rectLabel.height + 10;
+      // const rectWidth = rectLabel.width + 10;
+      // const rectHeight = rectLabel.height + 10;
+      var rectWidth = 0;
+      var rectHeight = 0;
+      if(label && label !== ''){
+        rectWidth = rectLabel.width + 10;
+        rectHeight = rectLabel.height + 10;
+      } 
       const x = parseFloat(lineText.getAttribute("x"));
       const y = parseFloat(lineText.getAttribute("y"));
       lineText.setAttributeNS(null, "x", String(x));

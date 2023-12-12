@@ -766,7 +766,6 @@ export class TiledeskConnectors {
       // add lineText to connector
       const x = (frontPoint.x + backPoint.x) / 2;
       const y = (frontPoint.y + backPoint.y) / 2;
-
       let group = document.createElementNS("http://www.w3.org/2000/svg", "g");
       let lineText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       lineText.setAttributeNS(null, "id", "label_"+id);
@@ -783,7 +782,6 @@ export class TiledeskConnectors {
       group.removeChild(lineText);
       const rectWidth = bbox.width + 10;
       const rectHeight = bbox.height + 10;
-
       let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       rect.setAttributeNS(null, "id", "rect_"+id);
       rect.setAttributeNS(null, "x", String( x - rectWidth / 2));
@@ -817,8 +815,12 @@ export class TiledeskConnectors {
     let rect = document.getElementById("rect_"+id);
     if (lineText && rect) {
       const bbox = lineText.getBBox();
-      const rectWidth = bbox.width + 10;
-      const rectHeight = bbox.height + 10;
+      var rectWidth = 0;
+      var rectHeight = 0;
+      if(lineText.textContent && lineText.textContent !== ''){
+        rectWidth = bbox.width + 10;
+        rectHeight = bbox.height + 10;
+      } 
       const x = (frontPoint.x + backPoint.x) / 2;
       const y = (frontPoint.y + backPoint.y) / 2;
       lineText.setAttributeNS(null, "x", String(x));
