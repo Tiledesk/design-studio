@@ -763,16 +763,42 @@ export class TiledeskConnectors {
       });
       this.svgContainer.appendChild(connector);
 
-      // create text for label
+      // add lineText to connector
+      const x = (frontPoint.x + backPoint.x) / 2;
+      const y = (frontPoint.y + backPoint.y) / 2;
+
+      let group = document.createElementNS("http://www.w3.org/2000/svg", "g");
       let lineText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       lineText.setAttributeNS(null, "id", "label_"+id);
-      lineText.setAttributeNS(null, "x", String((frontPoint.x + backPoint.x) / 2)); // Posizione x al centro
-      lineText.setAttributeNS(null, "y", String((frontPoint.y + backPoint.y) / 2)); // Posizione y al centro
+      lineText.setAttributeNS(null, "x", String(x));
+      lineText.setAttributeNS(null, "y", String(y));
       lineText.setAttributeNS(null, "text-anchor", "middle");
       lineText.setAttributeNS(null, "dominant-baseline", "middle");
+      lineText.setAttributeNS(null, "stroke", "none");
+      lineText.setAttributeNS(null, "fill", "#b1b1b7");
+      lineText.setAttributeNS(null, "style", `font-size: 12px;`);
       lineText.textContent = label;
-      this.svgContainer.appendChild(lineText);
+      group.appendChild(lineText);
+      const bbox = lineText.getBBox();
+      group.removeChild(lineText);
+      const rectWidth = bbox.width + 10;
+      const rectHeight = bbox.height + 10;
+
+      let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttributeNS(null, "id", "rect_"+id);
+      rect.setAttributeNS(null, "x", String( x - rectWidth / 2));
+      rect.setAttributeNS(null, "y", String( y - rectHeight / 2));
+      rect.setAttributeNS(null, "width", String(rectWidth));
+      rect.setAttributeNS(null, "height", String(rectHeight));
+      rect.setAttributeNS(null, "fill", "#fcfafa");
+      rect.setAttributeNS(null, "stroke", "none");
+      rect.setAttributeNS(null, "rx", "8"); 
+      // rect.setAttributeNS(null, "style", `left:${x}; top:${y};`);
+      group.appendChild(rect);
+      group.appendChild(lineText);
+      this.svgContainer.appendChild(group);
     }
+
     // control points
     let controlFront = { x: 0, y: 0 };
     let controlBack = { x: 0, y: 0 };
@@ -783,11 +809,24 @@ export class TiledeskConnectors {
     let d = "M" + (frontPoint.x - 10) + " " + frontPoint.y + " " + "C " + controlFront.x + " " + controlFront.y + " " + controlBack.x + " " + controlBack.y + " " + backPoint.x + " " + backPoint.y;// + " marker-end=\"url(#arrowhead)\"";
     connector.setAttributeNS(null, "d", d);
     connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
+    this.updateLineTextPosition(id, frontPoint, backPoint);
+  }
 
+  updateLineTextPosition(id, frontPoint, backPoint){
     let lineText = document.getElementById("label_"+id);
-    if (lineText) {
-      lineText.setAttributeNS(null, "x", String((frontPoint.x + backPoint.x) / 2));
-      lineText.setAttributeNS(null, "y", String((frontPoint.y + backPoint.y) / 2));
+    let rect = document.getElementById("rect_"+id);
+    if (lineText && rect) {
+      const bbox = lineText.getBBox();
+      const rectWidth = bbox.width + 10;
+      const rectHeight = bbox.height + 10;
+      const x = (frontPoint.x + backPoint.x) / 2;
+      const y = (frontPoint.y + backPoint.y) / 2;
+      lineText.setAttributeNS(null, "x", String(x));
+      lineText.setAttributeNS(null, "y", String(y));
+      rect.setAttributeNS(null, "x",  String(x - rectWidth / 2));
+      rect.setAttributeNS(null, "y", String(y - rectHeight / 2));
+      rect.setAttributeNS(null, "width", String(rectWidth));
+      rect.setAttributeNS(null, "height", String(rectHeight));
     }
   }
 
@@ -887,6 +926,18 @@ export class TiledeskConnectors {
     };
   }
 
+
+  // updateConnectorAttributes(id, attributes=null) {
+  //   console.log("updateConnectorAttributes:::::  ", attributes);
+  //   let lineText = document.getElementById("label_"+id);
+  //   if (lineText) {
+  //     var label = null;
+  //     if(attributes && attributes.label){
+  //       label = attributes.label;
+  //     }
+  //     lineText.textContent = label;
+  //   }
+  // }
 
   // refreshConnectorsOutOfItent(element) {
   //   console.log("refreshConnectorsOutOfItent ----> ", this.blocks, element.id);

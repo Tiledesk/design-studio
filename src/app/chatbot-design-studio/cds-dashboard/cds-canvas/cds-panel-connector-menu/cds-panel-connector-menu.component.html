@@ -28,6 +28,7 @@
   <div *ngIf="showLineTextarea">
     <cds-textarea id="value"
         class="line-text"
+        [limitCharsText]="150"
         [text]="connector.label"
         [textLimitBtn]="false"
         [emojiPikerBtn]="false"

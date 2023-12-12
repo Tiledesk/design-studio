@@ -480,6 +480,41 @@ export class ConnectorService {
   }
 
 
+  public updateConnectorAttributes(elementID, attributes=null) {
+    console.log("updateConnectorAttributes:::::  ", attributes);
+    const lineText = document.getElementById("label_"+elementID);
+    if(lineText){
+      var label = null;
+      if(attributes && attributes.label){
+        label = attributes.label;
+      }
+      lineText.textContent = label;
+    }
+    // update position lineText
+    this.updateLineTextPosition(elementID);
+  }
+
+  
+  updateLineTextPosition(id){
+    let lineText = document.getElementById("label_"+id);
+    let rect = document.getElementById("rect_"+id);
+    var rectLabel = lineText.getBoundingClientRect();
+    // console.log("lineText.style:::::  ", rectLabel);
+    if (lineText && rect) {
+      const rectWidth = rectLabel.width + 10;
+      const rectHeight = rectLabel.height + 10;
+      const x = parseFloat(lineText.getAttribute("x"));
+      const y = parseFloat(lineText.getAttribute("y"));
+      lineText.setAttributeNS(null, "x", String(x));
+      lineText.setAttributeNS(null, "y", String(y));
+      rect.setAttributeNS(null, "x",  String(x - rectWidth / 2));
+      rect.setAttributeNS(null, "y", String(y - rectHeight / 2));
+      rect.setAttributeNS(null, "width", String(rectWidth));
+      rect.setAttributeNS(null, "height", String(rectHeight));
+    }
+  }
+
+
   /**
    * 
    * @param elementID 

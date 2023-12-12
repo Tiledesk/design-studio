@@ -1099,7 +1099,7 @@ export class CdsCanvasComponent implements OnInit {
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     }
     if(event.type === "line-text"){
-      if(event.label){
+      // if(event.label){
         const intentId = this.connectorSelected.id.split('/')[0];
         let intent = this.intentService.getIntentFromId(intentId);
         if(!intent.attributes.connectors){
@@ -1110,9 +1110,10 @@ export class CdsCanvasComponent implements OnInit {
         }
         intent.attributes.connectors[this.connectorSelected.id]['label'] = event.label;
         this.intentService.updateIntent(intent);
+        this.connectorService.updateConnectorAttributes(this.connectorSelected.id, event);
       }
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
-    }
+    // }
     
   }
   // --------------------------------------------------------- //
