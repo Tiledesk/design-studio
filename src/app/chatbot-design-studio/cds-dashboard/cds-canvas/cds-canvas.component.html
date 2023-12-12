@@ -61,6 +61,7 @@
 
         <cds-panel-connector-menu *ngIf="IS_OPEN_PANEL_CONNECTOR_MENU"
             class="panel--connector--menu" 
+            [connector]="connectorSelected"
             [style.top.px]="mousePosition.y" 
             [style.left.px]="mousePosition.x"
             (addActionFromConnectorMenu)="onAddActionFromConnectorMenu($event)">

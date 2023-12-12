@@ -97,7 +97,7 @@ export class TiledeskConnectors {
   // PUBLIC FUNCTIONS //
 
 
-  createConnector(fromId, toId, fromPoint, toPoint, save=false, undo=false, notify=true) {
+  createConnector(fromId, toId, fromPoint, toPoint, notify=true, attributes=null) {
     const id = fromId + "/" + toId;
     let connector = {
       id: id,
@@ -124,11 +124,9 @@ export class TiledeskConnectors {
       this.blocks[inblock.id] = inblock;
     }
     inblock.inConnectors[connector.id] = connector.id;
-    this.#drawConnector(id, fromPoint, toPoint);
+    this.#drawConnector(id, fromPoint, toPoint, attributes);
     this.removeConnectorDraft();
-    console.log("connector CREATED id, save, undo:", id, save, undo, notify);
-    connector['save']=save;
-    connector['undo']=undo;
+    console.log("connector CREATED id, save, undo:", id, notify);
     if(notify){
       const event = new CustomEvent("connector-created", { detail: { connector: connector } });
       document.dispatchEvent(event);
@@ -243,8 +241,6 @@ export class TiledeskConnectors {
       connectorElement.remove();
       const connectorDeleted = this.connectors[connectorId];
       delete this.connectors[connectorId];
-      connectorDeleted['save']=save;
-      connectorDeleted['undo']=undo;
       if (connectorDeleted && notify) {
         // this.#removeConnector(connectorDeleted, );
         const customEvent = new CustomEvent("connector-deleted", { detail: { connector: connectorDeleted } });
@@ -433,7 +429,7 @@ export class TiledeskConnectors {
 
 
   moved(element, x, y) {
-    // // console.log("moving ----> ", element.id, x, y);
+   console.log("moving ----> ", element.id, x, y);
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) {
@@ -528,7 +524,7 @@ export class TiledeskConnectors {
   #createConnectors() {
     //// console.log('createConnectors: ', this.connectors);
     for (const [key, value] of Object.entries(this.connectors)) {
-      this.createConnector(value.fromId, value.toId, value.fromPoint, value.toPoint, false, false);
+      this.createConnector(value.fromId, value.toId, value.fromPoint, value.toPoint, false, null);
     }
   }
 
@@ -569,7 +565,7 @@ export class TiledeskConnectors {
 
   /** handleMouseMove */
   #handleMouseMove(event) {
-    // // console.log("move...", event.target.id);
+    console.log("move...", event.target.id);
     let mouse_pos_logic;
     const target = event.target;
     let elConnectable = this.#searchClassInParents(target, this.classes["input_block"]);
@@ -596,7 +592,6 @@ export class TiledeskConnectors {
               toId: elConnectable.id
             }
           })
-
         document.dispatchEvent(connectorMovedOverIntent);
         // console.log("connector-moved-over-intent!");
       }
@@ -635,7 +630,7 @@ export class TiledeskConnectors {
       }
     }
     if (elConnectable) {
-      this.createConnector(this.fromId, elConnectable.id, this.drawingBack, this.toPoint, true, true);
+      this.createConnector(this.fromId, elConnectable.id, this.drawingBack, this.toPoint, true, null);
       const connectorReleaseOnIntent = new CustomEvent("connector-release-on-intent",
         {
           detail: {
@@ -715,8 +710,12 @@ export class TiledeskConnectors {
   /** 
    * Creates or modify a connector in HTML
    */
-  #drawConnector(id, backPoint, frontPoint) {
-    console.log("drawConnector:::::  ", id, backPoint, frontPoint);
+  #drawConnector(id, backPoint, frontPoint, attributes=null) {
+    console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    var label = null;
+    if(attributes && attributes.label){
+      label = attributes.label;
+    }
     let connector = document.getElementById(id);
     if (!connector) {
       connector = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -724,6 +723,7 @@ export class TiledeskConnectors {
       connector.setAttributeNS(null, "id", id);
       connector.setAttributeNS(null, "class", "connector");
       connector.setAttributeNS(null, "pointer-events", "stroke");
+
       connector.addEventListener('mouseover', (e) => {
         //// console.log("mouseover e", e.currentTarget);
         if (this.selectedConnector !== null) { // jump highlighting current selection
@@ -762,7 +762,43 @@ export class TiledeskConnectors {
         document.dispatchEvent(event);
       });
       this.svgContainer.appendChild(connector);
+
+      // add lineText to connector
+      const x = (frontPoint.x + backPoint.x) / 2;
+      const y = (frontPoint.y + backPoint.y) / 2;
+
+      let group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      let lineText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      lineText.setAttributeNS(null, "id", "label_"+id);
+      lineText.setAttributeNS(null, "x", String(x));
+      lineText.setAttributeNS(null, "y", String(y));
+      lineText.setAttributeNS(null, "text-anchor", "middle");
+      lineText.setAttributeNS(null, "dominant-baseline", "middle");
+      lineText.setAttributeNS(null, "stroke", "none");
+      lineText.setAttributeNS(null, "fill", "#b1b1b7");
+      lineText.setAttributeNS(null, "style", `font-size: 12px;`);
+      lineText.textContent = label;
+      group.appendChild(lineText);
+      const bbox = lineText.getBBox();
+      group.removeChild(lineText);
+      const rectWidth = bbox.width + 10;
+      const rectHeight = bbox.height + 10;
+
+      let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttributeNS(null, "id", "rect_"+id);
+      rect.setAttributeNS(null, "x", String( x - rectWidth / 2));
+      rect.setAttributeNS(null, "y", String( y - rectHeight / 2));
+      rect.setAttributeNS(null, "width", String(rectWidth));
+      rect.setAttributeNS(null, "height", String(rectHeight));
+      rect.setAttributeNS(null, "fill", "#fcfafa");
+      rect.setAttributeNS(null, "stroke", "none");
+      rect.setAttributeNS(null, "rx", "8"); 
+      // rect.setAttributeNS(null, "style", `left:${x}; top:${y};`);
+      group.appendChild(rect);
+      group.appendChild(lineText);
+      this.svgContainer.appendChild(group);
     }
+
     // control points
     let controlFront = { x: 0, y: 0 };
     let controlBack = { x: 0, y: 0 };
@@ -773,6 +809,25 @@ export class TiledeskConnectors {
     let d = "M" + (frontPoint.x - 10) + " " + frontPoint.y + " " + "C " + controlFront.x + " " + controlFront.y + " " + controlBack.x + " " + controlBack.y + " " + backPoint.x + " " + backPoint.y;// + " marker-end=\"url(#arrowhead)\"";
     connector.setAttributeNS(null, "d", d);
     connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
+    this.updateLineTextPosition(id, frontPoint, backPoint);
+  }
+
+  updateLineTextPosition(id, frontPoint, backPoint){
+    let lineText = document.getElementById("label_"+id);
+    let rect = document.getElementById("rect_"+id);
+    if (lineText && rect) {
+      const bbox = lineText.getBBox();
+      const rectWidth = bbox.width + 10;
+      const rectHeight = bbox.height + 10;
+      const x = (frontPoint.x + backPoint.x) / 2;
+      const y = (frontPoint.y + backPoint.y) / 2;
+      lineText.setAttributeNS(null, "x", String(x));
+      lineText.setAttributeNS(null, "y", String(y));
+      rect.setAttributeNS(null, "x",  String(x - rectWidth / 2));
+      rect.setAttributeNS(null, "y", String(y - rectHeight / 2));
+      rect.setAttributeNS(null, "width", String(rectWidth));
+      rect.setAttributeNS(null, "height", String(rectHeight));
+    }
   }
 
   /** Measure from phisical to logical */
@@ -871,6 +926,18 @@ export class TiledeskConnectors {
     };
   }
 
+
+  // updateConnectorAttributes(id, attributes=null) {
+  //   console.log("updateConnectorAttributes:::::  ", attributes);
+  //   let lineText = document.getElementById("label_"+id);
+  //   if (lineText) {
+  //     var label = null;
+  //     if(attributes && attributes.label){
+  //       label = attributes.label;
+  //     }
+  //     lineText.textContent = label;
+  //   }
+  // }
 
   // refreshConnectorsOutOfItent(element) {
   //   console.log("refreshConnectorsOutOfItent ----> ", this.blocks, element.id);
