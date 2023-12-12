@@ -66,8 +66,8 @@ export class TiledeskAuthService {
         if (data['success'] && data['token']) {
           that.tiledeskToken = data['token'];
           that.createCompleteUser(data['user']);
-          // that.appStorage.setItem('tiledeskToken', that.tiledeskToken);
           this.checkAndSetInStorageTiledeskToken(that.tiledeskToken)
+          this.BS_IsONLINE.next(true)
           resolve(that.tiledeskToken)
         }
       }, (error) => {
@@ -96,8 +96,8 @@ export class TiledeskAuthService {
         if (data['success'] && data['token']) {
           that.tiledeskToken = data['token'];
           that.createCompleteUser(data['user']);
-          // that.appStorage.setItem('tiledeskToken', that.tiledeskToken);
           this.checkAndSetInStorageTiledeskToken(that.tiledeskToken)
+          this.BS_IsONLINE.next(true)
           resolve(that.tiledeskToken)
         }
       }, error: (error) => {
@@ -122,10 +122,9 @@ export class TiledeskAuthService {
         if (data['success'] && data['token']) {
           that.tiledeskToken = data['token'];
           that.createCompleteUser(data['user']);
-          // that.appStorage.setItem('tiledeskToken', that.tiledeskToken); // salvarlo esternamente nell'app.component
           this.checkAndSetInStorageTiledeskToken(that.tiledeskToken)
-          resolve(this.currentUser)
           this.BS_IsONLINE.next(true)
+          resolve(this.currentUser)
         }
       }, error: (error)=>{
         reject(error)
@@ -137,6 +136,7 @@ export class TiledeskAuthService {
     this.logger.log('[TILEDESK-AUTH] - LOGOUT')
     this.appStorage.removeItem('tiledeskToken')
     this.appStorage.removeItem('currentUser')
+    localStorage.removeItem('tiledesk_token')
     this.BS_IsONLINE.next(false)
     this.setCurrentUser(null);
     // this.isOnline$.next(false) 
@@ -185,19 +185,18 @@ export class TiledeskAuthService {
 
   private checkAndSetInStorageTiledeskToken(tiledeskToken) {
     this.logger.log('[TILEDESK-AUTH] - checkAndSetInStorageTiledeskToken tiledeskToken from request', tiledeskToken)
-    const storedTiledeskToken = this.appStorage.getItem('tiledeskToken');
+    const storedTiledeskToken = localStorage.getItem('tiledesk_token');
     this.logger.log('[TILEDESK-AUTH] - checkAndSetInStorageTiledeskToken storedTiledeskToken ', storedTiledeskToken)
     if (!storedTiledeskToken) {
       this.logger.log('[TILEDESK-AUTH] - checkAndSetInStorageTiledeskToken TOKEN DOES NOT EXIST - RUN SET ')
-      this.appStorage.setItem('tiledeskToken', tiledeskToken);
+      localStorage.setItem('tiledesk_token', tiledeskToken)
     } else if (storedTiledeskToken && storedTiledeskToken !== tiledeskToken) {
       this.logger.log('[TILEDESK-AUTH] - checkAndSetInStorageTiledeskToken STORED-TOKEN EXIST BUT IS != FROM TOKEN - RUN SET ')
-      this.appStorage.setItem('tiledeskToken', tiledeskToken);
+      localStorage.setItem('tiledesk_token', tiledeskToken)
     } else if (storedTiledeskToken && storedTiledeskToken === tiledeskToken) {
       this.logger.log('[TILEDESK-AUTH] - checkAndSetInStorageTiledeskToken STORED-TOKEN EXIST AND IS = TO TOKEN ')
     }
-
-    localStorage.setItem('tiledesk_token', tiledeskToken)
+    this.appStorage.setItem('tiledeskToken', tiledeskToken)
   }
 
   isLoggedIn(): Promise<boolean>{
