@@ -278,7 +278,7 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     // ASSIGN_FUNCTION: { name: 'Set function', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY: { name: 'Capture User Reply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: 'This action allow to capture the user reply' },
     QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: 'PRE', description: 'This action allow to connect with Qapla' },
-    MAKE : { name: 'Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/web_request.svg", status: "beta", description: ''},
+    MAKE : { name: 'Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "beta", description: ''},
 }
 
 export const EVENTS_LIST = {
