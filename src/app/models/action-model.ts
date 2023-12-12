@@ -512,14 +512,12 @@ export class ActionMake extends Action {
     assignErrorTo: string;
     trueIntent: string;
     falseIntent: string;
-    assignments: {}
     constructor(){
         super();
         this.url = '';
         this.bodyParameters = "";
         this.assignStatusTo = '';
         this.assignErrorTo = '';
-        this.assignments = {};
         this._tdActionType = TYPE_ACTION.MAKE;
     }
 }

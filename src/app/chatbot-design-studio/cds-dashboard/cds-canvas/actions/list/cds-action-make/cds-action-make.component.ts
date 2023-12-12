@@ -128,7 +128,6 @@ export class CdsActionMakeComponent implements OnInit {
   private initialize(){
     this.initializeAttributes();
     this.jsonParameters = this.action.bodyParameters;
-    this.assignments = this.action.assignments
     if(this.intentSelected){
       this.initializeConnector();
     }
@@ -168,11 +167,6 @@ export class CdsActionMakeComponent implements OnInit {
   onChangeAttributes(attributes:any){
     this.logger.log('[ACTION-MAKE]onChangeAttributes ',attributes);
     this.action.bodyParameters = attributes;
-    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-  }
-
-  onChangeAttributesResponse(attributes:{[key: string]: string }){
-    this.action.assignments = attributes ;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
