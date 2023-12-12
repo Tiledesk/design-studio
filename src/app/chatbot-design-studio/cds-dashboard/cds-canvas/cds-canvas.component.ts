@@ -1080,10 +1080,16 @@ export class CdsCanvasComponent implements OnInit {
     this.connectorSelected = {};
     const intentId = idConnector.split('/')[0];
     let intent = this.intentService.getIntentFromId(intentId);
-    if(intent.attributes.connectors[idConnector]){
-      this.connectorSelected = intent.attributes.connectors[idConnector];
+    this.connectorSelected = {
+      id: idConnector
     }
-    this.connectorSelected.id = idConnector;
+    try {
+      if(intent.attributes.connectors && intent.attributes.connectors[idConnector]){
+        this.connectorSelected = intent.attributes.connectors[idConnector];
+      }
+    } catch (error) {
+      console.log("Error: ", error);
+    }
   }
 
 
@@ -1099,7 +1105,8 @@ export class CdsCanvasComponent implements OnInit {
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     }
     if(event.type === "line-text"){
-      // if(event.label){
+      console.log('[CDS-CANVAS] line-text:: ', this.connectorSelected);
+      if(this.connectorSelected && this.connectorSelected.id){
         const intentId = this.connectorSelected.id.split('/')[0];
         let intent = this.intentService.getIntentFromId(intentId);
         if(!intent.attributes.connectors){
@@ -1108,12 +1115,13 @@ export class CdsCanvasComponent implements OnInit {
         if(!intent.attributes.connectors[this.connectorSelected.id]){
           intent.attributes.connectors[this.connectorSelected.id] = {};
         }
+        intent.attributes.connectors[this.connectorSelected.id]['id'] = this.connectorSelected.id;
         intent.attributes.connectors[this.connectorSelected.id]['label'] = event.label;
         this.intentService.updateIntent(intent);
         this.connectorService.updateConnectorAttributes(this.connectorSelected.id, event);
       }
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
-    // }
+    }
     
   }
   // --------------------------------------------------------- //

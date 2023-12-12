@@ -39,12 +39,7 @@ export class IntentAttributes {
             _tdActionType: "intent",
             intentName: ""
         };
-        this.connectors = {
-            "123456": {
-                label: "test",
-                color: "red"
-            }
-        }
+        this.connectors = {}
     }
 }
 
