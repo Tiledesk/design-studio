@@ -15,6 +15,7 @@ export class ConnectorService {
   listOfConnectors: any = {};
   tiledeskConnectors: any;
   connectorDraft: any = {};
+  listOfIntents: any;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -78,6 +79,7 @@ export class ConnectorService {
    */
   public createConnectors(intents){
     // this.logger.log('[CONNECTOR-SERV] -----> createConnectors::: ', intents);
+    this.listOfIntents = intents;
     intents.forEach(intent => {
       this.createConnectorsOfIntent(intent);
     });
@@ -158,6 +160,15 @@ export class ConnectorService {
   }
 
 
+  /**
+   * 
+   * @param intentId 
+   */
+  private intentExists(intentId){
+    const response = this.listOfIntents.some((obj) => obj.intent_id === intentId);
+    this.logger.log('[CONNECTOR-SERV] intentExists::', intentId, this.listOfIntents, response);
+    return response;
+  }
 
   /**
    * refreshConnectorsOfIntent
@@ -167,7 +178,6 @@ export class ConnectorService {
    */
   public createConnectorsOfIntent(intent:any){
     
-
     if(intent.actions){
       intent.actions.forEach(action => {
         let idConnectorFrom = null;
@@ -180,6 +190,10 @@ export class ConnectorService {
           if(action.intentName && action.intentName !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId;
             idConnectorTo = action.intentName.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.intentName = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
@@ -205,6 +219,10 @@ export class ConnectorService {
               if(endIndex>-1){
                 idConnectorTo = button.action.substring(startIndex, endIndex);
               }
+              if(!this.intentExists(idConnectorTo)){
+                button.action = '';
+                idConnectorTo = null;
+              }
               this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
               this.logger.log('[CONNECTOR-SERV] -> idConnectorTo', idConnectorTo);
               // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -218,6 +236,10 @@ export class ConnectorService {
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo = action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - ONLINE_AGENTS ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - ONLINE_AGENTS ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -226,6 +248,10 @@ export class ConnectorService {
           if(action.falseIntent && action.falseIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
             idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - ONLINE_AGENTS ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - ONLINE_AGENTS ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -238,6 +264,10 @@ export class ConnectorService {
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo = action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - OPEN_HOURS ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - OPEN_HOURS ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -246,6 +276,10 @@ export class ConnectorService {
           if(action.falseIntent && action.falseIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
             idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - OPEN_HOURS ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - OPEN_HOURS ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -258,6 +292,10 @@ export class ConnectorService {
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -266,6 +304,10 @@ export class ConnectorService {
           if(action.falseIntent && action.falseIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
             idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -278,6 +320,10 @@ export class ConnectorService {
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -286,6 +332,10 @@ export class ConnectorService {
           if(action.falseIntent && action.falseIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
             idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -298,6 +348,10 @@ export class ConnectorService {
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -306,6 +360,10 @@ export class ConnectorService {
           if(action.falseIntent && action.falseIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
             idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -315,16 +373,24 @@ export class ConnectorService {
         /**  WEB-MAKE */
         if(action._tdActionType === TYPE_ACTION.MAKE){
           if(action.trueIntent && action.trueIntent !== ''){
-            const idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
-            const idConnectorTo =  action.trueIntent.replace("#", "");
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
           if(action.falseIntent && action.falseIntent !== ''){
-            const idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
-            const idConnectorTo = action.falseIntent.replace("#", "");
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
@@ -338,7 +404,11 @@ export class ConnectorService {
           this.logger.log('[CONNECTOR-SERV] intent_display_name', intent.intent_display_name);
           if(action.goToIntent && action.goToIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId;
-            idConnectorTo = action.goToIntent.replace("#", ""); ;
+            idConnectorTo = action.goToIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.goToIntent = '';
+              idConnectorTo = null;
+            }
             this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
