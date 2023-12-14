@@ -761,7 +761,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** ******************************
    * intent controls options: START
    * ****************************** */
-  onOptionIntentControlClicked(event: 'webhook' | 'delete' | 'test'){
+  onOptionIntentControlClicked(event: 'webhook' | 'delete' | 'test' | 'copy'){
     switch(event){
       case 'webhook':
         this.toggleIntentWebhook(this.intent);
@@ -771,8 +771,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         break;
       case 'test':
         this.openTestSiteInPopupWindow()
+        break;
+      case 'copy':
+        this.copyIntent();
+        break;
     }
   }
+
+
+  private copyIntent(){
+    const element = {element: this.intent, type: 'INTENT'}
+    this.intentService.copyElement(element);
+  }
+
 
   openTestSiteInPopupWindow() {
     this.testItOut.emit(this.intent)

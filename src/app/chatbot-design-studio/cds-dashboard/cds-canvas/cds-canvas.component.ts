@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input} from '@angular/core';
 import { Observable, Subscription, timeout } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -81,6 +81,10 @@ export class CdsCanvasComponent implements OnInit {
   mousePosition: any;
   connectorSelected: any;
 
+  /** panel context menu */
+  IS_OPEN_CONTEXT_MENU: boolean = false;
+  positionContextMenu: any = { 'x': 0, 'y': 0 };
+
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private intentService: IntentService,
@@ -153,6 +157,7 @@ export class CdsCanvasComponent implements OnInit {
   // --------------------------------------------------------- //
   /** SUBSCRIBE TO THE INTENT LIST */
   // --------------------------------------------------------- //
+  
   private setSubscriptions(){
 
     this.subscriptionUndoRedo = this.intentService.behaviorUndoRedo.subscribe((undoRedo: any) => {
@@ -205,7 +210,6 @@ export class CdsCanvasComponent implements OnInit {
     this.subscriptionOpenAddActionMenu = this.controllerService.isOpenAddActionMenu$.subscribe((menu: any) => {
       if (menu) {
         this.closeAllPanels();
-        
       } else {
         this.IS_OPEN_ADD_ACTIONS_MENU = false;
       }
@@ -236,6 +240,7 @@ export class CdsCanvasComponent implements OnInit {
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+    this.IS_OPEN_CONTEXT_MENU = false;
     // this.closePanelWidget.next();
   }
 
@@ -584,6 +589,7 @@ export class CdsCanvasComponent implements OnInit {
   private removeConnectorDraftAndCloseFloatMenu() {
     this.connectorService.removeConnectorDraft();
     this.IS_OPEN_ADD_ACTIONS_MENU = false;
+    this.IS_OPEN_CONTEXT_MENU = false;
   }
 
   /** posCenterIntentSelected */
@@ -1098,7 +1104,6 @@ export class CdsCanvasComponent implements OnInit {
    * @param event 
    */
   async onAddActionFromConnectorMenu(event) {
-
     // console.log('[CDS-CANVAS] onAddActionFromConnectorMenu:: ', event, connector.id);
     if(event.type === "delete"){
       this.connectorService.deleteConnector( this.connectorSelected.id, true, true);
@@ -1125,5 +1130,31 @@ export class CdsCanvasComponent implements OnInit {
     
   }
   // --------------------------------------------------------- //
+
+
+  public onShowContextMenu(event: MouseEvent): void {
+      event.preventDefault();
+      console.log('[CDS-CANVAS] onShowContextMenu:: ', event);
+      // this.showCustomMenu(x, y);
+
+      // Recupera l'elemento che ha scatenato l'evento
+      const targetElement = event.target as HTMLElement;
+      const customAttributeValue = targetElement.getAttribute('custom-attribute');
+
+      if(customAttributeValue === 'tds_container'){
+        // sto incollando sullo stage
+        this.positionContextMenu.x = event.clientX;
+        this.positionContextMenu.y = event.clientY;
+        this.IS_OPEN_CONTEXT_MENU = true;
+        console.log('Attributi dell\'elemento premuto:', customAttributeValue);
+      }
+      // Stampa gli attributi dell'elemento
+      // console.log('ID dell\'elemento premuto:', targetElement.id);
+      // console.log('Classi dell\'elemento premuto:', targetElement.className);
+  }
+
+  public onHideContextMenu(){
+    this.IS_OPEN_CONTEXT_MENU = false;
+  }
 
 }

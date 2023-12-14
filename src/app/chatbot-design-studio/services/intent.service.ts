@@ -64,6 +64,8 @@ export class IntentService {
   public arrayREDO: Array<any> = [];
   public lastActionUndoRedo: boolean;
 
+  public arrayCOPYPAST: Array<any> = [];
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -917,10 +919,8 @@ export class IntentService {
 
 
   /************************************************
-   * UNDO / REDO
-   * 
-   * 
-  /************************************************/
+  * UNDO / REDO
+  /************************************************ /
 
   /** */
   public restoreLastUNDO(){
@@ -1238,5 +1238,16 @@ export class IntentService {
         }
       }
     }
+
+
+  /************************************************
+  * UNDO / REDO
+  /************************************************/
+  public copyElement(element){
+    console.log('[INTENT SERVICE] -> copyElement, ', element);
+    if(element && element.type === 'INTENT'){
+      this.arrayCOPYPAST.push(element);
+    }
+  }
 
 }
