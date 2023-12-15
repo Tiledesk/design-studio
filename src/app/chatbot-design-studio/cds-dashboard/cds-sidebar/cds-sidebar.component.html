@@ -24,7 +24,7 @@
         <!-- ------------------------------------------------------- -->
         <!-- @ Bot Fulfillment-->
         <!-- ------------------------------------------------------- -->
-        <ng-container *ngIf="USER_ROLE !== 'agent'">
+        <!-- <ng-container *ngIf="USER_ROLE !== 'agent'">
             <li [ngClass]="{'active-item': FULFILLMENT_ROUTE_IS_ACTIVE }" (click)="goTo(SIDEBAR_PAGES.FULFILLMENT)"
                 matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="{{ 'Fulfillment' | translate }}" #tooltip="matTooltip"
                 matTooltipPosition='right' matTooltipHideDelay="100" [matTooltipDisabled]="IS_OPEN_SIDEBAR">
@@ -38,7 +38,7 @@
                     </p>
                 </a>
             </li>
-        </ng-container>
+        </ng-container> -->
 
         <!-- ------------------------------------------------------- -->
         <!-- Bot Training -->
@@ -152,7 +152,7 @@
         </p>
     </div>
 
-    <div id="cds-sb-fulfillment" name="fulfillment" class="section" (click)="goTo(SIDEBAR_PAGES.FULFILLMENT)"
+    <!-- <div id="cds-sb-fulfillment" name="fulfillment" class="section" (click)="goTo(SIDEBAR_PAGES.FULFILLMENT)"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'Fulfillment' | translate}}" 
             #tooltip="matTooltip"
@@ -167,7 +167,7 @@
         <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
             {{'Fulfillment' | translate}}
         </p>
-    </div>
+    </div> -->
 
     <div id="cds-sb-rules" name="rules" class="section" (click)="goTo(SIDEBAR_PAGES.RULES)"
         matTooltipClass="cds-mat-tooltip" 
