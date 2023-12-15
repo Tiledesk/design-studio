@@ -22,7 +22,7 @@
 
             <form [formGroup]="globalForm" (submit)="onSubmitForm()" (keydown.enter)="onSubmitForm()">
                 <div class="secret-inner-container">
-                    <div class="field-box" style="width: 40%;">
+                    <div class="field-box" style="width: 50%;">
                         <label class="title-label">{{ "CDSCanvas.Key" | translate }}</label>
                         <cds-text id="custom-input"
                             class="text-editable-div" 
@@ -32,7 +32,7 @@
                         </cds-text>
                     </div>
 
-                    <div class="field-box" style="width: 40%;">
+                    <div class="field-box" style="width: 50%;">
                         <label class="title-label">{{ "CDSGlobals.value" | translate | uppercase}}</label>
                         <cds-text id="custom-input"
                             class="text-editable-div" 

@@ -1,7 +1,10 @@
+<!-- --------------------------------------------------- -->
+<!------------------- TOKEN Section -------------------- -->
+<!-- --------------------------------------------------- -->
 <div class="chatbot-developer-wpr">
     <div class="row">
         <div class="col-sm-10 col-md-10">
-            <h3 class="card_title__underlined" style="color: #e8eaed;">
+            <h3 class="card_title__underlined">
                 <span class="card_title__underline">
                     Token
                 </span>
@@ -12,9 +15,6 @@
         </div>
     </div>
 
-    <!-- --------------------------------------------------- -->
-    <!-- TOKEN Section title -->
-    <!-- --------------------------------------------------- -->
     <div class="section-title" style="margin-left: 22px;">
         {{'CDSDeveloper.ClickToGetToken' | translate }}
     </div>
@@ -23,9 +23,7 @@
     <div class="row">
         <div class="col-sm-10 col-md-10 token-btn-wpr">
            <div class="input-wrp">
-                <input id="jwt" name="jwt" [(ngModel)]="jwt" class="input csd-chatbot-dtls-input"
-                    type="text" style="margin-bottom: 0px; color:#808080"
-                    placeholder="{{ 'JWT' | translate }}">
+                <input id="jwt" name="jwt" [(ngModel)]="jwt" class="input csd-chatbot-dtls-input" type="text" placeholder="{{ 'JWT' | translate }}">
                 <span class="material-icons copy" (click)="copyToClipBoard()">content_copy</span>
            </div>
             <button class="btn btn-primary cds-blue-button" (click)="generateToken()">
@@ -35,6 +33,86 @@
                 </span>
                 </span>
                 {{'CDSDeveloper.GetToken' | translate }}
+            </button>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- --------------------------------------------------- -->
+<!------------- FULFILLMENT Section ----------------------->
+<!-- --------------------------------------------------- -->
+<div class="chatbot-fulfillment-wpr" style="margin-top: 30px;">
+    <div class="row">
+        <div class="col-sm-8 col-md-8">
+            <h3 class="card_title__underlined">
+                <span class="card_title__underline">
+                    Fulfillment
+                </span>
+            </h3>
+        </div>
+        <div class="col-sm-2 col-md-2 onoffswitch-wrapper">
+            <div class="label">
+                <span *ngIf="selectedChatbot.webhook_enabled === true" 
+                  [class.active]="selectedChatbot.webhook_enabled === true">
+                    {{'Enabled' | translate}}
+                </span>
+                <span *ngIf="selectedChatbot.webhook_enabled === false">
+                    {{'Disabled' | translate}}
+                </span>
+            </div>
+            <div class="nw-onoffswitch-wrapper" style="clear: both;display: inline-block;">
+                <div class="nw-onoffswitch">
+                    <input (change)="toggleWebhook($event)" type="checkbox" name="webhook-switch"
+                        class="nw-onoffswitch-checkbox" id="webhook-switch"
+                        [checked]="selectedChatbot.webhook_enabled === true">
+                    <label class="nw-onoffswitch-label" for="webhook-switch"></label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-10 col-md-10">
+          <div class="section-subtitle"> </div>
+        </div>
+
+        <div class="col-sm-10 col-md-10 fulfillment-description">
+            {{'YourWebServiceWillReceivePostRequestFrom' | translate: tparams}}
+            {{'BeSureThatYourWebServiceMeetsAllTheWebhookRequirements' | translate}}
+            <span class="custom-link" (click)="openWebhookRequirementsDoc()">
+                {{'LearnMoreAboutWebhookRequirements' | translate }}
+            </span>
+        </div>
+
+        <div *ngIf="selectedChatbot.webhook_enabled" class="col-sm-10 col-md-10 webhook-enabled-box">
+            <label class="custom-label webhook-url-label">
+              <span>{{'WebhookURL' | translate }}</span>
+              <span style="color:#ff5252">*</span>
+            </label>
+            <div class="input-box">
+              <input id="webhook-url" name="webhook-url" [(ngModel)]="selectedChatbot.webhook_url"
+                (ngModelChange)="onChangeWebhookUrl($event)" class="input" type="text"
+                style="margin-bottom: 3px;" placeholder="{{'EnterWebhookURL' | translate}}" autocomplete="off">
+
+              <div class="webhook-url-errors" *ngIf="WEBHOOK_URL_IS_EMPTY === true">
+                {{'ThisUrlWilReceiveAPostRequestFrom' | translate: tparams}}
+              </div>
+              <div class="webhook-url-errors"
+                *ngIf="WEBHOOK_URL_IS_EMPTY === false && WEBHOOK_URL_IS_HTTP_or_HTTPS === false">
+                {{'WebhookmentUrlMustBeAHttpsUrl' | translate}}
+              </div>
+
+              <div class="webhook-url-errors"
+                *ngIf="WEBHOOK_URL_IS_EMPTY === false && WEBHOOK_URL_IS_HTTP_or_HTTPS === true && WEBHOOK_URL_IS_VALID === false">
+                {{'WebhookmentUrlMustBeAValidUrl' | translate}}
+              </div>
+            </div>
+        </div>
+
+        <div class="col-sm-10 col-md-10">
+            <button id="update-bot-btn" #editbotbtn
+              class="btn btn-primary pull-right cds-blue-button" (click)="editBot()"
+              [disabled]="(selectedChatbot.webhook_enabled === true && WEBHOOK_URL_HAS_ERROR === true) || (selectedChatbot.webhook_enabled === false  && selectedChatbot.webhook_url === undefined)">
+              {{ "BotsAddEditPage.UpdateBotName" | translate }}
             </button>
         </div>
     </div>

@@ -38,6 +38,8 @@ input[type="text"] {
     max-width: 400px;
     padding: 0 30px 0 8px !important;
     text-overflow: ellipsis;
+    margin-bottom: 0px; 
+    color:#808080;
 }
 
 .material-icons.copy{
@@ -70,7 +72,180 @@ input[type="text"] {
 
 
 .chatbot-developer-wpr,
+.chatbot-fulfillment-wpr,
 .row {
     margin-right: 0px;
     margin-left: 8px;
+}
+
+
+
+//Fullfilment: section start
+.onoffswitch-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+
+    .label span{
+        text-transform: uppercase; 
+        font-weight: 400;
+        color: $gray;
+
+        &.active{
+            color: $blu
+        }
+    }
+}
+
+// --------------------
+// SWITCH BTN
+// --------------------
+// --------- start new on-off btn logo ---------
+.nw-onoffswitch {
+    position: relative;
+    width: 45px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+.nw-onoffswitch-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.nw-onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    height: 25px;
+    padding: 0;
+    line-height: 25px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease-in;
+}
+.nw-onoffswitch-label:before {
+    content: "";
+    display: block;
+    width: 25px;
+    margin: 0px;
+    background: #ffffff;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 20px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    transition: all 0.3s ease-in 0s;
+}
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
+    background-color: $blu;
+}
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
+    border-color: $blu;
+}
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
+    right: 0px;
+}
+// --------- ./end new on-off btn logo ---------
+
+.fulfillment-description {
+    color: #a0a3ab;
+    font-weight: 300;
+}
+
+.custom-link {
+    color: #3ea9f5;
+    cursor: pointer;
+}
+
+.custom-link:hover {
+    text-decoration: underline;
+}
+
+.custom-label {
+    color: #7695a5;
+    height: 36px;
+    padding-top: 7px;
+    padding-left: 16px;
+    padding-right: 16px;
+    text-align: right !important;
+}
+
+@media (max-width: 768px) {
+    .custom-label {
+        height: 0px !important;
+    }
+    .webhook-url-label {
+        text-align: left !important;
+        position: relative;
+        top: -17px;
+        margin-top: 16px;
+    }
+}
+
+.webhook-url-errors {
+    color: #fff !important;
+    text-align: left;
+    padding: 6px 12px;
+    //padding: 6px 12px 6px 0px;
+    background: #f76949;
+    font-weight: 300 !important;
+    line-height: 20px !important;
+    font-size: 13px !important;
+    margin-bottom: 12px !important;
+    margin-top: 5px;
+    display: block;
+    border-radius: 6px;
+}
+
+.webhook-url-errors:before {
+    position: relative;
+    top: -30px;
+    left: 20px;
+    content: "";
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 6px 6px 6px;
+    border-color: transparent transparent #f76949 transparent;
+}
+
+.webhook-enabled-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.input-box {
+    width: 100%;
+    // display: flex;
+    // flex: 1;
+}
+
+@media screen and (max-width: 1500px) {
+    .webhook-enabled-box {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    // .input-box {
+    //     display: flex;
+
+    // }
+    
+    .custom-label {
+        padding: 0px;
+        margin: 0px;
+        height: 30px;
+    }
+}
+
+.cds-blue-button{
+    margin-top: 12px;
+    margin-bottom: 5px;
+    padding: 12px 30px;
 }

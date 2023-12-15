@@ -13,7 +13,7 @@ export enum TYPE_INTENT_NAME {
 export enum SIDEBAR_PAGES {
     INTENTS = 'cds-sb-intents',
     SETTINGS = 'cds-sb-settings',
-    FULFILLMENT = 'cds-sb-fulfillment',
+    // FULFILLMENT = 'cds-sb-fulfillment',
     RULES = 'cds-sb-rules',
     GLOBALS = 'cds-sb-globals'
 }

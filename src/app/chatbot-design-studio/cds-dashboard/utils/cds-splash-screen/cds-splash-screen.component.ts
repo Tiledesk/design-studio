@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { SIDEBAR_PAGES } from 'src/app/chatbot-design-studio/utils';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 
 @Component({
@@ -12,7 +13,7 @@ export class CdsSplashScreenComponent implements OnInit {
   @Input() text: string
   @Input() videoUrl: string;
   @Input() videoDescription: string;
-  @Input() section:  "cds-sb-intents" | "cds-sb-fulfillment" | "cds-sb-training" | "cds-sb-rules" | "cds-sb-settings"
+  @Input() section:  SIDEBAR_PAGES
   @Output() onClickBtn = new EventEmitter();
 
   canShowVideo: boolean = true
