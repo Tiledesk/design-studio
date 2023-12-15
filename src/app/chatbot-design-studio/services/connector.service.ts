@@ -68,7 +68,7 @@ export class ConnectorService {
     if (elFrom && elTo) { 
       const fromPoint = this.tiledeskConnectors.elementLogicCenter(elFrom);
       const toPoint = this.tiledeskConnectors.elementLogicTopLeft(elTo);
-      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, false, null);
+      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, false, true, null);
     }
   }
 
@@ -92,7 +92,6 @@ export class ConnectorService {
    * @param fromId 
    * @param toId 
    * @param save 
-   * @param undo 
    * @returns 
    */
   public async createConnectorFromId(fromId, toId, notify=false, attributes=null) {
@@ -117,7 +116,7 @@ export class ConnectorService {
       const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
       const toPoint = this.tiledeskConnectors.elementLogicTopLeft(toEle);
       this.logger.log('[CONNECTOR-SERV] createConnector attributes:', attributes);
-      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, notify, attributes);
+      this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, false, notify, attributes);
       return true;
     } else {
       return false;
@@ -149,7 +148,7 @@ export class ConnectorService {
         const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
         const toPoint = this.tiledeskConnectors.elementLogicTopLeft(toEle);
         this.logger.log('[CONNECTOR-SERV] createConnectorById createConnector', connectorID);
-        this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, false, null);
+        this.tiledeskConnectors.createConnector(fromId, toId, fromPoint, toPoint, false, false, null);
         return true;
       } else {
         return false;
@@ -461,8 +460,8 @@ export class ConnectorService {
    * @param intent_id 
    * @param dispatch 
    */
-  public deleteConnectorsOutOfBlock(intent_id, save=false, undo=false, notify=true){
-    this.tiledeskConnectors.deleteConnectorsOutOfBlock(intent_id, save, undo, notify);
+  public deleteConnectorsOutOfBlock(intent_id, save=false, notify=true){
+    this.tiledeskConnectors.deleteConnectorsOutOfBlock(intent_id, save, notify);
     // this.logger.log('[CONNECTOR-SERV] deleteConnectorsOutOfBlock intent_id ' ,intent_id);
   }
 
@@ -470,9 +469,9 @@ export class ConnectorService {
    * deleteConnectorsOfBlock
    * @param intent_id 
    */
-  public deleteConnectorsOfBlock(intent_id, save=false, undo=false){
+  public deleteConnectorsOfBlock(intent_id, save=false, notify=false){
     this.logger.log('[CONNECTOR-SERV] deleteConnectorsOfBlock intent_id ' ,intent_id);
-    this.tiledeskConnectors.deleteConnectorsOfBlock(intent_id, save, undo);
+    this.tiledeskConnectors.deleteConnectorsOfBlock(intent_id, save, notify);
   }
 
   /**
@@ -515,9 +514,10 @@ export class ConnectorService {
    * @param connectorID 
    * 
    */
-  public deleteConnector(connectorID, save=false, undo=false, notify=true) {
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', connectorID)
-    this.tiledeskConnectors.deleteConnector(connectorID, save, undo, notify);
+  public deleteConnector(connectorID, save=false, notify=true) {
+    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', connectorID, save, notify);
+    this.deleteConnectorAttributes(connectorID);
+    this.tiledeskConnectors.deleteConnector(connectorID, save, notify);
   }
 
 
@@ -526,7 +526,7 @@ export class ConnectorService {
    * @param connectorID 
    */
   public deleteConnectorToList(connectorID){
-    this.logger.log('[CONNECTOR-SERV] deleteConnectorToList::  connectorID ', connectorID)
+    // this.logger.log('[CONNECTOR-SERV] deleteConnectorToList::  connectorID ', connectorID)
     delete this.listOfConnectors[connectorID];
   }
 
@@ -543,7 +543,7 @@ export class ConnectorService {
    * 
    * elimino il connettore creato in precedenza allo stesso punto e lo sostituisco con il nuovo
    */
-  public deleteConnectorWithIDStartingWith(connectorID, save=false, undo=false, notify=true){
+  public deleteConnectorWithIDStartingWith(connectorID, save=false, notify=true){
     this.logger.log('[CONNECTOR-SERV] deleteConnectorWithIDStartingWith:: ', connectorID, this.tiledeskConnectors.connectors);
     const isConnector = document.getElementById(connectorID);
     if (isConnector){
@@ -555,9 +555,17 @@ export class ConnectorService {
       }, {});
       for (const [key, connector] of Object.entries(listOfConnectors)) {
         this.logger.log('delete connector :: ', key );
-        this.tiledeskConnectors.deleteConnector(key, save, undo, notify);
+        this.deleteConnector(key, save, notify);
       };
     }
+  }
+
+
+  private deleteConnectorAttributes(connectorID){
+    const intentId = connectorID.split('/')[0];
+    let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
+    delete intent.attributes.connectors[connectorID];
+    this.updateConnectorAttributes(connectorID, null);
   }
   /*************************************************/
 
@@ -585,7 +593,7 @@ export class ConnectorService {
 
 
   public updateConnectorAttributes(elementID, attributes=null) {
-    console.log("updateConnectorAttributes:::::  ", attributes);
+    console.log("updateConnectorAttributes:::::  ",elementID,  attributes);
     const lineText = document.getElementById("label_"+elementID);
     if(lineText){
       var label = null;
@@ -593,9 +601,9 @@ export class ConnectorService {
         label = attributes.label;
       }
       lineText.textContent = label;
+      this.updateLineTextPosition(elementID, label);
     }
     // update position lineText
-    this.updateLineTextPosition(elementID, label);
   }
 
   
@@ -663,7 +671,7 @@ export class ConnectorService {
         let connectorElement = document.getElementById(connectorId);
         if(connectorElement){
           console.log("[JS] deleteConnectorWithFromId ----> ID",connectorId);
-          this.deleteConnector(connectorId, false, false, false);
+          this.deleteConnector(connectorId, false, false);
         }
     //   }
     // }

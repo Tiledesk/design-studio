@@ -127,12 +127,13 @@ export class CdsActionReplyTextComponent implements OnInit {
       const idButton = array[array.length - 1];
       const idConnector = this.idAction+'/'+idButton;
       const buttonChanged = this.buttons.find(obj => obj.uid === idButton);
-      console.log('updateConnector [CdsActionReplyTextComponent]:: buttonChanged: ', this.connector, buttonChanged, this.buttons, idButton);
+      
       // console.log('updateConnector [CdsActionReplyTextComponent]:: connector.fromId: ', idConnector, idButton, this.connector.fromId);
       if(idConnector === this.connector.fromId && buttonChanged){
+        console.log('updateConnector [CdsActionReplyTextComponent]:: buttonChanged: ', this.connector, buttonChanged, this.buttons, idButton);
         if(this.connector.deleted){
           // DELETE 
-          this.logger.log('[CdsActionReplyTextComponent] deleteConnector :: ', this.connector);
+          // this.logger.log('[CdsActionReplyTextComponent] deleteConnector :: ', this.connector);
           buttonChanged.__isConnected = false;
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.__idConnection = null;
@@ -144,7 +145,7 @@ export class CdsActionReplyTextComponent implements OnInit {
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.action = buttonChanged.action? buttonChanged.action : '#' + this.connector.toId;
           buttonChanged.type = TYPE_BUTTON.ACTION;
-          this.logger.log('[CdsActionReplyTextComponent] updateConnector :: ', buttonChanged);
+          // this.logger.log('[CdsActionReplyTextComponent] updateConnector :: ', buttonChanged);
           if(!buttonChanged.__isConnected){
             buttonChanged.__isConnected = true;
             buttonChanged.__idConnection = this.connector.fromId+"/"+this.connector.toId;

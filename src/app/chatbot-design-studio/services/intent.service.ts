@@ -83,7 +83,7 @@ export class IntentService {
    * per notificare alle actions che i connettori sono cambiati
    */
   public onChangedConnector(connector){
-    // console.log('[INTENT SERVICE] ::: onChangedConnector:: ', connector);
+    console.log('[INTENT SERVICE] ::: onChangedConnector:: ', connector);
     this.changedConnector.next(connector);
   }
 
@@ -991,7 +991,7 @@ export class IntentService {
         this.listOfIntents = replaceItemInArrayForKey('intent_id', this.listOfIntents, intent);
         let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
         if(isOnTheStage){
-          this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id, false, false, false);
+          this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id, false, false);
           this.connectorService.updateConnectorsOfBlock(intent.intent_id);
           this.refreshIntents();
           this.setIntentSelected(intent.intent_id);
@@ -1130,7 +1130,7 @@ export class IntentService {
       });
 
       this.listOfIntents = deleteItemInArrayForKey('intent_id', this.listOfIntents, intent);
-      this.connectorService.deleteConnectorsOfBlock(intent.intent_id);
+      this.connectorService.deleteConnectorsOfBlock(intent.intent_id, false, true);
       // this.connectorService.deleteConnectorsToIntentById(intent.intent_id);
       this.payload.operations = this.operationsRedo;
       let operations = {undo:this.operationsUndo, redo:this.operationsRedo};
@@ -1179,7 +1179,6 @@ export class IntentService {
       // console.log('[INTENT SERVICE] -> opsUpdate, ', payload);
       payload = removeNodesStartingWith(payload, '__');
       //this.setDragAndListnerEventToElement(intent.intent_id);
-
       return new Promise((resolve, reject) => {
         this.faqService.opsUpdate(payload).subscribe((resp: any) => {
           console.log('[INTENT SERVICE] -> opsUpdate, ', resp);

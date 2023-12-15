@@ -97,7 +97,7 @@ export class TiledeskConnectors {
   // PUBLIC FUNCTIONS //
 
 
-  createConnector(fromId, toId, fromPoint, toPoint, notify=true, attributes=null) {
+  createConnector(fromId, toId, fromPoint, toPoint, save=false, notify=true, attributes=null) {
     const id = fromId + "/" + toId;
     let connector = {
       id: id,
@@ -126,7 +126,8 @@ export class TiledeskConnectors {
     inblock.inConnectors[connector.id] = connector.id;
     this.#drawConnector(id, fromPoint, toPoint, attributes);
     this.removeConnectorDraft();
-    console.log("connector CREATED id, save, undo:", id, notify);
+    console.log("connector CREATED id, save, notify:", id, save, notify);
+    connector['save'] = save;
     if(notify){
       const event = new CustomEvent("connector-created", { detail: { connector: connector } });
       document.dispatchEvent(event);
@@ -154,11 +155,11 @@ export class TiledeskConnectors {
     // console.log("[JS] connectors :---> ", this.connectors);
   }
 
-  deleteConnectorsOutOfBlock(blockId, save=false, undo=false, notify=true) {
+  deleteConnectorsOutOfBlock(blockId, save=false, notify=true) {
     // console.log("[JS] deleteConnectorsOutOfBlock ----> ", blockId);
     for (var connectorId in this.connectors) {
       if (connectorId.startsWith(blockId)) {
-        this.deleteConnector(connectorId, save, undo, notify);
+        this.deleteConnector(connectorId, save, notify);
       }
     }
     // delete this.blocks[blockId];
@@ -208,18 +209,18 @@ export class TiledeskConnectors {
 
 
   /**  */
-  deleteConnectorsOfBlock(blockId, save=false, undo=false) {
+  deleteConnectorsOfBlock(blockId, save=false, notify=false) {
     // console.log("[JS] deleteConnectorsOfBlock ----> ", blockId);
     let arrayOfDeletedConnectors = [];
     for (var connectorId in this.connectors) {
       if (connectorId.startsWith(blockId)) {
         // connettore in uscita
-        this.deleteConnector(connectorId, save, undo);
+        this.deleteConnector(connectorId, save, notify);
       } else if (connectorId.includes(blockId)) {
         // connettore in entrata
         arrayOfDeletedConnectors.push(connectorId);
         // console.log("[JS] cancello connettore in Entrata ----> ", connectorId, save, undo);
-        this.deleteConnector(connectorId, save, undo);
+        this.deleteConnector(connectorId, save, notify);
       }
     }
     delete this.blocks[blockId];
@@ -231,7 +232,7 @@ export class TiledeskConnectors {
 
 
 
-  deleteConnector(connectorId, save=false, undo=false, notify=true) {
+  deleteConnector(connectorId, save=false, notify=true) {
     // console.log('[JS] connectorId: ', connectorId);
     // console.log('[JS] this.blocks: ', this.blocks);
     // console.log('[JS] this.connectors: ', this.connectors);
@@ -242,6 +243,7 @@ export class TiledeskConnectors {
       const connectorDeleted = this.connectors[connectorId];
       delete this.connectors[connectorId];
       if (connectorDeleted && notify) {
+        connectorDeleted['save'] = save;
         // this.#removeConnector(connectorDeleted, );
         const customEvent = new CustomEvent("connector-deleted", { detail: { connector: connectorDeleted } });
         document.dispatchEvent(customEvent);
@@ -354,7 +356,7 @@ export class TiledeskConnectors {
         const fromEle = document.getElementById(connector['fromId']);
         const toEle = document.getElementById(connector['toId']);
         if(!fromEle || !toEle){
-          this.deleteConnector(connectorId, false, false, false);
+          this.deleteConnector(connectorId, false, false);
         }
       }
     }
@@ -524,7 +526,7 @@ export class TiledeskConnectors {
   #createConnectors() {
     //// console.log('createConnectors: ', this.connectors);
     for (const [key, value] of Object.entries(this.connectors)) {
-      this.createConnector(value.fromId, value.toId, value.fromPoint, value.toPoint, false, null);
+      this.createConnector(value.fromId, value.toId, value.fromPoint, value.toPoint, false, false, null);
     }
   }
 
@@ -630,7 +632,7 @@ export class TiledeskConnectors {
       }
     }
     if (elConnectable) {
-      this.createConnector(this.fromId, elConnectable.id, this.drawingBack, this.toPoint, true, null);
+      this.createConnector(this.fromId, elConnectable.id, this.drawingBack, this.toPoint, true, true, null);
       const connectorReleaseOnIntent = new CustomEvent("connector-release-on-intent",
         {
           detail: {
@@ -780,8 +782,8 @@ export class TiledeskConnectors {
       group.appendChild(lineText);
       const bbox = lineText.getBBox();
       group.removeChild(lineText);
-      const rectWidth = bbox.width + 10;
-      const rectHeight = bbox.height + 10;
+      const rectWidth = bbox.width?bbox.width+10:0;
+      const rectHeight = bbox.height?bbox.height+10:0;
       let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       rect.setAttributeNS(null, "id", "rect_"+id);
       rect.setAttributeNS(null, "x", String( x - rectWidth / 2));

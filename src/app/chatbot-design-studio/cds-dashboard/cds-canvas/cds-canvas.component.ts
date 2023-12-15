@@ -401,6 +401,10 @@ export class CdsCanvasComponent implements OnInit {
         const connector = e.detail.connector;
         connector['deleted'] = true;
         delete connector['created'];
+        // const intentId = connector.id.split('/')[0];
+        // let intent = this.intentService.getIntentFromId(intentId);
+        // delete intent.attributes.connectors[connector.id];
+
         this.connectorService.deleteConnectorToList(connector.id);
         this.intentService.onChangedConnector(connector);
         this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
@@ -429,6 +433,7 @@ export class CdsCanvasComponent implements OnInit {
     document.addEventListener(
       "connector-selected", (e: CustomEvent) => {
       //  console.log("[CDS-CANVAS] connector-selected:", e, e.detail.mouse_pos);
+        this.closeAllPanels();
         this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
         this.mousePosition = e.detail.mouse_pos;
         this.mousePosition.x -= -10;
@@ -438,6 +443,7 @@ export class CdsCanvasComponent implements OnInit {
         // this.IS_OPEN_ADD_ACTIONS_MENU = true;
         // this.positionFloatMenu = e.detail.mouse_pos;
         this.intentService.unselectAction();
+
       },
       true
     );
@@ -1098,9 +1104,13 @@ export class CdsCanvasComponent implements OnInit {
    * @param event 
    */
   async onAddActionFromConnectorMenu(event) {
-
     // console.log('[CDS-CANVAS] onAddActionFromConnectorMenu:: ', event, connector.id);
     if(event.type === "delete"){
+      const intentId = this.connectorSelected.id.split('/')[0];
+      let intent = this.intentService.getIntentFromId(intentId);
+      delete intent.attributes.connectors[this.connectorSelected.id];
+      this.connectorService.updateConnectorAttributes(this.connectorSelected.id, event);
+
       this.connectorService.deleteConnector( this.connectorSelected.id, true, true);
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     }
