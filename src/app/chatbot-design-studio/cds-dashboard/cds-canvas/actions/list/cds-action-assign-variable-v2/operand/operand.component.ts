@@ -90,6 +90,11 @@ export class OperandV2Component implements OnInit {
     /** END EVENTS TEXTAREA */
 
 
+    onChangeIsCheckbox(event){
+        this.operandForm.get('isVariable').setValue(event.checked);
+        this.onChangeOperand.emit(this.operand)
+    }
+
     onSelectedFunction(event: any) {
         if(event){
             this.operandForm.get('function').setValue(event.value);

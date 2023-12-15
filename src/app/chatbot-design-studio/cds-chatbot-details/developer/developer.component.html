@@ -78,9 +78,9 @@
         <div class="col-sm-10 col-md-10 fulfillment-description">
             {{'YourWebServiceWillReceivePostRequestFrom' | translate: tparams}}
             {{'BeSureThatYourWebServiceMeetsAllTheWebhookRequirements' | translate}}
-            <span class="custom-link" (click)="openWebhookRequirementsDoc()">
+            <a class="custom-link" [href]="EXTERNAL_URL.getFulFillMentDoc" target="_blank">
                 {{'LearnMoreAboutWebhookRequirements' | translate }}
-            </span>
+            </a>
         </div>
 
         <div *ngIf="selectedChatbot.webhook_enabled" class="col-sm-10 col-md-10 webhook-enabled-box">

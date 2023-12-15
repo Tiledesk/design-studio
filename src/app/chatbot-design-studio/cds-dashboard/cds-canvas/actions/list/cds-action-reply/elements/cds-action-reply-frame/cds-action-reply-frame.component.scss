@@ -122,7 +122,7 @@ appdashboard-filter{
 
     .response-wrp{
         border-radius: 8px;
-        background: $color-withe-hex; // #ffffff;
+        background: $color-white-hex; // #ffffff;
         border: 1px solid $gray-light-02; //1px solid #ffffff;
         overflow-x: hidden;
         overflow-y: auto;
@@ -182,13 +182,13 @@ appdashboard-filter{
             justify-content: center;
             em {
                 font-size: 1.15em;
-                color: $color-withe-hex;
+                color: $color-white-hex;
                 transition: color .3s;
             }
         }
     }
     .control-button:hover{
-        color: $color-withe-hex;
+        color: $color-white-hex;
         &.delete{
             box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
             em {

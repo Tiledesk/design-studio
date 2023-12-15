@@ -261,7 +261,7 @@ mat-expansion-panel ::ng-deep {
     height: 26px;
     border-radius: 12px;
     background-color: white;
-    border: 1px solid $blu-01;
+    border: 1px solid var(--text-color);
 }
 
 .slider-input ::ng-deep {
@@ -304,7 +304,7 @@ mat-expansion-panel ::ng-deep {
     background-color: white;
     padding: 6px 12px;
     font-size: 14px;
-    border: 1px solid $blu-01;
+    border: 1px solid $blu-light-02;
     color: $gray;
 }
 

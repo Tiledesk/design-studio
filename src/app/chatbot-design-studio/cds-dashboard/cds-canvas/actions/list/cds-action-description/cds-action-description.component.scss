@@ -180,43 +180,6 @@ input.action-input {
 }
 
 
-::ng-deep .description-tooltip {
-    background-color: #fff;
-    color: #555555;
-    font-size: 12px;
-    border-radius: 8px;
-    font-family: 'Poppins';
-    // padding-top:8px;
-    // padding-bottom:8px;
-    border: 1px solid #e5effe;
-}
-
-.tooltip-wrp {
-    position: relative;
-    padding: 12px;
-    // box-shadow: 0 2px 4px -1px #0003, 0 4px 5px #00000024, 0 1px 10px #0000001f;
-    // background-color: #fff;
-    color: #555555; 
-    font-size: 10px;
-    text-align: justify;
-    border-radius: 4px;
-    font-family: 'Poppins';
-    border: 1px solid #e5effe;
-    width: auto;
-}
-
-.caret_tooltip {
-    height: 8px;
-    width: 8px;
-    position: absolute;
-    right: -4px;
-    top: 50%;
-    background: #fff;
-    transform: translateY(-50%) rotate(45deg);
-    background: #fff;
-}
-
-
 
 // .custom-action-title {
 //     width: 100%;

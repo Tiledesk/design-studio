@@ -2,10 +2,10 @@
 
 
 :host{
-    --backgroundColor: #{$color-withe-hex};
+    --backgroundColor: #{$color-white-hex};
     --textColor: #{$blu};
     --hoverBackgroundColor: #{$blu};
-    --hoverTextColor: #{$color-withe-hex};
+    --hoverTextColor: #{$color-white-hex};
     --buttonFontSize: 0.7em;
     --max-width: #{$button-max-width-base};
 }

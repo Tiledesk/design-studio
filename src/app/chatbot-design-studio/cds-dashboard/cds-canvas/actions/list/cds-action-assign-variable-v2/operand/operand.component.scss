@@ -64,6 +64,12 @@ div.operand-wrp {
     }
 }
 
+.disable-input-message{
+    span.material-icons,
+    span.material-icons-outlined{
+        font-size: 16px;
+    }
+}
 // cds-textarea#operand ::ng-deep {
 //     display: flex;
 //     width: 100%;

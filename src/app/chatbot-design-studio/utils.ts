@@ -26,7 +26,8 @@ export enum SETTINGS_SECTION {
 }
 
 export enum EXTERNAL_URL {
-    getchatbotinfo = "https://tiledesk.com/community/getchatbotinfo/chatbotId/"
+    getchatbotinfo = "https://tiledesk.com/community/getchatbotinfo/chatbotId/",
+    getFulFillMentDoc = 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model'
 }
 
 

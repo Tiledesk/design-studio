@@ -21,6 +21,22 @@
     </div>
 
     <span class="material-icons" (click)="onToggleSelectFunction()">settings</span>
+
+    <div class="disable-input-message">
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="operandForm.value.isVariable"
+                (change)="onChangeIsCheckbox($event)">
+                {{"CDSCanvas.TreatAsAttributeName" | translate}}
+                <span class="material-icons-outlined" *ngIf="true"
+                    [satPopoverAnchor]="descriptionTooltip"
+                    (click)="descriptionTooltip.toggle()">info</span>
+            </mat-checkbox>
+        </section>
+    </div>
+
+    <div></div>
+
     <div class="select-function">
         <label>Function</label>
         <cds-select id="selectOperand"
@@ -35,3 +51,16 @@
     </div>
     
 </div>
+
+
+<sat-popover #descriptionTooltip id="descriptionTooltip" 
+    hasBackdrop 
+    verticalAlign="center" 
+    horizontalAlign="after" 
+    (backdropClicked)="descriptionTooltip.close()" 
+    panelClass="description-tooltip">
+    <div class="tooltip-wrp">
+        <div class="caret_tooltip"></div>
+        <span [innerHTML]="'CDSCanvas.TreatAsAttributeNameTips' | translate"></span>
+   </div>
+</sat-popover>

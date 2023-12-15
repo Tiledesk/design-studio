@@ -6,6 +6,7 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { NotifyService } from 'src/app/services/notify.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { EXTERNAL_URL } from '../../utils';
 
 @Component({
   selector: 'cds-detail-developer',
@@ -25,7 +26,10 @@ export class CDSDetailDeveloperComponent implements OnInit {
   public jwt: string;
   public tparams: any;
 
-  logger: LoggerService = LoggerInstance.getInstance();
+  EXTERNAL_URL = EXTERNAL_URL
+
+  private logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
     private faqKbService: FaqKbService,
     private brandService: BrandService,
@@ -124,7 +128,7 @@ export class CDSDetailDeveloperComponent implements OnInit {
   }
 
   openWebhookRequirementsDoc() {
-    const url = 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model';
+    const url = EXTERNAL_URL.getFulFillMentDoc
     window.open(url, '_blank');
   }
 
