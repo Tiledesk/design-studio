@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7-rc.8
+- added: fullfillment section to cds-settings-developer tab section
+- bug-fixed: connectorTo not found (connector-point is fill but connector is not created )
+- removed: unused variable colors;
+
 ### 1.0.7-rc.7
 - added: label over a connector
 - bug-fixed: cds-globals not updated
