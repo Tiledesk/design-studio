@@ -207,6 +207,7 @@ import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-p
 import { NetworkOfflineComponent } from '../modals/network-offline/network-offline.component';
 import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
+import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/context-menu/context-menu.component';
 
 @NgModule({
   declarations: [
@@ -365,7 +366,8 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
     CdsOptionsComponent,
     CdsPanelConnectorMenuComponent,
     
-    GetVariableNamePipe
+    GetVariableNamePipe,
+         ContextMenuComponent
 
   ],
   imports: [

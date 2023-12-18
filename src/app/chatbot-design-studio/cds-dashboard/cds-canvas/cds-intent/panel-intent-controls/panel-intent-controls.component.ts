@@ -13,13 +13,20 @@ export class PanelIntentControlsComponent implements OnInit {
   @Input() webhookEnabled: boolean = false
   @Output() onOptionClicked = new EventEmitter()
 
-  webHookTooltipText: string
+  webHookTooltipText: string;
+  copyTooltipText: string;
+  copyElementEnabled: boolean = true;
 
   constructor() { }
 
   ngOnInit(): void {
+    this. initialize();
   }
 
+  initialize(){
+    this.copyTooltipText = "Copy intent";
+    this.copyElementEnabled = true;
+  }
 
   onMouseOverWebhookBtn() {
     // console.log('[CDS-INTENT] onMouseOverWebhookBtn  intent ', intent)
@@ -41,6 +48,10 @@ export class PanelIntentControlsComponent implements OnInit {
 
   openTestSiteInPopupWindow(){
     this.onOptionClicked.emit('test')
+  }
+
+  onCopyIntent(){
+    this.onOptionClicked.emit('copy')
   }
 
 }

@@ -22,7 +22,7 @@
 </div>
 
 
-<div id="tds_container" class="box-right tds-drag-container" cdkDropListGroup>
+<div id="tds_container" class="box-right tds-drag-container" cdkDropListGroup (contextmenu)="onShowContextMenu($event)">
 
     <cds-panel-elements class="cds-panel-elements" 
         (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
@@ -31,6 +31,7 @@
 
     <div #receiver_elements_dropped_on_stage cdkDropList
         class="receiver-elements-dropped-on-stage"
+        custom-attribute="tds_container" 
         (cdkDropListDropped)="onDroppedElementToStage($event)">
     </div>
 
@@ -105,13 +106,18 @@
 
 <!-- *ngIf="IS_OPEN_PANEL_WIDGET" -->
 <cds-panel-widget  *ngIf="testitOutFirstClick"
+    id="widget-preview" 
+    class="cds-generic-panel"
     [class.isVisible]="IS_OPEN_PANEL_WIDGET"
     [class.isHidden]="!IS_OPEN_PANEL_WIDGET"
     [isPanelVisible]="IS_OPEN_PANEL_WIDGET"
-    [intent]="intentSelected"
-    id="widget-preview" 
-    class="cds-generic-panel">
+    [intent]="intentSelected">
 </cds-panel-widget>
 
-
+<cds-context-menu *ngIf="IS_OPEN_CONTEXT_MENU"
+    class="context-menu"
+    [style.top.px]="positionContextMenu.y" 
+    [style.left.px]="positionContextMenu.x"
+    (hideContextMenu)="onHideContextMenu($event)">
+</cds-context-menu>
 
