@@ -544,10 +544,11 @@ export class TiledeskConnectors {
       if (parent.parentElement) {
         parent = parent.parentElement;
       } else {
+        // console.log("Nessun elemento parent contiene la classe 'pippo'.");
         parent = null;
       }
     }
-    // // console.log("Nessun elemento parent contiene la classe 'pippo'.");
+    // console.log("Nessun elemento parent contiene la classe 'pippo'.");
     return null;
   }
 
@@ -573,9 +574,9 @@ export class TiledeskConnectors {
     let elConnectable = this.#searchClassInParents(target, this.classes["input_block"]);
     if (elConnectable && elConnectable.id && this.fromId) {
       // console.log("1 connectable? ", this.fromId, elConnectable.id);
-      if (this.fromId.startsWith(elConnectable.id)) {
-        elConnectable = null;
-      }
+      // if (this.fromId.startsWith(elConnectable.id)) {
+      //   elConnectable = null;
+      // }
     }
     if (elConnectable) {
       const block_rect = elConnectable.getBoundingClientRect();
@@ -627,10 +628,11 @@ export class TiledeskConnectors {
     let elConnectable = this.#searchClassInParents(event.target, this.classes["input_block"]);
     if (elConnectable && elConnectable.id && this.fromId) {
       // console.log("2 connectable? ", this.fromId, elConnectable.id);
-      if (this.fromId.startsWith(elConnectable.id)) {
-        elConnectable = null;
-      }
+      // if (this.fromId.startsWith(elConnectable.id)) {
+      //   elConnectable = null;
+      // }
     }
+
     if (elConnectable) {
       this.createConnector(this.fromId, elConnectable.id, this.drawingBack, this.toPoint, true, true, null);
       const connectorReleaseOnIntent = new CustomEvent("connector-release-on-intent",
