@@ -1155,7 +1155,7 @@ export class CdsCanvasComponent implements OnInit {
       if(customAttributeValue === 'tds_container'){
         // sto incollando sullo stage
         this.positionContextMenu.x = event.clientX;
-        this.positionContextMenu.y = event.clientY;
+        this.positionContextMenu.y = event.offsetY;
         this.IS_OPEN_CONTEXT_MENU = true;
         console.log('Attributi dell\'elemento premuto:', customAttributeValue);
       }

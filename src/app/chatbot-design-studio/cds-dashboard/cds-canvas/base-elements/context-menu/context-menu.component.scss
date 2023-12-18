@@ -2,16 +2,15 @@
 
 .cds-panel-elements {
     position: absolute;
-    top: 12px;
-    left: 100%;
-    transform: translateX(12px);
+    width: 190px;
+    /* font-size: 14px; */
+    top: 0;
+    left: 0;
+    /* transform: translateX(12px); */
     padding: 4px;
     border-radius: 10px;
     z-index: 10;
-
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    /* display: flex; */
 }
 svg {
     overflow: hidden;
@@ -19,7 +18,7 @@ svg {
 }
 
 .cds-elements {
-    padding: 4px;
+    padding: 0;
     border-radius: 8px;
     background-color: white;
     box-shadow: rgba(19, 33, 68, 0.01) 0px 1px 3px 1px, rgba(19, 33, 68, 0.12) 0px 5px 8px -8px, rgba(19, 33, 68, 0.12) 0px 2px 4px -3px, rgba(19, 33, 68, 0.03) 0px 0px 0px 1px;
@@ -28,28 +27,39 @@ svg {
     border: 2px solid $gray-02
 }
 
+.cds-button-element:hover, 
+.cds-button-element:focus {
+    background-color: $gray-02;
+}
+
+
 .cds-button-element {
     animation: 0.1s ease-in-out 0s 1 normal both running;
+    padding: 6px 10px;
+    /* background-color: aquamarine; */
+    margin: 0;
+    width: 100%;
 }
 
 .cds-box-button {
     transition: background-color 0.15s ease 0s;
-    width: 64px;
-    height: 64px;
-    flex-direction: column;
-    text-align: center;
+    width: 100%;
     cursor: pointer;
     border-radius: 6px;
     overflow: hidden;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    flex-direction: row;
 }
 
-.cds-box-button:hover, 
-.cds-box-button:focus {
-    background-color: $gray-02;
-}
+
+
+
+// .cds-box-button:hover, 
+// .cds-box-button:focus {
+//     background-color: $gray-02;
+// }
 
 
 .box-img {
@@ -61,7 +71,7 @@ svg {
 }
 
 .box-title {
-    font-size: 9px;
+    font-size: 14px;
     font-weight: 400; 
 }
 
