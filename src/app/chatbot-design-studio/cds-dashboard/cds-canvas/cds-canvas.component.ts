@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef } from '@angular/core';
 import { Observable, Subscription, timeout } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -88,7 +88,8 @@ export class CdsCanvasComponent implements OnInit {
     private connectorService: ConnectorService,
     private controllerService: ControllerService,
     private translate: TranslateService,
-    public dashboardService: DashboardService
+    public dashboardService: DashboardService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.setSubscriptions();
   }
@@ -127,6 +128,7 @@ export class CdsCanvasComponent implements OnInit {
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
     this.addEventListener();
+    this.changeDetectorRef.detectChanges();
   }
 
   private async setStartIntent(){

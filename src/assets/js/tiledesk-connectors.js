@@ -98,6 +98,7 @@ export class TiledeskConnectors {
 
 
   createConnector(fromId, toId, fromPoint, toPoint, save=false, notify=true, attributes=null) {
+    if(!fromPoint || !toPoint)return;
     const id = fromId + "/" + toId;
     let connector = {
       id: id,

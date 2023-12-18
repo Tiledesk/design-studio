@@ -52,12 +52,12 @@ export class SelectComponent implements OnInit {
   }
 
   onChangeActionButton(event) {
-    // this.logger.log("[SELECT BASE ELEMENT] onChangeActionButton event: ", event, this.items)
+    console.log("[SELECT BASE ELEMENT] onChangeActionButton event: ", event)
     // this.itemSelected = event;
     if(event){
       this.itemSelected = event[this.bindValueSelect];
+      this.onSelected.emit(event);
     }
-    this.onSelected.emit(event)
   }
 
   onResetValue(event){
