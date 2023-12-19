@@ -294,7 +294,7 @@ export class CdsCanvasComponent implements OnInit {
     document.addEventListener(
       "start-dragging", (e: CustomEvent) => {
         const el = e.detail.element;
-        // this.logger.log('[CDS-CANVAS] start-dragging ', el);
+        this.logger.log('[CDS-CANVAS] start-dragging ', el);
         this.removeConnectorDraftAndCloseFloatMenu();
         this.intentSelected = this.listOfIntents.find((intent) => intent.intent_id === el.id);
         el.style.zIndex = 2;
@@ -403,10 +403,12 @@ export class CdsCanvasComponent implements OnInit {
         const connector = e.detail.connector;
         connector['deleted'] = true;
         delete connector['created'];
-        // const intentId = connector.id.split('/')[0];
+        // const intentId = this.connectorSelected.id.split('/')[0];
         // let intent = this.intentService.getIntentFromId(intentId);
-        // delete intent.attributes.connectors[connector.id];
-
+        // if(intent.attributes && intent.attributes.connectors && intent.attributes.connectors[this.connectorSelected.id]){
+        //   delete intent.attributes.connectors[this.connectorSelected.id];
+        // }
+        // this.connectorService.updateConnectorAttributes(this.connectorSelected.id, event);
         this.connectorService.deleteConnectorToList(connector.id);
         this.intentService.onChangedConnector(connector);
         this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
@@ -1110,9 +1112,10 @@ export class CdsCanvasComponent implements OnInit {
     if(event.type === "delete"){
       const intentId = this.connectorSelected.id.split('/')[0];
       let intent = this.intentService.getIntentFromId(intentId);
-      delete intent.attributes.connectors[this.connectorSelected.id];
+      if(intent.attributes && intent.attributes.connectors && intent.attributes.connectors[this.connectorSelected.id]){
+        delete intent.attributes.connectors[this.connectorSelected.id];
+      }
       this.connectorService.updateConnectorAttributes(this.connectorSelected.id, event);
-
       this.connectorService.deleteConnector( this.connectorSelected.id, true, true);
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     }

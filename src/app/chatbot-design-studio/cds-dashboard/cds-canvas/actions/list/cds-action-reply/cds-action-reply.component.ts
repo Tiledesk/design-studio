@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, Output, EventEmitter, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Intent } from 'src/app/models/intent-model';
 import { Wait, Button, Message, Command, ActionReply, MessageAttributes } from 'src/app/models/action-model';
@@ -58,7 +58,8 @@ export class CdsActionReplyComponent implements OnInit {
   constructor(
     private intentService: IntentService,
     private controllerService: ControllerService,
-    private connectorService: ConnectorService
+    private connectorService: ConnectorService,
+    private changeDetectorRef: ChangeDetectorRef
   ) { }
 
   // manageTooltip(){}
@@ -83,6 +84,8 @@ export class CdsActionReplyComponent implements OnInit {
     this.action._tdActionId = this.action._tdActionId?this.action._tdActionId:generateShortUID();
     this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
     // this.initialize();
+
+    this.changeDetectorRef.detectChanges();
   }
 
 

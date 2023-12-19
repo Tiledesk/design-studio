@@ -98,6 +98,7 @@ export class TiledeskConnectors {
 
 
   createConnector(fromId, toId, fromPoint, toPoint, save=false, notify=true, attributes=null) {
+    console.log("createConnector:::::  ", fromId, toId, fromPoint, toPoint);
     if(!fromPoint || !toPoint)return;
     const id = fromId + "/" + toId;
     let connector = {
@@ -622,10 +623,14 @@ export class TiledeskConnectors {
 
   /** handleMouseUp */
   #handleMouseUp(event) {
-    // console.log("mouse up event...", event);
+    console.log("mouse up event...", event.target.classList);
     this.target.removeEventListener("mousemove", this.ref_handleMouseMove, false);
     this.target.removeEventListener("mouseup", this.ref_handleMouseUp, false);
     // console.log('handleMouseUp ------> ', event.target, event.srcElement);
+    const connectable = this.classes["connectable"];
+    if (event.target && event.target.classList && event.target.classList.contains(connectable)) {
+      return null;
+    }
     let elConnectable = this.#searchClassInParents(event.target, this.classes["input_block"]);
     if (elConnectable && elConnectable.id && this.fromId) {
       // console.log("2 connectable? ", this.fromId, elConnectable.id);
@@ -635,6 +640,7 @@ export class TiledeskConnectors {
     }
 
     if (elConnectable) {
+      console.log("handleMouseUp:::::  ");
       this.createConnector(this.fromId, elConnectable.id, this.drawingBack, this.toPoint, true, true, null);
       const connectorReleaseOnIntent = new CustomEvent("connector-release-on-intent",
         {
