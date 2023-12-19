@@ -931,10 +931,16 @@ export class TiledeskConnectors {
           conn.toPoint = this.elementLogicTopLeft(elToId);
           // console.log("conn.toPoint :---> ", elToId, conn.toId, conn.toPoint);
         }
-        this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
-        conn['notify']='';
-        // const event = new CustomEvent("connector-updated", { detail: { connector: conn } });
-        // document.dispatchEvent(event);
+        // console.log("conn :---> ", elFrom, elToId);
+        if(elFrom && elToId){
+          this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
+          conn['notify']='';
+          // const event = new CustomEvent("connector-updated", { detail: { connector: conn } });
+          // document.dispatchEvent(event);
+        } else {
+          this.deleteConnector(conn_id, false, true);
+        }
+        
       }
     };
   }

@@ -538,29 +538,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     const addActionPlaceholderEl = <HTMLElement>document.querySelector('.add--action-placeholder');
     this.logger.log('[CDS-INTENT] onDragStarted addActionPlaceholderEl ', addActionPlaceholderEl)
-
-    // const myObserver = new ResizeObserver(entries => {
-    //   // this will get called whenever div dimension changes
-    //   if(!actionDragPlaceholder || !addActionPlaceholderEl)return;
-    //   entries.forEach(entry => {
-    //     this.actionDragPlaceholderWidth = entry.contentRect.width
-    //     this.logger.log('[CDS-INTENT] width actionDragPlaceholderWidth', this.actionDragPlaceholderWidth);
-    //     if (this.actionDragPlaceholderWidth === 258) {
-    //       this.hideActionDragPlaceholder = false;
-    //       this.logger.log('[CDS-INTENT] Hide action drag placeholder', this.hideActionDragPlaceholder);
-    //       actionDragPlaceholder.style.opacity = '1';
-    //       addActionPlaceholderEl.style.opacity = '0';
-    //       this.logger.log('[CDS-INTENT] HERE 1 !!!! ');
-    //     } else {
-    //       this.hideActionDragPlaceholder = true;
-    //       this.logger.log('[CDS-INTENT] Hide action drag placeholder', this.hideActionDragPlaceholder);
-    //       actionDragPlaceholder.style.opacity = '0';
-    //       addActionPlaceholderEl.style.opacity = '1';
-    //       this.logger.log('[CDS-INTENT] HERE 2 !!!! ');
-    //     }
-    //     //  this.logger.log('height', entry.contentRect.height);
-    //   });
-    // });
     const myObserver = new ResizeObserver(entries => {
       // this will get called whenever div dimension changes
       entries.forEach(entry => {
@@ -594,44 +571,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** onDragEnded
    * get the action moved and update its connectors */
   onDragEnded(event, index) {
-    this.logger.log('[CDS-INTENT] onDragEnded: ', event);
+    this.logger.log('[CDS-INTENT] onDragEnded: ', event, this.intent.intent_id);
     this.isDragging = false;
     this.connectorService.updateConnector(this.intent.intent_id);
-    // this.logger.log('[CDS-INTENT] isDragging - onDragEnded ', this.isDragging)
-    // ----------------------------------
-    // Display action arrow on drag ended 
-    // ----------------------------------
-    // const actionArrowElem = <HTMLElement>document.querySelector(`#action-arrow-${index}`);
-    // actionArrowElem.style.display = 'block';
-    // this.logger.log('[CDS-INTENT] onDragEnded actionArrowElem', actionArrowElem)
-
-    // const fromEle = document.getElementById(this.intent.intent_id);
-    // this.connectorService.updateConnector(fromEle);
+    // const previousIntentId = this.intentService.previousIntentId;
+    // if(previousIntentId){
+    //   this.logger.log("[CDS-INTENT] onDropAction previousIntentId: ", previousIntentId);
+    //   this.connectorService.updateConnector(previousIntentId);
+    // }
+    this.connectorService.updateConnector(this.intent.intent_id);
   }
-
-  // mouseOverAddActionPlaceholder(event) {
-  //   this.logger.log('[CDS-INTENT] mouseOverAddActionPlaceholder event ', event)
-
-  //   const actionListEl = <HTMLElement>document.querySelector('.actions-list-wpr');
-  //   this.logger.log('[CDS-INTENT] mouseOverAddActionPlaceholder actionListEl ', actionListEl)
-
-  //   const addActionPlaceholderEl = <HTMLElement>document.querySelector('.add--action-placeholder');
-  //   this.logger.log('[CDS-INTENT] mouseOverAddActionPlaceholder addActionPlaceholderEl ', addActionPlaceholderEl)
-
-  //   if (actionListEl && actionListEl.classList.contains('cdk-drop-list-receiving')) {
-  //     this.logger.log('[CDS-INTENT] mouseOverAddActionPlaceholder here yes') 
-
-  //     addActionPlaceholderEl.style.opacity = '0'
-  //     this.dragDisabled = false;
-  //   } 
-  // }
-
-  // mouseOutAddActionPlaceholder(event) {
-  //   this.logger.log('[CDS-INTENT] mouseOutAddActionPlaceholder ', event)
-  //   const addActionPlaceholderEl = <HTMLElement>document.querySelector('.add--action-placeholder');
-  //   this.logger.log('[CDS-INTENT] mouseOverAddActionPlaceholder addActionPlaceholderEl ', addActionPlaceholderEl);
-  //   // addActionPlaceholderEl.style.opacity = '1'
-  // }
 
 
   /** Predicate function that only allows type='intent' to be dropped into a list. */
@@ -670,6 +619,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             // moving action from another intent
             this.logger.log("[CDS-INTENT] onDropAction sposto la action tra 2 intent differenti");
             this.intentService.moveActionBetweenDifferentIntents(event, action, this.intent.intent_id);
+            this.intentService.updateIntent(this.intent, null);
           } else if (action.value && action.value.type) {
             // moving new action in intent from panel elements
             this.logger.log("[CDS-INTENT] onDropAction aggiungo una nuova action all'intent da panel elements - action ", this.newActionCreated);
