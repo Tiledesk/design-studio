@@ -695,7 +695,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.logger.log('[CDS-INTENT] openActionMenu > intent ', intent)
     this.logger.log('[CDS-INTENT] openActionMenu > calleBy ', calleBy)
     const openActionMenuElm = this.openActionMenuBtnRef.nativeElement.getBoundingClientRect()
-    let xOffSet = 157
+    let xOffSet = openActionMenuElm.width + 10 // offset = element width + padding 
     if (calleBy === 'add-action-placeholder') {
       xOffSet = 277
     }
