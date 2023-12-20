@@ -14,7 +14,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 import { Chatbot } from 'src/app/models/faq_kb-model';
-import { EXTERNAL_URL, TYPE_INTENT_NAME } from '../../utils';
+import { EXTERNAL_URL, LOGO_MENU_ITEMS, TYPE_INTENT_NAME } from '../../utils';
 import { CdsPublishOnCommunityModalComponent } from '../../../modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { environment } from 'src/environments/environment';
@@ -51,7 +51,8 @@ export class CdsHeaderComponent implements OnInit {
   public_Key: string;
   TRY_ON_WA: boolean;
 
-  version: string;
+
+  LOGO_MENU_ITEMS = LOGO_MENU_ITEMS;
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -77,8 +78,6 @@ export class CdsHeaderComponent implements OnInit {
     if(this.router.url.includes('beta')){
       this.isBetaUrl = true;
     }
-
-    this.version = environment.VERSION
   }
 
   getOSCODE() {
@@ -203,8 +202,20 @@ export class CdsHeaderComponent implements OnInit {
     })
   }
 
-  onMenuOptionFN(event){
-    this.onMenuOption.emit(event)
+  onMenuOptionFN(item: { key: string, label: string, icon: string, src?: string}){
+    switch(item.key){
+      case 'GO_TO_DASHBOARD':
+        let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
+        window.open(dashbordBaseUrl, '_self').focus();
+        break;
+      case 'LOG_OUT':
+        this.tiledeskAuthService.logOut()
+        let DASHBOARD_URL = this.appConfigService.getConfig().dashboardBaseUrl + '#/login'
+        window.open(DASHBOARD_URL, '_self').focus();
+        break;
+      case 'EXPORT':
+        this.onMenuOption.emit(item.key)
+    }
   }
 
   openTestSiteInPopupWindow() {

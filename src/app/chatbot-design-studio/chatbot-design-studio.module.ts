@@ -206,6 +206,7 @@ import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-
 import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
 import { NetworkOfflineComponent } from '../modals/network-offline/network-offline.component';
 import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
+import { ChangelogComponent } from '../modals/changelog/changelog.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 
 @NgModule({
@@ -358,6 +359,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
     ChangeBotLangModalComponent,
     NetworkOfflineComponent,
     MouseTipsComponent,
+    ChangelogComponent,
     
     //EVENT BASE COMPONENT
     CdsEventComponent,

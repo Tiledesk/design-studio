@@ -26,6 +26,15 @@ cds-header {
   font-size: 16px;
 }
 
+cds-changelog{
+  position: absolute;
+  top: 5px;
+  z-index: 13;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 cds-rules,
 cds-chatbot-details,
 cds-fulfillment,
