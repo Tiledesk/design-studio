@@ -433,7 +433,7 @@ export class TiledeskConnectors {
 
 
   moved(element, x, y) {
-   console.log("moving ----> ", element.id, x, y);
+  //  console.log("moving ----> ", element.id, x, y);
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) {
@@ -722,7 +722,7 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes=null) {
-    console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    // console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
     var label = null;
     if(attributes && attributes.label){
       label = attributes.label;
