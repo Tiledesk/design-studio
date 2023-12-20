@@ -27,7 +27,8 @@ export enum SETTINGS_SECTION {
 
 export enum EXTERNAL_URL {
     getchatbotinfo = "https://tiledesk.com/community/getchatbotinfo/chatbotId/",
-    getFulFillMentDoc = 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model'
+    getFulFillMentDoc = 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model',
+    getChangelogUrl = 'https://tiledesk.com/category/changelog/'
 }
 
 
@@ -472,19 +473,19 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
     }
 ]
 
+export const LOGO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, src?: string}> = [
+    { key: 'GO_TO_DASHBOARD', label: 'GoToDashboard',  icon: 'arrow_back'},
+    { key: 'EXPORT', label: 'Export', icon: 'file_download'},
+    { key: 'LOG_OUT', label: 'LogOut', icon: 'logout'}
+]
 
-// export function patchActionId(action) {
-//     try {
-//         if(!action._tdActionId || action._tdActionId == "UUIDV4"){
-//             action._tdActionId = uuidv4();
-//         }
-//     } catch (error) {
-//        // error 
-//     }
-//     return action;
-// }
-
-
+export const INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, src?: string}> = [
+    { key: 'HELP_CENTER', label: 'HelpCenter', icon: 'help', src: 'https://gethelp.tiledesk.com/'},
+    { key: 'ROAD_MAP', label: 'RoadMap', icon: 'checklist', src: 'https://tiledesk.sleekplan.app/roadmap'},
+    { key: 'FEEDBACK', label: 'Feedback', icon: 'lightbulb', src: 'https://tiledesk.sleekplan.app/'},
+    { key: 'SUPPORT', label: 'support@tiledesk.com', icon: 'email', src: 'mailto:support@tiledesk.com'},
+    { key: 'CHANGELOG',  label: 'WhatsNew', icon: 'local_fire_department'}
+]
 
 
 export function generateShortUID(index?) {
