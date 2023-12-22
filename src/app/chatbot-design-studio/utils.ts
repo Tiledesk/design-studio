@@ -28,9 +28,8 @@ export enum SETTINGS_SECTION {
 export enum EXTERNAL_URL {
     getchatbotinfo = "https://tiledesk.com/community/getchatbotinfo/chatbotId/",
     getFulFillMentDoc = 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model',
-    getChangelogUrl = 'https://tiledesk.com/category/changelog/'
+    getChangelogUrl = 'https://feedback.tiledesk.com/changelog'
 }
-
 
 export enum TYPE_MATH_OPERATOR {
     addAsNumber = "addAsNumber",
@@ -481,10 +480,10 @@ export const LOGO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, 
 
 export const INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, src?: string}> = [
     { key: 'HELP_CENTER', label: 'HelpCenter', icon: 'help', src: 'https://gethelp.tiledesk.com/'},
-    { key: 'ROAD_MAP', label: 'RoadMap', icon: 'checklist', src: 'https://tiledesk.sleekplan.app/roadmap'},
-    { key: 'FEEDBACK', label: 'Feedback', icon: 'lightbulb', src: 'https://tiledesk.sleekplan.app/'},
+    { key: 'ROAD_MAP', label: 'RoadMap', icon: 'checklist', src: 'https://feedback.tiledesk.com/roadmap'},
+    { key: 'FEEDBACK', label: 'Feedback', icon: 'lightbulb', src: 'https://feedback.tiledesk.com/feedback'},
     { key: 'SUPPORT', label: 'support@tiledesk.com', icon: 'email', src: 'mailto:support@tiledesk.com'},
-    { key: 'CHANGELOG',  label: 'WhatsNew', icon: 'local_fire_department'}
+    { key: 'CHANGELOG',  label: 'WhatsNew', icon: 'local_fire_department', src:'https://feedback.tiledesk.com/changelog'}
 ]
 
 
