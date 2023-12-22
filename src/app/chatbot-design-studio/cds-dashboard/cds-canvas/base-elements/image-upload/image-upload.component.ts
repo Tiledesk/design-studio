@@ -32,6 +32,8 @@ export class CDSImageUploadComponent implements OnInit {
   
   selectedFiles: FileList;
   isFilePendingToUpload: Boolean = false;
+  optionSelected: 'upload' | 'link' = 'upload'
+  textTag: string = '';
   arrayFilesLoad: Array<any> = [];
 
   private logger: LoggerService = LoggerInstance.getInstance()
@@ -50,12 +52,44 @@ export class CDSImageUploadComponent implements OnInit {
 
   initializeApp(){
     try {
-      if(this.metadata.src){
+      if(this.metadata.src && !this.metadata.src.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g)) ){
+        this.optionSelected = 'upload';
         this.isImageSvg = this.imageUrlIsSvgFormat(this.metadata.src);
         // this.setImageSize(this.metadata.src);
+      }else if(this.metadata.src && this.metadata.src.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))){
+        this.textTag = this.metadata.src.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))[0]
+        this.optionSelected = 'link'
       }
     } catch (error) {
       // this.logger.log("error: ", error);
+    }
+  }
+
+  onChangeTextarea(text: string){
+    if(text && text.match(new RegExp(/{{[^{}]*}}/g))){
+      this.metadata = {
+        name: text,
+        src: text,
+        type: 'image/jpg'
+      }
+      this.onChangeMetadata.emit(this.metadata)
+    }else if(text) {
+      this.isFilePendingToUpload = true
+      this.optionSelected = 'upload';
+      this.createFile(text);
+    }
+  }
+
+  onBlur(event){
+
+  }
+
+
+  onClearSelectedAttribute(){
+    this.optionSelected = 'upload'
+    this.metadata = {
+      name: '',
+      src: '',
     }
   }
 
@@ -78,17 +112,17 @@ export class CDSImageUploadComponent implements OnInit {
   }
 
   // CUSTOM FUNCTIONS //
-  selectFile(event: any): void {
-    try {
-      let selectedFiles = event.target.files[0];
+  // selectFile(event: any): void {
+  //   try {
+  //     let selectedFiles = event.target.files[0];
 
-      if (selectedFiles) {
-        this.uploadAttachment(selectedFiles);
-      }
-    } catch (error) {
-      this.logger.log("error: ", error);
-    }
-  }
+  //     if (selectedFiles) {
+  //       this.uploadAttachment(selectedFiles);
+  //     }
+  //   } catch (error) {
+  //     this.logger.log("error: ", error);
+  //   }
+  // }
 
 
   detectFiles(event: any){
@@ -226,27 +260,27 @@ export class CDSImageUploadComponent implements OnInit {
   }
 
 
-  private uploadAttachment(uploadedFiles){
-    if ((uploadedFiles.type.startsWith('image') || uploadedFiles.type.includes('gif')) && uploadedFiles.type.includes('svg')) {
-      this.isImageSvg = true;
-    } else if ((uploadedFiles.type.startsWith('image') || uploadedFiles.type.includes('gif')) && !uploadedFiles.type.includes('svg')) {
-      this.isImageSvg = false;
-    }
-    this.uploadService.upload(this.user.uid, uploadedFiles).then(downloadURL => {
-      if (downloadURL) {
-        this.existAnAttacment = true
-        uploadedFiles['downloadURL'] = downloadURL;
-      }
-      this.metadata.src = downloadURL;
-      this.existAnAttacment = true
-      this.setImageSize(uploadedFiles);
-      // this.logger.log(`[WS-REQUESTS-MSGS] - upload native metadata `, this.metadata);
-      // this.fileUpload.nativeElement.value = '';
-    }).catch(error => {
-      this.logger.log("[IMAGE-UPLOAD] error", error);
-      // this.logger.error(`[WS-REQUESTS-MSGS] - upload native Failed to upload file and get link `, error);
-    });
-  }
+  // private uploadAttachment(uploadedFiles){
+  //   if ((uploadedFiles.type.startsWith('image') || uploadedFiles.type.includes('gif')) && uploadedFiles.type.includes('svg')) {
+  //     this.isImageSvg = true;
+  //   } else if ((uploadedFiles.type.startsWith('image') || uploadedFiles.type.includes('gif')) && !uploadedFiles.type.includes('svg')) {
+  //     this.isImageSvg = false;
+  //   }
+  //   this.uploadService.upload(this.user.uid, uploadedFiles).then(downloadURL => {
+  //     if (downloadURL) {
+  //       this.existAnAttacment = true
+  //       uploadedFiles['downloadURL'] = downloadURL;
+  //     }
+  //     this.metadata.src = downloadURL;
+  //     this.existAnAttacment = true
+  //     this.setImageSize(uploadedFiles);
+  //     // this.logger.log(`[WS-REQUESTS-MSGS] - upload native metadata `, this.metadata);
+  //     // this.fileUpload.nativeElement.value = '';
+  //   }).catch(error => {
+  //     this.logger.log("[IMAGE-UPLOAD] error", error);
+  //     // this.logger.error(`[WS-REQUESTS-MSGS] - upload native Failed to upload file and get link `, error);
+  //   });
+  // }
 
   // EVENT FUNCTIONS //
 
@@ -283,6 +317,7 @@ export class CDSImageUploadComponent implements OnInit {
 
   /** */
   readAsDataURL(e: any) {
+    console.log('eventtt', e)
     let dataFiles = " "
     if (e.type === 'change') {
       dataFiles = e.target.files;
@@ -295,10 +330,10 @@ export class CDSImageUploadComponent implements OnInit {
     // ---------------------------------------------------------------------
     // USE CASE IMAGE
     // ---------------------------------------------------------------------
-    let file:any = dataFiles[0];
+    let event:any = { target: { files: dataFiles} }
     try {
-      if (file) {
-        this.uploadAttachment(file);
+      if (event) {
+        this.detectFiles(event);
       }
     } catch (error) {
       this.logger.log("error: ", error);
@@ -482,6 +517,36 @@ export class CDSImageUploadComponent implements OnInit {
       })
       return isAcceptFile
     }
+  }
+
+  async createFile(url){
+    const that = this
+    let filename = url.substring(url.lastIndexOf('/')+1);
+    let response = await fetch(url);
+    let data = await response.blob();
+    const dT = new DataTransfer();
+    dT.items.add(new File([data], filename, { type: 'image/jpeg' }));
+    this.selectedFiles = dT.files;
+    const imageXLoad = new Image;
+    this.logger.debug('[IMAGE-UPLOAD] onload ', imageXLoad);
+    imageXLoad.src = url
+    imageXLoad.title = filename;
+    imageXLoad.onload = function () {
+      that.logger.debug('[IMAGE-UPLOAD] onload image', imageXLoad);
+      // that.arrayFilesLoad.push(imageXLoad);
+      const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
+      that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: 'image/jpeg', size: dT.files.item(0).size };
+      that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+      // SEND MESSAGE
+      that.loadFile();
+    };
+    imageXLoad.onerror = function(error) {
+      that.logger.error('[IMAGE-UPLOAD] onerror image', error);
+      setTimeout(()=> {
+        that.isFilePendingToUpload = false
+      }, 2000)
+    }
+
   }
 }
 // END ALL //
