@@ -5,6 +5,17 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7-rc.9
+- added: upload/link option while loading an image from a source file or a link ora a variable dynamically
+- added: leadAttributes section for variableList
+- added: support icon menu on bottom section in cds-sidebar
+- added: cds-changelog component for new updates news
+- added: show function select if operand.function has a value in cds-action-assign-variable-v2
+- added: dynamic reuse of cds-menu element
+- changed: color defined variables 
+- added: cds-textarea in button url section to add variable as url for a button reply element
+- bug-fixed: floating action list hide called intent --> new Xpositioning 
+
 ### 1.0.7-rc.8
 - added: fullfillment section to cds-settings-developer tab section
 - bug-fixed: connectorTo not found (connector-point is fill but connector is not created )
