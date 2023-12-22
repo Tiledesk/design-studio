@@ -469,6 +469,15 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'lastUserImageWidth', value: 'lastUserImageWidth', description: 'The height in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
             { name: 'lastUserImageHeight', value: 'lastUserImageHeight', description: 'The wdth in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'}
         ]
+    },
+    {   key: 'leadAttributes',
+        elements: [
+            { name: 'userEmail', value: 'userEmail', description: 'The user email of the current Lead', src: '', icon:'person'},
+            { name: 'userFullname', value: 'userFullname', description: 'The user fullname of the current Lead', src: '', icon:'person'},
+            { name: 'userPhone', value: 'userPhone', description: 'The user phone of the current Lead', src: '', icon:'person'},
+            { name: 'userLeadId', value: 'userLeadId', description: 'The user lead-ID of the current Lead', src: '', icon:'person'},
+            { name: 'userCompany', value: 'userCompany', description: 'The user company of the current Lead', src: '', icon:'person'}
+        ]
     }
 ]
 
