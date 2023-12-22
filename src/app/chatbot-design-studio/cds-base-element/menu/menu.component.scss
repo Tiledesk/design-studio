@@ -3,7 +3,7 @@
 
 :host {
     --text-color: #{$blu};
-    --icon-color: #{$gray-light-01};
+    --icon-color-menu: #{$gray-light-01};
     --text-hover-color: #{$blu};
     --icon-hover-color: #{$blu};
 }
@@ -52,7 +52,7 @@
     img{
         width: 16px;
         font-size: 16px;
-        color: var(--icon-color);
+        color: var(--icon-color-menu);
         filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
     }
 
@@ -76,5 +76,5 @@
 }
 
 .current-user{
-    color: var(--icon-color);
+    color: var(--icon-color-menu);
 }

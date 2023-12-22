@@ -1,5 +1,8 @@
 @import "./src/assets/sass/cds/_variables.scss";
-$width-title: 80%;
+
+:host{
+  --width-title: 80%;
+}
 
 .header {
     // position: relative;
@@ -7,8 +10,8 @@ $width-title: 80%;
     justify-content: space-between;
     gap: 10px;
     width: 100%;
-    height: $height-header;
-    max-height: $height-header;
+    height: var(--height-header);
+    max-height: var(--height-header);
     // margin-top: 10px;
     .onff-intent-webhook {
       font-size: 13px;
@@ -18,17 +21,6 @@ $width-title: 80%;
       font-family: 'Poppins','Roboto',Arial,sans-serif;
     }
     
-
-    .i-priority-color-mark {
-        background-color: $color-blue-hex;
-        position: absolute;
-        border-radius: 10px;
-        top: 22px;
-        left: 12px;
-        display: block;
-        width: 8px;
-        height: 8px;
-    }
     .has--error {
         background-color: #ed2e19;
     }
@@ -39,9 +31,9 @@ $width-title: 80%;
         .form-control {
             border: 0;
             background-size: 0 2px, 100% 0px;
-            background-image: linear-gradient($color-light-gray-hex, $color-light-gray-hex);
+            background-image: linear-gradient($gray-light-01, $gray-light-01);
             transition-duration: 0.2s;
-            /*  height: $height-header;*/
+            /*  height: var(--height-header);*/
             &[readonly]{
               cursor: grab;
               background-image: none !important;
@@ -50,14 +42,14 @@ $width-title: 80%;
         label.title {
             position: absolute;
             display: block;
-            width: $width-title;
+            width: var(--width-title);
             top: 0;
             margin: 0;
             padding: 0 0 0 10px;
             font-weight: 400;
             font-size: 1.0em;
-            line-height: $height-header;
-            color: $color-light-gray-hex;
+            line-height: var(--height-header);
+            color: $gray-light-01;
             // z-index: 1;
             &.noDisplay {
                 display: none;
@@ -66,25 +58,20 @@ $width-title: 80%;
         input {
             // position: absolute;
             display: block;
-            // width: $width-title;
+            // width: var(--width-title);
             top: 0;
             // left: 30px;
             // margin-top: 6px;
             padding: 0; //0 0 0 10px;
-            // color: $color-text-dark-hex;
+            // color: $gray;
             color: $blu;
             font-size: 1.0em;
             // z-index: 2;
             position: relative;
-
-            // &:hover{
-            //   background-color: $color-light-gray-hex;
-            //   border-radius: 5px;
-            // }
         }
         .btn-save {
             position: absolute;
-            width: calc(100% - $width-title);
+            width: calc(100% - var(--width-title));
             max-width: 100px;
             right: 10px;
             padding: 8px;
@@ -95,35 +82,21 @@ $width-title: 80%;
     .form-group {
         &.is-error {
             .form-control {
-                background-image: linear-gradient($color-red-hex, $color-red-hex),
-                    linear-gradient($color-light-gray-hex, $color-light-gray-hex);
+                background-image: linear-gradient(var(--color-red-hex), var(--color-red-hex)),
+                    linear-gradient($gray-light-01, $gray-light-01);
                 background-size: 100% 2px, 100% 1px;
                 transition-duration: 0.3s;
             }
         }
         &.is-focused:not(.is-error) {
             .form-control {
-                background-image: linear-gradient($color-blue-hex, $color-blue-hex),
-                    linear-gradient($color-light-gray-hex, $color-light-gray-hex);
+                background-image: linear-gradient($blu, $blu),
+                    linear-gradient($gray-light-01, $gray-light-01);
                 background-size: 100% 2px, 100% 1px;
                 transition-duration: 0.3s;
             }
         }
     }
-}
-
-#cds-save-intent-btn {
-    background: #3ea9f5;
-    color: $light-black;
-    box-shadow: none !important;
-    font-weight: 500 !important;
-    font-family: "Poppins", "Roboto", "Arial", sans-serif !important;
-    text-transform: capitalize !important;
-    font-size: 14px !important;
-}
-
-#cds-save-intent-btn:hover {
-    background: rgb(138, 180, 248, 0.8) !important;
 }
 
 .error---msg {

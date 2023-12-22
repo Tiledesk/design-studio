@@ -9,20 +9,28 @@
     // position: fixed; */
     position: relative;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     border-bottom-right-radius: 3px;
     border-bottom-left-radius: 3px;
     box-shadow: rgba(0, 27, 71, .24) 0px 1px 3px;
-    background: rgb(255, 194, 97);
+    background: rgb(14 14 14);
+    padding: 7px 20px;
+}
+
+span.material-icons,
+span.material-icons-outlined{
+    color: rgb(242, 247, 247);
+    font-size: 20px;
 }
 
 
 .alert-content{
-    color: rgb(8, 15, 26);
+    color: rgb(242, 247, 247);
     text-align: center;
     transition: all 0.15s ease-in-out 0s;
     font-size: 14px;
     line-height: 18px;
     /* // letter-spacing: -0.01em; */
-    padding: 7px 20px;
 }

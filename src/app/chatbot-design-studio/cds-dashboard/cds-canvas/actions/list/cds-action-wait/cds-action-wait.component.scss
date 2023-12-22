@@ -26,7 +26,7 @@
     width: 100%;
     text-align: center;
     transition: width 0.3s ease-in;
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
 }
 
 .action-wait-slider > mat-slider {

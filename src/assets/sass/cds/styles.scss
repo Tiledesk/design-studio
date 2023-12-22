@@ -194,7 +194,7 @@ emoji-mart {
 .action-row-right {
     font-size: 12px;
     font-weight: 400;
-    color: $brown-85;
+    color: var(--brown-85);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -209,13 +209,13 @@ emoji-mart {
 }
 
 .action-row .action-row-left svg {
-    fill: $brown-85;
+    fill: var(--brown-85);
 }
 
 .web-request-action-method {
     font-weight: 500;
     font-size: 14px;
-    color: $brown-85;
+    color: var(--brown-85);
 }
 
 

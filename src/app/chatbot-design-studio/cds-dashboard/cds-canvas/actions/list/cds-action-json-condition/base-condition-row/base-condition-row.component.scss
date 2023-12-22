@@ -18,7 +18,7 @@
 }
 
 .material-icons{
-    color: $icon-color;
+    color: var(--icon-color);
     font-size: 18px;
 }
 
@@ -153,7 +153,7 @@ section.header{
         font-size: 16px;
         line-height: 20px;
         font-weight: 600;
-        color: #22272d;
+        color: $blu;
         margin: 0;
     }
     span.material-icons{

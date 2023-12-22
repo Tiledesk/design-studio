@@ -85,6 +85,7 @@ export class CdsDashboardComponent implements OnInit {
     return false
   }
   onCloseChangelog(){
+    this.showChangelog = false;
     this.appStorageService.setItem('changelog', environment.VERSION)
   }
 

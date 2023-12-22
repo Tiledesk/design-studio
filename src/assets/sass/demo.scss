@@ -1394,10 +1394,10 @@ footer ul {
   // width: calc(100% - 49px);
   // top: -16px;
   // margin-left: 10px;
-  border-left: 1px solid $icon-color;
-  border-right: 1px solid $icon-color;
-  border-bottom: 1px solid $icon-color;
-  outline: 1px solid $icon-color;
+  border-left: 1px solid var(--icon-color);
+  border-right: 1px solid var(--icon-color);
+  border-bottom: 1px solid var(--icon-color);
+  outline: 1px solid var(--icon-color);
 }
 
 

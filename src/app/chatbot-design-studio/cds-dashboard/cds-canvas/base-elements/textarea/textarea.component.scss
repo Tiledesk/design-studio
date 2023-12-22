@@ -2,7 +2,7 @@
 @import "./src/assets/sass/cds/styles.scss";
 
 .text-editor-wrapper {
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
     position: relative;
     width: 100%;
     height: auto;
@@ -63,7 +63,7 @@ mat-form-field.box-textarea ::ng-deep {
     // margin-left: 20px;
     textarea {
         border-radius: 8px;
-        background: $color-white-hex;
+        background: var(--color-white-hex);
         border: 1px solid $blu-light-02;
         overflow-x: hidden;
         overflow-y: auto;
@@ -111,8 +111,8 @@ mat-form-field.box-textarea ::ng-deep {
             width: 40px;
             text-align: center;
             &.error {
-                background: red;
-                color: white;
+                background: var(--color-red-hex);
+                color: var(--color-white-hex);
             }
         }
     }

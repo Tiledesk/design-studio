@@ -99,7 +99,7 @@
 
             span.label-select {
                 margin-right: 4px;
-                color: $blu
+                color: $gray;
             }
 
             span.label-select-option {
@@ -129,9 +129,19 @@
 
     }
 
+    .ng-dropdown-panel,
+    .ng-select.ng-select-opened>.ng-select-container{
+        border: 1px solid $blu-light-02;
+    }
     .ng-dropdown-panel .ng-dropdown-footer {
         border-top: 1px solid #ededed;
         padding: 0px !important;
+    }
+
+    .ng-dropdown-panel.ng-select-bottom,
+    .ng-dropdown-panel.ng-select-bottom .ng-dropdown-panel-items .ng-option:last-child{
+        border-bottom-right-radius: 8px;
+        border-bottom-left-radius: 8px;  
     }
 
     

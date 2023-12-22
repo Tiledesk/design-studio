@@ -7,7 +7,7 @@
   --action-no-featured-backgroud: #{$action-no-featured-item-background};
   --intent-background: #{$intent-preview-background};
   --intent-border-color: #{$intent-preview-borderColor};
-  --intent-header-background: transparent; //#{$deep-brown};
+  --intent-header-background: transparent;
   --base-border-radius-preview: #{$border-radius-base-preview};
   --base-padding-preview: #{$padding-base-preview};
   --action-selected-color: #{$action-color-selected};
@@ -26,7 +26,7 @@
   pointer-events: none;
   user-select: none;
   opacity: 0.8;
-  background-color: #ffffff;
+  background-color: var(--drag-preview-background);
   max-width: 244px;
   width: 100%;
 }
@@ -278,9 +278,9 @@
 
 .action-drag-placeholder {
   // background: #ccc;
-   background: rgba(221,228,234,.8);
+  background: var(--drop-zone-background);
   // border: dotted 3px #999;
-   border: dashed 1px #6c6859;
+  border: dashed 1px var(----drop-zone-color-border);
   min-height: 60px;
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   border-radius: 8px;

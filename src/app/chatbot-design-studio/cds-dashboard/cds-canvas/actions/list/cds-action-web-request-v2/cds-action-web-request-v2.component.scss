@@ -153,7 +153,7 @@
 
 /** CSS textarea */
 .text-editor-wrapper {
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
     position: relative;
     width: 100%;
     //height: auto;

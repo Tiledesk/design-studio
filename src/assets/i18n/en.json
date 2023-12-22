@@ -335,7 +335,8 @@
         "mostUsed":"Most used",
         "systemDefined":"System defined",
         "uploadedDocument":"Uploaded document",
-        "uploadedImage":"Uploaded image"
+        "uploadedImage":"Uploaded image",
+        "leadAttributes":"Lead attributes"
     },
     "New":"New",
     "Event":"Event",

@@ -1,5 +1,5 @@
 <div class="cds-publish-on-community-modal-header">
-    <h1 mat-dialog-title>{{ 'CDSModalPublishOnCommunity.PublishYouChatbotToCommunity' | translate }}</h1>
+    <div class="header-title">{{ 'CDSModalPublishOnCommunity.PublishYouChatbotToCommunity' | translate }}</div>
     <mat-dialog-actions>
         <button mat-button mat-dialog-close>
             <span class="material-icons">
@@ -8,6 +8,9 @@
         </button>
         <!-- <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Install</button> -->
     </mat-dialog-actions>
+
+    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+    
 </div>
 
 <mat-dialog-content class="mat-typography" style="min-height: 30px; height: 400px;">
@@ -53,7 +56,7 @@
                 <div class="row" style="margin-right: 0px; margin-left: 0px;">
 
                     <div class="col-xs-12">
-                        <button id="csd-update-bot-btn" #editbotbtn class="btn btn-primary pull-left"
+                        <button id="csd-update-bot-btn" #editbotbtn class="btn btn-primary cds-blue-button pull-left"
                             (click)="editBot()" [disabled]="selectedChatbot?.name?.length === 0">
                             <!- - {{ "BotsAddEditPage.UpdateBotName" | translate }} - ->
                             Update bot
@@ -213,7 +216,7 @@
         <mat-tab label="{{ 'CDSModalPublishOnCommunity.Publishing' | translate }}">
             <div class="publishing-wpr">
 
-                <div class="row" style="margin-right: 0px;margin-left: 0px;width: 639px;">
+                <div class="row" style="width: 639px;">
                     <div class="col-xs-12">
                         <div class="deploy-to-community-text" style="margin-top: 30px;">
                             <h3 style="line-height: 22px;">
@@ -229,10 +232,10 @@
                 </div>
 
 
-                <div class="row" style="margin-right: 0px;margin-left: 0px;">
+                <div class="row">
                     <div class="col-xs-12">
-                        <div class="publish-bot-to-community-btn-wpr" style="display: flex; justify-content: center; align-items: center;">
-                            <button id="csd-publish-bot-to-community-btn" class="btn btn-primary"
+                        <div class="publish-bot-to-community-btn-wpr">
+                            <button id="csd-publish-bot-to-community-btn" class="btn btn-primary cds-blue-button"
                                 (click)="publishOnCommunity()">
                                 {{ 'CDSModalPublishOnCommunity.DeployToCommunity' | translate }}
                             </button>

@@ -63,6 +63,15 @@ export class CDSElementFromUrlComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(this.metadata.src);
   }
 
+  /** onChangeTextarea */
+  onChangeTextarea(text:string) {
+    this.pathElement = text;
+  }
+
+  onBlur(event){
+    // console.log('[ACTION REPLY TEXT] onBlur', event.target.value, this.response.text);
+  }
+
   onLoadPathElement(){
     this.metadata.width = this.widthElement;
     this.metadata.height = this.heightElement;

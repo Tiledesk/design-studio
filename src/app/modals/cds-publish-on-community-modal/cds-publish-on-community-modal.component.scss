@@ -54,41 +54,8 @@ textarea[type="text"] {
 input[type="file"] {
     display: none;
 }
-.custom-file-upload {
-    border: 1px solid $light-blue;
-    display: inline-block;
-    padding: 11px 12px;
-    cursor: pointer;
-    background: $light-blue !important;
-    color: #000;
-    border-radius: 4px;
-    font-weight: 500;
-    margin-top: 14px;
-    // width: 145px;
-}
 
-.custom-file-upload:hover {
-    background: rgba(138, 180, 248, 0.8) !important;
-}
 
-#csd-update-bot-btn {
-    border: 1px solid $light-blue;
-    display: inline-block;
-    padding: 11px 12px;
-    cursor: pointer;
-    background: $light-blue !important;
-    color: #000;
-    border-radius: 4px;
-    font-weight: 500;
-    // margin-top: 14px;
-    box-shadow: unset;
-    margin-top: 12px;
-    box-shadow: unset;
-}
-
-#csd-update-bot-btn:hover {
-    background: rgba(138, 180, 248, 0.8) !important;
-}
 
 .bot-profile-img {
     vertical-align: middle;
@@ -174,33 +141,16 @@ input[type="file"] {
     // align-items: center;
 }
 
-#csd-publish-bot-to-community-btn {
-    border: 1px solid $light-blue;
-    display: inline-block;
-    padding: 11px 12px;
-    cursor: pointer;
-    background: $light-blue !important;
-    color: #000;
-    border-radius: 4px;
-    font-weight: 500;
-    box-shadow: unset;
-    height: 41px;
-}
-
-#csd-publish-bot-to-community-btn:hover {
-    background: rgba(138, 180, 248, 0.8) !important;
-}
-
 /*
 /* Navigation btn 
 /* ------------------------------------ */
 
 #cds-navigation-btn {
-    border: 1px solid $light-blue;
+    border: 1px solid $blu-05;
     display: inline-block;
     padding: 11px 12px;
     cursor: pointer;
-    background: $light-blue !important;
+    background: $blu-05 !important;
     color: #000;
     border-radius: 4px;
     font-weight: 500;
@@ -217,8 +167,9 @@ input[type="file"] {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    h1 {
+    div.header-title {
         margin:0px;
+        font-weight: 600;
         color: #22272d;
     }
     mat-dialog-actions{
@@ -260,4 +211,10 @@ input[type="file"] {
     color: #000 !important;
     margin-bottom: 24px;
     font-weight: 400;
+}
+
+.publish-bot-to-community-btn-wpr{
+    display: flex; 
+    justify-content: flex-end;
+    align-items: center;
 }

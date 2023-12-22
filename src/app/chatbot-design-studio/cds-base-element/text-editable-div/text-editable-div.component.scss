@@ -88,18 +88,20 @@
     pointer-events: none;
     transition: background-color 0.3s, color 0.3s;
     .num-chars {
-        background: $color-light-gray-hex;
+        background: $blu-light-01;
+        flex-shrink: 0;
         padding: 0px 8px;
-        border-radius: 12px;
+        border-radius: 10px;
         font-size: 0.8em;
-        color: $color-text-box-hex;
+        color: $blu;
         float: right;
-        line-height: 20px;
+        line-height: 24px;
         font-weight: 700;
         width: 40px;
         text-align: center;
         &.error {
-            background: $color-orange-hex;
+            background: var(--color-red-hex);
+            color: var(--color-white-hex);
         }
     }
 }
@@ -191,7 +193,7 @@
 }
 
 .material-icons{
-    color: $light-blue;
+    color: $blu-05;
     font-size: 18px;
 }
 

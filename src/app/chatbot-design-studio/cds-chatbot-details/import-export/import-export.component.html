@@ -290,9 +290,8 @@
 
         <input name="fileChangeUploadCSV" id="fileChangeUploadCSV" class="inputfile" type="file"
           (change)="fileChangeUploadCSV($event)" accept=".csv" />
-        <label id="upload-csv-choose-file" class="btn btn-primary" for="fileChangeUploadCSV"
+        <label id="upload-csv-choose-file" class="btn btn-primary cds-blue-button" for="fileChangeUploadCSV"
           [ngClass]="{'disabled': modalChoosefileDisabled }">
-
           {{ 'CDSSetting.ChooseFile' | translate }}
         </label>
       </div>
@@ -439,7 +438,7 @@
         <span #importIntentsFromJson class="import-intents-from-json-btn-wpr" style="margin-left: 16px;">
           <input style="display:inline" name="upload-intents-from-json-add" id="upload-intents-from-json-add"
             class="inputfile" type="file" (change)="fileChangeUploadIntentsFromJSON($event, 'add')" accept=".json" />
-          <label id=upload-intents-from-json-add class="btn btn-primary" for="upload-intents-from-json-add">
+          <label id=upload-intents-from-json-add class="btn btn-primary cds-blue-button" for="upload-intents-from-json-add">
             <span class="material-icons" style="padding-right: 8px;">
               cloud_upload
             </span>

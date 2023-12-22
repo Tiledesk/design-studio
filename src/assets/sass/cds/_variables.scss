@@ -1,56 +1,5 @@
-/** LOCAL COLORS **/
-$color-white-hex: #ffffff;
-$color-blue-hex: #3ea9f5;
-$color-red-hex: #ed2e19;
-$color-orange-hex: #ffbb1c;
-$color-light-gray-hex: #D2D2D2;
-
-$color-txt-1-hex: #787878;
-$color-txt-2-hex: #858585;
-$color-txt-3-hex: #CCCCCC;
-$color-txt-4-hex: #ffffff;
-
-
-
-
-
-$color-bck-light-gray-hex: #e7f3ff;
-$color-bck-gray-hex: #647283;
-$color-text-box-hex: #566787;
-$color-text-dark-hex: #22272d;
-$color-text-select-hex: #7695A5;
-
-$brown-85: #6c6859d9;
-
-
-// Typography elements
-$font-size-base: 14px;
-
-$height-header: 25px;
-
-$icon-color: #ecb606b0;
-$icon-active-background: rgb(58, 107, 147);
-
-$light-blue: #8ab4f8;
-$light-black: #202124;
-$light-gray: #5f6368;
-
-$deep-brown: #6c6859;
-$light-brown: #e8e6dd;
-
-
-
 
 /* CDS REFACTORING
-/* ******************************* */
-$scrollbar-track-white-color: rgb(255, 255, 255);
-$scrollbar-thumb-color:rgba(162, 176, 195, 1);
-$border-light: rgb(223,227,237);
-$drop-zone-color-border: rgb(212, 217, 230);
-$drop-zone-background: rgb(142,152,168);
-$icon-bckgrnd-color: #e4e6eb;
-
-
 
 
 /* CDS NEW v2
@@ -58,13 +7,12 @@ $icon-bckgrnd-color: #e4e6eb;
 $mdb-font-family-poppins: 'Poppins', 'Roboto', Arial, sans-serif !default;
 $mdb-font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !default;
 
-$drag-background: rgb(152 153 153 / 40%);
-$drag-points-color: rgb(240 233 233 / 25%);
-
 
 $blu: #506493;
 $blu-02: rgb(91, 114, 167);
 $blu-03: rgb(61,64,68);
+$blu-04: #647283;
+$blu-05: #8ab4f8;;
 $blu-light-01: rgb(244, 246, 251);
 $blu-light-02: #b6c2df;
 $blu-light-03: rgb(224, 227, 241);
@@ -134,4 +82,35 @@ body.light {
         --textColor: #{$empty-element-property};
         --borderColor: #{$empty-element-property};
     }
+}
+
+:host{
+
+    /* LIGHT TEME COLORS*/
+    --color-white-hex: #ffffff;
+    --color-red-hex: #ed2e19;
+    --brown-85: #6c6859d9;
+    --blu: #506493;
+
+    --icon-color: #ecb606b0;
+    --icon-active-background: rgb(58, 107, 147);
+
+    --font-size-base: 14px;
+    --height-header: 25px;
+
+
+    //ACTION DRAG-DROP 
+    --drop-zone-background: rgba(221,228,234,.8);
+    --drop-zone-color-border: #6c6859:
+    --drag-preview-background: var(--color-white-hex);
+
+
+    /** SCROLL-BAR **/
+    --scrollbar-track-background: #{$blu-light-01};
+    --scrollbar-thumb-background: #{$blu};
+    --scrollbar-thumb-border-radius: 3px;
+
+    /** CANVAS CONTAINER COLORS */
+    --container-background: rgb(152 153 153 / 40%);
+    --container-points-color: rgb(240 233 233 / 25%);
 }

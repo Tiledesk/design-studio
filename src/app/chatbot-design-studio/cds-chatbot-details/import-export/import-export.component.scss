@@ -137,15 +137,13 @@ input[type="file"] {
     text-transform: unset !important;
     color: #202124 !important;
     font-weight: 500 !important;
-    background: $light-blue !important;
+    background: $blu-05 !important;
     margin-left: 15px;
 }
 
 .inport-faq-from-csv:hover {
     background: rgba(138, 180, 248, 0.8) !important;
 }
-
-
 
 .cds-blue-button {
     margin-left: 12px;
@@ -157,38 +155,4 @@ input[type="file"] {
     gap: 10px;
 }
 
-#upload-intents-from-json-overwrite {
-    box-shadow: unset !important;
-    text-transform: unset !important;
-    color: #202124 !important;
-    font-weight: 500 !important;
-    background: $light-blue !important;
-}
 
-#upload-intents-from-json-overwrite:hover {
-    background: rgba(138, 180, 248, 0.8) !important;
-}
-
-#upload-intents-from-json-add {
-    box-shadow: unset !important;
-    text-transform: unset !important;
-    color: #202124 !important;
-    background: $light-blue !important;
-}
-
-#upload-intents-from-json-add :hover {
-    background: rgba(138, 180, 248, 0.8) !important;
-}
-
-#upload-csv-choose-file {
-    padding-left: 15px !important;
-    padding-right: 15px !important;
-    background: $blu !important;
-    box-shadow: unset !important;
-    color: $color-white-hex;
-    font-weight: 500 !important;
-}
-
-#upload-csv-choose-file:hover {
-    background: rgba(138, 180, 248, 0.8) !important;
-}
