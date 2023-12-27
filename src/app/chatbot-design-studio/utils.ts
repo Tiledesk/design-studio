@@ -481,18 +481,19 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
     }
 ]
 
-export const LOGO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, src?: string}> = [
-    { key: 'GO_TO_DASHBOARD', label: 'GoToDashboard',  icon: 'arrow_back'},
-    { key: 'EXPORT', label: 'Export', icon: 'file_download'},
-    { key: 'LOG_OUT', label: 'LogOut', icon: 'logout'}
+export const LOGO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}> = [
+    { key: 'GO_TO_DASHBOARD', label: 'GoToDashboard',  icon: 'arrow_back', type: TYPE_URL.SELF},
+    { key: 'EXPORT', label: 'Export', icon: 'file_download', type: TYPE_URL.SELF},
+    { key: 'LOG_OUT', label: 'LogOut', icon: 'logout', type: TYPE_URL.SELF}
 ]
 
-export const INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, src?: string}> = [
-    { key: 'HELP_CENTER', label: 'HelpCenter', icon: 'help', src: 'https://gethelp.tiledesk.com/'},
-    { key: 'ROAD_MAP', label: 'RoadMap', icon: 'checklist', src: 'https://feedback.tiledesk.com/roadmap'},
-    { key: 'FEEDBACK', label: 'Feedback', icon: 'lightbulb', src: 'https://feedback.tiledesk.com/feedback'},
-    { key: 'SUPPORT', label: 'support@tiledesk.com', icon: 'email', src: 'mailto:support@tiledesk.com'},
-    { key: 'CHANGELOG',  label: 'WhatsNew', icon: 'local_fire_department', src:'https://feedback.tiledesk.com/changelog'}
+export const INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}> = [
+    { key: 'HELP_CENTER', label: 'HelpCenter', icon: 'help', type: TYPE_URL.BLANK , src: 'https://gethelp.tiledesk.com/'},
+    { key: 'ROAD_MAP', label: 'RoadMap', icon: 'checklist', type: TYPE_URL.BLANK, src: 'https://feedback.tiledesk.com/roadmap'},
+    { key: 'FEEDBACK', label: 'Feedback', icon: 'lightbulb', type: TYPE_URL.BLANK, src: 'https://feedback.tiledesk.com/feedback'},
+    { key: 'GITHUB', label: 'GitHubRepo', icon: 'code', type: TYPE_URL.BLANK, src: 'https://github.com/Tiledesk'},
+    { key: 'SUPPORT', label: 'support@tiledesk.com', icon: 'email', type: TYPE_URL.SELF, src: 'mailto:support@tiledesk.com'},
+    { key: 'CHANGELOG',  label: 'Changelog', icon: 'local_fire_department', type: TYPE_URL.BLANK, src:'https://feedback.tiledesk.com/changelog'}
 ]
 
 

@@ -186,7 +186,7 @@ appdashboard-filter{
 }
 
 .control-label{
-    font-family: 'Poppins','Roboto',Arial,sans-serif;
+    font-family: var(--font-family-poppins);
     color: $blu;
     text-align: left;
     line-height: 20px;

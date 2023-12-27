@@ -9,6 +9,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { environment } from 'src/environments/environment';
+import { TYPE_URL } from '../../utils';
 
 
 @Component({
@@ -18,10 +19,11 @@ import { environment } from 'src/environments/environment';
 })
 export class CDSMenuComponent implements OnInit {
 
-  @Input() items: Array<{ key: string, label: string, icon: string, src?: string}>;
+  @Input() items: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}>;
   @Input() menuType: 'header' | 'sidebar' = 'header';
   @Output() onMenuOption = new EventEmitter();
   
+  TYPE_URL = TYPE_URL;
   selectedChatbot: Chatbot;
   loggedUser: UserModel;
 

@@ -5,6 +5,10 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7-rc.10
+- added: leadAttributes section for variableList
+- added: GitHub link on sidebar bottom menu
+
 ### 1.0.7-rc.9
 - added: upload/link option while loading an image from a source file or a link ora a variable dynamically
 - added: leadAttributes section for variableList

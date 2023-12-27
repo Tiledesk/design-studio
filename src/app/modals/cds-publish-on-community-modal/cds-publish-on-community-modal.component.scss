@@ -74,7 +74,7 @@ input[type="file"] {
     background: #f44336!important;
     box-shadow: none!important;
     font-weight: 500!important;
-    font-family: Poppins,Roboto,Arial,sans-serif!important;
+    font-family: var(--font-family-poppins) !important;
     text-transform: capitalize!important;
     font-size: 14px!important;
     height: 44px;

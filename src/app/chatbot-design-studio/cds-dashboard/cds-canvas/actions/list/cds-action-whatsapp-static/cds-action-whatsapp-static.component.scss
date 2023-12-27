@@ -13,7 +13,7 @@
 
         label {
             font-weight: 500;
-            font-family: Poppins, Roboto, Arial, sans-serif;
+            font-family: var(--font-family-poppins);
             text-transform: capitalize;
             font-size: 14px;
             animation: blinker 1s linear infinite;

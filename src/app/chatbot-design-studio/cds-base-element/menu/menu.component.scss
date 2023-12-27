@@ -63,8 +63,12 @@
     color: var(--text-color);
     padding: 0;
     vertical-align: middle;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 400;
+}
+
+.external-link:hover{
+    text-decoration: underline;
 }
 
 .custom-divider {
@@ -72,7 +76,7 @@
     margin-bottom: 5px;
     border: 0;
     border-top: 1px solid $blu;
-    font-family: Poppins,Roboto,Arial,sans-serif;
+    font-family: var(--font-family-poppins);
 }
 
 .current-user{

@@ -435,7 +435,7 @@
   height: auto;
   line-height: 32px;
   margin: 10px 5px 0;
-  font-family: "Poppins";
+  font-family: var(--font-family-poppins);
   padding: 10px;
   transition: all 0.1s;
 
@@ -481,7 +481,7 @@
   height: auto;
   line-height: 32px;
   margin: 10px 5px 0;
-  font-family: "Poppins";
+  font-family: var(--font-family-poppins);
   padding: 10px;
   transition: all 0.3s;
   width: 96px;

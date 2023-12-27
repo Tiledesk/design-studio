@@ -4,10 +4,6 @@
 
 /* CDS NEW v2
 /* ******************************* */
-$mdb-font-family-poppins: 'Poppins', 'Roboto', Arial, sans-serif !default;
-$mdb-font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !default;
-
-
 $blu: #506493;
 $blu-02: rgb(91, 114, 167);
 $blu-03: rgb(61,64,68);
@@ -85,6 +81,10 @@ body.light {
 }
 
 :host{
+
+    // Typography elements
+    --font-family-poppins: 'Poppins', 'Roboto', Arial, sans-serif;
+    $mdb-font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !default;
 
     /* LIGHT TEME COLORS*/
     --color-white-hex: #ffffff;

@@ -3,7 +3,7 @@
 
 cds-header {
   height: $header-height;
-  font-family: $mdb-font-family-poppins;
+  font-family: var(--font-family-poppins);
   line-height: $header-height;
   font-size: 21px;
   color: $blu;
@@ -21,7 +21,7 @@ cds-header {
   height: calc(100vh - $header-height);
   overflow-x: hidden;
   overflow-y: hidden;
-  font-family: $mdb-font-family-poppins;
+  font-family: var(--font-family-poppins);
   color: $blu;
   font-size: 16px;
 }

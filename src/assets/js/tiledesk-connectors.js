@@ -915,12 +915,12 @@ export class TiledeskConnectors {
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) { return; }
-    console.log("block :---> ", block);
+    // console.log("block :---> ", block);
     for (const [key, conn_id] of Object.entries(block.outConnectors)) {
       let conn = this.connectors[conn_id];
-      console.log("conn :---> ", this.connectors, conn_id);
+      // console.log("conn :---> ", this.connectors, conn_id);
       if (conn) {
-        console.log("OUT :---> ", conn);
+        // console.log("OUT :---> ", conn);
         const elFrom = document.getElementById(conn.fromId);
         if (elFrom) {
           conn.fromPoint = this.elementLogicCenter(elFrom);

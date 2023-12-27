@@ -143,7 +143,7 @@
     color: #fff;
     box-shadow: none;
     font-weight: 500;
-    font-family: Poppins, Roboto, Arial, sans-serif;
+    font-family: var(--font-family-poppins);
     text-transform: capitalize;
     font-size: 14px;
     padding: 6px 12px;
@@ -164,7 +164,7 @@
     color: #4b5052;
     box-shadow: none;
     font-weight: 500;
-    font-family: Poppins, Roboto, Arial, sans-serif;
+    font-family: var(--font-family-poppins);
     text-transform: capitalize;
     font-size: 14px;
     padding: 6px 12px;

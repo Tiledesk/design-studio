@@ -2,6 +2,9 @@
 @import "./src/assets/sass/md/_variables.scss";
 /** GENERIC **/
 
+body{
+    font-family: var(--font-family-poppins);
+}
 /*
 Ellips text
 */
@@ -75,7 +78,7 @@ button.close{
     margin-bottom: 0px;
     height: 40px !important;
     position: relative;
-    font-family: "Poppins", "Roboto", "Arial", sans-serif;
+    font-family: var(--font-family-poppins);
     height: 30px;
     font-size: 16px;
     margin-top: 10px;
@@ -155,7 +158,7 @@ button.close{
     color: #555555;
     font-size: 12px;
     border-radius: 2px;
-    font-family: "Poppins";
+    font-family: var(--font-family-poppins);
     padding-top: 8px;
     padding-bottom: 8px;
     border: 1px solid #e5effe;
@@ -395,7 +398,7 @@ color: white;
     color: #555555;
     font-size: 12px;
     border-radius: 8px;
-    font-family: 'Poppins';
+    font-family: var(--font-family-poppins);
     // padding-top:8px;
     // padding-bottom:8px;
     border: 1px solid #e5effe;
@@ -409,7 +412,7 @@ color: white;
     font-size: 10px;
     text-align: justify;
     border-radius: 4px;
-    font-family: 'Poppins';
+    font-family: var(--font-family-poppins);
     // border: 1px solid #e5effe;
     width: auto;
 }
@@ -430,7 +433,7 @@ color: white;
     background-color: $gray-light-01 !important;
     color: $gray !important;
     font-size: 12px !important;
-    font-family: "Poppins", "Roboto", "Arial", sans-serif;
+    font-family: var(--font-family-poppins);
     border-radius: 16px !important;
     padding-top: 2px !important;
     padding-bottom: 2px !important;
@@ -442,7 +445,7 @@ color: white;
     color: white;
     box-shadow: none;
     font-weight: 500;
-    font-family: "Poppins", Roboto, Arial, sans-serif;
+    font-family: var(--font-family-poppins);
     text-transform: capitalize;
     font-size: 14px;
     padding: 6px 12px;

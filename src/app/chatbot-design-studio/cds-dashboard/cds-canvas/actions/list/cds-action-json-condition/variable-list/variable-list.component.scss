@@ -167,7 +167,7 @@
     color: #555555;
     font-size: 12px;
     border-radius: 8px;
-    font-family: 'Poppins';
+    font-family: var(--font-family-poppins);
     // padding-top:8px;
     // padding-bottom:8px;
     border: 1px solid #e5effe;
@@ -182,7 +182,7 @@
     font-size: 10px;
     text-align: justify;
     border-radius: 4px;
-    font-family: 'Poppins';
+    font-family: var(--font-family-poppins);
     border: 1px solid #e5effe;
     width: auto;
     cursor: pointer;

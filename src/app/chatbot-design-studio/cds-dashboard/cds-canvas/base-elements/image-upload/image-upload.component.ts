@@ -66,22 +66,23 @@ export class CDSImageUploadComponent implements OnInit {
   }
 
   onChangeTextarea(text: string){
+    console.log('onChangeTextarea eventtttt', text)
+    this.metadata.src = text
+    this.optionSelected = 'link'
     if(text && text.match(new RegExp(/{{[^{}]*}}/g))){
       this.metadata = {
         name: text,
         src: text,
         type: 'image/jpg'
       }
-      this.onChangeMetadata.emit(this.metadata)
-    }else if(text) {
-      this.isFilePendingToUpload = true
-      this.optionSelected = 'upload';
-      this.createFile(text);
     }
   }
 
   onBlur(event){
-
+    console.log('eventtttt', event)
+    // this.isFilePendingToUpload = true
+    this.createFile(this.metadata.src);
+    this.onChangeMetadata.emit(this.metadata)
   }
 
 
