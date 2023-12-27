@@ -297,6 +297,8 @@ export class ActionGPTTask extends Action {
     temperature: number;
     model: string;
     preview?: Array<any>;
+    trueIntent: string;
+    falseIntent: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.GPT_TASK

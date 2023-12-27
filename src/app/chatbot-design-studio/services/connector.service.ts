@@ -314,7 +314,7 @@ export class ConnectorService {
           }
         }
 
-        /**  ASKGPT */
+        /** ASKGPT */
         if(action._tdActionType === TYPE_ACTION.ASKGPT){
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
@@ -342,7 +342,35 @@ export class ConnectorService {
           }
         }
 
-        /**  WEB-REQUEST-V2 */
+        /**  GPT-TASK */
+        if(action._tdActionType === TYPE_ACTION.GPT_TASK){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - GPT-TASK ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - GPT-TASK ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - GPT-TASK ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - GPT-TASK ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
+        /** WEB-REQUEST-V2 */
         if(action._tdActionType === TYPE_ACTION.WEB_REQUESTV2){
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
@@ -369,7 +397,7 @@ export class ConnectorService {
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
         }
-        /**  WEB-MAKE */
+        /** MAKE */
         if(action._tdActionType === TYPE_ACTION.MAKE){
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
@@ -396,7 +424,6 @@ export class ConnectorService {
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
         }
-        
 
         /**  CAPTURE USER_REPLY */
         if(action._tdActionType === TYPE_ACTION.CAPTURE_USER_REPLY){
