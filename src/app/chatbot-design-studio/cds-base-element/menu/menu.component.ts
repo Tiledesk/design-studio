@@ -19,7 +19,7 @@ import { TYPE_URL } from '../../utils';
 })
 export class CDSMenuComponent implements OnInit {
 
-  @Input() items: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}>;
+  @Input() items: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string, localIcon?: boolean}>;
   @Input() menuType: 'header' | 'sidebar' = 'header';
   @Output() onMenuOption = new EventEmitter();
   
@@ -41,6 +41,18 @@ export class CDSMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.loggedUser = this.tiledeskAuthService.getCurrentUser();
+  }
+
+  ngOnChanges(){
+    if(this.items){
+      this.items.map((el)=> {
+        el.localIcon = false
+        if(el.icon && el.icon.match(new RegExp(/(?=.*?assets|http|https\b)^.*$/))){
+          el.localIcon =true
+        }
+      })
+      console.log('itemmmm', this.items)
+    }
   }
 
 

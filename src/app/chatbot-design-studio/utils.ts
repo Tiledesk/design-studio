@@ -491,9 +491,9 @@ export const INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, 
     { key: 'HELP_CENTER', label: 'HelpCenter', icon: 'help', type: TYPE_URL.BLANK , src: 'https://gethelp.tiledesk.com/'},
     { key: 'ROAD_MAP', label: 'RoadMap', icon: 'checklist', type: TYPE_URL.BLANK, src: 'https://feedback.tiledesk.com/roadmap'},
     { key: 'FEEDBACK', label: 'Feedback', icon: 'lightbulb', type: TYPE_URL.BLANK, src: 'https://feedback.tiledesk.com/feedback'},
-    { key: 'GITHUB', label: 'GitHubRepo', icon: 'code', type: TYPE_URL.BLANK, src: 'https://github.com/Tiledesk'},
     { key: 'SUPPORT', label: 'support@tiledesk.com', icon: 'email', type: TYPE_URL.SELF, src: 'mailto:support@tiledesk.com'},
-    { key: 'CHANGELOG',  label: 'Changelog', icon: 'local_fire_department', type: TYPE_URL.BLANK, src:'https://feedback.tiledesk.com/changelog'}
+    { key: 'CHANGELOG',  label: 'Changelog', icon: 'local_fire_department', type: TYPE_URL.BLANK, src:'https://feedback.tiledesk.com/changelog'},
+    { key: 'GITHUB', label: 'GitHubRepo', icon: 'assets/images/github-mark.svg', type: TYPE_URL.BLANK, src: 'https://github.com/Tiledesk'}
 ]
 
 
