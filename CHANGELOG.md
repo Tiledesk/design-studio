@@ -6,8 +6,10 @@
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 1.0.7-rc.10
-- added: leadAttributes section for variableList
+- added: success/failure branch on cds-action-gpt-task
 - added: GitHub link on sidebar bottom menu
+- added: ability to use local svg icon for menu component
+- changed: moved globals on bottom in variable-list component
 
 ### 1.0.7-rc.9
 - added: upload/link option while loading an image from a source file or a link ora a variable dynamically
