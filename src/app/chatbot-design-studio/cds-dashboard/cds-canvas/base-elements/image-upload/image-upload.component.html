@@ -1,10 +1,13 @@
-<div *ngIf="!metadata.src" class="wrapper">
-    <div class="toogle-wrp">
-        <mat-button-toggle-group [(ngModel)]="optionSelected">
-            <mat-button-toggle value="upload">Upload</mat-button-toggle>
-            <mat-button-toggle value="link">Link</mat-button-toggle>
-        </mat-button-toggle-group>
-    </div>
+
+
+<!-- <div class="toogle-wrp">
+    <mat-button-toggle-group [(ngModel)]="optionSelected">
+        <mat-button-toggle value="upload">Upload</mat-button-toggle>
+        <mat-button-toggle value="link">Link</mat-button-toggle>
+    </mat-button-toggle-group>
+</div> -->
+
+<div *ngIf="!metadata.src && optionSelected === 'upload'" class="wrapper">
 
     <!-- 'UPLOAD use case'  -->
     <div *ngIf="optionSelected === 'upload'"
@@ -38,9 +41,12 @@
         
     </div>
 
+</div>
+
+<div *ngIf="optionSelected === 'link'" class="wrapper">
+    
     <!-- 'LINK use case'  -->
-    <div *ngIf="optionSelected === 'link'"
-        class="dropUploadImage link">  
+    <div *ngIf="optionSelected === 'link'" class="dropUploadImage link">  
         
         <div *ngIf="!isFilePendingToUpload" class="field-box">
             <cds-textarea 
@@ -62,20 +68,8 @@
         </loading-spinner>
 
     </div>
-    
-
 </div>
 
-
-
-
-<div *ngIf="metadata.src && optionSelected==='link'"  class="link-wrp">
-    <div>Link:</div>
-    <div class="tag">
-        <span class="material-icons close" (click)="onClearSelectedAttribute()">close</span>
-        <div class="tag-content ellips"><span class="tag-text">{{textTag}}</span></div>
-    </div>
-</div>
 
 <div *ngIf="metadata.src && optionSelected==='upload'" class="image-wrp">
     <img *ngIf="!isImageSvg" #imageUploaded id="imageUploaded" [src]="sanitizerUrl()" (change)="getDimensionImage()">

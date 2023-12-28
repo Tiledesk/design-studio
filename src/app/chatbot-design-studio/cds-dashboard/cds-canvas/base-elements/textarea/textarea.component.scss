@@ -23,11 +23,11 @@ mat-form-field.mat-focused ::ng-deep {
             .mat-form-field-infix {
                 textarea {
                     border: 1px solid $blu ;
-                    outline: 0px solid $blu;
+                    // outline: 0px solid $blu;
                     transition: border 0.3s;
                     &.invalid{
                         border: 1px solid red !important;
-                        outline: 0px solid red !important;
+                        // outline: 0px solid red !important;
                         transition: border 0.3s;
                     }
                 }
@@ -123,7 +123,7 @@ mat-form-field.box-textarea ::ng-deep {
         -webkit-box-pack: center;
         -ms-flex-pack: center;
         align-items: center;
-        background: #fff;
+        background: var(--color-white-hex);
         border-radius: 100%;
         -webkit-box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
         box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
@@ -138,13 +138,13 @@ mat-form-field.box-textarea ::ng-deep {
         border: 1px solid $blu-light-02;
         &:hover {
             background: $blu;
-            color:#fff ;
+            color:var(--color-white-hex) ;
         }
     }
     .emoji-picker {
         .emoji-picker-button {
             align-items: center;
-            background: #fff;
+            background: var(--color-white-hex);
             border-radius: 100%;
             box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
             cursor: pointer;
@@ -156,7 +156,7 @@ mat-form-field.box-textarea ::ng-deep {
             border: 1px solid $blu-light-02;
             &:hover {
                 background: $blu;
-                color:#fff ;
+                color:var(--color-white-hex) ;
             }
         }
     }
@@ -182,7 +182,7 @@ mat-form-field.box-textarea ::ng-deep {
     flex-direction: column;
     box-shadow: 0 0 20px 4px rgb(154 161 177 / 15%), 0 4px 80px -8px rgb(36 40 47 / 25%),
         0 4px 4px -2px rgb(91 94 105 / 15%);
-    background: rgb(255, 255, 255);
+    background: var(--color-white-hex);
     border-radius: 4px;
     // right: 27px !important;
 }
@@ -210,7 +210,7 @@ mat-form-field.box-textarea ::ng-deep {
         padding: 2px;
         max-width: calc(100% - 25px);
         background-color: $blu;
-        color: #fff;
+        color: var(--color-white-hex);
         .close{
             position: absolute;
             display: flex;
@@ -220,7 +220,7 @@ mat-form-field.box-textarea ::ng-deep {
             height: 17px;
             font-size: 13px;
             border-radius: 50%;
-            background: #fff;
+            background: var(--color-white-hex);
             border: 1px solid $blu;
             color: $blu;
             cursor: pointer;

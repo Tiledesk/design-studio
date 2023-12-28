@@ -91,6 +91,7 @@ export class CdsSidebarComponent implements OnInit {
       case 'ROAD_MAP':
       case 'FEEDBACK':
       case 'CHANGELOG':
+      case 'GITHUB':
         window.open(item.src, '_blank')
         break;
       case 'SUPPORT':

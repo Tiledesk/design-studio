@@ -269,7 +269,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       this.tiledeskAuthService.signInWithCustomToken(tiledeskToken).then(user => {
         this.logger.log('[APP-COMP] >>> initAuthentication user ', user)
 
-        this.updateStoredCurrentUser()
+        //this.updateStoredCurrentUser()
         this.projectService.initialize(serverBaseURL);
         this.multiChannelService.initialize(serverBaseURL)
         this.userService.initialize(serverBaseURL)

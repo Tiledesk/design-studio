@@ -1,11 +1,10 @@
+@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/styles.scss";
+
 ::ng-deep .custom-dialog-container {
     width: 40vw!important;
     min-width: 500px;
     max-width: 1000px!important;
-    mat-dialog-container {
-      padding: 0;
-    }
-
 
     .tpl-modal-box {
         border-radius: 6px;
@@ -15,11 +14,9 @@
     .tpl-modal-header {
         align-items: flex-start;
         align-items: center;
-        border-bottom: 1px solid #dbe1e8;
         display: flex;
         flex-shrink: 0;
         justify-content: center;
-        padding: 15px;
         width: 100%;
         i {
             flex-shrink: 0;
@@ -32,7 +29,6 @@
     
     .tpl-modal-header-text {
         flex-grow: 1;
-        padding-right: 15px;
         text-align: center;
         width: 0;
         span {
@@ -49,7 +45,7 @@
     
     .tpl-modal-content {
         flex-grow: 1;
-        padding: 30px 25px;
+        padding: 30px 0px;
         width: 100%;
     }
     
@@ -75,19 +71,24 @@
         line-height: 19px;
     }
     
-    .tpl-input {
-        background: #fff;
-        border: 2px solid #c6cdd4;
-        border-radius: 6px;
-        color: #22272d;
-        display: block;
-        font-weight: 400;
-        height: 37px;
-        line-height: 35px;
-        padding: 0 15px;
+    input {
+        border-radius: 8px;
+        background: var(--color-white-hex);
+        border: 1px solid $blu-light-02;
+        color: $gray;
+        font-size: 1.15em;
+        line-height: 25px;
+        
         -webkit-transition: border .3s;
         transition: border .3s;
         width: 100%;
+
+        padding: 10px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        margin: 0px;
+        // resize: none;
+
         &::placeholder {
             opacity: 0.5;
         }
@@ -102,19 +103,14 @@
         display: flex;
         flex-shrink: 0;
         justify-content: flex-end;
-        padding: 0 25px 20px;
         color: #333;
+        gap: 5px;
         .cds-yellow-button{
             margin-left: 10px; 
             min-width: 80px;
             background-color: #ecb606b0;
             height: 100%;
             color: #333;
-        }
-        .btn-cancel {
-            min-width: 80px;
-            border: 0;
-            height: 100%;
         }
     }
 }
@@ -138,18 +134,6 @@
     margin-bottom: 2px;
 }
 
-#cds-publish-btn {
-    background: #006cff;
-    color: #fff;
-    box-shadow: none;
-    font-weight: 500;
-    font-family: var(--font-family-poppins);
-    text-transform: capitalize;
-    font-size: 14px;
-    padding: 6px 12px;
-    border-radius: 10px;
-}
-
 #cds-publish-btn:hover:enabled {
     opacity: .8 !important;
 }
@@ -162,16 +146,4 @@
 #cds-cancel-btn {
     background: #e5e5e5;
     color: #4b5052;
-    box-shadow: none;
-    font-weight: 500;
-    font-family: var(--font-family-poppins);
-    text-transform: capitalize;
-    font-size: 14px;
-    padding: 6px 12px;
-    border-radius: 10px;
-    margin-right: 6px;
-}
-
-#cds-cancel-btn:hover {
-    opacity: .8 !important;
 }
