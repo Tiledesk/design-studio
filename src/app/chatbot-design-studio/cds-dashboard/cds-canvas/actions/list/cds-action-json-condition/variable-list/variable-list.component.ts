@@ -34,7 +34,7 @@ export class VariableListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('[VARIABLE-LSIT] onInit')
+    console.log('[VARIABLE-LSIT] onInit', variableList.find(el => el.key === 'globals'))
     this.initialize();
   }
 

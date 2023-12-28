@@ -239,8 +239,7 @@ mat-expansion-panel {
     }
 }
 
-mat-expansion-panel#userDefined,
-mat-expansion-panel#globals {
+mat-expansion-panel#userDefined {
     ::ng-deep {
         .mat-expansion-panel-content{
             height: unset !important;
