@@ -9,6 +9,7 @@
 - added: success/failure branch on cds-action-gpt-task
 - added: GitHub link on sidebar bottom menu
 - added: ability to use local svg icon for menu component
+- changed: set 'Content-type' header option as 'application/json' automatically if user select 'body' radio option, remove 'Content-type' header option  if user select 'none' in radio button
 - changed: moved globals on bottom in variable-list component
 
 ### 1.0.7-rc.9
