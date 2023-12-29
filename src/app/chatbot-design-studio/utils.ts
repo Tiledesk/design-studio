@@ -125,7 +125,8 @@ export enum TYPE_ACTION {
     JSON_CONDITION = 'jsoncondition',
     CONDITION = 'condition',
     CAPTURE_USER_REPLY = 'capture_user_reply',
-    QAPLA = "qapla"
+    QAPLA = "qapla",
+    HUBSPOT = 'hubspot'
 }
 
 export enum TYPE_ACTION_CATEGORY {
@@ -280,6 +281,7 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     CAPTURE_USER_REPLY: { name: 'Capture User Reply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: 'This action allow to capture the user reply' },
     QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: 'PRE', description: 'This action allow to connect with Qapla' },
     MAKE : { name: 'Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "beta", description: ''},
+    HUPSPOT : { name: 'Hubspot',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.HUBSPOT, src:"assets/images/actions/make.svg", status: "beta", description: ''},
 }
 
 export const EVENTS_LIST = {

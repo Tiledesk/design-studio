@@ -214,6 +214,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-make>
+                     <!-- ADD INTENT HUBSPOT-->
+                     <cds-action-hubspot *ngSwitchCase="typeAction.HUBSPOT"
+                     class="panel-response"
+                     [intentSelected]="intentSelected"
+                     [action]="elementSelected"
+                     [previewMode]="false"
+                     (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                     (updateAndSaveAction)="onSaveIntent($event)">
+                 </cds-action-hubspot>
                     
                     <!-- <cds-action-assign-function *ngSwitchCase="typeAction.ASSIGN_FUNCTION"
                         [action]="elementSelected">
