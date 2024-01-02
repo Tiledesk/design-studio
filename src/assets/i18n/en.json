@@ -347,8 +347,7 @@
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
     "CDSGlobals":{
         "Globals":"Globals",
-        "NoGlobalVariables":"No global variables",
-        "GlobalVariablesDescription" : "Global variables are a set of variables that are always available in a workspace",
+        "NoGlobalVariables":"No global variables <br><br>Global variables are a set of variables that are always available in a workspace",
         "GLOBAL_KEY" :"GLOBAL_KEY",
         "value":"value"
     }

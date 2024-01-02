@@ -1,4 +1,25 @@
-<div class="cds-container">
+<div class="cds-container" *ngIf="showWelcome">
+    <cds-splash-screen
+        [text]="'CDSGlobals.NoGlobalVariables' | translate"
+        [section]="'cds-sb-globals'"
+        (onClickBtn)="addNew($event)" > 
+    </cds-splash-screen>
+
+     <!-- // FOOTER - START -->
+     <div class="footer">
+        <div class="container-wrp">
+            <span class="material-icons-outlined">info</span>
+            <div>
+                <label> Use variables to reuse values and protect sensitive data</label>
+                <label> Store sensitive data in variables type secret to keep its values masked on the screen. <br> Work with the current value of a variable to prevent sharing sensitive values with your team</label>
+            </div>
+        </div>
+    </div>
+    <!-- // FOOTER - END -->
+</div>
+
+
+<div class="cds-container" *ngIf="!showWelcome">
 
     <!-- // HEADER - START -->
     <div class="header">
@@ -10,8 +31,8 @@
                 {{ "Add" | translate }}
             </button>
         </div>
-        <p *ngIf="list && list.length === 0" class="header-subtitle">{{ "CDSGlobals.NoGlobalVariables" | translate }}</p>
-        <p *ngIf="list && list.length === 0" class="header-description">{{ "CDSGlobals.GlobalVariablesDescription" | translate }}</p>
+        <!-- <p *ngIf="list && list.length === 0" class="header-subtitle">{{ "CDSGlobals.NoGlobalVariables" | translate }}</p>
+        <p *ngIf="list && list.length === 0" class="header-description">{{ "CDSGlobals.GlobalVariablesDescription" | translate }}</p> -->
     </div>
     <!-- // HEADER - END -->
 

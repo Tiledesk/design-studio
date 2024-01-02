@@ -27,6 +27,7 @@ export class CdsGlobalsComponent implements OnInit {
   list = [];
   updateIndex: any;
   currentValue: string;
+  showWelcome: boolean = true;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -45,9 +46,11 @@ export class CdsGlobalsComponent implements OnInit {
       this.selectedChatbot.attributes.globals.sort((a, b) => {
         return a.key.toLowerCase().localeCompare(b.key.toLowerCase());;
       })
-      this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));;
+      this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));
       this.logger.debug("[CDS-GLOBALS] globals list: ", this.list)
-  
+      if(this.list.length > 0){
+        this.showWelcome = false
+      }
     }
   }
 
@@ -139,6 +142,13 @@ export class CdsGlobalsComponent implements OnInit {
   showHideNewSection(visible: boolean) {
     this.showUpdateSecret(null, null);
     this.newSectionVisible = visible;
+  }
+
+  addNew(event){
+    if(this.list.length === 0 ){
+      this.showWelcome = false
+      this.showHideNewSection(true)
+    }
   }
 
   // private initializeAttributes() {
