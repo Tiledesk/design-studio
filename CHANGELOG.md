@@ -5,6 +5,8 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.7 in PROD
+
 ### 1.0.7-rc.11
 - added: trueIntent and falseIntent property into cds-action-make
 - added: cds-splash-screen component inside cds-globals section if no global variables are set to current chatbot
