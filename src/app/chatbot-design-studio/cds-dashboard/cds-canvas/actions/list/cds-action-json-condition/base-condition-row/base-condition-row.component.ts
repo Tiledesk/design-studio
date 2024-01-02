@@ -132,6 +132,13 @@ export class BaseConditionRowComponent implements OnInit {
 
   onClickOperator(operator: {}){
     this.conditionForm.patchValue({ operator: operator['type']})
+    
+    //activate submit button and disable 'Value' textarea i operator is equal to 'isEmpty'
+    if(operator['type'] === 'isEmpty'){
+      this.disableSubmit = false;
+      this.readonlyTextarea = true;
+      this.setAttributeBtnOperand2 = false;
+    }
   }
 
   onSubmitCondition(){
