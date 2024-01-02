@@ -336,11 +336,14 @@
   right: 0px;
 }
 
-.footer-intent>.csd-open-action-menu-btn-wpr {
+.footer-intent>.csd-open-action-menu-btn-wpr,
+.add--action-placeholder .csd-open-action-menu-btn-wpr
+{
   opacity: 0;
 }
 
-.footer-intent:hover>.csd-open-action-menu-btn-wpr {
+.footer-intent:hover>.csd-open-action-menu-btn-wpr,
+.add--action-placeholder:hover .csd-open-action-menu-btn-wpr {
   opacity: 1;
 }
 

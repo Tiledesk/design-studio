@@ -1,12 +1,5 @@
 <div *ngIf="previewMode" class="cds-action-preview">
 
-    <div class="action-row-left">
-       
-        <span class="make-action-method" *ngIf="action.method">
-            {{ action.method}}
-        </span>
-
-    </div>
 
     <div *ngIf="action.url" class="action-row-right">
         {{action.url}}

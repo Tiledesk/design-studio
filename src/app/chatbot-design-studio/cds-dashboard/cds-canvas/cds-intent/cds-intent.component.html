@@ -65,13 +65,15 @@
                 </span>
             </div>
 
-            <div class="add-action-from-placeholder-btn-wpr">
-                <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+            <div class="csd-open-action-menu-btn-wpr">
+                <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+                    class="cds-add-action-btn">    
+                    + Add action
+                </div>
+                <!-- <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                     class="btn cds-add-action-btn csd-add-action-btn-wpr-element">
-                    <span class="material-icons csd-add-action-btn-wpr-element">
-                        add
-                    </span>
-                </button>
+                    + Add action
+                </button> -->
             </div>
         </div>
 
@@ -304,10 +306,9 @@
 
     <div class="footer-intent">
        
-        <div *ngIf="!isStart" class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart && listOfActions?.length > 0" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                class="cds-add-action-btn">
-                
+                class="cds-add-action-btn">    
                 + Add action
             </div>
         </div>
