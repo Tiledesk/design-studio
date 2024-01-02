@@ -501,6 +501,8 @@ export class ActionQapla extends Action {
     assignStatusTo: string;
     assignResultTo: string;
     assignErrorTo: string;
+    trueIntent: string;
+    falseIntent: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.QAPLA
