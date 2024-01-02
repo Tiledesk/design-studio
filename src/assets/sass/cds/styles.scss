@@ -173,11 +173,21 @@ emoji-mart {
     }
 }
 
+/** ACTION PREVIEW: start **/
 .cds-action-preview {
     /* padding: 3px 16px 16px; */
     padding: 5px 10px;;
     margin: 0px;;
     position: relative;
+    .title-preview-label{
+        color: #6c6859;
+        font-size: 12px; 
+        margin: 0px;
+    }
+    .icon-action img{
+        height: 16px;
+        filter: brightness(0) saturate(100%) invert(42%) sepia(2%) saturate(2720%) hue-rotate(9deg) brightness(91%) contrast(81%);
+    }
 }
 .action-row {
     display: flex;
@@ -185,7 +195,6 @@ emoji-mart {
     gap: 6px;
     flex-direction: row;
 }
-
 .action-row-left {
     height: 20px;
     width: 20px;
@@ -193,7 +202,6 @@ emoji-mart {
     align-items: center;
     justify-content: center;
 }
-
 .action-row-right {
     font-size: 12px;
     font-weight: 400;
@@ -202,7 +210,6 @@ emoji-mart {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .action-row-right.empty,
 .set-attribute-value.empty {
     background: none !important;
@@ -210,10 +217,19 @@ emoji-mart {
     font-size: 12px !important;
     padding: unset !important;
 }
-
 .action-row .action-row-left svg {
     fill: var(--brown-85);
 }
+.previewContent{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    // padding: 3px 0px;
+}
+/** ACTION PREVIEW: end **/
 
 .web-request-action-method {
     font-weight: 500;
@@ -296,7 +312,7 @@ emoji-mart {
     }
 }
 
-/** CONNECTOR TRUE/FALSE **/
+/** CONNECTOR TRUE/FALSE: start **/
 cds-connector.connector-true {
     .point-connector-empty{
         border-color: $success-connector;
@@ -379,13 +395,10 @@ cds-connector.connector-false {
     top: calc(50% - 10px);
 }
 
-
-
-
 ::ng-deep .mat-expansion-indicator::after {
 color: white;
 }
-
+/** CONNECTOR TRUE/FALSE: end **/
 
 .preview-divider {
     margin: 5px 0px;

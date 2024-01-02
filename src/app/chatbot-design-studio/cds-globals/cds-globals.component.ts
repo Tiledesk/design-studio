@@ -111,6 +111,9 @@ export class CdsGlobalsComponent implements OnInit {
         value: ''
       }
       this.globalForm.reset();
+      this.selectedChatbot.attributes= {
+        globals: data
+      }
       
       //Update local list (for variable-list component)
       variableList.find(el => el.key ==='globals').elements = this.selectedChatbot.attributes.globals.map(({
