@@ -8,11 +8,11 @@
         (onOptionClicked)="onOptionIntentControlClicked($event)">
     </cds-panel-intent-controls>
 
-    <div class="pic-header tds_draggable" 
+    <div class="pic-header" 
         [id]="'block-header-'+ intent?.intent_id"
         [ngClass]="{'cds-start': isStart}">
 
-        <cds-panel-intent-header class="pic-title-text" 
+        <cds-panel-intent-header class="pic-title-text tds_draggable" 
             [class.isStart]="isStart"
             [intent]="intent">
         </cds-panel-intent-header>

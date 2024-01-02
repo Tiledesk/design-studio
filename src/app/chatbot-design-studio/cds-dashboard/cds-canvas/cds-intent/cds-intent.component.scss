@@ -87,7 +87,6 @@
     margin: 0px; //10px 0px;
     overflow-x: hidden;
     position: relative;
-    border-radius: 10px;
     // border: 2px solid rgb(255, 255, 255);
     padding: 0 0px 10px 0px;
     // background-color: rgb(235, 226, 198);
@@ -608,8 +607,7 @@ cds-panel-intent-header.isStart ::ng-deep{
 .cds-intent-options {
   display: flex;
   justify-content: center;
-  align-items: center;
-  align-self: flex-end;
+  align-items: flex-end;
   gap: 5px;
 
   .option {
