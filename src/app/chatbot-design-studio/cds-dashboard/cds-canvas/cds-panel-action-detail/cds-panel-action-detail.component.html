@@ -185,6 +185,7 @@
                         [action]="elementSelected"
                         [project_id]="project_id"
                         [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-gpt-task>
 
@@ -203,9 +204,10 @@
                         [action]="elementSelected"
                         [project_id]="project_id"
                         [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-qapla>
-                    <!-- ADD INTENT MAKE-->
+
                     <cds-action-make *ngSwitchCase="typeAction.MAKE"
                         class="panel-response"
                         [intentSelected]="intentSelected"

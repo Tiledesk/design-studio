@@ -1138,6 +1138,8 @@ export class IntentService {
     this.setBehaviorUndoRedo();
     console.log('[INTENT SERVICE] updateIntentNew -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
     this.refreshIntents();
+    let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
+    this.refreshIntent(intentToUpdate)
     this.opsUpdate(this.payload);
   }
 

@@ -87,7 +87,6 @@
     margin: 0px; //10px 0px;
     overflow-x: hidden;
     position: relative;
-    border-radius: 10px;
     // border: 2px solid rgb(255, 255, 255);
     padding: 0 0px 10px 0px;
     // background-color: rgb(235, 226, 198);
@@ -336,11 +335,14 @@
   right: 0px;
 }
 
-.footer-intent>.csd-open-action-menu-btn-wpr {
+.footer-intent>.csd-open-action-menu-btn-wpr,
+.add--action-placeholder .csd-open-action-menu-btn-wpr
+{
   opacity: 0;
 }
 
-.footer-intent:hover>.csd-open-action-menu-btn-wpr {
+.footer-intent:hover>.csd-open-action-menu-btn-wpr,
+.add--action-placeholder:hover .csd-open-action-menu-btn-wpr {
   opacity: 1;
 }
 
@@ -605,8 +607,7 @@ cds-panel-intent-header.isStart ::ng-deep{
 .cds-intent-options {
   display: flex;
   justify-content: center;
-  align-items: center;
-  align-self: flex-end;
+  align-items: flex-end;
   gap: 5px;
 
   .option {

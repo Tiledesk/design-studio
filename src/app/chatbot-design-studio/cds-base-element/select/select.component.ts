@@ -40,7 +40,6 @@ export class SelectComponent implements OnInit {
 
   ngOnChanges(){
     if(this.itemSelected && this.items){
-      //   this.logger.log('itemmmm selectedddd-->', this.itemSelected, this.items)
       //   this.itemSelected = this.items.find(el => el[this.bindValueSelect] === this.itemSelected)
       try {
         this.itemSelected = this.items.find(el => el[this.bindValueSelect] === this.itemSelected)[this.bindValueSelect]

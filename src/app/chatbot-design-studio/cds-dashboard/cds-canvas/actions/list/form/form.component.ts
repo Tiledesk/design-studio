@@ -67,7 +67,6 @@ export class CdsFormComponent implements OnInit, OnChanges {
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,
-    private httpClient: HttpClient,
   ) {
     this.langBot = this.route.snapshot.params['botlang'];
     if (!this.langBot || this.langBot === undefined) {

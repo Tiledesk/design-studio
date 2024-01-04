@@ -98,7 +98,7 @@ export class TiledeskConnectors {
 
 
   createConnector(fromId, toId, fromPoint, toPoint, save=false, notify=true, attributes=null) {
-    console.log("createConnector:::::  ", fromId, toId, fromPoint, toPoint);
+    // console.log("createConnector:::::  ", fromId, toId, fromPoint, toPoint);
     if(!fromPoint || !toPoint)return;
     const id = fromId + "/" + toId;
     let connector = {
@@ -128,7 +128,7 @@ export class TiledeskConnectors {
     inblock.inConnectors[connector.id] = connector.id;
     this.#drawConnector(id, fromPoint, toPoint, attributes);
     this.removeConnectorDraft();
-    console.log("connector CREATED id, save, notify:", id, save, notify);
+    // console.log("connector CREATED id, save, notify:", id, save, notify);
     connector['save'] = save;
     if(notify){
       const event = new CustomEvent("connector-created", { detail: { connector: connector } });

@@ -5,6 +5,22 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.8 in PROD
+
+### 1.0.8-rc.1
+- added: cds-global-panel-detail component to add/update/delete an existing global variable
+- bug-fixed: cannot set iframe url into cds-action-reply 
+- bug-fixed: cannot delete image because of path url error
+
+### 1.0.7 in PROD
+
+### 1.0.7-rc.11
+- added: trueIntent and falseIntent property into cds-action-make
+- added: cds-splash-screen component inside cds-globals section if no global variables are set to current chatbot
+- changed: activate submit button and disable 'Value' textarea i operator is equal to 'isEmpty' in cds-action-json-condition 
+- bug-fixed: form and question icons not updated realtime if form or question is set
+- bug-fixed: cds-intent not draggable in some top point of the component
+
 ### 1.0.7-rc.10
 - added: success/failure branch on cds-action-gpt-task
 - added: GitHub link on sidebar bottom menu

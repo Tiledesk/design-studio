@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, Input } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser'
-import { getEmbedUrl } from '../../../..//utils';
+import { getEmbedUrl } from '../../../../utils';
 import { Metadata } from 'src/app/models/action-model';
 
 @Component({
@@ -64,7 +64,7 @@ export class CDSElementFromUrlComponent implements OnInit {
   }
 
   /** onChangeTextarea */
-  onChangeTextarea(text:string) {
+  onChangeTextArea(text:string) {
     this.pathElement = text;
   }
 

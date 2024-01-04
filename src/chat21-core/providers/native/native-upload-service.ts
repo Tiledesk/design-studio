@@ -112,7 +112,7 @@ export class NativeUploadService extends UploadService {
 
         //USE IMAGE API
         const that = this;
-        const url = this.URL_TILEDESK_IMAGES + '/users' + '?path=' + path
+        const url = this.URL_TILEDESK_IMAGES + '/users' + '?path=' + path.split('path=')[1]
         return new Promise((resolve, reject) => {
             that.http.delete(url, requestOptions).subscribe(data => {
                 // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];

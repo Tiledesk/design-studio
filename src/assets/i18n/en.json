@@ -343,14 +343,16 @@
     "WhatsNew": "What's new ?",
     "Changelog":"Changelog",
     "GitHubRepo":"GitHub repository",
-    "ReadMoreOnOurWebsite": "Read more on our website",
+    "ReadMore": "Read more",
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
     "CDSGlobals":{
         "Globals":"Globals",
-        "NoGlobalVariables":"No global variables",
-        "GlobalVariablesDescription" : "Global variables are a set of variables that are always available in a workspace",
+        "NoGlobalVariables":"No global variables <br><br>Global variables are a set of variables that are always available in a workspace",
         "GLOBAL_KEY" :"GLOBAL_KEY",
-        "value":"value"
+        "value":"value",
+        "InfoTitle":"Use variables to reuse values and protect sensitive data",
+        "InfoDescription":"Store sensitive data in variables type secret to keep its values masked on the screen. <br> Work with the current value of a variable to prevent sharing sensitive values with your team",
+        "ManageGlobal":"Manage global variable"
     }
     
 

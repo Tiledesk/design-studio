@@ -180,6 +180,7 @@ import { CdsActionMakeComponent } from './cds-dashboard/cds-canvas/actions/list/
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
 import { CdsPanelWidgetComponent } from './cds-dashboard/cds-canvas/cds-panel-widget/cds-panel-widget.component';
 import { CdsPanelButtonConfigurationComponent } from './cds-dashboard/cds-canvas/cds-panel-button-configuration/cds-panel-button-configuration.component';
+import { CdsGlobalPanelDetailComponent } from './cds-globals/cds-global-panel-detail/cds-global-panel-detail.component';
 
 //FORM
 import { CdsFormComponent } from './cds-dashboard/cds-canvas/actions/list/form/form.component';
@@ -348,6 +349,10 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
     CDSDetailCommunityComponent,
     CDSDetailDeveloperComponent,
     // ******* CDS CHATBOT DETAIL:: end *******
+
+    // ******* CDS GLOBALS:: start *******
+    CdsGlobalPanelDetailComponent,
+    // ******* CDS GLOBALS:: start *******
 
     //UTILS
     CdsPopupComponent,
