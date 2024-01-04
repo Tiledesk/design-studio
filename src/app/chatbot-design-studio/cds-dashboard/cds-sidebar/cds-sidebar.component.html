@@ -128,6 +128,7 @@
 <div class="content" [class.is_opened]="IS_OPEN_SIDEBAR">
 
     <div style="width: 100%;">
+
         <div id="cds-sb-intents" name="intents" class="section" (click)="goTo(SIDEBAR_PAGES.INTENTS)"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{ 'Blocks' | translate }}" 
@@ -136,9 +137,6 @@
             matTooltipHideDelay="100" 
             [matTooltipDisabled]="IS_OPEN_SIDEBAR">
             <span class="item-icon">
-                <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                    <path d="M320-520q17 0 28.5-11.5T360-560q0-17-11.5-28.5T320-600q-17 0-28.5 11.5T280-560q0 17 11.5 28.5T320-520Zm160 0q17 0 28.5-11.5T520-560q0-17-11.5-28.5T480-600q-17 0-28.5 11.5T440-560q0 17 11.5 28.5T480-520Zm160 0q17 0 28.5-11.5T680-560q0-17-11.5-28.5T640-600q-17 0-28.5 11.5T600-560q0 17 11.5 28.5T640-520ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/>
-                </svg> -->
                 <svg xmlns="http://www.w3.org/2000/svg"  height="24" viewBox="0 0 24 24" width="24">
                     <path d="M18.8,8.6c1.9,0,3.4-1.5,3.4-3.4s-1.5-3.4-3.4-3.4c-1.9,0-3.4,1.5-3.4,3.4c0,0.2,0,0.4,0.1,0.6l-8,4
                         C6.8,9.2,6.1,8.9,5.2,8.9c-1.9,0-3.4,1.5-3.4,3.4s1.5,3.4,3.4,3.4c0.8,0,1.5-0.3,2.1-0.7l6.1,3.2c0,0.2-0.1,0.4-0.1,0.6
@@ -228,7 +226,7 @@
     <div style="width: 100%;">
         <div id="cds-sb-support" name="support" class="section" [matMenuTriggerFor]="menuSupport"
             matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{'Settings' | translate}}"
+            matTooltip="{{'HelpCenter' | translate}}"
             #tooltip="matTooltip" 
             matTooltipPosition='right' 
             matTooltipHideDelay="100"
@@ -243,7 +241,7 @@
                 </svg>
             </span>
             <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-                {{'Settings' | translate}}
+                {{'HelpCenter' | translate}}
             </p>
         </div>
     </div>

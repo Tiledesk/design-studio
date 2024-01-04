@@ -349,7 +349,10 @@
         "Globals":"Globals",
         "NoGlobalVariables":"No global variables <br><br>Global variables are a set of variables that are always available in a workspace",
         "GLOBAL_KEY" :"GLOBAL_KEY",
-        "value":"value"
+        "value":"value",
+        "InfoTitle":"Use variables to reuse values and protect sensitive data",
+        "InfoDescription":"Store sensitive data in variables type secret to keep its values masked on the screen. <br> Work with the current value of a variable to prevent sharing sensitive values with your team",
+        "ManageGlobal":"Manage global variable"
     }
     
 

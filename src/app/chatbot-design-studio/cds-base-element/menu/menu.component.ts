@@ -51,7 +51,6 @@ export class CDSMenuComponent implements OnInit {
           el.localIcon =true
         }
       })
-      console.log('itemmmm', this.items)
     }
   }
 

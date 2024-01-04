@@ -1,6 +1,6 @@
 <div id="panel_actions_div" class="actions-drawer" #panel_menu_div >
  
-        <div class="action-box" *ngFor="let item of items">
+        <div class="menu-box" *ngFor="let item of items">
             <div class="menu-btns-wpr" (click)="onItemClick(item)">
                 <div class="menu-btn-icon">
                     <span class="material-icons-outlined" *ngIf="!item.localIcon">{{item.icon}}</span>
