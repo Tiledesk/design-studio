@@ -181,7 +181,6 @@ export class CdsCanvasComponent implements OnInit {
         this.closeAllPanels();
         this.removeConnectorDraftAndCloseFloatMenu();
         setTimeout(() => {
-          
           this.IS_OPEN_PANEL_ACTION_DETAIL = true;
         }, 0);
       } else {
@@ -445,6 +444,10 @@ export class CdsCanvasComponent implements OnInit {
       "keydown", (e) => {
         // Verifica se è stato premuto Ctrl (Windows) o Command (Mac) e Z contemporaneamente
         console.log('[CDS-CANVAS]  keydown ', e);
+        var focusedElement = document.activeElement;
+        if (focusedElement.tagName === 'TEXTAREA') {
+          return;
+        }
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
           e.preventDefault(); 
           // Evita il comportamento predefinito, ad esempio la navigazione indietro nella cronologia del browser

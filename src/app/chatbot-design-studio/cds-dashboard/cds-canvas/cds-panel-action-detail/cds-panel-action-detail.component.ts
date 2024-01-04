@@ -18,7 +18,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   @Input() elementIntentSelected: any;
   @Input() showSpinner: boolean;
   @Output() savePanelIntentDetail = new EventEmitter();
-  
+  @Output() closePanel = new EventEmitter();
 
   // elementIntentSelected: any;
   project_id: string;
@@ -32,7 +32,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   // elementSelectedMaxLength: number[] = [];
   elementIntentSelectedType: string;
   openCardButton = false;
-  
+
 
    /** panel reply button configuaration */
    private subscriptionIntent: Subscription;
@@ -57,6 +57,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     //   }
     this.initialize();
     this.initSubscriptions();
+    this.addEventListener();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -77,7 +78,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     console.log('[PANEL-INTENT-DETAIL] (initialize)', this.elementIntentSelected);
     try{
       this.elementIntentSelectedType = this.elementIntentSelected.type;
-      this.elementSelected = this.elementIntentSelected.element; // this.intentService.selectedAction; // !!!!! aggiunta da dario per bindare la action !!!
+      this.elementSelected = this.elementIntentSelected.element; // this.intentService.selectedAction;
       // this.elementSelected = JSON.parse(JSON.stringify(this.elementIntentSelected.element));
       // this.elementSelectedIndex = this.elementIntentSelected.index
       // this.elementSelectedMaxLength = [...Array(this.elementIntentSelected.maxLength).keys()]
@@ -92,17 +93,38 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
   initSubscriptions() {
     /** SUBSCRIBE TO THE INTENT SELECTED */
-    this.subscriptionIntent = this.intentService.behaviorIntent.subscribe((intent: Intent) => {
-      this.logger.log('[PANEL-INTENT-DETAIL] --- initSubscriptions AGGIORNATO INTENT ',intent.intent_id, this.elementSelected);
-      //recupero id dalla action e verifico se ho modificato l'intent della action aperta
+    this.subscriptionIntent = this.intentService.behaviorIntent.subscribe((int: Intent) => {
+      
+      let intent = this.intentService.listOfIntents.find((obj) => obj.intent_id === int.intent_id);
+      this.logger.log('[PANEL-INTENT-DETAIL] --- initSubscriptions AGGIORNATO INTENT ',int.intent_id, this.elementSelected, intent);
+
+      // recupero id dalla action e verifico se ho modificato l'intent della action aperta
       // se si aggiorno la action
       if (intent && intent.intent_id === this.intentSelected.intent_id) {
           // this.idSelectedIntent = intent.intent_id;
           let newAction = intent.actions.find((obj) => obj._tdActionId === this.elementSelected._tdActionId);
           this.elementSelected = newAction;
           this.logger.log('[PANEL-INTENT-DETAIL] --- AGGIORNO ACTION', intent, this.elementSelected._tdActionId);
+      } else {
+        this.logger.log('[PANEL-INTENT-DETAIL] --- CHIUDO');
+        this.closePanel.emit();
       }
     });
+  }
+
+
+  // ---------------------------------------------------------
+  // Event listener di eventi Stage e Connectors
+  // ---------------------------------------------------------
+  addEventListener() {
+    document.addEventListener(
+      "keydown", (e) => {
+        console.log('[CDS-CANVAS]  keydown ', e);
+        var focusedElement = document.activeElement;
+        if (focusedElement.tagName === 'TEXTAREA') {
+        }
+      }, false
+    );
   }
 
   // private setDragConfig(){

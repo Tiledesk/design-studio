@@ -995,14 +995,16 @@ export class IntentService {
   /** */
   public restoreLastUNDO(){
     console.log('[INTENT SERVICE] -> restoreLastUNDO', this.operationsUndo);
-    if(this.intentSelected){
-      const stringJson1 = JSON.stringify(this.listOfIntents.find((obj) => obj.intent_id === this.intentSelected.intent_id));
-      const stringJson2 = JSON.stringify(this.intentSelected);
-      if(stringJson1 !== stringJson2){
-        console.log('[INTENT SERVICE] -> è diverso', stringJson1, stringJson2);
-        return;
-      }
-    }
+
+
+    // if(this.intentSelected){
+    //   const stringJson1 = JSON.stringify(this.listOfIntents.find((obj) => obj.intent_id === this.intentSelected.intent_id));
+    //   const stringJson2 = JSON.stringify(this.intentSelected);
+    //   if(stringJson1 !== stringJson2){
+    //     console.log('[INTENT SERVICE] -> è diverso', stringJson1, stringJson2);
+    //     return;
+    //   }
+    // }
     
     this.lastActionUndoRedo = true;
     if(this.arrayUNDO && this.arrayUNDO.length>0){
@@ -1010,12 +1012,11 @@ export class IntentService {
       this.arrayREDO.push(objUNDO);
       // console.log('[INTENT SERVICE] -> RESTORE UNDO: ', this.arrayREDO);
       this.payload.operations = objUNDO.undo;
+      console.log('[INTENT UNDO] -> ho aggiornato gli array dopo UNDO ', this.payload, this.arrayUNDO, this.arrayREDO);
+      this.refreshIntents();
       this.restoreIntent(objUNDO.undo);
       this.setBehaviorUndoRedo();
-      console.log('[INTENT UNDO] -> ho aggiornato gli array dopo UNDO ', this.payload, this.arrayUNDO, this.arrayREDO);
       this.opsUpdate(this.payload);
-      this.refreshIntents();
-      
     }
     const action = this.intentSelected.actions.find((obj) => obj._tdActionId === this.actionSelectedID);
     console.log('[INTENT SERVICE] -> è action:: ', action, this.intentSelected, this.actionSelectedID);
