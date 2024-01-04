@@ -181,6 +181,7 @@ export class CdsCanvasComponent implements OnInit {
         this.closeAllPanels();
         this.removeConnectorDraftAndCloseFloatMenu();
         setTimeout(() => {
+          
           this.IS_OPEN_PANEL_ACTION_DETAIL = true;
         }, 0);
       } else {
