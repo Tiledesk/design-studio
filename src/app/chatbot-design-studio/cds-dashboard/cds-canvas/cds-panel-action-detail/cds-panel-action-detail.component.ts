@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, TemplateRef, ViewContainerRef, HostListener } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ConnectorService } from '../../../services/connector.service';
 import { IntentService } from '../../../services/intent.service';
 import { TYPE_ACTION, TYPE_INTENT_ELEMENT } from '../../../utils';
@@ -18,6 +19,8 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   @Input() showSpinner: boolean;
   @Output() savePanelIntentDetail = new EventEmitter();
   
+
+  // elementIntentSelected: any;
   project_id: string;
   intentSelected: Intent;
 
@@ -30,6 +33,10 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   elementIntentSelectedType: string;
   openCardButton = false;
   
+
+   /** panel reply button configuaration */
+   private subscriptionIntent: Subscription;
+
   private logger: LoggerService = LoggerInstance.getInstance()
   
   constructor(
@@ -40,27 +47,37 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.project_id = this.dashboardService.projectID;
-  //  this.logger.log('[PANEL-INTENT-DETAIL] (ngOnInit) @Input elementIntentSelected ', this.elementIntentSelected, this.intentSelected);
-  //   try {
-  //     this.elementSelected = JSON.parse(JSON.stringify(this.elementIntentSelected.element));
-  //     this.elementIntentSelectedType = this.elementIntentSelected.type;
-  //     this.logger.log('[PANEL-INTENT-DETAIL] (OnInit) elementSelected ', this.elementSelected);
-  //   } catch (error) {
-  //     this.logger.log('[PANEL-INTENT-DETAIL] (OnInit) ERROR', error);
-  //   }
-  // this.initialize();
+    //  this.logger.log('[PANEL-INTENT-DETAIL] (ngOnInit) @Input elementIntentSelected ', this.elementIntentSelected, this.intentSelected);
+    //   try {
+    //     this.elementSelected = JSON.parse(JSON.stringify(this.elementIntentSelected.element));
+    //     this.elementIntentSelectedType = this.elementIntentSelected.type;
+    //     this.logger.log('[PANEL-INTENT-DETAIL] (OnInit) elementSelected ', this.elementSelected);
+    //   } catch (error) {
+    //     this.logger.log('[PANEL-INTENT-DETAIL] (OnInit) ERROR', error);
+    //   }
+    this.initialize();
+    this.initSubscriptions();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('[PANEL-INTENT-DETAIL] (OnChanges)', changes, this.elementIntentSelected);
-    this.initialize();
+    //this.initialize();
   }
+
+
+  ngOnDestroy() {
+    if (this.subscriptionIntent) {
+      this.subscriptionIntent.unsubscribe();
+    }
+  }
+  
 
   initialize(){
     this.intentSelected = this.intentService.intentSelected;
+    console.log('[PANEL-INTENT-DETAIL] (initialize)', this.elementIntentSelected);
     try{
       this.elementIntentSelectedType = this.elementIntentSelected.type;
-      this.elementSelected = this.elementIntentSelected.element;
+      this.elementSelected = this.elementIntentSelected.element; // this.intentService.selectedAction; // !!!!! aggiunta da dario per bindare la action !!!
       // this.elementSelected = JSON.parse(JSON.stringify(this.elementIntentSelected.element));
       // this.elementSelectedIndex = this.elementIntentSelected.index
       // this.elementSelectedMaxLength = [...Array(this.elementIntentSelected.maxLength).keys()]
@@ -70,6 +87,22 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     }catch(error){
       this.logger.log('[CDS-PANEL-INTENT-DETAIL] (ngOnChanges) ERROR', error);
     }
+  }
+
+
+  initSubscriptions() {
+    /** SUBSCRIBE TO THE INTENT SELECTED */
+    this.subscriptionIntent = this.intentService.behaviorIntent.subscribe((intent: Intent) => {
+      this.logger.log('[PANEL-INTENT-DETAIL] --- initSubscriptions AGGIORNATO INTENT ',intent.intent_id, this.elementSelected);
+      //recupero id dalla action e verifico se ho modificato l'intent della action aperta
+      // se si aggiorno la action
+      if (intent && intent.intent_id === this.intentSelected.intent_id) {
+          // this.idSelectedIntent = intent.intent_id;
+          let newAction = intent.actions.find((obj) => obj._tdActionId === this.elementSelected._tdActionId);
+          this.elementSelected = newAction;
+          this.logger.log('[PANEL-INTENT-DETAIL] --- AGGIORNO ACTION', intent, this.elementSelected._tdActionId);
+      }
+    });
   }
 
   // private setDragConfig(){
