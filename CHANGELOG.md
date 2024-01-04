@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.8-rc.1
+- added: cds-global-panel-detail component to add/update/delete an existing global variable
+- bug-fixed: cannot set iframe url into cds-action-reply 
+- bug-fixed: cannot delete image because of path url error
+
 ### 1.0.7 in PROD
 
 ### 1.0.7-rc.11
