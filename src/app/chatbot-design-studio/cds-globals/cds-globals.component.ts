@@ -62,6 +62,12 @@ export class CdsGlobalsComponent implements OnInit {
     let index = this.list.findIndex(s => s.key === key);
     this.list.splice(index, 1);
     this.saveAttributes();
+
+    if(this.list.length === 0 ){
+      this.showWelcome = true
+    }else{
+      this.showWelcome = false
+    }
   }
 
   saveAttributes() {

@@ -61,7 +61,7 @@
 .menu-btn-text{
     display: inline-flex;
     color: var(--text-color);
-    padding: 0;
+    padding: 0px var(--base-padding);
     vertical-align: middle;
     font-size: 11px;
     font-weight: 400;
