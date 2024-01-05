@@ -274,6 +274,14 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-make>
+
+                    <cds-action-code *ngSwitchCase="TYPE_ACTION.CODE"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-code>
+
                 </div>
             </span>
             

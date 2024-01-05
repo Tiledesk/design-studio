@@ -175,6 +175,7 @@ import { CdsActionGPTTaskComponent } from './cds-dashboard/cds-canvas/actions/li
 import { CdsActionCaptureUserReplyComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-capture-user-reply/cds-action-capture-user-reply.component';
 import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-qapla/cds-action-qapla.component';
 import { CdsActionMakeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-make/cds-action-make.component';
+import { CdsActionCodeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-code/cds-action-code.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
@@ -300,6 +301,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
         CdsActionGPTTaskComponent,
         CdsActionCaptureUserReplyComponent,
         CdsActionQaplaComponent,
+        CdsActionCodeComponent,
         // action REPLY elements: start //
         CdsActionReplyToolsComponent,
         CdsActionReplyTextComponent,
@@ -372,7 +374,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
     CdsOptionsComponent,
     CdsPanelConnectorMenuComponent,
     
-    GetVariableNamePipe
+    GetVariableNamePipe,
 
   ],
   imports: [

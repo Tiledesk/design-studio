@@ -314,6 +314,14 @@ export class ActionCaptureUserReply extends Action {
     }   
 }
 
+export class ActionCode extends Action {
+    source: string
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.CODE
+    }   
+}
+
 export class Operation {
     operators?: Array<TYPE_MATH_OPERATOR>
     operands: Array<Operand>
