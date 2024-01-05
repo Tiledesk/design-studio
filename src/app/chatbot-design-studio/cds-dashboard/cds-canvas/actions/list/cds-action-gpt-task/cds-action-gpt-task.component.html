@@ -81,7 +81,7 @@
     </div>
 </div> -->
 
-<div id="scrollMe" #scrollMe *ngIf="!previewMode && !showVariablesSection" class="content-panel-intent-detail" >
+<div id="scrollMe" #scrollMe *ngIf="!previewMode && !showVariablesSection" class="content-panel-intent-detail no-footer">
 
 
     <div class="field-box">
@@ -95,7 +95,7 @@
             [text]="action.question" 
             [placeholder]="'Enter prompt'"
             (blur)="onBlur($event)"
-            (changeTextarea)="changeTextarea($event, 'question')">
+            (changeTextarea)="onChangeTextarea($event, 'question')">
         </cds-textarea>
     </div>
 
