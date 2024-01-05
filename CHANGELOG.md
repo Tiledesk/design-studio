@@ -5,6 +5,12 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.9-rc.1
+- added: cds-action-code
+- added: cds-mat-tooltip on variable-list item to show current variable description
+- added: currentPhoneNumber leadInfo attributes variable
+- bug-fixed: if open cds-panel-action-detail, then the stage is not draggable with mouse connected
+
 ### 1.0.8 in PROD
 
 ### 1.0.8-rc.1
