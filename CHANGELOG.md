@@ -5,7 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
-
+### 1.0.10-rc.1
+- added: JSON.stringify function in TYPE_FUNCTION_LIST for cds-action-set-attribute
+ 
 ### 1.0.9 in PROD
 
 ### 1.0.9-rc.1
