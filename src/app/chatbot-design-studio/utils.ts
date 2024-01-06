@@ -47,7 +47,8 @@ export enum TYPE_FUNCTION_VAR {
     ceilAsNumber = "ceilAsNumber",
     floorAsNumber = "floorAsNumber",
     roundAsNumber = "roundAsNumber",
-    JSONparse = 'JSONparse'
+    JSONparse = 'JSONparse',
+    JSONstringify= 'JSONstringify'
 }
 
 export enum TYPE_FUNCTION_FUNC {
@@ -325,6 +326,7 @@ export const TYPE_FUNCTION_LIST_FOR_VARIABLES: { [key: string]: { name: string, 
     "floorAsNumbers": { name: "Floor", type: TYPE_FUNCTION_VAR.floorAsNumber, src: "assets/images/functions/floor.svg" },
     "ceilAsNumbers": { name: "Ceil", type: TYPE_FUNCTION_VAR.ceilAsNumber, src: "assets/images/functions/ceil.svg" },
     "JSONparse":  { name: "JSON.parse", type: TYPE_FUNCTION_VAR.JSONparse, src: "assets/images/functions/jsonParse.svg" },
+    "JSONstringify":  { name: "JSON.stringify", type: TYPE_FUNCTION_VAR.JSONstringify, src: "assets/images/functions/jsonParse.svg" },
 }
 
 export const TYPE_FUNCTION_LIST_FOR_FUNCTIONS: { [key: string]: { name: string, type: TYPE_FUNCTION_FUNC, src?: string } } = {
