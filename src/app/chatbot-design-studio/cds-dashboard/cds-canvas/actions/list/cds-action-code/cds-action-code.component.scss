@@ -21,3 +21,9 @@
         color: rgb(141, 162, 181)
     }
 }
+
+.limit-content {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+}
