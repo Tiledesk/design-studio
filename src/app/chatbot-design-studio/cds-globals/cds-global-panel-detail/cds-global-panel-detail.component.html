@@ -22,7 +22,9 @@
                         class="text-editable-div" 
                         [class.invalid]="(globalForm.controls.value.errors?.pattern || globalForm.controls.value.errors?.required) && globalForm.controls.value.touched"
                         [control]="globalForm.get('value')"
-                        [placeholder]="'CDSGlobals.value' | translate">
+                        [placeholder]="'CDSGlobals.value' | translate"
+                        [emojiPikerBtn]="false" 
+                        [setAttributeBtn]="false">
                     </cds-textarea>
                 </div>
 
