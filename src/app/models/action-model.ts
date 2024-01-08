@@ -297,6 +297,8 @@ export class ActionGPTTask extends Action {
     temperature: number;
     model: string;
     preview?: Array<any>;
+    trueIntent: string;
+    falseIntent: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.GPT_TASK
@@ -309,6 +311,14 @@ export class ActionCaptureUserReply extends Action {
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.CAPTURE_USER_REPLY
+    }   
+}
+
+export class ActionCode extends Action {
+    source: string
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.CODE
     }   
 }
 
@@ -499,6 +509,8 @@ export class ActionQapla extends Action {
     assignStatusTo: string;
     assignResultTo: string;
     assignErrorTo: string;
+    trueIntent: string;
+    falseIntent: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.QAPLA

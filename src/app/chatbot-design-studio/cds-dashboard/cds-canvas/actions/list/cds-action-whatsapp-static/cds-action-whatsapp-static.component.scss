@@ -13,7 +13,7 @@
 
         label {
             font-weight: 500;
-            font-family: Poppins, Roboto, Arial, sans-serif;
+            font-family: var(--font-family-poppins);
             text-transform: capitalize;
             font-size: 14px;
             animation: blinker 1s linear infinite;
@@ -115,7 +115,7 @@ cds-textarea#phone-number-id.is-invalid ::ng-deep {
     padding: 4px 10px 0px 10px;
 
     span.title {
-        color: $color-white-hex;
+        color: var(--color-white-hex);
         font-size: 14px;
     }
 }
@@ -135,12 +135,12 @@ cds-textarea#phone-number-id.is-invalid ::ng-deep {
 }
 
 .icon-only:hover {
-    color: $color-white-hex;
+    color: var(--color-white-hex);
 }
 
 
 pre ::ng-deep{
-    color: $color-white-hex;
+    color: var(--color-white-hex);
     line-height: 16px;
     margin-bottom: 0px;
     padding: 10px;

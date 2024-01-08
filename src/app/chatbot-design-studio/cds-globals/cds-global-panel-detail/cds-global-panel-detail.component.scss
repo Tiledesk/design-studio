@@ -1,0 +1,82 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+
+.panel-intent-detail {
+    // position: relative;
+    display: block;
+    width: 480px;
+    min-width: 400px;
+    height: 100%; //auto
+    max-height: 100%;
+    // border-radius: 16px;
+    overflow: hidden;
+    padding: 0;
+    background-color: var(--color-white-hex);;
+    border-left: 1px solid $gray-light-02;
+    // margin: 0 auto 0 auto; // nk
+    inset: 0 0 0 200px;
+}
+
+.header-panel {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: $blu-light-03;
+    z-index: 2;
+    padding: 10px;
+
+    .label-global{
+        overflow-x: clip;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0;
+        color: var(--blu);
+    }
+}
+.content-panel{
+    // height: calc(100% - 73px); // nk
+    // height: calc(100% - 100px); // nk
+    // overflow: hidden; // nk
+    overflow: hidden auto;
+}
+
+.buttons-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+}
+
+.buttons-container#updatediv {
+    justify-content: space-between;
+}
+
+#add-button {
+    background: var(--blu);;
+    color: var(--color-white-hex);
+}
+#delete-button {
+    background: var(--color-red-hex);
+    color: var(--color-white-hex);
+}
+#cancel-button {
+    background: #b1b1b1;
+    color: var(--color-white-hex);
+}
+
+cds-text#custom-input.invalid ::ng-deep {
+    input{
+        border: 1px solid red !important;
+        outline: 0px solid red !important;
+        transition: border 0.3s;
+    }
+}
+
+cds-text#custom-input.disabled{
+    pointer-events: none;
+}

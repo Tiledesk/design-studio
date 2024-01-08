@@ -14,7 +14,7 @@ input[type="text"] {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     border-radius: 8px;
-    background-color: $color-white-hex;
+    background-color: var(--color-white-hex);
     border: solid 1px $blu-light-02;
 }
 textarea[type="text"] {
@@ -33,7 +33,7 @@ textarea[type="text"] {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     border-radius: 8px;
-    background-color: $color-white-hex;
+    background-color: var(--color-white-hex);
     border: solid 1px $blu-light-02;
 }
 
@@ -78,7 +78,7 @@ ng-select {
     margin-bottom: 10px;
     appearance: none;
     -webkit-appearance: none;
-    background: #fff;
+    background: var(--color-white-hex);;
     // border-top: 1px solid #c0c0c0;
     padding-right: 8px;
     padding-top: 5px;
@@ -142,7 +142,7 @@ input[type="file"] {
     padding: 11px 12px;
     cursor: pointer;
     background: $blu !important;
-    color: $color-white-hex;
+    color: var(--color-white-hex);
     border-radius: $btn-border-radius;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -152,8 +152,8 @@ input[type="file"] {
 }
 
 #cds-delete-bot-img-btn {
-    color: #fff;
-    background: $color-red-hex !important;
+    color: var(--color-white-hex);
+    background: var(--color-red-hex) !important;
     height: 44px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -227,7 +227,7 @@ input[type="file"] {
     line-height: 22px;
     position: relative;
     top: 4px;
-    color: #fff;
+    color: var(--color-white-hex);
     cursor: pointer;
     margin-right: 4px;
     padding-left: 3px;

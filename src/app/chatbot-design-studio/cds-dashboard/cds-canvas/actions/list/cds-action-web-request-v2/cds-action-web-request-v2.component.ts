@@ -180,8 +180,8 @@ export class CdsActionWebRequestV2Component implements OnInit {
     })
     this.jsonHeader = this.action.headersString;
     this.bodyOptions.forEach(el => { el.value ===this.action.bodyType? el.checked= true: el.checked = false })
-    this.jsonIsValid = this.isValidJson(this.action.jsonBody);
-    if(this.jsonIsValid && this.action.jsonBody){
+    // this.jsonIsValid = this.isValidJson(this.action.jsonBody);
+    if(this.action.jsonBody){
       this.body = this.action.jsonBody;
       this.body = this.formatJSON(this.body, "\t");
     }
@@ -245,10 +245,13 @@ export class CdsActionWebRequestV2Component implements OnInit {
     switch (event.value){
       case 'none':
         this.body = JSON.stringify({})
+        delete this.jsonHeader['Content-Type']
         break;
       case 'json':
         this.body = this.action.jsonBody
+        this.jsonHeader['Content-Type'] = 'application/json'
     }
+    this.action.headersString = this.jsonHeader
   }
 
   onChangeTextarea(e, type: 'url' | 'body'){
@@ -256,8 +259,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
       case 'body': {
         this.body = e;
         this.action.jsonBody = this.body;
+        
         setTimeout(() => {
-          this.jsonIsValid = this.isValidJson(this.body);
+          // this.jsonIsValid = this.isValidJson(this.body);
           // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
         }, 0);
         break;

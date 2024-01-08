@@ -15,48 +15,124 @@
     height: 100%;
     overflow: hidden;
     position: relative;
-}
-
-.header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
     margin: 10px;
+}
+.row {
+    margin-right: 0px;
+    margin-left: 0px;
+}
 
-    .cds-row {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
+.cds-bottom-nav {
+    background-color: #fff;
+    width: 100%;
+    // z-index: 1028;
+    position: relative;
+    padding-bottom: 5px;
+    float: left;
+    height: 50px;
+    padding-left: 0px;
+    // display: flex;
+    // flex-grow: 1;
+}
+
+.cds-bottom-nav li {
+    float: left;
+    padding: 15px;
+    list-style: none;
+    position: relative;
+    display: block;
+    height: 52px;
+    border-bottom: 3px solid $blu-light-02;
+    cursor: pointer;
+}
+
+.cds-bottom-nav li a {
+    padding: 0px 15px;
+    color: $blu-light-02;
+    line-height: 20px;
+}
+
+.cds-bottom-nav li a:hover {
+    text-decoration: none;
+    //  background-color: #eee;
+}
+
+.li-active {
+    border-bottom: 3px solid $blu !important;
+    pointer-events: none;
+}
+.li-active a {
+    color: $blu !important;
+}
+
+// tab in general route
+.btn-with-border-effect {
+    background: none;
+    border: 0;
+    box-sizing: border-box;
+    // margin: 1em;
+    // padding: 1em 2em;
+    //   padding-bottom: 37px;
+    font-size: 14px;
+    font-weight: 300;
+
+    // Required, since we're setting absolute on pseudo-elements
+    position: relative;
+    vertical-align: middle;
+
+    &::before,
+    &::after {
+        box-sizing: inherit;
+        content: "";
+        position: absolute;
         width: 100%;
-    }
-    .header-title {
-        color: var(--text-color);
-        font-size: 18px;
-        font-weight: 600;
-    }
-
-    .header-subtitle{
-        font-weight: 500;
+        height: 100%;
     }
 }
+
+.border-from-center {
+    &:hover {
+        color: $blu;
+    }
+
+    // Set up base styles, we're going to scale instead of animating width/height
+    &::before,
+    &::after {
+        top: 3px;
+        // top: 0px;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        transform-origin: center; // Ensure scaling is done from the center (expands outwards)
+    }
+
+    // scale3d(<scale-horizontal>, <scale-vertical>, <scale-depth>);
+    &::before {
+        // border-top: 2px solid $purple;
+        border-bottom: 3px solid $blu;
+        transform: scale3d(0, 1, 1); // Shrink only width
+    }
+
+    &:hover::before,
+    &:hover::after {
+        transform: scale3d(1, 1, 1); // Show full-size
+        transition: transform 0.5s;
+    }
+}
+
 
 .content {
     height: 80%;
     padding: 10px;
     display: grid;
+    column-gap: 5px;
+    grid-template-columns: 0.3fr 0.5fr;
+    justify-content: center;
 }
 
-.footer{
-    padding: 10px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    .container-wrp{
-        background-color: rgba( $gray-light-02, 0.4);
+.info{
+   .container-wrp{
+        // background-color: rgba( $gray-light-02, 0.4);
         display: flex;
         padding: 10px;
         border-radius: 8px;
@@ -67,10 +143,23 @@
             flex-direction: column;
         }
         label:first-child{
-            font-weight: 600;
-            font-size: 20px;
+            font-weight: 300;
+            font-size: 16px;
             color: $blu
         }
+        label{
+            font-size: 12px;
+        }
+    }
+}
+
+.add-btn-wrp{
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr 0.1fr;
+    gap: 5px;
+    
+    button.cds-blue-button{
+        justify-self: end;
     }
 }
 
@@ -79,15 +168,16 @@
     flex-direction: column;
 }
 
-.secrets-list {
+.global-list {
     margin-top: 20px;
     overflow-y: scroll;
 }
 
-.secret-inner-container {
-    display: flex;
-    flex-direction: row;
+.global-inner-container {
+    display: grid;
+    justify-content: flex-start;
     gap: 5px;
+    grid-template-columns: 0.5fr 0.5fr 0.1fr;
 }
 
 
@@ -121,6 +211,9 @@
     .mat-menu-content{
         padding: 5px !important;
     }
+}
+.menu-box{
+    padding: 0px var(--base-padding);
 }
 
 .menu-btns-wpr {
@@ -172,33 +265,10 @@
     color: var(--text-color);
     padding: 0;
     vertical-align: middle;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 400;
 }
 /** **** MAT-MENU : end **** **/
-
-.update-view {
-    padding: 20px 0px;
-}
-
-
-.input-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-cds-text#custom-input.invalid ::ng-deep {
-    input{
-        border: 2px solid red !important;
-        outline: 0px solid red !important;
-        transition: border 0.3s;
-    }
-}
-
-cds-text#custom-input.disabled{
-    pointer-events: none;
-}
 
 .field-box.password{
     position: relative;
@@ -220,31 +290,6 @@ cds-text#custom-input.disabled{
     }
 }
 
-.buttons-container {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 5px;
-}
-
-.buttons-container#updatediv {
-    justify-content: space-between;
-}
-
-#add-button {
-    background: $blu;
-    color: $color-white-hex;
-}
-#delete-button {
-    background: $color-red-hex;
-    color: $color-white-hex;
-}
-#cancel-button {
-    background: #b1b1b1;
-    color: $color-white-hex;
-}
 #cds-custom-icon-button {
     border-radius: 8px;
     height: 36px;
@@ -252,8 +297,37 @@ cds-text#custom-input.disabled{
     display: flex;
     align-items: center;
     justify-content: center;
+
+    background-color: var(--color-white-hex);
+    color: var(--blu);
+    .material-icons{
+        font-size: 22px;
+    }
 }
 
 .copy-icon:hover {
     font-weight: 600 !important;
+}
+
+
+
+.cds-generic-panel{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+    height: 100%;
+    transform: translateX(100%);
+    animation: slide-in 0.3s ease-in-out forwards;
+    animation-delay: 0.2s;
+  
+    &#global-detail{
+      z-index: 10
+    }
+}
+  
+@keyframes slide-in {
+    to {
+      transform: translateX(0);
+    }
 }

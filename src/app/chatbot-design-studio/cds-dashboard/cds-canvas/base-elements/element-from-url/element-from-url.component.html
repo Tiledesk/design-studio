@@ -6,9 +6,14 @@
                 <label class="control-label">
                     {{ 'CDSCanvas.AddPath' | translate }}
                 </label>
-                <input type = "text" 
-                    [(ngModel)] = "pathElement"
-                    class="input form-control"/>
+                <cds-textarea 
+                    class="text-editable-div"
+                    [text]="pathElement" 
+                    [minRow]="1" [maxRow]="2"
+                    [emojiPikerBtn]="false"
+                    (blur)="onBlur($event)"
+                    (changeTextarea)="onChangeTextArea($event)">
+                </cds-textarea>
             </div> 
     
             <button 

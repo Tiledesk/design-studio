@@ -2,10 +2,10 @@
 
 
 :host{
-    --backgroundColor: #{$color-white-hex};
+    --backgroundColor: var(--color-white-hex);
     --textColor: #{$blu};
     --hoverBackgroundColor: #{$blu};
-    --hoverTextColor: #{$color-white-hex};
+    --hoverTextColor: var(--color-white-hex);
     --buttonFontSize: 0.7em;
     --max-width: #{$button-max-width-base};
 }
@@ -150,7 +150,7 @@
         }
         &.delete{
             em {
-                color: $color-red-hex;
+                color: var(--color-red-hex);
             }
         }
     }

@@ -76,7 +76,7 @@ div.operand-wrp {
 //         width: calc(100% - 45px);
 //     }
 //     textarea::placeholder {
-//         font-family: 'Poppins','Roboto',Arial,sans-serif;
+//         font-family: var(--font-family-poppins)
 //         font-size: 13px;
 //     }
 // }
@@ -84,7 +84,7 @@ div.operand-wrp {
 
 cds-select#selectOperand ::ng-deep {
     .ng-value-container{
-        font-family: 'Poppins','Roboto',Arial,sans-serif;
+        font-family: var(--font-family-poppins);
         .ng-placeholder {
             font-size: 13px;
         }

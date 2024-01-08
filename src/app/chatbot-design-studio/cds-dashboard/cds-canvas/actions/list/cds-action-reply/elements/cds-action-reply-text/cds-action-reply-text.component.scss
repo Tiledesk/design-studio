@@ -1,16 +1,7 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-
-// $button-text-color: $color-blue-hex;
-// $button-border-color:$color-blue-hex;
-// $button-background-color: $color-white-hex;
-
-// $button-text-color: $icon-color;
-// $button-border-color: $icon-color;
-// $button-background-color: $icon-color-backgroud;
-
 .extensions-response {
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
     position: relative;
     width: calc(100% - 6px);
     height: auto;
@@ -93,7 +84,7 @@ appdashboard-filter{
 
         .response-wrp{
             border-radius: 8px;
-            background: $color-white-hex; // #ffffff;
+            background: var(--color-white-hex); // #ffffff;
             border: 1px solid $gray-light-02; //1px solid #ffffff;
             overflow-x: hidden;
             overflow-y: auto;
@@ -132,7 +123,7 @@ appdashboard-filter{
 /* ****************************** */
 
 .text-editor-wrapper {
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
     position: relative;
     width: 100%;
     height: auto;
@@ -153,7 +144,7 @@ appdashboard-filter{
 .response-controls {
     .control-button {
         cursor: pointer;
-        color: $color-bck-gray-hex;
+        color: $blu-04;
         transition: color .3s;
         height: 20px;
         &.delete{
@@ -176,7 +167,7 @@ appdashboard-filter{
         &.delete{
             box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
             em {
-                color: $color-red-hex;
+                color: var(--color-red-hex);
             }
         }
     }
@@ -187,15 +178,21 @@ appdashboard-filter{
     margin: -20px 50px 0px 0px;
     float: right;
     .num-chars {
-        // background: $color-light-gray-hex;
+        background: $blu-light-01;
+        flex-shrink: 0;
         padding: 0px 8px;
-        border-radius: 12px;
+        border-radius: 10px;
         font-size: 0.8em;
-        // color: $color-text-box-hex;
+        color: $blu;
         float: right;
-        // &.error {
-        //     // background: $color-orange-hex;
-        // }
+        line-height: 24px;
+        font-weight: 700;
+        width: 40px;
+        text-align: center;
+        &.error {
+            background: var(--color-red-hex);
+            color: var(--color-white-hex);
+            }
     }
     .text-editor-insert-attribute {
         float: right;
@@ -275,31 +272,3 @@ cds-textarea.text-editable-div ::ng-deep{
         font-size: 0.9em !important;
     }
 }
-
-/** TEXT AREA **/
-// mat-form-field.mat-focused ::ng-deep {
-//     .mat-form-field-wrapper {
-//         .mat-form-field-flex {
-//             .mat-form-field-infix {
-//                 textarea {
-//                     border: 1px solid $color-blue-hex!important;
-//                     outline: 1px solid $color-blue-hex!important;
-//                     transition: border .3s;
-//                 }
-//             }
-//         }
-//     }
-// }
-// mat-form-field.box-textarea ::ng-deep {
-//     .mat-form-field-wrapper {
-//         padding-bottom:0;
-//         .mat-form-field-flex {
-//             border-radius: 4px 4px 0 0;
-//             padding: 0 0.75em 0 0.75em;
-//             margin: 0;
-//         }
-//     }
-//     .mat-form-field-underline {
-//         display: none;
-//     }    
-// }

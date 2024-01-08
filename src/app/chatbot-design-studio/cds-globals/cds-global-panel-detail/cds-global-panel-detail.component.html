@@ -1,0 +1,48 @@
+<div class="panel-intent-detail">
+    <div class="header-panel">
+        <label class="label-global">{{'CDSGlobals.ManageGlobal' | translate }}</label>
+    </div>
+    <div  #scrollMe id="scrollMe" class="content-panel content-panel-global-detail no-footer">
+        <form [formGroup]="globalForm">
+            <div class="secret-inner-container">
+
+                <div class="field-box" >
+                    <label class="title-label">{{ "CDSCanvas.Key" | translate }}</label>
+                    <cds-text id="custom-input"
+                        class="text-editable-div" 
+                        [class.invalid]="(globalForm.controls.key.errors?.pattern || globalForm.controls.key.errors?.required) && (globalForm.controls.key.dirty || globalForm.controls.key.touched)"
+                        [control]="globalForm.get('key')"
+                        [placeholder]="'CDSGlobals.GLOBAL_KEY' | translate">
+                    </cds-text>
+                </div>
+
+                <div class="field-box">
+                    <label class="title-label">{{ "CDSGlobals.value" | translate | titlecase }}</label>
+                    <cds-textarea id="custom-input"
+                        class="text-editable-div" 
+                        [class.invalid]="(globalForm.controls.value.errors?.pattern || globalForm.controls.value.errors?.required) && globalForm.controls.value.touched"
+                        [control]="globalForm.get('value')"
+                        [placeholder]="'CDSGlobals.value' | translate">
+                    </cds-textarea>
+                </div>
+
+            </div>
+
+            <div class="buttons-container">
+                <button id="delete-button" class="btn btn-primary cds-blue-button" *ngIf="global"
+                    (click)="onDelete()">{{ "Delete" | translate}}</button>
+                <div class="buttons-container">
+                    <button id="cancel-button" class="btn btn-primary cds-blue-button"
+                        (click)="onCancel()">{{ "Cancel" | translate}}</button>
+                    <button id="add-button" class="btn btn-primary cds-blue-button" *ngIf="global"
+                        (click)="onUpdate()" type="submit"
+                        [disabled]="!globalForm.valid">{{ "Update" | translate}}</button>
+                    <button id="add-button" class="btn btn-primary cds-blue-button" *ngIf="!global"
+                        (click)="onAdd()" type="submit"
+                        [disabled]="!globalForm.valid">{{ "Add" | translate}}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div></div>
+</div>

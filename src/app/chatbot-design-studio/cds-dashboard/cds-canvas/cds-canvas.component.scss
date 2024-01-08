@@ -192,11 +192,11 @@ cds-fulfillment {
           width: 3px;
         }
         &::-webkit-scrollbar-track {
-          background-color: $blu-light-01;
+          background-color: var(--scrollbar-track-background);
         }
         &::-webkit-scrollbar-thumb {
-          background-color: $blu;
-          border-radius: 3px;
+          background-color: var(--scrollbar-thumb-background);
+          border-radius: var(--scrollbar-thumb-border-radius);
         }
       }
 
@@ -329,7 +329,7 @@ cds-fulfillment {
   position: relative;
   display: block;
   background-size: 16px 16px;
-  background-image: radial-gradient($drag-background 1.14286px, $drag-points-color 1.14286px);
+  background-image: radial-gradient(var(--container-background) 1.14286px, var(--container-points-color) 1.14286px);
   // background-image: radial-gradient(rgb(218, 226, 226) 1.14286px, rgb(244, 246, 246) 1.14286px);
   background-position: 593.4px -230.4px;
 }

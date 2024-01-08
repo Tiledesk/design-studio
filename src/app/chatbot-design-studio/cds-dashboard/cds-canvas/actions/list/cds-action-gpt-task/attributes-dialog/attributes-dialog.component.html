@@ -4,8 +4,11 @@
             <span>Set Attributes</span>
         </div>
         <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+        
     </div>
-
+    
+    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+    
     <form>
         <div class="tpl-modal-content">
 
@@ -16,8 +19,8 @@
 
         </div>
         <div class="tpl-modal-buttons">
-            <button id="cds-cancel-btn" class="btn btn-cancel" type="button" [mat-dialog-close]="false">Cancel</button>
-            <button #setVarBtn id="cds-publish-btn" class="btn btn-primary set-var-btn" type="button" [disabled]="btn_disabled"
+            <button id="cds-cancel-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">Cancel</button>
+            <button #setVarBtn id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" [disabled]="btn_disabled"
                 (click)="onGenerateClick()">Generate
             </button>
         </div>

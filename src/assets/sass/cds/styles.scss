@@ -2,6 +2,9 @@
 @import "./src/assets/sass/md/_variables.scss";
 /** GENERIC **/
 
+body{
+    font-family: var(--font-family-poppins);
+}
 /*
 Ellips text
 */
@@ -75,7 +78,7 @@ button.close{
     margin-bottom: 0px;
     height: 40px !important;
     position: relative;
-    font-family: "Poppins", "Roboto", "Arial", sans-serif;
+    font-family: var(--font-family-poppins);
     height: 30px;
     font-size: 16px;
     margin-top: 10px;
@@ -100,7 +103,8 @@ button.close{
 
 /* PANEL INTENT DETAIL */
 .content-panel-intent-detail,
-.content-panel-button-configuration {
+.content-panel-button-configuration,
+.content-panel-global-detail {
     padding: 20px 30px 30px;
     position: absolute;
     top: $haeder-panel-action-detail-height;
@@ -155,7 +159,7 @@ button.close{
     color: #555555;
     font-size: 12px;
     border-radius: 2px;
-    font-family: "Poppins";
+    font-family: var(--font-family-poppins);
     padding-top: 8px;
     padding-bottom: 8px;
     border: 1px solid #e5effe;
@@ -170,11 +174,21 @@ emoji-mart {
     }
 }
 
+/** ACTION PREVIEW: start **/
 .cds-action-preview {
     /* padding: 3px 16px 16px; */
     padding: 5px 10px;;
     margin: 0px;;
     position: relative;
+    .title-preview-label{
+        color: #6c6859;
+        font-size: 12px; 
+        margin: 0px;
+    }
+    .icon-action img{
+        height: 16px;
+        filter: brightness(0) saturate(100%) invert(42%) sepia(2%) saturate(2720%) hue-rotate(9deg) brightness(91%) contrast(81%);
+    }
 }
 .action-row {
     display: flex;
@@ -182,7 +196,6 @@ emoji-mart {
     gap: 6px;
     flex-direction: row;
 }
-
 .action-row-left {
     height: 20px;
     width: 20px;
@@ -190,16 +203,14 @@ emoji-mart {
     align-items: center;
     justify-content: center;
 }
-
 .action-row-right {
     font-size: 12px;
     font-weight: 400;
-    color: $brown-85;
+    color: var(--brown-85);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .action-row-right.empty,
 .set-attribute-value.empty {
     background: none !important;
@@ -207,15 +218,24 @@ emoji-mart {
     font-size: 12px !important;
     padding: unset !important;
 }
-
 .action-row .action-row-left svg {
-    fill: $brown-85;
+    fill: var(--brown-85);
 }
+.previewContent{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    // padding: 3px 0px;
+}
+/** ACTION PREVIEW: end **/
 
 .web-request-action-method {
     font-weight: 500;
     font-size: 14px;
-    color: $brown-85;
+    color: var(--brown-85);
 }
 
 
@@ -293,7 +313,7 @@ emoji-mart {
     }
 }
 
-/** CONNECTOR TRUE/FALSE **/
+/** CONNECTOR TRUE/FALSE: start **/
 cds-connector.connector-true {
     .point-connector-empty{
         border-color: $success-connector;
@@ -376,13 +396,10 @@ cds-connector.connector-false {
     top: calc(50% - 10px);
 }
 
-
-
-
 ::ng-deep .mat-expansion-indicator::after {
 color: white;
 }
-
+/** CONNECTOR TRUE/FALSE: end **/
 
 .preview-divider {
     margin: 5px 0px;
@@ -395,7 +412,7 @@ color: white;
     color: #555555;
     font-size: 12px;
     border-radius: 8px;
-    font-family: 'Poppins';
+    font-family: var(--font-family-poppins);
     // padding-top:8px;
     // padding-bottom:8px;
     border: 1px solid #e5effe;
@@ -408,8 +425,8 @@ color: white;
     color: #555555; 
     font-size: 10px;
     text-align: justify;
-    border-radius: 4px;
-    font-family: 'Poppins';
+    border-radius: 8px;
+    font-family: var(--font-family-poppins);
     // border: 1px solid #e5effe;
     width: auto;
 }
@@ -430,10 +447,13 @@ color: white;
     background-color: $gray-light-01 !important;
     color: $gray !important;
     font-size: 12px !important;
-    font-family: "Poppins", "Roboto", "Arial", sans-serif;
+    font-family: var(--font-family-poppins);
     border-radius: 16px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    line-height: 1.4;
     // border: 1px solid #e5effe !important;
 }
   
@@ -442,7 +462,7 @@ color: white;
     color: white;
     box-shadow: none;
     font-weight: 500;
-    font-family: "Poppins", Roboto, Arial, sans-serif;
+    font-family: var(--font-family-poppins);
     text-transform: capitalize;
     font-size: 14px;
     padding: 6px 12px;

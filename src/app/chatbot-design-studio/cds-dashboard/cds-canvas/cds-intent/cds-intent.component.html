@@ -8,11 +8,11 @@
         (onOptionClicked)="onOptionIntentControlClicked($event)">
     </cds-panel-intent-controls>
 
-    <div class="pic-header tds_draggable" 
+    <div class="pic-header" 
         [id]="'block-header-'+ intent?.intent_id"
         [ngClass]="{'cds-start': isStart}">
 
-        <cds-panel-intent-header class="pic-title-text" 
+        <cds-panel-intent-header class="pic-title-text tds_draggable" 
             [class.isStart]="isStart"
             [intent]="intent">
         </cds-panel-intent-header>
@@ -65,13 +65,15 @@
                 </span>
             </div>
 
-            <div class="add-action-from-placeholder-btn-wpr">
-                <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+            <div class="csd-open-action-menu-btn-wpr">
+                <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+                    class="cds-add-action-btn">    
+                    + Add action
+                </div>
+                <!-- <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                     class="btn cds-add-action-btn csd-add-action-btn-wpr-element">
-                    <span class="material-icons csd-add-action-btn-wpr-element">
-                        add
-                    </span>
-                </button>
+                    + Add action
+                </button> -->
             </div>
         </div>
 
@@ -248,7 +250,8 @@
                     <cds-action-gpt-task *ngSwitchCase="TYPE_ACTION.GPT_TASK" 
                         class="panel-response" 
                         [intentSelected]="intent"
-                        [action]="action">
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-gpt-task>
     
                     <cds-action-capture-user-reply *ngSwitchCase="TYPE_ACTION.CAPTURE_USER_REPLY" 
@@ -259,17 +262,26 @@
                     </cds-action-capture-user-reply>
                     
                     <cds-action-qapla *ngSwitchCase="TYPE_ACTION.QAPLA" 
-                        class="panel-response" 
+                        class="panel-response"
+                        [intentSelected]="intent" 
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-qapla>
-                    <!-- ADD INTENT MAKE-->
+
                     <cds-action-make *ngSwitchCase="TYPE_ACTION.MAKE"    
                         class="panel-response"
                         [intentSelected]="intent" 
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-make>
+
+                    <cds-action-code *ngSwitchCase="TYPE_ACTION.CODE"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-code>
+
                 </div>
             </span>
             
@@ -303,10 +315,9 @@
 
     <div class="footer-intent">
        
-        <div *ngIf="!isStart" class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart && listOfActions?.length > 0" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                class="cds-add-action-btn">
-                
+                class="cds-add-action-btn">    
                 + Add action
             </div>
         </div>

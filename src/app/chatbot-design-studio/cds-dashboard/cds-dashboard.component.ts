@@ -1,12 +1,9 @@
 
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 // import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES //
-import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
-import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
-import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 
 // MODEL //
@@ -21,15 +18,15 @@ import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
-import { MultichannelService } from 'src/app/services/multichannel.service';
 import { OpenaiService } from 'src/app/services/openai.service';
-import { UsersService } from 'src/app/services/users.service';
 import { WhatsappService } from 'src/app/services/whatsapp.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DepartmentService } from 'src/app/services/department.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { Subject } from 'rxjs';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -53,11 +50,13 @@ export class CdsDashboardComponent implements OnInit {
   activeSidebarSection: SIDEBAR_PAGES = SIDEBAR_PAGES.INTENTS;
   activeDetailSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
   isBetaUrl: boolean = false;
+  showChangelog: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private route: ActivatedRoute,
     private appConfigService: AppConfigService,
+    private appStorageService: AppStorageService,
     private dashboardService: DashboardService,
     private kbService: KnowledgeBaseService,
     public departmentService: DepartmentService,
@@ -69,8 +68,25 @@ export class CdsDashboardComponent implements OnInit {
 
   ngOnInit() {
     console.log("•••• [CDS DSHBRD] ngOnInit ••••");
+    // ---------------------------------------
+    // Changelog alert
+    // ---------------------------------------
+    this.showChangelog = this.checkForChangelogNotify();
+
     this.executeAsyncFunctionsInSequence();
     this.hideShowWidget('hide')
+  }
+
+  checkForChangelogNotify(): boolean{
+    let changelogKey = this.appStorageService.getItem("changelog")
+    if(!changelogKey || changelogKey !== environment.VERSION){
+      return true
+    }
+    return false
+  }
+  onCloseChangelog(){
+    this.showChangelog = false;
+    this.appStorageService.setItem('changelog', environment.VERSION)
   }
 
   async getUrlParams(): Promise<boolean> {
@@ -215,7 +231,7 @@ export class CdsDashboardComponent implements OnInit {
 
   onMenuOption(event){
     switch(event){
-      case 'export':
+      case 'EXPORT':
         this.activeSidebarSection = SIDEBAR_PAGES.SETTINGS
         this.activeDetailSection = SETTINGS_SECTION.IMPORT_EXPORT
         break;

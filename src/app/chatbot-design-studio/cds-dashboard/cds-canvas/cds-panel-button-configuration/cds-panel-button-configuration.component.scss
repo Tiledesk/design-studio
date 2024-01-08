@@ -135,34 +135,9 @@
 
 
 
-
-
-.button-footer-tab {
-    min-height: 50px;
-    border-top: 1px solid #6474913d;
-    border-bottom-left-radius: 1em;
-    border-bottom-right-radius: 1em;
-    button {
-        padding: 8px;
-        margin: 8px;
-        background: $light-blue!important;
-        color: $light-black!important;
-        box-shadow: none!important;
-        font-weight: 500!important;
-        font-family: Poppins,Roboto,Arial,sans-serif!important;
-        text-transform: capitalize!important;
-        font-size: 14px!important;
-        padding: 6px 12px;
-    }
-}
-
-
-
-
-
 /** NG-SELECT **/
 .ng-select.ng-select-focused>.ng-select-container {
-    border-color: $color-red-hex;
+    border-color: var(--color-red-hex);
     box-shadow: inset 0 1px 1px #00000013,0 0 0 3px #007eff1a;
 }
 .ng-select.form-control-select{
@@ -184,7 +159,8 @@
 .form-group.is-error {
     .form-control {
         outline: none;
-        background-image: linear-gradient($color-red-hex,$color-red-hex),linear-gradient($color-light-gray-hex,$color-light-gray-hex);
+        background-image: linear-gradient(var(--color-red-hex),var(--color-red-hex)),
+            linear-gradient($gray-light-01,$gray-light-01);
         background-size: 100% 2px,100% 1px;
         box-shadow: none;
         transition-duration: .3s;
@@ -193,46 +169,14 @@
         &.form-control-select ::ng-deep .ng-select-container  { 
             display: flex;
             outline: none;
-            background-image: linear-gradient($color-red-hex,$color-red-hex),linear-gradient($color-light-gray-hex,$color-light-gray-hex);
+            background-image: linear-gradient(var(--color-red-hex),var(--color-red-hex)),
+                linear-gradient($gray-light-01,$gray-light-01);
             background-size: 100% 2px,100% 1px;
             box-shadow: none;
             transition-duration: .3s;
         }
     }
 }
-
-.form-group label.control-label {
-    top: -35px; 
-    left: 0;
-    font-size: 0.8em;
-    line-height: normal;
-    position: absolute;
-    pointer-events: none;
-    transition: .3s ease all;
-    color: $color-txt-4-hex;
-
-}
-.form-group.is-empty label.control-label {
-    top: -10px;
-    left: 6px;
-    font-size: 1em;
-    line-height: normal;
-    position: absolute;
-    color: $color-txt-3-hex;
-    z-index:1;
-    pointer-events: none;
-}
-.form-group.is-focused label.control-label {
-    top: -35px; 
-    left: 0;
-    font-size: 0.8em;
-    line-height: normal;
-    position: absolute;
-    pointer-events: none;
-    transition: .3s ease all;
-    color: $color-txt-4-hex;
-}
-
 
 ::ng-deep .ng-dropdown-panel {
     .ng-dropdown-panel-items {

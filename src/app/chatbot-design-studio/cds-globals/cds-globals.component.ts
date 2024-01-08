@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Global } from './../../models/global-model';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { variableList } from '../utils';
 import { Chatbot } from 'src/app/models/faq_kb-model';
@@ -15,28 +16,24 @@ export class CdsGlobalsComponent implements OnInit {
 
   @Input() selectedChatbot: Chatbot;
 
-  newSectionVisible: boolean = false;
-  updateSecretVisible: boolean = false;
-
-  newGlobal = {
-    key: '',
-    value: ''
-  }
-  globalForm: FormGroup;
-
+  
+  newGlobal: Global = { key: '', value: '' }
+  
   list = [];
   updateIndex: any;
   currentValue: string;
 
+  IS_OPEN_PANEL_GLOBAL_DETAIL: boolean = false;
+  showWelcome: boolean = true;
+  selectedGlobal: Global
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private formBuilder: FormBuilder,
     private faqKbService: FaqKbService
   ) { }
 
   ngOnInit(): void {
-    this.globalForm = this.createSecretsGroup();
   }
 
   ngOnChanges(): void {
@@ -45,58 +42,32 @@ export class CdsGlobalsComponent implements OnInit {
       this.selectedChatbot.attributes.globals.sort((a, b) => {
         return a.key.toLowerCase().localeCompare(b.key.toLowerCase());;
       })
-      this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));;
+      this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));
       this.logger.debug("[CDS-GLOBALS] globals list: ", this.list)
-  
-    }
-  }
-
-  createSecretsGroup(): FormGroup {
-    return this.formBuilder.group({
-      key: ['', [Validators.required, Validators.pattern('([A-Za-z0-9\_]+)')]],
-      // key: ['', [Validators.required, Validators.pattern('[a-zA-Z0-9_]*$')]],
-      value: ['', [Validators.required]]
-    })
-
-  }
-
-  onSubmitForm() {
-    console.log('[CDS-GLOBALS] onSubmitForm:', this.globalForm)
-    if(this.globalForm.valid){
-      this.list.push(this.globalForm.value);
-      this.saveAttributes();
-      this.newSectionVisible = false
-    }
-  }
-
-  updateSecret(index) {
-    console.log('[CDS-GLOBALS] updateSecret:', this.globalForm)
-    if(this.globalForm.valid){
-      this.list[index] = this.globalForm.value
-      this.saveAttributes();
-      this.updateIndex = null;
+      if(this.list.length > 0){
+        this.showWelcome = false
+      }
     }
   }
 
   showUpdateSecret(index, global) {
     this.updateIndex = index;
     if (global) {
-      this.globalForm.patchValue({ 'key': global.key, 'value': global.value })
+      this.IS_OPEN_PANEL_GLOBAL_DETAIL = true
+      this.selectedGlobal = global
     }
-    this.newSectionVisible = false
-  }
-
-  cancelUpdateSecret(index) {
-    this.updateIndex = null;
-    this.list[index] = this.selectedChatbot.attributes.globals[index];
   }
 
   deleteElement(key) {
-    this.newSectionVisible = false;
     let index = this.list.findIndex(s => s.key === key);
     this.list.splice(index, 1);
-
     this.saveAttributes();
+
+    if(this.list.length === 0 ){
+      this.showWelcome = true
+    }else{
+      this.showWelcome = false
+    }
   }
 
   saveAttributes() {
@@ -107,7 +78,9 @@ export class CdsGlobalsComponent implements OnInit {
         key: '',
         value: ''
       }
-      this.globalForm.reset();
+      this.selectedChatbot.attributes= {
+        globals: data
+      }
       
       //Update local list (for variable-list component)
       variableList.find(el => el.key ==='globals').elements = this.selectedChatbot.attributes.globals.map(({
@@ -124,21 +97,54 @@ export class CdsGlobalsComponent implements OnInit {
     })
   }
 
-  showHideUpdateSecret(secret) {
-    secret.visible = !secret.visible;
-  }
-
-  showHideSecret(secret) {
-    secret.visible = !secret.visible;
-  }
-
   copyToClipboard(value) {
     navigator.clipboard.writeText(value)
   }
 
-  showHideNewSection(visible: boolean) {
-    this.showUpdateSecret(null, null);
-    this.newSectionVisible = visible;
+  addNew(event){
+    this.IS_OPEN_PANEL_GLOBAL_DETAIL = true
+    this.selectedGlobal = null
+  }
+
+  onGlobalChange(event: {type: 'add' | 'edit' | 'delete' | 'return', element: Global | null }){
+    console.log('[CDS-GLOBALS ] onGlobalChange -->', event, this.updateIndex)
+    switch(event.type){
+      case 'add':
+        this.list.push(event.element)
+        break;
+      case 'edit':
+        this.list[this.updateIndex] = event.element
+        break;
+      case 'delete':
+        let index = this.list.findIndex(s => s.key === this.updateIndex);
+        this.list.splice(index, 1);
+        break;
+      case 'return':
+        break;
+    }
+
+    this.saveAttributes();
+    this.updateIndex = null;
+
+    if(this.list.length === 0 ){
+      this.showWelcome = true
+    }else{
+      this.showWelcome = false
+    }
+
+    this.IS_OPEN_PANEL_GLOBAL_DETAIL = false
+  }
+
+  // -------------------------------------------------------
+  // @ Close WHEN THE GLOBAL SECTION IS CLICKED 
+  // - detail gloal panel
+  // -------------------------------------------------------
+  @HostListener('document:click', ['$event'])
+  documentClick(event: any): void {
+    this.logger.log('[CDS GLOBALS] DOCUMENT CLICK event: ', event.target);
+    if (event.target.id.startsWith("cds-globals-")) {
+      this.IS_OPEN_PANEL_GLOBAL_DETAIL = false
+    }
   }
 
   // private initializeAttributes() {

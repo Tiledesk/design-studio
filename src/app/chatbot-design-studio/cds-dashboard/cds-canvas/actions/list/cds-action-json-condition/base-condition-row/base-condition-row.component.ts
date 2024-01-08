@@ -34,10 +34,11 @@ export class BaseConditionRowComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.logger.log('[BASE_CONDITION_ROW] ******* ngOnInit-->');
   }
 
   ngOnChanges(changes: SimpleChanges){
-    this.logger.log('******* ngOnChanges-->');
+    this.logger.log('[BASE_CONDITION_ROW] ******* ngOnChanges-->');
     this.conditionForm = this.createConditionGroup()
     this.operatorsList = Object.keys(OPERATORS_LIST).map(key => (OPERATORS_LIST[key]))
     if(this.condition){
@@ -131,6 +132,13 @@ export class BaseConditionRowComponent implements OnInit {
 
   onClickOperator(operator: {}){
     this.conditionForm.patchValue({ operator: operator['type']})
+    
+    //activate submit button and disable 'Value' textarea i operator is equal to 'isEmpty'
+    if(operator['type'] === 'isEmpty'){
+      this.disableSubmit = false;
+      this.readonlyTextarea = true;
+      this.setAttributeBtnOperand2 = false;
+    }
   }
 
   onSubmitCondition(){

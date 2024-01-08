@@ -35,6 +35,32 @@
         </div>
     </div>
 
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">Success</label>
+        
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+       <label class="title-preview-label">else</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
 </div>
 
 <!-- <div id="variables" class="content" *ngIf="!previewMode && showVariablesSection"
@@ -55,7 +81,7 @@
     </div>
 </div> -->
 
-<div id="scrollMe" #scrollMe *ngIf="!previewMode && !showVariablesSection" class="content-panel-intent-detail" >
+<div id="scrollMe" #scrollMe *ngIf="!previewMode && !showVariablesSection" class="content-panel-intent-detail no-footer">
 
 
     <div class="field-box">
@@ -69,7 +95,7 @@
             [text]="action.question" 
             [placeholder]="'Enter prompt'"
             (blur)="onBlur($event)"
-            (changeTextarea)="changeTextarea($event, 'question')">
+            (changeTextarea)="onChangeTextarea($event, 'question')">
         </cds-textarea>
     </div>
 
@@ -89,7 +115,54 @@
         </cds-textarea>
     </div>
 
-    <a (click)="goToKNB()" id="router-link" routerLinkActive="router-link-active" target="_blank">Manage GPT Key</a>
+    <div class="field-box">
+        <a (click)="goToKNB()" id="router-link" routerLinkActive="router-link-active" target="_blank">Manage GPT Key</a>
+    </div>
+
+    <div class="field-box">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">Success</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.trueIntent" 
+            [placeholder]="'Select a block'"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
+            (onReset)="onResetBlockSelect($event, 'trueIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+    </div>
+
+    <div class="field-box">
+        <div class="condition-container">
+            <label class="condition-text">Else</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.falseIntent" 
+            [placeholder]="'Select a block'"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
+            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="action.falseIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+        </cds-attributes> -->
+    </div>
 
     <hr class="custom-divider">
 

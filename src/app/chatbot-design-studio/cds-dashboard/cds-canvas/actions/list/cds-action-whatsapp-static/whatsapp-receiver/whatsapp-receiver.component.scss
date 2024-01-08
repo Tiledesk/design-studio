@@ -31,7 +31,7 @@
 }
 
 .highlighted {
-    box-shadow: 0px 0px 4px 0px $color-red-hex;
+    box-shadow: 0px 0px 4px 0px var(--color-red-hex);
 }
 
 .response-controls {
@@ -72,7 +72,7 @@
         color: $blu-light-02;
         &.delete{
             em {
-                color: $color-red-hex;
+                color: var(--color-red-hex);
             }
         }
         &.copy {
@@ -157,7 +157,7 @@ loading-spinner.custom-spinner ::ng-deep {
         width: 100%;
         height: 36px;
         border-radius: 8px;
-        background: $color-white-hex;
+        background: var(--color-white-hex);
         border: 1px solid $blu-light-02 !important;
         color: $gray;
         padding: 4px 8px;
@@ -313,7 +313,7 @@ button.icon-only {
     border-radius: 8px;
     background: $blu-light-02;
     border: 1px solid $blu-light-02 !important;
-    color: $color-white-hex;
+    color: var(--color-white-hex);
 
     display: flex;
     align-items: center;

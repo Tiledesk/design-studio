@@ -1,6 +1,7 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 :host{
+    --icon-color: #{$blu};
     --textColor: #{$blu};
     --backGroundColor: #{$blu-light-03};
     --hoverBackgroundColor: #{$blu-light-03};
@@ -13,29 +14,6 @@
     width: 0px;
 }
 
-.previewContent{
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 5px;
-    padding: 0px;
-  
-    .icon-action img{
-        height: 16px;
-        filter: brightness(0) saturate(100%) invert(42%) sepia(2%) saturate(2720%) hue-rotate(9deg) brightness(91%) contrast(81%);
-    }
-  
-    .title-preview-label{
-        color: #6c6859;
-        font-size: 12px; 
-        margin: 0px;
-    }
-
-}
-
-
 .flex-element{
     display: flex;
     width: 100%;
@@ -47,36 +25,6 @@
 
 
 // _________________CONDITION ::: START ___________________________
-
-.basic-filter-wrp{
-    background: #fff;
-    margin: 0 30px;
-    padding: 20px;
-    grid-row-gap: 15px;
-    border-radius: 4px;
-    display: flex;
-
-    .add-filter-button{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        font-weight: 600;
-        padding: 8px 15px;
-        border: 1px solid #c6cdd4;
-        border-radius: 4px;
-        color: $light-black;
-        cursor: pointer;
-
-
-        :hover{
-            border-color: $light-black
-        }
-    }
-    
-}
-
-
 ::ng-deep .add-filter-panel {
     display: flex;
     -ms-flex-direction: column;
@@ -296,7 +244,7 @@ cds-select.operator ::ng-deep{
         -webkit-box-align: center;
         -webkit-box-pack: center;
         align-items: center;
-        color: $icon-color;
+        color: var(--icon-color);
         display: flex;
         font-size: 15px;
         justify-content: center;
@@ -304,7 +252,7 @@ cds-select.operator ::ng-deep{
         transition: color 0.3s ease 0s;
         span.material-icons{
             font-size: 15px;
-            color: $icon-color;
+            color: var(--icon-color);
         }
     }
 

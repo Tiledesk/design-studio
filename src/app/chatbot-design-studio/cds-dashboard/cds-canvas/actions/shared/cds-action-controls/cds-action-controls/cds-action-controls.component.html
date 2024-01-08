@@ -1,10 +1,25 @@
 <div class="action-controls">
     <div class="action-control-btns-wpr">
-        <div class="action-control-btn icon" (click)="onClickAction('delete', $event)">
+
+        <div class="action-control-btn icon" 
+            matTooltipClass="cds-mat-tooltip" 
+            matTooltip="delete action" 
+            #tooltip="matTooltip"
+            matTooltipPosition='above' 
+            matTooltipHideDelay="100"
+            (click)="onClickAction('delete', $event)">
             <img src="assets/images/icons/bin.svg">
         </div>
-        <div class="action-control-btn icon" (click)="onClickAction('edit', $event)">
+        <div class="action-control-btn icon" 
+            matTooltipClass="cds-mat-tooltip" 
+            matTooltip="edit action" 
+            #tooltip="matTooltip"
+            matTooltipPosition='above' 
+            matTooltipHideDelay="100"
+            (click)="onClickAction('edit', $event)">
             <img src="assets/images/icons/edit.svg">
         </div>
+
+
     </div>
 </div>

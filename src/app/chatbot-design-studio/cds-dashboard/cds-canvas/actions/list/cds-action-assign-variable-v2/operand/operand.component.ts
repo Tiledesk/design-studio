@@ -18,7 +18,7 @@ export class OperandV2Component implements OnInit {
 
     operandForm: FormGroup;
     // listOfFunctions: Array<{name: string, value: string, icon?:string}> = [];
-    openSlectFunction: boolean;
+    openSelectFunction: boolean = false;
     placeholder: string;
 
     private logger: LoggerService = LoggerInstance.getInstance();
@@ -26,7 +26,6 @@ export class OperandV2Component implements OnInit {
     constructor(private formBuild: FormBuilder) {}
 
     ngOnInit(): void {
-        this.openSlectFunction = false;
         this.initialize();
     }
 
@@ -40,6 +39,7 @@ export class OperandV2Component implements OnInit {
             }
             if (data.function !== null) {
                 this.operand.function = data.function;
+                this.openSelectFunction = true
             } else {
                 delete(this.operand.function);
             }
@@ -105,7 +105,7 @@ export class OperandV2Component implements OnInit {
     }
 
     onToggleSelectFunction(){
-        this.openSlectFunction = !this.openSlectFunction;
+        this.openSelectFunction = !this.openSelectFunction;
     }
 
 }
