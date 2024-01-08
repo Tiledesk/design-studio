@@ -454,7 +454,9 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'chatChannel', value: 'chatChannel', description: 'The channel where this conversation belongs to. Ex. "web", "whatsapp", "facebook", "telegram"', src: '', icon: 'language' },
             { name: 'user_source_page', value: 'user_source_page', description: 'The page where this conversations is runinng. Only available on channel "web"', src: '', icon: 'language' },
             { name: 'chat_url', value: 'chat_url', description: 'The url of the Chat to send to a colleague to chat with this user. Use "Invite human" action to invite the human to this chat.', src: '', icon: 'laptop' },
-            { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available',src: '', icon: 'laptop' },
+            { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available', src: '', icon: 'laptop' },
+            { name: 'ticketId', value: 'ticketId', description: 'The current conversation ticket ID', src: '', icon: 'sell' },
+            
         ]
     },
     {
