@@ -157,7 +157,7 @@
     display: grid;
     grid-template-columns: 0.5fr 0.5fr 0.1fr;
     gap: 5px;
-    
+
     button.cds-blue-button{
         justify-self: end;
     }
@@ -329,5 +329,12 @@
 @keyframes slide-in {
     to {
       transform: translateX(0);
+    }
+}
+
+
+cds-text#custom-input-value ::ng-deep{
+    input{
+        padding: 4px 30px 4px 8px !important;
     }
 }
