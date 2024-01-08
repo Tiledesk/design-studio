@@ -123,6 +123,11 @@ export class ConnectorService {
     }
   }
 
+  /**
+   * 
+   * @param connectorID 
+   * @returns 
+   */
   public async createConnectorById(connectorID) {
     const isConnector = document.getElementById(connectorID);
     if (isConnector) {
@@ -176,7 +181,6 @@ export class ConnectorService {
    * create connectors from Intent
    */
   public createConnectorsOfIntent(intent:any){
-    
     if(intent.actions){
       intent.actions.forEach(action => {
         let idConnectorFrom = null;
@@ -837,4 +841,13 @@ export class ConnectorService {
     return buttons;
   }
 
+
+  /**
+   * 
+   * @param positions 
+   */
+  public logicPoint(positions){
+    return this.tiledeskConnectors.logicPoint(positions);
+  }
+  
 }

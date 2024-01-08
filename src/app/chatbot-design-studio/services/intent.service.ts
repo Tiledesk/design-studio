@@ -1,12 +1,13 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { v4 as uuidv4 } from 'uuid';
 
 import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionCode } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { TYPE_INTENT_NAME, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey } from '../utils';
+import { TYPE_INTENT_NAME, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, INTENT_TEMP_ID } from '../utils';
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
@@ -1251,6 +1252,53 @@ export class IntentService {
     console.log('[INTENT SERVICE] -> copyElement, ', element);
     if(element && element.type === 'INTENT'){
       this.arrayCOPYPAST.push(element);
+    }
+  }
+
+  public async pasteElementToStage(positions){
+    let element = this.arrayCOPYPAST[0];
+    let point = this.connectorService.logicPoint(positions);
+    console.log('[INTENT SERVICE] -> pasteElementToStage, ', element, point);
+    if(element && element.type === 'INTENT'){
+      let newIntent_id = uuidv4();
+      let prevIntent = element.element;
+
+
+      let newIntent = JSON.parse(JSON.stringify(prevIntent));
+      newIntent.intent_display_name = prevIntent.intent_display_name+" copy";
+      newIntent.attributes.position = point;
+      newIntent.id = INTENT_TEMP_ID;
+      newIntent._id = INTENT_TEMP_ID;
+      newIntent.intent_id = newIntent_id;
+      
+
+        // const newAction = this.createNewAction( TYPE_ACTION.REPLY);
+        let newAction = prevIntent.actions[0];
+        let intent2 = this.createNewIntent(prevIntent.id_faq_kb, newAction, 0);
+        intent2.attributes = prevIntent.attributes;
+        intent2.attributes.position = point;
+        intent2.actions = prevIntent.actions;
+
+        let elementJson = JSON.stringify(intent2).replace(prevIntent.intent_id, newIntent_id);
+        let intent = JSON.parse(elementJson);
+        this.connectorService.createConnectorsOfIntent(intent);
+      // intent2.actions = prevIntent.actions;
+      // nell'intent sostituisco tutte le occorrenze di intent_id!!!!
+      // Sostituisci tutte le occorrenze di "123" con "new" nella stringa JSON
+
+
+
+      // let intent = intent2;
+      this.addNewIntentToListOfIntents(intent);
+      this.setDragAndListnerEventToElement(intent.intent_id);
+      this.setIntentSelected(intent.intent_id);
+      const savedIntent = await this.saveNewIntent(intent, null, null);
+      console.log('[INTENT SERVICE] -> listOfIntents, ', intent);
+
+
+
+     
+     console.log('[INTENT SERVICE] -> pasteElementToStage ----> ',intent,  prevIntent);
     }
   }
 

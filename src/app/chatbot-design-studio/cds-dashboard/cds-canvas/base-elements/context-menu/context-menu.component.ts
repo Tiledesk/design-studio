@@ -1,4 +1,5 @@
-import { Component, OnInit, HostListener, ElementRef, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, Input, Output, EventEmitter } from '@angular/core';
+import { IntentService } from '../../../../services/intent.service';
 
 @Component({
   selector: 'cds-context-menu',
@@ -6,16 +7,19 @@ import { Component, OnInit, HostListener, ElementRef, Output, EventEmitter } fro
   styleUrls: ['./context-menu.component.scss']
 })
 export class ContextMenuComponent implements OnInit {
+  @Input() positions: any;
   @Output() hideContextMenu = new EventEmitter();
 
-  ACTION_CATEGORY: any;
+  MENU_ITEMS: any;
   constructor(
-    private el: ElementRef
+    private el: ElementRef,
+    public intentService: IntentService
   ) { }
 
   ngOnInit(): void {
     this.addDocumentClickListener();
-    this.ACTION_CATEGORY = ['incolla'];
+    this.MENU_ITEMS = ['incolla'];
+    // se array paste è vuoto disabilita incolla
   }
 
   @HostListener('document:click', ['$event'])
@@ -30,6 +34,14 @@ export class ContextMenuComponent implements OnInit {
     console.log('[CDS-CONTEXT-MENU] hideContextMenu:: ');
     this.hideContextMenu.emit();
     this.removeDocumentClickListener();
+  }
+
+  onClickedMenuButton(item){
+    console.log('[CDS-CONTEXT-MENU] onClickedMenuButton', item, this.positions);
+    if(item === 'incolla'){
+      this.intentService.pasteElementToStage(this.positions);
+    }
+    this.onHideContextMenu();
   }
 
   private addDocumentClickListener(): void {

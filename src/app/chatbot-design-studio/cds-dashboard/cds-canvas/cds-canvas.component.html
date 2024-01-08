@@ -118,6 +118,7 @@
     class="context-menu"
     [style.top.px]="positionContextMenu.y" 
     [style.left.px]="positionContextMenu.x"
+    [positions]="positionContextMenu"
     (hideContextMenu)="onHideContextMenu($event)">
 </cds-context-menu>
 
