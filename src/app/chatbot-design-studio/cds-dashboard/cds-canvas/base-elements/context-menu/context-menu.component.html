@@ -4,7 +4,7 @@
     <div size="4" class="cds-elements" mat-button>
 
         <!-- ACTIONS -->
-        <div *ngFor="let item of MENU_ITEMS" class="cds-element" (click)="onClickedMenuButton(item)">
+        <div *ngFor="let item of MENU_ITEMS" class="cds-element" [class.disabled]="isPasteButtonDisabled" (click)="onClickedMenuButton(item)">
             <!-- 
             <div class="cds-button-element">
                 <div class="cds-box-button">
@@ -12,8 +12,8 @@
                 </div>
             </div> 
             -->
-            <div class="cds-button-element">
-                <div class="cds-box-button">
+            <div class="cds-button-element" >
+                <div class="cds-box-button" >
                     <!-- <span class="box-img">
                         <img class="active-icon" [src]="">
                     </span> -->

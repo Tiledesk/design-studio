@@ -747,6 +747,7 @@ export class CdsCanvasComponent implements OnInit {
   }
 
 
+
   /**
    * createNewIntentDraggingActionFromAnotherIntent
    * @param pos 

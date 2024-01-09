@@ -11,6 +11,8 @@ export class ContextMenuComponent implements OnInit {
   @Output() hideContextMenu = new EventEmitter();
 
   MENU_ITEMS: any;
+  isPasteButtonDisabled: boolean = false;
+
   constructor(
     private el: ElementRef,
     public intentService: IntentService
@@ -18,8 +20,13 @@ export class ContextMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.addDocumentClickListener();
-    this.MENU_ITEMS = ['incolla'];
-    // se array paste è vuoto disabilita incolla
+    this.MENU_ITEMS = ['paste'];
+  }
+
+  ngAfterViewInit() {
+    if(this.intentService.arrayCOPYPAST.length === 0){
+      this.isPasteButtonDisabled = true;
+    }
   }
 
   @HostListener('document:click', ['$event'])

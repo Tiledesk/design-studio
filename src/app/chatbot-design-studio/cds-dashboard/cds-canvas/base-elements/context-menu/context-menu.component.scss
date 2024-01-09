@@ -1,5 +1,9 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
 .cds-panel-elements {
     position: absolute;
     width: 190px;
