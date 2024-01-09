@@ -181,11 +181,28 @@ export class ConnectorService {
    * create connectors from Intent
    */
   public createConnectorsOfIntent(intent:any){
+
+    if(intent.attributes && intent.attributes.nextBlockAction){
+      let idConnectorFrom = null;
+      let idConnectorTo = null;
+      let nextBlockAction = intent.attributes.nextBlockAction;
+      if(nextBlockAction.intentName && nextBlockAction.intentName !== ''){
+        idConnectorFrom = intent.intent_id+'/'+nextBlockAction._tdActionId;
+        idConnectorTo = nextBlockAction.intentName.replace("#", "");
+        if(!this.intentExists(idConnectorTo)){
+          nextBlockAction.intentName = '';
+          idConnectorTo = null;
+        }
+        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+        this.createConnector(intent, idConnectorFrom, idConnectorTo);
+      }
+    }
+
     if(intent.actions){
       intent.actions.forEach(action => {
         let idConnectorFrom = null;
         let idConnectorTo = null;
-        // this.logger.log('[CONNECTOR-SERV] createConnectors:: ACTION ', action._tdActionId);
+        this.logger.log('[CONNECTOR-SERV] createConnectors:: ACTION ', action);
         
         /**  INTENT */
         if(action._tdActionType === TYPE_ACTION.INTENT){

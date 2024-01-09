@@ -72,25 +72,24 @@ export class CdsDashboardComponent implements OnInit {
     // Changelog alert
     // ---------------------------------------
     this.showChangelog = this.checkForChangelogNotify();
-
     this.executeAsyncFunctionsInSequence();
-    this.hideShowWidget('hide')
+    this.hideShowWidget('hide');
   }
 
   checkForChangelogNotify(): boolean{
     let changelogKey = this.appStorageService.getItem("changelog")
     if(!changelogKey || changelogKey !== environment.VERSION){
-      return true
+      return true;
     }
-    return false
+    return false;
   }
+
   onCloseChangelog(){
     this.showChangelog = false;
     this.appStorageService.setItem('changelog', environment.VERSION)
   }
 
   async getUrlParams(): Promise<boolean> {
-    
     return new Promise((resolve, reject) => {
       this.route.params.subscribe({ next: (params) => {
           this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  PARAMS', params);
@@ -122,10 +121,8 @@ export class CdsDashboardComponent implements OnInit {
       this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
       const getCurrentProject = await this.dashboardService.getCurrentProject();
       this.logger.log('[CDS DSHBRD] Risultato 3:', getCurrentProject);
-
-
-      this.project = this.dashboardService.project
-      this.initialize()
+      this.project = this.dashboardService.project;
+      this.initialize();
       const getBotById = await this.dashboardService.getBotById();
       this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
       const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();

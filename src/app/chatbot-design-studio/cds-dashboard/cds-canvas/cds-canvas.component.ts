@@ -232,6 +232,15 @@ export class CdsCanvasComponent implements OnInit {
       // scaleAndcenterStageOnCenterPosition(this.listOfIntents)
     }
     this.subscriptionOpenWidgetPanel = this.onHeaderTestItOut.subscribe((event) => this.onTestItOut(event));
+
+    // ---------------------------------------
+    // load localstorage
+    // ---------------------------------------
+    let copyPasteTEMP = JSON.parse(localStorage.getItem('copied_items'));
+    this.logger.log('[CDS-CANVAS]  copyPasteTEMP', copyPasteTEMP);
+    if(copyPasteTEMP){
+      this.intentService.arrayCOPYPAST = copyPasteTEMP['copy'];
+    }
   }
 
  

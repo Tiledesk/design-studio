@@ -474,14 +474,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.formSelected.emit(this.intent.form);
   }
 
-  onClickControl(event: 'delete' | 'edit', action: Action, index: number) {
-    this.logger.log('[CDS-INTENT] onClickControl', event)
+  onClickControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number) {
+    this.logger.log('[CDS-INTENT] onClickControl', event, action);
     if (event === 'edit') {
       this.onSelectAction(action, index, action._tdActionId)
     } else if (event === 'delete') {
       this.intentService.selectAction(this.intent.intent_id, action._tdActionId)
       this.intentService.deleteSelectedAction();
       // this.actionDeleted.emit(true)
+    } else if (event === 'copy') {
+      this.copyAction(action);
     }
   }
 
@@ -735,6 +737,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.intentService.copyElement(element);
   }
 
+  private copyAction(ele){
+    let action = JSON.parse(JSON.stringify(ele));
+    const element = {element: action, type: 'ACTION'}
+    this.intentService.copyElement(element);
+  }
 
   openTestSiteInPopupWindow() {
     this.testItOut.emit(this.intent)

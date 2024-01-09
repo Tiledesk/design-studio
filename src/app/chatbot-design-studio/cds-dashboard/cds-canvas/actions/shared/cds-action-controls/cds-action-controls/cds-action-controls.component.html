@@ -1,6 +1,16 @@
 <div class="action-controls">
     <div class="action-control-btns-wpr">
 
+        <div class="action-control-btn icon"
+            matTooltipClass="cds-mat-tooltip" 
+            matTooltip="copy action" 
+            #tooltip="matTooltip"
+            matTooltipPosition='above' 
+            matTooltipHideDelay="100"
+            (click)="onClickAction('copy', $event)">
+            <img src="assets/images/icons/copy.svg">
+        </div>
+
         <div class="action-control-btn icon" 
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="delete action" 

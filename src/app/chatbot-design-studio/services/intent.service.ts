@@ -77,7 +77,9 @@ export class IntentService {
     private stageService: StageService,
     private dashboardService: DashboardService,
     private tiledeskAuthService: TiledeskAuthService
-  ) { }
+  ) { 
+
+  }
 
 
   /**
@@ -1251,7 +1253,14 @@ export class IntentService {
   public copyElement(element){
     console.log('[INTENT SERVICE] -> copyElement, ', element);
     if(element && element.type === 'INTENT'){
-      this.arrayCOPYPAST.push(element);
+      this.arrayCOPYPAST[0] = element;
+      let key = 'copied_items';
+      let chatbotId = element.element.id_faq_kb;
+      let value = {
+        'chatbot': chatbotId,
+        'copy': this.arrayCOPYPAST
+      }
+      localStorage.setItem(key, JSON.stringify(value));
     }
   }
 
@@ -1260,46 +1269,41 @@ export class IntentService {
     let point = this.connectorService.logicPoint(positions);
     console.log('[INTENT SERVICE] -> pasteElementToStage, ', element, point);
     if(element && element.type === 'INTENT'){
-      let newIntent_id = uuidv4();
-      let prevIntent = element.element;
-
-
-      let newIntent = JSON.parse(JSON.stringify(prevIntent));
-      newIntent.intent_display_name = prevIntent.intent_display_name+" copy";
-      newIntent.attributes.position = point;
-      newIntent.id = INTENT_TEMP_ID;
-      newIntent._id = INTENT_TEMP_ID;
-      newIntent.intent_id = newIntent_id;
-      
-
-        // const newAction = this.createNewAction( TYPE_ACTION.REPLY);
-        let newAction = prevIntent.actions[0];
-        let intent2 = this.createNewIntent(prevIntent.id_faq_kb, newAction, 0);
-        intent2.attributes = prevIntent.attributes;
-        intent2.attributes.position = point;
-        intent2.actions = prevIntent.actions;
-
-        let elementJson = JSON.stringify(intent2).replace(prevIntent.intent_id, newIntent_id);
-        let intent = JSON.parse(elementJson);
-        this.connectorService.createConnectorsOfIntent(intent);
-      // intent2.actions = prevIntent.actions;
-      // nell'intent sostituisco tutte le occorrenze di intent_id!!!!
-      // Sostituisci tutte le occorrenze di "123" con "new" nella stringa JSON
-
-
-
-      // let intent = intent2;
-      this.addNewIntentToListOfIntents(intent);
-      this.setDragAndListnerEventToElement(intent.intent_id);
-      this.setIntentSelected(intent.intent_id);
-      const savedIntent = await this.saveNewIntent(intent, null, null);
-      console.log('[INTENT SERVICE] -> listOfIntents, ', intent);
-
-
-
-     
-     console.log('[INTENT SERVICE] -> pasteElementToStage ----> ',intent,  prevIntent);
+      this.pasteIntentOntoStage(element.element, point);
+    } else if(element && element.type === 'ACTION'){
+      // se ho premuto incolla su un intent: aggiungo la action in coda all'intent
+      // altrimenti creo una nuova action
     }
+    localStorage.removeItem('copied_items');
+    this.arrayCOPYPAST = [];
+  }
+
+
+  private pasteIntentOntoStage(element, point){
+    let newIntent_id = uuidv4();
+    let prevIntent = element;
+    // let newIntent = JSON.parse(JSON.stringify(prevIntent));
+    // newIntent.intent_display_name = prevIntent.intent_display_name+" copy";
+    // newIntent.attributes.position = point;
+    // newIntent.id = INTENT_TEMP_ID;
+    // newIntent._id = INTENT_TEMP_ID;
+    // newIntent.intent_id = newIntent_id;
+    // const newAction = this.createNewAction( TYPE_ACTION.REPLY);
+    let newAction = prevIntent.actions[0];
+    let newIntent = this.createNewIntent(prevIntent.id_faq_kb, newAction, 0);
+    newIntent.attributes = prevIntent.attributes;
+    newIntent.attributes.position = point;
+    newIntent.actions = prevIntent.actions;
+    let elementJson = JSON.stringify(newIntent).replace(prevIntent.intent_id, newIntent_id);
+    let intent = JSON.parse(elementJson);
+    this.connectorService.createConnectorsOfIntent(intent);
+    // this.connectorService.updateConnectorsOfBlock(intent.intent_id);
+
+    this.addNewIntentToListOfIntents(intent);
+    this.setDragAndListnerEventToElement(intent.intent_id);
+    this.setIntentSelected(intent.intent_id);
+    this.saveNewIntent(intent, null, null);
+    console.log('[INTENT SERVICE] -> listOfIntents, ', intent);
   }
 
 }

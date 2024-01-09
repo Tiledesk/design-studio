@@ -24,6 +24,13 @@ export class ContextMenuComponent implements OnInit {
   }
 
   ngAfterViewInit() {
+    // ---------------------------------------
+    // load localstorage
+    // ---------------------------------------
+    let copyPasteTEMP = JSON.parse(localStorage.getItem('copied_items'));
+    if(copyPasteTEMP){
+      this.intentService.arrayCOPYPAST = copyPasteTEMP['copy'];
+    }
     if(this.intentService.arrayCOPYPAST.length === 0){
       this.isPasteButtonDisabled = true;
     }
@@ -45,7 +52,7 @@ export class ContextMenuComponent implements OnInit {
 
   onClickedMenuButton(item){
     console.log('[CDS-CONTEXT-MENU] onClickedMenuButton', item, this.positions);
-    if(item === 'incolla'){
+    if(item === 'paste'){
       this.intentService.pasteElementToStage(this.positions);
     }
     this.onHideContextMenu();
