@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.10-rc.3
+- added: ability to set variable as global key
+- changed: text limit to code textarea cds-action-code
+- changed: text limit to prompt textarea cds-action-gpt-task
+
 ### 1.0.10-rc.2
 - added: limit to 4 line for cds-action-code preview input box
 - changed: removed variable and emoji options from global value input detail component
