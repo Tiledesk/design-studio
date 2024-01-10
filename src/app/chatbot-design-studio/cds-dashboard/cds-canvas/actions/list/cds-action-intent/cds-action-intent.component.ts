@@ -91,12 +91,16 @@ export class CdsActionIntentComponent implements OnInit {
 
   private updateConnector(){
     this.isConnected = this.action.intentName?true:false;
+    const array = this.connector.fromId.split("/");
+    const idIntent= array[0];
+    const idAction= array[1];
+    if(this.idIntentSelected !== idIntent){
+      return;
+    }
     try {
       if(!this.action.intentName)this.isConnected = false;
       else this.isConnected = true;
-      const array = this.connector.fromId.split("/");
-      const idAction= array[1];
-      if(idAction === this.action._tdActionId){
+      if(idAction === this.action._tdActionId ){
         console.log('[CDS-ACTION-INTENT] - updateConnector :: ', idAction, this.action._tdActionId, this.connector);
         if(this.connector.deleted){
           this.action.intentName = null;
