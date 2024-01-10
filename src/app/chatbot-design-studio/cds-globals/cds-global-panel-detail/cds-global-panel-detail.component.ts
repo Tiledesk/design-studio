@@ -30,7 +30,7 @@ export class CdsGlobalPanelDetailComponent implements OnInit {
 
   createGlobalForm(): FormGroup {
     return this.formBuilder.group({
-      key: ['', [Validators.required, Validators.pattern('([A-Za-z0-9\_]+)')]],
+      key: ['', [Validators.required, Validators.pattern('({{.*[A-Za-z0-9\_]+}}$)|([A-za-z0-9\_]+)')]], // (group1: get {{[A-za-z0-0\_]}}) | (group2: get[A-za-z0-0\_] )
       // key: ['', [Validators.required, Validators.pattern('[a-zA-Z0-9_]*$')]],
       value: ['', [Validators.required]]
     })
