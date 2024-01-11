@@ -920,8 +920,16 @@ export class IntentService {
       button.__isConnected = true;
       const posId = button.action.indexOf("#");
       if (posId !== -1) {
-        const toId = button.action.slice(posId+1);
-        button.__idConnection = idActionConnector+"/"+toId;
+        // const toId = button.action.slice(posId+1);
+        // button.__idConnection = idActionConnector+"/"+toId;
+        let result = button.action;
+        const regex = /#(.*?){/;
+        const match = button.action.match(regex);
+        // La sottostringa desiderata sarà nel secondo elemento dell'array 'match'
+        if (match && match.length > 1) {
+          result = match[1];
+        }
+        button.__idConnection = idActionConnector+"/"+result;
       }
     } else {
       button.__isConnected = false;
@@ -1016,7 +1024,7 @@ export class IntentService {
       // console.log('[INTENT SERVICE] -> RESTORE UNDO: ', this.arrayREDO);
       this.payload.operations = objUNDO.undo;
       console.log('[INTENT UNDO] -> ho aggiornato gli array dopo UNDO ', this.payload, this.arrayUNDO, this.arrayREDO);
-      this.refreshIntents();
+      // this.refreshIntents();
       this.restoreIntent(objUNDO.undo);
       this.setBehaviorUndoRedo();
       this.opsUpdate(this.payload);
