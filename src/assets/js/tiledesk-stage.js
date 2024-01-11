@@ -15,6 +15,7 @@ export class TiledeskStage {
 
     isDragging = false;
     // isDraggingElement = false;
+    // isDraggingElement = false;
 
     constructor(containerId, drawerId, classDraggable) {
         this.containerId = containerId;
@@ -42,8 +43,8 @@ export class TiledeskStage {
         var clientX = 0;
         var clientY = 0;
         this.container.onmousedown = (function(event) {
-            // console.log('mousedown', event.button, this.isDraggingElement); && this.isDraggingElement === false
-            if (event.button === 1 ) { 
+            // console.log('mousedown', event.button);// this.isDraggingElement);  && this.isDraggingElement === false
+            if (event.button === 1) { 
                 // Bottone centrale del mouse (rotellina)
                 isDragging = true;
                 event.preventDefault();
@@ -54,7 +55,7 @@ export class TiledeskStage {
                 startY = this.ty;
             
                 document.onmousemove = (function(event) {
-                    // console.log('mousemove', isDragging, event, this.tx);
+                    console.log('mousemove', isDragging, event, this.tx);
                     if (isDragging) {
                         let direction = 1;
                         this.tx = startX + (event.clientX - clientX) * direction;
@@ -69,7 +70,7 @@ export class TiledeskStage {
 
                 document.onmouseup = (function() {
                     isDragging = false;
-                    // console.log('mouseup', isDragging);
+                     console.log('mouseup', isDragging);
                     document.onmousemove = null;
                     document.onmouseup = null;
                 }).bind(this);
@@ -165,8 +166,8 @@ export class TiledeskStage {
         let pos_mouse_y;
         // console.log('setDragElement::: ', element);
         element.onmousedown = (function(event) {
-            // this.isDraggingElement = true;
-            console.log('dragMouseDown', event, this.classDraggable, element);
+            //this.isDraggingElement = true;
+            // console.log('dragMouseDown', event, this.classDraggable, element);
             if (!event.target.classList.contains(this.classDraggable)) {
                 return false;
             }
@@ -206,7 +207,7 @@ export class TiledeskStage {
             document.onmouseup = (function() {
                 document.onmousemove = null;
                 document.onmouseup = null;
-                // this.isDraggingElement = false;
+                //this.isDraggingElement = false;
                 const custom_event = new CustomEvent("end-dragging", {
                     detail: {
                         element: element

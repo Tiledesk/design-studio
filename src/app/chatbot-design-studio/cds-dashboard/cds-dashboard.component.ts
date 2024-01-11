@@ -90,7 +90,6 @@ export class CdsDashboardComponent implements OnInit {
   }
 
   async getUrlParams(): Promise<boolean> {
-    
     return new Promise((resolve, reject) => {
       this.route.params.subscribe({ next: (params) => {
           this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  PARAMS', params);
@@ -122,8 +121,6 @@ export class CdsDashboardComponent implements OnInit {
       this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
       const getCurrentProject = await this.dashboardService.getCurrentProject();
       this.logger.log('[CDS DSHBRD] Risultato 3:', getCurrentProject);
-
-
       this.project = this.dashboardService.project
       this.initialize()
       const getBotById = await this.dashboardService.getBotById();

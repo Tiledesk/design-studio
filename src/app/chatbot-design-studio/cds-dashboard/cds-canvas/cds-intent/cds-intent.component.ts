@@ -657,7 +657,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       replaceItemInArrayForKey('_tdActionId', this.intent.actions, object);
     }
     // this.setActionIntentInListOfActions();
-    // this.logger.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
+    this.logger.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
     this.intentService.updateIntent(this.intent);
     // this.intentService.onUpdateIntentWithTimeout(this.intent, 0, true, connector);
   }

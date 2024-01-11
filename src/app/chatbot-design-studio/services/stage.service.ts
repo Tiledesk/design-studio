@@ -72,7 +72,7 @@ export class StageService {
   }
 
 
-  async zoom(event: 'in' | 'out', elementId){
+  async zoom(event: 'in' | 'out'){
     return await this.tiledeskStage.zoom(event);
     // return new Promise((resolve) => {
     //   const element = document.getElementById(elementId);

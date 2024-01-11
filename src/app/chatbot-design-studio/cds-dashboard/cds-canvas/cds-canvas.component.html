@@ -100,15 +100,15 @@
     class="cds-generic-panel"
     [project_id]="projectID"
     [elementIntentSelected]="elementIntentSelected"
+    (closePanel)="closeAllPanels()"
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-action-detail> 
 
-<!-- *ngIf="IS_OPEN_PANEL_WIDGET" -->
+<!-- *ngIf="IS_OPEN_PANEL_WIDGET" intent]="intentSelected" -->
 <cds-panel-widget  *ngIf="testitOutFirstClick"
     [class.isVisible]="IS_OPEN_PANEL_WIDGET"
     [class.isHidden]="!IS_OPEN_PANEL_WIDGET"
     [isPanelVisible]="IS_OPEN_PANEL_WIDGET"
-    [intent]="intentSelected"
     id="widget-preview" 
     class="cds-generic-panel">
 </cds-panel-widget>
