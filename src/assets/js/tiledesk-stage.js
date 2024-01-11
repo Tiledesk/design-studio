@@ -15,6 +15,7 @@ export class TiledeskStage {
 
     isDragging = false;
     // isDraggingElement = false;
+    // isDraggingElement = false;
 
     constructor(containerId, drawerId, classDraggable) {
         this.containerId = containerId;

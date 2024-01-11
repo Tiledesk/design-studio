@@ -48,7 +48,7 @@ export class CdsActionQaplaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log("[ACTION QAPLA] action:", this.action);
+    this.logger.log("[ACTION QAPLA] action:", this.action);
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
       this.connector = connector;

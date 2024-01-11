@@ -22,13 +22,15 @@
                         class="text-editable-div" 
                         [class.invalid]="(globalForm.controls.value.errors?.pattern || globalForm.controls.value.errors?.required) && globalForm.controls.value.touched"
                         [control]="globalForm.get('value')"
-                        [placeholder]="'CDSGlobals.value' | translate">
+                        [placeholder]="'CDSGlobals.value' | translate"
+                        [emojiPikerBtn]="false" 
+                        [setAttributeBtn]="false">
                     </cds-textarea>
                 </div>
 
             </div>
 
-            <div class="buttons-container">
+            <div class="field-box buttons-container">
                 <button id="delete-button" class="btn btn-primary cds-blue-button" *ngIf="global"
                     (click)="onDelete()">{{ "Delete" | translate}}</button>
                 <div class="buttons-container">
@@ -40,6 +42,15 @@
                     <button id="add-button" class="btn btn-primary cds-blue-button" *ngIf="!global"
                         (click)="onAdd()" type="submit"
                         [disabled]="!globalForm.valid">{{ "Add" | translate}}</button>
+                </div>
+            </div>
+
+            <div class="field-box" *ngIf="(globalForm.controls.key.errors?.pattern || globalForm.controls.key.errors?.required) && (globalForm.controls.key.dirty || globalForm.controls.key.touched)">
+                <div class="tpl-info">
+                    <i class="material-icons-outlined tpl-info-icon">help_outline</i>
+                    <div class="tpl-info-text">
+                        <span [innerHTML]="'CDSCanvas.TheGlobalKeyMustBe' | translate"></span>
+                    </div>
                 </div>
             </div>
         </form>

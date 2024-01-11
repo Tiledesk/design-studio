@@ -30,13 +30,12 @@
             <div *ngFor="let variable of item.elements" (click)="onVariableSelected(variable)" class="category-row">
                 <span class="material-icons">{{variable?.icon}}</span>
                 <label class="category-row-name ellips">{{variable?.name}}</label>   
-                <!-- <div *ngIf="variable?.description"
-                    [satPopoverAnchor]="descriptionTooltip"
-                    (mouseover)="$event.stopPropagation();descriptionTooltip.toggle()">
+                <div *ngIf="variable?.description"
+                    matTooltipClass="cds-mat-tooltip"  matTooltip="{{ variable?.description | translate}}" #tooltip="matTooltip" matTooltipPosition='left' matTooltipHideDelay="100">
                     <span class="material-icons-outlined">info</span>
                 </div>
 
-                <sat-popover #descriptionTooltip id="descriptionTooltip" 
+                <!-- <sat-popover #descriptionTooltip id="descriptionTooltip" 
                     hasBackdrop 
                     verticalAlign="center" 
                     horizontalAlign="after" 
@@ -46,7 +45,7 @@
                         <div class="caret_tooltip"></div>
                         <span [innerHTML]="variable?.description"></span>
                     </div>
-                </sat-popover> --> 
+                </sat-popover>  -->
             </div>
         </mat-expansion-panel>
     </div>

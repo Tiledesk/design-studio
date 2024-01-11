@@ -101,7 +101,6 @@ export class DashboardService {
                 name,
                 value: name
               }))
-              console.log('variableeeeee', variableList)
             }
             resolve(true);
           }

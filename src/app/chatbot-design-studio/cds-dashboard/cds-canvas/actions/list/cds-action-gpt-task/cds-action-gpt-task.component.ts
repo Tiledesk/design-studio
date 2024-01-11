@@ -176,7 +176,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.logger.debug("[ACTION GPT-TASK] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
-  changeTextarea($event: string, property: string) {
+  onChangeTextarea($event: string, property: string) {
     this.logger.debug("[ACTION GPT-TASK] changeTextarea event: ", $event);
     this.logger.debug("[ACTION GPT-TASK] changeTextarea propery: ", property);
     this.action[property] = $event;

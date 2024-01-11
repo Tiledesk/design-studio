@@ -47,7 +47,8 @@ export enum TYPE_FUNCTION_VAR {
     ceilAsNumber = "ceilAsNumber",
     floorAsNumber = "floorAsNumber",
     roundAsNumber = "roundAsNumber",
-    JSONparse = 'JSONparse'
+    JSONparse = 'JSONparse',
+    JSONstringify= 'JSONstringify'
 }
 
 export enum TYPE_FUNCTION_FUNC {
@@ -125,7 +126,8 @@ export enum TYPE_ACTION {
     JSON_CONDITION = 'jsoncondition',
     CONDITION = 'condition',
     CAPTURE_USER_REPLY = 'capture_user_reply',
-    QAPLA = "qapla"
+    QAPLA = "qapla",
+    CODE = 'code'
 }
 
 export enum TYPE_ACTION_CATEGORY {
@@ -276,10 +278,11 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     GPT_TASK: { name: 'GPT Task', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.GPT_TASK,  src: "assets/images/actions/openai-icon.svg", status: "active", description: 'This action forwards the question to ChatGPT' },
     HIDE_MESSAGE: { name: 'Hidden message', category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.HIDE_MESSAGE, src: "assets/images/actions/hidden_message.svg", status: "active",  },
     CHANGE_DEPARTMENT: { name: 'Change dept', category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CHANGE_DEPARTMENT, src: "assets/images/actions/change_department.svg", status: "active" },
+    CODE : { name: 'Code',category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CODE, src:"assets/images/actions/code.svg", status: "beta", description: '', disabled: false},
     // ASSIGN_FUNCTION: { name: 'Set function', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY: { name: 'Capture User Reply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: 'This action allow to capture the user reply' },
-    QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: 'PRO', description: 'This action allow to connect with Qapla', disabled: true },
-    MAKE : { name: 'Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "beta", plan: 'PRO', description: '', disabled: true},
+    QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: 'PRO', description: 'This action allow to connect with Qapla', disabled: false },
+    MAKE : { name: 'Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "beta", plan: 'PRO', description: '', disabled: false},
 }
 
 export const EVENTS_LIST = {
@@ -323,6 +326,7 @@ export const TYPE_FUNCTION_LIST_FOR_VARIABLES: { [key: string]: { name: string, 
     "floorAsNumbers": { name: "Floor", type: TYPE_FUNCTION_VAR.floorAsNumber, src: "assets/images/functions/floor.svg" },
     "ceilAsNumbers": { name: "Ceil", type: TYPE_FUNCTION_VAR.ceilAsNumber, src: "assets/images/functions/ceil.svg" },
     "JSONparse":  { name: "JSON.parse", type: TYPE_FUNCTION_VAR.JSONparse, src: "assets/images/functions/jsonParse.svg" },
+    "JSONstringify":  { name: "JSON.stringify", type: TYPE_FUNCTION_VAR.JSONstringify, src: "assets/images/functions/jsonParse.svg" },
 }
 
 export const TYPE_FUNCTION_LIST_FOR_FUNCTIONS: { [key: string]: { name: string, type: TYPE_FUNCTION_FUNC, src?: string } } = {
@@ -450,7 +454,9 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'chatChannel', value: 'chatChannel', description: 'The channel where this conversation belongs to. Ex. "web", "whatsapp", "facebook", "telegram"', src: '', icon: 'language' },
             { name: 'user_source_page', value: 'user_source_page', description: 'The page where this conversations is runinng. Only available on channel "web"', src: '', icon: 'language' },
             { name: 'chat_url', value: 'chat_url', description: 'The url of the Chat to send to a colleague to chat with this user. Use "Invite human" action to invite the human to this chat.', src: '', icon: 'laptop' },
-            { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available',src: '', icon: 'laptop' },
+            { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available', src: '', icon: 'laptop' },
+            { name: 'ticketId', value: 'ticketId', description: 'The current conversation ticket ID', src: '', icon: 'sell' },
+            
         ]
     },
     {
@@ -472,11 +478,12 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
     },
     {   key: 'leadAttributes',
         elements: [
-            { name: 'userEmail', value: 'userEmail', description: 'The user email of the current Lead', src: '', icon:'person'},
-            { name: 'userFullname', value: 'userFullname', description: 'The user fullname of the current Lead', src: '', icon:'person'},
-            { name: 'userPhone', value: 'userPhone', description: 'The user phone of the current Lead', src: '', icon:'person'},
-            { name: 'userLeadId', value: 'userLeadId', description: 'The user lead-ID of the current Lead', src: '', icon:'person'},
-            { name: 'userCompany', value: 'userCompany', description: 'The user company of the current Lead', src: '', icon:'person'}
+            { name: 'userEmail', value: 'userEmail', description: 'The user email in Tiledesk Contacts', src: '', icon:'person'},
+            { name: 'userFullname', value: 'userFullname', description: 'The user Fullname in Tiledesk Contacts', src: '', icon:'person'},
+            { name: 'userPhone', value: 'userPhone', description: 'The user phone in Tiledesk Contacts', src: '', icon:'person'},
+            { name: 'userLeadId', value: 'userLeadId', description: 'The user contact Id in Tiledesk Contacts', src: '', icon:'person'},
+            { name: 'userCompany', value: 'userCompany', description: 'The user Company name in Tiledesk Contacts', src: '', icon:'person'},
+            { name: 'currentPhoneNumber', value: 'currentPhoneNumber', description: 'The user phone used in the current conversation (i.e. coming from Whatsapp / SMS channels)', src: '', icon:'person'}
         ]
     }
 ]

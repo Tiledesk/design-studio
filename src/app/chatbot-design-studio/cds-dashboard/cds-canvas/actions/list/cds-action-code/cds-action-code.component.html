@@ -1,0 +1,24 @@
+<div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
+    <div class="response-wrp limit-content" *ngIf="action.source">{{action.source}}</div>
+    <div class="response-wrp no-text" *ngIf="!action.source">Click to add code source ...</div>
+</div>
+
+<div id="scrollMe" #scrollMe *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+
+    <div class="field-box">
+        <label class="title-label">Code</label>
+        <cds-textarea id="code" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [limitCharsText]="10000"
+            [minRow]="5"
+            [maxRow]="25" 
+            [text]="action.source" 
+            [placeholder]="'Enter your code'"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event)">
+        </cds-textarea>
+    </div>
+
+</div>

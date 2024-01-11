@@ -81,21 +81,21 @@
     </div>
 </div> -->
 
-<div id="scrollMe" #scrollMe *ngIf="!previewMode && !showVariablesSection" class="content-panel-intent-detail" >
+<div id="scrollMe" #scrollMe *ngIf="!previewMode && !showVariablesSection" class="content-panel-intent-detail no-footer">
 
 
     <div class="field-box">
         <label class="title-label">Prompt</label>
         <cds-textarea id="question" 
-            [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
+            [limitCharsText]="10000"
             [minRow]="2"
             [maxRow]="10" 
             [text]="action.question" 
             [placeholder]="'Enter prompt'"
             (blur)="onBlur($event)"
-            (changeTextarea)="changeTextarea($event, 'question')">
+            (changeTextarea)="onChangeTextarea($event, 'question')">
         </cds-textarea>
     </div>
 
