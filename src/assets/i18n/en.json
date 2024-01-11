@@ -234,6 +234,7 @@
         "AddCustomAttributes":"Add a custom attribute",
         "AddAttribute":"Add attribute",
         "TheAttributesNameMustBe":" The attribute’s name can only contain alphanumeric <br> characters which are letters A-Z, numbers 0-9 and <br> underscore.",
+        "TheGlobalKeyMustBe":" The key's name can only contain alphanumeric <br> characters which are letters A-Z, numbers 0-9 and <br> underscore.",
         "AttributeName":"Attribute name",
         "TypeAttributeName":"Type attribute name",
         "Filter":"Filter",
