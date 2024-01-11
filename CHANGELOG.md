@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.10-rc.4
+- added: error message if global key contains not allowed chaacters
+
 ### 1.0.10-rc.3
 - added: ability to set variable as global key
 - changed: text limit to code textarea cds-action-code
