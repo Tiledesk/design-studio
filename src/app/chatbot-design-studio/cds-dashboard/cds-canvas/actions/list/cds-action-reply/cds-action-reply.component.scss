@@ -186,13 +186,13 @@ $margin-bottom: 15px;
             left: 0px;
             top: 27px;
             margin: 0;
-            color: $color-bck-gray-hex;
+            color: $blu-04;
             cursor: grab;
             background-color: transparent;
             z-index: 1; 
         }
         .response-drop:hover {
-            color: $color-white-hex;
+            color: var(--color-white-hex);
             cursor: grab;  
         }
     }
@@ -200,16 +200,16 @@ $margin-bottom: 15px;
 
 
     /** START DRAG AND DROP **/
-    .draggable-list {
-        width: 500px;
-        max-width: 100%;
-        border: solid 1px $color-txt-3-hex;
-        min-height: 60px;
-        display: block;
-        background: $color-white-hex;
-        border-radius: 4px;
-        overflow: hidden;
-    }
+    // &.draggable-list {
+    //     width: 500px;
+    //     max-width: 100%;
+    //     // border: solid 1px $color-txt-3-hex;
+    //     min-height: 60px;
+    //     display: block;
+    //     background: var(--color-white-hex);
+    //     border-radius: 4px;
+    //     overflow: hidden;
+    // }
       
     .cdk-drag-preview {
         box-sizing: border-box;
@@ -229,8 +229,8 @@ $margin-bottom: 15px;
       
     .custom-placeholder {
         opacity: 0.4;
-        background: $color-txt-3-hex;
-        border: dotted 2px $color-txt-2-hex;
+        background: #CCCCCC;
+        border: dotted 2px #858585;
         min-height: 60px;
         transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
     }

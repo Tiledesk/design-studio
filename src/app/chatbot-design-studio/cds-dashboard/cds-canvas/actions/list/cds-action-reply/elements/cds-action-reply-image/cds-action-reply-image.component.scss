@@ -2,7 +2,7 @@
 
 
 .extensions-response {
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
     position: relative;
     width: calc(100% - 6px);
     height: auto;
@@ -74,7 +74,7 @@ appdashboard-filter{
 
     &.image-editor-wrapper{
         // padding: 0;
-        margin: 0px;
+        // margin: 0px;
         cds-textarea.text-editable-div{
             width: calc(100% - 20px);
             margin: 5px auto;
@@ -82,7 +82,7 @@ appdashboard-filter{
 
         .response-image-uploader-wrapper{
             margin: 5px auto;
-            max-width: calc(100% - 20px);
+            max-width: calc(100% - 5px);
 
             img{
                 width: 100%;
@@ -124,7 +124,7 @@ appdashboard-filter{
 
         .response-wrp{
             border-radius: 8px;
-            background: $color-white-hex; // #ffffff;
+            background: var(--color-white-hex); // #ffffff;
             border: 1px solid $gray-light-02; //1px solid #ffffff;
             overflow-x: hidden;
             overflow-y: auto;
@@ -169,7 +169,7 @@ appdashboard-filter{
 
 
 .image-editor-wrapper {
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
     position: relative;
     width: 100%;
     height: auto;
@@ -189,7 +189,7 @@ appdashboard-filter{
 .response-controls {
     .control-button {
         cursor: pointer;
-        color: $color-bck-gray-hex;
+        color: $blu-04;
         transition: color .3s;
         height: 20px;
         &.delete{
@@ -212,7 +212,7 @@ appdashboard-filter{
         &.delete{
             box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
             em {
-                color: $color-red-hex;
+                color: var(--color-red-hex);
             }
         }
     }
@@ -318,7 +318,7 @@ appdashboard-filter{
     // flex-wrap: wrap;
     // margin: 12px 0 0 0;
     // width: 100%;
-    // font-size: $font-size-base;
+    // font-size: var(--font-size-base);
     // padding: 0 25px;
 
     display: flex;

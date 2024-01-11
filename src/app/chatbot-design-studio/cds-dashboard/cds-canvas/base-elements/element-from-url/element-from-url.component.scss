@@ -65,7 +65,7 @@
 }
 
 .control-label{
-    font-family: 'Poppins','Roboto',Arial,sans-serif;
+    font-family: var(--font-family-poppins);
     color: $gray-light-01;
     text-align: left;
     line-height: 20px;

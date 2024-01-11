@@ -210,7 +210,7 @@ export class TextEditableDivComponent implements OnInit, OnChanges {
     splits.forEach(element => {
       if (element.type === 'tag') {
         tagName = '{{' + element.name + '}}';
-        tagNameAsTag = `<div tag="true" contenteditable="false"  style=" font-weight: 400;font-family: 'ROBOTO'; background: #ffdc66;cursor: pointer;-webkit-transition: all 0.3s;  transition: all 0.3s; border-radius: 10px;-webkit-box-decoration-break: clone; box-decoration-break: clone; display: inline; padding: 0 5px;">${tagName}</div>`
+        tagNameAsTag = `<div tag="true" contenteditable="false"  style=" font-weight: 400;font-family: var(--font-family-poppins); background: #ffdc66;cursor: pointer;-webkit-transition: all 0.3s;  transition: all 0.3s; border-radius: 10px;-webkit-box-decoration-break: clone; box-decoration-break: clone; display: inline; padding: 0 5px;">${tagName}</div>`
         newSplitsArray.push(tagNameAsTag)
       } else if (element.type === 'text') {
         newSplitsArray.push(element.text)
@@ -285,7 +285,7 @@ export class TextEditableDivComponent implements OnInit, OnChanges {
     }
     const timestamp = new Date().getTime()
     this.logger.log('timestamp', timestamp)
-    this.setAttributeAtCaret(`<div tag="true" id="${timestamp}" contenteditable="false" style="font-weight: 400;font-family: 'ROBOTO'; background: #ffdc66; cursor: pointer;-webkit-transition: all 0.3s;  transition: all 0.3s; border-radius: 10px;-webkit-box-decoration-break: clone; box-decoration-break: clone; display: inline; padding: 0 5px;">${attribute}</div>`)
+    this.setAttributeAtCaret(`<div tag="true" id="${timestamp}" contenteditable="false" style="font-weight: 400;font-family: var(--font-family-poppins); background: #ffdc66; cursor: pointer;-webkit-transition: all 0.3s;  transition: all 0.3s; border-radius: 10px;-webkit-box-decoration-break: clone; box-decoration-break: clone; display: inline; padding: 0 5px;">${attribute}</div>`)
     // this.isOpenSetAttributesPanel = false;
 
     // this.savedSelection = this.saveSelection(imputEle, attribute.length, 'onVariableSelected')
@@ -320,7 +320,7 @@ export class TextEditableDivComponent implements OnInit, OnChanges {
   //   const imputEle = this.elementRef.nativeElement.querySelector('#content-editable')
   //   this.logger.log("[TEXT-EDITABLE-DIV] selectedAttibute imputEle: ", imputEle);
   //   imputEle.focus();
-  //   this.setAttributeAtCaret(`<div contenteditable="false" style="font-weight: 400;font-family: 'ROBOTO'; background: #ffdc66;cursor: pointer;-webkit-transition: all 0.3s;  transition: all 0.3s; border-radius: 10px;-webkit-box-decoration-break: clone; box-decoration-break: clone; display: inline; padding: 0 5px;">${attribute}</div>`)
+  //   this.setAttributeAtCaret(`<div contenteditable="false" style="font-weight: 400;font-family: var(--font-family-poppins); background: #ffdc66;cursor: pointer;-webkit-transition: all 0.3s;  transition: all 0.3s; border-radius: 10px;-webkit-box-decoration-break: clone; box-decoration-break: clone; display: inline; padding: 0 5px;">${attribute}</div>`)
   //   this.isOpenSetAttributesPanel = false;
   //   // this.onInput()
   // }

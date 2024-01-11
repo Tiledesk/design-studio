@@ -98,6 +98,8 @@ export class TiledeskConnectors {
 
 
   createConnector(fromId, toId, fromPoint, toPoint, save=false, notify=true, attributes=null) {
+    // console.log("createConnector:::::  ", fromId, toId, fromPoint, toPoint);
+    if(!fromPoint || !toPoint)return;
     const id = fromId + "/" + toId;
     let connector = {
       id: id,
@@ -126,7 +128,7 @@ export class TiledeskConnectors {
     inblock.inConnectors[connector.id] = connector.id;
     this.#drawConnector(id, fromPoint, toPoint, attributes);
     this.removeConnectorDraft();
-    console.log("connector CREATED id, save, notify:", id, save, notify);
+    // console.log("connector CREATED id, save, notify:", id, save, notify);
     connector['save'] = save;
     if(notify){
       const event = new CustomEvent("connector-created", { detail: { connector: connector } });
@@ -431,7 +433,7 @@ export class TiledeskConnectors {
 
 
   moved(element, x, y) {
-   console.log("moving ----> ", element.id, x, y);
+  //  console.log("moving ----> ", element.id, x, y);
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) {
@@ -621,10 +623,14 @@ export class TiledeskConnectors {
 
   /** handleMouseUp */
   #handleMouseUp(event) {
-    // console.log("mouse up event...", event);
+    console.log("mouse up event...", event.target.classList);
     this.target.removeEventListener("mousemove", this.ref_handleMouseMove, false);
     this.target.removeEventListener("mouseup", this.ref_handleMouseUp, false);
     // console.log('handleMouseUp ------> ', event.target, event.srcElement);
+    const connectable = this.classes["connectable"];
+    if (event.target && event.target.classList && event.target.classList.contains(connectable)) {
+      return null;
+    }
     let elConnectable = this.#searchClassInParents(event.target, this.classes["input_block"]);
     if (elConnectable && elConnectable.id && this.fromId) {
       // console.log("2 connectable? ", this.fromId, elConnectable.id);
@@ -634,6 +640,7 @@ export class TiledeskConnectors {
     }
 
     if (elConnectable) {
+      console.log("handleMouseUp:::::  ");
       this.createConnector(this.fromId, elConnectable.id, this.drawingBack, this.toPoint, true, true, null);
       const connectorReleaseOnIntent = new CustomEvent("connector-release-on-intent",
         {
@@ -715,7 +722,7 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes=null) {
-    console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    // console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
     var label = null;
     if(attributes && attributes.label){
       label = attributes.label;
@@ -908,12 +915,12 @@ export class TiledeskConnectors {
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) { return; }
-    console.log("block :---> ", block);
+    // console.log("block :---> ", block);
     for (const [key, conn_id] of Object.entries(block.outConnectors)) {
       let conn = this.connectors[conn_id];
-      console.log("conn :---> ", this.connectors, conn_id);
+      // console.log("conn :---> ", this.connectors, conn_id);
       if (conn) {
-        console.log("OUT :---> ", conn);
+        // console.log("OUT :---> ", conn);
         const elFrom = document.getElementById(conn.fromId);
         if (elFrom) {
           conn.fromPoint = this.elementLogicCenter(elFrom);
@@ -924,10 +931,16 @@ export class TiledeskConnectors {
           conn.toPoint = this.elementLogicTopLeft(elToId);
           // console.log("conn.toPoint :---> ", elToId, conn.toId, conn.toPoint);
         }
-        this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
-        conn['notify']='';
-        // const event = new CustomEvent("connector-updated", { detail: { connector: conn } });
-        // document.dispatchEvent(event);
+        // console.log("conn :---> ", elFrom, elToId);
+        if(elFrom && elToId){
+          this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
+          conn['notify']='';
+          // const event = new CustomEvent("connector-updated", { detail: { connector: conn } });
+          // document.dispatchEvent(event);
+        } else {
+          this.deleteConnector(conn_id, false, true);
+        }
+        
       }
     };
   }

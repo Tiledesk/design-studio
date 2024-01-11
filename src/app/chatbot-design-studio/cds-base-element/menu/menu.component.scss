@@ -3,16 +3,19 @@
 
 :host {
     --text-color: #{$blu};
-    --icon-color: #{$gray-light-01};
+    --icon-color-menu: #{$gray-light-01};
     --text-hover-color: #{$blu};
     --icon-hover-color: #{$blu};
+    --base-padding: 6px;
 }
 
 #panel_actions_div{
-    padding: 6px;
+    padding: var(--base-padding) 0px;
     box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
 }
-
+.menu-box{
+    padding: 0px var(--base-padding);
+}
 
 .menu-btns-wpr {
     // width: 136px; // dp
@@ -23,9 +26,8 @@
     align-items: center;
     justify-content: flex-start;
     gap: 5px;
-
+    padding: 0px 2px;
     
-
     &:hover{
         cursor: pointer;
         box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
@@ -52,19 +54,21 @@
     img{
         width: 16px;
         font-size: 16px;
-        color: var(--icon-color);
+        color: var(--icon-color-menu);
         filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
     }
-
-
 }
 .menu-btn-text{
     display: inline-flex;
     color: var(--text-color);
-    padding: 0;
+    padding: 0px var(--base-padding);
     vertical-align: middle;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 400;
+}
+
+.external-link:hover{
+    text-decoration: underline;
 }
 
 .custom-divider {
@@ -72,9 +76,9 @@
     margin-bottom: 5px;
     border: 0;
     border-top: 1px solid $blu;
-    font-family: Poppins,Roboto,Arial,sans-serif;
+    font-family: var(--font-family-poppins);
 }
 
 .current-user{
-    color: var(--icon-color);
+    color: var(--icon-color-menu);
 }

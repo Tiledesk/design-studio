@@ -2,7 +2,7 @@ import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -826,6 +826,9 @@ export class IntentService {
       action.assignStatusTo = 'hubspot_status';
       action.assignErrorTo = 'hubspot_error';
     }
+    if(typeAction === TYPE_ACTION.CODE){
+      action = new ActionCode();
+    }
     return action;
   }
   // END ATTRIBUTE FUNCTIONS //
@@ -1060,6 +1063,8 @@ export class IntentService {
     this.setBehaviorUndoRedo();
     console.log('[INTENT SERVICE] updateIntentNew -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
     this.refreshIntents();
+    let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
+    this.refreshIntent(intentToUpdate)
     this.opsUpdate(this.payload);
   }
 

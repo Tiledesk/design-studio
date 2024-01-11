@@ -185,6 +185,7 @@
                         [action]="elementSelected"
                         [project_id]="project_id"
                         [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-gpt-task>
 
@@ -203,9 +204,10 @@
                         [action]="elementSelected"
                         [project_id]="project_id"
                         [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-qapla>
-                    <!-- ADD INTENT MAKE-->
+
                     <cds-action-make *ngSwitchCase="typeAction.MAKE"
                         class="panel-response"
                         [intentSelected]="intentSelected"
@@ -214,15 +216,23 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-make>
-                     <!-- ADD INTENT HUBSPOT-->
+
                      <cds-action-hubspot *ngSwitchCase="typeAction.HUBSPOT"
-                     class="panel-response"
-                     [intentSelected]="intentSelected"
-                     [action]="elementSelected"
-                     [previewMode]="false"
-                     (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
-                     (updateAndSaveAction)="onSaveIntent($event)">
-                 </cds-action-hubspot>
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-hubspot>
+
+                    <cds-action-code *ngSwitchCase="typeAction.CODE"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-code>
                     
                     <!-- <cds-action-assign-function *ngSwitchCase="typeAction.ASSIGN_FUNCTION"
                         [action]="elementSelected">

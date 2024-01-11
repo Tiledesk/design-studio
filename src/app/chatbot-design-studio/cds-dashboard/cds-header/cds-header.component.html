@@ -22,12 +22,7 @@
         </span>
     </div> -->
     <!-- <i class="material-icons cds-btn-back" (click)="goBack()">keyboard_arrow_left</i> -->
-    <div class="header-go-back"
-        matTooltip="v. {{version}}" 
-        matTooltipClass="custom-mat-tooltip"
-        matTooltipHideDelay="100"
-        matTooltipPosition='below'
-        #tooltip="matTooltip">
+    <div class="header-go-back">
         <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#006cff">
             <path d="M0 0h24v24H0z" fill="none"/><path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"/>
         </svg> -->
@@ -115,6 +110,7 @@
 <mat-menu #menu="matMenu" class="menuElement" xPosition="after">
     <ng-template matMenuContent>
         <cds-menu
+            [items]="LOGO_MENU_ITEMS"
             (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
     </ng-template>
 </mat-menu>

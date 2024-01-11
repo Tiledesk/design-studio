@@ -67,9 +67,9 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChange) {
-    if(changes && changes['readonly'] && changes['readonly'].previousValue !== changes['readonly'].currentValue){
-      this.textTag = this.text
-    }
+    // if(changes && changes['readonly'] && changes['readonly'].previousValue !== changes['readonly'].currentValue){
+    //   this.textTag = this.text
+    // }
     // this.initialize();
   }
 

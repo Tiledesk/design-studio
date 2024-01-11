@@ -1,14 +1,18 @@
 <div id="panel_actions_div" class="actions-drawer" #panel_menu_div >
  
-        <div class="action-box">
-            <div class="menu-btns-wpr" (click)="onGoBack()">
+        <div class="menu-box" *ngFor="let item of items">
+            <div class="menu-btns-wpr" (click)="onItemClick(item)">
                 <div class="menu-btn-icon">
-                    <span class="material-icons-outlined">arrow_back</span>
+                    <span class="material-icons-outlined" *ngIf="!item.localIcon">{{item.icon}}</span>
+                    <img class="icon" *ngIf="item.localIcon" [src]="item.icon"/>
                 </div>
-                <div class="menu-btn-text truncate">{{ 'GoToDashboard' | translate}}</div>
+                <div class="menu-btn-text truncate"
+                    [ngClass]="{'external-link': item.type === TYPE_URL.BLANK }">{{ item.label | translate}}</div>
+                <span class="material-icons-outlined menu-btn-text" *ngIf="item.type === TYPE_URL.BLANK">open_in_new</span>
+                
             </div>
         </div>
-        <div class="action-box" (click)="exportChatbotToJSON()">
+        <!-- <div class="action-box" (click)="exportChatbotToJSON()">
             <div class="menu-btns-wpr">
                 <div class="menu-btn-icon">
                     <span class="material-icons-outlined"> file_download</span>
@@ -23,12 +27,13 @@
                 </div>
                 <div class="menu-btn-text truncate">{{ 'Logout' | translate}}</div>
             </div>
-        </div>
+        </div> -->
 
         <hr class="custom-divider">
 
-        <div class="menu-btn-text current-user">
-            {{loggedUser?.email}}
+        <div class="menu-btn-text current-user" >
+            <span *ngIf="menuType === 'header'">{{loggedUser?.email}}</span>
+            <span *ngIf="menuType === 'sidebar'">© 2023 Tiledesk ver {{version}}</span>
         </div>
 
 </div>

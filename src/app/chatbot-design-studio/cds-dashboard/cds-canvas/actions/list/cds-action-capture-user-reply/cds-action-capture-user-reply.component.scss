@@ -1,14 +1,5 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-.previewContent{
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 5px;
-    padding: 3px 0px;
-}
 
 .previewContent#capture-user-reply {
     justify-content: flex-start;

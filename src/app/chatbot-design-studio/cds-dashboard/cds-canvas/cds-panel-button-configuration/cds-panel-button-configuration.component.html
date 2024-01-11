@@ -63,11 +63,14 @@
                 <label class="title-label">
                     {{ 'Url' | translate }}
                 </label>
-                <cds-text
-                    [text]="buttonUrl"
+                <cds-textarea 
+                    class="text-editable-div"
+                    [text]="buttonUrl" 
+                    [minRow]="1" [maxRow]="2"
+                    [emojiPikerBtn]="false"
                     (blur)="onBlur($event)"
-                    (onChange)="onChangeUrl($event)">
-                </cds-text>
+                    (changeTextarea)="onChangeUrl($event)">
+                </cds-textarea>
             </div> 
 
         </div>

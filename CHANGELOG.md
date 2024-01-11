@@ -5,6 +5,63 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.10-rc.4
+- added: error message if global key contains not allowed chaacters
+
+### 1.0.10-rc.3
+- added: ability to set variable as global key
+- changed: text limit to code textarea cds-action-code
+- changed: text limit to prompt textarea cds-action-gpt-task
+
+### 1.0.10-rc.2
+- added: limit to 4 line for cds-action-code preview input box
+- changed: removed variable and emoji options from global value input detail component
+
+### 1.0.10-rc.1
+- added: JSON.stringify function in TYPE_FUNCTION_LIST for cds-action-set-attribute
+
+### 1.0.9 in PROD
+
+### 1.0.9-rc.1
+- added: cds-action-code
+- added: cds-mat-tooltip on variable-list item to show current variable description
+- added: currentPhoneNumber leadInfo attributes variable
+- bug-fixed: if open cds-panel-action-detail, then the stage is not draggable with mouse connected
+
+### 1.0.8 in PROD
+
+### 1.0.8-rc.1
+- added: cds-global-panel-detail component to add/update/delete an existing global variable
+- bug-fixed: cannot set iframe url into cds-action-reply 
+- bug-fixed: cannot delete image because of path url error
+
+### 1.0.7 in PROD
+
+### 1.0.7-rc.11
+- added: trueIntent and falseIntent property into cds-action-make
+- added: cds-splash-screen component inside cds-globals section if no global variables are set to current chatbot
+- changed: activate submit button and disable 'Value' textarea i operator is equal to 'isEmpty' in cds-action-json-condition 
+- bug-fixed: form and question icons not updated realtime if form or question is set
+- bug-fixed: cds-intent not draggable in some top point of the component
+
+### 1.0.7-rc.10
+- added: success/failure branch on cds-action-gpt-task
+- added: GitHub link on sidebar bottom menu
+- added: ability to use local svg icon for menu component
+- changed: set 'Content-type' header option as 'application/json' automatically if user select 'body' radio option, remove 'Content-type' header option  if user select 'none' in radio button
+- changed: moved globals on bottom in variable-list component
+
+### 1.0.7-rc.9
+- added: upload/link option while loading an image from a source file or a link ora a variable dynamically
+- added: leadAttributes section for variableList
+- added: support icon menu on bottom section in cds-sidebar
+- added: cds-changelog component for new updates news
+- added: show function select if operand.function has a value in cds-action-assign-variable-v2
+- added: dynamic reuse of cds-menu element
+- changed: color defined variables 
+- added: cds-textarea in button url section to add variable as url for a button reply element
+- bug-fixed: floating action list hide called intent --> new Xpositioning 
+
 ### 1.0.7-rc.8
 - added: fullfillment section to cds-settings-developer tab section
 - bug-fixed: connectorTo not found (connector-point is fill but connector is not created )

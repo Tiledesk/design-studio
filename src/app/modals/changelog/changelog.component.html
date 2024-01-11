@@ -1,0 +1,11 @@
+<!-- --------------------------------------------------- -->
+<!-- @ What's new - Link to changelog  -->
+<!-- --------------------------------------------------- -->
+<div class="changelog-wrp">
+    <div class="info">
+        <span class="material-icons">rocket_launch</span>
+        <div> {{'WhatsNew' | translate}}</div>
+        <a target="_blank" [href]="EXTERNAL_URL.getChangelogUrl"> {{ 'ReadMore' | translate }}</a>
+    </div>
+    <span class="material-icons" (click)="onCloseClick()">close</span>
+</div>

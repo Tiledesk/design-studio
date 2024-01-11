@@ -1,5 +1,12 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+
+.wrapper{
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+}
+
 .is-in-drop-event{
     background-color: rgba(255, 255, 255, 0.3);
 }
@@ -45,6 +52,18 @@
     // width: calc(100% - 30px);
     // height: calc(100% - 30px);
     min-height: 210px;
+
+    &.link{
+        padding: 15px;
+        min-height: unset;
+        .field-box{
+            width: 100%;
+            margin-bottom: 0;
+        }
+        &:hover{
+            opacity: 1;
+        }
+    }
     &:hover{
         opacity: 0.5;
     }
@@ -81,6 +100,49 @@
     }
 }
 
+.link-wrp {
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    height: 40px;
+    .tag {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        margin: 3px;
+        height: fit-content;
+        padding: 2px 10px;
+        max-width: calc(100% - 40px);
+        background-color: $blu;
+        color: #fff;
+        .close{
+            position: absolute;
+            display: flex;
+            top: -5px;
+            right: -7px;
+            width: 17px;
+            height: 17px;
+            font-size: 13px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid $blu;
+            color: $blu;
+            cursor: pointer;
+            opacity: 1;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            &:hover{
+                background: $blu-light-03;
+            }
+        }
+    }
+}
+
 loading-spinner.custom-spinner ::ng-deep{
     padding: 17px 0px;
     .sk-fading-circle {
@@ -92,4 +154,42 @@ loading-spinner.custom-spinner ::ng-deep{
     .sk-fading-circle .sk-circle:before {
         background-color: $blu ;
     }
+}
+
+
+/** button TOOGLE */
+div.toogle-wrp{
+    margin: 0px 0px 5px 0px;
+    display: flex;
+    gap: 10px;
+    position: relative;
+}
+
+mat-button-toggle-group ::ng-deep{
+    border: unset;
+    border-radius: 0px;
+}
+
+mat-button-toggle{
+    background-color: transparent;
+    border: none;
+    color: $blu-light-02;
+    border-bottom: 2px solid transparent;
+
+    &.mat-button-toggle-checked{
+        border-color: $blu;
+        color: $blu;
+        font-weight: 400;
+
+    }
+    
+    &.mat-button-toggle+mat-button-toggle.mat-button-toggle{
+        border-left: none;
+    }
+
+    &::ng-deep .mat-button-toggle-label-content {
+        line-height: 36px;
+    }
+
+    
 }

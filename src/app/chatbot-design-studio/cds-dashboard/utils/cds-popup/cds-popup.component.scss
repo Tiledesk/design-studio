@@ -39,7 +39,7 @@
   
   .cds-dialog-popup-wpr .cds-dialog-popup-title {
     -webkit-font-smoothing: antialiased;
-    font-family: "Poppins", "Roboto", "Arial", sans-serif;
+    font-family: var(--font-family-poppins);
     font-size: 21px;
     color: #202124;
     line-height: 21px;
@@ -70,7 +70,7 @@
     cursor: pointer;
     z-index: 0;
     -webkit-font-smoothing: antialiased;
-    font-family: "Poppins", "Roboto", "Arial", sans-serif;
+    font-family: var(--font-family-poppins);
     letter-spacing: 0.25px;
     font-weight: 500;
     height: 36px;

@@ -1,5 +1,5 @@
 import { Chatbot } from 'src/app/models/faq_kb-model';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -8,6 +8,8 @@ import { downloadObjectAsJson } from 'src/app/utils/util';
 import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
+import { environment } from 'src/environments/environment';
+import { TYPE_URL } from '../../utils';
 
 
 @Component({
@@ -17,11 +19,15 @@ import { UserModel } from 'src/chat21-core/models/user';
 })
 export class CDSMenuComponent implements OnInit {
 
+  @Input() items: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string, localIcon?: boolean}>;
+  @Input() menuType: 'header' | 'sidebar' = 'header';
   @Output() onMenuOption = new EventEmitter();
   
+  TYPE_URL = TYPE_URL;
   selectedChatbot: Chatbot;
   loggedUser: UserModel;
 
+  version: string;
   private logger: LoggerService = LoggerInstance.getInstance()
 
   constructor(
@@ -30,44 +36,26 @@ export class CDSMenuComponent implements OnInit {
     private tiledeskAuthService: TiledeskAuthService
   ) {
     this.selectedChatbot = this.dashboardService.selectedChatbot
+    this.version = environment.VERSION
    }
 
   ngOnInit(): void {
     this.loggedUser = this.tiledeskAuthService.getCurrentUser();
   }
 
-
-  // -------------------------------------------------------------------------------------- 
-  // Go To Dashbaord --> all chatbot list
-  // -------------------------------------------------------------------------------------- 
-  onGoBack() {
-    let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
-    const myWindow = window.open(dashbordBaseUrl, '_self')
-    myWindow.focus();
-    // this.location.back()
-    // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);
+  ngOnChanges(){
+    if(this.items){
+      this.items.map((el)=> {
+        el.localIcon = false
+        if(el.icon && el.icon.match(new RegExp(/(?=.*?assets|http|https\b)^.*$/))){
+          el.localIcon =true
+        }
+      })
+    }
   }
 
-  // -------------------------------------------------------------------------------------- 
-  // Export chatbot to JSON
-  // -------------------------------------------------------------------------------------- 
-  onLogOut(){
-    this.tiledeskAuthService.logOut()
-    this.goToDashboardLogin()
 
+  onItemClick(item: { label: string, icon: string, src?: string}){
+    this.onMenuOption.emit(item)
   }
-
-  // -------------------------------------------------------------------------------------- 
-  // Export chatbot to JSON
-  // -------------------------------------------------------------------------------------- 
-  exportChatbotToJSON() {
-    this.onMenuOption.emit('export')
-  }
-
-  goToDashboardLogin(){
-    let DASHBOARD_URL = this.appConfigService.getConfig().dashboardBaseUrl + '#/login'
-    const myWindow = window.open(DASHBOARD_URL, '_self');
-    myWindow.focus();
-  }
-
 }

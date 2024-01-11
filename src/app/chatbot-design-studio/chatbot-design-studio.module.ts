@@ -176,11 +176,13 @@ import { CdsActionCaptureUserReplyComponent } from './cds-dashboard/cds-canvas/a
 import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-qapla/cds-action-qapla.component';
 import { CdsActionMakeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-make/cds-action-make.component';
 import { CdsActionHubspotComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-hubspot/cds-action-hubspot.component';
+import { CdsActionCodeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-code/cds-action-code.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
 import { CdsPanelWidgetComponent } from './cds-dashboard/cds-canvas/cds-panel-widget/cds-panel-widget.component';
 import { CdsPanelButtonConfigurationComponent } from './cds-dashboard/cds-canvas/cds-panel-button-configuration/cds-panel-button-configuration.component';
+import { CdsGlobalPanelDetailComponent } from './cds-globals/cds-global-panel-detail/cds-global-panel-detail.component';
 
 //FORM
 import { CdsFormComponent } from './cds-dashboard/cds-canvas/actions/list/form/form.component';
@@ -207,6 +209,7 @@ import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-
 import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
 import { NetworkOfflineComponent } from '../modals/network-offline/network-offline.component';
 import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
+import { ChangelogComponent } from '../modals/changelog/changelog.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 
 @NgModule({
@@ -300,6 +303,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
         CdsActionGPTTaskComponent,
         CdsActionCaptureUserReplyComponent,
         CdsActionQaplaComponent,
+        CdsActionCodeComponent,
         // action REPLY elements: start //
         CdsActionReplyToolsComponent,
         CdsActionReplyTextComponent,
@@ -350,6 +354,10 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
     CDSDetailDeveloperComponent,
     // ******* CDS CHATBOT DETAIL:: end *******
 
+    // ******* CDS GLOBALS:: start *******
+    CdsGlobalPanelDetailComponent,
+    // ******* CDS GLOBALS:: start *******
+
     //UTILS
     CdsPopupComponent,
     CdsSplashScreenComponent,
@@ -360,6 +368,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
     ChangeBotLangModalComponent,
     NetworkOfflineComponent,
     MouseTipsComponent,
+    ChangelogComponent,
     
     //EVENT BASE COMPONENT
     CdsEventComponent,
@@ -367,7 +376,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
     CdsOptionsComponent,
     CdsPanelConnectorMenuComponent,
     
-    GetVariableNamePipe
+    GetVariableNamePipe,
 
   ],
   imports: [

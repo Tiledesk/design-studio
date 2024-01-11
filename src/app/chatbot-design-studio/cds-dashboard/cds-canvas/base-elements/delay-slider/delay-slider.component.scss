@@ -14,7 +14,7 @@ $text-color: $blu;
     // width: 100px;
     text-align: center;
     transition: width .3s ease-in;
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
 
     &:hover{
         opacity: 0.8;

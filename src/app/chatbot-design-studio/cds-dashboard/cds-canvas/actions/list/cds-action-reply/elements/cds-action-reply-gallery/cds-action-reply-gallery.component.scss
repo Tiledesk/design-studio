@@ -9,7 +9,7 @@
 
 
 .extensions-response {
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
     position: relative;
     width: calc(100% - 6px);
     height: auto;
@@ -204,7 +204,7 @@ appdashboard-filter{
 .response-controls {
     .control-button {
         cursor: pointer;
-        color: $color-bck-gray-hex;
+        color: $blu-04;
         transition: color .3s;
         height: 20px;
         &.delete{
@@ -227,7 +227,7 @@ appdashboard-filter{
         &.delete{
             box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
             em {
-                color: $color-red-hex;
+                color: var(--color-red-hex);
             }
         }
     }
@@ -242,7 +242,7 @@ appdashboard-filter{
     gap: 10px;
     margin: 0;
     width: 100%;
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
     padding: 0 32px 32px 32px;
 }
 
@@ -254,7 +254,7 @@ appdashboard-filter{
     user-select: none;
     box-sizing: border-box;
     outline: none;
-    background: $color-white-hex;
+    background: var(--color-white-hex);
     border-radius: $button-border-radius-base;
     cursor: pointer;
     font-size: 1em;
@@ -499,6 +499,14 @@ appdashboard-filter{
 }
 
 cds-image-upload ::ng-deep {
+
+    div.wrapper{
+        flex-direction: row;
+        div.toogle-wrp{ //hide Upload/link toogle 
+            display: none;
+        }
+    }
+    
     div.dropUploadImage{
         min-height: unset !important;
         margin: 10px;
@@ -533,7 +541,7 @@ cds-image-upload ::ng-deep {
 
         .control-button {
             cursor: pointer;
-            color: $color-bck-gray-hex;
+            color: $blu-04;
             transition: color .3s;
             height: 20px;
             opacity: 0;
@@ -616,14 +624,14 @@ cds-image-upload ::ng-deep {
         }
     }
     .control-button:hover{
-        color: $color-white-hex;
+        color: var(--color-white-hex);
         box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
         em {
             opacity: 0.8;
         }
         &.delete{
             em {
-                color: $color-red-hex;
+                color: var(--color-red-hex);
             }
         }
     }
