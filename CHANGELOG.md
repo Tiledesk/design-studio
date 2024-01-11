@@ -5,6 +5,8 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.10 in PROD
+
 ### 1.0.10-rc.4
 - added: error message if global key contains not allowed chaacters
 
