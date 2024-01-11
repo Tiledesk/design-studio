@@ -133,6 +133,9 @@ export enum PLAN_NAME {
     A = 'Growth',
     B = 'Scale',
     C = 'Plus',
+    D = 'Basic',
+    E = 'Premium',
+    F = 'Custom'
 }
 
 export enum TYPE_BUTTON {

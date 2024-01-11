@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { Location } from '@angular/common';
-import { PLAN_NAME, URL_understanding_default_roles } from 'src/app/utils/util';
+import { URL_understanding_default_roles } from 'src/app/utils/util';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 const swal = require('sweetalert');
 declare var $: any;
 /// Notify users about errors and other helpful stuff

@@ -75,3 +75,7 @@ $padding: 10px;
     height: 24px;
     z-index: 1;
 }
+
+.blur-action{
+    backdrop-filter: blur(10px);
+}

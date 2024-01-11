@@ -15,7 +15,7 @@
                  *ngIf="i === elementSelectedIndex" 
                 -->
                 
-                <div [ngSwitch]="elementSelected._tdActionType">
+                <div [ngSwitch]="elementSelected._tdActionType" [class.blur-action]="!canShowActionByPlan">
 
                     <cds-action-reply *ngSwitchCase="typeAction.REPLY"
                         class="panel-response"
@@ -238,6 +238,11 @@
                         [action]="elementSelected">
                     </cds-action-assign-function> -->
     
+                </div>
+
+
+                <div class="hide_action">
+
                 </div>
             <!-- </div> -->
         </div>

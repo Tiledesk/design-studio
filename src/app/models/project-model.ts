@@ -1,4 +1,4 @@
-import { PLAN_NAME } from "../utils/util";
+import { PLAN_NAME } from "src/chat21-core/utils/constants";
 
 export interface Project {
     _id: string;
