@@ -2,12 +2,14 @@ import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange
 import { Subscription } from 'rxjs';
 import { ConnectorService } from '../../../services/connector.service';
 import { IntentService } from '../../../services/intent.service';
-import { TYPE_ACTION, TYPE_INTENT_ELEMENT } from '../../../utils';
+import { ACTIONS_LIST, TYPE_ACTION, TYPE_INTENT_ELEMENT } from '../../../utils';
 import { Intent, Form} from 'src/app/models/intent-model';
 import { Action} from 'src/app/models/action-model';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { ProjectPlanUtils } from 'src/app/utils/project-utils';
+
 
 @Component({
   selector: 'cds-panel-action-detail',
@@ -37,12 +39,15 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
    /** panel reply button configuaration */
    private subscriptionIntent: Subscription;
 
+  
+  canShowActionByPlan: boolean = true
   private logger: LoggerService = LoggerInstance.getInstance()
   
   constructor(
     private intentService: IntentService,
     private connectorService: ConnectorService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private projectPlanUtils: ProjectPlanUtils,
   ) { }
 
   ngOnInit(): void {
@@ -85,6 +90,12 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
       console.log('[PANEL-INTENT-DETAIL] (OnChanges) elementIntentSelectedType ', this.elementIntentSelectedType);
       console.log('[PANEL-INTENT-DETAIL] (OnChanges) elementSelected ', this.elementSelected);
       // console.log('[PANEL-INTENT-DETAIL] (OnChanges) intentSelected ', this.intentSelected);
+
+      let action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType)
+      if(action && action.plan){
+        this.canShowActionByPlan = this.projectPlanUtils.checkIfCanLoad(action.plan)
+        console.log('[PANEL-INTENT-DETAIL] --> status', this.canShowActionByPlan)
+      }
     }catch(error){
       this.logger.log('[CDS-PANEL-INTENT-DETAIL] (ngOnChanges) ERROR', error);
     }

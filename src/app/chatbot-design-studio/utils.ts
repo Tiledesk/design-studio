@@ -1,5 +1,6 @@
 import { AbstractControl } from "@angular/forms";
 import { Intent } from "src/app/models/intent-model";
+import { PLAN_NAME } from "src/chat21-core/utils/constants";
 import { v4 as uuidv4 } from 'uuid';
 
 export const preDisplayName:string  = 'untitled_block_';
@@ -127,6 +128,7 @@ export enum TYPE_ACTION {
     CONDITION = 'condition',
     CAPTURE_USER_REPLY = 'capture_user_reply',
     QAPLA = "qapla",
+    HUBSPOT = 'hubspot',
     CODE = 'code'
 }
 
@@ -253,7 +255,7 @@ export const INTENT_ELEMENT = {
 }
 
 
-export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_CATEGORY, type: TYPE_ACTION, src: string, status: 'active' | 'inactive' | 'beta', plan?: string, description?: string, disabled?: boolean}}= {
+export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_CATEGORY, type: TYPE_ACTION, src: string, status: 'active' | 'inactive' | 'beta', plan?: PLAN_NAME, description?: string, disabled?: boolean}}= {
     REPLY : { name: 'Reply', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.REPLY, src:"assets/images/actions/reply.svg", status: "active" ,description: '<b>Pro tip</b>: Turn this block into a programmed proactive message. <a href=https://www.youtube.com/embed/p0ux-86Y4_I target=_blank>Here is how!</a> '},
     RANDOM_REPLY : { name: 'Random Reply', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.RANDOM_REPLY, src:"assets/images/actions/random_reply.svg", status: "active", description: 'Create some replies that will be randomly selected'},
     AGENT : { name: 'Agent Handoff', category: TYPE_ACTION_CATEGORY.MOST_USED, type: TYPE_ACTION.AGENT, src:"assets/images/actions/agent_handoff.svg", status: "active", description: 'This action replaces the current chatbot with an agent.<br>The upcoming agent is assigned to the conversation following the department rules'},
@@ -281,8 +283,9 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     CODE : { name: 'Code',category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CODE, src:"assets/images/actions/code.svg", status: "beta", description: '', disabled: false},
     // ASSIGN_FUNCTION: { name: 'Set function', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY: { name: 'Capture User Reply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: 'This action allow to capture the user reply' },
-    QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: 'PRO', description: 'This action allow to connect with Qapla', disabled: false },
-    MAKE : { name: 'Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "beta", plan: 'PRO', description: '', disabled: false},
+    QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: PLAN_NAME.C, description: 'This action allow to connect with Qapla', disabled: false },
+    MAKE : { name: 'Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "beta", plan: PLAN_NAME.D, description: '', disabled: false},
+    HUPSPOT : { name: 'Hubspot',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.HUBSPOT, src:"assets/images/actions/make.svg", status: "beta", description: ''},
 }
 
 export const EVENTS_LIST = {
