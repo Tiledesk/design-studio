@@ -278,7 +278,7 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     GPT_TASK: { name: 'GPT Task', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.GPT_TASK,  src: "assets/images/actions/openai-icon.svg", status: "active", description: 'This action forwards the question to ChatGPT' },
     HIDE_MESSAGE: { name: 'Hidden message', category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.HIDE_MESSAGE, src: "assets/images/actions/hidden_message.svg", status: "active",  },
     CHANGE_DEPARTMENT: { name: 'Change dept', category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CHANGE_DEPARTMENT, src: "assets/images/actions/change_department.svg", status: "active" },
-    CODE : { name: 'Code',category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CODE, src:"assets/images/actions/code.svg", status: "inactive", description: '', disabled: false},
+    CODE : { name: 'Code',category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CODE, src:"assets/images/actions/code.svg", status: "beta", description: '', disabled: false},
     // ASSIGN_FUNCTION: { name: 'Set function', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY: { name: 'Capture User Reply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: 'This action allow to capture the user reply' },
     QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: 'PRO', description: 'This action allow to connect with Qapla', disabled: false },
