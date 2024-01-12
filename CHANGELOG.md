@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.11-rc.1
+- bug-fixed: on connect button with attributes (on undo, after deleting the intent, the intent connectors are not created)
+
 ### 1.0.10 in PROD
 
 ### 1.0.10-rc.4
