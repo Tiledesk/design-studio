@@ -43,6 +43,27 @@ export class ProjectPlanUtils {
             /** get che current keyName for the current project (usefull to compare later)*/
             let currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == this.project.profile.name.toUpperCase());
             console.log('[PROJECT_PROFILE] currentPlanNameKey from list -->', currentPlanNameKey)
+            
+            switch(currentPlanNameKey[0]){
+                case PLAN_NAME.A: {
+                    console.log('case A')
+                    currentPlanNameKey[0] = PLAN_NAME.D
+                    break;
+                }
+                case PLAN_NAME.B: {
+                    console.log('case B')
+                    currentPlanNameKey[0] = PLAN_NAME.E
+                    break;
+                }
+                case PLAN_NAME.C: {
+                    console.log('case C')
+                    currentPlanNameKey[0] = PLAN_NAME.F
+                    break;
+                }
+                    
+            }
+            console.log('[PROJECT_PROFILE] currentPlanNameKey from list --> after re-build', currentPlanNameKey)
+            
             /** compare enums: current action enum plan >= current prject profile enum name (UPPERCASE)  */
             if(currentPlanNameKey.length>0){
                 return actionPlanAvailability >= PLAN_NAME[currentPlanNameKey[0]]? true: false; 
