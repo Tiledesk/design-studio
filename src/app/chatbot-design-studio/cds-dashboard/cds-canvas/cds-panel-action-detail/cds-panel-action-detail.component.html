@@ -15,7 +15,7 @@
                  *ngIf="i === elementSelectedIndex" 
                 -->
                 
-                <div [ngSwitch]="elementSelected._tdActionType" [class.blur-action]="!canShowActionByPlan">
+                <div [ngSwitch]="elementSelected._tdActionType" *ngIf="canShowActionByPlan.enabled">
 
                     <cds-action-reply *ngSwitchCase="typeAction.REPLY"
                         class="panel-response"
@@ -241,8 +241,18 @@
                 </div>
 
 
-                <div class="hide_action">
+                <div *ngIf="!canShowActionByPlan.enabled">
 
+                    <div class="block-overlay">
+                        <span class="material-icons lock-icon">lock</span>
+                        <p [innerHTML]="'CDSCanvas.FeatureAvailableFromPlan' | translate: canShowActionByPlan"></p>
+                
+                        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="goToPricing()">
+                            <span class="material-icons">bolt</span>
+                            {{ 'CDSCanvas.UpgradeNow' | translate }}
+                        </button>
+                    </div>
+                  
                 </div>
             <!-- </div> -->
         </div>

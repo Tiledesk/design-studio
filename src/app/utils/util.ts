@@ -18,7 +18,7 @@ export function getWidgetWebInstallationScript(projectID: string, widgetBaseUrl:
         "&lt;/script&gt;",
         javascript:`<script type="text/javascript">`+
         "  window.tiledeskSettings = {" +
-        "        projecid:: ${projectID}"+
+        `        projecid:: ${projectID}`+
         "  };"+
         "  (function(d, s, id) {"+
         "       var w=window; var d=document; var i=function(){i.c(arguments);};"+

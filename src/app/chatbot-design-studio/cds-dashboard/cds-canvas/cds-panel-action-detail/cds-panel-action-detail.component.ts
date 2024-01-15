@@ -9,6 +9,8 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
+import { PLAN_NAME } from 'src/chat21-core/utils/constants';
+import { AppConfigService } from 'src/app/services/app-config';
 
 
 @Component({
@@ -40,7 +42,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
    private subscriptionIntent: Subscription;
 
   
-  canShowActionByPlan: boolean = true
+  canShowActionByPlan: { plan: PLAN_NAME, enabled: boolean}= { plan: PLAN_NAME.A, enabled: true}
   private logger: LoggerService = LoggerInstance.getInstance()
   
   constructor(
@@ -48,6 +50,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     private connectorService: ConnectorService,
     private dashboardService: DashboardService,
     private projectPlanUtils: ProjectPlanUtils,
+    private appConfigService: AppConfigService
   ) { }
 
   ngOnInit(): void {
@@ -93,7 +96,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
       let action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType)
       if(action && action.plan){
-        this.canShowActionByPlan = this.projectPlanUtils.checkIfCanLoad(action.plan)
+        this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.plan)}
         console.log('[PANEL-INTENT-DETAIL] --> status', this.canShowActionByPlan)
       }
     }catch(error){
@@ -186,6 +189,11 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   onCloseIntent(){
     console.log('----> onCloseIntent:: ', this.elementIntentSelectedType, this.intentSelected);
     // this.closeAndSavePanelIntentDetail.emit();
+  }
+
+  goToPricing() {
+    let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/pricing'
+    window.open(dashbordBaseUrl, '_blank')
   }
 
  /**

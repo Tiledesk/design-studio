@@ -43,7 +43,6 @@ export class CdsActionQaplaComponent implements OnInit {
 
   constructor(
     private dashboardService: DashboardService,
-    private appConfigService: AppConfigService,
     private intentService: IntentService,
   ) { }
 
@@ -209,12 +208,6 @@ export class CdsActionQaplaComponent implements OnInit {
     }
     this.action[type]=null
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-  }
-
-  goToPricing() {
-    let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/pricing'
-    window.open(dashbordBaseUrl, '_self')
-    //this.hideShowWidget('show');
   }
   
   onBlur(event){
