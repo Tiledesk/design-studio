@@ -41,27 +41,32 @@ export class ProjectPlanUtils {
             // ------------------------------------------------------------------------
             console.log('[PROJECT_PROFILE] USECASE: payment', this.project)
             /** get che current keyName for the current project (usefull to compare later)*/
-            let currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == this.project.profile.name.toUpperCase());
-            console.log('[PROJECT_PROFILE] currentPlanNameKey from list -->', currentPlanNameKey)
-            
-            switch(currentPlanNameKey[0]){
+            let currentPlanNameKey: PLAN_NAME
+            switch(this.project.profile.name.toUpperCase()){
                 case PLAN_NAME.A: {
                     console.log('case A')
-                    currentPlanNameKey[0] = PLAN_NAME.D
+                    currentPlanNameKey = PLAN_NAME.D
                     break;
                 }
                 case PLAN_NAME.B: {
                     console.log('case B')
-                    currentPlanNameKey[0] = PLAN_NAME.E
+                    currentPlanNameKey = PLAN_NAME.E
                     break;
                 }
                 case PLAN_NAME.C: {
                     console.log('case C')
-                    currentPlanNameKey[0] = PLAN_NAME.F
+                    currentPlanNameKey = PLAN_NAME.F
                     break;
+                }
+                default: {
+
                 }
                     
             }
+            // currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == this.project.profile.name.toUpperCase());
+            console.log('[PROJECT_PROFILE] currentPlanNameKey from list -->', currentPlanNameKey)
+            
+            
             console.log('[PROJECT_PROFILE] currentPlanNameKey from list --> after re-build', currentPlanNameKey)
             
             /** compare enums: current action enum plan >= current prject profile enum name (UPPERCASE)  */
