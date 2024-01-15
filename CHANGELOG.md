@@ -6,6 +6,8 @@
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 1.0.11-rc.1
+- added: cds-action-hubspot into integrations action-list section
+- added: check for action availability depends of current project plan
 - bug-fixed: on connect button with attributes (on undo, after deleting the intent, the intent connectors are not created)
 
 ### 1.0.10 in PROD
