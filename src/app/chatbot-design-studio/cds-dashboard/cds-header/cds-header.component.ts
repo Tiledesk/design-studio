@@ -240,7 +240,7 @@ export class CdsHeaderComponent implements OnInit {
                                 "&tiledesk_preChatForm=false" +
                                 "&td_draft=true"
           navigator.clipboard.writeText(testItOutUrl)
-          this.notify.showNotification(this.translationsMap.get('CDSHeader.LinkCopiedToClipboard'), 2, 'done')
+          this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSHeader.LinkCopiedToClipboard'), 2, 'done')
         }
         break;
       case 'OPEN_NEW_PAGE':{

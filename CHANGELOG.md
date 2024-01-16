@@ -5,6 +5,10 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.11-rc.2
+- added: share icon next to chatbot name in header component
+- added: badge on action-list for PRO action type
+
 ### 1.0.11-rc.1
 - added: cds-action-hubspot into integrations action-list section
 - added: check for action availability depends of current project plan
