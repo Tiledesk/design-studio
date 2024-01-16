@@ -40,38 +40,42 @@ export class ProjectPlanUtils {
             // USECASE: PAYMENT Plan (TRIAL ACTIVE i.e. Scale trial)
             // ------------------------------------------------------------------------
             console.log('[PROJECT_PROFILE] USECASE: payment', this.project)
+            
             /** get che current keyName for the current project (usefull to compare later)*/
-            let currentPlanNameKey: PLAN_NAME
+            /** before: MAKE A COMPARE BETWEEN OLD AND NEW PROJECT TYPE
+             * LEGEND: 
+             * - A --> D
+             * - B --> E
+             * - C --> F
+             */
+            let currentPlanNameKey: string[] = ['A']
             switch(this.project.profile.name.toUpperCase()){
-                case PLAN_NAME.A: {
+                case PLAN_NAME.A.toUpperCase(): {
                     console.log('case A')
-                    currentPlanNameKey = PLAN_NAME.D
+                    currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.D.toUpperCase());
                     break;
                 }
-                case PLAN_NAME.B: {
+                case PLAN_NAME.B.toUpperCase(): {
                     console.log('case B')
-                    currentPlanNameKey = PLAN_NAME.E
+                    currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.E.toUpperCase());
                     break;
                 }
-                case PLAN_NAME.C: {
+                case PLAN_NAME.C.toUpperCase(): {
                     console.log('case C')
-                    currentPlanNameKey = PLAN_NAME.F
+                    currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.F.toUpperCase());
                     break;
                 }
                 default: {
-
+                    currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == this.project.profile.name.toUpperCase());
+                    break;
                 }
                     
             }
-            // currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == this.project.profile.name.toUpperCase());
-            console.log('[PROJECT_PROFILE] currentPlanNameKey from list -->', currentPlanNameKey)
-            
-            
-            console.log('[PROJECT_PROFILE] currentPlanNameKey from list --> after re-build', currentPlanNameKey)
             
             /** compare enums: current action enum plan >= current prject profile enum name (UPPERCASE)  */
             if(currentPlanNameKey.length>0){
-                return actionPlanAvailability >= PLAN_NAME[currentPlanNameKey[0]]? true: false; 
+                console.log('check plan availability: actionPlanAvailability VS currentPlanNameKey -->',actionPlanAvailability,  PLAN_NAME[currentPlanNameKey[0]])
+                return PLAN_NAME[currentPlanNameKey[0]] >= actionPlanAvailability ? true: false; 
             }
             return false
        }
