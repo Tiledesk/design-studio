@@ -39,7 +39,7 @@ export class ProjectPlanUtils {
             // ------------------------------------------------------------------------ 
             // USECASE: PAYMENT Plan (TRIAL ACTIVE i.e. Scale trial)
             // ------------------------------------------------------------------------
-            console.log('[PROJECT_PROFILE] USECASE: payment', this.project)
+            this.logger.log('[PROJECT_PROFILE] USECASE: payment', this.project)
             
             /** get che current keyName for the current project (usefull to compare later)*/
             /** before: MAKE A COMPARE BETWEEN OLD AND NEW PROJECT TYPE
@@ -51,17 +51,17 @@ export class ProjectPlanUtils {
             let currentPlanNameKey: string[] = ['A']
             switch(this.project.profile.name.toUpperCase()){
                 case PLAN_NAME.A.toUpperCase(): {
-                    console.log('case A')
+                    this.logger.log('case A')
                     currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.D.toUpperCase());
                     break;
                 }
                 case PLAN_NAME.B.toUpperCase(): {
-                    console.log('case B')
+                    this.logger.log('case B')
                     currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.E.toUpperCase());
                     break;
                 }
                 case PLAN_NAME.C.toUpperCase(): {
-                    console.log('case C')
+                    this.logger.log('case C')
                     currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.F.toUpperCase());
                     break;
                 }
@@ -74,9 +74,10 @@ export class ProjectPlanUtils {
             
             /** compare enums: current action enum plan >= current prject profile enum name (UPPERCASE)  */
             if(currentPlanNameKey.length>0){
-                console.log('check plan availability: actionPlanAvailability VS currentPlanNameKey -->',actionPlanAvailability,  PLAN_NAME[currentPlanNameKey[0]])
+                this.logger.log('check plan availability: actionPlanAvailability VS currentPlanNameKey -->',actionPlanAvailability,  PLAN_NAME[currentPlanNameKey[0]])
                 return PLAN_NAME[currentPlanNameKey[0]] >= actionPlanAvailability ? true: false; 
             }
+            
             return false
        }
     }

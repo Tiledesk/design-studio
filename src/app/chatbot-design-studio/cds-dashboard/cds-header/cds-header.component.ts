@@ -14,11 +14,14 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 import { Chatbot } from 'src/app/models/faq_kb-model';
-import { EXTERNAL_URL, LOGO_MENU_ITEMS, TYPE_INTENT_NAME } from '../../utils';
+import { EXTERNAL_URL, TYPE_INTENT_NAME } from '../../utils';
 import { CdsPublishOnCommunityModalComponent } from '../../../modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { environment } from 'src/environments/environment';
 import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
+import { LOGO_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
+import { NotifyService } from 'src/app/services/notify.service';
+import { TranslateService } from '@ngx-translate/core';
 
 const swal = require('sweetalert');
 
@@ -47,12 +50,13 @@ export class CdsHeaderComponent implements OnInit {
 
   isBetaUrl: boolean = false;
   popup_visibility: string = 'none';
-  public TESTSITE_BASE_URL: string;
-  public_Key: string;
   TRY_ON_WA: boolean;
 
-
   LOGO_MENU_ITEMS = LOGO_MENU_ITEMS;
+  SHARE_MENU_ITEMS = SHARE_MENU_ITEMS;
+
+  translationsMap: Map<string, string> = new Map();
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -63,7 +67,9 @@ export class CdsHeaderComponent implements OnInit {
     private multichannelService: MultichannelService,
     private dashboardService: DashboardService,
     private intentService: IntentService,
-    private tiledeskAuthService: TiledeskAuthService
+    private tiledeskAuthService: TiledeskAuthService,
+    private notify: NotifyService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -72,8 +78,8 @@ export class CdsHeaderComponent implements OnInit {
     this.defaultDepartmentId = this.dashboardService.defaultDepartment._id;
     this.selectedChatbot = this.dashboardService.selectedChatbot;
 
-    this.getTestSiteUrl();
     this.getOSCODE();
+    this.getTranslations()
     this.isBetaUrl = false;
     if(this.router.url.includes('beta')){
       this.isBetaUrl = true;
@@ -81,13 +87,13 @@ export class CdsHeaderComponent implements OnInit {
   }
 
   getOSCODE() {
-    this.public_Key = this.appConfigService.getConfig().t2y12PruGU9wUtEGzBJfolMIgK;
+    let public_Key = this.appConfigService.getConfig().t2y12PruGU9wUtEGzBJfolMIgK;
     // this.logger.log('AppConfigService getAppConfig (SIGNUP) public_Key', this.public_Key)
     // this.logger.log('NavbarComponent public_Key', this.public_Key)
 
-    let keys = this.public_Key.split("-");
+    let keys = public_Key.split("-");
 
-    if (this.public_Key.includes("TOW") === true) {
+    if (public_Key.includes("TOW") === true) {
 
       keys.forEach(key => {
         // this.logger.log('NavbarComponent public_Key key', key)
@@ -111,9 +117,16 @@ export class CdsHeaderComponent implements OnInit {
     }
   }
 
-  getTestSiteUrl() {
-    this.TESTSITE_BASE_URL = this.appConfigService.getConfig().widgetBaseUrl;
-    this.logger.log('[CDS DSBRD] AppConfigService getAppConfig TESTSITE_BASE_URL', this.TESTSITE_BASE_URL);
+  getTranslations() {
+
+    let keys = [
+      'CDSHeader.LinkCopiedToClipboard',
+    ]
+
+    this.translate.get(keys).subscribe((text)=>{
+      this.translationsMap.set('CDSHeader.LinkCopiedToClipboard', text['CDSHeader.LinkCopiedToClipboard'])
+    })
+
   }
 
   onToggleSidebarWith(IS_OPEN) {
@@ -216,6 +229,32 @@ export class CdsHeaderComponent implements OnInit {
         break;
       case 'EXPORT':
         this.onMenuOption.emit(item.key)
+        break;
+      case 'COPY_LINK':{
+        let testItOutUrl = this.appConfigService.getConfig().widgetBaseUrl + "assets/twp" + '/chatbot-panel.html' +
+                                '?tiledesk_projectid=' + this.projectID + 
+                                '&tiledesk_participants=bot_' + this.selectedChatbot._id + 
+                                "&tiledesk_departmentID=" + this.defaultDepartmentId + 
+                                "&tiledesk_hideHeaderCloseButton=true" +
+                                "&tiledesk_widgetTitle="+ this.selectedChatbot.name +
+                                "&tiledesk_preChatForm=false" +
+                                "&td_draft=true"
+          navigator.clipboard.writeText(testItOutUrl)
+          this.notify.showNotification(this.translationsMap.get('CDSHeader.LinkCopiedToClipboard'), 2, 'done')
+        }
+        break;
+      case 'OPEN_NEW_PAGE':{
+        let testItOutUrl = this.appConfigService.getConfig().widgetBaseUrl + "assets/twp" + '/chatbot-panel.html' +
+                              '?tiledesk_projectid=' + this.projectID + 
+                              '&tiledesk_participants=bot_' + this.selectedChatbot._id + 
+                              "&tiledesk_departmentID=" + this.defaultDepartmentId + 
+                              "&tiledesk_hideHeaderCloseButton=true" +
+                              "&tiledesk_widgetTitle="+ this.selectedChatbot.name +
+                              "&tiledesk_preChatForm=false" +
+                              "&td_draft=true"
+        window.open(testItOutUrl, '_blank')
+        }
+        break;
     }
   }
 

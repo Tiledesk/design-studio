@@ -111,10 +111,18 @@
     }
 
     .header-title {
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        gap: 5px;
         font-weight: 300;
+
+        span.material-icons{
+            font-size: 20px;
+            cursor: pointer;
+            &:hover{
+                opacity: 0.8;
+            }
+        }
     }
 }
 
@@ -181,6 +189,10 @@
     left: 35px;
     border: 2px solid $gray-02;
     box-shadow: none;
+
+    &.shareMenu{
+        width: 200px;
+    }
 }
 
 ::ng-deep {

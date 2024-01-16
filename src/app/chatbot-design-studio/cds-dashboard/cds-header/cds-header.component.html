@@ -31,7 +31,10 @@
         </span>
         
     </div>
-    <div class="header-title">{{ selectedChatbot?.name }}</div>
+    <div class="header-title ellips">
+        {{ selectedChatbot?.name }}
+        <span class="material-icons" [matMenuTriggerFor]="menuShare">ios_share</span>
+    </div>
     <div class="right-opts">
 
         <div class="btn-group" id="cds-publish-btn-wrp" [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
@@ -111,6 +114,17 @@
     <ng-template matMenuContent>
         <cds-menu
             [items]="LOGO_MENU_ITEMS"
+            (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
+    </ng-template>
+</mat-menu>
+
+
+<!-- SHARE MENU OPTIONS-->
+<mat-menu #menuShare="matMenu" class="menuElement shareMenu" xPosition="after">
+    <ng-template matMenuContent>
+        <cds-menu
+            [items]="SHARE_MENU_ITEMS"
+            [menuType]="''"
             (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
     </ng-template>
 </mat-menu>

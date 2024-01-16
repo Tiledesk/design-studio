@@ -347,6 +347,8 @@
     "Changelog":"Changelog",
     "GitHubRepo":"GitHub repository",
     "ReadMore": "Read more",
+    "CopyLink":"Copy link",
+    "OpenLinkInNewTab":"Open Link in new tab",
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
     "CDSGlobals":{
         "Globals":"Globals",
@@ -356,6 +358,9 @@
         "InfoTitle":"Use variables to reuse values and protect sensitive data",
         "InfoDescription":"Store sensitive data in variables type secret to keep its values masked on the screen. <br> Work with the current value of a variable to prevent sharing sensitive values with your team",
         "ManageGlobal":"Manage global variable"
+    },
+    "CDSHeader": {
+        "LinkCopiedToClipboard":"Link copied to clipboard"
     }
     
 

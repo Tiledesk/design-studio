@@ -280,12 +280,12 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     GPT_TASK: { name: 'GPT Task', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.GPT_TASK,  src: "assets/images/actions/openai-icon.svg", status: "active", description: 'This action forwards the question to ChatGPT' },
     HIDE_MESSAGE: { name: 'Hidden message', category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.HIDE_MESSAGE, src: "assets/images/actions/hidden_message.svg", status: "active",  },
     CHANGE_DEPARTMENT: { name: 'Change dept', category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CHANGE_DEPARTMENT, src: "assets/images/actions/change_department.svg", status: "active" },
-    CODE : { name: 'Code',category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CODE, src:"assets/images/actions/code.svg", status: "beta", description: '', disabled: false},
+    CODE : { name: 'Code',category: TYPE_ACTION_CATEGORY.SPECIAL, type: TYPE_ACTION.CODE, src:"assets/images/actions/code.svg", status: "beta", plan: PLAN_NAME.F, description: '', disabled: false},
     // ASSIGN_FUNCTION: { name: 'Set function', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY: { name: 'Capture User Reply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: 'This action allow to capture the user reply' },
     QAPLA: { name: 'Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: PLAN_NAME.E, description: 'This action allow to connect with Qapla', disabled: false },
     MAKE : { name: 'Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "beta", plan: PLAN_NAME.D, description: '', disabled: false},
-    HUPSPOT : { name: 'Hubspot',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.HUBSPOT, src:"assets/images/actions/hubspot.svg", status: "beta", plan: PLAN_NAME.E, description: ''},
+    HUPSPOT : { name: 'Hubspot',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.HUBSPOT, src:"assets/images/actions/hubspot.svg", status: "inactive", plan: PLAN_NAME.E, description: ''},
 }
 
 export const EVENTS_LIST = {
@@ -490,22 +490,6 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
         ]
     }
 ]
-
-export const LOGO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}> = [
-    { key: 'GO_TO_DASHBOARD', label: 'GoToDashboard',  icon: 'arrow_back', type: TYPE_URL.SELF},
-    { key: 'EXPORT', label: 'Export', icon: 'file_download', type: TYPE_URL.SELF},
-    { key: 'LOG_OUT', label: 'LogOut', icon: 'logout', type: TYPE_URL.SELF}
-]
-
-export const INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}> = [
-    { key: 'HELP_CENTER', label: 'HelpCenter', icon: 'help', type: TYPE_URL.BLANK , src: 'https://gethelp.tiledesk.com/'},
-    { key: 'ROAD_MAP', label: 'RoadMap', icon: 'checklist', type: TYPE_URL.BLANK, src: 'https://feedback.tiledesk.com/roadmap'},
-    { key: 'FEEDBACK', label: 'Feedback', icon: 'lightbulb', type: TYPE_URL.BLANK, src: 'https://feedback.tiledesk.com/feedback'},
-    { key: 'SUPPORT', label: 'support@tiledesk.com', icon: 'email', type: TYPE_URL.SELF, src: 'mailto:support@tiledesk.com'},
-    { key: 'CHANGELOG',  label: 'Changelog', icon: 'local_fire_department', type: TYPE_URL.BLANK, src:'https://feedback.tiledesk.com/changelog'},
-    { key: 'GITHUB', label: 'GitHubRepo', icon: 'assets/images/github-mark.svg', type: TYPE_URL.BLANK, src: 'https://github.com/Tiledesk'}
-]
-
 
 export function generateShortUID(index?) {
     let timestamp = uuidv4();
