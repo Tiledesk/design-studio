@@ -29,7 +29,7 @@
             </div>
         </div> -->
 
-        <hr class="custom-divider">
+        <hr class="custom-divider" *ngIf="menuType">
 
         <div class="menu-btn-text current-user" >
             <span *ngIf="menuType === 'header'">{{loggedUser?.email}}</span>
