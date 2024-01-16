@@ -5,9 +5,28 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.11-rc.1
+- added: cds-action-hubspot into integrations action-list section
+- added: check for action availability depends of current project plan
+- bug-fixed: on connect button with attributes (on undo, after deleting the intent, the intent connectors are not created)
+
+### 1.0.10 in PROD
+
+### 1.0.10-rc.4
+- added: error message if global key contains not allowed chaacters
+
+### 1.0.10-rc.3
+- added: ability to set variable as global key
+- changed: text limit to code textarea cds-action-code
+- changed: text limit to prompt textarea cds-action-gpt-task
+
+### 1.0.10-rc.2
+- added: limit to 4 line for cds-action-code preview input box
+- changed: removed variable and emoji options from global value input detail component
+
 ### 1.0.10-rc.1
 - added: JSON.stringify function in TYPE_FUNCTION_LIST for cds-action-set-attribute
- 
+
 ### 1.0.9 in PROD
 
 ### 1.0.9-rc.1

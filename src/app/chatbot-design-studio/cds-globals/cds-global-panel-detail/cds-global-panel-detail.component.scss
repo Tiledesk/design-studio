@@ -80,3 +80,38 @@ cds-text#custom-input.invalid ::ng-deep {
 cds-text#custom-input.disabled{
     pointer-events: none;
 }
+
+.tpl-info {
+    border-radius: 4px;
+    display: flex;
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    width: 100%;
+    color: #333;
+    background: #ecb606b0;
+    .tpl-info-icon {
+        font-size: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        width: 35px;
+    }
+}
+
+.tpl-info-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    a {
+        color: var(--icon-color);
+        text-decoration: underline;
+    }
+    span.material-icons,
+    span.material-icons-outlined {
+        color: var(--icon-color);
+    }
+}
+
+// label.form-error{
+//     color: var(--color-red-hex);
+// }

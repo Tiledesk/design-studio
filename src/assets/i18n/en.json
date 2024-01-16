@@ -234,13 +234,16 @@
         "AddCustomAttributes":"Add a custom attribute",
         "AddAttribute":"Add attribute",
         "TheAttributesNameMustBe":" The attribute’s name can only contain alphanumeric <br> characters which are letters A-Z, numbers 0-9 and <br> underscore.",
+        "TheGlobalKeyMustBe":" The key's name can only contain alphanumeric <br> characters which are letters A-Z, numbers 0-9 and <br> underscore.",
         "AttributeName":"Attribute name",
         "TypeAttributeName":"Type attribute name",
         "Filter":"Filter",
         "AddFilter":"Add filter",
         "StopOnConditionMet":"Stop on condition met",
         "TreatAsAttributeName":"Treat as attribute name",
-        "TreatAsAttributeNameTips": "Treat the contents of the above field as the name of an attribute. \n Useful if you want to assign to this attribute the value of another one."
+        "TreatAsAttributeNameTips": "Treat the contents of the above field as the name of an attribute. \n Useful if you want to assign to this attribute the value of another one.",
+        "FeatureAvailableFromPlan":"Feature available from <b>{{ plan }}</b> plan",
+        "UpgradeNow":"Upgrade now!"
     },
     "Name":"Name",
     "Label": "Label",

@@ -3,11 +3,11 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionCode } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { TYPE_INTENT_NAME, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, INTENT_TEMP_ID } from '../utils';
+import { TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, INTENT_TEMP_ID } from '../utils';
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
@@ -15,6 +15,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { ExpressionType } from '@angular/compiler';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -105,6 +106,61 @@ export class IntentService {
     //this.liveActiveIntent.next(this.intentSelected);
   }
 
+
+  public setIntentSelectedById(intent_id?){
+    if(this.listOfIntents && this.listOfIntents.length > 0 && intent_id){
+      this.intentSelected = this.listOfIntents.find(obj => ( obj.intent_id === intent_id));
+    } else {
+      this.intentSelected = null;
+    }
+  }
+
+  public setIntentSelectedByIntent(intent){
+    this.intentSelected = intent;
+  }
+
+  public setIntentSelectedPosition(x, y){
+    if (this.intentSelected && this.intentSelected.attributes) {
+      if (!this.intentSelected.attributes.position) {
+        this.intentSelected.attributes.position = {};
+      }
+      this.intentSelected.attributes.position = {'x': x, 'y': y};
+    } else {
+      this.intentSelected = {
+        attributes: {
+          position: {
+            x: x,
+            y: y
+          }
+        }
+      };
+    }
+  }
+
+  public updateIntentSelected(){
+    if(this.intentSelected){
+      this.updateIntent(this.intentSelected);
+    }
+  }
+
+  public addActionToIntentSelected(action){
+    if(this.intentSelected){
+      this.intentSelected.actions.push(action);
+      this.updateIntent(this.intentSelected);
+    }
+  }
+
+  // public setElementSelected(action){
+  //   if(action && action._tdActionId){
+  //     this.actionSelectedID = action._tdActionId;
+  //     this.selectedAction = action;
+  //   } else {
+  //     this.actionSelectedID = null;
+  //     this.selectedAction = null;
+  //   }
+  // }
+
+  
   public setLiveActiveIntent(intentName: string){
     let intent = this.listOfIntents.find((intent) => intent.intent_display_name === intentName);
     this.liveActiveIntent.next(intent)
@@ -663,6 +719,20 @@ export class IntentService {
   }
 
 
+  public async setStartIntent(){
+    this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
+    this.logger.log('[CDS-CANVAS]  intentSelected: ', this.intentSelected);
+    if(this.intentSelected){
+      this.setDefaultIntentSelected();
+      //** center stage on 'start' intent */
+      let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
+      if(startElement){
+        this.stageService.centerStageOnHorizontalPosition(startElement);
+      }
+    }
+  }
+
+
   /** unselectAction */
   public unselectAction(){
     this.actionSelectedID = null;
@@ -826,6 +896,11 @@ export class IntentService {
       action.assignStatusTo = 'make_status';
       action.assignErrorTo = 'make_error';
     }
+    if(typeAction === TYPE_ACTION.HUBSPOT){
+      action = new ActionHubspot();
+      action.assignStatusTo = 'hubspot_status';
+      action.assignErrorTo = 'hubspot_error';
+    }
     if(typeAction === TYPE_ACTION.CODE){
       action = new ActionCode();
     }
@@ -855,8 +930,16 @@ export class IntentService {
       button.__isConnected = true;
       const posId = button.action.indexOf("#");
       if (posId !== -1) {
-        const toId = button.action.slice(posId+1);
-        button.__idConnection = idActionConnector+"/"+toId;
+        // const toId = button.action.slice(posId+1);
+        // button.__idConnection = idActionConnector+"/"+toId;
+        let result = button.action;
+        const regex = /#(.*?){/;
+        const match = button.action.match(regex);
+        // La sottostringa desiderata sarà nel secondo elemento dell'array 'match'
+        if (match && match.length > 1) {
+          result = match[1];
+        }
+        button.__idConnection = idActionConnector+"/"+result;
       }
     } else {
       button.__isConnected = false;
@@ -931,17 +1014,31 @@ export class IntentService {
   /** */
   public restoreLastUNDO(){
     console.log('[INTENT SERVICE] -> restoreLastUNDO', this.operationsUndo);
+
+
+    // if(this.intentSelected){
+    //   const stringJson1 = JSON.stringify(this.listOfIntents.find((obj) => obj.intent_id === this.intentSelected.intent_id));
+    //   const stringJson2 = JSON.stringify(this.intentSelected);
+    //   if(stringJson1 !== stringJson2){
+    //     console.log('[INTENT SERVICE] -> è diverso', stringJson1, stringJson2);
+    //     return;
+    //   }
+    // }
+    
     this.lastActionUndoRedo = true;
     if(this.arrayUNDO && this.arrayUNDO.length>0){
       const objUNDO = JSON.parse(JSON.stringify(this.arrayUNDO.pop()));
       this.arrayREDO.push(objUNDO);
       // console.log('[INTENT SERVICE] -> RESTORE UNDO: ', this.arrayREDO);
       this.payload.operations = objUNDO.undo;
+      console.log('[INTENT UNDO] -> ho aggiornato gli array dopo UNDO ', this.payload, this.arrayUNDO, this.arrayREDO);
+      // this.refreshIntents();
       this.restoreIntent(objUNDO.undo);
       this.setBehaviorUndoRedo();
-      console.log('[INTENT UNDO] -> ho aggiornato gli array dopo UNDO ', this.payload, this.arrayUNDO, this.arrayREDO);
       this.opsUpdate(this.payload);
     }
+    const action = this.intentSelected.actions.find((obj) => obj._tdActionId === this.actionSelectedID);
+    console.log('[INTENT SERVICE] -> è action:: ', action, this.intentSelected, this.actionSelectedID);
   }
 
   /** */

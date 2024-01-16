@@ -533,3 +533,20 @@ export class ActionMake extends Action {
         this._tdActionType = TYPE_ACTION.MAKE;
     }
 }
+
+export class ActionHubspot extends Action {
+    token: string;
+    bodyParameters: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    constructor(){
+        super();
+        this.token = '';
+        this.bodyParameters = "";
+        this.assignStatusTo = '';
+        this.assignErrorTo = '';
+        this._tdActionType = TYPE_ACTION.HUBSPOT;
+    }
+}

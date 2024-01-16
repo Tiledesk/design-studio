@@ -15,7 +15,7 @@
                  *ngIf="i === elementSelectedIndex" 
                 -->
                 
-                <div [ngSwitch]="elementSelected._tdActionType">
+                <div [ngSwitch]="elementSelected._tdActionType" *ngIf="canShowActionByPlan.enabled">
 
                     <cds-action-reply *ngSwitchCase="typeAction.REPLY"
                         class="panel-response"
@@ -217,6 +217,15 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-make>
 
+                     <cds-action-hubspot *ngSwitchCase="typeAction.HUBSPOT"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-hubspot>
+
                     <cds-action-code *ngSwitchCase="typeAction.CODE"
                         class="panel-response"
                         [intentSelected]="intentSelected"
@@ -229,6 +238,21 @@
                         [action]="elementSelected">
                     </cds-action-assign-function> -->
     
+                </div>
+
+
+                <div *ngIf="!canShowActionByPlan.enabled">
+
+                    <div class="block-overlay">
+                        <span class="material-icons lock-icon">lock</span>
+                        <p [innerHTML]="'CDSCanvas.FeatureAvailableFromPlan' | translate: canShowActionByPlan"></p>
+                
+                        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="goToPricing()">
+                            <span class="material-icons">bolt</span>
+                            {{ 'CDSCanvas.UpgradeNow' | translate }}
+                        </button>
+                    </div>
+                  
                 </div>
             <!-- </div> -->
         </div>

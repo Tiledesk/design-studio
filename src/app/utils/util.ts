@@ -1,19 +1,10 @@
-export enum PLAN_NAME {
-    A = 'Growth',
-    B = 'Scale',
-    C = 'Plus',
-    D = 'Basic',
-    E = 'Premium',
-    F = 'Custom'
-}
-
 export const URL_understanding_default_roles = 'https://gethelp.tiledesk.com/articles/understanding-default-roles/' // 'https://docs.tiledesk.com/knowledge-base/understanding-default-roles/'
 
 export function getWidgetWebInstallationScript(projectID: string, widgetBaseUrl: string): {html, javascript} {
     return {
         html: `&lt;script type="text/javascript"&gt;\n`+
         "  window.tiledeskSettings = {\n" +
-        `        projecid:: ${projectID}\n`+
+        `        projectid: "${projectID}"\n`+
         "  };\n"+
         "  (function(d, s, id) {\n"+
         "       var w=window; var d=document; var i=function(){i.c(arguments);};\n"+
@@ -27,7 +18,7 @@ export function getWidgetWebInstallationScript(projectID: string, widgetBaseUrl:
         "&lt;/script&gt;",
         javascript:`<script type="text/javascript">`+
         "  window.tiledeskSettings = {" +
-        "        projecid:: ${projectID}"+
+        `        projectid: "${projectID}"`+
         "  };"+
         "  (function(d, s, id) {"+
         "       var w=window; var d=document; var i=function(){i.c(arguments);};"+

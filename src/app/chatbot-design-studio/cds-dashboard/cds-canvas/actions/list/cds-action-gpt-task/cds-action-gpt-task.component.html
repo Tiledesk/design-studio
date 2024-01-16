@@ -87,9 +87,9 @@
     <div class="field-box">
         <label class="title-label">Prompt</label>
         <cds-textarea id="question" 
-            [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
+            [limitCharsText]="10000"
             [minRow]="2"
             [maxRow]="10" 
             [text]="action.question" 
@@ -247,7 +247,7 @@
                         [text]="action.context" 
                         [placeholder]="'You are an awesome assistant'"
                         (blur)="onBlur($event)"
-                        (changeTextarea)="changeTextarea($event, 'context')">
+                        (changeTextarea)="onChangeTextarea($event, 'context')">
                     </cds-textarea>
                 </div>
 

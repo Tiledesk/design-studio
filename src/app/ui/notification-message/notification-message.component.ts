@@ -6,7 +6,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subject, Subscription } from 'rxjs';
 import { BrandService } from '../../services/brand.service';
 import { takeUntil } from 'rxjs/operators';
-import { PLAN_NAME } from 'src/app/utils/util';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
@@ -16,6 +15,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { Project } from 'src/app/models/project-model';
 import { UserModel } from 'src/chat21-core/models/user';
 import { ProjectUser } from 'src/app/models/project-user';
+import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 const swal = require('sweetalert');
 @Component({
   selector: 'notification-message',

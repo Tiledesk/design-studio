@@ -1,22 +1,21 @@
 import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { Intent } from 'src/app/models/intent-model';
-import { ActionMake } from 'src/app/models/action-model';
-import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, variableList, TYPE_ACTION, ACTIONS_LIST } from '../../../../../utils';
+import { ActionHubspot } from 'src/app/models/action-model';
+import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, variableList } from '../../../../../utils';
 import { IntentService } from '../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { ProjectService } from 'src/app/services/projects.service';
 
 @Component({
-  selector: 'cds-action-make',
-  templateUrl: './cds-action-make.component.html',
-  styleUrls: ['./cds-action-make.component.scss']
+  selector: 'cds-action-hubspot',
+  templateUrl: './cds-action-hubspot.component.html',
+  styleUrls: ['./cds-action-hubspot.component.scss']
 })
-export class CdsActionMakeComponent implements OnInit {
+export class CdsActionHubspotComponent implements OnInit {
 
   @Input() intentSelected: Intent;
-  @Input() action: ActionMake;
+  @Input() action: ActionHubspot;
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
@@ -27,8 +26,6 @@ export class CdsActionMakeComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
@@ -46,15 +43,14 @@ export class CdsActionMakeComponent implements OnInit {
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private intentService: IntentService,
-    private projectService: ProjectService
+    private intentService: IntentService
   ) { }
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    this.logger.debug("[ACTION-MAKE] action detail: ", this.action, ACTIONS_LIST["MAKE"].plan);
+    this.logger.debug("[ACTION-HUBSPOT] action detail: ", this.action);
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION-MAKE] isChangedConnector -->', connector);
+      this.logger.debug('[ACTION-HUBSPOT] isChangedConnector -->', connector);
       this.connector = connector;
       this.updateConnector();
     });
@@ -69,44 +65,19 @@ export class CdsActionMakeComponent implements OnInit {
   }
 
 
-  // private checkConnectionStatus(){
-  //   if(this.action.trueIntent){
-  //    this.isConnectedTrue = true;
-  //   } else {
-  //    this.isConnectedTrue = false;
-  //   }
-  //   if(this.action.falseIntent){
-  //     this.isConnectedFalse = true;
-  //    } else {
-  //     this.isConnectedFalse = false;
-  //    }
-  // }
-
   private checkConnectionStatus(){
     if(this.action.trueIntent){
-      this.isConnectedTrue = true;
-      const posId = this.action.trueIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.trueIntent.slice(posId+1);
-        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-      }
+     this.isConnectedTrue = true;
     } else {
      this.isConnectedTrue = false;
-     this.idConnectionTrue = null;
     }
     if(this.action.falseIntent){
       this.isConnectedFalse = true;
-      const posId = this.action.falseIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.falseIntent.slice(posId+1);
-        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-      }
      } else {
       this.isConnectedFalse = false;
-      this.idConnectionFalse = null;
      }
   }
-  
+
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
@@ -122,30 +93,27 @@ export class CdsActionMakeComponent implements OnInit {
       if(idAction === this.action._tdActionId){
         if(this.connector.deleted){
           if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null;
-            this.isConnectedTrue = false;
-            this.idConnectionTrue = null;
+            this.action.trueIntent = null
+            this.isConnectedTrue = false
           }        
           if(array[array.length -1] === 'false'){
-            this.action.falseIntent = null;
+            this.action.falseIntent = null
             this.isConnectedFalse = false;
-            this.idConnectionFalse = null;
           }
           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
         } else { 
-          this.logger.debug('[ACTION-MAKE] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
+          this.logger.debug('[ACTION-HUBSPOT] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
           if(array[array.length -1] === 'true'){
             this.isConnectedTrue = true;
-            this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
             this.action.trueIntent = '#'+this.connector.toId;
             if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
           }        
           if(array[array.length -1] === 'false'){
             this.isConnectedFalse = true;
-            this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
-            this.action.falseIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          
+            if(this.action.falseIntent !== '#'+this.connector.toId){
+              this.action.falseIntent = '#'+this.connector.toId;
+              if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+            } 
           }
         }
 
@@ -167,29 +135,29 @@ export class CdsActionMakeComponent implements OnInit {
 
   private initializeAttributes() {
     let new_attributes = [];
-    //if (!variableList.userDefined.some(v => v.name === 'result')) {
-      //new_attributes.push({ name: "result", value: "result" });
-    //}
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'make_status')) {
-      new_attributes.push({ name: "make_status", value: "make_status" });
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'hubspot_result')) {
+      new_attributes.push({ name: "hubspot_result", value: "hubspot_result" });
     }
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'make_error')) {
-      new_attributes.push({ name: "make_error", value: "make_error" });
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'hubspot_status')) {
+      new_attributes.push({ name: "hubspot_status", value: "hubspot_status" });
+    }
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'hubspot_error')) {
+      new_attributes.push({ name: "hubspot_error", value: "hubspot_error" });
     }
     variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
-    this.logger.debug("[ACTION MAKE] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined').elements);
+    this.logger.debug("[ACTION-HUBSPOT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined').elements);
   }
 
 
 
 
   // EVENT FUNCTIONS //
-  onChangeTextarea(e, type: 'url'){
+  onChangeTextarea(e, type: 'token'){
     switch(type){
-      case 'url' : {
-        this.action.url = e;
+      case 'token' : {
+        this.action.token = e;
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        console.log("[ACTION MAKE] this.action", this.action);
+        console.log("[ACTION-HUBSPOT] this.action", this.action);
       }
     }
 
@@ -197,14 +165,14 @@ export class CdsActionMakeComponent implements OnInit {
 
 
   onChangeAttributes(attributes:any){
-    this.logger.log('[ACTION-MAKE]onChangeAttributes ',attributes);
+    this.logger.log('[ACTION-HUBSPOT]onChangeAttributes ',attributes);
     this.action.bodyParameters = attributes;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
   onSelectedAttribute(event, property) {
-    this.logger.log("[ACTION-MAKE] onEditableDivTextChange event", event)
-    this.logger.log("[ACTION-MAKE] onEditableDivTextChange property", property)
+    this.logger.log("[ACTION-HUBSPOT] onEditableDivTextChange event", event)
+    this.logger.log("[ACTION-HUBSPOT] onEditableDivTextChange property", property)
     this.action[property] = event.value;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }

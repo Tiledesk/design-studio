@@ -19,7 +19,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   @ViewChild('widgetIframe', {static:true}) widgetIframe:ElementRef;
 
   @Input() isPanelVisible: boolean = false
-  @Input() intent: Intent;
+  // @Input() intent: Intent;
   // @Input() projectID: string;
   // @Input() id_faq_kb: string;
   // @Input() defaultDepartmentId: string;
