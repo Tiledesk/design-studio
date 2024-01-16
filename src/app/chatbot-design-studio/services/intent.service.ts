@@ -1352,9 +1352,16 @@ export class IntentService {
     if(element && element.type === 'INTENT'){
       this.arrayCOPYPAST[0] = element;
       let key = 'copied_items';
-      let chatbotId = element.element.id_faq_kb;
       let value = {
-        'chatbot': chatbotId,
+        'chatbot': element.chatbot,
+        'copy': this.arrayCOPYPAST
+      }
+      localStorage.setItem(key, JSON.stringify(value));
+    } else if(element && element.type === 'ACTION'){
+      this.arrayCOPYPAST[0] = element;
+      let key = 'copied_items';
+      let value = {
+        'chatbot': element.chatbot,
         'copy': this.arrayCOPYPAST
       }
       localStorage.setItem(key, JSON.stringify(value));
@@ -1368,8 +1375,22 @@ export class IntentService {
     if(element && element.type === 'INTENT'){
       this.pasteIntentOntoStage(element.element, point);
     } else if(element && element.type === 'ACTION'){
+      let newAction = element.element;
       // se ho premuto incolla su un intent: aggiungo la action in coda all'intent
+      let newIntent_id = uuidv4();
+      let prevIntent_id = element.intent_id;
+      let newIntent = this.createNewIntent(element.chatbot, newAction, 0);
+      newIntent.attributes.position = point;
+
+      let elementJson = JSON.stringify(newIntent).replace(prevIntent_id, newIntent_id);
+      let intent = JSON.parse(elementJson);
+      this.connectorService.createConnectorsOfIntent(intent);
       // altrimenti creo una nuova action
+      this.addNewIntentToListOfIntents(intent);
+      this.setDragAndListnerEventToElement(intent.intent_id);
+      this.setIntentSelected(intent.intent_id);
+      this.saveNewIntent(intent, null, null);
+      console.log('[INTENT SERVICE] -> listOfIntents, ', intent);
     }
     localStorage.removeItem('copied_items');
     this.arrayCOPYPAST = [];

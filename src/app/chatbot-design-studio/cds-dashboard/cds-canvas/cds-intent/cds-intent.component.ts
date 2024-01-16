@@ -733,13 +733,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   private copyIntent(){
     let intent = JSON.parse(JSON.stringify(this.intent));
-    const element = {element: intent, type: 'INTENT'}
+    const element = {element: intent, type: 'INTENT', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
     this.intentService.copyElement(element);
   }
 
   private copyAction(ele){
     let action = JSON.parse(JSON.stringify(ele));
-    const element = {element: action, type: 'ACTION'}
+    const element = {element: action, type: 'ACTION', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
     this.intentService.copyElement(element);
   }
 
