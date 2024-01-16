@@ -1011,17 +1011,6 @@ export class IntentService {
   /** */
   public restoreLastUNDO(){
     console.log('[INTENT SERVICE] -> restoreLastUNDO', this.operationsUndo);
-
-
-    // if(this.intentSelected){
-    //   const stringJson1 = JSON.stringify(this.listOfIntents.find((obj) => obj.intent_id === this.intentSelected.intent_id));
-    //   const stringJson2 = JSON.stringify(this.intentSelected);
-    //   if(stringJson1 !== stringJson2){
-    //     console.log('[INTENT SERVICE] -> è diverso', stringJson1, stringJson2);
-    //     return;
-    //   }
-    // }
-    
     this.lastActionUndoRedo = true;
     if(this.arrayUNDO && this.arrayUNDO.length>0){
       const objUNDO = JSON.parse(JSON.stringify(this.arrayUNDO.pop()));
@@ -1068,6 +1057,7 @@ export class IntentService {
     operations.forEach(async ele => {
       let intent = JSON.parse(JSON.stringify(ele.intent));
       if(ele.type === 'post'){
+        console.log('[INTENT SERVICE] -> POST: ', intent);
         this.listOfIntents = insertItemInArray(this.listOfIntents, intent);
         let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
         if(isOnTheStage){
@@ -1078,6 +1068,7 @@ export class IntentService {
         }
       }
       else if(ele.type === 'delete'){
+        console.log('[INTENT SERVICE] -> DELETE: ', intent);
         let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
         if(isOnTheStage){
           this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id);
@@ -1091,7 +1082,9 @@ export class IntentService {
         this.listOfIntents = replaceItemInArrayForKey('intent_id', this.listOfIntents, intent);
         let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
         if(isOnTheStage){
+          // console.log('[INTENT SERVICE] -> deleteConnectorsOutOfBlock: ', intent.intent_id);
           this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id, false, false);
+          // console.log('[INTENT SERVICE] -> updateConnectorsOfBlock: ', intent.intent_id);
           this.connectorService.updateConnectorsOfBlock(intent.intent_id);
           this.refreshIntents();
           this.setIntentSelected(intent.intent_id);

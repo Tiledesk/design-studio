@@ -124,6 +124,7 @@ export class ConnectorService {
   }
 
   public async createConnectorById(connectorID) {
+    this.logger.log('[CONNECTOR-SERV] createConnectorById: ', connectorID);
     const isConnector = document.getElementById(connectorID);
     if (isConnector) {
       this.logger.log('[CONNECTOR-SERV] createConnectorById il connettore esiste già', connectorID);
@@ -133,7 +134,10 @@ export class ConnectorService {
     var lastIndex = connectorID.lastIndexOf("/");
     if (lastIndex !== -1) {
       const fromId = connectorID.substring(0, lastIndex);
-      const toId = connectorID.substring(lastIndex + 1);
+      let toId = connectorID.substring(lastIndex + 1);
+      if (toId.startsWith('#')) {
+        toId = toId.substring(1);
+      }
       let fromEle = document.getElementById(fromId);
       if(!fromEle) {
         fromEle = await isElementOnTheStage(fromId); // sync
@@ -142,7 +146,7 @@ export class ConnectorService {
       let toEle = document.getElementById(toId);
       if(!toEle) {
         toEle = await isElementOnTheStage(toId); // sync
-        this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle);
+        this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle, toId);
       }
       if (toEle && fromEle) {
         const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
