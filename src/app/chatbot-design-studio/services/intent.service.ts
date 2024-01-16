@@ -1368,12 +1368,20 @@ export class IntentService {
     }
   }
 
+
   public async pasteElementToStage(positions){
     let element = this.arrayCOPYPAST[0];
     let point = this.connectorService.logicPoint(positions);
     console.log('[INTENT SERVICE] -> pasteElementToStage, ', element, point);
     if(element && element.type === 'INTENT'){
-      this.pasteIntentOntoStage(element.element, point);
+      let newIntent_id = uuidv4();
+      let prevIntent = element;
+      let newAction = prevIntent.actions[0];
+      let newIntent = this.createNewIntent(element.chatbot, newAction, 0);
+      newIntent.attributes = prevIntent.attributes;
+      newIntent.attributes.position = point;
+      newIntent.actions = prevIntent.actions;
+      this.pasteIntentOntoStage(newIntent, prevIntent.intent_id, newIntent_id);
     } else if(element && element.type === 'ACTION'){
       let newAction = element.element;
       // se ho premuto incolla su un intent: aggiungo la action in coda all'intent
@@ -1381,42 +1389,18 @@ export class IntentService {
       let prevIntent_id = element.intent_id;
       let newIntent = this.createNewIntent(element.chatbot, newAction, 0);
       newIntent.attributes.position = point;
-
-      let elementJson = JSON.stringify(newIntent).replace(prevIntent_id, newIntent_id);
-      let intent = JSON.parse(elementJson);
-      this.connectorService.createConnectorsOfIntent(intent);
-      // altrimenti creo una nuova action
-      this.addNewIntentToListOfIntents(intent);
-      this.setDragAndListnerEventToElement(intent.intent_id);
-      this.setIntentSelected(intent.intent_id);
-      this.saveNewIntent(intent, null, null);
-      console.log('[INTENT SERVICE] -> listOfIntents, ', intent);
+      this.pasteIntentOntoStage(newIntent,prevIntent_id, newIntent_id);
+      console.log('[INTENT SERVICE] -> listOfIntents, ');
     }
     localStorage.removeItem('copied_items');
     this.arrayCOPYPAST = [];
   }
 
-
-  private pasteIntentOntoStage(element, point){
-    let newIntent_id = uuidv4();
-    let prevIntent = element;
-    // let newIntent = JSON.parse(JSON.stringify(prevIntent));
-    // newIntent.intent_display_name = prevIntent.intent_display_name+" copy";
-    // newIntent.attributes.position = point;
-    // newIntent.id = INTENT_TEMP_ID;
-    // newIntent._id = INTENT_TEMP_ID;
-    // newIntent.intent_id = newIntent_id;
-    // const newAction = this.createNewAction( TYPE_ACTION.REPLY);
-    let newAction = prevIntent.actions[0];
-    let newIntent = this.createNewIntent(prevIntent.id_faq_kb, newAction, 0);
-    newIntent.attributes = prevIntent.attributes;
-    newIntent.attributes.position = point;
-    newIntent.actions = prevIntent.actions;
-    let elementJson = JSON.stringify(newIntent).replace(prevIntent.intent_id, newIntent_id);
+  private pasteIntentOntoStage(newIntent, prevIntent_id, newIntent_id){
+    let elementJson = JSON.stringify(newIntent).replace(prevIntent_id, newIntent_id);
     let intent = JSON.parse(elementJson);
     this.connectorService.createConnectorsOfIntent(intent);
     // this.connectorService.updateConnectorsOfBlock(intent.intent_id);
-
     this.addNewIntentToListOfIntents(intent);
     this.setDragAndListnerEventToElement(intent.intent_id);
     this.setIntentSelected(intent.intent_id);
