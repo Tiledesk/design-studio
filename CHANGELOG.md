@@ -5,6 +5,10 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.11-rc.3
+- added: isNull and isUndefined operator function for cds-action-json-condition
+- bug-fixed: compera alphabetic project/action plan rather than PLAN_NAME enum 
+
 ### 1.0.11-rc.2
 - added: share icon next to chatbot name in header component
 - added: badge on action-list for PRO action type
