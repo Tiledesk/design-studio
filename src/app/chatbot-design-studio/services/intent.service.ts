@@ -1375,7 +1375,7 @@ export class IntentService {
     console.log('[INTENT SERVICE] -> pasteElementToStage, ', element, point);
     if(element && element.type === 'INTENT'){
       let newIntent_id = uuidv4();
-      let prevIntent = element;
+      let prevIntent = element.element;
       let newAction = prevIntent.actions[0];
       let newIntent = this.createNewIntent(element.chatbot, newAction, 0);
       newIntent.attributes = prevIntent.attributes;
