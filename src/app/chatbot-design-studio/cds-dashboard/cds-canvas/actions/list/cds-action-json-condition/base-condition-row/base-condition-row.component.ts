@@ -1,7 +1,7 @@
 import { SatPopover } from '@ncstate/sat-popover';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Component, Input, OnInit, SimpleChanges, EventEmitter, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { OPERATORS_LIST, OperatorValidator } from '../../../../../../utils';
+import { OPERATORS_LIST, OperatorValidator, TYPE_OPERATOR } from '../../../../../../utils';
 import { Condition } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -134,7 +134,9 @@ export class BaseConditionRowComponent implements OnInit {
     this.conditionForm.patchValue({ operator: operator['type']})
     
     //activate submit button and disable 'Value' textarea i operator is equal to 'isEmpty'
-    if(operator['type'] === 'isEmpty'){
+    if(operator['type'] === TYPE_OPERATOR.isEmpty|| 
+        operator['type'] === TYPE_OPERATOR.isNull || 
+        operator['type'] === TYPE_OPERATOR.isUndefined ){
       this.disableSubmit = false;
       this.readonlyTextarea = true;
       this.setAttributeBtnOperand2 = false;

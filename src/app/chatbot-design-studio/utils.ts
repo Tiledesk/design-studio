@@ -175,6 +175,8 @@ export enum TYPE_OPERATOR {
     containsIgnoreCase = "containsIgnoreCase",
     endsWith = "endsWith",
     isEmpty = "isEmpty",
+    isNull = "isNull",
+    isUndefined = "isUndefined",
     matches = "matches"
 }
 
@@ -309,6 +311,8 @@ export const OPERATORS_LIST: { [key: string]: { name: string, type: TYPE_OPERATO
     "contains": { name: "contains", type: TYPE_OPERATOR.contains },
     "containsIgnoreCase": { name: "contains Ignore Case", type: TYPE_OPERATOR.containsIgnoreCase },
     "isEmpty": { name: "is Empty", type: TYPE_OPERATOR.isEmpty },
+    "isNull": { name: "is Null", type: TYPE_OPERATOR.isNull },
+    "isUndefined": { name: "is Empty", type: TYPE_OPERATOR.isUndefined },
     "matches": { name: "matches", type: TYPE_OPERATOR.matches }
 }
 
