@@ -41,6 +41,11 @@ export class ProjectPlanUtils {
             // ------------------------------------------------------------------------
             this.logger.log('[PROJECT_PROFILE] USECASE: payment', this.project)
             
+            /** check if the subscription is Active or NOT */
+            if(this.project.isActiveSubscription === false){
+                return false
+            }
+
             /** get che current keyName for the current project (usefull to compare later)*/
             /** before: MAKE A COMPARE BETWEEN OLD AND NEW PROJECT TYPE
              * LEGEND: 
@@ -74,8 +79,10 @@ export class ProjectPlanUtils {
             
             /** compare enums: current action enum plan >= current prject profile enum name (UPPERCASE)  */
             if(currentPlanNameKey.length>0){
-                this.logger.log('check plan availability: actionPlanAvailability VS currentPlanNameKey -->',actionPlanAvailability,  PLAN_NAME[currentPlanNameKey[0]])
-                return PLAN_NAME[currentPlanNameKey[0]] >= actionPlanAvailability ? true: false; 
+                let actionPlanNameKey: string[] = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == actionPlanAvailability.toUpperCase());
+                this.logger.log('check plan availability: currentPlanNameKey VS actionPlanNameKey -->', currentPlanNameKey[0], actionPlanNameKey[0])
+                // this.logger.log('check plan availability: PLAN currentPlanNameKey VS PLAN actionPlanNameKey -->', PLAN_NAME[currentPlanNameKey[0]]> PLAN_NAME[actionPlanNameKey[0]])
+                return currentPlanNameKey[0] >= actionPlanNameKey[0] ? true: false; 
             }
             
             return false
