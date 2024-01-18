@@ -461,7 +461,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   openAttributesDialog() {
     this.logger.log("temp_variables: ", this.temp_variables);
     const dialogRef = this.dialog.open(AttributesDialogComponent, {
-      panelClass: 'custom-dialog-container',
+      panelClass: 'custom-setattribute-dialog-container',
       data: { attributes: this.temp_variables, question: this.action.question }
     });
     dialogRef.afterClosed().subscribe(result => {
