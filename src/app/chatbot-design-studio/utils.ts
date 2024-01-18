@@ -312,7 +312,7 @@ export const OPERATORS_LIST: { [key: string]: { name: string, type: TYPE_OPERATO
     "containsIgnoreCase": { name: "contains Ignore Case", type: TYPE_OPERATOR.containsIgnoreCase },
     "isEmpty": { name: "is Empty", type: TYPE_OPERATOR.isEmpty },
     "isNull": { name: "is Null", type: TYPE_OPERATOR.isNull },
-    "isUndefined": { name: "is Empty", type: TYPE_OPERATOR.isUndefined },
+    "isUndefined": { name: "is Undefined", type: TYPE_OPERATOR.isUndefined },
     "matches": { name: "matches", type: TYPE_OPERATOR.matches }
 }
 
