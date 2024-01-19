@@ -48,6 +48,7 @@ export class CDSFilterComponent implements OnInit {
     }else if(last){
       this.expression.conditions.splice(index-1, 2)
     }
+    this.onReset()
     this.onChangeExpression.emit(this.expression)
   }
 
@@ -58,6 +59,7 @@ export class CDSFilterComponent implements OnInit {
 
 
   onDismiss(condition: Condition){
+    console.log('[BASE_FILTER] onDismiss', condition, this.selectedCondition, this.selectedIndex,)
     if(condition){
       this.logger.log('onDismiss popover condition', condition, this.selectedCondition, this.selectedIndex, this.expression)
       //if condition already exist --> do not push new condition
@@ -74,7 +76,14 @@ export class CDSFilterComponent implements OnInit {
       }
     }
     this.addConditionFilter.close();
+    this.onReset()
     this.onChangeExpression.emit(this.expression)
+  }
+
+
+  onReset(){
+    this.selectedCondition = null
+    this.selectedIndex= null
   }
 
 }

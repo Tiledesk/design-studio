@@ -51,7 +51,7 @@
     horizontalAlign="center" 
     verticalAlign="center" 
     hasBackdrop 
-    (backdropClicked)="addConditionFilter.close()"
+    (backdropClicked)="addConditionFilter.close();onDismiss($event)"
     panelClass="base-filter--add-filter-panel"
     interactiveClose="false">
     <base-condition-row

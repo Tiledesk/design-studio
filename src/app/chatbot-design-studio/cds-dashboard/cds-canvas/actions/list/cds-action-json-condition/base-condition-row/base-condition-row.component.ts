@@ -40,6 +40,7 @@ export class BaseConditionRowComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges){
     this.logger.log('[BASE_CONDITION_ROW] ******* ngOnChanges-->');
     this.conditionForm = this.createConditionGroup()
+    this.step=0;
     this.operatorsList = Object.keys(OPERATORS_LIST).map(key => (OPERATORS_LIST[key]))
     if(this.condition){
       this.logger.log('[BASE_CONDITION_ROW] selectedConditionnnn-->', this.condition)
