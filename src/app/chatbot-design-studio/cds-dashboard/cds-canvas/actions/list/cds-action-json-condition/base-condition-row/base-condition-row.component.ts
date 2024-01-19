@@ -109,7 +109,7 @@ export class BaseConditionRowComponent implements OnInit {
 
   onClearSelectedAttribute(){
     this.logger.log('onClearSelectedAttribute-->');   
-    this.conditionForm.patchValue({ operand2: {type: 'var', name: ''}}, {emitEvent: false});
+    this.conditionForm.patchValue({ operand2: {type: 'const', name: '', value: ''}}, {emitEvent: false})
     this.disableSubmit = true;
     this.readonlyTextarea = false;
     this.setAttributeBtnOperand2 = true;
