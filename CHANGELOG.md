@@ -7,7 +7,10 @@
 
 ### 1.0.11-rc.3
 - added: isNull and isUndefined operator function for cds-action-json-condition
-- bug-fixed: compera alphabetic project/action plan rather than PLAN_NAME enum 
+- bug-fixed: compare alphabetic project/action plan rather than PLAN_NAME enum 
+- bug-fixed: attribute dialog-container component UI
+- bug-fixed: after deleted attribute from value field in cds-action-json-condition and cds-action-action-condition, restore base form with operator2.type = 'const'
+- bug-fixed: if click on existing condition and then add a new one, the last created condition is not pushed but replaced to che last selected condition
 
 ### 1.0.11-rc.2
 - added: share icon next to chatbot name in header component

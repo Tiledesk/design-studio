@@ -59,7 +59,7 @@ export class CDSFilterComponent implements OnInit {
 
 
   onDismiss(condition: Condition){
-    console.log('[BASE_FILTER] onDismiss', condition, this.selectedCondition, this.selectedIndex,)
+    this.logger.log('[BASE_FILTER] onDismiss', condition, this.selectedCondition, this.selectedIndex,)
     if(condition){
       this.logger.log('onDismiss popover condition', condition, this.selectedCondition, this.selectedIndex, this.expression)
       //if condition already exist --> do not push new condition
