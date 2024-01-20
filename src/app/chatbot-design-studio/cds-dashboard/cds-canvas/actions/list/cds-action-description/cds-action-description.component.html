@@ -37,13 +37,13 @@
     <div class="section">
         <div class="action-title">
             <div class="icon-action">
-                <img class="active-icon" [src]="element?.src" [title]="element?.name">
+                <img class="active-icon" [src]="element?.src" [title]="element?.name | translate ">
             </div>
-            <p *ngIf="!previewMode" class="label-action">{{element?.name}}</p>
+            <p *ngIf="!previewMode" class="label-action">{{element?.name | translate }}</p>
             <span *ngIf="!previewMode && element?.status ==='beta'" class="trigger-beta-badge">Beta</span>
             <div *ngIf="previewMode" class="action-btn-icon">
                 <button class="btn btn-tdblu-no-boxshadow drag-btn">
-                    <img class="active-icon" src="assets/images/icons/drag_indicator.svg" title="Drag">
+                    <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate">
                 </button>
             </div>
         </div>
@@ -77,6 +77,6 @@
     panelClass="description-tooltip">
     <div class="tooltip-wrp">
         <div class="caret_tooltip"></div>
-        <span [innerHTML]="element?.description"></span>
+        <span [innerHTML]="element?.description | translate "></span>
    </div>
 </sat-popover>

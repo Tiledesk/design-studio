@@ -3,7 +3,7 @@
     
     <div class="textarea-value">
         <div class="value-wrp">
-            <label>Value</label>
+            <label>{{'CDSCanvas.Value' | translate }}</label>
             <cds-textarea id="operand"
                 [placeholder]="operandForm.value.isVariable? '' : placeholder"
                 [textLimitBtn]="false"
@@ -38,12 +38,12 @@
     <div></div>
 
     <div class="select-function">
-        <label>Function</label>
+        <label>{{'CDSCanvas.Function' | translate}}</label>
         <cds-select id="selectOperand"
             [items]="listOfFunctions"
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'"
-            [placeholder]="'Apply a function to the value'"
+            [placeholder]="'CDSCanvas.ApplyAFunctionToValue' | translate"
             [itemSelected]="operandForm.value.function"
             [clearable]="true"
             (onSelected)="onSelectedFunction($event)">

@@ -19,7 +19,6 @@ export class OperandComponent implements OnInit {
     operandForm: FormGroup;
     // listOfFunctions: Array<{name: string, value: string, icon?:string}> = [];
     openSlectFunction: boolean;
-    placeholder: string;
 
     private logger: LoggerService = LoggerInstance.getInstance();
     
@@ -31,7 +30,6 @@ export class OperandComponent implements OnInit {
     }
 
     private initialize(){
-        this.placeholder = 'Insert a constant value or choose an attribute';
         this.operandForm = this.createOperandGroup();
         this.operandForm.valueChanges.subscribe(data => {
             if(data.value !== '') {

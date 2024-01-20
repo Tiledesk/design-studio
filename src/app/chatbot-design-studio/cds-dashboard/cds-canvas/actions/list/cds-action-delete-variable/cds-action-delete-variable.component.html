@@ -12,7 +12,7 @@
             {{action?.variableName}}
         </div>
         <div *ngIf="!action?.variableName" class="action-row-right empty">
-            Set variable to delete
+            {{'CDSCanvas.SetVariableToDelete' | translate }}
         </div>
     </div>
 
@@ -21,7 +21,7 @@
 <div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
 
     <div class="field-box">
-        <label class="title-label">Variable name:</label>
+        <label class="title-label">{{'CDSCanvas.VariableName' | translate }}:</label>
         <cds-select
             [items]="variableListUserDefined"
             [bindLabelSelect]="'name'"

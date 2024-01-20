@@ -20,7 +20,7 @@
             [items]="listOfFunctions"
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'"
-            [placeholder]="'Apply a function to the value'"
+            [placeholder]="'CDSCanvas.ApplyAFunctionToValue' | translate"
             [clearable]="true"
             [itemSelected]="action.functionName"
             (onSelected)="onSelectedFunction($event)">

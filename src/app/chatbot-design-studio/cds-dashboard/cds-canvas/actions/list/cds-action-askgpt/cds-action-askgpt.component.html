@@ -11,7 +11,7 @@
             {{action?.question}}
         </div>
         <div *ngIf="!action?.question" class="action-row-right empty">
-            Enter the question
+            {{'CDSCanvas.EnterTheQuestion' | translate}}
         </div>
     </div>
 
@@ -24,7 +24,7 @@
             {{action?.kbName}}
         </div>
         <div *ngIf="!action?.kbid" class="action-row-right empty">
-            Select Knowledge Base
+            {{'CDSCanvas.SelectKnowledgeBase' | translate}}
         </div>
     </div>
 
@@ -34,7 +34,7 @@
             <img class="active-icon" src="assets/images/icons/if_condition.svg">
         </div>
 
-        <label class="title-preview-label">Success</label>
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate}}</label>
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
@@ -46,7 +46,7 @@
     <hr class="preview-divider">
 
     <div class="previewContent">
-       <label class="title-preview-label">else</label>
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate}}</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
             [idConnection] = "idConnectionFalse"
@@ -60,7 +60,7 @@
 
 
     <div class="field-box">
-        <label class="title-label">Prompt</label>
+        <label class="title-label">{{'CDSCanvas.Prompt' | translate}}</label>
         <cds-textarea id="question" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -68,14 +68,14 @@
             [minRow]="2"
             [maxRow]="4" 
             [text]="action?.question" 
-            [placeholder]="'Question to submit'"
+            [placeholder]="'CDSCanvas.QuestionToSubmit' | translate"
             (blur)="onBlur($event)"
             (changeTextarea)="changeTextarea($event, 'question')">
         </cds-textarea>
     </div>
 
     <div class="field-box">
-        <label class="title-label">Knowledge Base ID</label>
+        <label class="title-label">{{'CDSCanvas.KnowledgeBaseID' | translate}}</label>
         <cds-select id="text-condition" 
             [items]="kbs_list" 
             [itemSelected]="kb_selected_id" 
@@ -85,12 +85,12 @@
         </cds-select>
     </div>
 
-    <a class="link" (click)="goToKNB()">Manage Knowledge Bases</a>
+    <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
     
     <hr class="custom-divider">
 
     <div class="field-box">
-        <label class="title-label">GPT Reply</label>
+        <label class="title-label">{{'CDSCanvas.GPTReply' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -105,7 +105,7 @@
     </div>
 
     <div class="field-box">
-        <label class="title-label">GPT Source</label>
+        <label class="title-label">{{'CDSCanvas.GPTSource' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false"
             [emojiPikerBtn]="false" 
@@ -126,14 +126,14 @@
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
-            <label class="condition-text">Success</label>
+            <label class="condition-text">{{'CDSCanvas.Success' | translate}}</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.trueIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
             (onReset)="onResetBlockSelect($event, 'trueIntent')">
@@ -147,14 +147,14 @@
 
     <div class="field-box">
         <div class="condition-container">
-            <label class="condition-text">Else</label>
+            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.falseIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
             (onReset)="onResetBlockSelect($event, 'falseIntent')">
