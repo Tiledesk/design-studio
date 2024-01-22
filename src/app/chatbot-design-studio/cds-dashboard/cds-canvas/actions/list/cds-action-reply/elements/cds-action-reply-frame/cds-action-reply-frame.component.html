@@ -26,7 +26,7 @@
    <!-- ||  -->
    <div class="add-filter-btn" *ngIf="canShowFilter && filterConditionExist">
         <span class="material-icons-outlined">filter_alt</span>
-        Filter
+        {{'CDSCanvas.Filter' | translate }}
     </div>
     <div class="filter-wrapper" *ngIf="canShowFilter"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
@@ -44,7 +44,7 @@
     <div class="text-editor">
         <div *ngIf="!response.metadata.src" class="response-frame-panel no-image">
             <div class="image"><img src="assets/images/icons/add_image.svg"></div>
-            <div class="text">Click to add frame</div>
+            <div class="text">{{'CDSCanvas.ClickToAddFrame' | translate}}</div>
         </div>
         <div *ngIf="response.metadata.src" class="content-frame">
             <cds-element-from-url 
@@ -55,7 +55,7 @@
     
         <div>
             <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
-            <div class="response-wrp no-text" *ngIf="!response.text">Click to add text ...</div>
+            <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate}}</div>
         </div>
 
     </div>

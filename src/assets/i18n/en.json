@@ -319,6 +319,7 @@
         "GoTo":"go to",
         "GoToBlock":"Go to block",
         "CustomAttribute":"Custom Attribute",
+        "Action":"Action",
         "Condition":"Condition",
         "ApplyCondition":"Apply condition",
         "AddNewCondition":"Add new condition",
@@ -356,14 +357,22 @@
         "LoadingTemplates":"Loading templates",
         "NoTemplate":"Oops, looks like there is no template.",
         "CreateOneNow":"Create one now!",
-        "AddReceiver":"Add receiver"
+        "AddReceiver":"Add receiver",
+        "AddContentsToReply":"Add contents to this Reply",
+        "ClickToAddFrame":"Click to add frame",
+        "ClickToAddImage":"Click to add image",
+        "ClickToAddUrl":"Click to add url ...",
+        "ClickToAddText":"Click to add text ...",
+        "AddButton":"Add button",
+        "AddCard":"Add card",
+        "TypeTitle":"Type Title",
+        "TypeDescription":"Type Description"
     },
     "Name":"Name",
     "Label": "Label",
     "Actions": "Actions",
     "DisableInputBox":"Disable input box",
     "url":"url",
-    "ClickToAddUrl":"Click to add url ...",
     "OpenIn":"Open in",
     "SameWidgetWindow":"Same widget window",
     "NewTabWindow": "New Tab window",
@@ -372,7 +381,10 @@
     "Frame": "Frame",
     "Gallery": "Gallery",
     "Redirect": "Redirect",
+    "Message":"Message",
+    "Every":"Every",
     "CDSForm":{
+        "FormDescription":"The Forms block allows you to ask more than one question within a single message, making it easier for the customer to provide all the relevant information.",
         "AddAFormToAsk":"Add a Form to ask user data",
         "AddForm": "Add form",
         "SelectTemplateForm": "Select a type of form among those suggested, or create a new one",
@@ -400,6 +412,12 @@
             "field_label": "Write a clear label that helps users to enter the correct data (ex: what's your name?)",
             "field_error": "Write an error message if the data entered by the user is not correct"
         }
+    },
+    "CDSRules":{
+        "RuleName":"Rule name",
+        "AddRule":"Add Rule",
+        "DeleteRule":"Delete Rule",
+        "UpdateRule":"Update Rule"
     },
     "CDSButtonTypes":{
         "text":"text",

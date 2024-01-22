@@ -10,7 +10,7 @@
     </cds-text>
 </div>
 <div class="section">
-    <label class="section-label">Every:</label>
+    <label class="section-label">{{'Every' | translate }}:</label>
     <mat-chip-list aria-label="hours" #chipList [formControl]="conditionsForm.controls['triggerEvery']">
             <mat-chip #chipRef="matChip" 
                 [value]="chip.value" *ngFor="let chip of chips; let i = index" 
