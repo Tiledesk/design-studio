@@ -339,6 +339,8 @@
         "Result":"Result",
         "Error":"Error",
         "ChooseBot":"Choose a bot",
+        "ChooseBlockDescription":"Automatically execute this block when this chatbot joins the conversation",
+        "ExecuteBlock":"Execute block",
         "ThisRequestNoBody":"This request does not have a body",
         "Location":"Location",
         "PhoneNumber":"Phone number",

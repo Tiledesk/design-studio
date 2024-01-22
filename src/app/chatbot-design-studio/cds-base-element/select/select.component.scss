@@ -17,7 +17,7 @@
             align-items: center;
             gap: 10px;
             background: transparent;
-            
+
             span.material-icons{
                 font-size: 20px;
                 padding: 0px 4px;
@@ -143,6 +143,10 @@
     .ng-dropdown-panel.ng-select-bottom .ng-dropdown-panel-items .ng-option:last-child{
         border-bottom-right-radius: 8px;
         border-bottom-left-radius: 8px;  
+    }
+
+    .ng-placeholder {
+        font-size: 14px;
     }
 
     
