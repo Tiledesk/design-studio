@@ -38,7 +38,7 @@
                 </div>
             </div>
         </section>
-        <section class="value" formGroupName="operand2">
+        <section class="value" formGroupName="operand2" *ngIf="canShowOperand2">
             <div>{{'CDSCanvas.Value' | translate }}</div>
             <div class="value-wrp">
                 <!-- //[readonly]="conditionForm.value.operand2.name? true : false" -->
