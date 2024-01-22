@@ -70,7 +70,6 @@ export class CDSTextareaComponent implements OnInit {
     // if(changes && changes['readonly'] && changes['readonly'].previousValue !== changes['readonly'].currentValue){
     //   this.textTag = this.text
     // }
-    console.log('changessss', changes)
     if(this.readonly){
       this.control.disable();
     }else if(!this.readonly){
