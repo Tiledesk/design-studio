@@ -5,6 +5,15 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.11-rc.4
+- added: cds-action-replace-bot-v2 with 'execute block' option
+- added: translation keys into cds-action components
+- bug-fixed: reset operator2 value if condition is 'IsEmpty' or 'isNull' or 'isUndefined'
+- bug-fixed: removed angular warning for readonly textarea deprecated propery with reactive Forms -> now ise control.disabled() or control.enabled()
+- bug-fixed: operand2 textarea not render textTag on init if readOnly is enabled
+- bug-fixed: if condition is changed to 'IsEmpty' or 'isNull' or 'isUndefined' in operand2 cds-action-json-condition textarea not reset correctly
+- removed: cds-action-replace-bot DEPRECATED
+
 ### 1.0.11-rc.3
 - added: isNull and isUndefined operator function for cds-action-json-condition
 - bug-fixed: compare alphabetic project/action plan rather than PLAN_NAME enum 
