@@ -133,7 +133,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   addEventListener() {
     document.addEventListener(
       "keydown", (e) => {
-        console.log('[CDS-CANVAS]  keydown ', e);
+        // console.log('[PANEL-INTENT-DETAIL]  keydown ', e);
         var focusedElement = document.activeElement;
         if (focusedElement.tagName === 'TEXTAREA') {
         }
