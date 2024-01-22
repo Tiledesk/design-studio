@@ -5,7 +5,7 @@
         <div class="value-wrp">
             <label>{{'CDSCanvas.Value' | translate }}</label>
             <cds-textarea id="operand"
-                [placeholder]="operandForm.value.isVariable? '' : placeholder"
+                [placeholder]="operandForm.value.isVariable? '' : 'CDSCanvas.InsertConstantValueOrChoise' | translate"
                 [textLimitBtn]="false"
                 [emojiPikerBtn]="false"
                 [text]="operandForm.value.value"

@@ -37,7 +37,6 @@ export class CdsActionQaplaComponent implements OnInit {
   private subscriptionChangedConnector: Subscription;
   
   project: Project;
-  action_locked: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 

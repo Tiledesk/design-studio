@@ -1,7 +1,7 @@
 <div id="search">
     <span class="material-icons">search</span>
     <input type="text" 
-        placeholder="Type search value" 
+        [placeholder]="'CDSCanvas.TypeSearchValue' | translate" 
         [(ngModel)]="textVariable"
         (ngModelChange)="onChangeSearch($event)">
 </div>
@@ -65,14 +65,14 @@
     <div id="no-data" *ngIf="isEmpty">
        <div class="no-result">
             <span class="material-icons">search</span>
-            <span class="text ellips">Nothing found. Please consider changing your search query.</span>
+            <span class="text ellips">{{'CDSCanvas.NoVariableFound' | translate }}</span>
        </div>
     </div>
 </div>
 
 <div id="add-attribute" (click)="onAddCustomAttribute()">
     <span class="material-icons">add</span>
-    <div>Add custom attributes</div>
+    <div>{{'CDSCanvas.AddCustomAttributes' | translate }}</div>
 </div>
 
 

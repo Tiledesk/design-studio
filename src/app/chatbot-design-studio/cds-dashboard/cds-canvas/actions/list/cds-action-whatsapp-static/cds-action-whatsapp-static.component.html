@@ -8,11 +8,11 @@
         </div>
         
         <div *ngIf="action.payload.receiver_list.length == 1" class="action-row-right">
-            {{action.payload.receiver_list.length}} contact selected
+            {{action.payload.receiver_list.length}} {{'CDSCanvas.ContactSelected' | translate }}
         </div>
 
         <div *ngIf="action.payload.receiver_list.length != 1" class="action-row-right">
-            {{action.payload.receiver_list.length}} contacts selected
+            {{action.payload.receiver_list.length}}  {{'CDSCanvas.ContactSelected' | translate }}
         </div>
 
     </div>
@@ -24,7 +24,7 @@
         </div>
         
         <div class="action-row-right">
-            Add contacts
+            {{'CDSCanvas.AddContacts' | translate }}
         </div>
 
     </div>
@@ -38,7 +38,7 @@
 
         <!-- // Phone number id -->
         <div class="field-box">
-            <label class="title-label">Phone number id</label>
+            <label class="title-label">{{'CDSCanvas.PhoneNumberId' | translate }}</label>
             <cds-textarea id="phone-number-id"  
                 [emojiPikerBtn]="false" 
                 [textLimitBtn]="false" 
@@ -53,7 +53,7 @@
 
         <!-- // Select template -->
         <div class="field-box">
-            <label class="title-label">Choose a template</label>
+            <label class="title-label">{{'CDSCanvas.ChooseTemplate' | translate }}</label>
             <cds-select id="template-select" 
                 [items]="templates_list" 
                 [bindLabelSelect]="'name'"
@@ -69,7 +69,7 @@
 
     <div *ngIf="showLoader" class="loader-container">
         <div id="opt-train-wrp">
-            <label>Loading templates</label>
+            <label>{{'CDSCanvas.LoadingTemplates' | translate }}</label>
             <div class="lds-spinner">
                 <div></div>
                 <div></div>
@@ -88,9 +88,9 @@
     </div>
 
     <div *ngIf="templates_list.length == 0 && !showLoader" id="select-template-box" class="select-template-box">
-        <p>Oops, looks like there is no template. <a
+        <p>{{'CDSCanvas.NoTemplate' | translate}}<a
                 href="https://www.facebook.com/business/help/2055875911147364?id=2129163877102343"
-                target="_blank">Create one now!</a></p>
+                target="_blank">{{'CDSCanvas.CreateOneNow' | translate}}</a></p>
     </div>
 
     <div *ngIf="selected_template" class="receiver-list">
@@ -136,7 +136,7 @@
                         add
                     </span>
                 </button>
-                <div class="add-btn-text" (click)="addReceiver()"> Add receiver </div>
+                <div class="add-btn-text" (click)="addReceiver()">{{'CDSCanvas.AddReceiver' | translate }}</div>
             </div>
         </div>
 

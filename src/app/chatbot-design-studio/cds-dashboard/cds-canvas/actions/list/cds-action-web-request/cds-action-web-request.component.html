@@ -11,7 +11,7 @@
         {{action.url}}
     </div>
     <div *ngIf="!action.url" class="action-row-right empty">
-        Enter request URL
+       {{' CDSCanvas.EnterRequestURL' | translate}}
     </div>
 
 
@@ -37,7 +37,7 @@
             [textLimitBtn]="false"
             [emojiPikerBtn]="false"
             [setAttributeBtn]="true"
-            [placeholder]="'Enter request URL'"
+            [placeholder]="'CDSCanvas.EnterRequestURL' | translate"
             (changeTextarea)="onChangeTextarea($event, 'url')">
         </cds-textarea>
     </div>
@@ -88,7 +88,7 @@
 
     <div class="text-editor-wrapper">
         <div class="field-box">
-            <label class="title-label">Assign to:</label>
+            <label class="title-label">{{'CDSCanvas.AssignTo' | translate }}:</label>
             <cds-attributes
                 class="cds-attributes"
                 [attributes]="assignments"

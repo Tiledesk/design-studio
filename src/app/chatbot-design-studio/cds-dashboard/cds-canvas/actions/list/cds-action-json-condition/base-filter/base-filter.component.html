@@ -15,7 +15,7 @@
                 </div>
                 <div class="filter-text no-ellips">
                     <b>{{group?.operand1}}</b> 
-                    {{OPERATORS_LIST[group?.operator].name}}
+                    {{OPERATORS_LIST[group?.operator].name | translate }}
                     <b *ngIf="group?.operand2.type === 'const'">{{group?.operand2?.value}}</b>
                     <b *ngIf="group?.operand2.type === 'var'">{{group?.operand2?.name}}</b>
                 </div>                    
@@ -39,7 +39,7 @@
             [satPopoverAnchor]="addConditionFilter" 
             (click)="addConditionFilter.toggle()">
             <span class="material-icons">add</span>
-            Add new condition
+            {{'CDSCanvas.AddNewCondition' | translate }}
         </div>
     </div>
     

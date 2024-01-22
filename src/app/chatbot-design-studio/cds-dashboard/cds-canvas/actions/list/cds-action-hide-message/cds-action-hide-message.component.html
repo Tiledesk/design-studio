@@ -12,7 +12,7 @@
             {{action?.text}}
         </div>
         <div *ngIf="!action?.text" class="action-row-right empty">
-            Set the hidden message
+            {{'CDSCanvas.SetHiddenMessage' | translate }}
         </div>
     </div>
 </div>
@@ -20,7 +20,7 @@
 <div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
 
     <div class="field-box">
-        <label class="title-label">Hidden message:</label>
+        <label class="title-label">{{'CDSCanvas.HiddenMessage' | translate }}:</label>
         <cds-textarea 
             class="text-editable-div" 
             [text]="action?.text" 
