@@ -75,7 +75,7 @@ export class CDSTextareaComponent implements OnInit {
     }else if(!this.readonly){
       this.control.enable();
     }
-    this.initialize();
+    // this.initialize();
     
   }
 
