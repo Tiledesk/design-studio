@@ -11,6 +11,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { AppConfigService } from 'src/app/services/app-config';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 
 
 @Component({
@@ -50,7 +51,8 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     private connectorService: ConnectorService,
     private dashboardService: DashboardService,
     private projectPlanUtils: ProjectPlanUtils,
-    private appConfigService: AppConfigService
+    private appConfigService: AppConfigService,
+    private tiledeskAuthService: TiledeskAuthService
   ) { }
 
   ngOnInit(): void {
@@ -194,6 +196,32 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   goToPricing() {
     let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/pricing'
     window.open(dashbordBaseUrl, '_blank')
+  }
+
+  goToContactSales(){
+    let user = this.tiledeskAuthService.getCurrentUser();
+    window.open(`mailto:sales@tiledesk.com?subject=Upgrade to Tiledesk ${this.canShowActionByPlan.plan}`);
+    try {
+      window['analytics'].page('CDS Contact sales', {
+        action: this.elementSelected
+      });
+    } catch (err) {
+      this.logger.error('Pricing page error', err);
+    }
+
+    try {
+      window['analytics'].track(`Contact us to upgrade plan to ${this.canShowActionByPlan.plan}`, {
+        "email": user.email,
+        "action": this.elementSelected
+      }, {
+        "context": {
+          "groupId": this.dashboardService.projectID
+        }
+      });
+    } catch (err) {
+      this.logger.error('track contact us to upgrade plan error', err);
+    }
+    
   }
 
  /**

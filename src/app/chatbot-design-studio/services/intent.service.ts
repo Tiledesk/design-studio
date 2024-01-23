@@ -908,7 +908,7 @@ export class IntentService {
   
 
   public patchButtons(buttons, idAction){
-    console.log('patchButtons:: ', buttons);
+    // console.log('patchButtons:: ', buttons);
     buttons.forEach((button, index) => {
       const checkUid = buttons.filter(btn => btn.uid === button.uid);
       if (checkUid.length > 1 || !button.uid && button.uid == undefined) {
