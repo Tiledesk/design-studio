@@ -5,6 +5,8 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.11 in PROD
+
 ### 1.0.11-rc.4
 - added: cds-action-replace-bot-v2 with 'execute block' option
 - added: translation keys into cds-action components
