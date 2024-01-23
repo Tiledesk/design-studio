@@ -16,19 +16,19 @@ export function getWidgetWebInstallationScript(projectID: string, widgetBaseUrl:
         "       fjs.parentNode.insertBefore(js, fjs);\n"+
         "  }(document,'script','tiledesk-jssdk'));\n"+
         "&lt;/script&gt;",
-        javascript:`<script type="text/javascript">`+
-        "  window.tiledeskSettings = {" +
-        `        projectid: "${projectID}"`+
-        "  };"+
-        "  (function(d, s, id) {"+
-        "       var w=window; var d=document; var i=function(){i.c(arguments);};"+
-        "       i.q=[]; i.c=function(args){i.q.push(args);}; w.Tiledesk=i;"+     
-        "       var js, fjs=d.getElementsByTagName(s)[0];"+
-        "       if (d.getElementById(id)) return;"+
-        "       js=d.createElement(s);"+
-        `       js.id=id; js.async=true; js.src="${widgetBaseUrl}launch.js";`+
-        "       fjs.parentNode.insertBefore(js, fjs);"+
-        "  }(document,'script','tiledesk-jssdk'));"+
+        javascript:`<script type="text/javascript">`+ '\n' +
+        "  window.tiledeskSettings = {" + '\n' +
+        `        projectid: "${projectID}"`+ '\n' +
+        "  };"+ '\n' +
+        "  (function(d, s, id) {"+ '\n' +
+        "       var w=window; var d=document; var i=function(){i.c(arguments);};"+ '\n' +
+        "       i.q=[]; i.c=function(args){i.q.push(args);}; w.Tiledesk=i;"+ '\n' +    
+        "       var js, fjs=d.getElementsByTagName(s)[0];"+ '\n' +
+        "       if (d.getElementById(id)) return;"+ '\n' +
+        "       js=d.createElement(s);"+ '\n' +
+        `       js.id=id; js.async=true; js.src="${widgetBaseUrl}launch.js";`+ '\n' +
+        "       fjs.parentNode.insertBefore(js, fjs);"+ '\n' +
+        "  }(document,'script','tiledesk-jssdk'));"+ '\n' +
         "</script>"
 
          //<span class="">d, s, id</span>
