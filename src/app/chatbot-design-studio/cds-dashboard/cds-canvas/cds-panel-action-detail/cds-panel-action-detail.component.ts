@@ -116,15 +116,24 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
       // recupero id dalla action e verifico se ho modificato l'intent della action aperta
       // se si aggiorno la action
-      if (intent && intent.intent_id === this.intentSelected.intent_id) {
-          // this.idSelectedIntent = intent.intent_id;
-          let newAction = intent.actions.find((obj) => obj._tdActionId === this.elementSelected._tdActionId);
-          this.elementSelected = newAction;
-          this.logger.log('[PANEL-INTENT-DETAIL] --- AGGIORNO ACTION', intent, this.elementSelected._tdActionId);
-      } else {
-        this.logger.log('[PANEL-INTENT-DETAIL] --- CHIUDO');
-        this.closePanel.emit();
-      }
+      try{
+        if (intent && intent.intent_id === this.intentSelected.intent_id) {
+            // this.idSelectedIntent = intent.intent_id;
+            if(this.elementIntentSelected.type === TYPE_INTENT_ELEMENT.ACTION){
+              let newAction = intent.actions.find((obj) => obj._tdActionId === this.elementSelected._tdActionId);
+              this.elementSelected = newAction;
+            }else {
+              this.elementIntentSelectedType = this.elementIntentSelected.type;
+              this.elementSelected = this.elementIntentSelected.element
+            }
+            this.logger.log('[PANEL-INTENT-DETAIL] --- AGGIORNO ACTION', intent, this.elementSelected._tdActionId);
+        } else {
+          this.logger.log('[PANEL-INTENT-DETAIL] --- CHIUDO');
+          this.closePanel.emit();
+        }
+      }catch(error){
+        console.log('errorrrrrr', error, this.elementIntentSelected)
+      } 
     });
   }
 
