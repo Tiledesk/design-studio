@@ -48,6 +48,9 @@
         <cds-rules *ngIf="activeSidebarSection == SIDEBAR_PAGES.RULES && initFinished" 
             [selectedChatbot]="selectedChatbot">
         </cds-rules>
+
+        <cds-support *ngIf="activeSidebarSection == SIDEBAR_PAGES.SUPPORT && initFinished">
+        </cds-support>
         
     </div>
     

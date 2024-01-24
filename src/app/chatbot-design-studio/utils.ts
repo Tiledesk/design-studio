@@ -16,7 +16,8 @@ export enum SIDEBAR_PAGES {
     SETTINGS = 'cds-sb-settings',
     // FULFILLMENT = 'cds-sb-fulfillment',
     RULES = 'cds-sb-rules',
-    GLOBALS = 'cds-sb-globals'
+    GLOBALS = 'cds-sb-globals',
+    SUPPORT = 'cds-sb-support'
 }
 
 export enum SETTINGS_SECTION {
