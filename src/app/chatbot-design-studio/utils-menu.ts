@@ -12,7 +12,8 @@ export const INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, 
     { key: 'FEEDBACK', label: 'Feedback', icon: 'lightbulb', type: TYPE_URL.BLANK, src: 'https://feedback.tiledesk.com/feedback'},
     { key: 'SUPPORT', label: 'support@tiledesk.com', icon: 'email', type: TYPE_URL.SELF, src: 'mailto:support@tiledesk.com'},
     { key: 'CHANGELOG',  label: 'Changelog', icon: 'local_fire_department', type: TYPE_URL.BLANK, src:'https://feedback.tiledesk.com/changelog'},
-    { key: 'GITHUB', label: 'GitHubRepo', icon: 'assets/images/github-mark.svg', type: TYPE_URL.BLANK, src: 'https://github.com/Tiledesk'}
+    { key: 'GITHUB', label: 'GitHubRepo', icon: 'assets/images/github-mark.svg', type: TYPE_URL.BLANK, src: 'https://github.com/Tiledesk'},
+    { key: 'DISCORD', label: 'Discord', icon: 'assets/images/discord.svg', type: TYPE_URL.BLANK, src: 'https://discord.gg/mcuCmKKn'}
 ]
 
 export const SHARE_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}> = [

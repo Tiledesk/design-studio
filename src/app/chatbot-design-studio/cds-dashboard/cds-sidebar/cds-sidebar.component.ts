@@ -93,6 +93,7 @@ export class CdsSidebarComponent implements OnInit {
       case 'FEEDBACK':
       case 'CHANGELOG':
       case 'GITHUB':
+      case 'DISCORD':
         window.open(item.src, '_blank')
         break;
       case 'SUPPORT':
