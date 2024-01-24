@@ -5,6 +5,15 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.12-rc.1
+- added: discord channel menu option on support bottom sidebar icon
+- added: style.scss, material-dashboard.scss and action-styl.scss as lazy load style
+- changed: show changelog only if minor version is changed 
+- bug-fixed: missing translations
+- bug-fixed: cds-textarea not updated
+- bug-fixed: widget installation code is not formatted while click on copy in Publish modal
+- bug-fixed: cannot read property of undefined reading _tdActionId with forms 
+
 ### 1.0.11 in PROD
 
 ### 1.0.11-rc.4
