@@ -80,7 +80,11 @@ export class CdsDashboardComponent implements OnInit {
   checkForChangelogNotify(): boolean{
     let changelogKey = this.appStorageService.getItem("changelog")
     if(!changelogKey || changelogKey !== environment.VERSION){
-      return true
+      let stored_minor_version = changelogKey.split('.')[2]
+      let local_minor_version = environment.VERSION.split('.')[2]
+      if(stored_minor_version === local_minor_version){
+        return false
+      }
     }
     return false
   }
