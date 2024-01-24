@@ -135,9 +135,9 @@ cds-fulfillment {
 }
 
 .toggle-setting-sidebar-icon {
-  background: $blu;
+  background: var(--blu);
   color: #fff;
-  border: 1px solid $blu !important;
+  border: 1px solid var(--blu) !important;
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -148,7 +148,7 @@ cds-fulfillment {
 
 .toggle-setting-sidebar-icon:hover {
     background: #f5f8fa;
-    color:  $blu;
+    color:  var(--blu);
 }
 
 
@@ -157,8 +157,8 @@ cds-fulfillment {
     width: $box-left-width;
     max-width: $box-left-width;
     min-width: $box-left-width;
-    background-color: $blu-light-01;
-    border-right: 1px solid $gray-light-02;
+    background-color: var(--blu-light-01);
+    border-right: 1px solid var(--gray-light-02);
     z-index: 10;
     position: relative;
     .panel-intent-list {

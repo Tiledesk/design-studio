@@ -1,8 +1,6 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 h4 {
     font-size: 16px;
-    color: $blu;
+    color: var(--blu);
 }
 
 
@@ -22,7 +20,7 @@ h4 {
 .cds-input-group {
     margin-bottom: 8px;
     flex-wrap: nowrap;
-    border: 1px solid $gray-light-02;
+    border: 1px solid var(--gray-light-02);
     border-radius: 4px;
 }
 
@@ -30,7 +28,7 @@ h4 {
 //     border: none;
 //     height: 47px;
 //     width: 100%;
-//     color: $blu;
+//     color: var(--blu);
 //     // border-top-right-radius: 4px;
 //     // border-bottom-right-radius: 4px;
 // }
@@ -40,7 +38,7 @@ h4 {
     // height: 47px;
     width: 100%;
     font-weight: 400;
-    color: $blu;
+    color: var(--blu);
     font-size: 12px;
     padding: 4px 0px;
 }
@@ -56,7 +54,7 @@ h4 {
 }
 
 .cds-group-addon-question-right {
-    background: $blu;
+    background: var(--blu);
     // height: 47px;
     border-radius: 0;
     // padding-left: 6px;

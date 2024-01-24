@@ -1,18 +1,9 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
-
-cds-textarea.subject-text-area ::ng-deep  {
-    textarea {
-        resize: none !important;
-    }
-}
-
+cds-textarea.subject-text-area ::ng-deep,
 cds-textarea.to-text-area ::ng-deep  {
     textarea {
         resize: none !important;
     }
 }
-
 
 ::ng-deep .set-attributes-panel {
     display: flex;
@@ -25,83 +16,4 @@ cds-textarea.to-text-area ::ng-deep  {
     background: rgb(255, 255, 255);
     border-radius: 4px;
     padding: 15px 0;
-}
-
-.select-category-row {
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    cursor: pointer;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    height: 32px;
-    padding: 0 15px;
-    -webkit-transition: background-color 0.2s, opacity 0.2s;
-    transition: background-color 0.2s, opacity 0.2s;
-}
-
-.select-category-row-name {
-    color: #22272d;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 20px;
-    margin-right: 20px;
-}
-
-[contenteditable] {
-    border: 1px solid #000;
-    margin: 10.5px;
-    line-height: 25px;
-    -webkit-appearance: textfield;
-    appearance: textfield;
-    background: #fff;
-    padding: 5px;
-    border-radius: 8px;
-    min-height: 37px;
-    width: calc(100% - 168px);
-}
-.single-attribute-style {
-    background: #ffdc66;
-    cursor: pointer;
-    -webkit-transition: all 0.3s;
-    transition: all 0.3s;
-    border-radius: 10px;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-    display: inline;
-    padding: 0 5px;
-}
-
-.set--attribrutes-panel {
-    min-width: 150px;
-    background: #fff;
-    padding: 6px;
-    position: absolute;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    // gap: 5px;
-    // top: -68px;
-    box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;
-    right: 0;
-    // top: -110px;
-    z-index: 1050;
-}
-
-#set--attribrute {
-    background: #fff;
-    text-align: left;
-    padding: 6px;
-    border: unset;
-    -webkit-transition: background-color 0.2s, opacity 0.2s;
-    transition: background-color 0.2s, opacity 0.2s;
-    font-weight: 400;
-}
-#set--attribrute:hover {
-    background: #006cff;
-}
-
-#set--attribrute:hover {
-    background-color: #f0f4f7;
 }

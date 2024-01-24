@@ -2,10 +2,10 @@
 
 
 :host{
-    --icon-color: #{$blu};
-    --textColor: #{$blu};
-    --backGroundColor: #{$blu-light-04};
-    --hoverBackgroundColor: #{$blu-light-03};
+    --icon-color: #{var(--blu)};
+    --textColor: #{var(--blu)};
+    --backGroundColor: #{var(--blu-light-04)};
+    --hoverBackgroundColor: #{var(--blu-light-03)};
 
     --content-background: rgb(244, 246, 251, 0.4);
     --border-radius-base: 8px
@@ -69,7 +69,7 @@
         }
     }
     .control-button:hover {
-        color: $blu-light-02;
+        color: var(--blu-light-02);
         &.delete{
             em {
                 color: var(--color-red-hex);
@@ -91,14 +91,14 @@ loading-spinner.custom-spinner ::ng-deep {
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: $blu ;
+        background-color: var(--blu) ;
     }
 }
 
 .parameters-container {
     //margin-top: 16px;
     background-color: var(--content-background);
-    border: 1px solid $gray-light-02;
+    border: 1px solid var(--gray-light-02);
     border-radius: 4px;
     padding: 6px;
     //border: 2px solid transparent;
@@ -156,10 +156,10 @@ loading-spinner.custom-spinner ::ng-deep {
     input {
         width: 100%;
         height: 36px;
-        border-radius: 8px;
+        border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
-        border: 1px solid $blu-light-02 !important;
-        color: $gray;
+        border: 1px solid var(--blu-light-02) !important;
+        color: var(--gray);
         padding: 4px 8px;
         font-size: 14px;
     }
@@ -311,8 +311,8 @@ button.icon-only {
     width: 40px;
     margin-left: 4px;
     border-radius: 8px;
-    background: $blu-light-02;
-    border: 1px solid $blu-light-02 !important;
+    background: var(--blu-light-02);
+    border: 1px solid var(--blu-light-02) !important;
     color: var(--color-white-hex);
 
     display: flex;

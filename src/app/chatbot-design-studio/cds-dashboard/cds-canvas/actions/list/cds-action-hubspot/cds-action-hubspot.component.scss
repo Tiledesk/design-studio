@@ -4,9 +4,9 @@
     width: 0px;
 }
 :host {
-    --background-color: #{$blu-light-01};
-    //--slider-background-color: #{$blu-light-03};
-    --text-color: #{$blu};
+    --background-color: var(--blu-light-01);
+    //--slider-background-color: #{var(--blu-light-03)};
+    --text-color: #{var(--blu)};
 }
 
 
@@ -176,78 +176,11 @@
 }
 
 .material-icons {
-    color: #ecb606b0;
+    color: var(--icon-color);
     font-size: 18px;
 }
 
-cds-select#method ::ng-deep{
-    // padding: 6px 0;
-    min-width:120px;
-    .ng-select-container{
-        height: 37px;
-        border-radius: 8px 0px 0px 8px;
-    }
-}
 
-// cds-textarea#assignTo ::ng-deep {
-//     display: flex;
-//     textarea {
-//         border: 1px solid rgb(118, 118, 118) !important;
-//         resize: none !important; 
-//         padding: 8px 20px !important;
-//         height: 25px !important;
-//         min-height: 25px !important;
-//     }
-// }
-
-cds-textarea#url ::ng-deep {
-    display: flex;
-    width: 100%;
-    // padding: 6px 0px 0px 0;
-    textarea {
-        border-radius: 0px 8px 8px 0px;
-        resize: none !important; 
-        padding: 6px 16px !important;
-
-        height: 23px !important;
-        min-height: 23px !important;
-    }
-}
-
-cds-textarea#body.jsonError ::ng-deep {
-    textarea {
-        border: 1px solid red !important;
-    }
-}
-
-/** button TOOGLE */
-mat-button-toggle-group ::ng-deep{
-    border: unset;
-    border-radius: 0px;
-}
-
-mat-button-toggle{
-    background-color: transparent;
-    border: none;
-    color: $blu-light-02;
-    border-bottom: 2px solid transparent;
-
-    &.mat-button-toggle-checked{
-        border-color: $blu;
-        color: $blu;
-        font-weight: 400;
-
-    }
-    
-    &.mat-button-toggle+mat-button-toggle.mat-button-toggle{
-        border-left: none;
-    }
-
-    &::ng-deep .mat-button-toggle-label-content {
-        line-height: 36px;
-    }
-
-}
 
 .custom-expansion-panel {
     background-color: transparent;

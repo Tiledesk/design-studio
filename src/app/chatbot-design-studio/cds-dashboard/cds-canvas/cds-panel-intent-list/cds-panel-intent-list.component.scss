@@ -2,12 +2,12 @@
 
 
 :host{
-    --text-color: #{$gray};
-    --text-color-hover: #{$blu};
-    --background-color-hover: #{$blu};
-    --text-color-active: #{$blu};
+    --text-color: #{var(--gray)};
+    --text-color-hover: #{var(--blu)};
+    --background-color-hover: #{var(--blu)};
+    --text-color-active: #{var(--blu)};
     --background-color-active: var(--icon-active-background);
-    --icon-color-active: #{$blu};
+    --icon-color-active: #{var(--blu)};
 }
 
 .content {
@@ -227,7 +227,7 @@
 }
 
 .intent:hover {
-    // background-color: $blu;
+    // background-color: var(--blu);
     box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
     opacity: 1;
     .delete-box {
@@ -267,7 +267,7 @@
     .list-alt-icon,
     .bolt-icon,
     .action-counter{
-        color: $gray-light-01;
+        color: var(--gray-light-01);
     }
 
 }

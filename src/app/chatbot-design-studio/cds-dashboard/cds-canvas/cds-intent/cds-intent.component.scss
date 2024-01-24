@@ -12,10 +12,10 @@
   --base-padding-preview: #{$padding-base-preview};
   --action-selected-color: #{$action-color-selected};
 
-  --base-color: #{$blu};
+  --base-color: #{var(--blu)};
   --startIntentMaxWith: 160px;
 
-  --base-border-radius-base: #{$button-border-radius-base};
+  --base-border-radius-base: #{var(--button-border-radius-base)};
 }
 
 

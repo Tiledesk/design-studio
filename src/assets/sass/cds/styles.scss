@@ -74,7 +74,7 @@ button.close{
 /* Bottom Underline of the titles of the sections */
 .card_title__underlined {
     text-transform: none;
-    color: $blu;
+    color: var(--blu);
     margin-bottom: 0px;
     height: 40px !important;
     position: relative;
@@ -90,8 +90,8 @@ button.close{
     top: 0;
     left: 0;
     bottom: -1px;
-    border-bottom: 2px solid $blu;
-    color: $blu;
+    border-bottom: 2px solid var(--blu);
+    color: var(--blu);
     z-index: 1;
 }
 
@@ -107,10 +107,10 @@ button.close{
 .content-panel-global-detail {
     padding: 20px 30px 30px;
     position: absolute;
-    top: $haeder-panel-action-detail-height;
+    top: var(--header-panel-action-detail-height);
     right: 0;
     left: 0;
-    bottom: $footer-panel-action-detail-height;
+    bottom: var(--footer-panel-action-detail-height);
     // overflow: auto; // nk
     // max-height: calc(100vh - 200px); // nk
 }
@@ -119,18 +119,18 @@ button.close{
 }
 
 .title-label{
-    color: $blu;
+    color: var(--blu);
     font-size: 14px;
 }
 .subtitle-label{
-    color: $blu;
+    color: var(--blu);
     font-size: 11px;
     font-style: italic;
 }
 .condition-text {
     font-size: 14px;
     font-weight: 600;
-    color: $blu;
+    color: var(--blu);
 }
 .condition-container {
     display: flex;
@@ -179,63 +179,7 @@ emoji-mart {
     }
 }
 
-/** ACTION PREVIEW: start **/
-.cds-action-preview {
-    /* padding: 3px 16px 16px; */
-    padding: 5px 10px;;
-    margin: 0px;;
-    position: relative;
-    .title-preview-label{
-        color: #6c6859;
-        font-size: 12px; 
-        margin: 0px;
-    }
-    .icon-action img{
-        height: 16px;
-        filter: brightness(0) saturate(100%) invert(42%) sepia(2%) saturate(2720%) hue-rotate(9deg) brightness(91%) contrast(81%);
-    }
-}
-.action-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-direction: row;
-}
-.action-row-left {
-    height: 20px;
-    width: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.action-row-right {
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--brown-85);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.action-row-right.empty,
-.set-attribute-value.empty {
-    background: none !important;
-    color: $empty-element-property !important;
-    font-size: 12px !important;
-    padding: unset !important;
-}
-.action-row .action-row-left svg {
-    fill: var(--brown-85);
-}
-.previewContent{
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 5px;
-    // padding: 3px 0px;
-}
-/** ACTION PREVIEW: end **/
+
 
 .web-request-action-method {
     font-weight: 500;
@@ -321,21 +265,21 @@ emoji-mart {
 /** CONNECTOR TRUE/FALSE: start **/
 cds-connector.connector-true {
     .point-connector-empty{
-        border-color: $success-connector;
-        background: $success-connector;
+        border-color:  var(--success-connector);
+        background:  var(--success-connector);
     }
     .point-connector{
-        background: $success-connector;
+        background:  var(--success-connector);
     }
 }
 
 cds-connector.connector-false {
     .point-connector-empty{
-      border-color: $failure-connector;
-      background: $failure-connector;
+      border-color: var(--failure-connector);
+      background: var(--failure-connector);
     }
     .point-connector{
-      background: $failure-connector;
+      background: var(--failure-connector);
     }
 }
 
@@ -408,7 +352,7 @@ color: white;
 
 .preview-divider {
     margin: 5px 0px;
-    border-top: 2px solid rgba( $blu , 0.3);
+    border-top: 2px solid rgba( var(--blu) , 0.3);
 }
 
 // TOOLTIP DESCRIPTION INFO ICON : start
@@ -449,8 +393,8 @@ color: white;
 
 // ::ng-deep
 ::ng-deep .cds-mat-tooltip {
-    background-color: $gray-light-01 !important;
-    color: $gray !important;
+    background-color: var(--gray-light-01) !important;
+    color: var(--gray) !important;
     font-size: 12px !important;
     font-family: var(--font-family-poppins);
     border-radius: 16px !important;
@@ -463,7 +407,7 @@ color: white;
 }
   
 .btn.btn-primary.cds-blue-button {
-    background: $blu-02;
+    background: var(--blu-02);
     color: white;
     box-shadow: none;
     font-weight: 500;
@@ -472,10 +416,10 @@ color: white;
     font-size: 14px;
     padding: 6px 12px;
     margin: 0;
-    border-radius: $btn-border-radius;
+    border-radius: var(--button-border-radius-base);
     &:hover {
         opacity: 0.8;
-    //   background: rgba($blu-02, 0.8);
+    //   background: rgba(var(--blu-02), 0.8);
     }
 }
 
@@ -486,7 +430,7 @@ appdashboard-cds-dashboard a {
 .cds-title{
     font-size: 18px;
     position: relative;
-    color: $blu;
+    color: var(--blu);
     font-weight: 600;
 }
 
@@ -497,10 +441,10 @@ appdashboard-cds-dashboard a {
     // left: 0;
     // right: 0;
     z-index: 2;
-    height: $footer-panel-action-detail-height;
+    height: var(--footer-panel-action-detail-height);
     margin: auto 0;
     padding: 7px 20px;
-    border-top: 1px solid $gray-light-02;
+    border-top: 1px solid var(--gray-light-02);
 }
 
 img.active-icon {

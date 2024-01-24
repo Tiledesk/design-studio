@@ -1,7 +1,7 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-$background-color: $blu-light-01;
-$text-color: $blu;
+$background-color: var(--blu-light-01);
+$text-color: var(--blu);
 
 .delay {
     align-items: center;

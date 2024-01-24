@@ -2,9 +2,9 @@
 
 
 :host {
-    --background-color: #{$blu-light-01};
-    --slider-background-color: #{$blu-light-03};
-    --text-color: #{$blu};
+    --background-color: #{var(--blu-light-01)};
+    --slider-background-color: #{var(--blu-light-03)};
+    --text-color: #{var(--blu)};
 }
 
 ::-webkit-scrollbar {
@@ -15,7 +15,7 @@
     margin-top: 40px;
     margin-bottom: 20px;
     border: 0;
-    border-top: 1px solid $blu;
+    border-top: 1px solid var(--blu);
 }
 
 
@@ -277,12 +277,12 @@ mat-expansion-panel ::ng-deep {
     max-height: 37px;
     overflow: hidden;
     transition: max-height 0.5s ease-out;
-    border-radius: 8px;
-    background-color: white;
+    border-radius: var(--input-border-radius-base);
+    background-color: var(--color-white-hex);
     padding: 6px 12px;
     font-size: 14px;
-    border: 1px solid $blu-light-02;
-    color: $gray;
+    border: 1px solid var(--blu-light-02);
+    color: var(--gray);
 }
 
 .preview-container-extended {
@@ -295,14 +295,6 @@ mat-expansion-panel ::ng-deep {
     align-items: center;
 }
 
-.generating-placeholder {
-    background-color: white;
-    display: flex;
-    padding: 6px 12px;
-    font-size: 14px;
-    border-radius: 8px;
-}
-
 loading-spinner.custom-spinner ::ng-deep {
     .sk-fading-circle {
         width: 20px ;
@@ -311,7 +303,7 @@ loading-spinner.custom-spinner ::ng-deep {
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: $blu ;
+        background-color: var(--blu) ;
     }
 }
 

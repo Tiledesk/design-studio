@@ -1,8 +1,8 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 :host{
-    --selectedColor: #{$blu};
-    --text-color : #{$blu-light-02};
+    --selectedColor: #{var(--blu)};
+    --text-color : #{var(--blu-light-02)};
 }
 
 .section{

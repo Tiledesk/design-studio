@@ -2,13 +2,13 @@
 @import "./src/assets/sass/cds/styles.scss";
 
 cds-header {
-  height: $header-height;
+  height: var(--header-height);
   font-family: var(--font-family-poppins);
-  line-height: $header-height;
+  line-height: var(--header-height);
   font-size: 21px;
-  color: $blu;
+  color: var(--blu);
   background: white;
-  border-bottom: 1px solid $gray-light-02;
+  border-bottom: 1px solid var(--gray-light-02);
   display: flex;
 }
 
@@ -18,11 +18,11 @@ cds-header {
   margin-top: 0px;
   padding: 0px;
   width: 100%;
-  height: calc(100vh - $header-height);
+  height: calc(100vh - var(--header-height));
   overflow-x: hidden;
   overflow-y: hidden;
   font-family: var(--font-family-poppins);
-  color: $blu;
+  color: var(--blu);
   font-size: 16px;
 }
 
@@ -51,18 +51,18 @@ cds-globals {
 }
 
 cds-sidebar {
-  background-color: $blu-light-04;
-  border-right: 1px solid $gray-light-02;
-  width: $sidebar-base-width;
+  background-color: var(--blu-light-04);
+  border-right: 1px solid var(--gray-light-02);
+  width: var(--sidebar-base-width);
   transition: 0.3s;
   display: flex;
-  min-width: $sidebar-base-width;
+  min-width: var(--sidebar-base-width);
   overflow-y: hidden;
 }
 
 .cds-content {
   display: flex;
-  width: calc(100% - $sidebar-base-width);
+  width: calc(100% - var(--sidebar-base-width));
   overflow: hidden;
 }
 
@@ -93,7 +93,7 @@ cds-sidebar {
   // margin-right: auto;
   width: 100px;
   height: 100px;
-  border: 3px solid $tiledesk-base-color;
+  border: 3px solid  var(--tiledesk-base-color);
   border-radius: 50%;
 
   animation: spin 7s ease-in-out;

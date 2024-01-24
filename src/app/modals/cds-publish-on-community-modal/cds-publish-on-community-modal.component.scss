@@ -71,7 +71,7 @@ input[type="file"] {
     padding: 3px 15px;
     margin-top: 19px;
     color: #fff;
-    background: #f44336!important;
+    background: var(--color-red-hex)!important;
     box-shadow: none!important;
     font-weight: 500!important;
     font-family: var(--font-family-poppins) !important;
@@ -146,11 +146,11 @@ input[type="file"] {
 /* ------------------------------------ */
 
 #cds-navigation-btn {
-    border: 1px solid $blu-05;
+    border: 1px solid var(--blu-05);
     display: inline-block;
     padding: 11px 12px;
     cursor: pointer;
-    background: $blu-05 !important;
+    background: var(--blu-05) !important;
     color: #000;
     border-radius: 4px;
     font-weight: 500;

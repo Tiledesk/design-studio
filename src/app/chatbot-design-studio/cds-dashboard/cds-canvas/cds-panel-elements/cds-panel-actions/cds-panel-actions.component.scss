@@ -1,10 +1,10 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 
-$text-color: $blu;
-$icon-color: $gray-light-01;
-$text-hover-color: $blu;
-$icon-hover-color: $blu;
+$text-color: var(--blu);
+$icon-color: var(--gray-light-01);
+$text-hover-color: var(--blu);
+$icon-hover-color: var(--blu);
 $base-padding: 6px;
 
 #panel_actions_div{
@@ -185,7 +185,7 @@ $base-padding: 6px;
 }
 
 .cdk-drag-disabled{
-    background: $gray-02;
+    background: var(--gray-02);
     .actions-btns-wpr,
     .actions-btns-wpr:hover{
         cursor: not-allowed;
