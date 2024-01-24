@@ -208,10 +208,11 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 
 import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
 import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
-import { NetworkOfflineComponent } from '../modals/network-offline/network-offline.component';
 import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
 import { ChangelogComponent } from '../modals/changelog/changelog.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
+import { MaterialModule } from '../shared/material.module';
+import { CdsSupportComponent } from './cds-support/cds-support.component';
 
 @NgModule({
   declarations: [
@@ -368,7 +369,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
     CdsModalActivateBotComponent,
     CdsPublishOnCommunityModalComponent,
     ChangeBotLangModalComponent,
-    NetworkOfflineComponent,
+    // NetworkOfflineComponent,
     MouseTipsComponent,
     ChangelogComponent,
     
@@ -379,42 +380,44 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
     CdsPanelConnectorMenuComponent,
     
     GetVariableNamePipe,
+         CdsSupportComponent,
 
   ],
   imports: [
     BrowserAnimationsModule,
-    A11yModule,
     CommonModule,
-    DragDropModule,
     NgSelectModule,
+    // DragDropModule,
+    // A11yModule,
     PickerModule,
-    TextFieldModule,
-    MatSliderModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatTooltipModule,
-    MatRadioModule,
-    MatCheckboxModule,
-    MatChipsModule,
-    MatGridListModule,
-    MatAutocompleteModule,
-    MatSlideToggleModule,
-    MatButtonToggleModule,
-    MatListModule,
-    MatButtonModule,
-    MatIconModule,
-    MatButtonToggleModule,
-    MatDialogModule,
+    // TextFieldModule,
+    // MatSliderModule,
+    // MatSidenavModule,
+    // MatSelectModule,
+    // MatTooltipModule,
+    // MatRadioModule,
+    // MatCheckboxModule,
+    // MatChipsModule,
+    // MatGridListModule,
+    // MatAutocompleteModule,
+    // MatSlideToggleModule,
+    // MatButtonToggleModule,
+    // MatListModule,
+    // MatButtonModule,
+    // MatIconModule,
+    // MatButtonToggleModule,
+    // MatDialogModule,
+    // MatInputModule,
+    // MatExpansionModule,
+    // MatTabsModule,
+    // MatMenuModule,
     RouterModule,
     // TranslateModule,
     FormsModule,
-    MatInputModule,
-    MatExpansionModule,
-    MatTabsModule,
-    MatMenuModule,
     ReactiveFormsModule,
     SatPopoverModule,
-    SharedModule,
+    // SharedModule,
+    MaterialModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

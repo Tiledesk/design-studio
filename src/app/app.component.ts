@@ -15,7 +15,7 @@ import { UsersService } from './services/users.service';
 import { MultichannelService } from './services/multichannel.service';
 import { ScriptService } from 'src/chat21-core/providers/scripts/script.service';
 import { NetworkService } from './services/network.service';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 
