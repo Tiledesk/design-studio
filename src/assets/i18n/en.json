@@ -369,7 +369,14 @@
         "AddButton":"Add button",
         "AddCard":"Add card",
         "TypeTitle":"Type Title",
-        "TypeDescription":"Type Description"
+        "TypeDescription":"Type Description",
+        "EnterEmailRecipient":"Enter email recipient",
+        "EnterEmailSubject":"Enter email subject",
+        "EnterEmailBody":"Enter email body",
+        "To":"To",
+        "Subject":"Subject",
+        "ReplyTo":"Reply to",
+        "EmailBody":"Email body"
     },
     "Name":"Name",
     "Label": "Label",
