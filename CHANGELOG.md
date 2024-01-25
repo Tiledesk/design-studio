@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.12-rc.1 
+- bug-fixed: cannot split of undefined if key doesn't exist 
+
 ### 1.0.11.2 in PROD
 - bug-fixed: cannot split of undefined
 
