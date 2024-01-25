@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.11.2 in PROD
+- bug-fixed: cannot split of undefined
+
 ### 1.0.11.1 in PROD
 - bug-fixed: cannot read property of undefined reading _tdActionId with forms
 
