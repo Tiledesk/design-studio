@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.11.3 in PROD
+- changed: cds-action-delete-attribute now support all variables (userdefined and systemdefined)
+
 ### 1.0.12-rc.1
 - added: ability to group items into cds-select base element
 - changed: show changelog only if minor version is changed
