@@ -23,9 +23,11 @@
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.VariableName' | translate }}:</label>
         <cds-select
-            [items]="variableListUserDefined"
+            [items]="filteredList"
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'"
+            [groupByKey]="'category'"
+            [searchable]="true"
             [itemSelected]="action?.variableName"
             (onSelected)="onChangeSelect($event)">
         </cds-select>
