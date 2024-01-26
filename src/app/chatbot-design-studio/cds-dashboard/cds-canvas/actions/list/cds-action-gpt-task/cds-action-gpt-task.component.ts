@@ -31,7 +31,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   panelOpenState = false;
   models_list = [
-    { name: "GPT-3 (DaVinci)", value: "text-davinci-003" }, 
+    // { name: "GPT-3 (DaVinci)", value: "text-davinci-003" }, 
     { name: "GPT-3.5 Turbo (ChatGPT)", value: "gpt-3.5-turbo" }, 
     { name: "GPT-4 (ChatGPT)", value: "gpt-4" }
   ];
