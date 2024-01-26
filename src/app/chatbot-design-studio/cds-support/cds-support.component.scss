@@ -1,0 +1,21 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+:host {
+    --content-background: rgb(244, 246, 251, 0.4);
+    --base-radius: 8px
+}
+.card-container{
+    display: flex;
+    width: 100%;
+    padding: 40px 0;
+    /* max-width: 1280px; */
+    justify-content: center;
+    align-items: center;
+    gap: $base-element-gap
+}
+
+.cds-card {
+    background: var(--content-background);
+    border-radius: var(--base-radius);
+    box-shadow: rgba(0,0,0,.1) 0px 3px 6px 0px,rgba(0,0,0,.08) 0px 1px 3px 0px; 
+}

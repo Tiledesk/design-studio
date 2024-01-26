@@ -96,7 +96,8 @@ export class CdsSidebarComponent implements OnInit {
         window.open(item.src, '_blank')
         break;
       case 'SUPPORT':
-        window.open(item.src, '_self')
+        this.onClickItemList.emit(SIDEBAR_PAGES.SUPPORT)
+        // window.open(item.src, '_self')
     }
   }
 

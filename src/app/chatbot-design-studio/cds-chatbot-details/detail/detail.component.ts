@@ -262,7 +262,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.logger.log('[CDS-CHATBOT-DTLS] - selectedChatbot', this.selectedChatbot)
     if (this.selectedChatbot._id) {
       let url = this.imageRepoService.getImagePhotoUrl(this.selectedChatbot._id)
-      console.log('urlllll', url)
       this.checkImageExists(url, (existImage)=> {
         existImage? this.selectedChatbot.imageURL = url: null; 
       })

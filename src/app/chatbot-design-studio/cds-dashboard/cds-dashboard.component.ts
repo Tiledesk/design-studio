@@ -173,11 +173,14 @@ export class CdsDashboardComponent implements OnInit {
     this.openaiService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
 
+    this.hideShowWidget('hide')
+
   }
 
   /** hideShowWidget */
   private hideShowWidget(status: "hide" | "show") {
     try {
+      console.log('TILEDEESKKKKKK', window['tiledesk'])
       if (window && window['tiledesk']) {
         this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
         if (status === 'hide') {
@@ -249,7 +252,7 @@ export class CdsDashboardComponent implements OnInit {
   /** SIDEBAR OUTPUT EVENTS */
   onClickItemList(event: SIDEBAR_PAGES) {
     this.logger.log('[CDS DSHBRD] active section-->', event);
-    if(event !== 'cds-sb-intents'){
+    if(event !== SIDEBAR_PAGES.INTENTS){
       // this.connectorService.initializeConnectors();
       // this.eventTestItOutHeader.next(null);
     }
