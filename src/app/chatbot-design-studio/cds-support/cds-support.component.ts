@@ -2,10 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { SUPPORT_OPTIONS } from '../utils-menu';
-
-function getWindow(): any {
-  return window;
-}
+import { TYPE_URL } from '../utils';
 
 @Component({
   selector: 'cds-support',
@@ -14,26 +11,23 @@ function getWindow(): any {
 })
 export class CdsSupportComponent implements OnInit {
 
-  private window;
-  private initialized = false;
-
   SUPPORT_OPTIONS = SUPPORT_OPTIONS
-
+  cardOptions: { [key: string]: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string, description?: string, localIcon?: boolean }>}
   private logger: LoggerService = LoggerInstance.getInstance()
   
   constructor() { }
 
   ngOnInit(): void {
     console.log('[CDS-SUPPORT initttt]')
-    // Object.keys(SUPPORT_OPTIONS).forEach(key => {
-    //   SUPPORT_OPTIONS[key].map((el)=> {
-    //     el.localIcon = false
-    //     if(el.icon && el.icon.match(new RegExp(/(?=.*?assets|http|https\b)^.*$/))){
-    //       el.localIcon =true
-    //     }
-    //   })
-    // })
-    this.window = getWindow();
+    this.cardOptions = SUPPORT_OPTIONS
+    Object.keys(SUPPORT_OPTIONS).forEach(key => {
+      this.cardOptions[key].map((el)=> {
+        el.localIcon = false
+        if(el.icon && el.icon.match(new RegExp(/(?=.*?assets|http|https\b)^.*$/))){
+          el.localIcon =true
+        }
+      })
+    })
     this.hideShowWidget("show")
   }
 
@@ -53,7 +47,7 @@ export class CdsSupportComponent implements OnInit {
   }
 
   ngOnDestroy(){
-    this.window['Tiledesk']('hide')
+    this.hideShowWidget("hide")
   }
 
 }
