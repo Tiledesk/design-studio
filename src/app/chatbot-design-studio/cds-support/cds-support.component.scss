@@ -24,6 +24,11 @@
     }
 }
 
+.title-label{
+    font-size: 23px;
+    font-weight: 600;
+}
+
 .section-icon{
     display: flex;
     align-items: center;
@@ -35,8 +40,11 @@
     align-items: center;
     width: 100%;
     background-color: var(--content-background);
-    border: 1px solid rgb(223, 227, 237);
     border-radius: 8px;
     padding: 10px;
     gap: 20px;
+
+    &:not(:last-child){
+        border-bottom: 1px solid rgb(223, 227, 237);
+    }
 }
