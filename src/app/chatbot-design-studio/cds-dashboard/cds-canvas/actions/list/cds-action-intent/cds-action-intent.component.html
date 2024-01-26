@@ -2,7 +2,7 @@
 
     <div  *ngIf="!isStart && !isLast" class="previewContent">
         <label class="title-label">
-            go to
+            {{'CDSCanvas.GoTo' | translate }}
         </label>
         <cds-connector class="connector"
             [idConnector] = "idConnector"
@@ -39,7 +39,7 @@
     </cds-action-description> -->
 
     <div class="field-box">
-        <label class="title-label">Go to block</label>
+        <label class="title-label">{{'CDSCanvas.GoToBlock' | translate }}</label>
         <cds-select id="text-condition"
             [items]="intents"
             [bindLabelSelect]="'name'"

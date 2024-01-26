@@ -5,9 +5,37 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.11.3 in PROD
+- changed: cds-action-delete-attribute now support all variables (userdefined and systemdefined)
+
+### 1.0.12-rc.1
+- added: ability to group items into cds-select base element
+- changed: show changelog only if minor version is changed
+- changed: cds-action-delete-attribute now support all variables (userdefined and systemdefined)
+
+### 1.0.11.2 in PROD
+- bug-fixed: cannot split of undefined
+
+### 1.0.11.1 in PROD
+- bug-fixed: cannot read property of undefined reading _tdActionId with forms
+
+### 1.0.11 in PROD
+
+### 1.0.11-rc.4
+- added: cds-action-replace-bot-v2 with 'execute block' option
+- added: translation keys into cds-action components
+- bug-fixed: reset operator2 value if condition is 'IsEmpty' or 'isNull' or 'isUndefined'
+- bug-fixed: removed angular warning for readonly textarea deprecated propery with reactive Forms -> now ise control.disabled() or control.enabled()
+- bug-fixed: operand2 textarea not render textTag on init if readOnly is enabled
+- bug-fixed: if condition is changed to 'IsEmpty' or 'isNull' or 'isUndefined' in operand2 cds-action-json-condition textarea not reset correctly
+- removed: cds-action-replace-bot DEPRECATED
+
 ### 1.0.11-rc.3
 - added: isNull and isUndefined operator function for cds-action-json-condition
-- bug-fixed: compera alphabetic project/action plan rather than PLAN_NAME enum 
+- bug-fixed: compare alphabetic project/action plan rather than PLAN_NAME enum 
+- bug-fixed: attribute dialog-container component UI
+- bug-fixed: after deleted attribute from value field in cds-action-json-condition and cds-action-action-condition, restore base form with operator2.type = 'const'
+- bug-fixed: if click on existing condition and then add a new one, the last created condition is not pushed but replaced to che last selected condition
 
 ### 1.0.11-rc.2
 - added: share icon next to chatbot name in header component

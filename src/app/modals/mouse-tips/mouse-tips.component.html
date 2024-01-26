@@ -15,8 +15,8 @@
 
     <div class="content">
         <mat-button-toggle-group [(ngModel)]="optionSelected" (change)="onChangeOption($event)">
-            <mat-button-toggle value="trackpad">Trackpad mode</mat-button-toggle>
-            <mat-button-toggle value="mouse">Mouse mode</mat-button-toggle>
+            <mat-button-toggle value="trackpad">{{ "CDSModalMouseTrackPad.TrackpadMode" | translate }}</mat-button-toggle>
+            <mat-button-toggle value="mouse">{{ "CDSModalMouseTrackPad.MouseMode" | translate }}</mat-button-toggle>
         </mat-button-toggle-group>
 
         <div *ngIf="optionSelected === 'mouse'" class="tips-container">

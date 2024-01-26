@@ -50,13 +50,12 @@ export class CdsPanelElementsComponent implements OnInit {
   onOpenMenu(e, type, category?: string) {
     this.onMouseOverActionMenuSx.emit(true)
     setTimeout(() => {
-      // console.log('[CDS-PANEL-ELEMENTS] onOpenMenu: menu type ', type);
       this.menuType = type;
       this.menuCategory = category;
       //this.menuTrigger.openMenu();
       // let x = e.offsetLeft;
       let y = e.offsetTop;
-      console.log('[CDS-PANEL-ELEMENTS] onMouseOverElement :::: ', y, this.isDraggingMenuElement);
+      // console.log('[CDS-PANEL-ELEMENTS] onMouseOverElement :::: ', y, this.isDraggingMenuElement);
       this.isOpen = true;
       if(this.isDraggingMenuElement == false){
         this.positionMenu = {'x': 85, 'y': y }

@@ -12,7 +12,7 @@
         {{action.url}}
     </div>
     <div *ngIf="!action.url" class="action-row-right empty">
-        Enter request URL
+        {{'CDSCanvas.EnterRequestURL' | translate}}
     </div>
 
     <div class="previewContent">
@@ -21,7 +21,7 @@
             <img src="assets/images/icons/if_condition.svg">
         </div>
 
-        <label class="title-preview-label">Success</label>
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
@@ -33,7 +33,7 @@
     <hr class="preview-divider">
 
     <div class="previewContent">
-       <label class="title-preview-label">else</label>
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
             [idConnection] = "idConnectionFalse"
@@ -64,7 +64,7 @@
             [textLimitBtn]="false"
             [emojiPikerBtn]="false"
             [setAttributeBtn]="true"
-            [placeholder]="'Enter request URL'"
+            [placeholder]="'CDSCanvas.EnterRequestURL' | translate"
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'url')">
         </cds-textarea>
@@ -118,7 +118,7 @@
         </cds-textarea>
 
         <div class="cds-web-request-row-body center" *ngIf="action?.bodyType === 'none'">
-            <span>This request does not have a body</span>
+            <span>{{'CDSCanvas.ThisRequestNoBody' | translate }}</span>
         </div>
 
         <div class="cds-web-request-row-body center json-error-yes" *ngIf="action?.bodyType === 'body' && !jsonIsValid">
@@ -130,7 +130,7 @@
     <hr class="custom-divider">
 
     <div class="field-box">
-        <label class="title-label">Assign result to</label>
+        <label class="title-label">{{'CDSCanvas.AssignResultTo' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -145,7 +145,7 @@
     </div>
 
     <div class="field-box">
-        <label class="title-label">Assign status</label>
+        <label class="title-label">{{'CDSCanvas.AssignStatusTo' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -161,7 +161,7 @@
 
 
     <div class="field-box">
-        <label class="title-label">Assign error</label>
+        <label class="title-label">{{'CDSCanvas.AssignErrorTo' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false"
             [emojiPikerBtn]="false" 
@@ -183,14 +183,14 @@
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
-            <span class="condition-text">Success</span>
+            <span class="condition-text">{{'CDSCanvas.Success' | translate}}</span>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.trueIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate "
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
             (onReset)="onResetBlockSelect($event, 'trueIntent')">
@@ -204,14 +204,14 @@
 
     <div class="field-box">
         <div class="condition-container">
-            <span class="condition-text">Else</span>
+            <span class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</span>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.falseIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate "
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
             (onReset)="onResetBlockSelect($event, 'falseIntent')">

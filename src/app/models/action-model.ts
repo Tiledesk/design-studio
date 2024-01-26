@@ -175,6 +175,15 @@ export class ActionReplaceBot extends Action {
     }
 }
 
+export class ActionReplaceBotV2 extends Action {
+    botName: string;
+    blockName: string;
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.REPLACE_BOTV2;
+    }
+}
+
 export class ActionChangeDepartment extends Action {
     depName: string;
     constructor(){

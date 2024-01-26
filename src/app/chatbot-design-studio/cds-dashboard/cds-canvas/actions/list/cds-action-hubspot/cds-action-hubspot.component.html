@@ -12,7 +12,7 @@
         {{action.token}}
     </div>
     <div *ngIf="!action.token" class="action-row-right empty">
-        Enter the Access Token
+        {{'CDSCanvas.EnterAccessToken' | translate }}
     </div>
 
     <div class="previewContent">
@@ -21,7 +21,7 @@
             <img src="assets/images/icons/if_condition.svg">
         </div>
 
-        <label class="title-preview-label">Success</label>
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate}}</label>
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
@@ -32,7 +32,7 @@
     <hr class="preview-divider">
 
     <div class="previewContent">
-       <label class="title-preview-label">else</label>
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate}}</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
             [isConnected] = "isConnectedFalse">
@@ -44,21 +44,21 @@
 <!-- Details -->
 <div *ngIf="!previewMode" class="content-panel-intent-detail" #scrollMe id="scrollMe" >
     <div class="field-box">
-        <label class="title-label">Hubspot access token</label>
+        <label class="title-label">{{'CDSCanvas.HubspotAccessToken' | translate }}</label>
         <cds-textarea id="hubspotToken" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
             [minRow]="1" [maxRow]="2" 
             [text]="action.token"
-            [placeholder]="'Enter Hubspot Access Token'"
+            [placeholder]="'CDSCanvas.EnterHubspotAccessToken' | translate"
             (changeTextarea)="onChangeTextarea($event, 'token')"
             (selectedAttribute)="onSelectedAttribute($event, 'token')">
         </cds-textarea>
     </div>
 
     <div class="field-box">
-        <label class="title-label">Body parameters</label>
+        <label class="title-label">{{'CDSCanvas.BodyParameters' | translate }}</label>
         <cds-attributes
             class="cds-attributes"
             [method]="typeMethodAttribute.INPUT"
@@ -74,14 +74,14 @@
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
-            <span class="condition-text">Success</span>
+            <span class="condition-text">{{'CDSCanvas.Success' | translate }}</span>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.trueIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
             (onReset)="onResetBlockSelect($event, 'trueIntent')">
@@ -90,14 +90,14 @@
 
     <div class="field-box">
         <div class="condition-container">
-            <span class="condition-text">Else</span>
+            <span class="condition-text">{{'CDSCanvas.Else' | translate | titlecase }}</span>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.falseIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
             (onReset)="onResetBlockSelect($event, 'falseIntent')">
@@ -110,13 +110,13 @@
             class="custom-expansion-panel">
             <mat-expansion-panel-header class="disable_ripple">
                 <mat-panel-title>
-                    Advanced
+                    {{'CDSCanvas.Advanced' | translate }}
                 </mat-panel-title>
             </mat-expansion-panel-header>
             <div>
 
     <div class="field-box">
-        <label class="title-label"> Assign result to</label>
+        <label class="title-label">{{'CDSCanvas.AssignResultTo' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -131,7 +131,7 @@
     </div>
 
     <div class="field-box">
-        <label class="title-label">Assign status to</label>
+        <label class="title-label">{{'CDSCanvas.AssignStatusTo' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -147,7 +147,7 @@
 
 
     <div class="field-box">
-        <label class="title-label">Assign error to</label>
+        <label class="title-label">{{'CDSCanvas.AssignErrorTo' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false"
             [emojiPikerBtn]="false" 

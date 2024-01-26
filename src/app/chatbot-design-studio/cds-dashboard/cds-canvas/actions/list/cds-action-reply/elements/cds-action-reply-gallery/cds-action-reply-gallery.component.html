@@ -26,7 +26,7 @@
     <!-- ||  -->
     <div class="add-filter-btn" *ngIf="canShowFilter && filterConditionExist">
         <span class="material-icons-outlined">filter_alt</span>
-        Filter
+        {{'CDSCanvas.Filter' | translate }}
     </div>
     <div class="filter-wrapper" *ngIf="canShowFilter"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
@@ -155,7 +155,7 @@
                                 add
                             </span>
                         </button>
-                        <div class="action--text csd-add-action-btn-wpr-element"> Add button </div>
+                        <div class="action--text csd-add-action-btn-wpr-element">{{'CDSCanvas.AddButton' | translate }}</div>
                     </div>
                 </div>
             </div>
@@ -169,7 +169,7 @@
                             add
                         </span>
                     </button>
-                    <div class="action--text csd-add-action-btn-wpr-element"> Add card </div>
+                    <div class="action--text csd-add-action-btn-wpr-element">{{'CDSCanvas.AddCard' | translate }}</div>
                 </div>
             </div>
             <div *ngIf="last" class="cards-scroll-spacer"></div>
@@ -187,8 +187,8 @@
             <img src="assets/images/icons/add_image.svg">
         </div>
         <div class="content">
-            <span class="text">Type Title</span>
-            <span class="text description">Type Description</span>
+            <span class="text">{{'CDSCanvas.TypeTitle' | translate }}</span>
+            <span class="text description">{{'CDSCanvas.TypeDescription' | translate }}</span>
         </div>
     </div>
 </ng-template>
@@ -224,7 +224,7 @@
         
             </div>
             <div *ngIf="galleryEl.buttons.length < 3" class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', i, null)">
-                + Add button
+                + {{'CDSCanvas.AddButton' | translate }}
             </div>
         </div> 
         <!-- <div class="gallery-divider"></div> -->

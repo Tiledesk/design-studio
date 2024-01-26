@@ -1,12 +1,13 @@
 @import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/cds/styles.scss";
 
-::ng-deep .custom-dialog-container {
+::ng-deep .custom-setattribute-dialog-container {
     width: 40vw!important;
     min-width: 500px;
     max-width: 1000px!important;
 
     .tpl-modal-box {
+        
         border-radius: 6px;
         flex-direction: column;
         background: rgb(255, 255, 255);

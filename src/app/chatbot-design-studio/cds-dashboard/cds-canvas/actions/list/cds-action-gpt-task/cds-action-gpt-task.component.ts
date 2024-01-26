@@ -31,7 +31,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   panelOpenState = false;
   models_list = [
-    { name: "GPT-3 (DaVinci)", value: "text-davinci-003" }, 
+    // { name: "GPT-3 (DaVinci)", value: "text-davinci-003" }, 
     { name: "GPT-3.5 Turbo (ChatGPT)", value: "gpt-3.5-turbo" }, 
     { name: "GPT-4 (ChatGPT)", value: "gpt-4" }
   ];
@@ -461,7 +461,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   openAttributesDialog() {
     this.logger.log("temp_variables: ", this.temp_variables);
     const dialogRef = this.dialog.open(AttributesDialogComponent, {
-      panelClass: 'custom-dialog-container',
+      panelClass: 'custom-setattribute-dialog-container',
       data: { attributes: this.temp_variables, question: this.action.question }
     });
     dialogRef.afterClosed().subscribe(result => {

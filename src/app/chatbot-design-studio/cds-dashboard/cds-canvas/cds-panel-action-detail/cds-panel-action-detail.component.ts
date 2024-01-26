@@ -11,6 +11,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { AppConfigService } from 'src/app/services/app-config';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 
 
 @Component({
@@ -50,7 +51,8 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     private connectorService: ConnectorService,
     private dashboardService: DashboardService,
     private projectPlanUtils: ProjectPlanUtils,
-    private appConfigService: AppConfigService
+    private appConfigService: AppConfigService,
+    private tiledeskAuthService: TiledeskAuthService
   ) { }
 
   ngOnInit(): void {
@@ -92,13 +94,13 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
       // this.elementSelectedMaxLength = [...Array(this.elementIntentSelected.maxLength).keys()]
       console.log('[PANEL-INTENT-DETAIL] (OnChanges) elementIntentSelectedType ', this.elementIntentSelectedType);
       console.log('[PANEL-INTENT-DETAIL] (OnChanges) elementSelected ', this.elementSelected);
-      // console.log('[PANEL-INTENT-DETAIL] (OnChanges) intentSelected ', this.intentSelected);
-
+      
       let action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType)
       if(action && action.plan){
         this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.plan)}
         console.log('[PANEL-INTENT-DETAIL] --> status', this.canShowActionByPlan)
       }
+
     }catch(error){
       this.logger.log('[CDS-PANEL-INTENT-DETAIL] (ngOnChanges) ERROR', error);
     }
@@ -115,10 +117,15 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
       // recupero id dalla action e verifico se ho modificato l'intent della action aperta
       // se si aggiorno la action
       if (intent && intent.intent_id === this.intentSelected.intent_id) {
-          // this.idSelectedIntent = intent.intent_id;
+        //CASE OF ACTION UPDATES
+        if(this.elementIntentSelected.type === TYPE_INTENT_ELEMENT.ACTION){
           let newAction = intent.actions.find((obj) => obj._tdActionId === this.elementSelected._tdActionId);
           this.elementSelected = newAction;
-          this.logger.log('[PANEL-INTENT-DETAIL] --- AGGIORNO ACTION', intent, this.elementSelected._tdActionId);
+        }else {
+          //CASE OF FORM/QUESTION UPDATES
+          this.elementIntentSelectedType = this.elementIntentSelected.type;
+          this.elementSelected = this.elementIntentSelected.element
+        }
       } else {
         this.logger.log('[PANEL-INTENT-DETAIL] --- CHIUDO');
         this.closePanel.emit();
@@ -133,7 +140,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   addEventListener() {
     document.addEventListener(
       "keydown", (e) => {
-        console.log('[CDS-CANVAS]  keydown ', e);
+        // console.log('[PANEL-INTENT-DETAIL]  keydown ', e);
         var focusedElement = document.activeElement;
         if (focusedElement.tagName === 'TEXTAREA') {
         }
@@ -194,6 +201,32 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   goToPricing() {
     let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/pricing'
     window.open(dashbordBaseUrl, '_blank')
+  }
+
+  goToContactSales(){
+    let user = this.tiledeskAuthService.getCurrentUser();
+    window.open(`mailto:sales@tiledesk.com?subject=Upgrade to Tiledesk ${this.canShowActionByPlan.plan}`);
+    try {
+      window['analytics'].page('CDS Contact sales', {
+        action: this.elementSelected
+      });
+    } catch (err) {
+      this.logger.error('Pricing page error', err);
+    }
+
+    try {
+      window['analytics'].track(`Contact us to upgrade plan to ${this.canShowActionByPlan.plan}`, {
+        "email": user.email,
+        "action": this.elementSelected
+      }, {
+        "context": {
+          "groupId": this.dashboardService.projectID
+        }
+      });
+    } catch (err) {
+      this.logger.error('track contact us to upgrade plan error', err);
+    }
+    
   }
 
  /**

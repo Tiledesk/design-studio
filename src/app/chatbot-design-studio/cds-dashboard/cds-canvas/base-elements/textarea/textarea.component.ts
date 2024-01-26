@@ -70,7 +70,13 @@ export class CDSTextareaComponent implements OnInit {
     // if(changes && changes['readonly'] && changes['readonly'].previousValue !== changes['readonly'].currentValue){
     //   this.textTag = this.text
     // }
+    if(this.readonly){
+      this.control.disable();
+    }else if(!this.readonly){
+      this.control.enable();
+    }
     // this.initialize();
+    
   }
 
   ngAfterViewInit() {
@@ -108,7 +114,7 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   onChangeTextArea(event) {
-    this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
+    // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
     this.calculatingleftCharsText();
     if(this.readonly && event){
       this.textTag = event;

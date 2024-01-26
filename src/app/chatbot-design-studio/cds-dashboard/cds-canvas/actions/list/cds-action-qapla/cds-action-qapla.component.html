@@ -11,7 +11,7 @@
             {{action?.trackingNumber}}
         </div>
         <div *ngIf="!action?.trackingNumber" class="action-row-right empty">
-            Enter the tracking number
+            {{'CDSCanvas.EnterTrackingNumber' | translate}}
         </div>
     </div>
 
@@ -21,7 +21,7 @@
             <img class="active-icon" src="assets/images/icons/if_condition.svg">
         </div>
 
-        <label class="title-preview-label">Success</label>
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
@@ -33,7 +33,7 @@
     <hr class="preview-divider">
 
     <div class="previewContent">
-       <label class="title-preview-label">else</label>
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
             [idConnection] = "idConnectionFalse"
@@ -43,10 +43,10 @@
 
 </div>
 
-<div *ngIf="!previewMode && action_locked == false" class="content-panel-intent-detail no-footer">
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
 
     <div class="field-box">
-        <label class="title-label">Tracking Number</label>
+        <label class="title-label">{{'CDSCanvas.TrackingNumber' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -54,14 +54,14 @@
             [minRow]="1" [maxRow]="1" 
             [readonly]="false" 
             [text]="action.trackingNumber"
-            [placeholder]="'Tracking number to search'"
+            [placeholder]="'CDSCanvas.TrackingNumberToSearch' | translate"
             (blur)="onBlur($event)"
             (changeTextarea)="changeTextarea($event, 'trackingNumber')">
         </cds-textarea>
     </div>
 
     <div class="field-box">
-        <label class="title-label">Qapla Api Key</label>
+        <label class="title-label">{{'CDSCanvas.QaplaApiKey' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -69,7 +69,7 @@
             [minRow]="1" [maxRow]="1" 
             [readonly]="false" 
             [text]="action.apiKey"
-            [placeholder]="'Your Api Key'"
+            [placeholder]="'CDSCanvas.YourApiKey' | translate"
             (blur)="onBlur($event)"
             (changeTextarea)="changeTextarea($event, 'apiKey')">
         </cds-textarea>
@@ -78,7 +78,7 @@
     <hr class="custom-divider">
 
     <div class="field-box">
-        <label class="title-label">Status</label>
+        <label class="title-label">{{'CDSCanvas.Status' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -92,7 +92,7 @@
     </div>
 
     <div class="field-box">
-        <label class="title-label">Result</label>
+        <label class="title-label">{{'CDSCanvas.Result' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -106,7 +106,7 @@
     </div>
 
     <div class="field-box">
-        <label class="title-label">Error</label>
+        <label class="title-label">{{'CDSCanvas.Error' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -126,14 +126,14 @@
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
-            <label class="condition-text">Success</label>
+            <label class="condition-text">{{'CDSCanvas.Success' | translate }}</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.trueIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate "
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
             (onReset)="onResetBlockSelect($event, 'trueIntent')">
@@ -147,14 +147,14 @@
 
     <div class="field-box">
         <div class="condition-container">
-            <label class="condition-text">Else</label>
+            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.falseIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate "
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
             (onReset)="onResetBlockSelect($event, 'falseIntent')">
@@ -168,16 +168,3 @@
     
 </div>
 
-<div *ngIf="!previewMode && action_locked == true" class="content-panel-intent-detail no-footer">
-
-    <div class="block-overlay">
-        <span class="material-icons lock-icon">lock</span>
-        <p>Feature available from <b>Scale</b> plan</p>
-
-        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="goToPricing()">
-            <span class="material-icons">bolt</span>
-            Upgrade now!
-        </button>
-    </div>
-  
-</div>

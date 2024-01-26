@@ -21,11 +21,11 @@
             <div class="option" 
                 (click)="onSelectQuestion(HAS_SELECTED_TYPE.QUESTION)"
                 [attr.active]="questionCount > 0">
-                <img src="assets/images/brain.svg" title="Question">
+                <img src="assets/images/brain.svg" [title]="'Question' | translate">
             </div>
             <div class="option" (click)="onSelectForm(HAS_SELECTED_TYPE.FORM)" 
                 [attr.active]="formSize > 0">
-                <img src="assets/images/form.svg" title="Form">
+                <img src="assets/images/form.svg" title="'Form' | translate">
             </div>
         </div>
     </div>
@@ -59,16 +59,16 @@
                 <span class="material-icons"> add </span>
             </div> -->
             <div class="add--action-placeholder-text">
-                Add an action to this block
+                {{ 'CDSCanvas.AddAnActionToBlock' | translate}}
                 <span style="display: block;font-size: 12px;">
-                    Actions are executed in sequence starting from the top block action
+                    {{ 'CDSCanvas.AddAnActionToBlockDescription' | translate}}
                 </span>
             </div>
 
             <div class="csd-open-action-menu-btn-wpr">
                 <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                     class="cds-add-action-btn">    
-                    + Add action
+                    + {{ 'CDSCanvas.AddAction' | translate}}
                 </div>
                 <!-- <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                     class="btn cds-add-action-btn csd-add-action-btn-wpr-element">
@@ -197,6 +197,11 @@
                         [action]="action">
                     </cds-action-replace-bot>
     
+                    <cds-action-replace-bot-v2 *ngSwitchCase="TYPE_ACTION.REPLACE_BOTV2" 
+                        class="panel-response"
+                        [action]="action">
+                    </cds-action-replace-bot-v2>
+
                     <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE" 
                         class="panel-response"
                         [action]="action">
@@ -325,7 +330,7 @@
         <div *ngIf="!isStart && listOfActions?.length > 0" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">    
-                + Add action
+                + {{ 'CDSCanvas.AddAction' | translate}}
             </div>
         </div>
     </div>

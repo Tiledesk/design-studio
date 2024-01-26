@@ -45,7 +45,7 @@
                         </span>
                         <span *ngIf="header_component?.format === 'LOCATION'">
                             <div class="location-preview">
-                                <p>Location</p>
+                                <p>{{'CDSCanvas.Location' | translate }}</p>
                             </div>
                             <!-- <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3047.4846825263085!2d18.16983501538924!3d40.198280279391!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x134423b7392e6d13%3A0x60b481aa8d84673!2sEurofood%20SRL!5e0!3m2!1sit!2sit!4v1685097718757!5m2!1sit!2sit" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> -->
 
@@ -94,7 +94,7 @@
 
         <!-- // Phone Number - START -->
         <div>
-            <p class="parameters-title">Phone number</p>
+            <p class="parameters-title">{{'CDSCanvas.PhoneNumber' | translate}}</p>
             <div class="parameter">
                 <div class="param-number">
                     <span class="material-icons-round">
@@ -114,9 +114,8 @@
 
         <!-- // Header parameters - START -->
         <div *ngIf="header_component && header_component.example">
-            <p class="parameters-title">Header parameters</p>
-            <p *ngIf="header_component.example.header_handle" class="parameters-subtitle">The header contains a Media to
-                customize</p>
+            <p class="parameters-title">{{'CDSCanvas.HeaderParameters' | translate }}</p>
+            <p *ngIf="header_component.example.header_handle" class="parameters-subtitle">{{'CDSCanvas.TheHeaderContainsMedia' | translate }}</p>
 
             <!-- // header text -->
             <div *ngFor="let hp of header_component.example.header_text; index as i" class="parameter">
@@ -143,7 +142,7 @@
                     <!-- <input type="text" placeholder="{{hp}}" (input)="onParamHeaderChange($event.target.value, i+1)"> -->
                     <input *ngIf="!fileUploadedName" 
                         type="text" 
-                        placeholder="Insert a valid URL or update a file"
+                        [placeholder]="'CDSCanvas.InsertValidURLOrUpdateFile' | translate "
                         (input)="onParamHeaderChange($event.target.value, i+1)" 
                         (blur)="onBlur()" 
                         (focus)="onFocus()">
@@ -180,7 +179,7 @@
         </div>
 
         <div *ngIf="header_component?.format == 'LOCATION'">
-            <p style="font-size: 14px;">Location headers not yet supported.</p>
+            <p style="font-size: 14px;">{{'CDSCanvas.LocationHeadersNotSupported' | translate }}</p>
             <!-- <p class="parameters-title">Header parameters</p>
             <div class="selected-place">
                 <div>
@@ -213,7 +212,7 @@
 
         <!-- // Body parameters - START -->
         <div *ngIf="body_component.example">
-            <p class="parameters-title">Body parameters</p>
+            <p class="parameters-title">{{'CDSCanvas.BodyParameters' | translate }}</p>
             <div *ngFor="let bp of body_component.example.body_text[0]; index as i" class="parameter">
                 <div class="param-number">
                     <!-- <span>{{</span> {{ i + 1 }} <span>}}</span> -->
@@ -234,12 +233,12 @@
 
 
         <div *ngIf="body_params.length == 0 && header_params.length == 0 && buttons_params.length == 0">
-            <p style="font-style: italic; color: #a3a3a3;">No parameters</p>
+            <p style="font-style: italic; color: #a3a3a3;">{{'CDSCanvas.NoParameters' | translate }}</p>
         </div>
 
         <!-- // Buttons parameters - START -->
         <div *ngIf="url_button_component && url_button_component.example">
-            <p class="parameters-title">Buttons parameters</p>
+            <p class="parameters-title">{{'CDSCanvas.ButtonsParameters' | translate }}</p>
             <div *ngFor="let param of url_button_component.example; index as i" class="parameter">
                 <div class="param-number">
                     <!-- <span>{{</span> {{ i + 1 }} <span>}}</span> -->
@@ -247,7 +246,7 @@
                 </div>
                 <div class="field-wrapper large">
                     <input type="text" 
-                        placeholder="Insert a valid URL" 
+                        placeholder="'CDSCanvas.InsertValidURL' | translate " 
                         value="{{buttons_params[i].text}}"
                         (input)="onParamButtonChange($event.target.value, i+1)" 
                         (blur)="onBlur()" 

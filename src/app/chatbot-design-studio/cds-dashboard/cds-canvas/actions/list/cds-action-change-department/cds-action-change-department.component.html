@@ -15,7 +15,7 @@
             {{action?.depName}}
         </div>
         <div *ngIf="!action?.depName" class="action-row-right empty">
-            Select a department
+            {{'CDSCanvas.SelectADepartment' | translate }}
         </div>
     </div>
 
@@ -25,7 +25,7 @@
 <div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
 
     <div class="field-box">
-        <label class="title-label">Choose a department</label>
+        <label class="title-label">{{'CDSCanvas.ChooseADepartment' | translate }}</label>
         <cds-select id="select" 
             [items]="deps_name_list" 
             [bindLabelSelect]="'name'"

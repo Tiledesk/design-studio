@@ -40,4 +40,19 @@
         </cds-select>
     </div>
 
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.ExecuteBlock' | translate }}</label>
+        <label class="subtitle-label">{{'CDSCanvas.ChooseBlockDescription' | translate }}</label>
+        <cds-select id="text-condition" 
+            [items]="chatbots_block_name_list" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [searchable]=true
+            [clearable]=true
+            [itemSelected]="action?.blockName" 
+            (onSelected)="onChangeBlockSelect($event)"
+            (onReset)="onResetBlockSelect($event)">
+        </cds-select>
+    </div>
+
 </div>

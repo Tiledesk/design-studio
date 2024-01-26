@@ -162,6 +162,7 @@ import { CdsActionOpenHoursComponent } from './cds-dashboard/cds-canvas/actions/
 import { CdsActionJsonConditionComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-json-condition/cds-action-json-condition.component';
 import { CdsActionDeleteVariableComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-delete-variable/cds-action-delete-variable.component';
 import { CdsActionReplaceBotComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-replace-bot/cds-action-replace-bot.component';
+import { CdsActionReplaceBotV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-replace-bot-v2/cds-action-replace-bot-v2.component';
 import { CdsActionAssignVariableComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable/cds-action-assign-variable.component';
 import { CdsActionAssignVariableV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/cds-action-assign-variable-v2.component';
 import { CdsActionHideMessageComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-hide-message/cds-action-hide-message.component';
@@ -289,6 +290,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
         CdsActionJsonConditionComponent,
         CdsActionDeleteVariableComponent,
         CdsActionReplaceBotComponent,
+        CdsActionReplaceBotV2Component,
         CdsActionAssignVariableComponent,
         CdsActionAssignVariableV2Component,
         CdsActionHideMessageComponent,

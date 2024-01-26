@@ -2,7 +2,7 @@ import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2 } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -838,6 +838,9 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.REPLACE_BOT){
       action = new  ActionReplaceBot();
     }
+    if(typeAction === TYPE_ACTION.REPLACE_BOTV2){
+      action = new  ActionReplaceBotV2();
+    }
     if(typeAction === TYPE_ACTION.CHANGE_DEPARTMENT) {
       action = new  ActionChangeDepartment();
       action.triggerBot = true;
@@ -905,7 +908,7 @@ export class IntentService {
   
 
   public patchButtons(buttons, idAction){
-    console.log('patchButtons:: ', buttons);
+    // console.log('patchButtons:: ', buttons);
     buttons.forEach((button, index) => {
       const checkUid = buttons.filter(btn => btn.uid === button.uid);
       if (checkUid.length > 1 || !button.uid && button.uid == undefined) {

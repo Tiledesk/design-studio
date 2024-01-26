@@ -15,13 +15,13 @@
     <div *ngIf="arrayResponses?.length === 0"
         class="reply--action-placeholder">
         <div class="reply--action-placeholder-text">
-            Add contents to this Reply
+            {{'CDSCanvas.AddContentsToReply' | translate }}
         </div>
     </div>
 
     <div class="box-dw" [class.previewMode]="previewMode">
 
-        <div class="reply-info" *ngIf="typeAction === typeActions.RANDOM_REPLY">{{actionList.RANDOM_REPLY.description}}</div>
+        <div class="reply-info" *ngIf="typeAction === typeActions.RANDOM_REPLY">{{actionList.RANDOM_REPLY.description | translate }}</div>
 
         <div #scrollMe id="scrollMe" 
             class="content draggable-list"

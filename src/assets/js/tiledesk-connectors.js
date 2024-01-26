@@ -911,7 +911,7 @@ export class TiledeskConnectors {
 
 
   updateConnectorsOutOfItent(element) {
-    console.log("updateConnectorsOutOfItent ----> ", this.blocks, element.id);
+    // console.log("updateConnectorsOutOfItent ----> ", this.blocks, element.id);
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) { return; }

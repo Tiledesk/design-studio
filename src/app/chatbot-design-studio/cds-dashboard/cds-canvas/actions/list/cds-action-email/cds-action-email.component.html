@@ -13,7 +13,7 @@
             {{this.action.to}}
         </div>
         <div *ngIf="!action.to" class="action-row-right empty">
-            Enter email recipient
+            {{'CDSCanvas.EnterEmailRecipient' | translate}}
         </div>
     </div>
 
@@ -29,7 +29,7 @@
             {{action.subject}}
         </div>
         <div *ngIf="!action.subject" class="action-row-right">
-            Enter email subject
+            {{'CDSCanvas.EnterEmailSubject' | translate}}
         </div>
     </div>
 
@@ -48,7 +48,7 @@
             {{action.text}}
         </div>
         <div *ngIf="!action.text" class="action-row-right empty">
-            Enter email body
+            {{'CDSCanvas.EnterEmailBody' | translate}}
         </div>
     </div>    
 </div>
@@ -59,7 +59,7 @@
 
 
     <div class="field-box">
-        <label class="title-label">To</label>
+        <label class="title-label">{{'CDSCanvas.To' | translate}}</label>
         <!-- <div class="text-editor-wpr" style="position: relative;"> -->
         <!-- [limitCharsText]="150"  -->
         <cds-textarea class="to-text-area" 
@@ -76,7 +76,7 @@
 
 
     <div class="field-box">
-        <label class="title-label">Subject</label>
+        <label class="title-label">{{'CDSCanvas.Subject' | translate}}</label>
         <cds-textarea class="subject-text-area" 
             [emojiPikerBtn]="false" 
             [limitCharsText]="150"
@@ -90,7 +90,7 @@
     </div>
 
     <div class="field-box">
-        <label class="title-label">Reply to</label>
+        <label class="title-label">{{'CDSCanvas.ReplyTo' | translate}}</label>
         <!-- <div class="text-editor-wpr" style="position: relative;"> -->
         <!-- [limitCharsText]="150"  -->
         <cds-textarea class="to-text-area" 
@@ -107,7 +107,7 @@
 
 
     <div class="field-box">
-        <label class="title-label">Email body</label>
+        <label class="title-label">{{'CDSCanvas.EmailBody' | translate}}</label>
         <cds-textarea class="body-text-area" 
             [limitCharsText]="1024" 
             [emojiPikerBtn]="false" 

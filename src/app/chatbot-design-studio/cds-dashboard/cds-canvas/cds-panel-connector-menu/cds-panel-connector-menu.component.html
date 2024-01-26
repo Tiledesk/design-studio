@@ -3,24 +3,20 @@
     <!-- ---------------------------------- -->
     <!-- Delete intent  -->
     <!-- ---------------------------------- -->
-    <div
-      class="intent-header-action-btn icon"
+    <div class="intent-header-action-btn icon"
       matTooltipClass="cds-mat-tooltip"
-      matTooltip="Delete connector"
+      [matTooltip]="'CDSCanvas.DeleteConnector' | translate"
       matTooltipPosition="above"
       matTooltipHideDelay="100"
-      (click)="onAddActionFromConnectorMenu(typeOfmenu.DELETE)"
-    >
+      (click)="onAddActionFromConnectorMenu(typeOfmenu.DELETE)">
       <img src="assets/images/icons/bin.svg" />
     </div>
-    <div
-      class="intent-header-action-btn icon"
+    <div class="intent-header-action-btn icon"
       matTooltipClass="cds-mat-tooltip"
-      matTooltip="Line text"
+      [matTooltip]="'CDSCanvas.LineText' | translate"
       matTooltipPosition="above"
       matTooltipHideDelay="100"
-      (click)="onShowLineTextArea()"
-    >
+      (click)="onShowLineTextArea()">
       <img src="assets/images/icons/line_text.svg" />
     </div>
   </div>

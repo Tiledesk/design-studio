@@ -26,6 +26,7 @@ export class BaseConditionRowComponent implements OnInit {
   conditionForm: FormGroup;
   readonlyTextarea: boolean = false;
   setAttributeBtnOperand2: boolean = false;
+  canShowOperand2: boolean = true
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -40,6 +41,7 @@ export class BaseConditionRowComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges){
     this.logger.log('[BASE_CONDITION_ROW] ******* ngOnChanges-->');
     this.conditionForm = this.createConditionGroup()
+    this.step=0;
     this.operatorsList = Object.keys(OPERATORS_LIST).map(key => (OPERATORS_LIST[key]))
     if(this.condition){
       this.logger.log('[BASE_CONDITION_ROW] selectedConditionnnn-->', this.condition)
@@ -69,8 +71,12 @@ export class BaseConditionRowComponent implements OnInit {
     });
     if(this.condition.operand2){
       this.setAttributeBtnOperand2 = false;
+      if(this.condition.operand2.type === 'var'){
+        this.readonlyTextarea = true
+      }
     } else {
       this.setAttributeBtnOperand2 = true;
+      this.readonlyTextarea = false;
     }
 }
 
@@ -98,18 +104,18 @@ export class BaseConditionRowComponent implements OnInit {
       this.conditionForm.patchValue({ operand1: variableSelected.value}, {emitEvent: false})
       this.step +=1;
     }else if (step == 1){
-      this.conditionForm.patchValue({ operand2: {type:'var', name:variableSelected.name, value:variableSelected.value}}, {emitEvent: false});
+      this.conditionForm.patchValue({ operand2: { type: 'var', name: variableSelected.name, value: variableSelected.value}}, {emitEvent: false});
       this.logger.log('formmmmm', this.conditionForm);
-      this.disableSubmit = false;
       this.readonlyTextarea = true;
       this.setAttributeBtnOperand2 = false;
+      this.disableSubmit = false;
     }
     this.logger.log('******* onVariableSelected-->', step, variableSelected);
   }
 
   onClearSelectedAttribute(){
     this.logger.log('onClearSelectedAttribute-->');   
-    this.conditionForm.patchValue({ operand2: {type: 'var', name: ''}}, {emitEvent: false});
+    this.conditionForm.patchValue({ operand2: {type: 'const', name: '', value: ''}}, {emitEvent: false})
     this.disableSubmit = true;
     this.readonlyTextarea = false;
     this.setAttributeBtnOperand2 = true;
@@ -133,10 +139,19 @@ export class BaseConditionRowComponent implements OnInit {
   onClickOperator(operator: {}){
     this.conditionForm.patchValue({ operator: operator['type']})
     
+    this.disableSubmit = true;
+    this.readonlyTextarea = false;
+    this.setAttributeBtnOperand2 = true;
+    this.canShowOperand2 = true;
+
     //activate submit button and disable 'Value' textarea i operator is equal to 'isEmpty'
     if(operator['type'] === TYPE_OPERATOR.isEmpty|| 
         operator['type'] === TYPE_OPERATOR.isNull || 
         operator['type'] === TYPE_OPERATOR.isUndefined ){
+      
+      this.onClearInput()
+      this.canShowOperand2 = false
+
       this.disableSubmit = false;
       this.readonlyTextarea = true;
       this.setAttributeBtnOperand2 = false;
@@ -148,6 +163,7 @@ export class BaseConditionRowComponent implements OnInit {
     if(this.conditionForm.valid){
       let condition: Condition = new Condition()
       condition = Object.assign(condition, this.conditionForm.value);
+      condition.operand2.type == 'var'? condition.operand2.name = condition.operand2.value: null;
       this.step = 0;
       this.conditionForm = this.createConditionGroup()
       this.close.emit(condition)
