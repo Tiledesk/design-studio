@@ -12,6 +12,14 @@
 
     
     .ng-dropdown-panel .ng-dropdown-panel-items {
+        .ng-optgroup{
+            padding: 0 15px;
+            color: #9ba6b3;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 20px;
+        }
+
         .ng-option{
             display: flex;
             align-items: center;
