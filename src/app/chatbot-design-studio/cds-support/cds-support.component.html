@@ -1,6 +1,24 @@
 <div class="container-fluid">
     <div class="card-container">
-        <div class="cds-card">aaaa</div>
-        <div class="cds-card">sssss</div>
+        <div class="cds-card">
+            <label>Self Service</label>
+            <div class="items-wrp" *ngFor="let item of SUPPORT_OPTIONS['SELF_SERVICE']">
+                <div class="card-item">
+                    <div class="section-icon">
+                        <span class="material-icons-outlined" *ngIf="!item.localIcon">{{item.icon}}</span>
+                        <img class="icon" *ngIf="item.localIcon" [src]="item.icon"/>
+                    </div>
+                    <div class="section-text">
+                        <div class="cds-title">{{item.label}}</div>
+                        <div class="cds-description">{{item?.description}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="items-wrp" *ngFor="let item of SUPPORT_OPTIONS['CONTACT_US']">
+            <div class="card-item">
+                {{item.label}}
+            </div>
+        </div>
     </div>
 </div>

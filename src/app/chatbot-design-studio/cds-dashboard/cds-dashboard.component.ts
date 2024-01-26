@@ -180,7 +180,6 @@ export class CdsDashboardComponent implements OnInit {
   /** hideShowWidget */
   private hideShowWidget(status: "hide" | "show") {
     try {
-      console.log('TILEDEESKKKKKK', window['tiledesk'])
       if (window && window['tiledesk']) {
         this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
         if (status === 'hide') {

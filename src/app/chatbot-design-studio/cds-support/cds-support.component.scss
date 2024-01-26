@@ -19,3 +19,14 @@
     border-radius: var(--base-radius);
     box-shadow: rgba(0,0,0,.1) 0px 3px 6px 0px,rgba(0,0,0,.08) 0px 1px 3px 0px; 
 }
+
+.card-item{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background-color: var(--content-background);
+    border: 1px solid rgb(223, 227, 237);
+    border-radius: 8px;
+    padding: 10px;
+    gap: 20px;
+}
