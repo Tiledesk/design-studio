@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.12-rc.3
+- bug-fixed: lowecase pipe not exist
+
 ### 1.0.12-rc.2
 - changed: text limit to global value rows
 
