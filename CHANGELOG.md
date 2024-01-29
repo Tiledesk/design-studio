@@ -5,6 +5,15 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.12-rc.3
+- bug-fixed: lowecase pipe not exist
+
+### 1.0.12-rc.2
+- changed: text limit to global value rows
+
+### 1.0.11.3 in PROD
+- changed: cds-action-delete-attribute now support all variables (userdefined and systemdefined)
+
 ### 1.0.12-rc.1
 - added: discord channel menu option on support bottom sidebar icon
 - added: style.scss, material-dashboard.scss and action-styl.scss as lazy load style
@@ -13,6 +22,12 @@
 - bug-fixed: cds-textarea not updated
 - bug-fixed: widget installation code is not formatted while click on copy in Publish modal
 - bug-fixed: cannot read property of undefined reading _tdActionId with forms 
+
+### 1.0.11.2 in PROD
+- bug-fixed: cannot split of undefined
+
+### 1.0.11.1 in PROD
+- bug-fixed: cannot read property of undefined reading _tdActionId with forms
 
 ### 1.0.11 in PROD
 

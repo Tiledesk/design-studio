@@ -921,7 +921,6 @@ export class IntentService {
   
 
   public patchButton(button, idAction){
-    console.log('patchButton:: ', button);
     const idActionConnector = idAction+'/'+button.uid;
     button.__idConnector = idActionConnector;
     if(button.action && button.action !== ''){

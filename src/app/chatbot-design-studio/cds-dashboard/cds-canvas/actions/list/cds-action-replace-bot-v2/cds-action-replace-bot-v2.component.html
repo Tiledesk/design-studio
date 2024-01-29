@@ -35,6 +35,7 @@
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'"
             [searchable]=true
+            [clearable]=true
             [itemSelected]="action?.botName" 
             (onSelected)="onChangeSelect($event)">
         </cds-select>

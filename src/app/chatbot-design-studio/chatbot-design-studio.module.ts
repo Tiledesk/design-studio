@@ -60,25 +60,12 @@ import { CDSDetailDeveloperComponent } from './cds-chatbot-details/developer/dev
 //CDS CANVAS
 import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.component';
 
-
 //CDS-SECRETS
 import { CdsGlobalsComponent } from './cds-globals/cds-globals.component';
 
+//CDS-SUPPORT
+import { CdsSupportComponent } from './cds-support/cds-support.component';
 
-//SERVICES
-// import { DragDropService } from './services/drag-drop.service';
-
-// import { SharedModule } from '../shared/shared.module';
-
-// import { PanelReplyToolsComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/panel-reply-tools/panel-reply-tools.component';
-// import { ActionReplyComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/action-reply.component';
-// import { ImageResponseComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/reply-types/image-response/image-response.component';
-// import { FrameResponseComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/reply-types/frame-response/frame-response.component';
-// import { ImageUploadComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/elements/image-upload/image-upload.component';
-// import { ElementFromUrlComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/elements/element-from-url/element-from-url.component';
-// import { QuestionComponent } from './cds-dashboard/panel-intent-detail/question/question.component';
-// import { AnswerComponent } from './cds-dashboard/panel-intent-detail/answer/answer.component';
-// import { ElementTextareaComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/elements/element-textarea/element-textarea.component';
 
 
 //BASE-ELEMENT
@@ -212,7 +199,6 @@ import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
 import { ChangelogComponent } from '../modals/changelog/changelog.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 import { MaterialModule } from '../shared/material.module';
-import { CdsSupportComponent } from './cds-support/cds-support.component';
 
 @NgModule({
   declarations: [
@@ -380,8 +366,7 @@ import { CdsSupportComponent } from './cds-support/cds-support.component';
     CdsPanelConnectorMenuComponent,
     
     GetVariableNamePipe,
-         CdsSupportComponent,
-
+    CdsSupportComponent
   ],
   imports: [
     BrowserAnimationsModule,

@@ -19,6 +19,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
 const swal = require('sweetalert');
 
 @Component({
@@ -69,7 +70,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   dept_id: string;
   selected_dept_id: string;
   selected_dept_name: string;
-  botHasBeenAssociatedWithDept: string;
 
   user: UserModel
 
@@ -79,10 +79,10 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     private tiledeskAuthService: TiledeskAuthService,
     private faqKbService: FaqKbService,
     private departmentService: DepartmentService,
-    private router: Router,
     private notify: NotifyService,
     private imageRepoService: ImageRepoService,
     private translate: TranslateService,
+    private appConfigService: AppConfigService,
     public dialog: MatDialog,
   ) {  super(); }
 
@@ -99,7 +99,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
 
   getDeptsByProjectId() {
-    this.departmentService.getDeptsByProjectId().subscribe((departments: any) => {
+    this.departmentService.getDeptsByProjectId().subscribe({ next: (departments: any) => {
       this.logger.log('[CDS-CHATBOT-DTLS] - DEPT GET DEPTS ', departments);
       this.logger.log('[CDS-CHATBOT-DTLS] - DEPT BOT ID ', this.selectedChatbot._id);
 
@@ -200,13 +200,13 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
         this.COUNT_OF_VISIBLE_DEPT = countOfVisibleDepts;
         this.logger.log('[CDS-CHATBOT-DTLS] - DEPT - COUNT_OF_VISIBLE_DEPT', this.COUNT_OF_VISIBLE_DEPT);
       }
-    }, error => {
+    }, error: (error) => {
 
       this.logger.error('[CDS-CHATBOT-DTLS] - DEPT - GET DEPTS  - ERROR', error);
-    }, () => {
+    }, complete: () => {
       this.logger.log('[CDS-CHATBOT-DTLS] - DEPT - GET DEPTS - COMPLETE')
 
-    });
+    }});
   }
 
   onSelectDept() {
@@ -227,26 +227,22 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   }
 
   hookBotToDept() {
-    this.departmentService.updateExistingDeptWithSelectedBot(this.dept_id, this.selectedChatbot._id).subscribe((res) => {
+    this.departmentService.updateExistingDeptWithSelectedBot(this.dept_id, this.selectedChatbot._id).subscribe({next: (res) => {
       this.logger.log('[CDS-CHATBOT-DTLS] - UPDATE EXISTING DEPT WITH SELECED BOT - RES ', res);
-    }, (error) => {
+    }, error: (error) => {
       this.logger.error('[CDS-CHATBOT-DTLS] - UPDATE EXISTING DEPT WITH SELECED BOT - ERROR ', error);
-    }, () => {
+    }, complete: () => {
       this.logger.log('[CDS-CHATBOT-DTLS] - UPDATE EXISTING DEPT WITH SELECED BOT * COMPLETE *');
       this.translateAndPresentModalBotAssociatedWithDepartment();
-    });
+    }});
   }
 
   translateAndPresentModalBotAssociatedWithDepartment() {
     let parametres = { bot_name: this.selectedChatbot.name, dept_name: this.selected_dept_name };
-
-    this.translate.get("BotHasBeenAssociatedWithDepartment", parametres).subscribe((res: string) => {
-      this.botHasBeenAssociatedWithDept = res
-    });
-
+    
     swal({
       title: this.translationsMap.get('Done') + "!",
-      text: this.botHasBeenAssociatedWithDept,
+      text: this.translate.instant("BotHasBeenAssociatedWithDepartment", parametres),
       icon: "success",
       button: "OK",
       dangerMode: false,
@@ -262,7 +258,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.logger.log('[CDS-CHATBOT-DTLS] - selectedChatbot', this.selectedChatbot)
     if (this.selectedChatbot._id) {
       let url = this.imageRepoService.getImagePhotoUrl(this.selectedChatbot._id)
-      console.log('urlllll', url)
       this.checkImageExists(url, (existImage)=> {
         existImage? this.selectedChatbot.imageURL = url: null; 
       })
@@ -536,7 +531,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   // });
 
   updateBotLanguage(){
-    this.logger.log('open modal to updateeeeee')
     this.logger.log('openDialog')
     const dialogRef = this.dialog.open(ChangeBotLangModalComponent, {
       width: '600px',
@@ -556,24 +550,22 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
 
   updateChatbotLanguage(langCode) {
-    this.faqKbService.updateFaqKbLanguage(this.selectedChatbot._id, langCode).subscribe((faqKb) => {
+    this.faqKbService.updateFaqKbLanguage(this.selectedChatbot._id, langCode).subscribe({ next: (faqKb) => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT LANG - FAQ KB UPDATED ', faqKb);
       if (faqKb) {
-       
       }
-    }, (error) => {
+    }, error: (error) => {
       this.logger.error('[CDS-CHATBOT-DTLS] EDIT BOT LANG-  ERROR ', error);
-
 
       // =========== NOTIFY ERROR ===========
       this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotError'), 4, 'report_problem');
 
-    }, () => {
+    }, complete: () => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT LANG - * COMPLETE *');
       // =========== NOTIFY SUCCESS===========
       this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotSuccess'), 2, 'done');
       this.updateChatbot(this.selectedChatbot, langCode)
-    });
+    }});
 
   }
 
@@ -581,25 +573,24 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.logger.log('updateChatbot langCode', langCode) 
     this.selectedChatbot.language = langCode
 
-    this.faqKbService.updateChatbot(selectedChatbot)
-      .subscribe((chatbot: any) => {
-        this.logger.log('[CDS-CHATBOT-DTLS] - UPDATED CHATBOT - RES ', chatbot);
-
-      }, (error) => {
-        this.logger.error('[CDS-CHATBOT-DTLS] - UPDATED CHATBOT - ERROR  ', error);
-        // self.notify.showWidgetStyleUpdateNotification(this.create_label_error, 4, 'report_problem');
-      }, () => {
-        this.logger.log('[CDS-CHATBOT-DTLS] - UPDATED CHATBOT * COMPLETE *');
-
-      });
+    this.faqKbService.updateChatbot(selectedChatbot).subscribe({ next: (chatbot: any) => {
+      this.logger.log('[CDS-CHATBOT-DTLS] - UPDATED CHATBOT - RES ', chatbot);
+    }, error:(error) => {
+      this.logger.error('[CDS-CHATBOT-DTLS] - UPDATED CHATBOT - ERROR  ', error);
+      // self.notify.showWidgetStyleUpdateNotification(this.create_label_error, 4, 'report_problem');
+    }, complete: () => {
+      this.logger.log('[CDS-CHATBOT-DTLS] - UPDATED CHATBOT * COMPLETE *');
+    }});
   }
 
   goToRoutingAndDepts() {
-    this.router.navigate(['project/' + this.project._id + '/departments']);
+    let redirecturl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.project._id + '/departments'
+    window.open(redirecturl, '_blank')
   }
 
   goToEditAddPage_EDIT_DEPT(deptid, deptdefaut) {
-    this.router.navigate(['project/' + this.project._id + '/department/edit', deptid]);
+    let redirecturl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.project._id + '/department/edit/'+ deptid
+    window.open(redirecturl, '_blank')
   }
 
 

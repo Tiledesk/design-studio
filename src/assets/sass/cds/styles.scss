@@ -157,19 +157,6 @@ button.close{
 } 
 
 
-
-
-.cds-custom-tooltip {
-    background-color: #fff;
-    color: #555555;
-    font-size: 12px;
-    border-radius: 2px;
-    font-family: var(--font-family-poppins);
-    padding-top: 8px;
-    padding-bottom: 8px;
-    border: 1px solid #e5effe;
-}
-
 emoji-mart {
     border: 0;
     margin-top: 12px;
@@ -355,57 +342,14 @@ color: white;
     border-top: 2px solid rgba( var(--blu) , 0.3);
 }
 
-// TOOLTIP DESCRIPTION INFO ICON : start
-::ng-deep .description-tooltip {
-    background-color: #fff;
-    color: #555555;
-    font-size: 12px;
-    border-radius: 8px;
-    font-family: var(--font-family-poppins);
-    // padding-top:8px;
-    // padding-bottom:8px;
-    border: 1px solid #e5effe;
-}
-.tooltip-wrp {
-    position: relative;
-    padding: 8px;
-    // box-shadow: 0 2px 4px -1px #0003, 0 4px 5px #00000024, 0 1px 10px #0000001f;
-    // background-color: #fff;
-    color: #555555; 
-    font-size: 10px;
-    text-align: justify;
-    border-radius: 8px;
-    font-family: var(--font-family-poppins);
-    // border: 1px solid #e5effe;
-    width: auto;
-}
-.caret_tooltip {
-    height: 8px;
-    width: 8px;
-    position: absolute;
-    right: -4px;
-    top: 50%;
-    background: #fff;
-    transform: translateY(-50%) rotate(45deg);
-    background: #fff;
-}
-// TOOLTIP DESCRIPTION INFO ICON : end
 
-// ::ng-deep
-::ng-deep .cds-mat-tooltip {
-    background-color: var(--gray-light-01) !important;
-    color: var(--gray) !important;
-    font-size: 12px !important;
-    font-family: var(--font-family-poppins);
-    border-radius: 16px !important;
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-    line-height: 1.4;
-    // border: 1px solid #e5effe !important;
+.custom-divider {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    border: 0;
+    border-top: 1px solid #eeeeee1c;
 }
-  
+
 .btn.btn-primary.cds-blue-button {
     background: var(--blu-02);
     color: white;

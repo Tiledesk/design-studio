@@ -94,13 +94,13 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
       // this.elementSelectedMaxLength = [...Array(this.elementIntentSelected.maxLength).keys()]
       console.log('[PANEL-INTENT-DETAIL] (OnChanges) elementIntentSelectedType ', this.elementIntentSelectedType);
       console.log('[PANEL-INTENT-DETAIL] (OnChanges) elementSelected ', this.elementSelected);
-      // console.log('[PANEL-INTENT-DETAIL] (OnChanges) intentSelected ', this.intentSelected);
-
+      
       let action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType)
       if(action && action.plan){
         this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.plan)}
         console.log('[PANEL-INTENT-DETAIL] --> status', this.canShowActionByPlan)
       }
+
     }catch(error){
       this.logger.log('[CDS-PANEL-INTENT-DETAIL] (ngOnChanges) ERROR', error);
     }
@@ -117,15 +117,15 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
       // recupero id dalla action e verifico se ho modificato l'intent della action aperta
       // se si aggiorno la action
       if (intent && intent.intent_id === this.intentSelected.intent_id) {
-        // this.idSelectedIntent = intent.intent_id;
+        //CASE OF ACTION UPDATES
         if(this.elementIntentSelected.type === TYPE_INTENT_ELEMENT.ACTION){
           let newAction = intent.actions.find((obj) => obj._tdActionId === this.elementSelected._tdActionId);
           this.elementSelected = newAction;
         }else {
+          //CASE OF FORM/QUESTION UPDATES
           this.elementIntentSelectedType = this.elementIntentSelected.type;
           this.elementSelected = this.elementIntentSelected.element
         }
-        this.logger.log('[PANEL-INTENT-DETAIL] --- AGGIORNO ACTION', intent, this.elementSelected._tdActionId);
       } else {
         this.logger.log('[PANEL-INTENT-DETAIL] --- CHIUDO');
         this.closePanel.emit();
