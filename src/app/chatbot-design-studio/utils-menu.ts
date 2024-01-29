@@ -25,12 +25,12 @@ export const SUPPORT_OPTIONS: { [key: string]: Array<{ key: string, label: strin
         { key: 'DOCS',          label: 'Docs',          icon: 'description',                    type: TYPE_URL.BLANK,   src: 'https://developer.tiledesk.com/'},
         { key: 'HELP_CENTER',   label: 'HelpCenter',    icon: 'help',                           type: TYPE_URL.BLANK ,  src: 'https://gethelp.tiledesk.com/'},
         { key: 'ROAD_MAP',      label: 'RoadMap',       icon: 'checklist',                      type: TYPE_URL.BLANK,   src: 'https://feedback.tiledesk.com/roadmap'},
-        { key: 'SYSTEM_STATUS', label: 'SystemStatus',  icon: 'health_and_safety',              type: TYPE_URL.BLANK,   src: 'https://feedback.tiledesk.com/roadmap'},
+        // { key: 'SYSTEM_STATUS', label: 'SystemStatus',  icon: 'health_and_safety',              type: TYPE_URL.BLANK,   src: 'https://feedback.tiledesk.com/roadmap'},
         { key: 'GITHUB',        label: 'GitHubRepo',    icon: 'assets/images/github-mark.svg',  type: TYPE_URL.BLANK,   src: 'https://github.com/Tiledesk'}
     ],
     "CONTACT_US": [
         { key: 'EMAIL',   label: 'SendUsEmail',    icon: 'mail',   type: TYPE_URL.BLANK ,  src: 'mailto:support@tiledesk.com', description:"support@tiledesk.com"},
-        { key: 'CHAT',   label: 'ChatUs',    icon: 'forum',   type: TYPE_URL.BLANK ,  src: 'mailto:support@tiledesk.com', description:"support@tiledesk.com"},
+        { key: 'CHAT',   label: 'ChatUs',    icon: 'forum',   type: TYPE_URL.BLANK , description:"StartConversation"},
         { key: 'DISCORD',   label: 'DiscordChannel',    icon: 'assets/images/github-mark.svg',   type: TYPE_URL.BLANK ,  src: 'https://discord.gg/Wut2FtpP', description:"JoinDiscordChannel"},
     ]
 }

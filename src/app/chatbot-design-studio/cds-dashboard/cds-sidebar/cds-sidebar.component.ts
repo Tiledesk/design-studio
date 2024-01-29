@@ -88,11 +88,8 @@ export class CdsSidebarComponent implements OnInit {
 
   onMenuOptionFN(item: { key: string, label: string, icon: string, src?: string}){
     switch(item.key){
-      case 'HELP_CENTER':
-      case 'ROAD_MAP':
       case 'FEEDBACK':
       case 'CHANGELOG':
-      case 'GITHUB':
         window.open(item.src, '_blank')
         break;
       case 'SUPPORT':

@@ -28,10 +28,31 @@ export class CdsSupportComponent implements OnInit {
         }
       })
     })
+    console.log('[CDS-SUPPORT this.cardOptions]', this.cardOptions)
     this.hideShowWidget("show")
   }
 
-  private hideShowWidget(status: "hide" | "show") {
+  onCardItemClick(item, section){
+    if(section === 'CONTACT_US'){
+      switch(item.key){
+        case 'EMAIL':
+        case 'DISCORD':
+          window.open(item.src, '_blank')
+          break;
+        case 'CHAT':
+          this.hideShowWidget('open')
+          break;
+      }
+    }
+
+
+    if(section === 'SELF_SERVICE'){
+      window.open(item.src, '_blank')
+    }
+
+  }
+
+  private hideShowWidget(status: "hide" | "show" | "open" | "close") {
     try {
       if (window && window['tiledesk']) {
         this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
@@ -39,6 +60,10 @@ export class CdsSupportComponent implements OnInit {
           window['tiledesk'].hide();
         } else if (status === 'show') {
           window['tiledesk'].show();
+        } else if(status === 'open'){
+          window['tiledesk'].open();
+        }else if(status === "close"){
+          window['tiledesk'].close();
         }
       }
     } catch (error) {

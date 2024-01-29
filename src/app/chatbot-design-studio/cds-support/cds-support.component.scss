@@ -2,49 +2,91 @@
 
 :host {
     --content-background: rgb(244, 246, 251, 0.4);
+    --content-hover-background: #506493;
     --base-radius: 8px
 }
 .card-container{
-    display: flex;
     width: 100%;
     padding: 40px 0;
     /* max-width: 1280px; */
     justify-content: center;
     align-items: center;
-    gap: 20px
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 20px;
+    width: 100%;
+    grid-template-columns: 0.8fr 1fr;
 }
 
 .cds-card {
     background: var(--content-background);
     border-radius: var(--base-radius);
     box-shadow: rgba(0,0,0,.1) 0px 3px 6px 0px,rgba(0,0,0,.08) 0px 1px 3px 0px; 
-    width: 50%;
-    &:first-child{
-        width: 30%;
-    }
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .title-label{
     font-size: 23px;
     font-weight: 600;
+    margin: 10px 15px;
+}
+.section-wrp{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-around;
+}
+
+.section-info{
+    display: flex;
+    gap: 20px;
 }
 
 .section-icon{
     display: flex;
     align-items: center;
     justify-content: center;
+    span.material-icons-outlined,
+    img{
+        width: 20px;
+        font-size: 20px;
+        color: var(--icon-color-menu);
+        filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+    }
 }
 
 .cds-card-item{
     display: flex;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
     background-color: var(--content-background);
-    border-radius: 8px;
+    // border-radius: 8px;
     padding: 10px;
     gap: 20px;
+    cursor: pointer;
 
     &:not(:last-child){
         border-bottom: 1px solid rgb(223, 227, 237);
     }
+
+    &:hover{
+        span.material-icons-outlined,
+        img{
+            width: 20px;
+            font-size: 20px;
+            color: var(--content-hover-background);
+            filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+        }
+    }
+}
+
+.cds-title{
+    font-weight: 400;
+}
+.cds-description{
+    font-weight: 200;
 }
