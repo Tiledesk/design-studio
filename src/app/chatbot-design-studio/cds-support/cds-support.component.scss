@@ -13,14 +13,13 @@
     align-items: center;
 
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
     grid-column-gap: 20px;
     width: 100%;
-    grid-template-columns: 0.8fr 1fr;
+    grid-template-columns: 1fr 0.6fr;
 }
 
 .cds-card {
-    background: var(--content-background);
+    // background: var(--content-background);
     border-radius: var(--base-radius);
     box-shadow: rgba(0,0,0,.1) 0px 3px 6px 0px,rgba(0,0,0,.08) 0px 1px 3px 0px; 
     display: flex;
@@ -63,7 +62,6 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    background-color: var(--content-background);
     // border-radius: 8px;
     padding: 10px;
     gap: 20px;
