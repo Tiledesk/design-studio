@@ -19,8 +19,9 @@ import { TYPE_URL } from '../../utils';
 })
 export class CDSMenuComponent implements OnInit {
 
-  @Input() items: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string, localIcon?: boolean}>;
+  @Input() items: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status?: string, src?: string, localIcon?: boolean}>;
   @Input() menuType: 'header' | 'sidebar' = 'header';
+  @Input() menuTitle: 'string'
   @Output() onMenuOption = new EventEmitter();
   
   TYPE_URL = TYPE_URL;
@@ -45,6 +46,7 @@ export class CDSMenuComponent implements OnInit {
 
   ngOnChanges(){
     if(this.items){
+      this.items = this.items.filter(el => el.status !== 'inactive')
       this.items.map((el)=> {
         el.localIcon = false
         if(el.icon && el.icon.match(new RegExp(/(?=.*?assets|http|https\b)^.*$/))){
