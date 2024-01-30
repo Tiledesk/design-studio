@@ -17,42 +17,71 @@ export class BrandService {
   // "brandSrc":"https://tiledeskbrand.nicolan74.repl.co/mybrand",
 
   public brand: any;
-
+  
    _brand = {
-    "metaTitle": "Tiledesk Support Dashboard",
-    "favicon__url": "https://tiledesk.com/wp-content/uploads/2022/07/tiledesk_v13-300x300.png",
-    "company_name": "Tiledesk",
-    "company_site_name": "tiledesk.com",
-    "company_site_url": "https://www.tiledesk.com",
-    "company_logo_white__url": "assets/img/logos/tiledesk-logo_white_orange.svg",
-    "company_logo_black__url": "assets/img/logos/tiledesk_3.0_logo_black_v2_no_version.svg",
-    "company_logo_allwhite__url": "assets/img/logos/tiledesk_3.0_logo_all_white_v2_no_version.svg",
-    "company_logo_no_text__url": "assets/img/logos/tiledesk-solo-logo.png",
-    "privacy_policy_link_text": "Privacy Policy",
-    "privacy_policy_url": "https://www.tiledesk.com/privacy.html",
-    "display_terms_and_conditions_link": true,
-    "terms_and_conditions_url": "https://www.tiledesk.com/termsofservice.html",
-    "contact_us_email": "support@tiledesk.com",
-    "footer": {
-        "display_terms_and_conditions_link": true,
-        "display_contact_us_email": true
+    DASHBOARD: {
+      "metaTitle": "Tiledesk Support Dashboard",
+      "favicon__url": "https://tiledesk.com/wp-content/uploads/2022/07/tiledesk_v13-300x300.png",
+      "company_name": "Tiledesk",
+      "company_site_name": "tiledesk.com",
+      "company_site_url": "https://www.tiledesk.com",
+      "company_logo_white__url": "assets/img/logos/tiledesk-logo_white_orange.svg",
+      "company_logo_black__url": "assets/img/logos/tiledesk_3.0_logo_black_v2_no_version.svg",
+      "company_logo_allwhite__url": "assets/img/logos/tiledesk_3.0_logo_all_white_v2_no_version.svg",
+      "company_logo_no_text__url": "assets/img/logos/tiledesk-solo-logo.png",
+      "privacy_policy_link_text": "Privacy Policy",
+      "privacy_policy_url": "https://www.tiledesk.com/privacy.html",
+      "display_terms_and_conditions_link": true,
+      "terms_and_conditions_url": "https://www.tiledesk.com/termsofservice.html",
+      "contact_us_email": "support@tiledesk.com",
+      "footer": {
+          "display_terms_and_conditions_link": true,
+          "display_contact_us_email": true
+      },
+      "recent_project_page": {
+          "company_logo_black__width": "130px"
+      },
+      "signup_page": {
+          "display_terms_and_conditions_link": true
+      },
+      "handle_invitation_page": {
+          "company_logo_45x45": "assets/img/logos/tiledesk-solo-logo.png"
+      },
+      "wizard_create_project_page": {
+          "logo_x_rocket": "assets/img/logos/logo_x_rocket4x4.svg"
+      },
+      "wizard_install_widget_page": {
+          "logo_on_rocket": "assets/img/logos/tiledesk-solo-logo.png"
+      },
     },
-    "recent_project_page": {
-        "company_logo_black__width": "130px"
+    CHAT: {
+
     },
-    "signup_page": {
-        "display_terms_and_conditions_link": true
+    CDS: {
+      menuItems: [
+        { key: 'FEEDBACK', icon: "", src:"", status: "inactive"},
+        { key: 'CHANGELOG', icon: "", src:""},
+      ],
+      supportOpions: {
+        "SELF_SERVICE": [
+          { key: 'DOCS', icon: "", src:""},
+          { key: 'HELP_CENTER', icon: "", src:""},
+          { key: 'ROAD_MAP', icon: "", src:""},
+          { key: 'GITHUB', icon: "", src:""},
+        ],
+        "CONTACT_US": [
+          { key: 'EMAIL', icon: "", src:""},
+          { key: 'CHAT', icon: "", src:""},
+          { key: 'DISCORD', icon: "", src:""},
+        ]
+      }
     },
-    "handle_invitation_page": {
-        "company_logo_45x45": "assets/img/logos/tiledesk-solo-logo.png"
-    },
-    "wizard_create_project_page": {
-        "logo_x_rocket": "assets/img/logos/logo_x_rocket4x4.svg"
-    },
-    "wizard_install_widget_page": {
-        "logo_on_rocket": "assets/img/logos/tiledesk-solo-logo.png"
+    COMMON: {
+      baseLogo: "",
+      logoNoText: '',
+      logoWhite: ""
     }
-}
+  }
 
   public assetBrand: any;
   // public brand = brand
@@ -94,6 +123,7 @@ export class BrandService {
 
 
   async loadBrand() {
+
     // this.getData()
     //   .subscribe(data => {
     //     this.assetBrand = data
@@ -155,7 +185,7 @@ export class BrandService {
       let url = this.appConfig.getConfig().brandSrc
       if (url && url !== 'CHANGEIT') {
         const data = await this.httpClient.get(url).toPromise();
-
+        
         console.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
 
         this.brand =data
@@ -186,6 +216,5 @@ export class BrandService {
     return this.brand;
     
   }
-
 
 }
