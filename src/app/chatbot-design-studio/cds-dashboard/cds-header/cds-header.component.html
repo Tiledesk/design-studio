@@ -89,8 +89,9 @@
         <div class="btn-group"
                 matTooltipClass="custom-mat-tooltip"
                 matTooltip="{{ 'TestIt' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
-                matTooltipHideDelay="100">
-            <button id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" (click)="openTestSiteInPopupWindow()">
+                matTooltipHideDelay="100"
+                [matMenuTriggerFor]="menuPlay">
+            <button id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" >
                 <img class="active-icon" width="18px" height="18px" src="assets/images/icons/play.svg">
             </button>
         </div>
@@ -120,10 +121,20 @@
 
 
 <!-- SHARE MENU OPTIONS-->
-<mat-menu #menuShare="matMenu" class="menuElement shareMenu" xPosition="after">
+<mat-menu #menuShare="matMenu" class="menuElement shareMenu" xPosition="after" yPosition="below">
     <ng-template matMenuContent>
         <cds-menu
             [items]="SHARE_MENU_ITEMS"
+            [menuType]="''"
+            (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
+    </ng-template>
+</mat-menu>
+
+<!-- PLAY MENU OPTIONS-->
+<mat-menu #menuPlay="matMenu" class="menuElement playMenu" xPosition="after" yPosition="below">
+    <ng-template matMenuContent>
+        <cds-menu
+            [items]="PLAY_MENU_ITEMS"
             [menuType]="''"
             (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
     </ng-template>

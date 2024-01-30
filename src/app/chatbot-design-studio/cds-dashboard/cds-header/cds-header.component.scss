@@ -191,7 +191,15 @@
     box-shadow: none;
 
     &.shareMenu{
+        width: unset;
+        top: 10px;
+        left: -100px;
+    }
+
+    &.playMenu{
         width: 200px;
+        top: 10px;
+        left: -170px;
     }
 }
 

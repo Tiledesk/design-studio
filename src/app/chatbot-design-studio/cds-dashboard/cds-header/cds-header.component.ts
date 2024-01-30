@@ -19,7 +19,7 @@ import { CdsPublishOnCommunityModalComponent } from '../../../modals/cds-publish
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { environment } from 'src/environments/environment';
 import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
-import { LOGO_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
+import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -54,6 +54,7 @@ export class CdsHeaderComponent implements OnInit {
 
   LOGO_MENU_ITEMS = LOGO_MENU_ITEMS;
   SHARE_MENU_ITEMS = SHARE_MENU_ITEMS;
+  PLAY_MENU_ITEMS = PLAY_MENU_ITEMS;
 
   translationsMap: Map<string, string> = new Map();
 
@@ -115,6 +116,8 @@ export class CdsHeaderComponent implements OnInit {
       this.TRY_ON_WA = false;
       // this.logger.log('PUBLIC-KEY (SIGNUP) - mt is', this.MT);
     }
+    // PLAY_MENU_ITEMS.map(el => { el.key === 'WHATSAPP' && !this.TRY_ON_WA ? el.status = 'inactive': null }) 
+
   }
 
   getTranslations() {
@@ -255,6 +258,13 @@ export class CdsHeaderComponent implements OnInit {
         window.open(testItOutUrl, '_blank')
         }
         break;
+      case 'WHATSAPP':
+        this.openWhatsappPage()
+        break;
+      case 'WEB':
+        this.openTestSiteInPopupWindow()
+        break;
+        
     }
   }
 
