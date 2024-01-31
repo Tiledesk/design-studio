@@ -271,8 +271,8 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     ASSIGN_VARIABLE: { name: 'CDSActionList.NAME.SetAttribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.ASSIGN_VARIABLE, src: "assets/images/actions/assign_var.svg", status: "inactive"},
     ASSIGN_VARIABLE_V2: { name: 'CDSActionList.NAME.SetAttribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.ASSIGN_VARIABLE_V2, src: "assets/images/actions/assign_var.svg", status: "active" },
     DELETE_VARIABLE: { name: 'CDSActionList.NAME.DeleteAttribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.DELETE_VARIABLE, src: "assets/images/actions/delete_var.svg", status: "active",  },
-    REPLACE_BOT: { name: 'CDSActionList.NAME.ReplaceBot', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.REPLACE_BOT, src: "assets/images/actions/replace_bot.svg", status: "inactive", description: "CDSActionList.DESCRIPTION.ReplaceBot"},
-    REPLACE_BOTV2: { name: 'CDSActionList.NAME.ReplaceBot', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.REPLACE_BOTV2, src: "assets/images/actions/replace_bot.svg", status: "active", description: "CDSActionList.DESCRIPTION.ReplaceBot"},
+    REPLACE_BOT: { name: 'CDSActionList.NAME.ReplaceBot', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.REPLACE_BOT, src: "assets/images/actions/replace_bot.svg", status: "active", description: "CDSActionList.DESCRIPTION.ReplaceBot"},
+    REPLACE_BOTV2: { name: 'CDSActionList.NAME.ReplaceBot', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.REPLACE_BOTV2, src: "assets/images/actions/replace_bot.svg", status: "inactive", description: "CDSActionList.DESCRIPTION.ReplaceBot"},
     WAIT : { name: 'CDSActionList.NAME.Wait', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.WAIT, src:"assets/images/actions/wait.svg", status: "active", description: "CDSActionList.DESCRIPTION.Wait"},
     // WEB_REQUEST : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUEST, src:"assets/images/actions/web_request.svg", status: "active", description: ''},
     WEB_REQUESTV2 : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUESTV2, src:"assets/images/actions/web_request.svg", status: "beta", description: ''},
@@ -289,7 +289,7 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     CAPTURE_USER_REPLY: { name: 'CDSActionList.NAME.CaptureUserReply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: "CDSActionList.DESCRIPTION.CaptureUserReply" },
     QAPLA: { name: 'CDSActionList.NAME.Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: PLAN_NAME.E, description: "CDSActionList.DESCRIPTION.Qapla", disabled: false },
     MAKE : { name: 'CDSActionList.NAME.Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "active", plan: PLAN_NAME.D, description: '', disabled: false},
-    HUPSPOT : { name: 'CDSActionList.NAME.Hubspot',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.HUBSPOT, src:"assets/images/actions/hubspot.svg", status: "active", plan: PLAN_NAME.E, description: ''},
+    HUPSPOT : { name: 'CDSActionList.NAME.Hubspot',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.HUBSPOT, src:"assets/images/actions/hubspot.svg", status: "inactive", plan: PLAN_NAME.E, description: ''},
 }
 
 export const EVENTS_LIST = {
