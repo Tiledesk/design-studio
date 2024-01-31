@@ -5,6 +5,8 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.12 in PROD
+
 ### 1.0.12-rc.3
 - added: brandService added to load remote logos and resources
 - changed: logos and resources from remote json
