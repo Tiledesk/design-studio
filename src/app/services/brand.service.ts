@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppConfigService } from './app-config';
+import { BrandResources } from '../chatbot-design-studio/BrandResources';
 
 const swal = require('sweetalert');
 
@@ -18,41 +19,71 @@ export class BrandService {
 
   public brand: any;
 
-   _brand = {
-    "metaTitle": "Tiledesk Support Dashboard",
-    "favicon__url": "https://tiledesk.com/wp-content/uploads/2022/07/tiledesk_v13-300x300.png",
-    "company_name": "Tiledesk",
-    "company_site_name": "tiledesk.com",
-    "company_site_url": "https://www.tiledesk.com",
-    "company_logo_white__url": "assets/img/logos/tiledesk-logo_white_orange.svg",
-    "company_logo_black__url": "assets/img/logos/tiledesk_3.0_logo_black_v2_no_version.svg",
-    "company_logo_allwhite__url": "assets/img/logos/tiledesk_3.0_logo_all_white_v2_no_version.svg",
-    "company_logo_no_text__url": "assets/img/logos/tiledesk-solo-logo.png",
-    "privacy_policy_link_text": "Privacy Policy",
-    "privacy_policy_url": "https://www.tiledesk.com/privacy.html",
-    "display_terms_and_conditions_link": true,
-    "terms_and_conditions_url": "https://www.tiledesk.com/termsofservice.html",
-    "contact_us_email": "support@tiledesk.com",
-    "footer": {
-        "display_terms_and_conditions_link": true,
-        "display_contact_us_email": true
+  _brand = {
+    DASHBOARD: {
+      META_TITLE: "Tiledesk Support Dashboard",
+      FAVICON_URL: "https://tiledesk.com/wp-content/uploads/2022/07/tiledesk_v13-300x300.png",
+      "company_name": "Tiledesk",
+      "company_site_name": "tiledesk.com",
+      "company_site_url": "https://www.tiledesk.com",
+      "company_logo_white__url": "assets/img/logos/tiledesk-logo_white_orange.svg",
+      "company_logo_black__url": "assets/img/logos/tiledesk_3.0_logo_black_v2_no_version.svg",
+      "company_logo_allwhite__url": "assets/img/logos/tiledesk_3.0_logo_all_white_v2_no_version.svg",
+      "company_logo_no_text__url": "assets/img/logos/tiledesk-solo-logo.png",
+      "privacy_policy_link_text": "Privacy Policy",
+      "privacy_policy_url": "https://www.tiledesk.com/privacy.html",
+      "display_terms_and_conditions_link": true,
+      "terms_and_conditions_url": "https://www.tiledesk.com/termsofservice.html",
+      "contact_us_email": "support@tiledesk.com",
+      "footer": {
+          "display_terms_and_conditions_link": true,
+          "display_contact_us_email": true
+      },
+      "recent_project_page": {
+          "company_logo_black__width": "130px"
+      },
+      "signup_page": {
+          "display_terms_and_conditions_link": true
+      },
+      "handle_invitation_page": {
+          "company_logo_45x45": "assets/img/logos/tiledesk-solo-logo.png"
+      },
+      "wizard_create_project_page": {
+          "logo_x_rocket": "assets/img/logos/logo_x_rocket4x4.svg"
+      },
+      "wizard_install_widget_page": {
+          "logo_on_rocket": "assets/img/logos/tiledesk-solo-logo.png"
+      },
     },
-    "recent_project_page": {
-        "company_logo_black__width": "130px"
+    CHAT: {
+
     },
-    "signup_page": {
-        "display_terms_and_conditions_link": true
+    CDS: {
+      META_TITLE:"Design Studio",
+      FAVICON_URL: "https://tiledesk.com/wp-content/uploads/2022/07/tiledesk_v13-300x300.png",
+      INFO_MENU_ITEMS: [
+        { key: 'HELP_CENTER', icon: "", src:"", status: "inactive"},
+        { key: 'ROAD_MAP', icon: "", src:"", status: "inactive"},
+        { key: 'FEEDBACK', icon: "", src:"", status: "inactive"},
+        { key: 'SUPPORT', icon: "", src:"", status: "inactive"},
+        { key: 'CHANGELOG', icon: "", src:"", status: "inactive"},
+        { key: 'GITHUB', icon: "", src:"", status: "inactive"},
+      ]
     },
-    "handle_invitation_page": {
-        "company_logo_45x45": "assets/img/logos/tiledesk-solo-logo.png"
-    },
-    "wizard_create_project_page": {
-        "logo_x_rocket": "assets/img/logos/logo_x_rocket4x4.svg"
-    },
-    "wizard_install_widget_page": {
-        "logo_on_rocket": "assets/img/logos/tiledesk-solo-logo.png"
+    COMMON: {
+      COMPANY_LOGO:"assets/logos/tiledesk_logo.svg",
+      COMPANY_LOGO_NO_TEXT:"assets/logos/tiledesk_logo.svg",
+      BASE_LOGO: "assets/logos/tiledesk_logo.svg",
+      BASE_LOGO_NO_TEXT: "assets/logos/tiledesk_logo.svg",
+      BASE_LOGO_WHITE: "assets/logos/tiledesk-logo_new_white.svg",
+      BASE_LOGO_WHITE_NO_TEXT:"",
+      COMPANY_NAME: "Tiledesk",
+      COMPANY_SITE_NAME:"tiledesk.com",
+      COMANY_SITE_URL:"https://www.tiledesk.com",
+      CONTACT_US_EMAIL: "support@tiledesk.com",
+      COMPANY_PRIMARY_COLOR:""
     }
-}
+  }
 
   public assetBrand: any;
   // public brand = brand
@@ -161,6 +192,9 @@ export class BrandService {
         this.brand =data
 
         console.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
+
+        const resources = new BrandResources(this);
+        resources.loadResources()
       }
     } catch (err) {
       console.error('[BRAND-SERV] loadBrand error : ', err);
@@ -169,6 +203,8 @@ export class BrandService {
       // this.notify.showNotificationChangeProject('ops', 2, 'done');
       this.displaySwalAlert(err)
     }
+    
+    
   }
 
   displaySwalAlert(err) {
@@ -183,8 +219,7 @@ export class BrandService {
 
   getBrand() {
     console.log('BrandService getBrand has been called - brand: ', this.brand);
-    return this.brand;
-    
+    return { ...this.brand['CDS'], ...this.brand['COMMON'] }
   }
 
 

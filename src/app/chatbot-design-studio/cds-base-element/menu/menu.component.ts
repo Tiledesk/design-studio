@@ -10,6 +10,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { UserModel } from 'src/chat21-core/models/user';
 import { environment } from 'src/environments/environment';
 import { TYPE_URL } from '../../utils';
+import { BRAND_BASE_INFO } from '../../utils-resources';
 
 
 @Component({
@@ -19,7 +20,7 @@ import { TYPE_URL } from '../../utils';
 })
 export class CDSMenuComponent implements OnInit {
 
-  @Input() items: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string, localIcon?: boolean}>;
+  @Input() items: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status?: string, src?: string, localIcon?: boolean}>;
   @Input() menuType: 'header' | 'sidebar' = 'header';
   @Output() onMenuOption = new EventEmitter();
   
@@ -28,6 +29,7 @@ export class CDSMenuComponent implements OnInit {
   loggedUser: UserModel;
 
   version: string;
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
   private logger: LoggerService = LoggerInstance.getInstance()
 
   constructor(
@@ -45,6 +47,7 @@ export class CDSMenuComponent implements OnInit {
 
   ngOnChanges(){
     if(this.items){
+      this.items = this.items.filter(el => el.status !== 'inactive')
       this.items.map((el)=> {
         el.localIcon = false
         if(el.icon && el.icon.match(new RegExp(/(?=.*?assets|http|https\b)^.*$/))){

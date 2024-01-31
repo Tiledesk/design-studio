@@ -18,7 +18,6 @@ $gray-02: rgb(239,241,245);
 $gray-light-01: rgb(214, 214, 214);
 $gray-light-02: rgb(223, 227, 237);
 
-$tiledesk-base-color: rgb(224,106,88);
 $success-connector: rgb(44, 191, 35);
 $failure-connector: rgb(191, 35, 35);
 
@@ -97,6 +96,8 @@ body.light {
 
     --font-size-base: 14px;
     --height-header: 25px;
+
+    --base-brand-color: rgb(224, 106, 88);
 
 
     //ACTION DRAG-DROP 

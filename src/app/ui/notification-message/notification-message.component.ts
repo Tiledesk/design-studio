@@ -16,6 +16,7 @@ import { Project } from 'src/app/models/project-model';
 import { UserModel } from 'src/chat21-core/models/user';
 import { ProjectUser } from 'src/app/models/project-user';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 const swal = require('sweetalert');
 @Component({
   selector: 'notification-message',
@@ -58,7 +59,7 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
   profile_name_for_segment: string;
 
   private logger: LoggerService = LoggerInstance.getInstance();
-  
+
   constructor(
     public notify: NotifyService,
     public projectService: ProjectService,
@@ -73,8 +74,8 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
     this.tparams = brand;
 
     if (brand) {
-      this.company_name = brand['company_name'];
-      this.contactUsEmail = brand['contact_us_email'];
+      this.company_name = brand['COMPANY_NAME'];
+      this.contactUsEmail = brand['CONTACT_US_EMAIL'];
     }
 
   }
