@@ -6,6 +6,9 @@
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 1.0.12-rc.3
+- added: brandService added to load remote logos and resources
+- changed: logos and resources from remote json
+- changed: limit global value to 4026 characters
 - bug-fixed: lowecase pipe not exist
 
 ### 1.0.12-rc.2
