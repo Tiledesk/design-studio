@@ -93,7 +93,7 @@ cds-sidebar {
   // margin-right: auto;
   width: 100px;
   height: 100px;
-  border: 3px solid $tiledesk-base-color;
+  border: 3px solid var(--base-brand-color);
   border-radius: 50%;
 
   animation: spin 7s ease-in-out;

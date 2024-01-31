@@ -64,6 +64,7 @@ import { HomeComponent } from './components/home/home.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { NetworkService } from './services/network.service';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
+import { BrandResources } from './chatbot-design-studio/BrandResources';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
@@ -204,7 +205,8 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     { provide: MAT_DIALOG_DATA, useValue: {} },
     { provide: MatDialogRef, useValue: {} },
-    NetworkService
+    NetworkService,
+    BrandResources
   ]
 })
 export class AppModule { }
