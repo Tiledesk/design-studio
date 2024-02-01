@@ -30,8 +30,11 @@ export class BrandResources {
         /** CSS */
         document.documentElement.style.setProperty('--base-brand-color', this.brand['BRAND_PRIMARY_COLOR']);
 
+        /** BRAND_BASE_INFO */
+        Object.keys(BRAND_BASE_INFO).forEach(key => BRAND_BASE_INFO[key] = this.brand[key])
+
         /** LOGOS_ITEMS */
-        Object.keys(LOGOS_ITEMS).forEach(key => { LOGOS_ITEMS[key].icon = this.brand[key]; LOGOS_ITEMS[key].label = this.brand['BRAND_NAME']})
+        Object.keys(LOGOS_ITEMS).forEach(key => { LOGOS_ITEMS[key].icon = this.brand[key] })
         
         /** INFO_MENU_ITEMS */
         let result: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...INFO_MENU_ITEMS, ...this.brand['INFO_MENU_ITEMS']].reduce((m, o) => m.set(o.key, o), new Map).values());
@@ -49,8 +52,7 @@ export class BrandResources {
             if(this.brand['MEDIA'][key].description) MEDIA[key].description = this.brand['MEDIA'][key].description
         })
 
-        /** BRAND_BASE_INFO */
-        Object.keys(BRAND_BASE_INFO).forEach(key => BRAND_BASE_INFO[key] = this.brand[key])
+        
     }
 }
 
