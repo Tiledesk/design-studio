@@ -23,15 +23,15 @@ export class BrandResources {
         }
 
         /** META TITLE and FAVICON */
-        document.title = this.brand['COMPANY_NAME'] + ' ' + this.brand['META_TITLE']
+        document.title = this.brand['BRAND_NAME'] + ' ' + this.brand['META_TITLE']
         var icon = document.querySelector("link[rel~='icon']") as HTMLElement;
         icon.setAttribute('href', this.brand['FAVICON_URL'])
 
         /** CSS */
-        document.documentElement.style.setProperty('--base-brand-color', this.brand['BRAND_COLOR']);
+        document.documentElement.style.setProperty('--base-brand-color', this.brand['BRAND_PRIMARY_COLOR']);
 
         /** LOGOS_ITEMS */
-        Object.keys(LOGOS_ITEMS).forEach(key => { LOGOS_ITEMS[key].icon = this.brand[key]; LOGOS_ITEMS[key].label = this.brand['COMPANY_NAME']})
+        Object.keys(LOGOS_ITEMS).forEach(key => { LOGOS_ITEMS[key].icon = this.brand[key]; LOGOS_ITEMS[key].label = this.brand['BRAND_NAME']})
         
         /** INFO_MENU_ITEMS */
         let result: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...INFO_MENU_ITEMS, ...this.brand['INFO_MENU_ITEMS']].reduce((m, o) => m.set(o.key, o), new Map).values());

@@ -1,4 +1,3 @@
-import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,6 +22,7 @@ import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-
 import { LOGO_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
+import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
 
 const swal = require('sweetalert');
 
@@ -57,7 +57,6 @@ export class CdsHeaderComponent implements OnInit {
   SHARE_MENU_ITEMS = SHARE_MENU_ITEMS;
   LOGOS_ITEMS = LOGOS_ITEMS
   BRAND_BASE_INFO = BRAND_BASE_INFO
-  
   translationsMap: Map<string, string> = new Map();
 
   private logger: LoggerService = LoggerInstance.getInstance();

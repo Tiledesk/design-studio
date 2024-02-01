@@ -28,7 +28,7 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
   PLAN_NAME = PLAN_NAME
   private unsubscribe$: Subject<any> = new Subject<any>();
   tparams: any;
-  company_name: string;
+  brand_name: string;
   displayExpiredSessionModal: string;
 
   project: Project;
@@ -74,7 +74,7 @@ export class NotificationMessageComponent implements OnInit, OnDestroy {
     this.tparams = brand;
 
     if (brand) {
-      this.company_name = brand['COMPANY_NAME'];
+      this.brand_name = brand['BRAND_NAME'];
       this.contactUsEmail = brand['CONTACT_US_EMAIL'];
     }
 

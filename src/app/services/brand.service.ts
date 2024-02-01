@@ -78,6 +78,7 @@ export class BrandService {
       BASE_LOGO_WHITE: "assets/logos/tiledesk-logo_new_white.svg",
       BASE_LOGO_WHITE_NO_TEXT:"",
       COMPANY_NAME: "Tiledesk",
+      BRAN_NAME: "Tiledesk",
       COMPANY_SITE_NAME:"tiledesk.com",
       COMANY_SITE_URL:"https://www.tiledesk.com",
       CONTACT_US_EMAIL: "support@tiledesk.com",
