@@ -31,7 +31,7 @@
                 <span class="material-icons">{{variable?.icon}}</span>
                 <label class="category-row-name ellips">{{variable?.name}}</label>   
                 <div *ngIf="variable?.description"
-                    matTooltipClass="cds-mat-tooltip"  matTooltip="{{ variable?.description | translate}}" #tooltip="matTooltip" matTooltipPosition='left' matTooltipHideDelay="100">
+                    matTooltipClass="cds-mat-tooltip"  matTooltip="{{ variable?.description | translate: BRAND_BASE_INFO }}" #tooltip="matTooltip" matTooltipPosition='left' matTooltipHideDelay="100">
                     <span class="material-icons-outlined">info</span>
                 </div>
 

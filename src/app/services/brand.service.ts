@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppConfigService } from './app-config';
+import { BrandResources } from '../chatbot-design-studio/BrandResources';
 
 const swal = require('sweetalert');
 
@@ -17,11 +18,11 @@ export class BrandService {
   // "brandSrc":"https://tiledeskbrand.nicolan74.repl.co/mybrand",
 
   public brand: any;
-  
-   _brand = {
+
+  _brand = {
     DASHBOARD: {
-      "metaTitle": "Tiledesk Support Dashboard",
-      "favicon__url": "https://tiledesk.com/wp-content/uploads/2022/07/tiledesk_v13-300x300.png",
+      META_TITLE: "Tiledesk Support Dashboard",
+      FAVICON_URL: "https://tiledesk.com/wp-content/uploads/2022/07/tiledesk_v13-300x300.png",
       "company_name": "Tiledesk",
       "company_site_name": "tiledesk.com",
       "company_site_url": "https://www.tiledesk.com",
@@ -58,28 +59,30 @@ export class BrandService {
 
     },
     CDS: {
-      menuItems: [
+      META_TITLE:"Design Studio",
+      FAVICON_URL: "https://tiledesk.com/wp-content/uploads/2022/07/tiledesk_v13-300x300.png",
+      INFO_MENU_ITEMS: [
+        { key: 'HELP_CENTER', icon: "", src:"", status: "inactive"},
+        { key: 'ROAD_MAP', icon: "", src:"", status: "inactive"},
         { key: 'FEEDBACK', icon: "", src:"", status: "inactive"},
-        { key: 'CHANGELOG', icon: "", src:""},
-      ],
-      supportOpions: {
-        "SELF_SERVICE": [
-          { key: 'DOCS', icon: "", src:""},
-          { key: 'HELP_CENTER', icon: "", src:""},
-          { key: 'ROAD_MAP', icon: "", src:""},
-          { key: 'GITHUB', icon: "", src:""},
-        ],
-        "CONTACT_US": [
-          { key: 'EMAIL', icon: "", src:""},
-          { key: 'CHAT', icon: "", src:""},
-          { key: 'DISCORD', icon: "", src:""},
-        ]
-      }
+        { key: 'SUPPORT', icon: "", src:"", status: "inactive"},
+        { key: 'CHANGELOG', icon: "", src:"", status: "inactive"},
+        { key: 'GITHUB', icon: "", src:"", status: "inactive"},
+      ]
     },
     COMMON: {
-      baseLogo: "",
-      logoNoText: '',
-      logoWhite: ""
+      COMPANY_LOGO:"assets/logos/tiledesk_logo.svg",
+      COMPANY_LOGO_NO_TEXT:"assets/logos/tiledesk_logo.svg",
+      BASE_LOGO: "assets/logos/tiledesk_logo.svg",
+      BASE_LOGO_NO_TEXT: "assets/logos/tiledesk_logo.svg",
+      BASE_LOGO_WHITE: "assets/logos/tiledesk-logo_new_white.svg",
+      BASE_LOGO_WHITE_NO_TEXT:"",
+      COMPANY_NAME: "Tiledesk",
+      BRAN_NAME: "Tiledesk",
+      COMPANY_SITE_NAME:"tiledesk.com",
+      COMANY_SITE_URL:"https://www.tiledesk.com",
+      CONTACT_US_EMAIL: "support@tiledesk.com",
+      COMPANY_PRIMARY_COLOR:""
     }
   }
 
@@ -123,7 +126,6 @@ export class BrandService {
 
 
   async loadBrand() {
-
     // this.getData()
     //   .subscribe(data => {
     //     this.assetBrand = data
@@ -185,12 +187,15 @@ export class BrandService {
       let url = this.appConfig.getConfig().brandSrc
       if (url && url !== 'CHANGEIT') {
         const data = await this.httpClient.get(url).toPromise();
-        
+
         console.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
 
         this.brand =data
 
         console.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
+
+        const resources = new BrandResources(this);
+        resources.loadResources()
       }
     } catch (err) {
       console.error('[BRAND-SERV] loadBrand error : ', err);
@@ -199,6 +204,8 @@ export class BrandService {
       // this.notify.showNotificationChangeProject('ops', 2, 'done');
       this.displaySwalAlert(err)
     }
+    
+    
   }
 
   displaySwalAlert(err) {
@@ -213,8 +220,8 @@ export class BrandService {
 
   getBrand() {
     console.log('BrandService getBrand has been called - brand: ', this.brand);
-    return this.brand;
-    
+    return { ...this.brand['CDS'], ...this.brand['COMMON'] }
   }
+
 
 }

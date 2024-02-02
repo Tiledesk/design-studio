@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SIDEBAR_PAGES } from 'src/app/chatbot-design-studio/utils';
+import { BRAND_BASE_INFO, LOGOS_ITEMS } from 'src/app/chatbot-design-studio/utils-resources';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 
 @Component({
@@ -18,6 +19,10 @@ export class CdsSplashScreenComponent implements OnInit {
 
   canShowVideo: boolean = true
   url: SafeResourceUrl = null
+
+  LOGOS_ITEMS = LOGOS_ITEMS
+  BRAND_BASE_INFO = BRAND_BASE_INFO
+  
   constructor(
       public appStorageService: AppStorageService,
       private sanitizer: DomSanitizer

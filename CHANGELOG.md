@@ -5,7 +5,29 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.14-rc.1
+- added: cds-action-askgptv2
+- added: variable-list tooltip description translations
+- changed: cds-action-code reduced max chars  
+- changed: cds-action-code available only for custom plan
+
+### 1.0.13.1 in PROD
+- changed: restore cds-action-change-department
+
+### 1.0.13 in PROD
+
+### 1.0.12 in PROD
+
+### 1.0.11.5 in PROD
+- bug-fixed: lowecase pipe not exist
+
+### 1.0.11.4 in PROD
+- changed: text limit to global value rows
+
 ### 1.0.12-rc.3
+- added: brandService added to load remote logos and resources
+- changed: logos and resources from remote json
+- changed: limit global value to 4026 characters
 - bug-fixed: lowecase pipe not exist
 
 ### 1.0.12-rc.2

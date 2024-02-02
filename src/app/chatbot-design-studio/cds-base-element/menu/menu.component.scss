@@ -11,7 +11,7 @@
 
 #menu_div{
     padding: var(--base-padding) 0px;
-    box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    // box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
 }
 
 .menu-title{
@@ -95,4 +95,15 @@
 
 .current-user{
     color: var(--icon-color-menu);
+}
+
+::ng-deep .custom-mat-tooltip-in-settings-sidebar {
+    background-color: #fff  !important;
+    color: #555555 !important;
+    font-size: 12px  !important;
+    border-radius: 2px !important;
+    font-family: var(--font-family-poppins) !important;
+    padding-top:8px!important;
+    padding-bottom:8px!important;
+    border: 1px solid #e5effe!important;
 }

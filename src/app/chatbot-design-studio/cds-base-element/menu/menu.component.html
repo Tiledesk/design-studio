@@ -32,11 +32,15 @@
             </div>
         </div> -->
 
-        <hr class="custom-divider" *ngIf="menuType">
+        <hr class="custom-divider" *ngIf="menuType && items.length > 0">
 
-        <div class="menu-btn-text current-user truncate">
+        <div class="menu-btn-text current-user truncate" >
             <span *ngIf="menuType === 'header'">{{loggedUser?.email}}</span>
-            <span *ngIf="menuType === 'sidebar'">© 2024 Tiledesk ver {{version}}</span>
+            <span *ngIf="menuType === 'sidebar'" 
+                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="© 2024 {{BRAND_BASE_INFO.BRAND_NAME}} ver {{version}}" #tooltip="matTooltip"
+                matTooltipPosition='right' matTooltipHideDelay="100">
+                © 2024 {{BRAND_BASE_INFO.BRAND_NAME}} ver {{version}}
+            </span>
         </div>
 
 </div>

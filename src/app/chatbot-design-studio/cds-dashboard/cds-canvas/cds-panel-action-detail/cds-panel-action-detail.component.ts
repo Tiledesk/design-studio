@@ -97,7 +97,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
       
       let action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType)
       if(action && action.plan){
-        this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.plan)}
+        this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.type, action.plan)}
         console.log('[PANEL-INTENT-DETAIL] --> status', this.canShowActionByPlan)
       }
 

@@ -10,6 +10,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { UserModel } from 'src/chat21-core/models/user';
 import { environment } from 'src/environments/environment';
 import { TYPE_URL } from '../../utils';
+import { BRAND_BASE_INFO } from '../../utils-resources';
 
 
 @Component({
@@ -29,6 +30,7 @@ export class CDSMenuComponent implements OnInit {
   loggedUser: UserModel;
 
   version: string;
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
   private logger: LoggerService = LoggerInstance.getInstance()
 
   constructor(

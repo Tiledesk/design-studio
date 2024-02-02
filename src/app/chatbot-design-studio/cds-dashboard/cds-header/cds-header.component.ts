@@ -22,6 +22,7 @@ import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-
 import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
+import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
 
 const swal = require('sweetalert');
 
@@ -54,8 +55,8 @@ export class CdsHeaderComponent implements OnInit {
 
   LOGO_MENU_ITEMS = LOGO_MENU_ITEMS;
   SHARE_MENU_ITEMS = SHARE_MENU_ITEMS;
-  PLAY_MENU_ITEMS = PLAY_MENU_ITEMS;
-
+  LOGOS_ITEMS = LOGOS_ITEMS
+  BRAND_BASE_INFO = BRAND_BASE_INFO
   translationsMap: Map<string, string> = new Map();
 
   private logger: LoggerService = LoggerInstance.getInstance();

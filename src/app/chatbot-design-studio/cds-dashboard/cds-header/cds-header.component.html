@@ -5,11 +5,11 @@
         matTooltipPosition='below'
         #tooltip="matTooltip">
     <div *ngIf="!IS_OPEN_SIDEBAR">
-        <img class="logo" src="assets/logos/tiledesk_logo.svg">
+        <img class="logo" [src]="LOGOS_ITEMS['BASE_LOGO_NO_TEXT'].icon">
         <!-- <span class="material-icons" (click)="goToBack()">arrow_back</span> -->
         <span class="material-icons" [matMenuTriggerFor]="menu">more_vert</span>
     </div>
-    <img *ngIf="IS_OPEN_SIDEBAR" src="assets/logos/tiledesk-logo_new_white.svg">
+    <img *ngIf="IS_OPEN_SIDEBAR" [src]="LOGOS_ITEMS['BASE_LOGO'].icon">
 </div>
 <div class="header-right">
     <!-- <div class="toggle-setting-sidebar-icon-wpr" [class.is_opened]="IS_OPEN_SIDEBAR"
@@ -27,9 +27,8 @@
             <path d="M0 0h24v24H0z" fill="none"/><path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"/>
         </svg> -->
         <span class="cds-text">
-            Design Studio
-        </span>
-        
+            {{BRAND_BASE_INFO['META_TITLE']}}
+        </span>    
     </div>
     <div class="header-title ellips">
         {{ selectedChatbot?.name }}

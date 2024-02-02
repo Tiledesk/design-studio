@@ -224,7 +224,7 @@
     </div>
 
     <div style="width: 100%;">
-        <div id="cds-sb-support" name="support" class="section" [matMenuTriggerFor]="menuSupport"
+        <div id="cds-sb-support" name="support" class="section" [matMenuTriggerFor]="INFO_MENU_ITEMS.length > 0? menuSupport: null"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'HelpCenter' | translate}}"
             #tooltip="matTooltip" 

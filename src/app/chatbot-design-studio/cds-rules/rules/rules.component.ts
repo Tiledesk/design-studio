@@ -7,6 +7,7 @@ import { Rule } from 'src/app/models/rule-model';
 import { IntentService } from '../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { MEDIA } from '../../utils-resources';
 
 @Component({
   selector: 'cds-rules',
@@ -23,6 +24,8 @@ export class RulesComponent implements OnInit {
   showWelcome: boolean = false;
   listOfRules: Rule[]=[];
 
+  MEDIA = MEDIA
+  
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(

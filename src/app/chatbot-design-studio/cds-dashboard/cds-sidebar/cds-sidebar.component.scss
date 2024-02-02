@@ -228,7 +228,8 @@ li > a {
 ::ng-deep .mat-menu-panel.menuElementSupport {
     min-width: 100px;
     max-width: 400px;
-    width: 185px;
+    min-height: unset;
+    width: 220px;
     color: $blu;
     font-size: 15px;
     line-height: 18px;

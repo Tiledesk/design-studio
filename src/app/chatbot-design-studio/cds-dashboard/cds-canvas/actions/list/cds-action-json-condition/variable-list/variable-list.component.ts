@@ -5,6 +5,7 @@ import { variableList } from '../../../../../../utils';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { ActivatedRoute } from '@angular/router';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 
 @Component({
   selector: 'variable-list',
@@ -27,6 +28,8 @@ export class VariableListComponent implements OnInit {
 
   isEmpty: boolean = false
   isSearching: boolean = false
+
+  BRAND_BASE_INFO = BRAND_BASE_INFO
   constructor(
     public dialog: MatDialog,
     private faqkbService: FaqKbService,
