@@ -6,6 +6,7 @@
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 1.0.14-rc.1
+- added: cds-action-askgptv2
 - added: variable-list tooltip description translations
 - changed: cds-action-code reduced max chars  
 - changed: cds-action-code available only for custom plan
