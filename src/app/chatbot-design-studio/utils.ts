@@ -271,8 +271,8 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     ASSIGN_VARIABLE: { name: 'CDSActionList.NAME.SetAttribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.ASSIGN_VARIABLE, src: "assets/images/actions/assign_var.svg", status: "inactive"},
     ASSIGN_VARIABLE_V2: { name: 'CDSActionList.NAME.SetAttribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.ASSIGN_VARIABLE_V2, src: "assets/images/actions/assign_var.svg", status: "active" },
     DELETE_VARIABLE: { name: 'CDSActionList.NAME.DeleteAttribute', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.DELETE_VARIABLE, src: "assets/images/actions/delete_var.svg", status: "active",  },
-    REPLACE_BOT: { name: 'CDSActionList.NAME.ReplaceBot', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.REPLACE_BOT, src: "assets/images/actions/replace_bot.svg", status: "active", description: "CDSActionList.DESCRIPTION.ReplaceBot"},
-    REPLACE_BOTV2: { name: 'CDSActionList.NAME.ReplaceBot', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.REPLACE_BOTV2, src: "assets/images/actions/replace_bot.svg", status: "inactive", description: "CDSActionList.DESCRIPTION.ReplaceBot"},
+    REPLACE_BOT: { name: 'CDSActionList.NAME.ReplaceBot', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.REPLACE_BOT, src: "assets/images/actions/replace_bot.svg", status: "inactive", description: "CDSActionList.DESCRIPTION.ReplaceBot"},
+    REPLACE_BOTV2: { name: 'CDSActionList.NAME.ReplaceBot', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.REPLACE_BOTV2, src: "assets/images/actions/replace_bot.svg", status: "active", description: "CDSActionList.DESCRIPTION.ReplaceBot"},
     WAIT : { name: 'CDSActionList.NAME.Wait', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.WAIT, src:"assets/images/actions/wait.svg", status: "active", description: "CDSActionList.DESCRIPTION.Wait"},
     // WEB_REQUEST : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUEST, src:"assets/images/actions/web_request.svg", status: "active", description: ''},
     WEB_REQUESTV2 : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUESTV2, src:"assets/images/actions/web_request.svg", status: "beta", description: ''},
@@ -442,57 +442,57 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
     {
         key: 'mostUsed',
         elements: [
-            { name: 'last_user_text', value: 'last_user_text', description: 'The last text the user typed. This is overwritten on each user reply', src: '', icon: 'send' },
-            { name: 'user_country', value: 'user_country', description: 'The user Country as decoded by Tiledesk',src: '', icon: 'language' },
-            { name: 'user_city', value: 'user_city', description: 'The user City as decoded by Tiledesk', src: '', icon: 'language' },
-            { name: 'user_language', value: 'user_language', description: 'The user language decoded on channel', src: '', icon: 'language' },
-            { name: 'transcript', value: 'transcript', description: 'All the conversation messages exchanged with this chatbot during the chat', src: '', icon: 'description'},
+            { name: 'last_user_text',       value: 'last_user_text',        description: 'CDSvariablesList.mostUsedELements.last_user_text.description',                src: '', icon: 'send' },
+            { name: 'user_country',         value: 'user_country',          description: 'CDSvariablesList.mostUsedELements.user_country.description',                  src: '', icon: 'language' },
+            { name: 'user_city',            value: 'user_city',             description: 'CDSvariablesList.mostUsedELements.user_city.description',                     src: '', icon: 'language' },
+            { name: 'user_language',        value: 'user_language',         description: 'CDSvariablesList.mostUsedELements.user_language.description',                 src: '', icon: 'language' },
+            { name: 'transcript',           value: 'transcript',            description: 'CDSvariablesList.mostUsedELements.transcript.description',                    src: '', icon: 'description'},
         ]
     },
     {
         key: 'systemDefined',
         elements: [
-            { name: 'department_id', value: 'department_id', description: 'The ID of the department where this chatbot is activated', src: '', icon: 'domain' },
-            { name: 'department_name', value: 'department_name', description: 'The name of the department where this chatbot is activated', src: '', icon: 'domain' },
-            { name: 'project_id', value: 'project_id', description: 'The name of the project where this chatbot belongs to', src: '', icon: 'domain' },
-            { name: 'last_message_id', value: 'last_message_id', description: 'The unique ID of the last message sent', src: '', icon: 'textsms' },
-            { name: 'conversation_id', value: 'conversation_id', description: 'This conversation unique ID', src: '', icon: 'textsms' },
-            { name: 'chatbot_name', value: 'chatbot_name', description: 'This chatbot name', src: '', icon: 'person' },
-            { name: 'user_id', value: 'user_id', description: 'The user unique ID inside Tiledesk database', src: '', icon: 'person' },
-            { name: 'user_agent', value: 'user_agent', description: 'The web user agent where this conversation initiated', src: '', icon: 'person' },
-            { name: 'chatChannel', value: 'chatChannel', description: 'The channel where this conversation belongs to. Ex. "web", "whatsapp", "facebook", "telegram"', src: '', icon: 'language' },
-            { name: 'user_source_page', value: 'user_source_page', description: 'The page where this conversations is runinng. Only available on channel "web"', src: '', icon: 'language' },
-            { name: 'chat_url', value: 'chat_url', description: 'The url of the Chat to send to a colleague to chat with this user. Use "Invite human" action to invite the human to this chat.', src: '', icon: 'laptop' },
-            { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available', src: '', icon: 'laptop' },
-            { name: 'ticketId', value: 'ticketId', description: 'The current conversation ticket ID', src: '', icon: 'sell' },
+            { name: 'department_id',        value: 'department_id',         description: 'CDSvariablesList.systemDefinedElements.department_id.description',            src: '', icon: 'domain' },
+            { name: 'department_name',      value: 'department_name',       description: 'CDSvariablesList.systemDefinedElements.department_name.description',          src: '', icon: 'domain' },
+            { name: 'project_id',           value: 'project_id',            description: 'CDSvariablesList.systemDefinedElements.project_id.description',               src: '', icon: 'domain' },
+            { name: 'last_message_id',      value: 'last_message_id',       description: 'CDSvariablesList.systemDefinedElements.last_message_id.description',          src: '', icon: 'textsms' },
+            { name: 'conversation_id',      value: 'conversation_id',       description: 'CDSvariablesList.systemDefinedElements.conversation_id.description',          src: '', icon: 'textsms' },
+            { name: 'chatbot_name',         value: 'chatbot_name',          description: 'CDSvariablesList.systemDefinedElements.chatbot_name.description',             src: '', icon: 'person' },
+            { name: 'user_id',              value: 'user_id',               description: 'CDSvariablesList.systemDefinedElements.user_id.description',                  src: '', icon: 'person' },
+            { name: 'user_agent',           value: 'user_agent',            description: 'CDSvariablesList.systemDefinedElements.user_agent.description',               src: '', icon: 'person' },
+            { name: 'chatChannel',          value: 'chatChannel',           description: 'CDSvariablesList.systemDefinedElements.chatChannel.description',              src: '', icon: 'language' },
+            { name: 'user_source_page',     value: 'user_source_page',      description: 'CDSvariablesList.systemDefinedElements.user_source_page.description',         src: '', icon: 'language' },
+            { name: 'chat_url',             value: 'chat_url',              description: 'CDSvariablesList.systemDefinedElements.chat_url.description',                 src: '', icon: 'laptop' },
+            { name: 'user_ip_address',      value: 'user_ip_address',       description: 'CDSvariablesList.systemDefinedElements.user_ip_address.description',          src: '', icon: 'laptop' },
+            { name: 'ticketId',             value: 'ticketId',              description: 'CDSvariablesList.systemDefinedElements.ticketId.description',                 src: '', icon: 'sell' },
             
         ]
     },
     {
         key: 'uploadedDocument',
         elements: [
-            { name: 'lastUserDocumentURL', value: 'lastUserDocumentURL', description: 'The public URL to access the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
-            { name: 'lastUserDocumentName', value: 'lastUserDocumentName', description: 'The name of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
-            { name: 'lastUserDocumentType', value: 'lastUserDocumentType', description: 'The type of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
+            { name: 'lastUserDocumentURL',  value: 'lastUserDocumentURL',   description: 'CDSvariablesList.uploadedDocumentElements.lastUserDocumentURL.description',   src: '', icon:'upload_file'},
+            { name: 'lastUserDocumentName', value: 'lastUserDocumentName',  description: 'CDSvariablesList.uploadedDocumentElements.lastUserDocumentName.description',  src: '', icon:'upload_file'},
+            { name: 'lastUserDocumentType', value: 'lastUserDocumentType',  description: 'CDSvariablesList.uploadedDocumentElements.lastUserDocumentType.description',  src: '', icon:'upload_file'},
         ]
     },
     {   key: 'uploadedImage',
         elements: [
-            { name: 'lastUserImageURL', value: 'lastUserImageURL', description: 'The public URL to access the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-            { name: 'lastUserImageName', value: 'lastUserImageName', description: 'The name of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-            { name: 'lastUserImageType', value: 'lastUserImageType', description: 'The type of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-            { name: 'lastUserImageWidth', value: 'lastUserImageWidth', description: 'The height in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-            { name: 'lastUserImageHeight', value: 'lastUserImageHeight', description: 'The wdth in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'}
+            { name: 'lastUserImageURL',     value: 'lastUserImageURL',      description: 'CDSvariablesList.uploadedImageElements.lastUserImageURL.description',         src: '', icon:'image'},
+            { name: 'lastUserImageName',    value: 'lastUserImageName',     description: 'CDSvariablesList.uploadedImageElements.lastUserImageName.description',        src: '', icon:'image'},
+            { name: 'lastUserImageType',    value: 'lastUserImageType',     description: 'CDSvariablesList.uploadedImageElements.lastUserImageType.description',        src: '', icon:'image'},
+            { name: 'lastUserImageWidth',   value: 'lastUserImageWidth',    description: 'CDSvariablesList.uploadedImageElements.lastUserImageWidth.description',       src: '', icon:'image'},
+            { name: 'lastUserImageHeight',  value: 'lastUserImageHeight',   description: 'CDSvariablesList.uploadedImageElements.lastUserImageHeight.description',      src: '', icon:'image'}
         ]
     },
     {   key: 'leadAttributes',
         elements: [
-            { name: 'userEmail', value: 'userEmail', description: 'The user email in Tiledesk Contacts', src: '', icon:'person'},
-            { name: 'userFullname', value: 'userFullname', description: 'The user Fullname in Tiledesk Contacts', src: '', icon:'person'},
-            { name: 'userPhone', value: 'userPhone', description: 'The user phone in Tiledesk Contacts', src: '', icon:'person'},
-            { name: 'userLeadId', value: 'userLeadId', description: 'The user contact Id in Tiledesk Contacts', src: '', icon:'person'},
-            { name: 'userCompany', value: 'userCompany', description: 'The user Company name in Tiledesk Contacts', src: '', icon:'person'},
-            { name: 'currentPhoneNumber', value: 'currentPhoneNumber', description: 'The user phone used in the current conversation (i.e. coming from Whatsapp / SMS channels)', src: '', icon:'person'}
+            { name: 'userEmail',            value: 'userEmail',             description: 'CDSvariablesList.leadAttributesElements.userEmail.description',               src: '', icon:'person'},
+            { name: 'userFullname',         value: 'userFullname',          description: 'CDSvariablesList.leadAttributesElements.userFullname.description',            src: '', icon:'person'},
+            { name: 'userPhone',            value: 'userPhone',             description: 'CDSvariablesList.leadAttributesElements.userPhone.description',               src: '', icon:'person'},
+            { name: 'userLeadId',           value: 'userLeadId',            description: 'CDSvariablesList.leadAttributesElements.userLeadId.description',              src: '', icon:'person'},
+            { name: 'userCompany',          value: 'userCompany',           description: 'CDSvariablesList.leadAttributesElements.userCompany.description',             src: '', icon:'person'},
+            { name: 'currentPhoneNumber',   value: 'currentPhoneNumber',    description: 'CDSvariablesList.leadAttributesElements.currentPhoneNumber.description',      src: '', icon:'person'}
         ]
     }
 ]

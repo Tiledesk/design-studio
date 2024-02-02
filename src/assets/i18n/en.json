@@ -548,7 +548,50 @@
         "systemDefined":"System defined",
         "uploadedDocument":"Uploaded document",
         "uploadedImage":"Uploaded image",
-        "leadAttributes":"Lead attributes"
+        "leadAttributes":"Lead attributes",
+        "mostUsedELements":{
+            "last_user_text":{ "description":"The last text the user typed. This is overwritten on each user reply" },
+            "user_country":{ "description":"The user Country as decoded by {{ BRAND_NAME }}" },
+            "user_city":{ "description":"The user City as decoded by {{ BRAND_NAME }}" },
+            "user_language":{ "description":"The user language decoded on channel" },
+            "transcript":{ "description":"All the conversation messages exchanged with this chatbot during the chat" }
+        },
+        "systemDefinedElements":{
+            "department_id":{ "description":"The ID of the department where this chatbot is activated" },
+            "department_name":{ "description":"'The name of the department where this chatbot is activated" },
+            "project_id":{ "description":"The name of the project where this chatbot belongs to" },
+            "last_message_id":{ "description":"The unique ID of the last message sent" },
+            "conversation_id":{ "description":"This conversation unique ID" },
+            "chatbot_name":{ "description":"This chatbot name" },
+            "user_id":{ "description":"The user unique ID inside Tiledesk database" },
+            "user_agent":{ "description":"The web user agent where this conversation initiated" },
+            "chatChannel":{ "description":"The channel where this conversation belongs to. Ex. 'web', 'whatsapp', 'facebook', 'telegram'" },
+            "user_source_page":{ "description":"The page where this conversations is runinng. Only available on channel 'web'" },
+            "chat_url":{ "description":"The url of the Chat to send to a colleague to chat with this user. Use 'Invite human' action to invite the human to this chat" },
+            "user_ip_address":{ "description":"The user IP address, when available" },
+            "ticketId":{ "description":"The current conversation ticket ID"}
+        },
+        "uploadedDocumentElements":{
+            "lastUserDocumentURL":{ "description":"The public URL to access the document uploaded by the user. It's empy if no document is uploaded" },
+            "lastUserDocumentName":{ "description":"The name of the document uploaded by the user. It's empy if no document is uploaded" },
+            "lastUserDocumentType":{ "description":"The type of the document uploaded by the user. It's empy if no document is uploaded" }
+        },
+        "uploadedImageElements":{
+            "lastUserImageURL":{ "description":"The public URL to access the image uploaded by the user. It's empy if no image is uploaded" },
+            "lastUserImageName":{ "description":"The name of the image uploaded by the user. It's empy if no image is uploaded" },
+            "lastUserImageType":{ "description":"The type of the image uploaded by the user. It's empy if no image is uploaded" },
+            "lastUserImageWidth":{ "description":"The height in pixel of the image uploaded by the user. It's empy if no image is uploaded" },
+            "lastUserImageHeight":{ "description":"The wdth in pixel of the image uploaded by the user. It's empy if no image is uploaded" }
+        },
+        "leadAttributesElements":{
+            "userEmail":{ "description":"The user email in {{ BRAND_NAME }} Contacts" },
+            "userFullname":{ "description":"The user Fullname in {{ BRAND_NAME }} Contacts" },
+            "userPhone":{ "description":"The user phone in {{ BRAND_NAME }} Contacts" },
+            "userLeadId":{ "description":"The user contact Id in {{ BRAND_NAME }} Contacts" },
+            "userCompany":{ "description":"The user Company name in {{ BRAND_NAME }} Contacts" },
+            "currentPhoneNumber":{ "description":"The user phone used in the current conversation (i.e. coming from Whatsapp / SMS channels)" }
+        }
+
     },
     "New":"New",
     "Event":"Event",
