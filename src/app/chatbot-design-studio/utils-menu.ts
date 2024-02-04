@@ -6,7 +6,7 @@ export const LOGO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, 
     { key: 'LOG_OUT', label: 'LogOut', icon: 'logout', type: TYPE_URL.SELF}
 ]
 
-export const INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status:"active" | "inactive", src?: string}> = [
+export var INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status:"active" | "inactive", src?: string}> = [
     // { key: 'HELP_CENTER', label: 'HelpCenter', icon: 'help', type: TYPE_URL.BLANK , status: "active", src: 'https://gethelp.tiledesk.com/'},
     // { key: 'ROAD_MAP', label: 'RoadMap', icon: 'checklist', type: TYPE_URL.BLANK, status: "active", src: 'https://feedback.tiledesk.com/roadmap'},
     { key: 'SUPPORT', label: 'Help', icon: 'help', type: TYPE_URL.SELF, status: "active" },
@@ -15,18 +15,18 @@ export const INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, 
     // { key: 'GITHUB', label: 'GitHubRepo', icon: 'assets/images/github-mark.svg', type: TYPE_URL.BLANK, status: "active", src: 'https://github.com/Tiledesk'}
 ]
 
-export const SHARE_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}> = [
+export var SHARE_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}> = [
     { key: 'COPY_LINK',     label: 'CopyLink',          icon: 'copy',               type: TYPE_URL.SELF},
     { key: 'OPEN_NEW_PAGE', label: 'OpenLinkInNewTab',  icon: 'open_in_browser',    type: TYPE_URL.BLANK},
     { key: 'EXPORT',        label: 'Export',            icon: 'file_download',      type: TYPE_URL.SELF},
 ]
 
-export const PLAY_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive" , src?: string}> = [
+export var PLAY_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive" , src?: string}> = [
     { key: 'WEB',       label: 'WebWidget',     icon: 'assets/images/icons/play.svg',                           type: TYPE_URL.SELF,    status: "active"},
     { key: 'WHATSAPP',  label: 'TryOnWhatsapp', icon: 'assets/images/channel_icons/whatsapp-logo_green.svg',    type: TYPE_URL.BLANK,   status: "inactive"},
 ]
 
-export const SUPPORT_OPTIONS: { [key: string]: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string, description?: string}>} = {
+export var SUPPORT_OPTIONS: { [key: string]: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string, description?: string}>} = {
     "SELF_SERVICE":[
         { key: 'DOCS',          label: 'Docs',          icon: 'description',                    type: TYPE_URL.BLANK,   status:"active",    src: 'https://developer.tiledesk.com/'},
         { key: 'HELP_CENTER',   label: 'HelpCenter',    icon: 'help',                           type: TYPE_URL.BLANK ,  status:"active",    src: 'https://gethelp.tiledesk.com/'},
@@ -37,6 +37,6 @@ export const SUPPORT_OPTIONS: { [key: string]: Array<{ key: string, label: strin
     "CONTACT_US": [
         { key: 'EMAIL',   label: 'SendUsEmail',         icon: 'mail',                           type: TYPE_URL.BLANK ,  status:"active",    src: 'mailto:support@tiledesk.com', description:"support@tiledesk.com"},
         { key: 'CHAT',      label: 'ChatUs',            icon: 'forum',                          type: TYPE_URL.BLANK ,  status:"active",    description:"StartConversation"},
-        { key: 'DISCORD',   label: 'DiscordChannel',    icon: 'assets/images/github-mark.svg',  type: TYPE_URL.BLANK ,  status:"active",    src: 'https://discord.gg/Wut2FtpP', description:"JoinDiscordChannel"},
+        { key: 'DISCORD',   label: 'DiscordChannel',    icon: 'assets/images/discord.svg',  type: TYPE_URL.BLANK ,  status:"active",    src: 'https://discord.gg/Wut2FtpP', description:"JoinDiscordChannel"},
     ]
 }

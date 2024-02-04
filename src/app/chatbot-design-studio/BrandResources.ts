@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BrandService } from "../services/brand.service";
-import { INFO_MENU_ITEMS, SHARE_MENU_ITEMS } from "./utils-menu";
+import { INFO_MENU_ITEMS, SHARE_MENU_ITEMS, SUPPORT_OPTIONS } from "./utils-menu";
 import { BRAND_BASE_INFO, LOGOS_ITEMS, MEDIA } from "./utils-resources";
 import { TYPE_URL } from "./utils";
 
@@ -43,6 +43,22 @@ export class BrandResources {
             INFO_MENU_ITEMS.find(a => a.key === el.key).src = el.src
             INFO_MENU_ITEMS.find(a => a.key === el.key).status = el.status
             INFO_MENU_ITEMS.find(a => a.key === el.key).icon = el.icon
+        })
+
+        /** SUPPORT-COMP OPTIONS */
+        let options_SELF: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...SUPPORT_OPTIONS['SELF_SERVICE'], ...this.brand['SUPPORT_OPTIONS']['SELF_SERVICE']].reduce((m, o) => m.set(o.key, o), new Map).values());
+        options_SELF.forEach(el => {
+            SUPPORT_OPTIONS['SELF_SERVICE'].find(a => a.key === el.key).icon = el.icon
+            SUPPORT_OPTIONS['SELF_SERVICE'].find(a => a.key === el.key).src = el.src
+            SUPPORT_OPTIONS['SELF_SERVICE'].find(a => a.key === el.key).status = el.status
+            SUPPORT_OPTIONS['SELF_SERVICE'].find(a => a.key === el.key).icon = el.icon
+        })
+        let options_CONTACTS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...SUPPORT_OPTIONS['CONTACT_US'], ...this.brand['SUPPORT_OPTIONS']['CONTACT_US']].reduce((m, o) => m.set(o.key, o), new Map).values());
+        options_CONTACTS.forEach(el => {
+            SUPPORT_OPTIONS['CONTACT_US'].find(a => a.key === el.key).icon = el.icon
+            SUPPORT_OPTIONS['CONTACT_US'].find(a => a.key === el.key).src = el.src
+            SUPPORT_OPTIONS['CONTACT_US'].find(a => a.key === el.key).status = el.status
+            SUPPORT_OPTIONS['CONTACT_US'].find(a => a.key === el.key).icon = el.icon
         })
 
         /** MEDIA */
