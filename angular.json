@@ -50,11 +50,11 @@
               "src/assets/sass/cds/styles.scss"
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.js",
-              "node_modules/bootstrap-notify/bootstrap-notify.js",
-              "src/assets/js/mqtt/4.1.0/mqtt.min.js",
-              "node_modules/moment/moment.js"
+              { "input": "node_modules/jquery/dist/jquery.js", "inject": true, "bundleName": "jquery" },
+              { "input": "node_modules/bootstrap/dist/js/bootstrap.js", "inject": true, "bundleName": "bootstrap" },
+              { "input": "node_modules/bootstrap-notify/bootstrap-notify.js", "inject": true, "bundleName": "bootstrap-notify" },
+              { "input": "node_modules/moment/moment.js", "inject": true, "bundleName": "moment" },
+              { "input": "src/assets/js/mqtt/4.1.0/mqtt.min.js", "inject": false, "bundleName": "mqtt.min" }
             ]
           },
           "configurations": {
