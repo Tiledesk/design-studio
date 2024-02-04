@@ -57,6 +57,7 @@ export class CdsHeaderComponent implements OnInit {
   SHARE_MENU_ITEMS = SHARE_MENU_ITEMS;
   LOGOS_ITEMS = LOGOS_ITEMS
   BRAND_BASE_INFO = BRAND_BASE_INFO
+  PLAY_MENU_ITEMS = PLAY_MENU_ITEMS;
   translationsMap: Map<string, string> = new Map();
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -100,15 +101,15 @@ export class CdsHeaderComponent implements OnInit {
       keys.forEach(key => {
         // this.logger.log('NavbarComponent public_Key key', key)
         if (key.includes("TOW")) {
-          // this.logger.log('PUBLIC-KEY (SIGNUP) - key', key);
+          // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - key', key);
           let tow = key.split(":");
-          // this.logger.log('PUBLIC-KEY (SIGNUP) - mt key&value', mt);
+          // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt key&value', mt);
           if (tow[1] === "F") {
             this.TRY_ON_WA = false;
-            // this.logger.log('PUBLIC-KEY (SIGNUP) - mt is', this.MT);
+            // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt is', this.MT);
           } else {
             this.TRY_ON_WA = true;
-            // this.logger.log('PUBLIC-KEY (SIGNUP) - mt is', this.MT);
+            // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt is', this.MT);
           }
         }
       });
@@ -117,7 +118,14 @@ export class CdsHeaderComponent implements OnInit {
       this.TRY_ON_WA = false;
       // this.logger.log('PUBLIC-KEY (SIGNUP) - mt is', this.MT);
     }
-    // PLAY_MENU_ITEMS.map(el => { el.key === 'WHATSAPP' && !this.TRY_ON_WA ? el.status = 'inactive': null }) 
+    this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt is', this.TRY_ON_WA);
+    PLAY_MENU_ITEMS.map(el => { 
+        if(el.key === 'WHATSAPP' && this.TRY_ON_WA){
+          el.status = 'active'
+        }else if(el.key === 'WHATSAPP' && !this.TRY_ON_WA){
+          el.status = 'inactive'
+        }  
+    }) 
 
   }
 
