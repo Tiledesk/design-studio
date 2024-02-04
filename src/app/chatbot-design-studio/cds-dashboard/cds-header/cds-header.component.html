@@ -79,12 +79,12 @@
                 </li>
             </ul> -->
         </div>
-        <div *ngIf="TRY_ON_WA === true" class="btn-group">
+        <!-- <div *ngIf="TRY_ON_WA === true" class="btn-group">
             <button id="cds-test-it-wab-out-btn" class="btn btn-primary cds-blue-button" type="button" (click)="openWhatsappPage()">
                 <img width="18px" height="18px" src="assets/images/channel_icons/whatsapp-logo_green.svg">
                 {{ 'TryOnWhatsapp' | translate}}
             </button>
-        </div>
+        </div> -->
         <div class="btn-group"
                 matTooltipClass="custom-mat-tooltip"
                 matTooltip="{{ 'TestIt' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
@@ -117,7 +117,6 @@
             (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
     </ng-template>
 </mat-menu>
-
 
 <!-- SHARE MENU OPTIONS-->
 <mat-menu #menuShare="matMenu" class="menuElement shareMenu" xPosition="after" yPosition="below">
