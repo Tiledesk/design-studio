@@ -6,25 +6,25 @@ import { v4 as uuidv4 } from 'uuid';
 export const preDisplayName:string  = 'untitled_block_';
 
 export enum TYPE_INTENT_NAME {
-    TOPIC_INTERNAL = 'internal',
-    DISPLAY_NAME_START = "start",
-    DISPLAY_NAME_DEFAULT_FALLBACK = "defaultFallback",
+    TOPIC_INTERNAL                  = 'internal',
+    DISPLAY_NAME_START              = "start",
+    DISPLAY_NAME_DEFAULT_FALLBACK   = "defaultFallback",
 }
 
 export enum SIDEBAR_PAGES {
-    INTENTS = 'cds-sb-intents',
-    SETTINGS = 'cds-sb-settings',
+    INTENTS     = 'cds-sb-intents',
+    SETTINGS    = 'cds-sb-settings',
     // FULFILLMENT = 'cds-sb-fulfillment',
-    RULES = 'cds-sb-rules',
-    GLOBALS = 'cds-sb-globals',
-    SUPPORT = 'cds-sb-support'
+    RULES       = 'cds-sb-rules',
+    GLOBALS     = 'cds-sb-globals',
+    SUPPORT     = 'cds-sb-support'
 }
 
 export enum SETTINGS_SECTION {
-    DETAIL = 'bot_detail',
-    IMPORT_EXPORT = 'import_export',
-    COMMUNITY = 'community',
-    DEVELOPER = 'developer'
+    DETAIL          = 'bot_detail',
+    IMPORT_EXPORT   = 'import_export',
+    COMMUNITY       = 'community',
+    DEVELOPER       = 'developer'
 }
 
 export enum EXTERNAL_URL {
@@ -34,125 +34,125 @@ export enum EXTERNAL_URL {
 }
 
 export enum TYPE_MATH_OPERATOR {
-    addAsNumber = "addAsNumber",
-    addAsString = "addAsString",
-    subtractAsNumber = "subtractAsNumber",
-    multiplyAsNumber = "multiplyAsNumber",
-    divideAsNumber = "divideAsNumber"
+    addAsNumber         = "addAsNumber",
+    addAsString         = "addAsString",
+    subtractAsNumber    = "subtractAsNumber",
+    multiplyAsNumber    = "multiplyAsNumber",
+    divideAsNumber      = "divideAsNumber"
 }
 
 export enum TYPE_FUNCTION_VAR {
-    upperCaseAsString = "upperCaseAsString",
-    lowerCaseAsString = "lowerCaseAsString",
-    capitalizeAsString = "capitalizeAsString",
-    absAsNumber = "absAsNumber",
-    ceilAsNumber = "ceilAsNumber",
-    floorAsNumber = "floorAsNumber",
-    roundAsNumber = "roundAsNumber",
-    JSONparse = 'JSONparse',
-    JSONstringify= 'JSONstringify'
+    upperCaseAsString   = "upperCaseAsString",
+    lowerCaseAsString   = "lowerCaseAsString",
+    capitalizeAsString  = "capitalizeAsString",
+    absAsNumber         = "absAsNumber",
+    ceilAsNumber        = "ceilAsNumber",
+    floorAsNumber       = "floorAsNumber",
+    roundAsNumber       = "roundAsNumber",
+    JSONparse           = 'JSONparse',
+    JSONstringify       = 'JSONstringify'
 }
 
 export enum TYPE_FUNCTION_FUNC {
-    isOpenNowAsStrings = "openNow",
+    isOpenNowAsStrings       = "openNow",
     availableAgentsAsStrings = "availableAgents"
 }
 
 
 export enum TYPE_INTENT_ELEMENT {
-    QUESTION = 'question',
-    RESPONSE = 'response',
-    FORM = 'form',
-    ACTION = 'action',
-    ANSWER = 'answer'
+    QUESTION        = 'question',
+    RESPONSE        = 'response',
+    FORM            = 'form',
+    ACTION          = 'action',
+    ANSWER          = 'answer'
 }
 
 export enum TYPE_RESPONSE {
-    TEXT = 'text',
+    TEXT        = 'text',
     RANDOM_TEXT = 'randomText',
-    IMAGE = 'image',
-    FORM = 'form',
-    VIDEO = 'video'
+    IMAGE       = 'image',
+    FORM        = 'form',
+    VIDEO       = 'video'
 }
 
 export enum TYPE_BUTTON {
-    TEXT = 'text',
-    URL = 'url',
-    ACTION = 'action'
+    TEXT    = 'text',
+    URL     = 'url',
+    ACTION  = 'action'
 }
 
 export enum TYPE_URL {
-    BLANK = 'blank',
-    PARENT = 'parent',
-    SELF = 'self'
+    BLANK   = 'blank',
+    PARENT  = 'parent',
+    SELF    = 'self'
 }
 
 export enum TYPE_COMMAND {
-    WAIT = 'wait',
+    WAIT    = 'wait',
     MESSAGE = 'message',
 }
 
 export enum TYPE_MESSAGE {
-    TEXT = 'text',
-    IMAGE = 'image',
-    FRAME = 'frame',
-    GALLERY = 'gallery',
-    REDIRECT = 'redirect'
+    TEXT        = 'text',
+    IMAGE       = 'image',
+    FRAME       = 'frame',
+    GALLERY     = 'gallery',
+    REDIRECT    = 'redirect'
 }
 
 export enum TYPE_ACTION {
-    REPLY = 'reply',
-    RANDOM_REPLY = 'randomreply',
-    WEB_REQUEST = 'webrequest',
-    WEB_REQUESTV2 = 'webrequestv2',
-    MAKE = 'make',
-    AGENT = 'agent',
-    CLOSE = 'close',
-    EMAIL = 'email',
-    WHATSAPP_STATIC = 'whatsapp_static',
-    WHATSAPP_ATTRIBUTE = 'whatsapp_attribute',
-    WHATSAPP_SEGMENT = 'whatsapp_segment',
-    ASKGPT = 'askgpt',
-    ASKGPTV2 = "askgptv2",
-    GPT_TASK = 'gpt_task',
-    WAIT = 'wait',
-    INTENT = 'intent',
-    ASSIGN_VARIABLE = 'setattribute',
-    ASSIGN_VARIABLE_V2 = 'setattribute-v2',
-    ASSIGN_FUNCTION = 'setfunction',
-    DELETE_VARIABLE = 'delete',
-    REPLACE_BOT = 'replacebot',
-    REPLACE_BOTV2 = 'replacebotv2',
-    CHANGE_DEPARTMENT = 'department',
-    ONLINE_AGENTS = 'ifonlineagents',
-    OPEN_HOURS = 'ifopenhours',
-    HIDE_MESSAGE = 'hmessage',
-    JSON_CONDITION = 'jsoncondition',
-    CONDITION = 'condition',
-    CAPTURE_USER_REPLY = 'capture_user_reply',
-    QAPLA = "qapla",
-    HUBSPOT = 'hubspot',
-    CODE = 'code'
+    REPLY               = 'reply',
+    RANDOM_REPLY        = 'randomreply',
+    WEB_REQUEST         = 'webrequest',
+    WEB_REQUESTV2       = 'webrequestv2',
+    MAKE                = 'make',
+    AGENT               = 'agent',
+    CLOSE               = 'close',
+    EMAIL               = 'email',
+    WHATSAPP_STATIC     = 'whatsapp_static',
+    WHATSAPP_ATTRIBUTE  = 'whatsapp_attribute',
+    WHATSAPP_SEGMENT    = 'whatsapp_segment',
+    ASKGPT              = 'askgpt',
+    ASKGPTV2            = "askgptv2",
+    GPT_TASK            = 'gpt_task',
+    WAIT                = 'wait',
+    INTENT              = 'intent',
+    ASSIGN_VARIABLE     = 'setattribute',
+    ASSIGN_VARIABLE_V2  = 'setattribute-v2',
+    ASSIGN_FUNCTION     = 'setfunction',
+    DELETE_VARIABLE     = 'delete',
+    REPLACE_BOT         = 'replacebot',
+    REPLACE_BOTV2       = 'replacebotv2',
+    CHANGE_DEPARTMENT   = 'department',
+    ONLINE_AGENTS       = 'ifonlineagents',
+    OPEN_HOURS          = 'ifopenhours',
+    HIDE_MESSAGE        = 'hmessage',
+    JSON_CONDITION      = 'jsoncondition',
+    CONDITION           = 'condition',
+    CAPTURE_USER_REPLY  = 'capture_user_reply',
+    QAPLA               = "qapla",
+    HUBSPOT             = 'hubspot',
+    CODE                = 'code'
 }
 
 export enum TYPE_ACTION_CATEGORY {
-    MOST_USED = 'Most Used',
-    FLOW = 'Flow',
-    INTEGRATIONS = 'Integrations',
-    SPECIAL = 'Special',
-    NEW = 'New'
+    MOST_USED       = 'Most Used',
+    FLOW            = 'Flow',
+    INTEGRATIONS    = 'Integrations',
+    SPECIAL         = 'Special',
+    NEW             = 'New'
 }
 
 export enum TYPE_EVENT_CATEGORY {
-    TRIGGER = 'trigger',
-    RULE = 'rule'
+    TRIGGER     = 'trigger',
+    RULE        = 'rule'
 }
 
 export const ACTION_CATEGORY =[
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.MOST_USED, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.MostUsed', src: 'assets/images/actions_category/most_used.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Flow', src: 'assets/images/actions_category/flow.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.MOST_USED, TYPE_ACTION_CATEGORY),    name: 'CDSActionCategory.MostUsed',     src: 'assets/images/actions_category/most_used.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY),         name: 'CDSActionCategory.Flow',         src: 'assets/images/actions_category/flow.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Special', src: 'assets/images/actions_category/special.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
 ]
 
@@ -163,24 +163,24 @@ export function getKeyByValue(value, keys) {
 }
 
 export enum TYPE_OPERATOR {
-    equalAsNumbers = "equalAsNumbers",
-    equalAsStrings = "equalAsStrings",
-    notEqualAsNumbers = "notEqualAsNumbers",
-    notEqualAsStrings = "notEqualAsStrings",
-    greaterThan = "greaterThan",
-    greaterThanOrEqual = "greaterThanOrEqual",
-    lessThan = "lessThan",
-    lessThanOrEqual = "lessThanOrEqual",
-    startsWith = "startsWith",
-    notStartsWith = 'notStartsWith',
-    startsWithIgnoreCase = "startsWithIgnoreCase",
-    contains = "contains",
-    containsIgnoreCase = "containsIgnoreCase",
-    endsWith = "endsWith",
-    isEmpty = "isEmpty",
-    isNull = "isNull",
-    isUndefined = "isUndefined",
-    matches = "matches"
+    equalAsNumbers          = "equalAsNumbers",
+    equalAsStrings          = "equalAsStrings",
+    notEqualAsNumbers       = "notEqualAsNumbers",
+    notEqualAsStrings       = "notEqualAsStrings",
+    greaterThan             = "greaterThan",
+    greaterThanOrEqual      = "greaterThanOrEqual",
+    lessThan                = "lessThan",
+    lessThanOrEqual         = "lessThanOrEqual",
+    startsWith              = "startsWith",
+    notStartsWith           = 'notStartsWith',
+    startsWithIgnoreCase    = "startsWithIgnoreCase",
+    contains                = "contains",
+    containsIgnoreCase      = "containsIgnoreCase",
+    endsWith                = "endsWith",
+    isEmpty                 = "isEmpty",
+    isNull                  = "isNull",
+    isUndefined             = "isUndefined",
+    matches                 = "matches"
 }
 
 export enum TYPE_ATTACHMENT {
@@ -188,57 +188,57 @@ export enum TYPE_ATTACHMENT {
 }
 
 export enum TYPE_METHOD_REQUEST {
-    GET = 'GET', 
-    POST = 'POST', 
-    PUT = 'PUT',
-    PATCH = 'PATCH',
-    DELETE = 'DELETE', 
-    COPY = 'COPY', 
-    HEAD = 'HEAD',
-    OPTIONS = 'OPTIONS',
-    LINK = 'LINK', 
-    UNLINK = 'UNLINK', 
-    PURGE = 'PURGE',
-    LOCK = 'LOCK',
-    UNLOCK = 'UNLOCK', 
-    PROPFIND = 'PROPFIND', 
-    VIEW = 'VIEW'
+    GET         = 'GET', 
+    POST        = 'POST', 
+    PUT         = 'PUT',
+    PATCH       = 'PATCH',
+    DELETE      = 'DELETE', 
+    COPY        = 'COPY', 
+    HEAD        = 'HEAD',
+    OPTIONS     = 'OPTIONS',
+    LINK        = 'LINK', 
+    UNLINK      = 'UNLINK', 
+    PURGE       = 'PURGE',
+    LOCK        = 'LOCK',
+    UNLOCK      = 'UNLOCK', 
+    PROPFIND    = 'PROPFIND', 
+    VIEW        = 'VIEW'
 }
 
 export enum TYPE_METHOD_ATTRIBUTE {
-    TEXT = 'text',
-    INPUT = 'input'
+    TEXT    = 'text',
+    INPUT   = 'input'
 }
 
 export enum TYPE_OF_MENU {
-    EVENT = 'event',
-    BLOCK = 'block',
-    ACTION = 'action',
-    FORM = 'form',
-    QUESTION = 'question'
+    EVENT       = 'event',
+    BLOCK       = 'block',
+    ACTION      = 'action',
+    FORM        = 'form',
+    QUESTION    = 'question'
 }
 
 
 export enum TYPE_UPDATE_ACTION {
-    CONNECTOR = 'connector',
-    ACTION = 'action',
-    INTENT = 'intent',
+    CONNECTOR   = 'connector',
+    ACTION      = 'action',
+    INTENT      = 'intent',
 }
 
 export enum OPTIONS {
-    ZOOM_IN ='zoom-in',
-    ZOOM_OUT = 'zoom-out',
-    CENTER = 'center',
-    UNDO = "undo",
-    REDO = "redo",
-    MOUSE = "mouse"
+    ZOOM_IN     = 'zoom-in',
+    ZOOM_OUT    = 'zoom-out',
+    CENTER      = 'center',
+    UNDO        = "undo",
+    REDO        = "redo",
+    MOUSE       = "mouse"
 }
 
-export const INTENT_TEMP_ID = '';
-export const MESSAGE_METADTA_WIDTH = '100%';
+export const INTENT_TEMP_ID         = '';
+export const MESSAGE_METADTA_WIDTH  = '100%';
 export const MESSAGE_METADTA_HEIGHT = 230;
-export const TIME_WAIT_DEFAULT = 500;
-export const TEXT_CHARS_LIMIT = 1024;
+export const TIME_WAIT_DEFAULT      = 500;
+export const TEXT_CHARS_LIMIT       = 1024;
 export const classCardButtonNoClose = 'card-buttons-no-close';
 
 
@@ -254,9 +254,9 @@ export function calculatingRemainingCharacters(text: string, limit: number): num
 }
 
 export const INTENT_ELEMENT = {
-    FORM: { name: 'Form', type: TYPE_INTENT_ELEMENT.FORM, src: "assets/images/form.svg", description: "Add a Form to ask user data"},
+    FORM:       { name: 'Form',     type: TYPE_INTENT_ELEMENT.FORM,     src: "assets/images/form.svg", description: "Add a Form to ask user data"   },
+    QUESTION:   { name: 'Question', type: TYPE_INTENT_ELEMENT.QUESTION, src: "assets/images/form.svg", description: "Add a Question"                },
     // ANSWER: { name: 'Answer', type: TYPE_INTENT_ELEMENT.ANSWER, src: "assets/images/form.svg", description: "Add an Answer"},
-    QUESTION: { name: 'Question', type: TYPE_INTENT_ELEMENT.QUESTION, src: "assets/images/form.svg", description: "Add a Question"},
 }
 
 
@@ -296,61 +296,61 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
 }
 
 export const EVENTS_LIST = {
-    TRIGGER: { name: 'Trigger', type: TYPE_EVENT_CATEGORY.TRIGGER, src: "assets/images/events/trigger.svg"},
-    RULE: { name: 'Rule', type: TYPE_EVENT_CATEGORY.RULE, src: "assets/images/events/rule.svg"},
+    TRIGGER:    { name: 'Trigger',  type: TYPE_EVENT_CATEGORY.TRIGGER,  src: "assets/images/events/trigger.svg" },
+    RULE:       { name: 'Rule',     type: TYPE_EVENT_CATEGORY.RULE,     src: "assets/images/events/rule.svg"    },
 }
 
 export const OPERATORS_LIST: { [key: string]: { name: string, type: TYPE_OPERATOR, src?: string } } = {
-    "equalAsNumbers": { name: "CDSOperatorList.equalAsNumbers", type: TYPE_OPERATOR.equalAsNumbers, src: "assets/images/operators/equal.svg" },
-    "equalAsStrings": { name: "CDSOperatorList.equalAsStrings", type: TYPE_OPERATOR.equalAsStrings, src: "assets/images/operators/equal.svg" },
-    "notEqualAsNumbers": { name: "CDSOperatorList.notEqualAsNumbers", type: TYPE_OPERATOR.notEqualAsNumbers, src: "assets/images/operators/not-equal.svg" },
-    "notEqualAsStrings": { name: "CDSOperatorList.notEqualAsStrings", type: TYPE_OPERATOR.notEqualAsStrings, src: "assets/images/operators/not-equal.svg" },
-    "greaterThan": { name: "CDSOperatorList.greaterThan", type: TYPE_OPERATOR.greaterThan, src: "assets/images/operators/grather.svg" },
-    "greaterThanOrEqual": { name: "CDSOperatorList.greaterThanOrEqual", type: TYPE_OPERATOR.greaterThanOrEqual, src: "assets/images/operators/gratherEqual.svg" },
-    "lessThan": { name: "CDSOperatorList.lessThan", type: TYPE_OPERATOR.lessThan, src: "assets/images/operators/less.svg" },
-    "lessThanOrEqual": { name: "CDSOperatorList.lessThanOrEqual", type: TYPE_OPERATOR.lessThanOrEqual, src: "assets/images/operators/lessEqual.svg" },
-    "startsWith": { name: "CDSOperatorList.startsWith", type: TYPE_OPERATOR.startsWith },
-    "notStartsWith": { name: "CDSOperatorList.notStartsWith", type: TYPE_OPERATOR.notStartsWith },
-    "startsWithIgnoreCase": { name: "CDSOperatorList.startsWithIgnoreCase", type: TYPE_OPERATOR.startsWithIgnoreCase },
-    "endsWith": { name: "CDSOperatorList.endsWith", type: TYPE_OPERATOR.endsWith },
-    "contains": { name: "CDSOperatorList.contains", type: TYPE_OPERATOR.contains },
-    "containsIgnoreCase": { name: "CDSOperatorList.containsIgnoreCase", type: TYPE_OPERATOR.containsIgnoreCase },
-    "isEmpty": { name: "CDSOperatorList.isEmpty", type: TYPE_OPERATOR.isEmpty },
-    "isNull": { name: "CDSOperatorList.isNull", type: TYPE_OPERATOR.isNull },
-    "isUndefined": { name: "CDSOperatorList.isUndefined", type: TYPE_OPERATOR.isUndefined },
-    "matches": { name: "CDSOperatorList.matches", type: TYPE_OPERATOR.matches }
+    "equalAsNumbers":           { name: "CDSOperatorList.equalAsNumbers",                   type: TYPE_OPERATOR.equalAsNumbers,                 src: "assets/images/operators/equal.svg"        },
+    "equalAsStrings":           { name: "CDSOperatorList.equalAsStrings",                   type: TYPE_OPERATOR.equalAsStrings,                 src: "assets/images/operators/equal.svg"        },
+    "notEqualAsNumbers":        { name: "CDSOperatorList.notEqualAsNumbers",                type: TYPE_OPERATOR.notEqualAsNumbers,              src: "assets/images/operators/not-equal.svg"    },
+    "notEqualAsStrings":        { name: "CDSOperatorList.notEqualAsStrings",                type: TYPE_OPERATOR.notEqualAsStrings,              src: "assets/images/operators/not-equal.svg"    },
+    "greaterThan":              { name: "CDSOperatorList.greaterThan",                      type: TYPE_OPERATOR.greaterThan,                    src: "assets/images/operators/grather.svg"      },
+    "greaterThanOrEqual":       { name: "CDSOperatorList.greaterThanOrEqual",               type: TYPE_OPERATOR.greaterThanOrEqual,             src: "assets/images/operators/gratherEqual.svg" },
+    "lessThan":                 { name: "CDSOperatorList.lessThan",                         type: TYPE_OPERATOR.lessThan,                       src: "assets/images/operators/less.svg"         },
+    "lessThanOrEqual":          { name: "CDSOperatorList.lessThanOrEqual",                  type: TYPE_OPERATOR.lessThanOrEqual,                src: "assets/images/operators/lessEqual.svg"    },
+    "startsWith":               { name: "CDSOperatorList.startsWith",                       type: TYPE_OPERATOR.startsWith                                                                      },
+    "notStartsWith":            { name: "CDSOperatorList.notStartsWith",                    type: TYPE_OPERATOR.notStartsWith                                                                   },
+    "startsWithIgnoreCase":     { name: "CDSOperatorList.startsWithIgnoreCase",             type: TYPE_OPERATOR.startsWithIgnoreCase                                                            },
+    "endsWith":                 { name: "CDSOperatorList.endsWith",                         type: TYPE_OPERATOR.endsWith                                                                        },
+    "contains":                 { name: "CDSOperatorList.contains",                         type: TYPE_OPERATOR.contains                                                                        },
+    "containsIgnoreCase":       { name: "CDSOperatorList.containsIgnoreCase",               type: TYPE_OPERATOR.containsIgnoreCase                                                              },
+    "isEmpty":                  { name: "CDSOperatorList.isEmpty",                          type: TYPE_OPERATOR.isEmpty                                                                         },
+    "isNull":                   { name: "CDSOperatorList.isNull",                           type: TYPE_OPERATOR.isNull                                                                          },
+    "isUndefined":              { name: "CDSOperatorList.isUndefined",                      type: TYPE_OPERATOR.isUndefined                                                                     },
+    "matches":                  { name: "CDSOperatorList.matches",                          type: TYPE_OPERATOR.matches                                                                         }
 }
 
 export const TYPE_MATH_OPERATOR_LIST: { [key: string]: { name: string, type: TYPE_MATH_OPERATOR, src?: string } } = {
-    "addAsNumbers": { name: "CDSMathOperatorList.addAsNumbers", type: TYPE_MATH_OPERATOR.addAsNumber, src: "assets/images/operators/add.svg" },
-    "addAsStrings": { name: "CDSMathOperatorList.addAsStrings", type: TYPE_MATH_OPERATOR.addAsString, src: "assets/images/operators/add.svg" },
-    "substractAsNumbers": { name: "CDSMathOperatorList.substractAsNumbers", type: TYPE_MATH_OPERATOR.subtractAsNumber, src: "assets/images/operators/substract.svg" },
-    "multiplyAsNumbers": { name: "CDSMathOperatorList.multiplyAsNumbers", type: TYPE_MATH_OPERATOR.multiplyAsNumber, src: "assets/images/operators/multiply.svg" },
-    "divideAsNumbers": { name: "CDSMathOperatorList.divideAsNumbers", type: TYPE_MATH_OPERATOR.divideAsNumber, src: "assets/images/operators/divide.svg" },
+    "addAsNumbers":             { name: "CDSMathOperatorList.addAsNumbers",                 type: TYPE_MATH_OPERATOR.addAsNumber,               src: "assets/images/operators/add.svg"          },
+    "addAsStrings":             { name: "CDSMathOperatorList.addAsStrings",                 type: TYPE_MATH_OPERATOR.addAsString,               src: "assets/images/operators/add.svg"          },
+    "substractAsNumbers":       { name: "CDSMathOperatorList.substractAsNumbers",           type: TYPE_MATH_OPERATOR.subtractAsNumber,          src: "assets/images/operators/substract.svg"    },
+    "multiplyAsNumbers":        { name: "CDSMathOperatorList.multiplyAsNumbers",            type: TYPE_MATH_OPERATOR.multiplyAsNumber,          src: "assets/images/operators/multiply.svg"     },
+    "divideAsNumbers":          { name: "CDSMathOperatorList.divideAsNumbers",              type: TYPE_MATH_OPERATOR.divideAsNumber,            src: "assets/images/operators/divide.svg"       },
 }
 
 export const TYPE_FUNCTION_LIST_FOR_VARIABLES: { [key: string]: { name: string, type: TYPE_FUNCTION_VAR, src?: string } } = {
-    "upperCaseAsStrings": { name: "CDSFunctionListForVariable.upperCaseAsStrings", type: TYPE_FUNCTION_VAR.upperCaseAsString, src: "assets/images/functions/upperCase.svg" },
-    "lowerCaseAsStrings": { name: "CDSFunctionListForVariable.lowerCaseAsStrings", type: TYPE_FUNCTION_VAR.lowerCaseAsString, src: "assets/images/functions/lowerCase.svg" },
-    "capitalizeAsStrings": { name: "CDSFunctionListForVariable.capitalizeAsStrings", type: TYPE_FUNCTION_VAR.capitalizeAsString, src: "assets/images/functions/capitalize.svg" },
-    "absAsNumbers": { name: "CDSFunctionListForVariable.absAsNumbers", type: TYPE_FUNCTION_VAR.absAsNumber, src: "assets/images/functions/abs.svg" },
-    "roundAsNumbers": { name: "CDSFunctionListForVariable.roundAsNumbers", type: TYPE_FUNCTION_VAR.roundAsNumber, src: "assets/images/functions/round.svg" },
-    "floorAsNumbers": { name: "CDSFunctionListForVariable.floorAsNumbers", type: TYPE_FUNCTION_VAR.floorAsNumber, src: "assets/images/functions/floor.svg" },
-    "ceilAsNumbers": { name: "CDSFunctionListForVariable.ceilAsNumbers", type: TYPE_FUNCTION_VAR.ceilAsNumber, src: "assets/images/functions/ceil.svg" },
-    "JSONparse":  { name: "JSON.parse", type: TYPE_FUNCTION_VAR.JSONparse, src: "assets/images/functions/jsonParse.svg" },
-    "JSONstringify":  { name: "JSON.stringify", type: TYPE_FUNCTION_VAR.JSONstringify, src: "assets/images/functions/jsonParse.svg" },
+    "upperCaseAsStrings":       { name: "CDSFunctionListForVariable.upperCaseAsStrings",    type: TYPE_FUNCTION_VAR.upperCaseAsString,          src: "assets/images/functions/upperCase.svg"    },
+    "lowerCaseAsStrings":       { name: "CDSFunctionListForVariable.lowerCaseAsStrings",    type: TYPE_FUNCTION_VAR.lowerCaseAsString,          src: "assets/images/functions/lowerCase.svg"    },
+    "capitalizeAsStrings":      { name: "CDSFunctionListForVariable.capitalizeAsStrings",   type: TYPE_FUNCTION_VAR.capitalizeAsString,         src: "assets/images/functions/capitalize.svg"   },
+    "absAsNumbers":             { name: "CDSFunctionListForVariable.absAsNumbers",          type: TYPE_FUNCTION_VAR.absAsNumber,                src: "assets/images/functions/abs.svg"          },
+    "roundAsNumbers":           { name: "CDSFunctionListForVariable.roundAsNumbers",        type: TYPE_FUNCTION_VAR.roundAsNumber,              src: "assets/images/functions/round.svg"        },
+    "floorAsNumbers":           { name: "CDSFunctionListForVariable.floorAsNumbers",        type: TYPE_FUNCTION_VAR.floorAsNumber,              src: "assets/images/functions/floor.svg"        },
+    "ceilAsNumbers":            { name: "CDSFunctionListForVariable.ceilAsNumbers",         type: TYPE_FUNCTION_VAR.ceilAsNumber,               src: "assets/images/functions/ceil.svg"         },
+    "JSONparse":                { name: "JSON.parse",                                       type: TYPE_FUNCTION_VAR.JSONparse,                  src: "assets/images/functions/jsonParse.svg"    },
+    "JSONstringify":            { name: "JSON.stringify",                                   type: TYPE_FUNCTION_VAR.JSONstringify,              src: "assets/images/functions/jsonParse.svg"    },
 }
 
 export const TYPE_FUNCTION_LIST_FOR_FUNCTIONS: { [key: string]: { name: string, type: TYPE_FUNCTION_FUNC, src?: string } } = {
-    "isOpenNowAsStrings": { name: "Is open now", type: TYPE_FUNCTION_FUNC.isOpenNowAsStrings, src: "" },
-    "availableAgentAsStrings": { name: "Available agents?", type: TYPE_FUNCTION_FUNC.availableAgentsAsStrings, src: "" },
+    "isOpenNowAsStrings":       { name: "Is open now",                                      type: TYPE_FUNCTION_FUNC.isOpenNowAsStrings,        src: ""                                         },
+    "availableAgentAsStrings":  { name: "Available agents?",                                type: TYPE_FUNCTION_FUNC.availableAgentsAsStrings,  src: ""                                         },
 }
 
 export const CERTIFIED_TAGS: Array<{color: string, name: string}> = [
-    { "color": "#a16300", "name": "Lead-Gen" },
-    { "color": "#25833e", "name": "Support" }, 
-    // { "color": "#00699e", "name": "Pre-Sale" }, 
-    // { "color": "#0049bd", "name": "Self-serve" }, 
+    { color: "#a16300", name: "Lead-Gen" },
+    { color: "#25833e", name: "Support" }, 
+    // { color: "#00699e", name: "Pre-Sale" }, 
+    // { color: "#0049bd", name: "Self-serve" }, 
 ]
 
 export const BUTTON_TYPES: Array<{ label: string, value: TYPE_BUTTON }> = [
