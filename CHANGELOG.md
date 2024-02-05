@@ -5,6 +5,12 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.14-rc.2
+- added: new support component 
+- added: new play menu component
+- added: new share menu component
+- added: brandResources class now support nested array of objects  
+
 ### 1.0.14-rc.1
 - added: cds-action-askgptv2
 - added: variable-list tooltip description translations
