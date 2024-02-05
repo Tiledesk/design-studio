@@ -12,15 +12,15 @@ import { TYPE_URL } from '../utils';
 export class CdsSupportComponent implements OnInit {
 
   SUPPORT_OPTIONS = SUPPORT_OPTIONS
-  cardOptions: { [key: string]: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string, description?: string, localIcon?: boolean }>}
+  cardOptions: { [key: string]: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string, description?: string, localIcon?: boolean }>}
   private logger: LoggerService = LoggerInstance.getInstance()
   
   constructor() { }
 
   ngOnInit(): void {
-    console.log('[CDS-SUPPORT initttt]')
     this.cardOptions = SUPPORT_OPTIONS
     Object.keys(SUPPORT_OPTIONS).forEach(key => {
+      this.cardOptions[key] =  this.cardOptions[key].filter(el => el.status !== 'inactive')
       this.cardOptions[key].map((el)=> {
         el.localIcon = false
         if(el.icon && el.icon.match(new RegExp(/(?=.*?assets|http|https\b)^.*$/))){
@@ -28,7 +28,7 @@ export class CdsSupportComponent implements OnInit {
         }
       })
     })
-    console.log('[CDS-SUPPORT this.cardOptions]', this.cardOptions)
+    this.logger.log('[CDS-SUPPORT this.cardOptions]', this.cardOptions)
     this.hideShowWidget("show")
   }
 
