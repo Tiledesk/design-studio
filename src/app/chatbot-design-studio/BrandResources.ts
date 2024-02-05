@@ -39,6 +39,7 @@ export class BrandResources {
         /** INFO_MENU_ITEMS */
         let result: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...INFO_MENU_ITEMS, ...this.brand['INFO_MENU_ITEMS']].reduce((m, o) => m.set(o.key, o), new Map).values());
         result.forEach(el => {
+            if(!INFO_MENU_ITEMS.find(a => a.key === el.key)) return;
             INFO_MENU_ITEMS.find(a => a.key === el.key).icon = el.icon
             INFO_MENU_ITEMS.find(a => a.key === el.key).src = el.src
             INFO_MENU_ITEMS.find(a => a.key === el.key).status = el.status
@@ -48,6 +49,7 @@ export class BrandResources {
         /** SUPPORT-COMP OPTIONS */
         let options_SELF: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...SUPPORT_OPTIONS['SELF_SERVICE'], ...this.brand['SUPPORT_OPTIONS']['SELF_SERVICE']].reduce((m, o) => m.set(o.key, o), new Map).values());
         options_SELF.forEach(el => {
+            if(!SUPPORT_OPTIONS['SELF_SERVICE'].find(a => a.key === el.key)) return;
             SUPPORT_OPTIONS['SELF_SERVICE'].find(a => a.key === el.key).icon = el.icon
             SUPPORT_OPTIONS['SELF_SERVICE'].find(a => a.key === el.key).src = el.src
             SUPPORT_OPTIONS['SELF_SERVICE'].find(a => a.key === el.key).status = el.status
@@ -55,6 +57,7 @@ export class BrandResources {
         })
         let options_CONTACTS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...SUPPORT_OPTIONS['CONTACT_US'], ...this.brand['SUPPORT_OPTIONS']['CONTACT_US']].reduce((m, o) => m.set(o.key, o), new Map).values());
         options_CONTACTS.forEach(el => {
+            if(!SUPPORT_OPTIONS['CONTACT_US'].find(a => a.key === el.key)) return;
             SUPPORT_OPTIONS['CONTACT_US'].find(a => a.key === el.key).icon = el.icon
             SUPPORT_OPTIONS['CONTACT_US'].find(a => a.key === el.key).src = el.src
             SUPPORT_OPTIONS['CONTACT_US'].find(a => a.key === el.key).status = el.status
