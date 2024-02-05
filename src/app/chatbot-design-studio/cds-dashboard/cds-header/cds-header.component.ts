@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -32,7 +32,7 @@ const swal = require('sweetalert');
   styleUrls: ['./cds-header.component.scss']
 })
 export class CdsHeaderComponent implements OnInit {
- 
+  
   @Input() IS_OPEN_SIDEBAR: boolean;
   // @Input() projectID: string;
   // @Input() defaultDepartmentId: string;
@@ -128,6 +128,7 @@ export class CdsHeaderComponent implements OnInit {
     }) 
 
   }
+
 
   getTranslations() {
 
