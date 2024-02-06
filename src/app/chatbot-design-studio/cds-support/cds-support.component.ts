@@ -29,7 +29,8 @@ export class CdsSupportComponent implements OnInit {
       })
     })
     this.logger.log('[CDS-SUPPORT this.cardOptions]', this.cardOptions)
-    this.hideShowWidget("show")
+    this.manageWidget("start")
+    this.manageWidget('show')
   }
 
   onCardItemClick(item, section){
@@ -40,7 +41,7 @@ export class CdsSupportComponent implements OnInit {
           window.open(item.src, '_blank')
           break;
         case 'CHAT':
-          this.hideShowWidget('open')
+          this.manageWidget('open')
           break;
       }
     }
@@ -52,7 +53,7 @@ export class CdsSupportComponent implements OnInit {
 
   }
 
-  private hideShowWidget(status: "hide" | "show" | "open" | "close") {
+  private manageWidget(status: "hide" | "show" | "open" | "close" | "start") {
     try {
       if (window && window['tiledesk']) {
         this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
@@ -66,13 +67,19 @@ export class CdsSupportComponent implements OnInit {
           window['tiledesk'].close();
         }
       }
+
+      if (window && !window['tiledesk']) {
+        if(status === "start"){
+          window['startWidget']();
+        }
+      }
     } catch (error) {
       this.logger.error('tiledesk_widget_hide ERROR', error)
     }
   }
 
   ngOnDestroy(){
-    this.hideShowWidget("hide")
+    this.manageWidget("hide")
   }
 
 }

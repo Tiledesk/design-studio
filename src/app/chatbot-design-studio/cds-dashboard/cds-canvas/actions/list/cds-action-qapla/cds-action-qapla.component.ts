@@ -58,8 +58,6 @@ export class CdsActionQaplaComponent implements OnInit {
 
     this.initializeAttributes();
     this.project = this.dashboardService.project;
-    console.log("this.project: ", this.project);
-    this.availabilityCheck();
   }
 
   ngOnDestroy() {
@@ -140,14 +138,6 @@ export class CdsActionQaplaComponent implements OnInit {
     } catch (error) {
       this.logger.error('[ACTION-ASKGPT] updateConnector error: ', error);
     }
-  }
-
-  availabilityCheck() {
-    console.log("availabilityCheck profile plan: ", this.project.profile)
-    // if (this.project.profile.name !== 'Scale' && this.project.profile.name !== 'Plus') {
-    //   console.log("availabilityCheck BLOCK ACTION!!");
-    //   this.action_locked = true;
-    // }
   }
   
   private initializeAttributes() {
