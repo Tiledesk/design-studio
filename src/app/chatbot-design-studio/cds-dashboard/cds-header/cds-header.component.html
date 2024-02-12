@@ -79,22 +79,23 @@
                 </li>
             </ul> -->
         </div>
-        <!-- <div *ngIf="TRY_ON_WA === true" class="btn-group">
+        <div *ngIf="TRY_ON_WA === true" class="btn-group">
             <button id="cds-test-it-wab-out-btn" class="btn btn-primary cds-blue-button" type="button" (click)="openWhatsappPage()">
                 <img width="18px" height="18px" src="assets/images/channel_icons/whatsapp-logo_green.svg">
                 {{ 'TryOnWhatsapp' | translate}}
             </button>
-        </div> -->
+        </div>
         <div class="btn-group"
                 matTooltipClass="custom-mat-tooltip"
                 matTooltip="{{ 'TestIt' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
                 matTooltipHideDelay="100">
-            <button *ngIf="!TRY_ON_WA" id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" (click)="openTestSiteInPopupWindow()">
+                <!-- *ngIf="!TRY_ON_WA" -->
+            <button  id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" (click)="openTestSiteInPopupWindow()">
                 <img class="active-icon" width="18px" height="18px" src="assets/images/icons/play.svg">
             </button>
-            <button *ngIf="TRY_ON_WA" id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" [matMenuTriggerFor]="menuPlay">
+            <!-- <button *ngIf="TRY_ON_WA" id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" [matMenuTriggerFor]="menuPlay">
                 <img class="active-icon" width="18px" height="18px" src="assets/images/icons/play.svg">
-            </button>
+            </button> -->
         </div>
         <!-- <div class="cds-close-btn-wpr">
 
