@@ -35,7 +35,7 @@
                         <img [src]="item.value.src" [title]="item.value.name | translate">
                     </div>
                     <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name | translate}}</div>
-                    <span *ngIf="item?.value?.plan" class="trigger-beta-badge">PRO</span>
+                    <span *ngIf="item?.value?.plan" class="trigger-beta-badge">Pro</span>
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <button class="btn btn-tdblu-no-boxshadow drag-btn">
                             <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate ">
