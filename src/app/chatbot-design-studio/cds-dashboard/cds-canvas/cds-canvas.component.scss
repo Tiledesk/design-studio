@@ -18,11 +18,13 @@ $toogle-sidebar-width: 22px;
   width: auto;
   height: 100%;
   transform: translateX(100%);
-  animation: slide-in 0.3s ease-in-out forwards;
-  animation-delay: 0.2s;
+  animation: slide-in 0.2s ease-in-out forwards;
+  // animation-delay: 0.2s;
+  animation-delay: 0s;
 
   &#action-detail{
-    z-index: 10
+    z-index: 10;
+    
   }
   &#button-configuration{
     z-index: 11
