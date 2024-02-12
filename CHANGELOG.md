@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.0.14-rc.3
+- added: dashboard integration redirect link in cds-action-qapla and cds-action-hubspot in favour of apiKey into action detail
+- changed: animation-delay reduced to 0 for all cds-panel components
+- changed: do not close and reopen again cds-panel-action-detail component if it's already opened
+
 ### 1.0.14-rc.2
 - added: new support component 
 - added: new play menu component
