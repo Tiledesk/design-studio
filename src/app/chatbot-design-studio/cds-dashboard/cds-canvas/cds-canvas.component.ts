@@ -15,7 +15,7 @@ import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
 
 // UTILS //
-import { insertItemInArray, scaleAndcenterStageOnCenterPosition, isElementOnTheStage, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
+import { TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
 
 
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -179,10 +179,11 @@ export class CdsCanvasComponent implements OnInit {
       this.elementIntentSelected = element;
       if (element.type) {
         this.closeAllPanels();
+        this.IS_OPEN_PANEL_ACTION_DETAIL = true;
         this.removeConnectorDraftAndCloseFloatMenu();
-        setTimeout(() => {
-          this.IS_OPEN_PANEL_ACTION_DETAIL = true;
-        }, 0);
+        // setTimeout(() => {
+        //   this.IS_OPEN_PANEL_ACTION_DETAIL = true;
+        // }, 0);
       } else {
         this.IS_OPEN_PANEL_ACTION_DETAIL = false;
       }
@@ -193,7 +194,8 @@ export class CdsCanvasComponent implements OnInit {
     this.subscriptionOpenButtonPanel = this.controllerService.isOpenButtonPanel$.subscribe((button: Button) => {
       this.buttonSelected = button;
       if (button) {
-        this.closeAllPanels(); // nk the action detail panel is not closed when the button detail panel is opened
+        this.closeAllPanels();
+        this.closeActionDetailPanel();
         // this.IS_OPEN_PANEL_WIDGET = false;
         this.removeConnectorDraftAndCloseFloatMenu();
         setTimeout(() => {
@@ -208,7 +210,7 @@ export class CdsCanvasComponent implements OnInit {
     this.subscriptionOpenAddActionMenu = this.controllerService.isOpenAddActionMenu$.subscribe((menu: any) => {
       if (menu) {
         this.closeAllPanels();
-        
+        this.closeActionDetailPanel()
       } else {
         this.IS_OPEN_ADD_ACTIONS_MENU = false;
       }
@@ -236,10 +238,13 @@ export class CdsCanvasComponent implements OnInit {
   /** closeAllPanels */
   private closeAllPanels(){
     this.IS_OPEN_PANEL_WIDGET = false;
-    this.IS_OPEN_PANEL_ACTION_DETAIL = false;
+    // this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     // this.closePanelWidget.next();
+  }
+  private closeActionDetailPanel(){
+    this.IS_OPEN_PANEL_ACTION_DETAIL = false;
   }
 
   /** getIntentPosition: call from html */
@@ -423,6 +428,7 @@ export class CdsCanvasComponent implements OnInit {
       "connector-selected", (e: CustomEvent) => {
       //  console.log("[CDS-CANVAS] connector-selected:", e, e.detail.mouse_pos);
         this.closeAllPanels();
+        this.closeActionDetailPanel();
         this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
         this.mousePosition = e.detail.mouse_pos;
         this.mousePosition.x -= -10;
@@ -479,12 +485,13 @@ export class CdsCanvasComponent implements OnInit {
   // -------------------------------------------------------
   @HostListener('document:click', ['$event'])
   documentClick(event: any): void {
-    this.logger.log('[CDS CANVAS] DOCUMENT CLICK event: ', event.target.id);
-    if (event.target.id.startsWith("cdk-drop-list-")) {
+    this.logger.log('[CDS CANVAS] DOCUMENT CLICK event: ', event.target.id, event);
+    if (event.target.id.startsWith("cdk-drop-list-") && !event.target.className.includes('button-replies')) {
       this.removeConnectorDraftAndCloseFloatMenu();
       // this.controllerService.closeActionDetailPanel();
       // this.controllerService.closeButtonPanel();
       this.closeAllPanels();
+      this.closeActionDetailPanel();
     }
   }
 
@@ -539,6 +546,7 @@ export class CdsCanvasComponent implements OnInit {
     this.positionFloatMenu.x = this.positionFloatMenu.x+marginLeft;
     detail.menuPoint = this.positionFloatMenu;
     this.closeAllPanels();
+    this.closeActionDetailPanel();
     this.IS_OPEN_ADD_ACTIONS_MENU = true;
     this.hasClickedAddAction = false;
     // this.IS_OPEN_PANEL_WIDGET = false;
@@ -656,6 +664,7 @@ export class CdsCanvasComponent implements OnInit {
     if (action.value && action.value.type) {
       this.logger.log('[CDS-CANVAS] ho draggato una action da panel element sullo stage');
       this.closeAllPanels();
+      this.closeActionDetailPanel();
       // this.removeConnectorDraftAndCloseFloatMenu();  
       this.createNewIntentFromPanelElement(pos, action.value.type);
     } else if (action) {
@@ -820,6 +829,7 @@ export class CdsCanvasComponent implements OnInit {
     this.intentService.setIntentSelected(intent.intent_id);
     this.posCenterIntentSelected(intent);
     this.closeAllPanels();
+    this.closeActionDetailPanel();
   }
 
   /** onDeleteIntent */
@@ -829,6 +839,7 @@ export class CdsCanvasComponent implements OnInit {
       this.removeConnectorDraftAndCloseFloatMenu();
     }
     this.closeAllPanels();
+    this.closeActionDetailPanel();
     this.deleteIntent(intent);
     // swal({
     //   title: this.translate.instant('AreYouSure'),
@@ -911,6 +922,7 @@ export class CdsCanvasComponent implements OnInit {
     this.logger.log('[CDS-CANVAS] showPanelActions event:: ', event);
     this.IS_OPEN_ADD_ACTIONS_MENU = true;
     this.closeAllPanels();
+    this.closeActionDetailPanel();
     // this.controllerService.closeActionDetailPanel();
     // this.controllerService.closeButtonPanel();
     this.hasClickedAddAction = event.addAction;

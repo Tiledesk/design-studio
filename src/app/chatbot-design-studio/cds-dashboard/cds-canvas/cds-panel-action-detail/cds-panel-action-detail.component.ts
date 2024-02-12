@@ -72,7 +72,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('[PANEL-INTENT-DETAIL] (OnChanges)', changes, this.elementIntentSelected);
-    //this.initialize();
+    this.initialize();
   }
 
 
