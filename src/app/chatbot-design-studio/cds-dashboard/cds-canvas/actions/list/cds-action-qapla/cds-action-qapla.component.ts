@@ -19,6 +19,7 @@ export class CdsActionQaplaComponent implements OnInit {
 
   @Input() intentSelected: Intent;
   @Input() action: ActionQapla;
+  @Input() project_id: string;
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter;
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
@@ -43,6 +44,7 @@ export class CdsActionQaplaComponent implements OnInit {
   constructor(
     private dashboardService: DashboardService,
     private intentService: IntentService,
+    private appConfigService: AppConfigService,
   ) { }
 
   ngOnInit(): void {
@@ -201,5 +203,10 @@ export class CdsActionQaplaComponent implements OnInit {
   
   onBlur(event){
     this.updateAndSaveAction.emit();
+  }
+
+  goToIntegration(){
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name=' + this.action._tdActionType
+    window.open(url, '_blank')
   }
 }

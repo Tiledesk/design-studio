@@ -6,6 +6,7 @@ import { IntentService } from '../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { AppConfigService } from 'src/app/services/app-config';
 
 @Component({
   selector: 'cds-action-hubspot',
@@ -16,6 +17,7 @@ export class CdsActionHubspotComponent implements OnInit {
 
   @Input() intentSelected: Intent;
   @Input() action: ActionHubspot;
+  @Input() project_id: string;
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
@@ -43,7 +45,8 @@ export class CdsActionHubspotComponent implements OnInit {
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private intentService: IntentService
+    private intentService: IntentService,
+    private appConfigService: AppConfigService,
   ) { }
 
   // SYSTEM FUNCTIONS //
@@ -204,5 +207,10 @@ export class CdsActionHubspotComponent implements OnInit {
     }
     this.action[type] = null;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
+  goToIntegration(){
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name=' + this.action._tdActionType
+    window.open(url, '_blank')
   }
 }

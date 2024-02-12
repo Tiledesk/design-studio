@@ -60,7 +60,7 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box">
+    <!-- <div class="field-box">
         <label class="title-label">{{'CDSCanvas.QaplaApiKey' | translate }}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
@@ -73,8 +73,10 @@
             (blur)="onBlur($event)"
             (changeTextarea)="changeTextarea($event, 'apiKey')">
         </cds-textarea>
-    </div>
+    </div> -->
 
+    <a class="link" (click)="goToIntegration()">{{'CDSCanvas.ManageIntegration' | translate}}</a>
+    
     <hr class="custom-divider">
 
     <div class="field-box">

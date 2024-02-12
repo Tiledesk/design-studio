@@ -270,6 +270,11 @@ mat-expansion-panel ::ng-deep {
 
 }
 
+a.link{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 
 // PREVIEW SECTION --- start **************** //
 .preview-container {

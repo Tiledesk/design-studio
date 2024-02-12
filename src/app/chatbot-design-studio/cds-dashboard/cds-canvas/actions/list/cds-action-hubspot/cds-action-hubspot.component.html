@@ -43,7 +43,7 @@
 
 <!-- Details -->
 <div *ngIf="!previewMode" class="content-panel-intent-detail" #scrollMe id="scrollMe" >
-    <div class="field-box">
+    <!-- <div class="field-box">
         <label class="title-label">{{'CDSCanvas.HubspotAccessToken' | translate }}</label>
         <cds-textarea id="hubspotToken" 
             [textLimitBtn]="false" 
@@ -55,7 +55,7 @@
             (changeTextarea)="onChangeTextarea($event, 'token')"
             (selectedAttribute)="onSelectedAttribute($event, 'token')">
         </cds-textarea>
-    </div>
+    </div> -->
 
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.BodyParameters' | translate }}</label>
@@ -67,6 +67,8 @@
         </cds-attributes>
     </div>
 
+    <a class="link" (click)="goToIntegration()">{{'CDSCanvas.ManageIntegration' | translate}}</a>
+    
     <hr class="custom-divider">
 
     <div class="field-box">

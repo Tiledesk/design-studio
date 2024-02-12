@@ -6,6 +6,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { variableList, TYPE_UPDATE_ACTION } from '../../../../../utils';
+import { AppConfigService } from 'src/app/services/app-config';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -44,6 +45,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   constructor(
     private intentService: IntentService,
+    private appConfigService: AppConfigService,
   ) { }
 
   ngOnInit(): void {
@@ -220,6 +222,11 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.action.falseIntentAttributes = attributes;
     }
     this.logger.log("action updated: ", this.action)
+  }
+
+  goToKNB(){
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/knowledge-bases'
+    window.open(url, '_blank')
   }
 
 }
