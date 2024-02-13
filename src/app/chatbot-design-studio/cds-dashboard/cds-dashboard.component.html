@@ -17,8 +17,9 @@
         class="chatboat-dashboard" 
         [class.is_opened_sidebar]="IS_OPEN_SIDEBAR">
 
-        <cds-changelog *ngIf="showChangelog"
-            (onClose)="onCloseChangelog()"></cds-changelog>
+        <cds-changelog *ngIf="showChangelog" 
+            (onClose)="onCloseChangelog()">
+        </cds-changelog>
        
         <cds-sidebar class="cds-sidebar" 
             [activeSidebarSection]="activeSidebarSection"

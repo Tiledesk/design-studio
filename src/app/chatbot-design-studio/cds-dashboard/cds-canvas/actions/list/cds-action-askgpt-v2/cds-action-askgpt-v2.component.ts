@@ -5,7 +5,7 @@ import { ActionAskGPTV2 } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { variableList, TYPE_UPDATE_ACTION } from '../../../../../utils';
+import { variableList, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from '../../../../../utils';
 import { AppConfigService } from 'src/app/services/app-config';
 
 @Component({
@@ -34,10 +34,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   isConnectedFalse: boolean = false;
   connector: any;
 
-  models_list = [
-    { name: "GPT-3.5 Turbo (ChatGPT)", value: "gpt-3.5-turbo" }, 
-    { name: "GPT-4 (ChatGPT)", value: "gpt-4" }
-  ];
+  model_list: Array<{ name: string, value: string }>;
 
   private subscriptionChangedConnector: Subscription;
 
@@ -50,6 +47,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug("[ACTION-ASKGPTV2] action detail: ", this.action);
+    this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive')
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
       this.connector = connector;
