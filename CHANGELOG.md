@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.1.0-rc1
+- added: TYPE_GPT_MODEL const in utils and used in cds-action-askgptv2 and cds-action-gpt-task components
+
 ### 1.0.14-rc.3
 - added: dashboard integration redirect link in cds-action-qapla and cds-action-hubspot in favour of apiKey into action detail
 - changed: animation-delay reduced to 0 for all cds-panel components
