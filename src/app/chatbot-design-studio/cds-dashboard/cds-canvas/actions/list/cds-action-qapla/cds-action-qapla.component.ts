@@ -50,8 +50,11 @@ export class CdsActionQaplaComponent implements OnInit {
     this.logger.log("[ACTION QAPLA] action:", this.action);
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
-      this.connector = connector;
-      this.updateConnector();
+      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
+      if(connector.fromId.startsWith(connectorId)){
+        this.connector = connector;
+        this.updateConnector();
+      }
     });
     if(this.intentSelected){
       this.initializeConnector();

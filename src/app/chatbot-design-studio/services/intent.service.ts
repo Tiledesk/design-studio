@@ -1071,6 +1071,7 @@ export class IntentService {
     operations.forEach(async ele => {
       let intent = JSON.parse(JSON.stringify(ele.intent));
       if(ele.type === 'post'){
+        console.log('[INTENT SERVICE] -> POST ZZ: ', intent);
         this.listOfIntents = insertItemInArray(this.listOfIntents, intent);
         let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
         if(isOnTheStage){
@@ -1081,6 +1082,7 @@ export class IntentService {
         }
       }
       else if(ele.type === 'delete'){
+        console.log('[INTENT SERVICE] -> DELETE ZZ: ', intent);
         let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
         if(isOnTheStage){
           this.connectorService.deleteConnectorsOutOfBlock(intent.intent_id);
@@ -1090,7 +1092,7 @@ export class IntentService {
         }
       }
       else if(ele.type === 'put'){
-        console.log('[INTENT SERVICE] -> PUT: ', intent);
+        console.log('[INTENT SERVICE] -> PUT ZZ: ', intent);
         this.listOfIntents = replaceItemInArrayForKey('intent_id', this.listOfIntents, intent);
         let isOnTheStage = await isElementOnTheStage(intent.intent_id); // sync
         if(isOnTheStage){

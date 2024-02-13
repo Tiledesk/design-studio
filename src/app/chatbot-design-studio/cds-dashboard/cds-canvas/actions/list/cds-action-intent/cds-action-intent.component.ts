@@ -41,9 +41,12 @@ export class CdsActionIntentComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      // console.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
-      this.connector = connector;
-      this.updateConnector();
+      console.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
+      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
+      if(connector.fromId.startsWith(connectorId)){
+        this.connector = connector;
+        this.updateConnector();
+      }
     });
     this.initialize();
   }
@@ -63,6 +66,7 @@ export class CdsActionIntentComponent implements OnInit {
 
 
   private checkConnectionStatus(){
+    console.log('[CDS-ACTION-INTENT] **************************11111');
     if(this.action.intentName){
      this.isConnected = true;
      const posId = this.action.intentName.indexOf("#");
@@ -90,6 +94,7 @@ export class CdsActionIntentComponent implements OnInit {
 
 
   private updateConnector(){
+    console.log('[CDS-ACTION-INTENT] **************************2222', this.action.intentName);
     this.isConnected = this.action.intentName?true:false;
     const array = this.connector.fromId.split("/");
     const idIntent= array[0];
