@@ -5,6 +5,8 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.1.0 in PROD
+
 ### 1.1.0-rc2
 - changed: return changes to cds-attributes parent if attributes object is empty ( keys.length = 0 )
 - bug-fixed: cds-action-make and cds-action-hubspot bodyparameters set as object and not as a string
