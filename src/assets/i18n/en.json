@@ -322,6 +322,7 @@
         "SetHiddenMessage":"Set the hidden message",
         "HiddenMessage":"Hidden message",
         "EnterAccessToken":"Enter the Access Token",
+        "EnterParameters":"Enter parameters",
         "HubspotAccessToken":"Hubspot access token",
         "EnterHubspotAccessToken":"Enter Hubspot Access Token",
         "BodyParameters":"Body parameters",

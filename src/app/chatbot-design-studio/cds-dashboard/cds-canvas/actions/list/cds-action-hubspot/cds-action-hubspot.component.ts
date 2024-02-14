@@ -36,7 +36,7 @@ export class CdsActionHubspotComponent implements OnInit {
   pattern = "^[a-zA-Z_]*[a-zA-Z_]+[a-zA-Z0-9_]*$";
 
   limitCharsText = TEXT_CHARS_LIMIT;
-  jsonParameters: string; 
+  jsonParameters: { [key: string]: string}; 
   errorMessage: string;
 
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
@@ -155,7 +155,7 @@ export class CdsActionHubspotComponent implements OnInit {
 
 
   // EVENT FUNCTIONS //
-  onChangeTextarea(e, type: 'token'){
+  onChangeTextarea(e, type: string){
     switch(type){
       case 'token' : {
         this.action.token = e;
@@ -163,7 +163,6 @@ export class CdsActionHubspotComponent implements OnInit {
         console.log("[ACTION-HUBSPOT] this.action", this.action);
       }
     }
-
   }
 
 

@@ -903,6 +903,7 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.HUBSPOT){
       action = new ActionHubspot();
+      action.assignResultTo = 'hubspot_result';
       action.assignStatusTo = 'hubspot_status';
       action.assignErrorTo = 'hubspot_error';
     }
