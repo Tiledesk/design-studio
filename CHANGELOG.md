@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.1.0-rc2
+- changed: return changes to cds-attributes parent if attributes object is empty ( keys.length = 0 )
+- bug-fixed: cds-action-make and cds-action-hubspot bodyparameters set as object and not as a string
+- bug-fixed: cds-action-make and cds-action-hubspot custom-divider color 
+
 ### 1.1.0-rc1
 - added: TYPE_GPT_MODEL const in utils and used in cds-action-askgptv2 and cds-action-gpt-task components
 

@@ -102,7 +102,7 @@ export class AttributesComponent implements OnInit {
       }
     });
     if(Object.keys(attributes).length === 0 || JSON.stringify(attributes) !== JSON.stringify(this.attributes)){
-      console.log("[ATTRIBUTES] ------- >>>> ", this.attributes, attributes);
+      this.logger.log("[ATTRIBUTES] ------- >>>> ", this.attributes, attributes);
       this.attributes = attributes;
       this.changeAttributes.emit(attributes);
     }
