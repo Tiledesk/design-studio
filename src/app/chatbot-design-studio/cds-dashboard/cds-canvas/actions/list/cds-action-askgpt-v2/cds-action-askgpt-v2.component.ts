@@ -1,26 +1,24 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ActionQapla } from 'src/app/models/action-model';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+import { ActionAskGPTV2 } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
-import { TYPE_UPDATE_ACTION, variableList } from '../../../../../utils';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Project } from 'src/app/models/project-model';
-import { DashboardService } from 'src/app/services/dashboard.service';
+import { variableList, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from '../../../../../utils';
 import { AppConfigService } from 'src/app/services/app-config';
-import { Subscription } from 'rxjs';
-import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 
 @Component({
-  selector: 'cds-action-qapla',
-  templateUrl: './cds-action-qapla.component.html',
-  styleUrls: ['./cds-action-qapla.component.scss']
+  selector: 'cds-action-askgpt-v2',
+  templateUrl: './cds-action-askgpt-v2.component.html',
+  styleUrls: ['./cds-action-askgpt-v2.component.scss']
 })
-export class CdsActionQaplaComponent implements OnInit {
+export class CdsActionAskgptV2Component implements OnInit {
 
   @Input() intentSelected: Intent;
-  @Input() action: ActionQapla;
-  @Input() project_id: string;
+  @Input() action: ActionAskGPTV2;
   @Input() previewMode: boolean = true;
+  @Input() project_id: string;
   @Output() updateAndSaveAction = new EventEmitter;
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
@@ -35,37 +33,43 @@ export class CdsActionQaplaComponent implements OnInit {
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
+
+  model_list: Array<{ name: string, value: string }>;
+
   private subscriptionChangedConnector: Subscription;
-  
-  project: Project;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private dashboardService: DashboardService,
     private intentService: IntentService,
     private appConfigService: AppConfigService,
   ) { }
 
   ngOnInit(): void {
-    this.logger.log("[ACTION QAPLA] action:", this.action);
+    this.logger.debug("[ACTION-ASKGPTV2] action detail: ", this.action);
+    this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive')
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
+      this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
       this.connector = connector;
       this.updateConnector();
     });
     if(this.intentSelected){
       this.initializeConnector();
     }
-
-    this.initializeAttributes();
-    this.project = this.dashboardService.project;
+    if (this.previewMode == false) {
+      this.onDetailModeLoad();
+    }
   }
 
   ngOnDestroy() {
     if (this.subscriptionChangedConnector) {
       this.subscriptionChangedConnector.unsubscribe();
     }
+  }
+
+  onDetailModeLoad() {
+    //this.getKnowledgeBaseSettings();
+    this.initializeAttributes();
   }
 
   initializeConnector() {
@@ -100,7 +104,7 @@ export class CdsActionQaplaComponent implements OnInit {
       this.idConnectionFalse = null;
      }
   }
-  
+
   private updateConnector(){
     try {
       const array = this.connector.fromId.split("/");
@@ -120,7 +124,7 @@ export class CdsActionQaplaComponent implements OnInit {
           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
         } else { 
           // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
-          this.logger.debug('[ACTION-ASKGPT] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
+          this.logger.debug('[ACTION-ASKGPTV2] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
           if(array[array.length -1] === 'true'){
             // this.action.trueIntent = '#'+this.connector.toId;
             this.isConnectedTrue = true;
@@ -138,39 +142,44 @@ export class CdsActionQaplaComponent implements OnInit {
         }
       }
     } catch (error) {
-      this.logger.error('[ACTION-ASKGPT] updateConnector error: ', error);
+      this.logger.error('[ACTION-ASKGPTV2] updateConnector error: ', error);
     }
   }
-  
+
+
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'qapla_status')) {
-      new_attributes.push({ name: "qapla_status", value: "qapla_status" });
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_reply')) {
+      new_attributes.push({ name: "kb_reply", value: "kb_reply" });
     }
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'qapla_result')) {
-      new_attributes.push({ name: "qapla_result", value: "qapla_result" });
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_source')) {
+      new_attributes.push({ name: "kb_source", value: "kb_source" });
     }
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'qapla_error')) {
-      new_attributes.push({ name: "qapla_error", value: "qapla_error" });
-    }
-    variableList.find(el => el.key ==='userDefined').elements = [...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
-    this.logger.debug("[ACTION GPT-TASK] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
+    variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
+    this.logger.debug("[ACTION ASKGPTV2] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
   changeTextarea($event: string, property: string) {
-    this.logger.debug("[ACTION QAPLA] changeTextarea event: ", $event);
-    this.logger.debug("[ACTION QAPLA] changeTextarea propery: ", property);
-    this.action[property] = $event;
-    console.log("[ACTION QAPLA] Action updated: ", this.action);
-    // this.updateAndSaveAction.emit();  
+    this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
+    this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
+    this.action[property] = $event
+    // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
-
-  onSelectedAttribute(event, property) {
-    this.logger.log("[ACTION QAPLA] onEditableDivTextChange event", event)
-    this.logger.log("[ACTION QAPLA] onEditableDivTextChange property", property)
-    this.action[property] = event.value;
-    console.log("[ACTION QAPLA] Action updated: ", this.action);
+  
+  onBlur(event){
     this.updateAndSaveAction.emit();
+  }
+  
+  onChangeSelect(event, target) {
+    if (event.clickEvent === 'footer') {
+      // this.openAddKbDialog();  moved in knowledge base settings
+    } else {
+      this.logger.log("event: ", event);
+      this.action.model = event.value;
+      
+      this.logger.log("[ACTION-ASKGPT] updated action", this.action);
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    }
   }
 
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
@@ -201,12 +210,21 @@ export class CdsActionQaplaComponent implements OnInit {
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
   
-  onBlur(event){
-    this.updateAndSaveAction.emit();
+  onChangeAttributes(attributes:any, type:'trueIntent' | 'falseIntent'){
+    this.logger.log("type: ", type)
+    this.logger.log("attributes: ", attributes)
+    if (type === 'trueIntent') {
+      this.action.trueIntentAttributes = attributes;
+    }
+    if (type === 'falseIntent') {
+      this.action.falseIntentAttributes = attributes;
+    }
+    this.logger.log("action updated: ", this.action)
   }
 
-  goToIntegration(){
-    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name=' + this.action._tdActionType
+  goToKNB(){
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/knowledge-bases'
     window.open(url, '_blank')
   }
+
 }

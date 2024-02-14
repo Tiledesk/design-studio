@@ -1,6 +1,6 @@
 <div class="container-fluid" *ngIf="showWelcome">
     <cds-splash-screen
-        [text]="'CDSGlobals.NoGlobalVariables' | translate"
+        [text]="MEDIA['GLOBALS'].text | translate"
         [section]="'cds-sb-globals'"
         (onClickBtn)="addNew($event)" > 
     </cds-splash-screen>

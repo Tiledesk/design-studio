@@ -115,9 +115,11 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box">
-        <a (click)="goToKNB()" id="router-link" routerLinkActive="router-link-active" target="_blank">{{'CDSCanvas.ManageGPTKey' | translate }}</a>
-    </div>
+    
+    <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageGPTKey' | translate }}</a>
+    
+
+    <hr class="custom-divider">
 
     <div class="field-box">
         <div class="condition-container">
@@ -179,7 +181,7 @@
                 <!-- // model select -->
                 <div class="field-box">
                     <cds-select id="text-condition" 
-                        [items]="models_list" 
+                        [items]="model_list" 
                         [itemSelected]="action.model"
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"

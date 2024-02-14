@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -19,9 +19,10 @@ import { CdsPublishOnCommunityModalComponent } from '../../../modals/cds-publish
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { environment } from 'src/environments/environment';
 import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
-import { LOGO_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
+import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
+import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
 
 const swal = require('sweetalert');
 
@@ -31,7 +32,7 @@ const swal = require('sweetalert');
   styleUrls: ['./cds-header.component.scss']
 })
 export class CdsHeaderComponent implements OnInit {
- 
+  
   @Input() IS_OPEN_SIDEBAR: boolean;
   // @Input() projectID: string;
   // @Input() defaultDepartmentId: string;
@@ -54,7 +55,9 @@ export class CdsHeaderComponent implements OnInit {
 
   LOGO_MENU_ITEMS = LOGO_MENU_ITEMS;
   SHARE_MENU_ITEMS = SHARE_MENU_ITEMS;
-
+  LOGOS_ITEMS = LOGOS_ITEMS
+  BRAND_BASE_INFO = BRAND_BASE_INFO
+  PLAY_MENU_ITEMS = PLAY_MENU_ITEMS;
   translationsMap: Map<string, string> = new Map();
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -98,15 +101,15 @@ export class CdsHeaderComponent implements OnInit {
       keys.forEach(key => {
         // this.logger.log('NavbarComponent public_Key key', key)
         if (key.includes("TOW")) {
-          // this.logger.log('PUBLIC-KEY (SIGNUP) - key', key);
+          // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - key', key);
           let tow = key.split(":");
-          // this.logger.log('PUBLIC-KEY (SIGNUP) - mt key&value', mt);
+          // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt key&value', mt);
           if (tow[1] === "F") {
             this.TRY_ON_WA = false;
-            // this.logger.log('PUBLIC-KEY (SIGNUP) - mt is', this.MT);
+            // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt is', this.MT);
           } else {
             this.TRY_ON_WA = true;
-            // this.logger.log('PUBLIC-KEY (SIGNUP) - mt is', this.MT);
+            // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt is', this.MT);
           }
         }
       });
@@ -115,7 +118,17 @@ export class CdsHeaderComponent implements OnInit {
       this.TRY_ON_WA = false;
       // this.logger.log('PUBLIC-KEY (SIGNUP) - mt is', this.MT);
     }
+    this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt is', this.TRY_ON_WA);
+    PLAY_MENU_ITEMS.map(el => { 
+        if(el.key === 'WHATSAPP' && this.TRY_ON_WA){
+          el.status = 'active'
+        }else if(el.key === 'WHATSAPP' && !this.TRY_ON_WA){
+          el.status = 'inactive'
+        }  
+    }) 
+
   }
+
 
   getTranslations() {
 
@@ -255,6 +268,13 @@ export class CdsHeaderComponent implements OnInit {
         window.open(testItOutUrl, '_blank')
         }
         break;
+      case 'WHATSAPP':
+        this.openWhatsappPage()
+        break;
+      case 'WEB':
+        this.openTestSiteInPopupWindow()
+        break;
+        
     }
   }
 

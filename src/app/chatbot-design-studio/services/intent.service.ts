@@ -2,11 +2,11 @@ import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2 } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2 } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey } from '../utils';
+import { TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
@@ -871,11 +871,18 @@ export class IntentService {
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
     }
+    if(typeAction === TYPE_ACTION.ASKGPTV2) {
+      action = new ActionAskGPTV2();
+      action.question = '{{last_user_text}}'
+      action.assignReplyTo = 'kb_reply';
+      action.assignSourceTo = 'kb_source';
+      action.model = TYPE_GPT_MODEL['GPT-4'].value
+    }
     if(typeAction === TYPE_ACTION.GPT_TASK){
       action = new ActionGPTTask();
       action.max_tokens = 128;
       action.temperature = 0.7;
-      action.model = "gpt-3.5-turbo";
+      action.model = TYPE_GPT_MODEL['GPT-3.5'].value
       action.assignReplyTo = 'gpt_reply';
       action.preview = [];
     }
@@ -896,6 +903,7 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.HUBSPOT){
       action = new ActionHubspot();
+      action.assignResultTo = 'hubspot_result';
       action.assignStatusTo = 'hubspot_status';
       action.assignErrorTo = 'hubspot_error';
     }

@@ -76,7 +76,7 @@
 
         .cds-text{
             font-weight: 700;
-            color:  var(--tiledesk-base-color);
+            color: var(--base-brand-color);
         }
     }
     .toggle-setting-sidebar-icon-wpr {
@@ -191,7 +191,16 @@
     box-shadow: none;
 
     &.shareMenu{
+        width: unset;
+        top: 10px;
+        left: -100px;
+    }
+
+    &.playMenu{
         width: 200px;
+        top: 10px;
+        left: -170px;
+        min-height: unset;
     }
 }
 

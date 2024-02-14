@@ -83,8 +83,8 @@ export class CdsDashboardComponent implements OnInit {
       return true
     }
     if(changelogKey && changelogKey !== environment.VERSION){
-      let stored_minor_version = changelogKey.split('.')[2]
-      let local_minor_version = environment.VERSION.split('.')[2]
+      let stored_minor_version = changelogKey.split('.')[1]
+      let local_minor_version = environment.VERSION.split('.')[1]
       if(stored_minor_version === local_minor_version){
         return false
       }

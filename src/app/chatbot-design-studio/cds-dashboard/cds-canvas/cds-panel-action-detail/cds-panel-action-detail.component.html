@@ -186,6 +186,16 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-askgpt>
 
+                    <cds-action-askgpt-v2 *ngSwitchCase="typeAction.ASKGPTV2"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-askgpt-v2>
+
                     <cds-action-gpt-task *ngSwitchCase="typeAction.GPT_TASK"
                         class="panel-response"
                         [intentSelected]="intentSelected"
@@ -228,6 +238,7 @@
                         class="panel-response"
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
+                        [project_id]="project_id"
                         [previewMode]="false"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">

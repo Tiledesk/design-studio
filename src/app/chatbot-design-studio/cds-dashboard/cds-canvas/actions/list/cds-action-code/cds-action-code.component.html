@@ -8,10 +8,10 @@
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.Code' | translate }}</label>
         <cds-textarea id="code" 
-            [textLimitBtn]="false" 
+            [textLimitBtn]="true" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
-            [limitCharsText]="10000"
+            [limitCharsText]="4000"
             [minRow]="5"
             [maxRow]="25" 
             [text]="action.source" 

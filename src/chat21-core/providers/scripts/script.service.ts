@@ -23,7 +23,7 @@ export class ScriptService {
       let count = 0;
       scriptArray.forEach(element => {
         count = count + 1;
-        this.scriptList.push({name: element.split('/').pop(), loaded: false, src: element})
+        this.scriptList.push({name: element.split('/').pop().trim(), loaded: false, src: element.trim()})
       });
       this.logger.log('[SCRIPT-SERVICE] buildScriptArray ', this.scriptList);
       this.load()

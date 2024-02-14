@@ -5,11 +5,11 @@
         matTooltipPosition='below'
         #tooltip="matTooltip">
     <div *ngIf="!IS_OPEN_SIDEBAR">
-        <img class="logo" src="assets/logos/tiledesk_logo.svg">
+        <img class="logo" [src]="LOGOS_ITEMS['BASE_LOGO_NO_TEXT'].icon">
         <!-- <span class="material-icons" (click)="goToBack()">arrow_back</span> -->
         <span class="material-icons" [matMenuTriggerFor]="menu">more_vert</span>
     </div>
-    <img *ngIf="IS_OPEN_SIDEBAR" src="assets/logos/tiledesk-logo_new_white.svg">
+    <img *ngIf="IS_OPEN_SIDEBAR" [src]="LOGOS_ITEMS['BASE_LOGO'].icon">
 </div>
 <div class="header-right">
     <!-- <div class="toggle-setting-sidebar-icon-wpr" [class.is_opened]="IS_OPEN_SIDEBAR"
@@ -27,9 +27,8 @@
             <path d="M0 0h24v24H0z" fill="none"/><path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"/>
         </svg> -->
         <span class="cds-text">
-            Design Studio
-        </span>
-        
+            {{BRAND_BASE_INFO['META_TITLE']}}
+        </span>    
     </div>
     <div class="header-title ellips">
         {{ selectedChatbot?.name }}
@@ -90,9 +89,13 @@
                 matTooltipClass="custom-mat-tooltip"
                 matTooltip="{{ 'TestIt' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
                 matTooltipHideDelay="100">
-            <button id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" (click)="openTestSiteInPopupWindow()">
+                <!-- *ngIf="!TRY_ON_WA" -->
+            <button  id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" (click)="openTestSiteInPopupWindow()">
                 <img class="active-icon" width="18px" height="18px" src="assets/images/icons/play.svg">
             </button>
+            <!-- <button *ngIf="TRY_ON_WA" id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" [matMenuTriggerFor]="menuPlay">
+                <img class="active-icon" width="18px" height="18px" src="assets/images/icons/play.svg">
+            </button> -->
         </div>
         <!-- <div class="cds-close-btn-wpr">
 
@@ -118,12 +121,22 @@
     </ng-template>
 </mat-menu>
 
-
 <!-- SHARE MENU OPTIONS-->
-<mat-menu #menuShare="matMenu" class="menuElement shareMenu" xPosition="after">
+<mat-menu #menuShare="matMenu" class="menuElement shareMenu" xPosition="after" yPosition="below">
     <ng-template matMenuContent>
         <cds-menu
             [items]="SHARE_MENU_ITEMS"
+            [menuType]="''"
+            [menuTitle]="'SharePrototype' | translate "
+            (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
+    </ng-template>
+</mat-menu>
+
+<!-- PLAY MENU OPTIONS-->
+<mat-menu #menuPlay="matMenu" class="menuElement playMenu" xPosition="after" yPosition="below">
+    <ng-template matMenuContent>
+        <cds-menu
+            [items]="PLAY_MENU_ITEMS"
             [menuType]="''"
             (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
     </ng-template>

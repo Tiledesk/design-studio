@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Intent } from 'src/app/models/intent-model';
 import { ActionGPTTask } from 'src/app/models/action-model';
-import { TYPE_UPDATE_ACTION, variableList } from '../../../../../utils';
+import { TYPE_GPT_MODEL, TYPE_UPDATE_ACTION, variableList } from '../../../../../utils';
 import { OpenaiService } from 'src/app/services/openai.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -30,11 +30,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
-  models_list = [
-    // { name: "GPT-3 (DaVinci)", value: "text-davinci-003" }, 
-    { name: "GPT-3.5 Turbo (ChatGPT)", value: "gpt-3.5-turbo" }, 
-    { name: "GPT-4 (ChatGPT)", value: "gpt-4" }
-  ];
+  model_list: Array<{ name: string, value: string }>;
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
   // ai_error: string = "Oops! Something went wrong."
@@ -68,6 +64,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
+    this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive')
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
       this.connector = connector;

@@ -5,7 +5,50 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.1.0 in PROD
+
+### 1.1.0-rc2
+- changed: return changes to cds-attributes parent if attributes object is empty ( keys.length = 0 )
+- bug-fixed: cds-action-make and cds-action-hubspot bodyparameters set as object and not as a string
+- bug-fixed: cds-action-make and cds-action-hubspot custom-divider color 
+
+### 1.1.0-rc1
+- added: TYPE_GPT_MODEL const in utils and used in cds-action-askgptv2 and cds-action-gpt-task components
+
+### 1.0.14-rc.3
+- added: dashboard integration redirect link in cds-action-qapla and cds-action-hubspot in favour of apiKey into action detail
+- changed: animation-delay reduced to 0 for all cds-panel components
+- changed: do not close and reopen again cds-panel-action-detail component if it's already opened
+
+### 1.0.14-rc.2
+- added: new support component 
+- added: new play menu component
+- added: new share menu component
+- added: brandResources class now support nested array of objects  
+
+### 1.0.14-rc.1
+- added: cds-action-askgptv2
+- added: variable-list tooltip description translations
+- changed: cds-action-code reduced max chars  
+- changed: cds-action-code available only for custom plan
+
+### 1.0.13.1 in PROD
+- changed: restore cds-action-change-department
+
+### 1.0.13 in PROD
+
+### 1.0.12 in PROD
+
+### 1.0.11.5 in PROD
+- bug-fixed: lowecase pipe not exist
+
+### 1.0.11.4 in PROD
+- changed: text limit to global value rows
+
 ### 1.0.12-rc.3
+- added: brandService added to load remote logos and resources
+- changed: logos and resources from remote json
+- changed: limit global value to 4026 characters
 - bug-fixed: lowecase pipe not exist
 
 ### 1.0.12-rc.2

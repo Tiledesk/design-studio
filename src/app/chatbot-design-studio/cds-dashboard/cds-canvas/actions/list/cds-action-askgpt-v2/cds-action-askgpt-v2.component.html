@@ -3,15 +3,31 @@
     <div class="action-row">
         <div class="action-row-left">
             <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
-                <path d="M0 0h24v24H0z" fill="none"/>
-                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
             </svg>
         </div>
-        <div *ngIf="action?.trackingNumber" class="action-row-right">
-            {{action?.trackingNumber}}
+        <div *ngIf="action?.question" class="action-row-right">
+            {{action?.question}}
         </div>
-        <div *ngIf="!action?.trackingNumber" class="action-row-right empty">
-            {{'CDSCanvas.EnterTrackingNumber' | translate}}
+        <div *ngIf="!action?.question" class="action-row-right empty">
+            {{'CDSCanvas.EnterTheQuestion' | translate}}
+        </div>
+    </div>
+
+    <div class="action-row">
+        <!-- <div class="action-row-left">
+            <img src="assets/images/actions/openai-icon.svg">
+        </div> -->
+        <div id="gpt-icon" class="action-row-left icon-action">
+            <img src="assets/images/actions/openai-icon.svg">
+        </div>
+        <div *ngIf="action?.model" class="action-row-right">
+            <!-- {{getValue('name')}} -->
+            {{action?.model}}
+        </div>
+        <div *ngIf="!action?.model" class="action-row-right empty">
+            {{'CDSCanvas.SelectKnowledgeBaseModel' | translate}}
         </div>
     </div>
 
@@ -21,7 +37,7 @@
             <img class="active-icon" src="assets/images/icons/if_condition.svg">
         </div>
 
-        <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate}}</label>
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
@@ -33,7 +49,7 @@
     <hr class="preview-divider">
 
     <div class="previewContent">
-       <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate}}</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
             [idConnection] = "idConnectionFalse"
@@ -43,81 +59,67 @@
 
 </div>
 
+
 <div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
 
+
     <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.TrackingNumber' | translate }}</label>
-        <cds-textarea id="assignTo" 
+        <label class="title-label">{{'CDSCanvas.Prompt' | translate}}</label>
+        <cds-textarea id="question" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
-            [minRow]="1" [maxRow]="1" 
-            [readonly]="false" 
-            [text]="action.trackingNumber"
-            [placeholder]="'CDSCanvas.TrackingNumberToSearch' | translate"
+            [minRow]="2"
+            [maxRow]="4" 
+            [text]="action?.question" 
+            [placeholder]="'CDSCanvas.QuestionToSubmit' | translate"
             (blur)="onBlur($event)"
-            (changeTextarea)="changeTextarea($event, 'trackingNumber')">
+            (changeTextarea)="changeTextarea($event, 'question')">
         </cds-textarea>
     </div>
 
-    <!-- <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.QaplaApiKey' | translate }}</label>
-        <cds-textarea id="assignTo" 
-            [textLimitBtn]="false" 
-            [emojiPikerBtn]="false" 
-            [setAttributeBtn]="false" 
-            [minRow]="1" [maxRow]="1" 
-            [readonly]="false" 
-            [text]="action.apiKey"
-            [placeholder]="'CDSCanvas.YourApiKey' | translate"
-            (blur)="onBlur($event)"
-            (changeTextarea)="changeTextarea($event, 'apiKey')">
-        </cds-textarea>
-    </div> -->
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.Model' | translate}}</label>
+        <cds-select id="text-condition" 
+            [items]="model_list" 
+            [itemSelected]="action.model"
+            [bindLabelSelect]="'name'" 
+            [bindValueSelect]="'value'"
+            (onSelected)="onChangeSelect($event, 'model')">
+        </cds-select>
+    </div>
 
-    <a class="link" (click)="goToIntegration()">{{'CDSCanvas.ManageIntegration' | translate}}</a>
+    <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
     
     <hr class="custom-divider">
 
     <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.Status' | translate}}</label>
+        <label class="title-label">{{'CDSCanvas.GPTReply' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
-            [setAttributeBtn]="true" 
-            [minRow]="1" [maxRow]="1" 
+            [setAttributeBtn]="true"
+            [minRow]="1" 
+            [maxRow]="1" 
             [readonly]="true" 
-            [text]="action.assignStatusTo"
-            (selectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')"
-            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')">
+            [text]="action.assignReplyTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')">
         </cds-textarea>
     </div>
 
     <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.Result' | translate }}</label>
+        <label class="title-label">{{'CDSCanvas.GPTSource' | translate}}</label>
         <cds-textarea id="assignTo" 
-            [textLimitBtn]="false" 
+            [textLimitBtn]="false"
             [emojiPikerBtn]="false" 
-            [setAttributeBtn]="true" 
-            [minRow]="1" [maxRow]="1" 
+            [setAttributeBtn]="true"
+            [minRow]="1" 
+            [maxRow]="1" 
             [readonly]="true" 
-            [text]="action.assignResultTo"
-            (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
-            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
-        </cds-textarea>
-    </div>
-
-    <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.Error' | translate }}</label>
-        <cds-textarea id="assignTo" 
-            [textLimitBtn]="false" 
-            [emojiPikerBtn]="false" 
-            [setAttributeBtn]="true" 
-            [minRow]="1" [maxRow]="1" 
-            [readonly]="true" 
-            [text]="action.assignErrorTo"
-            (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
-            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+            [text]="action.assignSourceTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')">
         </cds-textarea>
     </div>
 
@@ -128,14 +130,14 @@
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
-            <label class="condition-text">{{'CDSCanvas.Success' | translate }}</label>
+            <label class="condition-text">{{'CDSCanvas.Success' | translate}}</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.trueIntent" 
-            [placeholder]="'CDSCanvas.SelectABlock' | translate "
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
             (onReset)="onResetBlockSelect($event, 'trueIntent')">
@@ -156,7 +158,7 @@
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.falseIntent" 
-            [placeholder]="'CDSCanvas.SelectABlock' | translate "
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
             (onReset)="onResetBlockSelect($event, 'falseIntent')">
@@ -167,6 +169,5 @@
             (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
         </cds-attributes> -->
     </div>
-    
-</div>
 
+</div>

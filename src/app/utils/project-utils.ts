@@ -4,6 +4,8 @@ import { Project } from "../models/project-model";
 import { PLAN_NAME } from "src/chat21-core/utils/constants";
 import { LoggerService } from "src/chat21-core/providers/abstract/logger.service";
 import { LoggerInstance } from "src/chat21-core/providers/logger/loggerInstance";
+import { Action } from "../models/action-model";
+import { TYPE_ACTION } from "../chatbot-design-studio/utils";
 
 @Injectable({
     providedIn: 'root'
@@ -19,12 +21,17 @@ export class ProjectPlanUtils {
         this.project = this.projectService.getCurrentProject()
     }
 
-    public checkIfCanLoad(actionPlanAvailability: PLAN_NAME): boolean{
+    public checkIfCanLoad(actionType: TYPE_ACTION, actionPlanAvailability: PLAN_NAME): boolean{
         
         this.logger.log('[PROJECT_PROFILE] checkIfCanLoad -->', actionPlanAvailability, this.project)
         if(this.project.profile.type === 'free'){
             this.logger.log('[PROJECT_PROFILE] USECASE: Free Plan')
-            if(this.project.trialExpired === false){
+            if(actionType === TYPE_ACTION.CODE){
+                 // ------------------------------------------------------------------------ 
+                // USECASE: Free Plan and CODE ACTION--> do not show 
+                // ------------------------------------------------------------------------
+                return false
+            }else if(this.project.trialExpired === false){
                 // ------------------------------------------------------------------------ 
                 // USECASE: Free Plan (TRIAL ACTIVE i.e. Scale trial)
                 // ------------------------------------------------------------------------

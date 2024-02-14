@@ -298,6 +298,22 @@ export class ActionAskGPT extends Action {
     }
 }
 
+export class ActionAskGPTV2 extends Action {
+    question: string;
+    model: string;
+    assignReplyTo: string;
+    assignSourceTo: string;
+    preview?: Array<any>;
+    trueIntent: string;
+    falseIntent: string;
+    trueIntentAttributes?: string;
+    falseIntentAttributes?: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.ASKGPTV2
+    }
+}
+
 export class ActionGPTTask extends Action {
     question: string;
     assignReplyTo: string;
@@ -528,7 +544,7 @@ export class ActionQapla extends Action {
 
 export class ActionMake extends Action {
     url: string;
-    bodyParameters: string;
+    bodyParameters: { [ key: string]: string};
     assignStatusTo: string;
     assignErrorTo: string;
     trueIntent: string;
@@ -536,7 +552,7 @@ export class ActionMake extends Action {
     constructor(){
         super();
         this.url = '';
-        this.bodyParameters = "";
+        this.bodyParameters = {};
         this.assignStatusTo = '';
         this.assignErrorTo = '';
         this._tdActionType = TYPE_ACTION.MAKE;
@@ -545,7 +561,7 @@ export class ActionMake extends Action {
 
 export class ActionHubspot extends Action {
     token: string;
-    bodyParameters: string;
+    bodyParameters: { [ key: string]: string};
     assignStatusTo: string;
     assignErrorTo: string;
     trueIntent: string;
@@ -553,7 +569,7 @@ export class ActionHubspot extends Action {
     constructor(){
         super();
         this.token = '';
-        this.bodyParameters = "";
+        this.bodyParameters = {};
         this.assignStatusTo = '';
         this.assignErrorTo = '';
         this._tdActionType = TYPE_ACTION.HUBSPOT;
