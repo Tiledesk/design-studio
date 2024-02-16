@@ -49,7 +49,7 @@
               { "input" : "src/assets/sass/cds/tooltip-style.scss", "inject": true, "bundleName": "tooltip-style"},
               { "input" : "src/assets/sass/material-dashboard.scss", "inject": true, "bundleName": "material-dashboard"},
               { "input" : "src/assets/sass/cds/styles.scss", "inject": true, "bundleName": "cds-style"},
-              { "input": "src/assets/sass/cds/action-styles.scss", "inject": true, "bundleName": "action-style"}
+              { "input" : "src/assets/sass/cds/action-styles.scss", "inject": true, "bundleName": "action-style"}
             ],
             "scripts": [
               { "input": "node_modules/jquery/dist/jquery.js", "inject": true, "bundleName": "jquery" },
