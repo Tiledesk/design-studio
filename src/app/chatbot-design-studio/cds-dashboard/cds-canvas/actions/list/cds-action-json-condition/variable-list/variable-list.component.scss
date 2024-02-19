@@ -1,9 +1,9 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 :host {
-    --background-color: #{$blu-light-01};
-    --column-color: #{$blu-02};
-    --text-color: #{$blu};
+    --background-color: #{var(--blu-light-01)};
+    --column-color: var(--blu-02);
+    --text-color: var(--blu);
 
     --content-background: rgb(244, 246, 251, 0.4);
     --base-radius: 8px
@@ -31,7 +31,7 @@
 
 .material-icons,
 .material-icons-outlined{
-    color: $blu-light-02;
+    color: var(--blu-light-02);
     font-size: 18px;
 
     &:hover.delete{
@@ -78,7 +78,7 @@
             }
             .material-icons,
             .material-icons-outlined {
-                color: $blu;
+                color: var(--blu);
             }
         }
     }
@@ -149,12 +149,12 @@
     justify-content: center;
     .material-icons{
         margin-right: 15px;
-        color: $blu;
+        color: var(--blu);
         font-size: 24px;
         font-weight: 500;
     }
     div {
-        color: $blu;
+        color: var(--blu);
         font-size: 16px;
         font-weight: 600;
         line-height: 20px;
@@ -166,7 +166,7 @@
 mat-expansion-panel {
     box-shadow: none !important;
     // background-color: var(--content-background);
-    border-bottom: 1px solid $gray-light-02;
+    border-bottom: 1px solid var(--gray-light-02);
     overflow: visible;
     border-radius: 0 !important;
     &.open-block {

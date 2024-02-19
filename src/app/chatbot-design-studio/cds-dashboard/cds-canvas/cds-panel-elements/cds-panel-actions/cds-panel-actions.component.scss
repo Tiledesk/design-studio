@@ -1,10 +1,10 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 
-$text-color: $blu;
-$icon-color: $gray-light-01;
-$text-hover-color: $blu;
-$icon-hover-color: $blu;
+$text-color: var(--blu);
+$icon-color: var(--gray-light-01);
+$text-hover-color: var(--blu);
+$icon-hover-color: var(--blu);
 $base-padding: 6px;
 
 #panel_actions_div{
@@ -91,14 +91,18 @@ $base-padding: 6px;
 
 .trigger-beta-badge {
     font-weight: 400;
-    background-color: $text-color;
+    background: linear-gradient(45deg, #3167e2, #a736ff);
     padding: 1px 8px;
-    border-radius: 10px;
-    font-size: 10px;
-    line-height: 13px;
+    border-radius: 5px;
+    padding: 0px 6px;
+    height: 16px;
+    font-size: 9px;
+    letter-spacing: 1px;
     color: #fff;
     position: relative;
     margin: 0px 3px;
+    display: flex;
+    align-items: center;
 }
 
 .action-btn-icon img{
@@ -185,7 +189,7 @@ $base-padding: 6px;
 }
 
 .cdk-drag-disabled{
-    background: $gray-02;
+    background: var(--gray-02);
     .actions-btns-wpr,
     .actions-btns-wpr:hover{
         cursor: not-allowed;

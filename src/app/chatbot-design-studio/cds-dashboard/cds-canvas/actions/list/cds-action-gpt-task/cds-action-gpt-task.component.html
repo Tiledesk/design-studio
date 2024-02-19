@@ -13,7 +13,7 @@
                 {{action?.question}}
             </div>
             <div *ngIf="!action?.question" class="action-row-right empty">
-                Enter prompt
+                {{'CDSCanvas.EnterPrompt' | translate }}
             </div>
         </div>
 
@@ -30,7 +30,7 @@
                 {{action?.model}}
             </div>
             <div *ngIf="!action?.model" class="action-row-right empty">
-                Enter the question
+                {{'CDSCanvas.EnterTheQuestion' | translate }}
             </div>
         </div>
     </div>
@@ -41,7 +41,7 @@
             <img class="active-icon" src="assets/images/icons/if_condition.svg">
         </div>
 
-        <label class="title-preview-label">Success</label>
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
@@ -53,7 +53,7 @@
     <hr class="preview-divider">
 
     <div class="previewContent">
-       <label class="title-preview-label">else</label>
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
             [idConnection] = "idConnectionFalse"
@@ -85,7 +85,7 @@
 
 
     <div class="field-box">
-        <label class="title-label">Prompt</label>
+        <label class="title-label">{{'CDSCanvas.Prompt' | translate }}</label>
         <cds-textarea id="question" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
@@ -93,14 +93,14 @@
             [minRow]="2"
             [maxRow]="10" 
             [text]="action.question" 
-            [placeholder]="'Enter prompt'"
+            [placeholder]="'CDSCanvas.EnterPrompt' | translate"
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'question')">
         </cds-textarea>
     </div>
 
     <div class="field-box">
-        <label class="title-label">GPT Reply</label>
+        <label class="title-label">{{'CDSCanvas.GPTReply' | translate }}</label>
         <cds-textarea 
             id="assignTo" 
             [textLimitBtn]="false" 
@@ -115,23 +115,25 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box">
-        <a (click)="goToKNB()" id="router-link" routerLinkActive="router-link-active" target="_blank">Manage GPT Key</a>
-    </div>
+    
+    <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageGPTKey' | translate }}</a>
+    
+
+    <hr class="custom-divider">
 
     <div class="field-box">
         <div class="condition-container">
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
-            <label class="condition-text">Success</label>
+            <label class="condition-text">{{'CDSCanvas.Success' | translate }}</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.trueIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
             (onReset)="onResetBlockSelect($event, 'trueIntent')">
@@ -145,14 +147,14 @@
 
     <div class="field-box">
         <div class="condition-container">
-            <label class="condition-text">Else</label>
+            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.falseIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
             (onReset)="onResetBlockSelect($event, 'falseIntent')">
@@ -171,7 +173,7 @@
             class="custom-expansion-panel">
             <mat-expansion-panel-header class="disable_ripple">
                 <mat-panel-title>
-                    AI Settings
+                    {{'CDSCanvas.AISettings' | translate }}
                 </mat-panel-title>
             </mat-expansion-panel-header>
             <div>
@@ -179,7 +181,7 @@
                 <!-- // model select -->
                 <div class="field-box">
                     <cds-select id="text-condition" 
-                        [items]="models_list" 
+                        [items]="model_list" 
                         [itemSelected]="action.model"
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"
@@ -189,7 +191,7 @@
 
                 <!-- // max_tokens slider -->
                 <div class="field-box">
-                    <label class="title-label">Max Tokens</label>
+                    <label class="title-label">{{'CDSCanvas.MaxTokens' | translate }}</label>
                     <div class="action-wait-content">
 
                         <div class="action-wait-slider ">
@@ -215,7 +217,7 @@
                 <!-- // temperature slider -->
                 <div class="text-editor-wrapper">
                     <div class="field-box">
-                        <label class="title-label">Temperature</label>
+                        <label class="title-label">{{'CDSCanvas.Temperature' | translate }}</label>
                         <div class="action-wait-content">
 
                             <div class="action-wait-slider">
@@ -238,14 +240,14 @@
                 </div>
 
                 <div class="field-box">
-                    <label class="title-label">System context</label>
+                    <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context" 
                         [textLimitBtn]="false" 
                         [emojiPikerBtn]="false" 
                         [setAttributeBtn]="false"
                         [minRow]="1" [maxRow]="3" 
                         [text]="action.context" 
-                        [placeholder]="'You are an awesome assistant'"
+                        [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
                         (blur)="onBlur($event)"
                         (changeTextarea)="onChangeTextarea($event, 'context')">
                     </cds-textarea>
@@ -261,7 +263,7 @@
         <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
             [disabled]="!action.question" (click)="execPreview()">
             <span class="material-icons">preview</span>
-            Preview
+            {{'CDSCanvas.Preview' | translate }}
         </button>
     </div>
 
@@ -270,7 +272,7 @@
     <div class="answer-preview" *ngIf="showPreview">
         <div class="header-answer-preview">
             <div class="label-and-button-container">
-                <label class="title-label">Answer preview</label>
+                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}</label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
                     <span class="material-icons-round">
@@ -284,7 +286,7 @@
 
             <div class="placeholder-container" *ngIf="searching">
                 <loading-spinner class="custom-spinner"></loading-spinner>
-                <span style="margin-left: 8px;">Generating answer...</span>
+                <span style="margin-left: 8px;">{{'CDSCanvas.GeneratingAnswer' | translate}} ...</span>
             </div>
 
             <div *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
@@ -298,10 +300,10 @@
         </div>
 
         <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
-            <span style="font-weight: 500;">Tokens usage</span>
-            <span>Prompt: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>Max tokens for the answer: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens }}</span>
+            <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
+            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
+            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
+            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
         </div>
 
         <!-- <div id="preview-container" class="preview-container">

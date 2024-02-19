@@ -1,6 +1,6 @@
 <div class="text-editor-wrapper">
     <div class="text-editor">
-
+        <!-- [readonly]="readonly" -->
         <mat-form-field class="box-textarea" appearance="fill">
             <textarea matInput
                 id="text-area"
@@ -13,7 +13,7 @@
                 cdkAutosizeMinRows="{{minRow}}"
                 cdkAutosizeMaxRows="{{maxRow}}"
                 [(ngModel)]="text"
-                [readonly]="readonly"
+               
                 (click)="onClickTextareaOpenSetAttributePopover();"
                 (blur)="onBlur($event)"
                 (ngModelChange)="onChangeTextArea($event)">

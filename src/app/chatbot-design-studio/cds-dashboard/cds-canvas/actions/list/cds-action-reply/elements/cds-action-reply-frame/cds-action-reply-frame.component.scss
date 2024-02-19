@@ -1,77 +1,11 @@
 @import "./src/assets/sass/cds/_variables.scss";
 $max-height: 230px;
 
-.extensions-response {
-    font-size: var(--font-size-base);
-    position: relative;
-    width: calc(100% - 6px);
-    height: auto;
-    margin: 27px 0px 5px 0px;
-    padding: 0px 30px;
-    display: flex;
-    flex-wrap: wrap;
-    row-gap: 5px;
-    column-gap: 5px;
-    align-content: center;
-    .delay-wrapper,
-    .filter-wrapper {
-        display: block;
-        height: auto;
-        width: auto;
-        // padding: 0em 0.75em 0;
-    }
-    .response-controls {
-        position: absolute;
-        top: 26px;
-        left: 0px;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-        z-index: 1;
-    }
-
-    .add-filter-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        padding: 0px 9px;
-        height: 26px;
-        font-size: .9em;
-        font-weight: 400;
-        border-radius: 13px;
-        transition: all 0.3s ease 0s;
-        background: $blu;
-        color: $blu-light-01;
-    
-        span.material-icons-outlined{
-            font-size: 20px;
-            color: white;
-        }
-    
-        &:hover{
-            opacity: 0.8;
-            cursor: pointer;
-        }
-    }
-}
-
-.extensions-response:hover{
-    .response-controls {
-        opacity: 1;
-    }
-}
-
-appdashboard-delay-slider,
-appdashboard-filter{
-    display: flex;
+:host{
+    --base-margin: #{var(--input-base-margin)};
 }
 
 .previewMode{
-    &.extensions-response{
-        margin: 0;
-        padding: 0 10px 0px 25px;
-    }
-
     .response-frame-panel{
         margin: 0;
         max-width: 100%;
@@ -119,93 +53,14 @@ appdashboard-filter{
         margin: 5px auto;
         max-width: calc(100% - 5px); //calc(100% - 20px);
     }
-
-    .response-wrp{
-        border-radius: 8px;
-        background: var(--color-white-hex); // #ffffff;
-        border: 1px solid $gray-light-02; //1px solid #ffffff;
-        overflow-x: hidden;
-        overflow-y: auto;
-        color: #22272d;
-        font-size: 1.15em;
-        line-height: 25px;
-        width: calc(100% - 5px); //calc(100% - 20px);
-        padding: 4px 10px;
-
-        line-height: 20px;
-        font-size: .8em;
-        margin: auto;
-
-        &.no-text{
-            color: rgb(141, 162, 181)
-        }
-    }
 }
-
-.text-editor-wrapper {
-    font-size: var(--font-size-base);
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 5px 0 0 0;
-    // padding: 0;
-    // max-width: 100%;
-    .text-editor {
-        position: relative;
-        margin: 0;
-        padding: 0;        
-    }
-
-}
-
-// .text-editor-wrapper:hover{
-//     .text-editor {
-//         .response-controls {
-//             opacity: 1;
-//         }
-//     }
-// } 
-
-.response-controls {
-    .control-button {
-        cursor: pointer;
-        color: $blu-04;
-        transition: color .3s;
-        height: 20px;
-        &.delete{
-            height: 24px;
-            width: 24px;
-            background: $blu-04;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            em {
-                font-size: 1.15em;
-                color: var(--color-white-hex);
-                transition: color .3s;
-            }
-        }
-    }
-    .control-button:hover{
-        color: var(--color-white-hex);
-        &.delete{
-            box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
-            em {
-                color: var(--color-red-hex);
-            }
-        }
-    }
-}
-
-
 
 .response-frame-wrapper{
     position: relative;
     display: block;
     border-radius: 8px; 
-    margin-left: 30px;
-    margin-right: 30px;
+    margin-left: var(--base-margin);
+    margin-right: var(--base-margin);
     // margin-top: 10px;
     margin-bottom: 10px;
     padding: 0px;
@@ -226,8 +81,8 @@ appdashboard-filter{
 /** box-textarea **/
 cds-textarea.text-editable-div ::ng-deep{
     display: block;
-    margin-left: 30px;
-    margin-right: 30px;
+    margin-left: var(--base-margin);
+    margin-right: var(--base-margin);
     // width: calc(100% - 66px);
     textarea {
         line-height: 20px !important; 

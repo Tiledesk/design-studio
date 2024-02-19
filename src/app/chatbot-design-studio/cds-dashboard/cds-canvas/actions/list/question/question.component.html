@@ -1,9 +1,7 @@
 <div class="cds-questions-main-content">
 
     <div class="cds-add-question-container">
-        <h4>
-            When a user says something similar to a training phrase, Tiledesk matches it to the block
-        </h4>
+        <h4>{{'CDSCanvas.QuestionDescription' | translate}}</h4>
         <div class="input-group cds-input-group">
             <span class="input-group-addon cds-group-addon-left">
                 <span class="material-icons">
@@ -12,7 +10,7 @@
             </span>
             <input [(ngModel)]="newQuestion" (keydown.enter)='onAddQuestion()' type="text"
                 class="cds-question-input" aria-label="question"
-                placeholder="Add user expression and press enter or click ADD">
+                [placeholder]="'CDSCanvas.QuestionPlaceholderNew' | translate">
             <span class="input-group-addon cds-group-addon-question-right" (click)="onAddQuestion()"
                 [ngClass]="{'add-question-btn-disabled': !newQuestion || newQuestion?.length === 0}">
                 <!-- <span class="cds-group-addon-question-right-btn-text"> ADD </span> -->

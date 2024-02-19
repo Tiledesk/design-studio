@@ -46,15 +46,17 @@
               "node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
               "node_modules/@ctrl/ngx-emoji-mart/picker.css",
               "src/styles.scss",
-              "src/assets/sass/material-dashboard.scss",
-              "src/assets/sass/cds/styles.scss"
+              { "input" : "src/assets/sass/cds/tooltip-styles.scss", "inject": true, "bundleName": "cds-tooltip-style"},
+              { "input" : "src/assets/sass/material-dashboard.scss", "inject": true, "bundleName": "material-dashboard"},
+              { "input" : "src/assets/sass/cds/styles.scss", "inject": true, "bundleName": "cds-style"},
+              { "input" : "src/assets/sass/cds/action-styles.scss", "inject": true, "bundleName": "action-style"}
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/bootstrap/dist/js/bootstrap.js",
-              "node_modules/bootstrap-notify/bootstrap-notify.js",
-              "src/assets/js/mqtt/4.1.0/mqtt.min.js",
-              "node_modules/moment/moment.js"
+              { "input": "node_modules/jquery/dist/jquery.js", "inject": true, "bundleName": "jquery" },
+              { "input": "node_modules/bootstrap/dist/js/bootstrap.js", "inject": true, "bundleName": "bootstrap" },
+              { "input": "node_modules/bootstrap-notify/bootstrap-notify.js", "inject": true, "bundleName": "bootstrap-notify" },
+              { "input": "node_modules/moment/moment.js", "inject": true, "bundleName": "moment" },
+              { "input": "src/assets/js/mqtt/4.1.0/mqtt.min.js", "inject": false, "bundleName": "mqtt.min" }
             ]
           },
           "configurations": {
@@ -63,12 +65,12 @@
                 {
                   "type": "initial",
                   "maximumWarning": "3mb",
-                  "maximumError": "5mb"
+                  "maximumError": "7mb"
                 },
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "10kb",
-                  "maximumError": "17kb"
+                  "maximumError": "20kb"
                 }
               ],
               "optimization": {

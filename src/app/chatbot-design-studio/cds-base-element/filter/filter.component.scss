@@ -1,10 +1,10 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 :host{
-    --textColor: #{$blu};
-    --backGroundColor: #{$blu-light-04};
-    --hoverBackgroundColor: #{$blu-light-03};
-    --border-radius-base: 8px
+    --textColor: #{var(--blu)};
+    --backGroundColor: #{var(--blu-light-04)};
+    --hoverBackgroundColor: #{var(--blu-light-03)};
+    --border-radius-base: 8px;
+    --button-border-radius: #{var(--button-border-radius-base)};
+    --button-height: #{var(--button-height-base)};
 }
 
 .previewMode{
@@ -102,13 +102,13 @@
     user-select: none;
     box-sizing: border-box;
     outline: none;
-    border: 1px dashed $blu-light-02;
-    border-radius: $button-border-radius-base;
-    color: $blu-light-02;
+    border: 1px dashed var(--blu-light-02);
+    border-radius: var(--button-border-radius);
+    color: var(--blu-light-02);
     cursor: pointer;
     font-size: 0.7em;
     font-weight: 400;
-    line-height: $button-height-base;
+    line-height: var(--button-height);
     // margin: 0px 5px 0;
     order: 1;
     padding: 0 10px;
@@ -146,13 +146,13 @@
         user-select: none;
         box-sizing: border-box;
         outline: none;
-        border: 1px dashed $blu-light-02;
-        border-radius: $button-border-radius-base;
-        color: $blu-light-02;
+        border: 1px dashed var(--blu-light-02);
+        border-radius: var(--button-border-radius);
+        color: var(--blu-light-02);
         cursor: pointer;
         font-size: 0.7em;
         font-weight: 400;
-        line-height: $button-height-base;
+        line-height: var(--button-height);
         // margin: 0px 5px 0;
         order: 1;
         padding: 0 10px;

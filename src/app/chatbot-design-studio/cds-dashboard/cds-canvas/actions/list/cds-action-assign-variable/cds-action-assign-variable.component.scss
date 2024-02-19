@@ -7,7 +7,7 @@
 
 
 .material-icons {
-    color: $blu;
+    color: var(--blu);
     font-size: 16px;
 }
 
@@ -81,13 +81,6 @@ div {
 
 .set-attribute-operands-wpr {
     padding: 0px 3px;
-}
-
-.set-attribute-operands-wpr.empty {
-    color: $empty-element-property;
-    background: unset;
-    font-size: 12px;
-    font-weight: 400;
 }
 
 

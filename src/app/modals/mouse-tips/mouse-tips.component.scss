@@ -83,12 +83,12 @@ mat-button-toggle-group ::ng-deep{
 mat-button-toggle{
     background-color: transparent;
     border: none;
-    color: $blu-light-02;
+    color: var(--blu-light-02);
     border-bottom: 2px solid transparent;
 
     &.mat-button-toggle-checked{
-        border-color: $blu;
-        color: $blu;
+        border-color: var(--blu);
+        color: var(--blu);
         font-weight: 400;
 
     }

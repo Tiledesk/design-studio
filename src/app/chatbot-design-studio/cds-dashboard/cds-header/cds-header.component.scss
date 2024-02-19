@@ -1,6 +1,5 @@
-@import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/cds/styles.scss";
-
+@import "./src/assets/sass/cds/tooltip-styles.scss";
 
 .header-left {
     // border-right: 2px solid #394f5a;
@@ -10,8 +9,8 @@
     // justify-content: center;
     // align-items: center;
     transition: 0.3s;
-    // background-color: $blu;
-    border-right: 1px solid $gray-light-02;
+    // background-color: var(--blu);
+    border-right: 1px solid var(--gray-light-02);
     padding: 10px;
     
     &.is_opened{
@@ -40,7 +39,7 @@
         span.material-icons{
             opacity: 0;
             position: absolute;
-            color: $blu
+            color: var(--blu)
         }
         
         &:hover{
@@ -76,7 +75,7 @@
 
         .cds-text{
             font-weight: 700;
-            color: $tiledesk-base-color;
+            color: var(--base-brand-color);
         }
     }
     .toggle-setting-sidebar-icon-wpr {
@@ -111,10 +110,18 @@
     }
 
     .header-title {
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        gap: 5px;
         font-weight: 300;
+
+        span.material-icons{
+            font-size: 20px;
+            cursor: pointer;
+            &:hover{
+                opacity: 0.8;
+            }
+        }
     }
 }
 
@@ -148,9 +155,9 @@
 
 #cds-test-it-out-btn{
     background-color: transparent;
-    outline: 2px solid $blu-02;
+    outline: 2px solid var(--blu-02);
     outline-offset: -1px;
-    color: $blu-02;
+    color: var(--blu-02);
     border-radius: 50%;
 
     display: flex;
@@ -164,7 +171,7 @@
     min-width: 100px;
     max-width: 400px;
     width: 185px;
-    color: $blu;
+    color: var(--blu);
     font-size: 15px;
     line-height: 18px;
     list-style: none;
@@ -179,8 +186,21 @@
     position: absolute;
     top: -35px;
     left: 35px;
-    border: 2px solid $gray-02;
+    border: 2px solid var(--gray-02);
     box-shadow: none;
+
+    &.shareMenu{
+        width: unset;
+        top: 10px;
+        left: -100px;
+    }
+
+    &.playMenu{
+        width: 200px;
+        top: 10px;
+        left: -170px;
+        min-height: unset;
+    }
 }
 
 ::ng-deep {

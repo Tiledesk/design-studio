@@ -3,16 +3,16 @@
         <div class="button-wrp">
             <button id="cds-new-rules-button" type="button" class="btn btn-primary cds-blue-button" (click)="addNew()"> 
                 <span class="material-icons icon plus-icon">add</span>
-                Add
+                {{'Add' | translate}}
             </button>
         </div>
     </div>
 
     <div class="welcome_message_wrp" *ngIf="showWelcome">
         <cds-splash-screen *ngIf=!intentSelected
-            [text]="'CDSSplashScreen.YouHaveNoRules' | translate"
-            [videoUrl]="'https://www.youtube.com/embed/p0ux-86Y4_I'"
-            [videoDescription]="'CDSSplashScreen.LearnAboutAI' | translate"
+            [text]="MEDIA['RULES'].text | translate"
+            [videoUrl]="MEDIA['RULES'].src"
+            [videoDescription]="MEDIA['RULES'].description | translate"
             [section]="'cds-sb-rules'"
             (onClickBtn)="addNew($event)" > 
         </cds-splash-screen>

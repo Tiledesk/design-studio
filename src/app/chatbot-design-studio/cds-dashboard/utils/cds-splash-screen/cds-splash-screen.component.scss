@@ -9,7 +9,7 @@
     padding: 25px calc(20%);
     gap: 10px;
     text-align: center;
-    color: $blu;
+    color: var(--blu);
     transition: 0.5s;
     opacity: 1;
     padding-top: 110px;
@@ -25,8 +25,13 @@
 .cds-ss-txt {
     font-size: 24px;
     margin-left: 8px;
-    color: #f18876;
+    color: var(--base-brand-color);
     font-weight: 400;
+}
+
+.logo{
+    width: 35px;
+    transition: opacity 0.2s ease-in-out;
 }
 
 .welcome_subtitle{

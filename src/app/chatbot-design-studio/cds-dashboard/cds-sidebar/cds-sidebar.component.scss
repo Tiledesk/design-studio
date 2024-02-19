@@ -1,5 +1,6 @@
 @import "./src/assets/sass/md/_variables.scss";
 @import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/tooltip-styles.scss";
 
 .settings-sidebar-wpr {
     position: relative;
@@ -200,7 +201,7 @@ li > a {
     transition: all .3s;
     width: 100%;
     cursor: pointer;
-    height: $sidebar-base-width;
+    height: var(--sidebar-base-width);
 
     .item-label {
         margin-bottom: 0px;
@@ -209,8 +210,8 @@ li > a {
     }
 
     .item-icon {
-        color: $blu-03;
-        fill: $blu-03;
+        color: var(--blu-03);
+        fill: var(--blu-03);
         display: flex;
     }
 
@@ -218,7 +219,7 @@ li > a {
 
 .section:hover,
 .is_active {
-    background-color: $blu;
+    background-color: var(--blu);
     .item-icon {
         color: white;
         fill: white;
@@ -228,8 +229,9 @@ li > a {
 ::ng-deep .mat-menu-panel.menuElementSupport {
     min-width: 100px;
     max-width: 400px;
-    width: 185px;
-    color: $blu;
+    min-height: unset;
+    width: 220px;
+    color: var(--blu);
     font-size: 15px;
     line-height: 18px;
     list-style: none;
@@ -244,7 +246,7 @@ li > a {
     position: absolute;
     bottom: 10px;
     left: 45px;
-    border: 2px solid $gray-02;
+    border: 2px solid var(--gray-02);
     box-shadow: none;
 }
 

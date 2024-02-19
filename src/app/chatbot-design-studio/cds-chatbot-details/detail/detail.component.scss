@@ -1,6 +1,3 @@
-@import "./src/assets/sass/md/_variables.scss";
-@import "./src/assets/sass/cds/_variables.scss";
-
 input[type="text"] {
     // min-width: 307px !important;
     height: 36px;
@@ -13,9 +10,9 @@ input[type="text"] {
     padding: 0 8px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    border-radius: 8px;
+    border-radius: var(--input-border-radius-base);
     background-color: var(--color-white-hex);
-    border: solid 1px $blu-light-02;
+    border: solid 1px var(--blu-light-02);
 }
 textarea[type="text"] {
     // min-width: 307px !important;
@@ -32,9 +29,9 @@ textarea[type="text"] {
 
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    border-radius: 8px;
+    border-radius: var(--input-border-radius-base);
     background-color: var(--color-white-hex);
-    border: solid 1px $blu-light-02;
+    border: solid 1px var(--blu-light-02);
 }
 
 input[type="text"]:disabled {
@@ -73,7 +70,7 @@ input[type="text"]:disabled::placeholder {
 }
 
 ng-select {
-    font-size: 14px;
+    font-size: var(--font-size-base);
     width: 40%;
     margin-bottom: 10px;
     appearance: none;
@@ -96,10 +93,10 @@ ng-select {
 }
 
 ::ng-deep .ng-select .ng-select-container {
-    border-radius: 8px;
+    border-radius: var(--input-border-radius-base);
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border: 1px solid $blu-light-02;
+    border: 1px solid var(--blu-light-02);
 }
 
 .cds-bot_avatar_label {
@@ -137,13 +134,13 @@ input[type="file"] {
 }
 
 .custom-file-upload {
-    border: 1px solid $blu;
+    border: 1px solid var(--blu);
     display: inline-block;
     padding: 11px 12px;
     cursor: pointer;
-    background: $blu !important;
+    background: var(--blu) !important;
     color: var(--color-white-hex);
-    border-radius: $btn-border-radius;
+    border-radius: var(--button-border-radius-base);
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     font-weight: 500;
@@ -161,16 +158,14 @@ input[type="file"] {
 
 #activate-bot {
     border: 0;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-top-right-radius: var(--input-border-radius-base);
+    border-bottom-right-radius: var(--input-border-radius-base);
 }
 
 #csd-update-bot-btn {
     border: 0px;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-    padding: 6px 12px; 
-    margin: 0px;
+    border-top-right-radius: var(--input-border-radius-base);
+    border-bottom-right-radius: var(--input-border-radius-base);
 }
 
 .cds-custom-label {

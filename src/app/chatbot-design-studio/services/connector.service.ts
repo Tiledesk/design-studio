@@ -129,6 +129,7 @@ export class ConnectorService {
    * @returns 
    */
   public async createConnectorById(connectorID) {
+    this.logger.log('[CONNECTOR-SERV] createConnectorById: ', connectorID);
     const isConnector = document.getElementById(connectorID);
     if (isConnector) {
       this.logger.log('[CONNECTOR-SERV] createConnectorById il connettore esiste già', connectorID);
@@ -138,7 +139,10 @@ export class ConnectorService {
     var lastIndex = connectorID.lastIndexOf("/");
     if (lastIndex !== -1) {
       const fromId = connectorID.substring(0, lastIndex);
-      const toId = connectorID.substring(lastIndex + 1);
+      let toId = connectorID.substring(lastIndex + 1);
+      if (toId.startsWith('#')) {
+        toId = toId.substring(1);
+      }
       let fromEle = document.getElementById(fromId);
       if(!fromEle) {
         fromEle = await isElementOnTheStage(fromId); // sync
@@ -147,7 +151,7 @@ export class ConnectorService {
       let toEle = document.getElementById(toId);
       if(!toEle) {
         toEle = await isElementOnTheStage(toId); // sync
-        this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle);
+        this.logger.log('[CONNECTOR-SERV] isOnTheStageFrom', toEle, toId);
       }
       if (toEle && fromEle) {
         const fromPoint = this.tiledeskConnectors.elementLogicCenter(fromEle);
@@ -358,6 +362,34 @@ export class ConnectorService {
             }
             this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
+        /** ASKGPTV2 */
+        if(action._tdActionType === TYPE_ACTION.ASKGPTV2){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - ASKGPTV2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - ASKGPTV2 ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - ASKGPTV2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - ASKGPTV2 ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }

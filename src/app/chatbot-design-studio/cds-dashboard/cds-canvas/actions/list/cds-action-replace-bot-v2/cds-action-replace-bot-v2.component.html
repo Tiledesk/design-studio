@@ -1,0 +1,59 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="action-row">
+        <div class="action-row-left">
+            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 48 48"
+                style="enable-background:new 0 0 48 48;" xml:space="preserve" fill="none" height="24" width="24">
+                <g>
+                    <circle cx="16.8" cy="27.5" r="3.1" />
+                    <path d="M24.9,8.6V6.8V5.1c1.2-0.5,1.8-1.9,1.3-3.1c-0.5-1.2-1.9-1.8-3.1-1.3c-1.2,0.5-1.8,1.9-1.3,3.1c0.2,0.6,0.7,1,1.3,1.3v1.7
+     v1.8c-10.4,0.5-18.5,9.4-18,19.8c0.5,10.4,9.4,18.5,19.8,18c10.4-0.5,18.5-9.4,18-19.8C42.4,16.8,34.6,9,24.9,8.6z M24,37.2
+     c-8.9,0-16-4.4-16-9.7s7.2-9.7,16-9.7c8.9,0,16,4.4,16,9.7v0C40,32.8,32.9,37.2,24,37.2z" />
+                    <path
+                        d="M31.2,24.4c-1.7,0-3.1,1.4-3.1,3.1c0,1.7,1.4,3.1,3.1,3.1v0c1.7,0,3.1-1.4,3.1-3.1C34.3,25.8,32.9,24.4,31.2,24.4z" />
+                </g>
+            </svg>
+        </div>
+
+        <div *ngIf="action?.botName" class="action-row-right"> 
+            {{action.botName}}
+        </div>
+        <div *ngIf="!action?.botName" class="action-row-right empty"> 
+            {{'CDSCanvas.ChooseBot' | translate }}
+        </div>
+        
+    </div>
+</div>
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail">
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.ChooseBot' | translate }}</label>
+        <cds-select id="text-condition" 
+            [items]="chatbots_name_list" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [searchable]=true
+            [clearable]=true
+            [itemSelected]="action?.botName" 
+            (onSelected)="onChangeSelect($event)">
+        </cds-select>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.ExecuteBlock' | translate }}</label>
+        <label class="subtitle-label">{{'CDSCanvas.ChooseBlockDescription' | translate }}</label>
+        <cds-select id="text-condition" 
+            [items]="chatbots_block_name_list" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [searchable]=true
+            [clearable]=true
+            [itemSelected]="action?.blockName" 
+            (onSelected)="onChangeBlockSelect($event)"
+            (onReset)="onResetBlockSelect($event)">
+        </cds-select>
+    </div>
+
+</div>

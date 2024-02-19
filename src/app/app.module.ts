@@ -11,7 +11,6 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { Chat21Service } from 'src/chat21-core/providers/mqtt/chat-service';
-import { ChatbotDesignStudioModule } from './chatbot-design-studio/chatbot-design-studio.module';
 import { BotsBaseComponent } from './components/bots/bots-base/bots-base.component';
 import { FaqService } from './services/faq.service';
 import { FaqKbService } from './services/faq-kb.service';
@@ -64,6 +63,9 @@ import { HomeComponent } from './components/home/home.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { NetworkService } from './services/network.service';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
+import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
+import { ChatbotDesignStudioModule } from './chatbot-design-studio/chatbot-design-studio.module';
+import { BrandResources } from './chatbot-design-studio/BrandResources';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
@@ -73,6 +75,9 @@ export function createTranslateLoader(http: HttpClient) {
 
 const appInitializerFn =  (appConfig: AppConfigService, brandService: BrandService, logger: NGXLogger) => {
   return async() => {
+    await import("./shared/material.module").then(m => m.MaterialModule)
+    await import("./shared/shared.module").then(m => m.SharedModule);
+
     let customLogger = new CustomLogger(logger);
     LoggerInstance.setInstance(customLogger);
     if (environment.remoteConfig) {
@@ -114,7 +119,8 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     BotsBaseComponent,
     UnauthorizedComponent,
     HomeComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    NetworkOfflineComponent
   ],
   imports: [
     // TooltipModule.forRoot(CutomTooltipOptions as TooltipOptions),
@@ -122,7 +128,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
-    // ChatbotDesignStudioModule,
+    ChatbotDesignStudioModule,
     SatPopoverModule,
     FormsModule,
     ReactiveFormsModule,
@@ -142,27 +148,28 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
       colorScheme: ['purple', 'yellow', 'gray', 'gray', 'red', 'red', 'red'],
       // serverLoggingUrl: 'https://tiledesk-server-pre.herokuapp.com/logs'
     }),
-    MatSliderModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatTooltipModule,
-    MatRadioModule,
-    MatCheckboxModule,
-    MatChipsModule,
-    MatGridListModule,
-    MatAutocompleteModule,
-    MatSlideToggleModule,
-    MatButtonToggleModule,
-    MatListModule,
-    MatButtonModule,
-    MatIconModule,
-    MatButtonToggleModule,
-    MatDialogModule,
-    MatInputModule,
-    MatExpansionModule,
-    MatTabsModule,
-    MatMenuModule,
-    NgSelectModule
+    // MatSliderModule,
+    // MatSidenavModule,
+    // MatSelectModule,
+    // MatTooltipModule,
+    // MatRadioModule,
+    // MatCheckboxModule,
+    // MatChipsModule,
+    // MatGridListModule,
+    // MatAutocompleteModule,
+    // MatSlideToggleModule,
+    // MatButtonToggleModule,
+    // MatListModule,
+    // MatButtonModule,
+    // MatIconModule,
+    // MatButtonToggleModule,
+    // MatDialogModule,
+    // MatInputModule,
+    // MatExpansionModule,
+    // MatTabsModule,
+    // MatMenuModule,
+    NgSelectModule,
+    // MaterialModule
   ],
   bootstrap: [AppComponent],
   providers: [
@@ -202,9 +209,10 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     DatePipe,
     NotifyService,
     { provide: LocationStrategy, useClass: HashLocationStrategy },
-    { provide: MAT_DIALOG_DATA, useValue: {} },
-    { provide: MatDialogRef, useValue: {} },
-    NetworkService
+    // { provide: MAT_DIALOG_DATA, useValue: {} },
+    // { provide: MatDialogRef, useValue: {} },
+    NetworkService,
+    BrandResources
   ]
 })
 export class AppModule { }

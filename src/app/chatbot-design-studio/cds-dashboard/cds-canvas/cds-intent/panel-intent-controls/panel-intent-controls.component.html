@@ -9,7 +9,7 @@
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onDeleteIntent()" 
             matTooltipClass="cds-mat-tooltip"
-            matTooltip="Delete block" 
+            [matTooltip]="'CDSCanvas.DeleteBlock' | translate" 
             #tooltip="matTooltip" 
             matTooltipPosition='above' 
             matTooltipHideDelay="100">
@@ -54,7 +54,7 @@
         <div *ngIf="deleteOptionEnabled" class="intent-header-action-btn icon"
             (click)="openTestSiteInPopupWindow()" 
             matTooltipClass="cds-mat-tooltip"
-            matTooltip="Start test from here" 
+            [matTooltip]="'CDSCanvas.StartTest' | translate" 
             #tooltip="matTooltip" 
             matTooltipPosition='above'
             matTooltipHideDelay="100">

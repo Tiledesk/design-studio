@@ -19,7 +19,7 @@
     <hr class="preview-divider">
 
     <div class="previewContent">
-        <label class="title-preview-label">else</label>
+        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
             [idConnection] = "idConnectionFalse"
@@ -45,7 +45,7 @@
                 [bindLabelSelect]="'name'"
                 [bindValueSelect]="'value'" 
                 [itemSelected]="action?.trueIntent" 
-                [placeholder]="'Select a block'"
+                [placeholder]="'CDSCanvas.SelectABlock' | translate "
                 [clearable]="true" 
                 (onSelected)="onChangeSelect($event, 'trueIntent')"
                 (onReset)="onResetBlockSelect($event, 'trueIntent')">
@@ -60,14 +60,14 @@
         <!-- falseIntent -->
         <div class="field-box">
             <div class="condition-container">
-                <span class="condition-text">Else</span>
+                <span class="condition-text">{{'CDSCanvas.Else' | translate }}</span>
             </div>
             <cds-select id="text-condition" 
                 [items]="listOfIntents" 
                 [bindLabelSelect]="'name'"
                 [bindValueSelect]="'value'" 
                 [itemSelected]="action?.falseIntent" 
-                [placeholder]="'Select a block'"
+                [placeholder]="'CDSCanvas.SelectABlock' | translate "
                 [clearable]="true" 
                 (onSelected)="onChangeSelect($event, 'falseIntent')"
                 (onReset)="onResetBlockSelect($event, 'falseIntent')">

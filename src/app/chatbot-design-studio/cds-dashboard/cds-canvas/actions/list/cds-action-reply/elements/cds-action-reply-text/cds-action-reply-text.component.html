@@ -25,9 +25,9 @@
     </div>
     
     <!-- ||  -->
-    <div class="add-filter-btn" *ngIf="canShowFilter && filterConditionExist">
+    <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
         <span class="material-icons-outlined">filter_alt</span>
-        Filter
+        {{'CDSCanvas.Filter' | translate }}
     </div>
     <div class="filter-wrapper" *ngIf="canShowFilter"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
@@ -42,7 +42,7 @@
 
 <div *ngIf="previewMode" class="text-editor-wrapper previewMode">
     <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
-    <div class="response-wrp no-text" *ngIf="!response.text">Click to add text ...</div>
+    <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate }}</div>
 </div> 
 
 
@@ -90,6 +90,6 @@
     </div>
 
     <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', index)">
-    + Add button
+    + {{'CDSCanvas.AddButton' | translate }}
     </div>
 </div>

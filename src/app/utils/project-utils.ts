@@ -4,6 +4,8 @@ import { Project } from "../models/project-model";
 import { PLAN_NAME } from "src/chat21-core/utils/constants";
 import { LoggerService } from "src/chat21-core/providers/abstract/logger.service";
 import { LoggerInstance } from "src/chat21-core/providers/logger/loggerInstance";
+import { Action } from "../models/action-model";
+import { TYPE_ACTION } from "../chatbot-design-studio/utils";
 
 @Injectable({
     providedIn: 'root'
@@ -19,12 +21,17 @@ export class ProjectPlanUtils {
         this.project = this.projectService.getCurrentProject()
     }
 
-    public checkIfCanLoad(actionPlanAvailability: PLAN_NAME): boolean{
+    public checkIfCanLoad(actionType: TYPE_ACTION, actionPlanAvailability: PLAN_NAME): boolean{
         
         this.logger.log('[PROJECT_PROFILE] checkIfCanLoad -->', actionPlanAvailability, this.project)
         if(this.project.profile.type === 'free'){
             this.logger.log('[PROJECT_PROFILE] USECASE: Free Plan')
-            if(this.project.trialExpired === false){
+            if(actionType === TYPE_ACTION.CODE){
+                 // ------------------------------------------------------------------------ 
+                // USECASE: Free Plan and CODE ACTION--> do not show 
+                // ------------------------------------------------------------------------
+                return false
+            }else if(this.project.trialExpired === false){
                 // ------------------------------------------------------------------------ 
                 // USECASE: Free Plan (TRIAL ACTIVE i.e. Scale trial)
                 // ------------------------------------------------------------------------
@@ -39,8 +46,13 @@ export class ProjectPlanUtils {
             // ------------------------------------------------------------------------ 
             // USECASE: PAYMENT Plan (TRIAL ACTIVE i.e. Scale trial)
             // ------------------------------------------------------------------------
-            console.log('[PROJECT_PROFILE] USECASE: payment', this.project)
+            this.logger.log('[PROJECT_PROFILE] USECASE: payment', this.project)
             
+            /** check if the subscription is Active or NOT */
+            if(this.project.isActiveSubscription === false){
+                return false
+            }
+
             /** get che current keyName for the current project (usefull to compare later)*/
             /** before: MAKE A COMPARE BETWEEN OLD AND NEW PROJECT TYPE
              * LEGEND: 
@@ -51,17 +63,17 @@ export class ProjectPlanUtils {
             let currentPlanNameKey: string[] = ['A']
             switch(this.project.profile.name.toUpperCase()){
                 case PLAN_NAME.A.toUpperCase(): {
-                    console.log('case A')
+                    this.logger.log('case A')
                     currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.D.toUpperCase());
                     break;
                 }
                 case PLAN_NAME.B.toUpperCase(): {
-                    console.log('case B')
+                    this.logger.log('case B')
                     currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.E.toUpperCase());
                     break;
                 }
                 case PLAN_NAME.C.toUpperCase(): {
-                    console.log('case C')
+                    this.logger.log('case C')
                     currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.F.toUpperCase());
                     break;
                 }
@@ -74,9 +86,12 @@ export class ProjectPlanUtils {
             
             /** compare enums: current action enum plan >= current prject profile enum name (UPPERCASE)  */
             if(currentPlanNameKey.length>0){
-                console.log('check plan availability: actionPlanAvailability VS currentPlanNameKey -->',actionPlanAvailability,  PLAN_NAME[currentPlanNameKey[0]])
-                return PLAN_NAME[currentPlanNameKey[0]] >= actionPlanAvailability ? true: false; 
+                let actionPlanNameKey: string[] = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == actionPlanAvailability.toUpperCase());
+                this.logger.log('check plan availability: currentPlanNameKey VS actionPlanNameKey -->', currentPlanNameKey[0], actionPlanNameKey[0])
+                // this.logger.log('check plan availability: PLAN currentPlanNameKey VS PLAN actionPlanNameKey -->', PLAN_NAME[currentPlanNameKey[0]]> PLAN_NAME[actionPlanNameKey[0]])
+                return currentPlanNameKey[0] >= actionPlanNameKey[0] ? true: false; 
             }
+            
             return false
        }
     }

@@ -1,60 +1,13 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-
-.extensions-response {
-    font-size: var(--font-size-base);
-    position: relative;
-    width: calc(100% - 6px);
-    height: auto;
-    margin: 27px 0px 5px 0px;
-    padding: 0px 30px;
-    display: flex;
-    flex-wrap: wrap;
-    row-gap: 5px;
-    column-gap: 5px;
-    align-content: center;
-    .delay-wrapper,
-    .filter-wrapper {
-        display: block;
-        height: auto;
-        width: auto;
-        // padding: 0em 0.75em 0;
-    }
-    .response-controls {
-        position: absolute;
-        top: 26px;
-        left: 0px;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-        z-index: 1;
-    }
-}
-
-.extensions-response:hover{
-    .response-controls {
-        opacity: 1;
-    }
-}
-
-appdashboard-delay-slider,
-appdashboard-filter{
-    display: flex;
+:host{
+    --base-margin: #{var(--input-base-margin)};
 }
 
 .previewMode{
-    &.extensions-response{
-        margin: 0;
-        padding: 0 10px 0px 25px;
-    }
-
     &.text-editor-wrapper{
         // padding: 0;
         margin: 0px;
-
-        cds-textarea.text-editable-div{
-            width: calc(100% - 20px);
-            margin: 0px auto;
-        }
 
         .control-label{
             margin: 0px 10px;
@@ -84,85 +37,11 @@ appdashboard-filter{
             }
         }
 
-        .response-wrp{
-            border-radius: 8px;
-            background: var(--color-white-hex); // #ffffff;
-            border: 1px solid $gray-light-02; //1px solid #ffffff;
-            overflow-x: hidden;
-            overflow-y: auto;
-            color: #22272d;
-            font-size: 1.15em;
-            line-height: 25px;
-            width:calc(100% - 5px); //calc(100% - 20px);
-            padding: 4px 10px;
-    
-            line-height: 20px;
-            font-size: .8em;
-            margin: auto;
-    
-            &.no-text{
-                color: rgb(141, 162, 181)
-            }
-        }
     }
 
 
 }
 
-.text-editor-wrapper {
-    font-size: var(--font-size-base);
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 5px 0 0 0;
-    padding: 0;
-    .text-editor {
-        position: relative;
-        margin: 0;
-        padding: 0;
-    }
-}
-    
-// .text-editor-wrapper:hover {
-//     .text-editor {
-//         .response-controls {
-//             opacity: 1;
-//         }
-//     }
-// }
-
-/** response-controls **/
-.response-controls {
-    .control-button {
-        cursor: pointer;
-        color: $blu-04;
-        transition: color .3s;
-        height: 20px;
-        &.delete{
-            height: 24px;
-            width: 24px;
-            background: $blu-light-02;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            em {
-                font-size: 1.15em;
-                color: $blu;
-                transition: color .3s;
-            }
-        }
-    }
-    .control-button:hover{
-        color: $blu-light-02;
-        &.delete{
-            box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
-            em {
-                color: var(--color-red-hex);
-            }
-        }
-    }
-}
 
 
 
@@ -187,7 +66,7 @@ appdashboard-filter{
 
 .control-label{
     font-family: var(--font-family-poppins);
-    color: $blu;
+    color: var(--blu);
     text-align: left;
     line-height: 20px;
     font-size: 14px;
@@ -199,31 +78,15 @@ appdashboard-filter{
     // margin-bottom: 10px;
 }
 
-/** box-textarea **/
-.text-editor-wrapper {
-    font-size: var(--font-size-base);
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0px; //5px 0 0 0;
-    // padding: 0px 33px;
-}
-
 cds-textarea.text-editable-div ::ng-deep{
     display: block;
-    margin-left: 30px;
-    margin-right: 30px;
+    margin-left: var(--base-margin);
+    margin-right: var(--base-margin);
     // width: calc(100% - 66px);
     textarea {
         line-height: 20px !important; 
-        // width: calc(100% - 20px) !important;
+        width: calc(100% - 20px) !important;
         font-size: 0.9em !important;
-
-        resize: none !important; 
-        padding: 5px 10px 5px !important;
-
-        height: 20px !important;
-        min-height: 20px !important;
     }
 }
 
@@ -236,15 +99,15 @@ mat-button-toggle ::ng-deep{
 }
 
 mat-button-toggle-group {
-    border: 1px solid $gray-light-02;
-    margin-left: 30px;
-    border-radius: 8px;
+    border: 1px solid var(--gray-light-02);
+    margin-left: var(--base-margin);
+    border-radius: var(--input-border-radius-base);
 }
 mat-button-toggle.mat-button-toggle-checked{
-    background-color: $blu;
-    color: $blu-light-02;
+    background-color: var(--blu);
+    color: var(--blu-light-02);
 }
 
 mat-button-toggle.mat-button-toggle{
-    color: $blu-light-02;
+    color: var(--blu-light-02);
 }

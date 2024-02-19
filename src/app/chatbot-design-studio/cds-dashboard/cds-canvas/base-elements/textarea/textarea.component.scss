@@ -22,8 +22,8 @@ mat-form-field.mat-focused ::ng-deep {
             padding: 0px;
             .mat-form-field-infix {
                 textarea {
-                    border: 1px solid $blu ;
-                    // outline: 0px solid $blu;
+                    border: 1px solid var(--blu) ;
+                    // outline: 0px solid var(--blu);
                     transition: border 0.3s;
                     &.invalid{
                         border: 1px solid red !important;
@@ -62,12 +62,12 @@ mat-form-field.box-textarea ::ng-deep {
     width: 100%;
     // margin-left: 20px;
     textarea {
-        border-radius: 8px;
+        border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
-        border: 1px solid $blu-light-02;
+        border: 1px solid var(--blu-light-02);
         overflow-x: hidden;
         overflow-y: auto;
-        color: $gray;
+        color: var(--gray);
         font-size: 1.15em;
         line-height: 25px;
         resize: vertical;
@@ -99,12 +99,12 @@ mat-form-field.box-textarea ::ng-deep {
         pointer-events: none;
         transition: background-color 0.3s, color 0.3s;
         .num-chars {
-            background: $blu-light-01;
+            background: var(--blu-light-01);
             flex-shrink: 0;
             padding: 0px 8px;
             border-radius: 10px;
             font-size: 0.8em;
-            color: $blu;
+            color: var(--blu);
             float: right;
             line-height: 24px;
             font-weight: 700;
@@ -134,10 +134,10 @@ mat-form-field.box-textarea ::ng-deep {
         height: 24px;
         width: 24px;
         justify-content: center;
-        color: $blu;
-        border: 1px solid $blu-light-02;
+        color: var(--blu);
+        border: 1px solid var(--blu-light-02);
         &:hover {
-            background: $blu;
+            background: var(--blu);
             color:var(--color-white-hex) ;
         }
     }
@@ -152,10 +152,10 @@ mat-form-field.box-textarea ::ng-deep {
             height: 24px;
             width: 24px;
             justify-content: center;
-            color: $blu;
-            border: 1px solid $blu-light-02;
+            color: var(--blu);
+            border: 1px solid var(--blu-light-02);
             &:hover {
-                background: $blu;
+                background: var(--blu);
                 color:var(--color-white-hex) ;
             }
         }
@@ -209,7 +209,7 @@ mat-form-field.box-textarea ::ng-deep {
         height: fit-content;
         padding: 2px;
         max-width: calc(100% - 25px);
-        background-color: $blu;
+        background-color: var(--blu);
         color: var(--color-white-hex);
         .close{
             position: absolute;
@@ -221,8 +221,8 @@ mat-form-field.box-textarea ::ng-deep {
             font-size: 13px;
             border-radius: 50%;
             background: var(--color-white-hex);
-            border: 1px solid $blu;
-            color: $blu;
+            border: 1px solid var(--blu);
+            color: var(--blu);
             cursor: pointer;
             opacity: 1;
             justify-content: center;
@@ -230,7 +230,7 @@ mat-form-field.box-textarea ::ng-deep {
             padding: 0;
             margin: 0;
             &:hover{
-                background: $blu-light-03;
+                background: var(--blu-light-03);
             }
         }
     }

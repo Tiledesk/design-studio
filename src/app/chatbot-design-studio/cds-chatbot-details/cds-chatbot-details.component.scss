@@ -1,7 +1,3 @@
-@import "./src/assets/sass/md/_variables.scss";
-@import "./src/assets/sass/cds/_variables.scss";
-
-
 ::ng-deep .custom-mat-tooltip-in-faq-table {
     background-color: #555555 !important;
     color: #fff !important;
@@ -41,7 +37,7 @@
 
 .border-from-center {
     &:hover {
-        color: $blu;
+        color: var(--blu);
     }
 
     // Set up base styles, we're going to scale instead of animating width/height
@@ -58,7 +54,7 @@
     // scale3d(<scale-horizontal>, <scale-vertical>, <scale-depth>);
     &::before {
         // border-top: 2px solid $purple;
-        border-bottom: 3px solid $blu;
+        border-bottom: 3px solid var(--blu);
         transform: scale3d(0, 1, 1); // Shrink only width
     }
 
@@ -89,13 +85,13 @@
     position: relative;
     display: block;
     height: 52px;
-    border-bottom: 3px solid $blu-light-02;
+    border-bottom: 3px solid var(--blu-light-02);
     cursor: pointer;
 }
 
 .cds-bottom-nav li a {
     padding: 0px 15px;
-    color: $blu-light-02;
+    color: var(--blu-light-02);
     line-height: 20px;
 }
 
@@ -105,11 +101,11 @@
 }
 
 .li-active {
-    border-bottom: 3px solid $blu !important;
+    border-bottom: 3px solid var(--blu) !important;
     pointer-events: none;
 }
 .li-active a {
-    color: $blu !important;
+    color: var(--blu) !important;
 }
 .disabled-li {
     pointer-events: none;

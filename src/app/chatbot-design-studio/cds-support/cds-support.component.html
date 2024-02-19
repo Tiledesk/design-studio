@@ -1,0 +1,44 @@
+<div class="container-fluid">
+    <div class="card-container">
+        <div class="cds-card">
+            <label class="title-label">{{'SelfService' | translate }}</label>
+            <div class="section-wrp">
+                <div class="cds-card-item" *ngFor="let item of SUPPORT_OPTIONS['SELF_SERVICE']" (click)="onCardItemClick(item, 'SELF_SERVICE')">
+                    <div class="section-info">
+                        <div class="section-icon">
+                            <span class="material-icons-outlined" *ngIf="!item.localIcon">{{item.icon}}</span>
+                            <img class="icon" *ngIf="item.localIcon" [src]="item.icon"/>
+                        </div>
+                        <div class="section-text">
+                            <div class="cds-title">{{item.label | translate}}</div>
+                            <div class="cds-description">{{item?.description | translate }}</div>
+                        </div>
+                    </div>
+                    <div class="section-icon">
+                        <span class="material-icons-outlined">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cds-card">
+            <label class="title-label">{{'ContactUs' | translate }}</label>
+            <div class="section-wrp">
+                <div class="cds-card-item"  *ngFor="let item of SUPPORT_OPTIONS['CONTACT_US']" (click)="onCardItemClick(item, 'CONTACT_US')">
+                    <div class="section-info">
+                        <div class="section-icon">
+                            <span class="material-icons-outlined" *ngIf="!item.localIcon">{{item.icon}}</span>
+                            <img class="icon" *ngIf="item.localIcon" [src]="item.icon"/>
+                        </div>
+                        <div class="section-text">
+                            <div class="cds-title">{{item.label | translate}}</div>
+                            <div class="cds-description">{{item?.description | translate }}</div>
+                        </div>
+                    </div>
+                    <div class="section-icon">
+                        <span class="material-icons-outlined">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

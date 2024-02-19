@@ -12,7 +12,7 @@
 }
 
 .inputUploadImage {
-    color: $blu-light-02;;
+    color: var(--blu-light-02);;
     cursor: pointer;
     div.image{
         width: 40px;
@@ -28,7 +28,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    color: $blu-light-02;;
+    color: var(--blu-light-02);;
     text-wrap: wrap;
     font-weight: 300;
     span {
@@ -37,7 +37,7 @@
 }
 
 .dropUploadImage {
-    border: 2px dashed $blu-light-02;
+    border: 2px dashed var(--blu-light-02);
     border-radius: 6px;
     display: flex;
     flex-direction: column;
@@ -80,7 +80,7 @@
 .image-wrp{
     .control-button {
         &.delete {
-            color: $blu;
+            color: var(--blu);
             position: absolute;
             top: 0px;
             right: 0px;
@@ -116,7 +116,7 @@
         height: fit-content;
         padding: 2px 10px;
         max-width: calc(100% - 40px);
-        background-color: $blu;
+        background-color: var(--blu);
         color: #fff;
         .close{
             position: absolute;
@@ -128,8 +128,8 @@
             font-size: 13px;
             border-radius: 50%;
             background: #fff;
-            border: 1px solid $blu;
-            color: $blu;
+            border: 1px solid var(--blu);
+            color: var(--blu);
             cursor: pointer;
             opacity: 1;
             justify-content: center;
@@ -137,7 +137,7 @@
             padding: 0;
             margin: 0;
             &:hover{
-                background: $blu-light-03;
+                background: var(--blu-light-03);
             }
         }
     }
@@ -152,7 +152,7 @@ loading-spinner.custom-spinner ::ng-deep{
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: $blu ;
+        background-color: var(--blu) ;
     }
 }
 
@@ -173,12 +173,12 @@ mat-button-toggle-group ::ng-deep{
 mat-button-toggle{
     background-color: transparent;
     border: none;
-    color: $blu-light-02;
+    color: var(--blu-light-02);
     border-bottom: 2px solid transparent;
 
     &.mat-button-toggle-checked{
-        border-color: $blu;
-        color: $blu;
+        border-color: var(--blu);
+        color: var(--blu);
         font-weight: 400;
 
     }

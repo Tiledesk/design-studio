@@ -109,6 +109,13 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-replace-bot>
 
+                    <cds-action-replace-bot-v2 *ngSwitchCase="typeAction.REPLACE_BOTV2" 
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-replace-bot-v2>
+
                     <cds-action-assign-variable *ngSwitchCase="typeAction.ASSIGN_VARIABLE"
                         class="panel-response"
                         [action]="elementSelected"
@@ -179,6 +186,16 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-askgpt>
 
+                    <cds-action-askgpt-v2 *ngSwitchCase="typeAction.ASKGPTV2"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-askgpt-v2>
+
                     <cds-action-gpt-task *ngSwitchCase="typeAction.GPT_TASK"
                         class="panel-response"
                         [intentSelected]="intentSelected"
@@ -221,6 +238,7 @@
                         class="panel-response"
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
+                        [project_id]="project_id"
                         [previewMode]="false"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
@@ -247,9 +265,9 @@
                         <span class="material-icons lock-icon">lock</span>
                         <p [innerHTML]="'CDSCanvas.FeatureAvailableFromPlan' | translate: canShowActionByPlan"></p>
                 
-                        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="goToPricing()">
-                            <span class="material-icons">bolt</span>
-                            {{ 'CDSCanvas.UpgradeNow' | translate }}
+                        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="goToContactSales()">
+                            <!-- <span class="material-icons">bolt</span> -->
+                            {{ 'CDSCanvas.ContactSales' | translate }}
                         </button>
                     </div>
                   

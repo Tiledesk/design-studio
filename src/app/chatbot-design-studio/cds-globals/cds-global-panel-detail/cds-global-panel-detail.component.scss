@@ -12,7 +12,7 @@
     overflow: hidden;
     padding: 0;
     background-color: var(--color-white-hex);;
-    border-left: 1px solid $gray-light-02;
+    border-left: 1px solid var(--gray-light-02);
     // margin: 0 auto 0 auto; // nk
     inset: 0 0 0 200px;
 }
@@ -22,7 +22,7 @@
     top: 0;
     left: 0;
     right: 0;
-    background-color: $blu-light-03;
+    background-color: var(--blu-light-03);
     z-index: 2;
     padding: 10px;
 
@@ -88,7 +88,7 @@ cds-text#custom-input.disabled{
     padding: 12px 15px;
     width: 100%;
     color: #333;
-    background: #ecb606b0;
+    background: var(--icon-color);
     .tpl-info-icon {
         font-size: 20px;
         height: 20px;

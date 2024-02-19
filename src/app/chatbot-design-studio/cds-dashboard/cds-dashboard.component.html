@@ -17,8 +17,9 @@
         class="chatboat-dashboard" 
         [class.is_opened_sidebar]="IS_OPEN_SIDEBAR">
 
-        <cds-changelog *ngIf="showChangelog"
-            (onClose)="onCloseChangelog()"></cds-changelog>
+        <cds-changelog *ngIf="showChangelog" 
+            (onClose)="onCloseChangelog()">
+        </cds-changelog>
        
         <cds-sidebar class="cds-sidebar" 
             [activeSidebarSection]="activeSidebarSection"
@@ -48,6 +49,10 @@
         <cds-rules *ngIf="activeSidebarSection == SIDEBAR_PAGES.RULES && initFinished" 
             [selectedChatbot]="selectedChatbot">
         </cds-rules>
+
+        <cds-support *ngIf="activeSidebarSection == SIDEBAR_PAGES.SUPPORT && initFinished" 
+            [selectedChatbot]="selectedChatbot">
+        </cds-support>
         
     </div>
     

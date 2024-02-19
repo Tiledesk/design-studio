@@ -7,7 +7,7 @@
     flex-direction: column;
     animation: width 0.9s ease-in-out;
     background-color: white;
-    border-left: 1px solid $gray-light-02;
+    border-left: 1px solid var(--gray-light-02);
 }
 
 .emoji-picker {
@@ -45,7 +45,7 @@
     top: 0;
     left: 0;
     right: 0;
-    background-color: $blu-light-03;
+    background-color: var(--blu-light-03);
     z-index: 2;
     padding: 10px;
     padding-left: 20px;
@@ -69,14 +69,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: $blu;
+            color: var(--blu);
             transition: background-color 0.3s ease 0s;
         }
         &:hover{
             span.material-icons,
             span.material-icons-outlined{
-                background-color: $blu;
-                color: $blu-light-04;
+                background-color: var(--blu);
+                color: var(--blu-light-04);
             }
         }
     }    
@@ -96,7 +96,7 @@
         border-radius: 4px;
         // margin-right: 6px;
         // align-self: start;
-        color: $blu;
+        color: var(--blu);
         background: none;
 
         display: flex;
@@ -112,7 +112,7 @@
         font-size: 14px;
         font-weight: 500;
         margin: 0;
-        color: $blu;
+        color: var(--blu);
     }
 }
 
@@ -160,7 +160,7 @@
     .form-control {
         outline: none;
         background-image: linear-gradient(var(--color-red-hex),var(--color-red-hex)),
-            linear-gradient($gray-light-01,$gray-light-01);
+            linear-gradient(var(--gray-light-01),var(--gray-light-01));
         background-size: 100% 2px,100% 1px;
         box-shadow: none;
         transition-duration: .3s;
@@ -170,7 +170,7 @@
             display: flex;
             outline: none;
             background-image: linear-gradient(var(--color-red-hex),var(--color-red-hex)),
-                linear-gradient($gray-light-01,$gray-light-01);
+                linear-gradient(var(--gray-light-01),var(--gray-light-01));
             background-size: 100% 2px,100% 1px;
             box-shadow: none;
             transition-duration: .3s;

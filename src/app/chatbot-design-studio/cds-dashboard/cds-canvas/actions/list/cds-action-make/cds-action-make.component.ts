@@ -37,7 +37,7 @@ export class CdsActionMakeComponent implements OnInit {
   pattern = "^[a-zA-Z_]*[a-zA-Z_]+[a-zA-Z0-9_]*$";
 
   limitCharsText = TEXT_CHARS_LIMIT;
-  jsonParameters: string; 
+  jsonParameters: { [ key: string]: string}; 
   errorMessage: string;
 
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
@@ -46,8 +46,7 @@ export class CdsActionMakeComponent implements OnInit {
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private intentService: IntentService,
-    private projectService: ProjectService
+    private intentService: IntentService
   ) { }
 
   // SYSTEM FUNCTIONS //

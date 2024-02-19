@@ -3,9 +3,9 @@
     
     <div class="textarea-value">
         <div class="value-wrp">
-            <label>Value</label>
+            <label>{{'CDSCanvas.Value' | translate}}</label>
             <cds-textarea id="operand"
-                [placeholder]="operandForm.value.isVariable? '' : placeholder"
+                [placeholder]="operandForm.value.isVariable? '' : 'CDSCanvas.InsertConstantValueOrChoise' | translate"
                 [textLimitBtn]="false"
                 [emojiPikerBtn]="false"
                 [text]="operandForm.value.value"
@@ -24,12 +24,12 @@
 
     <span class="material-icons" (click)="onToggleSelectFunction()">settings</span>
     <div class="select-function">
-        <label>Function</label>
+        <label>{{'CDSCanvas.Function' | translate}}</label>
         <cds-select id="selectOperand"
             [items]="listOfFunctions"
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'"
-            [placeholder]="'Apply a function to the value'"
+            [placeholder]="'CDSCanvas.ApplyAFunctionToValue' | translate"
             [itemSelected]="operandForm.value.function"
             [clearable]="true"
             (onSelected)="onSelectedFunction($event)">

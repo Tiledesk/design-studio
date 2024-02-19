@@ -1,110 +1,7 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-.extensions-response {
-    font-size: var(--font-size-base);
-    position: relative;
-    width: calc(100% - 6px);
-    height: auto;
-    margin: 27px 0px 5px 0px;
-    padding: 0px 30px;
-    display: flex;
-    flex-wrap: wrap;
-    row-gap: 5px;
-    column-gap: 5px;
-    align-content: center;
-    .delay-wrapper,
-    .filter-wrapper {
-        display: block;
-        height: auto;
-        width: auto;
-        // padding: 0em 0.75em 0;
-    }
-
-    .response-controls {
-        position: absolute;
-        top: 26px;
-        left: 0px;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-        z-index: 1;
-    }
-
-    .add-filter-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        padding: 0px 9px;
-        height: 26px;
-        font-size: .9em;
-        font-weight: 400;
-        border-radius: 13px;
-        transition: all 0.3s ease 0s;
-        background: $blu;
-        color: $blu-light-01;
-    
-        span.material-icons-outlined{
-            font-size: 20px;
-            color: white;
-        }
-    
-        &:hover{
-            opacity: 0.8;
-            cursor: pointer;
-        }
-    }
-
-
-}
-
-appdashboard-delay-slider,
-appdashboard-filter{
-    display: flex;
-}
-
-.extensions-response:hover{
-    .response-controls {
-        opacity: 1;
-    }
-}
-
 
 .previewMode{
-    &.extensions-response{
-        margin: 0;
-        padding: 0 10px 0px 25px;
-    }
-
-    &.text-editor-wrapper{
-        // padding: 0;
-        cds-textarea.text-editable-div{
-            width: calc(100% - 20px);
-            margin: 0px auto;
-        }
-
-        .response-wrp{
-            border-radius: 8px;
-            background: var(--color-white-hex); // #ffffff;
-            border: 1px solid $gray-light-02; //1px solid #ffffff;
-            overflow-x: hidden;
-            overflow-y: auto;
-            color: #22272d;
-            font-size: 1.15em;
-            line-height: 25px;
-            width:  calc(100% - 5px); //calc(100% - 20px);
-            padding: 4px 10px;
-    
-            line-height: 20px;
-            font-size: .8em;
-            margin: auto;
-            white-space: pre-wrap;
-    
-            &.no-text{
-                color: rgb(141, 162, 181)
-            }
-        }
-    }
-
     &.buttons-response{
         padding: 0px 0px 0px 0px;
         margin: 0;
@@ -112,8 +9,8 @@ appdashboard-filter{
         flex-wrap: nowrap;
         align-items: center;
         .button-reply-add{
-            color: $blu-light-02;
-            border-color: $blu-light-02;
+            color: var(--blu-light-02);
+            border-color: var(--blu-light-02);
         }
     }
 
@@ -122,68 +19,18 @@ appdashboard-filter{
 /* ./ Preview mode 
 /* ****************************** */
 
-.text-editor-wrapper {
-    font-size: var(--font-size-base);
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0px; //5px 0 0 0;
-    // padding: 0px 33px;
-}
-    
-// .text-editor-wrapper:hover {
-//     .text-editor {
-//         .response-controls {
-//             opacity: 1;
-//         }
-//     }
-// }
-
-
-/** response-controls **/
-.response-controls {
-    .control-button {
-        cursor: pointer;
-        color: $blu-04;
-        transition: color .3s;
-        height: 20px;
-        &.delete{
-            height: 24px;
-            width: 24px;
-            background: $blu-light-02;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            em {
-                font-size: 1.15em;
-                color: $blu;
-                transition: color .3s;
-            }
-        }
-    }
-    .control-button:hover{
-        color: $blu-light-02;
-        &.delete{
-            box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
-            em {
-                color: var(--color-red-hex);
-            }
-        }
-    }
-}
 
 .editor-utils {
     position: relative;
     margin: -20px 50px 0px 0px;
     float: right;
     .num-chars {
-        background: $blu-light-01;
+        background: var(--blu-light-01);
         flex-shrink: 0;
         padding: 0px 8px;
         border-radius: 10px;
         font-size: 0.8em;
-        color: $blu;
+        color: var(--blu);
         float: right;
         line-height: 24px;
         font-weight: 700;
@@ -200,63 +47,6 @@ appdashboard-filter{
     .moji-picker {
         float: right;
     }
-}
-
-
-
-/** BUTTONS **/
-.buttons-response {
-    // display: block;
-    // margin: 12px 0 0;
-    // width: 100%;
-    // font-size: 14px;
-    // padding: 0 5px;
-    // flex-direction: row;
-    // float: right;
-
-    display: flex;
-    margin: 15px 0 0;
-    gap: 5px;
-    width: 100%;
-    font-size: 14px;
-    padding: 0 30px;
-    flex-direction: row;
-    float: right;
-    justify-content: flex-start;
-    /* align-content: flex-end; */
-    flex-wrap: wrap;
-    align-items: baseline;
-}
-
-.custom-placeholder {
-    margin: 10px 5px;
-    background: #dfdfdf;
-    border: dotted 0px #999;
-    height: $button-height-base;
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-
-}
-
-.button-reply-add {
-    float: right;
-    user-select: none;
-    box-sizing: border-box;
-    outline: none;
-    border: 1px dashed $blu-light-02;
-    border-radius: $button-border-radius-base;
-    color: $blu-light-02;
-    cursor: pointer;
-    font-size: 0.7em;
-    font-weight: 400;
-    line-height: $button-height-base;
-    // margin: 0px 5px 0;
-    order: 1;
-    padding: 0 10px;
-    transition: all .3s;
-    min-width: 100px;
-    text-align: center;
-    width: fit-content;
-    // margin-right: 10px;
 }
 
 

@@ -25,9 +25,9 @@
         </appdashboard-delay-slider>
     </div>
     <!-- ||  -->
-    <div class="add-filter-btn" *ngIf="canShowFilter && filterConditionExist">
+    <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
         <span class="material-icons-outlined">filter_alt</span>
-        Filter
+        {{'CDSCanvas.Filter' | translate }}
     </div>
     <div class="filter-wrapper" *ngIf="canShowFilter"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
@@ -46,7 +46,7 @@
         <div class="url-wrp">
             <span class="control-label">{{ 'url' | translate }}:</span>
             <div class="response-wrp" *ngIf="metadata.src">{{metadata.src}}</div>
-            <div class="response-wrp no-text" *ngIf="!metadata.src">{{ 'ClickToAddUrl' | translate }}</div>
+            <div class="response-wrp no-text" *ngIf="!metadata.src">{{ 'CDSCanvas.ClickToAddUrl' | translate }}</div>
         </div>
         <div class="url-wrp">
             <span class="control-label">{{ 'OpenIn' | translate }}:</span>

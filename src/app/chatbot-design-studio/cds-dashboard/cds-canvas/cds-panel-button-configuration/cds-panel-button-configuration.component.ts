@@ -281,8 +281,8 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     const posId = this.button.action.indexOf("#");
     if (posId !== -1) {
       toId = this.button.action.slice(posId+1);
+      this.button.__idConnection = fromId+"/"+toId;
     }
-    this.button.__idConnection = fromId+"/"+toId;
     this.logger.log('onChangeGoToBlock: ', this.button);
     // IMPORTANT! non salvare la modifica dei connettori ma solo la modifica della action!
     this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false);

@@ -76,10 +76,18 @@ export class CdsDashboardComponent implements OnInit {
     this.hideShowWidget('hide');
   }
 
-  checkForChangelogNotify(): boolean{
+  checkForChangelogNotify(): boolean {
     let changelogKey = this.appStorageService.getItem("changelog")
-    if(!changelogKey || changelogKey !== environment.VERSION){
-      return true;
+    if(!changelogKey){
+      return true
+    }
+    if(changelogKey && changelogKey !== environment.VERSION){
+      let stored_minor_version = changelogKey.split('.')[1]
+      let local_minor_version = environment.VERSION.split('.')[1]
+      if(stored_minor_version === local_minor_version){
+        return false
+      }
+      return true
     }
     return false;
   }
@@ -165,6 +173,8 @@ export class CdsDashboardComponent implements OnInit {
     this.openaiService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
 
+    this.hideShowWidget('hide')
+
   }
 
   /** hideShowWidget */
@@ -241,7 +251,7 @@ export class CdsDashboardComponent implements OnInit {
   /** SIDEBAR OUTPUT EVENTS */
   onClickItemList(event: SIDEBAR_PAGES) {
     this.logger.log('[CDS DSHBRD] active section-->', event);
-    if(event !== 'cds-sb-intents'){
+    if(event !== SIDEBAR_PAGES.INTENTS){
       // this.connectorService.initializeConnectors();
       // this.eventTestItOutHeader.next(null);
     }

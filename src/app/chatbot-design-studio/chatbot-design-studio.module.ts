@@ -60,25 +60,12 @@ import { CDSDetailDeveloperComponent } from './cds-chatbot-details/developer/dev
 //CDS CANVAS
 import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.component';
 
-
 //CDS-SECRETS
 import { CdsGlobalsComponent } from './cds-globals/cds-globals.component';
 
+//CDS-SUPPORT
+import { CdsSupportComponent } from './cds-support/cds-support.component';
 
-//SERVICES
-// import { DragDropService } from './services/drag-drop.service';
-
-// import { SharedModule } from '../shared/shared.module';
-
-// import { PanelReplyToolsComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/panel-reply-tools/panel-reply-tools.component';
-// import { ActionReplyComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/action-reply.component';
-// import { ImageResponseComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/reply-types/image-response/image-response.component';
-// import { FrameResponseComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/reply-types/frame-response/frame-response.component';
-// import { ImageUploadComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/elements/image-upload/image-upload.component';
-// import { ElementFromUrlComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/elements/element-from-url/element-from-url.component';
-// import { QuestionComponent } from './cds-dashboard/panel-intent-detail/question/question.component';
-// import { AnswerComponent } from './cds-dashboard/panel-intent-detail/answer/answer.component';
-// import { ElementTextareaComponent } from './cds-dashboard/panel-intent-detail/actions/action-reply/elements/element-textarea/element-textarea.component';
 
 
 //BASE-ELEMENT
@@ -162,6 +149,7 @@ import { CdsActionOpenHoursComponent } from './cds-dashboard/cds-canvas/actions/
 import { CdsActionJsonConditionComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-json-condition/cds-action-json-condition.component';
 import { CdsActionDeleteVariableComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-delete-variable/cds-action-delete-variable.component';
 import { CdsActionReplaceBotComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-replace-bot/cds-action-replace-bot.component';
+import { CdsActionReplaceBotV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-replace-bot-v2/cds-action-replace-bot-v2.component';
 import { CdsActionAssignVariableComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable/cds-action-assign-variable.component';
 import { CdsActionAssignVariableV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-assign-variable-v2/cds-action-assign-variable-v2.component';
 import { CdsActionHideMessageComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-hide-message/cds-action-hide-message.component';
@@ -177,6 +165,7 @@ import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list
 import { CdsActionMakeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-make/cds-action-make.component';
 import { CdsActionHubspotComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-hubspot/cds-action-hubspot.component';
 import { CdsActionCodeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-code/cds-action-code.component';
+import { CdsActionAskgptV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-askgpt-v2/cds-action-askgpt-v2.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
@@ -207,11 +196,11 @@ import { CdsRuleComponent } from './cds-dashboard/cds-rule/cds-rule.component';
 
 import { CdsOptionsComponent } from './cds-dashboard/cds-canvas/cds-options/cds-options.component';
 import { CdsPanelConnectorMenuComponent } from './cds-dashboard/cds-canvas/cds-panel-connector-menu/cds-panel-connector-menu.component';
-import { NetworkOfflineComponent } from '../modals/network-offline/network-offline.component';
 import { MouseTipsComponent } from '../modals/mouse-tips/mouse-tips.component';
 import { ChangelogComponent } from '../modals/changelog/changelog.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/context-menu/context-menu.component';
+import { MaterialModule } from '../shared/material.module';
 
 @NgModule({
   declarations: [
@@ -290,6 +279,7 @@ import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/c
         CdsActionJsonConditionComponent,
         CdsActionDeleteVariableComponent,
         CdsActionReplaceBotComponent,
+        CdsActionReplaceBotV2Component,
         CdsActionAssignVariableComponent,
         CdsActionAssignVariableV2Component,
         CdsActionHideMessageComponent,
@@ -305,6 +295,7 @@ import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/c
         CdsActionCaptureUserReplyComponent,
         CdsActionQaplaComponent,
         CdsActionCodeComponent,
+        CdsActionAskgptV2Component,
         // action REPLY elements: start //
         CdsActionReplyToolsComponent,
         CdsActionReplyTextComponent,
@@ -367,7 +358,7 @@ import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/c
     CdsModalActivateBotComponent,
     CdsPublishOnCommunityModalComponent,
     ChangeBotLangModalComponent,
-    NetworkOfflineComponent,
+    // NetworkOfflineComponent,
     MouseTipsComponent,
     ChangelogComponent,
     
@@ -378,43 +369,45 @@ import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/c
     CdsPanelConnectorMenuComponent,
     
     GetVariableNamePipe,
-    ContextMenuComponent
+    ContextMenuComponent,
+    CdsSupportComponent
 
   ],
   imports: [
     BrowserAnimationsModule,
-    A11yModule,
     CommonModule,
-    DragDropModule,
     NgSelectModule,
+    // DragDropModule,
+    // A11yModule,
     PickerModule,
-    TextFieldModule,
-    MatSliderModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatTooltipModule,
-    MatRadioModule,
-    MatCheckboxModule,
-    MatChipsModule,
-    MatGridListModule,
-    MatAutocompleteModule,
-    MatSlideToggleModule,
-    MatButtonToggleModule,
-    MatListModule,
-    MatButtonModule,
-    MatIconModule,
-    MatButtonToggleModule,
-    MatDialogModule,
+    // TextFieldModule,
+    // MatSliderModule,
+    // MatSidenavModule,
+    // MatSelectModule,
+    // MatTooltipModule,
+    // MatRadioModule,
+    // MatCheckboxModule,
+    // MatChipsModule,
+    // MatGridListModule,
+    // MatAutocompleteModule,
+    // MatSlideToggleModule,
+    // MatButtonToggleModule,
+    // MatListModule,
+    // MatButtonModule,
+    // MatIconModule,
+    // MatButtonToggleModule,
+    // MatDialogModule,
+    // MatInputModule,
+    // MatExpansionModule,
+    // MatTabsModule,
+    // MatMenuModule,
     RouterModule,
     // TranslateModule,
     FormsModule,
-    MatInputModule,
-    MatExpansionModule,
-    MatTabsModule,
-    MatMenuModule,
     ReactiveFormsModule,
     SatPopoverModule,
-    SharedModule,
+    // SharedModule,
+    MaterialModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

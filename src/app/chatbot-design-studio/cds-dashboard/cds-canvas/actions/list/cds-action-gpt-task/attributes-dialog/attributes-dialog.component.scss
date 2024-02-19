@@ -1,12 +1,13 @@
 @import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/cds/styles.scss";
 
-::ng-deep .custom-dialog-container {
+::ng-deep .custom-setattribute-dialog-container {
     width: 40vw!important;
     min-width: 500px;
     max-width: 1000px!important;
 
     .tpl-modal-box {
+        
         border-radius: 6px;
         flex-direction: column;
         background: rgb(255, 255, 255);
@@ -56,7 +57,7 @@
         padding: 12px 15px;
         width: 100%;
         color: #333;
-        background: #ecb606b0;
+        background: var(--icon-color);
         .tpl-info-icon {
             font-size: 20px;
             height: 20px;
@@ -72,10 +73,10 @@
     }
     
     input {
-        border-radius: 8px;
+        border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
-        border: 1px solid $blu-light-02;
-        color: $gray;
+        border: 1px solid var(--blu-light-02);
+        color: var(--gray);
         font-size: 1.15em;
         line-height: 25px;
         
@@ -108,7 +109,7 @@
         .cds-yellow-button{
             margin-left: 10px; 
             min-width: 80px;
-            background-color: #ecb606b0;
+            background-color: var(--icon-color);
             height: 100%;
             color: #333;
         }

@@ -7,21 +7,21 @@
     <div class="card-wrp new-rule" [formGroup]="ruleFormGroup">
 
             <div class="card-item">
-                <div class="card-title">Rule name:</div>
+                <div class="card-title">{{'CDSRules.RuleName' | translate}}:</div>
                 <cds-text
                     [control]="ruleFormGroup.controls['name']">
                 </cds-text>
             </div>
       
             <div class="card-item">
-                <div class="card-title">Condition</div>
+                <div class="card-title">{{'CDSCanvas.Condition' | translate}}</div>
                 <rule-condition
                     [condition]="ruleFormGroup.controls['when']">
                 </rule-condition>
             </div>
     
             <div class="card-item">
-                <div class="card-title">Action</div>
+                <div class="card-title">{{'CDSCanvas.Action' | translate}}</div>
                 <rule-action
                     [action]="ruleFormGroup.controls['do']"
                     [autocompleteOptions]="autocompleteOptions">
@@ -31,12 +31,12 @@
             <div class="card-item box-buttons">
                 <div class="loading-btn-wrapper">
                     <button id="retun-rule-form" class="btn btn-primary loading-btn" (click)="returnBack()">
-                        <span class="loading-btn__text"><span class="material-icons">keyboard_return</span> Cancel</span>
+                        <span class="loading-btn__text"><span class="material-icons">keyboard_return</span>{{'Cancel' | translate}}</span>
                     </button>
                 </div>
                 <div class="loading-btn-wrapper">
                     <button id="create-rule-form" class="btn btn-primary loading-btn" (click)="submitForm()">
-                        <span class="loading-btn__text">Add Rule</span>
+                        <span class="loading-btn__text">{{'CDSRules.AddRule' | translate}}</span>
                     </button>
                 </div>
                 
@@ -54,28 +54,28 @@
                 <mat-expansion-panel-header>
                     <mat-panel-title class="card-title no-margin">
                         <span class="material-icons">
-                            label
+                            {{'Label' | translate | lowercase }}
                         </span>
                         <span>{{ruleFormGroup?.value?.name}}</span>
                     </mat-panel-title>
                 </mat-expansion-panel-header>
 
                 <div class="card-item">
-                    <div class="card-title">Name:</div>
+                    <div class="card-title">{{'Name' | translate}}:</div>
                     <cds-text
                         [control]="ruleFormGroup.controls['name']">
                     </cds-text>
                 </div>
           
                 <div class="card-item">
-                    <div class="card-title">Condition</div>
+                    <div class="card-title">{{'CDSCanvas.Condition' | translate}}</div>
                     <rule-condition
                         [condition]="ruleFormGroup.controls['when']">
                     </rule-condition>
                 </div>
         
                 <div class="card-item">
-                    <div class="card-title">Action</div>
+                    <div class="card-title">{{'CDSCanvas.Action' | translate}}</div>
                     <rule-action
                         [action]="ruleFormGroup.controls['do']"
                         [autocompleteOptions]="autocompleteOptions">
@@ -85,12 +85,12 @@
                 <div class="card-item box-buttons">
                     <div class="loading-btn-wrapper">
                         <button id="delete-rule-form" class="btn btn-primary loading-btn" (click)="removeRule()">
-                            <span class="loading-btn__text">Delete Rule</span>
+                            <span class="loading-btn__text">{{'CDSRules.DeleteRule' | translate}}</span>
                         </button>
                     </div>
                     <div class="loading-btn-wrapper">
                         <button id="create-rule-form" class="btn btn-primary loading-btn" (click)="submitForm()">
-                            <span class="loading-btn__text">Update Rule</span>
+                            <span class="loading-btn__text">{{'CDSRules.UpdateRule' | translate}}</span>
                         </button>
                     </div>
                 </div>

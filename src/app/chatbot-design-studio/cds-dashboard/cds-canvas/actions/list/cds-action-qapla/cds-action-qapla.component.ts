@@ -19,6 +19,7 @@ export class CdsActionQaplaComponent implements OnInit {
 
   @Input() intentSelected: Intent;
   @Input() action: ActionQapla;
+  @Input() project_id: string;
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter;
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
@@ -37,13 +38,13 @@ export class CdsActionQaplaComponent implements OnInit {
   private subscriptionChangedConnector: Subscription;
   
   project: Project;
-  action_locked: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     private dashboardService: DashboardService,
     private intentService: IntentService,
+    private appConfigService: AppConfigService,
   ) { }
 
   ngOnInit(): void {
@@ -62,8 +63,6 @@ export class CdsActionQaplaComponent implements OnInit {
 
     this.initializeAttributes();
     this.project = this.dashboardService.project;
-    console.log("this.project: ", this.project);
-    this.availabilityCheck();
   }
 
   ngOnDestroy() {
@@ -145,14 +144,6 @@ export class CdsActionQaplaComponent implements OnInit {
       this.logger.error('[ACTION-ASKGPT] updateConnector error: ', error);
     }
   }
-
-  availabilityCheck() {
-    console.log("availabilityCheck profile plan: ", this.project.profile)
-    // if (this.project.profile.name !== 'Scale' && this.project.profile.name !== 'Plus') {
-    //   console.log("availabilityCheck BLOCK ACTION!!");
-    //   this.action_locked = true;
-    // }
-  }
   
   private initializeAttributes() {
     let new_attributes = [];
@@ -215,5 +206,10 @@ export class CdsActionQaplaComponent implements OnInit {
   
   onBlur(event){
     this.updateAndSaveAction.emit();
+  }
+
+  goToIntegration(){
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name=' + this.action._tdActionType
+    window.open(url, '_blank')
   }
 }

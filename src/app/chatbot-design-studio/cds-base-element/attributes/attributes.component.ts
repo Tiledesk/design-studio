@@ -95,14 +95,14 @@ export class AttributesComponent implements OnInit {
   }
 
   private setChangedAttributes(){
-    let attributes = {};
+    let attributes:  { [key: string]: string } = {};
     this.newAttributes.forEach(function(item) {
       if(item.key && item.value){
         attributes[item.key] = item.value;
       }
     });
-    if(JSON.stringify(attributes) !== JSON.stringify(this.attributes)){
-      console.log("[ATTRIBUTES] ------- >>>> ", this.attributes, attributes);
+    if(Object.keys(attributes).length === 0 || JSON.stringify(attributes) !== JSON.stringify(this.attributes)){
+      this.logger.log("[ATTRIBUTES] ------- >>>> ", this.attributes, attributes);
       this.attributes = attributes;
       this.changeAttributes.emit(attributes);
     }

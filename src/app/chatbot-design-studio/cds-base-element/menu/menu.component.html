@@ -1,5 +1,8 @@
-<div id="panel_actions_div" class="actions-drawer" #panel_menu_div >
+<div id="menu_div" class="actions-drawer" #panel_menu_div >
  
+        <div *ngIf="menuTitle" class="menu-title truncate">
+            {{menuTitle}}
+        </div>
         <div class="menu-box" *ngFor="let item of items">
             <div class="menu-btns-wpr" (click)="onItemClick(item)">
                 <div class="menu-btn-icon">
@@ -29,11 +32,15 @@
             </div>
         </div> -->
 
-        <hr class="custom-divider">
+        <hr class="custom-divider" *ngIf="menuType && items.length > 0">
 
-        <div class="menu-btn-text current-user" >
+        <div class="menu-btn-text current-user truncate" >
             <span *ngIf="menuType === 'header'">{{loggedUser?.email}}</span>
-            <span *ngIf="menuType === 'sidebar'">© 2023 Tiledesk ver {{version}}</span>
+            <span *ngIf="menuType === 'sidebar'" 
+                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="© 2024 {{BRAND_BASE_INFO.BRAND_NAME}} ver {{version}}" #tooltip="matTooltip"
+                matTooltipPosition='right' matTooltipHideDelay="100">
+                © 2024 {{BRAND_BASE_INFO.BRAND_NAME}} ver {{version}}
+            </span>
         </div>
 
 </div>

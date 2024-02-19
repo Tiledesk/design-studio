@@ -13,7 +13,7 @@
 
         <div class="action-control-btn icon" 
             matTooltipClass="cds-mat-tooltip" 
-            matTooltip="delete action" 
+            [matTooltip]="'CDSCanvas.DeleteAction' | translate" 
             #tooltip="matTooltip"
             matTooltipPosition='above' 
             matTooltipHideDelay="100"
@@ -22,7 +22,7 @@
         </div>
         <div class="action-control-btn icon" 
             matTooltipClass="cds-mat-tooltip" 
-            matTooltip="edit action" 
+            [matTooltip]="'CDSCanvas.EditAction' | translate" 
             #tooltip="matTooltip"
             matTooltipPosition='above' 
             matTooltipHideDelay="100"

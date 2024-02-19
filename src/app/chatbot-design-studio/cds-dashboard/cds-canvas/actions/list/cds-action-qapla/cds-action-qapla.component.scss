@@ -1,15 +1,5 @@
-
-.cds-action-preview{
-    .title-preview-label{
-     color: #6c6859;
-     font-size: 12px; 
-     margin: 0px;
-    }
-
-    .icon-action img{
-        height: 16px;
-        filter: brightness(0) saturate(100%) invert(42%) sepia(2%) saturate(2720%) hue-rotate(9deg) brightness(91%) contrast(81%);
-    }
-
+a.link{
+    cursor: pointer;
+    text-decoration: underline;
 }
 

@@ -5,6 +5,95 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.1.0 in PROD
+
+### 1.1.0-rc2
+- changed: return changes to cds-attributes parent if attributes object is empty ( keys.length = 0 )
+- bug-fixed: cds-action-make and cds-action-hubspot bodyparameters set as object and not as a string
+- bug-fixed: cds-action-make and cds-action-hubspot custom-divider color 
+
+### 1.1.0-rc1
+- added: TYPE_GPT_MODEL const in utils and used in cds-action-askgptv2 and cds-action-gpt-task components
+
+### 1.0.14-rc.3
+- added: dashboard integration redirect link in cds-action-qapla and cds-action-hubspot in favour of apiKey into action detail
+- changed: animation-delay reduced to 0 for all cds-panel components
+- changed: do not close and reopen again cds-panel-action-detail component if it's already opened
+
+### 1.0.14-rc.2
+- added: new support component 
+- added: new play menu component
+- added: new share menu component
+- added: brandResources class now support nested array of objects  
+
+### 1.0.14-rc.1
+- added: cds-action-askgptv2
+- added: variable-list tooltip description translations
+- changed: cds-action-code reduced max chars  
+- changed: cds-action-code available only for custom plan
+
+### 1.0.13.1 in PROD
+- changed: restore cds-action-change-department
+
+### 1.0.13 in PROD
+
+### 1.0.12 in PROD
+
+### 1.0.11.5 in PROD
+- bug-fixed: lowecase pipe not exist
+
+### 1.0.11.4 in PROD
+- changed: text limit to global value rows
+
+### 1.0.12-rc.3
+- added: brandService added to load remote logos and resources
+- changed: logos and resources from remote json
+- changed: limit global value to 4026 characters
+- bug-fixed: lowecase pipe not exist
+
+### 1.0.12-rc.2
+- changed: text limit to global value rows
+
+### 1.0.11.3 in PROD
+- changed: cds-action-delete-attribute now support all variables (userdefined and systemdefined)
+
+### 1.0.12-rc.1
+- added: discord channel menu option on support bottom sidebar icon
+- added: style.scss, material-dashboard.scss and action-styl.scss as lazy load style
+- changed: show changelog only if minor version is changed 
+- bug-fixed: missing translations
+- bug-fixed: cds-textarea not updated
+- bug-fixed: widget installation code is not formatted while click on copy in Publish modal
+- bug-fixed: cannot read property of undefined reading _tdActionId with forms 
+
+### 1.0.11.2 in PROD
+- bug-fixed: cannot split of undefined
+
+### 1.0.11.1 in PROD
+- bug-fixed: cannot read property of undefined reading _tdActionId with forms
+
+### 1.0.11 in PROD
+
+### 1.0.11-rc.4
+- added: cds-action-replace-bot-v2 with 'execute block' option
+- added: translation keys into cds-action components
+- bug-fixed: reset operator2 value if condition is 'IsEmpty' or 'isNull' or 'isUndefined'
+- bug-fixed: removed angular warning for readonly textarea deprecated propery with reactive Forms -> now ise control.disabled() or control.enabled()
+- bug-fixed: operand2 textarea not render textTag on init if readOnly is enabled
+- bug-fixed: if condition is changed to 'IsEmpty' or 'isNull' or 'isUndefined' in operand2 cds-action-json-condition textarea not reset correctly
+- removed: cds-action-replace-bot DEPRECATED
+
+### 1.0.11-rc.3
+- added: isNull and isUndefined operator function for cds-action-json-condition
+- bug-fixed: compare alphabetic project/action plan rather than PLAN_NAME enum 
+- bug-fixed: attribute dialog-container component UI
+- bug-fixed: after deleted attribute from value field in cds-action-json-condition and cds-action-action-condition, restore base form with operator2.type = 'const'
+- bug-fixed: if click on existing condition and then add a new one, the last created condition is not pushed but replaced to che last selected condition
+
+### 1.0.11-rc.2
+- added: share icon next to chatbot name in header component
+- added: badge on action-list for PRO action type
+
 ### 1.0.11-rc.1
 - added: cds-action-hubspot into integrations action-list section
 - added: check for action availability depends of current project plan

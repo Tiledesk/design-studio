@@ -153,13 +153,13 @@ section.header{
         font-size: 16px;
         line-height: 20px;
         font-weight: 600;
-        color: $blu;
+        color: var(--blu);
         margin: 0;
     }
     span.material-icons{
         font-size: 25px;
         cursor: pointer;
-        color: $blu;
+        color: var(--blu);
     }
 }
 
@@ -237,14 +237,14 @@ section.condition{
         margin: 5px;
         padding: 10px 15px;
         transition: all 0.3s ease 0s;
-        background-color: $blu-light-01;
-        color: $blu;
+        background-color: var(--blu-light-01);
+        color: var(--blu);
         cursor: pointer;
 
         &.active,
         &:hover{
-            background: $blu;
-            color: $blu-light-03;
+            background: var(--blu);
+            color: var(--blu-light-03);
             img{
                 filter: brightness(0) saturate(100%) invert(100%) sepia(20%) saturate(7023%) hue-rotate(179deg) brightness(106%) contrast(89%);
             }

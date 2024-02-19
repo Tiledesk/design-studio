@@ -5,7 +5,7 @@
             <img src="assets/images/actions/assign_var.svg">
         </div>
         <div *ngIf="action?.destination" class="set-attribute-label action-row-left" >
-            Assign:
+            {{'CDSCanvas.AssignTo' | translate }}:
         </div>
 
         <div class="action-row-right">
@@ -13,31 +13,31 @@
                 {{action?.destination}}
             </div>
             <div *ngIf="!action?.destination" class="set-attribute-value empty">
-                Select attribute
+                {{'CDSCanvas.SelectAttribute' | translate}}
             </div>
         </div>
     </div>
 
     <div *ngIf="action?.operation?.operands.length > 0" class="set-attribute-operations-wpr" style="margin-top: 3px;">
-        <div class="set-attribute-label">Operations:</div>
+        <div class="set-attribute-label">{{'CDSCanvas.Operations' | translate }}:</div>
         <div class="set-attribute-operands" *ngFor="let operand of action?.operation?.operands; let index= index">
             <div class="set-attribute-operands-wpr">
                 <div class="set-attribute-label-and-value-wpr">
-                    <div class="set-attribute-label"> Value </div>
+                    <div class="set-attribute-label"> {{'CDSCanvas.Value' | translate }} </div>
                     <div class="set-attribute-value">
                         <span>{{ operand?.value | getVariableName}} </span>
                     </div>
                 </div>
                 <div *ngIf="operand?.function" class="set-attribute-label-and-value-wpr">
-                    <div class="set-attribute-label"> Function: </div>
+                    <div class="set-attribute-label"> {{'CDSCanvas.Function' | translate }}: </div>
                     <div class="set-attribute-function">
-                        <span> {{ getValue(operand?.function, 'operands').name }} </span>
+                        <span> {{ getValue(operand?.function, 'operands').name  | translate }} </span>
                     </div>
                 </div>
             </div>
 
             <div class="set-attribute-operator" *ngIf="action?.operation?.operators[index]">
-                <span> {{ getValue(action?.operation?.operators[index], 'operators').name  }} </span>
+                <span> {{ getValue(action?.operation?.operators[index], 'operators').name | translate }} </span>
             </div>
         </div>
 
@@ -48,7 +48,7 @@
 
 <div *ngIf="!previewMode" id="scrollMe" class="content-panel-intent-detail no-footer">
     <div class="field-box">
-        <label class="title-label">Assign to:</label>
+        <label class="title-label">{{'CDSCanvas.AssignTo' | translate }}:</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 

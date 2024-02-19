@@ -6,6 +6,7 @@ import { Chatbot } from 'src/app/models/faq_kb-model';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { MEDIA } from '../utils-resources';
 
 @Component({
   selector: 'cds-globals',
@@ -27,6 +28,7 @@ export class CdsGlobalsComponent implements OnInit {
   showWelcome: boolean = true;
   selectedGlobal: Global
 
+  MEDIA = MEDIA
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(

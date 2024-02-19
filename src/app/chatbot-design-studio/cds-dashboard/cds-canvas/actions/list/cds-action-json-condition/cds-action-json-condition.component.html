@@ -21,7 +21,7 @@
     <hr *ngIf="!action?.noelse" class="preview-divider">
 
     <div *ngIf="!action?.noelse" class="previewContent">   
-        <label class="title-preview-label">else</label>
+        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
             [idConnection] = "idConnectionFalse"
@@ -59,7 +59,7 @@
                                 [items]="booleanOperators"
                                 [bindLabelSelect]="'operator'"
                                 [bindValueSelect]="'operator'"
-                                [placeholder]="'Select a block'"
+                                [placeholder]="'CDSCanvas.SelectABlock' | translate "
                                 [itemSelected]="group?.operator"
                                 (onSelected)="onChangeOperator($event, i)">
                             </cds-select>
@@ -73,7 +73,7 @@
             <div class="filter-add-group-wrapper add-conditions-group">
                 <div class="filter-add-group" (click)="onClickAddGroup()">
                     <div class="filter-add-group-plus"><span class="material-icons">add</span></div>
-                    <span class="text">Add conditions group</span>
+                    <span class="text">{{'CDSCanvas.AddConditionsGroup' | translate }}</span>
                 </div> 
             </div>
     
@@ -92,7 +92,7 @@
                     [bindLabelSelect]="'name'"
                     [bindValueSelect]="'value'" 
                     [itemSelected]="action?.trueIntent" 
-                    [placeholder]="'Select a block'"
+                    [placeholder]="'CDSCanvas.SelectABlock' | translate "
                     [clearable]="true" 
                     (onSelected)="onChangeForm($event, 'trueIntent')"
                     (onReset)="onResetBlockSelect($event, 'trueIntent')">
@@ -107,7 +107,7 @@
             <!-- falseIntent -->
             <div *ngIf="!action?.noelse" class="field-box">
                 <div class="condition-container">
-                    <span class="condition-text">Else</span>
+                    <span class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</span>
                 </div>
                 <cds-select 
                     id="text-condition" 
@@ -115,7 +115,7 @@
                     [bindLabelSelect]="'name'"
                     [bindValueSelect]="'value'" 
                     [itemSelected]="action?.falseIntent" 
-                    [placeholder]="'Select a block'"
+                    [placeholder]="'CDSCanvas.SelectABlock' | translate "
                     [clearable]="true" 
                     (onSelected)="onChangeForm($event, 'falseIntent')"
                     (onReset)="onResetBlockSelect($event, 'falseIntent')">
@@ -146,7 +146,7 @@
 
 
 <ng-template #placeholder>
-    <div class="title-label">Click to add a condition</div>
+    <div class="title-label">{{'CDSCanvas.ClickAddCondition' | translate }}</div>
 </ng-template>
 
 <ng-template #conditions>
@@ -162,13 +162,13 @@
                         </div>
                         <div class="filter-text no-ellips">
                             <b>{{condition?.operand1}}</b> 
-                            {{OPERATORS_LIST[condition?.operator].name}}
+                            {{OPERATORS_LIST[condition?.operator].name | translate }}
                             <b *ngIf="condition?.operand2.type === 'const'">{{condition?.operand2?.value}}</b>
                             <b *ngIf="condition?.operand2.type === 'var'">{{condition?.operand2?.name}}</b>
                         </div>
                        
                     </div>
-                    <div *ngIf="j%2 === 1">{{condition.operator}}</div>
+                    <div *ngIf="j%2 === 1">{{condition?.operator}}</div>
                 </div>
             </div>
 

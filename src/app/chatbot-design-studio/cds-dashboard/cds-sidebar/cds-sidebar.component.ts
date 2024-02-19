@@ -6,7 +6,8 @@ import { takeUntil } from 'rxjs/operators';
 import { DashboardService } from 'src/app/services/dashboard.service';
 
 // UTILS //
-import { INFO_MENU_ITEMS, SIDEBAR_PAGES } from '../../utils';
+import { SIDEBAR_PAGES } from '../../utils';
+import { INFO_MENU_ITEMS } from '../../utils-menu';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ProjectService } from 'src/app/services/projects.service';
@@ -87,15 +88,13 @@ export class CdsSidebarComponent implements OnInit {
 
   onMenuOptionFN(item: { key: string, label: string, icon: string, src?: string}){
     switch(item.key){
-      case 'HELP_CENTER':
-      case 'ROAD_MAP':
       case 'FEEDBACK':
       case 'CHANGELOG':
-      case 'GITHUB':
         window.open(item.src, '_blank')
         break;
       case 'SUPPORT':
-        window.open(item.src, '_self')
+        this.onClickItemList.emit(SIDEBAR_PAGES.SUPPORT)
+        // window.open(item.src, '_self')
     }
   }
 

@@ -1,10 +1,7 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
-
 :host {
-    --background-color: #{$blu-light-01};
-    --column-color: #{$blu-02};
-    --text-color: #{$blu};
+    --background-color: var(--blu-light-01);
+    --column-color: var(--blu-02);
+    --text-color: var(--blu);
 
     --content-background: rgb(244, 246, 251, 0.4);
     --base-radius: 8px
@@ -54,7 +51,7 @@
     mat-expansion-panel {
         box-shadow: none;
         background-color: var(--content-background);
-        border: 1px solid $gray-light-02;
+        border: 1px solid var(--gray-light-02);
         overflow: visible;
         &.open-block {
             pointer-events: none;
@@ -107,8 +104,8 @@
         width: 50%;
         padding: 0 10px;
         border-radius: 0 var(--base-radius) var(--base-radius) 0;
-        color: $gray;
-        border: 1px solid $blu-light-02;
+        color: var(--gray);
+        border: 1px solid var(--blu-light-02);
         width: calc(50% - 2px);
         text-overflow: ellipsis;
         overflow: hidden;
@@ -117,7 +114,7 @@
     }
     
     .dx-input:focus, .sx-input:focus {
-        border-color: $blu
+        border-color: var(--blu);
     }
 
 

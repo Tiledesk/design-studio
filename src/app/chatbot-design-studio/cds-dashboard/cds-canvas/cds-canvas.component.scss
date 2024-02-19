@@ -29,11 +29,13 @@ $toogle-sidebar-width: 22px;
   width: auto;
   height: 100%;
   transform: translateX(100%);
-  animation: slide-in 0.3s ease-in-out forwards;
-  animation-delay: 0.2s;
+  animation: slide-in 0.2s ease-in-out forwards;
+  // animation-delay: 0.2s;
+  animation-delay: 0s;
 
   &#action-detail{
-    z-index: 10
+    z-index: 10;
+    
   }
   &#button-configuration{
     z-index: 11
@@ -146,9 +148,9 @@ cds-fulfillment {
 }
 
 .toggle-setting-sidebar-icon {
-  background: $blu;
+  background: var(--blu);
   color: #fff;
-  border: 1px solid $blu !important;
+  border: 1px solid var(--blu) !important;
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -159,7 +161,7 @@ cds-fulfillment {
 
 .toggle-setting-sidebar-icon:hover {
     background: #f5f8fa;
-    color:  $blu;
+    color:  var(--blu);
 }
 
 
@@ -168,8 +170,8 @@ cds-fulfillment {
     width: $box-left-width;
     max-width: $box-left-width;
     min-width: $box-left-width;
-    background-color: $blu-light-01;
-    border-right: 1px solid $gray-light-02;
+    background-color: var(--blu-light-01);
+    border-right: 1px solid var(--gray-light-02);
     z-index: 10;
     position: relative;
     .panel-intent-list {

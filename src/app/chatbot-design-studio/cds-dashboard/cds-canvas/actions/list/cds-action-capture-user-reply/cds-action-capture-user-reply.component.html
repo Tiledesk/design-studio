@@ -22,8 +22,8 @@
 
     <div id="capture-user-reply" class="previewContent">
         
-        <label class="title-preview-label">Capture user reply to
-            <span *ngIf="!action?.assignResultTo" class="action-row-right empty">select attribute</span>
+        <label class="title-preview-label">{{'CDSCanvas.CaptureUserReplyTo' | translate }}:
+            <span *ngIf="!action?.assignResultTo" class="action-row-right empty">{{'CDSCanvas.SelectAttribute' | translate }}</span>
             <span *ngIf="action?.assignResultTo" style="font-weight: 600;">{{ action?.assignResultTo }}</span>
         </label>
 
@@ -41,7 +41,7 @@
 
 
     <div class="field-box">
-        <label class="title-label">Assign user reply to</label>
+        <label class="title-label">{{'CDSCanvas.AssignUserReplyTo' | translate }}:</label>
         <cds-textarea 
             id="assignTo" 
             [textLimitBtn]="false" 
@@ -51,26 +51,26 @@
             [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignResultTo"
-            [placeholder]="'(Optional)'"
+            [placeholder]="'CDSCanvas.Optional' | translate"
             (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
         </cds-textarea>
     </div>
 
 
-    <div *ngIf="action?.goToIntent" class="field-box">
+    <div class="field-box" *ngIf="action?.goToIntent">
         <div class="condition-container">
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/actions/connect_intent.svg">
             </div>
-            <label class="title-label">Then go to block</label>
+            <label class="title-label">{{'CDSCanvas.ThenGoToBlock' | translate }}</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.goToIntent" 
-            [placeholder]="'Select a block'"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'goToIntent')"
             (onReset)="onResetBlockSelect($event, 'goToIntent')">
