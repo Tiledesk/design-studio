@@ -27,7 +27,7 @@ $action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
 $action-color-selected: var(--blu); // rgba(179,141,38,1);
 $intent-preview-background: var(--blu-light-03); //rgb(235, 226, 198);
 $intent-preview-borderColor: var(--gray-light-02);
-$empty-element-property:rgb(191, 35, 35);
+// $empty-element-property:rgb(191, 35, 35);
 
 
 $padding-base-preview: 0 10px 10px;
@@ -100,6 +100,7 @@ $border-radius-base-preview: 8px;
 
     --base-brand-color: rgb(224, 106, 88);
 
+    --empty-element-property: rgb(191, 35, 35);
 
     --header-height: 60px;
     --sidebar-base-width: 60px;

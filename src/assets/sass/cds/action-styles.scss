@@ -1,4 +1,7 @@
-@import "./src/assets/sass/cds/_variables.scss";
+:root{
+    --empty-value-text-color: var(--empty-element-property);
+}
+
 
 /**  DELAY AND FILTER BUTTONS : start **/
 .extensions-response{
@@ -243,9 +246,10 @@ appdashboard-filter{
     text-overflow: ellipsis;
 }
 .action-row-right.empty,
-.set-attribute-value.empty {
+.set-attribute-value.empty,
+.set-attribute-operands-wpr {
     background: none !important;
-    color: $empty-element-property !important;
+    color: var(--empty-value-text-color) !important;
     padding: unset !important;
 }
 .action-row .action-row-left svg {
@@ -261,3 +265,5 @@ appdashboard-filter{
     // padding: 3px 0px;
 }
 /** ACTION PREVIEW: end **/
+
+
