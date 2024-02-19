@@ -1350,24 +1350,27 @@ export class IntentService {
   /************************************************
   * UNDO / REDO
   /************************************************/
-  public copyElement(element){
+  public copyElement(element): {key: string, data: any} {
     console.log('[INTENT SERVICE] -> copyElement, ', element);
+    let value= {}
     if(element && element.type === 'INTENT'){
       this.arrayCOPYPAST[0] = element;
       let key = 'copied_items';
-      let value = {
+      value = {
         'chatbot': element.chatbot,
         'copy': this.arrayCOPYPAST
       }
-      localStorage.setItem(key, JSON.stringify(value));
+      return {key: key, data: JSON.stringify(value)}
+      // localStorage.setItem(key, JSON.stringify(value));
     } else if(element && element.type === 'ACTION'){
       this.arrayCOPYPAST[0] = element;
       let key = 'copied_items';
-      let value = {
+      value = {
         'chatbot': element.chatbot,
         'copy': this.arrayCOPYPAST
       }
-      localStorage.setItem(key, JSON.stringify(value));
+      return {key: key, data: JSON.stringify(value)}
+      // localStorage.setItem(key, JSON.stringify(value));
     }
   }
 

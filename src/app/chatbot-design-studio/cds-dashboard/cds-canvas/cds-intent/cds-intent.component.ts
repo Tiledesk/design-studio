@@ -25,6 +25,7 @@ import { ControllerService } from '../../../services/controller.service';
 import { replaceItemInArrayForKey } from '../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 
 
 export enum HAS_SELECTED_TYPE {
@@ -97,7 +98,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     private stageService: StageService,
     private controllerService: ControllerService,
     private elemenRef: ElementRef,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private appStorageService: AppStorageService
   ) {
     this.initSubscriptions()
   }
@@ -734,13 +736,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   private copyIntent(){
     let intent = JSON.parse(JSON.stringify(this.intent));
     const element = {element: intent, type: 'INTENT', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
-    this.intentService.copyElement(element);
+    let data = this.intentService.copyElement(element);
+    this.appStorageService.setItem(data.key, data.data)
   }
 
   private copyAction(ele){
     let action = JSON.parse(JSON.stringify(ele));
     const element = {element: action, type: 'ACTION', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
-    this.intentService.copyElement(element);
+    let data = this.intentService.copyElement(element);
+    this.appStorageService.setItem(data.key, data.data)
   }
 
   openTestSiteInPopupWindow() {

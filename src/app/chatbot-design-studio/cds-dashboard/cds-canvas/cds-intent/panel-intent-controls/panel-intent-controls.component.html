@@ -20,10 +20,11 @@
         <!-- copy intent  -->
         <!-- ---------------------------------- -->
         <!--  -->
-        <div *ngIf="copyElementEnabled" 
+        <!-- *ngIf="copyElementEnabled"  -->
+        <div 
             class="intent-header-action-btn icon"
             matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{copyTooltipText}}" 
+            [matTooltip]="'CDSCanvas.CopyBlock' | translate" 
             #tooltip="matTooltip"
             matTooltipPosition='above' 
             matTooltipHideDelay="100"

@@ -14,7 +14,6 @@ export class PanelIntentControlsComponent implements OnInit {
   @Output() onOptionClicked = new EventEmitter()
 
   webHookTooltipText: string;
-  copyTooltipText: string;
   copyElementEnabled: boolean = true;
 
   constructor() { }
@@ -24,8 +23,7 @@ export class PanelIntentControlsComponent implements OnInit {
   }
 
   initialize(){
-    this.copyTooltipText = "Copy intent";
-    this.copyElementEnabled = true;
+    this.copyElementEnabled = false;
   }
 
   onMouseOverWebhookBtn() {

@@ -1,20 +1,31 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 .disabled {
     opacity: 0.5;
     pointer-events: none;
 }
 .cds-panel-elements {
     position: absolute;
-    width: 190px;
-    /* font-size: 14px; */
     top: 0;
     left: 0;
-    /* transform: translateX(12px); */
-    padding: 4px;
-    border-radius: 10px;
     z-index: 10;
     /* display: flex; */
+
+    min-width: 100px;
+    max-width: 400px;
+    width: 185px;
+    color: var(--blu);
+    font-size: 15px;
+    line-height: 18px;
+    list-style: none;
+    overflow: hidden;
+    padding: 0;
+    // box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    border-radius: 8px;
+    background: rgb(255,255,255);
+    will-change: transform;
+    animation: .15s ease 0s 1 normal none running fadein, .15s ease 0s 1 normal none running movein, .1s ease 0s 1 normal none running scaleY;
+    margin: 0;
+    border: 2px solid var(--gray-02);
+    box-shadow: none;
 }
 svg {
     overflow: hidden;
@@ -28,12 +39,12 @@ svg {
     box-shadow: rgba(19, 33, 68, 0.01) 0px 1px 3px 1px, rgba(19, 33, 68, 0.12) 0px 5px 8px -8px, rgba(19, 33, 68, 0.12) 0px 2px 4px -3px, rgba(19, 33, 68, 0.03) 0px 0px 0px 1px;
     overflow: hidden;
     transition: height 0.15s ease 0s;
-    border: 2px solid $gray-02
+    border: 2px solid var(--gray-02);
 }
 
 .cds-button-element:hover, 
 .cds-button-element:focus {
-    background-color: $gray-02;
+    background-color: var(--gray-02);
 }
 
 
@@ -62,7 +73,7 @@ svg {
 
 // .cds-box-button:hover, 
 // .cds-box-button:focus {
-//     background-color: $gray-02;
+//     background-color: var(--gray-02);
 // }
 
 
@@ -83,7 +94,7 @@ svg {
     min-width: 100px;
     max-width: 400px;
     width: 185px;
-    color: $blu;
+    color: var(--blu);
     font-size: 15px;
     line-height: 18px;
     list-style: none;
@@ -98,5 +109,5 @@ svg {
     position: absolute;
     top: 0px;
     left: 85px;
-    border: 2px solid $gray-02;
+    border: 2px solid var(--gray-02);
 }

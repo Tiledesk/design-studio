@@ -4,7 +4,7 @@
         <div class="control-button" 
             (click)="onCloseIntent()"
             matTooltipClass="cds-custom-tooltip"
-            matTooltip="Close" 
+            [matTooltip]="cClose" 
             matTooltipPosition='below'>
             <em class="material-icons">close</em>
         </div> 

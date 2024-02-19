@@ -1,37 +1,12 @@
 
 <div class="context-menu cds-panel-elements">
     
-    <div size="4" class="cds-elements" mat-button>
+    <cds-menu
+        [items]="CONTEXT_MENU_ITEMS"
+        [menuType]="''"
+        [menuTitle]="'Options' | translate"
+        (onMenuOption)="onMenuOptionFN($event)">
+    </cds-menu>
 
-        <!-- ACTIONS -->
-        <div *ngFor="let item of MENU_ITEMS" class="cds-element" [class.disabled]="isPasteButtonDisabled" (click)="onClickedMenuButton(item)">
-            <!-- 
-            <div class="cds-button-element">
-                <div class="cds-box-button">
-                    <span class="box-title">copy</span>
-                </div>
-            </div> 
-            -->
-            <div class="cds-button-element" >
-                <div class="cds-box-button" >
-                    <!-- <span class="box-img">
-                        <img class="active-icon" [src]="">
-                    </span> -->
-                    <span class="box-title">paste</span>
-                </div>
-            </div>
-
-        </div> 
-        <!-- <div *ngFor="let actionCategory of ACTION_CATEGORY" class="cds-element" (click)="onAddNewElement()"  (mouseout)="onCloseMenu()" (mouseleave)="onCloseMenu()"
-            (mouseover)="onOpenMenu(div3, TYPE_OF_MENU.ACTION, actionCategory.type)" #div3>
-            <div class="cds-button-element">
-                <div class="cds-box-button">
-                    <span class="box-img">
-                        <img class="active-icon" [src]="actionCategory.src">
-                    </span>
-                    <span class="box-title">{{ actionCategory.name | translate}}</span>
-                </div>
-            </div>
-        </div> -->
-    </div>
 </div>
+

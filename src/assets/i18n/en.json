@@ -261,8 +261,11 @@
         "DeleteConnector":"Delete connector",
         "LineText":"Line text",
         "DeleteBlock":"Delete block",
+        "CopyBlock":"Copy Block",
+        "Paste":"Paste",
         "StartTest":"Start test from here",
         "DeleteAction":"Delete action",
+        "CopyAction":"Copy action",
         "EditAction":"Edit action",
         "AddAction" :"Add action",
         "AddAnActionToBlock":"Add an action to this block",
@@ -626,6 +629,7 @@
         "InfoDescription":"Store sensitive data in variables type secret to keep its values masked on the screen. <br> Work with the current value of a variable to prevent sharing sensitive values with your team",
         "ManageGlobal":"Manage global variable"
     },
+    "Options": "Options",
     "CDSHeader": {
         "LinkCopiedToClipboard":"Link copied to clipboard"
     }
