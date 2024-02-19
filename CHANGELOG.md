@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.1
+- added: ability to copy/paste an action/block
+
 ### 1.1.0 in PROD
 
 ### 1.1.0-rc2
