@@ -166,6 +166,7 @@ import { CdsActionMakeComponent } from './cds-dashboard/cds-canvas/actions/list/
 import { CdsActionHubspotComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-hubspot/cds-action-hubspot.component';
 import { CdsActionCodeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-code/cds-action-code.component';
 import { CdsActionAskgptV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-askgpt-v2/cds-action-askgpt-v2.component';
+import { CdsActionCustomerioComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-customerio/cds-action-customerio.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
@@ -297,6 +298,7 @@ import { AdvancedComponent } from './cds-chatbot-details/advanced/advanced.compo
         CdsActionQaplaComponent,
         CdsActionCodeComponent,
         CdsActionAskgptV2Component,
+        CdsActionCustomerioComponent,
         // action REPLY elements: start //
         CdsActionReplyToolsComponent,
         CdsActionReplyTextComponent,

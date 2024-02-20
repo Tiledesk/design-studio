@@ -133,7 +133,8 @@ export enum TYPE_ACTION {
     CAPTURE_USER_REPLY  = 'capture_user_reply',
     QAPLA               = "qapla",
     HUBSPOT             = 'hubspot',
-    CODE                = 'code'
+    CUSTOMERIO          = 'customerio',
+    CODE                = 'code',
 }
 
 export enum TYPE_ACTION_CATEGORY {
@@ -300,6 +301,8 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     QAPLA:                  { name: 'CDSActionList.NAME.Qapla',                 category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.QAPLA,                src: "assets/images/actions/qapla.svg",                 status: "active", plan: PLAN_NAME.E,    description: "CDSActionList.DESCRIPTION.Qapla",             disabled: false },
     MAKE :                  { name: 'CDSActionList.NAME.Make',                  category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.MAKE,                 src:"assets/images/actions/make.svg",                   status: "active", plan: PLAN_NAME.D,    description: '',                                            disabled: false },
     HUPSPOT :               { name: 'CDSActionList.NAME.Hubspot',               category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.HUBSPOT,              src:"assets/images/actions/hubspot.svg",                status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
+    CUSTOMERIO :            { name: 'CDSActionList.NAME.Customerio',            category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.CUSTOMERIO,           src:"assets/images/actions/customerio.svg",             status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
+
 }
 
 export const EVENTS_LIST = {
