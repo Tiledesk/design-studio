@@ -201,6 +201,7 @@ import { ChangelogComponent } from '../modals/changelog/changelog.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/context-menu/context-menu.component';
 import { MaterialModule } from '../shared/material.module';
+import { AdvancedComponent } from './cds-chatbot-details/advanced/advanced.component';
 
 @NgModule({
   declarations: [
@@ -370,7 +371,8 @@ import { MaterialModule } from '../shared/material.module';
     
     GetVariableNamePipe,
     ContextMenuComponent,
-    CdsSupportComponent
+    CdsSupportComponent,
+    AdvancedComponent
 
   ],
   imports: [

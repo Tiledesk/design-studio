@@ -24,7 +24,8 @@ export enum SETTINGS_SECTION {
     DETAIL          = 'bot_detail',
     IMPORT_EXPORT   = 'import_export',
     COMMUNITY       = 'community',
-    DEVELOPER       = 'developer'
+    DEVELOPER       = 'developer',
+    ADVANCED        = 'advanced'
 }
 
 export enum EXTERNAL_URL {

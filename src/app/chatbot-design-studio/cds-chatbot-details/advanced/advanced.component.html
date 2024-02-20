@@ -3,7 +3,7 @@
       <div class="col-sm-10 col-md-10">
         <h3 class="card_title__underlined">
           <span class="card_title__underline">
-            {{ 'UserProfile.Profile' | translate }}
+            {{ 'BotsAddEditPage.ResolutionBotLanguage' | translate }}
           </span>
         </h3>
       </div>
@@ -12,86 +12,13 @@
       </div>
     </div>
 
-
-    <!--  --------------------------------------------------------------------------------------------------- -->
-    <!--  Bot avatar (for all bot type) -->
-    <!--  --------------------------------------------------------------------------------------------------- -->
-
-    <div class="row" style="margin-bottom: 16px;">
-      <label class="col-sm-2 cds-bot_avatar_label">
-        {{ 'UserProfile.Avatar' | translate }}
-      </label>
-      <div class="col-sm-10">
-        <!-- [ngStyle]="{'margin-left':botType === 'dialogflow' ? '35px' : 0 }" -->
-        <div class="card-avatar" style="display: flex;align-items: center;">
-          <div class="bot_avatar">
-
-            <img class="bot-profile-img" [src]="selectedChatbot?.imageURL" onerror="this.src='assets/images/avatar_bot_tiledesk.svg'" />
-            <!-- <img *ngIf="botProfileImageExist === false" class="bot-profile-img" src="assets/images/avatar_bot_tiledesk.svg"/> -->
-
-          </div>
-
-
-          <label for="file-upload" class="custom-file-upload">
-            <span *ngIf="!isFilePendingToUpload">
-              <i class="fa fa-cloud-upload"></i> 
-              {{ 'UserProfile.UploadImage' | translate }}
-            </span>
-            <span *ngIf="isFilePendingToUpload">
-              {{ 'Loading' | translate }}
-              <i class="fa fa-spinner fa-spin"></i>
-            </span>
-          </label>
-          <input #fileInputBotProfileImage (change)="upload($event)" id="file-upload" type="file"
-            accept=".jpg, .JPEG, .png" />
-
-          <button id="cds-delete-bot-img-btn" class="btn btn-primary cds-blue-button"
-            (click)="deleteBotProfileImage()">
-            <span class="material-icons" style="font-size: 24px; color: #fff">
-              delete_forever
-            </span>
-            <!-- <span class="bottom" style="min-width: fit-content;padding: 5px;border-radius: 3px; text-transform: none;">
-              {{'RemovePhoto' | translate}}
-            </span> -->
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ------------------------------------------------------------------------------------------- -->
-    <!--  Bot type  -->
-    <!-- ------------------------------------------------------------------------------------------- -->
-    <!-- <div class="row" style="margin-bottom: 16px;">
-      <label class="col-sm-2 cds-custom-label">
-        <!- - {{ "BotsAddEditPage.Type" | translate }} - ->
-        Type
-      </label>
-      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-        <input id="bot_type" name="bot_type" [(ngModel)]="selectedChatbot.type" class="input csd-chatbot-dtls-input"
-          type="text" style="margin-bottom: 0px; color:#808080" disabled>
-      </div>
-    </div> -->
-
-
-    <!-- ------------------------------------------------------------------------------------------- -->
-    <!-- Bot name  -->
-    <!-- ------------------------------------------------------------------------------------------- -->
-    <div class="row" style="margin-bottom: 16px;">
-      <label class="col-sm-2 cds-custom-label">
-        {{ 'BotsAddEditPage.BotName' | translate }}
-      </label>
-      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-        <input id="faqKb_name" name="faqKb_name" [(ngModel)]="selectedChatbot.name" class="input csd-chatbot-dtls-input"
-          type="text">
-      </div>
-    </div>
-
     <!-- ------------------------------------------------------------------------------------------- -->
     <!-- Bot language  -->
     <!-- ------------------------------------------------------------------------------------------- -->
-    <!-- <div class="row" style="margin-bottom: 16px;">
+    <div class="row" style="margin-bottom: 16px;">
+        <!-- style="padding-top: 0px; line-height: 1.2;" -->
         <label class="col-sm-2 cds-custom-label">
-            {{ 'BotsAddEditPage.ResolutionBotLanguage' | translate }}
+            {{ 'Language' | translate }}
         </label>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
           <div class="input-group">
@@ -107,7 +34,7 @@
             </button>
           </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- SPACER -->
     <!-- <div class="col-sm-12" style="height:10px"></div> -->
@@ -131,7 +58,7 @@
     <!-- ------------------------------------------------------------------------------------------- -->
     <!-- Update button  -->
     <!-- ------------------------------------------------------------------------------------------- -->
-    <div class="row" style="margin-bottom: 16px;">
+    <!-- <div class="row" style="margin-bottom: 16px;">
       <label class="col-sm-2 cds-custom-label">
       </label>
       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
@@ -140,14 +67,12 @@
           {{ 'BotsAddEditPage.UpdateBotName' | translate }}
         </button>
       </div>
-    </div>
+    </div> -->
 
     <!-- ---------------------------------------------------------- -->
     <!-- Department to which the bot is associated -->
     <!-- ---------------------------------------------------------- -->
-    <div *ngIf="isVisibleDEP === true" class="row" style="margin-bottom: 4px;">
-
-
+    <!-- <div *ngIf="isVisibleDEP === true" class="row" style="margin-bottom: 4px;">
       <div class="col-sm-10 col-md-10">
         <h3 class="card_title__underlined">
           <span class="card_title__underline">
@@ -159,7 +84,7 @@
         <div class="section-subtitle"> </div>
       </div>
 
-      <!-- USE CASE: THE BOT IS ASSOCIATED -->
+      <!- - USE CASE: THE BOT IS ASSOCIATED - ->
       <div *ngIf="DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY.length > 0" class="col-sm-10 col-md-10">
         <span>{{ 'DepartmentsThisBotIsAssociatedWith' | translate }}</span>
         <div *ngFor="let dept of DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY" style="margin-bottom: 8px;">
@@ -175,12 +100,12 @@
         </div>
       </div>
 
-      <!-- USE CASE: THIS BOT IS NOT ASSOCIATED BUT ALL DEPARTMENTS ALREADY HAVE A BOT -->
+      <!- - USE CASE: THIS BOT IS NOT ASSOCIATED BUT ALL DEPARTMENTS ALREADY HAVE A BOT - ->
       <div *ngIf="DEPTS_HAVE_BOT_BUT_NOT_THIS === true && depts_without_bot_array?.length === 0" class="col-sm-10 col-md-10">
         <span>{{ 'NoDeptsAreAssociatedWithThisBot' | translate}}</span>
       </div>
 
-      <!-- USE CASE: THIS BOT IS NOT ASSOCIATED AND SOME DEPARTMENTS DON'T HAVE A BOT -->
+      <!- - USE CASE: THIS BOT IS NOT ASSOCIATED AND SOME DEPARTMENTS DON'T HAVE A BOT - ->
       <div *ngIf="depts_without_bot_array?.length > 0 && DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY?.length === 0" class="col-sm-10 col-md-10">
         <span>{{ 'NoDeptsAreAssociatedWithThisBot' | translate}}</span>
 
@@ -213,4 +138,5 @@
         </span>
       </div>
     </div>
-  </div> <!-- ./ bot details -->
+  </div>  -->
+  <!-- ./ bot details -->
