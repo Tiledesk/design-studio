@@ -6,6 +6,7 @@ Tiledesk is an open-source, no-code development platform for creating chatbots a
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.6.
 
 <a href="https://www.producthunt.com/posts/design-studio-by-tiledesk?utm_source=badge-golden-kitty-badge&utm_medium=badge&utm_souce=badge-design&#0045;studio&#0045;by&#0045;tiledesk" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/golden-kitty-badge.svg?post_id=418558&theme=light" alt="Design&#0032;Studio&#0032;by&#0032;Tiledesk - Unlock&#0032;AI&#0032;magic&#0032;for&#0032;elevated&#0032;customer&#0032;engagement&#0044;&#0032;fast | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+
 **Golden Kitty Awards 2023: Open Source Product of the Year**
 
 ## Main Features
