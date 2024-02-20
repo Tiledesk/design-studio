@@ -9,6 +9,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 *Golden Kitty Awards 2023: Open Source Product of the Year*
 
+
 ## Main Features
 
 - **Pre-Designed Conversations and Admin Task Automation:** Automate customer conversations and daily administrative tasks.
