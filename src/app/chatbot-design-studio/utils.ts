@@ -130,6 +130,7 @@ export enum TYPE_ACTION {
     CAPTURE_USER_REPLY = 'capture_user_reply',
     QAPLA = "qapla",
     HUBSPOT = 'hubspot',
+    CUSTOMERIO = 'customerio',
     CODE = 'code'
 }
 
@@ -288,8 +289,9 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     // ASSIGN_FUNCTION: { name: 'CDSActionList.NAME.SetFunction', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY: { name: 'CDSActionList.NAME.CaptureUserReply', category: TYPE_ACTION_CATEGORY.FLOW, type: TYPE_ACTION.CAPTURE_USER_REPLY, src: "assets/images/actions/capture_user_reply.svg", status: "active", description: "CDSActionList.DESCRIPTION.CaptureUserReply" },
     QAPLA: { name: 'CDSActionList.NAME.Qapla', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.QAPLA, src: "assets/images/actions/qapla.svg", status: "active", plan: PLAN_NAME.E, description: "CDSActionList.DESCRIPTION.Qapla", disabled: false },
-    MAKE : { name: 'CDSActionList.NAME.Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "active", plan: PLAN_NAME.D, description: '', disabled: false},
-    HUPSPOT : { name: 'CDSActionList.NAME.Hubspot',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.HUBSPOT, src:"assets/images/actions/hubspot.svg", status: "inactive", plan: PLAN_NAME.E, description: ''},
+    MAKE : { name: 'CDSActionList.NAME.Make',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.MAKE, src:"assets/images/actions/make.svg", status: "active", description: '', disabled: false},
+    HUPSPOT : { name: 'CDSActionList.NAME.Hubspot',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.HUBSPOT, src:"assets/images/actions/hubspot.svg", status: "active", description: ''},
+    CUSTOMERIO : { name: 'CDSActionList.NAME.Customerio',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.CUSTOMERIO, src:"assets/images/actions/hubspot.svg", status: "active", description: ''},
 }
 
 export const EVENTS_LIST = {

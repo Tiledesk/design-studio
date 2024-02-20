@@ -233,6 +233,15 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-hubspot>
 
+                    <cds-action-customerio *ngSwitchCase="typeAction.CUSTOMERIO"
+                    class="panel-response"
+                    [intentSelected]="intentSelected"
+                    [action]="elementSelected"
+                    [previewMode]="false"
+                    (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                    (updateAndSaveAction)="onSaveIntent($event)">
+                </cds-action-customerio>
+
                     <cds-action-code *ngSwitchCase="typeAction.CODE"
                         class="panel-response"
                         [intentSelected]="intentSelected"

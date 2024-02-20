@@ -376,7 +376,11 @@
         "To":"To",
         "Subject":"Subject",
         "ReplyTo":"Reply to",
-        "EmailBody":"Email body"
+        "EmailBody":"Email body",
+        "CustomerioAccessToken":"Customer.io API token",
+        "EntercustomerioAccessToken":"Enter Customer.io API Token",
+        "CustomerioFormId":"Customer.io Form Id",
+        "EntercustomerioFormId":"Enter Customer.io Form Id"
     },
     "Name":"Name",
     "Label": "Label",
@@ -507,7 +511,8 @@
             "CaptureUserReply":"Capture User Reply",
             "Qapla":"Qapla'",
             "Make":"Make",
-            "Hubspot":"Hubspot"
+            "Hubspot":"Hubspot",
+            "Customerio":"Customer.io"
         },
         "DESCRIPTION":{
             "Reply":"<b>Pro tip</b>: Turn this block into a programmed proactive message. <a href=https://www.youtube.com/embed/p0ux-86Y4_I target=_blank>Here is how!</a> ",
@@ -537,7 +542,8 @@
             "CaptureUserReply":"This action allow to capture the user reply",
             "Qapla":"This action allow to connect with Qapla'",
             "Make":"",
-            "Hubspot":""
+            "Hubspot":"",
+            "Customerio":""
         }
         
     },

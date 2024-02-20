@@ -177,6 +177,7 @@ import { CdsActionCaptureUserReplyComponent } from './cds-dashboard/cds-canvas/a
 import { CdsActionQaplaComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-qapla/cds-action-qapla.component';
 import { CdsActionMakeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-make/cds-action-make.component';
 import { CdsActionHubspotComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-hubspot/cds-action-hubspot.component';
+import { CdsActionCustomerioComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-customerio/cds-action-customerio.component';
 import { CdsActionCodeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-code/cds-action-code.component';
 
 //CDS PANELS
@@ -306,6 +307,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
         CdsActionCaptureUserReplyComponent,
         CdsActionQaplaComponent,
         CdsActionCodeComponent,
+        CdsActionCustomerioComponent,
         // action REPLY elements: start //
         CdsActionReplyToolsComponent,
         CdsActionReplyTextComponent,

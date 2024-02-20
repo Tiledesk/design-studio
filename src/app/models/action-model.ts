@@ -559,3 +559,22 @@ export class ActionHubspot extends Action {
         this._tdActionType = TYPE_ACTION.HUBSPOT;
     }
 }
+
+export class ActionCustomerio extends Action {
+    //token: string;
+    formid: string;
+    bodyParameters: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    constructor(){
+        super();
+        //this.token = '';
+        this.formid = '';
+        this.bodyParameters = "";
+        this.assignStatusTo = '';
+        this.assignErrorTo = '';
+        this._tdActionType = TYPE_ACTION.CUSTOMERIO;
+    }
+}
