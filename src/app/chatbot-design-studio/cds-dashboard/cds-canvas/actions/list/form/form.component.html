@@ -1,4 +1,4 @@
-<div class="content-panel-intent-detail no-footer">
+<div class="content-panel-intent-detail form-content no-footer">
     <!-- SPLASH SCREEN  -->
     <div *ngIf="displayNewFormButton" class="splash-screen--form">
         <div class="field-box">
@@ -79,6 +79,7 @@
         <!-- @ ADD EDIT FIELD -->
         <!-- ------------------------------ -->
         <appdashboard-form-edit-add 
+            class="form-edit-add"
             *ngIf="displayAddForm || displayEditForm" 
             [field]="selectedField" 
             [displayAddForm]="displayAddForm"

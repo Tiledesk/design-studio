@@ -5,7 +5,9 @@
     --text-color: #{var(--blu)};
     --icon-color: #{var(--blu-light-02)};
 }
-
+.form-content {
+    overflow-y: auto;
+}
 .content-panel-intent-detail {
     .content-buttons--form {
         position: relative;
@@ -134,3 +136,9 @@
 }
 
  
+.form-edit-add {
+    margin: 30px 0;
+    display: inline-block;
+    width: 100%;
+}
+

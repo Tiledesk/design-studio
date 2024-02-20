@@ -1,4 +1,7 @@
 @import "./src/assets/sass/cds/_variables.scss";
+#scrollMe {
+    overflow-y: auto;
+}
 
 :host {
     --background-color: #{var(--blu-light-01)};
