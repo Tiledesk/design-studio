@@ -5,6 +5,12 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.2
+- added: cds-action-customerio
+- added: customAttributes for support widget to identify current logged user plan
+- removed: assignResultTo from cds-action-customerio and cds-action-hubspot
+
+
 ### 1.2.0-rc.1
 - added: ability to copy/paste an action/block
 
