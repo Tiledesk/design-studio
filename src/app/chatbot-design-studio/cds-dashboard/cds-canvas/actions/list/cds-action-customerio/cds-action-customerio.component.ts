@@ -135,9 +135,6 @@ export class CdsActionCustomerioComponent implements OnInit {
 
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'customerio_result')) {
-      new_attributes.push({ name: "customerio_result", value: "customerio_result" });
-    }
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'customerio_status')) {
       new_attributes.push({ name: "customerio_status", value: "customerio_status" });
     }
