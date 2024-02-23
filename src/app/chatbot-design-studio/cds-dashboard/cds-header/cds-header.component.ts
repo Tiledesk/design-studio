@@ -238,6 +238,9 @@ export class CdsHeaderComponent implements OnInit {
         this.tiledeskAuthService.logOut()
         localStorage.removeItem('user')
         let DASHBOARD_URL = this.appConfigService.getConfig().dashboardBaseUrl + '#/login'
+        if (window && window['tiledesk']) {
+          window['tiledesk'].logout()
+        }
         window.open(DASHBOARD_URL, '_self').focus();
         break;
       case 'EXPORT':

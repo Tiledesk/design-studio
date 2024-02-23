@@ -3,6 +3,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { SUPPORT_OPTIONS } from '../utils-menu';
 import { TYPE_URL } from '../utils';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'cds-support',
@@ -15,7 +16,9 @@ export class CdsSupportComponent implements OnInit {
   cardOptions: { [key: string]: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string, description?: string, localIcon?: boolean }>}
   private logger: LoggerService = LoggerInstance.getInstance()
   
-  constructor() { }
+  constructor(
+    private dashboardService: DashboardService
+  ) { }
 
   ngOnInit(): void {
     this.cardOptions = SUPPORT_OPTIONS
@@ -28,8 +31,15 @@ export class CdsSupportComponent implements OnInit {
         }
       })
     })
+
+    let projectBaseInfo = {
+      _id: this.dashboardService.project._id,
+      profile: this.dashboardService.project.profile,
+      isActiveSubscription: this.dashboardService.project.isActiveSubscription,
+      trialExpired: this.dashboardService.project.trialExpired
+    }
     this.logger.log('[CDS-SUPPORT this.cardOptions]', this.cardOptions)
-    this.manageWidget("start")
+    this.manageWidget("start", projectBaseInfo)
     this.manageWidget('show')
   }
 
@@ -53,7 +63,7 @@ export class CdsSupportComponent implements OnInit {
 
   }
 
-  private manageWidget(status: "hide" | "show" | "open" | "close" | "start") {
+  private manageWidget(status: "hide" | "show" | "open" | "close" | "start", projectInfo?: any) {
     try {
       if (window && window['tiledesk']) {
         this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
@@ -66,13 +76,17 @@ export class CdsSupportComponent implements OnInit {
         }else if(status === "close"){
           window['tiledesk'].close();
         }
+       
       }
 
       if (window && !window['tiledesk']) {
         if(status === "start"){
           window['startWidget']();
+          window['tiledesk_widget_login']();
+          window['tiledesk'].setAttributeParameter({ key: 'payload', value: {project:  projectInfo}})
         }
       }
+      
     } catch (error) {
       this.logger.error('tiledesk_widget_hide ERROR', error)
     }
