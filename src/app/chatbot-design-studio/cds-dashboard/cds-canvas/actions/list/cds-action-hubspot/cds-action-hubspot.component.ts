@@ -141,9 +141,6 @@ export class CdsActionHubspotComponent implements OnInit {
 
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'hubspot_result')) {
-      new_attributes.push({ name: "hubspot_result", value: "hubspot_result" });
-    }
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'hubspot_status')) {
       new_attributes.push({ name: "hubspot_status", value: "hubspot_status" });
     }

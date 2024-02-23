@@ -114,54 +114,37 @@
                 </mat-panel-title>
             </mat-expansion-panel-header>
             
-            <div>
 
-                <div class="field-box">
-                    <label class="title-label">{{'CDSCanvas.AssignResultTo' | translate }}</label>
-                    <cds-textarea id="assignTo" 
-                        [textLimitBtn]="false" 
-                        [emojiPikerBtn]="false" 
-                        [setAttributeBtn]="true"
-                        [minRow]="1" 
-                        [maxRow]="1" 
-                        [readonly]="true" 
-                        [text]="action.assignResultTo"
-                        (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
-                        (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
-                    </cds-textarea>
-                </div>
-
-                <div class="field-box">
-                    <label class="title-label">{{'CDSCanvas.AssignStatusTo' | translate }}</label>
-                    <cds-textarea id="assignStatusTo" 
-                        [textLimitBtn]="false" 
-                        [emojiPikerBtn]="false" 
-                        [setAttributeBtn]="true"
-                        [minRow]="1" 
-                        [maxRow]="1" 
-                        [readonly]="true" 
-                        [text]="action.assignStatusTo"
-                        (selectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')"
-                        (clearSelectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')">
-                    </cds-textarea>
-                </div>
-
-
-                <div class="field-box">
-                    <label class="title-label">{{'CDSCanvas.AssignErrorTo' | translate }}</label>
-                    <cds-textarea id="assignErrorTo" 
-                        [textLimitBtn]="false"
-                        [emojiPikerBtn]="false" 
-                        [setAttributeBtn]="true"
-                        [minRow]="1" 
-                        [maxRow]="1" 
-                        [readonly]="true" 
-                        [text]="action.assignErrorTo"
-                        (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
-                        (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
-                    </cds-textarea>
-                </div>
+            <div class="field-box">
+                <label class="title-label">{{'CDSCanvas.AssignStatusTo' | translate }}</label>
+                <cds-textarea id="assignStatusTo" 
+                    [textLimitBtn]="false" 
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="action.assignStatusTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')">
+                </cds-textarea>
             </div>
+
+            <div class="field-box">
+                <label class="title-label">{{'CDSCanvas.AssignErrorTo' | translate }}</label>
+                <cds-textarea id="assignErrorTo" 
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [minRow]="1" 
+                    [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="action.assignErrorTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+                </cds-textarea>
+            </div>
+
         </mat-expansion-panel>
     </mat-accordion>
 </div>
