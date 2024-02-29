@@ -164,7 +164,7 @@ export class CdsActionQaplaComponent implements OnInit {
     this.logger.debug("[ACTION QAPLA] changeTextarea event: ", $event);
     this.logger.debug("[ACTION QAPLA] changeTextarea propery: ", property);
     this.action[property] = $event;
-    console.log("[ACTION QAPLA] Action updated: ", this.action);
+    this.logger.log("[ACTION QAPLA] Action updated: ", this.action);
     // this.updateAndSaveAction.emit();  
   }
 
@@ -172,7 +172,7 @@ export class CdsActionQaplaComponent implements OnInit {
     this.logger.log("[ACTION QAPLA] onEditableDivTextChange event", event)
     this.logger.log("[ACTION QAPLA] onEditableDivTextChange property", property)
     this.action[property] = event.value;
-    console.log("[ACTION QAPLA] Action updated: ", this.action);
+    this.logger.log("[ACTION QAPLA] Action updated: ", this.action);
     this.updateAndSaveAction.emit();
   }
 

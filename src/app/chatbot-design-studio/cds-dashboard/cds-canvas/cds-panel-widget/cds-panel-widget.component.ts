@@ -116,6 +116,5 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
-    console.log('[CDS-PANEL-WIDGET] destroyyyyyyyy')
   }
 }

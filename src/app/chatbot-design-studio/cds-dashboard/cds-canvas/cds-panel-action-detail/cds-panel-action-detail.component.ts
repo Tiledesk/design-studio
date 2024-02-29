@@ -71,7 +71,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('[PANEL-INTENT-DETAIL] (OnChanges)', changes, this.elementIntentSelected);
+    this.logger.log('[PANEL-INTENT-DETAIL] (OnChanges)', changes, this.elementIntentSelected);
     this.initialize();
   }
 
@@ -85,20 +85,20 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
   initialize(){
     this.intentSelected = this.intentService.intentSelected;
-    console.log('[PANEL-INTENT-DETAIL] (initialize)', this.elementIntentSelected);
+    this.logger.log('[PANEL-INTENT-DETAIL] (initialize)', this.elementIntentSelected);
     try{
       this.elementIntentSelectedType = this.elementIntentSelected.type;
       this.elementSelected = this.elementIntentSelected.element; // this.intentService.selectedAction;
       // this.elementSelected = JSON.parse(JSON.stringify(this.elementIntentSelected.element));
       // this.elementSelectedIndex = this.elementIntentSelected.index
       // this.elementSelectedMaxLength = [...Array(this.elementIntentSelected.maxLength).keys()]
-      console.log('[PANEL-INTENT-DETAIL] (OnChanges) elementIntentSelectedType ', this.elementIntentSelectedType);
-      console.log('[PANEL-INTENT-DETAIL] (OnChanges) elementSelected ', this.elementSelected);
+      this.logger.log('[PANEL-INTENT-DETAIL] (OnChanges) elementIntentSelectedType ', this.elementIntentSelectedType);
+      this.logger.log('[PANEL-INTENT-DETAIL] (OnChanges) elementSelected ', this.elementSelected);
       
       let action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType)
       if(action && action.plan){
         this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.type, action.plan)}
-        console.log('[PANEL-INTENT-DETAIL] --> status', this.canShowActionByPlan)
+        this.logger.log('[PANEL-INTENT-DETAIL] --> status', this.canShowActionByPlan)
       }
 
     }catch(error){
@@ -140,7 +140,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   addEventListener() {
     document.addEventListener(
       "keydown", (e) => {
-        // console.log('[PANEL-INTENT-DETAIL]  keydown ', e);
+        // this.logger.log('[PANEL-INTENT-DETAIL]  keydown ', e);
         var focusedElement = document.activeElement;
         if (focusedElement.tagName === 'TEXTAREA') {
         }
@@ -151,9 +151,9 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   // private setDragConfig(){
   //   // drag study
   //   let el = document.getElementById("content-panel");
-  //   console.log('getElementById:: el', el);
+  //   this.logger.log('getElementById:: el', el);
   //   let drawer = document.getElementById("box-right");
-  //   console.log('getElementById:: drawer', drawer);
+  //   this.logger.log('getElementById:: drawer', drawer);
   //   setDrawer(el, drawer);
   // }
 
@@ -162,18 +162,18 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   onUpdateFormIntentSelected($event){
     this.elementSelected = $event;
     this.onSaveIntent()
-    // console.log("onUpdateFormIntentSelected:::: ", $event);
+    // this.logger.log("onUpdateFormIntentSelected:::: ", $event);
   }
 
   onUpdateAnswerIntentSelected($event){
     this.elementSelected = $event;
-    // console.log("updateAnswerIntentSelected:::: ", $event);
+    // this.logger.log("updateAnswerIntentSelected:::: ", $event);
   }
 
   onUpdateQuestionsIntentSelected($event){
     this.elementSelected = $event;
     this.onSaveIntent()
-    // console.log("onUpdateQuestionsIntentSelected:::: ", $event);
+    // this.logger.log("onUpdateQuestionsIntentSelected:::: ", $event);
   }
 
   onSaveIntent(event?){
@@ -188,13 +188,13 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     } else if(this.elementIntentSelectedType === this.typeIntentElement.FORM){
       this.intentSelected.form = this.elementSelected;
     }
-    console.log('----> onSaveIntent:: ', event, this.elementIntentSelectedType, this.intentSelected);
+    this.logger.log('----> onSaveIntent:: ', event, this.elementIntentSelectedType, this.intentSelected);
     // elimino connettori della action e poi li ricreo
     this.savePanelIntentDetail.emit(this.intentSelected);
   }
 
   onCloseIntent(){
-    console.log('----> onCloseIntent:: ', this.elementIntentSelectedType, this.intentSelected);
+    this.logger.log('----> onCloseIntent:: ', this.elementIntentSelectedType, this.intentSelected);
     // this.closeAndSavePanelIntentDetail.emit();
   }
 

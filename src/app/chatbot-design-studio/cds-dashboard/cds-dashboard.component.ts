@@ -107,7 +107,7 @@ export class CdsDashboardComponent implements OnInit {
           this.logger.error('[ DSHBRD-SERVICE ] ERROR: ', error);
           reject(false);
         }, complete: () => {
-          console.log('COMPLETE');
+          this.logger.log('COMPLETE');
         }
       });
     });

@@ -248,6 +248,7 @@
                         class="panel-response"
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
+                        [project_id]="project_id"
                         [previewMode]="false"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">

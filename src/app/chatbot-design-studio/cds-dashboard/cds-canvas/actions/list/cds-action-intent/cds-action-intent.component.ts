@@ -41,7 +41,7 @@ export class CdsActionIntentComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      console.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
+      this.logger.log('[CDS-ACTION-INTENT] - subcribe to isChangedConnector$ >>', connector);
       let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
       if(connector.fromId.startsWith(connectorId)){
         this.connector = connector;
@@ -66,7 +66,7 @@ export class CdsActionIntentComponent implements OnInit {
 
 
   private checkConnectionStatus(){
-    console.log('[CDS-ACTION-INTENT] **************************11111');
+    this.logger.log('[CDS-ACTION-INTENT] **************************11111');
     if(this.action.intentName){
      this.isConnected = true;
      const posId = this.action.intentName.indexOf("#");
@@ -94,7 +94,7 @@ export class CdsActionIntentComponent implements OnInit {
 
 
   private updateConnector(){
-    console.log('[CDS-ACTION-INTENT] **************************2222', this.action.intentName);
+    this.logger.log('[CDS-ACTION-INTENT] **************************2222', this.action.intentName);
     this.isConnected = this.action.intentName?true:false;
     const array = this.connector.fromId.split("/");
     const idIntent= array[0];
@@ -106,7 +106,7 @@ export class CdsActionIntentComponent implements OnInit {
       if(!this.action.intentName)this.isConnected = false;
       else this.isConnected = true;
       if(idAction === this.action._tdActionId ){
-        console.log('[CDS-ACTION-INTENT] - updateConnector :: ', idAction, this.action._tdActionId, this.connector);
+        this.logger.log('[CDS-ACTION-INTENT] - updateConnector :: ', idAction, this.action._tdActionId, this.connector);
         if(this.connector.deleted){
           this.action.intentName = null;
           this.isConnected = false;

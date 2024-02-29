@@ -258,7 +258,6 @@ export class FaqKbService {
 
     let body = { "rules": rule }
     this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
-    // console.log('[FAQ-KB.SERV] updateFaqKb - BODY ', url, body);
     return this._httpClient.patch(url, body, httpOptions)
   }
 
@@ -271,7 +270,7 @@ export class FaqKbService {
     };
     let url = this.SERVER_BASE_PATH + this.project_id + '/faq_kb/' + id + '/attributes';
     let body = JSON.stringify(attributes);
-    console.log('[FAQ-KB.SERV] updateFaqKb - BODY ', url, body);
+    this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', url, body);
     return this._httpClient.patch(url, body, httpOptions)
   }
 

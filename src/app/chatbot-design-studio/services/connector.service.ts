@@ -760,7 +760,7 @@ export class ConnectorService {
 
 
   public updateConnectorAttributes(elementID, attributes=null) {
-    console.log("updateConnectorAttributes:::::  ",elementID,  attributes);
+    // console.log("updateConnectorAttributes:::::  ",elementID,  attributes);
     const lineText = document.getElementById("label_"+elementID);
     if(lineText){
       var label = null;
@@ -837,7 +837,7 @@ export class ConnectorService {
     //     const connectorId = this.tiledeskConnectors.connectors[connectorKey].id;
         let connectorElement = document.getElementById(connectorId);
         if(connectorElement){
-          console.log("[JS] deleteConnectorWithFromId ----> ID",connectorId);
+          // console.log("[JS] deleteConnectorWithFromId ----> ID",connectorId);
           this.deleteConnector(connectorId, false, false);
         }
     //   }

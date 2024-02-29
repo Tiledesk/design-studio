@@ -28,7 +28,7 @@ export class CdsActionCodeComponent implements OnInit {
 
   onChangeTextarea(text){
     this.action.source = text;
-    console.log("[ACTION MAKE] this.action", this.action);
+    this.logger.log("[ACTION MAKE] this.action", this.action);
   }
 
   onBlur(event){

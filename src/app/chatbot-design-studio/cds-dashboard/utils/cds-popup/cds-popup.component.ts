@@ -62,7 +62,6 @@ export class CdsPopupComponent implements OnInit {
         right: 110
         // right: btnPosition.right - Math.floor(btnPosition.width / 2) - 160
       }
-      // console.log('positionnnnnnnn -->', btnPosition,  Math.floor(btnPosition.width / 2))
     }
   }
 

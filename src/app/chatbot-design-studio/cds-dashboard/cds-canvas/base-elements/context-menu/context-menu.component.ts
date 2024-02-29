@@ -39,7 +39,6 @@ export class ContextMenuComponent implements OnInit {
   }
 
   onMenuOptionFN(item: { key: string, label: string, icon: string, src?: string}){
-    console.log('[CDS-CONTEXT-MENU] onMenuOptionFN', item, this.positions);
     switch(item.key){
       case 'PASTE':{
         this.intentService.pasteElementToStage(this.positions);
@@ -51,25 +50,21 @@ export class ContextMenuComponent implements OnInit {
 
   @HostListener('document:click', ['$event'])
   handleClickOutside(event: Event): void {
-    console.log('[CDS-CONTEXT-MENU] click:: ', this.el.nativeElement, event.target);
     if (!this.el.nativeElement.contains(event.target)) {
       this.onHideContextMenu();
     }
   }
 
   onHideContextMenu(): void {
-    console.log('[CDS-CONTEXT-MENU] hideContextMenu:: ');
     this.hideContextMenu.emit();
     this.removeDocumentClickListener();
   }
 
   private addDocumentClickListener(): void {
-    console.log('[CDS-CONTEXT-MENU] addDocumentClickListener:: ');
     document.addEventListener('click', this.handleClickOutside.bind(this));
   }
 
   private removeDocumentClickListener(): void {
-    console.log('[CDS-CONTEXT-MENU] removeDocumentClickListener:: ');
     document.removeEventListener('click', this.handleClickOutside.bind(this));
   }
 }

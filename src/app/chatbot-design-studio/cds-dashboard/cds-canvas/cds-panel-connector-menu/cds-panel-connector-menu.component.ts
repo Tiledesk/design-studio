@@ -32,7 +32,7 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
     let event = { 
       'type': type
     }
-    console.log('[CDS-ADD-CONNECTOR MENU] onAddActionFromConnectorMenu - connector: ', event);
+    // console.log('[CDS-ADD-CONNECTOR MENU] onAddActionFromConnectorMenu - connector: ', event);
     this.addActionFromConnectorMenu.emit(event);
   }
 
@@ -42,7 +42,7 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
   
   onBlur(ev){
     const testoTextArea = ev.target.value;
-    console.log('[CDS-ADD-CONNECTOR MENU]  onBlur:: ', testoTextArea);
+    // console.log('[CDS-ADD-CONNECTOR MENU]  onBlur:: ', testoTextArea);
     let event = { 
       'type': TYPE_OF_MENU.LINE_TEXT, 
       'label': testoTextArea

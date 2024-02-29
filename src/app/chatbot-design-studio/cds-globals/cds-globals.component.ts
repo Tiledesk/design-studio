@@ -109,7 +109,7 @@ export class CdsGlobalsComponent implements OnInit {
   }
 
   onGlobalChange(event: {type: 'add' | 'edit' | 'delete' | 'return', element: Global | null }){
-    console.log('[CDS-GLOBALS ] onGlobalChange -->', event, this.updateIndex)
+    this.logger.log('[CDS-GLOBALS ] onGlobalChange -->', event, this.updateIndex)
     switch(event.type){
       case 'add':
         this.list.push(event.element)

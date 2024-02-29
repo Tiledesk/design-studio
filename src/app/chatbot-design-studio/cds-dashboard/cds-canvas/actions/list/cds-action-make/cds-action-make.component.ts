@@ -192,7 +192,7 @@ export class CdsActionMakeComponent implements OnInit {
       case 'url' : {
         this.action.url = e;
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        console.log("[ACTION MAKE] this.action", this.action);
+        this.logger.log("[ACTION MAKE] this.action", this.action);
       }
     }
 

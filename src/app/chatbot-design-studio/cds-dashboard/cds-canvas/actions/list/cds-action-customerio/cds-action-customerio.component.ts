@@ -1,3 +1,4 @@
+import { AppConfigService } from 'src/app/services/app-config';
 import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { Intent } from 'src/app/models/intent-model';
 import { ActionCustomerio } from 'src/app/models/action-model';
@@ -16,6 +17,7 @@ export class CdsActionCustomerioComponent implements OnInit {
 
   @Input() intentSelected: Intent;
   @Input() action: ActionCustomerio;
+  @Input() project_id: string;
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
@@ -43,7 +45,8 @@ export class CdsActionCustomerioComponent implements OnInit {
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private intentService: IntentService
+    private intentService: IntentService,
+    private appConfigService: AppConfigService
   ) { }
 
   // SYSTEM FUNCTIONS //
@@ -150,7 +153,7 @@ export class CdsActionCustomerioComponent implements OnInit {
 
   // EVENT FUNCTIONS //
   onChangeTextarea(e, type){
-    console.log('type; ', type);
+    this.logger.log('type; ', type);
     switch(type){
       // case 'token' : {
       //   this.action.token = e;
@@ -161,7 +164,7 @@ export class CdsActionCustomerioComponent implements OnInit {
       case 'formid' : {
         this.action.formid = e;
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        console.log("[ACTION-CUSTOMERIO] this.action", this.action);
+        this.logger.log("[ACTION-CUSTOMERIO] this.action", this.action);
       }
       break;
     }
@@ -209,5 +212,10 @@ export class CdsActionCustomerioComponent implements OnInit {
     }
     this.action[type] = null;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
+  goToIntegration(){
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name=' + this.action._tdActionType
+    window.open(url, '_blank')
   }
 }

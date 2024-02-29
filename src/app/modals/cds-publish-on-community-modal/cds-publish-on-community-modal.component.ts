@@ -56,7 +56,6 @@ export class CdsPublishOnCommunityModalComponent implements OnInit {
     this.selectedChatbot = data.chatbot;
     this.projectId = data.projectId;
     this.hasPersonalCmntyInfo = data.personalCmntyInfo;
-    console.log('[PUBLISH-ON-COMMUNITY-MODAL-COMPONENT] hasPersonalCmntyInfo ', this.hasPersonalCmntyInfo)
     this.logger.log('[PUBLISH-ON-COMMUNITY-MODAL-COMPONENT] selectedChatbot ', this.selectedChatbot)
     this.logger.log('[PUBLISH-ON-COMMUNITY-MODAL-COMPONENT] projectId ', this.projectId)
     if (this.selectedChatbot) {
@@ -285,7 +284,6 @@ export class CdsPublishOnCommunityModalComponent implements OnInit {
   // --------------------------------------------------------------------------------
   publishOnCommunity() {
     this.selectedChatbot.public = true;
-    // console.log('publishOnCommunity:: ', this.selectedChatbot);
     this.faqKbService.updateChatbot(this.selectedChatbot).subscribe((data) => {
       this.logger.log('[PUBLISH-ON-COMMUNITY-MODAL-COMPONENT] publishOnCommunity - RES ', data)
     }, (error) => {
@@ -314,7 +312,6 @@ export class CdsPublishOnCommunityModalComponent implements OnInit {
   }
 
   selectTab(index: number): void {
-    // console.log('selectTab index', index)
     this.selectedIndex = index;
   }
 

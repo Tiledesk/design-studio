@@ -130,7 +130,7 @@ export class CdsActionReplyTextComponent implements OnInit {
       
       // console.log('updateConnector [CdsActionReplyTextComponent]:: connector.fromId: ', idConnector, idButton, this.connector.fromId);
       if(idConnector === this.connector.fromId && buttonChanged){
-        console.log('updateConnector [CdsActionReplyTextComponent]:: buttonChanged: ', this.connector, buttonChanged, this.buttons, idButton);
+        this.logger.log('updateConnector [CdsActionReplyTextComponent]:: buttonChanged: ', this.connector, buttonChanged, this.buttons, idButton);
         if(this.connector.deleted){
           // DELETE 
           // this.logger.log('[CdsActionReplyTextComponent] deleteConnector :: ', this.connector);
@@ -210,7 +210,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   }
 
   onBlur(event){
-    console.log('[ACTION REPLY TEXT] onBlur', event.target.value, this.response.text);
+    this.logger.log('[ACTION REPLY TEXT] onBlur', event.target.value, this.response.text);
     // if(event.target.value !== this.response.text){
       this.changeActionReply.emit();
     // }
@@ -221,7 +221,7 @@ export class CdsActionReplyTextComponent implements OnInit {
 
   /** onOpenButtonPanel */
   onOpenButtonPanel(button){
-    console.log('[ACTION REPLY TEXT] onOpenButtonPanel ', button, this.response.attributes.attachment.buttons);
+    this.logger.log('[ACTION REPLY TEXT] onOpenButtonPanel ', button, this.response.attributes.attachment.buttons);
     this.openButtonPanel.emit(button);
   }
 

@@ -160,7 +160,7 @@ export class CdsActionHubspotComponent implements OnInit {
       case 'token' : {
         this.action.token = e;
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        console.log("[ACTION-HUBSPOT] this.action", this.action);
+        this.logger.log("[ACTION-HUBSPOT] this.action", this.action);
       }
     }
   }

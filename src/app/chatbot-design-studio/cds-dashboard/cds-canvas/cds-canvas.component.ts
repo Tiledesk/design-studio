@@ -387,7 +387,7 @@ export class CdsCanvasComponent implements OnInit {
     */
     document.addEventListener(
       "connector-created", (e: CustomEvent) => {
-        console.log("[CDS-CANVAS] connector-created:", e);
+        this.logger.log("[CDS-CANVAS] connector-created:", e);
         const connector = e.detail.connector;
         connector['created'] = true;
         delete connector['deleted'];
@@ -404,7 +404,7 @@ export class CdsCanvasComponent implements OnInit {
     */
     document.addEventListener(
       "connector-deleted", (e: CustomEvent) => {
-        console.log("[CDS-CANVAS] connector-deleted:", e);
+        this.logger.log("[CDS-CANVAS] connector-deleted:", e);
         const connector = e.detail.connector;
         connector['deleted'] = true;
         delete connector['created'];
@@ -426,7 +426,7 @@ export class CdsCanvasComponent implements OnInit {
     */
     document.addEventListener(
       "connector-updated", (e: CustomEvent) => {
-        console.log("[CDS-CANVAS] connector-updated:", e);
+        this.logger.log("[CDS-CANVAS] connector-updated:", e);
         const connector = e.detail.connector;
         // if(connector.notify)
         connector['updated'] = true;
@@ -464,7 +464,7 @@ export class CdsCanvasComponent implements OnInit {
     document.addEventListener(
       "keydown", (e) => {
         // Verifica se è stato premuto Ctrl (Windows) o Command (Mac) e Z contemporaneamente
-        console.log('[CDS-CANVAS]  keydown ', e);
+        this.logger.log('[CDS-CANVAS]  keydown ', e);
         var focusedElement = document.activeElement;
         if (focusedElement.tagName === 'TEXTAREA') {
           return;
@@ -1121,7 +1121,7 @@ export class CdsCanvasComponent implements OnInit {
         this.connectorSelected = intent.attributes.connectors[idConnector];
       }
     } catch (error) {
-      console.log("Error: ", error);
+      this.logger.log("Error: ", error);
     }
   }
 
@@ -1143,7 +1143,7 @@ export class CdsCanvasComponent implements OnInit {
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     }
     if(event.type === "line-text"){
-      console.log('[CDS-CANVAS] line-text:: ', this.connectorSelected);
+      this.logger.log('[CDS-CANVAS] line-text:: ', this.connectorSelected);
       if(this.connectorSelected && this.connectorSelected.id){
         const intentId = this.connectorSelected.id.split('/')[0];
         let intent = this.intentService.getIntentFromId(intentId);
@@ -1167,7 +1167,7 @@ export class CdsCanvasComponent implements OnInit {
 
   public onShowContextMenu(event: MouseEvent): void {
       event.preventDefault();
-      console.log('[CDS-CANVAS] onShowContextMenu:: ', event);
+      this.logger.log('[CDS-CANVAS] onShowContextMenu:: ', event);
       // this.showCustomMenu(x, y);
 
       // Recupera l'elemento che ha scatenato l'evento
@@ -1179,7 +1179,7 @@ export class CdsCanvasComponent implements OnInit {
         this.positionContextMenu.x = event.clientX;
         this.positionContextMenu.y = event.offsetY;
         this.IS_OPEN_CONTEXT_MENU = true;
-        console.log('Attributi dell\'elemento premuto:', customAttributeValue);
+        this.logger.log('Attributi dell\'elemento premuto:', customAttributeValue);
       }
       // Stampa gli attributi dell'elemento
       // console.log('ID dell\'elemento premuto:', targetElement.id);

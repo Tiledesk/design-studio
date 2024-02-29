@@ -69,9 +69,6 @@ export class CdsSidebarComponent implements OnInit {
   }
 
   goTo(section: SIDEBAR_PAGES) {
-    // console.log('[CDS-SIDEBAR] goTo item ', section)
-
-    // let elements = Array.from(document.getElementsByClassName('section is_active'));
     let elements = this.el.nativeElement.querySelectorAll('.section.is_active')
     if (elements.length != 0) {
       elements.forEach((el) => {
