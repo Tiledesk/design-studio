@@ -130,6 +130,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             // });
           }
 
+
+
           //UPDATE QUESTIONS
           if (this.intent.question) {
             const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
@@ -577,13 +579,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   onDragEnded(event, index) {
     this.logger.log('[CDS-INTENT] onDragEnded: ', event, this.intent.intent_id);
     this.isDragging = false;
+    
     this.connectorService.updateConnector(this.intent.intent_id);
     // const previousIntentId = this.intentService.previousIntentId;
     // if(previousIntentId){
     //   this.logger.log("[CDS-INTENT] onDropAction previousIntentId: ", previousIntentId);
     //   this.connectorService.updateConnector(previousIntentId);
     // }
-    this.connectorService.updateConnector(this.intent.intent_id);
+    // this.connectorService.updateConnector(this.intent.intent_id);
   }
 
 

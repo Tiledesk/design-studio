@@ -9,7 +9,8 @@
 
             <div class="intents">
                 <div *ngFor="let intent of internalIntents; let id = index" id="intent_{{id}}" class="intent"
-                    [ngClass]="{'active': idSelectedIntent === intent.intent_id}" [value]="intent.intent_id"
+                    [ngClass]="{'active': idSelectedIntent === intent.intent_id}" 
+                    [value]="intent.intent_id"
                     (click)="onSelectIntent(intent)">
 
                     <div class="icon-container">

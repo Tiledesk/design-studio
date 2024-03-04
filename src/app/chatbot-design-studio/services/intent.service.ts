@@ -1351,6 +1351,50 @@ export class IntentService {
     }
 
 
+    public cleanListOfIntents(listOfIntents){
+      listOfIntents = listOfIntents.filter(obj => {
+        // se un intent è vuoto ma ha connettori in ingresso cancello i connettori!
+        let connetorsIn = this.connectorService.searchConnectorsInByIntent(obj.intent_id);
+        if(obj.questions && obj.questions != ''){
+          return obj;
+        } else if(obj.form && obj.form != ''){
+          return obj;
+        } else if(obj.attributes.nextBlockAction?.intentName && obj.attributes.nextBlockAction?.intentName !== ''){
+          return obj;
+        } else if(obj.actions && obj.actions?.length > 0 ){
+          return obj;
+        } else if(connetorsIn && connetorsIn.length > 0 ){
+          return obj;
+        } else {
+          return;
+        }
+      });
+      return listOfIntents;
+    }
+
+
+    public hiddenEmptyIntents(listOfIntents){
+      listOfIntents = listOfIntents.filter(obj => {
+        let connetorsIn = this.connectorService.searchConnectorsInByIntent(obj.intent_id);
+        if(obj.questions && obj.questions != ''){
+          return obj;
+        } else if(obj.form && obj.form != ''){
+          return obj;
+        } else if(obj.attributes.nextBlockAction?.intentName && obj.attributes.nextBlockAction?.intentName !== ''){
+          return obj;
+        } else if(obj.actions && obj.actions?.length > 0 ){
+          return obj;
+        } else if(connetorsIn && connetorsIn.length > 0 ){
+          return obj;
+        } else {
+          // console.log("SOLO UN CASO CON INTENTID == ", connetorsIn, obj);
+          return;
+        }
+      });
+      return listOfIntents;
+    }
+
+
   /************************************************
   * UNDO / REDO
   /************************************************/
@@ -1393,7 +1437,11 @@ export class IntentService {
       newIntent.actions = prevIntent.actions;
       this.pasteIntentOntoStage(newIntent, prevIntent.intent_id, newIntent_id);
     } else if(element && element.type === 'ACTION'){
-      let newAction = element.element;
+      // let newAction = element.element;
+      let newAction_id = uuidv4();
+      let prevAction_id = element.element._tdActionId;
+      let jsonAction = JSON.stringify(element.element).replace(prevAction_id, newAction_id);
+      let newAction = JSON.parse(jsonAction);
       // se ho premuto incolla su un intent: aggiungo la action in coda all'intent
       let newIntent_id = uuidv4();
       let prevIntent_id = element.intent_id;

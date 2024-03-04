@@ -133,6 +133,10 @@ export class CdsCanvasComponent implements OnInit {
     this.connectorService.initializeConnectors();
     this.addEventListener();
     this.changeDetectorRef.detectChanges();
+
+    // setTimeout(() => {
+    //   this.listOfIntents = this.intentService.cleanListOfIntents(this.intentService.listOfIntents);
+    // }, 0);
   }
 
   // private async setStartIntent(){
@@ -175,8 +179,12 @@ export class CdsCanvasComponent implements OnInit {
      * ad ogni modifica (aggiunta eliminazione di un intent)
     */
     this.subscriptionListOfIntents = this.intentService.getIntents().subscribe(intents => {
-      // this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
+      this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
       this.listOfIntents = intents;
+      // if(intents.length > 0 || (intents.length == 0 && this.listOfIntents.length>0)){
+      //   this.listOfIntents = this.intentService.hiddenEmptyIntents(intents);
+      // }
+      
     });
 
     /** SUBSCRIBE TO THE STATE ACTION DETAIL PANEL */
@@ -282,10 +290,8 @@ export class CdsCanvasComponent implements OnInit {
   * create connectors
   */
   private refreshIntents() {
-    //setTimeout(() => {
       this.setDragAndListnerEventToElements();
       this.connectorService.createConnectors(this.listOfIntents);
-    //}, 0);
   }
 
   // ---------------------------------------------------------
