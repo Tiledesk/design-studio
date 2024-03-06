@@ -78,7 +78,6 @@
     <div class="tooltip-wrp">
         <div class="caret_tooltip"></div>
         <span [innerHTML]="element?.description | translate: tparams"></span>
-        <span [innerHTML]="element?.doc | translate: tparams"></span>
-
+        <span *ngIf="docEnabled" [innerHTML]="element?.doc | translate: tparams"></span>
    </div>
 </sat-popover>

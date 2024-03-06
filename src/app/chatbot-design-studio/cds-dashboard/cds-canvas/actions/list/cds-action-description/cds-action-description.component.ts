@@ -4,6 +4,7 @@ import { Action } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { BrandService } from 'src/app/services/brand.service';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 
 @Component({
   selector: 'cds-action-description',
@@ -23,6 +24,8 @@ export class CdsActionDescriptionComponent implements OnInit {
   element: any;
   dataInput: string;
   tparams: any;
+  docEnabled: boolean = true;
+  BRAND_BASE_INFO = BRAND_BASE_INFO
 
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -34,6 +37,9 @@ export class CdsActionDescriptionComponent implements OnInit {
 
 
   ngOnInit(): void {    
+    if(BRAND_BASE_INFO['DOCS'] === 'false' || !BRAND_BASE_INFO['DOCS']){
+      this.docEnabled = false
+    }
   }
 
   ngOnChanges(){

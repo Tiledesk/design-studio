@@ -20,7 +20,7 @@ export class CdsFulfillmentComponent implements OnInit {
   //webhook_is_enabled: Boolean = false;
   //webhookUrl: string;
   tparams: any;
-
+  docEnabled: boolean = true;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   WEBHOOK_URL_IS_EMPTY: boolean;
@@ -44,6 +44,9 @@ export class CdsFulfillmentComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log("[CDS-FULFILLMENT] input chatbot: ", this.chatbot);
+    if(BRAND_BASE_INFO['DOCS'] === 'false' || !BRAND_BASE_INFO['DOCS']){
+      this.docEnabled = false
+    }
   }
 
   editBot() {
