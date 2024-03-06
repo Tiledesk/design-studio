@@ -41,7 +41,7 @@
                 <p class="fulfillment-description">
                     {{'YourWebServiceWillReceivePostRequestFrom' | translate: tparams}}
                     {{'BeSureThatYourWebServiceMeetsAllTheWebhookRequirements' | translate}}
-                    <span class="custom-link" (click)="openWebhookRequirementsDoc()">
+                    <span class="custom-link" *ngIf="BRAND_BASE_INFO['DOCS']"(click)="openWebhookRequirementsDoc()">
                         {{'LearnMoreAboutWebhookRequirements' | translate }}
                     </span>
                 </p>
