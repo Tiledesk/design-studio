@@ -1,3 +1,4 @@
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ACTIONS_LIST, INTENT_ELEMENT } from '../../../../../utils';
 import { Action } from 'src/app/models/action-model';
@@ -24,6 +25,8 @@ export class CdsActionDescriptionComponent implements OnInit {
   dataInput: string;
 
   tparams: any;
+  docEnabled: boolean = true;
+  BRAND_BASE_INFO = BRAND_BASE_INFO
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private brandService: BrandService
@@ -32,7 +35,10 @@ export class CdsActionDescriptionComponent implements OnInit {
     this.tparams = brand;
    }
 
-  ngOnInit(): void {    
+  ngOnInit(): void { 
+    if(BRAND_BASE_INFO['DOCS'] === 'false' || !BRAND_BASE_INFO['DOCS']){
+      this.docEnabled = false
+    }
   }
 
   ngOnChanges(){

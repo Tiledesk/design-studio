@@ -79,7 +79,7 @@ export class CdsDashboardComponent implements OnInit {
   }
 
   checkForChangelogNotify(): boolean { 
-    if(!BRAND_BASE_INFO['DOCS']){
+    if(BRAND_BASE_INFO['DOCS'] === "false" || !BRAND_BASE_INFO['DOCS']){
       return false
     }
     let changelogKey = this.appStorageService.getItem("changelog")

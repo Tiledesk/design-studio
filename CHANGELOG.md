@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.4
+- bug-fixed: minor bug-fixed
+
 ### 1.2.0-rc.3
 - added: DOCS translator object
 
