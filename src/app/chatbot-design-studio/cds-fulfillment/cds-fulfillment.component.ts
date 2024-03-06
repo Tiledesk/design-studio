@@ -6,6 +6,7 @@ import { BrandService } from 'src/app/services/brand.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { BRAND_BASE_INFO } from '../utils-resources';
 
 @Component({
   selector: 'cds-fulfillment',
@@ -20,12 +21,14 @@ export class CdsFulfillmentComponent implements OnInit {
   //webhookUrl: string;
   tparams: any;
 
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
+  
   WEBHOOK_URL_IS_EMPTY: boolean;
   WEBHOOK_URL_HAS_ERROR: boolean;
   WEBHOOK_URL_IS_HTTPS: boolean;
   WEBHOOK_URL_IS_VALID: boolean;
   WEBHOOK_URL_IS_HTTP_or_HTTPS: boolean;
-  
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(

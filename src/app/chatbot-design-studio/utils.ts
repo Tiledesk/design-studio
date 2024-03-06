@@ -24,7 +24,8 @@ export enum SETTINGS_SECTION {
     DETAIL          = 'bot_detail',
     IMPORT_EXPORT   = 'import_export',
     COMMUNITY       = 'community',
-    DEVELOPER       = 'developer'
+    DEVELOPER       = 'developer',
+    ADVANCED        = 'advanced'
 }
 
 export enum EXTERNAL_URL {
@@ -132,7 +133,8 @@ export enum TYPE_ACTION {
     CAPTURE_USER_REPLY  = 'capture_user_reply',
     QAPLA               = "qapla",
     HUBSPOT             = 'hubspot',
-    CODE                = 'code'
+    CUSTOMERIO          = 'customerio',
+    CODE                = 'code',
 }
 
 export enum TYPE_ACTION_CATEGORY {
@@ -266,8 +268,8 @@ export const INTENT_ELEMENT = {
 }
 
 
-export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_CATEGORY, type: TYPE_ACTION, src: string, status: 'active' | 'inactive' | 'beta', plan?: PLAN_NAME, description?: string, disabled?: boolean}}= {
-    REPLY :                 { name: 'CDSActionList.NAME.Reply',                 category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.REPLY,                src:"assets/images/actions/reply.svg",                  status: "active" ,                      description: "CDSActionList.DESCRIPTION.Reply"                              },
+export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_CATEGORY, type: TYPE_ACTION, src: string, status: 'active' | 'inactive' | 'beta', plan?: PLAN_NAME, description?: string, doc?: string, disabled?: boolean}}= {
+    REPLY :                 { name: 'CDSActionList.NAME.Reply',                 category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.REPLY,                src:"assets/images/actions/reply.svg",                  status: "active" ,                      description: "CDSActionList.DESCRIPTION.Reply",              doc: "CDSActionList.DOCS.Reply"                 },
     RANDOM_REPLY :          { name: 'CDSActionList.NAME.RandomReply',           category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.RANDOM_REPLY,         src:"assets/images/actions/random_reply.svg",           status: "active",                       description: "CDSActionList.DESCRIPTION.RandomReply"                        },
     AGENT :                 { name: 'CDSActionList.NAME.AgentHandoff',          category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.AGENT,                src:"assets/images/actions/agent_handoff.svg",          status: "active",                       description: "CDSActionList.DESCRIPTION.AgentHandoff"                       },
     CLOSE :                 { name: 'CDSActionList.NAME.Close',                 category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.CLOSE,                src:"assets/images/actions/close.svg",                  status: "active",                       description: "CDSActionList.DESCRIPTION.Close"                              },
@@ -299,6 +301,8 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     QAPLA:                  { name: 'CDSActionList.NAME.Qapla',                 category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.QAPLA,                src: "assets/images/actions/qapla.svg",                 status: "active", plan: PLAN_NAME.E,    description: "CDSActionList.DESCRIPTION.Qapla",             disabled: false },
     MAKE :                  { name: 'CDSActionList.NAME.Make',                  category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.MAKE,                 src:"assets/images/actions/make.svg",                   status: "active", plan: PLAN_NAME.D,    description: '',                                            disabled: false },
     HUPSPOT :               { name: 'CDSActionList.NAME.Hubspot',               category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.HUBSPOT,              src:"assets/images/actions/hubspot.svg",                status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
+    CUSTOMERIO :            { name: 'CDSActionList.NAME.Customerio',            category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.CUSTOMERIO,           src:"assets/images/actions/customerio.svg",             status: "inactive", plan: PLAN_NAME.E,    description: ''                                                           },
+
 }
 
 export const EVENTS_LIST = {

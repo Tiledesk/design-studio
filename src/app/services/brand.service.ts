@@ -82,7 +82,8 @@ export class BrandService {
       COMPANY_SITE_NAME:"tiledesk.com",
       COMANY_SITE_URL:"https://www.tiledesk.com",
       CONTACT_US_EMAIL: "support@tiledesk.com",
-      COMPANY_PRIMARY_COLOR:""
+      COMPANY_PRIMARY_COLOR:"",
+      DOCS: true
     }
   }
 

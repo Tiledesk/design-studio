@@ -53,7 +53,7 @@
       "Continue": "Continua",
       "Type": "Tipo",
       "Messages": "Messaggi",
-      "ResolutionBotLanguage": "Lingua",
+      "ResolutionBotLanguage": "La lingua del chatbot",
       "ChangeChatbotLanguage": "Cambia la lingua del chatbot",
       "BeAwereToTranslate": "Tieni presente che devi tradurre le tue frasi di allenamento in modo che corrispondano alla nuova lingua per ottenere il massimo in termini di\n ",
       "TheChatbotTrainingWillRestart": "La formazione del chatbot verrà riavviata. "

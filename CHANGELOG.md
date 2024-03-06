@@ -5,6 +5,8 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.1.1 in PROD
+
 ### 1.1.0 in PROD
 
 ### 1.1.0-rc2
