@@ -203,6 +203,7 @@ import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/context-menu/context-menu.component';
 import { MaterialModule } from '../shared/material.module';
 import { AdvancedComponent } from './cds-chatbot-details/advanced/advanced.component';
+import { HeightSliderComponent } from './cds-dashboard/cds-canvas/base-elements/height-slider/height-slider.component';
 
 @NgModule({
   declarations: [
@@ -374,7 +375,8 @@ import { AdvancedComponent } from './cds-chatbot-details/advanced/advanced.compo
     GetVariableNamePipe,
     ContextMenuComponent,
     CdsSupportComponent,
-    AdvancedComponent
+    AdvancedComponent,
+    HeightSliderComponent
 
   ],
   imports: [

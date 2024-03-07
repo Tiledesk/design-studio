@@ -61,6 +61,10 @@ export class CdsActionReplyFrameComponent implements OnInit {
     this.canShowFilter = !opened;
   }
 
+  onClickHeightIframe(opened: boolean){
+    this.canShowFilter = !opened;
+  }
+
 
   /** onChangeDelayTime */
   onChangeDelayTime(value:number){
@@ -112,6 +116,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
 
   /** */
   onLoadPathElement(){
+    this.response.metadata.height = '1000px';
     this.changeActionReply.emit();
   }
 

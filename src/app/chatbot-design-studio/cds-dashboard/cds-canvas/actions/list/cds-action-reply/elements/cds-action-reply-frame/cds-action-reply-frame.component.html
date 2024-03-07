@@ -37,6 +37,15 @@
             (onChangeExpression)="onChangeExpression($event)">
         </appdashboard-filter>
     </div>
+
+    <div class="height-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+        <cds-height-slider
+            [heightIframe]="heightIframe"
+            (changeHeightIframe)="onChangeHeightIframe($event)"
+            (clickHeightIframe)="onClickHeightIframe($event)">
+        </cds-height-slider>
+    </div>
+
 </div>
 
 <div class="previewMode text-editor-wrapper" *ngIf="previewMode">

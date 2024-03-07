@@ -275,8 +275,8 @@ export class CdsActionReplyComponent implements OnInit {
 
   /** onChangingReplyAction */
   onChangeActionReply(event) {
-    // this.logger.log('onChangeActionReply ************', event);
     const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+    this.logger.log('onChangeActionReply ************', element);
     this.onUpdateAndSaveAction(element);
   }
   
