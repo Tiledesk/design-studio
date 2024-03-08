@@ -5,6 +5,12 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.5
+- added:  height on the iframe
+- change: copy and paste, change action id when you paste
+- change: change the cursor to + when the mouse is on the edge of the dot
+- bug-fixed: connectors disappear when you do action d&d.
+
 ### 1.2.0-rc.4
 - bug-fixed: minor bug-fixed
 
@@ -15,7 +21,6 @@
 - added: cds-action-customerio
 - added: customAttributes for support widget to identify current logged user plan
 - removed: assignResultTo from cds-action-customerio and cds-action-hubspot
-
 
 ### 1.2.0-rc.1
 - added: ability to copy/paste an action/block
