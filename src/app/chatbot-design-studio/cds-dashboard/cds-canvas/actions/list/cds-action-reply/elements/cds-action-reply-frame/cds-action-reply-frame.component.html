@@ -38,7 +38,7 @@
         </appdashboard-filter>
     </div>
 
-    <div class="height-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+    <div class="height-wrapper" [ngStyle]="{width: canShowHeight? 'auto': '100%'}">
         <cds-height-slider
             [heightIframe]="heightIframe"
             (changeHeightIframe)="onChangeHeightIframe($event)"

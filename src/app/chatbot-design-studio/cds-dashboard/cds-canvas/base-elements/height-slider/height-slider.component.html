@@ -3,12 +3,12 @@
     (focusout)="onFocusOut()"
     [ngClass]="{'open': open}">
     <em class="delay-button material-icons" (click)="onClick()">height</em>
-    <!-- <div class="delay-current" (click)="onClick()">{{heightIframe}}px</div>  disabled -->
     <input class="delay-current input-height" 
     [(ngModel)]="heightIframe"
-    type="number" 
-    (click)="onClick()"
-    ><span class="suffiss">px</span>
+    type="text"
+    (blur)="onBlurHeight($event)"
+    (ngModelChange)="onChangeHeight($event)"
+    ><span class="suffiss delay-current">px</span>
     <div class="delay-slider" *ngIf="open">
         <div class="delay-range">{{min}}px</div> 
         <div class="vue-slider">

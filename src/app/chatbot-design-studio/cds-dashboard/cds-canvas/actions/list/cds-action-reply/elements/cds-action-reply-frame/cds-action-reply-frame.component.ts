@@ -32,6 +32,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
   // Delay //
   delayTime: number;
   // Filter // 
+  canShowHeight: boolean = true;
   canShowFilter: boolean = true;
   filterConditionExist: boolean = false;
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
@@ -62,7 +63,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
   }
 
   onClickHeightIframe(opened: boolean){
-    this.canShowFilter = !opened;
+    this.canShowHeight = !this.canShowHeight;
   }
 
 
@@ -116,8 +117,16 @@ export class CdsActionReplyFrameComponent implements OnInit {
 
   /** */
   onLoadPathElement(){
-    this.response.metadata.height = '1000px';
+    //this.response.metadata.height = '1000px';
     this.changeActionReply.emit();
   }
+
+  /** */
+  onChangeHeightIframe(height){
+    this.canShowFilter = false;
+    this.response.metadata.height = height+'px';
+    this.changeActionReply.emit();
+  }
+  
 
 }

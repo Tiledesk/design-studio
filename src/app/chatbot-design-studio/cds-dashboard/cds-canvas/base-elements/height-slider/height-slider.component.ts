@@ -67,4 +67,16 @@ export class HeightSliderComponent implements OnInit {
     this.clickHeightIframe.emit(this.open);
   }
 
+
+  onChangeHeight(event){
+    if (isNaN(event)) {
+      this.heightIframe = 0;
+    }
+  }
+
+  onBlurHeight(event){
+    this.changeHeightIframe.emit(this.heightIframe);
+  }
+
+
 }
