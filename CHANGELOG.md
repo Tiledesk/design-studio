@@ -5,6 +5,12 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.4
+- bug-fixed: minor bug-fixed
+
+### 1.2.0-rc.3
+- added: DOCS translator object
+
 ### 1.2.0-rc.2
 - added: cds-action-customerio
 - added: customAttributes for support widget to identify current logged user plan

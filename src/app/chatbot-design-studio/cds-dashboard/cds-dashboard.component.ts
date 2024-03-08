@@ -27,6 +27,7 @@ import { FaqService } from 'src/app/services/faq.service';
 import { Subject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { environment } from 'src/environments/environment';
+import { BRAND_BASE_INFO } from '../utils-resources';
 
 
 @Component({
@@ -51,7 +52,8 @@ export class CdsDashboardComponent implements OnInit {
   activeDetailSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
   isBetaUrl: boolean = false;
   showChangelog: boolean = false;
-
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
+  
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private route: ActivatedRoute,
@@ -76,7 +78,10 @@ export class CdsDashboardComponent implements OnInit {
     this.hideShowWidget('hide');
   }
 
-  checkForChangelogNotify(): boolean {
+  checkForChangelogNotify(): boolean { 
+    if(BRAND_BASE_INFO['DOCS'] === "false" || !BRAND_BASE_INFO['DOCS']){
+      return false
+    }
     let changelogKey = this.appStorageService.getItem("changelog")
     if(!changelogKey){
       return true
