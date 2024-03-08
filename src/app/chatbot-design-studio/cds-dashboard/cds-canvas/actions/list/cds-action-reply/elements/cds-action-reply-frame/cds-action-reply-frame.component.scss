@@ -1,6 +1,16 @@
 @import "./src/assets/sass/cds/_variables.scss";
 $max-height: 230px;
 
+.extensions-response{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.delay-wrapper, .height-wrapper {
+    height: 32px; 
+}
+
 :host{
     --base-margin: #{var(--input-base-margin)};
 }

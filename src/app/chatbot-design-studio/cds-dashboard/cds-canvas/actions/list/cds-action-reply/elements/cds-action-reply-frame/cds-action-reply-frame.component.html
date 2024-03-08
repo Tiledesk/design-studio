@@ -16,19 +16,29 @@
         </div>
     </div>
 
-    <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+    <div *ngIf="!isOpenHeightSlider" class="delay-wrapper" [ngStyle]="{width: isOpenDelaySlider? '100%' : 'auto'}">
         <appdashboard-delay-slider
             [delayTime]="delayTime"
             (changeDelayTime)="onChangeDelayTime($event)"
             (clickDelayTime)="onClickDelayTime($event)">
         </appdashboard-delay-slider>
     </div>
+        
+    <div *ngIf="!isOpenDelaySlider" class="height-wrapper" [ngStyle]="{width: isOpenHeightSlider? '100%' : 'auto'}">
+        <cds-height-slider
+            [heightIframe]="heightIframe"
+            (changeHeightIframe)="onChangeHeightIframe($event)"
+            (clickHeightIframe)="onClickHeightIframe($event)">
+        </cds-height-slider>
+    </div>
+
    <!-- ||  -->
-   <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
+   <div *ngIf="!isOpenDelaySlider && !isOpenHeightSlider && canShowFilter && filterConditionExist" class="add-filter-btn-wrp">
         <span class="material-icons-outlined">filter_alt</span>
         {{'CDSCanvas.Filter' | translate }}
     </div>
-    <div class="filter-wrapper" *ngIf="canShowFilter"
+
+    <div class="filter-wrapper"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
         <appdashboard-filter
             [expression]="response._tdJSONCondition"
@@ -38,13 +48,7 @@
         </appdashboard-filter>
     </div>
 
-    <div class="height-wrapper" [ngStyle]="{width: canShowHeight? 'auto': '100%'}">
-        <cds-height-slider
-            [heightIframe]="heightIframe"
-            (changeHeightIframe)="onChangeHeightIframe($event)"
-            (clickHeightIframe)="onClickHeightIframe($event)">
-        </cds-height-slider>
-    </div>
+
 
 </div>
 

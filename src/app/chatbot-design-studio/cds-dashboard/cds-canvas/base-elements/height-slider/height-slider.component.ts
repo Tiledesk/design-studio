@@ -22,7 +22,7 @@ export class HeightSliderComponent implements OnInit {
   ngOnInit(): void {
     this.open = false;
     this.focusSlider = true;
-    if(!this.heightIframe) this.heightIframe = 80;
+    if(!this.heightIframe) this.heightIframe = 100;
   }
 
 
@@ -38,8 +38,10 @@ export class HeightSliderComponent implements OnInit {
   }
 
   onValueChange(){
-    this.closeDelaySlider()
-    this.changeHeightIframe.emit(this.heightIframe);
+    this.open = false;
+    this.closeDelaySlider();
+    //this.changeHeightIframe.emit(this.heightIframe);
+    this.saveHeight();
   }
 
   onFocusOut(){
@@ -75,8 +77,18 @@ export class HeightSliderComponent implements OnInit {
   }
 
   onBlurHeight(event){
-    this.changeHeightIframe.emit(this.heightIframe);
+    this.saveHeight();
   }
 
+
+  saveHeight(){
+    if(this.heightIframe < 10){
+      this.heightIframe = 10;
+    } 
+    if(this.heightIframe > 999){
+      this.heightIframe = 999;
+    }
+    this.changeHeightIframe.emit(this.heightIframe);
+  }
 
 }
