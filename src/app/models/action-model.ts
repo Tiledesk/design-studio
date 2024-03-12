@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { TYPE_ACTION, TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_METHOD_REQUEST, TYPE_OPERATOR } from '../chatbot-design-studio/utils';
+import { TYPE_ACTION, TYPE_ACTION_VXML, TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_METHOD_REQUEST, TYPE_OPERATOR } from '../chatbot-design-studio/utils';
 
 export class Action {
     _tdActionType: string;
@@ -369,9 +369,11 @@ export class Attributes {
         }
     }
 }
+
 export class Command {
     type: string;
     message?: Message;
+    settings?: Setting;
     time?: number;
     constructor(type: string) {
         this.type = type;
@@ -399,6 +401,12 @@ export class Message {
         if(_tdJSONCondition)
             this._tdJSONCondition = _tdJSONCondition
     }
+}
+
+export class Setting {
+    maxDigits?: number;
+    terminators?: string;
+    transferTo?: string;
 }
 
 export class MessageWithWait extends Message {
@@ -592,5 +600,19 @@ export class ActionCustomerio extends Action {
         this.assignStatusTo = '';
         this.assignErrorTo = '';
         this._tdActionType = TYPE_ACTION.CUSTOMERIO;
+    }
+}
+
+export class ActionVoice extends Action {
+    text?: string;
+    attributes: Attributes;
+    constructor(type: TYPE_ACTION_VXML, text?: string, attributes?: Attributes) {
+        super();
+        // this.text = text ? text : '...';
+        this._tdActionType = type;
+        this.attributes = new Attributes();
+        if (attributes){
+            this.attributes = attributes;
+        }
     }
 }

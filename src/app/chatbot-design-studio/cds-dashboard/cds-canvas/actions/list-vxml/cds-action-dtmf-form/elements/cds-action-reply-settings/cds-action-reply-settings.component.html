@@ -1,0 +1,70 @@
+
+<div *ngIf="previewMode" class="text-editor-wrapper previewMode">
+    
+    <div class="set-attribute-label-and-value-wpr"  *ngIf="response.hasOwnProperty('maxDigits')">
+        <div class="set-attribute-label"> {{'CDSCanvas.MaxDigits' | translate }} </div>
+        <div class="response-wrp" [class.no-text]="!response.maxDigits">{{response.maxDigits}}</div>
+    </div>
+
+    <div class="set-attribute-label-and-value-wpr"  *ngIf="response.hasOwnProperty('terminators')">
+        <div class="set-attribute-label"> {{'CDSCanvas.Terminators' | translate }} </div>
+        <div class="response-wrp" [class.no-text]="!response.terminators">{{response.terminators}}</div>
+    </div>
+
+    <div class="set-attribute-label-and-value-wpr"  *ngIf="response.hasOwnProperty('transferTo')">
+        <div class="set-attribute-label"> {{'CDSCanvas.TransferTo' | translate }} </div>
+        <div class="response-wrp" [class.no-text]="!response.transferTo">{{response.transferTo}}</div>
+    </div>
+    
+</div> 
+
+
+<div  *ngIf="!previewMode" class="setting-wrapper">
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('maxDigits')">
+        <label class="title-label">{{'CDSCanvas.MaxDigits' | translate}}</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.maxDigits"
+            [minRow]="1" [maxRow]="1" [limitCharsText]="1"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'maxDigits')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('terminators')">
+        <label class="title-label">{{'CDSCanvas.Terminators' | translate}}</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.terminators"
+            [minRow]="1" [maxRow]="1" [limitCharsText]="1"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'terminators')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('transferTo')" style="width: 100%;">
+        <label class="title-label">{{'CDSCanvas.TransferTo' | translate}}</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.transferTo"
+            [minRow]="1" [maxRow]="1" 
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'transferTo')">
+        </cds-textarea>
+    </div>
+
+</div> 
+

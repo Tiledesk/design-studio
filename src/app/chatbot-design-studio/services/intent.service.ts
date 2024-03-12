@@ -3,11 +3,11 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
+import { TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_ACTION, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL, TYPE_ACTION_VXML } from '../utils';
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
@@ -781,7 +781,7 @@ export class IntentService {
    * @param typeAction 
    * @returns 
    */
-  public createNewAction(typeAction: TYPE_ACTION) {
+  public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML) {
     // this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
     let action: any;
 
@@ -918,6 +918,34 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.CODE){
       action = new ActionCode();
+    }
+    if(typeAction === TYPE_ACTION_VXML.DTMF_FORM){
+      action = new ActionVoice(TYPE_ACTION_VXML.DTMF_FORM);
+      let commandWait = new Wait();
+      action.attributes.commands.push(commandWait);
+      let command = new Command(TYPE_COMMAND.MESSAGE);
+      command.message = new Message('text', 'A chat message will be sent to the visitor');
+      action.attributes.commands.push(command);
+      let commandWait2 = new Wait();
+      commandWait2.time = 0
+      action.attributes.commands.push(commandWait2);
+      let command_form = new Command(TYPE_COMMAND.SETTINGS);
+      command_form.settings = { maxDigits: null, terminators: '#'}
+      action.attributes.commands.push(command_form);
+    }
+    if(typeAction === TYPE_ACTION_VXML.BLIND_TRANSFER){
+      action = new ActionVoice(TYPE_ACTION_VXML.BLIND_TRANSFER);
+      let commandWait = new Wait();
+      action.attributes.commands.push(commandWait);
+      let command = new Command(TYPE_COMMAND.MESSAGE);
+      command.message = new Message('text', 'A chat message will be sent to the visitor');
+      action.attributes.commands.push(command);
+      let commandWait2 = new Wait();
+      commandWait2.time = 0
+      action.attributes.commands.push(commandWait2);
+      let command_form = new Command(TYPE_COMMAND.SETTINGS);
+      command_form.settings = { transferTo: ''}
+      action.attributes.commands.push(command_form);
     }
     return action;
   }

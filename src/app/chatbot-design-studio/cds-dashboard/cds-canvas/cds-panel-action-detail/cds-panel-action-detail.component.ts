@@ -1,3 +1,4 @@
+import { TYPE_ACTION_VXML } from './../../../utils';
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, TemplateRef, ViewContainerRef, HostListener } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ConnectorService } from '../../../services/connector.service';
@@ -30,7 +31,8 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   intentSelected: Intent;
 
   typeIntentElement = TYPE_INTENT_ELEMENT;
-  typeAction = TYPE_ACTION;
+  TYPE_ACTION = TYPE_ACTION;
+  TYPE_ACTION_VXML = TYPE_ACTION_VXML
   
   elementSelected: any;
   // elementSelectedIndex: number;

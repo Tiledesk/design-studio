@@ -89,8 +89,9 @@ export enum TYPE_URL {
 }
 
 export enum TYPE_COMMAND {
-    WAIT    = 'wait',
-    MESSAGE = 'message',
+    WAIT        = 'wait',
+    MESSAGE     = 'message',
+    SETTINGS   = 'settings'
 }
 
 export enum TYPE_MESSAGE {
@@ -137,12 +138,18 @@ export enum TYPE_ACTION {
     CODE                = 'code',
 }
 
+export enum TYPE_ACTION_VXML {
+    DTMF_FORM           = 'dtmf-form',
+    BLIND_TRANSFER      = 'blind_transfer'
+}
+
 export enum TYPE_ACTION_CATEGORY {
     MOST_USED       = 'Most Used',
     FLOW            = 'Flow',
     INTEGRATIONS    = 'Integrations',
     SPECIAL         = 'Special',
-    NEW             = 'New'
+    NEW             = 'New',
+    VOICE           = 'Voice'
 }
 
 export enum TYPE_EVENT_CATEGORY {
@@ -155,6 +162,7 @@ export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY),         name: 'CDSActionCategory.Flow',         src: 'assets/images/actions_category/flow.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
 ]
 
@@ -268,7 +276,7 @@ export const INTENT_ELEMENT = {
 }
 
 
-export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_CATEGORY, type: TYPE_ACTION, src: string, status: 'active' | 'inactive' | 'beta', plan?: PLAN_NAME, description?: string, doc?: string, disabled?: boolean}}= {
+export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_CATEGORY, type: TYPE_ACTION | TYPE_ACTION_VXML, src: string, status: 'active' | 'inactive' | 'beta', plan?: PLAN_NAME, description?: string, doc?: string, disabled?: boolean}}= {
     REPLY :                 { name: 'CDSActionList.NAME.Reply',                 category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.REPLY,                src:"assets/images/actions/reply.svg",                  status: "active" ,                      description: "CDSActionList.DESCRIPTION.Reply",              doc: "CDSActionList.DOCS.Reply"                 },
     RANDOM_REPLY :          { name: 'CDSActionList.NAME.RandomReply',           category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.RANDOM_REPLY,         src:"assets/images/actions/random_reply.svg",           status: "active",                       description: "CDSActionList.DESCRIPTION.RandomReply"                        },
     AGENT :                 { name: 'CDSActionList.NAME.AgentHandoff',          category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.AGENT,                src:"assets/images/actions/agent_handoff.svg",          status: "active",                       description: "CDSActionList.DESCRIPTION.AgentHandoff"                       },
@@ -302,6 +310,9 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     MAKE :                  { name: 'CDSActionList.NAME.Make',                  category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.MAKE,                 src:"assets/images/actions/make.svg",                   status: "active", plan: PLAN_NAME.D,    description: '',                                            disabled: false },
     HUPSPOT :               { name: 'CDSActionList.NAME.Hubspot',               category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.HUBSPOT,              src:"assets/images/actions/hubspot.svg",                status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
     CUSTOMERIO :            { name: 'CDSActionList.NAME.Customerio',            category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.CUSTOMERIO,           src:"assets/images/actions/customerio.svg",             status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
+
+    DFTM_FORM:              { name: 'CDSActionList.NAME.DTMFForm',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
+    BLIND_TRANSFER:         { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
 
 }
 

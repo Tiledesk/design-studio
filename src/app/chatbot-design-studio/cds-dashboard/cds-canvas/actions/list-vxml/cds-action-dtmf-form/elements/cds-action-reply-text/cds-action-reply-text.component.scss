@@ -1,0 +1,64 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+
+.previewMode{
+    &.buttons-response{
+        padding: 0px 0px 0px 0px;
+        margin: 0;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: center;
+        .button-reply-add{
+            color: var(--blu-light-02);
+            border-color: var(--blu-light-02);
+        }
+    }
+
+}
+
+/* ./ Preview mode 
+/* ****************************** */
+
+
+.editor-utils {
+    position: relative;
+    margin: -20px 50px 0px 0px;
+    float: right;
+    .num-chars {
+        background: var(--blu-light-01);
+        flex-shrink: 0;
+        padding: 0px 8px;
+        border-radius: 10px;
+        font-size: 0.8em;
+        color: var(--blu);
+        float: right;
+        line-height: 24px;
+        font-weight: 700;
+        // width: 40px;
+        text-align: center;
+        &.error {
+            background: var(--color-red-hex);
+            color: var(--color-white-hex);
+            }
+    }
+    .text-editor-insert-attribute {
+        float: right;
+    }
+    .moji-picker {
+        float: right;
+    }
+}
+
+
+/** box-textarea **/
+cds-textarea.text-editable-div ::ng-deep{
+    display: block;
+    margin-left: 30px;
+    margin-right: 30px;
+    // width: calc(100% - 66px);
+    textarea {
+        line-height: 20px !important; 
+        width: calc(100% - 20px) !important;
+        font-size: 0.9em !important;
+    }
+}

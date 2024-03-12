@@ -1,0 +1,95 @@
+<div class="extensions-response" *ngIf="!previewMode" >
+    
+    <div class="text-editor-drop">
+        <em class="material-icons">drag_indicator</em>
+    </div>
+
+    <div class="response-controls">
+        <div class="control-button delete" (click)="$event.stopPropagation();onDeleteActionReply()">
+            <em class="material-icons">delete</em>
+        </div>
+        <div class="control-button" (click)="$event.stopPropagation();onMoveUpResponse()">
+            <em class="material-icons">expand_less</em>
+        </div> 
+        <div class="control-button" (click)="$event.stopPropagation();onMoveDownResponse()">
+            <em class="material-icons">expand_more</em>
+        </div>
+    </div>
+    
+    <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+        <appdashboard-delay-slider
+            [delayTime]="delayTime"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-slider>
+    </div>
+    
+    <!-- ||  -->
+    <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
+        <span class="material-icons-outlined">filter_alt</span>
+        {{'CDSCanvas.Filter' | translate }}
+    </div>
+    <div class="filter-wrapper" *ngIf="canShowFilter"
+        [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
+        <appdashboard-filter
+            [expression]="response._tdJSONCondition"
+            [booleanOperators]="booleanOperators"
+            [previewMode]="previewMode"
+            (onChangeExpression)="onChangeExpression($event)">
+        </appdashboard-filter>
+    </div>
+</div>
+
+<div *ngIf="previewMode" class="text-editor-wrapper previewMode">
+    <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
+    <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate }}</div>
+</div> 
+
+
+<div  *ngIf="!previewMode" class="text-editor-wrapper">
+
+    <cds-textarea 
+        class="text-editable-div"
+        [text]="response.text" 
+        [minRow]="1"
+        popoverVerticalAlign="above"
+        (changeTextarea)="onChangeTextarea($event)"
+        (blur)="onBlur($event)"
+        (selectedAttribute)="onSelectedAttribute($event)">
+    </cds-textarea>    
+
+</div> 
+
+
+
+<div class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
+    
+    <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies" cdkDrag > 
+        
+        <!-- DRAG PLACEHOLDER -->
+        <cds-action-reply-button class="custom-placeholder" *cdkDragPlaceholder
+            [button]="button"
+            [previewMode]="previewMode">
+        </cds-action-reply-button>
+        
+        <cds-action-reply-button [class.connected]='button.__isConnected' cdkDragHandle
+            (click)="$event.stopPropagation(); onOpenButtonPanel(button)"
+            [button]="button"
+            [previewMode]="previewMode"
+            (onButtonControl)="onButtonControl($event, i)">
+        </cds-action-reply-button>
+
+        <cds-connector *ngIf="previewMode && button.type !== TYPE_BUTTON.URL"
+            class="button-connector"
+            cdkDragDisabled
+            [idConnector]="button.__idConnector"
+            [idConnection] = "button.__idConnection"
+            [isConnected]="button.__isConnected">
+        </cds-connector>
+
+    </div>
+
+    <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', index)">
+    + {{'CDSCanvas.AddButton' | translate }}
+    </div>
+</div>
