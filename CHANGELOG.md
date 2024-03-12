@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.6
+- added: brand name to header 
+- bug-fixed: if condition is changed in action-json-condition or filter, submit button is disabled
+- bug-fixed: if chatbot is associated with a dept and ther's depts with no chatbot associated with, do not show select with depts with no chatbot associated with
+
 ### 1.2.0-rc.5
 - added:  height on the iframe
 - change: copy and paste, change action id when you paste
