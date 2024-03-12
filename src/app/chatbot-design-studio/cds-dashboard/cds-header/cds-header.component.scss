@@ -73,9 +73,14 @@
         cursor: pointer;
         position: relative;
 
+        
         .cds-text{
             font-weight: 700;
             color: var(--base-brand-color);
+
+            &.title{
+                font-weight: 200;
+            }
         }
     }
     .toggle-setting-sidebar-icon-wpr {
