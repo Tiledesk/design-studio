@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angu
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
-import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/models/action-model';
+import { Message, Wait, Button, MessageAttributes, Expression, Setting } from 'src/app/models/action-model';
 import { TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../../utils';
 import { IntentService } from '../../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../../services/connector.service';
@@ -23,7 +23,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
   @Output() changeActionReply = new EventEmitter();
 
   @Input() idAction: string;
-  @Input() response: Message;
+  @Input() response: Setting;
   @Input() wait: Wait;
   @Input() index: number;
   @Input() previewMode: boolean = true;
@@ -70,10 +70,15 @@ export class CdsActionReplySettingsComponent implements OnInit {
   }
 
   onBlur(event){
-    this.logger.log('[ACTION REPLY SETTINGS] onBlur', event.target.value, this.response.text);
+    this.logger.log('[ACTION REPLY SETTINGS] onBlur', event.target.value, this.response);
     // if(event.target.value !== this.response.text){
       this.changeActionReply.emit();
     // }
+  }
+
+  onChangeToggle(event){
+    this.response.bargein = event
+    this.changeActionReply.emit();
   }
 
   onSelectedAttribute(variableSelected: {name: string, value: string}){

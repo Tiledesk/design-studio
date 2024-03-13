@@ -139,7 +139,7 @@ export enum TYPE_ACTION {
 }
 
 export enum TYPE_ACTION_VXML {
-    DTMF_FORM           = 'dtmf-form',
+    DTMF_FORM           = 'dtmf_form',
     BLIND_TRANSFER      = 'blind_transfer'
 }
 

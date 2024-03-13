@@ -404,9 +404,12 @@ export class Message {
 }
 
 export class Setting {
+    minDigits?: number;
     maxDigits?: number;
     terminators?: string;
     transferTo?: string;
+    timeout?: number;
+    bargein?: boolean = true;
 }
 
 export class MessageWithWait extends Message {

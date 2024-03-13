@@ -930,7 +930,7 @@ export class IntentService {
       commandWait2.time = 0
       action.attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { maxDigits: null, terminators: '#'}
+      command_form.settings = { minDigits: null, maxDigits: null, terminators: '#', timeout: 15, bargein: true}
       action.attributes.commands.push(command_form);
     }
     if(typeAction === TYPE_ACTION_VXML.BLIND_TRANSFER){

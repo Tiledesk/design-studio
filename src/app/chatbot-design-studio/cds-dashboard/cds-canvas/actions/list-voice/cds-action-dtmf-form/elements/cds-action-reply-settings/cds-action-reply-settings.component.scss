@@ -21,6 +21,10 @@
     .response-wrp{
         width: calc(100% - 150px);
         margin: unset;
+
+        &.expand{
+            width: calc(100% - 80px);
+        }
     }
     .no-text{
         border-color: var(--empty-element-property);
@@ -61,10 +65,16 @@
     }
 }
 .setting-wrapper{
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     padding: 0 var(--input-base-margin);
     justify-content: space-between;
     gap: 5px;
+
+    // this will target the last flashcard but only if there are an odd number of cards
+    & > *:nth-child(odd):last-child { 
+        grid-column: span 2;
+    }
 }
 
 

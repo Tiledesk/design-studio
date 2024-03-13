@@ -54,8 +54,12 @@ import { ActionComponent } from './cds-rules/rules-add/action/action.component';
 
 //SETTINGS COMPONENT
 import { CdsChatbotDetailsComponent } from './cds-chatbot-details/cds-chatbot-details.component';
+import { CDSDetailBotDetailComponent } from './cds-chatbot-details/detail/detail.component';
 import { CDSDetailCommunityComponent } from './cds-chatbot-details/community/community.component';
 import { CDSDetailDeveloperComponent } from './cds-chatbot-details/developer/developer.component';
+import { CDSDetailImportExportComponent } from './cds-chatbot-details/import-export/import-export.component';
+import { CDSAdvancedComponent } from './cds-chatbot-details/advanced/advanced.component';
+
 
 //CDS CANVAS
 import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.component';
@@ -93,8 +97,8 @@ import { DialogYesNoComponent } from './cds-base-element/dialog-yes-no/dialog-ye
 import { CDSFilterComponent } from './cds-base-element/filter/filter.component';
 import { CDSMenuComponent } from './cds-base-element/menu/menu.component';
 import { CDSRadioButtonComponent } from './cds-base-element/radio-button/radio-button.component';
-import { CDSDetailBotDetailComponent } from './cds-chatbot-details/detail/detail.component';
-import { CDSDetailImportExportComponent } from './cds-chatbot-details/import-export/import-export.component';
+import { CDSToogleComponent } from './cds-base-element/toogle/toogle.component';
+
 import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service';
 
 
@@ -135,8 +139,8 @@ import { AddkbDialogComponent } from './cds-dashboard/cds-canvas/actions/list/cd
 import { AttributesDialogComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
 
 //ACTION DTMF_FORM: elements
-import { CdsActionReplyToolsVoiceComponent } from './cds-dashboard/cds-canvas/actions/list-vxml/cds-action-dtmf-form/elements/cds-action-reply-tools-voice/cds-action-reply-tools-voice.component';
-import { CdsActionReplySettingsComponent } from './cds-dashboard/cds-canvas/actions/list-vxml/cds-action-dtmf-form/elements/cds-action-reply-settings/cds-action-reply-settings.component';
+import { CdsActionReplyToolsVoiceComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/elements/cds-action-reply-tools-voice/cds-action-reply-tools-voice.component';
+import { CdsActionReplySettingsComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/elements/cds-action-reply-settings/cds-action-reply-settings.component';
 
 //CDS- ACTIONS
 import { CdsActionDescriptionComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-description/cds-action-description.component';
@@ -172,7 +176,7 @@ import { CdsActionAskgptV2Component } from './cds-dashboard/cds-canvas/actions/l
 import { CdsActionCustomerioComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-customerio/cds-action-customerio.component';
 
 //CDS- ACTIONS VOICE
-import { CdsActionDTMFFormComponent } from './cds-dashboard/cds-canvas/actions/list-vxml/cds-action-dtmf-form/cds-action-dtmf-form.component';
+import { CdsActionDTMFFormComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/cds-action-dtmf-form.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
@@ -208,7 +212,7 @@ import { ChangelogComponent } from '../modals/changelog/changelog.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/context-menu/context-menu.component';
 import { MaterialModule } from '../shared/material.module';
-import { AdvancedComponent } from './cds-chatbot-details/advanced/advanced.component';
+
 
 @NgModule({
   declarations: [
@@ -229,6 +233,7 @@ import { AdvancedComponent } from './cds-chatbot-details/advanced/advanced.compo
     CDSFilterComponent,
     CDSMenuComponent,
     CDSRadioButtonComponent,
+    CDSToogleComponent,
     SelectComponent,
     TextEditableDivComponent,
 
@@ -362,6 +367,7 @@ import { AdvancedComponent } from './cds-chatbot-details/advanced/advanced.compo
     CDSDetailImportExportComponent,
     CDSDetailCommunityComponent,
     CDSDetailDeveloperComponent,
+    CDSAdvancedComponent,
     // ******* CDS CHATBOT DETAIL:: end *******
 
     // ******* CDS GLOBALS:: start *******
@@ -389,7 +395,7 @@ import { AdvancedComponent } from './cds-chatbot-details/advanced/advanced.compo
     GetVariableNamePipe,
     ContextMenuComponent,
     CdsSupportComponent,
-    AdvancedComponent,
+    
     
 
   ],

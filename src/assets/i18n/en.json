@@ -396,9 +396,12 @@
         "EmailBody":"Email body",
         "CustomerioFormId":"Customer.io Form Id",
         "EntercustomerioFormId":"Enter Customer.io Form Id",
+        "MinDigits": "Min digits",
         "MaxDigits": "Max digits",
-        "Terminators":"Terminators",
-        "TransferTo": "Transfer to"
+        "Terminator":"Terminator",
+        "Timeout": "Timeout",
+        "TransferTo": "Transfer to",
+        "BargeIn":"Barge-in"
     },
     "Name":"Name",
     "Label": "Label",
