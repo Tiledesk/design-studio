@@ -54,8 +54,12 @@ import { ActionComponent } from './cds-rules/rules-add/action/action.component';
 
 //SETTINGS COMPONENT
 import { CdsChatbotDetailsComponent } from './cds-chatbot-details/cds-chatbot-details.component';
+import { CDSDetailBotDetailComponent } from './cds-chatbot-details/detail/detail.component';
 import { CDSDetailCommunityComponent } from './cds-chatbot-details/community/community.component';
 import { CDSDetailDeveloperComponent } from './cds-chatbot-details/developer/developer.component';
+import { CDSDetailImportExportComponent } from './cds-chatbot-details/import-export/import-export.component';
+import { CDSAdvancedComponent } from './cds-chatbot-details/advanced/advanced.component';
+
 
 //CDS CANVAS
 import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.component';
@@ -74,7 +78,8 @@ import { CDSTextareaComponent } from './cds-dashboard/cds-canvas/base-elements/t
 import { CDSDelaySliderComponent } from './cds-dashboard/cds-canvas/base-elements/delay-slider/delay-slider.component';
 import { CDSImageUploadComponent } from './cds-dashboard/cds-canvas/base-elements/image-upload/image-upload.component';
 import { CDSElementFromUrlComponent } from './cds-dashboard/cds-canvas/base-elements/element-from-url/element-from-url.component';
-
+import { HeightSliderComponent } from './cds-dashboard/cds-canvas/base-elements/height-slider/height-slider.component';
+import { CdsConnectorComponent } from './cds-dashboard/cds-canvas/base-elements/cds-connector/cds-connector.component';
 
 
 //INTENT
@@ -92,10 +97,9 @@ import { DialogYesNoComponent } from './cds-base-element/dialog-yes-no/dialog-ye
 import { CDSFilterComponent } from './cds-base-element/filter/filter.component';
 import { CDSMenuComponent } from './cds-base-element/menu/menu.component';
 import { CDSRadioButtonComponent } from './cds-base-element/radio-button/radio-button.component';
-import { CDSDetailBotDetailComponent } from './cds-chatbot-details/detail/detail.component';
-import { CDSDetailImportExportComponent } from './cds-chatbot-details/import-export/import-export.component';
-import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service';
+import { CDSToogleComponent } from './cds-base-element/toogle/toogle.component';
 
+import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service';
 
 
 import { CdsPopupComponent } from './cds-dashboard/utils/cds-popup/cds-popup.component';
@@ -103,7 +107,6 @@ import { CdsPanelElementsComponent } from './cds-dashboard/cds-canvas/cds-panel-
 import { CdsPanelActionsComponent } from './cds-dashboard/cds-canvas/cds-panel-elements/cds-panel-actions/cds-panel-actions.component';
 import { CdsPanelIntentListComponent } from './cds-dashboard/cds-canvas/cds-panel-intent-list/cds-panel-intent-list.component';
 
-import { CdsConnectorComponent } from './cds-dashboard/cds-canvas/base-elements/cds-connector/cds-connector.component';
 
 //ACTION REPLY: elements
 import { CdsActionReplyToolsComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-reply/elements/cds-action-reply-tools/cds-action-reply-tools.component';
@@ -134,6 +137,10 @@ import { AddkbDialogComponent } from './cds-dashboard/cds-canvas/actions/list/cd
 
 //ACTION GPT-TASK: elements
 import { AttributesDialogComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
+
+//ACTION DTMF_FORM: elements
+import { CdsActionReplyToolsVoiceComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/elements/cds-action-reply-tools-voice/cds-action-reply-tools-voice.component';
+import { CdsActionReplySettingsComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/elements/cds-action-reply-settings/cds-action-reply-settings.component';
 
 //CDS- ACTIONS
 import { CdsActionDescriptionComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-description/cds-action-description.component';
@@ -167,6 +174,9 @@ import { CdsActionHubspotComponent } from './cds-dashboard/cds-canvas/actions/li
 import { CdsActionCodeComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-code/cds-action-code.component';
 import { CdsActionAskgptV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-askgpt-v2/cds-action-askgpt-v2.component';
 import { CdsActionCustomerioComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-customerio/cds-action-customerio.component';
+
+//CDS- ACTIONS VOICE
+import { CdsActionDTMFFormComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/cds-action-dtmf-form.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';
@@ -202,8 +212,7 @@ import { ChangelogComponent } from '../modals/changelog/changelog.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/context-menu/context-menu.component';
 import { MaterialModule } from '../shared/material.module';
-import { AdvancedComponent } from './cds-chatbot-details/advanced/advanced.component';
-import { HeightSliderComponent } from './cds-dashboard/cds-canvas/base-elements/height-slider/height-slider.component';
+
 
 @NgModule({
   declarations: [
@@ -224,6 +233,7 @@ import { HeightSliderComponent } from './cds-dashboard/cds-canvas/base-elements/
     CDSFilterComponent,
     CDSMenuComponent,
     CDSRadioButtonComponent,
+    CDSToogleComponent,
     SelectComponent,
     TextEditableDivComponent,
 
@@ -235,6 +245,7 @@ import { HeightSliderComponent } from './cds-dashboard/cds-canvas/base-elements/
       CDSImageUploadComponent,
       CDSTextComponent,
       CDSTextareaComponent,
+      HeightSliderComponent,
 
       //CDS INTENT
       CdsIntentComponent,
@@ -331,6 +342,14 @@ import { HeightSliderComponent } from './cds-dashboard/cds-canvas/base-elements/
         AttributesDialogComponent,
         // action GptTask elements: end //
 
+
+        //VXML ACTIONS //
+        CdsActionDTMFFormComponent,
+          // action DTMFForm elements: start //
+          CdsActionReplyToolsVoiceComponent,
+          CdsActionReplySettingsComponent,
+          // action DTMFForm elements: end //
+
     // ******* CDS CANVAS:: end *******
 
     // ******* CDS RULES:: start *******
@@ -348,6 +367,7 @@ import { HeightSliderComponent } from './cds-dashboard/cds-canvas/base-elements/
     CDSDetailImportExportComponent,
     CDSDetailCommunityComponent,
     CDSDetailDeveloperComponent,
+    CDSAdvancedComponent,
     // ******* CDS CHATBOT DETAIL:: end *******
 
     // ******* CDS GLOBALS:: start *******
@@ -375,8 +395,8 @@ import { HeightSliderComponent } from './cds-dashboard/cds-canvas/base-elements/
     GetVariableNamePipe,
     ContextMenuComponent,
     CdsSupportComponent,
-    AdvancedComponent,
-    HeightSliderComponent
+    
+    
 
   ],
   imports: [

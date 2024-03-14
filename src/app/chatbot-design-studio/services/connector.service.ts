@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
 import { StageService } from '../services/stage.service';
-import { TYPE_ACTION, TYPE_BUTTON, isElementOnTheStage, generateShortUID } from '../utils';
+import { TYPE_ACTION, TYPE_BUTTON, isElementOnTheStage, generateShortUID, TYPE_ACTION_VXML } from '../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 /** CLASSE DI SERVICES PER GESTIRE I CONNETTORI **/
@@ -225,7 +225,8 @@ export class ConnectorService {
         }
 
         /**  REPLY  RANDOM_REPLY */
-        if(action._tdActionType === TYPE_ACTION.REPLY || action._tdActionType === TYPE_ACTION.RANDOM_REPLY){
+        if( (action._tdActionType === TYPE_ACTION.REPLY || action._tdActionType === TYPE_ACTION.RANDOM_REPLY) ||
+            (action._tdActionType === TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType === TYPE_ACTION_VXML.BLIND_TRANSFER)){
           var buttons = this.findButtons(action);
           this.logger.log('buttons   ----- >', buttons, action);
           buttons.forEach(button => {

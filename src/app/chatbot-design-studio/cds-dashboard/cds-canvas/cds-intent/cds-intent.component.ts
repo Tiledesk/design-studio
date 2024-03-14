@@ -3,7 +3,7 @@ import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
 import { Subject, Subscription } from 'rxjs';
 
-import { ACTIONS_LIST, TYPE_ACTION, TYPE_INTENT_NAME, checkInternalIntent } from '../../../utils';
+import { ACTIONS_LIST, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_INTENT_NAME, checkInternalIntent } from '../../../utils';
 import { IntentService } from '../../../services/intent.service';
 // import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
 import { ConnectorService } from '../../../services/connector.service';
@@ -71,6 +71,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   listOfActions: Action[];
   HAS_SELECTED_TYPE = HAS_SELECTED_TYPE;
   TYPE_ACTION = TYPE_ACTION;
+  TYPE_ACTION_VXML = TYPE_ACTION_VXML;
   ACTIONS_LIST = ACTIONS_LIST;
   elementTypeSelected: HAS_SELECTED_TYPE
   isOpen: boolean = true;

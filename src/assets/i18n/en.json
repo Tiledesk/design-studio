@@ -395,7 +395,13 @@
         "ReplyTo":"Reply to",
         "EmailBody":"Email body",
         "CustomerioFormId":"Customer.io Form Id",
-        "EntercustomerioFormId":"Enter Customer.io Form Id"
+        "EntercustomerioFormId":"Enter Customer.io Form Id",
+        "MinDigits": "Min digits",
+        "MaxDigits": "Max digits",
+        "Terminator":"Terminator",
+        "Timeout": "Timeout",
+        "TransferTo": "Transfer to",
+        "BargeIn":"Barge-in"
     },
     "Name":"Name",
     "Label": "Label",
@@ -457,7 +463,8 @@
         "MostUsed":"Most used",
         "Flow":"Flow",
         "Integrations":"Integrations",
-        "Special":"Special"
+        "Special":"Special",
+        "Voice":"Voice"
     },
     "CDSOperatorList":{
         "equalAsNumbers":"equal As Numbers",
@@ -528,7 +535,9 @@
             "Qapla":"Qapla'",
             "Make":"Make",
             "Hubspot":"Hubspot",
-            "Customerio":"Customer.io"
+            "Customerio":"Customer.io",
+            "DTMFForm":"DTMF Form",
+            "BlindTransfer": "Transfer"
         },
         "DESCRIPTION":{
             "Reply":"<b>Pro tip</b>: Turn this block into a programmed proactive message.",
@@ -559,7 +568,9 @@
             "Qapla":"This action allow to connect with Qapla'",
             "Make":"",
             "Hubspot":"",
-            "Customerio":""
+            "Customerio":"",
+            "DTMFForm":"",
+            "BlindTransfer": ""
         },
         "DOCS": {
             "Reply":"<a href=https://www.youtube.com/embed/p0ux-86Y4_I target=_blank>Here is how!</a> ",
@@ -590,7 +601,9 @@
             "Qapla":"",
             "Make":"",
             "Hubspot":"",
-            "Customerio":""
+            "Customerio":"",
+            "DTMFForm":"",
+            "BlindTransfer": ""
         }
     },
     "CDSvariablesList": {

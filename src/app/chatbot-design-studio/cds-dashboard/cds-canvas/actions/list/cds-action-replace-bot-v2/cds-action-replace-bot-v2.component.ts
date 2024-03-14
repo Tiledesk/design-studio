@@ -72,7 +72,7 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
   getAllFaqById(chatbotId: string){
     this.logger.log("[ACTION REPLACE BOT] get AllFaqById: ",chatbotId);
     this.faqService.getAllFaqByFaqKbId(chatbotId).subscribe({ next: (faks: Intent[])=> {
-      this.chatbots_block_name_list = faks.map((el => ({name: el.intent_display_name, value: '/'+el.intent_display_name})))
+      this.chatbots_block_name_list = faks.map((el => ({name: el.intent_display_name, value: el.intent_display_name})))
       this.logger.log("[ACTION REPLACE BOT] get AllFaqById: ", this.chatbots_block_name_list);
     }, error: (error)=> {
       this.logger.error("[ACTION REPLACE BOT] error get AllFaqById: ", error);

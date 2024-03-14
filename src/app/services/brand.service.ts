@@ -189,17 +189,17 @@ export class BrandService {
       if (url && url !== 'CHANGEIT') {
         const data = await this.httpClient.get(url).toPromise();
 
-        console.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
+        this.logger.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
 
         this.brand =data
 
-        console.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
+        this.logger.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
 
         const resources = new BrandResources(this);
         resources.loadResources()
       }
     } catch (err) {
-      console.error('[BRAND-SERV] loadBrand error : ', err);
+      this.logger.error('[BRAND-SERV] loadBrand error : ', err);
 
       this.brand = this._brand;
       // this.notify.showNotificationChangeProject('ops', 2, 'done');
@@ -220,7 +220,7 @@ export class BrandService {
   }
 
   getBrand() {
-    console.log('BrandService getBrand has been called - brand: ', this.brand);
+    //this.logger.log('BrandService getBrand has been called - brand: ', this.brand);
     return { ...this.brand['CDS'], ...this.brand['COMMON'] }
   }
 
