@@ -5,6 +5,12 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.7
+- added: cds-action-dtmf-form and cds-action-blind-transfer
+- added: settings to vxml actions
+- added: gpt-4-preview type option to gpt-models
+- bug-fixed: action-replace-bot-v2 pass /+intentName
+
 ### 1.2.0-rc.6
 - added: brand name to header 
 - bug-fixed: if condition is changed in action-json-condition or filter, submit button is disabled
