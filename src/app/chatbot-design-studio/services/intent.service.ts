@@ -931,6 +931,22 @@ export class IntentService {
       action.attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
       command_form.settings = { minDigits: null, maxDigits: null, terminators: '#', timeout: 15, bargein: true}
+      command_form.subType = TYPE_ACTION_VXML.DTMF_FORM
+      action.attributes.commands.push(command_form);
+    }
+    if(typeAction === TYPE_ACTION_VXML.DTMF_MENU){
+      action = new ActionVoice(TYPE_ACTION_VXML.DTMF_MENU);
+      let commandWait = new Wait();
+      action.attributes.commands.push(commandWait);
+      let command = new Command(TYPE_COMMAND.MESSAGE);
+      command.message = new Message('text', 'A chat message will be sent to the visitor');
+      action.attributes.commands.push(command);
+      let commandWait2 = new Wait();
+      commandWait2.time = 0
+      action.attributes.commands.push(commandWait2);
+      let command_form = new Command(TYPE_COMMAND.SETTINGS);
+      command_form.settings = { no_input: null, no_match: null, timeout: 15, bargein: true}
+      command_form.subType = TYPE_ACTION_VXML.DTMF_MENU
       action.attributes.commands.push(command_form);
     }
     if(typeAction === TYPE_ACTION_VXML.BLIND_TRANSFER){
@@ -945,6 +961,7 @@ export class IntentService {
       action.attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
       command_form.settings = { transferTo: ''}
+      command_form.subType = TYPE_ACTION_VXML.BLIND_TRANSFER
       action.attributes.commands.push(command_form);
     }
     return action;

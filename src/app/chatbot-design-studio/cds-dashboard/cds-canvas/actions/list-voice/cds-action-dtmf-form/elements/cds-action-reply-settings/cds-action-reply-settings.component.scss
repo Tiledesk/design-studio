@@ -30,6 +30,12 @@
         border-color: var(--empty-element-property);
         height: 30px;
     }
+
+    .previewContent{
+        padding: 5px 10px;
+        margin: 0px;
+        position: relative;
+    }
 }
 
 /* ./ Preview mode 
@@ -75,6 +81,14 @@
     & > *:nth-child(odd):last-child { 
         grid-column: span 2;
     }
+}
+
+.connector-wrapper{
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--input-base-margin);
+    justify-content: space-between;
+    gap: 5px;
 }
 
 

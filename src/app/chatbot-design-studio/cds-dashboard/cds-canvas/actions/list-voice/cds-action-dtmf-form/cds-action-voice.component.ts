@@ -12,11 +12,11 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 
 
 @Component({
-  selector: 'cds-action-dtmf-form',
-  templateUrl: './cds-action-dtmf-form.component.html',
-  styleUrls: ['./cds-action-dtmf-form.component.scss']
+  selector: 'cds-action-voice',
+  templateUrl: './cds-action-voice.component.html',
+  styleUrls: ['./cds-action-voice.component.scss']
 })
-export class CdsActionDTMFFormComponent implements OnInit {
+export class CdsActionVoiceComponent implements OnInit {
 
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
   translateY: string;

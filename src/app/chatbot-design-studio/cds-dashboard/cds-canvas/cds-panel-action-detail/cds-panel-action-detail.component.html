@@ -262,21 +262,30 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-code>
                     
-                    <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
+                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"
                         [intentSelected]="intentSelected" 
                         [action]="elementSelected"
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
-                    </cds-action-dtmf-form>
+                    </cds-action-voice>
 
-                    <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.BLIND_TRANSFER"    
+                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.DTMF_MENU"    
+                        class="panel-response"
+                        [intentSelected]="intentSelected" 
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-voice>
+
+                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.BLIND_TRANSFER"    
                         class="panel-response"
                         [intentSelected]="intentSelected" 
                         [action]="elementSelected"
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
-                    </cds-action-dtmf-form>
+                    </cds-action-voice>
 
                     <!-- <cds-action-assign-function *ngSwitchCase="TYPE_ACTION.ASSIGN_FUNCTION"
                         [action]="elementSelected">
