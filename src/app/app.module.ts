@@ -128,7 +128,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
-    ChatbotDesignStudioModule,
+    // ChatbotDesignStudioModule,
     SatPopoverModule,
     FormsModule,
     ReactiveFormsModule,

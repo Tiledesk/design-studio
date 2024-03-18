@@ -185,13 +185,14 @@
             </p>
         </div>
 
-        <div id="cds-sb-globals" name="globals" class="section" (click)="goTo(SIDEBAR_PAGES.GLOBALS)"
+        <div id="cds-sb-globals" name="globals" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'Globals' | translate}}"
             #tooltip="matTooltip" 
             matTooltipPosition='right' 
             matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
+            [routerLink]="['globals']" routerLinkActive="router-link-active" >
             <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons-outlined item-icon">
                 <span class="material-icons">lock</span>
             </i>
@@ -200,7 +201,7 @@
             </p>
         </div>
 
-        <div id="cds-sb-settings" name="settings" class="section" (click)="goTo(SIDEBAR_PAGES.SETTINGS)"
+        <div id="cds-sb-settings" name="settings" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'Settings' | translate}}"
             #tooltip="matTooltip" 

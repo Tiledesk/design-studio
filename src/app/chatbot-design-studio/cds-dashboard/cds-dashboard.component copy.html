@@ -1,0 +1,61 @@
+<div *ngIf="!initFinished" class="loader">
+</div>
+
+<div *ngIf="initFinished">
+
+    <cds-header 
+        class="cds-header" 
+        [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 
+        [selectedChatbot]="selectedChatbot"
+        (goToBck)="goBack()"
+        (onTestItOut)="onTestItOut($event)" 
+        (toggleSidebarWith)="onToggleSidebarWith($event)"
+        (onMenuOption)="onMenuOption($event)">
+    </cds-header>
+
+    <div id="chatbot--dashboard" 
+        class="chatboat-dashboard" 
+        [class.is_opened_sidebar]="IS_OPEN_SIDEBAR">
+
+        <cds-changelog *ngIf="showChangelog" 
+            (onClose)="onCloseChangelog()">
+        </cds-changelog>
+       
+        <cds-sidebar class="cds-sidebar" 
+            [activeSidebarSection]="activeSidebarSection"
+            [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 
+            (onClickItemList)="onClickItemList($event)" 
+            (goToBck)="goBack()">
+        </cds-sidebar>
+        
+        <cds-canvas *ngIf="activeSidebarSection == SIDEBAR_PAGES.INTENTS && initFinished" 
+            class="cds-content"
+            [onHeaderTestItOut]="eventTestItOutHeader.asObservable()">
+        </cds-canvas>
+
+        <cds-chatbot-details *ngIf="activeSidebarSection == SIDEBAR_PAGES.SETTINGS && initFinished" 
+            [selectedChatbot]="selectedChatbot"
+            [activeSection]="activeDetailSection">
+        </cds-chatbot-details>
+
+        <!-- <cds-fulfillment *ngIf="activeSidebarSection == SIDEBAR_PAGES.FULFILLMENT && initFinished" 
+            [selectedChatbot]="selectedChatbot">
+        </cds-fulfillment> -->
+
+        <cds-globals *ngIf="activeSidebarSection == SIDEBAR_PAGES.GLOBALS && initFinished" 
+            [selectedChatbot]="selectedChatbot">
+        </cds-globals>
+        
+        <cds-rules *ngIf="activeSidebarSection == SIDEBAR_PAGES.RULES && initFinished" 
+            [selectedChatbot]="selectedChatbot">
+        </cds-rules>
+
+        <cds-support *ngIf="activeSidebarSection == SIDEBAR_PAGES.SUPPORT && initFinished" 
+            [selectedChatbot]="selectedChatbot">
+        </cds-support>
+        
+    </div>
+    
+    <cds-popup></cds-popup>
+
+</div>

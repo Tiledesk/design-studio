@@ -216,15 +216,16 @@ import { MaterialModule } from '../shared/material.module';
 
 @NgModule({
   declarations: [
-    CdsDashboardComponent,
-    CdsSidebarComponent,
-    CdsHeaderComponent,
+    // CdsDashboardComponent, // --> MOVED 
+    // CdsSidebarComponent, // --> MOVED
+    // CdsHeaderComponent, // --> MOVED
+
     //CDS-ROOT-ELEMENTS: init
     CdsCanvasComponent,
     RulesComponent,
     CdsFulfillmentComponent,
     CdsChatbotDetailsComponent,
-    CdsGlobalsComponent,
+    // CdsGlobalsComponent,
     //CDS-ROOT-ELEMENTS: end
 
     AttributesComponent,
@@ -394,13 +395,13 @@ import { MaterialModule } from '../shared/material.module';
     
     GetVariableNamePipe,
     ContextMenuComponent,
-    CdsSupportComponent,
+    // CdsSupportComponent, // --> MOVED 
     
     
 
   ],
   imports: [
-    BrowserAnimationsModule,
+    // BrowserAnimationsModule,
     CommonModule,
     NgSelectModule,
     // DragDropModule,
@@ -428,19 +429,20 @@ import { MaterialModule } from '../shared/material.module';
     // MatTabsModule,
     // MatMenuModule,
     RouterModule,
-    // TranslateModule,
+    TranslateModule,
     FormsModule,
     ReactiveFormsModule,
     SatPopoverModule,
     // SharedModule,
     MaterialModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
-      },
-    })
+
+    // TranslateModule.forRoot({
+    //   loader: {
+    //     provide: TranslateLoader,
+    //     useFactory: HttpLoaderFactory,
+    //     deps: [HttpClient],
+    //   },
+    // })
   ],
   providers: [
     WsChatbotService,
@@ -452,6 +454,6 @@ import { MaterialModule } from '../shared/material.module';
 })
 export class ChatbotDesignStudioModule { }
 
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
+// export function HttpLoaderFactory(http: HttpClient) {
+//   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+// }
