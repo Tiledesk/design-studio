@@ -406,7 +406,7 @@
     "Name":"Name",
     "Label": "Label",
     "Actions": "Actions",
-    "DisableInputBox":"Disable input box",
+    "DisableUserInput":"Disable user input",
     "url":"url",
     "OpenIn":"Open in",
     "SameWidgetWindow":"Same widget window",

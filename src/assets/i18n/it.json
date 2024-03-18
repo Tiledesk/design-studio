@@ -204,7 +204,7 @@
     "Name": "Nome",
     "Label": "Etichetta",
     "Actions": "Azioni",
-    "DisableInputBox": "Disabilita la casella di input",
+    "DisableUserInput": "Disabilita l'input utente",
     "url": "URL",
     "ClickToAddUrl": "Fare clic per aggiungere l'URL...",
     "OpenIn": "Apri dentro",
