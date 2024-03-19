@@ -183,23 +183,23 @@ export class BrandService {
     //     this.brand = this._brand;
     //   }
     // }
-
+    const that = this
     try {
       let url = this.appConfig.getConfig().brandSrc
       if (url && url !== 'CHANGEIT') {
         const data = await this.httpClient.get(url).toPromise();
 
-        this.logger.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
+        console.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
 
         this.brand =data
 
-        this.logger.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
+        console.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
 
         const resources = new BrandResources(this);
         resources.loadResources()
       }
     } catch (err) {
-      this.logger.error('[BRAND-SERV] loadBrand error : ', err);
+      console.error('[BRAND-SERV] loadBrand error : ', err);
 
       this.brand = this._brand;
       // this.notify.showNotificationChangeProject('ops', 2, 'done');
