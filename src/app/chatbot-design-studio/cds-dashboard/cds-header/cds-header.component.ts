@@ -211,7 +211,7 @@ export class CdsHeaderComponent implements OnInit {
 
 
   openWhatsappPage() {
-    let tiledesk_phone_number = this.appConfigService.getConfig().tiledeskPhoneNumber;
+    let phoneNumber = this.appConfigService.getConfig().phoneNumber;
     let info = {
       project_id: this.projectID,
       bot_id: this.selectedChatbot._id
@@ -221,7 +221,7 @@ export class CdsHeaderComponent implements OnInit {
       this.logger.log("--> testing code from whatsapp: ", response);
       // let code = "%23td" + response.short_uid;
       let text = "%23td" + response.short_uid + " Send me to start testing your bot";
-      const testItOutOnWhatsappUrl = `https://api.whatsapp.com/send/?phone=${tiledesk_phone_number}&text=${text}&type=phone_number&app_absent=0`
+      const testItOutOnWhatsappUrl = `https://api.whatsapp.com/send/?phone=${phoneNumber}&text=${text}&type=phone_number&app_absent=0`
       window.open(testItOutOnWhatsappUrl, 'blank');
     }).catch((err) => {
       this.logger.error("--> error getting testing code from whatsapp: ", err);
