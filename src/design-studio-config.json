@@ -1,6 +1,6 @@
 {
   "t2y12PruGU9wUtEGzBJfolMIgK": "${FEATURES_TOKEN}",
-  "apiUrl": "${API_URL}",
+  "apiUrl": "${SERVER_BASE_URL}",
   "brandSrc": "${BRAND_SRC}",
   "globalRemoteJSSrc": "${REMOTE_JS_SRC}",
   "widgetBaseUrl": "${WIDGET_LOCATION}",
