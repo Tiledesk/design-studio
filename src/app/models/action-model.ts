@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { TYPE_ACTION, TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_METHOD_REQUEST, TYPE_OPERATOR } from '../chatbot-design-studio/utils';
+import { BRAND_BASE_INFO } from '../chatbot-design-studio/utils-resources';
 
 export class Action {
     _tdActionType: string;
@@ -156,7 +157,7 @@ export class ActionWebRequestV2 extends Action {
     constructor(){
         super();
         this.url = '';
-        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":"TiledeskBotRuntime", "Accept":"*/*"};
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent": BRAND_BASE_INFO['BRAND_NAME']+" BotRuntime", "Accept":"*/*"};
         this.jsonBody = null
         this.bodyType = 'none'
         this.assignStatusTo = '';
