@@ -30,8 +30,18 @@ const routes: Routes = [
         loadChildren: () => import('../cds-fulfillment/cds-fulfillment.module').then( m => m.CdsFulFillMentModule),
       },
       {
+        path: 'rules',
+        title: 'Design studio - Rules',
+        loadChildren: () => import('../cds-rules/cds-rules.module').then( m => m.CdsRulesModule),
+      },
+      {
         path: 'globals',
         title: 'Design studio - Globals',
+        loadChildren: () => import('../cds-globals/cds-globals.module').then( m => m.CdsGlobalsModule),
+      },
+      {
+        path: 'settings',
+        title: 'Design studio - Detail',
         loadChildren: () => import('../cds-globals/cds-globals.module').then( m => m.CdsGlobalsModule),
       },
       {
@@ -53,8 +63,6 @@ const routes: Routes = [
 
     //UTILS
     CdsPopupComponent,
-
-
     ChangelogComponent
   ],
   imports: [
@@ -67,6 +75,3 @@ const routes: Routes = [
 })
 export class CdsDashboardModule { }
 
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}

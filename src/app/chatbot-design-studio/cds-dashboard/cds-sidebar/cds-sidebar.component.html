@@ -169,13 +169,14 @@
             </p>
         </div>
 
-        <div id="cds-sb-rules" name="rules" class="section" (click)="goTo(SIDEBAR_PAGES.RULES)"
+        <div id="cds-sb-rules" name="rules" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'Rules' | translate}}"
             #tooltip="matTooltip" 
             matTooltipPosition='right' 
             matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
+            [routerLink]="['rules']" routerLinkActive="is_active">
             <span class="item-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
                     <path d="m576-160-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104 104 104 104-56 56-104-104-104 104Zm79-360L513-662l56-56 85 85 170-170 56 57-225 226ZM80-280v-80h360v80H80Zm0-320v-80h360v80H80Z"/>
