@@ -5,9 +5,11 @@ import { MaterialModule } from 'src/app/shared/material.module';
 import { HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { ChatbotDesignStudioModule } from '../chatbot-design-studio.module';
 import { CdsGlobalsComponent } from './cds-globals.component';
 import { RouterModule, Routes } from '@angular/router';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { CdsGlobalPanelDetailComponent } from './cds-global-panel-detail/cds-global-panel-detail.component';
+import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
 
 const routes: Routes = [
   {
@@ -18,11 +20,10 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    // CDSMenuComponent,
-    // CdsGlobalsComponent,
+    CdsGlobalsComponent,
 
     // ******* CDS GLOBALS:: start *******
-    // CdsGlobalPanelDetailComponent,
+    CdsGlobalPanelDetailComponent,
     // ******* CDS GLOBALS:: start *******
     
     // CDSMenuComponent
@@ -31,7 +32,9 @@ const routes: Routes = [
     CommonModule,
     MaterialModule,
     TranslateModule,
-    ChatbotDesignStudioModule,
+    SharedModule,
+    CdsBaseElementModule,
+    // ChatbotDesignStudioModule,
     RouterModule.forChild(routes)
   ]
 })
