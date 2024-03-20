@@ -14,7 +14,7 @@ import { ProjectService } from 'src/app/services/projects.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { ProjectUser } from 'src/app/models/project-user';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'cds-sidebar',
@@ -45,6 +45,7 @@ export class CdsSidebarComponent implements OnInit {
     private el: ElementRef,
     private dashboardService: DashboardService,
     private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -92,7 +93,7 @@ export class CdsSidebarComponent implements OnInit {
         window.open(item.src, '_blank')
         break;
       case 'SUPPORT':
-        this.router.navigate(['support'])
+        this.router.navigate(['./support'], {relativeTo: this.route})
         // this.onClickItemList.emit(SIDEBAR_PAGES.SUPPORT)
         // window.open(item.src, '_self')
     }

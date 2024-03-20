@@ -26,7 +26,6 @@ const routes: Routes = [
     CdsGlobalPanelDetailComponent,
     // ******* CDS GLOBALS:: start *******
     
-    // CDSMenuComponent
   ],
   imports: [
     CommonModule,
@@ -40,6 +39,3 @@ const routes: Routes = [
 })
 export class CdsGlobalsModule { }
 
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}

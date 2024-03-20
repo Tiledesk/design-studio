@@ -15,8 +15,6 @@ import { MaterialModule } from 'src/app/shared/material.module';
 import { HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { CdsSupportModule } from '../cds-support/cds-support.module';
-import { CDSMenuComponent } from '../cds-base-element/menu/menu.component';
 import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
 import { CdsPopupComponent } from './utils/cds-popup/cds-popup.component';
 import { ChangelogComponent } from 'src/app/modals/changelog/changelog.component';
