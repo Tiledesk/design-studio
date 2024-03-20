@@ -15,12 +15,22 @@ import { MaterialModule } from 'src/app/shared/material.module';
 import { HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { CdsSupportModule } from '../cds-support/cds-support.module';
+import { CDSMenuComponent } from '../cds-base-element/menu/menu.component';
+import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
+import { CdsPopupComponent } from './utils/cds-popup/cds-popup.component';
+import { ChangelogComponent } from 'src/app/modals/changelog/changelog.component';
 
 const routes: Routes = [
   { path: '', 
     component: CdsDashboardComponent,
     title: 'CdsDashboard',
     children: [
+      {
+        path: 'fulfillment',
+        title: 'Design studio - Fulfillment',
+        loadChildren: () => import('../cds-fulfillment/cds-fulfillment.module').then( m => m.CdsFulFillMentModule),
+      },
       {
         path: 'globals',
         title: 'Design studio - Globals',
@@ -30,7 +40,8 @@ const routes: Routes = [
         path: 'support',
         title: 'Design studio - Support',
         loadChildren: () => import('../cds-support/cds-support.module').then( m => m.CdsSupportModule),
-      }
+      },
+
     ]
   }
 ];
@@ -41,13 +52,19 @@ const routes: Routes = [
     CdsDashboardComponent,
     CdsSidebarComponent,
     CdsHeaderComponent,
+
+    //UTILS
+    CdsPopupComponent,
+
+
+    ChangelogComponent
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    ChatbotDesignStudioModule,
     MaterialModule,
-    TranslateModule
+    TranslateModule,
+    CdsBaseElementModule
   ]
 })
 export class CdsDashboardModule { }
