@@ -301,6 +301,13 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-customerio>
 
+                    <cds-action-brevo *ngSwitchCase="TYPE_ACTION.BREVO"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-brevo>
+
                     <cds-action-code *ngSwitchCase="TYPE_ACTION.CODE"
                         class="panel-response"
                         [intentSelected]="intent"

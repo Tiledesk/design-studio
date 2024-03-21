@@ -594,3 +594,24 @@ export class ActionCustomerio extends Action {
         this._tdActionType = TYPE_ACTION.CUSTOMERIO;
     }
 }
+
+export class ActionBrevo extends Action {
+    //token: string;
+    formid: string;
+    bodyParameters: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    assignResultTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    constructor(){
+        super();
+        //this.token = '';
+        this.formid = '';
+        this.bodyParameters = "";
+        this.assignStatusTo = '';
+        this.assignErrorTo = '';
+        this.assignResultTo = '';
+        this._tdActionType = TYPE_ACTION.BREVO;
+    }
+}

@@ -254,6 +254,16 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-customerio>
 
+                    <cds-action-brevo *ngSwitchCase="typeAction.BREVO"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-brevo>
+
                     <cds-action-code *ngSwitchCase="typeAction.CODE"
                         class="panel-response"
                         [intentSelected]="intentSelected"
