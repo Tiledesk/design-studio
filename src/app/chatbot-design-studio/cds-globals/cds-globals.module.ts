@@ -33,7 +33,6 @@ const routes: Routes = [
     TranslateModule,
     SharedModule,
     CdsBaseElementModule,
-    // ChatbotDesignStudioModule,
     RouterModule.forChild(routes)
   ]
 })

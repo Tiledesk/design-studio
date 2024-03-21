@@ -244,7 +244,7 @@ export class CdsHeaderComponent implements OnInit {
         window.open(DASHBOARD_URL, '_self').focus();
         break;
       case 'EXPORT':
-        this.router.navigate(['.'], {relativeTo: this.route, queryParams: { active: SETTINGS_SECTION.IMPORT_EXPORT } })
+        this.router.navigate(['./settings'], {relativeTo: this.route, queryParams: { active: SETTINGS_SECTION.IMPORT_EXPORT } })
         break;
       case 'COPY_LINK':{
         let testItOutUrl = this.appConfigService.getConfig().widgetBaseUrl + "assets/twp" + '/chatbot-panel.html' +

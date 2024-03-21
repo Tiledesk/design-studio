@@ -13,12 +13,7 @@ import { CdsWhatsappReceiverComponent } from './whatsapp-receiver.component';
   imports: [
     CommonModule,
     FormsModule,
-    TranslateModule.forChild({
-      loader: {
-        provide: TranslateModule,
-        deps: [HttpClient]
-      }
-    })
+    TranslateModule
   ],
   declarations: [CdsWhatsappReceiverComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

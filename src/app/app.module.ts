@@ -64,7 +64,6 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { NetworkService } from './services/network.service';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
-import { ChatbotDesignStudioModule } from './chatbot-design-studio/chatbot-design-studio.module';
 import { BrandResources } from './chatbot-design-studio/BrandResources';
 
 // FACTORIES
