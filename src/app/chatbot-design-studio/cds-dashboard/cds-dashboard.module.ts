@@ -10,20 +10,24 @@ import { CdsHeaderComponent } from './cds-header/cds-header.component';
 
 
 
-import { ChatbotDesignStudioModule } from '../chatbot-design-studio.module';
 import { MaterialModule } from 'src/app/shared/material.module';
-import { HttpClient } from '@angular/common/http';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { TranslateModule } from '@ngx-translate/core';
 import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
 import { CdsPopupComponent } from './utils/cds-popup/cds-popup.component';
 import { ChangelogComponent } from 'src/app/modals/changelog/changelog.component';
+import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
+import { CdsPublishOnCommunityModalComponent } from 'src/app/modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
 
 const routes: Routes = [
   { path: '', 
     component: CdsDashboardComponent,
-    title: 'CdsDashboard',
+    title: 'Dashboard',
     children: [
+      {
+        path: 'blocks',
+        title: 'Design studio - Blocks',
+        loadChildren: () => import('./cds-canvas/cds-canvas.module').then( m => m.CdsCanvasModule),
+      },
       {
         path: 'fulfillment',
         title: 'Design studio - Fulfillment',
@@ -42,13 +46,18 @@ const routes: Routes = [
       {
         path: 'settings',
         title: 'Design studio - Detail',
-        loadChildren: () => import('../cds-globals/cds-globals.module').then( m => m.CdsGlobalsModule),
+        loadChildren: () => import('../cds-chatbot-details/cds-chatbot-details.module').then( m => m.CdsChatbotDetailsModule),
       },
       {
         path: 'support',
         title: 'Design studio - Support',
         loadChildren: () => import('../cds-support/cds-support.module').then( m => m.CdsSupportModule),
       },
+      {
+        path: '',
+        redirectTo: 'blocks',
+        pathMatch: 'full'
+      }
 
     ]
   }
@@ -63,7 +72,11 @@ const routes: Routes = [
 
     //UTILS
     CdsPopupComponent,
-    ChangelogComponent
+    ChangelogComponent,
+
+    //MODALS
+    CdsModalActivateBotComponent,
+    CdsPublishOnCommunityModalComponent,
   ],
   imports: [
     CommonModule,

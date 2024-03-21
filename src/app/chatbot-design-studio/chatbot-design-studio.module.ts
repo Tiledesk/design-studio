@@ -222,7 +222,7 @@ import { CdsBaseElementModule } from '../shared/cds-base-element.module';
     // CdsHeaderComponent, // --> MOVED
 
     //CDS-ROOT-ELEMENTS: init
-    CdsCanvasComponent,
+    // CdsCanvasComponent,
     // RulesComponent, // --> MOVED 
     // CdsFulfillmentComponent, // --> MOVED 
     // CdsChatbotDetailsComponent,
@@ -264,9 +264,9 @@ import { CdsBaseElementModule } from '../shared/cds-base-element.module';
       CdsPanelButtonConfigurationComponent,
       
       //CDS PANEL WIDGET
-      CdsPanelWidgetComponent,
+      // CdsPanelWidgetComponent,
 
-      CdsPanelIntentListComponent,
+      // CdsPanelIntentListComponent,
 
       //ACTIONS
         //SHARED
@@ -372,7 +372,7 @@ import { CdsBaseElementModule } from '../shared/cds-base-element.module';
     CdsPanelConnectorMenuComponent,
     
     GetVariableNamePipe,
-    ContextMenuComponent,
+    // ContextMenuComponent,
     
     
 

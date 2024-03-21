@@ -22,7 +22,7 @@
 </div>
 
 
-<div id="tds_container" class="box-right tds-drag-container" cdkDropListGroup (contextmenu)="onShowContextMenu($event)">
+<!-- <div id="tds_container" class="box-right tds-drag-container" cdkDropListGroup (contextmenu)="onShowContextMenu($event)">
 
     <cds-panel-elements class="cds-panel-elements" 
         (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
@@ -78,9 +78,9 @@
     
 
 
-</div>
+</div> -->
 
-<cds-add-action-menu class="menu--context--add" 
+<!-- <cds-add-action-menu class="menu--context--add" 
     [style.top.px]="15" 
     [style.left.px]="positionFloatMenu.x"
     [style.display]="IS_OPEN_ADD_ACTIONS_MENU?'block':'none'"
@@ -104,7 +104,7 @@
     [elementIntentSelected]="elementIntentSelected"
     (closePanel)="closeAllPanels()"
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
-</cds-panel-action-detail> 
+</cds-panel-action-detail>  -->
 
 <!-- *ngIf="IS_OPEN_PANEL_WIDGET" intent]="intentSelected" -->
 <cds-panel-widget  *ngIf="testitOutFirstClick"
