@@ -1,10 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BotsBaseComponent } from 'src/app/components/bots/bots-base/bots-base.component';
-import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/change-bot-lang.component';
 import { NotifyService } from 'src/app/services/notify.service';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { Project } from 'src/app/models/project-model';
@@ -19,7 +15,6 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
-import { DashboardService } from 'src/app/services/dashboard.service';
 const swal = require('sweetalert');
 
 @Component({
@@ -82,8 +77,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     private notify: NotifyService,
     private imageRepoService: ImageRepoService,
     private translate: TranslateService,
-    private appConfigService: AppConfigService,
-    public dialog: MatDialog,
+    private appConfigService: AppConfigService
   ) {  super(); }
 
   ngOnInit(): void {
@@ -503,8 +497,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.elementRef.nativeElement.blur();
 
     // this.logger.log('[CDS-CHATBOT-DTLS] FAQ KB NAME TO UPDATE ', this.faqKb_name);
-
-
     this.faqKbService.updateFaqKb(this.selectedChatbot._id, this.selectedChatbot.name, this.selectedChatbot.url, this.selectedChatbot.type, this.selectedChatbot.description, this.selectedChatbot.webhook_enabled, this.selectedChatbot.webhook_url, this.selectedChatbot.language).subscribe({next:(faqKb) => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - FAQ KB UPDATED ', faqKb);
       if (faqKb) {
@@ -525,64 +517,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     }});
   }
 
-  // let dialogRef = dialog.open(UserProfileComponent, {
-  //   height: '400px',
-  //   width: '600px',
-  // });
-
-  updateBotLanguage(){
-    this.logger.log('openDialog')
-    const dialogRef = this.dialog.open(ChangeBotLangModalComponent, {
-      width: '600px',
-      data: {
-        chatbot: this.selectedChatbot,
-        projectId: this.project._id
-      },
-    });
-    dialogRef.afterClosed().subscribe(langCode => {
-      this.logger.log(`Dialog result: ${langCode}`);
-      if (langCode !== 'close') {
-        this.botDefaultSelectedLang = this.botDefaultLanguages[this.getIndexOfbotDefaultLanguages(langCode)].name
-      }
-      this.updateChatbotLanguage(langCode)
-    })
-  }
-
-
-  updateChatbotLanguage(langCode) {
-    this.faqKbService.updateFaqKbLanguage(this.selectedChatbot._id, langCode).subscribe({ next: (faqKb) => {
-      this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT LANG - FAQ KB UPDATED ', faqKb);
-      if (faqKb) {
-      }
-    }, error: (error) => {
-      this.logger.error('[CDS-CHATBOT-DTLS] EDIT BOT LANG-  ERROR ', error);
-
-      // =========== NOTIFY ERROR ===========
-      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotError'), 4, 'report_problem');
-
-    }, complete: () => {
-      this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT LANG - * COMPLETE *');
-      // =========== NOTIFY SUCCESS===========
-      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotSuccess'), 2, 'done');
-      this.updateChatbot(this.selectedChatbot, langCode)
-    }});
-
-  }
-
-  updateChatbot(selectedChatbot, langCode) {
-    this.logger.log('updateChatbot langCode', langCode) 
-    this.selectedChatbot.language = langCode
-
-    this.faqKbService.updateChatbot(selectedChatbot).subscribe({ next: (chatbot: any) => {
-      this.logger.log('[CDS-CHATBOT-DTLS] - UPDATED CHATBOT - RES ', chatbot);
-    }, error:(error) => {
-      this.logger.error('[CDS-CHATBOT-DTLS] - UPDATED CHATBOT - ERROR  ', error);
-      // self.notify.showWidgetStyleUpdateNotification(this.create_label_error, 4, 'report_problem');
-    }, complete: () => {
-      this.logger.log('[CDS-CHATBOT-DTLS] - UPDATED CHATBOT * COMPLETE *');
-    }});
-  }
-
   goToRoutingAndDepts() {
     let redirecturl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.project._id + '/departments'
     window.open(redirecturl, '_blank')
@@ -592,8 +526,5 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     let redirecturl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.project._id + '/department/edit/'+ deptid
     window.open(redirecturl, '_blank')
   }
-
-
-
 
 }

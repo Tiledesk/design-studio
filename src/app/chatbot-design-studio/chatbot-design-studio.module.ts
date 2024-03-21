@@ -212,6 +212,7 @@ import { ChangelogComponent } from '../modals/changelog/changelog.component';
 import { GetVariableNamePipe } from '../pipe/get-variable-name.pipe';
 import { ContextMenuComponent } from './cds-dashboard/cds-canvas/base-elements/context-menu/context-menu.component';
 import { MaterialModule } from '../shared/material.module';
+import { CdsBaseElementModule } from '../shared/cds-base-element.module';
 
 
 @NgModule({
@@ -222,17 +223,16 @@ import { MaterialModule } from '../shared/material.module';
 
     //CDS-ROOT-ELEMENTS: init
     CdsCanvasComponent,
-    RulesComponent,
-    CdsFulfillmentComponent,
-    CdsChatbotDetailsComponent,
-    // CdsGlobalsComponent,
+    // RulesComponent, // --> MOVED 
+    // CdsFulfillmentComponent, // --> MOVED 
+    // CdsChatbotDetailsComponent,
     //CDS-ROOT-ELEMENTS: end
 
     AttributesComponent,
-    DialogComponent,
+    // DialogComponent,
     DialogYesNoComponent,
     CDSFilterComponent,
-    CDSMenuComponent,
+    // CDSMenuComponent,
     CDSRadioButtonComponent,
     CDSToogleComponent,
     SelectComponent,
@@ -244,8 +244,8 @@ import { MaterialModule } from '../shared/material.module';
       CDSDelaySliderComponent,
       CDSElementFromUrlComponent,
       CDSImageUploadComponent,
-      CDSTextComponent,
-      CDSTextareaComponent,
+      // CDSTextComponent,
+      // CDSTextareaComponent,
       HeightSliderComponent,
 
       //CDS INTENT
@@ -334,7 +334,7 @@ import { MaterialModule } from '../shared/material.module';
         // action JSON-CONDITION elements: start //
         BaseConditionRowComponent,
         BaseFilterComponent,
-        VariableListComponent,
+        // VariableListComponent,
         // action JSON-CONDITION elements: end //
         // action ASKGPT elements: start //
         AddkbDialogComponent,
@@ -353,39 +353,17 @@ import { MaterialModule } from '../shared/material.module';
 
     // ******* CDS CANVAS:: end *******
 
-    // ******* CDS RULES:: start *******
-    RulesAddComponent,
-    RulesListComponent,
-    ConditionComponent,
-    ActionComponent,
-    // ******* CDS RULES:: end *******
-
-    // ******* CDS FULLFILLMENT:: start *******
-    // ******* CDS FULLFILLMENT:: end *******
-
-    // ******* CDS CHATBOT DETAIL:: start *******
-    CDSDetailBotDetailComponent,
-    CDSDetailImportExportComponent,
-    CDSDetailCommunityComponent,
-    CDSDetailDeveloperComponent,
-    CDSAdvancedComponent,
-    // ******* CDS CHATBOT DETAIL:: end *******
-
-    // ******* CDS GLOBALS:: start *******
-    CdsGlobalPanelDetailComponent,
-    // ******* CDS GLOBALS:: start *******
-
     //UTILS
-    CdsPopupComponent,
-    CdsSplashScreenComponent,
+    // CdsPopupComponent,
+    // CdsSplashScreenComponent,
     
     //MODALS
-    CdsModalActivateBotComponent,
-    CdsPublishOnCommunityModalComponent,
-    ChangeBotLangModalComponent,
+    // CdsModalActivateBotComponent,
+    // CdsPublishOnCommunityModalComponent,
+    // ChangeBotLangModalComponent,
     // NetworkOfflineComponent,
     MouseTipsComponent,
-    ChangelogComponent,
+    // ChangelogComponent,
     
     //EVENT BASE COMPONENT
     CdsEventComponent,
@@ -395,7 +373,6 @@ import { MaterialModule } from '../shared/material.module';
     
     GetVariableNamePipe,
     ContextMenuComponent,
-    // CdsSupportComponent, // --> MOVED 
     
     
 
@@ -435,14 +412,7 @@ import { MaterialModule } from '../shared/material.module';
     SatPopoverModule,
     // SharedModule,
     MaterialModule,
-
-    // TranslateModule.forRoot({
-    //   loader: {
-    //     provide: TranslateLoader,
-    //     useFactory: HttpLoaderFactory,
-    //     deps: [HttpClient],
-    //   },
-    // })
+    CdsBaseElementModule
   ],
   providers: [
     WsChatbotService,

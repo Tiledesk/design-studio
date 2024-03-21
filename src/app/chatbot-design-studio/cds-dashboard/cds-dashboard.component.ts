@@ -240,15 +240,6 @@ export class CdsDashboardComponent implements OnInit {
 
     this.eventTestItOutHeader.next(event);
   }
-
-  onMenuOption(event){
-    switch(event){
-      case 'EXPORT':
-        this.activeSidebarSection = SIDEBAR_PAGES.SETTINGS
-        this.activeDetailSection = SETTINGS_SECTION.IMPORT_EXPORT
-        break;
-    }
-  }
   /*****************************************************/
 
 

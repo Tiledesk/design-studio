@@ -8,8 +8,7 @@
         [selectedChatbot]="selectedChatbot"
         (goToBck)="goBack()"
         (onTestItOut)="onTestItOut($event)" 
-        (toggleSidebarWith)="onToggleSidebarWith($event)"
-        (onMenuOption)="onMenuOption($event)">
+        (toggleSidebarWith)="onToggleSidebarWith($event)">
     </cds-header>
 
     <div id="chatbot--dashboard" 
@@ -27,12 +26,11 @@
             (goToBck)="goBack()">
         </cds-sidebar>
 
-        <span>hello dashboards</span>
-        <a routerLink="support"><button class="btn btn-success pull-right" > GO TO SUPPORT</button></a>
         <router-outlet></router-outlet>
 
     </div>
 
+    <cds-popup></cds-popup>
     
 </div>
 
