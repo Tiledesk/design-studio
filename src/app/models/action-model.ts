@@ -375,6 +375,7 @@ export class Command {
     message?: Message;
     settings?: Setting;
     time?: number;
+    subType?: string;
     constructor(type: string) {
         this.type = type;
     }
@@ -410,6 +411,8 @@ export class Setting {
     transferTo?: string;
     timeout?: number;
     bargein?: boolean = true;
+    no_input?: string;
+    no_match?: string;
 }
 
 export class MessageWithWait extends Message {

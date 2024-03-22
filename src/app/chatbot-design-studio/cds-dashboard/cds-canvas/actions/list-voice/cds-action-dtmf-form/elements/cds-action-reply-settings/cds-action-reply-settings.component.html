@@ -25,6 +25,36 @@
         <div class="set-attribute-label"> {{'CDSCanvas.TransferTo' | translate }} </div>
         <div class="response-wrp expand ellips" [class.no-text]="!response.transferTo">{{response.transferTo}}</div>
     </div>
+
+    <div class="previewContent" *ngIf="response.hasOwnProperty('no_input')">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.NoInput' | translate}}</label>
+        
+        <cds-connector class="button-connector"
+            [idConnector] = "idConnectorNoInput"
+            [idConnection] = "idConnectionNoInput"
+            [isConnected] = "isConnectedNoInput">
+        </cds-connector>
+    </div>
+
+    <div class="previewContent" *ngIf="response.hasOwnProperty('no_match')">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.NoMatch' | translate}}</label>
+        
+        <cds-connector class="button-connector"
+            [idConnector] = "idConnectorNoMatch"
+            [idConnection] = "idConnectionNoMatch"
+            [isConnected] = "isConnectedNoMatch">
+        </cds-connector>
+    </div>
     
 </div> 
 
@@ -104,6 +134,58 @@
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'transferTo')">
         </cds-textarea>
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode" class="connector-wrapper" >
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('no_input')" style="width: 100%;">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.NoInput' | translate}}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="response?.no_input" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'no_input')"
+            (onReset)="onResetBlockSelect($event, 'no_input')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('no_match')" style="width: 100%;">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.NoMatch' | translate}}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="response?.no_match" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'no_match')"
+            (onReset)="onResetBlockSelect($event, 'no_match')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
     </div>
 
 </div>

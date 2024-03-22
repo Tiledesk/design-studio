@@ -7,7 +7,6 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
-import { CdsActionDTMFFormComponent } from '../list-voice/cds-action-dtmf-form/cds-action-dtmf-form.component';
 import { CdsActionReplySettingsComponent } from '../list-voice/cds-action-dtmf-form/elements/cds-action-reply-settings/cds-action-reply-settings.component';
 import { CdsActionReplyToolsVoiceComponent } from '../list-voice/cds-action-dtmf-form/elements/cds-action-reply-tools-voice/cds-action-reply-tools-voice.component';
 import { CdsAnswerComponent } from './answer/answer.component';
@@ -65,6 +64,7 @@ import { CdsFormComponent } from './form/form.component';
 import { ModalWindowComponent } from './form/modal-window/modal-window.component';
 import { CdsQuestionComponent } from './question/question.component';
 import { BaseElementModule } from 'src/app/shared/base-element.module';
+import { CdsActionVoiceComponent } from '../list-voice/cds-action-dtmf-form/cds-action-voice.component';
 
 @NgModule({
   declarations: [
@@ -140,7 +140,7 @@ import { BaseElementModule } from 'src/app/shared/base-element.module';
 
 
     //VXML ACTIONS //
-    CdsActionDTMFFormComponent,
+    CdsActionVoiceComponent,
       // action DTMFForm elements: start //
       CdsActionReplyToolsVoiceComponent,
       CdsActionReplySettingsComponent,
@@ -227,7 +227,7 @@ import { BaseElementModule } from 'src/app/shared/base-element.module';
 
 
     //VXML ACTIONS //
-    CdsActionDTMFFormComponent,
+    CdsActionVoiceComponent,
       // action DTMFForm elements: start //
       CdsActionReplyToolsVoiceComponent,
       CdsActionReplySettingsComponent,

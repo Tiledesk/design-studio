@@ -581,6 +581,36 @@ export class ConnectorService {
           }
         }
 
+        /** DTMF_MENU' */
+        if(action._tdActionType === TYPE_ACTION_VXML.DTMF_MENU){
+          let settingCommand = action.attributes.commands.slice(-1)[0].settings
+          if(settingCommand && settingCommand.no_input && settingCommand.no_input !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/no_input';
+            idConnectorTo =  settingCommand.no_input.replace("#", "");
+            
+            if(!this.intentExists(idConnectorTo)){
+              settingCommand.no_input = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(settingCommand && settingCommand.no_match && settingCommand.no_match !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/no_match';
+            idConnectorTo = settingCommand.no_match.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              settingCommand.no_match = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
 
       });
     }

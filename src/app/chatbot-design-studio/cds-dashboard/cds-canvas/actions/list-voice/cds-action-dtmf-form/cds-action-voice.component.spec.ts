@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CdsActionDTMFFormComponent } from './cds-action-dtmf-form.component';
+import { CdsActionVoiceComponent } from './cds-action-voice.component';
 
 describe('CdsActionReplyComponent', () => {
-  let component: CdsActionDTMFFormComponent;
-  let fixture: ComponentFixture<CdsActionDTMFFormComponent>;
+  let component: CdsActionVoiceComponent;
+  let fixture: ComponentFixture<CdsActionVoiceComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CdsActionDTMFFormComponent ]
+      declarations: [ CdsActionVoiceComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CdsActionDTMFFormComponent);
+    fixture = TestBed.createComponent(CdsActionVoiceComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

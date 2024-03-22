@@ -401,7 +401,9 @@
         "Terminator":"Terminator",
         "Timeout": "Timeout",
         "TransferTo": "Transfer to",
-        "BargeIn":"Barge-in"
+        "BargeIn":"Barge-in",
+        "NoMatch":"No match",
+        "NoInput":"No input"
     },
     "Name":"Name",
     "Label": "Label",
@@ -537,6 +539,7 @@
             "Hubspot":"Hubspot",
             "Customerio":"Customer.io",
             "DTMFForm":"DTMF Form",
+            "DTMFMenu":"DTMF Menu",
             "BlindTransfer": "Transfer"
         },
         "DESCRIPTION":{
@@ -570,6 +573,7 @@
             "Hubspot":"",
             "Customerio":"",
             "DTMFForm":"",
+            "DTMFMenu":"",
             "BlindTransfer": ""
         },
         "DOCS": {
@@ -603,6 +607,7 @@
             "Hubspot":"",
             "Customerio":"",
             "DTMFForm":"",
+            "DTMFMenu":"",
             "BlindTransfer": ""
         }
     },
