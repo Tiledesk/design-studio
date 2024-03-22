@@ -137,14 +137,6 @@ import { CdsActionVoiceComponent } from '../list-voice/cds-action-dtmf-form/cds-
     // action GptTask elements: start //
     AttributesDialogComponent,
     // action GptTask elements: end //
-
-
-    //VXML ACTIONS //
-    CdsActionVoiceComponent,
-      // action DTMFForm elements: start //
-      CdsActionReplyToolsVoiceComponent,
-      CdsActionReplySettingsComponent,
-      // action DTMFForm elements: end //
   ],
   imports: [
     CommonModule,
@@ -224,14 +216,6 @@ import { CdsActionVoiceComponent } from '../list-voice/cds-action-dtmf-form/cds-
     // action GptTask elements: start //
     AttributesDialogComponent,
     // action GptTask elements: end //
-
-
-    //VXML ACTIONS //
-    CdsActionVoiceComponent,
-      // action DTMFForm elements: start //
-      CdsActionReplyToolsVoiceComponent,
-      CdsActionReplySettingsComponent,
-      // action DTMFForm elements: end //
   ]
 })
 export class CdsActionsModule { }

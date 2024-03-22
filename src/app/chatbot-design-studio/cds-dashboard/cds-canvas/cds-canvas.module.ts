@@ -30,6 +30,7 @@ import { BaseElementModule } from 'src/app/shared/base-element.module';
 import { CdsIntentComponent } from './cds-intent/cds-intent.component';
 import { PanelIntentControlsComponent } from './cds-intent/panel-intent-controls/panel-intent-controls.component';
 import { PanelIntentHeaderComponent } from './cds-intent/panel-intent-header/panel-intent-header.component';
+import { CdsVoiceActionsModule } from './actions/list-voice/cds-voice-actions.module';
 
 const routes: Routes = [
   {
@@ -95,6 +96,7 @@ const routes: Routes = [
     CdsBaseElementModule,
     BaseElementModule,
     CdsActionsModule,
+    CdsVoiceActionsModule,
     RouterModule.forChild(routes),
     // ChatbotDesignStudioModule
   ]
