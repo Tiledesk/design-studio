@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.8
+- added: PHONE_NUMBER to config-template env
+
 ### 1.2.0-rc.7
 - added: cds-action-dtmf-form and cds-action-blind-transfer
 - added: settings to vxml actions
