@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef} from '@angular/core';
-import { Observable, Subscription, timeout } from 'rxjs';
+import { Observable, Subscription, skip, timeout } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -243,7 +243,7 @@ export class CdsCanvasComponent implements OnInit {
       this.intentService.setStartIntent();
       // scaleAndcenterStageOnCenterPosition(this.listOfIntents)
     }
-    this.subscriptionOpenWidgetPanel = this.onHeaderTestItOut.subscribe((event) => this.onTestItOut(event));
+    this.subscriptionOpenWidgetPanel = this.intentService.BStestiTout.pipe(skip(1)).subscribe((event) => this.onTestItOut(event));
 
     // ---------------------------------------
     // load localstorage

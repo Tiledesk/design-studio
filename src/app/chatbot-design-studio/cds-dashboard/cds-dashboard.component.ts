@@ -43,8 +43,7 @@ export class CdsDashboardComponent implements OnInit {
   IS_OPEN_INTENTS_LIST: boolean = true;
   IS_OPEN_PANEL_WIDGET: boolean = false;
 
-  eventTestItOutHeader: Subject<Intent | boolean> = new Subject<Intent | boolean>();
-
+  
   project: Project;
   defaultDepartmentId: string;
   selectedChatbot: Chatbot
@@ -213,32 +212,6 @@ export class CdsDashboardComponent implements OnInit {
     // this.location.back()
     // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);
     this.hideShowWidget('show');
-  }
-
-  /** onTestItOut **
-   * Open WHEN THE PLAY BUTTON IS CLICKED
-   * - test widget
-   * @ Close
-   * - detail action panel
-   * - actions context menu' (static & float),
-   * - button configuration panel  
-  */
-  onTestItOut(event: Intent) {
-    this.logger.log('[CDS DSHBRD] onTestItOut intent ', event);
-    // if(typeof event === "boolean"){
-    //   this.IS_OPEN_PANEL_WIDGET = true;
-    // } else {
-    //   this.IS_OPEN_PANEL_WIDGET = !this.IS_OPEN_PANEL_WIDGET;
-    // }
-    // if(this.IS_OPEN_PANEL_WIDGET){
-    //   this.controllerService.closeActionDetailPanel();
-    //   this.controllerService.closeButtonPanel();
-    //   // this.intentService.setLiveActiveIntent(null);
-    //   this.controllerService.closeAddActionMenu();
-    //   this.connectorService.removeConnectorDraft();
-    // }
-
-    this.eventTestItOutHeader.next(event);
   }
   /*****************************************************/
 

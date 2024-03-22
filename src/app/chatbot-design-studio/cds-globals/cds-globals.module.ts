@@ -10,6 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CdsGlobalPanelDetailComponent } from './cds-global-panel-detail/cds-global-panel-detail.component';
 import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
+import { BaseElementModule } from 'src/app/shared/base-element.module';
 
 const routes: Routes = [
   {
@@ -33,6 +34,7 @@ const routes: Routes = [
     TranslateModule,
     SharedModule,
     CdsBaseElementModule,
+    BaseElementModule,
     RouterModule.forChild(routes)
   ]
 })

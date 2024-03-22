@@ -24,9 +24,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class CdsSidebarComponent implements OnInit {
 
   @Input() IS_OPEN_SIDEBAR: boolean;
-  @Input() activeSidebarSection: SIDEBAR_PAGES;
   // @Input() projectID: string;
-  @Output() onClickItemList = new EventEmitter<string>();
 
   projectID: string;
   user: UserModel
@@ -52,13 +50,9 @@ export class CdsSidebarComponent implements OnInit {
     this.projectID = this.dashboardService.projectID;
     this.user = this.tiledeskAuthService.getCurrentUser()
     this.getUserRole();
-    this.goTo(SIDEBAR_PAGES.INTENTS);
   }
 
   ngOnChanges(changes: SimpleChanges){
-    if(changes && changes['activeSidebarSection'] && changes['activeSidebarSection'].currentValue !== changes['activeSidebarSection'].previousValue ){
-      this.goTo(this.activeSidebarSection)
-    }
   }
 
 
@@ -69,20 +63,6 @@ export class CdsSidebarComponent implements OnInit {
         this.USER_ROLE = projectUser.role;
       }
     })
-  }
-
-  goTo(section: SIDEBAR_PAGES) {
-    let elements = this.el.nativeElement.querySelectorAll('.section.is_active')
-    if (elements.length != 0) {
-      elements.forEach((el) => {
-        el.classList.remove('is_active');
-      })
-    }
-
-    const element = this.el.nativeElement.querySelector('#'+section);
-    element.classList.toggle("is_active");
-
-    this.onClickItemList.emit(section)
   }
 
 

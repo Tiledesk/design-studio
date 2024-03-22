@@ -7,7 +7,6 @@
         [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 
         [selectedChatbot]="selectedChatbot"
         (goToBck)="goBack()"
-        (onTestItOut)="onTestItOut($event)" 
         (toggleSidebarWith)="onToggleSidebarWith($event)">
     </cds-header>
 
@@ -20,10 +19,7 @@
         </cds-changelog>
 
         <cds-sidebar class="cds-sidebar" 
-            [activeSidebarSection]="activeSidebarSection"
-            [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 
-            (onClickItemList)="onClickItemList($event)" 
-            (goToBck)="goBack()">
+            [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR">
         </cds-sidebar>
 
         <router-outlet></router-outlet>

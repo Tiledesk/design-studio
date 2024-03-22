@@ -28,6 +28,7 @@ export class IntentService {
   behaviorIntent = new BehaviorSubject <Intent>(null);
   liveActiveIntent = new BehaviorSubject<Intent>(null);
   testIntent = new BehaviorSubject<Intent>(null);
+  BStestiTout = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
 
   listOfIntents: Array<Intent> = [];
@@ -1337,6 +1338,10 @@ export class IntentService {
 
     public startTestWithIntent(intent: Intent){
       this.testIntent.next(intent)
+    }
+
+    public openTestItOut(intent: Intent){
+      this.BStestiTout.next(intent)
     }
 
 

@@ -12,6 +12,7 @@ import { RulesAddComponent } from './rules-add/rules-add.component';
 import { RulesListComponent } from './rules-list/rules-list.component';
 import { ConditionComponent } from './rules-add/condition/condition.component';
 import { ActionComponent } from './rules-add/action/action.component';
+import { BaseElementModule } from 'src/app/shared/base-element.module';
 
 const routes: Routes = [
   {
@@ -38,6 +39,7 @@ const routes: Routes = [
     TranslateModule,
     SharedModule,
     CdsBaseElementModule,
+    BaseElementModule,
     RouterModule.forChild(routes)
   ]
 })

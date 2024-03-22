@@ -14,13 +14,15 @@ $toogle-sidebar-width: 22px;
 //   height: auto;
 // }
 
+:host {
+  display: flex;
+  width: calc(100% - var(--sidebar-base-width));
+  overflow: hidden;
+}
 
 .context-menu {
   position: absolute;
 }
-
-
-
 
 .cds-generic-panel{
   position: absolute;

@@ -55,7 +55,6 @@ const routes: Routes = [
 
     //MODALS
     ChangeBotLangModalComponent,
-    
   ],
   imports: [
     CommonModule,

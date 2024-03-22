@@ -228,40 +228,40 @@ import { CdsBaseElementModule } from '../shared/cds-base-element.module';
     // CdsChatbotDetailsComponent,
     //CDS-ROOT-ELEMENTS: end
 
-    AttributesComponent,
+    // AttributesComponent,
     // DialogComponent,
-    DialogYesNoComponent,
-    CDSFilterComponent,
+    // DialogYesNoComponent,
+    // CDSFilterComponent,
     // CDSMenuComponent,
-    CDSRadioButtonComponent,
-    CDSToogleComponent,
-    SelectComponent,
-    TextEditableDivComponent,
+    // CDSRadioButtonComponent,
+    // CDSToogleComponent,
+    // SelectComponent,
+    // TextEditableDivComponent,
 
     // ******* CDS CANVAS:: start *******
       //BASE-ELEMENT
-      CdsConnectorComponent,
-      CDSDelaySliderComponent,
-      CDSElementFromUrlComponent,
-      CDSImageUploadComponent,
+      // CdsConnectorComponent,
+      // CDSDelaySliderComponent,
+      // CDSElementFromUrlComponent,
+      // CDSImageUploadComponent,
       // CDSTextComponent,
       // CDSTextareaComponent,
-      HeightSliderComponent,
+      // HeightSliderComponent,
 
       //CDS INTENT
-      CdsIntentComponent,
-      PanelIntentHeaderComponent,
-      PanelIntentControlsComponent,
+      // CdsIntentComponent,
+      // PanelIntentHeaderComponent,
+      // PanelIntentControlsComponent,
       
       //CDS PANEL ELEMENTS
-      CdsPanelElementsComponent,
-      CdsPanelActionsComponent,
+      // CdsPanelElementsComponent,
+      // CdsPanelActionsComponent,
 
       //CDS PANEL ACTION DETAIL
-      CdsActionDetailPanelComponent,
+      // CdsActionDetailPanelComponent,
 
       //CDS PANEL BUTTON CONFIGURATION
-      CdsPanelButtonConfigurationComponent,
+      // CdsPanelButtonConfigurationComponent,
       
       //CDS PANEL WIDGET
       // CdsPanelWidgetComponent,
@@ -270,86 +270,86 @@ import { CdsBaseElementModule } from '../shared/cds-base-element.module';
 
       //ACTIONS
         //SHARED
-        CdsActionControlsComponent,
-        CdsActionArrowComponent,
-        CdsAddActionMenuComponent,
+        // CdsActionControlsComponent,
+        // CdsActionArrowComponent,
+        // CdsAddActionMenuComponent,
         //LIST
-        CdsFormComponent,
-          //FORM components
-          FormFieldComponent,
-          FormEditAddComponent,
-          ModalWindowComponent,
-        CdsQuestionComponent,
-        CdsAnswerComponent,
-        CdsActionDescriptionComponent,
-        CdsActionReplyComponent,
-        CdsActionWaitComponent,
-        CdsActionAgentHandoffComponent,
-        CdsActionOnlineAgentsComponent,
-        CdsActionEmailComponent,
-        CdsActionIntentComponent,
-        CdsActionChangeDepartmentComponent,
-        CdsActionCloseComponent,
-        CdsActionOpenHoursComponent,
-        CdsActionJsonConditionComponent,
-        CdsActionDeleteVariableComponent,
-        CdsActionReplaceBotComponent,
-        CdsActionReplaceBotV2Component,
-        CdsActionAssignVariableComponent,
-        CdsActionAssignVariableV2Component,
-        CdsActionHideMessageComponent,
-        CdsActionWebRequestComponent,
-        CdsActionWebRequestV2Component,
-        CdsActionMakeComponent,
-        CdsActionHubspotComponent,
-        CdsActionWhatsappAttributeComponent,
-        CdsActionWhatsappStaticComponent,
-        CdsWhatsappReceiverComponent,
-        CdsActionAskgptComponent,
-        CdsActionGPTTaskComponent,
-        CdsActionCaptureUserReplyComponent,
-        CdsActionQaplaComponent,
-        CdsActionCodeComponent,
-        CdsActionAskgptV2Component,
-        CdsActionCustomerioComponent,
-        // action REPLY elements: start //
-        CdsActionReplyToolsComponent,
-        CdsActionReplyTextComponent,
-        CdsActionReplyImageComponent,
-        CdsActionReplyFrameComponent,
-        CdsActionReplyRedirectComponent,
-        CdsActionReplyGalleryComponent,
-        CdsActionReplyButtonComponent,
-        // action REPLY elements: end //
-        // action ASSIGN-VARIABLE elements: start //
-        OperationComponent,
-        OperatorComponent,
-        OperandComponent,
-        // action ASSIGN-VARIABLE elements: end //
-         // action ASSIGN-VARIABLE-V2 elements: start //
-         OperationV2Component,
-         OperatorV2Component,
-         OperandV2Component,
-         // action ASSIGN-VARIABLE-V2 elements: end //
-        // action JSON-CONDITION elements: start //
-        BaseConditionRowComponent,
-        BaseFilterComponent,
-        // VariableListComponent,
-        // action JSON-CONDITION elements: end //
-        // action ASKGPT elements: start //
-        AddkbDialogComponent,
-        // action ASKGPT elements: end //
-        // action GptTask elements: start //
-        AttributesDialogComponent,
-        // action GptTask elements: end //
+        // CdsFormComponent,
+        //   //FORM components
+        //   FormFieldComponent,
+        //   FormEditAddComponent,
+        //   ModalWindowComponent,
+        // CdsQuestionComponent,
+        // CdsAnswerComponent,
+        // CdsActionDescriptionComponent,
+        // CdsActionReplyComponent,
+        // CdsActionWaitComponent,
+        // CdsActionAgentHandoffComponent,
+        // CdsActionOnlineAgentsComponent,
+        // CdsActionEmailComponent,
+        // CdsActionIntentComponent,
+        // CdsActionChangeDepartmentComponent,
+        // CdsActionCloseComponent,
+        // CdsActionOpenHoursComponent,
+        // CdsActionJsonConditionComponent,
+        // CdsActionDeleteVariableComponent,
+        // CdsActionReplaceBotComponent,
+        // CdsActionReplaceBotV2Component,
+        // CdsActionAssignVariableComponent,
+        // CdsActionAssignVariableV2Component,
+        // CdsActionHideMessageComponent,
+        // CdsActionWebRequestComponent,
+        // CdsActionWebRequestV2Component,
+        // CdsActionMakeComponent,
+        // CdsActionHubspotComponent,
+        // CdsActionWhatsappAttributeComponent,
+        // CdsActionWhatsappStaticComponent,
+        // CdsWhatsappReceiverComponent,
+        // CdsActionAskgptComponent,
+        // CdsActionGPTTaskComponent,
+        // CdsActionCaptureUserReplyComponent,
+        // CdsActionQaplaComponent,
+        // CdsActionCodeComponent,
+        // CdsActionAskgptV2Component,
+        // CdsActionCustomerioComponent,
+        // // action REPLY elements: start //
+        // CdsActionReplyToolsComponent,
+        // CdsActionReplyTextComponent,
+        // CdsActionReplyImageComponent,
+        // CdsActionReplyFrameComponent,
+        // CdsActionReplyRedirectComponent,
+        // CdsActionReplyGalleryComponent,
+        // CdsActionReplyButtonComponent,
+        // // action REPLY elements: end //
+        // // action ASSIGN-VARIABLE elements: start //
+        // OperationComponent,
+        // OperatorComponent,
+        // OperandComponent,
+        // // action ASSIGN-VARIABLE elements: end //
+        //  // action ASSIGN-VARIABLE-V2 elements: start //
+        //  OperationV2Component,
+        //  OperatorV2Component,
+        //  OperandV2Component,
+        //  // action ASSIGN-VARIABLE-V2 elements: end //
+        // // action JSON-CONDITION elements: start //
+        // BaseConditionRowComponent,
+        // BaseFilterComponent,
+        // // VariableListComponent,
+        // // action JSON-CONDITION elements: end //
+        // // action ASKGPT elements: start //
+        // AddkbDialogComponent,
+        // // action ASKGPT elements: end //
+        // // action GptTask elements: start //
+        // AttributesDialogComponent,
+        // // action GptTask elements: end //
 
 
-        //VXML ACTIONS //
-        CdsActionDTMFFormComponent,
-          // action DTMFForm elements: start //
-          CdsActionReplyToolsVoiceComponent,
-          CdsActionReplySettingsComponent,
-          // action DTMFForm elements: end //
+        // //VXML ACTIONS //
+        // CdsActionDTMFFormComponent,
+        //   // action DTMFForm elements: start //
+        //   CdsActionReplyToolsVoiceComponent,
+        //   CdsActionReplySettingsComponent,
+        //   // action DTMFForm elements: end //
 
     // ******* CDS CANVAS:: end *******
 
@@ -362,14 +362,14 @@ import { CdsBaseElementModule } from '../shared/cds-base-element.module';
     // CdsPublishOnCommunityModalComponent,
     // ChangeBotLangModalComponent,
     // NetworkOfflineComponent,
-    MouseTipsComponent,
+    // MouseTipsComponent,
     // ChangelogComponent,
     
     //EVENT BASE COMPONENT
-    CdsEventComponent,
-    CdsRuleComponent,
-    CdsOptionsComponent,
-    CdsPanelConnectorMenuComponent,
+    // CdsEventComponent,
+    // CdsRuleComponent,
+    // CdsOptionsComponent,
+    // CdsPanelConnectorMenuComponent,
     
     GetVariableNamePipe,
     // ContextMenuComponent,
@@ -405,21 +405,21 @@ import { CdsBaseElementModule } from '../shared/cds-base-element.module';
     // MatExpansionModule,
     // MatTabsModule,
     // MatMenuModule,
-    RouterModule,
-    TranslateModule,
-    FormsModule,
-    ReactiveFormsModule,
-    SatPopoverModule,
+    // RouterModule,
+    // TranslateModule,
+    // FormsModule,
+    // ReactiveFormsModule,
+    // SatPopoverModule,
     // SharedModule,
-    MaterialModule,
-    CdsBaseElementModule
+    // MaterialModule,
+    // CdsBaseElementModule
   ],
   providers: [
-    WsChatbotService,
+    // WsChatbotService,
     // DragDropService
   ],
   entryComponents: [
-    ChangeBotLangModalComponent,
+    // ChangeBotLangModalComponent,
   ]
 })
 export class ChatbotDesignStudioModule { }
