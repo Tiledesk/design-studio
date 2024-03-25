@@ -62,6 +62,7 @@ export class CdsGlobalsComponent implements OnInit {
 
   showUpdateSecret(index, global) {
     this.updateIndex = index;
+    console.log('indexxxxx', this.updateIndex)
     if (global) {
       this.IS_OPEN_PANEL_GLOBAL_DETAIL = true
       this.selectedGlobal = global
@@ -126,8 +127,7 @@ export class CdsGlobalsComponent implements OnInit {
         this.list[this.updateIndex] = event.element
         break;
       case 'delete':
-        let index = this.list.findIndex(s => s.key === this.updateIndex);
-        this.list.splice(index, 1);
+        this.list.splice(this.updateIndex, 1);
         break;
       case 'return':
         break;
