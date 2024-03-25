@@ -67,17 +67,17 @@
     <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies" cdkDrag > 
         
         <!-- DRAG PLACEHOLDER -->
-        <cds-action-reply-button class="custom-placeholder" *cdkDragPlaceholder
+        <cds-action-reply-voice-button class="custom-placeholder" *cdkDragPlaceholder
             [button]="button"
             [previewMode]="previewMode">
-        </cds-action-reply-button>
+        </cds-action-reply-voice-button>
         
-        <cds-action-reply-button [class.connected]='button.__isConnected' cdkDragHandle
+        <cds-action-reply-voice-button [class.connected]='button.__isConnected' cdkDragHandle
             (click)="$event.stopPropagation(); onOpenButtonPanel(button)"
             [button]="button"
             [previewMode]="previewMode"
             (onButtonControl)="onButtonControl($event, i)">
-        </cds-action-reply-button>
+        </cds-action-reply-voice-button>
 
         <cds-connector *ngIf="previewMode && button.type !== TYPE_BUTTON.URL"
             class="button-connector"

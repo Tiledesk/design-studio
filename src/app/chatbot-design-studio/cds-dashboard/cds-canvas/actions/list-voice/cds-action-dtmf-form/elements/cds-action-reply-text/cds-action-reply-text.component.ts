@@ -12,11 +12,11 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
-  selector: 'cds-action-reply-text',
+  selector: 'cds-action-reply-voice-text',
   templateUrl: './cds-action-reply-text.component.html',
   styleUrls: ['./cds-action-reply-text.component.scss']
 })
-export class CdsActionReplyTextComponent implements OnInit {
+export class CdsActionReplyVoiceTextComponent implements OnInit {
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   
   @Output() updateAndSaveAction = new EventEmitter();

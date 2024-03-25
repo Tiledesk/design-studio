@@ -293,7 +293,7 @@ $margin-bottom: 15px;
 //     }
 // }
 
-cds-action-reply-text,
+cds-action-reply-voice-text,
 cds-action-reply-image,
 cds-action-reply-settings{
     display: flex;
@@ -303,7 +303,7 @@ cds-action-reply-settings{
 
 
 /*  REMOVE DROP AND MOVE_UP/MOVE_DOWN INDICATORS for RANDOM_REPLY type only */
-cds-action-reply-text.no-controls ::ng-deep,
+cds-action-reply-voice-text.no-controls ::ng-deep,
 cds-action-reply-settings.no-controls ::ng-deep{
     .text-editor-drop{
         display: none;

@@ -2,11 +2,11 @@ import { Component, Input, OnInit, EventEmitter, Output, SimpleChanges } from '@
 import { TYPE_BUTTON } from '../../../../../../../utils';
 
 @Component({
-  selector: 'cds-action-reply-button',
+  selector: 'cds-action-reply-voice-button',
   templateUrl: './cds-action-reply-button.component.html',
   styleUrls: ['./cds-action-reply-button.component.scss']
 })
-export class CdsActionReplyButtonComponent implements OnInit {
+export class CdsActionReplyVoiceButtonComponent implements OnInit {
 
   @Input() button: any
   @Input() previewMode: boolean = true;

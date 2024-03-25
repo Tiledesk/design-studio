@@ -9,6 +9,8 @@ import { CdsActionReplySettingsComponent } from '../list-voice/cds-action-dtmf-f
 import { CdsActionReplyToolsVoiceComponent } from '../list-voice/cds-action-dtmf-form/elements/cds-action-reply-tools-voice/cds-action-reply-tools-voice.component';
 import { BaseElementModule } from 'src/app/shared/base-element.module';
 import { CdsActionVoiceComponent } from '../list-voice/cds-action-dtmf-form/cds-action-voice.component';
+import { CdsActionReplyVoiceTextComponent } from './cds-action-dtmf-form/elements/cds-action-reply-text/cds-action-reply-text.component';
+import { CdsActionReplyVoiceButtonComponent } from './cds-action-dtmf-form/elements/cds-action-reply-button/cds-action-reply-button.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +19,8 @@ import { CdsActionVoiceComponent } from '../list-voice/cds-action-dtmf-form/cds-
       // action DTMFForm elements: start //
       CdsActionReplyToolsVoiceComponent,
       CdsActionReplySettingsComponent,
+      CdsActionReplyVoiceTextComponent,
+      CdsActionReplyVoiceButtonComponent
       // action DTMFForm elements: end //
   ],
   imports: [
@@ -33,6 +37,8 @@ import { CdsActionVoiceComponent } from '../list-voice/cds-action-dtmf-form/cds-
       // action DTMFForm elements: start //
       CdsActionReplyToolsVoiceComponent,
       CdsActionReplySettingsComponent,
+      CdsActionReplyVoiceTextComponent,
+      CdsActionReplyVoiceButtonComponent
       // action DTMFForm elements: end //
   ]
 })
