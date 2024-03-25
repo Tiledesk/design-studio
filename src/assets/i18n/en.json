@@ -403,7 +403,9 @@
         "TransferTo": "Transfer to",
         "BargeIn":"Barge-in",
         "NoMatch":"No match",
-        "NoInput":"No input"
+        "NoInput":"No input",
+        "RequestTimeout":"Request timeout",
+        "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. To never time out, set to 0."
     },
     "Name":"Name",
     "Label": "Label",

@@ -75,6 +75,7 @@
         <mat-button-toggle-group [(ngModel)]="optionSelected" (change)="onChangeOption($event)">
             <mat-button-toggle value="header">Header</mat-button-toggle>
             <mat-button-toggle value="body">Body</mat-button-toggle>
+            <mat-button-toggle value="settings">Settings</mat-button-toggle>
         </mat-button-toggle-group>
 
         <!-- <div class="add-response" (click)="onChangeParamsButton()">
@@ -125,6 +126,28 @@
             <span>{{errorMessage}}</span>
         </div>
 
+    </div>
+
+    <div class="cds-web-request-row"  *ngIf="optionSelected === 'settings'">
+       
+        <div class="cds-web-request-row-setting">
+            <div class="setting-left">
+                <label class="title-label">{{'CDSCanvas.RequestTimeout' | translate}}</label>
+                <label class="subtitle-label">{{'CDSCanvas.RequestTimeoutInfo' | translate }}</label>
+            </div>
+            <div class="setting-right">
+                <cds-textarea id="timeout"
+                    class = "text-editable-div"
+                    [text]="jsonSettings?.timeout"
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false"
+                    [setAttributeBtn]="true"
+                    [minRow]="1" [maxRow]="1"
+                    (blur)="onBlur($event)"
+                    (changeTextarea)="onChangeTextarea($event, 'setting')">
+                </cds-textarea>
+            </div>
+        </div>
     </div>
 
     <hr class="custom-divider">

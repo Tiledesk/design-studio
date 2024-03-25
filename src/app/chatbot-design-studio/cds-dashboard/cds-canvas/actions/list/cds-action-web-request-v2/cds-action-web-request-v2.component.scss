@@ -119,6 +119,20 @@
 }
 
 
+.cds-web-request-row-setting{
+    display: flex;
+    .setting-left{
+        display: flex;
+        flex-direction: column;
+        width: 80%;
+    }
+    .setting-right{
+        width: 20%;
+    }
+
+}
+
+
 /** CSS textarea */
 .text-editor-wrapper {
     font-size: var(--font-size-base);
