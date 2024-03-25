@@ -54,8 +54,11 @@ export class CdsActionHubspotComponent implements OnInit {
     this.logger.debug("[ACTION-HUBSPOT] action detail: ", this.action);
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-HUBSPOT] isChangedConnector -->', connector);
-      this.connector = connector;
-      this.updateConnector();
+      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
+      if(connector.fromId.startsWith(connectorId)){
+        this.connector = connector;
+        this.updateConnector();
+      }
     });
     this.initialize();
   }
@@ -138,9 +141,6 @@ export class CdsActionHubspotComponent implements OnInit {
 
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'hubspot_result')) {
-      new_attributes.push({ name: "hubspot_result", value: "hubspot_result" });
-    }
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'hubspot_status')) {
       new_attributes.push({ name: "hubspot_status", value: "hubspot_status" });
     }
@@ -160,7 +160,7 @@ export class CdsActionHubspotComponent implements OnInit {
       case 'token' : {
         this.action.token = e;
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        console.log("[ACTION-HUBSPOT] this.action", this.action);
+        this.logger.log("[ACTION-HUBSPOT] this.action", this.action);
       }
     }
   }

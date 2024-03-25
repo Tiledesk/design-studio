@@ -32,6 +32,12 @@ export class CdsActionReplyFrameComponent implements OnInit {
   // Delay //
   delayTime: number;
   // Filter // 
+  isOpenDelaySlider: boolean = false;
+  isOpenFilter: boolean = false;
+  isOpenHeightSlider: boolean = false;
+  heightIframe: any;
+
+  canShowHeight: boolean = true;
   canShowFilter: boolean = true;
   filterConditionExist: boolean = false;
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
@@ -51,6 +57,11 @@ export class CdsActionReplyFrameComponent implements OnInit {
     if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
       this.filterConditionExist = true
     }
+    if (typeof this.response?.metadata?.height === 'string') {
+      this.heightIframe = parseFloat(this.response.metadata.height);
+    } else {
+      this.heightIframe = this.response?.metadata?.height;
+    }
   }
 
 
@@ -58,7 +69,13 @@ export class CdsActionReplyFrameComponent implements OnInit {
   // EVENT FUNCTIONS //
   /** */
   onClickDelayTime(opened: boolean){
-    this.canShowFilter = !opened;
+    this.isOpenDelaySlider = !this.isOpenDelaySlider;
+    // this.canShowFilter = !opened;
+  }
+
+  onClickHeightIframe(opened: boolean){
+    this.isOpenHeightSlider = !this.isOpenHeightSlider;
+    this.canShowHeight = !this.canShowHeight;
   }
 
 
@@ -66,7 +83,8 @@ export class CdsActionReplyFrameComponent implements OnInit {
   onChangeDelayTime(value:number){
     this.delayTime = value;
     this.wait.time = value*1000;
-    this.canShowFilter = true;
+    this.isOpenDelaySlider = false;
+    // this.canShowFilter = true;
     this.changeActionReply.emit();
   }
 
@@ -112,7 +130,16 @@ export class CdsActionReplyFrameComponent implements OnInit {
 
   /** */
   onLoadPathElement(){
+    //this.response.metadata.height = '1000px';
     this.changeActionReply.emit();
   }
+
+  /** */
+  onChangeHeightIframe(height){
+    this.isOpenHeightSlider = false;
+    this.response.metadata.height = height+'px';
+    this.changeActionReply.emit();
+  }
+  
 
 }

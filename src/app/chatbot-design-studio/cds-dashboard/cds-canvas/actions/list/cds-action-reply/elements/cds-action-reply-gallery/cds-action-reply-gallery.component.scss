@@ -3,89 +3,19 @@
 :host{
     --cardImageHeight: 150px;
     --cardWidth: 220px;
-    --border-color: #{$blu-light-01};
-    --base-color: #{$blu-light-02};
-}
-
-
-.extensions-response {
-    font-size: var(--font-size-base);
-    position: relative;
-    width: calc(100% - 6px);
-    height: auto;
-    margin: 27px 0px 5px 0px;
-    padding: 0px 30px;
-    display: flex;
-    flex-wrap: wrap;
-    row-gap: 5px;
-    column-gap: 5px;
-    .delay-wrapper,
-    .filter-wrapper {
-        display: block;
-        height: auto;
-        width: auto;
-        // padding: 0em 0.75em 0;
-    }
-
-    .response-controls {
-        position: absolute;
-        top: 26px;
-        left: 0px;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-    }
-
-    .add-filter-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        padding: 0px 9px;
-        height: 26px;
-        font-size: .9em;
-        font-weight: 400;
-        border-radius: 13px;
-        transition: all 0.3s ease 0s;
-        background: $blu;
-        color: $blu-light-01;
-    
-        span.material-icons-outlined{
-            font-size: 20px;
-            color: white;
-        }
-    
-        &:hover{
-            opacity: 0.8;
-            cursor: pointer;
-        }
-    }
-}
-
-.extensions-response:hover{
-    .response-controls {
-        opacity: 1;
-    }
-}
-
-appdashboard-delay-slider,
-appdashboard-filter{
-    display: flex;
+    --border-color: #{var(--blu-light-01)};
+    --base-color: #{var(--blu-light-02)};
 }
 
 .previewMode{
     display: flex;
     flex-direction: column;
-    gap: $base-element-gap;
-
-    &.extensions-response{
-        margin: 0;
-        padding: 0 10px 0px 25px;
-    }
+    gap: var(--base-element-gap);
 
     .galleryElement {
         margin: 0;
         // padding: 8px;
-        gap: $base-element-gap;
+        gap: var(--base-element-gap);
         display: flex;
         flex-direction: column;
         // background-color: #ffffff80; // nk
@@ -162,7 +92,7 @@ appdashboard-filter{
         display: flex;
         margin: 0px; //15px 0 0;
         padding: 0px 0px 0px 0px;
-        gap: $base-element-gap;
+        gap: var(--base-element-gap);
         width: 100%;
         font-size: 14px;
         // padding: 0 5px;
@@ -183,7 +113,7 @@ appdashboard-filter{
         margin: 10px 5px;
         background: #dfdfdf;
         border: dotted 0px #999;
-        height: $button-height-base;
+        height: var(--button-height-base);
         transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
     }
 
@@ -199,40 +129,6 @@ appdashboard-filter{
     }
  
 }
-
-/** response-controls **/
-.response-controls {
-    .control-button {
-        cursor: pointer;
-        color: $blu-04;
-        transition: color .3s;
-        height: 20px;
-        &.delete{
-            height: 24px;
-            width: 24px;
-            background: var(--base-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            em {
-                font-size: 1.15em;
-                color: $blu;
-                transition: color .3s;
-            }
-        }
-    }
-    .control-button:hover{
-        color: var(--base-color);
-        &.delete{
-            box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
-            em {
-                color: var(--color-red-hex);
-            }
-        }
-    }
-}
-
 
 
 /** BUTTONS **/
@@ -255,18 +151,18 @@ appdashboard-filter{
     box-sizing: border-box;
     outline: none;
     background: var(--color-white-hex);
-    border-radius: $button-border-radius-base;
+    border-radius: var(--button-border-radius-base);
     cursor: pointer;
     font-size: 1em;
     font-weight: 500;
-    line-height: $button-height-base;
+    line-height: var(--button-height-base);
     text-align: center;
     transition: all .3s;
     &.custom-placeholder {
         margin: 10px 5px;
         background: #dfdfdf;
         border: dotted 0px #999;
-        height: $button-height-base;
+        height: var(--button-height-base);
         transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
     }
 }
@@ -315,7 +211,7 @@ appdashboard-filter{
         width: 100%;
         position: relative;
 
-        line-height: $button-height-base;
+        line-height: var(--button-height-base);
         padding: 5px 10px;
         font-size: 0.7em;
         font-weight: 500;
@@ -439,9 +335,9 @@ appdashboard-filter{
     cursor: pointer;
     font-size: 1em;
     font-weight: 500;
-    line-height: $button-height-base;
+    line-height: var(--button-height-base);
     border: 1px solid var(--border-color);
-    border-radius: $button-border-radius-base;
+    border-radius: var(--button-border-radius-base);
     text-align: center;
     box-sizing: border-box;
     margin: 0;
@@ -475,7 +371,7 @@ appdashboard-filter{
     overflow: hidden;
     position: relative;
     width: 100%;
-    border-radius: $button-border-radius-base $button-border-radius-base 0px 0px;
+    border-radius: var(--button-border-radius-base) var(--button-border-radius-base) 0px 0px;
 
     .image-overlay{
         // display: flex;
@@ -541,7 +437,7 @@ cds-image-upload ::ng-deep {
 
         .control-button {
             cursor: pointer;
-            color: $blu-04;
+            color: var(--blu-04);
             transition: color .3s;
             height: 20px;
             opacity: 0;
@@ -556,7 +452,7 @@ cds-image-upload ::ng-deep {
                 position: absolute;
                 em {
                     font-size: 1.15em;
-                    color: $blu;
+                    color: var(--blu);
                     transition: color .3s;
                 }
             }
@@ -575,12 +471,12 @@ cds-image-upload ::ng-deep {
     box-sizing: border-box;
     outline: none;
     border: 1px dashed var(--base-color);
-    border-radius: $button-border-radius-base;
+    border-radius: var(--button-border-radius-base);
     color: var(--base-color);
     cursor: pointer;
     font-size: 0.7em;
     font-weight: 400;
-    line-height: $button-height-base;
+    line-height: var(--button-height-base);
     // margin: 0px 5px 0;
     order: 1;
     padding: 0 10px;
@@ -607,8 +503,8 @@ cds-image-upload ::ng-deep {
     }
     .control-button {
         cursor: pointer;
-        background: $blu-light-02;
-        color: $blu;
+        background: var(--blu-light-02);
+        color: var(--blu);
         transition: color .3s;
         height: 24px;
         width: 24px;
@@ -619,7 +515,7 @@ cds-image-upload ::ng-deep {
         margin: 0 2px;
         em {
             font-size: 1.15em;
-            color: $blu;
+            color: var(--blu);
             transition: color .3s;
         }
     }
@@ -758,7 +654,7 @@ cds-textarea#title ::ng-deep{
 
 cds-textarea#description.noButtons ::ng-deep{
     textarea {
-        border-radius: 0px 0px $button-border-radius-base $button-border-radius-base;
+        border-radius: 0px 0px var(--button-border-radius-base) var(--button-border-radius-base);
     }
 }
 

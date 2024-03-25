@@ -54,8 +54,12 @@ export class CdsActionMakeComponent implements OnInit {
     this.logger.debug("[ACTION-MAKE] action detail: ", this.action, ACTIONS_LIST["MAKE"].plan);
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-MAKE] isChangedConnector -->', connector);
-      this.connector = connector;
-      this.updateConnector();
+      //console.log('[ACTION-MAKE] isChangedConnector indexIdMatch -->', connector, this.idIntentSelected, this.action._tdActionId);
+      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
+      if(connector.fromId.startsWith(connectorId)){
+        this.connector = connector;
+        this.updateConnector();
+      }
     });
     this.initialize();
   }
@@ -188,7 +192,7 @@ export class CdsActionMakeComponent implements OnInit {
       case 'url' : {
         this.action.url = e;
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        console.log("[ACTION MAKE] this.action", this.action);
+        this.logger.log("[ACTION MAKE] this.action", this.action);
       }
     }
 

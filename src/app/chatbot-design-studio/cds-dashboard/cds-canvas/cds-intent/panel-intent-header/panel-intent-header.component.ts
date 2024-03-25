@@ -131,7 +131,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   /** ENTER KEYBOARD EVENT*/
   onEnterButtonPressed(event) {
-    console.log('[PANEL-INTENT-HEADER] onEnterButtonPressed Intent name: onEnterButtonPressed event', event)
+    this.logger.log('[PANEL-INTENT-HEADER] onEnterButtonPressed Intent name: onEnterButtonPressed event', event)
     // // this.checkIntentName(this.intentName);
     // // this.onSaveIntent();
     // event.target.blur()

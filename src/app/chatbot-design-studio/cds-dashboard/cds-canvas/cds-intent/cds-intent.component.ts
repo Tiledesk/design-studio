@@ -3,7 +3,7 @@ import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
 import { Subject, Subscription } from 'rxjs';
 
-import { ACTIONS_LIST, TYPE_ACTION, TYPE_INTENT_NAME, checkInternalIntent } from '../../../utils';
+import { ACTIONS_LIST, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_INTENT_NAME, checkInternalIntent } from '../../../utils';
 import { IntentService } from '../../../services/intent.service';
 // import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
 import { ConnectorService } from '../../../services/connector.service';
@@ -25,6 +25,7 @@ import { ControllerService } from '../../../services/controller.service';
 import { replaceItemInArrayForKey } from '../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 
 
 export enum HAS_SELECTED_TYPE {
@@ -70,6 +71,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   listOfActions: Action[];
   HAS_SELECTED_TYPE = HAS_SELECTED_TYPE;
   TYPE_ACTION = TYPE_ACTION;
+  TYPE_ACTION_VXML = TYPE_ACTION_VXML;
   ACTIONS_LIST = ACTIONS_LIST;
   elementTypeSelected: HAS_SELECTED_TYPE
   isOpen: boolean = true;
@@ -97,7 +99,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     private stageService: StageService,
     private controllerService: ControllerService,
     private elemenRef: ElementRef,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private appStorageService: AppStorageService
   ) {
     this.initSubscriptions()
   }
@@ -127,6 +130,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             //   return obj._tdActionType !== TYPE_ACTION.INTENT;
             // });
           }
+
+
 
           //UPDATE QUESTIONS
           if (this.intent.question) {
@@ -474,14 +479,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.formSelected.emit(this.intent.form);
   }
 
-  onClickControl(event: 'delete' | 'edit', action: Action, index: number) {
-    this.logger.log('[CDS-INTENT] onClickControl', event)
+  onClickControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number) {
+    this.logger.log('[CDS-INTENT] onClickControl', event, action);
     if (event === 'edit') {
       this.onSelectAction(action, index, action._tdActionId)
     } else if (event === 'delete') {
       this.intentService.selectAction(this.intent.intent_id, action._tdActionId)
       this.intentService.deleteSelectedAction();
       // this.actionDeleted.emit(true)
+    } else if (event === 'copy') {
+      this.copyAction(action);
     }
   }
 
@@ -573,13 +580,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   onDragEnded(event, index) {
     this.logger.log('[CDS-INTENT] onDragEnded: ', event, this.intent.intent_id);
     this.isDragging = false;
+    
     this.connectorService.updateConnector(this.intent.intent_id);
     // const previousIntentId = this.intentService.previousIntentId;
     // if(previousIntentId){
     //   this.logger.log("[CDS-INTENT] onDropAction previousIntentId: ", previousIntentId);
     //   this.connectorService.updateConnector(previousIntentId);
     // }
-    this.connectorService.updateConnector(this.intent.intent_id);
+    // this.connectorService.updateConnector(this.intent.intent_id);
   }
 
 
@@ -711,7 +719,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** ******************************
    * intent controls options: START
    * ****************************** */
-  onOptionIntentControlClicked(event: 'webhook' | 'delete' | 'test'){
+  onOptionIntentControlClicked(event: 'webhook' | 'delete' | 'test' | 'copy'){
     switch(event){
       case 'webhook':
         this.toggleIntentWebhook(this.intent);
@@ -721,7 +729,26 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         break;
       case 'test':
         this.openTestSiteInPopupWindow()
+        break;
+      case 'copy':
+        this.copyIntent();
+        break;
     }
+  }
+
+
+  private copyIntent(){
+    let intent = JSON.parse(JSON.stringify(this.intent));
+    const element = {element: intent, type: 'INTENT', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
+    let data = this.intentService.copyElement(element);
+    this.appStorageService.setItem(data.key, data.data)
+  }
+
+  private copyAction(ele){
+    let action = JSON.parse(JSON.stringify(ele));
+    const element = {element: action, type: 'ACTION', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
+    let data = this.intentService.copyElement(element);
+    this.appStorageService.setItem(data.key, data.data)
   }
 
   openTestSiteInPopupWindow() {

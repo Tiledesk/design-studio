@@ -87,7 +87,7 @@
             tabindex="0" 
             [ngClass]="{
             'cds-action-active': intentService.actionSelectedID === action._tdActionId, 
-            'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY,
+            'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
             'cds-last-action': last
             }" 
             (keydown)="onKeydown($event)" 
@@ -116,7 +116,7 @@
                 </cds-action-description>
     
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
-    
+
                     <cds-action-controls 
                         (onClickControl)="onClickControl($event, action, i)">
                     </cds-action-controls>
@@ -207,10 +207,10 @@
                         [action]="action">
                     </cds-action-assign-variable>
 
-                    <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE_V2" 
+                    <cds-action-assign-variable-v2 *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE_V2" 
                         class="panel-response"
                         [action]="action">
-                    </cds-action-assign-variable>
+                    </cds-action-assign-variable-v2>
     
                     <cds-action-delete-variable *ngSwitchCase="TYPE_ACTION.DELETE_VARIABLE" 
                         class="panel-response"
@@ -294,12 +294,48 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-hubspot>
 
+                    <cds-action-customerio *ngSwitchCase="TYPE_ACTION.CUSTOMERIO"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-customerio>
+
+                    <cds-action-brevo *ngSwitchCase="TYPE_ACTION.BREVO"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-brevo>
+
                     <cds-action-code *ngSwitchCase="TYPE_ACTION.CODE"
                         class="panel-response"
                         [intentSelected]="intent"
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-code>
+
+
+                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-voice>
+
+                    <cds-action-voice *ngSwitchCase=" TYPE_ACTION_VXML.DTMF_MENU"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-voice>
+
+                    <cds-action-voice *ngSwitchCase=" TYPE_ACTION_VXML.BLIND_TRANSFER"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-voice>
 
                 </div>
             </span>

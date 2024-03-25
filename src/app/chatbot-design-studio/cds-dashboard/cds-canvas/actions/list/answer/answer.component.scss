@@ -1,13 +1,4 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
-
-
 .text-editor-wrapper {
-    font-size: var(--font-size-base);
-    position: relative;
-    width: 100%;
-    height: auto;
-    margin: 0;
     padding: 50px 0px 20px 0px;
     .text-editor {
         position: relative;
@@ -35,14 +26,14 @@
     width: calc(100% - 40px);
     margin-left: 20px;
     textarea {
-        border-radius: 8px;
+        border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
         border: 1px solid var(--color-white-hex);
         overflow-x: hidden;
         overflow-y: auto;
         width: calc(100% - 2.5em);
         padding: 20px 20px;
-        color: $gray;
+        color: var(--gray);
         font-size: 1.15em;
         line-height: 25px;
         resize: vertical;
@@ -55,8 +46,8 @@ mat-form-field.mat-focused ::ng-deep {
         .mat-form-field-flex {
             .mat-form-field-infix {
                 textarea {
-                    border: 1px solid $blu !important;
-                    outline: 1px solid $blu !important;
+                    border: 1px solid var(--blu) !important;
+                    outline: 1px solid var(--blu) !important;
                     transition: border .3s;
                 }
             }

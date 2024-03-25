@@ -98,6 +98,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
 
   /** initialize */
   private initialize(intents){
+    // intents = this.intentService.hiddenEmptyIntents(intents);
     this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK));
     this.defaultIntents = intents.filter(obj => ( obj.intent_display_name.trim() !== TYPE_INTENT_NAME.DISPLAY_NAME_START && obj.intent_display_name.trim() !== TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK));
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DISPLAY_NAME_START, 0);

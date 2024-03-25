@@ -67,7 +67,7 @@
       align-items: center;
       width: 100%;
       background-color: var(--content-background);
-      border: 1px solid $gray-light-02;
+      border: 1px solid var(--gray-light-02);
       border-radius: 8px;
       padding: 10px;
       gap: 20px;
@@ -76,14 +76,14 @@
         font-size: 17px;
         line-height: 17px;
         font-weight: 500;
-        color: $blu;
+        color: var(--blu);
       }
       .subtitle{
         font-size: 13px;
-        color: $gray;
+        color: var(--gray);
       }
       span.material-icons-outlined{
-        color: $blu;
+        color: var(--blu);
       }
       &:hover{
         cursor: pointer;
@@ -101,7 +101,7 @@
     gap: 10px;
 
     #ignoreBtn{
-        background-color: $blu-light-02;
+        background-color: var(--blu-light-02);
     }
 
 }
@@ -109,7 +109,7 @@
 div.code{
   // background-color: var(--content-background);
   background-color: rgb(43, 47, 50);
-  border: 1px solid $gray-light-02;
+  border: 1px solid var(--gray-light-02);
   overflow: hidden;
   position: relative;
   border-radius: 8px;

@@ -1,4 +1,4 @@
-<div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
+<div *ngIf="previewMode" class="cds-action-preview previewMode" style="position: relative;">
     <div class="response-wrp limit-content" *ngIf="action.source">{{action.source}}</div>
     <div class="response-wrp no-text" *ngIf="!action.source">{{'CDSCanvas.ClickToAddCodeSource' | translate }}</div>
 </div>

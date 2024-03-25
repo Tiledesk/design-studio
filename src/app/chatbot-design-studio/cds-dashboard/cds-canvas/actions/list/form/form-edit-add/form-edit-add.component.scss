@@ -1,11 +1,9 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 :host {
-    --background-color: #{$blu-light-04};
-    --text-color: #{$blu};
-    --icon-color: #{$blu-light-02};
-    --selected-row-background: #{$blu-light-02};
-    --selected-row-color:  #{$blu-light-03};
+    --background-color: #{var(--blu-light-04)};
+    --text-color: #{var(--blu)};
+    --icon-color: #{var(--blu-light-02)};
+    --selected-row-background: #{var(--blu-light-02)};
+    --selected-row-color:  #{var(--blu-light-03)};
 
     --content-background: rgb(244, 246, 251, 0.4);
 }
@@ -13,7 +11,7 @@
 
 .tilebot-add-edit-form {
     background-color: var(--content-background);
-    border: 1px solid $gray-light-02;
+    border: 1px solid var(--gray-light-02);
     border-radius: 4px;
     height: auto;
     max-height: 0;
@@ -114,14 +112,14 @@ cds-select#method ::ng-deep{
     min-width:120px;
     .ng-select-container{
         height: 37px;
-        border-radius: 8px 0px 0px 8px;
+        border-radius: var(--input-border-radius-base) 0px 0px var(--input-border-radius-base);
     }
 }
 cds-select#method.no-regex ::ng-deep{
 
     .ng-select-container{
         height: 37px;
-        border-radius: 8px 8px 8px 8px;
+        border-radius: var(--input-border-radius-base);
     }
 }
 
@@ -130,7 +128,7 @@ cds-textarea#regex ::ng-deep {
     width: 100%;
     // padding: 6px 0px 0px 0;
     textarea {
-        border-radius: 0px 8px 8px 0px;
+        border-radius: 0px var(--input-border-radius-base) var(--input-border-radius-base) 0px;
         resize: none !important; 
         padding: 6px 16px !important;
 

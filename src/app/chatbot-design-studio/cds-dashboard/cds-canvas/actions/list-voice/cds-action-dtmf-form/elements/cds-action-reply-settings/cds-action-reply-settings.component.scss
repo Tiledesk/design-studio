@@ -1,0 +1,103 @@
+.previewMode{
+    .set-attribute-label-and-value-wpr {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        justify-content: flex-end;
+        margin: 5px 15px;
+    }
+    .set-attribute-label {
+        font-size: 12px;
+        margin-bottom: 0;
+        font-weight: 400;
+        // background: #e8e6dd;
+        padding: 0px 3px;
+        height: inherit;
+    }
+
+    .response-wrp{
+        width: calc(100% - 150px);
+        margin: unset;
+
+        &.expand{
+            width: calc(100% - 80px);
+        }
+    }
+    .no-text{
+        border-color: var(--empty-element-property);
+        height: 30px;
+    }
+
+    .previewContent{
+        padding: 5px 10px;
+        margin: 0px;
+        position: relative;
+    }
+}
+
+/* ./ Preview mode 
+/* ****************************** */
+
+
+.editor-utils {
+    position: relative;
+    margin: -20px 50px 0px 0px;
+    float: right;
+    .num-chars {
+        background: var(--blu-light-01);
+        flex-shrink: 0;
+        padding: 0px 8px;
+        border-radius: 10px;
+        font-size: 0.8em;
+        color: var(--blu);
+        float: right;
+        line-height: 24px;
+        font-weight: 700;
+        // width: 40px;
+        text-align: center;
+        &.error {
+            background: var(--color-red-hex);
+            color: var(--color-white-hex);
+            }
+    }
+    .text-editor-insert-attribute {
+        float: right;
+    }
+    .moji-picker {
+        float: right;
+    }
+}
+.setting-wrapper{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 var(--input-base-margin);
+    justify-content: space-between;
+    gap: 5px;
+
+    // this will target the last flashcard but only if there are an odd number of cards
+    & > *:nth-child(odd):last-child { 
+        grid-column: span 2;
+    }
+}
+
+.connector-wrapper{
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--input-base-margin);
+    justify-content: space-between;
+    gap: 5px;
+}
+
+
+
+
+/** box-textarea **/
+cds-textarea.text-editable-div ::ng-deep{
+    display: block;
+    // width: calc(100% - 66px);
+    textarea {
+        line-height: 20px !important; 
+        width: calc(100% - 20px) !important;
+        font-size: 0.9em !important;
+    }
+}

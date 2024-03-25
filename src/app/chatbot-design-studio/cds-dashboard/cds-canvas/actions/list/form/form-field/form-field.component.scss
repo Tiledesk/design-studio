@@ -1,11 +1,9 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 :host {
-    --background-color: #{$blu-light-01};
-    --text-color: #{$blu};
-    --icon-color: #{$blu-light-02};
-    --selected-row-background: #{$blu-light-02};
-    --selected-row-color:  #{$blu-light-03};
+    --background-color: #{var(--blu-light-01)};
+    --text-color: #{var(--blu)};
+    --icon-color: #{var(--blu-light-02)};
+    --selected-row-background: #{var(--blu-light-02)};
+    --selected-row-color:  #{var(--blu-light-03)};
 }
 
 .card-content{

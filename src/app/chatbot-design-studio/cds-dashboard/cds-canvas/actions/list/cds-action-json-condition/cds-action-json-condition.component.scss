@@ -1,10 +1,8 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 :host{
-    --icon-color: #{$blu};
-    --textColor: #{$blu};
-    --backGroundColor: #{$blu-light-03};
-    --hoverBackgroundColor: #{$blu-light-03};
+    --icon-color: #{var(--blu)};
+    --textColor: #{var(--blu)};
+    --backGroundColor: #{var(--blu-light-03)};
+    --hoverBackgroundColor: #{var(--blu-light-03)};
 
     --border-radius-base: 8px
 }
@@ -71,7 +69,7 @@
         justify-content: center;
         margin-right: 10px;
         width: 22px;
-        background: $action-item-background;
+        background: var(--action-item-background);
         border-radius: 100%;
         transition: background-color 0.3s ease 0s;
 
@@ -185,15 +183,15 @@ cds-select.operator ::ng-deep{
 }
   
 ::ng-deep .mat-checkbox.mat-accent .mat-checkbox-frame {
-    border-color: $blu !important;
+    border-color: var(--blu) !important;
 }
   
 // overwrite the checkbox background
 ::ng-deep .mat-checkbox-checked .mat-checkbox-background, 
 .mat-checkbox-indeterminate .mat-checkbox-background {
-    background-color: $blu !important;
+    background-color: var(--blu) !important;
     .mat-checkbox-checkmark {
-        background: $blu !important;;
+        background: var(--blu) !important;;
         .mat-checkbox-checkmark-path {
         stroke: white;
         stroke-width: 5px;
@@ -225,7 +223,7 @@ cds-select.operator ::ng-deep{
     .expression{
         font-size: 9px;
         line-height: 15px;
-        background-color: $intent-preview-background;
+        background-color: var(--intent-preview-background);
         padding: 3px;
         border-radius: 4px;
         width: 100%;

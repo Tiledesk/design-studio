@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CdsContextMenuComponent } from './cds-context-menu.component';
+import { ToogleComponent } from './toogle.component';
 
-describe('CdsContextMenuComponent', () => {
-  let component: CdsContextMenuComponent;
-  let fixture: ComponentFixture<CdsContextMenuComponent>;
+describe('ToogleComponent', () => {
+  let component: ToogleComponent;
+  let fixture: ComponentFixture<ToogleComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CdsContextMenuComponent ]
+      declarations: [ ToogleComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CdsContextMenuComponent);
+    fixture = TestBed.createComponent(ToogleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

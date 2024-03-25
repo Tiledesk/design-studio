@@ -13,7 +13,7 @@
     height: 6px;
     position: relative;
     overflow: hidden;
-    color: $blu; 
+    color: var(--blu); 
     transform: rotate(90deg);
     top: 15px;
 }
@@ -51,5 +51,5 @@
 
 .cds-action-arrow-icon{
     font-size: 25px;
-    color: $blu;
+    color: var(--blu);
 }

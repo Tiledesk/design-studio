@@ -2,9 +2,9 @@
 
 
 :host {
-    --background-color: #{$blu-light-01};
-    --slider-background-color: #{$blu-light-03};
-    --text-color: #{$blu};
+    --background-color: #{var(--blu-light-01)};
+    --slider-background-color: #{var(--blu-light-03)};
+    --text-color: #{var(--blu)};
 }
 
 ::-webkit-scrollbar {
@@ -12,10 +12,7 @@
 }
 
 .custom-divider {
-    margin-top: 40px;
-    margin-bottom: 20px;
-    border: 0;
-    border-top: 1px solid $blu;
+    border-top: 1px solid var(--blu);
 }
 
 
@@ -282,12 +279,12 @@ a.link{
     max-height: 37px;
     overflow: hidden;
     transition: max-height 0.5s ease-out;
-    border-radius: 8px;
-    background-color: white;
+    border-radius: var(--input-border-radius-base);
+    background-color: var(--color-white-hex);
     padding: 6px 12px;
     font-size: 14px;
-    border: 1px solid $blu-light-02;
-    color: $gray;
+    border: 1px solid var(--blu-light-02);
+    color: var(--gray);
 }
 
 .preview-container-extended {
@@ -300,14 +297,6 @@ a.link{
     align-items: center;
 }
 
-.generating-placeholder {
-    background-color: white;
-    display: flex;
-    padding: 6px 12px;
-    font-size: 14px;
-    border-radius: 8px;
-}
-
 loading-spinner.custom-spinner ::ng-deep {
     .sk-fading-circle {
         width: 20px ;
@@ -316,7 +305,7 @@ loading-spinner.custom-spinner ::ng-deep {
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: $blu ;
+        background-color: var(--blu) ;
     }
 }
 
@@ -342,12 +331,6 @@ loading-spinner.custom-spinner ::ng-deep {
     align-items: center;
     padding: 6px 6px 6px 12px !important;
     margin: 0px 0px 0px 6px !important;
-}
-
-.content#variables {
-    // position: absolute;
-    // left: 440px;
-    // transition: all 0.3s ease-in;
 }
 
 // .content#variables .opened {

@@ -1,6 +1,6 @@
 <div class="header-left" [class.is_opened]="IS_OPEN_SIDEBAR" 
         matTooltip="{{ 'GoBack' | translate}}"  
-        matTooltipClass="custom-mat-tooltip"
+        matTooltipClass="cds-mat-tooltip"
         matTooltipHideDelay="100"
         matTooltipPosition='below'
         #tooltip="matTooltip">
@@ -26,9 +26,8 @@
         <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#006cff">
             <path d="M0 0h24v24H0z" fill="none"/><path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"/>
         </svg> -->
-        <span class="cds-text">
-            {{BRAND_BASE_INFO['META_TITLE']}}
-        </span>    
+        <span class="cds-text"> {{BRAND_BASE_INFO['COMPANY_NAME']}}</span> 
+        <span class="cds-text title"> {{BRAND_BASE_INFO['META_TITLE']}}</span>    
     </div>
     <div class="header-title ellips">
         {{ selectedChatbot?.name }}
@@ -86,7 +85,7 @@
             </button>
         </div>
         <div class="btn-group"
-                matTooltipClass="custom-mat-tooltip"
+                matTooltipClass="cds-mat-tooltip"
                 matTooltip="{{ 'TestIt' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
                 matTooltipHideDelay="100">
                 <!-- *ngIf="!TRY_ON_WA" -->
@@ -117,7 +116,8 @@
     <ng-template matMenuContent>
         <cds-menu
             [items]="LOGO_MENU_ITEMS"
-            (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
+            (onMenuOption)="onMenuOptionFN($event)">
+        </cds-menu>
     </ng-template>
 </mat-menu>
 
@@ -128,7 +128,8 @@
             [items]="SHARE_MENU_ITEMS"
             [menuType]="''"
             [menuTitle]="'SharePrototype' | translate "
-            (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
+            (onMenuOption)="onMenuOptionFN($event)">
+        </cds-menu>
     </ng-template>
 </mat-menu>
 
@@ -138,6 +139,7 @@
         <cds-menu
             [items]="PLAY_MENU_ITEMS"
             [menuType]="''"
-            (onMenuOption)="onMenuOptionFN($event)"></cds-menu>
+            (onMenuOption)="onMenuOptionFN($event)">
+        </cds-menu>
     </ng-template>
 </mat-menu>

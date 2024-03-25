@@ -2,13 +2,13 @@
 @import "./src/assets/sass/cds/styles.scss";
 
 cds-header {
-  height: $header-height;
+  height: var(--header-height);
   font-family: var(--font-family-poppins);
-  line-height: $header-height;
+  line-height: var(--header-height);
   font-size: 21px;
-  color: $blu;
+  color: var(--blu);
   background: white;
-  border-bottom: 1px solid $gray-light-02;
+  border-bottom: 1px solid var(--gray-light-02);
   display: flex;
 }
 
@@ -18,11 +18,11 @@ cds-header {
   margin-top: 0px;
   padding: 0px;
   width: 100%;
-  height: calc(100vh - $header-height);
+  height: calc(100vh - var(--header-height));
   overflow-x: hidden;
   overflow-y: hidden;
   font-family: var(--font-family-poppins);
-  color: $blu;
+  color: var(--blu);
   font-size: 16px;
 }
 
@@ -52,38 +52,22 @@ cds-support {
 }
 
 cds-sidebar {
-  background-color: $blu-light-04;
-  border-right: 1px solid $gray-light-02;
-  width: $sidebar-base-width;
+  background-color: var(--blu-light-04);
+  border-right: 1px solid var(--gray-light-02);
+  width: var(--sidebar-base-width);
   transition: 0.3s;
   display: flex;
-  min-width: $sidebar-base-width;
+  min-width: var(--sidebar-base-width);
   overflow-y: hidden;
 }
 
-.cds-content {
-  display: flex;
-  width: calc(100% - $sidebar-base-width);
-  overflow: hidden;
-}
+// .cds-content {
+//   display: flex;
+//   width: calc(100% - var(--sidebar-base-width));
+//   overflow: hidden;
+// }
 
-.cds-generic-panel {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: auto;
-  height: 100%;
 
-  &#action-detail{
-    z-index: 10
-  }
-  &#button-configuration{
-    z-index: 11
-  }
-  &#widget-preview{
-    z-index: 12
-  }
-}
 
 
 .loader{

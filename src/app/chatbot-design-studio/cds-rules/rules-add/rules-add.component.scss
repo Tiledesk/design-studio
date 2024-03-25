@@ -1,9 +1,9 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 :host {
-  --background-color: #{$blu-light-01};
-  --column-color: #{$blu-02};
-  --text-color: #{$blu};
+  --background-color: #{var(--blu-light-01)};
+  --column-color: var(--blu-02);
+  --text-color: var(--blu);
 
   --content-background: rgb(244, 246, 251, 0.4);
   --base-radius: 8px
@@ -131,8 +131,8 @@ $circle-size: 40px;
   height: 100%;
   
   &#create-rule-form{
-    background: $blu-05;
-    border: 1px solid $blu-05;
+    background: var(--blu-05);
+    border: 1px solid var(--blu-05);
     box-shadow: none;
   }
 

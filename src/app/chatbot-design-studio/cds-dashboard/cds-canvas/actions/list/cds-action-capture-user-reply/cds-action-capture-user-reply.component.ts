@@ -41,8 +41,11 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
 
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-CAPTURE-USER-REPLY] isChangedConnector -->', connector);
-      this.connector = connector;
-      this.updateConnector();
+      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
+      if(connector.fromId.startsWith(connectorId)){
+        this.connector = connector;
+        this.updateConnector();
+      }
     });
     this.initializeConnector();
   }

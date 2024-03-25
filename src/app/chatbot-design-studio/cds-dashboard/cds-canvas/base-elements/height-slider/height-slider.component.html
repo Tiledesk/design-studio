@@ -1,0 +1,32 @@
+<div class="delay" 
+    tabindex="1" 
+    (focusout)="onFocusOut()"
+    [ngClass]="{'open': open}">
+    <em class="delay-button material-icons" (click)="onClick()">height</em>
+    <input class="delay-current input-height" 
+    [(ngModel)]="heightIframe"
+    type="text"
+    (blur)="onBlurHeight($event)"
+    (ngModelChange)="onChangeHeight($event)"
+    ><span class="suffiss delay-current">px</span>
+    <div class="delay-slider" *ngIf="open">
+        <div class="delay-range">{{min}}px</div> 
+        <div class="vue-slider">
+            <mat-slider 
+                min={{min}}
+                max={{max}} 
+                step={{step}}
+                thumbLabel 
+                showTickMarks 
+                discrete 
+                [displayWith]="formatLabel"
+                [(ngModel)]="heightIframe"
+                (focus)="onFocusSlider()"
+                (valueChange)="onValueChange()"
+                (focusout)="onFocusOutSlider()">
+                <input matSliderThumb>
+            </mat-slider>
+        </div>
+        <div class="delay-range">{{max}}px</div>
+    </div>
+</div>

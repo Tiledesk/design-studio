@@ -29,6 +29,7 @@
     "Export":"Export",
     "HelpCenter":"Help Center",
     "RoadMap": "Roadmap",
+    "SystemStatus":"System Status",
     "Feedback":"Feedback",
     "Support":"Support",
     "Help":"Help",
@@ -224,11 +225,11 @@
     "LearnMoreAboutDefaultRoles": "Learn more about default roles",
     "Enabled": "Enabled",
     "Disabled": "Disabled",
-    "YourWebServiceWillReceivePostRequestFrom": "Your web service will receive a POST request from {{ BRAND_NAME }} in the form of the response to a user query matched by intents with webhook enabled.",
+    "YourWebServiceWillReceivePostRequestFrom": "Your web service will receive a POST request from {{BRAND_NAME}} in the form of the response to a user query matched by intents with webhook enabled.",
     "BeSureThatYourWebServiceMeetsAllTheWebhookRequirements": "Be sure that your web service meets all the webhook requirements specific to the API version enabled in this agent.",
     "LearnMoreAboutWebhookRequirements": "Learn more about webhook requirements",
     "WebhookURL":"Webhook URL",
-    "ThisUrlWilReceiveAPostRequestFrom": "This url will receive a POST request from {{ BRAND_NAME }} every time the webhook is triggered by an intent.",
+    "ThisUrlWilReceiveAPostRequestFrom": "This url will receive a POST request from {{BRAND_NAME}} every time the webhook is triggered by an intent.",
     "EnterWebhookURL": "Enter Webhook URL",
     "WebhookmentUrlMustBeAHttpsUrl": "The webhook URL must be an https or http URL",
     "WebhookmentUrlMustBeAValidUrl": "The webhook URL must be a valid URL",
@@ -394,7 +395,15 @@
         "ReplyTo":"Reply to",
         "EmailBody":"Email body",
         "CustomerioFormId":"Customer.io Form Id",
-        "EntercustomerioFormId":"Enter Customer.io Form Id"
+        "EntercustomerioFormId":"Enter Customer.io Form Id",
+        "MinDigits": "Min digits",
+        "MaxDigits": "Max digits",
+        "Terminator":"Terminator",
+        "Timeout": "Timeout",
+        "TransferTo": "Transfer to",
+        "BargeIn":"Barge-in",
+        "NoMatch":"No match",
+        "NoInput":"No input"
     },
     "Name":"Name",
     "Label": "Label",
@@ -456,7 +465,8 @@
         "MostUsed":"Most used",
         "Flow":"Flow",
         "Integrations":"Integrations",
-        "Special":"Special"
+        "Special":"Special",
+        "Voice":"Voice"
     },
     "CDSOperatorList":{
         "equalAsNumbers":"equal As Numbers",
@@ -527,7 +537,11 @@
             "Qapla":"Qapla'",
             "Make":"Make",
             "Hubspot":"Hubspot",
-            "Customerio":"Customer.io"
+            "Customerio":"Customer.io",
+            "Brevo":"Brevo",
+            "DTMFForm":"DTMF Form",
+            "DTMFMenu":"DTMF Menu",
+            "BlindTransfer": "Transfer"
         },
         "DESCRIPTION":{
             "Reply":"<b>Pro tip</b>: Turn this block into a programmed proactive message.",
@@ -544,7 +558,7 @@
             "ReplaceBot":"Choose a chatbot to replace the current one in the conversation",
             "Wait":"This action waits the specified amount of milliseconds before moving to the next one along the block actions-pipeline",
             "WebRequest":"",
-            "SendEmail":"This action send an email to the specified users group or email addresses.<br>You can use a comma sepatated addresses list.<br>i.e. 'support@domanin.com, info@domain.com'<br>You can use the special tag '@everyone' to send an email to each of the {{ BRAND_NAME }}’s project teamates.<br><br>You can also use the name of a single user group using the group name. i.e. 'sales'",
+            "SendEmail":"This action send an email to the specified users group or email addresses.<br>You can use a comma sepatated addresses list.<br>i.e. 'support@domanin.com, info@domain.com'<br>You can use the special tag '@everyone' to send an email to each of the {{BRAND_NAME}}’s project teamates.<br><br>You can also use the name of a single user group using the group name. i.e. 'sales'",
             "WhatsAppStatic":"This action send an approved WhatsApp template",
             "WhatsAppByAttribute":"This action send an approved WhatsApp template",
             "WhatsAppBySegment":"This action send an approved WhatsApp template",
@@ -558,7 +572,11 @@
             "Qapla":"This action allow to connect with Qapla'",
             "Make":"",
             "Hubspot":"",
-            "Customerio":""
+            "Customerio":"",
+            "Brevo":"",
+            "DTMFForm":"",
+            "DTMFMenu":"",
+            "BlindTransfer": ""
         },
         "DOCS": {
             "Reply":"<a href=https://www.youtube.com/embed/p0ux-86Y4_I target=_blank>Here is how!</a> ",
@@ -589,7 +607,10 @@
             "Qapla":"",
             "Make":"",
             "Hubspot":"",
-            "Customerio":""
+            "Customerio":"",
+            "DTMFForm":"",
+            "DTMFMenu":"",
+            "BlindTransfer": ""
         }
     },
     "CDSvariablesList": {
@@ -602,8 +623,8 @@
         "leadAttributes":"Lead attributes",
         "mostUsedELements":{
             "last_user_text":{ "description":"The last text the user typed. This is overwritten on each user reply" },
-            "user_country":{ "description":"The user Country as decoded by {{ BRAND_NAME }}" },
-            "user_city":{ "description":"The user City as decoded by {{ BRAND_NAME }}" },
+            "user_country":{ "description":"The user Country as decoded by {{BRAND_NAME}}" },
+            "user_city":{ "description":"The user City as decoded by {{BRAND_NAME}}" },
             "user_language":{ "description":"The user language decoded on channel" },
             "transcript":{ "description":"All the conversation messages exchanged with this chatbot during the chat" }
         },
@@ -635,11 +656,11 @@
             "lastUserImageHeight":{ "description":"The wdth in pixel of the image uploaded by the user. It's empy if no image is uploaded" }
         },
         "leadAttributesElements":{
-            "userEmail":{ "description":"The user email in {{ BRAND_NAME }} Contacts" },
-            "userFullname":{ "description":"The user Fullname in {{ BRAND_NAME }} Contacts" },
-            "userPhone":{ "description":"The user phone in {{ BRAND_NAME }} Contacts" },
-            "userLeadId":{ "description":"The user contact Id in {{ BRAND_NAME }} Contacts" },
-            "userCompany":{ "description":"The user Company name in {{ BRAND_NAME }} Contacts" },
+            "userEmail":{ "description":"The user email in {{BRAND_NAME}} Contacts" },
+            "userFullname":{ "description":"The user Fullname in {{BRAND_NAME}} Contacts" },
+            "userPhone":{ "description":"The user phone in {{BRAND_NAME}} Contacts" },
+            "userLeadId":{ "description":"The user contact Id in {{BRAND_NAME}} Contacts" },
+            "userCompany":{ "description":"The user Company name in {{BRAND_NAME}} Contacts" },
             "currentPhoneNumber":{ "description":"The user phone used in the current conversation (i.e. coming from Whatsapp / SMS channels)" }
         }
 

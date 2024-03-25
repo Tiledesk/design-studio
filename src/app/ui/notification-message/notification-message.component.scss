@@ -93,7 +93,7 @@ button.close {
 
 .new-btn,
 .new-btn-danger {
-  background-color: #f44336;
+  background-color: var(--color-red-hex);
 }
 
 .new-btn.danger:hover {

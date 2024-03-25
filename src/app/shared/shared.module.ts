@@ -5,23 +5,36 @@ import { TranslateModule } from '@ngx-translate/core';
 import { LoadingSpinnerComponent } from '../ui/loading-spinner/loading-spinner.component';
 import { NotificationMessageComponent } from '../ui/notification-message/notification-message.component';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CdsSplashScreenComponent } from '../chatbot-design-studio/cds-dashboard/utils/cds-splash-screen/cds-splash-screen.component';
+import { SatPopoverModule } from '@ncstate/sat-popover';
+import { PickerModule } from '@ctrl/ngx-emoji-mart';
+import { NgSelectModule } from '@ng-select/ng-select';
 // import { DirectivesModule } from '../_directives/directives';
 // import { NavbarComponent } from '../components/navbar/navbar.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    TranslateModule
+    TranslateModule,
+    // SatPopoverModule,
+    // PickerModule
     // DirectivesModule
   ],
   declarations: [
     LoadingSpinnerComponent,
-    NotificationMessageComponent
+    NotificationMessageComponent,
+    CdsSplashScreenComponent
   ],
   exports: [
     LoadingSpinnerComponent,
     NotificationMessageComponent,
-    // TranslateModule,
+    CdsSplashScreenComponent,
+
+    FormsModule,
+    ReactiveFormsModule,
+    SatPopoverModule,
+    PickerModule,
+    NgSelectModule
     // DirectivesModule
   ],
 })

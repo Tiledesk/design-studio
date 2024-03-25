@@ -1,0 +1,27 @@
+.add-responses {
+    // grid-gap: 5px;
+    // display: grid;+
+    display: flex;
+    float: right;
+    .add-response { 
+        text-align: center;
+        cursor: pointer;
+        box-sizing: border-box;
+        outline: none;
+        margin: 0;
+        padding: 3px 6px;
+        display: flex;
+        
+        &:not(:first-child){
+            border-left: 1px solid white;
+        }
+        
+        img{
+            width: 16px;
+            &:hover{
+                filter: brightness(0) saturate(100%) invert(83%) sepia(87%) saturate(3891%) hue-rotate(177deg) brightness(92%) contrast(89%);
+            }
+        }
+       
+    }
+}

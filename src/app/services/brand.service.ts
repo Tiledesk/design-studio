@@ -183,7 +183,7 @@ export class BrandService {
     //     this.brand = this._brand;
     //   }
     // }
-
+    const that = this
     try {
       let url = this.appConfig.getConfig().brandSrc
       if (url && url !== 'CHANGEIT') {
@@ -220,7 +220,7 @@ export class BrandService {
   }
 
   getBrand() {
-    console.log('BrandService getBrand has been called - brand: ', this.brand);
+    //this.logger.log('BrandService getBrand has been called - brand: ', this.brand);
     return { ...this.brand['CDS'], ...this.brand['COMMON'] }
   }
 

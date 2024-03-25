@@ -60,7 +60,7 @@
         padding: 12px 15px;
         width: 100%;
         color: #333;
-        background: #ecb606b0;
+        background: var(--icon-color);
         .tpl-info-icon {
             font-size: 20px;
             height: 20px;
@@ -107,7 +107,7 @@
         .cds-yellow-button{
             margin-left: 10px; 
             min-width: 80px;
-            background-color: #ecb606b0;
+            background-color: var(--icon-color);
             height: 100%;
             color: #333;
         }

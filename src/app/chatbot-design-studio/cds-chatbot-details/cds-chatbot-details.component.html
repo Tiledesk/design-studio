@@ -29,6 +29,12 @@
                     }">
             <a href="javascript:;" role="button"> {{ "Developer" | translate }} </a>
           </li>
+          <li (click)="toggleTab(SETTINGS_SECTION.ADVANCED)" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== SETTINGS_SECTION.ADVANCED, 
+                      'li-active' :           activeSection === SETTINGS_SECTION.ADVANCED
+                    }">
+            <a href="javascript:;" role="button"> {{ "Advanced" | translate }} </a>
+          </li>
         </ul>
     </div>
 
@@ -54,6 +60,12 @@
     <cds-detail-developer *ngIf="activeSection===SETTINGS_SECTION.DEVELOPER"
       [selectedChatbot]="selectedChatbot">
     </cds-detail-developer>
+
+    <cds-detail-advanced *ngIf="activeSection===SETTINGS_SECTION.ADVANCED"
+      [selectedChatbot]="selectedChatbot"
+      [project]="project"
+      [translationsMap]="translationsMap">
+    </cds-detail-advanced>
   </div>
 </div>
 

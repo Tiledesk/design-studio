@@ -127,7 +127,6 @@ export class RulesAddComponent implements OnInit {
 
   submitForm(){
     this.logger.debug('[RULES-ADD] submitForm-->', this.ruleFormGroup)
-    // console.log('submitForm-->', this.ruleFormGroup)
     const pendingClassName = 'loading-btn--pending';
     const successClassName = 'loading-btn--success';
     const failClassName    = 'loading-btn--fail';
@@ -236,7 +235,6 @@ export class RulesAddComponent implements OnInit {
   }
 
   openPanel(event){
-    // console.log('opennnn', event)
   }
 
 }

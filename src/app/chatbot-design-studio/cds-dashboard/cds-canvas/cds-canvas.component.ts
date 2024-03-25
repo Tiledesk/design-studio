@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef } from '@angular/core';
-import { Observable, Subscription, timeout } from 'rxjs';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef} from '@angular/core';
+import { Observable, Subscription, skip, timeout } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -81,6 +81,10 @@ export class CdsCanvasComponent implements OnInit {
   mousePosition: any;
   connectorSelected: any;
 
+  /** panel context menu */
+  IS_OPEN_CONTEXT_MENU: boolean = false;
+  positionContextMenu: any = { 'x': 0, 'y': 0 };
+
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private intentService: IntentService,
@@ -129,6 +133,10 @@ export class CdsCanvasComponent implements OnInit {
     this.connectorService.initializeConnectors();
     this.addEventListener();
     this.changeDetectorRef.detectChanges();
+
+    // setTimeout(() => {
+    //   this.listOfIntents = this.intentService.cleanListOfIntents(this.intentService.listOfIntents);
+    // }, 0);
   }
 
   // private async setStartIntent(){
@@ -156,6 +164,7 @@ export class CdsCanvasComponent implements OnInit {
   // --------------------------------------------------------- //
   /** SUBSCRIBE TO THE INTENT LIST */
   // --------------------------------------------------------- //
+  
   private setSubscriptions(){
 
     this.subscriptionUndoRedo = this.intentService.behaviorUndoRedo.subscribe((undoRedo: any) => {
@@ -170,8 +179,12 @@ export class CdsCanvasComponent implements OnInit {
      * ad ogni modifica (aggiunta eliminazione di un intent)
     */
     this.subscriptionListOfIntents = this.intentService.getIntents().subscribe(intents => {
-      // this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
+      this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
       this.listOfIntents = intents;
+      // if(intents.length > 0 || (intents.length == 0 && this.listOfIntents.length>0)){
+      //   this.listOfIntents = this.intentService.hiddenEmptyIntents(intents);
+      // }
+      
     });
 
     /** SUBSCRIBE TO THE STATE ACTION DETAIL PANEL */
@@ -230,7 +243,16 @@ export class CdsCanvasComponent implements OnInit {
       this.intentService.setStartIntent();
       // scaleAndcenterStageOnCenterPosition(this.listOfIntents)
     }
-    this.subscriptionOpenWidgetPanel = this.onHeaderTestItOut.subscribe((event) => this.onTestItOut(event));
+    this.subscriptionOpenWidgetPanel = this.intentService.BStestiTout.pipe(skip(1)).subscribe((event) => this.onTestItOut(event));
+
+    // ---------------------------------------
+    // load localstorage
+    // ---------------------------------------
+    let copyPasteTEMP = JSON.parse(localStorage.getItem('copied_items'));
+    this.logger.log('[CDS-CANVAS]  copyPasteTEMP', copyPasteTEMP);
+    if(copyPasteTEMP){
+      this.intentService.arrayCOPYPAST = copyPasteTEMP['copy'];
+    }
   }
 
  
@@ -241,6 +263,7 @@ export class CdsCanvasComponent implements OnInit {
     // this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+    this.IS_OPEN_CONTEXT_MENU = false;
     // this.closePanelWidget.next();
   }
   private closeActionDetailPanel(){
@@ -267,10 +290,8 @@ export class CdsCanvasComponent implements OnInit {
   * create connectors
   */
   private refreshIntents() {
-    //setTimeout(() => {
       this.setDragAndListnerEventToElements();
       this.connectorService.createConnectors(this.listOfIntents);
-    //}, 0);
   }
 
   // ---------------------------------------------------------
@@ -372,7 +393,7 @@ export class CdsCanvasComponent implements OnInit {
     */
     document.addEventListener(
       "connector-created", (e: CustomEvent) => {
-        console.log("[CDS-CANVAS] connector-created:", e);
+        this.logger.log("[CDS-CANVAS] connector-created:", e);
         const connector = e.detail.connector;
         connector['created'] = true;
         delete connector['deleted'];
@@ -389,7 +410,7 @@ export class CdsCanvasComponent implements OnInit {
     */
     document.addEventListener(
       "connector-deleted", (e: CustomEvent) => {
-        console.log("[CDS-CANVAS] connector-deleted:", e);
+        this.logger.log("[CDS-CANVAS] connector-deleted:", e);
         const connector = e.detail.connector;
         connector['deleted'] = true;
         delete connector['created'];
@@ -411,7 +432,7 @@ export class CdsCanvasComponent implements OnInit {
     */
     document.addEventListener(
       "connector-updated", (e: CustomEvent) => {
-        console.log("[CDS-CANVAS] connector-updated:", e);
+        this.logger.log("[CDS-CANVAS] connector-updated:", e);
         const connector = e.detail.connector;
         // if(connector.notify)
         connector['updated'] = true;
@@ -449,7 +470,7 @@ export class CdsCanvasComponent implements OnInit {
     document.addEventListener(
       "keydown", (e) => {
         // Verifica se è stato premuto Ctrl (Windows) o Command (Mac) e Z contemporaneamente
-        console.log('[CDS-CANVAS]  keydown ', e);
+        this.logger.log('[CDS-CANVAS]  keydown ', e);
         var focusedElement = document.activeElement;
         if (focusedElement.tagName === 'TEXTAREA') {
           return;
@@ -591,6 +612,7 @@ export class CdsCanvasComponent implements OnInit {
   private removeConnectorDraftAndCloseFloatMenu() {
     this.connectorService.removeConnectorDraft();
     this.IS_OPEN_ADD_ACTIONS_MENU = false;
+    this.IS_OPEN_CONTEXT_MENU = false;
   }
 
   /** posCenterIntentSelected */
@@ -738,6 +760,7 @@ export class CdsCanvasComponent implements OnInit {
     this.intentService.addNewIntentToListOfIntents(intent);
     const newIntent = await this.settingAndSaveNewIntent(pos, intent, null, null);
   }
+
 
 
   /**
@@ -1104,7 +1127,7 @@ export class CdsCanvasComponent implements OnInit {
         this.connectorSelected = intent.attributes.connectors[idConnector];
       }
     } catch (error) {
-      console.log("Error: ", error);
+      this.logger.log("Error: ", error);
     }
   }
 
@@ -1126,7 +1149,7 @@ export class CdsCanvasComponent implements OnInit {
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     }
     if(event.type === "line-text"){
-      console.log('[CDS-CANVAS] line-text:: ', this.connectorSelected);
+      this.logger.log('[CDS-CANVAS] line-text:: ', this.connectorSelected);
       if(this.connectorSelected && this.connectorSelected.id){
         const intentId = this.connectorSelected.id.split('/')[0];
         let intent = this.intentService.getIntentFromId(intentId);
@@ -1146,5 +1169,31 @@ export class CdsCanvasComponent implements OnInit {
     
   }
   // --------------------------------------------------------- //
+
+
+  public onShowContextMenu(event: MouseEvent): void {
+      event.preventDefault();
+      this.logger.log('[CDS-CANVAS] onShowContextMenu:: ', event);
+      // this.showCustomMenu(x, y);
+
+      // Recupera l'elemento che ha scatenato l'evento
+      const targetElement = event.target as HTMLElement;
+      const customAttributeValue = targetElement.getAttribute('custom-attribute');
+
+      if(customAttributeValue === 'tds_container'){
+        // sto incollando sullo stage
+        this.positionContextMenu.x = event.clientX;
+        this.positionContextMenu.y = event.offsetY;
+        this.IS_OPEN_CONTEXT_MENU = true;
+        this.logger.log('Attributi dell\'elemento premuto:', customAttributeValue);
+      }
+      // Stampa gli attributi dell'elemento
+      // console.log('ID dell\'elemento premuto:', targetElement.id);
+      // console.log('Classi dell\'elemento premuto:', targetElement.className);
+  }
+
+  public onHideContextMenu(){
+    this.IS_OPEN_CONTEXT_MENU = false;
+  }
 
 }

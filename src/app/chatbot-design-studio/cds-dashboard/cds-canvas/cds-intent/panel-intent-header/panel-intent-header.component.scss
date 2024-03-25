@@ -1,5 +1,3 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 :host{
   --width-title: 80%;
 }
@@ -10,8 +8,8 @@
     justify-content: space-between;
     gap: 10px;
     width: 100%;
-    height: var(--height-header);
-    max-height: var(--height-header);
+    height: var(--height-header-panel-intent);
+    max-height: var(--height-header-panel-intent);
     // margin-top: 10px;
     .onff-intent-webhook {
       font-size: 13px;
@@ -22,7 +20,7 @@
     }
     
     .has--error {
-        background-color: #ed2e19;
+        background-color: var(--color-red-hex);
     }
     .form-group {
         width: 100%;
@@ -31,9 +29,9 @@
         .form-control {
             border: 0;
             background-size: 0 2px, 100% 0px;
-            background-image: linear-gradient($gray-light-01, $gray-light-01);
+            background-image: linear-gradient(var(--gray-light-01), var(--gray-light-01));
             transition-duration: 0.2s;
-            /*  height: var(--height-header);*/
+            /*  height: var(---height-header-panel-intent);*/
             &[readonly]{
               cursor: grab;
               background-image: none !important;
@@ -48,8 +46,8 @@
             padding: 0 0 0 10px;
             font-weight: 400;
             font-size: 1.0em;
-            line-height: var(--height-header);
-            color: $gray-light-01;
+            line-height: var(--height-header-panel-intent);
+            color: var(--gray-light-01);
             // z-index: 1;
             &.noDisplay {
                 display: none;
@@ -65,7 +63,7 @@
             padding: 0; //0 0 0 10px;
             margin:0;
             // color: $gray;
-            color: $blu;
+            color: var(--blu);
             font-size: 1.0em;
             // z-index: 2;
             position: relative;
@@ -84,15 +82,15 @@
         &.is-error {
             .form-control {
                 background-image: linear-gradient(var(--color-red-hex), var(--color-red-hex)),
-                    linear-gradient($gray-light-01, $gray-light-01);
+                    linear-gradient(var(--gray-light-01), var(--gray-light-01));
                 background-size: 100% 2px, 100% 1px;
                 transition-duration: 0.3s;
             }
         }
         &.is-focused:not(.is-error) {
             .form-control {
-                background-image: linear-gradient($blu, $blu),
-                    linear-gradient($gray-light-01, $gray-light-01);
+                background-image: linear-gradient(var(--blu), var(--blu)),
+                    linear-gradient(var(--gray-light-01), var(--gray-light-01));
                 background-size: 100% 2px, 100% 1px;
                 transition-duration: 0.3s;
             }
@@ -104,7 +102,7 @@
     position: absolute;
     top: 39px;
     font-size: 11px;
-    color: #ed2e19;
+    color: var(--color-red-hex);
     font-weight: 500;
 }
 
@@ -395,9 +393,9 @@ $circle-size: 40px;
   
   span.rocket {
     // color: #0aae10;
-    color: #00d808;
+    color: var(--color-green-hex);
   }
   span.undo {
-    color: #ff4000;
+    color: var(--color-red-hex)
   }
 }

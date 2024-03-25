@@ -14,13 +14,19 @@ const routes: Routes = [
   // { path: 'project/', component: CdsDashboardComponent, canActivate:[AuthGuard] },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard]},
 
-  { path: 'project/:projectid/chatbot/:faqkbid', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
-  { path: 'project/:projectid/chatbot/:faqkbid/intent/:intent_id', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
+  // { path: 'project/:projectid/chatbot/:faqkbid', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
+  // { path: 'project/:projectid/chatbot/:faqkbid/intent/:intent_id', component: CdsDashboardComponent, canActivate:[AuthGuard, RoleGuard] },
 
   { path: 'project/unauthorized', component: UnauthorizedComponent },
 
-  // Wildcard route for a 404 page
-  { path: '**', component: NotFoundComponent }
+
+  { path: 'project/:projectid/chatbot/:faqkbid', 
+    loadChildren: () => import('./chatbot-design-studio/cds-dashboard/cds-dashboard.module').then( m => m.CdsDashboardModule),
+    canActivate:[AuthGuard, RoleGuard]
+  },
+
+    // Wildcard route for a 404 page
+  { path: '**', component: NotFoundComponent },
   
 ];
 

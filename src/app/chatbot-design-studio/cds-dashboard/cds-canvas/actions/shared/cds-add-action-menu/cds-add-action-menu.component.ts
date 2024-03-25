@@ -66,10 +66,6 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
       };
     }).filter(el => el.value.status !== 'inactive');;
 
-    // console.log('[CDS-ADD-ACTION-MENU] tdsContainerEleHeight (onchanges): ', this.tdsContainerEleHeight);
-    // this.contentHeight = this.tdsContainerEleHeight - 40;
-    // console.log('[CDS-ADD-ACTION-MENU] contentHeight (onchanges): ', this.contentHeight);
-
     if(this.menuItemsList){
       this.filterMenuItemsList = this.menuItemsList;
     }
@@ -85,7 +81,6 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
 
   onSearchAction(searchText) {
 
-    console.log('[CDS-ADD-ACTION-MENU] onSearchAction', searchText);
     searchText = searchText.toLocaleLowerCase()
     if (!searchText) {
      this.filterMenuItemsList = this.menuItemsList
@@ -101,7 +96,6 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
   // return it.toLocaleLowerCase().includes(searchText);
 
   onAddActionFromActionMenu(item){
-    console.log('[CDS-ADD-ACTION-MENU] ON ADDING ACTION - TO STAGE - item: ', item);
     // console.log('[CDS-ADD-ACTION-MENU] ON ADDING ACTION - TO STAGE - actionToSearch 1: ',this.actionToSearch);
     let event = { 
       'type': item.value.type

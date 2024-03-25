@@ -17,6 +17,22 @@
         </div>
 
         <!-- ---------------------------------- -->
+        <!-- copy intent  -->
+        <!-- ---------------------------------- -->
+        <!--  -->
+        <!-- *ngIf="copyElementEnabled"  -->
+        <div 
+            class="intent-header-action-btn icon"
+            matTooltipClass="cds-mat-tooltip" 
+            [matTooltip]="'CDSCanvas.CopyBlock' | translate" 
+            #tooltip="matTooltip"
+            matTooltipPosition='above' 
+            matTooltipHideDelay="100"
+            (click)="onCopyIntent()">
+            <img src="assets/images/icons/copy.svg">
+        </div>
+
+        <!-- ---------------------------------- -->
         <!-- Enable / disable intent webhook  -->
         <!-- ---------------------------------- -->
         <!--  -->

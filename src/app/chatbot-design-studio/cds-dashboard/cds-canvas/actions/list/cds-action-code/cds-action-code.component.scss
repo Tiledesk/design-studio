@@ -1,26 +1,3 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
-.response-wrp{
-    border-radius: 8px;
-    background: var(--color-white-hex); // #ffffff;
-    border: 1px solid $gray-light-02; //1px solid #ffffff;
-    overflow-x: hidden;
-    overflow-y: auto;
-    color: #22272d;
-    font-size: 1.15em;
-    line-height: 25px;
-    width:  calc(100% - 5px); //calc(100% - 20px);
-    padding: 4px 10px;
-
-    line-height: 20px;
-    font-size: .8em;
-    margin: auto;
-    white-space: pre-wrap;
-
-    &.no-text{
-        color: rgb(141, 162, 181)
-    }
-}
 
 .limit-content {
     display: -webkit-box;

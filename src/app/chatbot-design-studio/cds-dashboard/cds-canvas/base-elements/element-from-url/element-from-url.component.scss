@@ -1,5 +1,3 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 .row-upload {
     display: flex;
     position: relative;
@@ -34,71 +32,17 @@
     display: block;
     position: relative;
     label.control-label {
-        font-size: 14px;
+        font-family: var(--font-family-poppins);
+        font-size: var(--font-size-base);
         line-height: normal;
         color: #aaa;
         font-weight: 400;
         margin: 0;
     }
-    input {
-        border-radius: 8px;
-        background-color: $blu-light-03;
-        line-height: normal;
-        padding: 0 10px;
-        height: 30px;
-        width: 100%;
-        margin: auto;
-        position: relative;
-        display: flex;
-    }
-    &.size {
-        input {
-            width: 60px;
-            display: block;
-            margin: 0 auto;
-            text-align: center;
-        }
-        // label.control-label {
-        //     margin: 0px;
-        // }
-    }
-}
-
-.control-label{
-    font-family: var(--font-family-poppins);
-    color: $gray-light-01;
-    text-align: left;
-    line-height: 20px;
-    font-size: 14px;
-    box-sizing: border-box;
-    font-weight: 300;
-}
-
-
-
-.row-info {
-    margin-bottom: 8px;
-    flex-basis: 100px;
-    input {
-        box-sizing: border-box;
-        font: inherit;
-        color: #1e293b;
-        font-family: inherit;
-        font-size: inherit;
-        line-height: inherit;
-        display: block;
-        width: 100%;
-        margin: 0;
-        background: $blu-light-03;
-        border: none;
-        padding: 5px;
-        border-radius: 4px;
-        text-align: right;
-    }
 }
 
 .response-frame-panel {
-    border: 2px dashed $blu-light-02;
+    border: 2px dashed var(--blu-light-02);
     border-radius: 6px;
     display: flex;
     justify-content: center;
@@ -122,7 +66,7 @@
             right: 0px;
             margin-right: 0px;
             opacity: 0;
-            color: $blu;
+            color: var(--blu);
             cursor: pointer;
             transition: all .3s ease-in-out;
         }

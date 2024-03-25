@@ -14,6 +14,7 @@ import { ProjectService } from 'src/app/services/projects.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { ProjectUser } from 'src/app/models/project-user';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'cds-sidebar',
@@ -23,9 +24,7 @@ import { ProjectUser } from 'src/app/models/project-user';
 export class CdsSidebarComponent implements OnInit {
 
   @Input() IS_OPEN_SIDEBAR: boolean;
-  @Input() activeSidebarSection: SIDEBAR_PAGES;
   // @Input() projectID: string;
-  @Output() onClickItemList = new EventEmitter<string>();
 
   projectID: string;
   user: UserModel
@@ -42,20 +41,18 @@ export class CdsSidebarComponent implements OnInit {
     private tiledeskAuthService: TiledeskAuthService,
     private projectService: ProjectService,
     private el: ElementRef,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
     this.projectID = this.dashboardService.projectID;
     this.user = this.tiledeskAuthService.getCurrentUser()
     this.getUserRole();
-    this.goTo(SIDEBAR_PAGES.INTENTS);
   }
 
   ngOnChanges(changes: SimpleChanges){
-    if(changes && changes['activeSidebarSection'] && changes['activeSidebarSection'].currentValue !== changes['activeSidebarSection'].previousValue ){
-      this.goTo(this.activeSidebarSection)
-    }
   }
 
 
@@ -68,23 +65,6 @@ export class CdsSidebarComponent implements OnInit {
     })
   }
 
-  goTo(section: SIDEBAR_PAGES) {
-    // console.log('[CDS-SIDEBAR] goTo item ', section)
-
-    // let elements = Array.from(document.getElementsByClassName('section is_active'));
-    let elements = this.el.nativeElement.querySelectorAll('.section.is_active')
-    if (elements.length != 0) {
-      elements.forEach((el) => {
-        el.classList.remove('is_active');
-      })
-    }
-
-    const element = this.el.nativeElement.querySelector('#'+section);
-    element.classList.toggle("is_active");
-
-    this.onClickItemList.emit(section)
-  }
-
 
   onMenuOptionFN(item: { key: string, label: string, icon: string, src?: string}){
     switch(item.key){
@@ -93,7 +73,8 @@ export class CdsSidebarComponent implements OnInit {
         window.open(item.src, '_blank')
         break;
       case 'SUPPORT':
-        this.onClickItemList.emit(SIDEBAR_PAGES.SUPPORT)
+        this.router.navigate(['./support'], {relativeTo: this.route})
+        // this.onClickItemList.emit(SIDEBAR_PAGES.SUPPORT)
         // window.open(item.src, '_self')
     }
   }

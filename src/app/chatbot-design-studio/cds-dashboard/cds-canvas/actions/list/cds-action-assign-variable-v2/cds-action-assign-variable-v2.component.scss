@@ -1,15 +1,7 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 ::-webkit-scrollbar {
     width: 0px;
 }
 
-
-
-.material-icons {
-    color: $blu;
-    font-size: 16px;
-}
 
 div {
 
@@ -83,13 +75,6 @@ div {
     padding: 0px 3px;
 }
 
-.set-attribute-operands-wpr.empty {
-    color: $empty-element-property;
-    background: unset;
-    font-size: 12px;
-    font-weight: 400;
-}
-
 
 .set-attribute-label-and-value-wpr {
     display: flex;
@@ -152,7 +137,7 @@ div {
     }
     
     .set-attribute-value {
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 400;
         background: #ecb606;
         width: fit-content;

@@ -5,7 +5,7 @@ import { PLAN_NAME } from "src/chat21-core/utils/constants";
 import { LoggerService } from "src/chat21-core/providers/abstract/logger.service";
 import { LoggerInstance } from "src/chat21-core/providers/logger/loggerInstance";
 import { Action } from "../models/action-model";
-import { TYPE_ACTION } from "../chatbot-design-studio/utils";
+import { TYPE_ACTION, TYPE_ACTION_VXML } from "../chatbot-design-studio/utils";
 
 @Injectable({
     providedIn: 'root'
@@ -21,7 +21,7 @@ export class ProjectPlanUtils {
         this.project = this.projectService.getCurrentProject()
     }
 
-    public checkIfCanLoad(actionType: TYPE_ACTION, actionPlanAvailability: PLAN_NAME): boolean{
+    public checkIfCanLoad(actionType: TYPE_ACTION | TYPE_ACTION_VXML, actionPlanAvailability: PLAN_NAME): boolean{
         
         this.logger.log('[PROJECT_PROFILE] checkIfCanLoad -->', actionPlanAvailability, this.project)
         if(this.project.profile.type === 'free'){

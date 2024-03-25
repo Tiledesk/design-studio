@@ -1,11 +1,8 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
-
 :host{
-    --icon-color: #{$blu};
-    --textColor: #{$blu};
-    --backGroundColor: #{$blu-light-04};
-    --hoverBackgroundColor: #{$blu-light-03};
+    --icon-color: #{var(--blu)};
+    --textColor: #{var(--blu)};
+    --backGroundColor: #{var(--blu-light-04)};
+    --hoverBackgroundColor: #{var(--blu-light-03)};
 
     --content-background: rgb(244, 246, 251, 0.4);
     --border-radius-base: 8px
@@ -21,7 +18,7 @@
 }
 .content{
     background-color: var(--content-background);
-    border: 1px solid $gray-light-02;
+    border: 1px solid var(--gray-light-02);
     padding: 20px;
     border-radius: 4px;
     display: flex;
@@ -92,13 +89,13 @@
         user-select: none;
         box-sizing: border-box;
         outline: none;
-        border: 1px dashed $blu-light-02;
-        border-radius: $button-border-radius-base;
-        color: $blu-light-02;
+        border: 1px dashed var(--blu-light-02);
+        border-radius: var(--button-border-radius-base);
+        color: var(--blu-light-02);
         cursor: pointer;
         font-size: 0.7em;
         font-weight: 400;
-        line-height: $button-height-base;
+        line-height: var(--button-height-base);
         // margin: 0px 5px 0;
         order: 1;
         padding: 0 10px;

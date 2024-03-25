@@ -1,21 +1,20 @@
-@import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/animations.scss";
 
 
 :host{
-  --action-background: #{$action-item-background};
-  --action-no-featured-backgroud: #{$action-no-featured-item-background};
-  --intent-background: #{$intent-preview-background};
-  --intent-border-color: #{$intent-preview-borderColor};
+  --action-background: #{var(--action-item-background)};
+  --action-no-featured-backgroud: #{var(--action-no-featured-item-background)};
+  --intent-background: #{var(--intent-preview-background)};
+  --intent-border-color: #{var(--intent-preview-borderColor)};
   --intent-header-background: transparent;
-  --base-border-radius-preview: #{$border-radius-base-preview};
-  --base-padding-preview: #{$padding-base-preview};
-  --action-selected-color: #{$action-color-selected};
+  --base-border-radius-preview: #{var(--border-radius-base-preview)};
+  --base-padding-preview: #{var(--padding-base-preview)};
+  --action-selected-color: #{var(--action-color-selected)};
 
-  --base-color: #{$blu};
+  --base-color: #{var(--blu)};
   --startIntentMaxWith: 160px;
 
-  --base-border-radius-base: #{$button-border-radius-base};
+  --base-border-radius-base: #{var(--button-border-radius-base)};
 }
 
 

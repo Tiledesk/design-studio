@@ -100,8 +100,10 @@
     </div>
 
     <hr class="custom-divider">
+    
     <mat-accordion>
-    <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
+    
+        <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
             class="custom-expansion-panel">
             <mat-expansion-panel-header class="disable_ripple">
                 <mat-panel-title>
@@ -109,52 +111,52 @@
                 </mat-panel-title>
             </mat-expansion-panel-header>
             <div>
-<!--
-    <div class="field-box">
-        <label class="title-label"> Assign result to</label>
-        <cds-textarea id="assignTo" 
-            [textLimitBtn]="false" 
-            [emojiPikerBtn]="false" 
-            [setAttributeBtn]="true"
-            [minRow]="1" 
-            [maxRow]="1" 
-            [readonly]="true" 
-            [text]="action.assignResultTo"
-            (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
-            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
-        </cds-textarea>
-    </div>
--->
-    <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.AssignStatusTo' | translate }}</label>
-        <cds-textarea id="assignTo" 
-            [textLimitBtn]="false" 
-            [emojiPikerBtn]="false" 
-            [setAttributeBtn]="true"
-            [minRow]="1" [maxRow]="1" 
-            [readonly]="true" 
-            [text]="action.assignStatusTo"
-            (selectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')"
-            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')">
-        </cds-textarea>
-    </div>
+                <!--
+                <div class="field-box">
+                    <label class="title-label"> Assign result to</label>
+                    <cds-textarea id="assignTo" 
+                        [textLimitBtn]="false" 
+                        [emojiPikerBtn]="false" 
+                        [setAttributeBtn]="true"
+                        [minRow]="1" 
+                        [maxRow]="1" 
+                        [readonly]="true" 
+                        [text]="action.assignResultTo"
+                        (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+                        (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+                    </cds-textarea>
+                </div>
+                -->
+                <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.AssignStatusTo' | translate }}</label>
+                    <cds-textarea id="assignTo" 
+                        [textLimitBtn]="false" 
+                        [emojiPikerBtn]="false" 
+                        [setAttributeBtn]="true"
+                        [minRow]="1" [maxRow]="1" 
+                        [readonly]="true" 
+                        [text]="action.assignStatusTo"
+                        (selectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')"
+                        (clearSelectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')">
+                    </cds-textarea>
+                </div>
 
 
-    <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.AssignErrorTo' | translate }}</label>
-        <cds-textarea id="assignTo" 
-            [textLimitBtn]="false"
-            [emojiPikerBtn]="false" 
-            [setAttributeBtn]="true"
-            [minRow]="1" [maxRow]="1" 
-            [readonly]="true" 
-            [text]="action.assignErrorTo"
-            (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
-            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
-        </cds-textarea>
-    </div>
-</div>
-</mat-expansion-panel>
-</mat-accordion>
-<hr class="custom-divider">
+                <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.AssignErrorTo' | translate }}</label>
+                    <cds-textarea id="assignTo" 
+                        [textLimitBtn]="false"
+                        [emojiPikerBtn]="false" 
+                        [setAttributeBtn]="true"
+                        [minRow]="1" [maxRow]="1" 
+                        [readonly]="true" 
+                        [text]="action.assignErrorTo"
+                        (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
+                        (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+                    </cds-textarea>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+    
 </div>

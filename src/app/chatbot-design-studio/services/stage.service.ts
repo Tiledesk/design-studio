@@ -91,9 +91,7 @@ export class StageService {
   }
 
   scaleAndCenter(listOfintents){
-    console.log("[STAGE SERVICE] scaleAndCenter ");
     let resp = scaleAndcenterStageOnCenterPosition(listOfintents);
-    console.log("[STAGE SERVICE] resp ", resp);
     return this.tiledeskStage.translateAndScale(resp.point, resp.scale);
     // this.logger.log('[CDS-CANVAS] moved-and-scaled ', el)
   }

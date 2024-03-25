@@ -13,6 +13,48 @@
 
 ### 1.1.1 in PROD
 
+### 1.2.0-rc.10
+- added: cds-action-brevo
+- added: default active tab on settings icon click
+- removed: import of cds/_variable.scss from components
+
+### 1.2.0-rc.9
+- added: lazy modules
+
+### 1.2.0-rc.8
+- added: PHONE_NUMBER to config-template env
+
+### 1.2.0-rc.7
+- added: cds-action-dtmf-form and cds-action-blind-transfer
+- added: settings to vxml actions
+- added: gpt-4-preview type option to gpt-models
+- bug-fixed: action-replace-bot-v2 pass /+intentName
+
+### 1.2.0-rc.6
+- added: brand name to header 
+- bug-fixed: if condition is changed in action-json-condition or filter, submit button is disabled
+- bug-fixed: if chatbot is associated with a dept and ther's depts with no chatbot associated with, do not show select with depts with no chatbot associated with
+
+### 1.2.0-rc.5
+- added:  height on the iframe
+- change: copy and paste, change action id when you paste
+- change: change the cursor to + when the mouse is on the edge of the dot
+- bug-fixed: connectors disappear when you do action d&d.
+
+### 1.2.0-rc.4
+- bug-fixed: minor bug-fixed
+
+### 1.2.0-rc.3
+- added: DOCS translator object
+
+### 1.2.0-rc.2
+- added: cds-action-customerio
+- added: customAttributes for support widget to identify current logged user plan
+- removed: assignResultTo from cds-action-customerio and cds-action-hubspot
+
+### 1.2.0-rc.1
+- added: ability to copy/paste an action/block
+
 ### 1.1.0 in PROD
 
 ### 1.1.0-rc2
@@ -66,9 +108,13 @@
 - changed: cds-action-delete-attribute now support all variables (userdefined and systemdefined)
 
 ### 1.0.12-rc.1
-- added: ability to group items into cds-select base element
-- changed: show changelog only if minor version is changed
-- changed: cds-action-delete-attribute now support all variables (userdefined and systemdefined)
+- added: discord channel menu option on support bottom sidebar icon
+- added: style.scss, material-dashboard.scss and action-styl.scss as lazy load style
+- changed: show changelog only if minor version is changed 
+- bug-fixed: missing translations
+- bug-fixed: cds-textarea not updated
+- bug-fixed: widget installation code is not formatted while click on copy in Publish modal
+- bug-fixed: cannot read property of undefined reading _tdActionId with forms 
 
 ### 1.0.11.2 in PROD
 - bug-fixed: cannot split of undefined

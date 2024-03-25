@@ -66,7 +66,7 @@ export class CDSImageUploadComponent implements OnInit {
   }
 
   onChangeTextarea(text: string){
-    console.log('onChangeTextarea eventtttt', text)
+    this.logger.log('onChangeTextarea eventtttt', text)
     this.metadata.src = text
     this.optionSelected = 'link'
     if(text && text.match(new RegExp(/{{[^{}]*}}/g))){
@@ -79,7 +79,7 @@ export class CDSImageUploadComponent implements OnInit {
   }
 
   onBlur(event){
-    console.log('eventtttt', event)
+    this.logger.log('eventtttt', event)
     // this.isFilePendingToUpload = true
     this.createFile(this.metadata.src);
     this.onChangeMetadata.emit(this.metadata)
@@ -318,7 +318,7 @@ export class CDSImageUploadComponent implements OnInit {
 
   /** */
   readAsDataURL(e: any) {
-    console.log('eventtt', e)
+    this.logger.log('eventtt', e)
     let dataFiles = " "
     if (e.type === 'change') {
       dataFiles = e.target.files;
@@ -390,7 +390,7 @@ export class CDSImageUploadComponent implements OnInit {
 
 
   onDeletePathElement(event){
-    console.log('[IMAGE-UPLOAD] onDeletePathElement', event)
+    this.logger.log('[IMAGE-UPLOAD] onDeletePathElement', event)
     this.uploadService.delete(this.user.uid, this.metadata.src).then((result)=>{
       
       this.isFilePendingToUpload = false;

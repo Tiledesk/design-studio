@@ -65,7 +65,6 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   }
 
   ngOnChanges() {
-    console.log('CdsPanelButtonConfigurationComponent: ', this.button);
     this.initialize();
   }
 
@@ -182,7 +181,6 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   }
 
   private checkUrl(url: string): boolean {
-    console.log('checkUrl:: ', url);
     this.errorUrl = true;
     if (url && url.length > 1) {
       this.errorUrl = false;
@@ -207,7 +205,6 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   private checkAndSaveButton(){
     let checkLabel = this.checkButtonLabel();
     let checkType = this.checkTypeButton();
-    // console.log('checkAndSaveButton: ', checkLabel, checkType);
     if (checkLabel && checkType) {
       this.saveButton.emit(this.button);
     }
@@ -234,7 +231,6 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   onChangeTypeButton(typeOfButton: { label: string, value: TYPE_BUTTON }) {
     this.buttonType = this.button.type = typeOfButton.value;
     this.buttonAction = null;
-    console.log('onChangeTypeButton-->', typeOfButton, this.button)
     if(this.button.__idConnector){
       const fromId = this.button.__idConnector;
       // this.connectorService.deleteConnectorWithIDStartingWith(fromId);
@@ -255,7 +251,6 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
    */
   public onBlur(event){
     // setTimeout(() => {
-      console.log('onBlur: ', event);
       this.checkAndSaveButton();
     // }, 100);
   }

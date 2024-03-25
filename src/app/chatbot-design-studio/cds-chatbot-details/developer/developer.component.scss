@@ -29,9 +29,9 @@ input[type="text"] {
     padding: 0 8px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    border-radius: 8px;
+    border-radius: var(--input-border-radius-base);
     background-color: var(--color-white-hex);
-    border: solid 1px $blu-light-02;
+    border: solid 1px var(--blu-light-02);
 }
 
 .csd-chatbot-dtls-input {
@@ -46,7 +46,7 @@ input[type="text"] {
     position: absolute;
     top: 0;
     bottom: 0;
-    color: $blu;
+    color: var(--blu);
     right: 0px;
     display: flex;
     align-items: center;
@@ -90,10 +90,10 @@ input[type="text"] {
     .label span{
         text-transform: uppercase; 
         font-weight: 400;
-        color: $gray;
+        color: var(--gray);
 
         &.active{
-            color: $blu
+            color: var(--blu)
         }
     }
 }
@@ -141,11 +141,11 @@ input[type="text"] {
     transition: all 0.3s ease-in 0s;
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
-    background-color: $blu;
+    background-color: var(--blu);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
-    border-color: $blu;
+    border-color: var(--blu);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
     right: 0px;

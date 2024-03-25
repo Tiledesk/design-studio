@@ -21,7 +21,7 @@
 }
 
 .title {
-    color: $blu !important;
+    color: var(--blu) !important;
 }
 
 .fulfillment-description {
@@ -45,10 +45,10 @@
     .label span{
         text-transform: uppercase; 
         font-weight: 400;
-        color: $gray;
+        color: var(--gray);
 
         &.active{
-            color: $blu
+            color: var(--blu)
         }
     }
 }
@@ -96,11 +96,11 @@
     transition: all 0.3s ease-in 0s;
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
-    background-color: $blu;
+    background-color: var(--blu);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
-    border-color: $blu;
+    border-color: var(--blu);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
     right: 0px;

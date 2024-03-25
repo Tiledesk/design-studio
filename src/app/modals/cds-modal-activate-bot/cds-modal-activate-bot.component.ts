@@ -82,6 +82,17 @@ export class CdsModalActivateBotComponent implements OnInit {
       const depts_length = this.departments.length
       this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT] ---> GET DEPTS DEPTS LENGHT ', depts_length);
 
+      //CASE: selected bot is already connected with a dep --> not show select or automatic active bot 
+      const hasFoundBotIn = this.departments.filter((dept: any) => {
+        return dept.id_bot === this.selectedChatbot._id;
+      });
+      if(hasFoundBotIn.length > 0){
+        this.HAS_COMPLETED_HOOK_BOOT_TO_DEPT = true
+        this.HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS = true;
+        return;
+      }
+
+      //CASE: project has only 1 dept --> set this as the department to associate bot with
       if (depts_length === 1) {
         // this.DISPLAY_SELECT_DEPTS_WITHOUT_BOT = false;
         this.deptSelected = {id: this.departments[0]._id, name: this.departments[0].name}
@@ -91,11 +102,10 @@ export class CdsModalActivateBotComponent implements OnInit {
           this.hookBotToDept()
           this.logger.log('[ACTIVATE-BOT-MODAL-COMPONENT] --->  DEFAULT DEPT HAS BOT ');
           // this.DISPLAY_BTN_ACTIVATE_BOT_FOR_NEW_CONV = false;
-          // this.logger.log('Bot Create --->  DEFAULT DEPT HAS BOT DISPLAY_BTN_ACTIVATE_BOT_FOR_NEW_CONV ', this.DISPLAY_BTN_ACTIVATE_BOT_FOR_NEW_CONV);
         }
       }
 
-
+      //CASE: project has more than 1 dept --> show select with departments with no bot associated with
       if (depts_length > 1) {
         this.departments.forEach(dept => {
           if (!dept.hasBot) {
@@ -104,7 +114,6 @@ export class CdsModalActivateBotComponent implements OnInit {
           } 
         });
 
-        // this.logger.log('[CDS DSBRD] --->  DEPT ARRAY OF DEPT WITHOUT BOT ', this.depts_without_bot_array);
       }
 
     }

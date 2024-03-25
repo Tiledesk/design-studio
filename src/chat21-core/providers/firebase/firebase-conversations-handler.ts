@@ -2,29 +2,25 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 // firebase
-// import * as firebase from 'firebase/app';
-import firebase from "firebase/app";
-import 'firebase/messaging';
-import 'firebase/database';
-import 'firebase/auth';
-import 'firebase/storage';
+// import firebase from 'firebase/app';
 
 // models
 import { ConversationModel } from '../../models/conversation';
 
 // services
+import { AppConfigService } from 'src/app/services/app-config';
 import { ConversationsHandlerService } from '../abstract/conversations-handler.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LoggerService } from '../abstract/logger.service';
 import { LoggerInstance } from '../logger/loggerInstance';
-import { AppConfigService } from 'src/app/services/app-config';
-//import { DatabaseProvider } from '../database';
 
 // utils
 import { avatarPlaceholder, getColorBck } from '../../utils/utils-user';
 import { compareValues, conversationsPathForUserId, searchIndexInArrayForUid, isGroup } from '../../utils/utils';
-import { MESSAGE_TYPE_INFO, TOUCHING_OPERATOR } from '../../utils/constants';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { messageType } from 'src/chat21-core/utils/utils-message';
+import { MESSAGE_TYPE_INFO } from 'src/chat21-core/utils/constants';
+
+
 
 
 // @Injectable({ providedIn: 'root' })
@@ -49,16 +45,18 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
     private loggedUserId: string;
     private translationMap: Map<string, string>;
     private isConversationClosingMap: Map<string, boolean>;
-    private logger: LoggerService = LoggerInstance.getInstance()
-    private ref: firebase.database.Query;
+    private logger:LoggerService = LoggerInstance.getInstance()
+    // private ref: firebase.database.Query;
     private BASE_URL: string;
     private BASE_URL_DATABASE: string;
     // private audio: any;
     // private setTimeoutSound: any;
     private subscribe: any
 
+    private firebase: any;
+    private ref: any;
+
     constructor(
-        //public databaseProvider: DatabaseProvider
         public http: HttpClient,
         public appConfig: AppConfigService
     ) {
@@ -68,11 +66,7 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
     /**
      * inizializzo conversations handler
      */
-    initialize(
-        tenant: string,
-        userId: string,
-        translationMap: Map<string, string>
-    ) {
+    async initialize(tenant: string,userId: string,translationMap: Map<string, string>) {
         this.tenant = tenant;
         this.loggedUserId = userId;
         this.translationMap = translationMap;
@@ -82,6 +76,11 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
         //this.getConversationsFromStorage();
         this.BASE_URL = this.appConfig.getConfig().firebaseConfig.chat21ApiUrl;
         this.BASE_URL_DATABASE = this.appConfig.getConfig().firebaseConfig.databaseURL;
+
+        const { default: firebase} = await import("firebase/app");
+        await Promise.all([import("firebase/database"), import("firebase/auth")]);
+        this.firebase = firebase
+        this.ref = this.firebase.database['Query'];
     }
 
     /**
@@ -92,7 +91,7 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
     // connect() {
     //     const that = this;
     //     const urlNodeFirebase = conversationsPathForUserId(this.tenant, this.loggedUserId);
-    //     this.logger.printDebug('connect -------> conversations::ACTIVE', urlNodeFirebase)
+    //     this.logger.debug('connect -------> conversations::ACTIVE', urlNodeFirebase)
     //     this.ref = firebase.database().ref(urlNodeFirebase).orderByChild('timestamp').limitToLast(200);
     //     this.ref.on('child_changed', (childSnapshot) => {
     //         that.changed(childSnapshot);
@@ -110,18 +109,6 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
 
     // }
 
-    getConversationsFromLocalStorage(){
-        let conversationsStored = []
-        if(localStorage.getItem('chat_sv5__conversations')){
-            conversationsStored = JSON.parse(localStorage.getItem('chat_sv5__conversations'))
-            if(conversationsStored && conversationsStored.length > 0) {
-                // this.conversationsHandlerService.conversations = conversationsStored
-                this.logger.log('[FIREBASEConversationsHandlerSERVICE] retrive conversations from storage --> ', conversationsStored.length)
-                this.conversations = conversationsStored
-            }
-        }
-    }
-
     /**
      * mi connetto al nodo conversations
      * creo la reference
@@ -130,42 +117,11 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
     // ---------------------------------------------------------------------------------
     // New connect - renamed subscribeToConversation
     //----------------------------------------------------------------------------------
-    subscribeToConversations(lastConversationTimestamp: number, callback) {
+    subscribeToConversations(callback) {
         const that = this;
-        // this.getConversationsFromLocalStorage()
         const urlNodeFirebase = conversationsPathForUserId(this.tenant, this.loggedUserId);
         this.logger.debug('[FIREBASEConversationsHandlerSERVICE] SubscribeToConversations conversations::ACTIVE urlNodeFirebase', urlNodeFirebase)
-        this.ref = firebase.database().ref(urlNodeFirebase).orderByChild('timestamp').limitToLast(200);
-        
-        // this.ref.once('value').then(snapshot => {
-        //     this.conversations.splice(0) //empty conversations list and replace storedConversations with remote onces
-        //     if(snapshot && snapshot.val()){
-                
-        //         snapshot.forEach(childSnapshot => {
-        //             // const childData: ConversationModel = childSnapshot.val();
-        //             // childData.uid = childSnapshot.key
-        //             // that.added(childData)
-        //             // lastConversationTimestamp = childData.timestamp
-        //             that.added(childSnapshot)
-        //         });
-        //         this.logger.debug('[FIREBASEConversationsHandlerSERVICE] # of remote conversations on Firebase:', Object.keys(snapshot.val()).length)
-        //         this.logger.debug('[FIREBASEConversationsHandlerSERVICE] # of conversation added:', that.conversations)
-        //         callback(that.conversations)
-        //         return lastConversationTimestamp
-        //     }
-            
-        // }).then(()=> {
-        //     this.ref.on('child_changed', (childSnapshot) => {
-        //         that.changed(childSnapshot);
-        //     });
-        //     this.ref.on('child_removed', (childSnapshot) => {
-        //         that.removed(childSnapshot);
-        //     });
-        //     this.ref.on('child_added', (childSnapshot) => {
-        //         that.added(childSnapshot);
-        //     });
-        // })
-        
+        this.ref = this.firebase.database().ref(urlNodeFirebase).orderByChild('timestamp').limitToLast(200);
         this.ref.on('child_changed', (childSnapshot) => {
             that.changed(childSnapshot);
         });
@@ -179,6 +135,10 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
         setTimeout(() => {
             callback()
         }, 2000);
+        // SET AUDIO
+        // this.audio = new Audio();
+        // this.audio.src = URL_SOUND;
+        // this.audio.load();
     }
 
     public getLastConversation(callback: (conversation: ConversationModel, error: string)=>void){
@@ -235,11 +195,10 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
 
 
     setConversationRead(conversationrecipient): void {
-        this.logger.log('[CONVS-DETAIL][FB-ACTIVE] updateConversationBadge: ');
         const urlUpdate = conversationsPathForUserId(this.tenant, this.loggedUserId) + '/' + conversationrecipient;
         const update = {};
         update['/is_new'] = false;
-        firebase.database().ref(urlUpdate).update(update);
+        this.firebase.database().ref(urlUpdate).update(update);
     }
 
     /**
@@ -272,6 +231,7 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
     archiveConversation(conversationId: string) {
         const that = this
         this.setClosingConversation(conversationId, true);
+        this.setConversationRead(conversationId)
         const index = searchIndexInArrayForUid(this.conversations, conversationId);
         // if (index > -1) {
         //     this.conversations.splice(index, 1);
@@ -300,7 +260,7 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
 
         this.getFirebaseToken((error, idToken) => {
             this.logger.debug('[FIREBASEConversationsHandlerSERVICE] DELETE CONV idToken', idToken)
-            this.logger.debug('F[FIREBASEConversationsHandlerSERVICE] DELETE CONV error', error)
+            this.logger.debug('[FIREBASEConversationsHandlerSERVICE] DELETE CONV error', error)
             if (idToken) {
                 const httpOptions = {
                     headers: new HttpHeaders({
@@ -327,8 +287,8 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
     }
 
 
-    getFirebaseToken(callback) {
-        const firebase_currentUser = firebase.auth().currentUser;
+    getFirebaseToken(callback:(error: any, idToken: string)=>void) {
+        const firebase_currentUser = this.firebase.auth().currentUser;
         this.logger.debug(' // firebase current user ', firebase_currentUser);
         if (firebase_currentUser) {
             firebase_currentUser.getIdToken(/* forceRefresh */ true)
@@ -346,25 +306,23 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
 
     public getConversationDetail(conversationId: string, callback: (conv: ConversationModel) => void): void {
         // fare promise o callback ??
-        this.logger.log('[FIREBASEConversationsHandlerSERVICE]  getConversationDetail *****: ', conversationId)
         const conversation = this.conversations.find(item => item.uid === conversationId);
-        this.logger.log('[FIREBASEConversationsHandlerSERVICE]  conversations *****: ', this.conversations)
-        this.logger.log('[FIREBASEConversationsHandlerSERVICE]  getConversationDetail *****: ', conversation)
+        this.logger.debug('[FIREBASEConversationsHandlerSERVICE]  conversations *****: ', this.conversations)
+        this.logger.debug('[FIREBASEConversationsHandlerSERVICE]  getConversationDetail *****: ', conversation)
         if (conversation) {
             callback(conversation)
             // return conversationSelected
             // this.BSConversationDetail.next(conversationSelected);
         } else {
-            this.logger.log('[FIREBASEConversationsHandlerSERVICE]  getConversationDetail ***** ELSE')
             // const urlNodeFirebase = '/apps/' + this.tenant + '/users/' + this.loggedUserId + '/conversations/' + conversationId;
             const urlNodeFirebase = conversationsPathForUserId(this.tenant, this.loggedUserId) // + '/' + conversationId;
-            this.logger.log('[FIREBASEConversationsHandlerSERVICE] conversationDetail urlNodeFirebase *****', urlNodeFirebase)
-            const firebaseMessages = firebase.database().ref(urlNodeFirebase);
-            if(this.subscribe){
-                this.logger.log('[FIREBASEConversationsHandlerSERVICE] getConversationDetail ALREADY SUBSCRIBED')
-                return;
-            }
-
+            this.logger.debug('[FIREBASEConversationsHandlerSERVICE] conversationDetail urlNodeFirebase *****', urlNodeFirebase)
+            const firebaseMessages = this.firebase.database().ref(urlNodeFirebase);
+            // if(this.subscribe){
+            //     this.logger.log('[FIREBASEConversationsHandlerSERVICE] getConversationDetail ALREADY SUBSCRIBED')
+            //     return;
+            // }
+            
             this.subscribe = firebaseMessages.on('value', (snap) => {
                 const childSnapshot = snap.child('/'+conversationId)
                 if(!childSnapshot.exists()){
@@ -441,7 +399,7 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
         childData.uid = childSnapshot.key;
         const conversation = this.completeConversation(childData);
         if (this.isValidConversation(conversation)) {
-            this.setClosingConversation(conversation.uid, false);
+            this.setClosingConversation(childSnapshot.key, false);
             const index = searchIndexInArrayForUid(this.conversations, conversation.uid);
             if (index > -1) {
                 this.conversations.splice(index, 1, conversation);
@@ -494,7 +452,9 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
      * 6 -  ordino l'array per timestamp
      * 7 -  pubblico conversations:update
      */
+    //TODO-GAB: ora emit singola conversation e non dell'intero array di conversations
     private added(childSnapshot: any) {
+        
         if (this.conversationGenerate(childSnapshot)) {
             const index = searchIndexInArrayForUid(this.conversations, childSnapshot.key);
             if (index > -1) {
@@ -502,7 +462,7 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
                 this.conversationAdded.next(conversationAdded);
             }
         } else {
-            // this.logger.log('[FIREBASEConversationsHandlerSERVICE]ADDED::conversations with conversationId: ', childSnapshot.key, 'is not valid')
+            this.logger.error('[FIREBASEConversationsHandlerSERVICE]ADDED::conversations with conversationId: ', childSnapshot.key, 'is not valid')
         }
     }
 
@@ -516,17 +476,18 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
      * 7 -  attivo sound se è un msg nuovo
      */
 
+    //TODO-GAB: ora emit singola conversation e non dell'intero array di conversations
     private changed(childSnapshot: any) {
         const oldConversation = this.conversations[searchIndexInArrayForUid(this.conversations, childSnapshot.key)]
         //skip info message updates
-        if(messageType(MESSAGE_TYPE_INFO, oldConversation) ){
+        if(messageType(MESSAGE_TYPE_INFO, childSnapshot.val()) ){
             return;
         }
         if (this.conversationGenerate(childSnapshot)) {
             const index = searchIndexInArrayForUid(this.conversations, childSnapshot.key);
             if (index > -1) {
                 const conversationChanged = this.conversations[index]
-                this.conversationChanged.next(conversationChanged)
+                this.conversationChanged.next(conversationChanged);
                 this.conversationChangedDetailed.next({value: conversationChanged, previousValue: oldConversation});
             }
         } else {
@@ -541,6 +502,7 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
      * 4 -  pubblico conversations:update
      * 5 -  elimino conversazione dall'array delle conversazioni chiuse
      */
+    //TODO-GAB: ora emit singola conversation e non dell'intero array di conversations
     private removed(childSnapshot: any) {
         const index = searchIndexInArrayForUid(this.conversations, childSnapshot.key);
         if (index > -1) {
@@ -569,7 +531,8 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
      * @param conv
      */
     private completeConversation(conv): ConversationModel {
-        // conv.selected = false;
+        this.logger.debug('[FIREBASEConversationsHandlerSERVICE] completeConversation --> conv from firebase', conv)
+        conv.selected = false;
         if (!conv.sender_fullname || conv.sender_fullname === 'undefined' || conv.sender_fullname.trim() === '') {
             conv.sender_fullname = conv.sender;
         }
@@ -583,29 +546,15 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
             conversation_with_fullname = conv.recipient_fullname;
             conv.sender_fullname = this.translationMap.get('YOU')
             // conv.last_message_text = YOU + conv.last_message_text;
-            // } else if (conv.channel_type === TYPE_GROUP) {
+        // } else if (conv.channel_type === TYPE_GROUP) {
         } else if (isGroup(conv)) {
             // conversation_with_fullname = conv.sender_fullname;
             // conv.last_message_text = conv.last_message_text;
             conversation_with = conv.recipient;
-            // conversation_with_fullname = conv.recipient_fullname;
-            conversation_with_fullname = this.changeSenderFullName(conv)
+            conversation_with_fullname = conv.recipient_fullname;
         }
-        if (conv.attributes && conv.attributes.subtype) {
-            if (conv.attributes.subtype === 'info' || conv.attributes.subtype === 'info/support') {
-                this.translateInfoSupportMessages(conv);
-            }
-        }
-        /** START: UPDATE CONVERSATIONS is_new IF conv is selected or sender is me */
-        if(conv.uid === this.uidConvSelected){
-            conv.is_new = false
-        }
-        if(conv.sender === this.loggedUserId){
-            conv.is_new = false
-        }
-        /** END: UPDATE CONVERSATIONS is_new IF conv is selected or sender is me */
-
         // Fixes the bug: if a snippet of code is pasted and sent it is not displayed correctly in the convesations list
+        // conv.time_last_message = this.getTimeLastMessage(conv.timestamp);
         conv.conversation_with = conversation_with;
         conv.conversation_with_fullname = conversation_with_fullname;
         conv.status = this.setStatusConversation(conv.sender, conv.uid);
@@ -615,34 +564,6 @@ export class FirebaseConversationsHandler extends ConversationsHandlerService {
         // getImageUrlThumbFromFirebasestorage(conversation_with, this.FIREBASESTORAGE_BASE_URL_IMAGE, this.urlStorageBucket);
         return conv;
     }
-
-
-    /**BUG-FIX: on Conversation-list, when conversation start, it continuosly change the sender_fullname info from Guest to others name */
-    private changeSenderFullName(conversation: ConversationModel): string {
-        let old_conv = this.conversations.find(conv => conv.uid === conversation.uid)
-        let conversation_with_fullname = conversation.recipient_fullname
-        if(old_conv){
-            if(conversation.recipient_fullname !== old_conv.recipient_fullname && (conversation.recipient_fullname.indexOf('guest') === -1)){
-                conversation_with_fullname = conversation.recipient_fullname
-            } else {
-                // conversation_with_fullname=  old_conv.recipient_fullname
-                conversation_with_fullname=  old_conv.conversation_with_fullname
-            } 
-        }
-        return conversation_with_fullname
-    }
-
-    translateInfoSupportMessages(conv) {
-        const INFO_A_NEW_SUPPORT_REQUEST_HAS_BEEN_ASSIGNED_TO_YOU = this.translationMap.get('INFO_A_NEW_SUPPORT_REQUEST_HAS_BEEN_ASSIGNED_TO_YOU');
-        if ((conv.attributes && conv.attributes.messagelabel && conv.attributes.messagelabel.key === TOUCHING_OPERATOR) && conv.sender === "system") {
-            const textAfterColon = conv.last_message_text.split(":")[1]
-            if (textAfterColon !== undefined) {
-                conv.last_message_text = INFO_A_NEW_SUPPORT_REQUEST_HAS_BEEN_ASSIGNED_TO_YOU + ': ' + textAfterColon;
-            }
-        }
-    }
-
-
 
     /** */
     private setStatusConversation(sender: string, uid: string): string {

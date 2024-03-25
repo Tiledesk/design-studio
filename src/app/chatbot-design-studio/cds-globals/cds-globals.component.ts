@@ -7,6 +7,7 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { MEDIA } from '../utils-resources';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'cds-globals',
@@ -15,7 +16,7 @@ import { MEDIA } from '../utils-resources';
 })
 export class CdsGlobalsComponent implements OnInit {
 
-  @Input() selectedChatbot: Chatbot;
+  selectedChatbot: Chatbot;
 
   
   newGlobal: Global = { key: '', value: '' }
@@ -32,14 +33,21 @@ export class CdsGlobalsComponent implements OnInit {
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private faqKbService: FaqKbService
+    private faqKbService: FaqKbService,
+    private dashboardService: DashboardService
   ) { }
 
   ngOnInit(): void {
+    this.selectedChatbot = this.dashboardService.selectedChatbot
+    this.initialize()
   }
 
   ngOnChanges(): void {
     this.logger.log("[CDS-GLOBALS] ngOnChanges -- selectedChatbot::", this.selectedChatbot);
+    this.initialize()
+  }
+
+  initialize(){
     if(this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals){
       this.selectedChatbot.attributes.globals.sort((a, b) => {
         return a.key.toLowerCase().localeCompare(b.key.toLowerCase());;
@@ -109,7 +117,7 @@ export class CdsGlobalsComponent implements OnInit {
   }
 
   onGlobalChange(event: {type: 'add' | 'edit' | 'delete' | 'return', element: Global | null }){
-    console.log('[CDS-GLOBALS ] onGlobalChange -->', event, this.updateIndex)
+    this.logger.log('[CDS-GLOBALS ] onGlobalChange -->', event, this.updateIndex)
     switch(event.type){
       case 'add':
         this.list.push(event.element)

@@ -4,80 +4,66 @@
 
 /* CDS NEW v2
 /* ******************************* */
-$blu: #506493;
-$blu-02: rgb(91, 114, 167);
-$blu-03: rgb(61,64,68);
-$blu-04: #647283;
-$blu-05: #8ab4f8;;
-$blu-light-01: rgb(244, 246, 251);
-$blu-light-02: #b6c2df;
-$blu-light-03: rgb(224, 227, 241);
-$blu-light-04: rgb(229, 234, 245);
-$gray: rgb(112, 112, 112);
-$gray-02: rgb(239,241,245);
-$gray-light-01: rgb(214, 214, 214);
-$gray-light-02: rgb(223, 227, 237);
-
-$success-connector: rgb(44, 191, 35);
-$failure-connector: rgb(191, 35, 35);
-
-$header-height: 60px;
-$sidebar-base-width: 60px;
-$btn-border-radius: 16px;
-
-//reply buttons
-$button-height-base: 20px; //32px;
-$button-max-width-base: 200px;
-$button-min-width-base: 95px;
-$button-min-width-preview: 200px;
-$button-border-radius-base: 16px;
-
-//PANEL ACTION DETAIL
-$haeder-panel-action-detail-height: 44px;
-$footer-panel-action-detail-height: 42px;
+// $blu: #506493;
+// $blu-02: rgb(91, 114, 167);
+// $blu-03: rgb(61,64,68);
+// $blu-04: #647283;
+// $blu-05: #8ab4f8;;
+// $blu-light-01: rgb(244, 246, 251);
+// $blu-light-02: #b6c2df;
+// $blu-light-03: rgb(224, 227, 241);
+// $blu-light-04: rgb(229, 234, 245);
+// $gray: rgb(112, 112, 112);
+// $gray-02: rgb(239,241,245);
+// $gray-light-01: rgb(214, 214, 214);
+// var(--gray-light-02): rgb(223, 227, 237);
 
 
+// $btn-border-radius: 16px;
+
+// $action-item-color: #d2e3fc;
+// $action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
+// $action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
+// $action-color-selected: var(--blu); // rgba(179,141,38,1);
+// $intent-preview-background: var(--blu-light-03); //rgb(235, 226, 198);
+// $intent-preview-borderColor: var(--gray-light-02);
+// $empty-element-property:rgb(191, 35, 35);
 
 
-$action-item-color: #d2e3fc;
-$action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
-$action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
-$action-color-selected: $blu; // rgba(179,141,38,1);
-$intent-preview-background: $blu-light-03; //rgb(235, 226, 198);
-$intent-preview-borderColor: $gray-light-02;
-$empty-element-property:rgb(191, 35, 35);
+// $padding-base-preview: 0 10px 10px;
+// $base-element-gap: 5px;
+// $border-radius-base-preview: 8px;
 
 
-$padding-base-preview: 0 10px 10px;
-$base-element-gap: 5px;
-$border-radius-base-preview: 8px;
+// @mixin lighten() {
+//    body {
+//         --bgColor: #{$action-item-color};
+//         --textColor: #{$action-item-color};
+//         --borderColor: #{$action-item-color};
+//    }
+// }
+// @mixin darken() {
+//     body{
+//         --bgColor: #{$empty-element-property};
+//         --textColor: #{$empty-element-property};
+//         --borderColor: #{$empty-element-property};
+//     }
+// }
 
+// body.dark {
+//     @include darken();
+// }
+// body.light {
+//     @include lighten();
+// }
 
-@mixin lighten() {
-    --bgColor: #{$action-item-color};
-    --textColor: #{$action-item-color};
-    --borderColor: #{$action-item-color};
-}
-@mixin darken() {
-    --bgColor: #{$empty-element-property};
-    --textColor: #{$empty-element-property};
-    --borderColor: #{$empty-element-property};
-}
+// @media (prefers-color-scheme: dark) {
+//     @include darken();
+// }
 
-body.dark {
-    @include darken();
-}
-body.light {
-    @include lighten();
-}
-
-@media (prefers-color-scheme: dark) {
-    body{
-        --bgColor: #{$empty-element-property};
-        --textColor: #{$empty-element-property};
-        --borderColor: #{$empty-element-property};
-    }
-}
+// @media (prefers-color-scheme: light) {
+//     @include lighten();
+// }
 
 :root{
 
@@ -88,30 +74,78 @@ body.light {
     /* LIGHT TEME COLORS*/
     --color-white-hex: #ffffff;
     --color-red-hex: #ed2e19;
+    --color-green-hex: #0aae10;
     --brown-85: #6c6859d9;
-    --blu: #506493;
 
+    --blu: #506493;
+    --blu-02: rgb(91, 114, 167);
+    --blu-03: rgb(61,64,68);
+    --blu-04: #647283;
+    --blu-05: #8ab4f8;;
+    --blu-light-01: rgb(244, 246, 251);
+    --blu-light-02: #b6c2df;
+    --blu-light-03: rgb(224, 227, 241);
+    --blu-light-04: rgb(229, 234, 245);
+    --gray: rgb(112, 112, 112);
+    --gray-02: rgb(239,241,245);
+    --gray-light-01: rgb(214, 214, 214);
+    --gray-light-02: rgb(223, 227, 237);
+    
+    --tiledesk-base-color: rgb(224,106,88);
     --icon-color: #ecb606b0;
     --icon-active-background: rgb(58, 107, 147);
 
     --font-size-base: 14px;
-    --height-header: 25px;
+    --height-header-panel-intent: 25px;
 
     --base-brand-color: rgb(224, 106, 88);
 
+    --empty-element-property: rgb(191, 35, 35);
+
+    --header-height: 60px;
+    --sidebar-base-width: 60px;
+
+    /** CONNECTOR **/
+    --success-connector: rgb(44, 191, 35);
+    --failure-connector: rgb(191, 35, 35);
 
     //ACTION DRAG-DROP 
     --drop-zone-background: rgba(221,228,234,.8);
     --drop-zone-color-border: #6c6859:
     --drag-preview-background: var(--color-white-hex);
 
-
     /** SCROLL-BAR **/
-    --scrollbar-track-background: #{$blu-light-01};
-    --scrollbar-thumb-background: #{$blu};
+    --scrollbar-track-background: #{var(--blu-light-01)};
+    --scrollbar-thumb-background: var(--blu);
     --scrollbar-thumb-border-radius: 3px;
 
     /** CANVAS CONTAINER COLORS */
     --container-background: rgb(152 153 153 / 40%);
     --container-points-color: rgb(240 233 233 / 25%);
+
+    /** PANEL ACTION DETAIL **/
+    --header-panel-action-detail-height: 44px;
+    --footer-panel-action-detail-height: 42px;
+
+    /** REPLY BUTTONS **/
+    --button-height-base: 20px; //32px;
+    --button-max-width-base: 200px;
+    --button-min-width-base: 95px;
+    --button-min-width-preview: 200px;
+    --button-border-radius-base: 16px;
+
+    /** INPUT - SELECT - BUTTON TOOGLE **/
+    --input-border-radius-base: 8px;
+    --input-base-margin: 30px;
+
+
+    /** INTENT PREVIEW **/
+    --action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
+    --action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
+    --action-color-selected: var(--blu); // rgba(179,141,38,1);
+    --intent-preview-background: var(--blu-light-03); //rgb(235, 226, 198);
+    --intent-preview-borderColor: var(--gray-light-02);
+    --padding-base-preview: 0 10px 10px;
+    --base-element-gap: 5px;
+    --border-radius-base-preview: 8px;
 }

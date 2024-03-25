@@ -7,6 +7,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { BRAND_BASE_INFO } from '../utils-resources';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'cds-fulfillment',
@@ -15,7 +16,7 @@ import { BRAND_BASE_INFO } from '../utils-resources';
 })
 export class CdsFulfillmentComponent implements OnInit {
 
-  @Input() selectedChatbot: Chatbot;
+  selectedChatbot: Chatbot;
 
   //webhook_is_enabled: Boolean = false;
   //webhookUrl: string;
@@ -35,6 +36,7 @@ export class CdsFulfillmentComponent implements OnInit {
     private faqKbService: FaqKbService,
     private translate: TranslateService,
     private brandService: BrandService,
+    private dashboardService: DashboardService,
     private notify: NotifyService
   ) {
 
@@ -43,7 +45,8 @@ export class CdsFulfillmentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // console.log("[CDS-FULFILLMENT] input chatbot: ", this.chatbot);
+    console.log("[CDS-FULFILLMENT] input chatbot: ", this.selectedChatbot, BRAND_BASE_INFO);
+    this.selectedChatbot = this.dashboardService.selectedChatbot
     if(BRAND_BASE_INFO['DOCS'] === 'false' || !BRAND_BASE_INFO['DOCS']){
       this.docEnabled = false
     }

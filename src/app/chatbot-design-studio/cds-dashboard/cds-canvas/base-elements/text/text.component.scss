@@ -1,4 +1,3 @@
-@import "./src/assets/sass/cds/_variables.scss";
     
 .text-editor-wrapper:hover {
     .text-editor {
@@ -25,14 +24,14 @@
             // margin-left: 20px;
             width: 100%;
             input {
-                border-radius: 8px;
+                border-radius: var(--input-border-radius-base);
                 background: var(--color-white-hex);
-                border: 1px solid $blu-light-02;
+                border: 1px solid var(--blu-light-02);
                 overflow-x: hidden;
                 overflow-y: auto;
                 // width: calc(100% - 2.5em);
                 width: 100%;
-                color: $gray;
+                color: var(--gray);
                 font-size: 1.15em;
                 line-height: 25px;
                 resize: vertical;
@@ -72,11 +71,11 @@
         margin: -20px 50px 0px 0px;
         float: right;
         .num-chars {
-            background: $blu-light-01;
+            background: var(--blu-light-01);
             padding: 0px 8px;
             border-radius: 10px;
             font-size: 0.8em;
-            color: $blu;
+            color: var(--blu);
             float: right;
             &.error {
                 background: red;
@@ -101,8 +100,8 @@ mat-form-field.mat-form-field ::ng-deep {
         border-top: 0px !important;
         input{
             &:hover{
-                border: 1px solid $blu !important;
-                outline: 0px solid $blu !important;
+                border: 1px solid var(--blu) !important;
+                outline: 0px solid var(--blu) !important;
             }
         }
     }
@@ -114,8 +113,8 @@ mat-form-field.mat-focused ::ng-deep {
             .mat-form-field-infix {
                 display: flex;
                 input {
-                    border: 1px solid $blu!important;
-                    outline: 0px solid $blu!important;
+                    border: 1px solid var(--blu)!important;
+                    outline: 0px solid var(--blu)!important;
                     transition: border .3s;
                     &.invalid{
                         border: 1px solid red !important;

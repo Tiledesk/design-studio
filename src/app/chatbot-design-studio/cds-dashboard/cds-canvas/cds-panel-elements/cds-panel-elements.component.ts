@@ -36,12 +36,10 @@ export class CdsPanelElementsComponent implements OnInit {
   }
 
   onHideActionPlaceholderOfActionPanel(event) {
-    console.log('[CDS-PANEL-ELEMENTS] onHideActionPlaceholderOfActionPanel event', event)
     this.hideActionPlaceholderOfActionPanel.emit(event)
   }
 
   onDraggingMenuElement(event) {
-    console.log('[CDS-PANEL-ELEMENTS] onDraggingMenuElement event', event);
     if (event === true) {
       this.isOpen = false;
     }
@@ -55,7 +53,6 @@ export class CdsPanelElementsComponent implements OnInit {
       //this.menuTrigger.openMenu();
       // let x = e.offsetLeft;
       let y = e.offsetTop;
-      // console.log('[CDS-PANEL-ELEMENTS] onMouseOverElement :::: ', y, this.isDraggingMenuElement);
       this.isOpen = true;
       if(this.isDraggingMenuElement == false){
         this.positionMenu = {'x': 85, 'y': y }
@@ -67,26 +64,22 @@ export class CdsPanelElementsComponent implements OnInit {
     // this.menuTrigger.closeMenu();
     setTimeout(() => {
       if(this.isOverMenu == false && this.isDraggingMenuElement == false){
-        // console.log("CLOSE");
         this.isOpen = false;
       }
     }, 0);
   }
 
   // onMouseOverElement(e){
-  //   // console.log(':::: CdsPanelElementsComponent onMouseOverElement :::: ', e, e.target.offsetLeft);
   //   // let pos = {'x': e.target.offsetLeft+e.target.offsetWidth+20, 'y': e.target.offsetTop+12 }
   //   // this.showPanelActions.emit(pos);
   // }
 
   // onMouseLeaveElement(e){
-  //   // console.log(':::: CdsPanelElementsComponent onMouseOverElement :::: ', e, e.target.offsetLeft);
   //   // let pos = {'x': -100, 'y': -100 }
   //   // this.showPanelActions.emit(pos);
   // }
 
   onAddNewElement(){
-    // console.log(':::: CdsPanelElementsComponent onAddNewElement :::: ');
     // this.addNewElement.emit();
   }
 
@@ -100,7 +93,7 @@ export class CdsPanelElementsComponent implements OnInit {
   }
 
   onIsDraggingMenuElement(event: boolean){
-    console.log('[CDS-PANEL-ELEMENTS] onIsDraggingMenuElement event' , event)
+    // console.log('[CDS-PANEL-ELEMENTS] onIsDraggingMenuElement event' , event)
     this.isDraggingMenuElement = event;
     if(event === false){
       this.onCloseMenu();

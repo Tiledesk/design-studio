@@ -20,12 +20,12 @@ export class Intent {
     updatedAt?: Date;
     id?: string;
     attributes?: IntentAttributes;
-    type?: string
+    type?: string;
     constructor() {
         this.intent_id = uuidv4();
         this.actions = [];
         this.attributes = new IntentAttributes();
-        this.type = 'intent'
+        this.type = 'intent';
     }
 }
 export class IntentAttributes {

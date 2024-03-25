@@ -1,0 +1,120 @@
+$background-color: var(--blu-light-01);
+$text-color: var(--blu);
+
+.delay {
+    align-items: center;
+    background: $background-color;
+    border-radius: 13px;
+    display: inline-flex;
+    position: relative;
+    height: 26px;
+    padding: 0 9px 0 3px;
+    // width: 100px;
+    text-align: center;
+    transition: width .3s ease-in;
+    font-size: var(--font-size-base);
+
+    &:hover{
+        opacity: 0.8;
+        cursor: pointer;
+    }
+    // margin-top: 30px;
+    .delay-current{
+        display: contents;
+        width: auto;
+        color: $text-color;
+        cursor: pointer;
+        font-size: 0.8em;
+        font-weight: 400;
+        white-space: nowrap;
+    }
+
+    .suffiss{
+        display: block;
+    }
+
+    .input-height{
+        border: 0;
+        text-align: right;
+        display: block;
+        max-width: 26px;
+        background: var(--blu-light-01);
+    }
+
+
+    .delay-slider{
+        display: inline-block;
+        // opacity: 0;
+        visibility: hidden;
+        width: 0;
+        transition: opacity .2s;
+    }
+    .delay-range {
+        display: inline-flex;
+        color: $text-color;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+    &.open {
+        width: 100%;
+        .delay-current{
+            display: none;
+        }
+        .delay-slider{
+            width: 100%;
+            // opacity: 1;
+            visibility: visible;
+        }
+    }
+}
+
+.delay-button {
+    padding-right: 4px;
+    color: $text-color;
+    cursor: pointer;
+    width: 20px;
+}
+
+
+
+.delay-icon {
+    color: $text-color;
+    font-size: 1em;
+    font-weight: 700;
+    margin-right: 9px;
+}
+
+
+
+/** SLIDER **/ 
+.vue-slider {
+    margin: 0 5px;
+    position: relative;
+    display: inline-flex;
+    padding: 7px 0;
+    width: calc(100% - 80px);
+    height: 6px;
+}
+
+mat-slider {
+    width: 100%;
+    position: absolute;
+    top: -14px;
+}
+
+.vue-slider ::ng-deep{
+    .mat-accent .mat-slider-track-fill {
+        background-color: $text-color !important;
+    }
+    .mat-slider-thumb-label {
+        background-color: $text-color !important;
+    }
+    .mat-slider-thumb-label-text{
+        color: $background-color !important;
+        font-size: 8px!important;
+    }
+    .mat-slider-thumb {
+        background-color: $text-color !important;
+    }
+
+}
