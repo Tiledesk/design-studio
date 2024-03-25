@@ -21,18 +21,18 @@
 
 // $btn-border-radius: 16px;
 
-$action-item-color: #d2e3fc;
-$action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
-$action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
-$action-color-selected: var(--blu); // rgba(179,141,38,1);
-$intent-preview-background: var(--blu-light-03); //rgb(235, 226, 198);
-$intent-preview-borderColor: var(--gray-light-02);
+// $action-item-color: #d2e3fc;
+// $action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
+// $action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
+// $action-color-selected: var(--blu); // rgba(179,141,38,1);
+// $intent-preview-background: var(--blu-light-03); //rgb(235, 226, 198);
+// $intent-preview-borderColor: var(--gray-light-02);
 // $empty-element-property:rgb(191, 35, 35);
 
 
-$padding-base-preview: 0 10px 10px;
-$base-element-gap: 5px;
-$border-radius-base-preview: 8px;
+// $padding-base-preview: 0 10px 10px;
+// $base-element-gap: 5px;
+// $border-radius-base-preview: 8px;
 
 
 // @mixin lighten() {
@@ -137,4 +137,15 @@ $border-radius-base-preview: 8px;
     /** INPUT - SELECT - BUTTON TOOGLE **/
     --input-border-radius-base: 8px;
     --input-base-margin: 30px;
+
+
+    /** INTENT PREVIEW **/
+    --action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
+    --action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
+    --action-color-selected: var(--blu); // rgba(179,141,38,1);
+    --intent-preview-background: var(--blu-light-03); //rgb(235, 226, 198);
+    --intent-preview-borderColor: var(--gray-light-02);
+    --padding-base-preview: 0 10px 10px;
+    --base-element-gap: 5px;
+    --border-radius-base-preview: 8px;
 }

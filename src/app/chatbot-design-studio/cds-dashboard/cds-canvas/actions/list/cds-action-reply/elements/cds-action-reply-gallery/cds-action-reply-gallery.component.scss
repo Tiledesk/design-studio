@@ -10,12 +10,12 @@
 .previewMode{
     display: flex;
     flex-direction: column;
-    gap: $base-element-gap;
+    gap: var(--base-element-gap);
 
     .galleryElement {
         margin: 0;
         // padding: 8px;
-        gap: $base-element-gap;
+        gap: var(--base-element-gap);
         display: flex;
         flex-direction: column;
         // background-color: #ffffff80; // nk
@@ -92,7 +92,7 @@
         display: flex;
         margin: 0px; //15px 0 0;
         padding: 0px 0px 0px 0px;
-        gap: $base-element-gap;
+        gap: var(--base-element-gap);
         width: 100%;
         font-size: 14px;
         // padding: 0 5px;

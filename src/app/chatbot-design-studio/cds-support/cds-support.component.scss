@@ -1,7 +1,9 @@
 :host {
     --content-background: rgb(244, 246, 251, 0.4);
     --content-hover-background: #{var(--blu)};
-    --base-radius: 8px
+    --base-radius: 8px;
+
+    width: 100%;
 }
 .card-container{
     width: 100%;

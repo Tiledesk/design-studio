@@ -1,5 +1,3 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 .cds-action-preview {
     padding: 0px;
     margin: 0px;
@@ -11,12 +9,6 @@
 
 
 .previewContent{
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: flex-end;
-    gap: 5px; 
     padding: 5px 5px;
     top: calc(50% - 14px);
 
