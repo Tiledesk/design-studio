@@ -3,10 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 // firebase
-// import * as firebase from 'firebase/app';
-import firebase from "firebase/app";
-import 'firebase/messaging';
-import 'firebase/database';
+// import firebase from 'firebase/app';
 
 // services
 // import { EventsService } from '../events-service';
@@ -23,11 +20,7 @@ export class FirebasePresenceService extends PresenceService {
   BSIsOnline: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   BSLastOnline: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  // public tenant: string;
-
-  // -------------------------------
   // private params
-  // -------------------------------
   private tenant: string;
   private urlNodePresence: string;
   private onlineConnectionsRef: any;
@@ -35,6 +28,9 @@ export class FirebasePresenceService extends PresenceService {
   private keyConnectionRef: any;
   private logger: LoggerService = LoggerInstance.getInstance();
   online_member = []
+
+  private firebase: any;
+
   constructor() {
     super();
   }
@@ -42,11 +38,16 @@ export class FirebasePresenceService extends PresenceService {
   /**
    *
    */
-  public initialize(tenant: string) {
+  public async initialize(tenant: string) {
     // this.tenant = this.getTenant();
     this.tenant = tenant;
-    this.logger.log('[FIREBASEPresenceSERVICE] initialize this.tenant', this.tenant);
+    this.logger.debug('[FIREBASEPresenceSERVICE] initialize this.tenant', this.tenant);
     this.urlNodePresence = '/apps/' + this.tenant + '/presence/';
+
+    const { default: firebase} = await import("firebase/app");
+    await Promise.all([import("firebase/database")]);
+    this.firebase = firebase
+    return;
   }
 
   /**
@@ -78,7 +79,7 @@ export class FirebasePresenceService extends PresenceService {
     let local_BSIsOnline = new BehaviorSubject<any>(null);
     const urlNodeConnections = this.urlNodePresence + userid + '/connections';
     this.logger.debug('[FIREBASEPresenceSERVICE] userIsOnline: ', urlNodeConnections);
-    const connectionsRef = firebase.database().ref().child(urlNodeConnections);
+    const connectionsRef = this.firebase.database().ref().child(urlNodeConnections);
     connectionsRef.off()
     connectionsRef.on('value', (child) => {
       that.logger.debug('[FIREBASEPresenceSERVICE] CONVERSATION-DETAIL group detail userIsOnline id user', userid, '- child.val: ', child.val());
@@ -125,11 +126,10 @@ export class FirebasePresenceService extends PresenceService {
    * @param userid
    */
   public setPresence(userid: string): void {
-    this.logger.log('initialize FROM [APP-COMP] - [FIREBASEPresenceSERVICE] - SET PRESENCE userid ', userid) 
     this.onlineConnectionsRef = this.referenceOnlineForUser(userid);
     this.lastOnlineConnectionsRef = this.referenceLastOnlineForUser(userid);
     const connectedRefURL = '/.info/connected';
-    const conn = firebase.database().ref(connectedRefURL);
+    const conn = this.firebase.database().ref(connectedRefURL);
     conn.on('value', (dataSnapshot) => {
       this.logger.debug('[FIREBASEPresenceSERVICE] self.deviceConnectionRef: ', dataSnapshot.val());
       if (dataSnapshot.val()) {
@@ -170,9 +170,10 @@ export class FirebasePresenceService extends PresenceService {
    * usata in setupMyPresence
    * @param userid
    */
-  private referenceLastOnlineForUser(userid: string): firebase.database.Reference {
+  private referenceLastOnlineForUser(userid: string): any {
     const urlNodeLastOnLine = this.urlNodePresence + userid + '/lastOnline';
-    const lastOnlineRef = firebase.database().ref().child(urlNodeLastOnLine);
+    this.logger.log('referenceLastOnlineForUser', urlNodeLastOnLine)
+    const lastOnlineRef = this.firebase.database().ref().child(urlNodeLastOnLine);
     return lastOnlineRef;
   }
 
@@ -181,9 +182,9 @@ export class FirebasePresenceService extends PresenceService {
    * usata in setupMyPresence
    * @param userid
    */
-  private referenceOnlineForUser(userid: string): firebase.database.Reference {
+  private referenceOnlineForUser(userid: string): any {
     const urlNodeConnections = this.urlNodePresence + userid + '/connections';
-    const connectionsRef = firebase.database().ref().child(urlNodeConnections);
+    const connectionsRef = this.firebase.database().ref().child(urlNodeConnections);
     return connectionsRef;
   }
 
