@@ -5,6 +5,11 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.10
+- added: cds-action-brevo
+- added: default active tab on settings icon click
+- removed: import of cds/_variable.scss from components
+
 ### 1.2.0-rc.9
 - added: lazy modules
 
