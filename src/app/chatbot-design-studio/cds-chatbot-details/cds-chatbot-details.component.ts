@@ -55,8 +55,12 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     this.getTranslations();
     this.selectedChatbot = this.dashboardService.selectedChatbot;
 
+   
     this.route.queryParams.subscribe((params) => {
       console.log('parammmmmm', params)
+      if(!params.hasOwnProperty('active')){
+        this.toggleTab(this.activeSection)
+      }
       this.activeSection = params['active']
     })
   }
