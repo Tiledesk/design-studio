@@ -39,6 +39,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
 
   limitCharsText = TEXT_CHARS_LIMIT;
   jsonHeader: any; 
+  jsonSettings: any;
   body: string = null
   jsonIsValid = true;
   errorMessage: string;
@@ -188,6 +189,12 @@ export class CdsActionWebRequestV2Component implements OnInit {
       this.body = this.action.jsonBody;
       this.body = this.formatJSON(this.body, "\t");
     }
+    this.jsonSettings = { timeout: 30}
+    console.log('seeeeeee', this.action.settings)
+    if(this.action.settings){
+      this.jsonSettings = this.action.settings
+      console.log('seeeeeee innnn', this.action.settings, this.jsonSettings)
+    }
     this.assignments = this.action.assignments
     if(this.intentSelected){
       this.initializeConnector();
@@ -257,7 +264,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.action.headersString = this.jsonHeader
   }
 
-  onChangeTextarea(e, type: 'url' | 'body'){
+  onChangeTextarea(e, type: 'url' | 'body' | 'setting'){
     switch(type){
       case 'body': {
         this.body = e;
@@ -272,6 +279,12 @@ export class CdsActionWebRequestV2Component implements OnInit {
       case 'url' : {
         this.action.url = e;
         // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+        break;
+      }
+      case 'setting': {
+        this.jsonSettings.timeout = +e;
+        this.action['settings'] = this.jsonSettings;
+        break;
       }
     }
   }

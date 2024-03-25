@@ -145,6 +145,7 @@ export class ActionWebRequestV2 extends Action {
     method: string;
     url: string;
     headersString: any;
+    settings: any;
     jsonBody: string;
     bodyType: string;
     assignResultTo: string;
@@ -157,6 +158,7 @@ export class ActionWebRequestV2 extends Action {
         super();
         this.url = '';
         this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":"TiledeskBotRuntime", "Accept":"*/*"};
+        this.settings = { "timeout": 30 }
         this.jsonBody = null
         this.bodyType = 'none'
         this.assignStatusTo = '';
