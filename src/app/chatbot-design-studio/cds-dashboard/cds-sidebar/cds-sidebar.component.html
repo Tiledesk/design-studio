@@ -129,13 +129,14 @@
 
     <div style="width: 100%;">
 
-        <div id="cds-sb-intents" name="intents" class="section" (click)="goTo(SIDEBAR_PAGES.INTENTS)"
+        <div id="cds-sb-intents" name="intents" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{ 'Blocks' | translate }}" 
             #tooltip="matTooltip"
             matTooltipPosition='right' 
             matTooltipHideDelay="100" 
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
+            [routerLink]="['blocks']" routerLinkActive="is_active">
             <span class="item-icon">
                 <svg xmlns="http://www.w3.org/2000/svg"  height="24" viewBox="0 0 24 24" width="24">
                     <path d="M18.8,8.6c1.9,0,3.4-1.5,3.4-3.4s-1.5-3.4-3.4-3.4c-1.9,0-3.4,1.5-3.4,3.4c0,0.2,0,0.4,0.1,0.6l-8,4
@@ -151,13 +152,14 @@
             </p>
         </div>
 
-        <!-- <div id="cds-sb-fulfillment" name="fulfillment" class="section" (click)="goTo(SIDEBAR_PAGES.FULFILLMENT)"
+        <div id="cds-sb-fulfillment" name="fulfillment" class="section"
                 matTooltipClass="cds-mat-tooltip" 
                 matTooltip="{{'Fulfillment' | translate}}" 
                 #tooltip="matTooltip"
                 matTooltipPosition='right' 
                 matTooltipHideDelay="100" 
-                [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+                [matTooltipDisabled]="IS_OPEN_SIDEBAR"
+                [routerLink]="['fulfillment']" routerLinkActive="is_active">
             <span *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="item-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
                     <path d="m422-232 207-248H469l29-227-185 267h139l-30 208ZM320-80l40-280H160l360-520h80l-40 320h240L400-80h-80Zm151-390Z"/>
@@ -166,15 +168,16 @@
             <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
                 {{'Fulfillment' | translate}}
             </p>
-        </div> -->
+        </div>
 
-        <div id="cds-sb-rules" name="rules" class="section" (click)="goTo(SIDEBAR_PAGES.RULES)"
+        <div id="cds-sb-rules" name="rules" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'Rules' | translate}}"
             #tooltip="matTooltip" 
             matTooltipPosition='right' 
             matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
+            [routerLink]="['rules']" routerLinkActive="is_active">
             <span class="item-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
                     <path d="m576-160-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104 104 104 104-56 56-104-104-104 104Zm79-360L513-662l56-56 85 85 170-170 56 57-225 226ZM80-280v-80h360v80H80Zm0-320v-80h360v80H80Z"/>
@@ -185,13 +188,14 @@
             </p>
         </div>
 
-        <div id="cds-sb-globals" name="globals" class="section" (click)="goTo(SIDEBAR_PAGES.GLOBALS)"
+        <div id="cds-sb-globals" name="globals" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'Globals' | translate}}"
             #tooltip="matTooltip" 
             matTooltipPosition='right' 
             matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
+            [routerLink]="['globals']" routerLinkActive="is_active" >
             <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons-outlined item-icon">
                 <span class="material-icons">lock</span>
             </i>
@@ -200,13 +204,14 @@
             </p>
         </div>
 
-        <div id="cds-sb-settings" name="settings" class="section" (click)="goTo(SIDEBAR_PAGES.SETTINGS)"
+        <div id="cds-sb-settings" name="settings" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'Settings' | translate}}"
             #tooltip="matTooltip" 
             matTooltipPosition='right' 
             matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR">
+            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
+            [routerLink]="['settings']" routerLinkActive="is_active">
             <span class="item-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
                     <path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 

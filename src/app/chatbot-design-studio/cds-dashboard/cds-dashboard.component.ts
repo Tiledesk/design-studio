@@ -27,6 +27,7 @@ import { FaqService } from 'src/app/services/faq.service';
 import { Subject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { environment } from 'src/environments/environment';
+import { BRAND_BASE_INFO } from '../utils-resources';
 
 
 @Component({
@@ -42,8 +43,7 @@ export class CdsDashboardComponent implements OnInit {
   IS_OPEN_INTENTS_LIST: boolean = true;
   IS_OPEN_PANEL_WIDGET: boolean = false;
 
-  eventTestItOutHeader: Subject<Intent | boolean> = new Subject<Intent | boolean>();
-
+  
   project: Project;
   defaultDepartmentId: string;
   selectedChatbot: Chatbot
@@ -51,7 +51,8 @@ export class CdsDashboardComponent implements OnInit {
   activeDetailSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
   isBetaUrl: boolean = false;
   showChangelog: boolean = false;
-
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
+  
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private route: ActivatedRoute,
@@ -76,7 +77,10 @@ export class CdsDashboardComponent implements OnInit {
     this.hideShowWidget('hide');
   }
 
-  checkForChangelogNotify(): boolean {
+  checkForChangelogNotify(): boolean { 
+    if(BRAND_BASE_INFO['DOCS'] === "false" || !BRAND_BASE_INFO['DOCS']){
+      return false
+    }
     let changelogKey = this.appStorageService.getItem("changelog")
     if(!changelogKey){
       return true
@@ -208,41 +212,6 @@ export class CdsDashboardComponent implements OnInit {
     // this.location.back()
     // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);
     this.hideShowWidget('show');
-  }
-
-  /** onTestItOut **
-   * Open WHEN THE PLAY BUTTON IS CLICKED
-   * - test widget
-   * @ Close
-   * - detail action panel
-   * - actions context menu' (static & float),
-   * - button configuration panel  
-  */
-  onTestItOut(event: Intent) {
-    this.logger.log('[CDS DSHBRD] onTestItOut intent ', event);
-    // if(typeof event === "boolean"){
-    //   this.IS_OPEN_PANEL_WIDGET = true;
-    // } else {
-    //   this.IS_OPEN_PANEL_WIDGET = !this.IS_OPEN_PANEL_WIDGET;
-    // }
-    // if(this.IS_OPEN_PANEL_WIDGET){
-    //   this.controllerService.closeActionDetailPanel();
-    //   this.controllerService.closeButtonPanel();
-    //   // this.intentService.setLiveActiveIntent(null);
-    //   this.controllerService.closeAddActionMenu();
-    //   this.connectorService.removeConnectorDraft();
-    // }
-
-    this.eventTestItOutHeader.next(event);
-  }
-
-  onMenuOption(event){
-    switch(event){
-      case 'EXPORT':
-        this.activeSidebarSection = SIDEBAR_PAGES.SETTINGS
-        this.activeDetailSection = SETTINGS_SECTION.IMPORT_EXPORT
-        break;
-    }
   }
   /*****************************************************/
 

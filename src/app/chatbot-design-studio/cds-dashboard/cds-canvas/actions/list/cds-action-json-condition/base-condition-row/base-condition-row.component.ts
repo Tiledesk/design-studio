@@ -139,7 +139,7 @@ export class BaseConditionRowComponent implements OnInit {
   onClickOperator(operator: {}){
     this.conditionForm.patchValue({ operator: operator['type']})
     
-    this.disableSubmit = true;
+    // this.disableSubmit = true;
     this.readonlyTextarea = false;
     this.setAttributeBtnOperand2 = true;
     this.canShowOperand2 = true;

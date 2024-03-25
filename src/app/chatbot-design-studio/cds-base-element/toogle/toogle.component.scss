@@ -1,0 +1,15 @@
+::ng-deep .mat-slide-toggle {
+
+     //CASE:un-checked
+    .mat-slide-toggle-bar{
+        background-color: var(--blu-light-03);
+    }
+
+    //CASE: checked
+    &.mat-checked:not(.mat-disabled) .mat-slide-toggle-bar {
+        background-color: var(--blu-light-02);
+    }
+    &.mat-checked:not(.mat-disabled) .mat-slide-toggle-thumb {
+        background-color: var(--blu-02);
+    }
+}

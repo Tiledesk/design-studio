@@ -15,7 +15,7 @@ import { NotifyService } from 'src/app/services/notify.service';
   templateUrl: './advanced.component.html',
   styleUrls: ['./advanced.component.scss']
 })
-export class AdvancedComponent extends BotsBaseComponent implements OnInit {
+export class CDSAdvancedComponent extends BotsBaseComponent implements OnInit {
 
   @Input() selectedChatbot: Chatbot;
   @Input() project: Project;

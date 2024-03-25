@@ -11,6 +11,7 @@
   "baseImageUrl": "${API_BASEIMAGE_URL}",
   "logLevel": "${LOG_LEVEL}",
   "storage_prefix": "${CDS_STORAGE_PREFIX}",
+  "phoneNumber":"${PHONE_NUMBER}",
   "firebase": {
     "apiKey": "${FIREBASE_APIKEY}",
     "authDomain": "${FIREBASE_AUTHDOMAIN}",

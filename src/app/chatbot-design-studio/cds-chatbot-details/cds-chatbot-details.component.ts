@@ -10,6 +10,7 @@ import { ProjectService } from 'src/app/services/projects.service';
 import { BotsBaseComponent } from 'src/app/components/bots/bots-base/bots-base.component';
 import { SETTINGS_SECTION } from '../utils';
 import { Observable, Subscription } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 const swal = require('sweetalert');
 
 @Component({
@@ -19,7 +20,7 @@ const swal = require('sweetalert');
 })
 export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnInit {
   
-  @Input() selectedChatbot: Chatbot;
+  selectedChatbot: Chatbot;
   @Input() activeSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
 
   
@@ -39,6 +40,9 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     public appConfigService: AppConfigService,
     private projectService: ProjectService,
     private translate: TranslateService,
+    private dashboardService: DashboardService,
+    private router: Router,
+    private route: ActivatedRoute
   ) { super(); 
   }
 
@@ -49,13 +53,18 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     this.getOSCODE();
     this.project = this.projectService.getCurrentProject()
     this.getTranslations();
+    this.selectedChatbot = this.dashboardService.selectedChatbot;
 
-    
+    this.route.queryParams.subscribe((params) => {
+      console.log('parammmmmm', params)
+      this.activeSection = params['active']
+    })
   }
 
   toggleTab(section) {
     this.logger.log('[CDS-CHATBOT-DTLS] displaydetails', section)
     this.activeSection = section
+    this.router.navigate(['.'], {relativeTo: this.route, queryParams: { active: section } })
   }
 
   

@@ -3,11 +3,7 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 // firebase
-
-import firebase from "firebase/app";
-import 'firebase/messaging';
-import 'firebase/database';
-import 'firebase/firestore';
+// import firebase from 'firebase/app';
 
 // models
 
@@ -56,7 +52,9 @@ export class FirebaseConversationHandler extends ConversationHandlerService {
     private CLIENT_BROWSER: string;
     private lastDate = '';
     private logger: LoggerService = LoggerInstance.getInstance()
-    private ref: firebase.database.Query;
+    
+    private firebase: any;
+    private ref: any;
 
     constructor(@Inject('skipMessage') private skipMessage: boolean) {
         super();
@@ -65,7 +63,7 @@ export class FirebaseConversationHandler extends ConversationHandlerService {
     /**
      * inizializzo conversation handler
      */
-    initialize(recipientId: string, recipientFullName: string, loggedUser: UserModel, tenant: string, translationMap: Map<string, string>) {
+    async initialize(recipientId: string, recipientFullName: string, loggedUser: UserModel, tenant: string, translationMap: Map<string, string>) {
         this.logger.log('[FIREBASEConversationHandlerSERVICE] initWithRecipient', recipientId, recipientFullName, loggedUser, tenant, translationMap)
         this.recipientId = recipientId;
         this.recipientFullname = recipientFullName;
@@ -81,6 +79,10 @@ export class FirebaseConversationHandler extends ConversationHandlerService {
         this.conversationWith = recipientId;
         this.messages = [];
         // this.attributes = this.setAttributes();
+        const { default: firebase} = await import("firebase/app");
+        await Promise.all([import("firebase/database")]);
+        this.firebase = firebase
+        this.ref = this.firebase.database['Query'];
     }
 
     /**
@@ -95,7 +97,7 @@ export class FirebaseConversationHandler extends ConversationHandlerService {
         this.urlNodeFirebase = conversationMessagesRef(this.tenant, this.loggedUser.uid);
         this.urlNodeFirebase = this.urlNodeFirebase + this.conversationWith;
         this.logger.debug('[FIREBASEConversationHandlerSERVICE] urlNodeFirebase *****', this.urlNodeFirebase);
-        const firebaseMessages = firebase.database().ref(this.urlNodeFirebase);
+        const firebaseMessages = this.firebase.database().ref(this.urlNodeFirebase);
         this.ref = firebaseMessages.orderByChild('timestamp').limitToLast(100);
         this.ref.on('child_added', (childSnapshot) => {
             that.logger.debug('[FIREBASEConversationHandlerSERVICE] >>>>>>>>>>>>>> child_added: ', childSnapshot.val())
@@ -139,12 +141,12 @@ export class FirebaseConversationHandler extends ConversationHandlerService {
         if (!channelType || channelType === 'undefined') {
             channelType = TYPE_DIRECT;
         }
-        const firebaseMessagesCustomUid = firebase.database().ref(this.urlNodeFirebase);
+        const firebaseMessagesCustomUid = this.firebase.database().ref(this.urlNodeFirebase);
 
         // const key = messageRef.key;
         const lang = document.documentElement.lang;
         const recipientFullname = conversationWithFullname;
-        const timestamp = firebase.database.ServerValue.TIMESTAMP
+        const timestamp = this.firebase.database.ServerValue.TIMESTAMP
         const message = new MessageModel(
             '',
             lang,
@@ -171,7 +173,7 @@ export class FirebaseConversationHandler extends ConversationHandlerService {
             status: 0,
             metadata: metadataMsg,
             text: msg,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            timestamp: this.firebase.database.ServerValue.TIMESTAMP,
             type: typeMsg,
             attributes: attributes,
             channel_type: channelType
@@ -448,7 +450,7 @@ export class FirebaseConversationHandler extends ConversationHandlerService {
             if (msg.sender !== this.loggedUser.uid && msg.status < MSG_STATUS_RECEIVED) {
                 const urlNodeMessagesUpdate = this.urlNodeFirebase + '/' + msg.uid;
                 this.logger.debug('[FIREBASEConversationHandlerSERVICE] update message status', urlNodeMessagesUpdate);
-                firebase.database().ref(urlNodeMessagesUpdate).update({ status: MSG_STATUS_RECEIVED });
+                this.firebase.database().ref(urlNodeMessagesUpdate).update({ status: MSG_STATUS_RECEIVED });
             }
         }
     }

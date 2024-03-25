@@ -1,0 +1,205 @@
+
+<div *ngIf="previewMode" class="text-editor-wrapper previewMode">
+    
+    <div class="set-attribute-label-and-value-wpr"  *ngIf="response.hasOwnProperty('minDigits')">
+        <div class="set-attribute-label"> {{'CDSCanvas.MinDigits' | translate }} </div>
+        <div class="response-wrp ellips" [class.no-text]="!response.minDigits">{{response.minDigits}}</div>
+    </div>
+
+    <div class="set-attribute-label-and-value-wpr"  *ngIf="response.hasOwnProperty('maxDigits')">
+        <div class="set-attribute-label"> {{'CDSCanvas.MaxDigits' | translate }} </div>
+        <div class="response-wrp ellips" [class.no-text]="!response.maxDigits">{{response.maxDigits}}</div>
+    </div>
+
+    <div class="set-attribute-label-and-value-wpr"  *ngIf="response.hasOwnProperty('terminators')">
+        <div class="set-attribute-label"> {{'CDSCanvas.Terminator' | translate }} </div>
+        <div class="response-wrp ellips" [class.no-text]="!response.terminators">{{response.terminators}}</div>
+    </div>
+
+    <div class="set-attribute-label-and-value-wpr"  *ngIf="response.hasOwnProperty('timeout')">
+        <div class="set-attribute-label"> {{'CDSCanvas.Timeout' | translate }} </div>
+        <div class="response-wrp ellips" [class.no-text]="!response.timeout">{{response.timeout}}</div>
+    </div>
+
+    <div class="set-attribute-label-and-value-wpr"  *ngIf="response.hasOwnProperty('transferTo')">
+        <div class="set-attribute-label"> {{'CDSCanvas.TransferTo' | translate }} </div>
+        <div class="response-wrp expand ellips" [class.no-text]="!response.transferTo">{{response.transferTo}}</div>
+    </div>
+
+    <div class="previewContent" *ngIf="response.hasOwnProperty('no_input')">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.NoInput' | translate}}</label>
+        
+        <cds-connector class="button-connector"
+            [idConnector] = "idConnectorNoInput"
+            [idConnection] = "idConnectionNoInput"
+            [isConnected] = "isConnectedNoInput">
+        </cds-connector>
+    </div>
+
+    <div class="previewContent" *ngIf="response.hasOwnProperty('no_match')">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.NoMatch' | translate}}</label>
+        
+        <cds-connector class="button-connector"
+            [idConnector] = "idConnectorNoMatch"
+            [idConnection] = "idConnectionNoMatch"
+            [isConnected] = "isConnectedNoMatch">
+        </cds-connector>
+    </div>
+    
+</div> 
+
+
+<div  *ngIf="!previewMode" class="setting-wrapper">
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('minDigits')">
+        <label class="title-label">{{'CDSCanvas.MinDigits' | translate}}</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.minDigits"
+            [minRow]="1" [maxRow]="1" [limitCharsText]="2"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'minDigits')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('maxDigits')">
+        <label class="title-label">{{'CDSCanvas.MaxDigits' | translate}}</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.maxDigits"
+            [minRow]="1" [maxRow]="1" [limitCharsText]="2"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'maxDigits')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('terminators')">
+        <label class="title-label">{{'CDSCanvas.Terminator' | translate}}</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.terminators"
+            [minRow]="1" [maxRow]="1" [limitCharsText]="1"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'terminators')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('timeout')">
+        <label class="title-label">{{'CDSCanvas.Timeout' | translate}} (s)</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.timeout"
+            [minRow]="1" [maxRow]="1" [limitCharsText]="2"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'timeout')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('transferTo')" style="width: 100%;">
+        <label class="title-label">{{'CDSCanvas.TransferTo' | translate}}</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.transferTo"
+            [minRow]="1" [maxRow]="1" 
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'transferTo')">
+        </cds-textarea>
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode" class="connector-wrapper" >
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('no_input')" style="width: 100%;">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.NoInput' | translate}}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="response?.no_input" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'no_input')"
+            (onReset)="onResetBlockSelect($event, 'no_input')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('no_match')" style="width: 100%;">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.NoMatch' | translate}}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="response?.no_match" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'no_match')"
+            (onReset)="onResetBlockSelect($event, 'no_match')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode" class="setting-wrapper">
+    
+    <div class="field-box" *ngIf="response.hasOwnProperty('bargein')" style="width: 100%;">
+        <label class="title-label">{{'CDSCanvas.BargeIn' | translate}}</label>
+        <cds-toogle
+            [checked]="response.bargein"
+            [disabled]="false"
+            (onChangeToggle)="onChangeToggle($event)">
+        </cds-toogle>
+    </div>
+
+</div>
+

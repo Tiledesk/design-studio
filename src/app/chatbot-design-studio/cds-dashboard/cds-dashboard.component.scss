@@ -61,29 +61,13 @@ cds-sidebar {
   overflow-y: hidden;
 }
 
-.cds-content {
-  display: flex;
-  width: calc(100% - var(--sidebar-base-width));
-  overflow: hidden;
-}
+// .cds-content {
+//   display: flex;
+//   width: calc(100% - var(--sidebar-base-width));
+//   overflow: hidden;
+// }
 
-.cds-generic-panel {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: auto;
-  height: 100%;
 
-  &#action-detail{
-    z-index: 10
-  }
-  &#button-configuration{
-    z-index: 11
-  }
-  &#widget-preview{
-    z-index: 12
-  }
-}
 
 
 .loader{

@@ -82,7 +82,8 @@ export class BrandService {
       COMPANY_SITE_NAME:"tiledesk.com",
       COMANY_SITE_URL:"https://www.tiledesk.com",
       CONTACT_US_EMAIL: "support@tiledesk.com",
-      COMPANY_PRIMARY_COLOR:""
+      COMPANY_PRIMARY_COLOR:"",
+      DOCS: true
     }
   }
 
@@ -182,7 +183,7 @@ export class BrandService {
     //     this.brand = this._brand;
     //   }
     // }
-
+    const that = this
     try {
       let url = this.appConfig.getConfig().brandSrc
       if (url && url !== 'CHANGEIT') {
@@ -219,7 +220,7 @@ export class BrandService {
   }
 
   getBrand() {
-    console.log('BrandService getBrand has been called - brand: ', this.brand);
+    //this.logger.log('BrandService getBrand has been called - brand: ', this.brand);
     return { ...this.brand['CDS'], ...this.brand['COMMON'] }
   }
 

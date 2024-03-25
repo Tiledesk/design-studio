@@ -2,12 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 // firebase
+// firebase
 // import * as firebase from 'firebase/app';
-import firebase from "firebase/app";
-import 'firebase/messaging';
-import 'firebase/database';
-import 'firebase/auth';
-import 'firebase/storage';
+// import firebase from 'firebase/app';
 
 // models
 import { ConversationModel } from '../../models/conversation';
@@ -44,10 +41,11 @@ export class FirebaseArchivedConversationsHandler extends ArchivedConversationsH
     private translationMap: Map<string, string>;
     private isConversationClosingMap: Map<string, boolean>;
     private logger: LoggerService = LoggerInstance.getInstance()
-    private ref: firebase.database.Query;
+
 
     private subscribe: any;
-
+    private firebase: any;
+    private ref: any;
     constructor(
         //public databaseProvider: DatabaseProvider
     ) {
@@ -57,15 +55,18 @@ export class FirebaseArchivedConversationsHandler extends ArchivedConversationsH
     /**
      * inizializzo conversations handler
      */
-    initialize(tenant: string, userId: string, translationMap: Map<string, string>) {
+    async initialize(tenant: string, userId: string, translationMap: Map<string, string>) {
         this.logger.log('initialize FROM [APP-COMP] - FIREBASEArchivedConversationsHandlerSERVICE] tenant ', tenant, ' - userId: ', userId, ' - translationMap: ', translationMap)
         this.tenant = tenant;
         this.loggedUserId = userId;
         this.translationMap = translationMap;
         this.archivedConversations = [];
         this.isConversationClosingMap = new Map();
-        //this.databaseProvider.initialize(userId, this.tenant);
-        //this.getConversationsFromStorage();
+        
+        const { default: firebase} = await import("firebase/app");
+        await Promise.all([import("firebase/database"), import("firebase/auth")]);
+        this.firebase = firebase
+        this.ref = this.firebase.database['Query'];
     }
 
     /**
@@ -97,7 +98,7 @@ export class FirebaseArchivedConversationsHandler extends ArchivedConversationsH
         const that = this;
         const urlNodeFirebase = archivedConversationsPathForUserId(this.tenant, this.loggedUserId);
         this.logger.debug('[FIREBASEArchivedConversationsHandlerSERVICE] SubscribeToConversations conversations::ARCHIVED urlNodeFirebase', urlNodeFirebase)
-        this.ref = firebase.database().ref(urlNodeFirebase).orderByChild('timestamp').limitToLast(200);
+        this.ref = this.firebase.database().ref(urlNodeFirebase).orderByChild('timestamp').limitToLast(200);
         this.ref.on('child_changed', (childSnapshot) => {
             that.changed(childSnapshot);
         });
@@ -138,7 +139,7 @@ export class FirebaseArchivedConversationsHandler extends ArchivedConversationsH
         const urlUpdate = archivedConversationsPathForUserId(this.tenant, this.loggedUserId) + '/' + conversationrecipient;
         const update = {};
         update['/is_new'] = false;
-        firebase.database().ref(urlUpdate).update(update);
+        this.firebase.database().ref(urlUpdate).update(update);
     }
 
 
@@ -179,7 +180,7 @@ export class FirebaseArchivedConversationsHandler extends ArchivedConversationsH
             // const urlNodeFirebase = '/apps/' + this.tenant + '/users/' + this.loggedUserId + '/archived_conversations/' + conversationId;
             const urlNodeFirebase = archivedConversationsPathForUserId(this.tenant, this.loggedUserId) // + '/' + conversationId;
             this.logger.log('[FIREBASEArchivedConversationsHandlerSERVICE] urlNodeFirebase conversationDetail *****', urlNodeFirebase)
-            const firebaseMessages = firebase.database().ref(urlNodeFirebase);
+            const firebaseMessages = this.firebase.database().ref(urlNodeFirebase);
             if(this.subscribe){
                 this.logger.log('[FIREBASEArchivedConversationsHandlerSERVICE] getConversationDetail ALREADY SUBSCRIBED')
                 return;

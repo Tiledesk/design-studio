@@ -87,7 +87,7 @@
             tabindex="0" 
             [ngClass]="{
             'cds-action-active': intentService.actionSelectedID === action._tdActionId, 
-            'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY,
+            'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
             'cds-last-action': last
             }" 
             (keydown)="onKeydown($event)" 
@@ -116,7 +116,7 @@
                 </cds-action-description>
     
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
-    
+
                     <cds-action-controls 
                         (onClickControl)="onClickControl($event, action, i)">
                     </cds-action-controls>
@@ -314,6 +314,28 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-code>
+
+
+                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-voice>
+
+                    <cds-action-voice *ngSwitchCase=" TYPE_ACTION_VXML.DTMF_MENU"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-voice>
+
+                    <cds-action-voice *ngSwitchCase=" TYPE_ACTION_VXML.BLIND_TRANSFER"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-voice>
 
                 </div>
             </span>

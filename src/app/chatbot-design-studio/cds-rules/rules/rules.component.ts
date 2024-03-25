@@ -8,6 +8,7 @@ import { IntentService } from '../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { MEDIA } from '../../utils-resources';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'cds-rules',
@@ -16,7 +17,7 @@ import { MEDIA } from '../../utils-resources';
 })
 export class RulesComponent implements OnInit {
 
-  @Input() selectedChatbot: Chatbot;
+  selectedChatbot: Chatbot;
   // @Input() listOfIntents: Intent[];
 
   listOfIntents: Intent[];
@@ -30,14 +31,17 @@ export class RulesComponent implements OnInit {
 
   constructor(
     private intentService: IntentService,
+    private dashboardService: DashboardService
     ) { }
 
   ngOnInit(): void {
     this.listOfIntents = this.intentService.listOfIntents;
+    this.selectedChatbot = this.dashboardService.selectedChatbot
+    this.getAllRules();
   }
 
   ngOnChanges(changes: SimpleChanges){
-    this.getAllRules();
+   
   }
   
   ngOnDestroy(){

@@ -254,6 +254,10 @@ cds-connector.connector-true {
     .point-connector-empty{
         border-color:  var(--success-connector);
         background:  var(--success-connector);
+        &:hover{
+            border-color:  var(--success-connector);
+            background:  var(--success-connector);
+        }
     }
     .point-connector{
         background:  var(--success-connector);
@@ -262,8 +266,12 @@ cds-connector.connector-true {
 
 cds-connector.connector-false {
     .point-connector-empty{
-      border-color: var(--failure-connector);
-      background: var(--failure-connector);
+        border-color: var(--failure-connector);
+        background: var(--failure-connector);
+        &:hover{
+            border-color: var(--failure-connector);
+            background: var(--failure-connector);
+        }
     }
     .point-connector{
       background: var(--failure-connector);
@@ -286,12 +294,17 @@ cds-connector.connector-isLast {
     top: calc(50% - 18px);
 
     .point-connector-empty {
-        outline: 2px solid;
-        border: 0px;
+        // outline: 2px solid;
+        // border: 0px;
+        // background: #ffffff;
+        // color: rgb(168, 168, 174);
+        // width: 10px;
+        // height: 10px;
+        border: 2px solid;
         background: #ffffff;
         color: rgb(168, 168, 174);
-        width: 10px;
-        height: 10px;
+        width: 14px;
+        height: 14px;
     }
     .point-connector {
         // background: #e4e4e7;
@@ -304,11 +317,11 @@ cds-connector.connector-isLast {
 
     &:hover{
         cursor: default;
-        .point-connector-empty {
-            background: rgb(168, 168, 174);
-            border: 0px;
-            cursor: copy;
-        }
+        // .point-connector-empty {
+        //     background: rgb(168, 168, 174);
+        //     border: 0px;
+        //     cursor: copy;
+        // }
         .point-connector-empty::before {
             border: 0px;
         }

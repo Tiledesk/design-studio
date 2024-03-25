@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 
@@ -14,7 +14,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 import { Chatbot } from 'src/app/models/faq_kb-model';
-import { EXTERNAL_URL, TYPE_INTENT_NAME } from '../../utils';
+import { EXTERNAL_URL, SETTINGS_SECTION, TYPE_INTENT_NAME } from '../../utils';
 import { CdsPublishOnCommunityModalComponent } from '../../../modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { environment } from 'src/environments/environment';
@@ -41,7 +41,6 @@ export class CdsHeaderComponent implements OnInit {
   @Output() toggleSidebarWith = new EventEmitter();
   @Output() goToBck = new EventEmitter();
   @Output() onTestItOut = new EventEmitter();
-  @Output() onMenuOption = new EventEmitter();
 
   id_faq_kb: string;
   projectID: string;
@@ -64,6 +63,7 @@ export class CdsHeaderComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private faqKbService: FaqKbService,
     public dialog: MatDialog,
     public appConfigService: AppConfigService,
@@ -211,7 +211,7 @@ export class CdsHeaderComponent implements OnInit {
 
 
   openWhatsappPage() {
-    let tiledesk_phone_number = this.appConfigService.getConfig().tiledeskPhoneNumber;
+    let phoneNumber = this.appConfigService.getConfig().phoneNumber;
     let info = {
       project_id: this.projectID,
       bot_id: this.selectedChatbot._id
@@ -221,7 +221,7 @@ export class CdsHeaderComponent implements OnInit {
       this.logger.log("--> testing code from whatsapp: ", response);
       // let code = "%23td" + response.short_uid;
       let text = "%23td" + response.short_uid + " Send me to start testing your bot";
-      const testItOutOnWhatsappUrl = `https://api.whatsapp.com/send/?phone=${tiledesk_phone_number}&text=${text}&type=phone_number&app_absent=0`
+      const testItOutOnWhatsappUrl = `https://api.whatsapp.com/send/?phone=${phoneNumber}&text=${text}&type=phone_number&app_absent=0`
       window.open(testItOutOnWhatsappUrl, 'blank');
     }).catch((err) => {
       this.logger.error("--> error getting testing code from whatsapp: ", err);
@@ -244,7 +244,7 @@ export class CdsHeaderComponent implements OnInit {
         window.open(DASHBOARD_URL, '_self').focus();
         break;
       case 'EXPORT':
-        this.onMenuOption.emit(item.key)
+        this.router.navigate(['./settings'], {relativeTo: this.route, queryParams: { active: SETTINGS_SECTION.IMPORT_EXPORT } })
         break;
       case 'COPY_LINK':{
         let testItOutUrl = this.appConfigService.getConfig().widgetBaseUrl + "assets/twp" + '/chatbot-panel.html' +
@@ -288,7 +288,7 @@ export class CdsHeaderComponent implements OnInit {
     // let params = `toolbar=no,menubar=no,width=815,height=727,left=100,top=100`;
     // window.open(url, '_blank', params);
     let intentStart = this.intentService.listOfIntents.find(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
-    this.onTestItOut.emit(intentStart);
+    this.intentService.openTestItOut(intentStart)
   }
 
 
