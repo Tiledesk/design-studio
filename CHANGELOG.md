@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.2.0-rc.9
+- added: lazy modules
+
 ### 1.2.0-rc.8
 - added: PHONE_NUMBER to config-template env
 
