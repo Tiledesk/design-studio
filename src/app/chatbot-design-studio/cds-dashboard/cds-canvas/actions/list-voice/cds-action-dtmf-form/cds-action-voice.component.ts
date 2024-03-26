@@ -25,7 +25,7 @@ export class CdsActionVoiceComponent implements OnInit {
   @Input() intentSelected: Intent;
   @Input() previewMode: boolean = true
   @Output() updateAndSaveAction = new EventEmitter();
-  
+  @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   // idIntentSelected: string;
   idAction: string;
@@ -277,6 +277,13 @@ export class CdsActionVoiceComponent implements OnInit {
     const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
     this.logger.log('onChangeActionReply ************', element);
     this.onUpdateAndSaveAction(element);
+  }
+
+  /** onConnectorChangeReply */
+  onConnectorChangeReply(event){
+    this.logger.log('onConnectorChangeReply ************', event);
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    this.onConnectorChange.emit(event)
   }
   
 

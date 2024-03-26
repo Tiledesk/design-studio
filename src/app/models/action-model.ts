@@ -98,8 +98,7 @@ export class ActionHideMessage extends Action {
 export class ActionReply extends Action {
     text?: string;
     attributes: Attributes;
-    noInput?: string;
-    noMatch?: string;
+    settings: Setting
     constructor(text?: string, attributes?: Attributes) {
         super();
         // this.text = text ? text : '...';
@@ -414,10 +413,10 @@ export class Setting {
     maxDigits?: number;
     terminators?: string;
     transferTo?: string;
-    timeout?: number;
     bargein?: boolean = true;
-    no_input?: string;
-    no_match?: string;
+    noInputTimeout?: number;
+    noInputIntent?: string;
+    noMatchIntent?: string;
 }
 
 export class MessageWithWait extends Message {

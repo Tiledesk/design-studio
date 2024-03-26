@@ -25,7 +25,7 @@ export class CdsActionReplyComponent implements OnInit {
   @Input() intentSelected: Intent;
   @Input() previewMode: boolean = true
   @Output() updateAndSaveAction = new EventEmitter();
-  
+  @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   // idIntentSelected: string;
   idAction: string;
@@ -53,7 +53,6 @@ export class CdsActionReplyComponent implements OnInit {
   tipText: string;
   titlePlaceholder: string;
 
-  settings: Setting
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -79,9 +78,10 @@ export class CdsActionReplyComponent implements OnInit {
       if(this.action._tdActionTitle && this.action._tdActionTitle != ""){
         this.dataInput = this.action._tdActionTitle;
       }
-      this.settings = { no_input: null, timeout: 20 }
-      if(this.action.noInput){
-        this.settings = { no_input: this.action.noInput}
+
+      if(!this.action.settings){
+        console.log('settttttttttt', this.action)
+        this.action.settings = { noInputIntent: null, noInputTimeout: 5000 , noMatchIntent: null}
       }
       this.logger.log('ActionDescriptionComponent action:: ', this.element);
     } catch (error) {
@@ -284,6 +284,13 @@ export class CdsActionReplyComponent implements OnInit {
     const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
     this.logger.log('onChangeActionReply ************', element);
     this.onUpdateAndSaveAction(element);
+  }
+
+  /** onConnectorChangeReply */
+  onConnectorChangeReply(event){
+    this.logger.log('onConnectorChangeReply ************', event, this.action);
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    this.onConnectorChange.emit(event)
   }
   
 

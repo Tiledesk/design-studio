@@ -4,6 +4,7 @@ import { StageService } from '../services/stage.service';
 import { TYPE_ACTION, TYPE_BUTTON, isElementOnTheStage, generateShortUID, TYPE_ACTION_VXML } from '../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { Setting } from 'src/app/models/action-model';
 /** CLASSE DI SERVICES PER GESTIRE I CONNETTORI **/
 
 
@@ -254,6 +255,27 @@ export class ConnectorService {
               this.createConnector(intent, idConnectorFrom, idConnectorTo);
             }
           });
+
+          /** noInput and noMatch block connectors */
+          if( action.settings  &&  action.settings .noInputIntent &&  action.settings .noInputIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noInput';
+            idConnectorTo =  action.settings.noInputIntent.replace("#", "");
+            
+            if(!this.intentExists(idConnectorTo)){
+              action.settings.noInputIntent = '';
+              idConnectorTo = null;
+            }
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(action.settings && action.settings.noMatchIntent && action.settings.noMatchIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noMatch';
+            idConnectorTo = action.settings.noMatchIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.settings.noMatchIntent = '';
+              idConnectorTo = null;
+            }
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
         }
 
         /**  ONLINE_AGENTS */
@@ -611,29 +633,29 @@ export class ConnectorService {
 
         /** DTMF_MENU' */
         if(action._tdActionType === TYPE_ACTION_VXML.DTMF_MENU){
-          let settingCommand = action.attributes.commands.slice(-1)[0].settings
-          if(settingCommand && settingCommand.no_input && settingCommand.no_input !== ''){
-            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/no_input';
-            idConnectorTo =  settingCommand.no_input.replace("#", "");
+          let settingCommand: Setting = action.attributes.commands.slice(-1)[0].settings 
+          if(settingCommand && settingCommand.noInputIntent && settingCommand.noInputIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noInput';
+            idConnectorTo =  settingCommand.noInputIntent.replace("#", "");
             
             if(!this.intentExists(idConnectorTo)){
-              settingCommand.no_input = '';
+              settingCommand.noInputIntent = '';
               idConnectorTo = null;
             }
-            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorFrom', idConnectorFrom);
-            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorTo', idConnectorTo);
+            this.logger.log('[CONNECTOR-SERV] - DTMF_MENU ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - DTMF_MENU ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
-          if(settingCommand && settingCommand.no_match && settingCommand.no_match !== ''){
-            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/no_match';
-            idConnectorTo = settingCommand.no_match.replace("#", "");
+          if(settingCommand && settingCommand.noMatchIntent && settingCommand.noMatchIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noMatch';
+            idConnectorTo = settingCommand.noMatchIntent.replace("#", "");
             if(!this.intentExists(idConnectorTo)){
-              settingCommand.no_match = '';
+              settingCommand.noMatchIntent = '';
               idConnectorTo = null;
             }
-            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorFrom', idConnectorFrom);
-            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorTo', idConnectorTo);
+            this.logger.log('[CONNECTOR-SERV] - DTMF_MENU ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - DTMF_MENU ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }

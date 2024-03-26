@@ -937,7 +937,7 @@ export class IntentService {
       commandWait2.time = 0
       action.attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { minDigits: null, maxDigits: null, terminators: '#', timeout: 15, bargein: true}
+      command_form.settings = { minDigits: null, maxDigits: null, terminators: '#', noInputTimeout: 15, bargein: true}
       command_form.subType = TYPE_ACTION_VXML.DTMF_FORM
       action.attributes.commands.push(command_form);
     }
@@ -952,7 +952,7 @@ export class IntentService {
       commandWait2.time = 0
       action.attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { no_input: null, no_match: null, timeout: 15, bargein: true}
+      command_form.settings = { noInputIntent: null, noMatchIntent: null, noInputTimeout: 15, bargein: true}
       command_form.subType = TYPE_ACTION_VXML.DTMF_MENU
       action.attributes.commands.push(command_form);
     }

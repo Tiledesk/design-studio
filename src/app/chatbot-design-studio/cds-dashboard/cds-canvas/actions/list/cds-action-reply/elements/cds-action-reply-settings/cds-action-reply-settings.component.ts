@@ -26,7 +26,8 @@ export class CdsActionReplySettingsComponent implements OnInit {
   @Input() response: Setting;
   @Input() index: number;
   @Input() previewMode: boolean = true;
-  
+  @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
+
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   // Connectors //
@@ -62,6 +63,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
       }
     });
     this.initializeConnector();
+    this.delayTime = (this.response && this.response.noInputTimeout)? (this.response.noInputTimeout/1000) : 500;
 
   }
 
@@ -78,8 +80,8 @@ export class CdsActionReplySettingsComponent implements OnInit {
 
   initializeConnector() {
     this.idIntentSelected = this.idAction.split('/')[0];
-    this.idConnectorNoInput = this.idAction + '/no_input';
-    this.idConnectorNoMatch = this.idAction + '/no_match';
+    this.idConnectorNoInput = this.idAction + '/noInput';
+    this.idConnectorNoMatch = this.idAction + '/noMatch';
     this.listOfIntents = this.intentService.getListOfIntents();
     this.checkConnectionStatus();
   }
@@ -90,13 +92,13 @@ export class CdsActionReplySettingsComponent implements OnInit {
       const idButton = array[0] + '/' + array[array.length - 2];
       if(idButton === this.idAction){
         if(this.connector.deleted){
-          if(array[array.length -1] === 'no_input'){
-            this.response.no_input = null;
+          if(array[array.length -1] === 'noInput'){
+            this.response.noInputIntent = null;
             this.isConnectedNoInput = false;
             this.idConnectionNoInput = null;
           }        
-          if(array[array.length -1] === 'no_match'){
-            this.response.no_match = null;
+          if(array[array.length -1] === 'noMatch'){
+            this.response.noMatchIntent = null;
             this.isConnectedNoMatch = false;
             this.idConnectionNoMatch = null;
           }
@@ -104,18 +106,18 @@ export class CdsActionReplySettingsComponent implements OnInit {
         } else { 
           // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
           this.logger.debug('[ACTION REPLY SETTINGS] updateConnector', this.connector.toId, this.connector.fromId ,this.response, array[array.length-1]);
-          if(array[array.length -1] === 'no_input'){
+          if(array[array.length -1] === 'noInput'){
             // this.action.trueIntent = '#'+this.connector.toId;
             this.isConnectedNoInput = true;
             this.idConnectionNoInput = this.connector.fromId+"/"+this.connector.toId;
-            this.response.no_input = '#'+this.connector.toId;
+            this.response.noInputIntent = '#'+this.connector.toId;
             if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
           }        
-          if(array[array.length -1] === 'no_match'){
+          if(array[array.length -1] === 'noMatch'){
             // this.action.falseIntent = '#'+this.connector.toId;
             this.isConnectedNoMatch = true;
             this.idConnectionNoMatch = this.connector.fromId+"/"+this.connector.toId;
-            this.response.no_match = '#'+this.connector.toId;
+            this.response.noMatchIntent = '#'+this.connector.toId;
             if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
           }
         }
@@ -126,22 +128,22 @@ export class CdsActionReplySettingsComponent implements OnInit {
   }
 
   private checkConnectionStatus(){
-    if(this.response.no_input){
+    if(this.response.noInputIntent){
       this.isConnectedNoInput = true;
-      const posId = this.response.no_input.indexOf("#");
+      const posId = this.response.noInputIntent.indexOf("#");
       if (posId !== -1) {
-        const toId = this.response.no_input.slice(posId+1);
+        const toId = this.response.noInputIntent.slice(posId+1);
         this.idConnectionNoInput = this.idConnectorNoInput+"/"+toId;
       }
     } else {
       this.isConnectedNoInput = false;
       this.idConnectionNoInput = null;
     }
-    if(this.response.no_match){
+    if(this.response.noMatchIntent){
       this.isConnectedNoMatch = true;
-      const posId = this.response.no_match.indexOf("#");
+      const posId = this.response.noMatchIntent.indexOf("#");
       if (posId !== -1) {
-        const toId = this.response.no_match.slice(posId+1);
+        const toId = this.response.noMatchIntent.slice(posId+1);
         this.idConnectionNoMatch = this.idConnectorNoMatch+"/"+toId;
       }
      } else {
@@ -154,6 +156,19 @@ export class CdsActionReplySettingsComponent implements OnInit {
 
 
   // EVENT FUNCTIONS //
+
+  /** onClickDelayTime */
+  onClickDelayTime(opened: boolean){
+    // this.canShowFilter = !opened;
+  }
+
+  /** onChangeDelayTime */
+  onChangeDelayTime(value:number){
+    this.delayTime = value;
+    this.response.noInputTimeout = value*1000;
+    // this.canShowFilter = true;
+    this.changeActionReply.emit();
+  }
 
   /** onChangeTextarea */
   onChangeTextarea(text:string, key: string) {
@@ -184,5 +199,33 @@ export class CdsActionReplySettingsComponent implements OnInit {
       text = text.replace('{' + match + '}',createTag)
     });
     return text
+  }
+
+  onChangeBlockSelect(event:{name: string, value: string}, type: 'noInputIntent' | 'noMatchIntent') {
+    if(event){
+      this.response[type]=event.value
+      switch(type){
+        case 'noInputIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorNoInput, toId: this.response.noInputIntent});
+          break;
+        case 'noMatchIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorNoMatch, toId: this.response.noMatchIntent});
+          break;
+      }
+      // this.changeActionReply.emit()
+    }
+  }
+
+  onResetBlockSelect(event:{name: string, value: string}, type: 'noInputIntent' | 'noMatchIntent') {
+    switch(type){
+      case 'noInputIntent':
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorNoInput, toId: this.response.noInputIntent});
+        break;
+      case 'noMatchIntent':
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorNoMatch, toId: this.response.noMatchIntent});
+        break;
+    }
+    this.response[type]=null
+    // this.changeActionReply.emit()
   }
 }
