@@ -98,6 +98,8 @@ export class ActionHideMessage extends Action {
 export class ActionReply extends Action {
     text?: string;
     attributes: Attributes;
+    noInput?: string;
+    noMatch?: string;
     constructor(text?: string, attributes?: Attributes) {
         super();
         // this.text = text ? text : '...';

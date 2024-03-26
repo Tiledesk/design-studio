@@ -81,16 +81,15 @@
                      <!-- TEXT RESPONSE: only odd element -->
                      <div *ngIf="command.type === typeCommand.SETTINGS">
                             <div class="response">
-                                <cds-action-reply-settings
+                                <cds-action-reply-voice-settings
                                     [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                                     [index] = i
                                     [idAction] = "idAction"
                                     [response] = "command.settings"
-                                    [wait] = "arrayResponses[i-1]"
                                     [previewMode] = "previewMode"
                                     (updateAndSaveAction) = onUpdateAndSaveAction($event)
                                     (changeActionReply) = onChangeActionReply($event)>
-                                </cds-action-reply-settings>
+                                </cds-action-reply-voice-settings>
                             </div>
                      </div>
                 </div>

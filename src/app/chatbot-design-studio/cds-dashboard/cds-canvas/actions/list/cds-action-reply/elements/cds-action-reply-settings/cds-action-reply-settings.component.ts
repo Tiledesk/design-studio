@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
-  selector: 'cds-action-reply-voice-settings',
+  selector: 'cds-action-reply-settings',
   templateUrl: './cds-action-reply-settings.component.html',
   styleUrls: ['./cds-action-reply-settings.component.scss']
 })

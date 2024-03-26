@@ -63,6 +63,7 @@ import { ModalWindowComponent } from './form/modal-window/modal-window.component
 import { CdsQuestionComponent } from './question/question.component';
 import { BaseElementModule } from 'src/app/shared/base-element.module';
 import { CdsActionBrevoComponent } from './cds-action-brevo/cds-action-brevo.component';
+import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds-action-reply-settings/cds-action-reply-settings.component';
 
 @NgModule({
   declarations: [
@@ -114,6 +115,7 @@ import { CdsActionBrevoComponent } from './cds-action-brevo/cds-action-brevo.com
     CdsActionReplyRedirectComponent,
     CdsActionReplyGalleryComponent,
     CdsActionReplyButtonComponent,
+    CdsActionReplySettingsComponent,
     // action REPLY elements: end //
     // action ASSIGN-VARIABLE elements: start //
     OperationComponent,
