@@ -19,7 +19,6 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 export class CdsActionVoiceComponent implements OnInit {
 
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
-  translateY: string;
 
   @Input() action: ActionVoice;
   @Input() intentSelected: Intent;
@@ -53,13 +52,13 @@ export class CdsActionVoiceComponent implements OnInit {
   tipText: string;
   titlePlaceholder: string;
 
-  private logger: LoggerService = LoggerInstance.getInstance();
+  public logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private intentService: IntentService,
-    private controllerService: ControllerService,
-    private connectorService: ConnectorService,
-    private changeDetectorRef: ChangeDetectorRef
+    public intentService: IntentService,
+    public controllerService: ControllerService,
+    public connectorService: ConnectorService,
+    public changeDetectorRef: ChangeDetectorRef
   ) { }
 
   // manageTooltip(){}

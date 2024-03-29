@@ -323,19 +323,19 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-voice>
 
-                    <cds-action-voice *ngSwitchCase=" TYPE_ACTION_VXML.DTMF_MENU"    
+                    <cds-action-dtmf-menu *ngSwitchCase=" TYPE_ACTION_VXML.DTMF_MENU"    
                         class="panel-response"
                         [intentSelected]="intent" 
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-voice>
+                    </cds-action-dtmf-menu>
 
-                    <cds-action-voice *ngSwitchCase=" TYPE_ACTION_VXML.BLIND_TRANSFER"    
+                    <cds-action-blind-transfer *ngSwitchCase=" TYPE_ACTION_VXML.BLIND_TRANSFER"    
                         class="panel-response"
                         [intentSelected]="intent" 
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-voice>
+                    </cds-action-blind-transfer>
 
                 </div>
             </span>

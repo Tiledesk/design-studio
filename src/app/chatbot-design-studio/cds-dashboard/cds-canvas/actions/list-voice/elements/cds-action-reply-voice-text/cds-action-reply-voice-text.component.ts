@@ -4,17 +4,17 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/models/action-model';
-import { TYPE_ACTION, TYPE_ACTION_VXML, TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../../utils';
-import { IntentService } from '../../../../../../../services/intent.service';
-import { ConnectorService } from '../../../../../../../services/connector.service';
+import { TYPE_ACTION, TYPE_ACTION_VXML, TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../utils';
+import { IntentService } from '../../../../../../services/intent.service';
+import { ConnectorService } from '../../../../../../services/connector.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-reply-voice-text',
-  templateUrl: './cds-action-reply-text.component.html',
-  styleUrls: ['./cds-action-reply-text.component.scss']
+  templateUrl: './cds-action-reply-voice-text.component.html',
+  styleUrls: ['./cds-action-reply-voice-text.component.scss']
 })
 export class CdsActionReplyVoiceTextComponent implements OnInit {
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
@@ -34,6 +34,7 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
   @Input() index: number;
   @Input() actionType: TYPE_ACTION | TYPE_ACTION_VXML;
   @Input() previewMode: boolean = true;
+  @Input() allowedChars: string[]
 
   // Connector //
   idIntent: string;
@@ -228,6 +229,15 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
     this.openButtonPanel.emit(button);
   }
 
+  onChangeButton(button, index: number){
+    if(this.checkIfTextContainsAllowedChars(button.value)){
+      console.log('error char')
+    }
+    if(this.checkIfButtonsContainsDuplicateNum()){
+      console.log('error duplicatesss')
+    }
+  }
+
   /** onButtonControl */
   onButtonControl(action: string, index: number ){
     switch(action){
@@ -257,5 +267,17 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
       text = text.replace('{' + match + '}',createTag)
     });
     return text
+  }
+
+  checkIfTextContainsAllowedChars(text): boolean{
+    var allowedChars = ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#'];
+    var stringIncludesFruit = allowedChars.some(fruit => !text.includes(fruit));
+    return stringIncludesFruit
+  }
+
+  checkIfButtonsContainsDuplicateNum(): boolean{
+    var valueArr = this.buttons.map(function(item){ return item.value });
+    var checkIfContainsDuplicate = valueArr.some((item, index) => valueArr.indexOf(item) !== index);
+    return checkIfContainsDuplicate
   }
 }

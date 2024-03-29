@@ -61,7 +61,7 @@
 </div> 
 
 
-<div *ngIf="actionType !== TYPE_ACTION_VXML.DTMF_FORM" class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
+<div *ngIf="actionType === TYPE_ACTION_VXML.DTMF_MENU" class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
     
     <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies" cdkDrag > 
         
@@ -71,10 +71,13 @@
             [previewMode]="previewMode">
         </cds-action-reply-voice-button>
         
+        <!--  onOpenButtonPanel(button)" -->
         <cds-action-reply-voice-button [class.connected]='button.__isConnected' cdkDragHandle
-            (click)="$event.stopPropagation(); onOpenButtonPanel(button)"
+            [class.error]=""
+            (click)="$event.stopPropagation();"
             [button]="button"
             [previewMode]="previewMode"
+            (onChange)="onChangeButton($event, i)"
             (onButtonControl)="onButtonControl($event, i)">
         </cds-action-reply-voice-button>
 
@@ -89,6 +92,6 @@
     </div>
 
     <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', index)">
-    + {{'CDSCanvas.AddButton' | translate }}
+    + {{'CDSCanvas.AddOption' | translate }}
     </div>
 </div>

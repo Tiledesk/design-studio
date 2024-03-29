@@ -4,9 +4,9 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Button, MessageAttributes, Expression, Setting } from 'src/app/models/action-model';
-import { TYPE_BUTTON, TYPE_UPDATE_ACTION, replaceItemInArrayForKey } from '../../../../../../../utils';
-import { IntentService } from '../../../../../../../services/intent.service';
-import { ConnectorService } from '../../../../../../../services/connector.service';
+import { TYPE_BUTTON, TYPE_UPDATE_ACTION, replaceItemInArrayForKey } from '../../../../../../utils';
+import { IntentService } from '../../../../../../services/intent.service';
+import { ConnectorService } from '../../../../../../services/connector.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';

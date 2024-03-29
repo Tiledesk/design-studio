@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CdsActionReplyTextComponent } from './cds-action-reply-text.component';
+import { CdsActionReplyTextComponent } from './cds-action-reply-voice-text.component';
 
 describe('CdsActionReplyTextComponent', () => {
   let component: CdsActionReplyTextComponent;
