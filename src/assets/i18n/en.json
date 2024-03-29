@@ -543,7 +543,7 @@
             "Brevo":"Brevo",
             "DTMFForm":"DTMF Form",
             "DTMFMenu":"DTMF Menu",
-            "BlindTransfer": "Transfer"
+            "BlindTransfer": "Blind Transfer"
         },
         "DESCRIPTION":{
             "Reply":"<b>Pro tip</b>: Turn this block into a programmed proactive message.",
