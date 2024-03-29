@@ -4,7 +4,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/models/action-model';
-import { TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../../utils';
+import { TYPE_ACTION, TYPE_ACTION_VXML, TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../../utils';
 import { IntentService } from '../../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../../services/connector.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -32,6 +32,7 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
   @Input() response: Message;
   @Input() wait: Wait;
   @Input() index: number;
+  @Input() actionType: TYPE_ACTION | TYPE_ACTION_VXML;
   @Input() previewMode: boolean = true;
 
   // Connector //
@@ -48,6 +49,8 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
   // Buttons //
   TYPE_BUTTON = TYPE_BUTTON;
   buttons: Array<any>;
+
+  TYPE_ACTION_VXML = TYPE_ACTION_VXML
 
 
   private logger: LoggerService = LoggerInstance.getInstance();

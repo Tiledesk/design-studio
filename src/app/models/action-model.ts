@@ -417,6 +417,8 @@ export class Setting {
     noInputTimeout?: number;
     noInputIntent?: string;
     noMatchIntent?: string;
+    trueIntent?: string;
+    falseIntent?: string;
 }
 
 export class MessageWithWait extends Message {

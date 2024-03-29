@@ -47,12 +47,12 @@
                             </div>
 
                             <cds-action-reply-voice-text 
-                                [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
+                                [actionType]="action._tdActionType"
                                 (moveUpResponse) = onMoveUpResponse($event)
                                 (moveDownResponse) = onMoveDownResponse($event)
                                 (openButtonPanel) = onOpenButtonPanel($event)
