@@ -80,7 +80,6 @@ export class CdsActionReplyComponent implements OnInit {
       }
 
       if(!this.action.settings){
-        console.log('settttttttttt', this.action)
         this.action.settings = { noInputIntent: null, noInputTimeout: 5000 , noMatchIntent: null}
       }
       this.logger.log('ActionDescriptionComponent action:: ', this.element);
