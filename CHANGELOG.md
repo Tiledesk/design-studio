@@ -5,6 +5,10 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.3.0-rc.1
+- added: settings section in cds-action-web-requestv2
+- added: decodedCustomJWT userDefined attribute var
+
 ### 1.2.0 in PROD
 
 ### 1.1.4 in PROD
