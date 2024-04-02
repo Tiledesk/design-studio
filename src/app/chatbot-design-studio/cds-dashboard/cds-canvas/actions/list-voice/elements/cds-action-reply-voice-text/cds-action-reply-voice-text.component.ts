@@ -1,5 +1,5 @@
 
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
@@ -10,6 +10,8 @@ import { ConnectorService } from '../../../../../../services/connector.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TranslateService } from '@ngx-translate/core';
+const swal = require('sweetalert');
 
 @Component({
   selector: 'cds-action-reply-voice-text',
@@ -57,7 +59,9 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private connectorService: ConnectorService,
-    private intentService: IntentService
+    private intentService: IntentService,
+    private translate: TranslateService,
+    private el: ElementRef
   ) { }
 
   // SYSTEM FUNCTIONS //
@@ -229,12 +233,44 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
     this.openButtonPanel.emit(button);
   }
 
-  onChangeButton(button, index: number){
-    if(this.checkIfTextContainsAllowedChars(button.value)){
-      console.log('error char')
+  async onChangeButton(button, index: number, element){
+    let selectedButton = this.el.nativeElement.querySelectorAll('cds-action-reply-voice-button')[index]
+    selectedButton.classList.remove('error')
+    /** ERROR CASE: number contains more than 1 digits */
+    if(button.value.length > 1){
+      selectedButton.classList.add('error')
+      await swal({
+        title: this.translate.instant("CDSCanvas.Error"),
+        text: this.translate.instant("Alert.ErrorSingleDigit"),
+        icon: "error",
+        button: "OK",
+        dangerMode: false,
+      })
+      return;
     }
+    /** ERROR CASE: text must be into allowed chars array string */
+    if(this.checkIfTextContainsAllowedChars(button.value)){
+      selectedButton.classList.add('error')
+      await swal({
+        title: this.translate.instant("CDSCanvas.Error"),
+        text: this.translate.instant("Alert.ErrorAllowedOption"),
+        icon: "error",
+        button: "OK",
+        dangerMode: false,
+      })
+      return;
+    }
+    /** ERROR CASE: text must not be duplicated with other options */
     if(this.checkIfButtonsContainsDuplicateNum()){
-      console.log('error duplicatesss')
+      selectedButton.classList.add('error')
+      await swal({
+        title: this.translate.instant("CDSCanvas.Error"),
+        text: this.translate.instant("Alert.ErrorDuplicateDigit"),
+        icon: "error",
+        button: "OK",
+        dangerMode: false,
+      })
+      return;
     }
   }
 
@@ -271,7 +307,8 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
 
   checkIfTextContainsAllowedChars(text): boolean{
     var allowedChars = ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#'];
-    var stringIncludesFruit = allowedChars.some(fruit => !text.includes(fruit));
+    return !/^[0-9*#]*$/i.test(text)
+    var stringIncludesFruit = allowedChars.some(num => text !== num);
     return stringIncludesFruit
   }
 

@@ -624,10 +624,27 @@ export function deleteItemInArrayForKey(key, array, item) {
 }
 
 
-
 export function checkInternalIntent(intent: Intent): boolean{
     return intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START ||  intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK ? true: false
 }
+
+export function findFreeId (array, key) {
+    const sortedArray = array
+      .map((item) => +item[key]) // tranform string to number
+      .filter((value)=> !Number.isNaN(value)) //removes Null
+      .slice() // Make a copy of the array.
+      .sort(function (a, b) { return a - b }); // Sort it.
+    let previousId = -1;
+    for (let element of sortedArray) {
+      if (element != (previousId + 1)) {
+        // Found a gap.
+        return previousId + 1;
+      }
+      previousId = element;
+    }
+    // Found no gaps.
+    return previousId + 1;
+  }
 
 export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     let arrayCoord = [];

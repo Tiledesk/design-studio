@@ -74,10 +74,11 @@
         <!--  onOpenButtonPanel(button)" -->
         <cds-action-reply-voice-button [class.connected]='button.__isConnected' cdkDragHandle
             [class.error]=""
+            #refEl
             (click)="$event.stopPropagation();"
             [button]="button"
             [previewMode]="previewMode"
-            (onChange)="onChangeButton($event, i)"
+            (onChange)="onChangeButton($event, i, refEl)"
             (onButtonControl)="onButtonControl($event, i)">
         </cds-action-reply-voice-button>
 

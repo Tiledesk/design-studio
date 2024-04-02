@@ -3,13 +3,15 @@ import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, 
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
-import { TYPE_COMMAND, TYPE_RESPONSE, TYPE_MESSAGE, TYPE_ACTION, ACTIONS_LIST, generateShortUID, TYPE_UPDATE_ACTION, TYPE_URL, TYPE_INTENT_ELEMENT } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_COMMAND, TYPE_RESPONSE, TYPE_MESSAGE, TYPE_ACTION, ACTIONS_LIST, generateShortUID, TYPE_UPDATE_ACTION, TYPE_URL, TYPE_INTENT_ELEMENT, findFreeId } from 'src/app/chatbot-design-studio/utils';
 import { ActionVoice, Button, Command, Message, MessageAttributes, Wait } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TYPE_BUTTON } from 'src/chat21-core/utils/constants';
 import { CdsActionVoiceComponent } from '../cds-action-dtmf-form/cds-action-voice.component';
+import { TranslateService } from '@ngx-translate/core';
+const swal = require('sweetalert');
 
 @Component({
   selector: 'cds-action-dtmf-menu',
@@ -23,7 +25,8 @@ export class CdsActionDtmfMenuComponent extends CdsActionVoiceComponent implemen
     public override intentService: IntentService,
     public override controllerService: ControllerService,
     public override connectorService: ConnectorService,
-    public override changeDetectorRef: ChangeDetectorRef
+    public override changeDetectorRef: ChangeDetectorRef,
+    private translate: TranslateService
   ) { 
     super(intentService, controllerService, connectorService, changeDetectorRef);
   }
@@ -32,13 +35,13 @@ export class CdsActionDtmfMenuComponent extends CdsActionVoiceComponent implemen
 
   generateNewButtonName(arrayResponseIndex: number): string{
     let buttons = this.arrayResponses[arrayResponseIndex].message.attributes.attachment.buttons
-    var arrayButtonValues = buttons.map(function(item){ return +item.value }).filter(Boolean).sort();  
-    return (arrayButtonValues.splice(-1,1)[0] + 1).toString()
+    var arrayButtonValues = buttons.map(function(item){ return +item.value }).filter(Boolean).sort();
+    return findFreeId(buttons, 'value').toString()
   }
 
 
   /** onCreateNewButton */
-  public override onCreateNewButton(index){
+  public override async onCreateNewButton(index){
     this.logger.log('[ActionDTMFForm] onCreateNewButton: ', index);
     try {
       if(!this.arrayResponses[index].message.attributes || !this.arrayResponses[index].message.attributes.attachment){
@@ -48,6 +51,16 @@ export class CdsActionDtmfMenuComponent extends CdsActionVoiceComponent implemen
       this.logger.error('error: ', error);
     }
     let buttonSelected = this.createNewButtonOption(index);
+    if(+ buttonSelected.value > 9){
+      await swal({
+        title: this.translate.instant("CDSCanvas.Error"),
+        text: this.translate.instant("Alert.ErrorMaxOptions"),
+        icon: "error",
+        button: "OK",
+        dangerMode: false,
+      })
+      return;
+    }
     if(buttonSelected){
       this.arrayResponses[index].message.attributes.attachment.buttons.push(buttonSelected);
       this.logger.log('[ActionDTMFForm] onCreateNewButton: ', this.action, this.arrayResponses);

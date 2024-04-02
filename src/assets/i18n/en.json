@@ -408,6 +408,12 @@
         "RequestTimeout":"Request timeout",
         "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. To never time out, set to 0."
     },
+    "Alert": {
+        "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
+        "ErrorSingleDigit":"Invalid option. Allowed options are 0..9 single digit, *, #",
+        "ErrorAllowedOption":"Invalid option. Allowed options are 0..9 single digit, *, #",
+        "ErrorDuplicateDigit":"Invalid option. Provided option already exist. Please check and try again"
+    },
     "Name":"Name",
     "Label": "Label",
     "Actions": "Actions",
