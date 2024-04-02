@@ -13,6 +13,7 @@ import { CdsActionReplyVoiceTextComponent } from './elements/cds-action-reply-vo
 import { CdsActionReplyVoiceButtonComponent } from './elements/cds-action-reply-button/cds-action-reply-button.component';
 import { CdsActionDtmfMenuComponent } from './cds-action-dtmf-menu/cds-action-dtmf-menu.component';
 import { CdsActionBlindTransferComponent } from './cds-action-blind-transfer/cds-action-blind-transfer.component';
+import { CdsActionPlayPromptComponent } from './cds-action-play-prompt/cds-action-play-prompt.component';
 
 @NgModule({
   declarations: [
@@ -20,11 +21,13 @@ import { CdsActionBlindTransferComponent } from './cds-action-blind-transfer/cds
     CdsActionVoiceComponent,
     CdsActionDtmfMenuComponent,
     CdsActionBlindTransferComponent,
+    CdsActionPlayPromptComponent,
       // action DTMFForm elements: start //
       CdsActionReplyToolsVoiceComponent,
       CdsActionReplySettingsComponent,
       CdsActionReplyVoiceTextComponent,
       CdsActionReplyVoiceButtonComponent,
+      
       // action DTMFForm elements: end //
   ],
   imports: [
@@ -40,6 +43,7 @@ import { CdsActionBlindTransferComponent } from './cds-action-blind-transfer/cds
     CdsActionVoiceComponent,
     CdsActionDtmfMenuComponent,
     CdsActionBlindTransferComponent,
+    CdsActionPlayPromptComponent,
       // action DTMFForm elements: start //
       CdsActionReplyToolsVoiceComponent,
       CdsActionReplySettingsComponent,

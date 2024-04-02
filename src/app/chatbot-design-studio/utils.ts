@@ -142,8 +142,8 @@ export enum TYPE_ACTION {
 export enum TYPE_ACTION_VXML {
     DTMF_FORM           = 'dtmf_form',
     DTMF_MENU           = 'dtmf_menu',
-    BLIND_TRANSFER      = 'blind_transfer'
-
+    BLIND_TRANSFER      = 'blind_transfer',
+    PLAY_PROMPT         = 'play_prompt'
 }
 
 export enum TYPE_ACTION_CATEGORY {
@@ -319,6 +319,7 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     DFTM_FORM:              { name: 'CDSActionList.NAME.DTMFForm',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
     DTMF_MENU:              { name: 'CDSActionList.NAME.DTMFMenu',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
     BLIND_TRANSFER:         { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
+    PLAY_PROMPT:            { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
 }
 
 export const EVENTS_LIST = {
