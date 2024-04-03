@@ -1,4 +1,7 @@
-@import "./src/assets/sass/cds/_variables.scss";
+:host {
+    width: 100%;
+}
+
 
 .rules-container{
     display: flex;

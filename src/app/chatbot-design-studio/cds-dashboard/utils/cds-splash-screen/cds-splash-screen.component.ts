@@ -40,6 +40,11 @@ export class CdsSplashScreenComponent implements OnInit {
     }else{
       this.canShowVideo = false
     }
+
+    if(BRAND_BASE_INFO['DOCS'] === 'false' || !BRAND_BASE_INFO['DOCS']){
+      this.canShowVideo = false
+    }
+    
   }
 
   onAdd() {
