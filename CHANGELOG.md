@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.3.0-rc.2
+- added: lastUserDocumentAsAttachmentURL, lastUserDocumentAsInlineURL and strongAuthenticated variables
+
 ### 1.3.0-rc.1
 - added: settings section in cds-action-web-requestv2
 - added: decodedCustomJWT userDefined attribute var

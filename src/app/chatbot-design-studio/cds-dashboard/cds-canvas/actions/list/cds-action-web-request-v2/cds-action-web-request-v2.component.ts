@@ -1,11 +1,18 @@
 import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
-import { Intent } from 'src/app/models/intent-model';
-import { ActionWebRequest, ActionWebRequestV2 } from 'src/app/models/action-model';
-import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, variableList } from '../../../../../utils';
+import { Subscription } from 'rxjs/internal/Subscription';
+
+//SERVICES
 import { IntentService } from '../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subscription } from 'rxjs/internal/Subscription';
+
+//MODELS
+import { Intent } from 'src/app/models/intent-model';
+import { ActionWebRequestV2 } from 'src/app/models/action-model';
+
+//UTILS
+import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
+import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
   selector: 'cds-action-web-request-v2',

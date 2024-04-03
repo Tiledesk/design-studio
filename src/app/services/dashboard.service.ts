@@ -5,17 +5,20 @@ import { Router, ActivatedRoute } from '@angular/router';
 // SERVICES //
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DepartmentService } from 'src/app/services/department.service';
+import { ProjectService } from 'src/app/services/projects.service';
 
 // MODEL //
 import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
-
+import { Department } from 'src/app/models/department-model';
 // UTILS //
-import { variableList, convertJsonToArray } from 'src/app/chatbot-design-studio/utils';
+import { convertJsonToArray } from 'src/app/chatbot-design-studio/utils';
+import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { ProjectService } from 'src/app/services/projects.service';
-import { Department } from '../models/department-model';
+
+
 
 @Injectable({
   providedIn: 'root'

@@ -1,9 +1,15 @@
 import { Component, EventEmitter, Input, OnInit, Output, ElementRef } from '@angular/core';
-import { variableList } from '../../../../../utils';
+
+//MODELS
 import { ActionDeleteVariable } from 'src/app/models/action-model';
+
+//SERVICES
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TranslateService } from '@ngx-translate/core';
+
+//UTILS
+import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
   selector: 'cds-action-delete-variable',

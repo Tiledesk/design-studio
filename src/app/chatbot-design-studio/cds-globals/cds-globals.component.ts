@@ -1,7 +1,7 @@
 import { Global } from './../../models/global-model';
 import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { variableList } from '../utils';
+import { variableList } from '../utils-variables';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
