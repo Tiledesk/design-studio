@@ -522,7 +522,8 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'userPhone',            value: 'userPhone',             description: 'CDSvariablesList.leadAttributesElements.userPhone.description',               src: '', icon:'person'},
             { name: 'userLeadId',           value: 'userLeadId',            description: 'CDSvariablesList.leadAttributesElements.userLeadId.description',              src: '', icon:'person'},
             { name: 'userCompany',          value: 'userCompany',           description: 'CDSvariablesList.leadAttributesElements.userCompany.description',             src: '', icon:'person'},
-            { name: 'currentPhoneNumber',   value: 'currentPhoneNumber',    description: 'CDSvariablesList.leadAttributesElements.currentPhoneNumber.description',      src: '', icon:'person'}
+            { name: 'currentPhoneNumber',   value: 'currentPhoneNumber',    description: 'CDSvariablesList.leadAttributesElements.currentPhoneNumber.description',      src: '', icon:'person'},
+            { name: 'decodedCustomJWT',     value: 'decodedCustomJWT',      description: 'CDSvariablesList.leadAttributesElements.decodedCustomJWT.description',        src: '', icon:'person'}
         ]
     }
 ]

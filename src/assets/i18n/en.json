@@ -673,7 +673,8 @@
             "userPhone":{ "description":"The user phone in {{BRAND_NAME}} Contacts" },
             "userLeadId":{ "description":"The user contact Id in {{BRAND_NAME}} Contacts" },
             "userCompany":{ "description":"The user Company name in {{BRAND_NAME}} Contacts" },
-            "currentPhoneNumber":{ "description":"The user phone used in the current conversation (i.e. coming from Whatsapp / SMS channels)" }
+            "currentPhoneNumber":{ "description":"The user phone used in the current conversation (i.e. coming from Whatsapp / SMS channels)" },
+            "decodedCustomJWT":{ "description":"When the end-user (lead) is strong authenticated this JSON object contains certified info from the authentication provider. To get certified email use {{decodedCustomJWT.email}}. In the same way you can get firstname {{decodedCustomJWT.firstname}}, lastname {{decodedCustomJWT.laastname}} or custom attributes, i.e. {{decodedCustomJWT.attributes.SSN}}" }
         }
 
     },

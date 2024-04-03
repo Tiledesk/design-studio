@@ -78,10 +78,10 @@ export class CdsActionReplyComponent implements OnInit {
       if(this.action._tdActionTitle && this.action._tdActionTitle != ""){
         this.dataInput = this.action._tdActionTitle;
       }
-
-      if(!this.action.settings){
-        this.action.settings = { noInputIntent: null, noInputTimeout: 5000 , noMatchIntent: null}
-      }
+      // this.settings = { no_input: null, timeout: 20 }
+      // if(this.action.noInput){
+      //   this.settings = { no_input: this.action.noInput}
+      // }
       this.logger.log('ActionDescriptionComponent action:: ', this.element);
     } catch (error) {
       this.logger.log("error ", error);
