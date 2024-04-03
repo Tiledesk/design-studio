@@ -1,15 +1,22 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Intent } from 'src/app/models/intent-model';
+import { Subscription } from 'rxjs';
+
+//MODELS
 import { ActionGPTTask } from 'src/app/models/action-model';
-import { TYPE_GPT_MODEL, TYPE_UPDATE_ACTION, variableList } from '../../../../../utils';
+import { Intent } from 'src/app/models/intent-model';
+
+//SERVICES
 import { OpenaiService } from 'src/app/services/openai.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { MatDialog } from '@angular/material/dialog';
 import { AppConfigService } from 'src/app/services/app-config';
-import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog.component';
-import { Subscription } from 'rxjs';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+
+//UTILS
+import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog.component';
+import { TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
   selector: 'cds-action-gpt-task',

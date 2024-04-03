@@ -1,12 +1,19 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+
+//MODELS
 import { ActionAskGPTV2 } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
+
+//SERVICES
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { variableList, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from '../../../../../utils';
 import { AppConfigService } from 'src/app/services/app-config';
+
+//UTILS
+import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
   selector: 'cds-action-askgpt-v2',

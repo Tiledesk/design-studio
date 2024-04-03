@@ -1,12 +1,18 @@
-import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
-import { Intent } from 'src/app/models/intent-model';
-import { ActionMake } from 'src/app/models/action-model';
-import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, variableList, TYPE_ACTION, ACTIONS_LIST } from '../../../../../utils';
-import { IntentService } from '../../../../../services/intent.service';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Subscription } from 'rxjs/internal/Subscription';
+
+//SERVICES
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { ProjectService } from 'src/app/services/projects.service';
+
+//MODELS
+import { Intent } from 'src/app/models/intent-model';
+import { ActionMake } from 'src/app/models/action-model';
+
+//UTILS
+import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils';
+import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
   selector: 'cds-action-make',

@@ -1,14 +1,21 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Subscription } from 'rxjs';
+
+//SERVICES
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+import { AppConfigService } from 'src/app/services/app-config';
+
+//MODELS
 import { ActionQapla } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
-import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
-import { TYPE_UPDATE_ACTION, variableList } from '../../../../../utils';
-import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Project } from 'src/app/models/project-model';
-import { DashboardService } from 'src/app/services/dashboard.service';
-import { AppConfigService } from 'src/app/services/app-config';
-import { Subscription } from 'rxjs';
-import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+
+//UTILS
+import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
   selector: 'cds-action-qapla',

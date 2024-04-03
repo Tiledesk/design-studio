@@ -1,11 +1,13 @@
 import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../../../../../../cds-base-element/dialog/dialog.component';
-import { variableList } from '../../../../../../utils';
+
+//SERVICES
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { ActivatedRoute } from '@angular/router';
 import { DashboardService } from 'src/app/services/dashboard.service';
+//UTILS
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
+import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
   selector: 'variable-list',

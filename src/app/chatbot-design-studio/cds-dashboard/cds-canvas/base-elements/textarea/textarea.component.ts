@@ -1,7 +1,7 @@
 import { FormControl } from '@angular/forms';
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef, HostListener, SimpleChanges, SimpleChange } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { calculatingRemainingCharacters, TEXT_CHARS_LIMIT, variableList } from '../../../../utils';
+import { calculatingRemainingCharacters, TEXT_CHARS_LIMIT } from '../../../../utils';
 import { SatPopover } from '@ncstate/sat-popover';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
