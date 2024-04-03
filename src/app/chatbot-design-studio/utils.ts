@@ -99,7 +99,8 @@ export enum TYPE_MESSAGE {
     IMAGE       = 'image',
     FRAME       = 'frame',
     GALLERY     = 'gallery',
-    REDIRECT    = 'redirect'
+    REDIRECT    = 'redirect',
+    AUDIO       = 'audio'
 }
 
 export enum TYPE_ACTION {

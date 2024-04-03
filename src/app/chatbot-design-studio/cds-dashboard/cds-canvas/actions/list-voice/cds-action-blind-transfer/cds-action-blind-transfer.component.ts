@@ -1,8 +1,8 @@
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
-import { CdsActionVoiceComponent } from './../cds-action-dtmf-form/cds-action-voice.component';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { CdsActionVoiceComponent } from '../cds-action-voice-base/cds-action-voice.component';
 
 @Component({
   selector: 'cds-action-blind-transfer',

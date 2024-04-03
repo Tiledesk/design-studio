@@ -241,6 +241,7 @@
         "ImageDragging":"image dragging",
         "AddPath":"Add path",
         "LoadFrame":"load frame",
+        "AddAudioURL":"Add audio url",
         "Value":"Value",
         "Attributes":"Attributes",
         "Key":"Key",
@@ -383,6 +384,7 @@
         "ClickToAddImage":"Click to add image",
         "ClickToAddUrl":"Click to add url ...",
         "ClickToAddText":"Click to add text ...",
+        "ClickToAddAudioURL":"Click to add audio url ...",
         "AddButton":"Add button",
         "AddOption":"Add option",
         "AddCard":"Add card",
@@ -427,6 +429,7 @@
     "Frame": "Frame",
     "Gallery": "Gallery",
     "Redirect": "Redirect",
+    "AudioUrl":"Audio File Url",
     "Message":"Message",
     "Every":"Every",
     "CDSForm":{

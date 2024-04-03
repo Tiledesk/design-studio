@@ -8,17 +8,19 @@ import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
 import { CdsActionReplySettingsComponent } from './elements/cds-action-reply-settings/cds-action-reply-settings.component';
 import { CdsActionReplyToolsVoiceComponent } from './elements/cds-action-reply-tools-voice/cds-action-reply-tools-voice.component';
 import { BaseElementModule } from 'src/app/shared/base-element.module';
-import { CdsActionVoiceComponent } from '../list-voice/cds-action-dtmf-form/cds-action-voice.component';
+import { CdsActionDTMFFormComponent } from './cds-action-dtmf-form/cds-action-dtmf-form.component';
 import { CdsActionReplyVoiceTextComponent } from './elements/cds-action-reply-voice-text/cds-action-reply-voice-text.component';
 import { CdsActionReplyVoiceButtonComponent } from './elements/cds-action-reply-button/cds-action-reply-button.component';
 import { CdsActionDtmfMenuComponent } from './cds-action-dtmf-menu/cds-action-dtmf-menu.component';
 import { CdsActionBlindTransferComponent } from './cds-action-blind-transfer/cds-action-blind-transfer.component';
 import { CdsActionPlayPromptComponent } from './cds-action-play-prompt/cds-action-play-prompt.component';
+import { CdsActionVoiceComponent } from './cds-action-voice-base/cds-action-voice.component';
+import { CdsActionReplyAudioComponent } from './elements/cds-action-reply-audio/cds-action-reply-audio.component';
 
 @NgModule({
   declarations: [
     //VXML ACTIONS //
-    CdsActionVoiceComponent,
+    CdsActionDTMFFormComponent,
     CdsActionDtmfMenuComponent,
     CdsActionBlindTransferComponent,
     CdsActionPlayPromptComponent,
@@ -27,8 +29,10 @@ import { CdsActionPlayPromptComponent } from './cds-action-play-prompt/cds-actio
       CdsActionReplySettingsComponent,
       CdsActionReplyVoiceTextComponent,
       CdsActionReplyVoiceButtonComponent,
+      CdsActionReplyAudioComponent,
       
       // action DTMFForm elements: end //
+    CdsActionVoiceComponent
   ],
   imports: [
     CommonModule,
@@ -40,7 +44,7 @@ import { CdsActionPlayPromptComponent } from './cds-action-play-prompt/cds-actio
   ],
   exports:[
     //VXML ACTIONS //
-    CdsActionVoiceComponent,
+    CdsActionDTMFFormComponent,
     CdsActionDtmfMenuComponent,
     CdsActionBlindTransferComponent,
     CdsActionPlayPromptComponent,
@@ -48,8 +52,10 @@ import { CdsActionPlayPromptComponent } from './cds-action-play-prompt/cds-actio
       CdsActionReplyToolsVoiceComponent,
       CdsActionReplySettingsComponent,
       CdsActionReplyVoiceTextComponent,
-      CdsActionReplyVoiceButtonComponent
+      CdsActionReplyVoiceButtonComponent,
+      CdsActionReplyAudioComponent,
       // action DTMFForm elements: end //
+    CdsActionVoiceComponent
   ]
 })
 export class CdsVoiceActionsModule { }

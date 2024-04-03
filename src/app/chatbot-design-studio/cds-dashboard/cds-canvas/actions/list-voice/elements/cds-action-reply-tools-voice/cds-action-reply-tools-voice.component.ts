@@ -47,6 +47,7 @@ export class CdsActionReplyToolsVoiceComponent implements OnInit {
         } 
         break;
       case TYPE_MESSAGE.FRAME:
+      case TYPE_MESSAGE.AUDIO:
         newElement = {
           type: TYPE_COMMAND.MESSAGE,
           message: {

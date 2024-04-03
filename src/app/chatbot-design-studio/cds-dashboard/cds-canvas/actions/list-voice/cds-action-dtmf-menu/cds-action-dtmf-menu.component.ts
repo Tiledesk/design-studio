@@ -9,8 +9,8 @@ import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TYPE_BUTTON } from 'src/chat21-core/utils/constants';
-import { CdsActionVoiceComponent } from '../cds-action-dtmf-form/cds-action-voice.component';
 import { TranslateService } from '@ngx-translate/core';
+import { CdsActionVoiceComponent } from '../cds-action-voice-base/cds-action-voice.component';
 const swal = require('sweetalert');
 
 @Component({

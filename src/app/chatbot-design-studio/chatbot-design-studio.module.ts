@@ -176,8 +176,6 @@ import { CdsActionAskgptV2Component } from './cds-dashboard/cds-canvas/actions/l
 import { CdsActionCustomerioComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-customerio/cds-action-customerio.component';
 import { CdsActionBrevoComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-brevo/cds-action-brevo.component';
 
-//CDS- ACTIONS VOICE
-import { CdsActionVoiceComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/cds-action-voice.component';
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';

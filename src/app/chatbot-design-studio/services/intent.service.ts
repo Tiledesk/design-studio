@@ -3,7 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -969,6 +969,21 @@ export class IntentService {
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
       command_form.settings = { transferTo: '', trueIntent: null, falseIntent: null}
       command_form.subType = TYPE_ACTION_VXML.BLIND_TRANSFER
+      action.attributes.commands.push(command_form);
+    }
+    if(typeAction === TYPE_ACTION_VXML.PLAY_PROMPT){
+      action = new ActionVoice(TYPE_ACTION_VXML.PLAY_PROMPT);
+      let commandWait = new Wait();
+      action.attributes.commands.push(commandWait);
+      let command = new Command(TYPE_COMMAND.MESSAGE);
+      command.message = new Message('text', 'A chat message will be played to the caller');
+      action.attributes.commands.push(command);
+      let commandWait2 = new Wait();
+      commandWait2.time = 0
+      action.attributes.commands.push(commandWait2);
+      let command_form = new Command(TYPE_COMMAND.SETTINGS);
+      command_form.settings = { bargein: true }
+      command_form.subType = TYPE_ACTION_VXML.PLAY_PROMPT
       action.attributes.commands.push(command_form);
     }
     return action;

@@ -274,13 +274,13 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-code>
                     
-                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
+                    <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"
                         [intentSelected]="intentSelected" 
                         [action]="elementSelected"
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
-                    </cds-action-voice>
+                    </cds-action-dtmf-form>
 
                     <cds-action-dtmf-menu *ngSwitchCase="TYPE_ACTION_VXML.DTMF_MENU"    
                         class="panel-response"
@@ -291,13 +291,21 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-dtmf-menu>
 
-                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.BLIND_TRANSFER"    
+                    <cds-action-blind-transfer *ngSwitchCase="TYPE_ACTION_VXML.BLIND_TRANSFER"    
                         class="panel-response"
                         [intentSelected]="intentSelected" 
                         [action]="elementSelected"
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
-                    </cds-action-voice>
+                    </cds-action-blind-transfer>
+
+                    <cds-action-play-prompt *ngSwitchCase="TYPE_ACTION_VXML.PLAY_PROMPT"    
+                        class="panel-response"
+                        [intentSelected]="intentSelected" 
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-play-prompt>
 
                     <!-- <cds-action-assign-function *ngSwitchCase="TYPE_ACTION.ASSIGN_FUNCTION"
                         [action]="elementSelected">
