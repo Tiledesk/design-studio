@@ -986,6 +986,21 @@ export class IntentService {
       command_form.subType = TYPE_ACTION_VXML.PLAY_PROMPT
       action.attributes.commands.push(command_form);
     }
+    if(typeAction === TYPE_ACTION_VXML.SPEECH_FORM){
+      action = new ActionVoice(TYPE_ACTION_VXML.SPEECH_FORM);
+      let commandWait = new Wait();
+      action.attributes.commands.push(commandWait);
+      let command = new Command(TYPE_COMMAND.MESSAGE);
+      command.message = new Message('text', 'A chat message will be played to the caller');
+      action.attributes.commands.push(command);
+      let commandWait2 = new Wait();
+      commandWait2.time = 0
+      action.attributes.commands.push(commandWait2);
+      let command_form = new Command(TYPE_COMMAND.SETTINGS);
+      command_form.settings = { bargein: true, noInputIntent: null, noInputTimeout: 2000, incompleteSpeechTimeout: 2000}
+      command_form.subType = TYPE_ACTION_VXML.SPEECH_FORM
+      action.attributes.commands.push(command_form);
+    }
     return action;
   }
   // END ATTRIBUTE FUNCTIONS //

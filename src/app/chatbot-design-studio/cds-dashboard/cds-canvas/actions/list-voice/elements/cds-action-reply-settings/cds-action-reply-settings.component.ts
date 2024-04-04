@@ -51,7 +51,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
 
   // Delay //
   delayTime: number;
-
+  incompleteSpeechDelayTime: number;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -72,6 +72,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
     });
     this.initializeConnector();
     this.delayTime = (this.response && this.response.noInputTimeout)? (this.response.noInputTimeout/1000) : 500;
+    this.incompleteSpeechDelayTime = (this.response && this.response.incompleteSpeechTimeout)? (this.response.incompleteSpeechTimeout/1000) : 500;
 
   }
 
@@ -197,10 +198,14 @@ export class CdsActionReplySettingsComponent implements OnInit {
   }
 
   /** onChangeDelayTime */
-  onChangeDelayTime(value:number){
-    this.delayTime = value;
-    console.log('valueeeee', this.delayTime)
-    this.response.noInputTimeout = value*1000;
+  onChangeDelayTime(value:number, key: string){
+    if(key==='noInputIntent'){
+      this.delayTime = value;
+      this.response.noInputTimeout = value*1000;
+    }else{
+      this.incompleteSpeechDelayTime = value;
+      this.response.incompleteSpeechTimeout = value*1000;
+    }
     // this.canShowFilter = true;
     this.changeActionReply.emit();
   }

@@ -407,6 +407,7 @@
         "BargeIn":"Barge-in",
         "NoMatch":"No match",
         "NoInput":"No input",
+        "IncompleteSpeechTimeout":"Incomplete Speech Timeout",
         "RequestTimeout":"Request timeout",
         "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. To never time out, set to 0."
     },
@@ -554,7 +555,8 @@
             "DTMFForm":"DTMF Form",
             "DTMFMenu":"DTMF Menu",
             "BlindTransfer": "Blind Transfer",
-            "PlayPrompt":"Play prompt"
+            "PlayPrompt":"Play prompt",
+            "SpeechForm":"Speech Form"
         },
         "DESCRIPTION":{
             "Reply":"<b>Pro tip</b>: Turn this block into a programmed proactive message.",
@@ -590,7 +592,8 @@
             "DTMFForm":"",
             "DTMFMenu":"",
             "BlindTransfer": "",
-            "PlayPrompt":""
+            "PlayPrompt":"",
+            "SpeechForm":""
         },
         "DOCS": {
             "Reply":"<a href=https://www.youtube.com/embed/p0ux-86Y4_I target=_blank>Here is how!</a> ",
@@ -625,7 +628,8 @@
             "DTMFForm":"",
             "DTMFMenu":"",
             "BlindTransfer": "",
-            "PlayPrompt":""
+            "PlayPrompt":"",
+            "SpeechForm":""
         }
     },
     "CDSvariablesList": {

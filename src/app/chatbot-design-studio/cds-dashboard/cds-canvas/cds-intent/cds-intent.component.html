@@ -344,6 +344,13 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-play-prompt>
 
+                    <cds-action-speech-form *ngSwitchCase="TYPE_ACTION_VXML.SPEECH_FORM"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-speech-form>
+
                 </div>
             </span>
             

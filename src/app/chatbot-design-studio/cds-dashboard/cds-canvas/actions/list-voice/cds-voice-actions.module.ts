@@ -16,6 +16,7 @@ import { CdsActionBlindTransferComponent } from './cds-action-blind-transfer/cds
 import { CdsActionPlayPromptComponent } from './cds-action-play-prompt/cds-action-play-prompt.component';
 import { CdsActionVoiceComponent } from './cds-action-voice-base/cds-action-voice.component';
 import { CdsActionReplyAudioComponent } from './elements/cds-action-reply-audio/cds-action-reply-audio.component';
+import { CdsActionSpeechFormComponent } from './cds-action-speech-form/cds-action-speech-form.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { CdsActionReplyAudioComponent } from './elements/cds-action-reply-audio/
     CdsActionDtmfMenuComponent,
     CdsActionBlindTransferComponent,
     CdsActionPlayPromptComponent,
+    CdsActionSpeechFormComponent,
       // action DTMFForm elements: start //
       CdsActionReplyToolsVoiceComponent,
       CdsActionReplySettingsComponent,
@@ -48,6 +50,7 @@ import { CdsActionReplyAudioComponent } from './elements/cds-action-reply-audio/
     CdsActionDtmfMenuComponent,
     CdsActionBlindTransferComponent,
     CdsActionPlayPromptComponent,
+    CdsActionSpeechFormComponent,
       // action DTMFForm elements: start //
       CdsActionReplyToolsVoiceComponent,
       CdsActionReplySettingsComponent,

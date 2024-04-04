@@ -631,8 +631,9 @@ export class ConnectorService {
           }
         }
 
-        /** DTMF_MENU' ||  DTMF_FORM */
-        if(action._tdActionType === TYPE_ACTION_VXML.DTMF_MENU  || action._tdActionType === TYPE_ACTION_VXML.DTMF_FORM){
+        /** DTMF_MENU' ||  DTMF_FORM  || SPEECH_FORM */
+        if(action._tdActionType === TYPE_ACTION_VXML.DTMF_MENU  || action._tdActionType === TYPE_ACTION_VXML.DTMF_FORM
+            || action._tdActionType === TYPE_ACTION_VXML.SPEECH_FORM){
           let settingCommand: Setting = action.attributes.commands.slice(-1)[0].settings
           if(settingCommand && settingCommand.noInputIntent && settingCommand.noInputIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noInput';

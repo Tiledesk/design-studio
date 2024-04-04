@@ -419,6 +419,7 @@ export class Setting {
     noMatchIntent?: string;
     trueIntent?: string;
     falseIntent?: string;
+    incompleteSpeechTimeout?: number;
 }
 
 export class MessageWithWait extends Message {
