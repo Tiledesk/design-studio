@@ -36,7 +36,6 @@ const routes: Routes = [
   {
     path: '',
     component: CdsCanvasComponent,
-    title: 'Blocks',
   }
 ];
 
