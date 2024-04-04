@@ -22,7 +22,7 @@ import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service'
 const routes: Routes = [
   { path: '', 
     component: CdsDashboardComponent,
-    title: 'Dashboard',
+    title: 'Design studio',
     children: [
       {
         path: 'blocks',
