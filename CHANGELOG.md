@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.3.1 in PROD
+- bug-fixed: document title fixed
+
 ### 1.3.0 in PROD
 - bug-fixed: askgpt-v2 not create variables until detail is open
 
