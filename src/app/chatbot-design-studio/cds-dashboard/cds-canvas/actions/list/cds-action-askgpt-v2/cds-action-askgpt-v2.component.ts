@@ -63,9 +63,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     if(this.intentSelected){
       this.initializeConnector();
     }
-    if (this.previewMode == false) {
-      this.onDetailModeLoad();
-    }
+    this.initializeAttributes();
   }
 
   ngOnDestroy() {
@@ -74,10 +72,10 @@ export class CdsActionAskgptV2Component implements OnInit {
     }
   }
 
-  onDetailModeLoad() {
-    //this.getKnowledgeBaseSettings();
-    this.initializeAttributes();
-  }
+  // onDetailModeLoad() {
+  //   //this.getKnowledgeBaseSettings();
+  //   this.initializeAttributes();
+  // }
 
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
