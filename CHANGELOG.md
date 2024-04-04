@@ -5,6 +5,9 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.3.0 in PROD
+- bug-fixed: askgpt-v2 not create variables until detail is open
+
 ### 1.3.0-rc.2
 - added: lastUserDocumentAsAttachmentURL, lastUserDocumentAsInlineURL and strongAuthenticated variables
 
