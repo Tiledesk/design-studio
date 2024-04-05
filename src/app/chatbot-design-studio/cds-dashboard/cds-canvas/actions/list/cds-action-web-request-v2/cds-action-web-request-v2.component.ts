@@ -196,7 +196,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
       this.body = this.action.jsonBody;
       this.body = this.formatJSON(this.body, "\t");
     }
-    this.jsonSettings = { timeout: 30}
+    this.jsonSettings = { timeout: 20000}
     if(this.action.settings){
       this.jsonSettings = this.action.settings
     }

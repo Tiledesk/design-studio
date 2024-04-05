@@ -160,7 +160,7 @@ export class ActionWebRequestV2 extends Action {
         super();
         this.url = '';
         this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":"TiledeskBotRuntime", "Accept":"*/*"};
-        this.settings = { "timeout": 30 }
+        this.settings = { timeout: 20000 }
         this.jsonBody = null
         this.bodyType = 'none'
         this.assignStatusTo = '';

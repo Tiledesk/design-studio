@@ -409,7 +409,7 @@
         "NoInput":"No input",
         "IncompleteSpeechTimeout":"Incomplete Speech Timeout",
         "RequestTimeout":"Request timeout",
-        "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. To never time out, set to 0."
+        "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. Admitted values range: 1-300k ms"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
