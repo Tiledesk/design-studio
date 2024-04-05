@@ -5,6 +5,13 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.4.0-rc.1
+- added: cds-action-speech-form voice action
+- added: cds-action-voice-play-prompt
+- added: audio-upload to manage audio file url and drag&drop action in cds-action-reply-audio
+- changed: open OptionMenu while adding a new unexisting option in cds-action-dtmf-menu voice component
+- changed: default value for request timeout in cds-action-web-requestv2
+
 ### 1.3.0-rc.2
 - added: lastUserDocumentAsAttachmentURL, lastUserDocumentAsInlineURL and strongAuthenticated variables
 
