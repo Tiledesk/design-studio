@@ -73,16 +73,11 @@ $max-height: 230px;
     margin-right: var(--base-margin);
     // margin-top: 10px;
     margin-bottom: 10px;
-    padding: 10px; //10px 20px 20px;
+    padding: 0px; //10px 20px 20px;
     overflow: visible;
     // max-width: calc(100% - 66px);
     width: auto;
     height: auto;
-
-    border: 2px dashed var(--blu-light-02);
-    border-radius: 6px;
-    text-align: center;
-
     .frame-panel {
         border-radius: 6px;
         display: block;

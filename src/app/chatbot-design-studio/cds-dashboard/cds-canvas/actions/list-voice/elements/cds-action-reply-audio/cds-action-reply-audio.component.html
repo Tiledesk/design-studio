@@ -49,7 +49,7 @@
         </div>
         <div *ngIf="response.metadata.src" class="response-frame-panel no-image">
             <div class="image"><img src="assets/images/icons/audio.svg"></div>
-            <div class="response-wrp">{{response.metadata.src}}</div>
+            <div class="response-wrp">{{response.metadata.name}}</div>
         </div>
     </div>
 
@@ -61,18 +61,26 @@
     <div class="text-editor">
     
         <div class="response-frame-wrapper">
-            <label class="control-label"> {{ 'CDSCanvas.AddAudioURL' | translate }}</label>
-            <cds-textarea 
-                class="text-editable-div"
-                [text]="response?.metadata?.src" 
-                [minRow]="1" [maxRow]="2"
-                [emojiPikerBtn]="false"
-                popoverVerticalAlign="above"
-                (blur)="onBlur($event)"
-                (changeTextarea)="onChangeTextarea($event)">
-            </cds-textarea>
+            <cds-audio-upload 
+                class="image-upload"
+                [metadata] = response.metadata
+                (onChangeMetadata)="onChangeMetadata($event)"
+                (onDeletedMetadata)="onDeletedMetadata($event)">
+            </cds-audio-upload>
+            
         </div>
         
+         <!-- <label class="control-label"> {{ 'CDSCanvas.AddAudioURL' | translate }}</label> -->
+        <cds-textarea 
+            class="text-editable-div"
+            [text]="response?.metadata?.src" 
+            [placeholder]="'Paste url Here'"
+            [minRow]="1" [maxRow]="2"
+            [emojiPikerBtn]="false"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event)">
+        </cds-textarea>
        
             
     </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser'
 import { TYPE_ACTION, TYPE_MESSAGE } from 'src/app/chatbot-design-studio/utils';
-import { Expression, Message, Wait } from 'src/app/models/action-model';
+import { Expression, Message, Metadata, Wait } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -104,6 +104,7 @@ export class CdsActionReplyAudioComponent implements OnInit {
   onChangeTextarea(text:string) {
     if(!this.previewMode){
       this.response.metadata.src = text;
+      // this.response.metadata.name = text;
       // this.changeActionReply.emit();
     }
   }
@@ -111,10 +112,17 @@ export class CdsActionReplyAudioComponent implements OnInit {
   onBlur(event){
     this.changeActionReply.emit();
   }
+
+  /**onChangeMetadata */
+  onChangeMetadata(metadata: Metadata){
+    this.response.metadata = metadata;
+    this.changeActionReply.emit();
+  }
   
   /** */
   onDeletedMetadata(){
     this.response.metadata.src = '';
+    this.response.metadata.name = '';
     this.changeActionReply.emit();
   }
 
