@@ -944,50 +944,51 @@ export class IntentService {
     if(typeAction === TYPE_ACTION_VXML.DTMF_MENU){
       action = new ActionVoice(TYPE_ACTION_VXML.DTMF_MENU);
       let commandWait = new Wait();
-      action.attributes.commands.push(commandWait);
+      (action as ActionVoice).attributes.commands.push(commandWait);
       let command = new Command(TYPE_COMMAND.MESSAGE);
       command.message = new Message('text', 'A chat message will be sent to the visitor');
-      action.attributes.commands.push(command);
+      (action as ActionVoice).attributes.commands.push(command);
       let commandWait2 = new Wait();
-      commandWait2.time = 0
-      action.attributes.commands.push(commandWait2);
+      commandWait2.time = 0;
+      (action as ActionVoice).attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
       command_form.settings = { noInputIntent: null, noMatchIntent: null, noInputTimeout: 2000, bargein: true}
-      command_form.subType = TYPE_ACTION_VXML.DTMF_MENU
-      action.attributes.commands.push(command_form);
+      command_form.subType = TYPE_ACTION_VXML.DTMF_MENU;
+      (action as ActionVoice).attributes.commands.push(command_form);
     }
     if(typeAction === TYPE_ACTION_VXML.BLIND_TRANSFER){
       action = new ActionVoice(TYPE_ACTION_VXML.BLIND_TRANSFER);
       let commandWait = new Wait();
-      action.attributes.commands.push(commandWait);
+      (action as ActionVoice).attributes.commands.push(commandWait);
       let command = new Command(TYPE_COMMAND.MESSAGE);
       command.message = new Message('text', 'A chat message will be sent to the visitor');
-      action.attributes.commands.push(command);
+      (action as ActionVoice).attributes.commands.push(command);
       let commandWait2 = new Wait();
-      commandWait2.time = 0
-      action.attributes.commands.push(commandWait2);
+      commandWait2.time = 0;
+      (action as ActionVoice).attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
       command_form.settings = { transferTo: '', trueIntent: null, falseIntent: null}
-      command_form.subType = TYPE_ACTION_VXML.BLIND_TRANSFER
-      action.attributes.commands.push(command_form);
+      command_form.subType = TYPE_ACTION_VXML.BLIND_TRANSFER;
+      (action as ActionVoice).attributes.commands.push(command_form);
     }
     if(typeAction === TYPE_ACTION_VXML.PLAY_PROMPT){
       action = new ActionVoice(TYPE_ACTION_VXML.PLAY_PROMPT);
       let commandWait = new Wait();
-      action.attributes.commands.push(commandWait);
+      (action as ActionVoice).attributes.commands.push(commandWait);
       let command = new Command(TYPE_COMMAND.MESSAGE);
       command.message = new Message('text', 'A chat message will be played to the caller');
       action.attributes.commands.push(command);
       let commandWait2 = new Wait();
-      commandWait2.time = 0
-      action.attributes.commands.push(commandWait2);
+      commandWait2.time = 0;
+      (action as ActionVoice).attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { bargein: true }
-      command_form.subType = TYPE_ACTION_VXML.PLAY_PROMPT
-      action.attributes.commands.push(command_form);
+      command_form.settings = { bargein: true };
+      command_form.subType = TYPE_ACTION_VXML.PLAY_PROMPT;
+      (action as ActionVoice).attributes.commands.push(command_form);
     }
     if(typeAction === TYPE_ACTION_VXML.SPEECH_FORM){
       action = new ActionVoice(TYPE_ACTION_VXML.SPEECH_FORM);
+      (action as ActionVoice).attributes.disableInputMessage = false
       let commandWait = new Wait();
       action.attributes.commands.push(commandWait);
       let command = new Command(TYPE_COMMAND.MESSAGE);
