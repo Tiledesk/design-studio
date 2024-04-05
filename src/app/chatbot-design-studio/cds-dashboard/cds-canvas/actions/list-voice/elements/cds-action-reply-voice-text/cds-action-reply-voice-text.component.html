@@ -74,11 +74,9 @@
         <!--  onOpenButtonPanel(button)" -->
         <cds-action-reply-voice-button [class.connected]='button.__isConnected' cdkDragHandle
             [class.error]=""
-            #refEl
             (click)="$event.stopPropagation();"
             [button]="button"
             [previewMode]="previewMode"
-            (onChange)="onChangeButton($event, i, refEl)"
             (onButtonControl)="onButtonControl($event, i)">
         </cds-action-reply-voice-button>
 
@@ -92,7 +90,20 @@
 
     </div>
 
-    <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', index)">
+    <div class="button-reply-add single-btn-reply" [matMenuTriggerFor]="menuOptions" #clickMenuTrigger="matMenuTrigger" (click)="$event.stopPropagation();onButtonControl('new', index)">
     + {{'CDSCanvas.AddOption' | translate }}
     </div>
 </div>
+
+
+<!-- SHARE MENU OPTIONS-->
+<mat-menu #menuOptions="matMenu"  class="menuElement" xPosition="after" yPosition="below">
+    <ng-template matMenuContent>
+        <cds-menu
+            [items]="MENU_OPTIONS"
+            [menuType]="''"
+            [menuTitle]="'CDSCanvas.SelectOption' | translate "
+            (onMenuOption)="onMenuOptionFN($event)">
+        </cds-menu>
+    </ng-template>
+</mat-menu>

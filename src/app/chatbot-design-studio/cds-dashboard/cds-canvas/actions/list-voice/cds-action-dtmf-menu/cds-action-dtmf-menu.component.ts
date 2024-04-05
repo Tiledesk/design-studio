@@ -41,7 +41,9 @@ export class CdsActionDtmfMenuComponent extends CdsActionVoiceComponent implemen
 
 
   /** onCreateNewButton */
-  public override async onCreateNewButton(index){
+  public override async onCreateNewButton(event){
+    let index = event.index;
+    let buttonValue = event.option
     this.logger.log('[ActionDTMFForm] onCreateNewButton: ', index);
     try {
       if(!this.arrayResponses[index].message.attributes || !this.arrayResponses[index].message.attributes.attachment){
@@ -50,17 +52,7 @@ export class CdsActionDtmfMenuComponent extends CdsActionVoiceComponent implemen
     } catch (error) {
       this.logger.error('error: ', error);
     }
-    let buttonSelected = this.createNewButtonOption(index);
-    if(+ buttonSelected.value > 9){
-      await swal({
-        title: this.translate.instant("CDSCanvas.Error"),
-        text: this.translate.instant("Alert.ErrorMaxOptions"),
-        icon: "error",
-        button: "OK",
-        dangerMode: false,
-      })
-      return;
-    }
+    let buttonSelected = this.createNewButtonOption(index, buttonValue);
     if(buttonSelected){
       this.arrayResponses[index].message.attributes.attachment.buttons.push(buttonSelected);
       this.logger.log('[ActionDTMFForm] onCreateNewButton: ', this.action, this.arrayResponses);
@@ -71,9 +63,9 @@ export class CdsActionDtmfMenuComponent extends CdsActionVoiceComponent implemen
     }
   }
 
-  private createNewButtonOption(arrayResponseIndex: number) {
+  private createNewButtonOption(arrayResponseIndex: number, buttonValue: string) {
     const idButton = generateShortUID();
-    const buttonValue = this.generateNewButtonName(arrayResponseIndex)
+    // const buttonValue = this.generateNewButtonName(arrayResponseIndex)
     if(this.intentSelected.intent_id){
       this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
       const idActionConnector = this.idAction+'/'+idButton;

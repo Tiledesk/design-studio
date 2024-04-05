@@ -14,16 +14,7 @@
             <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
             </svg>
         </span>
-        <input matInput
-                #input_text
-                [readonly]="disabled"
-                cdkTextareaAutosize
-                cdkAutosizeMinRows="1"
-                cdkAutosizeMaxRows="5"
-                [(ngModel)]="button.value"
-                (blur)="onBlur($event)"
-                (click)="onEditButton()"
-                (ngModelChange)="onChangeText($event)"/>
+        {{button?.value}} 
         <div class="clear"></div>
     </div> 
 

@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TranslateService } from '@ngx-translate/core';
+import { MatMenuTrigger } from '@angular/material/menu';
 const swal = require('sweetalert');
 
 @Component({
@@ -20,6 +21,7 @@ const swal = require('sweetalert');
 })
 export class CdsActionReplyVoiceTextComponent implements OnInit {
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
+  @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
   
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
@@ -54,7 +56,8 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
   buttons: Array<any>;
 
   TYPE_ACTION_VXML = TYPE_ACTION_VXML
-
+  MENU_OPTIONS: Array<{label: string, icon: string}> = []
+  OPTIONS_ALLOWED: Array<{label: string, icon: string}> = []
 
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -72,6 +75,7 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
       this.updateConnector();
     });
     this.initialize();
+    ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#'].forEach((el) => this.OPTIONS_ALLOWED.push({ label: el, icon: 'dialpad'}));
   }
 
   /** */
@@ -285,9 +289,16 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
       case 'moveRight':
         break;
       case 'new': /** onCreateNewButton */
-        this.createNewButton.emit(this.index);
+        this.MENU_OPTIONS = this.OPTIONS_ALLOWED.filter((option)=> { return this.buttons.every((button) => button.value !== option.label )})
+        this.trigger.openMenu();
+        // this.createNewButton.emit(this.index);
         break;
     }
+  }
+
+
+  onMenuOptionFN(item: { key: string, label: string, icon: string, src?: string}){
+    this.createNewButton.emit({ index: this.index, option: item.label });
   }
 
   /** dropButtons */
