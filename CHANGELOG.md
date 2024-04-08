@@ -5,6 +5,8 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.3.2 in PROD
+
 ### 1.3.1 in PROD
 - bug-fixed: document title fixed
 
