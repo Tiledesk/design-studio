@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { TYPE_MESSAGE, TYPE_COMMAND, generateShortUID, TYPE_BUTTON, TYPE_URL } from '../../../../../../../utils';
+import { TYPE_MESSAGE, TYPE_COMMAND, generateShortUID, TYPE_BUTTON, TYPE_URL } from '../../../../../../utils';
 import { Message, Command, Button } from 'src/app/models/action-model';
 
 @Component({
@@ -47,6 +47,7 @@ export class CdsActionReplyToolsVoiceComponent implements OnInit {
         } 
         break;
       case TYPE_MESSAGE.FRAME:
+      case TYPE_MESSAGE.AUDIO:
         newElement = {
           type: TYPE_COMMAND.MESSAGE,
           message: {

@@ -1,13 +1,22 @@
+:host {
+    --button-option-border-radius: 8px;
+}
+
 .previewMode{
+    .cds-reply-button-element{
+        justify-content: end;
+        padding: 0px 15px;
+    }
     &.buttons-response{
         padding: 0px 0px 0px 0px;
         margin: 0;
         flex-direction: column;
         flex-wrap: nowrap;
-        align-items: center;
+        align-items: end;
         .button-reply-add{
             color: var(--blu-light-02);
             border-color: var(--blu-light-02);
+            margin: 0 15px;
         }
     }
 
@@ -46,6 +55,9 @@
     }
 }
 
+.button-reply-add{
+    border-radius: var(--button-option-border-radius);
+}
 
 /** box-textarea **/
 cds-textarea.text-editable-div ::ng-deep{
@@ -57,5 +69,16 @@ cds-textarea.text-editable-div ::ng-deep{
         line-height: 20px !important; 
         width: calc(100% - 20px) !important;
         font-size: 0.9em !important;
+    }
+}
+
+.buttons-response{
+    justify-content: space-around;
+}
+
+
+cds-action-reply-voice-button.error ::ng-deep{
+    .button-reply{
+        border: 1px solid var(--empty-element-property);
     }
 }

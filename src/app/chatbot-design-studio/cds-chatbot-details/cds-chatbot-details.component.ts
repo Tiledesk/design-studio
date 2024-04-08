@@ -57,7 +57,6 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
    
     this.route.queryParams.subscribe((params) => {
-      console.log('parammmmmm', params)
       if(!params.hasOwnProperty('active')){
         this.toggleTab(this.activeSection)
       }

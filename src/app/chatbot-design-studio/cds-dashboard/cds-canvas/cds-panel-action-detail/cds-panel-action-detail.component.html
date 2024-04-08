@@ -22,7 +22,8 @@
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
                         [previewMode]="false"
-                        (updateAndSaveAction)="onSaveIntent($event)">
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-reply>
 
                     <cds-action-reply *ngSwitchCase="TYPE_ACTION.RANDOM_REPLY"
@@ -30,7 +31,8 @@
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
                         [previewMode]="false"
-                        (updateAndSaveAction)="onSaveIntent($event)">
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-reply>
 
                     <cds-action-intent *ngSwitchCase="TYPE_ACTION.INTENT"
@@ -272,30 +274,46 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-code>
                     
-                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
+                    <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"
                         [intentSelected]="intentSelected" 
                         [action]="elementSelected"
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
-                    </cds-action-voice>
+                    </cds-action-dtmf-form>
 
-                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.DTMF_MENU"    
+                    <cds-action-dtmf-menu *ngSwitchCase="TYPE_ACTION_VXML.DTMF_MENU"    
                         class="panel-response"
                         [intentSelected]="intentSelected" 
                         [action]="elementSelected"
                         [previewMode]="false"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
-                    </cds-action-voice>
+                    </cds-action-dtmf-menu>
 
-                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.BLIND_TRANSFER"    
+                    <cds-action-blind-transfer *ngSwitchCase="TYPE_ACTION_VXML.BLIND_TRANSFER"    
                         class="panel-response"
                         [intentSelected]="intentSelected" 
                         [action]="elementSelected"
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
-                    </cds-action-voice>
+                    </cds-action-blind-transfer>
+
+                    <cds-action-play-prompt *ngSwitchCase="TYPE_ACTION_VXML.PLAY_PROMPT"    
+                        class="panel-response"
+                        [intentSelected]="intentSelected" 
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-play-prompt>
+
+                    <cds-action-speech-form *ngSwitchCase="TYPE_ACTION_VXML.SPEECH_FORM"    
+                        class="panel-response"
+                        [intentSelected]="intentSelected" 
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-speech-form>
 
                     <!-- <cds-action-assign-function *ngSwitchCase="TYPE_ACTION.ASSIGN_FUNCTION"
                         [action]="elementSelected">

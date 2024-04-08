@@ -12,20 +12,19 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 
 
 @Component({
-  selector: 'cds-action-voice',
-  templateUrl: './cds-action-voice.component.html',
-  styleUrls: ['./cds-action-voice.component.scss']
+  selector: 'cds-action-dtmf-form',
+  templateUrl: './cds-action-dtmf-form.component.html',
+  styleUrls: ['./cds-action-dtmf-form.component.scss']
 })
-export class CdsActionVoiceComponent implements OnInit {
+export class CdsActionDTMFFormComponent implements OnInit {
 
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
-  translateY: string;
 
   @Input() action: ActionVoice;
   @Input() intentSelected: Intent;
   @Input() previewMode: boolean = true
   @Output() updateAndSaveAction = new EventEmitter();
-  
+  @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   // idIntentSelected: string;
   idAction: string;
@@ -53,13 +52,13 @@ export class CdsActionVoiceComponent implements OnInit {
   tipText: string;
   titlePlaceholder: string;
 
-  private logger: LoggerService = LoggerInstance.getInstance();
+  public logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private intentService: IntentService,
-    private controllerService: ControllerService,
-    private connectorService: ConnectorService,
-    private changeDetectorRef: ChangeDetectorRef
+    public intentService: IntentService,
+    public controllerService: ControllerService,
+    public connectorService: ConnectorService,
+    public changeDetectorRef: ChangeDetectorRef
   ) { }
 
   // manageTooltip(){}
@@ -277,6 +276,13 @@ export class CdsActionVoiceComponent implements OnInit {
     const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
     this.logger.log('onChangeActionReply ************', element);
     this.onUpdateAndSaveAction(element);
+  }
+
+  /** onConnectorChangeReply */
+  onConnectorChangeReply(event){
+    this.logger.log('onConnectorChangeReply ************', event);
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    this.onConnectorChange.emit(event)
   }
   
 

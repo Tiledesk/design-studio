@@ -316,26 +316,40 @@
                     </cds-action-code>
 
 
-                    <cds-action-voice *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
+                    <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"
                         [intentSelected]="intent" 
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-voice>
+                    </cds-action-dtmf-form>
 
-                    <cds-action-voice *ngSwitchCase=" TYPE_ACTION_VXML.DTMF_MENU"    
+                    <cds-action-dtmf-menu *ngSwitchCase="TYPE_ACTION_VXML.DTMF_MENU"    
                         class="panel-response"
                         [intentSelected]="intent" 
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-voice>
+                    </cds-action-dtmf-menu>
 
-                    <cds-action-voice *ngSwitchCase=" TYPE_ACTION_VXML.BLIND_TRANSFER"    
+                    <cds-action-blind-transfer *ngSwitchCase="TYPE_ACTION_VXML.BLIND_TRANSFER"    
                         class="panel-response"
                         [intentSelected]="intent" 
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-voice>
+                    </cds-action-blind-transfer>
+
+                    <cds-action-play-prompt *ngSwitchCase="TYPE_ACTION_VXML.PLAY_PROMPT"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-play-prompt>
+
+                    <cds-action-speech-form *ngSwitchCase="TYPE_ACTION_VXML.SPEECH_FORM"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-speech-form>
 
                 </div>
             </span>

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, EventEmitter, Output, SimpleChanges } from '@angular/core';
-import { TYPE_BUTTON } from '../../../../../../../utils';
+import { TYPE_BUTTON } from '../../../../../../utils';
 
 @Component({
   selector: 'cds-action-reply-voice-button',

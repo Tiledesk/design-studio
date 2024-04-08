@@ -99,7 +99,8 @@ export enum TYPE_MESSAGE {
     IMAGE       = 'image',
     FRAME       = 'frame',
     GALLERY     = 'gallery',
-    REDIRECT    = 'redirect'
+    REDIRECT    = 'redirect',
+    AUDIO       = 'audio'
 }
 
 export enum TYPE_ACTION {
@@ -142,8 +143,9 @@ export enum TYPE_ACTION {
 export enum TYPE_ACTION_VXML {
     DTMF_FORM           = 'dtmf_form',
     DTMF_MENU           = 'dtmf_menu',
-    BLIND_TRANSFER      = 'blind_transfer'
-
+    BLIND_TRANSFER      = 'blind_transfer',
+    PLAY_PROMPT         = 'play_prompt',
+    SPEECH_FORM         = 'speech_form',
 }
 
 export enum TYPE_ACTION_CATEGORY {
@@ -165,7 +167,7 @@ export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY),         name: 'CDSActionCategory.Flow',         src: 'assets/images/actions_category/flow.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg'},
-    // { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
 ]
 
@@ -319,6 +321,9 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     DFTM_FORM:              { name: 'CDSActionList.NAME.DTMFForm',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
     DTMF_MENU:              { name: 'CDSActionList.NAME.DTMFMenu',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
     BLIND_TRANSFER:         { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
+    PLAY_PROMPT:            { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
+    SPEECH_FORM:            { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
+
 }
 
 export const EVENTS_LIST = {
@@ -558,10 +563,27 @@ export function deleteItemInArrayForKey(key, array, item) {
 }
 
 
-
 export function checkInternalIntent(intent: Intent): boolean{
     return intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START ||  intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK ? true: false
 }
+
+export function findFreeId (array, key) {
+    const sortedArray = array
+      .map((item) => +item[key]) // tranform string to number
+      .filter((value)=> !Number.isNaN(value)) //removes Null
+      .slice() // Make a copy of the array.
+      .sort(function (a, b) { return a - b }); // Sort it.
+    let previousId = -1;
+    for (let element of sortedArray) {
+      if (element != (previousId + 1)) {
+        // Found a gap.
+        return previousId + 1;
+      }
+      previousId = element;
+    }
+    // Found no gaps.
+    return previousId + 1;
+  }
 
 export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     let arrayCoord = [];

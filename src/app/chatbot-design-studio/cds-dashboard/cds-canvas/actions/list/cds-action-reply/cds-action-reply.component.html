@@ -215,10 +215,11 @@
                 <cds-action-reply-settings
                     [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                     [idAction] = "idAction"
-                    [response] = "settings"
+                    [response] = "action?.settings"
                     [previewMode] = "previewMode"
                     (updateAndSaveAction) = onUpdateAndSaveAction($event)
-                    (changeActionReply) = onChangeActionReply($event)>
+                    (changeActionReply) = onChangeActionReply($event)
+                    (onConnectorChange)= onConnectorChangeReply($event)>
                 </cds-action-reply-settings>
             </div> -->
             

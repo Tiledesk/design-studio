@@ -47,12 +47,12 @@
                             </div>
 
                             <cds-action-reply-voice-text 
-                                [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
+                                [actionType]="action._tdActionType"
                                 (moveUpResponse) = onMoveUpResponse($event)
                                 (moveDownResponse) = onMoveDownResponse($event)
                                 (openButtonPanel) = onOpenButtonPanel($event)
@@ -88,7 +88,8 @@
                                     [response] = "command.settings"
                                     [previewMode] = "previewMode"
                                     (updateAndSaveAction) = onUpdateAndSaveAction($event)
-                                    (changeActionReply) = onChangeActionReply($event)>
+                                    (changeActionReply) = onChangeActionReply($event)
+                                    (onConnectorChange)= onConnectorChangeReply($event)>
                                 </cds-action-reply-voice-settings>
                             </div>
                      </div>

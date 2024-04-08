@@ -1,23 +1,27 @@
 
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/models/action-model';
-import { TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../../utils';
-import { IntentService } from '../../../../../../../services/intent.service';
-import { ConnectorService } from '../../../../../../../services/connector.service';
+import { TYPE_ACTION, TYPE_ACTION_VXML, TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../utils';
+import { IntentService } from '../../../../../../services/intent.service';
+import { ConnectorService } from '../../../../../../services/connector.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TranslateService } from '@ngx-translate/core';
+import { MatMenuTrigger } from '@angular/material/menu';
+const swal = require('sweetalert');
 
 @Component({
   selector: 'cds-action-reply-voice-text',
-  templateUrl: './cds-action-reply-text.component.html',
-  styleUrls: ['./cds-action-reply-text.component.scss']
+  templateUrl: './cds-action-reply-voice-text.component.html',
+  styleUrls: ['./cds-action-reply-voice-text.component.scss']
 })
 export class CdsActionReplyVoiceTextComponent implements OnInit {
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
+  @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
   
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
@@ -32,7 +36,9 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
   @Input() response: Message;
   @Input() wait: Wait;
   @Input() index: number;
+  @Input() actionType: TYPE_ACTION | TYPE_ACTION_VXML;
   @Input() previewMode: boolean = true;
+  @Input() allowedChars: string[]
 
   // Connector //
   idIntent: string;
@@ -49,11 +55,16 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
   TYPE_BUTTON = TYPE_BUTTON;
   buttons: Array<any>;
 
+  TYPE_ACTION_VXML = TYPE_ACTION_VXML
+  MENU_OPTIONS: Array<{label: string, icon: string}> = []
+  OPTIONS_ALLOWED: Array<{label: string, icon: string}> = []
 
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private connectorService: ConnectorService,
-    private intentService: IntentService
+    private intentService: IntentService,
+    private translate: TranslateService,
+    private el: ElementRef
   ) { }
 
   // SYSTEM FUNCTIONS //
@@ -64,6 +75,7 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
       this.updateConnector();
     });
     this.initialize();
+    ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#'].forEach((el) => this.OPTIONS_ALLOWED.push({ label: el, icon: 'dialpad'}));
   }
 
   /** */
@@ -225,6 +237,47 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
     this.openButtonPanel.emit(button);
   }
 
+  async onChangeButton(button, index: number, element){
+    let selectedButton = this.el.nativeElement.querySelectorAll('cds-action-reply-voice-button')[index]
+    selectedButton.classList.remove('error')
+    /** ERROR CASE: number contains more than 1 digits */
+    if(button.value.length > 1){
+      selectedButton.classList.add('error')
+      await swal({
+        title: this.translate.instant("CDSCanvas.Error"),
+        text: this.translate.instant("Alert.ErrorSingleDigit"),
+        icon: "error",
+        button: "OK",
+        dangerMode: false,
+      })
+      return;
+    }
+    /** ERROR CASE: text must be into allowed chars array string */
+    if(this.checkIfTextContainsAllowedChars(button.value)){
+      selectedButton.classList.add('error')
+      await swal({
+        title: this.translate.instant("CDSCanvas.Error"),
+        text: this.translate.instant("Alert.ErrorAllowedOption"),
+        icon: "error",
+        button: "OK",
+        dangerMode: false,
+      })
+      return;
+    }
+    /** ERROR CASE: text must not be duplicated with other options */
+    if(this.checkIfButtonsContainsDuplicateNum()){
+      selectedButton.classList.add('error')
+      await swal({
+        title: this.translate.instant("CDSCanvas.Error"),
+        text: this.translate.instant("Alert.ErrorDuplicateDigit"),
+        icon: "error",
+        button: "OK",
+        dangerMode: false,
+      })
+      return;
+    }
+  }
+
   /** onButtonControl */
   onButtonControl(action: string, index: number ){
     switch(action){
@@ -236,9 +289,16 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
       case 'moveRight':
         break;
       case 'new': /** onCreateNewButton */
-        this.createNewButton.emit(this.index);
+        this.MENU_OPTIONS = this.OPTIONS_ALLOWED.filter((option)=> { return this.buttons.every((button) => button.value !== option.label )})
+        this.trigger.openMenu();
+        // this.createNewButton.emit(this.index);
         break;
     }
+  }
+
+
+  onMenuOptionFN(item: { key: string, label: string, icon: string, src?: string}){
+    this.createNewButton.emit({ index: this.index, option: item.label });
   }
 
   /** dropButtons */
@@ -254,5 +314,18 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
       text = text.replace('{' + match + '}',createTag)
     });
     return text
+  }
+
+  checkIfTextContainsAllowedChars(text): boolean{
+    var allowedChars = ['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#'];
+    return !/^[0-9*#]*$/i.test(text)
+    var stringIncludesFruit = allowedChars.some(num => text !== num);
+    return stringIncludesFruit
+  }
+
+  checkIfButtonsContainsDuplicateNum(): boolean{
+    var valueArr = this.buttons.map(function(item){ return item.value });
+    var checkIfContainsDuplicate = valueArr.some((item, index) => valueArr.indexOf(item) !== index);
+    return checkIfContainsDuplicate
   }
 }

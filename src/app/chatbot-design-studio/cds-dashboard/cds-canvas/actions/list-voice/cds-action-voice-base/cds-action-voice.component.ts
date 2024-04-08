@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, Output, EventEmitter, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Intent } from 'src/app/models/intent-model';
-import { Wait, Button, Message, Command, ActionReply, MessageAttributes, Setting } from 'src/app/models/action-model';
+import { Wait, Button, Message, Command, ActionReply, MessageAttributes, ActionVoice } from 'src/app/models/action-model';
 import { TYPE_UPDATE_ACTION, TYPE_INTENT_ELEMENT, ACTIONS_LIST, TYPE_ACTION, TYPE_COMMAND, TYPE_RESPONSE, TYPE_BUTTON, TYPE_URL, TYPE_MESSAGE, generateShortUID } from '../../../../../utils';
 
 import { ControllerService } from '../../../../../services/controller.service';
@@ -12,16 +12,15 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 
 
 @Component({
-  selector: 'cds-action-reply',
-  templateUrl: './cds-action-reply.component.html',
-  styleUrls: ['./cds-action-reply.component.scss']
+  selector: 'cds-action-voice',
+  templateUrl: './cds-action-voice.component.html',
+  styleUrls: ['./cds-action-voice.component.scss']
 })
-export class CdsActionReplyComponent implements OnInit {
+export class CdsActionVoiceComponent implements OnInit {
 
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
-  translateY: string;
 
-  @Input() action: ActionReply;
+  @Input() action: ActionVoice;
   @Input() intentSelected: Intent;
   @Input() previewMode: boolean = true
   @Output() updateAndSaveAction = new EventEmitter();
@@ -53,14 +52,13 @@ export class CdsActionReplyComponent implements OnInit {
   tipText: string;
   titlePlaceholder: string;
 
-
-  private logger: LoggerService = LoggerInstance.getInstance();
+  public logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private intentService: IntentService,
-    private controllerService: ControllerService,
-    private connectorService: ConnectorService,
-    private changeDetectorRef: ChangeDetectorRef
+    public intentService: IntentService,
+    public controllerService: ControllerService,
+    public connectorService: ConnectorService,
+    public changeDetectorRef: ChangeDetectorRef
   ) { }
 
   // manageTooltip(){}
@@ -70,7 +68,7 @@ export class CdsActionReplyComponent implements OnInit {
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    this.logger.log('ActionReplyComponent ngOnInit', this.action, this.intentSelected);
+    this.logger.log('ActionDTMFFormComponent ngOnInit', this.action, this.intentSelected);
     // // this.logger.log('ngOnInit panel-response::: ', this.typeAction);
     this.typeAction = (this.action._tdActionType === TYPE_ACTION.RANDOM_REPLY ? TYPE_ACTION.RANDOM_REPLY : TYPE_ACTION.REPLY);
     try {
@@ -78,11 +76,7 @@ export class CdsActionReplyComponent implements OnInit {
       if(this.action._tdActionTitle && this.action._tdActionTitle != ""){
         this.dataInput = this.action._tdActionTitle;
       }
-      // this.settings = { no_input: null, timeout: 20 }
-      // if(this.action.noInput){
-      //   this.settings = { no_input: this.action.noInput}
-      // }
-      this.logger.log('ActionDescriptionComponent action:: ', this.element);
+      this.logger.log('ActionDTMFFormComponent action:: ', this.element);
     } catch (error) {
       this.logger.log("error ", error);
     }
@@ -234,8 +228,9 @@ export class CdsActionReplyComponent implements OnInit {
       const wait = new Wait();
       let command = new Command(ele.type);
       command.message = message;
-      this.arrayResponses.push(wait);
-      this.arrayResponses.push(command);
+      this.arrayResponses.splice(this.arrayResponses.length-2, 0, wait)
+      this.arrayResponses.splice(this.arrayResponses.length-2, 0, command)
+      this.arrayResponses.join();
       this.scrollToBottom();
       const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
       this.onUpdateAndSaveAction(element);
@@ -267,10 +262,8 @@ export class CdsActionReplyComponent implements OnInit {
     const wait = this.arrayResponses[index-1];
     this.logger.log('wait: ', wait);
     if( wait && wait.type === this.typeCommand.WAIT){
-      this.logger.log('CANCELLO WAIT E MESSAGE');
       this.arrayResponses.splice(index-1, 2); 
     } else {
-      this.logger.log('CANCELLO SOLO MESSAGE');
       this.arrayResponses.splice(index, 1); 
     }
     this.logger.log('onDeleteActionReply', this.arrayResponses);
@@ -287,7 +280,7 @@ export class CdsActionReplyComponent implements OnInit {
 
   /** onConnectorChangeReply */
   onConnectorChangeReply(event){
-    this.logger.log('onConnectorChangeReply ************', event, this.action);
+    this.logger.log('onConnectorChangeReply ************', event);
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     this.onConnectorChange.emit(event)
   }
@@ -298,7 +291,7 @@ export class CdsActionReplyComponent implements OnInit {
 
   /** onCreateNewButton */
   onCreateNewButton(index){
-    this.logger.log('[cds-action-reply] onCreateNewButton: ', index);
+    this.logger.log('[ActionDTMFForm] onCreateNewButton: ', index);
     try {
       if(!this.arrayResponses[index].message.attributes || !this.arrayResponses[index].message.attributes.attachment){
         this.arrayResponses[index].message.attributes = new MessageAttributes();
@@ -309,7 +302,7 @@ export class CdsActionReplyComponent implements OnInit {
     let buttonSelected = this.createNewButton();
     if(buttonSelected){
       this.arrayResponses[index].message.attributes.attachment.buttons.push(buttonSelected);
-      this.logger.log('[cds-action-reply] onCreateNewButton: ', this.action, this.arrayResponses);
+      this.logger.log('[ActionDTMFForm] onCreateNewButton: ', this.action, this.arrayResponses);
       // this.intentService.setIntentSelected(this.intentSelected.intent_id);
       this.intentService.selectAction(this.intentSelected.intent_id, this.action._tdActionId);
       const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
@@ -334,7 +327,7 @@ export class CdsActionReplyComponent implements OnInit {
         '',
         true
       );
-      this.logger.log('[cds-action-reply] createNewButton: ', buttonSelected);
+      this.logger.log('[ActionDTMFForm] createNewButton: ', buttonSelected);
       return buttonSelected;
     }
     return null;
@@ -356,7 +349,7 @@ export class CdsActionReplyComponent implements OnInit {
    * 2 - update intent
    * */
   public async onUpdateAndSaveAction(element) {
-    this.logger.log('[cds-action-reply] onUpdateAndSaveAction:::: ', this.action, element);
+    this.logger.log('[ActionDTMFForm] onUpdateAndSaveAction:::: ', this.action, element);
     // this.connectorService.updateConnector(this.intentSelected.intent_id);
     this.updateAndSaveAction.emit(this.action);
   }

@@ -98,8 +98,7 @@ export class ActionHideMessage extends Action {
 export class ActionReply extends Action {
     text?: string;
     attributes: Attributes;
-    noInput?: string;
-    noMatch?: string;
+    settings: Setting
     constructor(text?: string, attributes?: Attributes) {
         super();
         // this.text = text ? text : '...';
@@ -161,7 +160,7 @@ export class ActionWebRequestV2 extends Action {
         super();
         this.url = '';
         this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":"TiledeskBotRuntime", "Accept":"*/*"};
-        this.settings = { "timeout": 30 }
+        this.settings = { timeout: 20000 }
         this.jsonBody = null
         this.bodyType = 'none'
         this.assignStatusTo = '';
@@ -414,10 +413,13 @@ export class Setting {
     maxDigits?: number;
     terminators?: string;
     transferTo?: string;
-    timeout?: number;
     bargein?: boolean = true;
-    no_input?: string;
-    no_match?: string;
+    noInputTimeout?: number;
+    noInputIntent?: string;
+    noMatchIntent?: string;
+    trueIntent?: string;
+    falseIntent?: string;
+    incompleteSpeechTimeout?: number;
 }
 
 export class MessageWithWait extends Message {
@@ -643,6 +645,7 @@ export class ActionVoice extends Action {
         // this.text = text ? text : '...';
         this._tdActionType = type;
         this.attributes = new Attributes();
+        this.attributes.disableInputMessage = true;
         if (attributes){
             this.attributes = attributes;
         }
