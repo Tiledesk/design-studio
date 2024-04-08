@@ -54,6 +54,8 @@ export class CdsActionWebRequestV2Component implements OnInit {
   methodSelectedBody = false;
   headerAttributes: any;
 
+  valueIsInvalid: boolean = false;
+
   // hasSelectedVariable: boolean = false;
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
   assignments: {} = {}
@@ -275,10 +277,10 @@ export class CdsActionWebRequestV2Component implements OnInit {
         this.body = e;
         this.action.jsonBody = this.body;
         
-        setTimeout(() => {
+        // setTimeout(() => {
           // this.jsonIsValid = this.isValidJson(this.body);
           // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        }, 0);
+        // }, 0);
         break;
       }
       case 'url' : {
@@ -287,6 +289,11 @@ export class CdsActionWebRequestV2Component implements OnInit {
         break;
       }
       case 'setting': {
+        if(isNaN(+e)){
+          this.valueIsInvalid = true;
+          break;
+        }
+        this.valueIsInvalid = false;
         this.jsonSettings.timeout = +e;
         this.action['settings'] = this.jsonSettings;
         break;

@@ -137,6 +137,7 @@
             </div>
             <div class="setting-right">
                 <cds-textarea id="timeout"
+                    [ngClass]="{'jsonError': valueIsInvalid}"
                     class = "text-editable-div"
                     [text]="jsonSettings?.timeout"
                     [textLimitBtn]="false"

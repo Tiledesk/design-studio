@@ -128,7 +128,7 @@ export class CDSTextareaComponent implements OnInit {
       }
     }
     if(!this.isSelected || !this.readonly){
-      this.changeTextarea.emit(event.trim());
+      this.changeTextarea.emit(event.toString().trim());
     }
   }
 
