@@ -63,6 +63,7 @@ import { ModalWindowComponent } from './form/modal-window/modal-window.component
 import { CdsQuestionComponent } from './question/question.component';
 import { BaseElementModule } from 'src/app/shared/base-element.module';
 import { CdsActionBrevoComponent } from './cds-action-brevo/cds-action-brevo.component';
+import { CdsActionN8nComponent } from './cds-action-n8n/cds-action-n8n.component';
 import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds-action-reply-settings/cds-action-reply-settings.component';
 
 @NgModule({
@@ -107,6 +108,7 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
     CdsActionAskgptV2Component,
     CdsActionCustomerioComponent,
     CdsActionBrevoComponent,
+    CdsActionN8nComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
@@ -188,6 +190,7 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
     CdsActionAskgptV2Component,
     CdsActionCustomerioComponent,
     CdsActionBrevoComponent,
+    CdsActionN8nComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,

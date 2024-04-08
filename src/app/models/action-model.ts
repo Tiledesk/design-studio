@@ -637,6 +637,25 @@ export class ActionBrevo extends Action {
     }
 }
 
+export class ActionN8n extends Action {
+    url: string;
+    bodyParameters: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    assignResultTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    constructor(){
+        super();
+        this.url = '';
+        this.bodyParameters = "";
+        this.assignStatusTo = '';
+        this.assignErrorTo = '';
+        this.assignResultTo = '';
+        this._tdActionType = TYPE_ACTION.N8N;
+    }
+}
+
 export class ActionVoice extends Action {
     text?: string;
     attributes: Attributes;
