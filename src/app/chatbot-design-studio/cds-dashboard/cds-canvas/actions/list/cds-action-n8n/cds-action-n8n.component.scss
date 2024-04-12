@@ -96,6 +96,13 @@ a.link{
     cursor: pointer;
     text-decoration: underline;
 }
-
+.box {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: auto;
+    height: auto;
+    align-content: space-between;
+  }
 
 

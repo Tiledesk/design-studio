@@ -289,6 +289,7 @@
         "KnowledgeBaseID":"Knowledge Base ID",
         "ManageKnowledgeBases":"Manage Knowledge Bases",
         "ManageIntegration":"Manage integration",
+        "Howitwork":"How it works",
         "GPTReply":"GPT Reply",
         "GPTSource":"GPT Source",
         "ApplyAFunctionToValue":"Apply a function to the value",

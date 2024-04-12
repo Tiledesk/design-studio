@@ -215,9 +215,12 @@ export class CdsActionN8nComponent implements OnInit {
     this.action[type] = null;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
-
   goToIntegration(){
     let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name=' + this.action._tdActionType
+    window.open(url, '_blank')
+  }
+  goToHelp(){
+    let url = "https://gethelp.tiledesk.com/articles/n8nio-action/"
     window.open(url, '_blank')
   }
 }
