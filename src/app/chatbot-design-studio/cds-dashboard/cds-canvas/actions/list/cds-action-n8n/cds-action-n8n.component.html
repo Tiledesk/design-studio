@@ -1,0 +1,166 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="action-row-left">
+       
+        <span class="n8n-action-method" *ngIf="action.method">
+            {{ action.method}}
+        </span>
+
+    </div>
+
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate}}</label>
+        
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate}}</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+</div>
+
+<!-- Details -->
+<div *ngIf="!previewMode" class="content-panel-intent-detail" #scrollMe id="scrollMe" >
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.N8nWebhookUrl' | translate }}</label>
+        <cds-textarea id="n8nWebUrl" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="2" 
+            [text]="action.url"
+            [placeholder]="'CDSCanvas.EnterN8nWebhookURL' | translate "
+            (changeTextarea)="onChangeTextarea($event, 'url')"
+            (selectedAttribute)="onSelectedAttribute($event, 'url')">
+        </cds-textarea>
+    </div>
+
+    <div class="box">
+        <a class="link" (click)="goToIntegration()">{{'CDSCanvas.ManageIntegration' | translate}}</a>
+        <a class="link" style="margin-top: 20px;" (click)="goToHelp()">{{'CDSCanvas.Howitwork' | translate}}</a>
+    </div>
+   
+    
+    <hr class="custom-divider">
+ 
+  
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.BodyParameters' | translate }}</label>
+        <cds-attributes
+            class="cds-attributes"
+            [method]="typeMethodAttribute.INPUT"
+            [attributes]="jsonParameters"
+            (changeAttributes)="onChangeAttributes($event)">
+        </cds-attributes>
+    </div>
+
+
+    <div class="field-box">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <span class="condition-text">{{'CDSCanvas.Success' | translate }}</span>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.trueIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
+            (onReset)="onResetBlockSelect($event, 'trueIntent')">
+        </cds-select>
+    </div>
+
+    <div class="field-box">
+        <div class="condition-container">
+            <span class="condition-text">{{'CDSCanvas.Else' | translate | titlecase }}</span>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.falseIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
+            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+        </cds-select>
+    </div>
+
+    <hr class="custom-divider">
+    <mat-accordion>
+    <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
+            class="custom-expansion-panel">
+            <mat-expansion-panel-header class="disable_ripple">
+                <mat-panel-title>
+                    {{'CDSCanvas.Advanced' | translate }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.AssignStatusTo' | translate }}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" 
+            [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignStatusTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.AssignResultTo' | translate }}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignResultTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+        </cds-textarea>
+    </div>
+
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.AssignErrorTo' | translate }}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" 
+            [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignErrorTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+        </cds-textarea>
+    </div>
+</div>
+</mat-expansion-panel>
+</mat-accordion>
+<hr class="custom-divider">
+</div>
