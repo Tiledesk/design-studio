@@ -139,6 +139,7 @@ export class TiledeskAuthService {
     localStorage.removeItem('tiledesk_token')
     this.BS_IsONLINE.next(false)
     this.setCurrentUser(null);
+    this.setTiledeskToken(null);
     // this.isOnline$.next(false) 
     const stored_project = localStorage.getItem('last_project')
     if (stored_project) {
@@ -217,6 +218,10 @@ export class TiledeskAuthService {
   }
   getTiledeskToken(): string {
     return this.tiledeskToken;
+  }
+
+  setTiledeskToken(token: string) {
+    this.tiledeskToken = token
   }
 
 }

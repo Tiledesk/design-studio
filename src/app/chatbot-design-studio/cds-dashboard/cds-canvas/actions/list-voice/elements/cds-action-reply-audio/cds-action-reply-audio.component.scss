@@ -93,12 +93,19 @@ $max-height: 230px;
     }
 }
 
+label.subtitle-label{
+    margin-left: var(--base-margin);
+    margin-right: var(--base-margin);
+    margin-bottom: 10px;
+}
+
 
 /** box-textarea **/
 cds-textarea.text-editable-div ::ng-deep{
     display: block;
     margin-left: var(--base-margin);
     margin-right: var(--base-margin);
+    margin-bottom: 10px;
     // width: calc(100% - 66px);
     textarea {
         line-height: 20px !important; 

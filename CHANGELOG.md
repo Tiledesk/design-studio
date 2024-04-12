@@ -5,6 +5,10 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.4.0-rc.2
+- added: cds-action-n8n
+- added: setTiledeskToken method on tiledesk-auth
+
 ### 1.4.0-rc.1
 - added: cds-action-speech-form voice action
 - added: cds-action-voice-play-prompt
