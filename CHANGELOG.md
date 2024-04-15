@@ -5,6 +5,10 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.4.0-rc.3
+- added: autofocus on search input element on cds-add-action-menu floating panel component
+- added: ascendent ordering of actions in cds-add-action-menu floating panel
+
 ### 1.4.0-rc.2
 - added: cds-action-n8n
 - added: setTiledeskToken method on tiledesk-auth
