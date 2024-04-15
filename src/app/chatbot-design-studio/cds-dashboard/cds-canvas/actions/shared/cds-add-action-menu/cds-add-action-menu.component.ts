@@ -1,5 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ACTIONS_LIST, TYPE_OF_MENU } from '../../../../../utils';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'cds-add-action-menu',
@@ -18,9 +19,10 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
   contentHeight : any;
   actionToSearch: string;
   // @Output() clickedOutOfAddActionMenu= new EventEmitter();
-  constructor() { }
+  constructor(public translate: TranslateService) { }
 
   ngOnInit(): void {
+   
     switch (this.menuType) {
       case TYPE_OF_MENU.ACTION:
         this.menuItemsList = Object.keys(ACTIONS_LIST).map(key => {
@@ -64,10 +66,10 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
         type: key,
         value: ACTIONS_LIST[key]
       };
-    }).filter(el => el.value.status !== 'inactive');;
+    }).filter(el => el.value.status !== 'inactive')
 
     if(this.menuItemsList){
-      this.filterMenuItemsList = this.menuItemsList;
+      this.filterMenuItemsList = this.menuItemsList.sort((el1, el2)=> this.translate.instant(el1.value.name).localeCompare(this.translate.instant(el2.value.name)));
     }
   }
 
