@@ -2,7 +2,7 @@
     <div class="menu-context-add-search">
         <div class="action-menu-search">
             <span class="material-icons"> search </span>
-            <input type="text" [placeholder]="'Search' | translate" [(ngModel)]="actionToSearch" (ngModelChange)="onSearchAction($event)">
+            <input type="text" #search [placeholder]="'Search' | translate" [(ngModel)]="actionToSearch" (ngModelChange)="onSearchAction($event)">
         </div>
     </div>
 

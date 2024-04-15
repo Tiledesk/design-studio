@@ -85,6 +85,7 @@
     [style.left.px]="positionFloatMenu.x"
     [style.display]="IS_OPEN_ADD_ACTIONS_MENU?'block':'none'"
     [menuType]="TYPE_OF_MENU.ACTION"
+    [isActive]="IS_OPEN_ADD_ACTIONS_MENU"
     (addActionFromActionMenu)="onAddActionFromActionMenu($event)">
 </cds-add-action-menu>
 
