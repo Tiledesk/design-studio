@@ -60,10 +60,7 @@
                 <label class="col-xs-12 cds--custom-label" style="font-size: 18px;">
                     {{ 'CDSSetting.ChatbotCommunityInfo' | translate}}
                 </label>
-                <label class="col-xs-12 cds--custom-label" style="font-size: 10px;
-                    padding-top: 0px;
-                    max-width: 400px;
-                    font-weight: 400;">
+                <label class="col-xs-12 cds--custom-label" style="font-size: 10px;font-weight: 400;">
                     {{ 'CDSSetting.AddsTheBelowInformations' | translate}}
                 </label>
             </div>
@@ -73,7 +70,7 @@
                     <!-- ------------------------------------------------------------------------------------------- -->
                     <!--  Main Category  -->
                     <!-- ------------------------------------------------------------------------------------------- -->
-                    <label class="col-xs-12">
+                    <label class="col-xs-12 cds--custom-label">
                         {{ 'CDSSetting.MainCategory' | translate}} <span>*</span>
                     </label>
                     <div class="col-xs-12">
@@ -97,13 +94,12 @@
                     <!-- ------------------------------------------------------------------------------------------- -->
                     <!--  Bot title  -->
                     <!-- ------------------------------------------------------------------------------------------- -->
-                        <label class="col-xs-12">
+                        <label class="col-xs-12 cds--custom-label">
                             {{ 'Title' | translate }} <span>*</span>
                         </label> 
                         <div class="col-xs-12">
                             <input id="bot_type" name="bot_type" [(ngModel)]="selectedChatbot.title"
-                                (ngModelChange)="onChangeTitle($event)" class="input csd-chatbot-dtls-input" type="text"
-                                style="margin-bottom: 0px; color:#808080" placeholder="{{ 'Title' | translate }}">
+                                (ngModelChange)="onChangeTitle($event)" class="input csd-chatbot-dtls-input" type="text" placeholder="{{ 'Title' | translate }}">
                             <span *ngIf="titleIsEmpty" class="csd-community-required-field">{{ 'Required' | translate}}</span>
                         </div>
 
@@ -123,7 +119,6 @@
                     <textarea id="bot_description" name="bot_description"
                         [(ngModel)]="selectedChatbot.short_description"
                         (ngModelChange)="onChangeShortDescription($event)" rows="4"
-                        style="resize: vertical; margin-bottom: 0px; color:#808080; "
                         class="input csd-chatbot-dtls-input" type="text" placeholder="{{ 'ShortDescription' | translate }}">
                     </textarea>
                     <span *ngIf="shortDescriptionIsEmpty" style="margin-top: -5px;"
@@ -144,8 +139,7 @@
                 </label>
                 <div class="col-xs-12">
                     <textarea id="bot_description" name="bot_description" [(ngModel)]="selectedChatbot.description"
-                        rows="6" style="resize: vertical; margin-bottom: 0px; color:#808080; margin-top: 10px;"
-                        class="input csd-chatbot-dtls-input" type="text" placeholder="{{ 'Description' | translate }} ">
+                        rows="6" class="input csd-chatbot-dtls-input" type="text" placeholder="{{ 'Description' | translate }} ">
             </textarea>
                 </div>
             </div>
@@ -210,10 +204,7 @@
                 <label class="col-xs-12 cds--custom-label" style="font-size: 18px;">
                     {{ 'CDSSetting.YourCommunityProfile' | translate }}
                 </label>
-                <label class="col-xs-12 cds--custom-label" style="font-size: 10px;
-                    padding-top: 0px;
-                    max-width: 400px;
-                    font-weight: 400;">
+                <label class="col-xs-12 cds--custom-label" style="font-size: 10px; font-weight: 400;">
                      {{ 'CDSSetting.EnterYourInformation' | translate }} 
                 </label>
             </div>
@@ -225,7 +216,7 @@
                 <div class="col-xs-12">
                     <input id="user-website" name="user_website" [(ngModel)]="userWebsite"
                         (ngModelChange)="onChangeUserWebsite($event)" class="input csd-chatbot-dtls-input" type="text"
-                        style="margin-bottom: 0px; color:#808080; position: relative;top: -1px;"
+                        style="position: relative;top: -1px;"
                         placeholder="{{ 'CDSSetting.YourWebSite' | translate }}">
                 </div>
             </div>
@@ -236,7 +227,7 @@
                 <div class="col-xs-12">
                     <input id="user-public-email" name="user_public_email" [(ngModel)]="userPlublicEmail"
                         class="input csd-chatbot-dtls-input" type="text"
-                        style="margin-bottom: 0px; color:#808080; position: relative;top: -1px;"
+                        style="position: relative;top: -1px;"
                         placeholder="{{ 'CDSSetting.YourPublicEmail' | translate }} ">
                 </div>
             </div>
@@ -248,7 +239,7 @@
                 <div class="col-xs-12">
                     <textarea id="user-description" name="user_description" [(ngModel)]="userDescription"
                         class="input csd-chatbot-dtls-input" type="text"
-                        style="margin-bottom: 0px; color:#808080; position: relative;top: -1px;"
+                        style="position: relative;top: -1px;"
                         placeholder="{{ 'YourDescription' | translate }}" rows="4">
                     </textarea>
                 </div>

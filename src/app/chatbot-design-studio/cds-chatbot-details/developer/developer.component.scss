@@ -1,4 +1,4 @@
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/settings-section.scss";
 
 .section-title {
     margin-left: 15px;
@@ -15,23 +15,6 @@
 .input-wrp{
     position: relative;
     width: 400px;
-}
-
-input[type="text"] {
-    // min-width: 307px !important;
-    height: 36px;
-    font-size: 14px;
-    width: 100%;
-    // margin-bottom: 10px;
-    appearance: none;
-    -webkit-appearance: none;
-    /* border-radius: 2px; */
-    padding: 0 8px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    border-radius: var(--input-border-radius-base);
-    background-color: var(--color-white-hex);
-    border: solid 1px var(--blu-light-02);
 }
 
 .csd-chatbot-dtls-input {
