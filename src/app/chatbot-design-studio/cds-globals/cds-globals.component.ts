@@ -1,4 +1,4 @@
-import { Global } from './../../models/global-model';
+import { Global } from '../../models/global-model';
 import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { variableList } from '../utils-variables';

@@ -1,5 +1,5 @@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Global } from './../../../models/global-model';
+import { Global } from '../../../models/global-model';
 import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 
 @Component({
