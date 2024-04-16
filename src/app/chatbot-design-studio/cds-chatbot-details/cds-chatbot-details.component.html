@@ -19,7 +19,7 @@
           <li (click)="toggleTab(SETTINGS_SECTION.COMMUNITY)" class="btn-with-border-effect" [ngClass]="
                     { 'border-from-center' :  activeSection !== SETTINGS_SECTION.COMMUNITY, 
                       'li-active' :           activeSection === SETTINGS_SECTION.COMMUNITY
-                    }">
+                    }" *ngIf="BRAND_BASE_INFO['COMMUNITY_SECTION']">
             <a href="javascript:;" role="button"> Community </a>
           </li>
 
