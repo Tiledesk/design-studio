@@ -1,0 +1,115 @@
+@import "./src/assets/sass/cds/_variables.scss";
+$max-height: 230px;
+
+.extensions-response{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.delay-wrapper, .height-wrapper {
+    height: 32px; 
+}
+
+:host{
+    --base-margin: #{var(--input-base-margin)};
+}
+
+.previewMode{
+    .response-frame-panel{
+        margin: 0;
+        max-width: 100%;
+        border-color: #8da2b5;
+        margin: 5px auto;
+        max-width: calc(100% - 5px); //calc(100% - 20px);
+
+        &.no-image{
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: none;
+
+            .image{
+                width: 40px;
+                height: 40px;
+                // border-radius: 8px;
+                // box-shadow: rgba(0, 0, 0, 0.12) 0px -1px 0px 0px inset;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+    
+                img {
+                    max-height: 90%;
+                    max-width: 90%;
+                    border-radius: inherit;
+                }
+            }
+
+            .text{
+                overflow-x: clip;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                font-size: .8em;
+                color: rgb(141, 162, 181)
+            }
+        }
+
+    }
+
+    .content-frame{
+        margin: 0;
+        max-width: 100%;
+        border-color: #647283;
+        margin: 5px auto;
+        max-width: calc(100% - 5px); //calc(100% - 20px);
+    }
+}
+
+.response-frame-wrapper{
+    position: relative;
+    display: block;
+    border-radius: 8px; 
+    margin-left: var(--base-margin);
+    margin-right: var(--base-margin);
+    // margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0px; //10px 20px 20px;
+    overflow: visible;
+    // max-width: calc(100% - 66px);
+    width: auto;
+    height: auto;
+    .frame-panel {
+        border-radius: 6px;
+        display: block;
+        overflow: hidden;
+    }
+    label.control-label {
+        font-family: var(--font-family-poppins);
+        font-size: var(--font-size-base);
+        line-height: normal;
+        color: #aaa;
+        font-weight: 400;
+        margin: 0;
+    }
+}
+
+label.subtitle-label{
+    margin-left: var(--base-margin);
+    margin-right: var(--base-margin);
+    margin-bottom: 10px;
+}
+
+
+/** box-textarea **/
+cds-textarea.text-editable-div ::ng-deep{
+    display: block;
+    margin-left: var(--base-margin);
+    margin-right: var(--base-margin);
+    margin-bottom: 10px;
+    // width: calc(100% - 66px);
+    textarea {
+        line-height: 20px !important; 
+        width: calc(100% - 20px) !important;
+        font-size: 0.9em !important;
+    }
+}

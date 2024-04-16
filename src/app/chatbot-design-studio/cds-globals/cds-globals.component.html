@@ -45,6 +45,7 @@
                     <cds-text id="custom-input"
                         class="text-editable-div disabled" 
                         [text]="global.key"
+                        [disabled]="true"
                         [placeholder]="'CDSGlobals.GLOBAL_KEY' | translate">
                     </cds-text>
                 </div>
@@ -53,6 +54,7 @@
                     <cds-text id="custom-input-value"
                         class="text-editable-div disabled" 
                         [text]="global.value"
+                        [disabled]="true"
                         [placeholder]="'CDSGlobals.value' | translate">
                     </cds-text>
                     <span class="material-icons-outlined copy-icon" (click)="copyToClipboard(global.value)">content_copy</span>

@@ -1,0 +1,91 @@
+<div class="extensions-response" *ngIf="!previewMode">
+    
+    <div class="text-editor-drop">
+        <em class="material-icons">drag_indicator</em>
+    </div>
+    
+    <div class="response-controls">
+        <div class="control-button delete" (click)="onDeleteActionReply()">
+            <em class="material-icons">delete</em>
+        </div>
+        <div class="control-button" (click)="onMoveUpResponse()">
+            <em class="material-icons">expand_less</em>
+        </div> 
+        <div class="control-button" (click)="onMoveDownResponse()">
+            <em class="material-icons">expand_more</em>
+        </div>
+    </div>
+
+    <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+        <appdashboard-delay-slider
+            [delayTime]="delayTime"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-slider>
+    </div>
+    
+    <!-- ||  -->
+    <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
+        <span class="material-icons-outlined">filter_alt</span>
+        {{'CDSCanvas.Filter' | translate }}
+    </div>
+    <div class="filter-wrapper" *ngIf="canShowFilter"
+        [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
+        <appdashboard-filter
+            [expression]="response._tdJSONCondition"
+            [booleanOperators]="booleanOperators"
+            [previewMode]="previewMode"
+            (onChangeExpression)="onChangeExpression($event)">
+        </appdashboard-filter>
+    </div>
+</div>
+
+<div *ngIf="previewMode" class="previewMode text-editor-wrapper" >
+    
+    <div class="text-editor">
+        <div *ngIf="!response.metadata.src" class="response-frame-panel no-image">
+            <div class="image"><img src="assets/images/icons/add_audio.svg"></div>
+            <div class="text">{{'CDSCanvas.ClickToAddAudioURL' | translate}}</div>
+        </div>
+        <div *ngIf="response.metadata.src" class="response-frame-panel no-image">
+            <div class="image"><img src="assets/images/icons/audio.svg"></div>
+            <div class="response-wrp">{{response.metadata.name}}</div>
+        </div>
+    </div>
+
+</div>
+
+    
+<div class="text-editor-wrapper" *ngIf="!previewMode">
+    
+    <div class="text-editor">
+    
+        <div class="response-frame-wrapper">
+            <cds-audio-upload 
+                class="image-upload"
+                [metadata] = response.metadata
+                (onChangeMetadata)="onChangeMetadata($event)"
+                (onDeletedMetadata)="onDeletedMetadata($event)">
+            </cds-audio-upload>
+            
+        </div>
+        
+         <!-- <label class="control-label"> {{ 'CDSCanvas.AddAudioURL' | translate }}</label> -->
+        <cds-textarea 
+            class="text-editable-div"
+            [text]="response?.metadata?.src" 
+            [placeholder]="'Paste url Here'"
+            [minRow]="1" [maxRow]="2"
+            [emojiPikerBtn]="false"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event)">
+        </cds-textarea>
+
+        <label class="subtitle-label">{{'CDSCanvas.AudioFileAllowed' | translate}}</label>
+       
+            
+    </div>
+
+</div> 
+

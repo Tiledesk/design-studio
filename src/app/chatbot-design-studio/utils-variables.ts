@@ -56,14 +56,14 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
     },
     {   key: 'leadAttributes',
         elements: [
-            { name: 'user Email',                        value: 'userEmail',                         description: 'CDSvariablesList.leadAttributesElements.userEmail.description',                               src: '', icon:'person'},
-            { name: 'user Fullname',                     value: 'userFullname',                      description: 'CDSvariablesList.leadAttributesElements.userFullname.description',                            src: '', icon:'person'},
-            { name: 'user Phone',                        value: 'userPhone',                         description: 'CDSvariablesList.leadAttributesElements.userPhone.description',                               src: '', icon:'person'},
-            { name: 'user Lead Id',                       value: 'userLeadId',                        description: 'CDSvariablesList.leadAttributesElements.userLeadId.description',                              src: '', icon:'person'},
-            { name: 'user Company',                      value: 'userCompany',                       description: 'CDSvariablesList.leadAttributesElements.userCompany.description',                             src: '', icon:'person'},
-            { name: 'current Phone Number',               value: 'currentPhoneNumber',                description: 'CDSvariablesList.leadAttributesElements.currentPhoneNumber.description',                      src: '', icon:'person'},
-            { name: 'decoded Custom JWT',                 value: 'decodedCustomJWT',                  description: 'CDSvariablesList.leadAttributesElements.decodedCustomJWT.description',                        src: '', icon:'password'},
-            { name: 'strong Authenticated',              value: 'strongAuthenticated',               description: 'CDSvariablesList.leadAttributesElements.strongAuthenticated.description',                     src: '', icon:'password'}
+            { name: 'user Email',                           value: 'userEmail',                         description: 'CDSvariablesList.leadAttributesElements.userEmail.description',                               src: '', icon:'person'},
+            { name: 'user Fullname',                        value: 'userFullname',                      description: 'CDSvariablesList.leadAttributesElements.userFullname.description',                            src: '', icon:'person'},
+            { name: 'user Phone',                           value: 'userPhone',                         description: 'CDSvariablesList.leadAttributesElements.userPhone.description',                               src: '', icon:'person'},
+            { name: 'user Lead Id',                         value: 'userLeadId',                        description: 'CDSvariablesList.leadAttributesElements.userLeadId.description',                              src: '', icon:'person'},
+            { name: 'user Company',                         value: 'userCompany',                       description: 'CDSvariablesList.leadAttributesElements.userCompany.description',                             src: '', icon:'person'},
+            { name: 'current Phone Number',                 value: 'currentPhoneNumber',                description: 'CDSvariablesList.leadAttributesElements.currentPhoneNumber.description',                      src: '', icon:'person'},
+            { name: 'decoded Custom JWT',                   value: 'decodedCustomJWT',                  description: 'CDSvariablesList.leadAttributesElements.decodedCustomJWT.description',                        src: '', icon:'password'},
+            { name: 'strong Authenticated',                 value: 'strongAuthenticated',               description: 'CDSvariablesList.leadAttributesElements.strongAuthenticated.description',                     src: '', icon:'password'}
         ]
     }
 ]

@@ -1,3 +1,5 @@
+@import "./src/assets/sass/cds/settings-section.scss";
+
 .cds-bottom-nav div {
     float: left;
     padding: 15px;
@@ -29,107 +31,6 @@
 }
 .disabled-li {
     pointer-events: none;
-}
-
-.cds--custom-label {
-    color: var(--blu);
-    height: 30px;
-    padding-top: 7px;
-    padding-left: 16px;
-    padding-right: 16px;
-    // text-align: right !important;
-    label{
-        color: var(--blu);
-    }
-}
-
-@media (max-width: 768px) {
-
-    // .cds--custom-label {
-    //     height: 0px !important;
-    // }
-    .webhook-url-label {
-        text-align: left !important;
-        position: relative;
-        top: -17px;
-        margin-top: 16px;
-    }
-}
-
-.csd-chatbot-dtls-input {
-    // max-width: 400px;
-    // max-width: 50%;
-}
-
-input[type="text"] {
-    // min-width: 307px !important;
-    height: 36px;
-    font-size: 14px;
-    width: 100%;
-    margin-bottom: 10px;
-    appearance: none;
-    -webkit-appearance: none;
-    background: #fff;
-    border: 1px solid var(--blu-light-02);
-    padding: 0 8px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    border-radius: var(--input-border-radius-base);
-}
-
-textarea[type="text"] {
-    // min-width: 307px !important;
-    // height: 36px;
-    font-size: 14px;
-    width: 100%;
-    margin-bottom: 10px;
-    appearance: none;
-    -webkit-appearance: none;
-    background: #fff;
-    border: 1px solid var(--blu-light-02);
-    padding-right: 8px;
-    padding-top: 5px;
-    padding-left: 8px;
-
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    border-radius: var(--input-border-radius-base);
-}
-
-input[type="text"]:disabled {
-    background-color: #f9f9f9 !important;
-    // cursor: not-allowed;
-}
-
-textarea[type="text"]:disabled {
-    background-color: #f9f9f9 !important;
-    // cursor: not-allowed;
-}
-
-input[type="text"]:disabled::placeholder {
-    color: #f9f9f9;
-    // font-size: 1.2em;
-    // font-style: italic;
-}
-
-::placeholder {
-    /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color: #a0a0a0 !important;
-    font-weight: 300 !important;
-    opacity: 1;
-    /* Firefox */
-}
-
-:-ms-input-placeholder {
-    /* Internet Explorer 10-11 */
-    color: #a0a0a0 !important;
-    font-weight: 300 !important;
-}
-
-::-ms-input-placeholder {
-    /* Microsoft Edge */
-    color: #a0a0a0 !important;
-    font-weight: 300 !important;
 }
 
 .flex-div{
@@ -255,8 +156,6 @@ ng-select {
 .bot-description-note {
     display: block;
     font-size: 10px;
-    font-weight: 400;
-    color: #5c5f66;
 }
 
 .cds-mandatory {

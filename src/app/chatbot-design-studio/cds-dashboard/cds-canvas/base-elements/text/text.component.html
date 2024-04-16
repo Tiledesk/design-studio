@@ -3,13 +3,13 @@
         
         <mat-form-field class="box-input" appearance="fill">
             <div class="input-prefix" *ngIf="customPrefix"> / </div>
+            <!-- [disabled]="disabled" -->
             <input matInput
                 #input_text
                 [class.customPrefix]="customPrefix"
                 [formControl]="control"
                 [matAutocomplete]="auto"
                 [placeholder]="placeholder"
-                [disabled]="disabled"
                 [type]="inputType"
                 cdkTextareaAutosize
                 cdkAutosizeMinRows="1"

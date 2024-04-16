@@ -99,7 +99,8 @@ export enum TYPE_MESSAGE {
     IMAGE       = 'image',
     FRAME       = 'frame',
     GALLERY     = 'gallery',
-    REDIRECT    = 'redirect'
+    REDIRECT    = 'redirect',
+    AUDIO       = 'audio'
 }
 
 export enum TYPE_ACTION {
@@ -136,14 +137,16 @@ export enum TYPE_ACTION {
     HUBSPOT             = 'hubspot',
     CUSTOMERIO          = 'customerio',
     BREVO               = 'brevo',
+    N8N                 = 'n8n',
     CODE                = 'code',
 }
 
 export enum TYPE_ACTION_VXML {
     DTMF_FORM           = 'dtmf_form',
     DTMF_MENU           = 'dtmf_menu',
-    BLIND_TRANSFER      = 'blind_transfer'
-
+    BLIND_TRANSFER      = 'blind_transfer',
+    PLAY_PROMPT         = 'play_prompt',
+    SPEECH_FORM         = 'speech_form',
 }
 
 export enum TYPE_ACTION_CATEGORY {
@@ -314,11 +317,16 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     MAKE :                  { name: 'CDSActionList.NAME.Make',                  category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.MAKE,                 src:"assets/images/actions/make.svg",                   status: "active", plan: PLAN_NAME.D,    description: '',                                            disabled: false },
     HUPSPOT :               { name: 'CDSActionList.NAME.Hubspot',               category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.HUBSPOT,              src:"assets/images/actions/hubspot.svg",                status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
     CUSTOMERIO :            { name: 'CDSActionList.NAME.Customerio',            category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.CUSTOMERIO,           src:"assets/images/actions/customerio.svg",             status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
-    BREVO :                 { name: 'CDSActionList.NAME.Brevo',                 category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.BREVO,                src:"assets/images/actions/brevo.svg",                  status: "inactive", plan: PLAN_NAME.E,    description: ''                                                             },
+    BREVO :                 { name: 'CDSActionList.NAME.Brevo',                 category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.BREVO,                src:"assets/images/actions/brevo.svg",                  status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
+    N8N :                   { name: 'CDSActionList.NAME.N8n',                   category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.N8N,                  src:"assets/images/actions/n8n.svg",                    status: "inactive", plan: PLAN_NAME.E,    description: ''                                                             },
+
 
     DFTM_FORM:              { name: 'CDSActionList.NAME.DTMFForm',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
     DTMF_MENU:              { name: 'CDSActionList.NAME.DTMFMenu',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
     BLIND_TRANSFER:         { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
+    PLAY_PROMPT:            { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
+    SPEECH_FORM:            { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
+
 }
 
 export const EVENTS_LIST = {
@@ -558,10 +566,27 @@ export function deleteItemInArrayForKey(key, array, item) {
 }
 
 
-
 export function checkInternalIntent(intent: Intent): boolean{
     return intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START ||  intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK ? true: false
 }
+
+export function findFreeId (array, key) {
+    const sortedArray = array
+      .map((item) => +item[key]) // tranform string to number
+      .filter((value)=> !Number.isNaN(value)) //removes Null
+      .slice() // Make a copy of the array.
+      .sort(function (a, b) { return a - b }); // Sort it.
+    let previousId = -1;
+    for (let element of sortedArray) {
+      if (element != (previousId + 1)) {
+        // Found a gap.
+        return previousId + 1;
+      }
+      previousId = element;
+    }
+    // Found no gaps.
+    return previousId + 1;
+  }
 
 export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     let arrayCoord = [];

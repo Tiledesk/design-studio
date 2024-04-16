@@ -9,7 +9,6 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
 import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/change-bot-lang.component';
 import { CdsCanvasComponent } from './cds-canvas.component';
-import { ChatbotDesignStudioModule } from '../../chatbot-design-studio.module';
 import { CdsPanelIntentListComponent } from './cds-panel-intent-list/cds-panel-intent-list.component';
 import { CdsPanelWidgetComponent } from './cds-panel-widget/cds-panel-widget.component';
 import { ContextMenuComponent } from './base-elements/context-menu/context-menu.component';

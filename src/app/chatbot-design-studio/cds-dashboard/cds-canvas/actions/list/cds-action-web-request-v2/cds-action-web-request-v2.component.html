@@ -132,11 +132,12 @@
        
         <div class="cds-web-request-row-setting">
             <div class="setting-left">
-                <label class="title-label">{{'CDSCanvas.RequestTimeout' | translate}}</label>
+                <label class="title-label">{{'CDSCanvas.RequestTimeout' | translate}} (ms)</label>
                 <label class="subtitle-label">{{'CDSCanvas.RequestTimeoutInfo' | translate }}</label>
             </div>
             <div class="setting-right">
                 <cds-textarea id="timeout"
+                    [ngClass]="{'jsonError': valueIsInvalid}"
                     class = "text-editable-div"
                     [text]="jsonSettings?.timeout"
                     [textLimitBtn]="false"

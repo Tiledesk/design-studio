@@ -1,0 +1,80 @@
+
+
+<!-- <div class="toogle-wrp">
+    <mat-button-toggle-group [(ngModel)]="optionSelected">
+        <mat-button-toggle value="upload">Upload</mat-button-toggle>
+        <mat-button-toggle value="link">Link</mat-button-toggle>
+    </mat-button-toggle-group>
+</div> -->
+
+<div *ngIf="!metadata.src && optionSelected === 'upload'" class="wrapper">
+
+    <!-- 'UPLOAD use case'  -->
+    <div *ngIf="optionSelected === 'upload'"
+        class="dropUploadAudio"
+        [ngClass]="{'is-in-drop-event': isHovering === true}"
+        (drop)="drop($event)"
+        (dragover)="allowDrop($event)" 
+        (dragleave)="drag($event)">    
+
+        <div *ngIf="!isFilePendingToUpload">
+            <label class="inputUploadAudio" [for]="'uploadAudio_'+ uuid">
+                <div class="image"><img class="base-icon-color" src="assets/images/icons/add_audio.svg"></div>
+                <input #audioInput style="display:none" type="file" [id]="'uploadAudio_'+ uuid" accept=".wav" (change)="detectFiles($event)" />
+            </label>
+        
+            <div class="labelDropUploadImage">
+                <span *ngIf="isHovering === false">
+                    {{'CDSCanvas.DragAudioOrClick' | translate}}
+                </span>
+                <span *ngIf="isHovering === true">
+                    {{'CDSCanvas.AudioDragging' | translate}}
+                </span>
+            </div>
+        </div>
+
+        <!-- -->
+        <loading-spinner  *ngIf="isFilePendingToUpload"
+            class="custom-spinner">
+        </loading-spinner>
+                
+        
+    </div>
+
+</div>
+
+<div *ngIf="optionSelected === 'link'" class="wrapper">
+    
+    <!-- 'LINK use case'  -->
+    <div *ngIf="optionSelected === 'link'" class="dropUploadAudio link">  
+        
+        <div *ngIf="!isFilePendingToUpload" class="field-box">
+            <cds-textarea 
+                class = "text-editable-div"
+                [text]="metadata.src"
+                [textLimitBtn]="false"
+                [emojiPikerBtn]="false"
+                [setAttributeBtn]="true"
+                [minRow]="1" [maxRow]="2"
+                [placeholder]="'Enter URL or {{variable}}'"
+                (blur)="onBlur($event)"
+                (changeTextarea)="onChangeTextarea($event)">
+            </cds-textarea>
+        </div>
+
+         <!-- -->
+         <loading-spinner  *ngIf="isFilePendingToUpload"
+            class="custom-spinner">
+        </loading-spinner>
+
+    </div>
+</div>
+
+
+<div *ngIf="metadata.src && optionSelected==='upload'" class="audio-wrp">
+    <div class="image"><img src="assets/images/icons/audio.svg"></div>
+    <div class="response-wrp">{{metadata.name}}</div>
+    <div class="control-button delete" (click)="onDeletePathElement($event)">
+        <em class="material-icons">clear</em>
+    </div>
+</div>

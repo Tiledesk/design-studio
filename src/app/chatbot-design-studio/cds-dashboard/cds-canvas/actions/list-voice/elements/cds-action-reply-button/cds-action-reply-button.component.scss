@@ -1,0 +1,167 @@
+:host{
+    --backgroundColor: var(--color-white-hex);
+    --textColor: #{var(--blu)};
+    --hoverBackgroundColor: #{var(--blu)};
+    --hoverTextColor: var(--color-white-hex);
+    --buttonFontSize: 0.7em;
+    --max-width: #{var(--button-max-width-base)};
+    --min-width-button-option-preview: 50px;
+    --max-width-button-option-preview: 70px;
+    --button-option-border-radius: 8px;
+}
+.previewMode{
+
+    .content-botton-reply {
+        height: unset;
+    }
+
+    .button-reply{
+        min-width: var(--min-width-button-option-preview);
+        max-width: var(--max-width-button-option-preview);
+        padding: 2px 10px;
+    }
+}
+
+.button-reply {
+    // float: right;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    min-width: 100px;
+    text-align: center;
+    // margin: 0px 5px 0px; //10px 5px 0;
+    padding: 0px 10px;
+    user-select: none;
+    box-sizing: border-box;
+    outline: none;
+    background: var(--backgroundColor);
+    border: 1px solid var(--textColor);
+    border-radius: var(--button-option-border-radius);
+    color: var(--textColor);
+    cursor: pointer;
+    font-size: 0.7em;
+    font-weight: 500;
+    line-height: var(--button-height-base);
+    transition: all .3s;
+
+    .icon-button-action {
+        position: absolute;
+        top: -1px;
+        right: 5px;
+        svg {
+            fill: var(--textColor);
+        }
+    }
+    .icon-button-action-self{
+        position: absolute;
+        right: 1px;
+        svg {
+            fill: var(--textColor);
+        }
+    }
+    &:focus,
+    &:hover {
+        color: var(--hoverTextColor);
+        background:  var(--hoverBackgroundColor);
+        .icon-button-action, .icon-button-action-self {
+            svg {
+                fill: var(--hoverTextColor);
+            }
+        }
+    }
+}
+
+.button-reply-wrp{
+    position: relative;
+}
+.button-reply-wrp:hover {
+    // transform: scale(1.05);
+    .button-controls {
+        opacity: 1;
+    }
+}
+
+.button-reply-text {
+    width: 100%;
+    height: 100%;
+    max-width: var(--max-width);
+    user-select: none;
+    color: var(--textColor);
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    line-height: var(--button-height-base);
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    overflow: hidden!important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.button-in-msg{
+    display: flex;
+    width: 100%;
+    position: relative;
+    justify-content: center;
+}
+
+.button-controls {
+    justify-content: space-between;
+    display: inline-flex;
+    position: absolute;
+    left: 5%;
+    top: -40%;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    .buttonsToMove{
+        display: inline-flex;
+    }
+    .control-button {
+        cursor: pointer;
+        background: var(--blu-light-02);
+        color: var(--blu);
+        transition: color .3s;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        em {
+            font-size: 1.15em;
+            color: var(--blu);
+            transition: color .3s;
+        }
+    }
+    .control-button:hover{
+        color: var(--backgroundColor);
+        box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
+        em {
+            opacity: 0.8;
+        }
+        &.delete{
+            em {
+                color: var(--color-red-hex);
+            }
+        }
+    }
+}
+
+input{
+    font: inherit;
+    background: rgba(0, 0, 0, 0);
+    color: currentColor;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    vertical-align: bottom;
+    text-align: inherit;
+    box-sizing: content-box;
+    caret-color: inherit;
+}

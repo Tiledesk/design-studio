@@ -139,8 +139,8 @@ import { AddkbDialogComponent } from './cds-dashboard/cds-canvas/actions/list/cd
 import { AttributesDialogComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
 
 //ACTION DTMF_FORM: elements
-import { CdsActionReplyToolsVoiceComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/elements/cds-action-reply-tools-voice/cds-action-reply-tools-voice.component';
-import { CdsActionReplySettingsComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/elements/cds-action-reply-settings/cds-action-reply-settings.component';
+import { CdsActionReplyToolsVoiceComponent } from './cds-dashboard/cds-canvas/actions/list-voice/elements/cds-action-reply-tools-voice/cds-action-reply-tools-voice.component';
+import { CdsActionReplySettingsComponent } from './cds-dashboard/cds-canvas/actions/list-voice/elements/cds-action-reply-settings/cds-action-reply-settings.component';
 
 //CDS- ACTIONS
 import { CdsActionDescriptionComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-description/cds-action-description.component';
@@ -175,9 +175,9 @@ import { CdsActionCodeComponent } from './cds-dashboard/cds-canvas/actions/list/
 import { CdsActionAskgptV2Component } from './cds-dashboard/cds-canvas/actions/list/cds-action-askgpt-v2/cds-action-askgpt-v2.component';
 import { CdsActionCustomerioComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-customerio/cds-action-customerio.component';
 import { CdsActionBrevoComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-brevo/cds-action-brevo.component';
+import { CdsActionN8nComponent } from './cds-dashboard/cds-canvas/actions/list/cds-action-n8n/cds-action-n8n.component';
 
-//CDS- ACTIONS VOICE
-import { CdsActionVoiceComponent } from './cds-dashboard/cds-canvas/actions/list-voice/cds-action-dtmf-form/cds-action-voice.component';
+
 
 //CDS PANELS
 import { CdsActionDetailPanelComponent } from './cds-dashboard/cds-canvas/cds-panel-action-detail/cds-panel-action-detail.component';

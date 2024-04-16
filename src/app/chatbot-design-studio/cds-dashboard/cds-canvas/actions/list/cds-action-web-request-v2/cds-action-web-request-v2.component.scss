@@ -125,10 +125,10 @@
     .setting-left{
         display: flex;
         flex-direction: column;
-        width: 80%;
+        width: 70%;
     }
     .setting-right{
-        width: 20%;
+        width: 30%;
     }
 
 }
@@ -192,7 +192,8 @@ cds-textarea#url ::ng-deep {
     }
 }
 
-cds-textarea#body.jsonError ::ng-deep {
+cds-textarea#body.jsonError ::ng-deep,
+cds-textarea#timeout.jsonError ::ng-deep {
     textarea {
         border: 1px solid red !important;
     }

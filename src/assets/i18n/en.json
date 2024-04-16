@@ -241,6 +241,9 @@
         "ImageDragging":"image dragging",
         "AddPath":"Add path",
         "LoadFrame":"load frame",
+        "AddAudioURL":"Add audio File",
+        "DragAudioOrClick":"drag audio file here or click to select them",
+        "AudioDragging":"audio dragging",
         "Value":"Value",
         "Attributes":"Attributes",
         "Key":"Key",
@@ -288,6 +291,7 @@
         "KnowledgeBaseID":"Knowledge Base ID",
         "ManageKnowledgeBases":"Manage Knowledge Bases",
         "ManageIntegration":"Manage integration",
+        "Howitwork":"How it works",
         "GPTReply":"GPT Reply",
         "GPTSource":"GPT Source",
         "ApplyAFunctionToValue":"Apply a function to the value",
@@ -347,7 +351,9 @@
         "ClickAddCondition":"Click to add a condition",
         "EnterRequestURL":"Enter request URL",
         "MakeWebhookUrl":"Make webhook url",
+        "N8nWebhookUrl":"N8N webhook url",
         "EnterMakeWebhookURL":"Enter Make Webhook URL",
+        "EnterN8nWebhookURL":"Enter N8N Webhook URL",
         "EnterTrackingNumber":"Enter the tracking number",
         "TrackingNumber":"Tracking Number",
         "TrackingNumberToSearch":"Tracking number to search",
@@ -383,7 +389,10 @@
         "ClickToAddImage":"Click to add image",
         "ClickToAddUrl":"Click to add url ...",
         "ClickToAddText":"Click to add text ...",
+        "ClickToAddAudioURL":"Click to add audio file ...",
         "AddButton":"Add button",
+        "AddOption":"Add option",
+        "SelectOption":"Select an option",
         "AddCard":"Add card",
         "TypeTitle":"Type Title",
         "TypeDescription":"Type Description",
@@ -404,8 +413,16 @@
         "BargeIn":"Barge-in",
         "NoMatch":"No match",
         "NoInput":"No input",
+        "IncompleteSpeechTimeout":"Incomplete Speech Timeout",
         "RequestTimeout":"Request timeout",
-        "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. To never time out, set to 0."
+        "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. Admitted values range: 1-300k ms",
+        "AudioFileAllowed":"You can only upload *.wav audio format with mono, 8 KHz, with PCM 8bit, PCM 16bit, Alaw or uLaw coding"
+    },
+    "Alert": {
+        "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
+        "ErrorSingleDigit":"Invalid option. Allowed options are 0..9 single digit, *, #",
+        "ErrorAllowedOption":"Invalid option. Allowed options are 0..9 single digit, *, #",
+        "ErrorDuplicateDigit":"Invalid option. Provided option already exist. Please check and try again"
     },
     "Name":"Name",
     "Label": "Label",
@@ -420,6 +437,7 @@
     "Frame": "Frame",
     "Gallery": "Gallery",
     "Redirect": "Redirect",
+    "AudioUrl":"Audio File Url",
     "Message":"Message",
     "Every":"Every",
     "CDSForm":{
@@ -541,9 +559,12 @@
             "Hubspot":"Hubspot",
             "Customerio":"Customer.io",
             "Brevo":"Brevo",
+            "N8n":"n8n",
             "DTMFForm":"DTMF Form",
             "DTMFMenu":"DTMF Menu",
-            "BlindTransfer": "Transfer"
+            "BlindTransfer": "Blind Transfer",
+            "PlayPrompt":"Play prompt",
+            "SpeechForm":"Speech Form"
         },
         "DESCRIPTION":{
             "Reply":"<b>Pro tip</b>: Turn this block into a programmed proactive message.",
@@ -576,9 +597,12 @@
             "Hubspot":"",
             "Customerio":"",
             "Brevo":"",
+            "N8n":"",
             "DTMFForm":"",
             "DTMFMenu":"",
-            "BlindTransfer": ""
+            "BlindTransfer": "",
+            "PlayPrompt":"",
+            "SpeechForm":""
         },
         "DOCS": {
             "Reply":"<a href=https://www.youtube.com/embed/p0ux-86Y4_I target=_blank>Here is how!</a> ",
@@ -612,7 +636,9 @@
             "Customerio":"",
             "DTMFForm":"",
             "DTMFMenu":"",
-            "BlindTransfer": ""
+            "BlindTransfer": "",
+            "PlayPrompt":"",
+            "SpeechForm":""
         }
     },
     "CDSvariablesList": {

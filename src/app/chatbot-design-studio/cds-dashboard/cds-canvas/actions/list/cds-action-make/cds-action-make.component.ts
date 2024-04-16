@@ -246,4 +246,9 @@ export class CdsActionMakeComponent implements OnInit {
     this.action[type] = null;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
+
+  goToHelp(){
+    let url = "https://gethelp.tiledesk.com/articles/makecom-action/"
+    window.open(url, '_blank')
+  }
 }

@@ -1,5 +1,6 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { ACTIONS_LIST, TYPE_OF_MENU } from '../../../../../utils';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'cds-add-action-menu',
@@ -9,7 +10,10 @@ import { ACTIONS_LIST, TYPE_OF_MENU } from '../../../../../utils';
 
 export class CdsAddActionMenuComponent implements OnInit, OnChanges {
 
+  @ViewChild('search', { static: false }) searchElement: ElementRef<HTMLInputElement>;
+  
   @Input() menuType: string;
+  @Input() isActive: boolean;
   // @Input() tdsContainerEleHeight: any;
   @Output() addActionFromActionMenu = new EventEmitter();
   // ACTIONS_LIST = ACTIONS_LIST
@@ -18,7 +22,7 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
   contentHeight : any;
   actionToSearch: string;
   // @Output() clickedOutOfAddActionMenu= new EventEmitter();
-  constructor() { }
+  constructor(public translate: TranslateService) { }
 
   ngOnInit(): void {
     switch (this.menuType) {
@@ -64,12 +68,20 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
         type: key,
         value: ACTIONS_LIST[key]
       };
-    }).filter(el => el.value.status !== 'inactive');;
+    }).filter(el => el.value.status !== 'inactive')
 
     if(this.menuItemsList){
-      this.filterMenuItemsList = this.menuItemsList;
+      this.filterMenuItemsList = this.menuItemsList.sort((el1, el2)=> this.translate.instant(el1.value.name).localeCompare(this.translate.instant(el2.value.name)));
+    }
+
+    //set autofocus on search input element (only when component is active)
+    if(this.isActive){
+      setTimeout(()=>{ // this will make the execution after the above boolean has changed
+        this.searchElement.nativeElement.focus();
+      },500); 
     }
   }
+
 
   // @HostListener('document:click', ['$event'])
   // documentClick(event: any): void {

@@ -17,7 +17,7 @@
     <!-- ------------------------------------------------------------------------------------------- -->
     <div class="row" style="margin-bottom: 16px;">
         <!-- style="padding-top: 0px; line-height: 1.2;" -->
-        <label class="col-sm-2 cds-custom-label">
+        <label class="col-sm-2 cds--custom-label">
             {{ 'Language' | translate }}
         </label>
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
@@ -27,7 +27,6 @@
               name="bot-default-selected-lang" 
               [(ngModel)]="botDefaultSelectedLang"
               type="text" 
-              style="color:#808080" 
               disabled>
             <button id="csd-update-bot-btn" class="btn btn-primary pull-left cds-blue-button" (click)="updateBotLanguage()">
                 {{ 'Change' | translate }}
@@ -35,108 +34,4 @@
           </div>
         </div>
     </div>
-
-    <!-- SPACER -->
-    <!-- <div class="col-sm-12" style="height:10px"></div> -->
-
-    <!-- ------------------------------------------------------------------------------------------- -->
-    <!-- Description  -->
-    <!-- ------------------------------------------------------------------------------------------- -->
-    <!-- <div class="row">
-      <label class="col-sm-2 cds-custom-label">
-        Description
-      </label>
-      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-        <textarea id="bot_description" name="bot_description" [(ngModel)]="faqKb_description" rows="4"
-          style="resize: vertical;" class="input csd-chatbot-dtls-input" type="text"
-          placeholder="{{ 'Description' | translate }}">
-          </textarea>
-      </div>
-    </div> -->
-
-
-    <!-- ------------------------------------------------------------------------------------------- -->
-    <!-- Update button  -->
-    <!-- ------------------------------------------------------------------------------------------- -->
-    <!-- <div class="row" style="margin-bottom: 16px;">
-      <label class="col-sm-2 cds-custom-label">
-      </label>
-      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-        <button #editbotbtn class="btn btn-primary pull-left cds-blue-button"
-          (click)="editBot()" [disabled]="selectedChatbot?.name?.length === 0">
-          {{ 'BotsAddEditPage.UpdateBotName' | translate }}
-        </button>
-      </div>
-    </div> -->
-
-    <!-- ---------------------------------------------------------- -->
-    <!-- Department to which the bot is associated -->
-    <!-- ---------------------------------------------------------- -->
-    <!-- <div *ngIf="isVisibleDEP === true" class="row" style="margin-bottom: 4px;">
-      <div class="col-sm-10 col-md-10">
-        <h3 class="card_title__underlined">
-          <span class="card_title__underline">
-            {{ 'Departments' | translate }}
-          </span>
-        </h3>
-      </div>
-      <div class="col-sm-10 col-md-10">
-        <div class="section-subtitle"> </div>
-      </div>
-
-      <!- - USE CASE: THE BOT IS ASSOCIATED - ->
-      <div *ngIf="DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY.length > 0" class="col-sm-10 col-md-10">
-        <span>{{ 'DepartmentsThisBotIsAssociatedWith' | translate }}</span>
-        <div *ngFor="let dept of DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY" style="margin-bottom: 8px;">
-          <span class="dept-avatar-wrapper" (click)="goToEditAddPage_EDIT_DEPT(dept?._id, dept?.default)">
-
-            <span class="dept-avatar-in-bot-dtl" [ngStyle]="{'background-color': dept?.dept_name_fillcolour }">
-              {{ dept?.dept_name_initial }}
-            </span>
-            <span class="dept-name-in-bot-dtl">
-              {{ dept?.name }}
-            </span>
-          </span>
-        </div>
-      </div>
-
-      <!- - USE CASE: THIS BOT IS NOT ASSOCIATED BUT ALL DEPARTMENTS ALREADY HAVE A BOT - ->
-      <div *ngIf="DEPTS_HAVE_BOT_BUT_NOT_THIS === true && depts_without_bot_array?.length === 0" class="col-sm-10 col-md-10">
-        <span>{{ 'NoDeptsAreAssociatedWithThisBot' | translate}}</span>
-      </div>
-
-      <!- - USE CASE: THIS BOT IS NOT ASSOCIATED AND SOME DEPARTMENTS DON'T HAVE A BOT - ->
-      <div *ngIf="depts_without_bot_array?.length > 0 && DEPTS_BOT_IS_ASSOCIATED_WITH_ARRAY?.length === 0" class="col-sm-10 col-md-10">
-        <span>{{ 'NoDeptsAreAssociatedWithThisBot' | translate}}</span>
-
-        <div class="input-group" style="margin-top: 6px;" *ngIf="depts_without_bot_array?.length > 0">
-          <ng-select id="depSelect"
-            [items]="depts_without_bot_array" 
-            bindValue="id" 
-            bindLabel="name"
-            placeholder="{{'SelectDepartment'|translate}}" 
-            [(ngModel)]="selected_dept_id" 
-            (change)="onSelectDept()">
-          </ng-select>
-
-            <button id="activate-bot" class="btn btn-primary cds-blue-button" (click)="hookBotToDept()"
-              [disabled]="!selected_dept_id">
-              <span>{{ 'CDSModalActivateBot.ActivateBot' | translate}}</span>
-            </button>
-        </div>
-      </div>
-
-    </div>
-    <div class="row">
-
-      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-        <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
-          {{'ManageTheBotIn' | translate}}
-          <span class="custom-link" (click)="goToRoutingAndDepts()">
-            {{'RoutingAndDepts' | translate}}
-          </span>
-        </span>
-      </div>
-    </div>
-  </div>  -->
-  <!-- ./ bot details -->
+</div>

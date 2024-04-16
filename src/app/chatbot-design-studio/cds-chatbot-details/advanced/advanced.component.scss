@@ -1,73 +1,5 @@
-input[type="text"] {
-    // min-width: 307px !important;
-    height: 36px;
-    font-size: 14px;
-    width: 100%;
-    // margin-bottom: 10px;
-    appearance: none;
-    -webkit-appearance: none;
-    /* border-radius: 2px; */
-    padding: 0 8px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    border-radius: var(--input-border-radius-base);
-    background-color: var(--color-white-hex);
-    border: solid 1px var(--blu-light-02);
-}
-textarea[type="text"] {
-    // min-width: 307px !important;
-    // height: 36px;
-    font-size: 14px;
-    width: 100%;
-    // margin-bottom: 10px;
-    appearance: none;
-    -webkit-appearance: none;
-    /* border-radius: 2px; */
-    padding-right: 8px;
-    padding-top: 5px;
-    padding-left: 8px;
+@import "./src/assets/sass/cds/settings-section.scss";
 
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    border-radius: var(--input-border-radius-base);
-    background-color: var(--color-white-hex);
-    border: solid 1px var(--blu-light-02);
-}
-
-input[type="text"]:disabled {
-    background-color: #f9f9f9 !important;
-    // cursor: not-allowed;
-}
-
-textarea[type="text"]:disabled {
-    background-color: #f9f9f9 !important;
-    // cursor: not-allowed;
-}
-
-input[type="text"]:disabled::placeholder {
-    color: #f9f9f9;
-    // font-size: 1.2em;
-    // font-style: italic;
-}
-
-::placeholder {
-    /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color: #a0a0a0 !important;
-    font-weight: 300 !important;
-    opacity: 1; /* Firefox */
-}
-
-:-ms-input-placeholder {
-    /* Internet Explorer 10-11 */
-    color: #a0a0a0 !important;
-    font-weight: 300 !important;
-}
-
-::-ms-input-placeholder {
-    /* Microsoft Edge */
-    color: #a0a0a0 !important;
-    font-weight: 300 !important;
-}
 
 ng-select {
     font-size: var(--font-size-base);
@@ -99,68 +31,10 @@ ng-select {
     border: 1px solid var(--blu-light-02);
 }
 
-.cds-bot_avatar_label {
-    height: 36px;
-    padding-top: 20px;
-    padding-left: 16px;
-    padding-right: 16px;
-    text-align: right;
-    margin-top: 12px;
-    color: #9aa0a6;
-}
-
-.bot-avatar{
-    width: 80px; 
-    height: 80px;
-    margin-right: 20px;
-}
-
-.bot-profile-img {
-    vertical-align: middle;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 1px solid #eee;
-    margin-right: 15px;
-    object-fit: cover;
-}
-
 .csd-chatbot-dtls-input {
     max-width: 400px;
 }
 
-input[type="file"] {
-    display: none;
-}
-
-.custom-file-upload {
-    border: 1px solid var(--blu);
-    display: inline-block;
-    padding: 11px 12px;
-    cursor: pointer;
-    background: var(--blu) !important;
-    color: var(--color-white-hex);
-    border-radius: var(--button-border-radius-base);
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    font-weight: 500;
-    // margin-top: 14px;
-    // width: 145px;
-}
-
-#cds-delete-bot-img-btn {
-    color: var(--color-white-hex);
-    background: var(--color-red-hex) !important;
-    height: 44px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-#activate-bot {
-    border: 0;
-    border-top-right-radius: var(--input-border-radius-base);
-    border-bottom-right-radius: var(--input-border-radius-base);
-}
 
 #csd-update-bot-btn {
     border: 0px;
@@ -168,12 +42,7 @@ input[type="file"] {
     border-bottom-right-radius: var(--input-border-radius-base);
 }
 
-.cds-custom-label {
-    color: #9aa0a6;
-    height: 36px;
-    padding-top: 7px;
-    padding-left: 16px;
-    padding-right: 16px;
+.cds--custom-label {
     text-align: right !important;
 }
 
@@ -204,46 +73,10 @@ input[type="file"] {
     outline: none;
 }
 
-.dept-avatar-wrapper {
-    cursor: pointer;
-}
-.dept-avatar-in-bot-dtl {
-    border-radius: 5px;
-    font-size: 18px;
-    font-weight: 400;
-    text-align: center;
-    padding-top: 5px;
-    padding-bottom: 3px;
-    display: inline-block;
-    // width: 32px;
-    width: fit-content;
-    min-width: 32px;
-    height: 32px;
-    line-height: 22px;
-    position: relative;
-    top: 4px;
-    color: var(--color-white-hex);
-    cursor: pointer;
-    margin-right: 4px;
-    padding-left: 3px;
-    padding-right: 3px;
-}
-
-.dept-name-in-bot-dtl {
-    position: relative;
-    top: 2px;
-    font-weight: 500;
-}
 
 .chatbot-details-wpr,
 .row {
     margin-right: 0px;
     margin-left: 8px;
-}
-
-
-
-.custom-link {
-    color: #0f62ff;
-    cursor: pointer;
+    align-items: center;
 }

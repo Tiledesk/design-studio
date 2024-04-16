@@ -1,0 +1,34 @@
+<div class="button-reply-wrp" [class.previewMode]="previewMode" >
+    <div class="button-reply" [class.ellips]="!previewMode"> 
+  
+        <span *ngIf="button?.target !== 'self' && button.type === TYPE_BUTTON.URL" class="icon-button-action">
+            <svg style="transform: rotateZ(45deg);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px">
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+            </svg>
+        </span>
+    
+        <span *ngIf="button?.target === 'self' && button.type === TYPE_BUTTON.URL" class="icon-button-action-self">
+            <svg style="transform: rotateZ(90deg);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px">
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+            </svg>
+        </span>
+        {{button?.value}} 
+        <div class="clear"></div>
+    </div> 
+
+    <div class="button-controls">
+        <!-- <div class="buttonsToMove">
+            <div class="control-button" (click)="onMoveLeftButton()">
+                <em class="material-icons">chevron_left</em>
+            </div> 
+            <div class="control-button" (click)="onMoveRightButton()">
+                <em class="material-icons">chevron_right</em>
+            </div>
+        </div> -->
+        <div class="control-button delete" (click)="$event.stopPropagation(); onDeleteButton()">
+            <em class="material-icons">delete</em>
+        </div>
+    </div>
+</div>

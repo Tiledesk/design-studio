@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, SimpleChange } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -36,6 +36,15 @@ export class CDSTextComponent implements OnInit {
       startWith(''),
       map(value => this._filter(value || ''))
     );
+  }
+
+
+  ngOnChanges(changes: SimpleChange) {
+    if(this.disabled){
+      this.control.disable();
+    }else if(!this.disabled){
+      this.control.enable();
+    }
   }
 
   onChangeText(event){

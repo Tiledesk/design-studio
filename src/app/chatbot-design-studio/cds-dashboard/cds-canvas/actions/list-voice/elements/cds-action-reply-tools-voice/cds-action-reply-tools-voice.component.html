@@ -1,0 +1,13 @@
+<div data-adding-allowed="true" class="add-responses">
+    <div class="add-response" (click)="addElement(TypeMessage.TEXT)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'Text' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <img class="active-icon" src="assets/images/action-reply-types/text.svg"/>
+        <!-- <span>{{'Text' | translate}}</span> -->
+    </div>
+    <div class="add-response" (click)="addElement(TypeMessage.AUDIO)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'AudioUrl' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <!-- <i class="material-icons">play_circle</i> -->
+        <img class="active-icon" src="assets/images/action-reply-types/file.svg"/>
+        <!-- <span>{{'Frame' | translate}}</span> -->
+    </div>
+</div>

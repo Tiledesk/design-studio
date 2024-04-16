@@ -25,7 +25,7 @@ export class CdsActionReplyComponent implements OnInit {
   @Input() intentSelected: Intent;
   @Input() previewMode: boolean = true
   @Output() updateAndSaveAction = new EventEmitter();
-  
+  @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   // idIntentSelected: string;
   idAction: string;
@@ -53,7 +53,6 @@ export class CdsActionReplyComponent implements OnInit {
   tipText: string;
   titlePlaceholder: string;
 
-  settings: Setting
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -284,6 +283,13 @@ export class CdsActionReplyComponent implements OnInit {
     const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
     this.logger.log('onChangeActionReply ************', element);
     this.onUpdateAndSaveAction(element);
+  }
+
+  /** onConnectorChangeReply */
+  onConnectorChangeReply(event){
+    this.logger.log('onConnectorChangeReply ************', event, this.action);
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    this.onConnectorChange.emit(event)
   }
   
 

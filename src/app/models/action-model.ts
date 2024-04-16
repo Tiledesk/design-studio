@@ -98,8 +98,7 @@ export class ActionHideMessage extends Action {
 export class ActionReply extends Action {
     text?: string;
     attributes: Attributes;
-    noInput?: string;
-    noMatch?: string;
+    settings: Setting
     constructor(text?: string, attributes?: Attributes) {
         super();
         // this.text = text ? text : '...';
@@ -160,8 +159,8 @@ export class ActionWebRequestV2 extends Action {
     constructor(){
         super();
         this.url = '';
-        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent": BRAND_BASE_INFO['BRAND_NAME']+" BotRuntime", "Accept":"*/*"};
-        this.settings = { "timeout": 30 }
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":"TiledeskBotRuntime", "Accept":"*/*"};
+        this.settings = { timeout: 20000 }
         this.jsonBody = null
         this.bodyType = 'none'
         this.assignStatusTo = '';
@@ -414,10 +413,13 @@ export class Setting {
     maxDigits?: number;
     terminators?: string;
     transferTo?: string;
-    timeout?: number;
     bargein?: boolean = true;
-    no_input?: string;
-    no_match?: string;
+    noInputTimeout?: number;
+    noInputIntent?: string;
+    noMatchIntent?: string;
+    trueIntent?: string;
+    falseIntent?: string;
+    incompleteSpeechTimeout?: number;
 }
 
 export class MessageWithWait extends Message {
@@ -635,6 +637,25 @@ export class ActionBrevo extends Action {
     }
 }
 
+export class ActionN8n extends Action {
+    url: string;
+    bodyParameters: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    assignResultTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    constructor(){
+        super();
+        this.url = '';
+        this.bodyParameters = "";
+        this.assignStatusTo = '';
+        this.assignErrorTo = '';
+        this.assignResultTo = '';
+        this._tdActionType = TYPE_ACTION.N8N;
+    }
+}
+
 export class ActionVoice extends Action {
     text?: string;
     attributes: Attributes;
@@ -643,6 +664,7 @@ export class ActionVoice extends Action {
         // this.text = text ? text : '...';
         this._tdActionType = type;
         this.attributes = new Attributes();
+        this.attributes.disableInputMessage = true;
         if (attributes){
             this.attributes = attributes;
         }

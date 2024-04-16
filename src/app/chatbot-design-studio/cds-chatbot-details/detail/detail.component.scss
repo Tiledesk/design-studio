@@ -35,37 +35,37 @@ textarea[type="text"] {
 }
 
 input[type="text"]:disabled {
-    background-color: #f9f9f9 !important;
+    background-color: var(--input-disabled) !important;
     // cursor: not-allowed;
 }
 
 textarea[type="text"]:disabled {
-    background-color: #f9f9f9 !important;
+    background-color: var(--input-disabled) !important;
     // cursor: not-allowed;
 }
 
 input[type="text"]:disabled::placeholder {
-    color: #f9f9f9;
+    color: var(--input-disabled);
     // font-size: 1.2em;
     // font-style: italic;
 }
 
 ::placeholder {
     /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color: #a0a0a0 !important;
+    color: var(--input-placeholder) !important;
     font-weight: 300 !important;
     opacity: 1; /* Firefox */
 }
 
 :-ms-input-placeholder {
     /* Internet Explorer 10-11 */
-    color: #a0a0a0 !important;
+    color: var(--input-placeholder) !important;
     font-weight: 300 !important;
 }
 
 ::-ms-input-placeholder {
     /* Microsoft Edge */
-    color: #a0a0a0 !important;
+    color: var(--input-placeholder) !important;
     font-weight: 300 !important;
 }
 

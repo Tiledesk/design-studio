@@ -11,6 +11,7 @@ import { BotsBaseComponent } from 'src/app/components/bots/bots-base/bots-base.c
 import { SETTINGS_SECTION } from '../utils';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BRAND_BASE_INFO } from '../utils-resources';
 const swal = require('sweetalert');
 
 @Component({
@@ -25,6 +26,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
   
   SETTINGS_SECTION = SETTINGS_SECTION
+  BRAND_BASE_INFO = BRAND_BASE_INFO
   isVisibleDEP: boolean;
 
   project: Project;
@@ -55,9 +57,13 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     this.getTranslations();
     this.selectedChatbot = this.dashboardService.selectedChatbot;
 
-   
+    // HIDE/SHOW community section 
+    if(!BRAND_BASE_INFO['COMMUNITY_SECTION']){
+      this.activeSection = SETTINGS_SECTION.DETAIL
+      this.toggleTab(this.activeSection)
+    }
+
     this.route.queryParams.subscribe((params) => {
-      console.log('parammmmmm', params)
       if(!params.hasOwnProperty('active')){
         this.toggleTab(this.activeSection)
       }

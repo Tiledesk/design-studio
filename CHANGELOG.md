@@ -7,6 +7,24 @@
 
 ### 1.3.2 in PROD
 
+### 1.4.0-rc.4
+- minor improvements
+
+### 1.4.0-rc.3
+- added: autofocus on search input element on cds-add-action-menu floating panel component
+- added: ascendent ordering of actions in cds-add-action-menu floating panel
+
+### 1.4.0-rc.2
+- added: cds-action-n8n
+- added: setTiledeskToken method on tiledesk-auth
+
+### 1.4.0-rc.1
+- added: cds-action-speech-form voice action
+- added: cds-action-voice-play-prompt
+- added: audio-upload to manage audio file url and drag&drop action in cds-action-reply-audio
+- changed: open OptionMenu while adding a new unexisting option in cds-action-dtmf-menu voice component
+- changed: default value for request timeout in cds-action-web-requestv2
+
 ### 1.3.1 in PROD
 - bug-fixed: document title fixed
 
