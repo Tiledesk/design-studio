@@ -243,3 +243,10 @@ ng-select {
     display: flex;
     gap: 30px;
 }
+
+
+#scrollMe{
+    max-height: calc(100vh - 250px);
+    overflow: auto;
+    overflow-y: scroll;
+}
