@@ -418,9 +418,6 @@ import { CdsBaseElementModule } from '../shared/cds-base-element.module';
   providers: [
     // WsChatbotService,
     // DragDropService
-  ],
-  entryComponents: [
-    // ChangeBotLangModalComponent,
   ]
 })
 export class ChatbotDesignStudioModule { }
