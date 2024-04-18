@@ -134,7 +134,7 @@ export class ActionWebRequest extends Action {
     constructor(){
         super();
         this.url = '';
-        this.headersString = {"Content-Type":"application/json", "Cache-Control":"no-cache", "User-Agent":"TiledeskBotRuntime", "Accept":"*/*"};
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent": BRAND_BASE_INFO['BRAND_NAME']+" BotRuntime", "Accept":"*/*"};
         this.jsonBody = JSON.stringify({});
         this.assignTo = '';
         this.assignments = {};
