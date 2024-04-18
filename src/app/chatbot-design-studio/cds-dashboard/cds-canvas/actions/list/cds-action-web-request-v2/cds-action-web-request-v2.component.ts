@@ -64,7 +64,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private intentService: IntentService
+    public intentService: IntentService
   ) { }
 
   // SYSTEM FUNCTIONS //

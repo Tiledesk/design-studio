@@ -637,21 +637,49 @@ export class ActionBrevo extends Action {
     }
 }
 
-export class ActionN8n extends Action {
+// export class ActionN8n extends Action {
+//     url: string;
+//     bodyParameters: string;
+//     assignStatusTo: string;
+//     assignErrorTo: string;
+//     assignResultTo: string;
+//     trueIntent: string;
+//     falseIntent: string;
+//     constructor(){
+//         super();
+//         this.url = '';
+//         this.bodyParameters = "";
+//         this.assignStatusTo = '';
+//         this.assignErrorTo = '';
+//         this.assignResultTo = '';
+//         this._tdActionType = TYPE_ACTION.N8N;
+//     }
+// }
+
+export class ActionN8n extends Action implements ActionWebRequestV2 {
     url: string;
-    bodyParameters: string;
+    assignResultTo: string;
     assignStatusTo: string;
     assignErrorTo: string;
-    assignResultTo: string;
     trueIntent: string;
     falseIntent: string;
+    method: string;
+    headersString: any;
+    settings: any;
+    jsonBody: string;
+    bodyType: string;
+    assignments: {};
     constructor(){
         super();
         this.url = '';
-        this.bodyParameters = "";
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":"TiledeskBotRuntime", "Accept":"*/*"};
+        this.settings = { timeout: 20000 }
+        this.jsonBody = null
+        this.bodyType = 'none'
         this.assignStatusTo = '';
         this.assignErrorTo = '';
-        this.assignResultTo = '';
+        this.assignments = {};
+        this.method = TYPE_METHOD_REQUEST.GET;
         this._tdActionType = TYPE_ACTION.N8N;
     }
 }
