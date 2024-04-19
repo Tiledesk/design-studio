@@ -70,28 +70,34 @@
     }
 
 
-  
-    .sx-input {
-        border: 0;
-        cursor: default;
-        display: flex;
-        outline: none;
-        overflow: hidden;
-        position: relative;
-        width: 150px;
-        height: 28px;
-        border-radius: var(--base-radius) 0 0 var(--base-radius);
-        background: #f2f2f2;
-        font-weight: 500;
-        font-size: 14px;
-        margin: 3px 0;
-        margin-right: 2px;
-        padding: 0 10px 0 10px;
+    cds-text#text.sx-input ::ng-deep {
         width: calc(50% - 2px);
-        color: #1e293b;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
+        input{
+            border: 1px solid #f2f2f2;
+            cursor: default;
+            display: flex;
+            outline: none;
+            overflow: hidden;
+            position: relative;
+            width: 150px;
+            height: 26px;
+            border-radius: var(--base-radius) 0 0 var(--base-radius);
+            background: #f2f2f2;
+            font-weight: 500;
+            font-size: 14px;
+            margin: 3px 0;
+            margin-right: 2px;
+            padding: 0 10px 0 10px;
+            width: 100%;
+            color: #1e293b;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+
+            &.autocompleteOpen{
+                border-radius: var(--base-radius) 0 0 0;
+            }
+        }       
     }
     
     
@@ -183,5 +189,19 @@
                 }
             }
         }
+    }
+}
+
+::ng-deep .mat-autocomplete-panel.mat-autocomplete-visible {
+    width: calc(100% - 2px);
+    position: relative;
+    top: -2px;
+    .mat-option{
+        height: 28px;
+        line-height: 28px;
+        font-size: 14px;
+        padding: 0 10px 0 10px;
+        width: 100%;
+        color: #1e293b;
     }
 }

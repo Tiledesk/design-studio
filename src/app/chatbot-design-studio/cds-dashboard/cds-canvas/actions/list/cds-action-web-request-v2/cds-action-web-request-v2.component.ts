@@ -11,7 +11,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionWebRequestV2 } from 'src/app/models/action-model';
 
 //UTILS
-import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, HEADER_TYPE } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
@@ -53,6 +53,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
   methodSelectedHeader = true;
   methodSelectedBody = false;
   headerAttributes: any;
+  autocompleteHeaderOptions: Array<string> = []
 
   valueIsInvalid: boolean = false;
 
@@ -206,6 +207,8 @@ export class CdsActionWebRequestV2Component implements OnInit {
     if(this.intentSelected){
       this.initializeConnector();
     }
+    HEADER_TYPE.forEach(el => this.autocompleteHeaderOptions.push(el.label))
+  
   }
 
   private initializeAttributes() {
