@@ -1,3 +1,4 @@
+import { HEADER_TYPE } from './../../utils';
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { TYPE_METHOD_ATTRIBUTE } from '../../utils';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -11,6 +12,7 @@ export class AttributesComponent implements OnInit {
 
   @Output() changeAttributes = new EventEmitter();
   @Input() attributes: any;
+  @Input() autocompleteOptions: Array<string> = [];
   @Input() method: any;
   @Input() openBlock: boolean;
 
@@ -25,6 +27,7 @@ export class AttributesComponent implements OnInit {
 
   ngOnInit(): void {
     // this.initialize();
+
   }
 
 
@@ -54,6 +57,7 @@ export class AttributesComponent implements OnInit {
     if(this.newAttributes.length>1) {
       this.openBlock = true;
     }
+
   }
 
 
@@ -76,7 +80,9 @@ export class AttributesComponent implements OnInit {
     // this.setChangedAttributes();
   }
 
-  onChangeAttributes(attribute: any, index: number){
+  onChangeAttributes(text: string, index: number){
+    this.newAttributes[index].key = text;
+    let attribute = { key : text, value: this.newAttributes[index].value}
     let that = this;
     if(attribute.key.length>0 || attribute.value.length>0){
       if (index == this.newAttributes.length-1){
@@ -91,6 +97,7 @@ export class AttributesComponent implements OnInit {
         }
       });
     }
+    
     // this.setChangedAttributes();
   }
 

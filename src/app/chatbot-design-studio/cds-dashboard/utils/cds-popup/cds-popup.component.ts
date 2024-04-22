@@ -56,7 +56,7 @@ export class CdsPopupComponent implements OnInit {
     if(publishBtnEl){
       let btnPosition = publishBtnEl.getBoundingClientRect()
       this.position = {
-        top: btnPosition.top + btnPosition.height,
+        top: btnPosition.top + btnPosition.height + 10,
         bottom: btnPosition.bottom,
         left: btnPosition.left + Math.floor(btnPosition.width / 2) - 160,
         right: 110

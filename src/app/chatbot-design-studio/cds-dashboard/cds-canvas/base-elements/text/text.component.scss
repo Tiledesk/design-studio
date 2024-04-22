@@ -45,6 +45,11 @@
                     padding-left: 20px;
                     width: calc(100% - 20px);
                 }
+
+                &.autocompleteOpen{
+                    border-radius: var(--input-border-radius-base) 0 0 0;
+                }
+                
             }
 
             .input-prefix {

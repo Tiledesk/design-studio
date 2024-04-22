@@ -1,50 +1,53 @@
-<div class="text-editor-wrapper">
-    <div class="text-editor">
-        <!-- [readonly]="readonly" -->
-        <mat-form-field class="box-textarea" appearance="fill">
-            <textarea matInput
-                id="text-area"
-                #autosize="cdkTextareaAutosize"
-                [class.invalid]="control.invalid"
-                [maxlength]="limitCharsText"
-                [formControl]="control"
-                [placeholder]="placeholder"
-                cdkTextareaAutosize
-                cdkAutosizeMinRows="{{minRow}}"
-                cdkAutosizeMaxRows="{{maxRow}}"
-                [(ngModel)]="text"
-                (click)="onClickTextareaOpenSetAttributePopover();"
-                (blur)="onBlur($event)"
-                (ngModelChange)="onChangeTextArea($event)">
-            </textarea>
-        </mat-form-field>
-
-        <div *ngIf="showUtils === true" unselectable="on" tabIndex="-1" class="editor-utils">
-
-            <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="addVariable.toggle(); openSetAttributePopover();">
-                <span class="material-icons" style="font-size: 16px;">
-                    data_object
-                </span>
-            </div>
+<div class="text-editor-wrapper" >
+    <div [class.focus-in]="expand" [class.focus-out]="!expand">
+        <div class="text-editor">
+            <!-- [readonly]="readonly" -->
+            <mat-form-field class="box-textarea" appearance="fill">
+                <textarea matInput
+                    id="text-area"
+                    #autosize="cdkTextareaAutosize"
+                    [class.invalid]="control.invalid"
+                    [maxlength]="limitCharsText"
+                    [formControl]="control"
+                    [placeholder]="placeholder"
+                    cdkTextareaAutosize
+                    cdkAutosizeMinRows="{{minRow}}"
+                    cdkAutosizeMaxRows="{{maxRow}}"
+                    [(ngModel)]="text"
+                    (click)="onClickTextareaOpenSetAttributePopover();"
+                    (blur)="onBlur($event); expand = false;"
+                    (focus)="onFocus($event); expand = true;"
+                    (ngModelChange)="onChangeTextArea($event)">
+                </textarea>
+            </mat-form-field>
     
-            <div *ngIf="emojiPikerBtn" class="emoji-picker">
-                <div class="emoji-picker-button" aria-expanded="false" [satPopoverAnchor]="emojiPicker" (click)="emojiPicker.toggle();">
-                    <span class="material-icons-outlined" style="font-size: 16px;">
-                        emoji_emotions
+            <div *ngIf="showUtils === true" unselectable="on" tabIndex="-1" class="editor-utils">
+    
+                <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="addVariable.toggle(); openSetAttributePopover();">
+                    <span class="material-icons" style="font-size: 16px;">
+                        data_object
                     </span>
+                </div>
+        
+                <div *ngIf="emojiPikerBtn" class="emoji-picker">
+                    <div class="emoji-picker-button" aria-expanded="false" [satPopoverAnchor]="emojiPicker" (click)="emojiPicker.toggle();">
+                        <span class="material-icons-outlined" style="font-size: 16px;">
+                            emoji_emotions
+                        </span>
+                    </div>
+                </div>
+        
+                <div *ngIf="textLimitBtn" data-status="default" class="tpl-text-limit">
+                    <div class="num-chars" [ngClass]="{'error' : alertCharsText}">{{leftCharsText}}</div>
                 </div>
             </div>
     
-            <div *ngIf="textLimitBtn" data-status="default" class="tpl-text-limit">
-                <div class="num-chars" [ngClass]="{'error' : alertCharsText}">{{leftCharsText}}</div>
+            <div class="tag" *ngIf="textTag">
+                <span class="material-icons close" (click)="onClearSelectedAttribute()">close</span>
+                <div class="tag-content ellips"><span class="tag-text">{{textTag}}</span></div>
             </div>
+    
         </div>
-
-        <div class="tag" *ngIf="textTag">
-            <span class="material-icons close" (click)="onClearSelectedAttribute()">close</span>
-            <div class="tag-content ellips"><span class="tag-text">{{textTag}}</span></div>
-        </div>
-
     </div>
 </div>
 

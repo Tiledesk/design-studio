@@ -94,6 +94,7 @@
             class="cds-attributes"
             [method]="typeMethodAttribute.INPUT"
             [attributes]="jsonHeader"
+            [autocompleteOptions]="autocompleteHeaderOptions"
             (changeAttributes)="onChangeAttributes($event)">
         </cds-attributes>
     </div>

@@ -12,6 +12,7 @@
 
 ### 1.4.0-rc.4
 - minor improvements
+- bug-fixed: community section doesn't scroll page
 
 ### 1.4.0-rc.3
 - added: autofocus on search input element on cds-add-action-menu floating panel component
