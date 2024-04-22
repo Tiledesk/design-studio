@@ -61,6 +61,14 @@ export class CDSTextComponent implements OnInit {
     this.blur.emit(event);
   }
 
+  onOpenClose(event: 'open' | 'close'){
+    if(event === 'open'){
+      this.myInput.nativeElement.classList.add('autocompleteOpen')
+    }else{
+      this.myInput.nativeElement.classList.remove('autocompleteOpen')
+    }
+  }
+
 
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
