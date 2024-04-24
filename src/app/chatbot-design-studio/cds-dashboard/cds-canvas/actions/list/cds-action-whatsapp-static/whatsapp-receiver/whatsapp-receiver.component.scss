@@ -37,6 +37,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-left: 2px;
+    margin-right: 6px;
     
     
     // height: 100%;
@@ -58,6 +60,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 6px;
             em {
                 font-size: 1.15em;
                 color: var(--textColor);
@@ -105,13 +108,15 @@ loading-spinner.custom-spinner ::ng-deep {
     font-family: Roboto;
     margin-bottom: 10px;
 
+
     p {
         margin-bottom: 0px;
     }
 
     .parameters-title {
-        font-weight: 500;
+        font-weight: 400;
         margin-bottom: 2px;
+        font-size: 14px;
     }
 
     .parameters-subtitle {
@@ -138,16 +143,22 @@ loading-spinner.custom-spinner ::ng-deep {
 
     .param-number {
         height: 36px;
-        width: 40px;
-        background-color: var(--textColor);
+        width: 36px;
+        //background-color: var(--textColor);
         color: var(--backGroundColor);
         display: flex;
         align-items: center;
         margin-right: 10px;
         justify-content: center;
         font-weight: 500;
-        border-radius: 4px;
+        border: solid 1px var(--textColor);
+        border-radius: var(--input-border-radius-base);
         font-style: italic;
+
+        span {
+            color: var(--textColor);
+            font-size: 18px;
+        }
     }
 
     input {
@@ -167,11 +178,12 @@ loading-spinner.custom-spinner ::ng-deep {
 .preview-container {
     display: flex;
     //background-color: bisque;
-    background-image: url("/assets/images/whatsapp_background.png");
+    //background-image: url("/assets/images/whatsapp_background.png");
+    background-image: url("../../../../../../../../assets/images/whatsapp_background.png");
     background-repeat: no-repeat;
     background-size: cover;
     border-radius: 6px;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     max-height: 0px;
     overflow: hidden;
     transition: max-height 0.6s;
