@@ -9,6 +9,7 @@
                 [class.customPrefix]="customPrefix"
                 [formControl]="control"
                 [matAutocomplete]="auto"
+                [matAutocompletePosition]="'below'"
                 [placeholder]="placeholder"
                 [type]="inputType"
                 cdkTextareaAutosize
@@ -18,8 +19,8 @@
                 (blur)="onBlur($event)"
                 (ngModelChange)="onChangeText($event)"/>
             <div class="input-suffix" *ngIf="customPrefix"> / </div>
-            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (opened)="onOpenClose('open')" (closed)="onOpenClose('close')">
+                <mat-option *ngFor="let option of filteredOptions | async" [value]="option" [title]="option">
                   {{option}}
                 </mat-option>
             </mat-autocomplete>

@@ -51,6 +51,9 @@ export class CDSTextareaComponent implements OnInit {
   startText: string;
   // strPlaceholder: string;
 
+  // Wrapper management // 
+  expand: boolean = false
+
   public textArea: string = '';
   public isEmojiPickerVisible: boolean = false;
   IS_ON_MOBILE_DEVICE = false;
@@ -133,12 +136,18 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   onBlur(event){
-    // this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen());
+    this.maxRow = 1;
+    this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen());
     if(!this.addVariable.isOpen() && !this.emojiPicker.isOpen() && this.textIsChanged){
       this.textIsChanged = false;
       this.startText = this.text;
       this.blur.emit(event);
     }
+  }
+
+  onFocus(event){
+    this.logger.log('[CDS-TEXAREA] - onFocus - isOpen textIsChanged');
+    this.maxRow = 5
   }
 
   onVariableSelected(variableSelected: { name: string, value: string }) {

@@ -19,6 +19,7 @@ import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-
 import { CdsPublishOnCommunityModalComponent } from 'src/app/modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
 import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service';
 
+
 const routes: Routes = [
   { path: '', 
     component: CdsDashboardComponent,

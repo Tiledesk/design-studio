@@ -5,6 +5,13 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.5.0-rc.2
+- bug-fixed: if chatbot not belongs to current project, redirect to unauthorized route 
+
+### 1.5.0-rc.1
+- added: headers autocomplete options in web-request-v2 component
+- added: textarea component into action-gpt-task modal preview
+- changed: cds-popup position 
 
 ### 1.4.0 in PROD
 
@@ -12,6 +19,7 @@
 
 ### 1.4.0-rc.4
 - minor improvements
+- bug-fixed: community section doesn't scroll page
 
 ### 1.4.0-rc.3
 - added: autofocus on search input element on cds-add-action-menu floating panel component

@@ -160,15 +160,17 @@
 
 #cds-test-it-out-btn{
     background-color: transparent;
-    outline: 2px solid var(--blu-02);
-    outline-offset: -1px;
+    border: 2px solid var(--blu-02);
+    // outline-offset: -1px;
     color: var(--blu-02);
     border-radius: 50%;
 
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 4px 6px 6px;
+    padding: 6px 6px;
+    width: 33px;
+    height: 33px;
 
 }
 

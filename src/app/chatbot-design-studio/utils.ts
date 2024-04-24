@@ -168,7 +168,7 @@ export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY),         name: 'CDSActionCategory.Flow',         src: 'assets/images/actions_category/flow.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg'},
-    // { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
 ]
 
@@ -318,14 +318,14 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     HUPSPOT :               { name: 'CDSActionList.NAME.Hubspot',               category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.HUBSPOT,              src:"assets/images/actions/hubspot.svg",                status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
     CUSTOMERIO :            { name: 'CDSActionList.NAME.Customerio',            category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.CUSTOMERIO,           src:"assets/images/actions/customerio.svg",             status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
     BREVO :                 { name: 'CDSActionList.NAME.Brevo',                 category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.BREVO,                src:"assets/images/actions/brevo.svg",                  status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
-    N8N :                   { name: 'CDSActionList.NAME.N8n',                   category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.N8N,                  src:"assets/images/actions/n8n.svg",                    status: "inactive", plan: PLAN_NAME.E,    description: ''                                                             },
+    N8N :                   { name: 'CDSActionList.NAME.N8n',                   category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.N8N,                  src:"assets/images/actions/n8n.svg",                    status: "active", plan: PLAN_NAME.E,    description: ''                                                             },
 
 
-    DFTM_FORM:              { name: 'CDSActionList.NAME.DTMFForm',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
-    DTMF_MENU:              { name: 'CDSActionList.NAME.DTMFMenu',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
-    BLIND_TRANSFER:         { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
-    PLAY_PROMPT:            { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
-    SPEECH_FORM:            { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "inactive", plan: PLAN_NAME.F,    description: ''                                                             },
+    DFTM_FORM:              { name: 'CDSActionList.NAME.DTMFForm',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
+    DTMF_MENU:              { name: 'CDSActionList.NAME.DTMFMenu',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
+    BLIND_TRANSFER:         { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
+    PLAY_PROMPT:            { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
+    SPEECH_FORM:            { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.F,    description: ''                                                             },
 
 }
 
@@ -397,6 +397,57 @@ export const URL_TYPES: Array<{ label: string, value: TYPE_URL }> = [
     { label: "blank", value: TYPE_URL.BLANK },
     { label: "parent", value: TYPE_URL.PARENT },
     { label: "self", value: TYPE_URL.SELF },
+]
+
+export const HEADER_TYPE: Array<{ label: string, value: string }> = [
+    { label: "Accept", value: "Accept" },
+    { label: "Accept-Charset", value: "Accept-Charset" },
+    { label: "Accept-Encoding", value: "Accept-Encoding" },
+    { label: "Accept-Language", value: "Accept-Language" },
+    { label: "Access-Control-Request-Headers", value: "Access-Control-Request-Headers" },
+    { label: "Access-Control-Request-Method", value: "Access-Control-Request-Method" },
+    { label: "Authorization", value: "Authorization" },
+    { label: "Cache-Control", value: "Cache-Control" },
+    { label: "Connection", value: "Connection" },
+    { label: "Content-MD5", value: "Content-MD5" },
+    { label: "Content-Length", value: "Content-Length" },
+    { label: "Content-Transfer-Encoding", value: "Content-Transfer-Encoding" },
+    { label: "Content-Type", value: "Content-Type" },
+    { label: "Cookie", value: "Cookie" },
+    { label: "Cookie 2", value: "Cookie 2" },
+    { label: "Date", value: "Date" },
+    { label: "Expect", value: "Expect" },
+    { label: "From", value: "From" },
+    { label: "Host", value: "Host" },
+    { label: "If-Match", value: "If-Match" },
+    { label: "If-Modified-Since", value: "If-Modified-Since" },
+    { label: "If-None-Match", value: "If-None-Match" },
+    { label: "If-Range", value: "If-Range" },
+    { label: "If-Unmodified-Since", value: "If-Unmodified-Since" },
+    { label: "Keep-Alive", value: "Keep-Alive" },
+    { label: "Max-Forwards", value: "Max-Forwards" },
+    { label: "Origin", value: "Origin" },
+    { label: "Pragma", value: "Pragma" },
+    { label: "Proxy-Authorization", value: "Proxy-Authorization" },
+    { label: "Range", value: "Range" },
+    { label: "Referer", value: "Referer" },
+    { label: "TE", value: "TE" },
+    { label: "Trailer", value: "Trailer" },
+    { label: "Transfer-Encoding", value: "Transfer-Encoding" },
+    { label: "Upgrade", value: "Upgrade" },
+    { label: "User-Agent", value: "User-Agent" },
+    { label: "Via", value: "Via" },
+    { label: "Warning", value: "Warning" },
+    { label: "X-Requested-With", value: "X-Requested-With" },
+    { label: "X-Do-Not-Track", value: "X-Do-Not-Track" },
+    { label: "DNT", value: "DNT" },
+    { label: "x-api-key", value: "x-api-key" },
+    { label: "x-mock-match-request-body", value: "x-mock-match-request-body" },
+    { label: "x-mock-match-request-headers", value: "x-mock-match-request-headers" },
+    { label: "x-mock-response-id", value: "x-mock-response-id" },
+    { label: "x-mock-response-name", value: "x-mock-response-name" },
+    { label: "x-mock-response-code", value: "x-mock-response-code" },
+    { label: "x-mock-response-delay", value: "x-mock-response-delay" },
 ]
 
 export function OperatorValidator(control: AbstractControl): { [key: string]: boolean } | null {
