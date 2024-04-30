@@ -193,6 +193,11 @@ export class CDSTextareaComponent implements OnInit {
     let cursor_pos = elem.selectionStart;
     var textarea_txt = elem.value;
     var txt_to_add = attribute;
+    
+    //clear '{' or '{{' cursor_pos -1/-2 chars
+    if( textarea_txt.substring(cursor_pos -1, cursor_pos) === '{')  textarea_txt = textarea_txt.substring(0, cursor_pos-1)
+    if( textarea_txt.substring(cursor_pos -2, cursor_pos) === '{{')  textarea_txt = textarea_txt.substring(0, cursor_pos-2)
+
     elem.value = textarea_txt.substring(0, cursor_pos) + txt_to_add + textarea_txt.substring(cursor_pos);
     elem.focus();
     elem.selectionEnd = cursor_pos + txt_to_add.length;
