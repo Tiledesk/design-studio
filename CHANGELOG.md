@@ -5,6 +5,14 @@
     *Dario De Pascalis* 
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.5.0-rc.3
+- added: open variable-list component on keydown '{' in textarea component
+- added: previewAskPrompt function in openaiService
+- added namespace, max_tokens, temperature, top_k params in askkb action
+- added preview and ai settings in askkb action interface
+- changed:  gpttask action interface
+- bug-fixed: action-web-request-v2 not show correct selected data if another action of the same type is already opened
+
 ### 1.5.0-rc.2
 - bug-fixed: if chatbot not belongs to current project, redirect to unauthorized route 
 
