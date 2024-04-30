@@ -32,8 +32,9 @@ export class AttributesDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onChangeInput() {
+  onChangeTextarea(text, key) {
     this.btn_disabled = false;
+    this.data.attributes.find(a => a.name === key).value = text
     if (this.data.attributes.find(a => a.value === null || a.value === '')){
       this.btn_disabled = true;
     }
