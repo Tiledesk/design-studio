@@ -99,74 +99,81 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.GPTReply' | translate }}</label>
-        <cds-textarea 
-            id="assignTo" 
-            [textLimitBtn]="false" 
-            [emojiPikerBtn]="false" 
-            [setAttributeBtn]="true"
-            [minRow]="1" 
-            [maxRow]="1" 
-            [readonly]="true" 
-            [text]="action.assignReplyTo"
-            (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
-            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')">
-        </cds-textarea>
+    <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
+        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
+            [disabled]="!action.question" (click)="execPreview()">
+            <span class="material-icons">preview</span>
+            {{'CDSCanvas.Preview' | translate }}
+        </button>
     </div>
 
-    
-    <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageGPTKey' | translate }}</a>
-    
-
-    <hr class="custom-divider">
-
-    <div class="field-box">
-        <div class="condition-container">
-            <div class="icon-action">
-                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+    <div class="answer-preview" *ngIf="showPreview">
+        <div class="header-answer-preview">
+            <div class="label-and-button-container">
+                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}</label>
+                <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
+                    (click)="showHideVariablesSection()">Set variables
+                    <span class="material-icons-round">
+                        chevron_right
+                    </span>
+                </button> -->
             </div>
-            <label class="condition-text">{{'CDSCanvas.Success' | translate }}</label>
         </div>
-        <cds-select id="text-condition" 
-            [items]="listOfIntents" 
-            [bindLabelSelect]="'name'"
-            [bindValueSelect]="'value'" 
-            [itemSelected]="action?.trueIntent" 
-            [placeholder]="'CDSCanvas.SelectABlock' | translate"
-            [clearable]="true" 
-            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
-            (onReset)="onResetBlockSelect($event, 'trueIntent')">
-        </cds-select>
-        <!-- <cds-attributes 
-            class="cds-attributes" 
-            [attributes]="trueIntentAttributes"
-            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
-        </cds-attributes> -->
-    </div>
 
-    <div class="field-box">
-        <div class="condition-container">
-            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
+        <div id="preview-container" class="preview-container">
+
+            <div class="placeholder-container" *ngIf="searching">
+                <loading-spinner class="custom-spinner"></loading-spinner>
+                <span style="margin-left: 8px;">{{'CDSCanvas.GeneratingAnswer' | translate}} ...</span>
+            </div>
+
+            <div *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
+                {{ ai_response.choices[0].message.content }}
+            </div>
+
+            <div *ngIf="showAiError">
+                {{ ai_error }}
+            </div>
+
         </div>
-        <cds-select id="text-condition" 
-            [items]="listOfIntents" 
-            [bindLabelSelect]="'name'"
-            [bindValueSelect]="'value'" 
-            [itemSelected]="action?.falseIntent" 
-            [placeholder]="'CDSCanvas.SelectABlock' | translate"
-            [clearable]="true" 
-            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
-            (onReset)="onResetBlockSelect($event, 'falseIntent')">
-        </cds-select>
-        <!-- <cds-attributes 
-            class="cds-attributes" 
-            [attributes]="action.falseIntentAttributes"
-            (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
-        </cds-attributes> -->
-    </div>
 
-    <hr class="custom-divider">
+        <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
+            <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
+            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
+            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
+            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
+        </div>
+
+        <!-- <div id="preview-container" class="preview-container">
+
+            <div class="placeholder-container" *ngIf="missingVariables">
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                    <span style="margin-left: 8px;">Set all variables to get the preview</span>
+                </div>
+            </div>
+
+            <div class="placeholder-container" *ngIf="searching && !missingVariables">
+                <loading-spinner class="custom-spinner"></loading-spinner>
+                <span style="margin-left: 8px;">Generating answer...</span>
+            </div>
+
+            <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content">
+                {{ ai_response.choices[0].message.content }}
+            </div>
+
+            <div *ngIf="showAiError">
+                {{ ai_error }}
+            </div>
+        </div>
+
+        <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content"
+            style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 6px; padding: 0px 4px; color: #a6a6a6;  font-size: 11px; width: 100%;">
+            <span style="font-weight: 500;">Tokens usage</span>
+            <span>Prompt: {{ ai_response.usage.prompt_tokens }}</span>
+            <span>Answer: {{ ai_response.usage.completion_tokens }}</span>
+            <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens }}</span>
+        </div> -->
+    </div>
 
     <mat-accordion>
         <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
@@ -257,85 +264,77 @@
         </mat-expansion-panel>
     </mat-accordion>
 
+    <hr class="custom-divider" style="margin-top: 10px;">
+
+    <div class="link-container">
+        <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageGPTKey' | translate }}</a>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.GPTReply' | translate }}</label>
+        <cds-textarea 
+            id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" 
+            [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignReplyTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')">
+        </cds-textarea>
+    </div>
+
+    
     <hr class="custom-divider">
+    
 
-    <div style="width: 100%; display: flex; justify-content: flex-end;">
-        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
-            [disabled]="!action.question" (click)="execPreview()">
-            <span class="material-icons">preview</span>
-            {{'CDSCanvas.Preview' | translate }}
-        </button>
+    <div class="field-box">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.Success' | translate }}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.trueIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
+            (onReset)="onResetBlockSelect($event, 'trueIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
     </div>
 
-
-
-    <div class="answer-preview" *ngIf="showPreview">
-        <div class="header-answer-preview">
-            <div class="label-and-button-container">
-                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}</label>
-                <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
-                    (click)="showHideVariablesSection()">Set variables
-                    <span class="material-icons-round">
-                        chevron_right
-                    </span>
-                </button> -->
-            </div>
+    <div class="field-box">
+        <div class="condition-container">
+            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
         </div>
-
-        <div id="preview-container" class="preview-container">
-
-            <div class="placeholder-container" *ngIf="searching">
-                <loading-spinner class="custom-spinner"></loading-spinner>
-                <span style="margin-left: 8px;">{{'CDSCanvas.GeneratingAnswer' | translate}} ...</span>
-            </div>
-
-            <div *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
-                {{ ai_response.choices[0].message.content }}
-            </div>
-
-            <div *ngIf="showAiError">
-                {{ ai_error }}
-            </div>
-
-        </div>
-
-        <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
-            <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
-        </div>
-
-        <!-- <div id="preview-container" class="preview-container">
-
-            <div class="placeholder-container" *ngIf="missingVariables">
-                <div style="display: flex; flex-direction: column; width: 100%;">
-                    <span style="margin-left: 8px;">Set all variables to get the preview</span>
-                </div>
-            </div>
-
-            <div class="placeholder-container" *ngIf="searching && !missingVariables">
-                <loading-spinner class="custom-spinner"></loading-spinner>
-                <span style="margin-left: 8px;">Generating answer...</span>
-            </div>
-
-            <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content">
-                {{ ai_response.choices[0].message.content }}
-            </div>
-
-            <div *ngIf="showAiError">
-                {{ ai_error }}
-            </div>
-        </div>
-
-        <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content"
-            style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 6px; padding: 0px 4px; color: #a6a6a6;  font-size: 11px; width: 100%;">
-            <span style="font-weight: 500;">Tokens usage</span>
-            <span>Prompt: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>Answer: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens }}</span>
-        </div> -->
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.falseIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
+            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="action.falseIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+        </cds-attributes> -->
     </div>
+
 
 
 </div>

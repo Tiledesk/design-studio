@@ -14,6 +14,7 @@
                 cdkAutosizeMaxRows="{{maxRow}}"
                 [(ngModel)]="text"
                 (click)="onClickTextareaOpenSetAttributePopover();"
+                (keydown)="openAttributesList($event)"
                 (blur)="onBlur($event)"
                 (ngModelChange)="onChangeTextArea($event)">
             </textarea>

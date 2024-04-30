@@ -78,7 +78,173 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box">
+     <!-- PREVIEW - START -->
+     <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
+        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
+            [disabled]="!action.question" (click)="execPreview()">
+            <span class="material-icons">preview</span>
+            {{'CDSCanvas.Preview' | translate }}
+        </button>
+    </div>
+
+    <div class="answer-preview" *ngIf="showPreview">
+        <div class="header-answer-preview">
+            <div class="label-and-button-container">
+                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}</label>
+                <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
+                    (click)="showHideVariablesSection()">Set variables
+                    <span class="material-icons-round">
+                        chevron_right
+                    </span>
+                </button> -->
+            </div>
+        </div>
+
+        <div id="preview-container" class="preview-container">
+
+            <div class="placeholder-container" *ngIf="searching">
+                <loading-spinner class="custom-spinner"></loading-spinner>
+                <span style="margin-left: 8px;">{{'CDSCanvas.GeneratingAnswer' | translate}} ...</span>
+            </div>
+
+            <div *ngIf="!searching && !showAiError && ai_response">
+                {{ ai_response }}
+            </div>
+
+            <div *ngIf="showAiError">
+                {{ ai_error }}
+            </div>
+
+        </div>
+
+        <!-- <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
+            <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
+            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
+            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
+            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
+        </div> -->
+
+    </div>
+    <!-- PREVIEW - END -->
+
+    <mat-accordion>
+        <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
+            class="custom-expansion-panel">
+            <mat-expansion-panel-header class="disable_ripple">
+                <mat-panel-title>
+                    {{'CDSCanvas.AISettings' | translate }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div>
+
+                <!-- // model select -->
+                <div class="field-box">
+                    <cds-select id="text-condition" 
+                        [items]="model_list" 
+                        [itemSelected]="action.model"
+                        [bindLabelSelect]="'name'" 
+                        [bindValueSelect]="'value'"
+                        (onSelected)="onChangeSelect($event, 'model')">
+                    </cds-select>
+                </div>
+
+                <!-- // max_tokens slider -->
+                <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.MaxTokens' | translate }}</label>
+                    <div class="action-wait-content">
+
+                        <div class="action-wait-slider ">
+                            <div class="action-wait-range">1</div>
+                            <mat-slider 
+                                class="wait-slider" 
+                                thumbLabel 
+                                [displayWith]="formatLabel" 
+                                step="1"  min="1" max="1024"
+                                [(ngModel)]="action.max_tokens"
+                                (change)="updateSliderValue($event.value, 'max_tokens')" 
+                                aria-label="units">
+                            </mat-slider>
+                            <div class="action-wait-range">1024</div>
+                        </div>
+                        <!-- // doesn't work propely -->
+                        <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
+                        <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens}}" disabled>
+                        <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
+                    </div>
+                </div>
+
+                <!-- // temperature slider -->
+                <div class="text-editor-wrapper">
+                    <div class="field-box">
+                        <label class="title-label">{{'CDSCanvas.Temperature' | translate }}</label>
+                        <div class="action-wait-content">
+
+                            <div class="action-wait-slider">
+                                <div class="action-wait-range">0</div>
+                                <mat-slider 
+                                    class="wait-slider" 
+                                    thumbLabel 
+                                    [displayWith]="formatLabel" 
+                                    step="0.05" min="0" max="1" 
+                                    [(ngModel)]="action.temperature"
+                                    (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">1</div>
+                            </div>
+                            <!-- // doesn't work propely -->
+                            <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
+                            <input type="text" class="slider-input gpt-setting-input" value="{{action.temperature}}" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- // top_k slider -->
+                <div class="text-editor-wrapper">
+                    <div class="field-box">
+                        <!-- <label class="title-label">{{'CDSCanvas.Temperature' | translate }}</label> -->
+                        <label class="title-label">Top K</label>
+                        <div class="action-wait-content">
+
+                            <div class="action-wait-slider">
+                                <div class="action-wait-range">0</div>
+                                <mat-slider 
+                                    class="wait-slider" 
+                                    thumbLabel 
+                                    [displayWith]="formatLabel" 
+                                    step="1" min="0" max="10" 
+                                    [(ngModel)]="action.top_k"
+                                    (change)="updateSliderValue($event.value, 'top_k')" aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">1</div>
+                            </div>
+                            <!-- // doesn't work propely -->
+                            <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
+                            <input type="text" class="slider-input gpt-setting-input" value="{{action.top_k}}" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
+                    <cds-textarea id="context" 
+                        [textLimitBtn]="false" 
+                        [emojiPikerBtn]="false" 
+                        [setAttributeBtn]="false"
+                        [minRow]="1" [maxRow]="3" 
+                        [text]="action.context" 
+                        [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
+                        (blur)="onBlur($event)"
+                        (changeTextarea)="onChangeTextarea($event, 'context')">
+                    </cds-textarea>
+                </div> -->
+
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+
+    <hr class="custom-divider" style="margin-top: 10px;">
+
+    <!-- <div class="field-box">
         <label class="title-label">{{'CDSCanvas.Model' | translate}}</label>
         <cds-select id="text-condition" 
             [items]="model_list" 
@@ -87,14 +253,29 @@
             [bindValueSelect]="'value'"
             (onSelected)="onChangeSelect($event, 'model')">
         </cds-select>
+    </div> -->
+
+    <div class="link-container">
+        <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
     </div>
 
-    <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
+    <!-- <div class="field-box">
+        <label class="title-label">Namespace</label>
+        <cds-select id="text-condition" 
+            [items]="namespace_list" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [searchable]=true
+            [clearable]=true
+            [itemSelected]="action?.namespace" 
+            (onSelected)="onChangeSelect($event)">
+        </cds-select>
+    </div> -->
     
-    <hr class="custom-divider">
+    <!-- <hr class="custom-divider"> -->
 
     <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.GPTReply' | translate}}</label>
+        <label class="title-label">{{'CDSCanvas.KBReply' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
@@ -109,7 +290,7 @@
     </div>
 
     <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.GPTSource' | translate}}</label>
+        <label class="title-label">{{'CDSCanvas.KBSource' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false"
             [emojiPikerBtn]="false" 
@@ -169,5 +350,8 @@
             (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
         </cds-attributes> -->
     </div>
+
+    
+
 
 </div>

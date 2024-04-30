@@ -111,6 +111,7 @@ button.close{
     right: 0;
     left: 0;
     bottom: var(--footer-panel-action-detail-height);
+    overflow: scroll;
     // overflow: auto; // nk
     // max-height: calc(100vh - 200px); // nk
 }

@@ -1,5 +1,9 @@
-a.link{
+a.link {
     cursor: pointer;
-    text-decoration: underline;
+    font-size: 14px;
+    font-weight: 400;
 }
 
+a.link:hover {
+    text-decoration: underline;
+}

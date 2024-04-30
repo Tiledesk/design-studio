@@ -882,7 +882,11 @@ export class IntentService {
       action.question = '{{last_user_text}}'
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
+      action.max_tokens = 512;
+      action.temperature = 0.7;
+      action.top_k = 5;
       action.model = TYPE_GPT_MODEL['GPT-4'].value
+      action.preview = [];
     }
     if(typeAction === TYPE_ACTION.GPT_TASK){
       action = new ActionGPTTask();
