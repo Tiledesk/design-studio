@@ -312,6 +312,10 @@ export class ActionAskGPTV2 extends Action {
     falseIntent: string;
     trueIntentAttributes?: string;
     falseIntentAttributes?: string;
+    namespace: string;
+    max_tokens: number;
+    temperature: number;
+    top_k: number;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2

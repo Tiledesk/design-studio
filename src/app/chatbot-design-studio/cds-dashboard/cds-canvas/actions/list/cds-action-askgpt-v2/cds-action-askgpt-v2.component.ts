@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { MatDialog } from '@angular/material/dialog';
 
 //MODELS
 import { ActionAskGPTV2 } from 'src/app/models/action-model';
@@ -10,8 +11,10 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppConfigService } from 'src/app/services/app-config';
+import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
+import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
 import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
@@ -41,7 +44,16 @@ export class CdsActionAskgptV2Component implements OnInit {
   isConnectedFalse: boolean = false;
   connector: any;
 
+  showPreview: boolean = false;
+  showAiError: boolean = false;
+  searching: boolean = false;
+  ai_response: string = "";
+  ai_error: string = "Oops! Something went wrong. Please retry in a few moment."
+
+  temp_variables = [];
+
   model_list: Array<{ name: string, value: string }>;
+  //namespace_list = []; // missing api for namespaces
 
   private subscriptionChangedConnector: Subscription;
 
@@ -50,11 +62,16 @@ export class CdsActionAskgptV2Component implements OnInit {
   constructor(
     private intentService: IntentService,
     private appConfigService: AppConfigService,
+    private openaiService: OpenaiService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
     this.logger.debug("[ACTION-ASKGPTV2] action detail: ", this.action);
     this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive')
+    if (!this.action.namespace) {
+      this.action.namespace = this.project_id;
+    }
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
       this.connector = connector;
@@ -64,6 +81,10 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.initializeConnector();
     }
     this.initializeAttributes();
+    if (!this.action.preview) {
+      this.action.preview = []; // per retrocompatibilità
+    }
+
   }
 
   ngOnDestroy() {
@@ -227,9 +248,131 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("action updated: ", this.action)
   }
 
+  updateSliderValue(event, target) {
+    this.logger.debug("[ACTION GPT-TASK] updateSliderValue event: ", event)
+    this.logger.debug("[ACTION GPT-TASK] updateSliderValue target: ", target)
+    this.action[target] = event;
+    this.updateAndSaveAction.emit();
+  }
+
   goToKNB(){
     let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/knowledge-bases'
     window.open(url, '_blank')
+  }
+
+  execPreview() {
+    //this.scrollToBottom();
+    this.checkVariables().then((resp) => {
+      if (resp === true) {
+        this.getResponse(this.action.question);
+
+      } else {
+        this.openAttributesDialog();
+      }
+    })
+  }
+
+  checkVariables() {
+    return new Promise((resolve) => {
+      let regex: RegExp = /{{[^{}]*}}/g;
+      let string = this.action.question;
+      let matches = string.match(regex);
+
+      if (!matches || matches.length == 0) {
+        resolve(true);
+
+      } else {
+
+        this.temp_variables = [];
+        matches.forEach((m) => {
+          let name = m.slice(2, m.length - 2);
+          let attr = this.action.preview.find(v => v.name === name);
+
+          if (attr && attr.value) {
+            this.temp_variables.push({ name: name, value: attr.value });
+
+          } else if (attr && !attr.value) {
+            this.temp_variables.push({ name: name, value: null });
+
+          } else {
+            this.temp_variables.push({ name: name, value: null });
+            this.action.preview.push({ name: name, value: null });
+          }
+        })
+        resolve(false);
+      }
+    })
+  }
+
+  getResponse(question) {
+    this.logger.log("getResponse called...")
+
+    let data = {
+      question: question,
+      //context: this.action.context,
+      model: this.action.model,
+      max_tokens: this.action.max_tokens,
+      temperature: this.action.temperature,
+      top_k: this.action.top_k
+    }
+
+    this.showAiError = false;
+    this.searching = true;
+    this.showPreview = true;
+
+    setTimeout(() => {
+      let element = document.getElementById("preview-container");
+      element.classList.remove('preview-container-extended')
+    }, 200)
+
+    this.openaiService.previewAskPrompt(data).subscribe((ai_response: any) => {
+      this.searching = false;
+      setTimeout(() => {
+        let element = document.getElementById("preview-container");
+        element.classList.add('preview-container-extended')
+      }, 200)
+      this.ai_response = ai_response.answer;
+    }, (error) => {
+      this.searching = false;
+      this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", error);
+      setTimeout(() => {
+        let element = document.getElementById("preview-container");
+        element.classList.add('preview-container-extended')
+      }, 200)
+      this.showAiError = true;
+    }, () => {
+      this.logger.debug("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
+      this.searching = false;
+    })
+
+  }
+
+  openAttributesDialog() {
+    this.logger.log("temp_variables: ", this.temp_variables);
+    const dialogRef = this.dialog.open(AttributesDialogComponent, {
+      panelClass: 'custom-setattribute-dialog-container',
+      data: { attributes: this.temp_variables, question: this.action.question }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.logger.log("AttributesDialogComponent result: ", result);
+      if (result !== false) {
+        this.getResponse(result.question);
+        this.saveAttributes(result.attributes);
+      }
+    });
+  }
+
+  saveAttributes(attributes) {
+    this.logger.log("attributes: ", attributes);
+    attributes.forEach(a => {
+      let index = this.action.preview.findIndex(v => v.name === a.name)
+      if (index != -1) {
+        this.action.preview[index].value = a.value;
+      } else {
+        this.action.preview.push({ name: a.name, value: a.value })
+      }
+      this.updateAndSaveAction.emit();
+    })
   }
 
 }

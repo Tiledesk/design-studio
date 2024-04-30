@@ -219,4 +219,12 @@ export class CDSTextareaComponent implements OnInit {
     }
   }
 
+  openAttributesList(event) {
+    const keyCode = event.which || event.keyCode;
+    const key = event.key;
+    if (keyCode === 219 && key === "{") { // '{' keyboard code
+      this.addVariable.toggle();;
+    }
+  }
+
 }

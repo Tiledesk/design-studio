@@ -89,17 +89,17 @@ export class CdsActionWebRequestV2Component implements OnInit {
     }
   }
 
-  // ngOnChanges(changes: SimpleChanges) {
-  //   // on change
-  //   this.initialize();
-  //   if(this.intentSelected){
-  //     this.initializeConnector();
-  //   }
-  //   console.log('[ACTION-WEB-REQUEST-v2] onChanges' , this.action, this.intentSelected )
-  //   // if (this.action && this.action.assignStatusTo) {
-  //   //   this.hasSelectedVariable = true
-  //   // }
-  // }
+  ngOnChanges(changes: SimpleChanges) {
+    // on change
+    this.initialize();
+    if(this.intentSelected){
+      this.initializeConnector();
+    }
+    console.log('[ACTION-WEB-REQUEST-v2] onChanges' , this.action, this.intentSelected )
+    // if (this.action && this.action.assignStatusTo) {
+    //   this.hasSelectedVariable = true
+    // }
+  }
 
   // private checkConnectionStatus(){
   //   if(this.action.trueIntent){

@@ -43,6 +43,7 @@ export class DashboardService {
   
   constructor(
     // private route: ActivatedRoute,
+    private router: Router,
     private projectService: ProjectService,
     private faqKbService: FaqKbService,
     private departmentService: DepartmentService,
@@ -109,7 +110,10 @@ export class DashboardService {
           }
         }, error: (error) => {
           this.logger.error('[ DSHBRD-SERVICE ] getBotById ERROR: ', error);
+          this.router.navigate([`project/unauthorized`]);
           reject(false);
+          //redirect t ounauth
+          //resolve(true)
         }, complete: () => {
           this.logger.log('COMPLETE ');
           resolve(true);
