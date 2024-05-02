@@ -97,5 +97,34 @@ export class ProjectPlanUtils {
     }
 
 
+    public checkIfIsEnabledInProject(actionType: TYPE_ACTION | TYPE_ACTION_VXML): boolean{
+        
+        this.logger.log('[PROJECT_PROFILE] checkIfIsEnabledInProject -->', actionType, this.project)
+        if (this.project.profile['customization'] === undefined){
+            // ------------------------------------------------------------------------ 
+            // USECASE: customization obj not exist
+            // ------------------------------------------------------------------------
+            return false
+        } else if(this.project.profile['customization'] && this.project.profile['customization']['actions'] === undefined){
+            // ------------------------------------------------------------------------ 
+            // USECASE: customization obj exist AND customization.actions obj not exist
+            // ------------------------------------------------------------------------
+            return false
+        } else if(this.project.profile['customization'] && this.project.profile['customization']['actions'] !== undefined){
+            // ------------------------------------------------------------------------ 
+            // USECASE: customization obj AND customization.actions obj exists
+            // ------------------------------------------------------------------------
+            if(this.project.profile['customization']['actions'][actionType]){
+                return true
+            }
+            return false
+        }
+
+
+        return true
+    }
+
+
+
     
 }

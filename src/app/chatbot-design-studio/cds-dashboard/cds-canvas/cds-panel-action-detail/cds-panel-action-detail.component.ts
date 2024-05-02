@@ -97,14 +97,23 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
       this.logger.log('[PANEL-INTENT-DETAIL] (OnChanges) elementIntentSelectedType ', this.elementIntentSelectedType);
       this.logger.log('[PANEL-INTENT-DETAIL] (OnChanges) elementSelected ', this.elementSelected);
       
-      let action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType)
-      if(action && action.plan){
-        this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.type, action.plan)}
-        this.logger.log('[PANEL-INTENT-DETAIL] --> status', this.canShowActionByPlan)
-      }
+      this.checkActionAvailabilty()
 
     }catch(error){
       this.logger.log('[CDS-PANEL-INTENT-DETAIL] (ngOnChanges) ERROR', error);
+    }
+  }
+
+
+  checkActionAvailabilty(){
+    let action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType)
+    if(action && action.plan){
+      this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.type, action.plan)}
+      this.logger.log('[PANEL-INTENT-DETAIL] --> checkIfCanLoad status', this.canShowActionByPlan)
+    }
+    if(action && action.type === TYPE_ACTION.CODE){
+      this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfIsEnabledInProject(action.type)}
+      this.logger.log('[PANEL-INTENT-DETAIL] --> checkIfIsEnabledInProject status', this.canShowActionByPlan)
     }
   }
 
