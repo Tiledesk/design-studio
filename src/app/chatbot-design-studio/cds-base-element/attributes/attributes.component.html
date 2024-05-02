@@ -77,7 +77,7 @@
                             class="dx-input" 
                             [(ngModel)]="attribute.value" 
                             placeholder="{{ 'CDSCanvas.Value' | translate }}" 
-                            (ngModelChange)="onChangeAttributes(attribute, i)"
+                            (ngModelChange)="onChangeAttributes(attribute.value, i)"
                             (blur)="onBlur($event)">
                     </div>
                 </div>
