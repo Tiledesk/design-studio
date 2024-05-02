@@ -24,7 +24,9 @@ export class OperandV2Component implements OnInit {
     
     constructor(private formBuild: FormBuilder) {}
 
-    ngOnInit(): void {
+    ngOnInit(): void { }
+    
+    ngOnChanges(changes) {     
         this.initialize();
     }
 
