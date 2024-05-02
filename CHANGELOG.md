@@ -6,7 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
-### 1.6.1-rc.1
+### 1.5.1 in PROD
+
+### 1.5.1-rc.1
 - bug-fixed: cds-action-set-attribute-vs not show correct selected data if another action of the same type is already opened 
 - bug-fixed: cds-attributes save [object object] key while value text is changed 
 
