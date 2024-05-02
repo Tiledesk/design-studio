@@ -18,7 +18,7 @@
                     [placeholder]="'CDSCanvas.Key' | translate"
                     [autocompleteOptions]="autocompleteOptions"
                     (blur)="onBlur($event)"
-                    (onChange)="onChangeAttributes($event, i)">
+                    (onChange)="onChangeAttributes('key', $event, i)">
                 </cds-text>
 
                 <!-- VALUE -->
@@ -77,7 +77,7 @@
                             class="dx-input" 
                             [(ngModel)]="attribute.value" 
                             placeholder="{{ 'CDSCanvas.Value' | translate }}" 
-                            (ngModelChange)="onChangeAttributes(attribute.value, i)"
+                            (ngModelChange)="onChangeAttributes('value', attribute.value, i)"
                             (blur)="onBlur($event)">
                     </div>
                 </div>

@@ -80,8 +80,8 @@ export class AttributesComponent implements OnInit {
     // this.setChangedAttributes();
   }
 
-  onChangeAttributes(text: string, index: number){
-    this.newAttributes[index].key = text;
+  onChangeAttributes(type: 'key' | 'value', text: string, index: number){
+    this.newAttributes[index][type] = text;
     let attribute = { key : text, value: this.newAttributes[index].value}
     let that = this;
     if(attribute.key.length>0 || attribute.value.length>0){
