@@ -17,6 +17,8 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog.component';
 import { TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -60,6 +62,9 @@ export class CdsActionGPTTaskComponent implements OnInit {
   isConnectedFalse: boolean = false;
   connector: any;
   private subscriptionChangedConnector: Subscription;
+
+  projectPlan: PLAN_NAME
+  PLAN_NAME = PLAN_NAME
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -67,11 +72,13 @@ export class CdsActionGPTTaskComponent implements OnInit {
     private openaiService: OpenaiService,
     private intentService: IntentService,
     private appConfigService: AppConfigService,
+    private dashboardService: DashboardService
   ) { }
 
   ngOnInit(): void {
     this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
     this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive')
+    this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
       let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
@@ -494,7 +501,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   }
 
   goToKNB(){
-    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/knowledge-bases'
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name=openai'
     window.open(url, '_blank')
   }
 

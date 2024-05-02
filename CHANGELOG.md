@@ -2,7 +2,8 @@
 
 ### **Authors**: 
     *Gabriele Panico*
-    *Dario De Pascalis* 
+    *Dario De Pascalis*
+    *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 1.5.0-rc.3

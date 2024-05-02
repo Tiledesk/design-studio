@@ -58,14 +58,14 @@
 
   &.outline-border {
     outline: 2px solid #6c6859;
-    border-radius: 10px;
+    border-radius: var(--base-border-radius-preview);
   }
 
   &.ripple-effect {
     animation-name: ripple_effect;
     animation-duration: 1s;
     animation-iteration-count: 1s;
-    border-radius: 10px;
+    border-radius: var(--base-border-radius-preview);
   }
 
   &.isStart{
