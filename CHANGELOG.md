@@ -6,6 +6,8 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.5.0 in PROD
+
 ### 1.5.0-rc.3
 - added: open variable-list component on keydown '{' in textarea component
 - added: previewAskPrompt function in openaiService
