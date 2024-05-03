@@ -28,9 +28,9 @@
                 [checked]="operandForm.value.isVariable"
                 (change)="onChangeIsCheckbox($event)">
                 {{"CDSCanvas.TreatAsAttributeName" | translate}}
-                <span class="material-icons-outlined" *ngIf="true"
-                    [satPopoverAnchor]="descriptionTooltip"
-                    (click)="descriptionTooltip.toggle()">info</span>
+                <span class="material-icons-outlined" 
+                    matTooltipClass="cds-mat-tooltip"  matTooltip="{{ 'CDSCanvas.TreatAsAttributeNameTips' | translate }}" 
+                    #tooltip="matTooltip" matTooltipPosition='left' matTooltipHideDelay="100">info</span>
             </mat-checkbox>
         </section>
     </div>
@@ -51,16 +51,3 @@
     </div>
     
 </div>
-
-
-<sat-popover #descriptionTooltip id="descriptionTooltip" 
-    hasBackdrop 
-    verticalAlign="center" 
-    horizontalAlign="after" 
-    (backdropClicked)="descriptionTooltip.close()" 
-    panelClass="description-tooltip">
-    <div class="tooltip-wrp">
-        <div class="caret_tooltip"></div>
-        <span [innerHTML]="'CDSCanvas.TreatAsAttributeNameTips' | translate"></span>
-   </div>
-</sat-popover>
