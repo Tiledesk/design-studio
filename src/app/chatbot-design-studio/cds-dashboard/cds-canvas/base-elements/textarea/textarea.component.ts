@@ -29,7 +29,7 @@ export class CDSTextareaComponent implements OnInit {
   @Input() minRow: number = 2;
   @Input() maxRow: number = 20;
   @Input() readonly: boolean = false;
-  @Input() onevalue: boolean = false;
+  @Input() autoResize: boolean = false;
   @Input() popoverVerticalAlign: string = 'below'
 
   @Output() changeTextarea = new EventEmitter();
@@ -136,7 +136,7 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   onBlur(event){
-    this.maxRow = 1;
+    if(this.autoResize) this.maxRow = 1;
     this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen());
     if(!this.addVariable.isOpen() && !this.emojiPicker.isOpen() && this.textIsChanged){
       this.textIsChanged = false;
@@ -147,7 +147,7 @@ export class CDSTextareaComponent implements OnInit {
 
   onFocus(event){
     this.logger.log('[CDS-TEXAREA] - onFocus - isOpen textIsChanged');
-    this.maxRow = 5
+    if(this.autoResize) this.maxRow = 5
   }
 
   onVariableSelected(variableSelected: { name: string, value: string }) {
