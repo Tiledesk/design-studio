@@ -247,8 +247,7 @@ appdashboard-filter{
     text-overflow: ellipsis;
 }
 .action-row-right.empty,
-.set-attribute-value.empty,
-.set-attribute-operands-wpr {
+.set-attribute-value.empty{
     background: none !important;
     color: var(--empty-value-text-color) !important;
     padding: unset !important;

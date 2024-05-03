@@ -6,6 +6,11 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.5.2-rc.1
+- bug-fixed: cds-action-set-attribute not save operand as well while select a variable from list
+- bug-fixed: cds-action-set-attribute tips select checkbox on click
+- bug-fixed: cds-action-reply textarea element autoresize on single row on focusout 
+
 ### 1.5.1 in PROD
 
 ### 1.5.1-rc.1
