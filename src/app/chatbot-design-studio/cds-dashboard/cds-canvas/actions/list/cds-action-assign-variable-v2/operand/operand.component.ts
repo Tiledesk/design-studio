@@ -78,7 +78,7 @@ export class OperandV2Component implements OnInit {
 
     onSelectedAttribute(variableSelected: { name: string, value: string }){
         // this.operandForm.get('isVariable').setValue(true);
-        this.operandForm.get('value').setValue('{{' + variableSelected.name + '}}');
+        // this.operandForm.get('value').setValue('{{' + variableSelected.value + '}}');
         this.onChangeOperand.emit(this.operand) 
     }
     onClearSelectedAttribute(){
