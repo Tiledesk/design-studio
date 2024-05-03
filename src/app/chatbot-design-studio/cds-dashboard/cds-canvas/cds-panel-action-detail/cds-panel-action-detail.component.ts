@@ -111,10 +111,10 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
       this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.type, action.plan)}
       this.logger.log('[PANEL-INTENT-DETAIL] --> checkIfCanLoad status', this.canShowActionByPlan)
     }
-    if(action && action.type === TYPE_ACTION.CODE){
-      this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfIsEnabledInProject(action.type)}
-      this.logger.log('[PANEL-INTENT-DETAIL] --> checkIfIsEnabledInProject status', this.canShowActionByPlan)
-    }
+    // if(action && action.type === TYPE_ACTION.CODE){
+    //   this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfIsEnabledInProject(action.type)}
+    //   this.logger.log('[PANEL-INTENT-DETAIL] --> checkIfIsEnabledInProject status', this.canShowActionByPlan)
+    // }
   }
 
 
