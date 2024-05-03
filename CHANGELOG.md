@@ -6,7 +6,7 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
-### 1.5.2 in PROD
+### 1.5.2 in PROD 
 
 ### 1.5.2-rc.1
 - bug-fixed: cds-action-set-attribute not save operand as well while select a variable from list
