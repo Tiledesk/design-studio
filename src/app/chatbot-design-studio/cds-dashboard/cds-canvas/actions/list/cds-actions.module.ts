@@ -65,6 +65,7 @@ import { BaseElementModule } from 'src/app/shared/base-element.module';
 import { CdsActionBrevoComponent } from './cds-action-brevo/cds-action-brevo.component';
 import { CdsActionN8nComponent } from './cds-action-n8n/cds-action-n8n.component';
 import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds-action-reply-settings/cds-action-reply-settings.component';
+import { CdsActionGptAssistantComponent } from './cds-action-gpt-assistant/cds-action-gpt-assistant.component';
 
 @NgModule({
   declarations: [
@@ -103,6 +104,7 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
     CdsActionAskgptComponent,
     CdsActionGPTTaskComponent,
     CdsActionCaptureUserReplyComponent,
+    CdsActionGptAssistantComponent,
     CdsActionQaplaComponent,
     CdsActionCodeComponent,
     CdsActionAskgptV2Component,
@@ -184,6 +186,7 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
     CdsWhatsappReceiverComponent,
     CdsActionAskgptComponent,
     CdsActionGPTTaskComponent,
+    CdsActionGptAssistantComponent,
     CdsActionCaptureUserReplyComponent,
     CdsActionQaplaComponent,
     CdsActionCodeComponent,

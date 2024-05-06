@@ -208,6 +208,15 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-gpt-task>
 
+                    <cds-action-gpt-assistant *ngSwitchCase="TYPE_ACTION.GPT_ASSISTANT" 
+                        class="panel-response" 
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-gpt-assistant>
+
                     <cds-action-capture-user-reply *ngSwitchCase="TYPE_ACTION.CAPTURE_USER_REPLY"
                         class="panel-response"
                         [intentSelected]="intentSelected"

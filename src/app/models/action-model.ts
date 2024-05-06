@@ -338,6 +338,20 @@ export class ActionGPTTask extends Action {
     }
 }
 
+export class ActionGPTAssistant extends Action {
+    prompt: string;
+    assistantId: string;
+    threadIdAttribute: string;
+    assignResultTo: string;
+    assignErrorTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.GPT_ASSISTANT
+    }
+}
+
 export class ActionCaptureUserReply extends Action {
     assignResultTo: string;
     goToIntent: string;

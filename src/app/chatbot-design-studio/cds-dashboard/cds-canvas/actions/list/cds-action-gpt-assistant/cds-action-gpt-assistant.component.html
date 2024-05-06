@@ -1,0 +1,177 @@
+<div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
+
+    <div class="action-row">
+        <div class="action-row-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
+            </svg>
+        </div>
+
+        <div class="action-row-right">
+            <div *ngIf="action?.prompt" class="action-row-right">
+                {{action?.prompt}}
+            </div>
+            <div *ngIf="!action?.prompt" class="action-row-right empty">
+                {{'CDSCanvas.EnterPrompt' | translate }}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
+        
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+<div id="scrollMe" #scrollMe *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.Prompt' | translate }}</label>
+        <cds-textarea id="question" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [limitCharsText]="10000"
+            [minRow]="2"
+            [maxRow]="10" 
+            [text]="action.prompt" 
+            [placeholder]="'CDSCanvas.EnterPrompt' | translate"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'prompt')">
+        </cds-textarea>
+    </div>
+
+    <hr class="custom-divider" style="margin-top: 10px;">
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.GPTAssistant' | translate }}</label>
+        <cds-textarea 
+            id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1" 
+            [text]="action.assistantId"
+            (selectedAttribute)="onSelectedAttribute($event, 'assistantId')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assistantId')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.GPTThread' | translate }}</label>
+        <cds-textarea 
+            id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.threadIdAttribute"
+            (selectedAttribute)="onSelectedAttribute($event, 'threadIdAttribute')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'threadIdAttribute')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.GPTResult' | translate }}</label>
+        <cds-textarea 
+            id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" 
+            [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignResultTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.GPTError' | translate }}</label>
+        <cds-textarea 
+            id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" 
+            [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignErrorTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+        </cds-textarea>
+    </div>
+
+    <hr class="custom-divider" style="margin-top: 10px;">
+
+    <div class="field-box">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.Success' | translate }}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.trueIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
+            (onReset)="onResetBlockSelect($event, 'trueIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+    </div>
+
+    <div class="field-box">
+        <div class="condition-container">
+            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.falseIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
+            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="action.falseIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+        </cds-attributes> -->
+    </div>
+
+</div>
