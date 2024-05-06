@@ -61,7 +61,11 @@ export class CdsActionWebRequestV2Component implements OnInit {
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
   assignments: {} = {}
 
-  bodyOptions: Array<{label: string, value: string, disabled: boolean, checked: boolean}>= [ {label: 'none', value: 'none', disabled: false, checked: true}, {label: 'Json', value: 'json', disabled: false, checked: false}]
+  bodyOptions: Array<{label: string, value: string, disabled: boolean, checked: boolean}>= [ 
+      {label: 'none',       value: 'none',      disabled: false, checked: true  }, 
+      {label: 'Json',       value: 'json',      disabled: false, checked: false },
+      {label: 'form-data',  value: 'form-data', disabled: false, checked: false }
+  ]
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -192,7 +196,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.methods = Object.keys(TYPE_METHOD_REQUEST).map((key, index) => {
       return { label: key, value: key }
     })
-    this.jsonHeader = this.action.headersString;
+    this.jsonHeader = this.action.headersString
     this.bodyOptions.forEach(el => { el.value ===this.action.bodyType? el.checked= true: el.checked = false })
     // this.jsonIsValid = this.isValidJson(this.action.jsonBody);
     if(this.action.jsonBody){
@@ -270,6 +274,10 @@ export class CdsActionWebRequestV2Component implements OnInit {
       case 'json':
         this.body = this.action.jsonBody
         this.jsonHeader['Content-Type'] = 'application/json'
+        break;
+      case 'form-data':
+        this.jsonHeader['Content-Type'] = 'multipart/form-data'
+        break;
     }
     this.action.headersString = this.jsonHeader
   }
@@ -327,6 +335,10 @@ export class CdsActionWebRequestV2Component implements OnInit {
   onChangeAttributesResponse(attributes:{[key: string]: string }){
     this.action.assignments = attributes ;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
+  onFormDataChanged(event){
+    console.log('[ACTION-WEB-REQUEST-v2] onFormDataChanged --> ', event)
   }
 
   onSelectedAttribute(event, property) {

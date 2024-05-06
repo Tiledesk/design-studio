@@ -100,14 +100,14 @@
         </cds-attributes>
     </div>
     
-    <div class="cds-web-request-row" *ngIf="optionSelected === 'body'">
+    <div class="cds-web-request-row" *ngIf="optionSelected === 'body'" [ngSwitch]="action?.bodyType ">
 
         <cds-radio-buttons
             [items]="bodyOptions"
             (changeButtonSelect)="onChangeButtonSelect($event)">
         </cds-radio-buttons>
 
-        <cds-textarea id="body" *ngIf="action?.bodyType !== 'none'"
+        <cds-textarea id="body" *ngSwitchCase="'json'"
             [ngClass]="{'jsonError': !jsonIsValid}"
             class = "text-editable-div"
             [text]="body"
@@ -120,13 +120,20 @@
             (changeTextarea)="onChangeTextarea($event, 'body')">
         </cds-textarea>
 
-        <div class="cds-web-request-row-body center" *ngIf="action?.bodyType === 'none'">
+        <div class="cds-web-request-row-body center" *ngSwitchCase="'none'">
             <span>{{'CDSCanvas.ThisRequestNoBody' | translate }}</span>
         </div>
+
+        <cds-form-data *ngSwitchCase="'form-data'"
+            [dataRows]="[]"
+            (onDataRowChanged)="onFormDataChanged($event)">
+        </cds-form-data>
 
         <div class="cds-web-request-row-body center json-error-yes" *ngIf="action?.bodyType === 'body' && !jsonIsValid">
             <span>{{errorMessage}}</span>
         </div>
+
+
 
     </div>
 

@@ -51,7 +51,6 @@ import { CdsActionReplyRedirectComponent } from './cds-action-reply/elements/cds
 import { CdsActionReplyTextComponent } from './cds-action-reply/elements/cds-action-reply-text/cds-action-reply-text.component';
 import { CdsActionReplyToolsComponent } from './cds-action-reply/elements/cds-action-reply-tools/cds-action-reply-tools.component';
 import { CdsActionWaitComponent } from './cds-action-wait/cds-action-wait.component';
-import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
 import { CdsActionWebRequestComponent } from './cds-action-web-request/cds-action-web-request.component';
 import { CdsActionWhatsappAttributeComponent } from './cds-action-whatsapp-attribute/cds-action-whatsapp-attribute.component';
 import { CdsActionWhatsappStaticComponent } from './cds-action-whatsapp-static/cds-action-whatsapp-static.component';
@@ -65,6 +64,8 @@ import { BaseElementModule } from 'src/app/shared/base-element.module';
 import { CdsActionBrevoComponent } from './cds-action-brevo/cds-action-brevo.component';
 import { CdsActionN8nComponent } from './cds-action-n8n/cds-action-n8n.component';
 import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds-action-reply-settings/cds-action-reply-settings.component';
+import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-data.component';
+import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
 
 @NgModule({
   declarations: [
@@ -95,6 +96,7 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
     CdsActionHideMessageComponent,
     CdsActionWebRequestComponent,
     CdsActionWebRequestV2Component,
+      FormDataComponent,
     CdsActionMakeComponent,
     CdsActionHubspotComponent,
     CdsActionWhatsappAttributeComponent,
@@ -139,6 +141,7 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
     // action ASKGPT elements: end //
     // action GptTask elements: start //
     AttributesDialogComponent,
+    FormDataComponent,
     // action GptTask elements: end //
   ],
   imports: [
