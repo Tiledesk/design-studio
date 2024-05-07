@@ -77,6 +77,7 @@
             [setAttributeBtn]="true"
             [minRow]="1" [maxRow]="1" 
             [text]="action.assistantId"
+            (changeTextarea)="onChangeTextarea($event, 'assistantId')"
             (selectedAttribute)="onSelectedAttribute($event, 'assistantId')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assistantId')">
         </cds-textarea>

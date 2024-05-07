@@ -10,10 +10,10 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
     {
         key: 'mostUsed',
         elements: [
-            { name: 'last User text',                   value: 'last_user_text',                    description: 'CDSvariablesList.mostUsedELements.last_user_text.description',                            src: '', icon: 'send' },
-            { name: 'user Country',                     value: 'user_country',                      description: 'CDSvariablesList.mostUsedELements.user_country.description',                              src: '', icon: 'language' },
-            { name: 'user City',                        value: 'user_city',                         description: 'CDSvariablesList.mostUsedELements.user_city.description',                                 src: '', icon: 'language' },
-            { name: 'user Language',                    value: 'user_language',                     description: 'CDSvariablesList.mostUsedELements.user_language.description',                             src: '', icon: 'language' },
+            { name: 'last user text',                   value: 'lastUserText',                      description: 'CDSvariablesList.mostUsedELements.last_user_text.description',                            src: '', icon: 'send' },
+            { name: 'user country',                     value: 'user_country',                      description: 'CDSvariablesList.mostUsedELements.user_country.description',                              src: '', icon: 'language' },
+            { name: 'user city',                        value: 'user_city',                         description: 'CDSvariablesList.mostUsedELements.user_city.description',                                 src: '', icon: 'language' },
+            { name: 'user language',                    value: 'user_language',                     description: 'CDSvariablesList.mostUsedELements.user_language.description',                             src: '', icon: 'language' },
             { name: 'transcript',                       value: 'transcript',                        description: 'CDSvariablesList.mostUsedELements.transcript.description',                                src: '', icon: 'description'},
         ]
     },

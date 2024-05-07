@@ -899,8 +899,8 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.GPT_ASSISTANT){
       action = new ActionGPTAssistant();
       action.threadIdAttribute = 'firstThread'
-      action.assignResultTo = 'gpt_assistant_result';
-      action.assignErrorTo = 'gpt_assistant_error';
+      action.assignResultTo = 'assistantReply';
+      action.assignErrorTo = 'assistantError';
     }
     if(typeAction === TYPE_ACTION.CAPTURE_USER_REPLY) {
       action = new ActionCaptureUserReply();
