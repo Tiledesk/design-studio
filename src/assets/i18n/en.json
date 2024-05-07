@@ -594,7 +594,7 @@
             "WhatsAppBySegment":"This action send an approved WhatsApp template",
             "AskTheKnowledgeBase":"This action forwards the question to ChatGPT",
             "GPTTask":"This action forwards the question to ChatGPT",
-            "GPTAssistant":"",
+            "GPTAssistant":"The Assistants API is designed to help developers build powerful AI assistants capable of performing a variety of tasks.",
             "HiddenMessage":"",
             "ChangeDept":"",
             "Code":"",
@@ -613,7 +613,7 @@
             "SpeechForm":""
         },
         "DOCS": {
-            "Reply":"<a href=https://www.youtube.com/embed/p0ux-86Y4_I target=_blank>Here is how!</a> ",
+            "Reply":"<a href='https://www.youtube.com/embed/p0ux-86Y4_I' target='_blank'>Here is how!</a> ",
             "RandomReply":"",
             "AgentHandoff":"",
             "Close":"",
@@ -633,7 +633,7 @@
             "WhatsAppBySegment":"",
             "AskTheKnowledgeBase":"",
             "GPTTask":"",
-            "GPTAssistant":"",
+            "GPTAssistant":"<a href='https://platform.openai.com/docs/assistants/how-it-works' target='_blank'>Learn more!</a>",
             "HiddenMessage":"",
             "ChangeDept":"",
             "Code":"",

@@ -21,6 +21,10 @@
     font-family: var(--font-family-poppins);
     // border: 1px solid #e5effe;
     width: auto;
+
+    span{
+        margin: 0 2px;
+    }
 }
 .caret_tooltip {
     height: 8px;
