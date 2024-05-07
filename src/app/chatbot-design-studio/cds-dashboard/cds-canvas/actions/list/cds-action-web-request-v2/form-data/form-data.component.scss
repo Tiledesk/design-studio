@@ -1,6 +1,25 @@
+:host {
+    --background-color: var(--blu-light-01);
+    --column-color: var(--blu-02);
+    --text-color: var(--blu);
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --base-radius: 8px
+}
+
+.form-data-row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-group{
+    justify-content: flex-end;
+}
+
 cds-textarea#key ::ng-deep,
 cds-textarea#value ::ng-deep {
-    width: calc(50% - 2px);
+    // width: calc(50% - 2px);
     .editor-utils {
         display: flex;
         align-items: center;
@@ -19,10 +38,49 @@ cds-textarea#value ::ng-deep {
         font-weight: 500;
         font-size: 14px;
         margin: 3px 0px 3px 0;
+        padding: 0 10px 0 10px !important;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-        padding: 0!important;
         resize: none!important;
     }      
 }
+
+cds-textarea{
+    display: flex;
+
+    &#key{
+        width: 68%;
+    }
+}
+
+cds-textarea#value ::ng-deep {
+
+    textarea{
+        border-radius: 0 var(--base-radius) var(--base-radius) 0;
+    }
+}
+
+cds-select#method{
+    display: flex;
+    align-items: center;
+    width: 30%;
+
+    ::ng-deep{
+
+        .select-bot-box{
+            width: 100%
+        }
+
+        .ng-select .ng-select-container {
+            height: 28px;
+            min-height: 28px;
+            border-radius: 0;
+            border-right: 0px;
+            border-left: 0px;
+        }
+        .ng-select.ng-select-single .ng-select-container .ng-value-container .ng-input{
+            top: unset;
+        }
+    }
+} 

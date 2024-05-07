@@ -3,14 +3,12 @@
 
 
         <!-- Enabled/Disabled checkbox -->
-        <div class="disable-input-message">
-            <section class="disable-input-message-section">
-                <mat-checkbox 
-                    [checked]="dataRow?.enabled"
-                    (change)="onCheckboxChanged($event, i)">
-                </mat-checkbox>
-            </section>
-        </div>
+        <section class="disable-section">
+            <mat-checkbox 
+                [checked]="dataRow?.enabled"
+                (change)="onCheckboxChanged($event, i)">
+            </mat-checkbox>
+        </section>
 
         <!-- Name + type ('Text'/'file') -->
         <div class="input-group cds-input-group">
