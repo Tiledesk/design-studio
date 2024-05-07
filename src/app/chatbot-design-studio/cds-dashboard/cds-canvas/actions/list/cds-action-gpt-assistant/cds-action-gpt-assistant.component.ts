@@ -146,7 +146,7 @@ export class CdsActionGptAssistantComponent implements OnInit {
       new_attributes.push({ name: "assistantReply", value: "assistantReply" });
     }
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'assistantError')) {
-      new_attributes.push({ name: "assistantReply", value: "assistantError" });
+      new_attributes.push({ name: "assistantError", value: "assistantError" });
     }
     variableList.find(el => el.key ==='userDefined').elements = [...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
     this.logger.debug("[ACTION GPT-ASSISTANT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));

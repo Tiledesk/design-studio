@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.6.0-rc.3
+- added: form-data implementation as a body option in cds-action-web-request-v2
+
 ### 1.6.0-rc.2
 - changed: last_user_text user defined variable to lastUserText new user defined variable
 - bug-fixed: cds-action-gpt-assistant not save property as well
