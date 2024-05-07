@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.6.0-rc.1
+- added: cds-action-gpt-assistant
+
 ### 1.5.2-rc.1
 - bug-fixed: cds-action-set-attribute not save operand as well while select a variable from list
 - bug-fixed: cds-action-set-attribute tips select checkbox on click
