@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 
@@ -23,6 +23,7 @@ import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
+import { every, filter } from 'rxjs';
 
 const swal = require('sweetalert');
 
@@ -51,6 +52,7 @@ export class CdsHeaderComponent implements OnInit {
   isBetaUrl: boolean = false;
   popup_visibility: string = 'none';
   TRY_ON_WA: boolean;
+  isBlockSectionActive: boolean = true
 
   LOGO_MENU_ITEMS = LOGO_MENU_ITEMS;
   SHARE_MENU_ITEMS = SHARE_MENU_ITEMS;
@@ -73,7 +75,26 @@ export class CdsHeaderComponent implements OnInit {
     private tiledeskAuthService: TiledeskAuthService,
     private notify: NotifyService,
     private translate: TranslateService
-  ) { }
+  ) { 
+    this.manageRouteChanges();
+  }
+
+  manageRouteChanges(){
+    /** check INIT ROUTE */
+    const child = this.router.url.split('/').slice(-1)[0];
+    if(child !== 'blocks'){
+      this.isBlockSectionActive = false
+    }
+
+    /** subscribe to ROUTE changes (ON NAVIGATIONSTART) */
+    this.router.events.pipe(filter(event => event instanceof NavigationStart)).subscribe((route: NavigationStart) => {
+      const child = route.url.split('/').slice(-1)[0];
+      this.isBlockSectionActive = true
+      if(child !== 'blocks'){
+        this.isBlockSectionActive = false
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.id_faq_kb = this.dashboardService.id_faq_kb;
