@@ -21,7 +21,6 @@ export class NetworkService {
       fromEvent(window, 'offline')
     ).pipe(map(() => navigator.onLine))
       .subscribe(status => {
-        // console.log('[NETWORK-OFFLINE] connection status', status);
         // this.networkStatus = status;
         this.networkStatus$.next(status)
       });

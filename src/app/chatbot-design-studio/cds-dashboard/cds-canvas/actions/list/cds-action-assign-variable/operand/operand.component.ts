@@ -70,7 +70,6 @@ export class OperandComponent implements OnInit {
     }
 
     onBlur(event){
-        // console.log('[ACTION REPLY TEXT] onBlur', event);
         this.onChangeOperand.emit(this.operand);
     }
 

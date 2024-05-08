@@ -70,7 +70,6 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      // console.log('[CDS-ACTION-REPLY-TEXT] - subcribe to isChangedConnector$ >>', connector);
       this.connector = connector;
       this.updateConnector();
     });
@@ -140,7 +139,6 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
       const idConnector = this.idAction+'/'+idButton;
       const buttonChanged = this.buttons.find(obj => obj.uid === idButton);
       
-      // console.log('updateConnector [CdsActionReplyTextComponent]:: connector.fromId: ', idConnector, idButton, this.connector.fromId);
       if(idConnector === this.connector.fromId && buttonChanged){
         this.logger.log('updateConnector [CdsActionReplyTextComponent]:: buttonChanged: ', this.connector, buttonChanged, this.buttons, idButton);
         if(this.connector.deleted){

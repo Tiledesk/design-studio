@@ -238,7 +238,6 @@ export class CdsFormComponent implements OnInit, OnChanges {
     // this.intentSelected.form = this.intentForm;
     this.updateIntentForm.emit(this.intentForm);
     // this.logger.log('[FORM-COMP] jsonGenerator this.intentSelected:: ', this.intentSelected);
-    // console.log('jsonGenerator form::: ', this.intentSelected);
   }
 
   openSettingsForm() {

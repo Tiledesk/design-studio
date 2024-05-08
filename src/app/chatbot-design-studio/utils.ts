@@ -645,33 +645,24 @@ export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     let arrayCoord = [];
     listOfIntents.forEach(intent => {
         const element = document.getElementById(intent.intent_id);
-        // console.log('element', intent.intent_id, element);
         arrayCoord.push({maxX:element.offsetLeft+element.offsetWidth, minX:element.offsetLeft, maxY:element.offsetTop+element.offsetHeight, minY:element.offsetTop});
     });
     var maxX = Math.max(...arrayCoord.map(obj => obj.maxX));
     var minX = Math.min(...arrayCoord.map(obj => obj.minX));
     var maxY = Math.max(...arrayCoord.map(obj => obj.maxY));
     var minY = Math.min(...arrayCoord.map(obj => obj.minY));
-    // console.log('coordinate', minX, maxX, minY, maxY);
-    // console.log("Coordinata x maggiore:", maxX, maxX_ );
-    // console.log("Coordinata x minore:", minX, minX_);
-    // console.log("Coordinata y maggiore:", maxY, maxY_);
-    // console.log("Coordinata y minore:", minY, minY_);
-    // let rightIntentWith = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.x > curr.attributes.position.x ? prev : curr}).intent_id).offsetWidth;
-    // let bottomIntentHeight = document.getElementById(listOfIntents.reduce((prev, curr)=> { return prev.attributes.position.y < curr.attributes.position.y ? prev : curr}).intent_id).offsetHeight;
-    // console.log('rightIntentWith', rightIntentWith, rightIntentWith_)
-    // console.log('bottomIntentHeight', bottomIntentHeight, bottomIntentHeight_)
+    
     const padding = 100
     var width = (maxX - minX)+ padding;
     var height = (maxY - minY) + padding;
     const stage = document.getElementById('tds_container').getBoundingClientRect()
     var scale = Math.min(stage.width / width, stage.height / height);
-    // console.log('scaleeeee: ', scale, (stage.width / width), (stage.height / height));
+    
     width = width*scale;
     height = height*scale;
-    // console.log('dimensione: ', width, height);
+    
     let centerPointX = (minX + (maxX-minX)/2)*scale;
     let centerPointY = (minY + (maxY-minY)/2)*scale;
-    // console.log('translateeee x- y ', translationX, translationY)
+    
     return { point: { x: centerPointX, y: centerPointY }, scale: scale }
 }

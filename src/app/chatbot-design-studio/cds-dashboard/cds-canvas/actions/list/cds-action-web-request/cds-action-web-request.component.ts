@@ -143,7 +143,6 @@ export class CdsActionWebRequestComponent implements OnInit {
   }
 
   onChangeAttributes(attributes:any){
-    // console.log('onChangeAttributes');
     this.action.headersString = attributes;
     this.updateAndSaveAction.emit()
     // this.jsonHeader = attributes;

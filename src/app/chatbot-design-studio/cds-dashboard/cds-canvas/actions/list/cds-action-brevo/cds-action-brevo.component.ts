@@ -164,21 +164,6 @@ export class CdsActionBrevoComponent implements OnInit {
   // EVENT FUNCTIONS //
   onChangeTextarea(e, type){
     this.logger.log('type; ', type);
-    // switch(type){
-    //   // case 'token' : {
-    //   //   this.action.token = e;
-    //   //   this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-    //   //   console.log("[ACTION-BREVO] this.action", this.action);
-    //   // }
-    //   // break;
-    //   // case 'formid' : {
-    //   //   this.action.formid = e;
-    //   //   this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-    //   //   this.logger.log("[ACTION-BREVO] this.action", this.action);
-    //   // }
-    //   // break;
-    // }
-
   }
 
 

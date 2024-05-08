@@ -31,7 +31,6 @@ export class WsChatbotService {
 
   getAppConfig() {
     this.SERVER_BASE_PATH = this.appConfigService.getConfig().apiUrl;
-    // console.log('[WS-MSGS-SERV] getAppConfig SERVER_BASE_PATH', this.SERVER_BASE_PATH);
   }
 
   // -----------------------------------------------------------------------------------------------------

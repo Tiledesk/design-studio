@@ -69,7 +69,6 @@ export class CDSElementFromUrlComponent implements OnInit {
   }
 
   onBlur(event){
-    // console.log('[ACTION REPLY TEXT] onBlur', event.target.value, this.response.text);
   }
 
   onLoadPathElement(){

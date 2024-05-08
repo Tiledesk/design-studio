@@ -59,11 +59,6 @@ export class CdsActionIntentComponent implements OnInit {
     }
   }
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   console.log('[CDS-ACTION-INTENT] >> ngOnChanges', changes);
-  //   this.checkConnectionStatus();
-  // }
-
 
   private checkConnectionStatus(){
     this.logger.log('[CDS-ACTION-INTENT] **************************11111');
@@ -123,19 +118,6 @@ export class CdsActionIntentComponent implements OnInit {
       this.logger.log('error: ', error);
     }
   }
-
-
-  // onChangeConnector(){
-  //   if(this.action.intentName == null){
-  //     // DELETE 
-  //     this.logger.log('[CDS-ACTION-INTENT] deleteConnector :: ');
-  //     this.isConnected = false;
-  //   } else {
-  //     // ADD / EDIT
-  //     console.log('[CDS-ACTION-INTENT] updateConnector :: ');
-  //     this.isConnected = true;
-  //   }
-  // }
 
   onChangeSelect(event: {name: string, value: string}){
     if(event){

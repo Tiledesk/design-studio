@@ -27,7 +27,6 @@ export class PanelIntentControlsComponent implements OnInit {
   }
 
   onMouseOverWebhookBtn() {
-    // console.log('[CDS-INTENT] onMouseOverWebhookBtn  intent ', intent)
     if (!this.webhookEnabled) {
       this.webHookTooltipText = "Enable webhook"
     } else if (this.webhookEnabled) {

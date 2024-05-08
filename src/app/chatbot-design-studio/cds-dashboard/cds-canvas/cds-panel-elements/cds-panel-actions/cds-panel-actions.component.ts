@@ -37,8 +37,6 @@ export class CdsPanelActionsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // console.log('ngOnInit: ', this.menuType);
-    // console.log('menuItemsList',this.menuItemsList, this.menuType);
   }
 
   ngOnChanges() {
@@ -111,7 +109,6 @@ export class CdsPanelActionsComponent implements OnInit {
     // this.connectedIDLists = this.dragDropService.connectedIDLists;
     // // ['action_list_drop_connect','drop-actions'];
     // // this.dragDropService.connectedIDLists;
-    // console.log("connectedLists--------------------> ",this.connectedIDLists);
   }
 
   onDragStarted(event:CdkDragStart, currentIndex: number) {

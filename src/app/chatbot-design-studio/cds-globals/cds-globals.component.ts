@@ -62,7 +62,6 @@ export class CdsGlobalsComponent implements OnInit {
 
   showUpdateSecret(index, global) {
     this.updateIndex = index;
-    console.log('indexxxxx', this.updateIndex)
     if (global) {
       this.IS_OPEN_PANEL_GLOBAL_DETAIL = true
       this.selectedGlobal = global
@@ -171,18 +170,12 @@ export class CdsGlobalsComponent implements OnInit {
 
 
   // showHideUpdateSecret(secret) {
-  //   console.log("showHideUpdateSecret with key: ", secret.key);
   //   let target = "update-secret-" + secret.key;
-  //   console.log("target: ", target);
-
   //   let el = <HTMLInputElement>document.getElementById(target);
-  //   console.log("el: ", el);
-
   //   let span_target = "span-icon-" + secret.key;
 
   //   let el_icon = <HTMLSpanElement>document.getElementById(span_target);
-  //   console.log("el_icon: ", el_icon);
-
+  
 
   //   this.updateSecretVisible = !this.updateSecretVisible;
   //   if (el) {

@@ -60,7 +60,6 @@ export class CdsActionMakeComponent implements OnInit {
     this.logger.debug("[ACTION-MAKE] action detail: ", this.action, ACTIONS_LIST["MAKE"].plan);
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-MAKE] isChangedConnector -->', connector);
-      //console.log('[ACTION-MAKE] isChangedConnector indexIdMatch -->', connector, this.idIntentSelected, this.action._tdActionId);
       let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
       if(connector.fromId.startsWith(connectorId)){
         this.connector = connector;

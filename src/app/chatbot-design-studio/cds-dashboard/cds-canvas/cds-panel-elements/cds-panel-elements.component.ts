@@ -93,7 +93,6 @@ export class CdsPanelElementsComponent implements OnInit {
   }
 
   onIsDraggingMenuElement(event: boolean){
-    // console.log('[CDS-PANEL-ELEMENTS] onIsDraggingMenuElement event' , event)
     this.isDraggingMenuElement = event;
     if(event === false){
       this.onCloseMenu();

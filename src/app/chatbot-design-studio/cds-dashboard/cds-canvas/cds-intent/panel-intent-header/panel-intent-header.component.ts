@@ -37,14 +37,11 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    // console.log("[PANEL-INTENT-HEADER] intentSelected: ", this.intent)
     this. initialize();
   }
 
   ngOnChanges() {
-    // console.log("[PANEL-INTENT-HEADER] header OnChanges intentSelected: ", this.intent)
     // this.logger.log("[PANEL-INTENT-HEADER] header OnChanges intentSelected intent_display_name: ", this.intent.intent_display_name)
-    // console.log("[PANEL-INTENT-HEADER] header OnChanges listOfIntents: ", this.listOfIntents)
   }
 
   /******************* CUSTOM FUNCTIONS *******************/ 
@@ -79,7 +76,6 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
       this.intentNameResult = false;
     }
     for (let i = 0; i < this.listOfIntents.length; i++) {
-      // console.log("[PANEL-INTENT-HEADER] checkIntentName::: ", this.listOfIntents[i], name, this.intent);
       if (this.listOfIntents[i].intent_display_name === name && this.listOfIntents[i].intent_id !== this.intent.intent_id) { 
         this.intentNameAlreadyExist = true;
         this.intentNameResult = false;
@@ -153,7 +149,6 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   // /** BLUR EVENT*/
   // onBlurIntentName(event) {
-  //   console.log('[PANEL-INTENT-HEADER] onBlurIntentName Intent name: onEnterButtonPressed event', event)
   //   // this.checkIntentName(this.intentName);
   //   // this.onSaveIntent();
   // }

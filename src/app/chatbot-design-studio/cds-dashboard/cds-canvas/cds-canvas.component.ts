@@ -236,7 +236,6 @@ export class CdsCanvasComponent implements OnInit {
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
     const getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
-    // console.log('[CDS-CANVAS] getAllIntents', this.intentService.listOfIntents);
     if (getAllIntents) {
       this.listOfIntents = this.intentService.listOfIntents;
       this.initListOfIntents();
@@ -447,7 +446,7 @@ export class CdsCanvasComponent implements OnInit {
     */
     document.addEventListener(
       "connector-selected", (e: CustomEvent) => {
-      //  console.log("[CDS-CANVAS] connector-selected:", e, e.detail.mouse_pos);
+        //console.log("[CDS-CANVAS] connector-selected:", e, e.detail.mouse_pos);
         this.closeAllPanels();
         this.closeActionDetailPanel();
         this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
@@ -524,7 +523,6 @@ export class CdsCanvasComponent implements OnInit {
   @HostListener('document:keydown', ['$event']) 
   onKeydownHandler(event: KeyboardEvent) {
     // event.key === 'Backspace' ||
-    // console.log('[CDS-CANVAS] MOUSE KEYDOWN CLOSE FLOAT MENU hasClickedAddAction ', this.hasClickedAddAction)
     if (event.key === 'Escape' || event.key === 'Canc' && !this.hasClickedAddAction) {
       if (!this.hasClickedAddAction) {
         // case: FLOAT MENU
@@ -1137,7 +1135,6 @@ export class CdsCanvasComponent implements OnInit {
    * @param event 
    */
   async onAddActionFromConnectorMenu(event) {
-    // console.log('[CDS-CANVAS] onAddActionFromConnectorMenu:: ', event, connector.id);
     if(event.type === "delete"){
       const intentId = this.connectorSelected.id.split('/')[0];
       let intent = this.intentService.getIntentFromId(intentId);
@@ -1187,9 +1184,6 @@ export class CdsCanvasComponent implements OnInit {
         this.IS_OPEN_CONTEXT_MENU = true;
         this.logger.log('Attributi dell\'elemento premuto:', customAttributeValue);
       }
-      // Stampa gli attributi dell'elemento
-      // console.log('ID dell\'elemento premuto:', targetElement.id);
-      // console.log('Classi dell\'elemento premuto:', targetElement.className);
   }
 
   public onHideContextMenu(){
