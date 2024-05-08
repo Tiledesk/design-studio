@@ -125,7 +125,7 @@
         </div>
 
         <cds-form-data *ngSwitchCase="'form-data'"
-            [dataRows]="[]"
+            [dataRows]="action?.formData"
             (onDataRowChanged)="onFormDataChanged($event)">
         </cds-form-data>
 
