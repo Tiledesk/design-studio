@@ -1,7 +1,12 @@
 <div class="form-data-wrp">
+    
+    <div class="form-data-row-header">
+        <div class="disable-section"></div>
+        <div class="key">Key</div>
+        <div class="value">Value</div>
+    </div>
+
     <div class="form-data-row" *ngFor="let dataRow of dataRows; let i=index">
-
-
         <!-- Enabled/Disabled checkbox -->
         <section class="disable-section">
             <mat-checkbox 
@@ -14,7 +19,7 @@
         <div class="input-group cds-input-group">
             <cds-textarea id="key"
                 class="text-editable-div"
-                [text]="dataRow.name" 
+                [text]="dataRow?.name" 
                 [minRow]="1" [maxRow]="5"
                 popoverVerticalAlign="above"
                 [textLimitBtn]="false"
@@ -37,7 +42,7 @@
         <!-- Value -->
         <cds-textarea id="value"
             class="text-editable-div"
-            [text]="dataRow.value" 
+            [text]="dataRow?.value" 
             [minRow]="1" [maxRow]="5"
             popoverVerticalAlign="above"
             [textLimitBtn]="false"

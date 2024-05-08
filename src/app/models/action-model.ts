@@ -149,6 +149,7 @@ export class ActionWebRequestV2 extends Action {
     headersString: any;
     settings: any;
     jsonBody: string;
+    formData: Array<FormData>;
     bodyType: string;
     assignResultTo: string;
     assignStatusTo: string;
@@ -163,6 +164,7 @@ export class ActionWebRequestV2 extends Action {
         this.settings = { timeout: 20000 }
         this.jsonBody = null
         this.bodyType = 'none'
+        this.formData = [];
         this.assignStatusTo = '';
         this.assignErrorTo = '';
         this.assignments = {};
@@ -170,6 +172,20 @@ export class ActionWebRequestV2 extends Action {
         this._tdActionType = TYPE_ACTION.WEB_REQUESTV2;
     }
 }
+
+export class FormData {
+    name: string;
+    value: string;
+    type: 'Text' | 'URL';
+    enabled: boolean;
+    constructor(){
+      this.name = '';
+      this.value = '';
+      this.type = 'Text';
+      this.enabled = true
+    }
+  
+  }
 
 export class ActionReplaceBot extends Action {
     botName: string;

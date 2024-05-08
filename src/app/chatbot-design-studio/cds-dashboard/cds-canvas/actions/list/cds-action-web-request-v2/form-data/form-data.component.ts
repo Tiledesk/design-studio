@@ -1,31 +1,37 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormData } from 'src/app/models/action-model';
 
 @Component({
   selector: 'cds-form-data',
   templateUrl: './form-data.component.html',
   styleUrls: ['./form-data.component.scss']
 })
+
+
+
 export class FormDataComponent implements OnInit {
 
-  @Input() dataRows: Array<{name: string, value: string, type: 'Text' | 'file', enabled: boolean}>
-  @Output() onDataRowChanged = new EventEmitter<Array<{name: string, value: string, type: 'Text' | 'file', enabled: boolean}>>()
+  @Input() dataRows: Array<FormData>
+  @Output() onDataRowChanged = new EventEmitter<Array<FormData>>()
 
-  methods: Array<{label: string, value: string}>;
+  methods: Array<{label: string, value: string}> = [
+    { label: 'Text', value: 'Text'},
+    { label: 'URL', value: 'URL'}
+  ]
   constructor() { }
 
   ngOnInit(): void {
+    
+  }
+
+  ngOnChanges(){
     this.initialize()
   }
 
 
   initialize(){
-    this.methods = [
-      { label: 'Text', value: 'Text'},
-      { label: 'File', value: 'file'}
-    ]
-    console.log('rowwwwwwww', this.dataRows)
     if(!this.dataRows || this.dataRows.length === 0){
-      this.dataRows.push({ name: '', value: '', type: 'Text', enabled: true})
+      this.dataRows.push(new FormData())
     }
   }
 
@@ -34,7 +40,7 @@ export class FormDataComponent implements OnInit {
     this.onDataRowChanged.emit(this.dataRows)
   }
 
-  onChangeMethodButton(e: {label: string, value: 'Text' | 'file'}, index: number){
+  onChangeMethodButton(e: {label: string, value: 'Text' | 'URL'}, index: number){
     this.dataRows[index].type = e.value;
     this.onDataRowChanged.emit(this.dataRows)
   }
@@ -63,7 +69,7 @@ export class FormDataComponent implements OnInit {
     let that = this;
     if(row.name.length>0 || row.value.length>0){
       if (index == this.dataRows.length-1){
-        this.dataRows.push({ name: '', value: '', type: 'Text', enabled: true});
+        this.dataRows.push(new FormData());
       }
     } else {
       this.dataRows.forEach(function(item, index, object) {

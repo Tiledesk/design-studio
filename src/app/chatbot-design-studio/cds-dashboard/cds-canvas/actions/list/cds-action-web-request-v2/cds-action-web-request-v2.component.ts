@@ -207,6 +207,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
     if(this.action.settings){
       this.jsonSettings = this.action.settings
     }
+    if(!this.action.formData){
+      this.action.formData = []
+    }
     this.assignments = this.action.assignments
     if(this.intentSelected){
       this.initializeConnector();
@@ -338,7 +341,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
   }
 
   onFormDataChanged(event){
-    console.log('[ACTION-WEB-REQUEST-v2] onFormDataChanged --> ', event)
+    this.logger.log('[ACTION-WEB-REQUEST-v2] onFormDataChanged --> ', event)
+    this.action.formData= event
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
   onSelectedAttribute(event, property) {
