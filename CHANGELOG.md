@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.6.0-rc.4
+- added: check on PRO action badge. show it depends on current project type and action plan availability
+- bug-fixed: if drop an action from an intent to another, connectors are lost
+ 
 ### 1.6.0-rc.3
 - added: form-data implementation as a body option in cds-action-web-request-v2
 
