@@ -628,6 +628,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             this.logger.log("[CDS-INTENT] onDropAction sposto la action tra 2 intent differenti");
             this.intentService.moveActionBetweenDifferentIntents(event, action, this.intent.intent_id);
             this.intentService.updateIntent(this.intent, null);
+            this.connectorService.updateConnectorsOfBlock(this.intent.intent_id)
           } else if (action.value && action.value.type) {
             // moving new action in intent from panel elements
             this.logger.log("[CDS-INTENT] onDropAction aggiungo una nuova action all'intent da panel elements - action ", this.newActionCreated);
