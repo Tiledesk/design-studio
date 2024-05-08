@@ -4,6 +4,7 @@ import { CdkDropList, CdkDragStart, CdkDragEnd, CdkDragMove } from '@angular/cdk
 import { ControllerService } from '../../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -33,6 +34,7 @@ export class CdsPanelActionsComponent implements OnInit {
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private controllerService: ControllerService,
+    private projectPlanUtils: ProjectPlanUtils,
     // public dragDropService: DragDropService
   ) { }
 
@@ -45,7 +47,8 @@ export class CdsPanelActionsComponent implements OnInit {
         this.menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[this.menuCategory] && el.status !== 'inactive')).map(element => {
           return {
             type: TYPE_OF_MENU.ACTION,
-            value: element
+            value: element,
+            canLoad: element.plan? this.projectPlanUtils.checkIfCanLoad(element.type, element.plan) : true
           };
         });
         break;
