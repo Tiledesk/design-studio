@@ -160,6 +160,14 @@ export class CdsActionGptAssistantComponent implements OnInit {
     // this.updateAndSaveAction.emit();
   }
 
+  onSelectedAttribute(event, property) {
+    this.logger.log("[ACTION GPT-ASSISTANT] onEditableDivTextChange event", event)
+    this.logger.log("[ACTION GPT-ASSISTANT] onEditableDivTextChange property", property)
+    this.action[property] = event.value;
+    this.logger.log("[ACTION GPT-ASSISTANT] Action updated: ", this.action);
+    this.updateAndSaveAction.emit();
+  }
+
   onBlur(event){
     this.updateAndSaveAction.emit();
   }
