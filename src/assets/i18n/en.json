@@ -489,6 +489,7 @@
     },
     "CDSActionCategory":{
         "MostUsed":"Most used",
+        "AI":"AI",
         "Flow":"Flow",
         "Integrations":"Integrations",
         "Special":"Special",
