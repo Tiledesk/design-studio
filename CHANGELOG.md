@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.6.0-rc.5
+- added: ability to hide 'try on whatsapp' and 'test it out' header buttons if current route is not 'blocks'
+- changed: css of changelog component 
+
 ### 1.6.0-rc.4
 - added: check on PRO action badge. show it depends on current project type and action plan availability
 - bug-fixed: if drop an action from an intent to another, connectors are lost
