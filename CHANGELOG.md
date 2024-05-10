@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.6.0-rc.6
+- added: ai action category section
+
 ### 1.6.0-rc.5
 - added: ability to hide 'try on whatsapp' and 'test it out' header buttons if current route is not 'blocks'
 - changed: css of changelog component 
