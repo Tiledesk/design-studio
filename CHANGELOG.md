@@ -6,6 +6,8 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.6.0 in PROD
+
 ### 1.6.0-rc.6
 👉 **added**: ai action category section <br> 
 👉 **added**: clickout management for globals-detail panel <br>
