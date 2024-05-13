@@ -7,7 +7,7 @@
 ### **Copyrigth**: *Tiledesk SRL*
 
 ### 1.6.0-rc.6
-👉 **added**: ai action category section <br>
+👉 **added**: ai action category section <br> 
 👉 **added**: clickout management for globals-detail panel <br>
 
 ### 1.6.0-rc.5
