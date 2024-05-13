@@ -1,5 +1,5 @@
 import { Global } from '../../models/global-model';
-import { Component, HostListener, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { variableList } from '../utils-variables';
 import { Chatbot } from 'src/app/models/faq_kb-model';
@@ -150,8 +150,8 @@ export class CdsGlobalsComponent implements OnInit {
   // -------------------------------------------------------
   @HostListener('document:click', ['$event'])
   documentClick(event: any): void {
-    this.logger.log('[CDS GLOBALS] DOCUMENT CLICK event: ', event.target);
-    if (event.target.id.startsWith("cds-globals-")) {
+    this.logger.log('[CDS GLOBALS] DOCUMENT CLICK event: ', event);
+    if (event.target.id.startsWith("cds-globals") || event.target.className.startsWith("cds-ss-main-content")) {
       this.IS_OPEN_PANEL_GLOBAL_DETAIL = false
     }
   }

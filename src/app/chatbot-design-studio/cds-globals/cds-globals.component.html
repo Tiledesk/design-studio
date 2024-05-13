@@ -1,4 +1,4 @@
-<div class="container-fluid" *ngIf="showWelcome">
+<div class="container-fluid" *ngIf="showWelcome" id="cds-globals-splash">
     <cds-splash-screen
         [text]="MEDIA['GLOBALS'].text | translate"
         [section]="'cds-sb-globals'"
@@ -7,7 +7,7 @@
 </div>
 
 
-<div class="container-fluid" *ngIf="!showWelcome" id="cds-globals">
+<div class="container-fluid" *ngIf="!showWelcome" id="cds-globals-list">
 
     <!-- // HEADER - START -->
     <div class="row">
@@ -27,7 +27,7 @@
     <!-- // HEADER - END -->
 
     <!-- // CONTENT - END -->
-    <div class="content">
+    <div class="content" id="cds-globals-content">
         <div class="info">
             <div class="container-wrp">
                 <!-- <span class="material-icons-outlined">info</span> -->
