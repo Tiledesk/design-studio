@@ -6,6 +6,8 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.6.1 in PROD
+
 ### 1.6.1-rc.1
 👉 **changed**: encoded chatbot name in share link
 👉 **bug-fixed**: assistantID is not saved correctly 
