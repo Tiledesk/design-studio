@@ -56,7 +56,9 @@
 }
 
 .header-right {
-    display: flex;
+    // display: flex;
+    display: grid;
+    grid-template-columns: 2fr 3fr 2.5fr;
     align-items: center;
     justify-content: space-between;
     width: 100%;
@@ -66,6 +68,7 @@
     .right-opts{
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         gap: 10px;
     }
 
@@ -117,6 +120,7 @@
     .header-title {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 5px;
         font-weight: 300;
 
