@@ -6,6 +6,12 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.7.0-rc.1
+👉 **added**: GPT-4o model into gpts actions
+👉 **added**: dynamic label to delay-slider component
+👉 **added**: voice flow variables
+👉 **bug-fixed**: connector and timeout slider values not updated on changes
+
 ### 1.6.1-rc.1
 👉 **changed**: encoded chatbot name in share link
 👉 **bug-fixed**: assistantID is not saved correctly 
