@@ -6,6 +6,8 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.7.0 in PROD
+
 ### 1.7.0-rc.1
 👉 **added**: GPT-4o model into gpts actions
 👉 **added**: dynamic label to delay-slider component

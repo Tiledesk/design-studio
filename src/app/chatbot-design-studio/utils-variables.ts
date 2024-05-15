@@ -66,10 +66,10 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'strong Authenticated',                     value: 'strongAuthenticated',               description: 'CDSvariablesList.leadAttributesElements.strongAuthenticated.description',                     src: '', icon:'password'}
         ]
     },
-    {   key: 'voiceFlow',
-        elements: [
-            { name: 'event',                                    value: 'event',                             description: 'CDSvariablesList.voiceFlowElements.event.description',                                        src: '', icon:'perm_phone_msg'},
-            { name: 'last block',                               value: 'lastBlock',                         description: 'CDSvariablesList.voiceFlowElements.lastBlock.description',                                    src: '', icon:'perm_phone_msg'},
-        ]
-    }
+    // {   key: 'voiceFlow',
+    //     elements: [
+    //         { name: 'event',                                    value: 'event',                             description: 'CDSvariablesList.voiceFlowElements.event.description',                                        src: '', icon:'perm_phone_msg'},
+    //         { name: 'last block',                               value: 'lastBlock',                         description: 'CDSvariablesList.voiceFlowElements.lastBlock.description',                                    src: '', icon:'perm_phone_msg'},
+    //     ]
+    // }
 ]
