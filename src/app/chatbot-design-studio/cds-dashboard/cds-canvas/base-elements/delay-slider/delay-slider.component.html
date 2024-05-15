@@ -3,7 +3,7 @@
     (focusout)="onFocusOutDelay()"
     [ngClass]="{'open': delayOpen}">
     <em class="delay-button material-icons" (click)="onDelayClick()">timelapse</em>
-    <div class="delay-current" (click)="onDelayClick()">+{{delayTime}}s {{'CDSCanvas.delay' | translate}}</div>
+    <div class="delay-current" (click)="onDelayClick()">+{{delayTime}}s {{ label | translate}}</div>
     <div class="delay-slider" *ngIf="delayOpen">
         <div class="delay-range">+{{min}}s</div> 
         <div class="vue-slider">

@@ -11,6 +11,7 @@ export class CDSDelaySliderComponent implements OnInit {
   @Input() step : number = 0.1;
   @Input() min: number = 0;
   @Input() max: number = 10;
+  @Input() label: string = 'CDSCanvas.delay';
   @Output() changeDelayTime = new EventEmitter();
   @Output() clickDelayTime = new EventEmitter();
 

@@ -276,6 +276,7 @@
         "AddAnActionToBlockDescription":"Actions are executed in sequence starting from the top block action",
         "delay":"delay",
         "DelayTime":"Delay Time",
+        "timeout":"timeout",
         "QuestionDescription":" When a user says something similar to a training phrase, Tiledesk matches it to the block",
         "QuestionPlaceholderNew":"Add user expression and press enter or click ADD",
         "Success":"Success",
