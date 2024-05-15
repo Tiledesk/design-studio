@@ -33,7 +33,7 @@
         </div>
 
         <label class="title-preview-label">{{'CDSCanvas.NoInput' | translate}}
-            <span *ngIf="response.hasOwnProperty('noInputTimeout')">({{delayTime}} s)</span>
+            <span *ngIf="response.hasOwnProperty('noInputTimeout')">({{response.noInputTimeout/1000}} s)</span>
         </label>
         
         <cds-connector class="button-connector"
@@ -137,6 +137,7 @@
         <label class="title-label">{{'CDSCanvas.IncompleteSpeechTimeout' | translate}} (s)</label>
         <appdashboard-delay-slider
             [delayTime]="incompleteSpeechDelayTime"
+            [label]="'CDSCanvas.timeout'"
             (changeDelayTime)="onChangeDelayTime($event, 'incompleteSpeechTimeout')"
             (clickDelayTime)="onClickDelayTime($event)">
         </appdashboard-delay-slider>
@@ -170,6 +171,7 @@
             <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '70%'}">
                 <appdashboard-delay-slider
                     [delayTime]="delayTime"
+                    [label]="'CDSCanvas.timeout'"
                     (changeDelayTime)="onChangeDelayTime($event, 'noInputIntent')"
                     (clickDelayTime)="onClickDelayTime($event)">
                 </appdashboard-delay-slider>

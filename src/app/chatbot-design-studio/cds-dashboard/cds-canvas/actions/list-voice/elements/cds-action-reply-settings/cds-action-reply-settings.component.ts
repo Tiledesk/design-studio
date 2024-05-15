@@ -1,5 +1,5 @@
 
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
@@ -49,10 +49,6 @@ export class CdsActionReplySettingsComponent implements OnInit {
 
   private subscriptionChangedConnector: Subscription;
 
-  // Delay //
-  delayTime: number;
-  incompleteSpeechDelayTime: number;
-
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private connectorService: ConnectorService,
@@ -71,9 +67,6 @@ export class CdsActionReplySettingsComponent implements OnInit {
       }
     });
     this.initializeConnector();
-    this.delayTime = (this.response && this.response.noInputTimeout)? (this.response.noInputTimeout/1000) : 500;
-    this.incompleteSpeechDelayTime = (this.response && this.response.incompleteSpeechTimeout)? (this.response.incompleteSpeechTimeout/1000) : 500;
-
   }
 
   /** */
@@ -200,10 +193,8 @@ export class CdsActionReplySettingsComponent implements OnInit {
   /** onChangeDelayTime */
   onChangeDelayTime(value:number, key: string){
     if(key==='noInputIntent'){
-      this.delayTime = value;
       this.response.noInputTimeout = value*1000;
     }else{
-      this.incompleteSpeechDelayTime = value;
       this.response.incompleteSpeechTimeout = value*1000;
     }
     // this.canShowFilter = true;
@@ -246,16 +237,16 @@ export class CdsActionReplySettingsComponent implements OnInit {
       this.response[type]=event.value
       switch(type){
         case 'noInputIntent':
-          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectionNoInput, toId: this.response.noInputIntent});
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorNoInput, toId: this.response.noInputIntent});
           break;
         case 'noMatchIntent':
-          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectionNoMatch, toId: this.response.noMatchIntent});
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorNoMatch, toId: this.response.noMatchIntent});
           break;
         case 'trueIntent':
-          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectionTrue, toId: this.response.trueIntent});
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.response.trueIntent});
           break;
         case 'falseIntent':
-          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectionFalse, toId: this.response.falseIntent});
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.response.falseIntent});
           break;
       }
       // this.changeActionReply.emit()
@@ -265,16 +256,16 @@ export class CdsActionReplySettingsComponent implements OnInit {
   onResetBlockSelect(event:{name: string, value: string}, type: 'noInputIntent' | 'noMatchIntent' | 'trueIntent' | 'falseIntent') {
     switch(type){
       case 'noInputIntent':
-        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectionNoInput, toId: this.response.noInputIntent});
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorNoInput, toId: this.response.noInputIntent});
         break;
       case 'noMatchIntent':
-        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectionNoMatch, toId: this.response.noMatchIntent});
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorNoMatch, toId: this.response.noMatchIntent});
         break;
       case 'trueIntent':
-        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectionTrue, toId: this.response.trueIntent});
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.response.trueIntent});
         break;
       case 'falseIntent':
-        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectionFalse, toId: this.response.falseIntent});
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorFalse, toId: this.response.falseIntent});
         break;
     }
     this.response[type]=null
