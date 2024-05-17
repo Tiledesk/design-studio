@@ -11,6 +11,8 @@
   --base-padding-preview: #{var(--padding-base-preview)};
   --action-selected-color: #{var(--action-color-selected)};
 
+  --add-action-background: #{var(--add-action-background-preview)};
+
   --base-color: #{var(--blu)};
   --startIntentMaxWith: 160px;
 
@@ -564,10 +566,9 @@
 .cds-add-action-btn {
   margin: 0px;
   padding: 0 10px;
-  border-radius: 50%;
   box-shadow: unset;
-  background: transparent;
-  border: 1px dashed var(--base-color);
+  background: var(--add-action-background);
+  box-shadow: #001b4714 0 3px 8px;
   border-radius: var(--base-border-radius-base);
   color: var(--base-color);
   cursor: pointer;

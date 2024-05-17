@@ -52,17 +52,20 @@ export class CdsPopupComponent implements OnInit {
   }
 
   setPosition(){
-    let publishBtnEl = document.getElementById('cds-publish-btn-wrp')
-    if(publishBtnEl){
-      let btnPosition = publishBtnEl.getBoundingClientRect()
-      this.position = {
-        top: btnPosition.top + btnPosition.height + 10,
-        bottom: btnPosition.bottom,
-        left: btnPosition.left + Math.floor(btnPosition.width / 2) - 160,
-        right: 110
-        // right: btnPosition.right - Math.floor(btnPosition.width / 2) - 160
+    setTimeout(() => {
+      let publishBtnEl = document.getElementById('cds-publish-btn-wrp')
+      if(publishBtnEl){
+        let btnPosition = publishBtnEl.getBoundingClientRect()
+        this.position = {
+          top: btnPosition.top + btnPosition.height + 10,
+          bottom: btnPosition.bottom,
+          left: btnPosition.left + Math.floor(btnPosition.width / 2) - 160,
+          right: 110
+          // right: btnPosition.right - Math.floor(btnPosition.width / 2) - 160
+        }
       }
-    }
+    }, 0);
+    
   }
 
 }
