@@ -6,6 +6,12 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.8.0-rc.1
+👉 **added**: cds-action-reply-v2
+👉 **changed**: 'add action' button into cds-intent preview component UI changed
+
+### 1.7.0 in PROD
+
 ### 1.7.0-rc.1
 👉 **added**: GPT-4o model into gpts actions
 👉 **added**: dynamic label to delay-slider component
