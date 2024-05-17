@@ -210,18 +210,18 @@
 
             </div>
 
-            <!-- <hr class="custom-divider" *ngIf="!previewMode" > -->
-            <!-- <div class="response">
+            <hr class="custom-divider" *ngIf="!previewMode" >
+            <div class="response">
                 <cds-action-reply-settings
                     [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                     [idAction] = "idAction"
-                    [response] = "action?.settings"
+                    [action] = "action"
                     [previewMode] = "previewMode"
                     (updateAndSaveAction) = onUpdateAndSaveAction($event)
                     (changeActionReply) = onChangeActionReply($event)
                     (onConnectorChange)= onConnectorChangeReply($event)>
                 </cds-action-reply-settings>
-            </div> -->
+            </div>
             
         </div>
 

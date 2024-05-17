@@ -278,6 +278,34 @@ export class ConnectorService {
           }
         }
 
+        /**  REPLY V2 */
+        if(action._tdActionType === TYPE_ACTION.REPLYV2){
+          if(action.noInputIntent && action.noInputIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noInput';
+            idConnectorTo = action.noInputIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.noInputIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - REPLY-V2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - REPLY-V2 ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(action.noMatchIntent && action.noMatchIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noMatch';
+            idConnectorTo = action.noMatchIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.noMatchIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - REPLY-V2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - REPLY-V2 ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
         /**  ONLINE_AGENTS */
         if(action._tdActionType === TYPE_ACTION.ONLINE_AGENTS){
           if(action.trueIntent && action.trueIntent !== ''){

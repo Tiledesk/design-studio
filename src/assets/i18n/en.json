@@ -537,6 +537,7 @@
     "CDSActionList": {
         "NAME": {
             "Reply":"Reply",
+            "ReplyV2":"Advanced reply",
             "RandomReply":"Random Reply",
             "AgentHandoff":"Agent Handoff",
             "Close":"Close",
@@ -577,6 +578,7 @@
         },
         "DESCRIPTION":{
             "Reply":"<b>Pro tip</b>: Turn this block into a programmed proactive message.",
+            "ReplyV2":"",
             "RandomReply":"Create some replies that will be randomly selected",
             "AgentHandoff":"This action replaces the current chatbot with an agent.<br>The upcoming agent is assigned to the conversation following the department rules",
             "Close":"This action instantly closes the current conversation",
@@ -616,6 +618,7 @@
         },
         "DOCS": {
             "Reply":"<a href='https://www.youtube.com/embed/p0ux-86Y4_I' target='_blank'>Here is how!</a> ",
+            "ReplyV2":"",
             "RandomReply":"",
             "AgentHandoff":"",
             "Close":"",
@@ -724,7 +727,7 @@
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
     "CDSGlobals":{
         "Globals":"Globals",
-        "NoGlobalVariables":"No global variables <br><br>Global variables are a set of variables that are always available in a workspace",
+        "NoGlobalVariables":"No global variables <br><br>Global variables are a set of variables that are always available in your flows",
         "GLOBAL_KEY" :"GLOBAL_KEY",
         "value":"value",
         "InfoTitle":"Use variables to reuse values and protect sensitive data",

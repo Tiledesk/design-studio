@@ -1,27 +1,27 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, Output, EventEmitter, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Intent } from 'src/app/models/intent-model';
-import { Wait, Button, Message, Command, ActionReply, MessageAttributes, Setting } from 'src/app/models/action-model';
-import { TYPE_UPDATE_ACTION, TYPE_INTENT_ELEMENT, ACTIONS_LIST, TYPE_ACTION, TYPE_COMMAND, TYPE_RESPONSE, TYPE_BUTTON, TYPE_URL, TYPE_MESSAGE, generateShortUID } from '../../../../../utils';
+import { Wait, Button, Message, Command, ActionReply, MessageAttributes, Setting, ActionReplyV2 } from 'src/app/models/action-model';
+import { TYPE_UPDATE_ACTION, TYPE_INTENT_ELEMENT, ACTIONS_LIST, TYPE_ACTION, TYPE_COMMAND, TYPE_RESPONSE, TYPE_BUTTON, TYPE_URL, TYPE_MESSAGE, generateShortUID } from '../../../../../../utils';
 
-import { ControllerService } from '../../../../../services/controller.service';
-import { IntentService } from '../../../../../services/intent.service';
-import { ConnectorService } from '../../../../../services/connector.service';
+import { ControllerService } from '../../../../../../services/controller.service';
+import { IntentService } from '../../../../../../services/intent.service';
+import { ConnectorService } from '../../../../../../services/connector.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 
 @Component({
-  selector: 'cds-action-reply',
+  selector: 'cds-action-reply-v2',
   templateUrl: './cds-action-reply.component.html',
   styleUrls: ['./cds-action-reply.component.scss']
 })
-export class CdsActionReplyComponent implements OnInit {
+export class CdsActionReplyV2Component implements OnInit {
 
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
   translateY: string;
 
-  @Input() action: ActionReply;
+  @Input() action: ActionReplyV2;
   @Input() intentSelected: Intent;
   @Input() previewMode: boolean = true
   @Output() updateAndSaveAction = new EventEmitter();

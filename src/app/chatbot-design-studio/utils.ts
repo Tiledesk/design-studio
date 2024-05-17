@@ -105,6 +105,7 @@ export enum TYPE_MESSAGE {
 
 export enum TYPE_ACTION {
     REPLY               = 'reply',
+    REPLYV2             = 'replyv2',
     RANDOM_REPLY        = 'randomreply',
     WEB_REQUEST         = 'webrequest',
     WEB_REQUESTV2       = 'webrequestv2',
@@ -289,6 +290,7 @@ export const INTENT_ELEMENT = {
 
 export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_CATEGORY, type: TYPE_ACTION | TYPE_ACTION_VXML, src: string, status: 'active' | 'inactive' | 'beta', plan?: PLAN_NAME, description?: string, doc?: string, disabled?: boolean}}= {
     REPLY :                 { name: 'CDSActionList.NAME.Reply',                 category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.REPLY,                src:"assets/images/actions/reply.svg",                  status: "active" ,                      description: "CDSActionList.DESCRIPTION.Reply",              doc: "CDSActionList.DOCS.Reply"                    },
+    REPLYV2 :               { name: 'CDSActionList.NAME.ReplyV2',               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.REPLYV2,              src:"assets/images/actions/reply.svg",                  status: "active" ,                      description: "CDSActionList.DESCRIPTION.ReplyV2",            doc: "CDSActionList.DOCS.ReplyV2"                  },
     RANDOM_REPLY :          { name: 'CDSActionList.NAME.RandomReply',           category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.RANDOM_REPLY,         src:"assets/images/actions/random_reply.svg",           status: "active",                       description: "CDSActionList.DESCRIPTION.RandomReply"                                                            },
     AGENT :                 { name: 'CDSActionList.NAME.AgentHandoff',          category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.AGENT,                src:"assets/images/actions/agent_handoff.svg",          status: "active",                       description: "CDSActionList.DESCRIPTION.AgentHandoff"                                                           },
     CLOSE :                 { name: 'CDSActionList.NAME.Close',                 category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.CLOSE,                src:"assets/images/actions/close.svg",                  status: "active",                       description: "CDSActionList.DESCRIPTION.Close"                                                                  },
