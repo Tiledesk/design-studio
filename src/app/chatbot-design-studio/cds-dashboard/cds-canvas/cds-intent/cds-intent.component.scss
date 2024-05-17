@@ -11,7 +11,9 @@
   --base-padding-preview: #{var(--padding-base-preview)};
   --action-selected-color: #{var(--action-color-selected)};
 
-  --add-action-background: #{var(--add-action-background-preview)};
+  --add-action-btn-background: #{var(--add-action-btn-background-preview)};
+  --add-action-btn-color: #{var(--add-action-btn-color-preview)};
+  --add-action-btn-hover-color: #{var(--add-action-btn-hover-color-preview)};
 
   --base-color: #{var(--blu)};
   --startIntentMaxWith: 160px;
@@ -566,11 +568,10 @@
 .cds-add-action-btn {
   margin: 0px;
   padding: 0 10px;
-  box-shadow: unset;
-  background: var(--add-action-background);
+  background: var(--add-action-btn-background);
   box-shadow: #001b4714 0 3px 8px;
   border-radius: var(--base-border-radius-base);
-  color: var(--base-color);
+  color: var(--add-action-btn-color);
   cursor: pointer;
   font-size: 0.7em;
   font-weight: 400;
@@ -588,6 +589,7 @@
 
 .cds-add-action-btn:hover {
   opacity: 0.8;
+  // color: var(--add-action-btn-hover-color)
 }
 
 cds-action-description.header-action ::ng-deep{
