@@ -796,6 +796,7 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.REPLYV2){
       action = new ActionReplyV2();
+      action.noInputTimeout = 10000;
       let commandWait = new Wait();
       action.attributes.commands.push(commandWait);
       let command = new Command(TYPE_COMMAND.MESSAGE);
@@ -881,13 +882,13 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.ASKGPT){
       action = new ActionAskGPT();
-      action.question = '{{last_user_text}}'
+      action.question = '{{lastUserText}}'
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
     }
     if(typeAction === TYPE_ACTION.ASKGPTV2) {
       action = new ActionAskGPTV2();
-      action.question = '{{last_user_text}}'
+      action.question = '{{lastUserText}}'
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
       action.max_tokens = 512;
@@ -906,7 +907,8 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.GPT_ASSISTANT){
       action = new ActionGPTAssistant();
-      action.threadIdAttribute = 'firstThread'
+      action.prompt ='{{lastUserText}}';
+      action.threadIdAttribute = 'firstThread';
       action.assignResultTo = 'assistantReply';
       action.assignErrorTo = 'assistantError';
     }

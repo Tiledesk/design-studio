@@ -67,6 +67,40 @@
 
                     </div>
 
+                    <!-- AUDIO RESPONSE: only odd element -->
+                    <div *ngIf="command.message?.type === typeMessage.FRAME" >
+
+                        <div class="response">
+
+                            <!-- *ngIf="typeAction === typeActions.REPLY" -->
+                            <div class="response-drop" 
+                                [ngClass]="{'grabbing':textGrabbing}"
+                                (mousedown)="mouseDown()" 
+                                (mouseup)="mouseUp()" 
+                                cdkDragHandle>
+                            </div>
+
+                            <cds-action-reply-voice-audio 
+                                [index] = i
+                                [idAction] = "idAction"
+                                [response] = "command.message"
+                                [wait] = "arrayResponses[i-1]"
+                                [previewMode] = "previewMode"
+                                [actionType]="action._tdActionType"
+                                (moveUpResponse) = onMoveUpResponse($event)
+                                (moveDownResponse) = onMoveDownResponse($event)
+                                (openButtonPanel) = onOpenButtonPanel($event)
+                                (createNewButton) = onCreateNewButton($event)
+                                (deleteButton) = onDeleteButton($event)
+                                (deleteActionReply) = onDeleteActionReply($event)
+                                (updateAndSaveAction) = onUpdateAndSaveAction($event)
+                                (changeActionReply) = onChangeActionReply($event)>
+                            </cds-action-reply-voice-audio>
+
+                        </div>
+
+                    </div>
+
                     <hr class="preview-divider" *ngIf="i !==length-1 && previewMode">
 
                 </div>
