@@ -280,6 +280,35 @@ export class ConnectorService {
 
         /**  REPLY V2 */
         if(action._tdActionType === TYPE_ACTION.REPLYV2){
+
+          var buttons = this.findButtons(action);
+          this.logger.log('buttons   ----- >', buttons, action);
+          buttons.forEach(button => {
+            // this.logger.log('[CONNECTOR-SERV] button   ----- > ', button, button.__idConnector);
+            if(button.type === TYPE_BUTTON.ACTION && button.action){
+              // const idConnectorFrom = button.__idConnector;
+              if(!button.uid || button.uid === "UUIDV4"){
+                button.uid = generateShortUID();
+              }
+              idConnectorFrom = intent.intent_id+"/"+action._tdActionId+"/"+button.uid;
+              this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
+              var startIndex = button.action.indexOf('#') + 1;
+              var endIndex = button.action.indexOf('{');
+              idConnectorTo = button.action.substring(startIndex);
+              if(endIndex>-1){
+                idConnectorTo = button.action.substring(startIndex, endIndex);
+              }
+              if(!this.intentExists(idConnectorTo)){
+                button.action = '';
+                idConnectorTo = null;
+              }
+              this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
+              this.logger.log('[CONNECTOR-SERV] -> idConnectorTo', idConnectorTo);
+              // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+              this.createConnector(intent, idConnectorFrom, idConnectorTo);
+            }
+          });
+          
           if(action.noInputIntent && action.noInputIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noInput';
             idConnectorTo = action.noInputIntent.replace("#", "");
