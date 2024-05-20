@@ -42,7 +42,7 @@ import { CdsActionOpenHoursComponent } from './cds-action-open-hours/cds-action-
 import { CdsActionQaplaComponent } from './cds-action-qapla/cds-action-qapla.component';
 import { CdsActionReplaceBotV2Component } from './cds-action-replace-bot-v2/cds-action-replace-bot-v2.component';
 import { CdsActionReplaceBotComponent } from './cds-action-replace-bot/cds-action-replace-bot.component';
-import { CdsActionReplyComponent } from './cds-action-reply/cds-action-reply.component';
+import { CdsActionReplyComponent } from './cds-action-reply/cds-action-reply-v1/cds-action-reply.component';
 import { CdsActionReplyButtonComponent } from './cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button.component';
 import { CdsActionReplyFrameComponent } from './cds-action-reply/elements/cds-action-reply-frame/cds-action-reply-frame.component';
 import { CdsActionReplyGalleryComponent } from './cds-action-reply/elements/cds-action-reply-gallery/cds-action-reply-gallery.component';
@@ -67,6 +67,7 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
 import { CdsActionGptAssistantComponent } from './cds-action-gpt-assistant/cds-action-gpt-assistant.component';
 import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-data.component';
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
+import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 
 @NgModule({
   declarations: [
@@ -80,6 +81,7 @@ import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-
     CdsAnswerComponent,
     CdsActionDescriptionComponent,
     CdsActionReplyComponent,
+    CdsActionReplyV2Component,
     CdsActionWaitComponent,
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,
@@ -165,6 +167,7 @@ import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-
     CdsAnswerComponent,
     CdsActionDescriptionComponent,
     CdsActionReplyComponent,
+    CdsActionReplyV2Component,
     CdsActionWaitComponent,
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,

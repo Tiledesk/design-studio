@@ -22,17 +22,24 @@
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
                         [previewMode]="false"
-                        (updateAndSaveAction)="onSaveIntent($event)"
-                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                        (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-reply>
 
-                    <cds-action-reply *ngSwitchCase="TYPE_ACTION.RANDOM_REPLY"
+                    <cds-action-reply-v2 *ngSwitchCase="TYPE_ACTION.REPLYV2"
                         class="panel-response"
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-reply-v2>
+
+                    <cds-action-reply *ngSwitchCase="TYPE_ACTION.RANDOM_REPLY"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-reply>
 
                     <cds-action-intent *ngSwitchCase="TYPE_ACTION.INTENT"

@@ -136,7 +136,7 @@
     <div class="field-box" *ngIf="response.hasOwnProperty('incompleteSpeechTimeout')">
         <label class="title-label">{{'CDSCanvas.IncompleteSpeechTimeout' | translate}} (s)</label>
         <appdashboard-delay-slider
-            [delayTime]="incompleteSpeechDelayTime"
+            [delayTime]="response.incompleteSpeechTimeout/1000"
             [label]="'CDSCanvas.timeout'"
             (changeDelayTime)="onChangeDelayTime($event, 'incompleteSpeechTimeout')"
             (clickDelayTime)="onClickDelayTime($event)">
@@ -170,7 +170,7 @@
             <label class="condition-text">{{'CDSCanvas.NoInput' | translate}}</label>
             <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '70%'}">
                 <appdashboard-delay-slider
-                    [delayTime]="delayTime"
+                    [delayTime]="response.noInputTimeout/1000"
                     [label]="'CDSCanvas.timeout'"
                     (changeDelayTime)="onChangeDelayTime($event, 'noInputIntent')"
                     (clickDelayTime)="onClickDelayTime($event)">

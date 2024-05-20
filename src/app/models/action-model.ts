@@ -98,11 +98,27 @@ export class ActionHideMessage extends Action {
 export class ActionReply extends Action {
     text?: string;
     attributes: Attributes;
-    settings: Setting
     constructor(text?: string, attributes?: Attributes) {
         super();
         // this.text = text ? text : '...';
         this._tdActionType = TYPE_ACTION.REPLY;
+        this.attributes = new Attributes();
+        if (attributes){
+            this.attributes = attributes;
+        }
+    }
+}
+
+export class ActionReplyV2 extends Action {
+    text?: string;
+    attributes: Attributes;
+    noInputIntent: string;
+    noMatchIntent: string;
+    noInputTimeout: number;
+    constructor(text?: string, attributes?: Attributes) {
+        super();
+        // this.text = text ? text : '...';
+        this._tdActionType = TYPE_ACTION.REPLYV2;
         this.attributes = new Attributes();
         if (attributes){
             this.attributes = attributes;
