@@ -6,6 +6,8 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.8.0 in PROD
+
 ### 1.8.0-rc.2
 👉 **changed**: set default values for cds-action-gpt-assistant and cds-action-reply-v2
 
