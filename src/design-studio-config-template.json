@@ -5,6 +5,7 @@
   "globalRemoteJSSrc": "${REMOTE_JS_SRC}",
   "widgetBaseUrl": "${WIDGET_LOCATION}",
   "dashboardBaseUrl": "${DASHBOARD_URL}",
+  "whatsappTemplatesBaseUrl":"${WHATSAPP_TEMPLATES_BASE_URL}",
   "wsUrl": "${WS_URL}",
   "wsUrlRel": "${WS_URL_RELATIVE}",
   "uploadEngine": "${UPLOAD_ENGINE}",

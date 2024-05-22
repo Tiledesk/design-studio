@@ -7,6 +7,7 @@ export const environment = {
   apiUrl: 'CHANGEIT',
   widgetBaseUrl: 'CHANGEIT',
   dashboardBaseUrl: 'CHANGEIT',
+  whatsappTemplatesBaseUrl: 'CHANGEIT',
   wsUrl: 'ws://localhost:3000/',
   uploadEngine: 'native',
   baseImageUrl: 'CHANGEIT',
