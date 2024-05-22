@@ -336,6 +336,7 @@
   bottom: -28px;
   left: 0px;
   right: 0px;
+  
 }
 
 .footer-intent>.csd-open-action-menu-btn-wpr,
@@ -347,6 +348,8 @@
 .footer-intent:hover>.csd-open-action-menu-btn-wpr,
 .add--action-placeholder:hover .csd-open-action-menu-btn-wpr {
   opacity: 1;
+  transform: translate3d(0, 00px, 0);
+  transition: 0.25s all ease-in-out;
 }
 
 
