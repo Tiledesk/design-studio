@@ -417,16 +417,16 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
  
-    this.uploadService.upload(this.user.uid, currentUpload).then(downloadURL => {
-      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
+    this.uploadService.upload(this.user.uid, currentUpload).then(data => {
+      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${data}`);
 
       this.fileUploadedName = file.name;
       if (this.header_params[0].image) {
-        this.header_params[0].image.link = downloadURL;
+        this.header_params[0].image.link = data.downloadURL;
       }
       if (this.header_params[0].document) {
-        this.header_params[0].document.link = downloadURL;
-        this.sanitizeUrl(downloadURL);
+        this.header_params[0].document.link = data.downloadURL;
+        this.sanitizeUrl(data.downloadURL);
       }
       this.invalidUrl = false;
       this.isFilePendingToUpload = false

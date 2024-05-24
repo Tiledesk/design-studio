@@ -490,6 +490,7 @@ export class MessageAttributes {
 export class Metadata {
     name?: string;
     src: string;
+    downloadURL: string;
     width?: number | string;
     height?: number | string; 
     type?: string;
@@ -547,13 +548,6 @@ export class Button {
     //     const { idConnector, isConnected, ...otherAttributes } = this;
     //     return otherAttributes;
     // }
-}
-
-export interface GalleryElement{
-    preview: Metadata;
-    title: string;
-    description: string;
-    buttons: Button[]
 }
 
 export interface GalleryElement{
