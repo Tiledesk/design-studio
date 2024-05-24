@@ -33,7 +33,7 @@ export class NativeUploadService extends UploadService {
     }
 
 
-    upload(userId: string, upload: UploadModel): Promise<any>  {
+    upload(userId: string, upload: UploadModel): Promise<{downloadURL: string, src: string}>  {
         this.logger.log('[NATIVE UPLOAD] - upload new image/file ... upload', upload)
         const headers = new HttpHeaders({
             Authorization: this.tiledeskToken,
@@ -51,7 +51,7 @@ export class NativeUploadService extends UploadService {
             return new Promise((resolve, reject) => {
                 that.http.post(url, formData, requestOptions).subscribe(data => {
                     const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
-                    resolve(downloadURL)
+                    resolve({downloadURL : downloadURL, src: downloadURL})
                     // that.BSStateUpload.next({upload: upload});
                 }, (error) => {
                     reject(error)
@@ -63,11 +63,9 @@ export class NativeUploadService extends UploadService {
             const url = this.URL_TILEDESK_FILE + '/users'
             return new Promise((resolve, reject) => {
                 that.http.post(url, formData, requestOptions).subscribe(data => {
-                    let downloadURL = this.URL_TILEDESK_FILE + '/download' + '?path=' + encodeURI(data['filename']);
-                    if(upload.file.type.includes('pdf')){
-                        downloadURL = this.URL_TILEDESK_FILE + '?path=' + encodeURI(data['filename']);
-                    }
-                    resolve(downloadURL)
+                    const src = this.URL_TILEDESK_FILE + '?path=' + encodeURI(data['filename']);
+                    const downloadURL = this.URL_TILEDESK_FILE + '/download' + '?path=' + encodeURI(data['filename']);
+                    resolve({downloadURL : downloadURL, src: src})
                     // that.BSStateUpload.next({upload: upload});
                 }, (error) => {
                     this.logger.error('[NATIVE UPLOAD] - ERROR upload new file ', error)

@@ -6,6 +6,14 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+
+### 1.9.0-rc.2
+👉 **added**: downloadURL in metadata obj while sending message from tiledesk
+
+### 1.9.0-rc.1
+👉 **added**: animation on 'Add action' cds-intent footer button
+👉 **changed**: whatsappApiUrl to whatsappTemplatesBaseUrl env property
+
 ### 1.8.0 in PROD
 
 ### 1.8.0-rc.2

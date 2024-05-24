@@ -40,6 +40,7 @@ export class CdsActionReplyToolsComponent implements OnInit {
             type: TYPE_MESSAGE.IMAGE,
             metadata: {
               src: '',
+              downloadURL: ''
               // width: MESSAGE_METADTA_WIDTH,
               // height: MESSAGE_METADTA_HEIGHT
             }
@@ -54,6 +55,7 @@ export class CdsActionReplyToolsComponent implements OnInit {
             type: TYPE_MESSAGE.FRAME,
             metadata: {
               src: '',
+              downloadURL: ''
               // width: MESSAGE_METADTA_WIDTH,
               // height: MESSAGE_METADTA_HEIGHT
             }
@@ -73,7 +75,7 @@ export class CdsActionReplyToolsComponent implements OnInit {
                   type: 'gallery',
                   gallery: [
                     {
-                      preview: { src: ''},
+                      preview: { src: '', downloadURL: ''},
                       title: 'Type title',
                       description: 'Type description',
                       buttons: [
@@ -117,6 +119,7 @@ export class CdsActionReplyToolsComponent implements OnInit {
             type: TYPE_MESSAGE.REDIRECT,
             metadata: {
               src : '',
+              downloadURL: '',
               target: TYPE_URL.BLANK,
               type: TYPE_MESSAGE.REDIRECT
             }

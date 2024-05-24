@@ -41,7 +41,7 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   filterConditionExist: boolean = false;
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
   typeActions = TYPE_ACTION;
-  gallery: Array<GalleryElement>;
+  gallery: GalleryElement[];
   // Textarea //
   activateEL: { [key: number]: {title: boolean, description: boolean} } = {};
   // Buttons //
@@ -185,7 +185,7 @@ export class CdsActionReplyGalleryComponent implements OnInit {
 
   newGalleryElement(){
     return {
-      preview: { src: ''}, //https://i.imgur.com/Py2UyiT.png
+      preview: { src: '', downloadURL: '' }, //https://i.imgur.com/Py2UyiT.png
       title: 'Type title',
       description: 'Type description',
       buttons: [ this.newButton() ]
@@ -345,7 +345,7 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
 
   onDeletedMetadata(metadata: Metadata, index: number){
-    this.gallery[index].preview = { src: ''};
+    this.gallery[index].preview = { src: '', downloadURL: ''};
     this.response.attributes.attachment.gallery = this.gallery
     this.changeActionReply.emit();
   }

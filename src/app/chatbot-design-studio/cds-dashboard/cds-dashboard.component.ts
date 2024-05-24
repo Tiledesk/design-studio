@@ -168,7 +168,7 @@ export class CdsDashboardComponent implements OnInit {
 
   private initialize(){
     let serverBaseURL = this.appConfigService.getConfig().apiUrl
-    let whatsappBaseUrl = this.appConfigService.getConfig().whatsappApiUrl
+    let whatsappBaseUrl = this.appConfigService.getConfig().whatsappTemplatesBaseUrl
 
     this.departmentService.initialize(serverBaseURL, this.project._id);
     this.faqKbService.initialize(serverBaseURL, this.project._id)

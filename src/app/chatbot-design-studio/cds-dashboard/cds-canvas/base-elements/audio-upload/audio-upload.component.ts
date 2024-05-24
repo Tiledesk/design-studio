@@ -73,6 +73,7 @@ export class CDSAudioUploadComponent implements OnInit {
       this.metadata = {
         name: text,
         src: text,
+        downloadURL: text,
         type: 'image/jpg'
       }
     }
@@ -91,6 +92,7 @@ export class CDSAudioUploadComponent implements OnInit {
     this.metadata = {
       name: '',
       src: '',
+      downloadURL: ''
     }
   }
 
@@ -244,10 +246,11 @@ export class CDSAudioUploadComponent implements OnInit {
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
  
-    this.uploadService.upload(this.user.uid, currentUpload).then(downloadURL => {
-      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
+    this.uploadService.upload(this.user.uid, currentUpload).then(data => {
+      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${data}`);
 
-      metadata.src = downloadURL;
+      metadata.src = data.src;
+      metadata.downloadURL = data.downloadURL
       this.metadata = metadata
       this.onChangeMetadata.emit(this.metadata)
       that.isFilePendingToUpload = false;

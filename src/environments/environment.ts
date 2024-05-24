@@ -7,6 +7,7 @@ export const environment = {
   apiUrl: 'http://localhost:3000/',
   widgetBaseUrl: 'http://localhost:4200/',
   dashboardBaseUrl: 'http://localhost:4200/',
+  whatsappTemplatesBaseUrl: 'http://localhost:3000/',
   wsUrl: 'ws://localhost:3000/',
   uploadEngine: 'native',
   baseImageUrl: 'CHANGEIT',
