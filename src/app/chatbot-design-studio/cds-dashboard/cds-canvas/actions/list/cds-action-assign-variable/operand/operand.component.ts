@@ -26,6 +26,10 @@ export class OperandComponent implements OnInit {
 
     ngOnInit(): void {
         this.openSlectFunction = false;
+        // this.initialize();
+    }
+
+    ngOnChanges(changes){
         this.initialize();
     }
 

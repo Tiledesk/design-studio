@@ -110,6 +110,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
    * possiamo visualizzare lo stage completo
    */
 
+  /** NOT IN USE */
   signInWithCustomToken(token) {
     // this.isOnline = false;
     this.logger.log('[APP-COMP] SIGNINWITHCUSTOMTOKEN  token', token)
@@ -117,6 +118,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.logger.log('[APP-COMP] SIGNINWITHCUSTOMTOKEN AUTLOGIN user', user)
     }).catch(error => {
         this.logger.error('[APP-COMP] SIGNINWITHCUSTOMTOKEN error::', error)
+
     })
   }
 
@@ -279,7 +281,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }).catch(error => {
         this.logger.error('[APP-COMP] initAuthentication SIGNINWITHCUSTOMTOKEN error::', error)
         if(error.status && error.status === 401){
-          this.router.navigate(['project/unauthorized'])
+          this.goToUnauthDashboardPage()
         }
       })
     } else {
@@ -292,6 +294,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   goToDashboardLogin(){
     let DASHBOARD_URL = this.appConfigService.getConfig().dashboardBaseUrl + '#/login'
+    const myWindow = window.open(DASHBOARD_URL, '_self');
+    myWindow.focus();
+  }
+
+  goToUnauthDashboardPage(){
+    let DASHBOARD_URL = this.appConfigService.getConfig().dashboardBaseUrl + '#/invalid-token'
     const myWindow = window.open(DASHBOARD_URL, '_self');
     myWindow.focus();
   }
