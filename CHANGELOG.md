@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.10.0-rc.1
+👉 **added**: 401 error code management on signInWithCustomToken
+
 ### 1.9.0 in PROD
 
 ### 1.9.0-rc.2
