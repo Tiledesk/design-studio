@@ -1,9 +1,9 @@
 import { TYPE_URL } from "./utils"
 
-export const LOGO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}> = [
-    { key: 'GO_TO_DASHBOARD',   label: 'GoToDashboard', icon: 'arrow_back', type: TYPE_URL.SELF },
+export const LOGO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status:"active" | "inactive", src?: string}> = [
+    { key: 'GO_TO_DASHBOARD',   label: 'GoToDashboard', icon: 'arrow_back', type: TYPE_URL.SELF, status: "active" },
     // { key: 'EXPORT', label: 'Export', icon: 'file_download', type: TYPE_URL.SELF},
-    { key: 'LOG_OUT',           label: 'LogOut',        icon: 'logout',     type: TYPE_URL.SELF }
+    { key: 'LOG_OUT',           label: 'LogOut',        icon: 'logout',     type: TYPE_URL.SELF, status: "active" }
 ]
 
 export var INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status:"active" | "inactive", src?: string}> = [
