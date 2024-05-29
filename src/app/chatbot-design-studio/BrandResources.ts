@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BrandService } from "../services/brand.service";
-import { INFO_MENU_ITEMS, SHARE_MENU_ITEMS, SUPPORT_OPTIONS } from "./utils-menu";
+import { INFO_MENU_ITEMS, LOGO_MENU_ITEMS, SHARE_MENU_ITEMS, SUPPORT_OPTIONS } from "./utils-menu";
 import { BRAND_BASE_INFO, LOGOS_ITEMS, MEDIA } from "./utils-resources";
 import { TYPE_URL } from "./utils";
 
@@ -36,6 +36,16 @@ export class BrandResources {
         /** LOGOS_ITEMS */
         Object.keys(LOGOS_ITEMS).forEach(key => { LOGOS_ITEMS[key].icon = this.brand[key] })
         
+        /** LOGO_MENU_ITEMS */
+        let logo_menu: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...LOGO_MENU_ITEMS, ...this.brand['LOGO_MENU_ITEMS']].reduce((m, o) => m.set(o.key, o), new Map).values());
+        logo_menu.forEach(el => {
+            if(!LOGO_MENU_ITEMS.find(a => a.key === el.key)) return;
+            LOGO_MENU_ITEMS.find(a => a.key === el.key).icon = el.icon
+            LOGO_MENU_ITEMS.find(a => a.key === el.key).src = el.src
+            LOGO_MENU_ITEMS.find(a => a.key === el.key).status = el.status
+            LOGO_MENU_ITEMS.find(a => a.key === el.key).icon = el.icon
+        })
+
         /** INFO_MENU_ITEMS */
         let result: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...INFO_MENU_ITEMS, ...this.brand['INFO_MENU_ITEMS']].reduce((m, o) => m.set(o.key, o), new Map).values());
         result.forEach(el => {

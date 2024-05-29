@@ -6,6 +6,7 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.10.0-rc.3
 ### 1.10.0-rc.2
 👉 **added**: status property to top left menu options to show/hide some options
 
