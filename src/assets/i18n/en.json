@@ -425,7 +425,7 @@
         "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. Admitted values range: 1-300k ms",
         "AudioFileAllowed":"You can only upload *.wav audio format with mono, 8 KHz, with PCM 8bit, PCM 16bit, Alaw or uLaw coding",
         "ProjectWide": "Project wide",
-        "CurrentConversationDepartment": "Current conversation department",
+        "CurrentDepartment": "Current department",
         "SelectedDepartment": "Selected Department",
         "CheckAgentsAvailability":"Check agents availability"
 
@@ -547,7 +547,7 @@
             "AgentHandoff":"Agent handoff",
             "Close":"Close",
             "IfOperatingHours":"If operating hours",
-            "IfOnlineAgent":"If online agent",
+            "IfOnlineAgent":"If online agents",
             "Condition":"Condition",
             "ConditionElse":"Condition w/ else",
             "ConnectBlock":"Connect block",

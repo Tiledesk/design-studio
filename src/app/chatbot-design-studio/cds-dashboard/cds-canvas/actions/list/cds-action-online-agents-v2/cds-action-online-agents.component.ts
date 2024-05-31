@@ -26,10 +26,10 @@ export class CdsActionOnlineAgentsV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
   
   radioOptions: Array<{name: string, value: string, disabled: boolean, checked: boolean}>= [ 
-    {name: 'CDSCanvas.ProjectWide',                     value: 'all',            disabled: false, checked: true  }, 
-    {name: 'CDSCanvas.CurrentConversationDepartment',   value: 'currentDep',    disabled: false, checked: false },
-    {name: 'CDSCanvas.SelectedDepartment',              value: 'selectedDep',   disabled: false, checked: false }
-]
+    {name: 'CDSCanvas.ProjectWide',               value: 'all',            disabled: false, checked: true  }, 
+    {name: 'CDSCanvas.CurrentDepartment',         value: 'currentDep',    disabled: false, checked: false },
+    {name: 'CDSCanvas.SelectedDepartment',        value: 'selectedDep',   disabled: false, checked: false }
+  ]
 
   actionOnlineAgentsFormGroup: FormGroup
   trueIntentAttributes: string = "";
@@ -99,7 +99,7 @@ export class CdsActionOnlineAgentsV2Component implements OnInit {
     if (this.action && this.action.trueIntent) {
       this.setFormValue();
     }
-    this.departments = this.dashboardService.departments.filter(dep => dep.default === false)
+    this.departments = this.dashboardService.departments
 
   }
   

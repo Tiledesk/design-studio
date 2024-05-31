@@ -69,6 +69,7 @@ import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-da
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
+import { FilterPipe } from 'src/app/pipe/filter.pipe';
 
 @NgModule({
   declarations: [
@@ -149,6 +150,9 @@ import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/
     AttributesDialogComponent,
     FormDataComponent,
     // action GptTask elements: end //
+
+    //PIPES
+    FilterPipe
   ],
   imports: [
     CommonModule,
@@ -233,6 +237,9 @@ import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/
     // action GptTask elements: start //
     AttributesDialogComponent,
     // action GptTask elements: end //
+
+    //PIPES
+    FilterPipe
   ]
 })
 export class CdsActionsModule { }
