@@ -1,0 +1,149 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+    
+    <div class="action-row">
+        <div class="action-row-left">
+       
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path
+                    d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z" />
+            </svg>
+        </div>
+
+        <div *ngIf="action?.selectedOption" class="action-row-right">
+            <span *ngIf="action.selectedOption !== 'selectedDep'">
+                {{ (radioOptions | filter:{key: 'value', value: action.selectedOption}).name | translate }} 
+            </span>
+            <span *ngIf="action.selectedOption === 'selectedDep'">
+                <span *ngIf="!action?.selectedDepartmentId">{{'SelectDepartment' | translate}}</span>
+                <span *ngIf="action?.selectedDepartmentId"><b>{{ (departments | filter:{key: 'id', value: action.selectedDepartmentId}).name }}</b></span>
+            </span>
+        </div>
+        <div *ngIf="!action?.selectedOption" class="action-row-right empty">
+            {{'CDSCanvas.SelectADepartment' | translate }}
+        </div>
+    </div>
+
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img src="assets/images/icons/if_condition.svg">
+        </div>
+        <label class="title-preview-label">
+            <b>ONLINE</b>
+        </label>
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+        
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode">
+    <div class="content-panel-intent-detail">
+
+
+        <div class="field-box">
+            <label class="title-label">{{'CDSCanvas.CheckAgentsAvailability' | translate }}</label>
+            <cds-radio-buttons
+                [items]="radioOptions"
+                [itemSelected]="action?.selectedOption" 
+                [bindLabelButton]="'name'"
+                [bindValueButton]="'value'"
+                [rows]="3" [columns]="1"
+                (changeButtonSelect)="onChangeButtonSelect($event)">
+            </cds-radio-buttons>
+
+
+            <div *ngIf="action.selectedOption === 'selectedDep'" class="deps-wrp">
+                <cds-select id="list-deps" 
+                    [items]="departments" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'_id'" 
+                    [itemSelected]="action?.selectedDepartmentId" 
+                    [placeholder]="'SelectDepartment' | translate "
+                    [clearable]="true" 
+                    (onSelected)="onChangeSelect($event, 'selectedDepartmentId')"
+                    (onReset)="onResetBlockSelect($event, 'selectedDepartmentId')">
+                </cds-select>
+            </div>
+        </div>
+
+        <hr class="custom-divider">
+
+        <!-- trueIntent -->
+        <div class="field-box">
+            <div class="condition-container">
+                <div class="icon-action">
+                    <img class="active-icon" src="assets/images/icons/if_condition.svg">
+                </div>
+                <span class="condition-text">ONLINE</span>
+            </div>
+            <cds-select id="text-condition" 
+                [items]="listOfIntents" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'" 
+                [itemSelected]="action?.trueIntent" 
+                [placeholder]="'CDSCanvas.SelectABlock' | translate "
+                [clearable]="true" 
+                (onSelected)="onChangeSelect($event, 'trueIntent')"
+                (onReset)="onResetBlockSelect($event, 'trueIntent')">
+            </cds-select>
+            <!-- <cds-attributes
+                class="cds-attributes"
+                [attributes]="trueIntentAttributes"
+                (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+            </cds-attributes> -->
+        </div>
+
+        <!-- falseIntent -->
+        <div class="field-box">
+            <div class="condition-container">
+                <span class="condition-text">{{'CDSCanvas.Else' | translate }}</span>
+            </div>
+            <cds-select id="text-condition" 
+                [items]="listOfIntents" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'" 
+                [itemSelected]="action?.falseIntent" 
+                [placeholder]="'CDSCanvas.SelectABlock' | translate "
+                [clearable]="true" 
+                (onSelected)="onChangeSelect($event, 'falseIntent')"
+                (onReset)="onResetBlockSelect($event, 'falseIntent')">
+            </cds-select>
+            <!-- <cds-attributes 
+                class="cds-attributes" 
+                [attributes]="action.falseIntentAttributes"
+                (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+            </cds-attributes> -->
+        </div>
+    
+    </div>
+    
+    
+    <!-- <div class="footer-panel-intent-detail">
+        <div class="disable-input-message">
+            <section class="disable-input-message-section">
+                <mat-checkbox 
+                    [checked]="action.stopOnConditionMet"
+                    (change)="onStopConditionMeet()">
+                    {{"CDSCanvas.StopOnConditionMet" | translate}}
+                </mat-checkbox>
+            </section>
+        </div>
+    </div> -->
+</div>

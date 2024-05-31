@@ -101,7 +101,7 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
 
   private _filter(value: string, array: Array<any>): Array<any> {
     const filterValue = value.toLowerCase();
-    return array.filter(option => option.value.name.toLowerCase().includes(filterValue));
+    return array.filter(option => this.translate.instant(option.value.name).toLowerCase().includes(filterValue));
   }
 
   // return it.toLocaleLowerCase().includes(searchText);

@@ -65,6 +65,7 @@ import { NetworkService } from './services/network.service';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
 import { BrandResources } from './chatbot-design-studio/BrandResources';
+import { FilterPipe } from './pipe/filter.pipe';
 
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {

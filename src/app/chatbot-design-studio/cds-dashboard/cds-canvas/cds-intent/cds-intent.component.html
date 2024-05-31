@@ -165,6 +165,14 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-online-agents>
+
+                    <cds-action-online-agents-v2 *ngSwitchCase="TYPE_ACTION.ONLINE_AGENTSV2" 
+                        class="panel-response"
+                        [connectorChanged]="connectorChanged" 
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-online-agents-v2>
     
                     <cds-action-open-hours *ngSwitchCase="TYPE_ACTION.OPEN_HOURS" 
                         class="panel-response"

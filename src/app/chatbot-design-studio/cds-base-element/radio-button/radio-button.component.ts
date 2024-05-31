@@ -9,10 +9,13 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 })
 export class CDSRadioButtonComponent implements OnInit {
 
-  @Input() items: [{label: string, value: any, disabled: boolean, checked: boolean}]
+  @Input() items: [{name: string, value: any, disabled: boolean, checked: boolean}]
+  @Input() itemSelected: any
+  @Input() bindLabelButton: string = 'name'
+  @Input() bindValueButton: string = 'value'
   @Input() color: string;
-  @Input() row: number = 1;
-  @Input() column: number = 1;
+  @Input() rows: number = 1;
+  @Input() columns: number = 1;
   @Output() changeButtonSelect = new EventEmitter<any>();
 
   logger: LoggerService = LoggerInstance.getInstance()
@@ -25,6 +28,19 @@ export class CDSRadioButtonComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges){
     if(this.color) this.elementRef.nativeElement.querySelector('.content').style.setProperty('--selectedColor', this.color);
+    if(this.rows) this.elementRef.nativeElement.querySelector('.content').style.setProperty('--rows', this.rows);
+    if(this.columns) this.elementRef.nativeElement.querySelector('.content').style.setProperty('--columns', this.columns);
+    
+    if(this.itemSelected && this.items){
+      //   this.itemSelected = this.items.find(el => el[this.bindValueSelect] === this.itemSelected)
+      try {
+        this.items.forEach(el => { el[this.bindValueButton] === this.itemSelected? el.checked= true: el.checked = false })
+      } catch (error) {
+        console.error('ERROR', error);
+      }
+      
+    }
+
   }
 
   onChangeButton(event){

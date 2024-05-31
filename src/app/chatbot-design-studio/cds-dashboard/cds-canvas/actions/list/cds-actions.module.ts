@@ -68,6 +68,8 @@ import { CdsActionGptAssistantComponent } from './cds-action-gpt-assistant/cds-a
 import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-data.component';
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
+import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
+import { FilterPipe } from 'src/app/pipe/filter.pipe';
 
 @NgModule({
   declarations: [
@@ -85,6 +87,7 @@ import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v
     CdsActionWaitComponent,
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,
+    CdsActionOnlineAgentsV2Component,
     CdsActionEmailComponent,
     CdsActionIntentComponent,
     CdsActionChangeDepartmentComponent,
@@ -147,6 +150,9 @@ import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v
     AttributesDialogComponent,
     FormDataComponent,
     // action GptTask elements: end //
+
+    //PIPES
+    FilterPipe
   ],
   imports: [
     CommonModule,
@@ -171,6 +177,7 @@ import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v
     CdsActionWaitComponent,
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,
+    CdsActionOnlineAgentsV2Component,
     CdsActionEmailComponent,
     CdsActionIntentComponent,
     CdsActionChangeDepartmentComponent,
@@ -230,6 +237,9 @@ import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v
     // action GptTask elements: start //
     AttributesDialogComponent,
     // action GptTask elements: end //
+
+    //PIPES
+    FilterPipe
   ]
 })
 export class CdsActionsModule { }

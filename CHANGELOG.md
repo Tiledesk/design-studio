@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+
+### 1.11.0-rc.1
+👉 **added**: cds-action-online-agents-v2
+
 ### 1.10.0 in PROD
 
 ### 1.10.0-rc.3

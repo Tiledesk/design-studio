@@ -19,7 +19,6 @@ const routes: Routes = [
   {
     path: '',
     component: CdsChatbotDetailsComponent,
-    title: 'Settings',
     // children: [
     //   // {
     //   //   path: 'detail',
