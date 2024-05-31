@@ -1,0 +1,125 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+    
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img src="assets/images/icons/if_condition.svg">
+        </div>
+        <label class="title-preview-label">
+            <b>ONLINE</b>
+        </label>
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+        
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode">
+    <div class="content-panel-intent-detail">
+
+
+        <div class="field-box">
+            <label class="title-label">{{'CDSCanvas.CheckAgentsAvailability' | translate }}</label>
+            <cds-radio-buttons
+                [items]="radioOptions"
+                [itemSelected]="action?.selectedOption" 
+                [bindLabelButton]="'name'"
+                [bindValueButton]="'value'"
+                [rows]="3" [columns]="1"
+                (changeButtonSelect)="onChangeButtonSelect($event)">
+            </cds-radio-buttons>
+
+
+            <div *ngIf="action.selectedOption === 'selectedDep'" class="deps-wrp">
+                <cds-select id="list-deps" 
+                    [items]="departments" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'_id'" 
+                    [itemSelected]="action?.selectedDepartmentId" 
+                    [placeholder]="'SelectDepartment' | translate "
+                    [clearable]="true" 
+                    (onSelected)="onChangeSelect($event, 'selectedDepartmentId')"
+                    (onReset)="onResetBlockSelect($event, 'selectedDepartmentId')">
+                </cds-select>
+            </div>
+        </div>
+
+        <hr class="custom-divider">
+
+        <!-- trueIntent -->
+        <div class="field-box">
+            <div class="condition-container">
+                <div class="icon-action">
+                    <img class="active-icon" src="assets/images/icons/if_condition.svg">
+                </div>
+                <span class="condition-text">ONLINE</span>
+            </div>
+            <cds-select id="text-condition" 
+                [items]="listOfIntents" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'" 
+                [itemSelected]="action?.trueIntent" 
+                [placeholder]="'CDSCanvas.SelectABlock' | translate "
+                [clearable]="true" 
+                (onSelected)="onChangeSelect($event, 'trueIntent')"
+                (onReset)="onResetBlockSelect($event, 'trueIntent')">
+            </cds-select>
+            <!-- <cds-attributes
+                class="cds-attributes"
+                [attributes]="trueIntentAttributes"
+                (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+            </cds-attributes> -->
+        </div>
+
+        <!-- falseIntent -->
+        <div class="field-box">
+            <div class="condition-container">
+                <span class="condition-text">{{'CDSCanvas.Else' | translate }}</span>
+            </div>
+            <cds-select id="text-condition" 
+                [items]="listOfIntents" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'" 
+                [itemSelected]="action?.falseIntent" 
+                [placeholder]="'CDSCanvas.SelectABlock' | translate "
+                [clearable]="true" 
+                (onSelected)="onChangeSelect($event, 'falseIntent')"
+                (onReset)="onResetBlockSelect($event, 'falseIntent')">
+            </cds-select>
+            <!-- <cds-attributes 
+                class="cds-attributes" 
+                [attributes]="action.falseIntentAttributes"
+                (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+            </cds-attributes> -->
+        </div>
+    
+    </div>
+    
+    
+    <!-- <div class="footer-panel-intent-detail">
+        <div class="disable-input-message">
+            <section class="disable-input-message-section">
+                <mat-checkbox 
+                    [checked]="action.stopOnConditionMet"
+                    (change)="onStopConditionMeet()">
+                    {{"CDSCanvas.StopOnConditionMet" | translate}}
+                </mat-checkbox>
+            </section>
+        </div>
+    </div> -->
+</div>

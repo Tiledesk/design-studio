@@ -336,7 +336,7 @@ export class ConnectorService {
         }
 
         /**  ONLINE_AGENTS */
-        if(action._tdActionType === TYPE_ACTION.ONLINE_AGENTS){
+        if(action._tdActionType === TYPE_ACTION.ONLINE_AGENTS || action._tdActionType === TYPE_ACTION.ONLINE_AGENTSV2){
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo = action.trueIntent.replace("#", "");

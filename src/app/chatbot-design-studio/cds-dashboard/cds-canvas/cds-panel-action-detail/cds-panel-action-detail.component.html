@@ -67,6 +67,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-online-agents>
 
+                    <cds-action-online-agents-v2 *ngSwitchCase="TYPE_ACTION.ONLINE_AGENTSV2"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"   
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-online-agents-v2>
+
                     <cds-action-open-hours *ngSwitchCase="TYPE_ACTION.OPEN_HOURS"
                         class="panel-response"   
                         [intentSelected]="intentSelected"

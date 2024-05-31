@@ -61,10 +61,10 @@ export class CdsActionWebRequestV2Component implements OnInit {
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
   assignments: {} = {}
 
-  bodyOptions: Array<{label: string, value: string, disabled: boolean, checked: boolean}>= [ 
-      {label: 'none',       value: 'none',      disabled: false, checked: true  }, 
-      {label: 'Json',       value: 'json',      disabled: false, checked: false },
-      {label: 'form-data',  value: 'form-data', disabled: false, checked: false }
+  bodyOptions: Array<{name: string, value: string, disabled: boolean, checked: boolean}>= [ 
+      {name: 'none',       value: 'none',      disabled: false, checked: true  }, 
+      {name: 'Json',       value: 'json',      disabled: false, checked: false },
+      {name: 'form-data',  value: 'form-data', disabled: false, checked: false }
   ]
   
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -266,7 +266,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
-  onChangeButtonSelect(event: {label: string, value: string, disabled: boolean, checked: boolean}){
+  onChangeButtonSelect(event: {name: string, value: string, disabled: boolean, checked: boolean}){
     this.bodyOptions.forEach(el => { el.value ===event.value? el.checked= true: el.checked = false })
     this.action.bodyType= event.value
     switch (event.value){

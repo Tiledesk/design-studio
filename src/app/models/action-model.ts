@@ -72,6 +72,23 @@ export class ActionOnlineAgent extends Action {
     }
 }
 
+export class ActionOnlineAgentV2 extends Action {
+    intentName: string;
+    trueIntent: string;
+    falseIntent: string;
+    trueIntentAttributes?: string;
+    falseIntentAttributes?: string;
+    stopOnConditionMet: boolean;
+    selectedOption: string;
+    selectedDepartmentId?: string;
+    constructor() {
+        super();
+        this.stopOnConditionMet = true;
+        this._tdActionType = TYPE_ACTION.ONLINE_AGENTSV2;
+        this.selectedOption = 'all'
+    }
+}
+
 export class ActionOpenHours extends Action {
     trueIntent: string;
     falseIntent: string;

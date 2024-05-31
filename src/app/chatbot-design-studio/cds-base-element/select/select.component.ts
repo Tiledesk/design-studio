@@ -13,9 +13,9 @@ export class SelectComponent implements OnInit {
   @Input() items: []
   @Input() itemSelected: any
   @Input() bindLabelSelect: string;
+  @Input() bindValueSelect: string;
   @Input() optionalBindAdditionalText: string; 
   @Input() optionalBindDescription: string; 
-  @Input() bindValueSelect: string;
   @Input() groupByKey: string; 
   @Input() footerButton: boolean = false;
   @Input() footerButtonDisabled: boolean = false;
