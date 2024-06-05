@@ -6,6 +6,12 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.12.0-rc.1
+👉 **changed**: voiceFlow variables restored
+👉 **bug-fixed**: wait time in action-reply and action-reply-voice is incorrect if set to 0
+
+### 1.11.0 in PROD
+
 ### 1.11.0-rc.1
 👉 **added**: cds-action-online-agents-v2
 
