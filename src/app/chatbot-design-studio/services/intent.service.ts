@@ -1017,7 +1017,7 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION_VXML.SPEECH_FORM){
       action = new ActionVoice(TYPE_ACTION_VXML.SPEECH_FORM);
-      (action as ActionVoice).attributes.disableInputMessage = false
+      // (action as ActionVoice).attributes.disableInputMessage = false
       let commandWait = new Wait();
       action.attributes.commands.push(commandWait);
       let command = new Command(TYPE_COMMAND.MESSAGE);

@@ -725,7 +725,6 @@ export class ActionVoice extends Action {
         // this.text = text ? text : '...';
         this._tdActionType = type;
         this.attributes = new Attributes();
-        this.attributes.disableInputMessage = true;
         if (attributes){
             this.attributes = attributes;
         }
