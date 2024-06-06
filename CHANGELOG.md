@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.12.0-rc.3
+👉 **added**: namespace, context and history properties into action-askgptv2
+
 ### 1.12.0-rc.2
 👉 **removed**: disableInput option from voice actions
 
