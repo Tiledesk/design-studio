@@ -899,6 +899,7 @@ export class IntentService {
       action.top_k = 5;
       action.model = TYPE_GPT_MODEL['GPT-4'].value
       action.preview = [];
+      action.history = false;
     }
     if(typeAction === TYPE_ACTION.GPT_TASK){
       action = new ActionGPTTask();

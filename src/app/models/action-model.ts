@@ -365,6 +365,8 @@ export class ActionAskGPTV2 extends Action {
     max_tokens: number;
     temperature: number;
     top_k: number;
+    context: string;
+    history: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2
