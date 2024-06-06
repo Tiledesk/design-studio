@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -18,6 +19,7 @@ export class CdsQuestionComponent implements OnInit {
   questions_array: string[];
   newQuestion: string;
 
+  BRAND_BASE_INFO = BRAND_BASE_INFO
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor() { }

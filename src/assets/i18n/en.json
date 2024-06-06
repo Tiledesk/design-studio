@@ -156,9 +156,9 @@
         "GoToBlock":"Go to block"
     },
     "CDSModalPublishOnCommunity": {
-        "PublishYouChatbotToCommunity":"Publish your chatbot on the tiledesk community",
+        "PublishYouChatbotToCommunity":"Publish your chatbot on the {{BRAND_NAME}} community",
         "Publishing":"Publishing",
-        "PublishChatbotCommunityDescription":"Publish your chatbot on the tiledesk community. Allow other users to clone and customize your chatbot. Collect accolades and become part of the world's largest conversation designer community.",
+        "PublishChatbotCommunityDescription":"Publish your chatbot on the {{BRAND_NAME}} community. Allow other users to clone and customize your chatbot. Collect accolades and become part of the world's largest conversation designer community.",
         "BeHeardBeKnow":"Be Heard, Be Known: complete the form available in the Personal info before publishing!",
         "DeployToCommunity":"Deploy to community"
     },
@@ -277,7 +277,7 @@
         "delay":"delay",
         "DelayTime":"Delay Time",
         "timeout":"timeout",
-        "QuestionDescription":" When a user says something similar to a training phrase, Tiledesk matches it to the block",
+        "QuestionDescription":" When a user says something similar to a training phrase, {{BRAND_NAME}} matches it to the block",
         "QuestionPlaceholderNew":"Add user expression and press enter or click ADD",
         "Success":"Success",
         "SelectABlock":"Select a block",
@@ -683,7 +683,7 @@
             "last_message_id":{ "description":"The unique ID of the last message sent" },
             "conversation_id":{ "description":"This conversation unique ID" },
             "chatbot_name":{ "description":"This chatbot name" },
-            "user_id":{ "description":"The user unique ID inside Tiledesk database" },
+            "user_id":{ "description":"The user unique ID inside {{BRAND_NAME}} database" },
             "user_agent":{ "description":"The web user agent where this conversation initiated" },
             "chatChannel":{ "description":"The channel where this conversation belongs to. Ex. 'web', 'whatsapp', 'facebook', 'telegram'" },
             "user_source_page":{ "description":"The page where this conversations is runinng. Only available on channel 'web'" },

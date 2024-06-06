@@ -10,6 +10,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { TranslateService } from '@ngx-translate/core';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 
 @Component({
   selector: 'appdashboard-cds-publish-on-community-modal',
@@ -41,6 +42,8 @@ export class CdsPublishOnCommunityModalComponent implements OnInit {
   @ViewChild('cdsfileInputBotProfileImage', { static: false }) cdsfileInputBotProfileImage: any;
   @ViewChild('editbotbtn', { static: false }) private elementRef: ElementRef;
 
+  BRAND_BASE_INFO = BRAND_BASE_INFO
+  
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
