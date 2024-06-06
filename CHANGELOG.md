@@ -6,6 +6,7 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.12.0-rc.4
 ### 1.12.0-rc.3
 👉 **added**: namespace, context and history properties into action-askgptv2
 
