@@ -42,6 +42,7 @@ export class TiledeskAuthService {
     this.URL_TILEDESK_SIGNIN = this.SERVER_BASE_URL + 'auth/signin';
     this.URL_TILEDESK_SIGNIN_ANONYMOUSLY = this.SERVER_BASE_URL + 'auth/signinAnonymously'
     this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN = this.SERVER_BASE_URL + 'auth/signinWithCustomToken';
+    console.log('[TILEDESK-AUTH-SERV] - urlssss',  this.SERVER_BASE_URL, this.URL_TILEDESK_SIGNIN, this.URL_TILEDESK_SIGNIN_ANONYMOUSLY, this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN)
   }
 
 

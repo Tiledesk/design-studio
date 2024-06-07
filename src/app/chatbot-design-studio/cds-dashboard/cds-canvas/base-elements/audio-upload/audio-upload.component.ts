@@ -226,7 +226,7 @@ export class CDSAudioUploadComponent implements OnInit {
               'size': size
           };
       }
-      this.logger.debug('[IMAGE-UPLOAD] metadata -------> ', metadata);
+      this.logger.debug('[AUDIO-UPLOAD] metadata -------> ', metadata);
       // this.scrollToBottom();
       // 1 - aggiungo messaggio localmente
       // this.addLocalMessageImage(metadata);
@@ -242,12 +242,12 @@ export class CDSAudioUploadComponent implements OnInit {
     const that = this;
     // const send_order_btn = <HTMLInputElement>document.getElementById('chat21-start-upload-doc');
     // send_order_btn.disabled = true;
-    that.logger.debug('[IMAGE-UPLOAD] AppComponent::uploadSingle::', metadata, file);
+    that.logger.debug('[AUDIO-UPLOAD] AppComponent::uploadSingle::', metadata, file);
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
  
     this.uploadService.upload(this.user.uid, currentUpload).then(data => {
-      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link -`, data);
+      that.logger.debug(`[AUDIO-UPLOAD] Successfully uploaded file and got download link -`, data);
 
       metadata.src = data.src;
       metadata.downloadURL = data.downloadURL
@@ -257,10 +257,10 @@ export class CDSAudioUploadComponent implements OnInit {
       // return downloadURL;
     }).catch(error => {
       // Use to signal error if something goes wrong.
-      that.logger.error(`[IMAGE-UPLOAD] uploadSingle:: Failed to upload file and get link - ${error}`);
+      that.logger.error(`[AUDIO-UPLOAD] uploadSingle:: Failed to upload file and get link - ${error}`);
       that.isFilePendingToUpload = false;
     });
-    that.logger.debug('[IMAGE-UPLOAD] reader-result: ', file);
+    that.logger.debug('[AUDIO-UPLOAD] reader-result: ', file);
   }
 
 
@@ -393,7 +393,7 @@ export class CDSAudioUploadComponent implements OnInit {
 
 
   onDeletePathElement(event){
-    this.logger.log('[IMAGE-UPLOAD] onDeletePathElement', event)
+    this.logger.log('[AUDIO-UPLOAD] onDeletePathElement', event)
     this.uploadService.delete(this.user.uid, this.metadata.src).then((result)=>{
       
       this.isFilePendingToUpload = false;
@@ -532,20 +532,20 @@ export class CDSAudioUploadComponent implements OnInit {
     dT.items.add(new File([data], filename, { type: 'image/jpeg' }));
     this.selectedFiles = dT.files;
     const imageXLoad = new Image;
-    this.logger.debug('[IMAGE-UPLOAD] onload ', imageXLoad);
+    this.logger.debug('[AUDIO-UPLOAD] onload ', imageXLoad);
     imageXLoad.src = url
     imageXLoad.title = filename;
     imageXLoad.onload = function () {
-      that.logger.debug('[IMAGE-UPLOAD] onload image', imageXLoad);
+      that.logger.debug('[AUDIO-UPLOAD] onload image', imageXLoad);
       // that.arrayFilesLoad.push(imageXLoad);
       const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
       that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: 'image/jpeg', size: dT.files.item(0).size };
-      that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+      that.logger.debug('[AUDIO-UPLOAD] OK: ', that.arrayFilesLoad[0]);
       // SEND MESSAGE
       that.loadFile();
     };
     imageXLoad.onerror = function(error) {
-      that.logger.error('[IMAGE-UPLOAD] onerror image', error);
+      that.logger.error('[AUDIO-UPLOAD] onerror image', error);
       setTimeout(()=> {
         that.isFilePendingToUpload = false
       }, 2000)
