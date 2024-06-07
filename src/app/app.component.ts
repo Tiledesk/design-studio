@@ -62,6 +62,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.logger.setLoggerConfig(true, appconfig.logLevel)
     this.logger.info('[APP-COMP] logLevel: ', appconfig.logLevel);
 
+    // -------> logLEvel queryParam <-------- //
+    const logLevel = getParameterByName('logLevel')
+    this.logger.info('[APP-COMP] logLevel from URL: ', logLevel);
+    if(logLevel){
+      this.logger.setLoggerConfig(true, logLevel)
+    }
+
+    // -------> token queryParam <-------- //
     const token = getParameterByName('jwt')
     if (token) {
       // this.isOnline = false;
@@ -82,7 +90,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.initialize()
     
     this.loadCustomScript(appconfig)
-
 
   }
 
@@ -281,7 +288,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }).catch(error => {
         this.logger.error('[APP-COMP] initAuthentication SIGNINWITHCUSTOMTOKEN error::', error)
         if(error.status && error.status === 401){
-          this.goToUnauthDashboardPage()
+          // this.goToUnauthDashboardPage()
         }
       })
     } else {

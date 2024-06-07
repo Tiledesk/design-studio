@@ -36,7 +36,8 @@
               "src/design-studio-config-template.json",
               "src/design-studio-config.json",
               "src/environments/real_data/cds-config-firebase.json",
-              "src/environments/real_data/cds-config-native-prod.json"
+              "src/environments/real_data/cds-config-native-prod.json",
+              "src/environments/real_data/cds-config-native-collaudo.json"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",

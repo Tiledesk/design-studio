@@ -154,27 +154,27 @@ export class CDSAudioUploadComponent implements OnInit {
           const typeFile = event.target.files[0].type;
           const size = event.target.files[0].size
           const reader = new FileReader();
-          that.logger.debug('[IMAGE-UPLOAD] OK preload: ', nameFile, typeFile, reader);
+          that.logger.debug('[AUDIO-UPLOAD] OK preload: ', nameFile, typeFile, reader);
           reader.addEventListener('load', function () {
-            that.logger.debug('[IMAGE-UPLOAD] addEventListener load', reader.result);
+            that.logger.debug('[AUDIO-UPLOAD] addEventListener load', reader.result);
             // that.isFileSelected = true;
             // se inizia con image
             if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
               const imageXLoad = new Image;
-              that.logger.debug('[IMAGE-UPLOAD] onload ', imageXLoad);
+              that.logger.debug('[AUDIO-UPLOAD] onload ', imageXLoad);
               imageXLoad.src = reader.result.toString();
               imageXLoad.title = nameFile;
               imageXLoad.onload = function () {
-                that.logger.debug('[IMAGE-UPLOAD] onload image');
+                that.logger.debug('[AUDIO-UPLOAD] onload image');
                 // that.arrayFilesLoad.push(imageXLoad);
                 const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
                 that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: typeFile, size: size };
-                that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+                that.logger.debug('[AUDIO-UPLOAD] OK: ', that.arrayFilesLoad[0]);
                 // SEND MESSAGE
                 that.loadFile();
               };
             } else {
-              that.logger.debug('[[IMAGE-UPLOAD] onload file');
+              that.logger.debug('[AUDIO-UPLOAD] onload file');
               const fileXLoad = {
                 src: reader.result.toString(),
                 title: nameFile
@@ -182,7 +182,7 @@ export class CDSAudioUploadComponent implements OnInit {
               // that.arrayFilesLoad.push(imageXLoad);
               const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
               that.arrayFilesLoad[0] = { uid: uid, file: fileXLoad, type: typeFile, size: size };
-              that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+              that.logger.debug('[AUDIO-UPLOAD] OK: ', that.arrayFilesLoad[0]);
               // SEND MESSAGE
               that.loadFile();
             }
@@ -190,7 +190,7 @@ export class CDSAudioUploadComponent implements OnInit {
 
           if (event.target.files[0]) {
             reader.readAsDataURL(event.target.files[0]);
-            that.logger.debug('[IMAGE-UPLOAD] reader-result: ', event.target.files[0]);
+            that.logger.debug('[AUDIO-UPLOAD] reader-result: ', event.target.files[0]);
           }
       }
     }
@@ -198,14 +198,14 @@ export class CDSAudioUploadComponent implements OnInit {
 
 
   loadFile() {
-    this.logger.debug('[IMAGE-UPLOAD] that.fileXLoad: ', this.arrayFilesLoad);
+    this.logger.debug('[AUDIO-UPLOAD] that.fileXLoad: ', this.arrayFilesLoad);
     // at the moment I only manage the upload of one image at a time
     if (this.arrayFilesLoad[0] && this.arrayFilesLoad[0].file) {
       const fileXLoad = this.arrayFilesLoad[0].file;
       const uid = this.arrayFilesLoad[0].uid;
       const type = this.arrayFilesLoad[0].type;
       const size = this.arrayFilesLoad[0].size
-      this.logger.debug('[IMAGE-UPLOAD] that.fileXLoad: ', type);
+      this.logger.debug('[AUDIO-UPLOAD] that.fileXLoad: ', type);
       let metadata;
       if (type.startsWith('image') && !type.includes('svg')) {
           metadata = {
@@ -247,7 +247,7 @@ export class CDSAudioUploadComponent implements OnInit {
     const currentUpload = new UploadModel(file);
  
     this.uploadService.upload(this.user.uid, currentUpload).then(data => {
-      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${data}`);
+      that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link -`, data);
 
       metadata.src = data.src;
       metadata.downloadURL = data.downloadURL
