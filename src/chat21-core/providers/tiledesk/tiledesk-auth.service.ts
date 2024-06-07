@@ -121,7 +121,7 @@ export class TiledeskAuthService {
     console.log('signInWithCustomToken--> outttt', this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN, that.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN)
     return new Promise((resolve, reject) => {
       console.log('signInWithCustomToken-->', this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN, that.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN)
-      this.http.post(this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN, null, requestOptions).subscribe({next: (data)=>{
+      that.http.post('http://35.198.150.252/api/auth/signinWithCustomToken', null, requestOptions).subscribe({next: (data)=>{
         if (data['success'] && data['token']) {
           that.tiledeskToken = data['token'];
           that.createCompleteUser(data['user']);
