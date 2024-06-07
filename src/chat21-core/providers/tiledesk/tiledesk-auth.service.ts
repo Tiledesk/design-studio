@@ -42,7 +42,6 @@ export class TiledeskAuthService {
     this.URL_TILEDESK_SIGNIN = this.SERVER_BASE_URL + 'auth/signin';
     this.URL_TILEDESK_SIGNIN_ANONYMOUSLY = this.SERVER_BASE_URL + 'auth/signinAnonymously'
     this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN = this.SERVER_BASE_URL + 'auth/signinWithCustomToken';
-    console.log('[TILEDESK-AUTH-SERV] - urlssss',  this.SERVER_BASE_URL, this.URL_TILEDESK_SIGNIN, this.URL_TILEDESK_SIGNIN_ANONYMOUSLY, this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN)
   }
 
 
@@ -118,10 +117,8 @@ export class TiledeskAuthService {
     });
     const requestOptions = { headers: headers };
     const that = this;
-    console.log('signInWithCustomToken--> outttt', this.SERVER_BASE_URL, this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN, that.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN)
     return new Promise((resolve, reject) => {
-      console.log('signInWithCustomToken-->', that.SERVER_BASE_URL, this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN, that.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN)
-      that.http.post( that.SERVER_BASE_URL + '/auth/signinWithCustomToken', null, requestOptions).subscribe({next: (data)=>{
+      this.http.post(this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN, null, requestOptions).subscribe({next: (data)=>{
         if (data['success'] && data['token']) {
           that.tiledeskToken = data['token'];
           that.createCompleteUser(data['user']);
