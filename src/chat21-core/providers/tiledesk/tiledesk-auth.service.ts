@@ -118,6 +118,7 @@ export class TiledeskAuthService {
     });
     const requestOptions = { headers: headers };
     const that = this;
+    console.log('signInWithCustomToken--> outttt', this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN, that.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN)
     return new Promise((resolve, reject) => {
       console.log('signInWithCustomToken-->', this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN, that.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN)
       this.http.post(this.URL_TILEDESK_SIGNIN_WITH_CUSTOM_TOKEN, null, requestOptions).subscribe({next: (data)=>{
