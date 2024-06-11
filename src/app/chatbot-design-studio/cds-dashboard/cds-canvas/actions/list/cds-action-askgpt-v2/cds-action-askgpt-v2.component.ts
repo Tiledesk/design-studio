@@ -34,7 +34,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  listOfNamespaces: Array<Namespace>
+  listOfNamespaces: Array<{name: string, value: string, icon?:string}>;
 
   // Connectors
   idIntentSelected: string;
@@ -192,7 +192,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPT] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList
+      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
 
     })
   }
@@ -222,6 +222,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent' | 'namespace') {
     if(event){
+      console.log('evnttttt', event)
       this.action[type]=event.value
       switch(type){
         case 'trueIntent':
