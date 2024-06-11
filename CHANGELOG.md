@@ -6,7 +6,7 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
-### 1.12.0 in PROD
+### 1.12.0 in PROD 
 
 ### 1.12.0-rc.5
 👉 **changed**: namescace model 
