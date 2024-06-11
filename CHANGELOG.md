@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.12.0-rc.5
+👉 **changed**: namescace model 
+👉 **changed**: top_k range in action askkb_v2
+
 ### 1.12.0-rc.4
 ### 1.12.0-rc.3
 👉 **added**: namespace, context and history properties into action-askgptv2
