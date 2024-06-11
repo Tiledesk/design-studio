@@ -143,7 +143,7 @@
         <cds-select id="text-condition" 
             [items]="listOfNamespaces" 
             [bindLabelSelect]="'name'"
-            [bindValueSelect]="'namespace_id'" 
+            [bindValueSelect]="'id'" 
             [itemSelected]="action?.namespace" 
             [placeholder]="'CDSCanvas.SelectNamespace' | translate"
             [clearable]="true" 
@@ -236,16 +236,16 @@
                         <div class="action-wait-content">
 
                             <div class="action-wait-slider">
-                                <div class="action-wait-range">0</div>
+                                <div class="action-wait-range">1</div>
                                 <mat-slider 
                                     class="wait-slider" 
                                     thumbLabel 
                                     [displayWith]="formatLabel" 
-                                    step="1" min="0" max="10" 
+                                    step="1" min="1" max="10" 
                                     [(ngModel)]="action.top_k"
                                     (change)="updateSliderValue($event.value, 'top_k')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">1</div>
+                                <div class="action-wait-range">10</div>
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
