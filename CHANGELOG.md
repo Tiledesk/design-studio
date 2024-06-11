@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.13.0-rc.1
+👉 **bug-fixed**: namespace select into cds-action-askgptv2 to not save data 
+
 ### 1.12.0-rc.5
 👉 **changed**: namescace model 
 👉 **changed**: top_k range in action askkb_v2
