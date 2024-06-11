@@ -26,7 +26,7 @@ export class NativeUploadService extends UploadService {
     }
 
     initialize(): void {
-        this.logger.info('[NATIVE UPLOAD] initialize')
+        this.logger.info('[NATIVE UPLOAD] initialize', this.getBaseUrl())
         this.URL_TILEDESK_FILE = this.getBaseUrl() + 'files'
         this.URL_TILEDESK_IMAGES = this.getBaseUrl() + 'images'
         this.tiledeskToken = this.appStorage.getItem('tiledeskToken')
@@ -45,7 +45,7 @@ export class NativeUploadService extends UploadService {
 
         const that = this;
         if ((upload.file.type.startsWith('image') && (!upload.file.type.includes('svg')))) {
-            this.logger.log('[NATIVE UPLOAD] - upload new image')
+            this.logger.log('[NATIVE UPLOAD] - upload new image', this.URL_TILEDESK_IMAGES)
             //USE IMAGE API
             const url = this.URL_TILEDESK_IMAGES + '/users'
             return new Promise((resolve, reject) => {
@@ -58,7 +58,7 @@ export class NativeUploadService extends UploadService {
                 });
             });
         } else {
-            this.logger.log('[NATIVE UPLOAD] - upload new file')
+            this.logger.log('[NATIVE UPLOAD] - upload new file', this.URL_TILEDESK_FILE)
             //USE FILE API
             const url = this.URL_TILEDESK_FILE + '/users'
             return new Promise((resolve, reject) => {

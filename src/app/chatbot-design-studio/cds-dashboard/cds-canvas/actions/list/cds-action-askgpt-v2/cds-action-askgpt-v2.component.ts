@@ -17,6 +17,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
 import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+import { Namespace } from 'src/app/models/namespace-model';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -33,6 +34,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
+  listOfNamespaces: Array<Namespace>
 
   // Connectors
   idIntentSelected: string;
@@ -84,6 +86,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (!this.action.preview) {
       this.action.preview = []; // per retrocompatibilità
     }
+    this.getListNamespaces()
 
   }
 
@@ -185,6 +188,15 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.debug("[ACTION ASKGPTV2] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
+
+  private getListNamespaces(){
+    this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
+      this.logger.log("[ACTION-ASKGPT] getListNamespaces", namaspaceList)
+      this.listOfNamespaces = namaspaceList
+
+    })
+  }
+
   changeTextarea($event: string, property: string) {
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
@@ -208,7 +220,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     }
   }
 
-  onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
+  onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent' | 'namespace') {
     if(event){
       this.action[type]=event.value
       switch(type){
@@ -223,7 +235,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     }
   }
 
-  onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
+  onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent' | 'namespace') {
     switch(type){
       case 'trueIntent':
         this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.action.trueIntent});
@@ -246,6 +258,15 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.action.falseIntentAttributes = attributes;
     }
     this.logger.log("action updated: ", this.action)
+  }
+
+  onChangeCheckbox(){
+    try {
+      this.action.history = !this.action.history;
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    } catch (error) {
+      this.logger.log("Error: ", error);
+    }
   }
 
   updateSliderValue(event, target) {

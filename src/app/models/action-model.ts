@@ -365,6 +365,8 @@ export class ActionAskGPTV2 extends Action {
     max_tokens: number;
     temperature: number;
     top_k: number;
+    context: string;
+    history: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2
@@ -725,7 +727,6 @@ export class ActionVoice extends Action {
         // this.text = text ? text : '...';
         this._tdActionType = type;
         this.attributes = new Attributes();
-        this.attributes.disableInputMessage = true;
         if (attributes){
             this.attributes = attributes;
         }

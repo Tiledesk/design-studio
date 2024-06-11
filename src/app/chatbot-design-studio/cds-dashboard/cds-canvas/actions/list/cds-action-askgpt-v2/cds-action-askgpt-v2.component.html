@@ -78,6 +78,16 @@
         </cds-textarea>
     </div>
 
+    <div class="field-box">
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.history"
+                (change)="onChangeCheckbox()">
+                {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
+            </mat-checkbox>
+        </section>
+    </div>
+
      <!-- PREVIEW - START -->
      <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
         <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
@@ -126,6 +136,26 @@
 
     </div>
     <!-- PREVIEW - END -->
+
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.Namespace' | translate}}</label>
+        <cds-select id="text-condition" 
+            [items]="listOfNamespaces" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'id'" 
+            [itemSelected]="action?.namespace" 
+            [placeholder]="'CDSCanvas.SelectNamespace' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'namespace')"
+            (onReset)="onResetBlockSelect($event, 'namespace')">
+        </cds-select>
+    </div>
+
+    <div class="link-container">
+        <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
+    </div>
+
 
     <mat-accordion>
         <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
@@ -206,22 +236,37 @@
                         <div class="action-wait-content">
 
                             <div class="action-wait-slider">
-                                <div class="action-wait-range">0</div>
+                                <div class="action-wait-range">1</div>
                                 <mat-slider 
                                     class="wait-slider" 
                                     thumbLabel 
                                     [displayWith]="formatLabel" 
-                                    step="1" min="0" max="10" 
+                                    step="1" min="1" max="10" 
                                     [(ngModel)]="action.top_k"
                                     (change)="updateSliderValue($event.value, 'top_k')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">1</div>
+                                <div class="action-wait-range">10</div>
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
                             <input type="text" class="slider-input gpt-setting-input" value="{{action.top_k}}" disabled>
                         </div>
                     </div>
+                </div>
+
+                <!-- // system context textarea -->
+                <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
+                    <cds-textarea id="context" 
+                        [textLimitBtn]="false" 
+                        [emojiPikerBtn]="false" 
+                        [setAttributeBtn]="false"
+                        [minRow]="1" [maxRow]="3" 
+                        [text]="action.context" 
+                        [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
+                        (blur)="onBlur($event)"
+                        (changeTextarea)="onChangeTextarea($event, 'context')">
+                    </cds-textarea>
                 </div>
 
                 <!-- <div class="field-box">
@@ -254,10 +299,6 @@
             (onSelected)="onChangeSelect($event, 'model')">
         </cds-select>
     </div> -->
-
-    <div class="link-container">
-        <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
-    </div>
 
     <!-- <div class="field-box">
         <label class="title-label">Namespace</label>

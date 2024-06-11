@@ -1,5 +1,5 @@
 <div class="cds-publish-on-community-modal-header">
-    <div class="header-title">{{ 'CDSModalPublishOnCommunity.PublishYouChatbotToCommunity' | translate }}</div>
+    <div class="header-title">{{ 'CDSModalPublishOnCommunity.PublishYouChatbotToCommunity' | translate:BRAND_BASE_INFO }}</div>
     <mat-dialog-actions>
         <button mat-button mat-dialog-close>
             <span class="material-icons">
@@ -220,7 +220,7 @@
                     <div class="col-xs-12">
                         <div class="deploy-to-community-text" style="margin-top: 30px;">
                             <h3 style="line-height: 22px;">
-                                {{ 'CDSModalPublishOnCommunity.PublishChatbotCommunityDescription' | translate }}
+                                {{ 'CDSModalPublishOnCommunity.PublishChatbotCommunityDescription' | translate:BRAND_BASE_INFO }}
                             </h3>
                         </div>
                         <div *ngIf="!hasPersonalCmntyInfo"  class="no-user-cmnty-info">

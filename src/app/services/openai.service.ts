@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+import { Observable } from 'rxjs';
+import { Namespace } from '../models/namespace-model';
 
 @Injectable({
   providedIn: 'root'
@@ -79,6 +81,21 @@ export class OpenaiService {
     return this.httpClient.post(url, data, httpOptions);
   }
 
+
+  getAllNamespaces(): Observable<Namespace[]>{
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    }
+
+    const url = this.URL_TILEDESK_OPENAI + "/kb/namespace/all";
+    this.logger.debug('[OPENAI.SERVICE] - getAllNamespaces URL: ', url);
+
+    return this.httpClient.get<Namespace[]>(url, httpOptions);
+  }
+
   ////////////////////////////////////////////////////////
   //////////////////// ASK KB - START ////////////////////
   ////////////////////////////////////////////////////////
@@ -129,6 +146,9 @@ export class OpenaiService {
 
     return this.httpClient.post(url, data, httpOptions);
   }
+
+
+
 
   
 }
