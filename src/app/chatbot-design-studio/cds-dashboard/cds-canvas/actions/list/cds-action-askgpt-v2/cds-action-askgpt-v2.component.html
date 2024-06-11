@@ -78,7 +78,7 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box">
+    <!-- <div class="field-box">
         <section class="disable-input-message-section">
             <mat-checkbox 
                 [checked]="action?.history"
@@ -86,7 +86,7 @@
                 {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
             </mat-checkbox>
         </section>
-    </div>
+    </div> -->
 
      <!-- PREVIEW - START -->
      <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
@@ -138,7 +138,7 @@
     <!-- PREVIEW - END -->
 
 
-    <div class="field-box">
+    <!-- <div class="field-box">
         <label class="title-label">{{'CDSCanvas.Namespace' | translate}}</label>
         <cds-select id="text-condition" 
             [items]="listOfNamespaces" 
@@ -150,7 +150,7 @@
             (onSelected)="onChangeBlockSelect($event, 'namespace')"
             (onReset)="onResetBlockSelect($event, 'namespace')">
         </cds-select>
-    </div>
+    </div> -->
 
     <div class="link-container">
         <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
@@ -255,7 +255,7 @@
                 </div>
 
                 <!-- // system context textarea -->
-                <div class="field-box">
+                <!-- <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context" 
                         [textLimitBtn]="false" 
@@ -267,7 +267,7 @@
                         (blur)="onBlur($event)"
                         (changeTextarea)="onChangeTextarea($event, 'context')">
                     </cds-textarea>
-                </div>
+                </div> -->
 
                 <!-- <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
