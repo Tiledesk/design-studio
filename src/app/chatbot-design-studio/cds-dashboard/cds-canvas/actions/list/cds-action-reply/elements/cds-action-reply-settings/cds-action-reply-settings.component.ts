@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { secondsToDhms } from 'src/app/utils/util';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'cds-action-reply-settings',
@@ -27,6 +28,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
   @Input() action: ActionReplyV2;
   @Input() index: number;
   @Input() previewMode: boolean = true;
+  @Input() handleActionChanges: Observable<ActionReplyV2>
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
@@ -39,6 +41,8 @@ export class CdsActionReplySettingsComponent implements OnInit {
   idConnectionNoInput: string;
   isConnectedNoMatch: boolean = false;
   isConnectedNoInput: boolean = false;
+  isConnectorInputDisabled: boolean = false;
+  isConnectorMatchDisabled: boolean = false;
   connector: any;
   private subscriptionChangedConnector: Subscription;
 
@@ -61,6 +65,12 @@ export class CdsActionReplySettingsComponent implements OnInit {
       }
     });
     this.initializeConnector();
+
+    this.handleActionChanges.subscribe(()=> this.checkButtonsInCommands())
+  }
+
+  ngOnChanges() {
+    this.logger.debug("[ACTION REPLY SETTINGS] onChangessss: ", this.action);
   }
 
   /** */
@@ -80,6 +90,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
     this.idConnectorNoMatch = this.idAction + '/noMatch';
     this.listOfIntents = this.intentService.getListOfIntents();
     this.checkConnectionStatus();
+    this.checkButtonsInCommands();
   }
 
   private updateConnector(){
@@ -172,7 +183,25 @@ export class CdsActionReplySettingsComponent implements OnInit {
   }
 
   // PRIVATE FUNCTIONS //
-
+  private checkButtonsInCommands(){
+    let commands = this.action.attributes.commands
+    if(commands && commands.length > 0){
+      let messages = commands.filter(command => command.type === TYPE_COMMAND.MESSAGE)
+      messages.forEach(el => {
+        if(el.message.attributes.attachment && el.message.attributes.attachment.buttons && el.message.attributes.attachment.buttons.length > 0){
+          this.isConnectorInputDisabled = false;
+          this.isConnectorMatchDisabled = false;
+          return;
+          
+        }else{
+          //CASE: no buttons in message element
+          this.isConnectorInputDisabled = true;
+          this.isConnectorMatchDisabled = true;
+          return;
+        }
+      })
+    }
+  }
 
   // EVENT FUNCTIONS //
 

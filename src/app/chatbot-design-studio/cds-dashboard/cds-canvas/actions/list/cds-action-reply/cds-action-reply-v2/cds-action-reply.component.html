@@ -217,6 +217,7 @@
                     [idAction] = "idAction"
                     [action] = "action"
                     [previewMode] = "previewMode"
+                    [handleActionChanges]="eventActionChanges.asObservable()"
                     (updateAndSaveAction) = onUpdateAndSaveAction($event)
                     (changeActionReply) = onChangeActionReply($event)
                     (onConnectorChange)= onConnectorChangeReply($event)>
