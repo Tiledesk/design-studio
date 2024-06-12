@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.13.0-rc.2
+👉 **added**: new delay-text component to increment input timeout over 120s 
+👉 **added**: ability to not activate NoInput and NoMatch connector if commands inside cds-action-replyv2 not contains buttons
+
 ### 1.13.0-rc.1
 👉 **bug-fixed**: namespace select into cds-action-askgptv2 to not save data 
 
