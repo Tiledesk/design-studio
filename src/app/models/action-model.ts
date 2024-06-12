@@ -444,19 +444,19 @@ export class Attributes {
 }
 
 export class Command {
-    type: string;
+    type: TYPE_COMMAND;
     message?: Message;
     settings?: Setting;
     time?: number;
     subType?: string;
-    constructor(type: string) {
+    constructor(type: TYPE_COMMAND) {
         this.type = type;
     }
 }
 
 export class Wait {
     time: number;
-    type: string;
+    type: TYPE_COMMAND;
     constructor() {
         this.type = TYPE_COMMAND.WAIT;
         this.time = 500;
@@ -493,7 +493,7 @@ export class Setting {
 
 export class MessageWithWait extends Message {
     time?: number = 500;
-    constructor(type: string, text: string, time: number, _tdJSONCondition?: Expression) {
+    constructor(type: TYPE_COMMAND, text: string, time: number, _tdJSONCondition?: Expression) {
         super(type,text, _tdJSONCondition);
         this.time = time?time:500;
     }

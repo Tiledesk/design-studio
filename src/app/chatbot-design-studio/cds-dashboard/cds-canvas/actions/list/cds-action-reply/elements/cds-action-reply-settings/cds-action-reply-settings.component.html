@@ -15,7 +15,7 @@
         </div>
 
         <label class="title-preview-label">{{'CDSCanvas.NoInput' | translate}}
-            <span *ngIf="action.hasOwnProperty('noInputTimeout')">({{action.noInputTimeout/1000}} s)</span>
+            <span *ngIf="action.hasOwnProperty('noInputTimeout')">({{formatLabel(action?.noInputTimeout/1000)}})</span>
         </label>
         
         <cds-connector class="button-connector"
@@ -70,12 +70,18 @@
             </div>
             <label class="condition-text">{{'CDSCanvas.NoInput' | translate}}</label>
             <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '70%'}">
-                <appdashboard-delay-slider
+                <appdashboard-delay-slider *ngIf="action.noInputTimeout < 120000"
                     [delayTime]="action.noInputTimeout/1000"
                     [max]="120" [step]="1"
                     (changeDelayTime)="onChangeDelayTime($event)"
                     (clickDelayTime)="onClickDelayTime($event)">
                 </appdashboard-delay-slider>
+                <appdashboard-delay-text *ngIf="action.noInputTimeout >= 120000"
+                    [delayTime]="action.noInputTimeout/1000"
+                    [max]="120"
+                    (changeDelayTime)="onChangeDelayTime($event)"
+                    (clickDelayTime)="onClickDelayTime($event)">
+                </appdashboard-delay-text>
             </div>
         </div>
         <cds-select id="text-condition" 
