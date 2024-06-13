@@ -74,7 +74,7 @@
             [text]="action?.question" 
             [placeholder]="'CDSCanvas.QuestionToSubmit' | translate"
             (blur)="onBlur($event)"
-            (changeTextarea)="changeTextarea($event, 'question')">
+            (changeTextarea)="onChangeTextarea($event, 'question')">
         </cds-textarea>
     </div>
 
@@ -268,20 +268,6 @@
                         (changeTextarea)="onChangeTextarea($event, 'context')">
                     </cds-textarea>
                 </div>
-
-                <!-- <div class="field-box">
-                    <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
-                    <cds-textarea id="context" 
-                        [textLimitBtn]="false" 
-                        [emojiPikerBtn]="false" 
-                        [setAttributeBtn]="false"
-                        [minRow]="1" [maxRow]="3" 
-                        [text]="action.context" 
-                        [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
-                        (blur)="onBlur($event)"
-                        (changeTextarea)="onChangeTextarea($event, 'context')">
-                    </cds-textarea>
-                </div> -->
 
             </div>
         </mat-expansion-panel>

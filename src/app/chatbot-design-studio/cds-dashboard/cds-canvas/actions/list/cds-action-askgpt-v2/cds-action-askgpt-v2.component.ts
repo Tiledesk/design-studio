@@ -197,7 +197,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     })
   }
 
-  changeTextarea($event: string, property: string) {
+  onChangeTextarea($event: string, property: string) {
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
     this.action[property] = $event

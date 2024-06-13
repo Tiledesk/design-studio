@@ -1,5 +1,5 @@
 
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
@@ -67,10 +67,6 @@ export class CdsActionReplySettingsComponent implements OnInit {
     this.initializeConnector();
 
     this.handleActionChanges.subscribe(()=> this.checkButtonsInCommands())
-  }
-
-  ngOnChanges() {
-    this.logger.debug("[ACTION REPLY SETTINGS] onChangessss: ", this.action);
   }
 
   /** */
