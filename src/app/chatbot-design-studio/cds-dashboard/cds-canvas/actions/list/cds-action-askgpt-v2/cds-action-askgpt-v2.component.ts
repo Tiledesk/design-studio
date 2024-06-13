@@ -18,6 +18,7 @@ import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dia
 import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { Namespace } from 'src/app/models/namespace-model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -65,6 +66,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     private intentService: IntentService,
     private appConfigService: AppConfigService,
     private openaiService: OpenaiService,
+    private translate: TranslateService,
     private dialog: MatDialog
   ) { }
 
@@ -222,7 +224,6 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent' | 'namespace') {
     if(event){
-      console.log('evnttttt', event)
       this.action[type]=event.value
       switch(type){
         case 'trueIntent':
@@ -362,6 +363,7 @@ export class CdsActionAskgptV2Component implements OnInit {
         element.classList.add('preview-container-extended')
       }, 200)
       this.showAiError = true;
+      this.ai_error = this.translate.instant('CDSCanvas.AiError')
     }, () => {
       this.logger.debug("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
       this.searching = false;
