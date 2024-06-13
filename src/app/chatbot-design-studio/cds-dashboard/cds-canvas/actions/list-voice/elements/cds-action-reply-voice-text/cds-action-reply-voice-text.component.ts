@@ -4,7 +4,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/models/action-model';
-import { TYPE_ACTION, TYPE_ACTION_VXML, TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../utils';
+import { TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../utils';
 import { IntentService } from '../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../services/connector.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -12,6 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TranslateService } from '@ngx-translate/core';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { TYPE_ACTION, TYPE_ACTION_VXML } from 'src/app/chatbot-design-studio/utils-actions';
 const swal = require('sweetalert');
 
 @Component({

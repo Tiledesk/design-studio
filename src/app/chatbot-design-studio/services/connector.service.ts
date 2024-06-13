@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
 import { StageService } from '../services/stage.service';
-import { TYPE_ACTION, TYPE_BUTTON, isElementOnTheStage, generateShortUID, TYPE_ACTION_VXML } from '../utils';
+import { TYPE_BUTTON, isElementOnTheStage, generateShortUID } from '../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Setting } from 'src/app/models/action-model';
+import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
 /** CLASSE DI SERVICES PER GESTIRE I CONNETTORI **/
 
 

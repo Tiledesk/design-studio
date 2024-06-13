@@ -3,7 +3,7 @@ import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
 import { Subject, Subscription } from 'rxjs';
 
-import { ACTIONS_LIST, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_INTENT_NAME, checkInternalIntent } from '../../../utils';
+import { checkInternalIntent } from '../../../utils';
 import { IntentService } from '../../../services/intent.service';
 // import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
 import { ConnectorService } from '../../../services/connector.service';
@@ -26,6 +26,7 @@ import { replaceItemInArrayForKey } from '../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 
 
 export enum HAS_SELECTED_TYPE {

@@ -3,9 +3,10 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionIntentConnected  } from 'src/app/models/action-model';
 import { IntentService } from '../../../../../services/intent.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { TYPE_UPDATE_ACTION, ACTIONS_LIST, TYPE_ACTION } from '../../../../../utils';
+import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-intent',

@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, 
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
-import { TYPE_COMMAND, TYPE_RESPONSE, TYPE_MESSAGE, TYPE_ACTION, ACTIONS_LIST, generateShortUID, TYPE_UPDATE_ACTION, TYPE_URL, TYPE_INTENT_ELEMENT, findFreeId } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_COMMAND, TYPE_RESPONSE, TYPE_MESSAGE, generateShortUID, TYPE_UPDATE_ACTION, TYPE_URL, TYPE_INTENT_ELEMENT, findFreeId } from 'src/app/chatbot-design-studio/utils';
 import { ActionVoice, Button, Command, Message, MessageAttributes, Wait } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';

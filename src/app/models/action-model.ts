@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import { TYPE_ACTION, TYPE_ACTION_VXML, TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_METHOD_REQUEST, TYPE_OPERATOR } from '../chatbot-design-studio/utils';
+import { TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_METHOD_REQUEST, TYPE_OPERATOR } from '../chatbot-design-studio/utils';
 import { BRAND_BASE_INFO } from '../chatbot-design-studio/utils-resources';
+import { TYPE_ACTION, TYPE_ACTION_VXML } from '../chatbot-design-studio/utils-actions';
 
 export class Action {
     _tdActionType: string;

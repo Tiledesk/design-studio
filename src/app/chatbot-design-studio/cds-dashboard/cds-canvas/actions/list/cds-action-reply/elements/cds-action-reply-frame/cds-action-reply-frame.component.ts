@@ -1,9 +1,10 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser'
 import { Expression, Message, Wait } from 'src/app/models/action-model';
-import { TYPE_ACTION, TYPE_MESSAGE, MESSAGE_METADTA_WIDTH, MESSAGE_METADTA_HEIGHT } from '../../../../../../../utils';
+import { TYPE_MESSAGE } from '../../../../../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-reply-frame',

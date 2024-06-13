@@ -1,7 +1,7 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Button, Expression, MessageAttributes, Message, Wait, Metadata } from 'src/app/models/action-model';
-import { TYPE_ACTION, TEXT_CHARS_LIMIT, calculatingRemainingCharacters, TYPE_BUTTON, generateShortUID } from '../../../../../../../utils';
+import { TYPE_BUTTON } from '../../../../../../../utils';
 import { ConnectorService } from '../../../../../../../services/connector.service';
 import { IntentService } from '../../../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';

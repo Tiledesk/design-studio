@@ -332,11 +332,12 @@ export class CdsActionAskgptV2Component implements OnInit {
 
     let data = {
       question: question,
-      //context: this.action.context,
+      context: this.action.context,
       model: this.action.model,
       max_tokens: this.action.max_tokens,
       temperature: this.action.temperature,
-      top_k: this.action.top_k
+      top_k: this.action.top_k,
+      namespace: this.action.namespace
     }
 
     this.showAiError = false;

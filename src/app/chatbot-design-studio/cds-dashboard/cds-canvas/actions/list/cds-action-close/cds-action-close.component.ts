@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils';
+import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 import { ActionClose } from 'src/app/models/action-model';
 
 @Component({
