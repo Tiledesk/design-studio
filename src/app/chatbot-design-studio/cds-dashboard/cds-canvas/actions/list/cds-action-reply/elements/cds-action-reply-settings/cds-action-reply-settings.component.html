@@ -84,13 +84,14 @@
                 </appdashboard-delay-text>
             </div>
         </div>
-        <cds-select id="text-condition" 
+        <cds-select id="noinput-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.noInputIntent" 
             [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
+            [attr.disabled]="isConnectorInputDisabled"
             (onSelected)="onChangeBlockSelect($event, 'noInputIntent')"
             (onReset)="onResetBlockSelect($event, 'noInputIntent')">
         </cds-select>
@@ -109,13 +110,14 @@
             </div>
             <label class="condition-text">{{'CDSCanvas.NoMatch' | translate}}</label>
         </div>
-        <cds-select id="text-condition" 
+        <cds-select id="nomatch-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
             [itemSelected]="action?.noMatchIntent" 
             [placeholder]="'CDSCanvas.SelectABlock' | translate"
-            [clearable]="true" 
+            [clearable]="true"
+            [attr.disabled]="isConnectorMatchDisabled"
             (onSelected)="onChangeBlockSelect($event, 'noMatchIntent')"
             (onReset)="onResetBlockSelect($event, 'noMatchIntent')">
         </cds-select>
