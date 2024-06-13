@@ -19,6 +19,7 @@ import { TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studi
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -72,6 +73,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
     private openaiService: OpenaiService,
     private intentService: IntentService,
     private appConfigService: AppConfigService,
+    private translate: TranslateService,
     private dashboardService: DashboardService
   ) { }
 
@@ -345,6 +347,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
         element.classList.add('preview-container-extended')
       }, 200)
       this.showAiError = true;
+      this.ai_error = this.translate.instant('CDSCanvas.AiError')
     }, () => {
       this.logger.debug("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
       this.searching = false;
