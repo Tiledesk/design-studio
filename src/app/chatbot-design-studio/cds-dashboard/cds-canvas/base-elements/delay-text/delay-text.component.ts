@@ -12,6 +12,8 @@ export class CDSDelayTextComponent implements OnInit {
 
   @Input() delayTime: number;
   @Input() label: string = 'CDSCanvas.delay';
+  @Input() min: number = 0;
+  @Input() max: number = 10;
   @Output() changeDelayTime = new EventEmitter();
   @Output() clickDelayTime = new EventEmitter();
 
@@ -64,6 +66,7 @@ export class CDSDelayTextComponent implements OnInit {
   }
 
   onChangeText(){
+    if(this.delayTime<0) this.delayTime = 0
     this.delayTimeUnit = this.formatLabel(this.delayTime)  
     // this.closeDelaySlider()
     // this.changeDelayTime.emit(this.delayTime);

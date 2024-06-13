@@ -184,6 +184,11 @@ export class CdsActionReplySettingsComponent implements OnInit {
     if(commands && commands.length > 0){
       let messages = commands.filter(command => command.type === TYPE_COMMAND.MESSAGE)
       messages.forEach(el => {
+        if(!el || !el.message || !el.message.attributes){
+          this.isConnectorInputDisabled = true;
+          this.isConnectorMatchDisabled = true;
+          return;
+        }
         if(el.message.attributes.attachment && el.message.attributes.attachment.buttons && el.message.attributes.attachment.buttons.length > 0){
           this.isConnectorInputDisabled = false;
           this.isConnectorMatchDisabled = false;
