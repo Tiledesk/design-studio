@@ -9,13 +9,15 @@
             <!-- [disabled]="disabled" -->
             <input matInput
                 #input_text id="input_text"
-                [type]="inputType"
+                type="number"
                 cdkTextareaAutosize
                 cdkAutosizeMinRows="1"
                 cdkAutosizeMaxRows="1"
                 [(ngModel)]="delayTime"
+                [min]="min"
                 (focus)="onFocusInput()"
                 (blur)="onBlur($event)"
+                (keydown.enter)="onFocusOutSlider()"
                 (ngModelChange)="onChangeText($event)"/>
             <span matSuffix>s</span>
         </mat-form-field>
