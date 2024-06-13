@@ -9,7 +9,6 @@ export class CdsConnectorComponent implements OnInit {
   @Input() idConnector: string;
   @Input() idConnection: string;
   @Input() isConnected: boolean;
-  @Input() isDisabled: boolean;
 
   constructor() { }
 

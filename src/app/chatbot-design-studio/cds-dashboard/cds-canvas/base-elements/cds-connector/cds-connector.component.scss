@@ -33,18 +33,19 @@
     -webkit-box-pack: center;
     justify-content: center;
 
-    &[disabled = "true"]{
-        cursor: not-allowed !important;
-        opacity: 0.6;
-        
-        .point-connector,
-        .point-connector-empty,
-        .point-connector-empty:hover{
-            cursor: not-allowed !important;
-            pointer-events:none;
-        }
+    // &[disabled = "true"]{
+    //     cursor: not-allowed !important;
+    //     opacity: 0.6;
 
-    }
+    //     .point-connector,
+    //     .point-connector-empty,
+    //     .point-connector-empty:hover{
+    //         cursor: not-allowed !important;
+    //         pointer-events:none;
+    //     }
+
+    // }
+    
     // cursor: copy;
 }
 
