@@ -91,7 +91,7 @@ export enum TYPE_URL {
 export enum TYPE_COMMAND {
     WAIT        = 'wait',
     MESSAGE     = 'message',
-    SETTINGS   = 'settings'
+    SETTINGS    = 'settings'
 }
 
 export enum TYPE_MESSAGE {

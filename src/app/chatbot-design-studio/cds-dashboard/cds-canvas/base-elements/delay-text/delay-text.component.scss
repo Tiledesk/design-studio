@@ -1,0 +1,192 @@
+$background-color: var(--blu-light-01);
+$text-color: var(--blu);
+
+.delay {
+    align-items: center;
+    background: $background-color;
+    border-radius: 13px;
+    border: 1px solid transparent;
+    display: inline-flex;
+    position: relative;
+    height: 26px;
+    padding: 0 9px 0 3px;
+    // width: 100px;
+    text-align: center;
+    transition: width .3s ease-in;
+    font-size: var(--font-size-base);
+
+    &:hover{
+        opacity: 0.8;
+        cursor: pointer;
+    }
+    // margin-top: 30px;
+    .delay-current{
+        display: contents;
+        width: auto;
+        color: $text-color;
+        cursor: pointer;
+        font-size: 0.8em;
+        font-weight: 400;
+        white-space: nowrap;
+    }
+    .delay-slider{
+        display: inline-flex;
+        align-items: center;
+        // opacity: 0;
+        visibility: hidden;
+        width: 0;
+        transition: opacity .2s;
+    }
+    .delay-range {
+        display: inline-flex;
+        color: $text-color;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+    &.open {
+        border: 1px solid $text-color;;
+        width: 100%;
+        .delay-current{
+            display: none;
+        }
+        .delay-slider{
+            width: 100%;
+            // opacity: 1;
+            visibility: visible;
+        }
+    }
+}
+
+.delay-button {
+    padding-right: 4px;
+    color: $text-color;
+    cursor: pointer;
+}
+
+
+
+.delay-icon {
+    color: $text-color;
+    font-size: 1em;
+    font-weight: 700;
+    margin-right: 9px;
+}
+
+
+
+/** INPUT **/ 
+.box-input {
+    // width: calc(100% - 40px);
+    // margin-left: 20px;
+    width: 100%;
+    input {
+        // border-radius: var(--input-border-radius-base);
+        // background: var(--color-white-hex);
+        outline: 0px solid transparent;
+        outline-offset: -1px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        // width: calc(100% - 2.5em);
+        width: 100%;
+        color: $text-color;
+        caret-color: $text-color;
+        font-size: 1.15em;
+        text-align: end;
+        // line-height: 25px;
+        resize: vertical;
+
+        padding: 10px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        margin: 0px;
+
+        &.customPrefix{
+            padding-left: 20px;
+            width: calc(100% - 20px);
+        }
+
+        &.autocompleteOpen{
+            border-radius: var(--input-border-radius-base) 0 0 0;
+        }
+        
+    }
+
+    .input-prefix {
+        position: absolute;
+        top: 14px;
+        left: 8px;
+        color: #7d7d7d;
+        font-weight: 800;
+    }
+    
+    .input-suffix {
+        position: absolute;
+        top: 14px;
+        right: 8px;
+        color: #7d7d7d;
+        font-weight: 800;
+    }
+}
+
+/** TEXT **/
+mat-form-field.mat-form-field ::ng-deep {
+    .mat-form-field-infix{
+        border-top: 0px !important;
+        input{
+            &:hover{
+                // border: 1px solid var(--blu) !important;
+                outline: 0px solid var(--blu) !important;
+                outline-offset: -1px;
+            }
+        }
+    }
+}
+
+mat-form-field.mat-focused ::ng-deep {
+    .mat-form-field-wrapper {
+        .mat-form-field-flex {
+            .mat-form-field-infix {
+                display: flex;
+                input {
+                    // border: 1px solid var(--blu)!important;
+                    outline: 0px solid var(--blu)!important;
+                    outline-offset: -1px;
+                    // transition: border .3s;
+                    &.invalid{
+                        // border: 1px solid red !important;
+                        outline: 1px solid red !important;
+                        outline-offset: -1px;
+                        // transition: border 0.3s;
+                    }
+                    
+                }
+
+                
+            }
+        }
+    }
+}
+mat-form-field.box-input ::ng-deep {
+    .mat-form-field-wrapper {
+        padding-bottom:0;
+        .mat-form-field-flex {
+            border-radius: 4px 4px 0 0;
+            // padding: 0 0.75em 0 0.75em;
+            padding: 0px;
+            margin: 0px;
+            background: transparent;
+        }
+    }
+    .mat-form-field-underline {
+        display: none;
+    }   
+    .mat-form-field-infix {
+        display: flex;
+        width: 100%;
+        padding: 0px;
+
+        .mat-form-field-label-wrapper{
+            display: none;
+        }
+    } 
+}

@@ -1,15 +1,17 @@
 
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Button, MessageAttributes, Expression, Setting, ActionReplyV2 } from 'src/app/models/action-model';
-import { TYPE_BUTTON, TYPE_UPDATE_ACTION, replaceItemInArrayForKey } from '../../../../../../../utils';
+import { TYPE_BUTTON, TYPE_COMMAND, TYPE_UPDATE_ACTION, replaceItemInArrayForKey } from '../../../../../../../utils';
 import { IntentService } from '../../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../../services/connector.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { secondsToDhms } from 'src/app/utils/util';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'cds-action-reply-settings',
@@ -26,6 +28,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
   @Input() action: ActionReplyV2;
   @Input() index: number;
   @Input() previewMode: boolean = true;
+  @Input() handleActionChanges: Observable<ActionReplyV2>
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
@@ -38,6 +41,8 @@ export class CdsActionReplySettingsComponent implements OnInit {
   idConnectionNoInput: string;
   isConnectedNoMatch: boolean = false;
   isConnectedNoInput: boolean = false;
+  isConnectorInputDisabled: boolean = false;
+  isConnectorMatchDisabled: boolean = false;
   connector: any;
   private subscriptionChangedConnector: Subscription;
 
@@ -60,6 +65,8 @@ export class CdsActionReplySettingsComponent implements OnInit {
       }
     });
     this.initializeConnector();
+
+    this.handleActionChanges.subscribe(()=> this.checkButtonsInCommands())
   }
 
   /** */
@@ -79,6 +86,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
     this.idConnectorNoMatch = this.idAction + '/noMatch';
     this.listOfIntents = this.intentService.getListOfIntents();
     this.checkConnectionStatus();
+    this.checkButtonsInCommands();
   }
 
   private updateConnector(){
@@ -147,8 +155,49 @@ export class CdsActionReplySettingsComponent implements OnInit {
      }
   }
 
-  // PRIVATE FUNCTIONS //
 
+  formatLabel(value: number): string {
+
+    const d = secondsToDhms(value).getDays();
+    const h = secondsToDhms(value).getHours();
+    const m = secondsToDhms(value).getMinutes();
+
+    let number = value
+    let unit = 's' 
+    if(d > 0){
+      number = d;
+      unit = 'd'
+    } else if(h > 0){
+      number = h;
+      unit = 'h'
+    }else if( m> 0){
+      number = m;
+      unit = 'm'
+    }
+    return number + unit
+    // return `${value}`+ 's';
+  }
+
+  // PRIVATE FUNCTIONS //
+  private checkButtonsInCommands(){
+    let commands = this.action.attributes.commands
+    if(commands && commands.length > 0){
+      let messages = commands.filter(command => command.type === TYPE_COMMAND.MESSAGE)
+      messages.forEach(el => {
+        if(el.message.attributes.attachment && el.message.attributes.attachment.buttons && el.message.attributes.attachment.buttons.length > 0){
+          this.isConnectorInputDisabled = false;
+          this.isConnectorMatchDisabled = false;
+          return;
+          
+        }else{
+          //CASE: no buttons in message element
+          this.isConnectorInputDisabled = true;
+          this.isConnectorMatchDisabled = true;
+          return;
+        }
+      })
+    }
+  }
 
   // EVENT FUNCTIONS //
 

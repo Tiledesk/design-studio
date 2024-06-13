@@ -9,6 +9,7 @@ import { IntentService } from '../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../services/connector.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { Subject } from 'rxjs';
 
 
 @Component({
@@ -26,6 +27,8 @@ export class CdsActionReplyV2Component implements OnInit {
   @Input() previewMode: boolean = true
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
+
+  eventActionChanges: Subject<ActionReplyV2> = new Subject<ActionReplyV2>();
 
   // idIntentSelected: string;
   idAction: string;
@@ -312,6 +315,7 @@ export class CdsActionReplyV2Component implements OnInit {
       this.logger.log('[cds-action-reply] onCreateNewButton: ', this.action, this.arrayResponses);
       // this.intentService.setIntentSelected(this.intentSelected.intent_id);
       this.intentService.selectAction(this.intentSelected.intent_id, this.action._tdActionId);
+      this.eventActionChanges.next(this.action)
       const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
       this.onUpdateAndSaveAction(element);
     }
@@ -346,7 +350,9 @@ export class CdsActionReplyV2Component implements OnInit {
     event.buttons.splice(event.index, 1);
     var intentId = this.idAction.substring(0, this.idAction.indexOf('/'));
     this.connectorService.deleteConnectorFromAction(intentId, button.__idConnector);
-    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    this.eventActionChanges.next(this.action)
+    const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+    this.onUpdateAndSaveAction(element);
   }
 
 

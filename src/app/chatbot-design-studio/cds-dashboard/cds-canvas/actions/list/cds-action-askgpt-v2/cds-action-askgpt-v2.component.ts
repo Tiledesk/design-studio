@@ -18,6 +18,7 @@ import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dia
 import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { Namespace } from 'src/app/models/namespace-model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -34,7 +35,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  listOfNamespaces: Array<Namespace>
+  listOfNamespaces: Array<{name: string, value: string, icon?:string}>;
 
   // Connectors
   idIntentSelected: string;
@@ -65,6 +66,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     private intentService: IntentService,
     private appConfigService: AppConfigService,
     private openaiService: OpenaiService,
+    private translate: TranslateService,
     private dialog: MatDialog
   ) { }
 
@@ -192,12 +194,12 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPT] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList
+      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
 
     })
   }
 
-  changeTextarea($event: string, property: string) {
+  onChangeTextarea($event: string, property: string) {
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
     this.action[property] = $event
@@ -361,6 +363,7 @@ export class CdsActionAskgptV2Component implements OnInit {
         element.classList.add('preview-container-extended')
       }, 200)
       this.showAiError = true;
+      this.ai_error = this.translate.instant('CDSCanvas.AiError')
     }, () => {
       this.logger.debug("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
       this.searching = false;

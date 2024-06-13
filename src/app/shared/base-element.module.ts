@@ -12,6 +12,7 @@ import { CDSElementFromUrlComponent } from '../chatbot-design-studio/cds-dashboa
 import { HeightSliderComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/base-elements/height-slider/height-slider.component';
 import { CDSImageUploadComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/base-elements/image-upload/image-upload.component';
 import { CDSAudioUploadComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/base-elements/audio-upload/audio-upload.component';
+import { CDSDelayTextComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/base-elements/delay-text/delay-text.component';
 
 
 
@@ -20,6 +21,7 @@ import { CDSAudioUploadComponent } from '../chatbot-design-studio/cds-dashboard/
     //BASE-ELEMENT
     CdsConnectorComponent,
     CDSDelaySliderComponent,
+    CDSDelayTextComponent,
     CDSElementFromUrlComponent,
     CDSImageUploadComponent,
     CDSAudioUploadComponent,
@@ -40,6 +42,7 @@ import { CDSAudioUploadComponent } from '../chatbot-design-studio/cds-dashboard/
     //BASE-ELEMENT
     CdsConnectorComponent,
     CDSDelaySliderComponent,
+    CDSDelayTextComponent,
     CDSElementFromUrlComponent,
     CDSImageUploadComponent,
     CDSAudioUploadComponent,
