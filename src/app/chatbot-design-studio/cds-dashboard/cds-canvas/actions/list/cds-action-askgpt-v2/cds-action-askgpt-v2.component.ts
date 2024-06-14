@@ -73,16 +73,13 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug("[ACTION-ASKGPTV2] action detail: ", this.action);
-    let ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    console.log('aiiiiiiiiiiiiii', ai_models)
+    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
     this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive').map((el)=> {
-      
       if(ai_models[el.value])
         return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
       else
         return { ...el, multiplier: null }
     })
-    console.log('aiiiiii', this.model_list)
     if (!this.action.namespace) {
       this.action.namespace = this.project_id;
     }
