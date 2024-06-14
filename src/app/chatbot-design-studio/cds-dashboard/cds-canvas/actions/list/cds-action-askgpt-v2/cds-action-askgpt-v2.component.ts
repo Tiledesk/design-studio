@@ -19,6 +19,7 @@ import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studi
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { Namespace } from 'src/app/models/namespace-model';
 import { TranslateService } from '@ngx-translate/core';
+import { loadTokenMultiplier } from 'src/app/utils/util';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -55,7 +56,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   temp_variables = [];
 
-  model_list: Array<{ name: string, value: string }>;
+  model_list: Array<{ name: string, value: string, multiplier: string}>;
   //namespace_list = []; // missing api for namespaces
 
   private subscriptionChangedConnector: Subscription;
@@ -72,7 +73,16 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug("[ACTION-ASKGPTV2] action detail: ", this.action);
-    this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive')
+    let ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
+    console.log('aiiiiiiiiiiiiii', ai_models)
+    this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive').map((el)=> {
+      
+      if(ai_models[el.value])
+        return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
+      else
+        return { ...el, multiplier: null }
+    })
+    console.log('aiiiiii', this.model_list)
     if (!this.action.namespace) {
       this.action.namespace = this.project_id;
     }

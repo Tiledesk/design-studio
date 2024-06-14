@@ -28,7 +28,7 @@
         </ng-template>
 
         <ng-template ng-option-tmp let-item="item" let-index="index">
-            <div class="select-item-wrp" style="justify-content: space-between;">
+            <div class="select-item-wrp" [attr.additionalText]="optionalBindAdditionalText && !item['icon']? true: false"> 
                 <div style="width: 100%; display: flex; flex-direction: column;">
                     <div class="select-item-wrp">
                         <span class="material-icons" *ngIf="item['icon']"
@@ -53,7 +53,7 @@
                 <span class="material-icons-outlined">{{footerButtonIcon}}</span>
                 {{footerButtonText}}
             </div>
-         </ng-template>
+        </ng-template>
 
          
          <!-- // OLD -->
