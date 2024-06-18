@@ -12,6 +12,7 @@ export const environment = {
   uploadEngine: 'native',
   baseImageUrl: 'CHANGEIT',
   logLevel: 'error',
+  aiModels: 'CHANGEIT',
   storage_prefix: "CHANGEIT",
   firebaseConfig: {
     apiKey: 'CHANGEIT',

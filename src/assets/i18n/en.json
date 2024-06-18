@@ -721,6 +721,8 @@
             "strongAuthenticated":{ "description":"Indicates that the current user logged in the chat session with 'strong authentication'" }
         },
         "voiceFlowElements":{
+            "voiceLanguage":{ "description":"Define the main language for the voice system interpreter" },
+            "voiceName":{ "description":"Define the name of the voice chatbot" },
             "event":{ "description":"Every handled event during current call flow" },
             "lastBlock":{ "description":"The last triggered block heard by the caller" }
         }

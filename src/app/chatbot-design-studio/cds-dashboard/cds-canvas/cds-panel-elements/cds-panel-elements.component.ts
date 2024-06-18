@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { TYPE_ACTION, ACTIONS_LIST, TYPE_OF_MENU, TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from '../../../utils';
+import { TYPE_OF_MENU } from '../../../utils';
+import { TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 
 
 @Component({

@@ -11,8 +11,9 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionMake } from 'src/app/models/action-model';
 
 //UTILS
-import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-make',

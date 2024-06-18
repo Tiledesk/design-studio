@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser'
-import { TYPE_ACTION, TYPE_MESSAGE } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_MESSAGE } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { Expression, Message, Metadata, Wait } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';

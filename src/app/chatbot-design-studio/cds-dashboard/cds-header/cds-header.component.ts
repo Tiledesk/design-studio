@@ -343,6 +343,10 @@ export class CdsHeaderComponent implements OnInit {
           "chatbot_id": that.selectedChatbot._id,
           "chatbot_type": that.selectedChatbot.type,
           "project_id": that.projectID
+        },
+        { "context": {
+           "groupId": that.projectID
+          }
         });
       } catch (err) {
         this.logger.error('Event: Publish Chatbot [track] error', err);

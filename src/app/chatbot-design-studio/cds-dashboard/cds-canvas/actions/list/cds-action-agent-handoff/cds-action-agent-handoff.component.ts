@@ -1,4 +1,4 @@
-import { ACTIONS_LIST } from '../../../../../utils';
+import { ACTIONS_LIST } from '../../../../../utils-actions';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActionAgent } from 'src/app/models/action-model';
 

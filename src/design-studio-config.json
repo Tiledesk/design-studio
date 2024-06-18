@@ -11,6 +11,7 @@
   "uploadEngine": "${UPLOAD_ENGINE}",
   "baseImageUrl": "${API_BASEIMAGE_URL}",
   "logLevel": "${LOG_LEVEL}",
+  "aiModels":"${AI_MODELS}",
   "storage_prefix": "cds_sv5",
   "phoneNumber":"${PHONE_NUMBER}",
   "firebase": {

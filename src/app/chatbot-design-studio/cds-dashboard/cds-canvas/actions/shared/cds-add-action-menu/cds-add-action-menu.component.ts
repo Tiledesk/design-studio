@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { ACTIONS_LIST, TYPE_OF_MENU } from '../../../../../utils';
+import { TYPE_OF_MENU } from '../../../../../utils';
 import { TranslateService } from '@ngx-translate/core';
+import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-add-action-menu',

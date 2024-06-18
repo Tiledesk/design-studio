@@ -20,6 +20,7 @@ import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { TranslateService } from '@ngx-translate/core';
+import { loadTokenMultiplier } from 'src/app/utils/util';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -79,7 +80,13 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
-    this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive')
+    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
+    this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive').map((el)=> {
+      if(ai_models[el.value])
+        return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
+      else
+        return { ...el, multiplier: null }
+    })
     this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);

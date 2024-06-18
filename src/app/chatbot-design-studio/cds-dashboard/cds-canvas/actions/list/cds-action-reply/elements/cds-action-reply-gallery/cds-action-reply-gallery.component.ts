@@ -3,11 +3,12 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 import { DomSanitizer } from '@angular/platform-browser';
 import { ConnectorService } from '../../../../../../../services/connector.service';
 import { IntentService } from '../../../../../../../services/intent.service';
-import { TYPE_ACTION, TYPE_BUTTON, TYPE_URL, generateShortUID } from '../../../../../../../utils';
+import { TYPE_BUTTON, TYPE_URL, generateShortUID } from '../../../../../../../utils';
 import { Button, Expression, GalleryElement, Message, Wait, Metadata, MessageAttributes } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-reply-gallery',

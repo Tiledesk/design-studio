@@ -6,9 +6,15 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
-### 1.13.1 in PROD 
+### 1.14.0-rc.2
+👉 **added**: voiceLanguage and voiceName variables to voiceFlow variables list
 
-### 1.13.0 in PROD 
+### 1.14.0-rc.1
+👉 **added**: aiModels env variable managed for cds-action-askgpt and cds-action-gpt-task
+
+### 1.13.1 in PROD
+
+### 1.13.0 in PROD
 
 ### 1.13.0-rc.2
 👉 **added**: new delay-text component to increment input timeout over 120s 

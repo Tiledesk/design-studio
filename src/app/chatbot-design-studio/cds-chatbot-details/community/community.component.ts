@@ -195,6 +195,10 @@ export class CDSDetailCommunityComponent implements OnInit {
               'userId': this.user.uid,
               'botId': this.selectedChatbot._id,
               'bot_name': this.selectedChatbot.name,
+            },
+            { "context": {
+                "groupId": this.project._id
+              }
             });
           } catch (err) {
             this.logger.error('track signup event error', err);
@@ -237,6 +241,10 @@ export class CDSDetailCommunityComponent implements OnInit {
                   'userId': this.user.uid,
                   'botId': this.selectedChatbot._id,
                   'bot_name': this.selectedChatbot.name,
+                },
+                { "context": {
+                    "groupId": this.project._id
+                  }
                 });
               } catch (err) {
                 this.logger.error('track signup event error', err);

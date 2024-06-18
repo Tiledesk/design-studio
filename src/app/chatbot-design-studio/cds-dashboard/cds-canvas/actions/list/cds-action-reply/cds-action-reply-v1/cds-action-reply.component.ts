@@ -2,13 +2,14 @@ import { Component, OnInit, Input, ViewChild, ElementRef, Output, EventEmitter, 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Intent } from 'src/app/models/intent-model';
 import { Wait, Button, Message, Command, ActionReply, MessageAttributes, Setting } from 'src/app/models/action-model';
-import { TYPE_UPDATE_ACTION, TYPE_INTENT_ELEMENT, ACTIONS_LIST, TYPE_ACTION, TYPE_COMMAND, TYPE_RESPONSE, TYPE_BUTTON, TYPE_URL, TYPE_MESSAGE, generateShortUID } from '../../../../../../utils';
+import { TYPE_UPDATE_ACTION, TYPE_INTENT_ELEMENT, TYPE_COMMAND, TYPE_RESPONSE, TYPE_BUTTON, TYPE_URL, TYPE_MESSAGE, generateShortUID } from '../../../../../../utils';
 
 import { ControllerService } from '../../../../../../services/controller.service';
 import { IntentService } from '../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../services/connector.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TYPE_ACTION, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 
 
 @Component({

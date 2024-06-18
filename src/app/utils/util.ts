@@ -74,3 +74,27 @@ export function secondsToDhms(seconds) {
 
     return { getDays: getDays, getHours: getHours,  getMinutes: getMinutes, getSeconds: getSeconds}
 }
+
+export function loadTokenMultiplier(ai_models) { 
+    let models_string = ai_models.replace(/ /g,'');
+
+    let models = {};
+    if (!models_string) {
+        return models;
+    }
+
+    let splitted_string = models_string.split(";");
+
+    splitted_string.forEach(m => {
+        let m_split = m.split(":");
+        let multiplier = null;
+        if (!m_split[1]) {
+            multiplier = null;
+        } else {
+            multiplier = Number(m_split[1]);;
+        }
+        models[m_split[0]] = multiplier;
+    })
+
+    return models
+}

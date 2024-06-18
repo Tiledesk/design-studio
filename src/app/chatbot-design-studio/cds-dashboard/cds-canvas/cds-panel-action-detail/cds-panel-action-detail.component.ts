@@ -1,9 +1,8 @@
-import { TYPE_ACTION_VXML } from './../../../utils';
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, TemplateRef, ViewContainerRef, HostListener } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ConnectorService } from '../../../services/connector.service';
 import { IntentService } from '../../../services/intent.service';
-import { ACTIONS_LIST, TYPE_ACTION, TYPE_INTENT_ELEMENT } from '../../../utils';
+import { TYPE_INTENT_ELEMENT } from '../../../utils';
 import { Intent, Form} from 'src/app/models/intent-model';
 import { Action} from 'src/app/models/action-model';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -13,6 +12,7 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 
 
 @Component({

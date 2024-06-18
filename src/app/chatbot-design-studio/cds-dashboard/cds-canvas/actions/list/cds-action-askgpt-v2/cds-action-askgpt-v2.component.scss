@@ -84,6 +84,20 @@ mat-expansion-panel ::ng-deep {
     }
 }
 
+cds-select#model-condition ::ng-deep{
+    .select-item-wrp{
+        justify-content: space-between;
+    }
+}
+
+::ng-deep .ng-dropdown-panel {
+    .ng-option .select-item-wrp[additionalText = true]{
+        .select-item-wrp{
+            justify-content: space-between;
+        }
+    }
+}
+
 
 .action-wait-content {
     display: flex;

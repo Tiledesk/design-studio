@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { TYPE_ACTION } from '../../../../../../../utils';
+import { TYPE_ACTION } from '../../../../../../../utils-actions';
 import { Expression, Message, Wait, Metadata } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
