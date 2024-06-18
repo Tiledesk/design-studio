@@ -142,6 +142,7 @@ export enum TYPE_ACTION {
     BREVO               = 'brevo',
     N8N                 = 'n8n',
     CODE                = 'code',
+    UPDATE_LEAD         = "lead_update",
 }
 
 export enum TYPE_ACTION_VXML {
@@ -307,6 +308,7 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     REPLACE_BOT:            { name: 'CDSActionList.NAME.ReplaceBot',            category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOT,          src: "assets/images/actions/replace_bot.svg",           status: "inactive",                     description: "CDSActionList.DESCRIPTION.ReplaceBot"                                                             },
     REPLACE_BOTV2:          { name: 'CDSActionList.NAME.ReplaceBot',            category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOTV2,        src: "assets/images/actions/replace_bot.svg",           status: "active",                       description: "CDSActionList.DESCRIPTION.ReplaceBot"                                                             },
     WAIT :                  { name: 'CDSActionList.NAME.Wait',                  category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.WAIT,                 src:"assets/images/actions/wait.svg",                   status: "active",                       description: "CDSActionList.DESCRIPTION.Wait"                                                                   },
+    UPDATE_LEAD:            { name: 'Lead Update',                               category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.UPDATE_LEAD,         src:"assets/images/actions/lead_update.svg",            status: "active",                       description: "Update contact info"                                                                   },
     // WEB_REQUEST : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUEST, src:"assets/images/actions/web_request.svg", status: "active", description: ''},
     WEB_REQUESTV2 :         { name: 'CDSActionList.NAME.WebRequest',            category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WEB_REQUESTV2,        src:"assets/images/actions/web_request.svg",            status: "beta",                         description: ''                                                                                                 },
     EMAIL :                 { name: 'CDSActionList.NAME.SendEmail',             category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.EMAIL,                src:"assets/images/actions/send_email.svg",             status: "active",                       description: "CDSActionList.DESCRIPTION.SendEmail"                                                              },

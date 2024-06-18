@@ -57,7 +57,7 @@ export class CdsActionMakeComponent implements OnInit {
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    this.logger.debug("[ACTION-MAKE] action detail: ", this.action, ACTIONS_LIST["MAKE"].plan);
+    console.log("[ACTION-MAKE] action detail: ", this.action, ACTIONS_LIST["MAKE"].plan);
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-MAKE] isChangedConnector -->', connector);
       let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
@@ -115,13 +115,7 @@ export class CdsActionMakeComponent implements OnInit {
      }
   }
   
-  initializeConnector() {
-    this.idIntentSelected = this.intentSelected.intent_id;
-    this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
-    this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
-    this.listOfIntents = this.intentService.getListOfIntents();
-    this.checkConnectionStatus();
-  }
+
 
   private updateConnector(){
     try {
@@ -168,9 +162,19 @@ export class CdsActionMakeComponent implements OnInit {
   private initialize(){
     this.initializeAttributes();
     this.jsonParameters = this.action.bodyParameters;
+    console.log('[ACTION-MAKE] intentSelected ' , this.intentSelected)
     if(this.intentSelected){
       this.initializeConnector();
     }
+  }
+
+  initializeConnector() {
+    this.idIntentSelected = this.intentSelected.intent_id;
+    this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
+    this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
+    this.listOfIntents = this.intentService.getListOfIntents();
+    console.log('[ACTION-MAKE] initializeConnector ' , this.listOfIntents)
+    this.checkConnectionStatus();
   }
 
   private initializeAttributes() {

@@ -199,7 +199,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     } else if(this.elementIntentSelectedType === this.typeIntentElement.FORM){
       this.intentSelected.form = this.elementSelected;
     }
-    this.logger.log('----> onSaveIntent:: ', event, this.elementIntentSelectedType, this.intentSelected);
+    console.log('----> onSaveIntent:: ', event, this.elementIntentSelectedType, this.intentSelected);
     // elimino connettori della action e poi li ricreo
     this.savePanelIntentDetail.emit(this.intentSelected);
   }

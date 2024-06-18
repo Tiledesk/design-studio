@@ -351,6 +351,16 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-speech-form>
 
+             
+                    <cds-action-lead-update *ngSwitchCase="TYPE_ACTION.UPDATE_LEAD"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-lead-update>      
+
                     <!-- <cds-action-assign-function *ngSwitchCase="TYPE_ACTION.ASSIGN_FUNCTION"
                         [action]="elementSelected">
                     </cds-action-assign-function> -->

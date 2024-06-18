@@ -381,6 +381,14 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-speech-form>
 
+                   
+                    <cds-action-lead-update *ngSwitchCase="TYPE_ACTION.UPDATE_LEAD" 
+                        class="panel-response" 
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-lead-update>
+
                 </div>
             </span>
             

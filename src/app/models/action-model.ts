@@ -731,3 +731,20 @@ export class ActionVoice extends Action {
         }
     }
 }
+
+
+
+export class ActionUpdateLead extends Action {
+    assignStatusTo: string;
+    assignErrorTo: string;
+    fullname: string;
+    trueIntent: string;
+    falseIntent: string;
+    constructor() {
+        super();
+        this.fullname= '';
+        this.assignStatusTo = '';
+        this.assignErrorTo = '';
+        this._tdActionType = TYPE_ACTION.UPDATE_LEAD
+    }
+}

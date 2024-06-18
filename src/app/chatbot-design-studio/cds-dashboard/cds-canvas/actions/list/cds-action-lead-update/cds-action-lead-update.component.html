@@ -1,0 +1,111 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="action-row">
+        <div class="action-row-left">
+            <!-- <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px">
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path
+                    d="M12 1.95c-5.52 0-10 4.48-10 10s4.48 10 10 10h5v-2h-5c-4.34 0-8-3.66-8-8s3.66-8 8-8 8 3.66 8 8v1.43c0 .79-.71 1.57-1.5 1.57s-1.5-.78-1.5-1.57v-1.43c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5c1.38 0 2.64-.56 3.54-1.47.65.89 1.77 1.47 2.96 1.47 1.97 0 3.5-1.6 3.5-3.57v-1.43c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+            </svg> -->
+        </div>
+        <div *ngIf="action" class="action-row-right">
+            {{action.fullname}}
+        </div>
+        <div *ngIf="!action.fullname" class="action-row-right empty">
+            Enter lead full name
+        </div>
+    </div>
+
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
+        
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+         <cds-connector class="connector-false"
+             [idConnector] = "idConnectorFalse"
+             [idConnection] = "idConnectionFalse"
+             [isConnected] = "isConnectedFalse">
+         </cds-connector>
+     </div>
+
+
+ 
+
+  
+</div>
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer" #scrollMe id="scrollMe">
+
+
+    <div class="field-box">
+        <label class="title-label">Lead Full name</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="to-text-area" 
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="action.fullname"
+            [minRow]="1" 
+            [maxRow]="1" 
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'fullname')"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">>
+        </cds-textarea>
+    </div>
+
+
+    <hr class="custom-divider">
+
+    <div class="field-box">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <span class="condition-text">{{'CDSCanvas.Success' | translate }}</span>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.trueIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate "
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
+            (onReset)="onResetBlockSelect($event, 'trueIntent')">
+        </cds-select>
+    </div>
+
+    <div class="field-box">
+        <div class="condition-container">
+            <span class="condition-text">{{'CDSCanvas.Else' | translate | titlecase }}</span>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.falseIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate "
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
+            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+        </cds-select>
+    </div>
+
+</div>
+
