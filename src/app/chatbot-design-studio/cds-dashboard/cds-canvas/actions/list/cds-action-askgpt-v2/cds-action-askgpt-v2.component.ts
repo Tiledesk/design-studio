@@ -95,7 +95,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (!this.action.preview) {
       this.action.preview = []; // per retrocompatibilità
     }
-    // this.getListNamespaces()
+    this.getListNamespaces()
 
   }
 

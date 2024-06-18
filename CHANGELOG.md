@@ -6,6 +6,7 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.14.0-rc.3
 ### 1.14.0-rc.2
 👉 **added**: voiceLanguage and voiceName variables to voiceFlow variables list
 
