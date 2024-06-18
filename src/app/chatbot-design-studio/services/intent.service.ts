@@ -1461,6 +1461,10 @@ export class IntentService {
             "chatbot_id": chatbot._id,
             "project_id": id_project,
             "action_type": action_type
+          },
+          { "context": {
+              "groupId": id_project
+            }
           });
         } catch (err) {
           this.logger.error('Event: CDS Added Action ', action_type, ' [track] error', err);
