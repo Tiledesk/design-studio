@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.14.0-rc.2
+👉 **added**: voiceLanguage and voiceName variables to voiceFlow variables list
+
 ### 1.14.0-rc.1
 👉 **added**: aiModels env variable managed for cds-action-askgpt and cds-action-gpt-task
 
