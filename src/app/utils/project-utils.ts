@@ -4,7 +4,6 @@ import { Project } from "../models/project-model";
 import { PLAN_NAME } from "src/chat21-core/utils/constants";
 import { LoggerService } from "src/chat21-core/providers/abstract/logger.service";
 import { LoggerInstance } from "src/chat21-core/providers/logger/loggerInstance";
-import { Action } from "../models/action-model";
 import { TYPE_ACTION, TYPE_ACTION_VXML } from "../chatbot-design-studio/utils-actions";
 
 @Injectable({

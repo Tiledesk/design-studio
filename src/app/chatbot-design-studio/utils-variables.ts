@@ -68,6 +68,8 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
     },
     {   key: 'voiceFlow',
         elements: [
+            { name: 'voice Language',                           value: 'voiceLanguage',                     description: 'CDSvariablesList.voiceFlowElements.voiceLanguage.description',                                src: '', icon:'language'},
+            { name: 'voice Name',                               value: 'voiceName',                         description: 'CDSvariablesList.voiceFlowElements.voiceName.description',                                    src: '', icon:'person'},
             { name: 'event',                                    value: 'event',                             description: 'CDSvariablesList.voiceFlowElements.event.description',                                        src: '', icon:'perm_phone_msg'},
             { name: 'last block',                               value: 'lastBlock',                         description: 'CDSvariablesList.voiceFlowElements.lastBlock.description',                                    src: '', icon:'perm_phone_msg'},
         ]
