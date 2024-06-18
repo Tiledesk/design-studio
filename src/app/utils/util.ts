@@ -76,21 +76,24 @@ export function secondsToDhms(seconds) {
 }
 
 export function loadTokenMultiplier(ai_models) { 
-    let models_string = ai_models.replace(/ /g,''); 
-    console.debug("(loadMultiplier) models_string: ", models_string)
+    let models_string = ai_models.replace(/ /g,'');
 
-    let splitted_string = models_string.split(";"); 
-    console.debug("splitted_string: ", splitted_string)
-    let models = {}; 
-    splitted_string.forEach(m => { 
-        let m_split = m.split(":"); 
+    let models = {};
+    if (!models_string) {
+        return models;
+    }
+
+    let splitted_string = models_string.split(";");
+
+    splitted_string.forEach(m => {
+        let m_split = m.split(":");
         let multiplier = null;
-        if (!m_split[1]) { 
-            multiplier = null; 
-        } else { 
-            multiplier = Number(m_split[1]);; 
-        } 
-        models[m_split[0]] = multiplier; 
+        if (!m_split[1]) {
+            multiplier = null;
+        } else {
+            multiplier = Number(m_split[1]);;
+        }
+        models[m_split[0]] = multiplier;
     })
 
     return models
