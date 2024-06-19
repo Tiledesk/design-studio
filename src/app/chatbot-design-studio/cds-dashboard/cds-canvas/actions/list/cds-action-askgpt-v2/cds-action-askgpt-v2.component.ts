@@ -95,7 +95,8 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (!this.action.preview) {
       this.action.preview = []; // per retrocompatibilità
     }
-    this.getListNamespaces()
+    this.getListNamespaces();
+    this.patchActionsKey();
 
   }
 
@@ -204,6 +205,19 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
 
     })
+  }
+
+  /** TO BE REMOVED: patch undefined action keys */
+  private patchActionsKey(){
+    if(!this.action.hasOwnProperty('top_k')){
+      this.action.top_k = 5;
+    }
+    if(!this.action.hasOwnProperty('max_tokens')){
+      this.action.max_tokens = 512;
+    }
+    if(!this.action.hasOwnProperty('temperature')){
+      this.action.temperature = 0.7;
+    }
   }
 
   onChangeTextarea($event: string, property: string) {
