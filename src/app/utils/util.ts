@@ -83,7 +83,8 @@ export function loadTokenMultiplier(ai_models) {
         return models;
     }
 
-    let splitted_string = models_string.split(";");
+    let models_string_trimmed = models_string.replace(/ /g,'');
+    let splitted_string = models_string_trimmed.split(";");
 
     splitted_string.forEach(m => {
         let m_split = m.split(":");
