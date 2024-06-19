@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.14.0-rc.4
+👉 **bug-fixed**: add unexisting keys in action-askpgtv2
+
 ### 1.14.0-rc.3
 ### 1.14.0-rc.2
 👉 **added**: voiceLanguage and voiceName variables to voiceFlow variables list
