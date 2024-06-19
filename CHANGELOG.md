@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.14.0-rc.5
+👉 **added**: error message if token quotes exceeded
+
 ### 1.14.0-rc.4
 👉 **bug-fixed**: add unexisting keys in action-askpgtv2
 
