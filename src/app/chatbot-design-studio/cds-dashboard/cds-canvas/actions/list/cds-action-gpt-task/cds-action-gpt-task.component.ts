@@ -346,14 +346,18 @@ export class CdsActionGPTTaskComponent implements OnInit {
         element.classList.add('preview-container-extended')
       }, 200)
       this.ai_response = ai_response;
-    }, (error) => {
+    }, (err) => {
       this.searching = false;
-      this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", error);
+      this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", err);
       setTimeout(() => {
         let element = document.getElementById("preview-container");
         element.classList.add('preview-container-extended')
       }, 200)
       this.showAiError = true;
+      if(err.error.error_code === 13001){
+        this.ai_error = this.translate.instant('CDSCanvas.AiQuotaExceeded')
+        return;
+      }
       this.ai_error = this.translate.instant('CDSCanvas.AiError')
     }, () => {
       this.logger.debug("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
