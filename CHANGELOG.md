@@ -6,6 +6,7 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.14.0-rc.6
 ### 1.14.0-rc.5
 👉 **added**: error message if token quotes exceeded
 
