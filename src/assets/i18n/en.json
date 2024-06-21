@@ -288,7 +288,7 @@
         "SelectNamespace":"Select namespace",
         "SelectKnowledgeBase":"Select Knowledge Base",
         "SelectABlock":"Select a block",
-        "Namespace":"Namespace",
+        "ChooseKB":"Choose Knowledge Base",
         "Model": "Model",
         "SelectKnowledgeBaseModel":"Select AI Model",
         "QuestionToSubmit":"Question to submit",
