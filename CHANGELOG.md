@@ -6,8 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
-### 1.14.1 in PROD
+### 1.14.2 in PROD
+👉 **bug-fixed**: cds-action-delete-attribute not select the right value
 
+### 1.14.1 in PROD
 
 ### 1.14.0 in PROD
 
