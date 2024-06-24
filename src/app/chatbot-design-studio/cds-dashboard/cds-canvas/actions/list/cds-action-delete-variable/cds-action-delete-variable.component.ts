@@ -53,7 +53,7 @@ export class CdsActionDeleteVariableComponent implements OnInit {
 
   onChangeSelect(variableSelected: {name: string, value: string}){
     // this.logger.log('changeeeeee', variableSelected);
-    this.action.variableName = variableSelected.name;
+    this.action.variableName = variableSelected.value;
     this.updateAndSaveAction.emit()
   }
 

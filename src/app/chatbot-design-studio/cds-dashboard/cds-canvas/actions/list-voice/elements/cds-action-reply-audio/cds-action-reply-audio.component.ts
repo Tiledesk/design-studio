@@ -33,12 +33,6 @@ export class CdsActionReplyAudioComponent implements OnInit {
   // Delay //
   delayTime: number;
   // Filter // 
-  isOpenDelaySlider: boolean = false;
-  isOpenFilter: boolean = false;
-  isOpenHeightSlider: boolean = false;
-  heightIframe: any;
-
-  canShowHeight: boolean = true;
   canShowFilter: boolean = true;
   filterConditionExist: boolean = false;
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
@@ -65,8 +59,7 @@ export class CdsActionReplyAudioComponent implements OnInit {
   // EVENT FUNCTIONS //
   /** */
   onClickDelayTime(opened: boolean){
-    this.isOpenDelaySlider = !this.isOpenDelaySlider;
-    // this.canShowFilter = !opened;
+    this.canShowFilter = !opened;
   }
 
 
@@ -74,8 +67,7 @@ export class CdsActionReplyAudioComponent implements OnInit {
   onChangeDelayTime(value:number){
     this.delayTime = value;
     this.wait.time = value*1000;
-    this.isOpenDelaySlider = false;
-    // this.canShowFilter = true;
+    this.canShowFilter = true;
     this.changeActionReply.emit();
   }
 

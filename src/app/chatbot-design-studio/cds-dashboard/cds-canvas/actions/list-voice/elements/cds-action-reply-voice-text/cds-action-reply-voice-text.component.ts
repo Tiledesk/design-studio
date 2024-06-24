@@ -187,7 +187,6 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
     this.delayTime = value;
     this.wait.time = value*1000;
     this.canShowFilter = true;
-    console.log('delayyyyyyy', this.delayTime)
     this.changeActionReply.emit();
   }
 
