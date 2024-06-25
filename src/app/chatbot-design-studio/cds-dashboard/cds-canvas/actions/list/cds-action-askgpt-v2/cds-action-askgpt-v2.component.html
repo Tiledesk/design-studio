@@ -82,7 +82,7 @@
         <section class="disable-input-message-section">
             <mat-checkbox 
                 [checked]="action?.history"
-                (change)="onChangeCheckbox()">
+                (change)="onChangeCheckbox('history')">
                 {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
             </mat-checkbox>
         </section>
@@ -269,6 +269,19 @@
                         (changeTextarea)="onChangeTextarea($event, 'context')">
                     </cds-textarea>
                 </div>
+
+                <!-- // advanced prompt -->                     
+                <div class="field-box">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.advancedPrompt"
+                            (change)="onChangeCheckbox('advancedPrompt')">
+                            {{"CDSCanvas.AdvancedContext" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <label class="checkbox-description" *ngIf="action?.advancedPrompt" [innerHTML]='"CDSCanvas.AdvancedContextDesctiption" | translate'></label>
+                </div>
+            
 
             </div>
         </mat-expansion-panel>

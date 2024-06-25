@@ -368,6 +368,7 @@ export class ActionAskGPTV2 extends Action {
     top_k: number;
     context: string;
     history: boolean;
+    advancedPrompt?: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2

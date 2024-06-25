@@ -283,9 +283,9 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("action updated: ", this.action)
   }
 
-  onChangeCheckbox(){
+  onChangeCheckbox(target){
     try {
-      this.action.history = !this.action.history;
+      this.action[target] = !this.action[target];
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     } catch (error) {
       this.logger.log("Error: ", error);
