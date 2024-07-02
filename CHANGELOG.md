@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.15.0-rc.1
+👉 **changed**: AI tokens default values for cds-action-gpt-task and cds-action-askkb-v2
+👉 **changed**: timeout defautl values for voice actions
+
 ### 1.14.2 in PROD
 👉 **bug-fixed**: cds-action-delete-attribute not select the right value
 
