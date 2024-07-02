@@ -37,7 +37,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private appConfigService: AppConfigService,
     public translate: TranslateService,
     public tiledeskAuthService: TiledeskAuthService,
-    //public dialog: MatDialog,
+    public dialog: MatDialog,
     private router: Router,
     public appStorageService: AppStorageService,
     public projectService: ProjectService,
@@ -177,14 +177,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   watchToConnectionStatus() {
     this.networkService.networkStatus$.subscribe((isOnline)=>{
       this.logger.log('[APP-COMP] watchToConnectionStatus IS ONLINEEEEE-->', isOnline)
-      // if(!isOnline){
-      //    const dialog = this.dialog.open(NetworkOfflineComponent, {
-      //     data: {},
-      //     panelClass: 'custom-dialog-container',
-      //     position: {bottom:'10px'},
-      //     disableClose: true
-      //   });
-      // }
+      if(!isOnline){
+         const dialog = this.dialog.open(NetworkOfflineComponent, {
+          data: {},
+          panelClass: 'custom-dialog-container',
+          position: {bottom:'10px'},
+          disableClose: true
+        });
+      }
     })
   }
 

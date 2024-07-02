@@ -163,7 +163,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     // MatButtonModule,
     // MatIconModule,
     // MatButtonToggleModule,
-    // MatDialogModule,
+    MatDialogModule,
     // MatInputModule,
     // MatExpansionModule,
     // MatTabsModule,

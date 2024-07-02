@@ -185,17 +185,17 @@
                     <div class="action-wait-content">
 
                         <div class="action-wait-slider ">
-                            <div class="action-wait-range">1</div>
+                            <div class="action-wait-range">10</div>
                             <mat-slider 
                                 class="wait-slider" 
                                 thumbLabel 
                                 [displayWith]="formatLabel" 
-                                step="1"  min="1" max="1024"
+                                step="1"  min="10" max="2048"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
                             </mat-slider>
-                            <div class="action-wait-range">1024</div>
+                            <div class="action-wait-range">2048</div>
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
