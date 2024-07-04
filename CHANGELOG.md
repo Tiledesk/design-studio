@@ -6,6 +6,8 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.15.0 in PROD
+
 ### 1.15.0-rc.2
 👉 **changed**: preview textarea min/max default line in cds-action-gpttask and cds-action-askgpt-v2
 👉 **bug-fixed**: bot image profile is not loaded
