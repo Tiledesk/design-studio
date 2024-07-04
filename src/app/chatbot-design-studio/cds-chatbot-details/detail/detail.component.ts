@@ -32,7 +32,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   @Input() isVisibleDEP: boolean;
   @Input() translationsMap: Map<string, string> = new Map();
 
-  botProfileImageExist: boolean;
+  // botProfileImageExist: boolean;
   // id_faq_kb: string;
 
   selectedFiles: FileList;
@@ -458,12 +458,14 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     that.logger.debug('[IMAGE-UPLOAD] AppComponent::uploadSingle::', file);
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
- 
+    
     this.uploadService.uploadProfile(this.selectedChatbot._id, currentUpload).then(downloadURL => {
       that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
 
-      that.selectedChatbot.imageURL = downloadURL;
-      this.botProfileImageExist = true
+      let url = this.imageRepoService.getImagePhotoUrl(this.selectedChatbot._id)
+      this.checkImageExists(url, (existImage)=> {
+        existImage? this.selectedChatbot.imageURL = url: null; 
+      })
       that.isFilePendingToUpload = false;
       // return downloadURL;
     }).catch(error => {
@@ -483,7 +485,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     // const file = event.target.files[0]
     this.logger.log('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE (FAQ-COMP) deleteBotProfileImage')
     this.uploadService.deleteProfile(this.selectedChatbot._id, this.selectedChatbot.imageURL).then((result)=>{
-      this.botProfileImageExist = false;
+      // this.botProfileImageExist = false;
       this.selectedChatbot.imageURL = null
       const delete_bot_image_btn = <HTMLElement>document.querySelector('#cds-delete-bot-img-btn');
       delete_bot_image_btn.blur();

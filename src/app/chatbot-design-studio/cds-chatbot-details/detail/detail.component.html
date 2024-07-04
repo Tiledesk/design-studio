@@ -24,11 +24,9 @@
       <div class="col-sm-10">
         <!-- [ngStyle]="{'margin-left':botType === 'dialogflow' ? '35px' : 0 }" -->
         <div class="card-avatar" style="display: flex;align-items: center;">
-          <div class="bot_avatar">
-
-            <img class="bot-profile-img" [src]="selectedChatbot?.imageURL" onerror="this.src='assets/images/avatar_bot_tiledesk.svg'" />
-            <!-- <img *ngIf="botProfileImageExist === false" class="bot-profile-img" src="assets/images/avatar_bot_tiledesk.svg"/> -->
-
+          <div class="bot_avatar">  
+            <img class="bot-profile-img" [src]="selectedChatbot?.imageURL" onerror="this.src='assets/images/avatar_bot_tiledesk.svg'"/>
+            <!-- <img class="bot-profile-img" [src]="selectedChatbot?.imageURL"/> -->
           </div>
 
 
