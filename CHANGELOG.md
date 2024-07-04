@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.16.0-rc.1
+👉 **added**: connectors on cds-action-gallery buttons
+👉 **changed**: disabled buttons click event 
+
 ### 1.15.0 in PROD
 
 ### 1.15.0-rc.2

@@ -107,8 +107,7 @@
                             [cdkDropListData]="galleryEl.buttons" 
                             cdkDropList (cdkDropListDropped)="dropButton($event, i)">
                             <div *ngFor="let button of galleryEl.buttons; let j= index; let firstBtn = first; let lastBtn = last" 
-                                class="single-button action"
-                                (click)="onOpenButtonPanel(i, j, button)" cdkDrag>
+                                class="single-button action" cdkDrag>
                                     {{button.value}}
                                 <div class="button-controls action-button-controls">
 
@@ -221,6 +220,13 @@
                     [previewMode]="previewMode"
                     (onButtonControl)="onButtonControl($event, i, j)">
                 </cds-action-reply-button>
+
+                <cds-connector class="button-connector"
+                    cdkDragDisabled
+                    [idConnector]="button.__idConnector"
+                    [idConnection] = "button.__idConnection"
+                    [isConnected]="button.__isConnected">
+                </cds-connector>
         
             </div>
             <div *ngIf="galleryEl.buttons.length < 3" class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', i, null)">
