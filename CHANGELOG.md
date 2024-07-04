@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.15.0-rc.2
+👉 **changed**: preview textarea min/max default line in cds-action-gpttask and cds-action-askgpt-v2
+👉 **bug-fixed**: bot image profile is not loaded
+ 
 ### 1.15.0-rc.1
 👉 **changed**: AI tokens default values for cds-action-gpt-task and cds-action-askkb-v2
 👉 **changed**: timeout defautl values for voice actions
