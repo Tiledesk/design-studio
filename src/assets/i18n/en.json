@@ -338,6 +338,7 @@
         "GeneratingAnswer":"Generating answer",
         "AiError": "Oops! Something went wrong. Please retry in a few moment.",
         "AiQuotaExceeded":"Oops! Token quota exceeed. Please upgrade your project",
+        "AiNoAnswer":"Unable to find a relevant answer",
         "TokensUsage":"Tokens usage",
         "MaxTokensForAnswer":"Max tokens for the answer",
         "Total":"Total",

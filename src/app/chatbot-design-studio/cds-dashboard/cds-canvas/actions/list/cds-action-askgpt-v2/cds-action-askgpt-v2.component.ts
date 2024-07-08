@@ -52,7 +52,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   showAiError: boolean = false;
   searching: boolean = false;
   ai_response: string = "";
-  ai_error: string = "Oops! Something went wrong. Please retry in a few moment."
+  ai_error: string = "";
 
   temp_variables = [];
 
@@ -370,12 +370,18 @@ export class CdsActionAskgptV2Component implements OnInit {
       element.classList.remove('preview-container-extended')
     }, 200)
 
+    this.openaiService.previewAskPrompt(data).subscribe(()=> {}, (error)=> {})
     this.openaiService.previewAskPrompt(data).subscribe((ai_response: any) => {
       this.searching = false;
       setTimeout(() => {
         let element = document.getElementById("preview-container");
         element.classList.add('preview-container-extended')
       }, 200)
+      if(!ai_response.answer){
+        this.showAiError = true;
+        this.ai_error = this.translate.instant('CDSCanvas.AiNoAnswer')
+        return;
+      }
       this.ai_response = ai_response.answer;
     }, (err) => {
       this.searching = false;
