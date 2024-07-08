@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.16.0-rc.2
+👉 **added**: manage of blank answer for cds-action-askgpt-v2
+
 ### 1.16.0-rc.1
 👉 **added**: connectors on cds-action-gallery buttons
 👉 **changed**: disabled buttons click event 
