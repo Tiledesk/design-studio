@@ -77,8 +77,7 @@
             [button]="button"
             [previewMode]="previewMode"
             (onButtonControl)="onButtonControl($event, i)">
-        </cds-action-reply-button>
-
+        </cds-action-reply-button>    
         <cds-connector *ngIf="previewMode && button.type !== TYPE_BUTTON.URL"
             class="button-connector"
             cdkDragDisabled

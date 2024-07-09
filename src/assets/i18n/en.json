@@ -151,6 +151,9 @@
     "CDSPanelButtons":{
         "Button":"Button",
         "ButtonTitle":"Button title",
+        "ButtonTypingAlias":"Button typing alias",
+        "ButtonTypingAliasPlaceholder":"text1, text2, text3",
+        "ButtonTypingAliasDescription":"Please set a comma separated list of button alias that the user can type to trigger the button",
         "Type":"Type",
         "OpenIn":"Open in",
         "GoToBlock":"Go to block"

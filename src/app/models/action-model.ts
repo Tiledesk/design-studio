@@ -532,6 +532,7 @@ export class Attachment {
 export class Button {
     uid: string;
     __idConnector: string;
+    __idConnection: string;
     __isConnected: boolean;
     type: string;
     value: string;
@@ -540,6 +541,7 @@ export class Button {
     action?: string;
     attributes?: any;
     show_echo?: boolean;
+    alias?: string;
 
     constructor(
         uid: string,

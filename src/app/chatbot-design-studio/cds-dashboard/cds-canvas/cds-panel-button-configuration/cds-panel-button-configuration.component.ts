@@ -21,7 +21,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   @ViewChild('input_title', { static: true }) input_topic: CDSTextComponent;
 
   @Input() isOpenPanel: boolean;
-  @Input() button: any;
+  @Input() button: Button;
   @Output() saveButton = new EventEmitter();
   // @Output() closeButtonPanel = new EventEmitter();
 
@@ -242,6 +242,10 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
       // }
     }
     this.checkAndSaveButton();
+  }
+
+  onChangeAlias(text: string) {
+    this.button.alias = text;
   }
 
 

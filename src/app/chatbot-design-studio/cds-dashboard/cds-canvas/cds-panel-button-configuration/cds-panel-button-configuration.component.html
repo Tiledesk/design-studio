@@ -30,6 +30,25 @@
                 (changeTextarea)="onChangeTitle($event)">
             </cds-textarea>
         </div>
+
+        <div class="field-box">
+            <label class="title-label">
+                {{ 'CDSPanelButtons.ButtonTypingAlias' | translate}}
+            </label>
+            <cds-textarea 
+                class="text-editable-div"
+                [text]="button?.alias" 
+                [minRow]="1" [maxRow]="2"
+                popoverVerticalAlign="above"
+                [emojiPikerBtn]="false"
+                [textLimitBtn]="false"
+                [setAttributeBtn]="false"
+                [placeholder]="'CDSPanelButtons.ButtonTypingAliasPlaceholder' | translate "
+                (blur)="onBlur($event)"
+                (changeTextarea)="onChangeAlias($event)">
+            </cds-textarea>
+            <label class="field-description"> {{ 'CDSPanelButtons.ButtonTypingAliasDescription' | translate}} </label>
+        </div>
         
         <div class="field-box">
             <label class="title-label">
