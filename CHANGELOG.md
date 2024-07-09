@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.16.0-rc.3
+👉 **added**: button alias
+
 ### 1.16.0-rc.2
 👉 **added**: manage of blank answer for cds-action-askgpt-v2
 
