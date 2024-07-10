@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, TemplateRef, ViewContainerRef, HostListener } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { ConnectorService } from '../../../services/connector.service';
 import { IntentService } from '../../../services/intent.service';
 import { TYPE_INTENT_ELEMENT } from '../../../utils';
@@ -43,6 +43,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
    /** panel reply button configuaration */
    private subscriptionIntent: Subscription;
+   eventActionChanges: Subject<Action> = new Subject<Action>();
 
   
   canShowActionByPlan: { plan: PLAN_NAME, enabled: boolean}= { plan: PLAN_NAME.A, enabled: true}
@@ -137,6 +138,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
           this.elementIntentSelectedType = this.elementIntentSelected.type;
           this.elementSelected = this.elementIntentSelected.element
         }
+        this.eventActionChanges.next(this.elementSelected)
       } else {
         this.logger.log('[PANEL-INTENT-DETAIL] --- CHIUDO');
         this.closePanel.emit();

@@ -9,7 +9,7 @@ import { IntentService } from '../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../services/connector.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { TYPE_ACTION, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 
 
@@ -26,6 +26,7 @@ export class CdsActionReplyV2Component implements OnInit {
   @Input() action: ActionReplyV2;
   @Input() intentSelected: Intent;
   @Input() previewMode: boolean = true
+  @Input() handleActionChanges: Observable<ActionReplyV2>
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
@@ -94,10 +95,11 @@ export class CdsActionReplyV2Component implements OnInit {
     this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
     // this.initialize();
 
+    this.handleActionChanges.subscribe((action)=> this.eventActionChanges.next(action))
     this.changeDetectorRef.detectChanges();
+
+    
   }
-
-
 
   /**
    * 
@@ -107,10 +109,6 @@ export class CdsActionReplyV2Component implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if(this.action && this.intentSelected) this.initialize();
   }
-
-
-
-
 
 
   // CUSTOM FUNCTIONS //
