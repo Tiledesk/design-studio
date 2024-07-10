@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.16.0-rc.4
+👉 **added**: added eventActionChanged handler on cds-action-reply-v2
+
 ### 1.16.0-rc.3
 👉 **added**: button alias
 
