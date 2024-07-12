@@ -30,7 +30,6 @@
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
                         [previewMode]="false"
-                        [handleActionChanges]="eventActionChanges.asObservable()"
                         (updateAndSaveAction)="onSaveIntent($event)"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-reply-v2>
