@@ -15,7 +15,6 @@ export class NetworkOfflineComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('network modalllllll')
     this.networkService.networkStatus$.subscribe((isOnline)=> {
       if(isOnline){
         this.dialogRef.close()

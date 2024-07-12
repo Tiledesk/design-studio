@@ -93,7 +93,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isActionIntent: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
-  eventActionChanges: Subject<Action> = new Subject<Action>();
 
   constructor(
     public intentService: IntentService,
@@ -150,7 +149,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           } else {
             this.formSize = 0;
           }
-          this.eventActionChanges.next(this.intentService.selectedAction)
 
         }
       });

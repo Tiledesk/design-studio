@@ -43,7 +43,6 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
    /** panel reply button configuaration */
    private subscriptionIntent: Subscription;
-   eventActionChanges: Subject<Action> = new Subject<Action>();
 
   
   canShowActionByPlan: { plan: PLAN_NAME, enabled: boolean}= { plan: PLAN_NAME.A, enabled: true}
@@ -138,7 +137,6 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
           this.elementIntentSelectedType = this.elementIntentSelected.type;
           this.elementSelected = this.elementIntentSelected.element
         }
-        this.eventActionChanges.next(this.elementSelected)
       } else {
         this.logger.log('[PANEL-INTENT-DETAIL] --- CHIUDO');
         this.closePanel.emit();
