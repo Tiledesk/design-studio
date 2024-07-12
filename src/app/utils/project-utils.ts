@@ -1,3 +1,5 @@
+import { filter } from 'rxjs';
+import { ACTIONS_LIST, ACTION_CATEGORY, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { Injectable, OnInit } from "@angular/core";
 import { ProjectService } from "../services/projects.service";
 import { Project } from "../models/project-model";
@@ -5,6 +7,7 @@ import { PLAN_NAME } from "src/chat21-core/utils/constants";
 import { LoggerService } from "src/chat21-core/providers/abstract/logger.service";
 import { LoggerInstance } from "src/chat21-core/providers/logger/loggerInstance";
 import { TYPE_ACTION, TYPE_ACTION_VXML } from "../chatbot-design-studio/utils-actions";
+import { AppConfigService } from '../services/app-config';
 
 @Injectable({
     providedIn: 'root'
@@ -15,9 +18,11 @@ export class ProjectPlanUtils {
 
     private logger: LoggerService = LoggerInstance.getInstance()
     constructor(
-        private projectService: ProjectService
+        private projectService: ProjectService,
+        private appConfigService: AppConfigService
     ){ 
-        this.project = this.projectService.getCurrentProject()
+        this.project = this.projectService.getCurrentProject();
+        this.checkIfKBSCanLoad();
     }
 
     public checkIfCanLoad(actionType: TYPE_ACTION | TYPE_ACTION_VXML, actionPlanAvailability: PLAN_NAME): boolean{
@@ -124,6 +129,73 @@ export class ProjectPlanUtils {
     }
 
 
+    public checkIfKBSCanLoad(){
+        this.logger.log('[PROJECT_PROFILE] checkIfCategoryCanLoad -->', this.project);
 
+        // --1: check into env
+        let public_Key = this.appConfigService.getConfig().t2y12PruGU9wUtEGzBJfolMIgK;
+        let keys = public_Key.split("-");
     
+        if (public_Key.includes("KNB") === true) {
+            keys.forEach(key => {
+                // this.logger.log('NavbarComponent public_Key key', key)
+                if (key.includes("KNB")) {
+                    // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - key', key);
+                    let tow = key.split(":");
+                    // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt key&value', mt);
+                    if (tow[1] === "F") {
+                        this.hideActionType(TYPE_ACTION_CATEGORY.AI)
+                        return;
+                    }
+                }
+            });
+    
+        }else {
+            this.hideActionType(TYPE_ACTION_CATEGORY.AI)
+            return;
+        }
+
+
+        // --2: check into PROJECT PROFILE
+        // --2.1: customization obj
+        // --2.2: quotes obj
+        if (this.project.profile['customization'] === undefined){
+            // ------------------------------------------------------------------------ 
+            // USECASE: customization obj not exist
+            // ------------------------------------------------------------------------
+            return;
+        }else if(this.project.profile['customization'] && this.project.profile['customization']['knowledgeBases'] === undefined){
+            // ------------------------------------------------------------------------ 
+            // USECASE: customization obj exist AND customization.knowledgeBases obj not exist
+            // ------------------------------------------------------------------------
+            return;
+        }else if(this.project.profile['customization'] && this.project.profile['customization']['knowledgeBases'] !== undefined){
+            // ------------------------------------------------------------------------ 
+            // USECASE: customization obj AND customization.knowledgeBases obj exists with FALSE value
+            // ------------------------------------------------------------------------
+            if(this.project.profile['customization']['knowledgeBases'] === false){
+                this.hideActionType(TYPE_ACTION_CATEGORY.AI)
+            }else if(this.project.profile['customization']['knowledgeBases']){
+                // ------------------------------------------------------------------------ 
+                // USECASE: customization obj AND customization.knowledgeBases obj exists with TRUE value
+                // ------------------------------------------------------------------------
+                if(this.project.profile['quotes'] && this.project.profile['quotes']['kbs']){
+                    this.project.profile['quotes']['kbs'] === 0?  this.hideActionType(TYPE_ACTION_CATEGORY.AI): null;
+                }
+            }
+            return;
+        }
+    }
+
+    private hideActionType(actionType: TYPE_ACTION_CATEGORY){
+        //MANAGE ACTION CATEGORIES
+        let index = ACTION_CATEGORY.findIndex(el => el.type === actionType);
+        if(index > -1){
+            ACTION_CATEGORY.splice(index,1)
+        }
+        
+        //MANAGE ACTION LIST
+        Object.values(ACTIONS_LIST).filter(el => el.category == actionType).map( el => el.status = 'inactive')
+    }
+
 }
