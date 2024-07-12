@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.16.1-rc.1
+👉 **bug-fixed**: connector not drowed if multiple cds-action-reply-v2 is in cascade 
+
 ### 1.16.0 in PROD
 
 ### 1.16.0-rc.4
