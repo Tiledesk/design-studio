@@ -9,7 +9,7 @@ import { IntentService } from '../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../services/connector.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subject } from 'rxjs';
+import { Observable, Subject, Subscription, takeUntil } from 'rxjs';
 import { TYPE_ACTION, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 
 
@@ -29,6 +29,8 @@ export class CdsActionReplyV2Component implements OnInit {
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
+  subscriptions: Array<{ key: string, value: Subscription }> = [];
+  private unsubscribe$: Subject<any> = new Subject<any>();
   eventActionChanges: Subject<ActionReplyV2> = new Subject<ActionReplyV2>();
 
   // idIntentSelected: string;
@@ -65,7 +67,9 @@ export class CdsActionReplyV2Component implements OnInit {
     private controllerService: ControllerService,
     private connectorService: ConnectorService,
     private changeDetectorRef: ChangeDetectorRef
-  ) { }
+  ) { 
+    this.initSubscriptions();
+  }
 
   // manageTooltip(){}
   // onChangeText(event){}
@@ -109,7 +113,29 @@ export class CdsActionReplyV2Component implements OnInit {
   }
 
 
+  initSubscriptions() {
 
+    let subscribtion: any;
+    let subscribtionKey: string;
+
+    /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
+    subscribtionKey = 'behaviorIntent';
+    subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
+    if (!subscribtion) {
+      subscribtion = this.intentService.behaviorIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
+        if (intent && this.intentSelected && intent.intent_id === this.intentSelected.intent_id) {
+          this.logger.log("[ActionReplyComponent] sto modifico l'intent: ", this.intentSelected, " con : ", intent);
+          let actionReply = intent.actions.find(el => el._tdActionId = this.action._tdActionId)
+          if(actionReply){
+            this.eventActionChanges.next(this.action)
+          }
+        }
+      });
+      const subscribe = { key: subscribtionKey, value: subscribtion };
+      this.subscriptions.push(subscribe);
+    }
+    
+  }
 
 
 

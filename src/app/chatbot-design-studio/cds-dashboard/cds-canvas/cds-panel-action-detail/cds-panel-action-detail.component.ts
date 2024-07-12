@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, TemplateRef, ViewContainerRef, HostListener } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { ConnectorService } from '../../../services/connector.service';
 import { IntentService } from '../../../services/intent.service';
 import { TYPE_INTENT_ELEMENT } from '../../../utils';
