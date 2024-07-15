@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.17.1-rc.1
+👉 **bug-fixed**: if two or more cds-action-reply-v2 is in the same intent, when user select one of them, also the first action is selected
+
 ### 1.17.0-rc.1
 👉 **added**: check to project profile object to dynamically hide/show action
 
