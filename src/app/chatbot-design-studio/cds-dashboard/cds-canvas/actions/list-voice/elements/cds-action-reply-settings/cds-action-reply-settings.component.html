@@ -59,28 +59,34 @@
     </div>
 
 
-    <div class="previewContent" *ngIf="response.hasOwnProperty('trueIntent')">
-        
-        <div class="icon-action">
-            <img src="assets/images/icons/if_condition.svg">
-        </div>
 
-        <label class="title-preview-label">{{'CDSCanvas.Success' | translate}}</label>
-        
-        <cds-connector class="connector-true"
-            [idConnector] = "idConnectorTrue"
-            [isConnected] = "isConnectedTrue">
-        </cds-connector>
+    <div class="cds-action-preview">
+        <div class="previewContent" *ngIf="response.hasOwnProperty('trueIntent')">
+    
+            <div class="icon-action">
+                <img src="assets/images/icons/if_condition.svg">
+            </div>
+    
+            <label class="title-preview-label">{{'CDSCanvas.Success' | translate}}</label>
+            
+            <cds-connector class="connector-true"
+                [idConnector] = "idConnectorTrue"
+                [isConnected] = "isConnectedTrue">
+            </cds-connector>
+        </div>
     </div>
+
 
     <hr class="preview-divider" *ngIf="response.hasOwnProperty('falseIntent')">
 
-    <div class="previewContent" *ngIf="response.hasOwnProperty('falseIntent')">
-       <label class="title-preview-label">{{'CDSCanvas.Else' | translate}}</label>
-        <cds-connector class="connector-false"
-            [idConnector] = "idConnectorFalse"
-            [isConnected] = "isConnectedFalse">
-        </cds-connector>
+    <div class="cds-action-preview">
+        <div class="previewContent" *ngIf="response.hasOwnProperty('falseIntent')">
+            <label class="title-preview-label">{{'CDSCanvas.Else' | translate}}</label>
+             <cds-connector class="connector-false"
+                 [idConnector] = "idConnectorFalse"
+                 [isConnected] = "isConnectedFalse">
+             </cds-connector>
+         </div>
     </div>
     
 </div> 
