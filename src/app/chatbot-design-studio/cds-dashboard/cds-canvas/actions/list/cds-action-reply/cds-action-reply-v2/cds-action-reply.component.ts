@@ -112,6 +112,16 @@ export class CdsActionReplyV2Component implements OnInit {
     if(this.action && this.intentSelected) this.initialize();
   }
 
+  ngOnDestroy() {
+    this.unsubscribe();
+  }
+
+  unsubscribe() {
+    this.unsubscribe$.next(null);
+    this.unsubscribe$.complete();
+
+  }
+
 
   initSubscriptions() {
 
@@ -125,7 +135,7 @@ export class CdsActionReplyV2Component implements OnInit {
       subscribtion = this.intentService.behaviorIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
         if (intent && this.intentSelected && intent.intent_id === this.intentSelected.intent_id) {
           this.logger.log("[ActionReplyComponent] sto modifico l'intent: ", this.intentSelected, " con : ", intent);
-          let actionReply = intent.actions.find(el => el._tdActionId = this.action._tdActionId)
+          let actionReply = intent.actions.find(el => el._tdActionId === this.action._tdActionId)
           if(actionReply){
             this.eventActionChanges.next(this.action)
           }
