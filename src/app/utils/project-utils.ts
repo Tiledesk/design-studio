@@ -1,5 +1,5 @@
 import { filter } from 'rxjs';
-import { ACTIONS_LIST, ACTION_CATEGORY, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
+import { ACTIONS_LIST, ACTION_CATEGORY, TYPE_ACTION_CATEGORY, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
 import { Injectable, OnInit } from "@angular/core";
 import { ProjectService } from "../services/projects.service";
 import { Project } from "../models/project-model";
@@ -23,6 +23,7 @@ export class ProjectPlanUtils {
     ){ 
         this.project = this.projectService.getCurrentProject();
         this.checkIfKBSCanLoad();
+        this.checkIfActionCategoryIsInProject(TYPE_ACTION_CATEGORY.VOICE);
     }
 
     public checkIfCanLoad(actionType: TYPE_ACTION | TYPE_ACTION_VXML, actionPlanAvailability: PLAN_NAME): boolean{
@@ -128,6 +129,40 @@ export class ProjectPlanUtils {
         return true
     }
 
+    public checkIfActionCategoryIsInProject(actionType: TYPE_ACTION_CATEGORY){
+        
+        let categoryKey = getKeyByValue(actionType, TYPE_ACTION_CATEGORY).toLowerCase();
+        this.logger.log('[PROJECT_PROFILE] checkIfActionCategoryIsInProject -->', actionType, categoryKey, this.project)
+        if (this.project.profile['customization'] === undefined){
+            // ------------------------------------------------------------------------ 
+            // USECASE: customization obj not exist
+            // ------------------------------------------------------------------------
+            console.log('use case 111111')
+            this.hideActionType(actionType);
+            return;
+        } else if(this.project.profile['customization'] && this.project.profile['customization'][categoryKey] === undefined){
+            // ------------------------------------------------------------------------ 
+            // USECASE: customization obj exist AND customization.[actionType] obj not exist
+            // ------------------------------------------------------------------------
+            console.log('use case 2222')
+            this.hideActionType(actionType);
+            return;
+        } else if(this.project.profile['customization'] && this.project.profile['customization'][categoryKey] !== undefined){
+            // ------------------------------------------------------------------------ 
+            // USECASE: customization obj AND customization.[actionType] obj exists
+            // ------------------------------------------------------------------------
+            console.log('use case 3333', this.project.profile['customization'][categoryKey])
+            if(this.project.profile['customization'][categoryKey]===false){
+                this.hideActionType(actionType);
+                return true
+            }
+            return;
+        }
+
+
+        return true
+    }
+
 
     public checkIfKBSCanLoad(){
         this.logger.log('[PROJECT_PROFILE] checkIfCategoryCanLoad -->', this.project);
@@ -135,7 +170,7 @@ export class ProjectPlanUtils {
         // --1: check into env
         let public_Key = this.appConfigService.getConfig().t2y12PruGU9wUtEGzBJfolMIgK;
         let keys = public_Key.split("-");
-    
+        this.logger.log('[PROJECT_PROFILE] checkIfCategoryCanLoad keys -->', keys);
         if (public_Key.includes("KNB") === true) {
             keys.forEach(key => {
                 // this.logger.log('NavbarComponent public_Key key', key)
@@ -151,6 +186,7 @@ export class ProjectPlanUtils {
             });
     
         }else {
+            this.logger.log('[PROJECT_PROFILE] keys KNB not exist', keys);
             this.hideActionType(TYPE_ACTION_CATEGORY.AI)
             return;
         }
@@ -188,8 +224,9 @@ export class ProjectPlanUtils {
     }
 
     private hideActionType(actionType: TYPE_ACTION_CATEGORY){
+        this.logger.log('[PROJECT_PROFILE] hideActionType', actionType);
         //MANAGE ACTION CATEGORIES
-        let index = ACTION_CATEGORY.findIndex(el => el.type === actionType);
+        let index = ACTION_CATEGORY.findIndex(el => el.type === getKeyByValue(actionType, TYPE_ACTION_CATEGORY));
         if(index > -1){
             ACTION_CATEGORY.splice(index,1)
         }
