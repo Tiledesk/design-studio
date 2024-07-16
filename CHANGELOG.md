@@ -6,6 +6,7 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.17.1 in PROD
 
 ### 1.17.0-rc.1
 👉 **added**: check to project profile object to dynamically hide/show action
