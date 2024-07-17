@@ -332,6 +332,11 @@ export class CdsActionAskgptV2Component implements OnInit {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
 
+          const index = this.temp_variables.findIndex((e) => e.name === name);
+          if(index> -1 ){ //key already exist: do not add it again
+            return;
+          }
+
           if (attr && attr.value) {
             this.temp_variables.push({ name: name, value: attr.value });
 
