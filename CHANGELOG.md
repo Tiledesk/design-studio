@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.17.2 in PROD
+👉 **bug-fixed**: cds-action-askkb-v2 show same variable n-times into preview modal
+
 ### 1.17.1 in PROD
 
 ### 1.17.0-rc.1
