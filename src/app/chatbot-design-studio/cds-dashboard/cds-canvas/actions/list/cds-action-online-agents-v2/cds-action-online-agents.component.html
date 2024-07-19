@@ -15,7 +15,7 @@
                 {{ (radioOptions | filter:{key: 'value', value: action.selectedOption}).name | translate }} 
             </span>
             <span *ngIf="action.selectedOption === 'selectedDep'">
-                <span *ngIf="!action?.selectedDepartmentId">{{'SelectDepartment' | translate}}</span>
+                <span *ngIf="!action?.selectedDepartmentId" class="action-row-right empty">{{'SelectDepartment' | translate}}</span>
                 <span *ngIf="action?.selectedDepartmentId"><b>{{ (departments | filter:{key: 'id', value: action.selectedDepartmentId}).name }}</b></span>
             </span>
         </div>

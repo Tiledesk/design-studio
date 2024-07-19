@@ -100,6 +100,14 @@ export class CdsActionOnlineAgentsV2Component implements OnInit {
       this.setFormValue();
     }
     this.departments = this.dashboardService.departments
+    
+    //FIX: if chatbot is imported from other env/project --> reset selectedDepartmentId 
+    if(this.action.selectedDepartmentId){
+      let actionDepIndex = this.departments.findIndex(dep => dep._id === this.action.selectedDepartmentId)
+      if(actionDepIndex === -1){
+        this.action.selectedDepartmentId = null;
+      }
+    }
 
   }
   
