@@ -19,7 +19,7 @@ export class CdsActionLeadUpdateComponent implements OnInit {
   @Output() updateAndSaveAction = new EventEmitter();
   
   leadPropertyFormGroup: FormGroup
-  leadPropertyList = leadPropertyList;
+  leadPropertyListFiltered = leadPropertyList;
 
   showPlaceholder: boolean = false;
   showCards: boolean = false
@@ -47,8 +47,8 @@ export class CdsActionLeadUpdateComponent implements OnInit {
     this.leadPropertyFormGroup = this.buildForm();
     this.leadPropertyFormGroup.valueChanges.subscribe(form => {
       this.logger.log('[ACTION-LEAD-UPDATE] form valueChanges-->', form)
-
     });
+
   }
 
   buildForm(): FormGroup{
@@ -85,6 +85,16 @@ export class CdsActionLeadUpdateComponent implements OnInit {
   onAddNewProperty(){
     this.logger.log("[ACTION-LEAD-UPDATE] onAddNewProperty ADD : ", this.showPlaceholder)
     this.showPlaceholder = true;
+  }
+
+  onDeleteProperty(index: number, key: string){
+    this.logger.log("[ACTION-LEAD-UPDATE] onDeleteProperty index : ", index)
+    delete this.action.update[key];
+    if(this.action && Object.keys(this.action.update).length === 0){
+      this.showCards = false;
+      this.showPlaceholder = true;
+    }
+    this.updateAndSaveAction.emit();
   }
 
 }
