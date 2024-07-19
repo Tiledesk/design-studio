@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.17.3 in PROD
+👉 **bug-fixed**: if depId is not in list, set as null the assigned property
+
 ### 1.17.2 in PROD
 👉 **bug-fixed**: cds-action-askkb-v2 show same variable n-times into preview modal
 
