@@ -27,9 +27,9 @@
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.ChooseADepartment' | translate }}</label>
         <cds-select id="select" 
-            [items]="deps_name_list" 
+            [items]="departments" 
             [bindLabelSelect]="'name'"
-            [bindValueSelect]="'value'" 
+            [bindValueSelect]="'name'" 
             [searchable]=true
             [itemSelected]="action?.depName" 
             (onSelected)="onChangeSelect($event)">
