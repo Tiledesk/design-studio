@@ -1,0 +1,126 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+    
+    <div class="previewContent">       
+        <div class="icon-action">
+            <img src="assets/images/icons/if_condition.svg">
+        </div>
+
+
+        <!-- <ng-container *ngIf="action?.groups.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length === 0" [ngTemplateOutlet]="placeholder"></ng-container>
+        <ng-container *ngIf="action?.groups.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length > 0" [ngTemplateOutlet]="conditions"></ng-container> -->
+        
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>   
+        
+    </div>
+
+
+    <hr *ngIf="!action?.noelse" class="preview-divider">
+
+    <div *ngIf="!action?.noelse" class="previewContent">   
+        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+
+<div *ngIf="!previewMode">
+    <div class="content-panel-intent-detail" id="scrollMe">
+
+        <ng-container *ngIf="showCards" [ngTemplateOutlet]="sections"></ng-container>
+        <ng-container *ngIf="showPlaceholder" [ngTemplateOutlet]="placeholder"></ng-container>
+
+        <div class="filter-add-group-wrapper add-conditions-group">
+            <div class="filter-add-group" (click)="onAddNewProperty()">
+                <div class="filter-add-group-plus"><span class="material-icons">add</span></div>
+                <span class="text">{{'CDSCanvas.UpdateProperty' | translate }}</span>
+            </div> 
+        </div>
+    
+    </div>
+</div>
+
+
+<ng-template #placeholder>
+    <div class="content">
+
+        <form [formGroup]="leadPropertyFormGroup">
+            <div class="setting-wrapper">
+                <div class="field-box" style="width: 100%;">
+                    <label class="title-label">{{'CDSCanvas.Key' | translate}}</label>
+                    <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+                    <!-- [limitCharsText]="150"  -->
+                    <cds-select
+                        [items]="leadPropertyList"
+                        [bindLabelSelect]="'name'"
+                        [bindValueSelect]="'value'"
+                        [searchable]="true"
+                        [itemSelected]="leadPropertyFormGroup.controls.key.value"
+                        (onSelected)="onChangeSelect($event)">
+                    </cds-select>
+                </div>
+        
+                <div class="field-box" style="width: 100%;">
+                    <label class="title-label">{{'CDSCanvas.Value' | translate}}</label>
+                    <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+                    <!-- [limitCharsText]="150"  -->
+                    <cds-textarea class="text-editable-div"
+                        [emojiPikerBtn]="false" 
+                        [textLimitBtn]="false" 
+                        [text]="selectedValue"
+                        [minRow]="1" [maxRow]="1" 
+                        popoverVerticalAlign="above"
+                        (blur)="onBlur($event)"
+                        (changeTextarea)="onChangeTextarea($event)">
+                    </cds-textarea>
+                </div>
+            </div>
+        </form>  
+
+    </div>
+</ng-template>
+
+<ng-template #sections>
+    <div class="content" *ngFor="let item of action?.update | keyvalue">
+
+        <div class="setting-wrapper">
+            <div class="field-box" style="width: 100%;">
+                <label class="title-label">{{'CDSCanvas.Key' | translate}}</label>
+                <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+                <!-- [limitCharsText]="150"  -->
+                <cds-select
+                    [items]="leadPropertyList"
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'"
+                    [searchable]="true"
+                    [itemSelected]="item.key"
+                    (onSelected)="onChangeSelect($event)">
+                </cds-select>
+            </div>
+    
+            <div class="field-box" style="width: 100%;">
+                <label class="title-label">{{'CDSCanvas.Value' | translate}}</label>
+                <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+                <!-- [limitCharsText]="150"  -->
+                <cds-textarea class="text-editable-div"
+                    [emojiPikerBtn]="false" 
+                    [textLimitBtn]="false" 
+                    [text]="item.value"
+                    [minRow]="1" [maxRow]="1" 
+                    popoverVerticalAlign="above"
+                    (blur)="onBlur($event)"
+                    (changeTextarea)="onChangeTextarea($event, 'selectedValue')">
+                </cds-textarea>
+            </div>
+        </div>
+
+    </div>
+</ng-template>

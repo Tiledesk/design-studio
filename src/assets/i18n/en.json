@@ -439,8 +439,8 @@
         "ProjectWide": "Project wide",
         "CurrentDepartment": "Current department",
         "SelectedDepartment": "Selected Department",
-        "CheckAgentsAvailability":"Check agents availability"
-
+        "CheckAgentsAvailability":"Check agents availability",
+        "UpdateProperty":"Update property"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -567,6 +567,7 @@
             "DeleteAttribute":"Delete attribute",
             "ReplaceBot":"Replace bot",
             "Wait":"Wait",
+            "LeadUpdate":"Lead update",
             "WebRequest":"Web request",
             "SendEmail":"Send email",
             "WhatsAppStatic":"WhatsApp static",
@@ -608,6 +609,7 @@
             "DeleteAttribute":"",
             "ReplaceBot":"Choose a chatbot to replace the current one in the conversation",
             "Wait":"This action waits the specified amount of milliseconds before moving to the next one along the block actions-pipeline",
+            "LeadUpdate":"This action allows to update lead property from a list of available properties.",
             "WebRequest":"",
             "SendEmail":"This action send an email to the specified users group or email addresses.<br>You can use a comma sepatated addresses list.<br>i.e. 'support@domanin.com, info@domain.com'<br>You can use the special tag '@everyone' to send an email to each of the {{BRAND_NAME}}’s project teamates.<br><br>You can also use the name of a single user group using the group name. i.e. 'sales'",
             "WhatsAppStatic":"This action send an approved WhatsApp template",
