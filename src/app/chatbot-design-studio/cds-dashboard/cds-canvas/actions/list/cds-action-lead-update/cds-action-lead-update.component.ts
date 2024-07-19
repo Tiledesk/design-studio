@@ -31,6 +31,9 @@ export class CdsActionLeadUpdateComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.log("[ACTION-LEAD-UPDATE] action: ", this.action)
+    if(this.action && !this.action.update){
+      this.action.update = {};
+    }
     if(this.action && Object.keys(this.action.update).length > 0){
       this.showCards = true
       this.showPlaceholder = false;

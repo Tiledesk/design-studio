@@ -440,7 +440,8 @@
         "CurrentDepartment": "Current department",
         "SelectedDepartment": "Selected Department",
         "CheckAgentsAvailability":"Check agents availability",
-        "UpdateProperty":"Update property"
+        "UpdateProperty":"Update property",
+        "SelectProperty":"Select property"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
