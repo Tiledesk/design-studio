@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.17.4 in PROD
+👉 **added**: gpt-4o-mini support 
+
 ### 1.17.3 in PROD
 👉 **bug-fixed**: if depId is not in list, set as null the assigned property
 
