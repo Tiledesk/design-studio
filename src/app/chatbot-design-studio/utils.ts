@@ -180,11 +180,12 @@ export enum OPTIONS {
 }
 
 export const TYPE_GPT_MODEL = {
-    'GPT-3': { name: "GPT-3 (DaVinci)", value: "text-davinci-003", status: "inactive"},
-    'GPT-3.5' : { name: "GPT-3.5 Turbo (ChatGPT)", value: "gpt-3.5-turbo", status: "active"},
-    'GPT-4' : { name: "GPT-4 (ChatGPT)", value: "gpt-4", status: "active"},
-    'GPT-4-turbo-preview': { name: "GPT-4 Turbo Preview (ChatGPT)", value: "gpt-4-turbo-preview", status: "active"},
-    'GPT-4o': { name: "GPT-4o (ChatGPT)", value: "gpt-4o", status: "active"}
+    'GPT-3':                { name: "GPT-3 (DaVinci)",                  value: "text-davinci-003",      status: "inactive"  },
+    'GPT-3.5' :             { name: "GPT-3.5 Turbo",                    value: "gpt-3.5-turbo",         status: "active"    },
+    'GPT-4' :               { name: "GPT-4",                            value: "gpt-4",                 status: "active"    },
+    'GPT-4-turbo-preview':  { name: "GPT-4 Turbo Preview",              value: "gpt-4-turbo-preview",   status: "active"    },
+    'GPT-4o':               { name: "GPT-4o",                           value: "gpt-4o",                status: "active"    },
+    'GPT-4o-mini':          { name: "GPT-4o mini",                      value: "gpt-4o-mini",           status: "active"    }
 }
 
 export const INTENT_TEMP_ID         = '';
