@@ -1,5 +1,25 @@
 <div *ngIf="previewMode" class="cds-action-preview">
     
+    <div class="action-row">
+        <div class="action-row-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
+                <path d="M10,0.4c-5.3,0-9.6,4.3-9.6,9.6s4.3,9.6,9.6,9.6c5.3,0,9.6-4.3,9.6-9.6C19.6,4.7,15.3,0.4,10,0.4z M10,17.6c-4.2,0-7.6-3.4-7.6-7.6c0-4.2,3.4-7.6,7.6-7.6l0,0V10l6.8-3.4c0.5,1,0.8,2.2,0.8,3.4C17.6,14.2,14.2,17.6,10,17.6z"/>
+            </svg>
+        </div>
+
+        <div *ngIf="action?.slotId" class="action-row-right">
+            <span *ngIf="action.slotId === ''">
+                {{ (radioOptions | filter:{key: 'category', value: 'general'}).name | translate }} 
+            </span>
+            <span *ngIf="action.slotId !== ''">
+                <b>{{ (timeSlots | filter:{key: 'value', value: action.slotId}).name }}</b>
+            </span>
+        </div>
+        <div *ngIf="!action?.slotId" class="action-row-right">
+            {{ (radioOptions | filter:{key: 'category', value: 'general'}).name | translate }} 
+        </div>
+    </div>
+
     <div class="previewContent">
         
         <div class="icon-action">
@@ -33,6 +53,34 @@
 
 <div *ngIf="!previewMode">
     <div class="content-panel-intent-detail">
+
+        <div class="field-box">
+            <label class="title-label">{{'CDSCanvas.CheckOperatingHours' | translate }}</label>
+            <cds-radio-buttons
+                [items]="radioOptions"
+                [itemSelected]="radioOptionSelected" 
+                [bindLabelButton]="'name'"
+                [bindValueButton]="'category'"
+                [rows]="3" [columns]="1"
+                (changeButtonSelect)="onChangeButtonSelect($event)">
+            </cds-radio-buttons>
+
+
+            <div *ngIf="radioOptionSelected !== null" class="deps-wrp">
+                <cds-select id="list-deps" 
+                    [items]="timeSlots" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'" 
+                    [itemSelected]="action?.slotId" 
+                    [placeholder]="'CDSCanvas.SelectTimeSlot' | translate "
+                    [clearable]="true" 
+                    (onSelected)="onChangeSelect($event, 'slotId')"
+                    (onReset)="onResetBlockSelect($event, 'slotId')">
+                </cds-select>
+            </div>
+        </div>
+
+        <hr class="custom-divider">
 
         <!-- trueIntent -->
         <div class="field-box">

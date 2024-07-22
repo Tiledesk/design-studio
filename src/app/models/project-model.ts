@@ -7,6 +7,9 @@ export interface Project {
     name?: string;
     activeOperatingHours?: boolean;
     operatingHours?: any
+    timeSlots?: {
+        [key: string]: { name: string, hours: string, active: boolean}
+    }
     createdBy?: string;
     id_project?: any;
     widget?: any;

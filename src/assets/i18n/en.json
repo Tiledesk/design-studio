@@ -441,7 +441,11 @@
         "SelectedDepartment": "Selected Department",
         "CheckAgentsAvailability":"Check agents availability",
         "UpdateProperty":"Update property",
-        "SelectProperty":"Select property"
+        "SelectProperty":"Select property",
+        "CheckOperatingHours":"Check operating hours",
+        "General":"General",
+        "SelectedTimeSlot":"Selected time slot",
+        "SelectTimeSlot":"Select time slot"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
