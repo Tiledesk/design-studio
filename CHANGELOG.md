@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.18.0-rc.1
+👉 **added**: cds-action-lead-update component
+👉 **added**: gpt-4o-mini support
 
 ### 1.17.2 in PROD
 👉 **bug-fixed**: cds-action-askkb-v2 show same variable n-times into preview modal
