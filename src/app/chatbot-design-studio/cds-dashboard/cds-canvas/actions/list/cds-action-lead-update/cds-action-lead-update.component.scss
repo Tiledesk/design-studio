@@ -1,0 +1,149 @@
+:host{
+    --icon-color: #{var(--blu)};
+    --textColor: #{var(--blu)};
+    --backGroundColor: #{var(--blu-light-04)};
+    --hoverBackgroundColor: #{var(--blu-light-03)};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --border-radius-base: 8px
+
+}
+
+.content{
+    background-color: var(--content-background);
+    border: 1px solid var(--gray-light-02);
+    padding: 20px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    &:not(:last-child){
+        margin-bottom: 5px;
+    }
+}
+
+
+.setting-wrapper{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: space-between;
+    gap: 5px;
+
+    // this will target the last flashcard but only if there are an odd number of cards
+    & > *:nth-child(odd):last-child { 
+        grid-column: span 2;
+    }
+}
+
+.filter-add-group-wrapper,
+.group-operator-wrapper{
+    align-items: center;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+    .filter-add-group{
+        cursor: pointer;
+        display: flex;
+        margin: 0px 10px;
+        transition: opacity 0.3s ease 0s;
+        span.text{
+            color: var(--textColor);
+            font-weight: 600;
+        }
+    }
+
+    .filter-add-group-plus{
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        display: flex;
+        height: 22px;
+        justify-content: center;
+        margin-right: 10px;
+        width: 22px;
+        background: var(--action-item-background);
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+
+        span.material-icons{
+            color: var(--textColor);
+            font-size: 20px;
+            transition: color 0.6s ease 0s;
+        }
+    }
+
+    &::before{
+        -webkit-box-flex: 1;
+        content: "";
+        flex-grow: 1;
+        height: 0px;
+        width: 0px;
+        border-top: 1px solid var(--textColor);
+    }
+
+    &::after{
+        -webkit-box-flex: 1;
+        content: "";
+        flex-grow: 1;
+        height: 0px;
+        width: 0px;
+        border-top: 1px solid var(--textColor);
+    }
+
+    &:hover{
+        opacity: 0.8;
+    }
+}
+
+.control-buttons{
+    height: 100%;
+    left: -44px;
+    position: absolute;
+    top: 0px;
+    width: 44px;
+
+    div.filter-remove{
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        transition: opacity 0.3s ease 0s;
+        opacity: 0;
+        height: 28px;
+        width: 28px;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background: white;
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+
+        span.material-icons,
+        span.material-icons-outlined{
+            font-size: 20px;
+            color: var(--textColor);
+        }
+
+        &:hover {
+            background-color: var(--hoverBackgroundColor);
+        }
+    }
+}
+
+.content{
+    position: relative;
+    &:hover{
+        div.filter-remove{
+            opacity: 1;
+            transition: opacity 0.3s ease 0s;
+        }
+    }
+}

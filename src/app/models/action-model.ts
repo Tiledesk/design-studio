@@ -736,3 +736,12 @@ export class ActionVoice extends Action {
         }
     }
 }
+
+export class ActionLeadUpdate extends Action {
+    update: { [key: string]: string}
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.LEAD_UPDATE;
+        this.update = {};
+    }
+}
