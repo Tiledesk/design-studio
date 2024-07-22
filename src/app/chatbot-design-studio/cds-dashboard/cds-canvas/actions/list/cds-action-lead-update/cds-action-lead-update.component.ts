@@ -48,10 +48,6 @@ export class CdsActionLeadUpdateComponent implements OnInit {
 
   private initialize() {
     this.leadPropertyFormGroup = this.buildForm();
-    this.leadPropertyFormGroup.valueChanges.subscribe(form => {
-      this.logger.log('[ACTION-LEAD-UPDATE] form valueChanges-->', form)
-    });
-
   }
 
   buildForm(): FormGroup{
@@ -64,14 +60,12 @@ export class CdsActionLeadUpdateComponent implements OnInit {
   onChangeSelect(propertySelected: {name: string, value: string} ){
     this.logger.log("[ACTION-LEAD-UPDATE] onChangeSelect event: ", propertySelected, this.action)
     this.leadPropertyFormGroup.patchValue({ key: propertySelected.value})
-    
   }
 
   onChangeTextarea(text){
     this.logger.log("[ACTION-LEAD-UPDATE] onChangeTextarea event: ", text, this.action)
     this.leadPropertyFormGroup.patchValue({ value: text})
     // this.action.update[this.selectedKey]=text;
-    
   }
 
   onBlur(event){
