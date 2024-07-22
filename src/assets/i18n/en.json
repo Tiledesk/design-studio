@@ -445,7 +445,8 @@
         "CheckOperatingHours":"Check operating hours",
         "General":"General",
         "SelectedTimeSlot":"Selected time slot",
-        "SelectTimeSlot":"Select time slot"
+        "SelectTimeSlot":"Select time slot",
+        "IgnoreOperatingHours":"Ignore General operating hours"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",

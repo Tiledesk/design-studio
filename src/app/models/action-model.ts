@@ -82,11 +82,13 @@ export class ActionOnlineAgentV2 extends Action {
     stopOnConditionMet: boolean;
     selectedOption: string;
     selectedDepartmentId?: string;
+    ignoreOperatingHours?: boolean;
     constructor() {
         super();
         this.stopOnConditionMet = true;
         this._tdActionType = TYPE_ACTION.ONLINE_AGENTSV2;
         this.selectedOption = 'all'
+        this.ignoreOperatingHours = false;
     }
 }
 
