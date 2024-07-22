@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.18.0-rc.2
+👉 **added**: implement time slots on cds-action-operating-hours 
+👉 **added**: ignoreOperatingHours property added on cds-action-online-agents-v2
+
 ### 1.18.0-rc.1
 👉 **added**: cds-action-lead-update component
 👉 **added**: gpt-4o-mini support
