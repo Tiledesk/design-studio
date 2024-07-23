@@ -1,0 +1,130 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+    
+    <div *ngIf="(action?.update | json) !== '{}' ">
+        <div class="action-row" *ngFor="let item of action?.update | keyvalue; let i=index">
+            <div class="action-row-left">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px">
+                    <path d="M7.5,2.12c0-.27-.21-.51-.47-.49-.92.05-1.68.32-2.27.81-.66.56-.99,1.35-.99,2.34v2.8c0,.55-.15.93-.44,1.17-.25.21-.65.35-1.23.39-.24.02-.45.23-.45.51v.63c0,.28.21.49.45.51.52.03.91.16,1.18.37h0c.31.23.47.62.47,1.22v2.77c0,.98.31,1.76.95,2.32.57.5,1.34.77,2.3.82.26.02.47-.22.47-.49v-.62c0-.28-.2-.49-.44-.51-.48-.04-.84-.18-1.09-.39-.28-.24-.44-.63-.44-1.22v-2.72c0-.68-.16-1.24-.5-1.66-.27-.33-.64-.57-1.1-.72.46-.15.83-.39,1.1-.72.34-.42.5-.98.5-1.66v-2.7c0-.51.13-.88.37-1.15.25-.26.62-.43,1.16-.49.24-.02.44-.24.44-.51v-.61Z"/>
+                    <path d="M12.64,2.12c0-.27.21-.51.47-.49.92.05,1.68.32,2.27.81.66.56.99,1.35.99,2.34v2.8c0,.55.15.93.44,1.17.25.21.65.35,1.23.39.24.02.45.23.45.51v.63c0,.28-.21.49-.45.51-.52.03-.91.16-1.18.37h0c-.31.23-.47.62-.47,1.22v2.77c0,.98-.31,1.76-.95,2.32-.57.5-1.34.77-2.3.82-.26.02-.47-.22-.47-.49v-.62c0-.28.2-.49.44-.51.48-.04.84-.18,1.09-.39.28-.24.44-.63.44-1.22v-2.72c0-.68.16-1.24.5-1.66.27-.33.64-.57,1.1-.72-.46-.15-.83-.39-1.1-.72-.34-.42-.5-.98-.5-1.66v-2.7c0-.51-.13-.88-.37-1.15-.25-.26-.62-.43-1.16-.49-.24-.02-.44-.24-.44-.51v-.61Z"/>
+              </svg>
+            </div>
+            <div class="action-row-right">
+                <b>{{item.key}}</b> : {{item.value}}
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="(action?.update | json ) == ( {} | json)">
+        <div class="action-row">
+            <div class="action-row-left">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px">
+                      <path d="M7.5,2.12c0-.27-.21-.51-.47-.49-.92.05-1.68.32-2.27.81-.66.56-.99,1.35-.99,2.34v2.8c0,.55-.15.93-.44,1.17-.25.21-.65.35-1.23.39-.24.02-.45.23-.45.51v.63c0,.28.21.49.45.51.52.03.91.16,1.18.37h0c.31.23.47.62.47,1.22v2.77c0,.98.31,1.76.95,2.32.57.5,1.34.77,2.3.82.26.02.47-.22.47-.49v-.62c0-.28-.2-.49-.44-.51-.48-.04-.84-.18-1.09-.39-.28-.24-.44-.63-.44-1.22v-2.72c0-.68-.16-1.24-.5-1.66-.27-.33-.64-.57-1.1-.72.46-.15.83-.39,1.1-.72.34-.42.5-.98.5-1.66v-2.7c0-.51.13-.88.37-1.15.25-.26.62-.43,1.16-.49.24-.02.44-.24.44-.51v-.61Z"/>
+                      <path d="M12.64,2.12c0-.27.21-.51.47-.49.92.05,1.68.32,2.27.81.66.56.99,1.35.99,2.34v2.8c0,.55.15.93.44,1.17.25.21.65.35,1.23.39.24.02.45.23.45.51v.63c0,.28-.21.49-.45.51-.52.03-.91.16-1.18.37h0c-.31.23-.47.62-.47,1.22v2.77c0,.98-.31,1.76-.95,2.32-.57.5-1.34.77-2.3.82-.26.02-.47-.22-.47-.49v-.62c0-.28.2-.49.44-.51.48-.04.84-.18,1.09-.39.28-.24.44-.63.44-1.22v-2.72c0-.68.16-1.24.5-1.66.27-.33.64-.57,1.1-.72-.46-.15-.83-.39-1.1-.72-.34-.42-.5-.98-.5-1.66v-2.7c0-.51-.13-.88-.37-1.15-.25-.26-.62-.43-1.16-.49-.24-.02-.44-.24-.44-.51v-.61Z"/>
+                </svg>
+            </div>
+            <div class="action-row-right empty">
+                {{ 'CDSCanvas.SelectProperty' | translate}}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div *ngIf="!previewMode">
+    <div class="content-panel-intent-detail" id="scrollMe">
+
+        <ng-container *ngIf="showCards" [ngTemplateOutlet]="sections"></ng-container>
+        <ng-container *ngIf="showPlaceholder" [ngTemplateOutlet]="placeholder"></ng-container>
+
+        <div class="filter-add-group-wrapper add-conditions-group">
+            <div class="filter-add-group" (click)="onAddNewProperty()">
+                <div class="filter-add-group-plus"><span class="material-icons">add</span></div>
+                <span class="text">{{'CDSCanvas.UpdateProperty' | translate }}</span>
+            </div> 
+        </div>
+    
+    </div>
+</div>
+
+
+<ng-template #placeholder>
+    <div class="content">
+
+        <form [formGroup]="leadPropertyFormGroup">
+            <div class="setting-wrapper">
+                <div class="field-box" style="width: 100%;">
+                    <label class="title-label">{{'CDSCanvas.Key' | translate}}</label>
+                    <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+                    <!-- [limitCharsText]="150"  -->
+                    <cds-select
+                        [items]="leadPropertyListFiltered"
+                        [bindLabelSelect]="'name'"
+                        [bindValueSelect]="'value'"
+                        [searchable]="true"
+                        [itemSelected]="leadPropertyFormGroup.controls.key.value"
+                        (onSelected)="onChangeSelect($event)">
+                    </cds-select>
+                </div>
+        
+                <div class="field-box" style="width: 100%;">
+                    <label class="title-label">{{'CDSCanvas.Value' | translate}}</label>
+                    <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+                    <!-- [limitCharsText]="150"  -->
+                    <cds-textarea class="text-editable-div"
+                        [emojiPikerBtn]="false" 
+                        [textLimitBtn]="false" 
+                        [text]="selectedValue"
+                        [minRow]="1" [maxRow]="1" 
+                        popoverVerticalAlign="above"
+                        (blur)="onBlur($event)"
+                        (changeTextarea)="onChangeTextarea($event)">
+                    </cds-textarea>
+                </div>
+            </div>
+        </form>  
+
+    </div>
+</ng-template>
+
+<ng-template #sections>
+    <div class="content" *ngFor="let item of action?.update | keyvalue; let i=index">
+
+        <div class="control-buttons">
+            <div class="filter-remove" (click)="onDeleteProperty(i, item.key)">
+                <span class="material-icons-outlined">delete</span>
+            </div>
+        </div>
+        <div class="setting-wrapper">
+            <div class="field-box" style="width: 100%;">
+                <label class="title-label">{{'CDSCanvas.Key' | translate}}</label>
+                <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+                <!-- [limitCharsText]="150"  -->
+                <cds-select
+                    [items]="leadPropertyListFiltered"
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'"
+                    [searchable]="true"
+                    [itemSelected]="item.key"
+                    (onSelected)="onChangeSelect($event)">
+                </cds-select>
+            </div>
+    
+            <div class="field-box" style="width: 100%;">
+                <label class="title-label">{{'CDSCanvas.Value' | translate}}</label>
+                <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+                <!-- [limitCharsText]="150"  -->
+                <cds-textarea class="text-editable-div"
+                    [emojiPikerBtn]="false" 
+                    [textLimitBtn]="false" 
+                    [text]="item.value"
+                    [minRow]="1" [maxRow]="1" 
+                    popoverVerticalAlign="above"
+                    (blur)="onBlur($event)"
+                    (changeTextarea)="onChangeTextarea($event, 'selectedValue')">
+                </cds-textarea>
+            </div>
+        </div>
+
+    </div>
+</ng-template>

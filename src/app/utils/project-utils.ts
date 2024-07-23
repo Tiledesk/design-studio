@@ -137,23 +137,19 @@ export class ProjectPlanUtils {
             // ------------------------------------------------------------------------ 
             // USECASE: customization obj not exist
             // ------------------------------------------------------------------------
-            console.log('caseeeee 11111')
             this.hideActionType(actionType);
             return;
         } else if(this.project.profile['customization'] && this.project.profile['customization'][categoryKey] === undefined){
             // ------------------------------------------------------------------------ 
             // USECASE: customization obj exist AND customization.[actionType] obj not exist
             // ------------------------------------------------------------------------
-            console.log('caseeeee 2222')
             this.hideActionType(actionType);
             return;
         } else if(this.project.profile['customization'] && this.project.profile['customization'][categoryKey] !== undefined){
             // ------------------------------------------------------------------------ 
             // USECASE: customization obj AND customization.[actionType] obj exists
             // ------------------------------------------------------------------------
-            console.log('caseeeee 3333')
             if(this.project.profile['customization'][categoryKey]===false){
-                console.log('caseeeee 3333.1111')
                 this.hideActionType(actionType);
                 return true
             }

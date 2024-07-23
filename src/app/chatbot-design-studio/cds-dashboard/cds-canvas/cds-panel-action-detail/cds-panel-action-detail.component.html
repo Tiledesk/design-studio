@@ -308,6 +308,14 @@
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-code>
+
+                    <cds-action-lead-update *ngSwitchCase="TYPE_ACTION.LEAD_UPDATE" 
+                        class="panel-response"
+                        [intentSelected]="intentSelected" 
+                        [action]="elementSelected"
+                        [previewMode]="false" 
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-lead-update>
                     
                     <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"

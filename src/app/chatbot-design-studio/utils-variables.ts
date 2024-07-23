@@ -75,3 +75,16 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
         ]
     }
 ]
+
+
+export const leadPropertyList: Array<{ name: string, value: string, description?: string, src?: string, icon?: string}> = [
+    { name: 'email',                value: 'email'          },
+    { name: 'fullname',             value: 'fullname'       },
+    { name: 'phone',                value: 'phone'          },
+    { name: 'company',              value: 'company'        },
+    { name: 'streetAddress',        value: 'streetAddress'  },
+    { name: 'city',                 value: 'city'           },
+    { name: 'region',               value: 'region'         },
+    { name: 'zipcode',              value: 'zipcode'        },
+    { name: 'country',              value: 'country'        }
+]
