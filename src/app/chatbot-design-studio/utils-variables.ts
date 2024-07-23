@@ -75,3 +75,12 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
         ]
     }
 ]
+
+export var tagsList: Array<{key: string, elements: Array<any>}> = [ 
+    {   key: 'request',
+        elements: []
+    },
+    {   key: 'lead',
+        elements: []
+    }
+]

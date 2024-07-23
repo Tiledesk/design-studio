@@ -440,7 +440,6 @@
         "CurrentDepartment": "Current department",
         "SelectedDepartment": "Selected Department",
         "CheckAgentsAvailability":"Check agents availability"
-
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -587,6 +586,7 @@
             "Customerio":"Customer.io",
             "Brevo":"Brevo",
             "N8n":"n8n",
+            "AddTag":"Add tag",
             "DTMFForm":"DTMF form",
             "DTMFMenu":"DTMF menu",
             "BlindTransfer": "Blind transfer",
@@ -627,6 +627,7 @@
             "Customerio":"",
             "Brevo":"",
             "N8n":"",
+            "AddTag":"This action allow chatbot to automatically tags a conversation or a contact during the conversation flow",
             "DTMFForm":"",
             "DTMFMenu":"",
             "BlindTransfer": "",
@@ -665,6 +666,7 @@
             "Make":"",
             "Hubspot":"",
             "Customerio":"",
+            "AddTag":"",
             "DTMFForm":"",
             "DTMFMenu":"",
             "BlindTransfer": "",

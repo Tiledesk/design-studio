@@ -723,6 +723,15 @@ export class ActionN8n extends Action {
     }
 }
 
+export class ActionAddTag extends Action {
+    tags: Array<string>;
+    target: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.ADD_TAG;
+    }
+}
+
 export class ActionVoice extends Action {
     text?: string;
     attributes: Attributes;

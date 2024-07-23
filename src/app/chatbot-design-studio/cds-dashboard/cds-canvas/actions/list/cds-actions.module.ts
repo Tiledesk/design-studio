@@ -70,6 +70,7 @@ import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { FilterPipe } from 'src/app/pipe/filter.pipe';
+import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 
 @NgModule({
   declarations: [
@@ -118,6 +119,7 @@ import { FilterPipe } from 'src/app/pipe/filter.pipe';
     CdsActionCustomerioComponent,
     CdsActionBrevoComponent,
     CdsActionN8nComponent,
+    CdsActionAddTagComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
@@ -207,6 +209,7 @@ import { FilterPipe } from 'src/app/pipe/filter.pipe';
     CdsActionCustomerioComponent,
     CdsActionBrevoComponent,
     CdsActionN8nComponent,
+    CdsActionAddTagComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,

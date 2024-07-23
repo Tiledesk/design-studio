@@ -1,0 +1,48 @@
+.cds-input-group {
+    flex-wrap: nowrap;
+    display: flex;
+
+    cds-text{
+        width: 90%;
+    }
+    .cds-group-addon-question-right{
+        width: 10%;
+    }
+
+}
+
+cds-text#text.sx-input ::ng-deep {
+    input{
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+.cds-group-addon-question-right {
+    background: var(--blu);
+    // height: 47px;
+    border-radius: 0;
+    // padding-left: 6px;
+    // padding-right: 6px;
+    padding-top: 0px;
+    border-top-right-radius: var(--input-border-radius-base);
+    border-bottom-right-radius: var(--input-border-radius-base);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cds-group-addon-question-right:hover {
+    opacity: 0.8 !important;
+}
+
+.cds-group-addon-question-right-btn-icon {
+    color: #fff;
+    position: relative;
+}
+
+.add-question-btn-disabled {
+    pointer-events: none;
+    background: #aaa;
+}

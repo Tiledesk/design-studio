@@ -345,6 +345,13 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-code>
 
+                    <cds-action-add-tag *ngSwitchCase="TYPE_ACTION.ADD_TAG"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-add-tag>
+
 
                     <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"
