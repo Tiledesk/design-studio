@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.18.0-rc.3
+👉 **added**: description msg for ignoreOperatingHours property into cds-action-online-agents
+
 ### 1.18.0-rc.2
 👉 **added**: implement time slots on cds-action-operating-hours 
 👉 **added**: ignoreOperatingHours property added on cds-action-online-agents-v2
