@@ -441,7 +441,13 @@
         "SelectedDepartment": "Selected Department",
         "CheckAgentsAvailability":"Check agents availability",
         "UpdateProperty":"Update property",
-        "SelectProperty":"Select property"
+        "SelectProperty":"Select property",
+        "CheckOperatingHours":"Check operating hours",
+        "General":"General",
+        "SelectedTimeSlot":"Selected time slot",
+        "SelectTimeSlot":"Select time slot",
+        "IgnoreOperatingHours":"Ignore General operating hours",
+        "IgnoreOperatingHoursDescription": "Check this option if you want to only check agents availability ignoring the General Operating hours settings. <br> This option is also useful if you want to demand opening and closing hours checking to the If Operating Hours Action, specifing a specific time slot"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
