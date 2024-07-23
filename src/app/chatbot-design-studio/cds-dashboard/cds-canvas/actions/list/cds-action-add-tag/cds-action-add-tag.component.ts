@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { MatChipInputEvent } from '@angular/material/chips';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { tagsList } from 'src/app/chatbot-design-studio/utils-variables';
 import { ActionAddTag, ActionCode } from 'src/app/models/action-model';
@@ -32,12 +33,7 @@ export class CdsActionAddTagComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.log("[ACTION-ADD-TAG] action", this.action)
-    if(this.action && this.action.tags && this.action.tags.length > 0){
-      this.action.tags.forEach((tag)=> {
-        tagsList.find(el => el.key === this.action.target).elements.push({name: tag})
-      })
-    }
-    tagsList.find(el => el.key === this.action.target).elements.forEach(el => this.autocompleteOptions.push(el.name))
+    this.checkIfTagAlreadyExist()
     this.logger.log("[ACTION-ADD-TAG] tagsList", tagsList)
     
   }
@@ -60,6 +56,7 @@ export class CdsActionAddTagComponent implements OnInit {
   }
 
   onAddTag(){
+    this.logger.log("[ACTION-ADD-TAG] onAddTag", this.newTag)
     /**if tag already exsit to not add to autocomplete options and tags list */
     let exist = this.autocompleteOptions.some(el => el.includes(this.newTag))
     if(!exist){
@@ -83,10 +80,25 @@ export class CdsActionAddTagComponent implements OnInit {
     }
 
     let autocompleteIndex = this.autocompleteOptions.findIndex(el => el === tag)
+    console.log('indexxxxx', autocompleteIndex)
     if(autocompleteIndex > -1 ){
       this.autocompleteOptions.splice(autocompleteIndex, 1)
     }
-   
+    this.updateAndSaveAction.emit();
+  }
+
+
+  checkIfTagAlreadyExist(){
+    this.autocompleteOptions = [];
+    this.action.tags.forEach((tag) => {
+      let index = tagsList.find(el => el.key === this.action.target).elements.findIndex(el => el.name === tag)
+      
+      if(index === -1){
+        tagsList.find(el => el.key === this.action.target).elements.push({name: tag})
+      }
+    });
+    console.log('checkIfTagAlreadyExist', tagsList)
+    tagsList.find(el => el.key === this.action.target).elements.forEach(el => this.autocompleteOptions.push(el.name))
   }
 
   onBlur(){

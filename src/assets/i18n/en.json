@@ -439,7 +439,10 @@
         "ProjectWide": "Project wide",
         "CurrentDepartment": "Current department",
         "SelectedDepartment": "Selected Department",
-        "CheckAgentsAvailability":"Check agents availability"
+        "CheckAgentsAvailability":"Check agents availability",
+        "Target":"Target",
+        "Conversation":"Conversation",
+        "Contact":"Contact"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
