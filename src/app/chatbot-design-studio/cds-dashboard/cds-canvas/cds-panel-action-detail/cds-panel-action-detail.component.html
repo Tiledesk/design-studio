@@ -1,4 +1,4 @@
-<div class="panel-intent-detail">
+<div class="panel-intent-detail" [class.minimize]="!maximize" [class.maximize]="maximize">
     <div class="header-panel">
         <cds-action-description
             [actionSelected]="elementIntentSelectedType === typeIntentElement.ACTION? elementSelected : null"
@@ -6,6 +6,11 @@
             [showTip]="elementIntentSelectedType === typeIntentElement.ACTION? true : false"
             [previewMode]="false">
         </cds-action-description>
+        
+        <div class="header-options-wrp icon-action" (click)="maximize = !maximize">
+            <img src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" *ngIf="!maximize">
+            <img src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" *ngIf="maximize">
+        </div>
     </div>
 
     <div id="content-panel" class="content-panel">

@@ -51,6 +51,8 @@
     "SelectDepartment": "Select department",
     "RelatedKnowledgeBase": "Related Knowledge Base",
     "ChooseALanguage": "Choose a language",
+    "Maximize":"Maximize",
+    "Minimize":"Minimize",
     "BotsAddEditPage": {
         "AddBot": "Add Bot",
         "EditBot": "Edit Bot",
