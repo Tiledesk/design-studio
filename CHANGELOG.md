@@ -6,6 +6,7 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.18.0 in PROD
 
 ### 1.18.0-rc.2
 👉 **added**: implement time slots on cds-action-operating-hours 
