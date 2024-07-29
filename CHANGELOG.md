@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.18.2-rc.1
+👉 **added**: convertToNumber function in cds-action-assign-variable
+
 ### 1.18.1 in PROD
 
 ### 1.18.0-rc.5
