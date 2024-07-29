@@ -48,6 +48,7 @@ export class CdsActionLeadUpdateComponent implements OnInit {
 
   private initialize() {
     this.leadPropertyFormGroup = this.buildForm();
+    this.leadPropertyListFiltered.forEach(el => Object.keys(this.action.update).includes(el.name)? el.disabled= true:  el.disabled = false)
   }
 
   buildForm(): FormGroup{
@@ -74,6 +75,7 @@ export class CdsActionLeadUpdateComponent implements OnInit {
       this.action.update[form.key] = form.value;
       this.showPlaceholder = false;
       this.showCards = true;
+      this.leadPropertyListFiltered.forEach(el => Object.keys(this.action.update).includes(el.name)? el.disabled= true:  el.disabled = false)
       this.leadPropertyFormGroup.reset();
       this.updateAndSaveAction.emit();
     }
@@ -81,12 +83,14 @@ export class CdsActionLeadUpdateComponent implements OnInit {
 
   onAddNewProperty(){
     this.logger.log("[ACTION-LEAD-UPDATE] onAddNewProperty ADD : ", this.showPlaceholder)
+    this.leadPropertyListFiltered.forEach(el => Object.keys(this.action.update).includes(el.name)? el.disabled= true:  el.disabled = false)
     this.showPlaceholder = true;
   }
 
   onDeleteProperty(index: number, key: string){
     this.logger.log("[ACTION-LEAD-UPDATE] onDeleteProperty index : ", index)
     delete this.action.update[key];
+    this.leadPropertyListFiltered.forEach(el => Object.keys(this.action.update).includes(el.name)? el.disabled= true:  el.disabled = false)
     if(this.action && Object.keys(this.action.update).length === 0){
       this.showCards = false;
       this.showPlaceholder = true;

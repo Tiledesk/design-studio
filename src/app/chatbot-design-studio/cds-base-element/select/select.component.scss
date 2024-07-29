@@ -56,6 +56,16 @@
                 text-overflow: ellipsis;
             }
 
+
+            &.ng-option-disabled {
+                
+                pointer-events: none;
+                .label-select{
+                    color: #ccc;
+
+                }
+            }
+
             // &.ng-option-marked {
             //     // background-color: rgba(var(--blu-light-02), .23) !important;
             // }
