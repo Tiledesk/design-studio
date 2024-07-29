@@ -6,7 +6,15 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
-### 1.18.0 in PROD
+### 1.18.0-rc.5
+👉 **added**: history property to cds-action-askkbv2
+
+### 1.18.0-rc.4
+👉 **added**: ani, dnis and callId voice property 
+👉 **added**: disabled option to select base component
+
+### 1.18.0-rc.3
+👉 **added**: description msg for ignoreOperatingHours property into cds-action-online-agents
 
 ### 1.18.0-rc.2
 👉 **added**: implement time slots on cds-action-operating-hours 

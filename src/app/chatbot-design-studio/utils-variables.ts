@@ -72,19 +72,22 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'voice Name',                               value: 'voiceName',                         description: 'CDSvariablesList.voiceFlowElements.voiceName.description',                                    src: '', icon:'person'},
             { name: 'event',                                    value: 'event',                             description: 'CDSvariablesList.voiceFlowElements.event.description',                                        src: '', icon:'perm_phone_msg'},
             { name: 'last block',                               value: 'lastBlock',                         description: 'CDSvariablesList.voiceFlowElements.lastBlock.description',                                    src: '', icon:'perm_phone_msg'},
+            { name: 'callId',                                   value: 'callId',                            description: 'CDSvariablesList.voiceFlowElements.callId.description',                                       src: '', icon:'perm_phone_msg'},
+            { name: 'dnis',                                     value: 'dnis',                              description: 'CDSvariablesList.voiceFlowElements.dnis.description',                                         src: '', icon:'perm_phone_msg'},
+            { name: 'ani',                                      value: 'ani',                               description: 'CDSvariablesList.voiceFlowElements.ani.description',                                          src: '', icon:'perm_phone_msg'},
         ]
     }
 ]
 
 
-export const leadPropertyList: Array<{ name: string, value: string, description?: string, src?: string, icon?: string}> = [
-    { name: 'email',                value: 'email'          },
-    { name: 'fullname',             value: 'fullname'       },
-    { name: 'phone',                value: 'phone'          },
-    { name: 'company',              value: 'company'        },
-    { name: 'streetAddress',        value: 'streetAddress'  },
-    { name: 'city',                 value: 'city'           },
-    { name: 'region',               value: 'region'         },
-    { name: 'zipcode',              value: 'zipcode'        },
-    { name: 'country',              value: 'country'        }
+export const leadPropertyList: Array<{ name: string, value: string, disabled: boolean, description?: string, src?: string, icon?: string}> = [
+    { name: 'email',                value: 'email',             disabled: false },
+    { name: 'fullname',             value: 'fullname',          disabled: false },
+    { name: 'phone',                value: 'phone',             disabled: false },
+    { name: 'company',              value: 'company',           disabled: false },
+    { name: 'streetAddress',        value: 'streetAddress',     disabled: false },
+    { name: 'city',                 value: 'city',              disabled: false },
+    { name: 'region',               value: 'region',            disabled: false },
+    { name: 'zipcode',              value: 'zipcode',           disabled: false },
+    { name: 'country',              value: 'country',           disabled: false }
 ]

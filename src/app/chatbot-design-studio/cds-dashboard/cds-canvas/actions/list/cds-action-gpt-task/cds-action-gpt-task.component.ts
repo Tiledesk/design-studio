@@ -233,6 +233,15 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.updateAndSaveAction.emit();
   }
 
+  onChangeCheckbox(target){
+    try {
+      this.action[target] = !this.action[target];
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    } catch (error) {
+      this.logger.log("Error: ", error);
+    }
+  }
+
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
     if(event){
       this.action[type]=event.value

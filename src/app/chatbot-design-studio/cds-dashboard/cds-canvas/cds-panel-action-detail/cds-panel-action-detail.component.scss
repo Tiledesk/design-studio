@@ -1,10 +1,13 @@
-$margin-left: 10px;
-$padding: 10px; 
+:host{
+    $margin-left: 10px;
+    $padding: 10px; 
+    --panel-width: 480px;
+}
 
 .panel-intent-detail {
     // position: relative;
     display: block;
-    width: 480px;
+    width: var(--panel-width);
     min-width: 400px;
     height: 100%; //auto
     max-height: 100%;
@@ -15,6 +18,14 @@ $padding: 10px;
     border-left: 1px solid var(--gray-light-02);
     // margin: 0 auto 0 auto; // nk
     inset: 0 0 0 200px;
+
+    &.minimize {
+        --panel-width: 480px;
+    }
+
+    &.maximize {
+        --panel-width: 680px;
+    }
 }
 
 .header-panel {
@@ -24,7 +35,22 @@ $padding: 10px;
     right: 0;
     background-color: var(--blu-light-03);
     z-index: 2;
+
+    display: flex;
+    align-items: center;
+    cds-action-description{
+        width: 100%;
+    }
 }
+
+.header-options-wrp{
+    display: flex;
+    padding: 10px;
+    &:hover{
+        cursor: pointer;
+    }
+}
+
 .content-panel{
     // height: calc(100% - 73px); // nk
     // height: calc(100% - 100px); // nk

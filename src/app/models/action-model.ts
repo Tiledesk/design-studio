@@ -383,6 +383,7 @@ export class ActionGPTTask extends Action {
     question: string;
     assignReplyTo: string;
     context: string;
+    history: boolean;
     max_tokens: number;
     temperature: number;
     model: string;
