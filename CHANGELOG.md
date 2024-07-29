@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.18.0-rc.5
+👉 **added**: history property to cds-action-askkbv2
+
 ### 1.18.0-rc.4
 👉 **added**: ani, dnis and callId voice property 
 👉 **added**: disabled option to select base component
