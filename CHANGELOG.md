@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.18.0-rc.4
+👉 **added**: ani, dnis and callId voice property 
+👉 **added**: disabled option to select base component
+
 ### 1.18.0-rc.3
 👉 **added**: description msg for ignoreOperatingHours property into cds-action-online-agents
 
