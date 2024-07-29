@@ -557,8 +557,9 @@
         "roundAsNumbers":"Round",
         "floorAsNumbers":"Floor",
         "ceilAsNumbers":"Ceil",
-        "JSONparse":"JSON.parse",
-        "JSONstringify":"JSON.stringify"
+        "convertToNumber":"Convert to number",
+        "JSONparse":"Convert to JSON Object",
+        "JSONstringify":"Stringify a JSON Object"
     },
     "CDSActionList": {
         "NAME": {
