@@ -51,6 +51,7 @@
     "SelectDepartment": "Select department",
     "RelatedKnowledgeBase": "Related Knowledge Base",
     "ChooseALanguage": "Choose a language",
+    "LearnMore":"Learn more",
     "BotsAddEditPage": {
         "AddBot": "Add Bot",
         "EditBot": "Edit Bot",
@@ -593,83 +594,259 @@
             "PlayPrompt":"Play prompt",
             "SpeechForm":"Speech form"
         },
-        "DESCRIPTION":{
-            "Reply":"<b>Pro tip</b>: Turn this block into a programmed proactive message.",
-            "ReplyV2":"",
-            "RandomReply":"Create some replies that will be randomly selected",
-            "AgentHandoff":"This action replaces the current chatbot with an agent.<br>The upcoming agent is assigned to the conversation following the department rules",
-            "Close":"This action instantly closes the current conversation",
-            "IfOperatingHours":"This action moves the flow to different blocks, based on the operating hours status.<br>During working hours the <b>TRUE block</b> will be triggered.<br>During offline hours the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset the same option.",
-            "IfOnlineAgent":"This action moves the flow to different blocks, based on the agents’ availability.<br>If there are agents available the <b>TRUE block</b> will be triggered.<br>If there are no agents available the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset Stop on met condition.",
-            "Condition":"",
-            "ConditionElse":"",
-            "ConnectBlock":"This action moves the flow to the specified block.<br> Keep in mind that if there are other actions in the current block actions-pipeline they will be executed too, generating a parallel-execution of all the branches affering to each block triggered through this Connect-block action.",
-            "SetAttribute":"",
-            "DeleteAttribute":"",
-            "ReplaceBot":"Choose a chatbot to replace the current one in the conversation",
-            "Wait":"This action waits the specified amount of milliseconds before moving to the next one along the block actions-pipeline",
-            "WebRequest":"",
-            "SendEmail":"This action send an email to the specified users group or email addresses.<br>You can use a comma sepatated addresses list.<br>i.e. 'support@domanin.com, info@domain.com'<br>You can use the special tag '@everyone' to send an email to each of the {{BRAND_NAME}}’s project teamates.<br><br>You can also use the name of a single user group using the group name. i.e. 'sales'",
-            "WhatsAppStatic":"This action send an approved WhatsApp template",
-            "WhatsAppByAttribute":"This action send an approved WhatsApp template",
-            "WhatsAppBySegment":"This action send an approved WhatsApp template",
-            "AskTheKnowledgeBase":"This action forwards the question to ChatGPT",
-            "GPTTask":"This action forwards the question to ChatGPT",
-            "GPTAssistant":"The Assistants API is designed to help developers build powerful AI assistants capable of performing a variety of tasks.",
-            "HiddenMessage":"",
-            "ChangeDept":"",
-            "Code":"",
-            "SetFunction":"",
-            "CaptureUserReply":"This action allow to capture the user reply",
-            "Qapla":"This action allow to connect with Qapla'",
-            "Make":"",
-            "Hubspot":"",
-            "Customerio":"",
-            "Brevo":"",
-            "N8n":"",
-            "DTMFForm":"",
-            "DTMFMenu":"",
-            "BlindTransfer": "",
-            "PlayPrompt":"",
-            "SpeechForm":""
-        },
-        "DOCS": {
-            "Reply":"<a href='https://www.youtube.com/embed/p0ux-86Y4_I' target='_blank'>Here is how!</a> ",
-            "ReplyV2":"",
-            "RandomReply":"",
-            "AgentHandoff":"",
-            "Close":"",
-            "IfOperatingHours":"",
-            "IfOnlineAgent":"",
-            "Condition":"",
-            "ConditionElse":"",
-            "ConnectBlock":"",
-            "SetAttribute":"",
-            "DeleteAttribute":"",
-            "ReplaceBot":"",
-            "Wait":"",
-            "WebRequest":"",
-            "SendEmail":"",
-            "WhatsAppStatic":"",
-            "WhatsAppByAttribute":"",
-            "WhatsAppBySegment":"",
-            "AskTheKnowledgeBase":"",
-            "GPTTask":"",
-            "GPTAssistant":"<a href='https://platform.openai.com/docs/assistants/how-it-works' target='_blank'>Learn more!</a>",
-            "HiddenMessage":"",
-            "ChangeDept":"",
-            "Code":"",
-            "SetFunction":"",
-            "CaptureUserReply":"",
-            "Qapla":"",
-            "Make":"",
-            "Hubspot":"",
-            "Customerio":"",
-            "DTMFForm":"",
-            "DTMFMenu":"",
-            "BlindTransfer": "",
-            "PlayPrompt":"",
-            "SpeechForm":""
+        "DOC": {
+            "Reply":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"https://www.youtube.com/embed/p0ux-86Y4_I",
+                "DOC_URL":""
+            },
+            "ReplyV2":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "RandomReply":{
+                "TITLE":"",
+                "DESCRIPTION":"Create some replies that will be randomly selected",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "AgentHandoff":{
+                "TITLE":"",
+                "DESCRIPTION":"This action replaces the current chatbot with an agent.<br>The upcoming agent is assigned to the conversation following the department rules",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Close":{
+                "TITLE":"",
+                "DESCRIPTION":"This action instantly closes the current conversation",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "IfOperatingHours":{
+                "TITLE":"",
+                "DESCRIPTION":"This action moves the flow to different blocks, based on the operating hours status.<br>During working hours the <b>TRUE block</b> will be triggered.<br>During offline hours the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset the same option",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "IfOnlineAgent":{
+                "TITLE":"",
+                "DESCRIPTION":"This action moves the flow to different blocks, based on the agents’ availability.<br>If there are agents available the <b>TRUE block</b> will be triggered.<br>If there are no agents available the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset Stop on met condition",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Condition":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "ConditionElse":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "ConnectBlock":{
+                "TITLE":"",
+                "DESCRIPTION":"This action moves the flow to the specified block.<br> Keep in mind that if there are other actions in the current block actions-pipeline they will be executed too, generating a parallel-execution of all the branches affering to each block triggered through this Connect-block action",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "SetAttribute":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "DeleteAttribute":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "ReplaceBot":{
+                "TITLE":"",
+                "DESCRIPTION":"Choose a chatbot to replace the current one in the conversation",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Wait":{
+                "TITLE":"",
+                "DESCRIPTION":"This action waits the specified amount of milliseconds before moving to the next one along the block actions-pipeline",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "WebRequest":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "SendEmail":{
+                "TITLE":"",
+                "DESCRIPTION":"This action send an email to the specified users group or email addresses.<br>You can use a comma sepatated addresses list.<br>i.e. 'support@domanin.com, info@domain.com'<br>You can use the special tag '@everyone' to send an email to each of the {{BRAND_NAME}}’s project teamates.<br><br>You can also use the name of a single user group using the group name. i.e. 'sales'",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "WhatsAppStatic":{
+                "TITLE":"",
+                "DESCRIPTION":"This action send an approved WhatsApp template",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "WhatsAppByAttribute":{
+                "TITLE":"",
+                "DESCRIPTION":"This action send an approved WhatsApp template",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "WhatsAppBySegment":{
+                "TITLE":"",
+                "DESCRIPTION":"This action send an approved WhatsApp template",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "AskTheKnowledgeBase":{
+                "TITLE":"",
+                "DESCRIPTION":"This action forwards the question to ChatGPT",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "GPTTask":{
+                "TITLE":"",
+                "DESCRIPTION":"This action forwards the question to ChatGPT",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "GPTAssistant":{
+                "TITLE":"",
+                "DESCRIPTION":"The Assistants API is designed to help developers build powerful AI assistants capable of performing a variety of tasks",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://platform.openai.com/docs/assistants/how-it-works"
+            },
+            "HiddenMessage":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "ChangeDept":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Code":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "SetFunction":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "CaptureUserReply":{
+                "TITLE":"",
+                "DESCRIPTION":"This action allow to capture the user reply",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Qapla":{
+                "TITLE":"",
+                "DESCRIPTION":"This action allow to connect with Qapla'",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Make":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Hubspot":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Customerio":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "DTMFForm":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "DTMFMenu":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "BlindTransfer": {
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "PlayPrompt":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "SpeechForm":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            }
         }
     },
     "CDSvariablesList": {
