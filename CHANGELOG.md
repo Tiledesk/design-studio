@@ -6,6 +6,11 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.18.2-rc.3
+👉 **added**: usage info into cds-action-gpt-task-v2 and cds-action-askkb-v2 actions
+👉 **added**: variable to system-contenxt field into cds-action-gpt-task-v2 and cds-action-askkb-v2 actions
+👉 **changed**: char limit to system-contenxt field into cds-action-gpt-task-v2 and cds-action-askkb-v2 actions
+
 ### 1.18.2-rc.2
 👉 **changed**: disabled restartConversation in cds-panel-widget
 
