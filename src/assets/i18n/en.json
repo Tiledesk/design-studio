@@ -342,6 +342,7 @@
         "Preview":"Preview",
         "AnswerPreview":"Answer preview",
         "GeneratingAnswer":"Generating answer",
+        "GeneratedWith":"generated with ",
         "AiError": "Oops! Something went wrong. Please retry in a few moment.",
         "AiQuotaExceeded":"Oops! Token quota exceeed. Please upgrade your project",
         "AiNoAnswer":"Unable to find a relevant answer",

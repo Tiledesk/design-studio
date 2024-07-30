@@ -120,7 +120,9 @@
     <div class="answer-preview" *ngIf="showPreview">
         <div class="header-answer-preview">
             <div class="label-and-button-container">
-                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}</label>
+                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (model_list | filter:{key: 'value', value: action?.model }).name }} )</span>
+                </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
                     <span class="material-icons-round">
@@ -263,8 +265,8 @@
                     <cds-textarea id="context" 
                         [textLimitBtn]="false" 
                         [emojiPikerBtn]="false" 
-                        [setAttributeBtn]="false"
-                        [minRow]="1" [maxRow]="3" 
+                        [limitCharsText]="10000"
+                        [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
                         [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
                         (blur)="onBlur($event)"
