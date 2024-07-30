@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.18.2-rc.2
+👉 **changed**: disabled restartConversation in cds-panel-widget
+
 ### 1.18.2-rc.1
 👉 **added**: convertToNumber function in cds-action-assign-variable
 
