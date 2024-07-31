@@ -348,14 +348,14 @@ export class CdsActionGPTTaskComponent implements OnInit {
       element.classList.remove('preview-container-extended')
     }, 200)
 
-    this.openaiService.previewPrompt(data).subscribe((ai_response: any) => {
+    this.openaiService.previewPrompt(data).subscribe({ next: (ai_response: any) => {
       this.searching = false;
       setTimeout(() => {
         let element = document.getElementById("preview-container");
         element.classList.add('preview-container-extended')
       }, 200)
       this.ai_response = ai_response;
-    }, (err) => {
+    }, error: (err) => {
       this.searching = false;
       this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", err);
       setTimeout(() => {
@@ -368,10 +368,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
         return;
       }
       this.ai_error = this.translate.instant('CDSCanvas.AiError')
-    }, () => {
+    }, complete: () => {
       this.logger.debug("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
       this.searching = false;
-    })
+    }});
 
   }
 

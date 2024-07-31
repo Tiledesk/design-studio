@@ -375,8 +375,7 @@ export class CdsActionAskgptV2Component implements OnInit {
       element.classList.remove('preview-container-extended')
     }, 200)
 
-    this.openaiService.previewAskPrompt(data).subscribe(()=> {}, (error)=> {})
-    this.openaiService.previewAskPrompt(data).subscribe((ai_response: any) => {
+    this.openaiService.previewAskPrompt(data).subscribe({ next: (ai_response: any)=> {
       this.searching = false;
       setTimeout(() => {
         let element = document.getElementById("preview-container");
@@ -388,7 +387,7 @@ export class CdsActionAskgptV2Component implements OnInit {
         return;
       }
       this.ai_response = ai_response.answer;
-    }, (err) => {
+    }, error: (err)=> {
       this.searching = false;
       this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", err);
       setTimeout(() => {
@@ -400,13 +399,10 @@ export class CdsActionAskgptV2Component implements OnInit {
         this.ai_error = this.translate.instant('CDSCanvas.AiQuotaExceeded')
         return;
       }
-      
-      this.ai_error = this.translate.instant('CDSCanvas.AiError')
-    }, () => {
+    }, complete: ()=> {
       this.logger.debug("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
       this.searching = false;
-    })
-
+    }});
   }
 
   openAttributesDialog() {
