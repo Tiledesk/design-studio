@@ -1,4 +1,4 @@
-<div *ngIf="menuItemsList.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo(divAction)">
+<div *ngIf="menuItemsList.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
 
     <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect 
         cdkDropList [cdkDropListData]="menuItemsList">
@@ -31,7 +31,7 @@
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
                 <div class="actions-btns-wpr" #divAction
-                    (mouseover)="openInfo(divAction, item.value, i)" 
+                    (mouseover)="openInfo(divAction, item.value)" 
                     [attr.id]="'menu-trigger-' + i">
                     
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">

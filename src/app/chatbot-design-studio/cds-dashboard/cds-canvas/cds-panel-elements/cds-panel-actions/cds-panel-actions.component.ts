@@ -125,7 +125,13 @@ export class CdsPanelActionsComponent implements OnInit {
   }
 
 
-  openInfo(e, element, index: number) {
+  openInfo(e, element) {
+    /**if element doesn't have any doc, close info */
+    if(!element.doc || element.doc===""){
+      this.closeInfo();
+      return; 
+    } 
+
     setTimeout(() => {
       this.hoveredElement = element;
       //this.menuTrigger.openMenu();
@@ -136,7 +142,7 @@ export class CdsPanelActionsComponent implements OnInit {
     }, 0);
   }
 
-  closeInfo(e) {
+  closeInfo() {
     setTimeout(() => {this.isOpen = false;},0)
     this.hoveredElement = null;
   }
