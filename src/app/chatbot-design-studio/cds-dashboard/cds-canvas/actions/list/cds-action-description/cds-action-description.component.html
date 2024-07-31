@@ -49,7 +49,7 @@
         </div>
         
         <div *ngIf="showTip" class="action-description">
-            <div *ngIf="element?.description"
+            <div *ngIf="element?.doc"
                 [satPopoverAnchor]="descriptionTooltip"
                 (click)="descriptionTooltip.toggle()">
                 <span class="material-icons-outlined">info</span>
@@ -77,7 +77,7 @@
     panelClass="description-tooltip">
     <div class="tooltip-wrp">
         <div class="caret_tooltip"></div>
-        <span [innerHTML]="element?.description | translate: tparams"></span>
-        <span *ngIf="BRAND_BASE_INFO['DOCS']" [innerHTML]="element?.doc | translate: tparams"></span>
+        <span [innerHTML]="element?.doc+'.DESCRIPTION' | translate: tparams"></span>
+        <span *ngIf="BRAND_BASE_INFO['DOCS']" [innerHTML]="element?.doc+'.DOC_URL' | translate: tparams"></span>
    </div>
 </sat-popover>
