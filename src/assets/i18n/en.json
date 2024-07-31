@@ -51,6 +51,7 @@
     "SelectDepartment": "Select department",
     "RelatedKnowledgeBase": "Related Knowledge Base",
     "ChooseALanguage": "Choose a language",
+    "WatchVideo":"Watch video",
     "LearnMore":"Learn more",
     "BotsAddEditPage": {
         "AddBot": "Add Bot",
@@ -596,9 +597,9 @@
         },
         "DOC": {
             "Reply":{
-                "TITLE":"",
+                "TITLE":"Example title",
                 "DESCRIPTION":"",
-                "IMAGE":"",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/Screenshot+2024-07-31+alle+12.54.06.png",
                 "VIDEO_URL":"https://www.youtube.com/embed/p0ux-86Y4_I",
                 "DOC_URL":""
             },
@@ -610,9 +611,9 @@
                 "DOC_URL":""
             },
             "RandomReply":{
-                "TITLE":"",
+                "TITLE":"Example title",
                 "DESCRIPTION":"Create some replies that will be randomly selected",
-                "IMAGE":"",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/Screenshot+2024-07-31+alle+12.54.06.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },

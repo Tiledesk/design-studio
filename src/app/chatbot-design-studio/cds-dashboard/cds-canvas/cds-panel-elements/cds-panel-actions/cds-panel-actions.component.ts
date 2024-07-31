@@ -7,6 +7,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { TranslateService } from '@ngx-translate/core';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -25,7 +26,8 @@ export class CdsPanelActionsComponent implements OnInit {
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   TYPE_OF_MENU = TYPE_OF_MENU;
-
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
+  
   menuItemsList: any;
   isDragging: any = false;
   indexDrag: number;
@@ -131,11 +133,11 @@ export class CdsPanelActionsComponent implements OnInit {
       let y = e.offsetTop;
       this.isOpen = true;
       this.positionMenu = {'x': 190, 'y': y }
-    }, 500);
+    }, 0);
   }
 
   closeInfo(e) {
-    this.isOpen = false;
+    setTimeout(() => {this.isOpen = false;},0)
     this.hoveredElement = null;
   }
 
@@ -143,7 +145,7 @@ export class CdsPanelActionsComponent implements OnInit {
     this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);
     this.controllerService.closeActionDetailPanel();
     this.isDragging = true;
-    // this.isOpen = false;
+    this.isOpen = false;
     this.indexDrag = currentIndex;
     
     this.isDraggingMenuElement.emit(this.isDragging);

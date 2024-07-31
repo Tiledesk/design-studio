@@ -91,7 +91,9 @@
                 <div *ngIf="hoveredElement?.name" class="action-btn-text truncate">{{hoveredElement.name | translate:BRAND_BASE_INFO}}</div>
             </div>
             <div class="info-tooltip-content">
-                <span [innerHTML]="hoveredElement?.doc+'.DESCRIPTION' | translate"></span>
+                <span class="title" [innerHTML]="hoveredElement?.doc+'.TITLE' | translate"></span>
+                <span class="description" [innerHTML]="hoveredElement?.doc+'.DESCRIPTION' | translate: BRAND_BASE_INFO"></span>
+                <img class="image" [src]="hoveredElement?.doc+'.IMAGE' | translate">
             </div>
             <div class="info-tooltip-footer">
                 <button id="watch-video" class="btn btn-primary cds-blue-button" type="button" (click)="onVideoUrlClick()">
