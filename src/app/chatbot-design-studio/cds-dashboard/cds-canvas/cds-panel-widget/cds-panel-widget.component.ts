@@ -79,7 +79,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     let url = testItOutUrl + '?tiledesk_projectid=' + this.projectID + 
                               '&tiledesk_participants=bot_' + this.selectedChatbot._id + 
                               "&tiledesk_departmentID=" + this.defaultDepartmentId + 
-                              "&tiledesk_widgetTitle="+ this.selectedChatbot.name +
+                              "&tiledesk_widgetTitle="+ encodeURIComponent(this.selectedChatbot.name) +
                               "&tiledesk_preChatForm=false" +
                               "&tiledesk_restartConversation=false" +
                               '&tiledesk_fullscreenMode=true&td_draft=true'
