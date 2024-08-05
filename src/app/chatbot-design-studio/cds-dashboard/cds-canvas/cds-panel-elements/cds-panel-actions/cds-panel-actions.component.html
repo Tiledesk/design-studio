@@ -96,11 +96,11 @@
                 <img class="image" [src]="hoveredElement?.doc+'.IMAGE' | translate">
             </div>
             <div class="info-tooltip-footer">
-                <button id="watch-video" class="btn btn-primary cds-blue-button" type="button" (click)="onVideoUrlClick()">
+                <a *ngIf="(hoveredElement?.doc+'.DOC_URL' | translate)" [href]="hoveredElement?.doc+'.DOC_URL' | translate" target="_blank">{{'LearnMore' | translate}}</a>
+                <button *ngIf="(hoveredElement?.doc+'.VIDEO_URL' | translate)" id="watch-video" class="btn btn-primary cds-blue-button" type="button" (click)="onVideoUrlClick()">
                     <img src="assets/images/icons/youtube.svg" width="14px" height="14px">
                     <div>{{'WatchVideo' | translate}}</div>
                 </button>
-                <a [href]="hoveredElement?.doc+'.DOC_URL' | translate" target="_blank">{{'LearnMore' | translate}}</a>
             </div>
         </div> 
     </div>

@@ -307,6 +307,7 @@ $base-padding: 6px;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        flex-direction: row-reverse;
         font-size: 12px;
 
         #watch-video{
@@ -321,6 +322,10 @@ $base-padding: 6px;
             div{
                 line-height: normal;
             }
+        }
+
+        a{
+            padding: 6px 12px;
         }
     }
 }
