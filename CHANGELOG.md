@@ -6,6 +6,9 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.19.0-rc.2
+👉 **added**: action doc contents 
+
 ### 1.19.0-rc.1
 👉 **added**: tooltip element while hovering on menu action list
 
