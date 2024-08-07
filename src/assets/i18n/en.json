@@ -613,7 +613,7 @@
                 "TITLE":"Send a message back to the user",
                 "DESCRIPTION":"This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc",
                 "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/REPLY.png",
-                "VIDEO_URL":"ssss",
+                "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/reply-action/"
             },
             "ReplyV2":{
