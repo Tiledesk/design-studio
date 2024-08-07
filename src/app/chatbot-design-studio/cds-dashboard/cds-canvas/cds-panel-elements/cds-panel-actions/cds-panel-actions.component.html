@@ -1,4 +1,4 @@
-<div *ngIf="menuItemsList.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div >
+<div *ngIf="menuItemsList.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
 
     <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect 
         cdkDropList [cdkDropListData]="menuItemsList">
@@ -30,7 +30,10 @@
 
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
-                <div class="actions-btns-wpr">
+                <div class="actions-btns-wpr" #divAction
+                    (mouseover)="openInfo(divAction, item.value)" 
+                    [attr.id]="'menu-trigger-' + i">
+                    
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <img [src]="item.value.src" [title]="item.value.name | translate">
                     </div>
@@ -73,6 +76,34 @@
     </div>
 
 
-        
-   
+    <!-- TOOLTIP FOR ACTION DOC -->
+    <div #menuInfo id="menuInfo" 
+        class="info-tooltip"
+        [style.display]="isOpen?'block':'none'" 
+        [style.top.px]="positionMenu.y"
+        [style.left.px]="positionMenu.x">
+        <div class="tooltip-wrp">
+            <div class="caret_tooltip"></div>
+            <div class="info-tooltip-header">
+                <div *ngIf="hoveredElement?.src && hoveredElement?.name" class="action-btn-icon">
+                    <img [src]="hoveredElement.src" [title]="hoveredElement.name | translate">
+                </div>
+                <div *ngIf="hoveredElement?.name" class="action-btn-text truncate">{{hoveredElement.name | translate:BRAND_BASE_INFO}}</div>
+            </div>
+            <div class="info-tooltip-content">
+                <span class="title" [innerHTML]="hoveredElement?.doc+'.TITLE' | translate"></span>
+                <span class="description" [innerHTML]="hoveredElement?.doc+'.DESCRIPTION' | translate: BRAND_BASE_INFO"></span>
+                <img class="image" [src]="hoveredElement?.doc+'.IMAGE' | translate">
+            </div>
+            <div class="info-tooltip-footer">
+                <a *ngIf="(hoveredElement?.doc+'.DOC_URL' | translate)" [href]="hoveredElement?.doc+'.DOC_URL' | translate" target="_blank">{{'LearnMore' | translate}}</a>
+                <button *ngIf="(hoveredElement?.doc+'.VIDEO_URL' | translate)" id="watch-video" class="btn btn-primary cds-blue-button" type="button" (click)="onVideoUrlClick()">
+                    <img src="assets/images/icons/youtube.svg" width="14px" height="14px">
+                    <div>{{'WatchVideo' | translate}}</div>
+                </button>
+            </div>
+        </div> 
+    </div>
+
+
 </div>

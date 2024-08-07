@@ -7,7 +7,12 @@ $text-hover-color: var(--blu);
 $icon-hover-color: var(--blu);
 $base-padding: 6px;
 
+:host{
+    --tooltip-top-position: 0px;
+}
+
 #panel_actions_div{
+    // position: absolute;
     padding: 0px;
     box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
     .menu-dragging,
@@ -195,5 +200,132 @@ $base-padding: 6px;
         cursor: not-allowed;
         user-select: none;
         box-shadow: none;
+    }
+}
+
+
+
+#menuInfo {
+    min-width: 100px;
+    max-width: 400px;
+    width: 270px;
+    color: var(--blu);
+    font-size: 15px;
+    line-height: 18px;
+    list-style: none;
+    // overflow: hidden;
+    padding: 0;
+    // box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    border-radius: 8px;
+    background: #181f29;
+    will-change: transform;
+    animation: .15s ease 0s 1 normal none running fadein, .15s ease 0s 1 normal none running movein, .1s ease 0s 1 normal none running scaleY;
+    margin: 0;
+    position: absolute;
+    top: 0px;
+    left: 85px;
+    // border: 2px solid var(--gray-02);
+}
+
+
+// TOOLTIP ACTION INFO ICON : start
+.info-tooltip {
+    background-color: var(--color-white-hex);
+    color: white;
+    font-size: 12px;
+    border-radius: 8px;
+    font-family: var(--font-family-poppins);
+    // padding-top:8px;
+    // padding-bottom:8px;
+    border: 1px solid #e5effe;
+    width: 300px;
+    max-width: 300px;
+
+    .tooltip-wrp {
+        position: relative;
+        padding: calc(10px + .5rem );
+        color: white;
+        // box-shadow: 0 2px 4px -1px #0003, 0 4px 5px #00000024, 0 1px 10px #0000001f;
+        // background-color: #fff;
+        font-size: 12px;
+        text-align: left;
+        border-radius: 8px;
+        font-family: var(--font-family-poppins);
+        // border: 1px solid #e5effe;
+        width: auto;
+        display: flex;
+        gap: 8px;
+        flex-direction: column;
+
+        span{
+            margin: 0;
+        }
+    }
+
+    .caret_tooltip {
+        height: 8px;
+        width: 8px;
+        position: absolute;
+        left: -4px;
+        top: 10px;
+        background: #181f29;
+        transform: translateY(0%) rotate(45deg);
+        // border-left: 2px solid var(--gray-02);
+        // border-bottom: 2px solid var(--gray-02);
+    }
+
+    .info-tooltip-header{
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        .action-btn-icon img{
+            width: 12px;
+            filter: brightness(0) saturate(100%) invert(99%) sepia(8%) saturate(403%) hue-rotate(225deg) brightness(117%) contrast(100%)
+        }
+        .action-btn-text{
+            color: white;
+        }
+    }
+
+    .info-tooltip-content{
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        
+        .title{
+            font-size: 14px;
+        }
+        .image{
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            border-radius: 3px;
+        }
+    }
+
+    .info-tooltip-footer{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: row-reverse;
+        font-size: 12px;
+
+        #watch-video{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 400;
+            background: white;
+            color: var(--blu);
+            border-radius: 8px;
+            div{
+                line-height: normal;
+            }
+        }
+
+        a{
+            padding: 6px 12px;
+        }
     }
 }

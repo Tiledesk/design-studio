@@ -54,6 +54,8 @@
     "Maximize":"Maximize",
     "Minimize":"Minimize",
     "Advanced":"Advanced",
+    "WatchVideo":"Watch video",
+    "LearnMore":"Learn more",
     "BotsAddEditPage": {
         "AddBot": "Add Bot",
         "EditBot": "Edit Bot",
@@ -606,84 +608,280 @@
             "PlayPrompt":"Play prompt",
             "SpeechForm":"Speech form"
         },
-        "DESCRIPTION":{
-            "Reply":"<b>Pro tip</b>: Turn this block into a programmed proactive message.",
-            "ReplyV2":"",
-            "RandomReply":"Create some replies that will be randomly selected",
-            "AgentHandoff":"This action replaces the current chatbot with an agent.<br>The upcoming agent is assigned to the conversation following the department rules",
-            "Close":"This action instantly closes the current conversation",
-            "IfOperatingHours":"This action moves the flow to different blocks, based on the operating hours status.<br>During working hours the <b>TRUE block</b> will be triggered.<br>During offline hours the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset the same option.",
-            "IfOnlineAgent":"This action moves the flow to different blocks, based on the agents’ availability.<br>If there are agents available the <b>TRUE block</b> will be triggered.<br>If there are no agents available the <b>FALSE block</b> will be triggered.<br>One of the two options can be unset. The flow will optionally stop only when a block-populated condition is met.<br>To optionally stop the flow set “Stop on met condition”. To always continue unset Stop on met condition.",
-            "Condition":"",
-            "ConditionElse":"",
-            "ConnectBlock":"This action moves the flow to the specified block.<br> Keep in mind that if there are other actions in the current block actions-pipeline they will be executed too, generating a parallel-execution of all the branches affering to each block triggered through this Connect-block action.",
-            "SetAttribute":"",
-            "DeleteAttribute":"",
-            "ReplaceBot":"Choose a chatbot to replace the current one in the conversation",
-            "Wait":"This action waits the specified amount of milliseconds before moving to the next one along the block actions-pipeline",
-            "LeadUpdate":"This action allows to update lead property from a list of available properties.",
-            "WebRequest":"",
-            "SendEmail":"This action send an email to the specified users group or email addresses.<br>You can use a comma sepatated addresses list.<br>i.e. 'support@domanin.com, info@domain.com'<br>You can use the special tag '@everyone' to send an email to each of the {{BRAND_NAME}}’s project teamates.<br><br>You can also use the name of a single user group using the group name. i.e. 'sales'",
-            "WhatsAppStatic":"This action send an approved WhatsApp template",
-            "WhatsAppByAttribute":"This action send an approved WhatsApp template",
-            "WhatsAppBySegment":"This action send an approved WhatsApp template",
-            "AskTheKnowledgeBase":"This action forwards the question to ChatGPT",
-            "GPTTask":"This action forwards the question to ChatGPT",
-            "GPTAssistant":"The Assistants API is designed to help developers build powerful AI assistants capable of performing a variety of tasks.",
-            "HiddenMessage":"",
-            "ChangeDept":"",
-            "Code":"",
-            "SetFunction":"",
-            "CaptureUserReply":"This action allow to capture the user reply",
-            "Qapla":"This action allow to connect with Qapla'",
-            "Make":"",
-            "Hubspot":"",
-            "Customerio":"",
-            "Brevo":"",
-            "N8n":"",
-            "DTMFForm":"",
-            "DTMFMenu":"",
-            "BlindTransfer": "",
-            "PlayPrompt":"",
-            "SpeechForm":""
-        },
-        "DOCS": {
-            "Reply":"<a href='https://www.youtube.com/embed/p0ux-86Y4_I' target='_blank'>Here is how!</a> ",
-            "ReplyV2":"",
-            "RandomReply":"",
-            "AgentHandoff":"",
-            "Close":"",
-            "IfOperatingHours":"",
-            "IfOnlineAgent":"",
-            "Condition":"",
-            "ConditionElse":"",
-            "ConnectBlock":"",
-            "SetAttribute":"",
-            "DeleteAttribute":"",
-            "ReplaceBot":"",
-            "Wait":"",
-            "WebRequest":"",
-            "SendEmail":"",
-            "WhatsAppStatic":"",
-            "WhatsAppByAttribute":"",
-            "WhatsAppBySegment":"",
-            "AskTheKnowledgeBase":"",
-            "GPTTask":"",
-            "GPTAssistant":"<a href='https://platform.openai.com/docs/assistants/how-it-works' target='_blank'>Learn more!</a>",
-            "HiddenMessage":"",
-            "ChangeDept":"",
-            "Code":"",
-            "SetFunction":"",
-            "CaptureUserReply":"",
-            "Qapla":"",
-            "Make":"",
-            "Hubspot":"",
-            "Customerio":"",
-            "DTMFForm":"",
-            "DTMFMenu":"",
-            "BlindTransfer": "",
-            "PlayPrompt":"",
-            "SpeechForm":""
+        "DOC": {
+            "Reply":{
+                "TITLE":"Send a message back to the user",
+                "DESCRIPTION":"This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/REPLY.png",
+                "VIDEO_URL":"ssss",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/reply-action/"
+            },
+            "ReplyV2":{
+                "TITLE":"Advanced reply management with input timeout and no-match",
+                "DESCRIPTION":"This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc.",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/REPLY.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/reply-action/"
+            },
+            "RandomReply":{
+                "TITLE":"Random messages in a set",
+                "DESCRIPTION":"This action sends back randomly selected messages choosen from a static set",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/RANDOM_REPLY.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "AgentHandoff":{
+                "TITLE":"Human handoff",
+                "DESCRIPTION":"This action removes the chatbot from the conversation and moves the flow to a human",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/AGENT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Close":{
+                "TITLE":"Close the conversation",
+                "DESCRIPTION":"This action closes the current conversation",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CLOSE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "IfOperatingHours":{
+                "TITLE":"Check opening hours",
+                "DESCRIPTION":"This action checks if the current time is included in some operating hours slot",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/OPEN_HOURS.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "IfOnlineAgent":{
+                "TITLE":"Check online agents",
+                "DESCRIPTION":"This action checks if there is an available agent in the current department",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/ONLINE_AGENTS.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/the-if-online-agent-action-and-its-role-in-conversation-design/"
+            },
+            "Condition":{
+                "TITLE":"Condition based branching",
+                "DESCRIPTION":"This action allows branching based on the specified condition",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CONDITION.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "ConditionElse":{
+                "TITLE":"Condition with else branch",
+                "DESCRIPTION":"This action allows branching based on the specified condition with true/false branches",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/JSON_CONDITION.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "ConnectBlock":{
+                "TITLE":"",
+                "DESCRIPTION":"This action moves the flow to the specified block.<br> Keep in mind that if there are other actions in the current block actions-pipeline they will be executed too, generating a parallel-execution of all the branches affering to each block triggered through this Connect-block action",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "SetAttribute":{
+                "TITLE":"Create or modify a flow attribute",
+                "DESCRIPTION":"With this action you can set the value of a flow attribute or change his type",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/ASSIGN_VARIABLE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "DeleteAttribute":{
+                "TITLE":"Delete a flow attribute",
+                "DESCRIPTION":"With this action you can remove the specified attribute",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/DELETE_VARIABLE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "ReplaceBot":{
+                "TITLE":"Replace the current bot with another one",
+                "DESCRIPTION":"Replaces the current chatbot with the specied one",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/REPLACE_BOT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
+            },
+            "Wait":{
+                "TITLE":"Wait before next action",
+                "DESCRIPTION":"Wait the specified amount of time before moving to the next action",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/WAIT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "WebRequest":{
+                "TITLE":"Invoke HTTP services",
+                "DESCRIPTION":"Configure and invoke a remote REST API",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/WEB_REQUESTV2.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/web-request-action/"
+            },
+            "SendEmail":{
+                "TITLE":"Send email",
+                "DESCRIPTION":"Sends an email with the specified fields",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/EMAIL.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/how-the-send-email-action-works/"
+            },
+            "WhatsAppStatic":{
+                "TITLE":"Send whatsapp message",
+                "DESCRIPTION":"Used to configure a Whatsapp message using a template and use the JSON to send massive Whatsapp messages",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/WHATSAPP_STATIC.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/#use-the-fast-prototyping-trick-to-generate-the-request-payload"
+            },
+            "WhatsAppByAttribute":{
+                "TITLE":"Used to send multi Whatsapp messages",
+                "DESCRIPTION":"Used to send massive whatsapp messages using a flow",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/WHATSAPP_ATTRIBUTE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/"
+            },
+            "WhatsAppBySegment":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "AskTheKnowledgeBase":{
+                "TITLE":"Prompt the KB",
+                "DESCRIPTION":"This action prompts the selected knowledge base to find the best suitable answer from the uploaded contents",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/ASKGPT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/"
+            },
+            "GPTTask":{
+                "TITLE":"ChatGPT Prompt",
+                "DESCRIPTION":"This action prompts chatGPT",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/GPT_TASK.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "GPTAssistant":{
+                "TITLE":"Prompt OpenAI Assistants",
+                "DESCRIPTION":"This action allows you to prompt the connected OpenAI Assistant",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/GPT_ASSISTANT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/chatgpt-assistant-action-beta/"
+            },
+            "HiddenMessage":{
+                "TITLE":"Send an hidden message (for the end user)",
+                "DESCRIPTION":"Send a hidden message in the current conversation",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/HIDE_MESSAGE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "ChangeDept":{
+                "TITLE":"Chage the department",
+                "DESCRIPTION":"Change the current conversation department",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CHANGE_DEPARTMENT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Code":{
+                "TITLE":"Execute a code snippet",
+                "DESCRIPTION":"Execute this code snippet (Nodejs)",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CODE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/code-action/"
+            },
+            "SetFunction":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "CaptureUserReply":{
+                "TITLE":"Capture the user reply",
+                "DESCRIPTION":"Wait until user replies, then capture and save the user reply in the specified attribute",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CAPTURE_USER_REPLY.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/capture-user-reply-action/"
+            },
+            "LeadUpdate":{
+                "TITLE":"Update lead data",
+                "DESCRIPTION":"Update the current lead (the end-user) in the conversation with the specified values",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/LEAD_UPDATE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Qapla":{
+                "TITLE":"Ask an order status to Qapla'",
+                "DESCRIPTION":"Query the remove Qapla' service",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/QAPLA.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/qapla-integration/"
+            },
+            "Make":{
+                "TITLE":"Invoke Make.com webhook",
+                "DESCRIPTION":"Invoke the wemote Make webhook",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/MAKE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/makecom-action/"
+            },
+            "Hubspot":{
+                "TITLE":"Hubspot CRM",
+                "DESCRIPTION":"Send lead data to Hubspot",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/HUBSPOT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/hubspot-action/"
+            },
+            "Customerio":{
+                "TITLE":"Customer.io CRM",
+                "DESCRIPTION":"Send lead data to Customer.io",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CUSTOMERIO.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "Brevo":{
+                "TITLE":"Brevo CRM",
+                "DESCRIPTION":"Send lead data to Brevo",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/BREVO.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/brevo-action/"
+            },
+            "N8n":{
+                "TITLE":"Invoke n8n webhook",
+                "DESCRIPTION":"Invoke the wemote n8n webhook",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/N8N.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/n8nio-action/"
+            },
+            "DTMFForm":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "DTMFMenu":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "BlindTransfer": {
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "PlayPrompt":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "SpeechForm":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            }
         }
     },
     "CDSvariablesList": {
