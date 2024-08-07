@@ -126,6 +126,9 @@ export class CdsPanelActionsComponent implements OnInit {
 
 
   openInfo(e, element) {
+    if(!BRAND_BASE_INFO['DOCS']){
+      return;
+    }
     /**if element doesn't have any doc, close info */
     if(!element.doc || element.doc===""){
       this.closeInfo();
@@ -143,6 +146,9 @@ export class CdsPanelActionsComponent implements OnInit {
   }
 
   closeInfo() {
+    if(!BRAND_BASE_INFO['DOCS']){
+      return;
+    }
     setTimeout(() => {this.isOpen = false;},0)
     this.hoveredElement = null;
   }
