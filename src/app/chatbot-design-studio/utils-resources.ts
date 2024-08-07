@@ -6,7 +6,7 @@ export const BRAND_BASE_INFO: { [key: string] : string | boolean } ={
     CONTACT_US_EMAIL: "support@tiledesk.com",
     FAVICON: "https://tiledesk.com/wp-content/uploads/2022/07/tiledesk_v13-300x300.png",
     META_TITLE:"Design Studio",
-    DOCS: false,
+    DOCS: true,
     COMMUNITY_SECTION: true,
     LOGOUT_ENABLED: false
 }
