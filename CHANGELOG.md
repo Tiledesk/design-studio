@@ -6,6 +6,8 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.19.0 in PROD
+
 ### 1.18.4 in PROD
 
 ### 1.18.3 in PROD
