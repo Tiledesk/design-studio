@@ -798,6 +798,13 @@
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/capture-user-reply-action/"
             },
+            "LeadUpdate":{
+                "TITLE":"Update lead data",
+                "DESCRIPTION":"Update the current lead (the end-user) in the conversation with the specified values",
+                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/LEAD_UPDATE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
             "Qapla":{
                 "TITLE":"Ask an order status to Qapla'",
                 "DESCRIPTION":"Query the remove Qapla' service",
