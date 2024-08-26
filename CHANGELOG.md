@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.19.1-rc.1
+👉 **added**: limitCharsText to cds-action-reply-text v2
+👉 **removed**: restartConversation from widget URL parameter
+
 ### 1.19.0-rc.2
 👉 **added**: action doc contents 
 
