@@ -386,7 +386,7 @@ export class CdsActionAskgptV2Component implements OnInit {
         this.ai_error = this.translate.instant('CDSCanvas.AiNoAnswer')
         return;
       }
-      this.ai_response = ai_response.answer;
+      this.ai_response = ai_response;
     }, error: (err)=> {
       this.searching = false;
       this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", err);

@@ -119,7 +119,7 @@
             </div>
 
             <div *ngIf="!searching && !showAiError && ai_response">
-                {{ ai_response }}
+                {{ ai_response?.answer }}
             </div>
 
             <div *ngIf="showAiError">
@@ -128,11 +128,11 @@
 
         </div>
 
-        <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
+        <div class="usage-container" *ngIf="!searching && !showAiError ">
             <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
+            <!-- <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span> -->
+            <!-- <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span> -->
+            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.prompt_token_size }}</span>
         </div>
 
     </div>
