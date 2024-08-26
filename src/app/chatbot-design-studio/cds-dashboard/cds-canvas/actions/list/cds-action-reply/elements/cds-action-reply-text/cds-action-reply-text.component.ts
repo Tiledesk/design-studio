@@ -32,6 +32,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   @Input() response: Message;
   @Input() wait: Wait;
   @Input() index: number;
+  @Input() limitCharsText: number;
   @Input() previewMode: boolean = true;
 
   // Connector //
