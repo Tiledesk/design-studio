@@ -68,7 +68,7 @@ export class CdsSupportComponent implements OnInit {
       if (window && window['tiledesk']) {
         this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
         if (status === 'hide') {
-          window['tiledesk'].hide();
+          window['tiledesk'].dispose();
         } else if (status === 'show') {
           window['tiledesk'].show();
         } else if(status === 'open'){

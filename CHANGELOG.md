@@ -6,6 +6,10 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
+### 1.19.3-rc.1
+👉 **added**: checkbox use namespace as name in cds-action-ask-kbv2
+👉 **changed**: dispose widget iframe when support component page is destroyed
+
 ### 1.19.1-rc.1
 👉 **added**: limitCharsText to cds-action-reply-text v2
 👉 **removed**: restartConversation from widget URL parameter
