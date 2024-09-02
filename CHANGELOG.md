@@ -6,17 +6,15 @@
     *Giovanni Troisi*  
 ### **Copyrigth**: *Tiledesk SRL*
 
-### 1.19.2 in PROD
+### 1.19.1-rc.1
+👉 **added**: limitCharsText to cds-action-reply-text v2
+👉 **removed**: restartConversation from widget URL parameter
 
-### 1.19.1 in PROD
+### 1.19.0-rc.2
+👉 **added**: action doc contents 
 
-### 1.19.0 in PROD
-
-### 1.18.4 in PROD
-
-### 1.18.3 in PROD
-
-### 1.18.2 in PROD
+### 1.19.0-rc.1
+👉 **added**: tooltip element while hovering on menu action list
 
 ### 1.18.2-rc.3
 👉 **added**: usage info into cds-action-gpt-task-v2 and cds-action-askkb-v2 actions
