@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MatDialog } from '@angular/material/dialog';
+import { ActionAskGPTV2 } from 'src/app/models/action-model';
 
 //MODELS
-import { ActionAskGPTV2 } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 
 //SERVICES
@@ -37,6 +37,9 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
   listOfNamespaces: Array<{name: string, value: string, icon?:string}>;
+
+  selectedNamespace: string;
+  //selectedNamespace: any;
 
   // Connectors
   idIntentSelected: string;
@@ -202,9 +205,21 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPT] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
-
+        this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
+        this.initializeNamespaceSelector();
     })
+  }
+
+  initializeNamespaceSelector() {
+    if (!this.action.namespaceAsName) {
+      if (this.action.namespace) {
+        this.selectedNamespace = this.action.namespace;
+      }
+    } else {
+      if (this.action.namespace) {
+        this.selectedNamespace = this.listOfNamespaces.find(n => n.name === this.action.namespace).value;
+      }
+    }
   }
 
   /** TO BE REMOVED: patch undefined action keys */
@@ -245,7 +260,16 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent' | 'namespace') {
     if(event){
-      this.action[type]=event.value
+      if (type === 'namespace') {
+        if (!this.action.namespaceAsName) {
+          this.action[type]=event.value
+        } else {
+          this.action[type] = this.listOfNamespaces.find(n => n.value === event.value).name;
+        }
+        this.selectedNamespace = event.value;
+      } else {
+        this.action[type]=event.value
+      }
       switch(type){
         case 'trueIntent':
           this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent});
@@ -283,10 +307,21 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("action updated: ", this.action)
   }
 
-  onChangeCheckbox(target){
+  async onChangeCheckbox(target){
     try {
-      this.action[target] = !this.action[target];
-      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+        this.action[target] = !this.action[target];
+        if (target === "namespaceAsName") {
+          if (this.action[target]) {
+            if (this.action.namespace) {
+              this.action.namespace = await this.idToName(this.action.namespace);
+            }
+            
+          } else {
+            this.action.namespace = await this.nameToId(this.action.namespace);
+          }
+        }
+        this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+
     } catch (error) {
       this.logger.log("Error: ", error);
     }
@@ -432,5 +467,20 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.updateAndSaveAction.emit();
     })
   }
+
+  async idToName(id: string): Promise<any> {
+    return new Promise((resolve) => {
+      let name = this.listOfNamespaces.find(n => n.value === id).name;
+      resolve(name)
+    })
+  }
+
+  async nameToId(name: string): Promise<any> {
+    return new Promise((resolve) => {
+      let id = this.listOfNamespaces.find(n => n.name === name).value;
+      resolve(id)
+    })
+  }
+
 
 }

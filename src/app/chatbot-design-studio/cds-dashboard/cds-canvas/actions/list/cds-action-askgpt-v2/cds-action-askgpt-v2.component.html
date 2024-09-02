@@ -75,9 +75,7 @@
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'question')">
         </cds-textarea>
-    </div>
 
-    <div class="field-box">
         <section class="disable-input-message-section">
             <mat-checkbox 
                 [checked]="action?.history"
@@ -86,6 +84,17 @@
             </mat-checkbox>
         </section>
     </div>
+
+    <!-- // Section moved to textarea field box -->
+    <!-- <div class="field-box">
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.history"
+                (change)="onChangeCheckbox('history')">
+                {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
+            </mat-checkbox>
+        </section>
+    </div> -->
 
      <!-- PREVIEW - START -->
      <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
@@ -141,17 +150,27 @@
 
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.ChooseKB' | translate}}</label>
-        <cds-select id="text-condition" 
+        <cds-select *ngIf="!changing" id="text-condition" 
             [items]="listOfNamespaces" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
-            [itemSelected]="action?.namespace" 
+            [itemSelected]="selectedNamespace" 
             [placeholder]="'CDSCanvas.SelectNamespace' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'namespace')"
             (onReset)="onResetBlockSelect($event, 'namespace')">
         </cds-select>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.namespaceAsName"
+                (change)="onChangeCheckbox('namespaceAsName')">
+                Use Knwoledge Base name
+            </mat-checkbox>
+            <label class="field-description" [innerHTML]='"CDSCanvas.UseKBNameDescription" | translate'></label>
+        </section>
     </div>
+
 
     <div class="link-container">
         <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>

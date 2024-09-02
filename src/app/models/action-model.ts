@@ -373,6 +373,7 @@ export class ActionAskGPTV2 extends Action {
     context: string;
     history: boolean;
     advancedPrompt?: boolean;
+    namespaceAsName: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2
@@ -388,6 +389,7 @@ export class ActionGPTTask extends Action {
     temperature: number;
     model: string;
     preview?: Array<any>;
+    format_type: string;
     trueIntent: string;
     falseIntent: string;
     constructor() {
