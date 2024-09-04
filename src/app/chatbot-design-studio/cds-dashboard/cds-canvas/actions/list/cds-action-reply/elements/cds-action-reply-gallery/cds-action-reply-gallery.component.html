@@ -17,11 +17,18 @@
     </div>
     
     <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
-        <appdashboard-delay-slider
+        <appdashboard-delay-slider *ngIf="wait.time < 10000"
             [delayTime]="delayTime"
+            [max]="10" [step]="1"
             (changeDelayTime)="onChangeDelayTime($event)"
             (clickDelayTime)="onClickDelayTime($event)">
         </appdashboard-delay-slider>
+        <appdashboard-delay-text *ngIf="wait.time >= 10000"
+            [delayTime]="delayTime"
+            [max]="120"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-text>
     </div>
     <!-- ||  -->
     <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">

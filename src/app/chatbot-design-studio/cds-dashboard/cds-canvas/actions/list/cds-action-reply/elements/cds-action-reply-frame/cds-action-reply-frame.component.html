@@ -17,11 +17,18 @@
     </div>
 
     <div *ngIf="!isOpenHeightSlider" class="delay-wrapper" [ngStyle]="{width: isOpenDelaySlider? '100%' : 'auto'}">
-        <appdashboard-delay-slider
+        <appdashboard-delay-slider *ngIf="wait.time < 10000"
             [delayTime]="delayTime"
+            [max]="10" [step]="1"
             (changeDelayTime)="onChangeDelayTime($event)"
             (clickDelayTime)="onClickDelayTime($event)">
         </appdashboard-delay-slider>
+        <appdashboard-delay-text *ngIf="wait.time >= 10000"
+            [delayTime]="delayTime"
+            [max]="120"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-text>
     </div>
         
     <div *ngIf="!isOpenDelaySlider" class="height-wrapper" [ngStyle]="{width: isOpenHeightSlider? '100%' : 'auto'}">

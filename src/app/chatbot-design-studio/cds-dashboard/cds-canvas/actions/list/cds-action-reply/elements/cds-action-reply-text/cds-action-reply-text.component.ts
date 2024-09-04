@@ -4,7 +4,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/models/action-model';
-import { TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../../utils';
+import { TEXT_CHARS_LIMIT, TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../../utils';
 import { IntentService } from '../../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../../services/connector.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -32,7 +32,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   @Input() response: Message;
   @Input() wait: Wait;
   @Input() index: number;
-  @Input() limitCharsText: number;
+  @Input() limitCharsText: number = TEXT_CHARS_LIMIT;
   @Input() previewMode: boolean = true;
 
   // Connector //
