@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.19.3-rc.3
+- **added**: ability to add wait time grather than 15s with text input in cds-action-wait
+- **removed**: wait time grather than 15s in cds-action-reply and cds-action-reply-v2
+
 # 1.19.3-rc.2
 - **added**: delay-time grather than 10s with text input in cds-action-reply and cds-action-reply-v2
 - **changed**: hide widget iframe when support component page is destroyed
@@ -17,7 +21,7 @@
 
 # 1.19.1-rc.1
 - **added**: limitCharsText to cds-action-reply-text v2
--- **removed**: restartConversation from widget URL parameter
+- **removed**: restartConversation from widget URL parameter
 
 # 1.19.0-rc.2
 - **added**: action doc contents 
