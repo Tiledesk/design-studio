@@ -249,3 +249,17 @@ input[type=number] {
     }
     
 }
+
+
+.mat-option{
+    color: var(--gray) !important;
+    height: unset !important;
+    line-height: 25px !important;
+    padding: 10px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+
+    &.mat-active{
+        background-color: #ebf5ff !important;;
+    }
+}

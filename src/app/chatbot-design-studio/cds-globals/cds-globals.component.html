@@ -46,6 +46,7 @@
                         class="text-editable-div disabled" 
                         [text]="global.key"
                         [disabled]="true"
+                        [showUtils]="false"
                         [placeholder]="'CDSGlobals.GLOBAL_KEY' | translate">
                     </cds-text>
                 </div>
@@ -55,6 +56,7 @@
                         class="text-editable-div disabled" 
                         [text]="global.value"
                         [disabled]="true"
+                        [showUtils]="false"
                         [placeholder]="'CDSGlobals.value' | translate">
                     </cds-text>
                     <span class="material-icons-outlined copy-icon" (click)="copyToClipboard(global.value)">content_copy</span>

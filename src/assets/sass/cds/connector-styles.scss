@@ -1,0 +1,95 @@
+/** CONNECTOR TRUE/FALSE: start **/
+cds-connector.connector-true {
+    .point-connector-empty{
+        border-color:  var(--success-connector);
+        background:  var(--success-connector);
+        &:hover{
+            border-color:  var(--success-connector);
+            background:  var(--success-connector);
+        }
+    }
+    .point-connector{
+        background:  var(--success-connector);
+    }
+}
+
+cds-connector.connector-false {
+    .point-connector-empty{
+        border-color: var(--failure-connector);
+        background: var(--failure-connector);
+        &:hover{
+            border-color: var(--failure-connector);
+            background: var(--failure-connector);
+        }
+    }
+    .point-connector{
+      background: var(--failure-connector);
+    }
+}
+
+cds-connector.connector {
+    position: absolute;
+    right: -28px;
+    top: calc(50% - 10px);
+}
+cds-connector.connector-isStart {
+    position: absolute;
+    right: -20px;
+    top: calc(50% - 13px);
+}
+cds-connector.connector-isLast {
+    position: absolute;
+    right: -32px;
+    top: calc(50% - 18px);
+
+    .point-connector-empty {
+        // outline: 2px solid;
+        // border: 0px;
+        // background: #ffffff;
+        // color: rgb(168, 168, 174);
+        // width: 10px;
+        // height: 10px;
+        border: 2px solid;
+        background: #ffffff;
+        color: rgb(168, 168, 174);
+        width: 14px;
+        height: 14px;
+    }
+    .point-connector {
+        // background: #e4e4e7;
+        border: 0px solid;
+        // border-color: rgba(0,0,0,.12);
+        // background: #b1b1b7;
+        width: 10px;
+        height: 10px;
+    }
+
+    &:hover{
+        cursor: default;
+        // .point-connector-empty {
+        //     background: rgb(168, 168, 174);
+        //     border: 0px;
+        //     cursor: copy;
+        // }
+        .point-connector-empty::before {
+            border: 0px;
+        }
+        .point-connector::before {
+            border: 0px;
+        }
+    }
+}
+
+
+cds-connector.button-connector {
+    position: absolute;
+    right: -19px;
+    top: calc(50% - 10px);
+}
+
+cds-connector.connector-true,
+cds-connector.connector-false {
+    position: absolute;
+    right: -28px;
+    top: calc(50% - 10px);
+}
