@@ -40,14 +40,6 @@ export class CdsGlobalsComponent implements OnInit {
   ngOnInit(): void {
     this.selectedChatbot = this.dashboardService.selectedChatbot
     this.initialize()
-    for(let i=0; i<20; i++){
-      this.list.push({
-        "key": "test"+i,
-        "value": "value"+1,
-        "visible": false
-      })
-    }
-    console.log('listttttt', this.list)
   }
 
   ngOnChanges(): void {
