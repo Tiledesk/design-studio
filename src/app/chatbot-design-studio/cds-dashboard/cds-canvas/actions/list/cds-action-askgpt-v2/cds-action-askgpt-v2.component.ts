@@ -58,6 +58,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   ai_error: string = "";
 
   temp_variables = [];
+  autocompleteOptions: Array<string> = [];
 
   model_list: Array<{ name: string, value: string, multiplier: string}>;
   //namespace_list = []; // missing api for namespaces
@@ -205,8 +206,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPT] getListNamespaces", namaspaceList)
-        this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
-        this.initializeNamespaceSelector();
+      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
+      namaspaceList.forEach(el => this.autocompleteOptions.push(el.name))
+      this.initializeNamespaceSelector();
     })
   }
 
@@ -217,7 +219,10 @@ export class CdsActionAskgptV2Component implements OnInit {
       }
     } else {
       if (this.action.namespace) {
-        this.selectedNamespace = this.listOfNamespaces.find(n => n.name === this.action.namespace).value;
+        let selected = this.listOfNamespaces.find(n => n.name === this.action.namespace)
+        if(selected){
+          this.selectedNamespace = selected.value
+        }
       }
     }
   }
@@ -315,8 +320,8 @@ export class CdsActionAskgptV2Component implements OnInit {
             if (this.action.namespace) {
               this.action.namespace = await this.idToName(this.action.namespace);
             }
-            
           } else {
+            console.log('tagettttttt', this.action.namespace)
             this.action.namespace = await this.nameToId(this.action.namespace);
           }
         }
@@ -477,8 +482,11 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   async nameToId(name: string): Promise<any> {
     return new Promise((resolve) => {
-      let id = this.listOfNamespaces.find(n => n.name === name).value;
-      resolve(id)
+      let selected = this.listOfNamespaces.find(n => n.name === name);
+      if(selected){
+        resolve(selected.value)
+      }
+      resolve({})
     })
   }
 

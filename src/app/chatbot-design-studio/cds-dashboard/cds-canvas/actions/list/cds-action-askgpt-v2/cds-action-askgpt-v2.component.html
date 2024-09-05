@@ -150,7 +150,7 @@
 
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.ChooseKB' | translate}}</label>
-        <cds-select *ngIf="!changing" id="text-condition" 
+        <cds-select *ngIf="!action?.namespaceAsName" id="text-condition" 
             [items]="listOfNamespaces" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
@@ -160,6 +160,15 @@
             (onSelected)="onChangeBlockSelect($event, 'namespace')"
             (onReset)="onResetBlockSelect($event, 'namespace')">
         </cds-select>
+        <!-- KEY -->
+        <cds-text *ngIf="action?.namespaceAsName" id="text"
+            class="sx-input" 
+            [text]="action.namespace"
+            [placeholder]="'CDSCanvas.SelectNamespace' | translate"
+            [autocompleteOptions]="autocompleteOptions"
+            (blur)="onBlur($event)"
+            (onChange)="onChangeTextarea($event, 'namespace')">
+        </cds-text>
 
         <section class="disable-input-message-section">
             <mat-checkbox 
