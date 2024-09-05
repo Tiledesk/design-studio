@@ -15,10 +15,10 @@
 
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.DelayTime' | translate}}: <b>{{delayTime}}s</b></label>
-        <div class="action-wait-content">
+        <div class="action-wait-content" >
 
             <!-- tickInterval="1000" -->
-            <div class="action-wait-slider">
+            <div class="action-wait-slider" *ngIf="delayTime < 15">
                 <div class="action-wait-range">0.5s</div>
                 <mat-slider class="wait-slider" thumbLabel 
                     [displayWith]="formatLabel"
@@ -29,6 +29,25 @@
                 </mat-slider>
 
                 <div class="action-wait-range">15s</div>
+            </div>
+
+            <div class="action-wait-slider" *ngIf="delayTime >= 15">
+                <em class="delay-button material-icons">timelapse</em>
+                <mat-form-field class="box-input" appearance="fill">
+                    <!-- [disabled]="disabled" -->
+                    <input matInput
+                        #input_text id="input_text"
+                        type="number"
+                        cdkTextareaAutosize
+                        cdkAutosizeMinRows="1"
+                        cdkAutosizeMaxRows="1"
+                        [(ngModel)]="delayTime"
+                        min="0.5" max="120"
+                        (focus)="onFocusInput()"
+                        (ngModelChange)="onChangeText($event)"/>
+                    <span matSuffix>s</span>
+                </mat-form-field>
+                <!-- <div class="delay-range">s</div>  -->
             </div>
         </div>
     </div>
