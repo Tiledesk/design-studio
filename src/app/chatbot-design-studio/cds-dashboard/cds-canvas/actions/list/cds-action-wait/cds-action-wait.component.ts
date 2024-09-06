@@ -43,12 +43,13 @@ export class CdsActionWaitComponent implements OnInit, OnChanges {
     }, 500);
   }
 
+  onFocusOut(){
+    this.updateAndSaveAction.emit()
+  }
 
   onChangeText(event){
     const msvalue = event * 1000
-
-    this.action.millis = msvalue
-    this.updateAndSaveAction.emit()
+    this.action.millis = msvalue    
   }
 
 
