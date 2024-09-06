@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.19.3
+
 # 1.19.3-rc.5
 - **added**: namespace variable added to attribute dialog if user request a preview in cds-action-askkb-v2
 
