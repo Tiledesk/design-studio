@@ -819,6 +819,10 @@ export class TiledeskConnectors {
     connector.setAttributeNS(null, "d", d);
     connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
     this.updateLineTextPosition(id, frontPoint, backPoint);
+
+
+    const event = new CustomEvent("connector-drawen", { detail: { connector: connector } });
+    document.dispatchEvent(event);
   }
 
   updateLineTextPosition(id, frontPoint, backPoint){

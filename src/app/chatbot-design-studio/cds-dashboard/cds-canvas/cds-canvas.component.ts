@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
 import { Observable, Subscription, skip, timeout } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -16,6 +16,7 @@ import { Button, Action} from 'src/app/models/action-model';
 
 // UTILS //
 import { TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
+import { LOGOS_ITEMS } from './../../utils-resources';
 
 
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -28,7 +29,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
   templateUrl: './cds-canvas.component.html',
   styleUrls: ['./cds-canvas.component.scss']
 })
-export class CdsCanvasComponent implements OnInit {
+export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   @ViewChild('receiver_elements_dropped_on_stage', { static: false }) receiverElementsDroppedOnStage: ElementRef;
   @ViewChild('drawer_of_items_to_zoom_and_drag', { static: false }) drawerOfItemsToZoomAndDrag: ElementRef;
@@ -46,6 +47,16 @@ export class CdsCanvasComponent implements OnInit {
   intent_id: string;
   hasClickedAddAction: boolean = false;
   hideActionPlaceholderOfActionPanel: boolean;
+
+  // DDP
+  private renderedIntentsCount = 0;
+  private renderedConnectorsCount = 0;
+  listOfConnectors: Array<any> = [];
+  renderedAllIntents = false;
+  renderedAllConnectors = false;
+  LOGOS_ITEMS = LOGOS_ITEMS;
+  loadingMessage = '';
+  loadingProgress = 0;
 
   /** panel list of intent */ 
   IS_OPEN_INTENTS_LIST: boolean = true;
@@ -127,17 +138,74 @@ export class CdsCanvasComponent implements OnInit {
 
   /** */
   ngAfterViewInit() {
-    this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
+    this.logger.log("[CDS-CANVAS2]  •••• ngAfterViewInit ••••");
+    this.addEventListener();
     this.stageService.initializeStage();
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
-    this.addEventListener();
     this.changeDetectorRef.detectChanges();
-
-    // setTimeout(() => {
-    //   this.listOfIntents = this.intentService.cleanListOfIntents(this.intentService.listOfIntents);
-    // }, 0);
   }
+
+
+  onIntentRendered(intentID) {
+    this.logger.log("[CDS-CANVAS2] •••• onIntentRendered ••••", intentID, this.listOfIntents.length);
+    this.renderedIntentsCount++;
+    this.loadingProgress += (this.renderedIntentsCount/this.listOfIntents.length*1.1)*100;
+    if (this.renderedIntentsCount === this.listOfIntents.length) {
+      this.onAllIntentsRendered();
+    }
+  }
+
+  onAllIntentsRendered() {
+    
+    // this.connectorService.createListOfConnectors(this.listOfIntents);
+    // this.connectorService.createConnectors(this.listOfIntents);
+    // this.loadingMessage =  "•••• Tutti i cds-intent sono stati renderizzati ••••";
+    // this.stageService.loaded = true;
+    // Ottieni un array delle chiavi
+    // this.listOfConnectors = Object.keys(this.connectorService.tiledeskConnectors.connectors);
+    // this.listOfConnectors = Object.entries(this.connectorService.tiledeskConnectors.connectors);
+    this.logger.log("[CDS-CANVAS2]  •••• Tutti i cds-intent sono stati completamente renderizzati ••••", this.connectorService.tiledeskConnectors.connectors);
+    setTimeout(() => {
+      this.loadingProgress = 100;
+      this.renderedAllIntents = true;
+      this.stageService.loaded = true;
+    }, 1000);
+  }
+
+  checkAllConnectors(connector){
+    this.listOfConnectors = Object.keys(this.connectorService.tiledeskConnectors.connectors);
+    let totConnectors = this.listOfConnectors.length;
+    this.renderedConnectorsCount++;
+    this.logger.log("[CDS-CANVAS2]  •••• E' stato creato un nuovo connettore verifico ••••", connector, this.renderedConnectorsCount, totConnectors);
+    if (this.renderedConnectorsCount === totConnectors) {
+      this.logger.log("[CDS-CANVAS2]  •••• Tutti i connettori sono stati renderizzati ••••");
+    }
+    // this.loadingMessage =  "•••• Tutti i connettori sono stati renderizzati ••••";
+    // controllo se tutti i connettori sono sullo stage ;
+
+    // if(this.renderedAllIntents === true){
+    //   // Funzione per controllare se ci sono oggetti con drawn: false -> restituisce true
+    //   function hasUndrawnObjects(map: Record<string, any>): boolean {
+    //     return Object.values(map).some(obj => obj.drawn === false);
+    //   }
+
+    //   // Esegui la verifica
+    //   let objectMap = this.connectorService.tiledeskConnectors.connectors;
+    //   const hasUndrawn = hasUndrawnObjects(objectMap);
+
+    //   if(hasUndrawn === false){
+    //     this.isDisabled = true;
+    //     this.stageService.loaded = true;
+    //   }
+    //   this.stageService.loaded = false;
+    // }
+    
+
+    // this.logger.log("[CDS-CANVAS2]  •••• E' stato creato un nuovo connettore verifico - sono tutti renderizzati? "+this.isDisabled+connector+" ••••");
+  }
+
+
 
   // private async setStartIntent(){
  
@@ -299,6 +367,16 @@ export class CdsCanvasComponent implements OnInit {
   addEventListener() {
     let that = this;
     /** LISTENER OF TILEDESK STAGE */
+
+
+    document.addEventListener(
+      "connector-drawen", (e: CustomEvent) => {
+        const connector = e.detail.connector;
+        this.checkAllConnectors(connector);
+      },
+      false
+    );
+    
 
     /** moved-and-scaled ** 
      * scatta quando sposto lo stage (lo muovo o lo scalo):
