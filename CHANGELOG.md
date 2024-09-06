@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.19.4
+
 # 1.19.4-rc.1
 - **bug-fixed**: variable is not saved correctyle in cds-action-askkb-v2 
 
