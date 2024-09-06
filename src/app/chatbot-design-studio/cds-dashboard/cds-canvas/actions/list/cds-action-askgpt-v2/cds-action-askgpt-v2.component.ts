@@ -250,6 +250,11 @@ export class CdsActionAskgptV2Component implements OnInit {
   onBlur(event){
     this.updateAndSaveAction.emit();
   }
+
+  onSelectedAttribute(variableSelected: { name: string, value: string }, key) {
+    this.action[key] = variableSelected.value;
+    this.updateAndSaveAction.emit()
+}
   
   onChangeSelect(event, target) {
     if (event.clickEvent === 'footer') {

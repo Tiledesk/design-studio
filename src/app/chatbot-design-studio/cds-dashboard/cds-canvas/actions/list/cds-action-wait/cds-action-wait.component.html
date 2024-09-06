@@ -44,6 +44,7 @@
                         [(ngModel)]="delayTime"
                         min="0.5" max="120"
                         (focus)="onFocusInput()"
+                        (focusout)="onFocusOut()"
                         (ngModelChange)="onChangeText($event)"/>
                     <span matSuffix>s</span>
                 </mat-form-field>
