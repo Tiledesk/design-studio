@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.19.3-rc.5
+- **added**: namespace variable added to attribute dialog if user request a preview in cds-action-askkb-v2
+
 # 1.19.3-rc.4
 - **added**: setAttributeBtn in cds-text base element component
 - **added**: autocomplete options in white selecting namespace in cds-action-askkb-v2
