@@ -27,9 +27,13 @@
 - **added**: checkbox use namespace as name in cds-action-ask-kbv2
 - **changed**: dispose widget iframe when support component page is destroyed
 
+# 1.19.1
+
 # 1.19.1-rc.1
 - **added**: limitCharsText to cds-action-reply-text v2
 - **removed**: restartConversation from widget URL parameter
+
+# 1.19.0
 
 # 1.19.0-rc.2
 - **added**: action doc contents 
@@ -41,6 +45,8 @@
 - **added**: usage info into cds-action-gpt-task-v2 and cds-action-askkb-v2 actions
 - **added**: variable to system-contenxt field into cds-action-gpt-task-v2 and cds-action-askkb-v2 actions
 - **changed**: char limit to system-contenxt field into cds-action-gpt-task-v2 and cds-action-askkb-v2 actions
+
+# 1.18.2
 
 # 1.18.2-rc.2
 - **changed**: disabled restartConversation in cds-panel-widget
