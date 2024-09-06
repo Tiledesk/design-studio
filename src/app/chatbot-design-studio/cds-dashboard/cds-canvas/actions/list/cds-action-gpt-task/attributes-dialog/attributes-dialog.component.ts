@@ -42,8 +42,10 @@ export class AttributesDialogComponent implements OnInit {
 
   onGenerateClick() {
     this.data.attributes.forEach((attr) => {
+      console.log('attttttttt', attr)
       let old_value = "{{" + attr.name + "}}";
       this.data.question = this.data.question.replace(old_value, attr.value);
+      this.data.namespace =  this.data.namespace.replace(old_value, attr.value);
     })
 
     this.logger.log("[AttributesDialog] - onGenerateClick return data: ", this.data);

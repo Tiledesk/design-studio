@@ -1,3 +1,4 @@
+import { Namespace } from './../../../../../../models/namespace-model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,7 +18,6 @@ import { OpenaiService } from 'src/app/services/openai.service';
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
 import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
-import { Namespace } from 'src/app/models/namespace-model';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 
@@ -321,7 +321,6 @@ export class CdsActionAskgptV2Component implements OnInit {
               this.action.namespace = await this.idToName(this.action.namespace);
             }
           } else {
-            console.log('tagettttttt', this.action.namespace)
             this.action.namespace = await this.nameToId(this.action.namespace);
           }
         }
@@ -344,16 +343,16 @@ export class CdsActionAskgptV2Component implements OnInit {
     window.open(url, '_blank')
   }
 
-  execPreview() {
+  async execPreview() {
     //this.scrollToBottom();
-    this.checkVariables().then((resp) => {
-      if (resp === true) {
-        this.getResponse(this.action.question);
-
-      } else {
-        this.openAttributesDialog();
-      }
-    })
+    this.temp_variables = [];
+    let resp = await this.checkVariables();
+    let respNamespace = await this.checkNamespaceVariables()
+    if (resp && respNamespace){
+      this.getResponse(this.action.question, this.action.namespace);
+    }else{
+      this.openAttributesDialog();
+    }
   }
 
   checkVariables() {
@@ -367,7 +366,6 @@ export class CdsActionAskgptV2Component implements OnInit {
 
       } else {
 
-        this.temp_variables = [];
         matches.forEach((m) => {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
@@ -393,7 +391,43 @@ export class CdsActionAskgptV2Component implements OnInit {
     })
   }
 
-  getResponse(question) {
+  checkNamespaceVariables() {
+    return new Promise((resolve) => {
+      let regex: RegExp = /{{[^{}]*}}/g;
+      let string = this.action.namespace;
+      let matches = string.match(regex);
+
+      if (!matches || matches.length == 0) {
+        resolve(true);
+
+      } else {
+
+        matches.forEach((m) => {
+          let name = m.slice(2, m.length - 2);
+          let attr = this.action.preview.find(v => v.name === name);
+
+          const index = this.temp_variables.findIndex((e) => e.name === name);
+          if(index> -1 ){ //key already exist: do not add it again
+            return;
+          }
+
+          if (attr && attr.value) {
+            this.temp_variables.push({ name: name, value: attr.value });
+
+          } else if (attr && !attr.value) {
+            this.temp_variables.push({ name: name, value: null });
+
+          } else {
+            this.temp_variables.push({ name: name, value: null });
+            this.action.preview.push({ name: name, value: null });
+          }
+        })
+        resolve(false);
+      }
+    })
+  }
+
+  async getResponse(question, namespace) {
     this.logger.log("getResponse called...")
 
     let data = {
@@ -403,7 +437,11 @@ export class CdsActionAskgptV2Component implements OnInit {
       max_tokens: this.action.max_tokens,
       temperature: this.action.temperature,
       top_k: this.action.top_k,
-      namespace: this.action.namespace
+      namespace: namespace
+    }
+
+    if(this.action.namespaceAsName){
+      data.namespace = await this.nameToId(namespace)
     }
 
     this.showAiError = false;
@@ -449,12 +487,12 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("temp_variables: ", this.temp_variables);
     const dialogRef = this.dialog.open(AttributesDialogComponent, {
       panelClass: 'custom-setattribute-dialog-container',
-      data: { attributes: this.temp_variables, question: this.action.question }
+      data: { attributes: this.temp_variables, question: this.action.question, namespace: this.action.namespace }
     });
     dialogRef.afterClosed().subscribe(result => {
       this.logger.log("AttributesDialogComponent result: ", result);
       if (result !== false) {
-        this.getResponse(result.question);
+        this.getResponse(result.question, result.namespace);
         this.saveAttributes(result.attributes);
       }
     });
@@ -486,7 +524,7 @@ export class CdsActionAskgptV2Component implements OnInit {
       if(selected){
         resolve(selected.value)
       }
-      resolve({})
+      resolve('')
     })
   }
 
