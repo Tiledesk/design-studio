@@ -18,6 +18,7 @@ export class ConnectorService {
   tiledeskConnectors: any;
   connectorDraft: any = {};
   listOfIntents: any;
+  mapOfConnectors: any = {};
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -80,13 +81,22 @@ export class ConnectorService {
    * 
    */
   public createConnectors(intents){
-    // this.logger.log('[CONNECTOR-SERV] -----> createConnectors::: ', intents);
     this.listOfIntents = intents;
     intents.forEach(intent => {
       this.createConnectorsOfIntent(intent);
     });
   }
 
+
+  public async createMapOfConnectors(intents){
+    // this.logger.log('[CONNECTOR-SERV] -----> createConnectors::: ', intents);
+    this.listOfIntents = intents;
+    intents.forEach(async intent => {
+      this.createListOfConnectorsByIntent(intent);     
+    });
+    // private createConnector(intent, idConnectorFrom, idConnectorTo){
+    return this.mapOfConnectors;
+  }
 
 
   /**
@@ -187,7 +197,6 @@ export class ConnectorService {
    * create connectors from Intent
    */
   public createConnectorsOfIntent(intent:any){
-
     if(intent.attributes && intent.attributes.nextBlockAction){
       let idConnectorFrom = null;
       let idConnectorTo = null;
@@ -1180,4 +1189,677 @@ export class ConnectorService {
     return this.tiledeskConnectors.logicPoint(positions);
   }
   
+
+
+
+
+
+
+
+
+  public createListOfConnectorsByIntent(intent:any){
+    if(intent.attributes && intent.attributes.nextBlockAction){
+      let idConnectorFrom = null;
+      let idConnectorTo = null;
+      let nextBlockAction = intent.attributes.nextBlockAction;
+      if(nextBlockAction.intentName && nextBlockAction.intentName !== ''){
+        idConnectorFrom = intent.intent_id+'/'+nextBlockAction._tdActionId;
+        idConnectorTo = nextBlockAction.intentName.replace("#", "");
+        if(!this.intentExists(idConnectorTo)){
+          nextBlockAction.intentName = '';
+          idConnectorTo = null;
+        }
+        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+        const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+      }
+    }
+
+    if(intent.actions){
+      intent.actions.forEach(action => {
+        let idConnectorFrom = null;
+        let idConnectorTo = null;
+        this.logger.log('[CONNECTOR-SERV] createConnectors:: ACTION ', action);
+        
+        /**  INTENT */
+        if(action._tdActionType === TYPE_ACTION.INTENT){
+          // this.logger.log('[CONNECTOR-SERV] intent_display_name', intent.intent_display_name);
+          if(action.intentName && action.intentName !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId;
+            idConnectorTo = action.intentName.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.intentName = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  REPLY  RANDOM_REPLY */
+        if( (action._tdActionType === TYPE_ACTION.REPLY || action._tdActionType === TYPE_ACTION.RANDOM_REPLY) ||
+            (action._tdActionType === TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType === TYPE_ACTION_VXML.DTMF_MENU || action._tdActionType === TYPE_ACTION_VXML.BLIND_TRANSFER)){
+          var buttons = this.findButtons(action);
+          this.logger.log('buttons   ----- >', buttons, action);
+          buttons.forEach(button => {
+            // this.logger.log('[CONNECTOR-SERV] button   ----- > ', button, button.__idConnector);
+            if(button.type === TYPE_BUTTON.ACTION && button.action){
+              // const idConnectorFrom = button.__idConnector;
+              if(!button.uid || button.uid === "UUIDV4"){
+                button.uid = generateShortUID();
+              }
+              idConnectorFrom = intent.intent_id+"/"+action._tdActionId+"/"+button.uid;
+              this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
+              var startIndex = button.action.indexOf('#') + 1;
+              var endIndex = button.action.indexOf('{');
+              idConnectorTo = button.action.substring(startIndex);
+              if(endIndex>-1){
+                idConnectorTo = button.action.substring(startIndex, endIndex);
+              }
+              if(!this.intentExists(idConnectorTo)){
+                button.action = '';
+                idConnectorTo = null;
+              }
+              this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
+              this.logger.log('[CONNECTOR-SERV] -> idConnectorTo', idConnectorTo);
+              // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+              const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+            }
+          });
+
+          /** noInput and noMatch block connectors */
+          if( action.settings  &&  action.settings .noInputIntent &&  action.settings .noInputIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noInput';
+            idConnectorTo =  action.settings.noInputIntent.replace("#", "");
+            
+            if(!this.intentExists(idConnectorTo)){
+              action.settings.noInputIntent = '';
+              idConnectorTo = null;
+            }
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.settings && action.settings.noMatchIntent && action.settings.noMatchIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noMatch';
+            idConnectorTo = action.settings.noMatchIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.settings.noMatchIntent = '';
+              idConnectorTo = null;
+            }
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  REPLY V2 */
+        if(action._tdActionType === TYPE_ACTION.REPLYV2){
+
+          var buttons = this.findButtons(action);
+          this.logger.log('buttons   ----- >', buttons, action);
+          buttons.forEach(button => {
+            // this.logger.log('[CONNECTOR-SERV] button   ----- > ', button, button.__idConnector);
+            if(button.type === TYPE_BUTTON.ACTION && button.action){
+              // const idConnectorFrom = button.__idConnector;
+              if(!button.uid || button.uid === "UUIDV4"){
+                button.uid = generateShortUID();
+              }
+              idConnectorFrom = intent.intent_id+"/"+action._tdActionId+"/"+button.uid;
+              this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
+              var startIndex = button.action.indexOf('#') + 1;
+              var endIndex = button.action.indexOf('{');
+              idConnectorTo = button.action.substring(startIndex);
+              if(endIndex>-1){
+                idConnectorTo = button.action.substring(startIndex, endIndex);
+              }
+              if(!this.intentExists(idConnectorTo)){
+                button.action = '';
+                idConnectorTo = null;
+              }
+              this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
+              this.logger.log('[CONNECTOR-SERV] -> idConnectorTo', idConnectorTo);
+              // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+              const connectorID = idConnectorFrom+'/'+idConnectorTo;
+              this.mapOfConnectors[connectorID] =  {'shown': false };
+
+              this.mapOfConnectors[connectorID] =  {'shown': false };
+            }
+          });
+          
+          if(action.noInputIntent && action.noInputIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noInput';
+            idConnectorTo = action.noInputIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.noInputIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - REPLY-V2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - REPLY-V2 ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.noMatchIntent && action.noMatchIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noMatch';
+            idConnectorTo = action.noMatchIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.noMatchIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - REPLY-V2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - REPLY-V2 ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  ONLINE_AGENTS */
+        if(action._tdActionType === TYPE_ACTION.ONLINE_AGENTS || action._tdActionType === TYPE_ACTION.ONLINE_AGENTSV2){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo = action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - ONLINE_AGENTS ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - ONLINE_AGENTS ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - ONLINE_AGENTS ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - ONLINE_AGENTS ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  OPEN_HOURS */
+        if(action._tdActionType === TYPE_ACTION.OPEN_HOURS){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo = action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - OPEN_HOURS ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - OPEN_HOURS ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - OPEN_HOURS ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - OPEN_HOURS ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  JSON-CONDITION */
+        if(action._tdActionType === TYPE_ACTION.JSON_CONDITION){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /** ASKGPT */
+        if(action._tdActionType === TYPE_ACTION.ASKGPT){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - ASKGPT ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /** ASKGPTV2 */
+        if(action._tdActionType === TYPE_ACTION.ASKGPTV2){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - ASKGPTV2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - ASKGPTV2 ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - ASKGPTV2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - ASKGPTV2 ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  GPT-TASK */
+        if(action._tdActionType === TYPE_ACTION.GPT_TASK){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - GPT-TASK ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - GPT-TASK ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - GPT-TASK ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - GPT-TASK ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  GPT-ASSISTANT */
+        if(action._tdActionType === TYPE_ACTION.GPT_ASSISTANT){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - GPT-ASSISTANT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - GPT-ASSISTANT ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - GPT-ASSISTANT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - GPT-ASSISTANT ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /** WEB-REQUEST-V2 */
+        if(action._tdActionType === TYPE_ACTION.WEB_REQUESTV2){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /** MAKE */
+        if(action._tdActionType === TYPE_ACTION.MAKE){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-MAKE ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  WEB-HUBSPOT */
+        if(action._tdActionType === TYPE_ACTION.HUBSPOT){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - WEB-HUBSPOT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-HUBSPOT ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - WEB-HUBSPOT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-HUBSPOT ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  WEB-CUSTOMERIO */
+        if(action._tdActionType === TYPE_ACTION.CUSTOMERIO){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - WEB-CUSTOMERIO ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-CUSTOMERIO ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - WEB-CUSTOMERIO ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - WEB-CUSTOMERIO ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+          /**  WEB-BREVO */
+          if(action._tdActionType === TYPE_ACTION.BREVO){
+            if(action.trueIntent && action.trueIntent !== ''){
+              idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+              idConnectorTo =  action.trueIntent.replace("#", "");
+              if(!this.intentExists(idConnectorTo)){
+                action.trueIntent = '';
+                idConnectorTo = null;
+              }
+              this.logger.log('[CONNECTOR-SERV] - WEB-BREVO ACTION -> idConnectorFrom', idConnectorFrom);
+              this.logger.log('[CONNECTOR-SERV] - WEB-BREVO ACTION -> idConnectorTo', idConnectorTo);
+              // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+              const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+            }
+            if(action.falseIntent && action.falseIntent !== ''){
+              idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+              idConnectorTo = action.falseIntent.replace("#", "");
+              if(!this.intentExists(idConnectorTo)){
+                action.falseIntent = '';
+                idConnectorTo = null;
+              }
+              this.logger.log('[CONNECTOR-SERV] - WEB-BREVO ACTION -> idConnectorFrom', idConnectorFrom);
+              this.logger.log('[CONNECTOR-SERV] - WEB-BREVO ACTION -> idConnectorTo', idConnectorTo);
+              // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+              const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+            }
+          }
+
+           /**  WEB-N8N */
+           if(action._tdActionType === TYPE_ACTION.N8N){
+            if(action.trueIntent && action.trueIntent !== ''){
+              idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+              idConnectorTo =  action.trueIntent.replace("#", "");
+              if(!this.intentExists(idConnectorTo)){
+                action.trueIntent = '';
+                idConnectorTo = null;
+              }
+              this.logger.log('[CONNECTOR-SERV] - WEB-N8N ACTION -> idConnectorFrom', idConnectorFrom);
+              this.logger.log('[CONNECTOR-SERV] - WEB-N8N ACTION -> idConnectorTo', idConnectorTo);
+              // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+              const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+            }
+            if(action.falseIntent && action.falseIntent !== ''){
+              idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+              idConnectorTo = action.falseIntent.replace("#", "");
+              if(!this.intentExists(idConnectorTo)){
+                action.falseIntent = '';
+                idConnectorTo = null;
+              }
+              this.logger.log('[CONNECTOR-SERV] - WEB-N8N ACTION -> idConnectorFrom', idConnectorFrom);
+              this.logger.log('[CONNECTOR-SERV] - WEB-N8N ACTION -> idConnectorTo', idConnectorTo);
+              // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+              const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+            }
+          }
+        
+        /** QAPLA' */
+        if(action._tdActionType === TYPE_ACTION.QAPLA){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /**  CAPTURE USER_REPLY */
+        if(action._tdActionType === TYPE_ACTION.CAPTURE_USER_REPLY){
+          this.logger.log('[CONNECTOR-SERV] intent_display_name', intent.intent_display_name);
+          if(action.goToIntent && action.goToIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId;
+            idConnectorTo = action.goToIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.goToIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+            this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /** DTMF_MENU' ||  DTMF_FORM  || SPEECH_FORM */
+        if(action._tdActionType === TYPE_ACTION_VXML.DTMF_MENU  || action._tdActionType === TYPE_ACTION_VXML.DTMF_FORM
+            || action._tdActionType === TYPE_ACTION_VXML.SPEECH_FORM){
+          let settingCommand: Setting = action.attributes.commands.slice(-1)[0].settings
+          if(settingCommand && settingCommand.noInputIntent && settingCommand.noInputIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noInput';
+            idConnectorTo =  settingCommand.noInputIntent.replace("#", "");
+            
+            if(!this.intentExists(idConnectorTo)){
+              settingCommand.noInputIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - DTMF_MENU ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - DTMF_MENU ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+            this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(settingCommand && settingCommand.noMatchIntent && settingCommand.noMatchIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/noMatch';
+            idConnectorTo = settingCommand.noMatchIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              settingCommand.noMatchIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - DTMF_MENU ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - DTMF_MENU ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+            this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+        /** BLIND TRANSFER' */
+        if(action._tdActionType === TYPE_ACTION_VXML.BLIND_TRANSFER){
+          let settingCommand: Setting = action.attributes.commands.slice(-1)[0].settings
+          if(settingCommand && settingCommand.trueIntent && settingCommand.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  settingCommand.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              settingCommand.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+            this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+          if(settingCommand && settingCommand.falseIntent && settingCommand.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = settingCommand.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              settingCommand.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - QAPLA ACTION -> idConnectorTo', idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            const connectorID = idConnectorFrom+'/'+idConnectorTo;
+            this.mapOfConnectors[connectorID] =  {'shown': false };
+          }
+        }
+
+
+      });
+    }
+  }
 }

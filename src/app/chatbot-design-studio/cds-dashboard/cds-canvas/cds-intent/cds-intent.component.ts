@@ -238,7 +238,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         }
       }  else {
         if(fromId && toId && fromId !== '' && toId !== ''){
-          this.connectorService.createConnectorFromId(fromId, toId); //Sync
+          if(this.stageService.loaded == true){
+            this.connectorService.createConnectorFromId(fromId, toId);
+          }
         }
       }
     } catch (error) {
