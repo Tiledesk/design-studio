@@ -453,7 +453,12 @@
         "SelectedTimeSlot":"Selected time slot",
         "SelectTimeSlot":"Select time slot",
         "IgnoreOperatingHours":"Ignore General operating hours",
-        "IgnoreOperatingHoursDescription": "Check this option if you want to only check agents availability ignoring the General Operating hours settings. <br> This option is also useful if you want to demand opening and closing hours checking to the If Operating Hours Action, specifing a specific time slot"
+        "IgnoreOperatingHoursDescription": "Check this option if you want to only check agents availability ignoring the General Operating hours settings. <br> This option is also useful if you want to demand opening and closing hours checking to the If Operating Hours Action, specifing a specific time slot",
+        "intentsProgress": "Loading intents in progress",
+        "intentsComplete": "Intents loading completed",
+        "connectorsProgress": "Loading connectors in progress",
+        "connectorsComplete": "Connectors loading completed",
+        "loadingCompleteWithErrors":"Loading completed with errors"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
