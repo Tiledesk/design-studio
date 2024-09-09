@@ -524,7 +524,7 @@ export class CdsActionAskgptV2Component implements OnInit {
       if(selected){
         resolve(selected.value)
       }
-      resolve('')
+      resolve(this.project_id)
     })
   }
 
