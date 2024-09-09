@@ -20,6 +20,7 @@ import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studi
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -31,13 +32,13 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Input() intentSelected: Intent;
   @Input() action: ActionAskGPTV2;
   @Input() previewMode: boolean = true;
-  @Input() project_id: string;
   @Output() updateAndSaveAction = new EventEmitter;
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
   listOfNamespaces: Array<{name: string, value: string, icon?:string}>;
 
+  project_id: string;
   selectedNamespace: string;
   //selectedNamespace: any;
 
@@ -70,6 +71,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   constructor(
     private intentService: IntentService,
     private appConfigService: AppConfigService,
+    private dashboardService: DashboardService,
     private openaiService: OpenaiService,
     private translate: TranslateService,
     private dialog: MatDialog
@@ -77,6 +79,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug("[ACTION-ASKGPTV2] action detail: ", this.action);
+    this.project_id = this.dashboardService.projectID
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
     this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive').map((el)=> {
       if(ai_models[el.value])
