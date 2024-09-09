@@ -84,9 +84,6 @@ export class CdsActionAskgptV2Component implements OnInit {
       else
         return { ...el, multiplier: null }
     })
-    if (!this.action.namespace) {
-      this.action.namespace = this.project_id;
-    }
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
       this.connector = connector;
@@ -212,17 +209,15 @@ export class CdsActionAskgptV2Component implements OnInit {
     })
   }
 
-  initializeNamespaceSelector() {
+  async initializeNamespaceSelector() {
     if (!this.action.namespaceAsName) {
-      if (this.action.namespace) {
-        this.selectedNamespace = this.action.namespace;
+      if (!this.action.namespace) {
+        this.action.namespace = this.project_id;
+        return;
       }
     } else {
-      if (this.action.namespace) {
-        let selected = this.listOfNamespaces.find(n => n.name === this.action.namespace)
-        if(selected){
-          this.selectedNamespace = selected.value
-        }
+      if (!this.action.namespace) {
+        this.action.namespace = await this.idToName(this.project_id);
       }
     }
   }

@@ -154,7 +154,7 @@
             [items]="listOfNamespaces" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
-            [itemSelected]="selectedNamespace" 
+            [itemSelected]="action.namespace" 
             [placeholder]="'CDSCanvas.SelectNamespace' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'namespace')"
