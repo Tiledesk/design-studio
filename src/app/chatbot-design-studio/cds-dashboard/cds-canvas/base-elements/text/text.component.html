@@ -29,7 +29,7 @@
             FIELD REQUIRED
         </div> -->
 
-        <div *ngIf="showUtils === true" unselectable="on" tabIndex="-1" class="editor-utils">
+        <div *ngIf="showUtils === true" #utils unselectable="on" tabIndex="-1" class="editor-utils">
     
             <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="addVariable.toggle(); openSetAttributePopover();">
                 <span class="material-icons" style="font-size: 16px;">

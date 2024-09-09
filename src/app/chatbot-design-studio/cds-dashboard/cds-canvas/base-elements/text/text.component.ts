@@ -15,6 +15,7 @@ export class CDSTextComponent implements OnInit {
   @ViewChild('input_text', {read:ElementRef}) myInput: ElementRef<HTMLInputElement>;
   @ViewChild('input_text', { read: MatAutocompleteTrigger }) autoComplete: MatAutocompleteTrigger;
   @ViewChild("addVariable") addVariable: SatPopover;
+  @ViewChild("utils", {read:ElementRef}) utilsComponent: ElementRef<HTMLElement>;
   
   // @Input() textMessage: string;
   @Input() control: FormControl<string> = new FormControl()
@@ -78,10 +79,10 @@ export class CDSTextComponent implements OnInit {
   onOpenClose(event: 'open' | 'close'){
     if(event === 'open'){
       this.myInput.nativeElement.classList.add('autocompleteOpen')
-      this.setAttributeBtn = false
-    }else{
+      this.utilsComponent.nativeElement.classList.add('slide-top')
+    }else {
       this.myInput.nativeElement.classList.remove('autocompleteOpen')
-      this.setAttributeBtn = true
+      this.utilsComponent.nativeElement.classList.remove('slide-top')
     }
   }
 
@@ -114,7 +115,8 @@ export class CDSTextComponent implements OnInit {
 
   openSetAttributePopover() {
     // this.emojiPicker.toggle()
-    this.myInput.nativeElement.focus()
+    this.myInput.nativeElement.focus();
+    this.onOpenClose('close')
   }
 
   private insertAtCursorPos(elem: HTMLInputElement, attribute) {
