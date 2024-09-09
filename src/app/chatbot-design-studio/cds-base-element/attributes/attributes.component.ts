@@ -83,7 +83,7 @@ export class AttributesComponent implements OnInit {
     this.newAttributes[index][type] = text;
     let attribute = { key : text, value: this.newAttributes[index].value}
     let that = this;
-    if(attribute.key.length>0 || attribute.value.length>0){
+    if(attribute.key && attribute.key.length>0 || attribute.value.length>0){
       if (index == this.newAttributes.length-1){
         this.newAttributes.push({key:"", value:""});
       }

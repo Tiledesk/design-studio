@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.20.0-rc.1 
+- **added**: slidet-top animation if autocomplete options is 
+- **bug-fixed**: data.namespace is undefined ig attribute-dialog is opened from gpt actions
+- **bug-fixed**: if autocomplete is open, cannot able to select variable from utils icon into cds-text component
+- **bug-fixed**: if unknown namespace is selected and namaspaceAsName is deactiveted, reset to defautl namespace
+- **bug-fixed**: if namespaceAsName is enabled and no namespace is selected, set the default one
+
 # 1.19.4
 
 # 1.19.4-rc.1
