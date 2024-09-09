@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.20.0
+
 # 1.20.0-rc.1 
 - **added**: slidet-top animation if autocomplete options is 
 - **bug-fixed**: data.namespace is undefined ig attribute-dialog is opened from gpt actions
