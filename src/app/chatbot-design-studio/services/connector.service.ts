@@ -34,6 +34,12 @@ export class ConnectorService {
   /** CREATE CONNECTOR                             */
   /*************************************************/
 
+
+  public async setMapOfConnectors(listOfIntents){
+    this.mapOfConnectors = await this.createMapOfConnectors(listOfIntents);
+    return this.mapOfConnectors;
+  }
+
   /**
    * createConnectorDraft
    * @param detail 

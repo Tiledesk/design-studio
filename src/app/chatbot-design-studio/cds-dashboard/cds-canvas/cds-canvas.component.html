@@ -133,7 +133,7 @@
 <div id="masck-canv" [class.disabled]="renderedAllElements">
     <img class="logo" [src]="LOGOS_ITEMS['BASE_LOGO_NO_TEXT'].icon">
     <div class="loading"> 
-        <!-- <span>{{ 'loading' | translate }}...</span> -->
-        <cds-preload-bar [progress]="loadingProgress"></cds-preload-bar>
+        <span class="info-loading">{{ labelInfoLoading }}</span>
+        <cds-preload-bar class="progress-bar" [progress]="loadingProgress"></cds-preload-bar>
     </div>
 </div>

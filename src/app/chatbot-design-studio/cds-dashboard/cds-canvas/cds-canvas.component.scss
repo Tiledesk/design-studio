@@ -386,7 +386,7 @@ svg:not(:root) {
   align-items: center;
   justify-content: center;
   transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-  transition-delay: 2s;
+  transition-delay: 0s;
   opacity: 1;
   &.disabled{
     opacity: 0;
@@ -394,13 +394,26 @@ svg:not(:root) {
     pointer-events: none;
   }
   img {
-    max-width: 50px;
-    max-height: 50px;
+    max-width: 40px;
+    max-height: 40px;
   }
   .loading {
     position: absolute;
     margin-top: 80px;
+  }
+  .info-loading {
+    font-size: smaller;
+    line-height: normal;
+    width: auto;
+    display: block;
+    margin: 10px auto;
+    min-height: 20px;
+    text-align: center;
+  }
+  .progress-bar {
     width: 100px;
+    display: flex;
+    margin: auto;
   }
 }
 

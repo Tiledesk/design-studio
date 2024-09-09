@@ -49,13 +49,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   hideActionPlaceholderOfActionPanel: boolean;
 
   /**  preload */
-  private renderedIntentsCount = 0;
-  private renderedAllIntents = false;
+  totElementsOnTheStage: number = 0;
+  countRenderedElements = 0;
+  renderedAllIntents = false;
   renderedAllElements = false;
   LOGOS_ITEMS = LOGOS_ITEMS;
   loadingProgress = 0;
   mapOfConnectors = [];
   mapOfIntents = [];
+  labelInfoLoading = "Loading...";
 
   /** panel list of intent */ 
   IS_OPEN_INTENTS_LIST: boolean = true;
@@ -146,13 +148,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
 
+
+
   onIntentRendered(intentID) {
-    // this.logger.log("[CDS-CANVAS2] •••• onIntentRendered ••••", intentID, this.mapOfIntents.length);
-    if (this.mapOfIntents[intentID]) {
+    this.labelInfoLoading = "Loading intents in progress";
+    if(this.mapOfIntents[intentID]) {
       this.mapOfIntents[intentID].shown = true;
-      this.renderedIntentsCount++;
-      this.loadingProgress += (this.renderedIntentsCount/this.mapOfIntents.length*1.1)*100;
+      this.countRenderedElements++;
+      this.loadingProgress += (this.countRenderedElements/this.totElementsOnTheStage)*100;
     }
+    // this.logger.log("[CDS-CANVAS-3] •••• onIntentRendered ••••", intentID, this.contaIntent);
     const allShownTrue = Object.values(this.mapOfIntents).every(intent => intent.shown === true);
     if(allShownTrue){ 
       this.onAllIntentsRendered();
@@ -160,31 +165,41 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   async onAllIntentsRendered() {
-    let resp = await this.connectorService.createMapOfConnectors(this.listOfIntents);
-    this.mapOfConnectors = resp;
-    // this.logger.log("[CDS-CANVAS2]  •••• Tutti i cds-intent sono stati renderizzati ••••", this.mapOfConnectors);
+    this.labelInfoLoading = "Intents loading completed";
+    this.logger.log("[CDS-CANVAS-3]  •••• Tutti i cds-intent sono stati renderizzati ••••");
     this.connectorService.createConnectors(this.listOfIntents);
     this.renderedAllIntents = true;
   }
 
   checkAllConnectors(connector){
     if(this.stageService.loaded === false){
-      if (this.mapOfConnectors[connector.id]) {
+      this.labelInfoLoading = "Loading connectors in progress";
+      if(this.mapOfConnectors[connector.id] && this.mapOfConnectors[connector.id].shown == false) {
         this.mapOfConnectors[connector.id].shown = true;
+        this.countRenderedElements++;
+        this.loadingProgress += (this.countRenderedElements/this.totElementsOnTheStage)*100;
       }
       // this.logger.log("[CDS-CANVAS2]  •••• E' stato creato un nuovo connettore verifico ••••", connector.id);
       const allShownTrue = Object.values(this.mapOfConnectors).every(connector => connector.shown === true);
       if(allShownTrue){ 
-        // this.logger.log("[CDS-CANVAS2]  •••• Tutti i connettori sono stati renderizzati ••••");
         this.stageService.loaded = true;
-        // setTimeout(() => { 
-          this.loadingProgress = 100;
-          this.renderedAllElements = true;
-        // }, 0);
+        this.loadingProgress = 100;
+        this.renderedAllElements = true;
+        this.labelInfoLoading = "Connectors loading completed";
+        this.logger.log("[CDS-CANVAS-3]  •••• Tutti i connettori sono stati renderizzati ••••", this.countRenderedElements, this.totElementsOnTheStage);
       }
     }
   }
 
+  private showStageForLimitTime(){
+    if (this.stageService.loaded == false) {
+      this.labelInfoLoading = "Loading completed with errors";
+      // this.logger.log('[CDS-CANVAS-3]  VAI AVANTI');
+      this.stageService.loaded = true;
+      this.loadingProgress = 100;
+      this.renderedAllElements = true;
+    }
+  }
 
 
   // private async setStartIntent(){
@@ -288,7 +303,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.listOfIntents = this.intentService.listOfIntents;
       this.initListOfIntents();
       this.intentService.setStartIntent();
-      this.setMapOfIntents();
+      this.mapOfIntents = await this.intentService.setMapOfIntents();
+      this.mapOfConnectors = await this.connectorService.setMapOfConnectors(this.listOfIntents);
+      const numIntents = Object.values(this.mapOfIntents).length;
+      const numConnectors = Object.values(this.mapOfConnectors).length;
+      this.totElementsOnTheStage = numIntents+numConnectors;
+      // this.logger.log('[CDS-CANVAS-3] totElementsOnTheStage ::', getAllIntents, numIntents, numConnectors);
+      setTimeout(() => {
+        this.showStageForLimitTime();
+      }, 30000);
+
       // scaleAndcenterStageOnCenterPosition(this.listOfIntents)
     }
     this.subscriptionOpenWidgetPanel = this.intentService.BStestiTout.pipe(skip(1)).subscribe((event) => this.onTestItOut(event));
@@ -302,16 +326,20 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.intentService.arrayCOPYPAST = copyPasteTEMP['copy'];
     }
   }
+  
 
 
-  private setMapOfIntents(){
-    this.listOfIntents.forEach(intent => {
-      const intentID = intent.intent_id;
-      this.mapOfIntents[intentID] = {'shown': false };
-    });
-    
-  }
+  // private setMapOfIntents(){
+  //   this.listOfIntents.forEach(intent => {
+  //     const intentID = intent.intent_id;
+  //     this.mapOfIntents[intentID] = {'shown': false };
+  //   });
+  // }
  
+  // private async setMapOfConnectors(){
+  //   this.mapOfConnectors = await this.connectorService.createMapOfConnectors(this.listOfIntents);
+  // }
+
 
   /** closeAllPanels */
   private closeAllPanels(){

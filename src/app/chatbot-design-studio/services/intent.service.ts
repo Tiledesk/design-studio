@@ -34,6 +34,7 @@ export class IntentService {
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
+  mapOfIntents: any = {}; 
   // selectedIntent: Intent;
   intentSelected: Intent;
   listActions: Array<Action>;
@@ -137,6 +138,16 @@ export class IntentService {
         }
       };
     }
+  }
+
+
+  public setMapOfIntents(){
+    this.listOfIntents.forEach( intent => {
+      const intentID = intent.intent_id;
+      this.mapOfIntents[intentID] = {'shown': false };
+    });
+    this.logger.log('[CDS-CANVAS-3] mapOfIntents: ', this.mapOfIntents);
+    return this.mapOfIntents;
   }
 
   public updateIntentSelected(){
