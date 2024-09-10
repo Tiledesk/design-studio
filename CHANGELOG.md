@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.20.0-rc.2
+# 1.21.0-rc.1
 - **added**: loader while canvas is drawing intents and connectors
 
 # 1.20.0-rc.1 
