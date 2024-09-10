@@ -65,8 +65,8 @@ export class CdsSupportComponent implements OnInit {
 
   private manageWidget(status: "hide" | "show" | "open" | "close" | "start", projectInfo?: any) {
     try {
+      this.logger.log('[CDS-SUPPORT] manageWidget ', window['tiledesk'], status)
       if (window && window['tiledesk']) {
-        this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
         if (status === 'hide') {
           window['tiledesk'].hide();
         } else if (status === 'show') {
@@ -80,6 +80,7 @@ export class CdsSupportComponent implements OnInit {
       }
 
       if (window && !window['tiledesk']) {
+        this.logger.log('[CDS-SUPPORT] manageWidget window[tiledesk] not exist', status)
         if(status === "start"){
           window['startWidget']();
           window['tiledesk_widget_login']();

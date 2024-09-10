@@ -273,7 +273,8 @@ export class CdsHeaderComponent implements OnInit {
                                 '&tiledesk_participants=bot_' + this.selectedChatbot._id + 
                                 "&tiledesk_departmentID=" + this.defaultDepartmentId + 
                                 "&tiledesk_hideHeaderCloseButton=true" +
-                                "&tiledesk_widgetTitle="+ encodeURI(this.selectedChatbot.name) +
+                                "&tiledesk_restartConversation=false" +
+                                "&tiledesk_widgetTitle="+ encodeURIComponent(this.selectedChatbot.name) +
                                 "&tiledesk_preChatForm=false" +
                                 "&td_draft=true"
           navigator.clipboard.writeText(testItOutUrl)
@@ -286,7 +287,8 @@ export class CdsHeaderComponent implements OnInit {
                               '&tiledesk_participants=bot_' + this.selectedChatbot._id + 
                               "&tiledesk_departmentID=" + this.defaultDepartmentId + 
                               "&tiledesk_hideHeaderCloseButton=true" +
-                              "&tiledesk_widgetTitle="+ encodeURI(this.selectedChatbot.name) +
+                              "&tiledesk_restartConversation=false" +
+                              "&tiledesk_widgetTitle="+ encodeURIComponent(this.selectedChatbot.name) +
                               "&tiledesk_preChatForm=false" +
                               "&td_draft=true"
         window.open(testItOutUrl, '_blank')

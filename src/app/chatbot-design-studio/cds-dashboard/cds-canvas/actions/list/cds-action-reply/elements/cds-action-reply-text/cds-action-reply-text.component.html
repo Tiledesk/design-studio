@@ -51,8 +51,8 @@
     <cds-textarea 
         class="text-editable-div"
         [text]="response.text" 
-        [limitCharsText]="limitCharsText"
         [minRow]="1"
+        [limitCharsText]="limitCharsText"
         popoverVerticalAlign="above"
         (changeTextarea)="onChangeTextarea($event)"
         (blur)="onBlur($event)"

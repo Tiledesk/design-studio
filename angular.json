@@ -51,7 +51,8 @@
               { "input" : "src/assets/sass/material-dashboard.scss", "inject": true, "bundleName": "material-dashboard"},
               { "input" : "src/assets/sass/cds/styles.scss", "inject": true, "bundleName": "cds-style"},
               { "input" : "src/assets/sass/cds/action-styles.scss", "inject": true, "bundleName": "action-style"},
-              { "input" : "src/assets/sass/cds/settings-section.scss", "inject": false, "bundleName": "settings-section"}
+              { "input" : "src/assets/sass/cds/settings-section.scss", "inject": false, "bundleName": "settings-section"},
+              { "input" : "src/assets/sass/cds/connector-styles.scss", "inject": true, "bundleName": "connector-style"}
             ],
             "scripts": [
               { "input": "node_modules/jquery/dist/jquery.js", "inject": true, "bundleName": "jquery" },

@@ -28,6 +28,29 @@
         <!-- <div *ngIf="control.invalid && (control.dirty || control.touched)">
             FIELD REQUIRED
         </div> -->
+
+        <div *ngIf="showUtils === true" #utils unselectable="on" tabIndex="-1" class="editor-utils">
+    
+            <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="addVariable.toggle(); openSetAttributePopover();">
+                <span class="material-icons" style="font-size: 16px;">
+                    data_object
+                </span>
+            </div>
+
+        </div>
         
     </div>
 </div> 
+
+
+<sat-popover #addVariable id="addVariable"  
+    horizontalAlign="center" 
+    verticalAlign="center"  
+    hasBackdrop 
+    (backdropClicked)="addVariable.close()" 
+    panelClass="texarea-add-filter-panel"  
+    interactiveClose="false">
+    <variable-list
+        (onSelected)="onVariableSelected($event)">
+    </variable-list>
+</sat-popover>

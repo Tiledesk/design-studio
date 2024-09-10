@@ -1,4 +1,4 @@
-<div class="rules-container">
+<div class="rules-container content" id="scrollMe">
     <div class="new-rules-box" [style.display]="showWelcome? 'none': 'block'">
         <div class="button-wrp">
             <button id="cds-new-rules-button" type="button" class="btn btn-primary cds-blue-button" (click)="addNew()"> 
@@ -31,6 +31,7 @@
         [selectedChatbot]="selectedChatbot"
         (onRuleDeleted)="onRuleDeleted($event)">
     </cds-rules-list>
+
       
 </div>
 

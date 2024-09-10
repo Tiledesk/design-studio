@@ -1,9 +1,10 @@
+import { Namespace } from './../../../../../../models/namespace-model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MatDialog } from '@angular/material/dialog';
+import { ActionAskGPTV2 } from 'src/app/models/action-model';
 
 //MODELS
-import { ActionAskGPTV2 } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 
 //SERVICES
@@ -17,9 +18,9 @@ import { OpenaiService } from 'src/app/services/openai.service';
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
 import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
-import { Namespace } from 'src/app/models/namespace-model';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -31,12 +32,15 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Input() intentSelected: Intent;
   @Input() action: ActionAskGPTV2;
   @Input() previewMode: boolean = true;
-  @Input() project_id: string;
   @Output() updateAndSaveAction = new EventEmitter;
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
   listOfNamespaces: Array<{name: string, value: string, icon?:string}>;
+
+  project_id: string;
+  selectedNamespace: string;
+  //selectedNamespace: any;
 
   // Connectors
   idIntentSelected: string;
@@ -55,6 +59,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   ai_error: string = "";
 
   temp_variables = [];
+  autocompleteOptions: Array<string> = [];
 
   model_list: Array<{ name: string, value: string, multiplier: string}>;
   //namespace_list = []; // missing api for namespaces
@@ -66,6 +71,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   constructor(
     private intentService: IntentService,
     private appConfigService: AppConfigService,
+    private dashboardService: DashboardService,
     private openaiService: OpenaiService,
     private translate: TranslateService,
     private dialog: MatDialog
@@ -73,6 +79,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug("[ACTION-ASKGPTV2] action detail: ", this.action);
+    this.project_id = this.dashboardService.projectID
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
     this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive').map((el)=> {
       if(ai_models[el.value])
@@ -80,9 +87,6 @@ export class CdsActionAskgptV2Component implements OnInit {
       else
         return { ...el, multiplier: null }
     })
-    if (!this.action.namespace) {
-      this.action.namespace = this.project_id;
-    }
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
       this.connector = connector;
@@ -203,8 +207,22 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPT] getListNamespaces", namaspaceList)
       this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
-
+      namaspaceList.forEach(el => this.autocompleteOptions.push(el.name))
+      this.initializeNamespaceSelector();
     })
+  }
+
+  async initializeNamespaceSelector() {
+    if (!this.action.namespaceAsName) {
+      if (!this.action.namespace) {
+        this.action.namespace = this.project_id;
+        return;
+      }
+    } else {
+      if (!this.action.namespace) {
+        this.action.namespace = await this.idToName(this.project_id);
+      }
+    }
   }
 
   /** TO BE REMOVED: patch undefined action keys */
@@ -230,6 +248,11 @@ export class CdsActionAskgptV2Component implements OnInit {
   onBlur(event){
     this.updateAndSaveAction.emit();
   }
+
+  onSelectedAttribute(variableSelected: { name: string, value: string }, key) {
+    this.action[key] = variableSelected.value;
+    this.updateAndSaveAction.emit()
+}
   
   onChangeSelect(event, target) {
     if (event.clickEvent === 'footer') {
@@ -245,7 +268,16 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent' | 'namespace') {
     if(event){
-      this.action[type]=event.value
+      if (type === 'namespace') {
+        if (!this.action.namespaceAsName) {
+          this.action[type]=event.value
+        } else {
+          this.action[type] = this.listOfNamespaces.find(n => n.value === event.value).name;
+        }
+        this.selectedNamespace = event.value;
+      } else {
+        this.action[type]=event.value
+      }
       switch(type){
         case 'trueIntent':
           this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent});
@@ -283,10 +315,20 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("action updated: ", this.action)
   }
 
-  onChangeCheckbox(target){
+  async onChangeCheckbox(target){
     try {
-      this.action[target] = !this.action[target];
-      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+        this.action[target] = !this.action[target];
+        if (target === "namespaceAsName") {
+          if (this.action[target]) {
+            if (this.action.namespace) {
+              this.action.namespace = await this.idToName(this.action.namespace);
+            }
+          } else {
+            this.action.namespace = await this.nameToId(this.action.namespace);
+          }
+        }
+        this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+
     } catch (error) {
       this.logger.log("Error: ", error);
     }
@@ -304,16 +346,16 @@ export class CdsActionAskgptV2Component implements OnInit {
     window.open(url, '_blank')
   }
 
-  execPreview() {
+  async execPreview() {
     //this.scrollToBottom();
-    this.checkVariables().then((resp) => {
-      if (resp === true) {
-        this.getResponse(this.action.question);
-
-      } else {
-        this.openAttributesDialog();
-      }
-    })
+    this.temp_variables = [];
+    let resp = await this.checkVariables();
+    let respNamespace = await this.checkNamespaceVariables()
+    if (resp && respNamespace){
+      this.getResponse(this.action.question, this.action.namespace);
+    }else{
+      this.openAttributesDialog();
+    }
   }
 
   checkVariables() {
@@ -327,7 +369,6 @@ export class CdsActionAskgptV2Component implements OnInit {
 
       } else {
 
-        this.temp_variables = [];
         matches.forEach((m) => {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
@@ -353,7 +394,43 @@ export class CdsActionAskgptV2Component implements OnInit {
     })
   }
 
-  getResponse(question) {
+  checkNamespaceVariables() {
+    return new Promise((resolve) => {
+      let regex: RegExp = /{{[^{}]*}}/g;
+      let string = this.action.namespace;
+      let matches = string.match(regex);
+
+      if (!matches || matches.length == 0) {
+        resolve(true);
+
+      } else {
+
+        matches.forEach((m) => {
+          let name = m.slice(2, m.length - 2);
+          let attr = this.action.preview.find(v => v.name === name);
+
+          const index = this.temp_variables.findIndex((e) => e.name === name);
+          if(index> -1 ){ //key already exist: do not add it again
+            return;
+          }
+
+          if (attr && attr.value) {
+            this.temp_variables.push({ name: name, value: attr.value });
+
+          } else if (attr && !attr.value) {
+            this.temp_variables.push({ name: name, value: null });
+
+          } else {
+            this.temp_variables.push({ name: name, value: null });
+            this.action.preview.push({ name: name, value: null });
+          }
+        })
+        resolve(false);
+      }
+    })
+  }
+
+  async getResponse(question, namespace) {
     this.logger.log("getResponse called...")
 
     let data = {
@@ -363,7 +440,11 @@ export class CdsActionAskgptV2Component implements OnInit {
       max_tokens: this.action.max_tokens,
       temperature: this.action.temperature,
       top_k: this.action.top_k,
-      namespace: this.action.namespace
+      namespace: namespace
+    }
+
+    if(this.action.namespaceAsName){
+      data.namespace = await this.nameToId(namespace)
     }
 
     this.showAiError = false;
@@ -386,7 +467,7 @@ export class CdsActionAskgptV2Component implements OnInit {
         this.ai_error = this.translate.instant('CDSCanvas.AiNoAnswer')
         return;
       }
-      this.ai_response = ai_response.answer;
+      this.ai_response = ai_response;
     }, error: (err)=> {
       this.searching = false;
       this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", err);
@@ -409,12 +490,12 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("temp_variables: ", this.temp_variables);
     const dialogRef = this.dialog.open(AttributesDialogComponent, {
       panelClass: 'custom-setattribute-dialog-container',
-      data: { attributes: this.temp_variables, question: this.action.question }
+      data: { attributes: this.temp_variables, question: this.action.question, namespace: this.action.namespace }
     });
     dialogRef.afterClosed().subscribe(result => {
       this.logger.log("AttributesDialogComponent result: ", result);
       if (result !== false) {
-        this.getResponse(result.question);
+        this.getResponse(result.question, result.namespace);
         this.saveAttributes(result.attributes);
       }
     });
@@ -432,5 +513,23 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.updateAndSaveAction.emit();
     })
   }
+
+  async idToName(id: string): Promise<any> {
+    return new Promise((resolve) => {
+      let name = this.listOfNamespaces.find(n => n.value === id).name;
+      resolve(name)
+    })
+  }
+
+  async nameToId(name: string): Promise<any> {
+    return new Promise((resolve) => {
+      let selected = this.listOfNamespaces.find(n => n.name === name);
+      if(selected){
+        resolve(selected.value)
+      }
+      resolve(this.project_id)
+    })
+  }
+
 
 }

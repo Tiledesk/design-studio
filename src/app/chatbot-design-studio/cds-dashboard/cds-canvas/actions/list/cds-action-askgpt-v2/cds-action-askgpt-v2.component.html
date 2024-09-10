@@ -75,8 +75,17 @@
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'question')">
         </cds-textarea>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.history"
+                (change)="onChangeCheckbox('history')">
+                {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
+            </mat-checkbox>
+        </section>
     </div>
 
+    <!-- // Section moved to textarea field box -->
     <!-- <div class="field-box">
         <section class="disable-input-message-section">
             <mat-checkbox 
@@ -119,7 +128,7 @@
             </div>
 
             <div *ngIf="!searching && !showAiError && ai_response">
-                {{ ai_response }}
+                {{ ai_response?.answer }}
             </div>
 
             <div *ngIf="showAiError">
@@ -128,11 +137,11 @@
 
         </div>
 
-        <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
+        <div class="usage-container" *ngIf="!searching && !showAiError ">
             <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
+            <!-- <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span> -->
+            <!-- <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span> -->
+            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.prompt_token_size }}</span>
         </div>
 
     </div>
@@ -141,17 +150,36 @@
 
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.ChooseKB' | translate}}</label>
-        <cds-select id="text-condition" 
+        <cds-select *ngIf="!action?.namespaceAsName" id="text-condition" 
             [items]="listOfNamespaces" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
-            [itemSelected]="action?.namespace" 
+            [itemSelected]="action.namespace" 
             [placeholder]="'CDSCanvas.SelectNamespace' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'namespace')"
             (onReset)="onResetBlockSelect($event, 'namespace')">
         </cds-select>
+        <!-- KEY -->
+        <cds-text *ngIf="action?.namespaceAsName" id="text"
+            class="sx-input" 
+            [text]="action.namespace"
+            [placeholder]="'CDSCanvas.SelectNamespace' | translate"
+            [autocompleteOptions]="autocompleteOptions"
+            (blur)="onBlur($event)"
+            (onChange)="onChangeTextarea($event, 'namespace')">
+        </cds-text>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.namespaceAsName"
+                (change)="onChangeCheckbox('namespaceAsName')">
+                Use Knwoledge Base name
+            </mat-checkbox>
+            <label class="field-description" [innerHTML]='"CDSCanvas.UseKBNameDescription" | translate'></label>
+        </section>
     </div>
+
 
     <div class="link-container">
         <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
@@ -321,8 +349,7 @@
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
-            [minRow]="1" 
-            [maxRow]="1" 
+            [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignReplyTo"
             (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
@@ -336,8 +363,7 @@
             [textLimitBtn]="false"
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
-            [minRow]="1" 
-            [maxRow]="1" 
+            [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignSourceTo"
             (selectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')"
