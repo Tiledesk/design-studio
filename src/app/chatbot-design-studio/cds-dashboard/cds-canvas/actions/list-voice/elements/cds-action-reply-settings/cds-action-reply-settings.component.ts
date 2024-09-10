@@ -30,6 +30,10 @@ export class CdsActionReplySettingsComponent implements OnInit {
   
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
+  radioOptions: Array<{name: string, value: string, disabled: boolean, checked: boolean}>= [ 
+    {name: 'blind',              value: 'blind',         disabled: false, checked: false  }, 
+    {name: 'consultant',         value: 'consultant',    disabled: false, checked: true   }
+  ]
   // Connectors NoInput- NoMatch //
   idIntentSelected: string;
   idConnectorNoMatch: string;
@@ -212,7 +216,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
   onBlur(event){
     this.logger.log('[ACTION REPLY SETTINGS] onBlur', event.target.value, this.response);
     // if(event.target.value !== this.response.text){
-      this.changeActionReply.emit();
+    this.changeActionReply.emit();
     // }
   }
 
@@ -222,6 +226,12 @@ export class CdsActionReplySettingsComponent implements OnInit {
   }
 
   onSelectedAttribute(variableSelected: {name: string, value: string}){
+  }
+
+  onChangeButtonSelect(event: {label: string, category: string, value: string, disabled: boolean, checked: boolean}){
+    this.radioOptions.forEach(el => { el.value ===event.value? el.checked= true: el.checked = false })
+    this.response.transferType = event.value;
+    this.changeActionReply.emit();
   }
 
   checkForVariablesInsideText(text: string){

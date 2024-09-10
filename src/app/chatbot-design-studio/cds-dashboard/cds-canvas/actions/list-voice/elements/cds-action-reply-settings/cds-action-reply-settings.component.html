@@ -163,6 +163,19 @@
         </cds-textarea>
     </div>
 
+    <div class="field-box" *ngIf="response.hasOwnProperty('transferType')" style="width: 100%;">
+        <label class="title-label">{{'CDSCanvas.TransferType' | translate }}</label>
+        <cds-radio-buttons
+            [items]="radioOptions"
+            [itemSelected]="response?.transferType" 
+            [bindLabelButton]="'name'"
+            [bindValueButton]="'value'"
+            [rows]="1" [columns]="2"
+            (changeButtonSelect)="onChangeButtonSelect($event)">
+        </cds-radio-buttons>
+    </div>
+    
+
 </div>
 
 <div *ngIf="!previewMode" class="connector-wrapper" >

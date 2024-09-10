@@ -491,6 +491,7 @@ export class Setting {
     maxDigits?: number;
     terminators?: string;
     transferTo?: string;
+    transferType?: string;
     bargein?: boolean = true;
     noInputTimeout?: number;
     noInputIntent?: string;

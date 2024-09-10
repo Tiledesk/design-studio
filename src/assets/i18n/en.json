@@ -437,6 +437,7 @@
         "Terminator":"Terminator",
         "Timeout": "Timeout",
         "TransferTo": "Transfer to",
+        "TransferType":"Transfer type",
         "BargeIn":"Barge-in",
         "NoMatch":"No match",
         "NoInput":"No input",

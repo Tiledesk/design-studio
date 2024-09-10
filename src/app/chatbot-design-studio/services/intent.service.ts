@@ -1015,7 +1015,7 @@ export class IntentService {
       commandWait2.time = 0;
       (action as ActionVoice).attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { transferTo: '', trueIntent: null, falseIntent: null}
+      command_form.settings = { transferTo: '', transferType: 'consultation', trueIntent: null, falseIntent: null}
       command_form.subType = TYPE_ACTION_VXML.BLIND_TRANSFER;
       (action as ActionVoice).attributes.commands.push(command_form);
     }
