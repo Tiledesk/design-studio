@@ -821,7 +821,7 @@ export class TiledeskConnectors {
     this.updateLineTextPosition(id, frontPoint, backPoint);
 
 
-    const event = new CustomEvent("connector-drawen", { detail: { connector: connector } });
+    const event = new CustomEvent("connector-drawn", { detail: { connector: connector } });
     document.dispatchEvent(event);
   }
 
