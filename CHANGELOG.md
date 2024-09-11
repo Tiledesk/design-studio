@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.2
+- **added**: removed all listener event when on navigation between tabs
+
 # 1.21.0-rc.1
 - **added**: loader while canvas is drawing intents and connectors
 
