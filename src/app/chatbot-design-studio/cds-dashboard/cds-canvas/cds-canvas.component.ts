@@ -37,6 +37,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   @Output() testItOut = new EventEmitter();
   @Input() onHeaderTestItOut: Observable<Intent>
 
+  /** listners */
+  listenerConnectorDrawn: (e: CustomEvent) => void;
+  listnerMovedAndScaled: (e: CustomEvent) => void;
+  listnerKeydown: (e: any) => void;
+  listnerConnectorSelected: (e: CustomEvent) => void;
+  listnerConnectorUpdated: (e: CustomEvent) => void;
+  listnerConnectorDeleted: (e: CustomEvent) => void;
+  listnerConnectorCreated: (e: CustomEvent) => void;
+  listnerConnectorDraftReleased: (e: CustomEvent) => void;
+  listnerEndDragging: (e: CustomEvent) => void;
+  listnerDragged: (e: CustomEvent) => void;
+  listnerStartDragging: (e: CustomEvent) => void;
+
   id_faq_kb: string;
   TYPE_OF_MENU = TYPE_OF_MENU;
 
@@ -49,7 +62,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   hideActionPlaceholderOfActionPanel: boolean;
 
   /**  preload */
-  private connectorDrawnListener: (event: CustomEvent) => void;
   totElementsOnTheStage: number = 0;
   countRenderedElements = 0;
   renderedAllIntents = false;
@@ -98,6 +110,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   positionContextMenu: any = { 'x': 0, 'y': 0 };
 
   private logger: LoggerService = LoggerInstance.getInstance()
+  
+  
   constructor(
     private intentService: IntentService,
     private stageService: StageService,
@@ -108,6 +122,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private changeDetectorRef: ChangeDetectorRef
   ) {
     this.setSubscriptions();
+    this.setListnerEvents();
   }
 
   ngOnInit(): void {
@@ -135,12 +150,22 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (this.subscriptionUndoRedo) {
       this.subscriptionUndoRedo.unsubscribe();
     }
-
     if (this.subscriptionUndoRedo) {
       this.subscriptionUndoRedo.unsubscribe();
     }
 
-    document.removeEventListener("connector-drawen", this.connectorDrawnListener, false);
+    document.removeEventListener("connector-drawn", this.listenerConnectorDrawn, false);
+    document.removeEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+    document.removeEventListener("start-dragging", this.listnerStartDragging, false);
+    document.removeEventListener("keydown", this.listnerKeydown, false);
+    document.removeEventListener("connector-selected", this.listnerConnectorSelected, false);
+    document.removeEventListener("connector-updated", this.listnerConnectorUpdated, false);
+    document.removeEventListener("connector-deleted", this.listnerConnectorDeleted, false);
+    document.removeEventListener("connector-created", this.listnerConnectorCreated, false);
+    document.removeEventListener("connector-draft-released", this.listnerConnectorDraftReleased, false);
+    document.removeEventListener("end-dragging", this.listnerEndDragging, false);
+    document.removeEventListener("dragged", this.listnerDragged, false);
+
   }
 
   /** */
@@ -194,6 +219,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   checkAllConnectors(connector){
+    this.logger.log("[CDS-CANVAS3]  •••• checkAllConnectors ••••", connector);
     if(this.stageService.loaded === false && this.renderedAllElements === false){
       this.labelInfoLoading = 'CDSCanvas.connectorsProgress';
       if(this.mapOfConnectors[connector.id] && this.mapOfConnectors[connector.id].shown === false) {
@@ -256,13 +282,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // --------------------------------------------------------- //
   
   private setSubscriptions(){
-
-    this.connectorDrawnListener = (e: CustomEvent) => {
-      const connector = e.detail.connector;
-      this.checkAllConnectors(connector);
-    };
-
-
 
     this.subscriptionUndoRedo = this.intentService.behaviorUndoRedo.subscribe((undoRedo: any) => {
       this.logger.log('[cds-panel-intent-list] --- AGGIORNATO undoRedo ',undoRedo);
@@ -330,7 +349,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
    /** initialize */
    private async initialize(){
-    this.addEventListener();
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
     const getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
@@ -400,216 +418,184 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   // ---------------------------------------------------------
-  // Event listener di eventi Stage e Connectors
+  // START Stage and Connectors event listeners
   // ---------------------------------------------------------
-  addEventListener() {
-    let that = this;
+  setListnerEvents(){
     /** LISTENER OF TILEDESK STAGE */
 
-    document.addEventListener("connector-drawen", this.connectorDrawnListener, false);
-
-    // document.addEventListener(
-    //   "connector-drawen", (e: CustomEvent) => {
-    //     const connector = e.detail.connector;
-    //     this.checkAllConnectors(connector);
-    //   },
-    //   false
-    // );
+    /** triggers when a connector is drawn on the stage  */
+    this.listenerConnectorDrawn = (e: CustomEvent) => {
+      const connector = e.detail.connector;
+      this.checkAllConnectors(connector);
+    };
+    document.addEventListener("connector-drawn", this.listenerConnectorDrawn, false);
     
-
     /** moved-and-scaled ** 
-     * scatta quando sposto lo stage (lo muovo o lo scalo):
-     * - imposto la scala
-     * - chiudo 
-     * - elimino il connettore disegnato e chiudo il float menu se è aperto
+    * fires when I move the stage (move or scale it):
+    * - set the scale
+    * - close
+    * - delete the drawn connector and close the float menu if it is open
     */
-    document.addEventListener(
-      "moved-and-scaled", (e: CustomEvent) => {
-        const el = e.detail;
-        // this.logger.log('[CDS-CANVAS] moved-and-scaled ', el)
-        this.connectorService.tiledeskConnectors.scale = e.detail.scale;
-        this.removeConnectorDraftAndCloseFloatMenu();
-      },
-      false
-    );
+    this.listnerMovedAndScaled = (e: CustomEvent) => {
+      const el = e.detail;
+      this.connectorService.tiledeskConnectors.scale = e.detail.scale;
+      this.removeConnectorDraftAndCloseFloatMenu();
+    };
+    document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
 
     /** start-dragging */
-    document.addEventListener(
-      "start-dragging", (e: CustomEvent) => {
-        const el = e.detail.element;
-        this.logger.log('[CDS-CANVAS] start-dragging ', el);
-        this.removeConnectorDraftAndCloseFloatMenu();
-        this.intentService.setIntentSelectedById(el.id);
-        //this.intentSelected = this.listOfIntents.find((intent) => intent.intent_id === el.id);
-        el.style.zIndex = 2;
-      },
-      false
-    );
+    this.listnerStartDragging = (e: CustomEvent) => {
+      const el = e.detail.element;
+      this.logger.log('[CDS-CANVAS] start-dragging ', el);
+      this.removeConnectorDraftAndCloseFloatMenu();
+      this.intentService.setIntentSelectedById(el.id);
+      //this.intentSelected = this.listOfIntents.find((intent) => intent.intent_id === el.id);
+      el.style.zIndex = 2;
+    };
+    document.addEventListener("start-dragging", this.listnerStartDragging, false);
 
     /** dragged **
-     * l'evento scatta quando muovo un intent sullo stage:
-     * - muovo i connettori collegati all'intent
-     * - rimuovo eventuali connectors tratteggiati e chiudo il float menu se è aperto
-     * - aggiorno la posizione dell'intent selected
+    * the event fires when I move an intent on the stage:
+    * move the connectors attached to the intent
+    * remove any dotted connectors and close the float menu if it is open
+    * update the position of the selected intent
     */
-    document.addEventListener(
-      "dragged", (e: CustomEvent) => {
-        const el = e.detail.element;
-        // this.logger.log('[CDS-CANVAS] dragged ', el);
-        const x = e.detail.x;
-        const y = e.detail.y;
-        this.connectorService.moved(el, x, y);
-        // Verifica se intentSelected è definito e se attributes è definito
-        this.intentService.setIntentSelectedPosition(el.offsetLeft, el.offsetTop);
-      },
-      false
-    );
+    this.listnerDragged = (e: CustomEvent) => {
+      const el = e.detail.element;
+      const x = e.detail.x;
+      const y = e.detail.y;
+      this.connectorService.moved(el, x, y);
+      this.intentService.setIntentSelectedPosition(el.offsetLeft, el.offsetTop);
+    };
+    document.addEventListener("dragged", this.listnerDragged, false);
 
     /** end-dragging */
-    document.addEventListener(
-      "end-dragging", (e: CustomEvent) => {
-        const el = e.detail.element;
-        this.logger.log('[CDS-CANVAS] end-dragging ', el);
-        el.style.zIndex = 1;
-        this.intentService.updateIntentSelected();
-      },
-      false
-    );
+    this.listnerEndDragging = (e: CustomEvent) => {
+      const el = e.detail.element;
+      this.logger.log('[CDS-CANVAS] end-dragging ', el);
+      el.style.zIndex = 1;
+      this.intentService.updateIntentSelected();
+    };
+    document.addEventListener("end-dragging", this.listnerEndDragging, false);
 
-    
-    /** LISTNER OF TILEDESK CONNECTORS */
-     
     /** connector-draft-released ** 
-     * scatta solo quando NON viene creato un connettore, cioè quando rilascio il connettore tratteggiato in un punto che non è "collegabile"
-     * se lo rilascio sullo stage ed 'e.detail' è completo della posizione di partenza e di arrivo del connettore posso aprire il float menu
-     * altrimenti
-     * rimuovo il connettore tratteggiato
+    * it only fires when a connector is NOT created, that is when I drop the dotted connector in a point that is not "connectable"
+    * if I drop it on the stage and 'e.detail' is complete with the start and end position of the connector I can open the float menu
+    * otherwise
+    * I remove the dotted connector
     */
-    document.addEventListener(
-      "connector-draft-released", (e: CustomEvent) => {
-        this.logger.log("[CDS-CANVAS] connector-draft-released :: ", e.detail);
-        if(!e || !e.detail) return;
-        const detail = e.detail;
-        const arrayOfClass = detail.target.classList.value.split(' ');
-        if (detail.target && arrayOfClass.includes("receiver-elements-dropped-on-stage") && detail.toPoint && detail.menuPoint) {
-          this.logger.log("[CDS-CANVAS] ho rilasciato il connettore tratteggiato nello stage (nell'elemento con classe 'receiver_elements_dropped_on_stage') e quindi apro il float menu");
-          this.openFloatMenuOnConnectorDraftReleased(detail);
-        } else {
-          this.logger.log("[CDS-CANVAS] ho rilasciato in un punto qualsiasi del DS ma non sullo stage quindi non devo aprire il menu", detail);
-          this.removeConnectorDraftAndCloseFloatMenu();
-        }
-      },
-      true
-    );
+    this.listnerConnectorDraftReleased = (e: CustomEvent) => {
+      this.logger.log("[CDS-CANVAS] connector-draft-released :: ", e.detail);
+      if(!e || !e.detail) return;
+      const detail = e.detail;
+      const arrayOfClass = detail.target.classList.value.split(' ');
+      if (detail.target && arrayOfClass.includes("receiver-elements-dropped-on-stage") && detail.toPoint && detail.menuPoint) {
+        this.logger.log("[CDS-CANVAS] ho rilasciato il connettore tratteggiato nello stage (nell'elemento con classe 'receiver_elements_dropped_on_stage') e quindi apro il float menu");
+        this.openFloatMenuOnConnectorDraftReleased(detail);
+      } else {
+        this.logger.log("[CDS-CANVAS] ho rilasciato in un punto qualsiasi del DS ma non sullo stage quindi non devo aprire il menu", detail);
+        this.removeConnectorDraftAndCloseFloatMenu();
+      }
+    };
+    document.addEventListener("connector-draft-released", this.listnerConnectorDraftReleased, false);
 
     /** connector-created **
-     * scatta quando viene creato un connettore:
-     *  - aggiungo il connettore alla lista dei connettori (addConnectorToList)
-     *  - notificare alle actions che i connettori sono cambiati (onChangedConnector) per aggiornare i pallini
+    * fires when a connector is created:
+    * add the connector to the connector list (addConnectorToList)
+    * notify actions that connectors have changed (onChangedConnector) to update the dots
     */
-    document.addEventListener(
-      "connector-created", (e: CustomEvent) => {
-        this.logger.log("[CDS-CANVAS] connector-created:", e);
-        const connector = e.detail.connector;
-        connector['created'] = true;
-        delete connector['deleted'];
-        this.connectorService.addConnectorToList(connector);
-        this.intentService.onChangedConnector(connector);
-      },
-      true
-    );
- 
+    this.listnerConnectorCreated = (e: CustomEvent) => {
+      this.logger.log("[CDS-CANVAS] connector-created:", e);
+      const connector = e.detail.connector;
+      connector['created'] = true;
+      delete connector['deleted'];
+      this.connectorService.addConnectorToList(connector);
+      this.intentService.onChangedConnector(connector);
+    };
+    document.addEventListener("connector-created", this.listnerConnectorCreated, false);
+
     /** connector-deleted **
-     * scatta quando viene eliminato un connettore:
-     *  - elimino il connettore dalla lista dei connettori (deleteConnectorToList)
-     *  - notificare alle actions che i connettori sono cambiati (onChangedConnector) per aggiornare i pallini
+    * fires when a connector is deleted:
+    * delete the connector from the connector list (deleteConnectorToList)
+    * notify actions that connectors have changed (onChangedConnector) to update the dots
     */
-    document.addEventListener(
-      "connector-deleted", (e: CustomEvent) => {
-        this.logger.log("[CDS-CANVAS] connector-deleted:", e);
-        const connector = e.detail.connector;
-        connector['deleted'] = true;
-        delete connector['created'];
-        // const intentId = this.connectorSelected.id.split('/')[0];
-        // let intent = this.intentService.getIntentFromId(intentId);
-        // if(intent.attributes && intent.attributes.connectors && intent.attributes.connectors[this.connectorSelected.id]){
-        //   delete intent.attributes.connectors[this.connectorSelected.id];
-        // }
-        // this.connectorService.updateConnectorAttributes(this.connectorSelected.id, event);
-        this.connectorService.deleteConnectorToList(connector.id);
-        this.intentService.onChangedConnector(connector);
-        this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
-      },
-      true
-    );
+    this.listnerConnectorDeleted = (e: CustomEvent) => {
+      this.logger.log("[CDS-CANVAS] connector-deleted:", e);
+      const connector = e.detail.connector;
+      connector['deleted'] = true;
+      delete connector['created'];
+      // const intentId = this.connectorSelected.id.split('/')[0];
+      // let intent = this.intentService.getIntentFromId(intentId);
+      // if(intent.attributes && intent.attributes.connectors && intent.attributes.connectors[this.connectorSelected.id]){
+      //   delete intent.attributes.connectors[this.connectorSelected.id];
+      // }
+      // this.connectorService.updateConnectorAttributes(this.connectorSelected.id, event);
+      this.connectorService.deleteConnectorToList(connector.id);
+      this.intentService.onChangedConnector(connector);
+      this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+    };
+    document.addEventListener("connector-deleted", this.listnerConnectorDeleted, false);
 
     /** connector-updated **
-     * scatta quando viene aggiornato un connettore:
-    */
-    document.addEventListener(
-      "connector-updated", (e: CustomEvent) => {
-        this.logger.log("[CDS-CANVAS] connector-updated:", e);
-        const connector = e.detail.connector;
-        // if(connector.notify)
-        connector['updated'] = true;
-        this.intentService.onChangedConnector(connector);
-      },
-      true
-    );
+    * fires when a connector is updated:
+    */   
+    this.listnerConnectorUpdated = (e: CustomEvent) => {
+      this.logger.log("[CDS-CANVAS] connector-updated:", e);
+      const connector = e.detail.connector;
+      // if(connector.notify)
+      connector['updated'] = true;
+      this.intentService.onChangedConnector(connector);
+    };
+    document.addEventListener("connector-updated", this.listnerConnectorUpdated, false);
+
 
     /** connector-selected **
-     * scatta quando viene selezionato un connettore:
-     * deseleziono action e intent (unselectAction)
+    * fires when a connector is selected:
+    * unselect action and intent (unselectAction)
+    */  
+    this.listnerConnectorSelected = (e: CustomEvent) => {
+      //console.log("[CDS-CANVAS] connector-selected:", e, e.detail.mouse_pos);
+      this.closeAllPanels();
+      this.closeActionDetailPanel();
+      this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
+      this.mousePosition = e.detail.mouse_pos;
+      this.mousePosition.x -= -10;
+      this.mousePosition.y -= 25;
+      //this.connectorSelected =  e.detail.connector;
+      this.setConnectorSelected(e.detail.connector.id);
+      // this.IS_OPEN_ADD_ACTIONS_MENU = true;
+      // this.positionFloatMenu = e.detail.mouse_pos;
+      this.intentService.unselectAction();
+    };
+    document.addEventListener("connector-selected", this.listnerConnectorSelected, false);
+
+    /**  keydown 
+    * check if Ctrl (Windows) or Command (Mac) and Z were pressed at the same time
     */
-    document.addEventListener(
-      "connector-selected", (e: CustomEvent) => {
-        //console.log("[CDS-CANVAS] connector-selected:", e, e.detail.mouse_pos);
-        this.closeAllPanels();
-        this.closeActionDetailPanel();
-        this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
-        this.mousePosition = e.detail.mouse_pos;
-        this.mousePosition.x -= -10;
-        this.mousePosition.y -= 25;
-        //this.connectorSelected =  e.detail.connector;
-        this.setConnectorSelected(e.detail.connector.id);
-        // this.IS_OPEN_ADD_ACTIONS_MENU = true;
-        // this.positionFloatMenu = e.detail.mouse_pos;
-        this.intentService.unselectAction();
-
-      },
-      true
-    );
-    
-    
-    
-  
-    document.addEventListener(
-      "keydown", (e) => {
-        // Verifica se è stato premuto Ctrl (Windows) o Command (Mac) e Z contemporaneamente
-        this.logger.log('[CDS-CANVAS]  keydown ', e);
-        var focusedElement = document.activeElement;
-        if (focusedElement.tagName === 'TEXTAREA') {
-          return;
-        }
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
-          e.preventDefault(); 
-          // Evita il comportamento predefinito, ad esempio la navigazione indietro nella cronologia del browser
-          this.logger.log("Hai premuto Ctrl+ALT+Z (o Command+Alt+Z)!");
-          this.intentService.restoreLastREDO();
-        } else if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-          // Impedisci il comportamento predefinito (ad esempio, l'undo in un campo di testo)
-          e.preventDefault(); 
-          this.logger.log("Hai premuto Ctrl+Z (o Command+Z)!");
-          this.intentService.restoreLastUNDO();
-        }
-      }, false
-    );
-
-    
+    this.listnerKeydown = (e) => {
+      this.logger.log('[CDS-CANVAS]  keydown ', e);
+      var focusedElement = document.activeElement;
+      if (focusedElement.tagName === 'TEXTAREA') {
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
+        e.preventDefault(); 
+        // Evita il comportamento predefinito, ad esempio la navigazione indietro nella cronologia del browser
+        this.logger.log("Hai premuto Ctrl+ALT+Z (o Command+Alt+Z)!");
+        this.intentService.restoreLastREDO();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+        // Impedisci il comportamento predefinito (ad esempio, l'undo in un campo di testo)
+        e.preventDefault(); 
+        this.logger.log("Hai premuto Ctrl+Z (o Command+Z)!");
+        this.intentService.restoreLastUNDO();
+      }
+    };
+    document.addEventListener("keydown", this.listnerKeydown, false);
 
   }
+
   // ---------------------------------------------------------
-  // END listener di eventi Stage e Connectors
+  // END Stage and Connectors event listeners
   // ---------------------------------------------------------
 
 
