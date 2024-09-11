@@ -969,7 +969,7 @@ export class ConnectorService {
   private deleteConnectorAttributes(connectorID){
     const intentId = connectorID.split('/')[0];
     let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
-    if(intent.attributes.connectors && intent.attributes.connectors[connectorID]){
+    if(intent && intent.attributes && intent.attributes.connectors && intent.attributes.connectors[connectorID]){
       delete intent.attributes.connectors[connectorID];
     }
     this.updateConnectorAttributes(connectorID, null);
