@@ -197,17 +197,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   onIntentRendered(intentID) {
-    // this.logger.log("[CDS-CANVAS3]  ••••onIntentRendered ••••",  this.stageService.loaded);
-    this.labelInfoLoading = 'CDSCanvas.intentsProgress';
-    if(this.mapOfIntents[intentID] && this.mapOfIntents[intentID].shown === false) {
-      this.mapOfIntents[intentID].shown = true;
-      this.countRenderedElements++;
-      this.loadingProgress += (this.countRenderedElements/this.totElementsOnTheStage)*100;
-    }
-    this.logger.log("[CDS-CANVAS3] •••• onIntentRendered •••• ", intentID, this.countRenderedElements);
-    const allShownTrue = Object.values(this.mapOfIntents).every(intent => intent.shown === true);
-    if(allShownTrue){ 
-      this.onAllIntentsRendered();
+    if(this.stageService.loaded === false && this.renderedAllElements === false){
+      // this.logger.log("[CDS-CANVAS3]  ••••onIntentRendered ••••",  this.stageService.loaded);
+      this.labelInfoLoading = 'CDSCanvas.intentsProgress';
+      if(this.mapOfIntents[intentID] && this.mapOfIntents[intentID].shown === false) {
+        this.mapOfIntents[intentID].shown = true;
+        this.countRenderedElements++;
+        this.loadingProgress += (this.countRenderedElements/this.totElementsOnTheStage)*100;
+      }
+      this.logger.log("[CDS-CANVAS3] •••• onIntentRendered •••• ", intentID, this.countRenderedElements);
+      const allShownTrue = Object.values(this.mapOfIntents).every(intent => intent.shown === true);
+      if(allShownTrue){ 
+        this.onAllIntentsRendered();
+      }
     }
   }
 

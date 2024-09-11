@@ -705,7 +705,7 @@ export class IntentService {
     // this.logger.log('[INTENT SERVICE] --> selectIntent',  this.listOfIntents, intentID);
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
     if(this.intentSelected)this.stageService.setDragElement(this.intentSelected.intent_id);
-   
+    return this.intentSelected;
   }
 
   /** selectAction */
@@ -720,10 +720,14 @@ export class IntentService {
 
   /** setIntentSelected */
   public setIntentSelected(intentID){
-    this.selectIntent(intentID);
+    this.intentSelected = this.selectIntent(intentID);
     this.actionSelectedID = null;
-    this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
+    this.listActions = null;
     this.selectedAction = null;
+    if(this.intentSelected && this.intentSelected.actions){
+      this.listActions = this.intentSelected.actions;
+    }
+    //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
     // this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
     this.behaviorIntent.next(this.intentSelected);
     // if(!this.intentSelected)return;
@@ -1298,8 +1302,12 @@ export class IntentService {
     this.setBehaviorUndoRedo();
     this.logger.log('[INTENT SERVICE] updateIntentNew -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
     this.refreshIntents();
-    let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
-    this.refreshIntent(intentToUpdate)
+    try {
+      let intentToUpdate = this.listOfIntents.find((obj) => obj.intent_id === this.intentSelected.intent_id);
+      this.refreshIntent(intentToUpdate)
+    } catch (error) {
+      this.logger.log('[INTENT SERVICE] -> error, ', error);
+    }
     this.opsUpdate(this.payload);
   }
 
@@ -1595,10 +1603,12 @@ export class IntentService {
     this.arrayCOPYPAST = [];
   }
 
+
   private pasteIntentOntoStage(newIntent, prevIntent_id, newIntent_id){
     let elementJson = JSON.stringify(newIntent).replace(prevIntent_id, newIntent_id);
     let intent = JSON.parse(elementJson);
-    this.connectorService.createConnectorsOfIntent(intent);
+    intent = this.resetConnectors(intent);
+    // this.connectorService.createConnectorsOfIntent(intent);
     // this.connectorService.updateConnectorsOfBlock(intent.intent_id);
     this.addNewIntentToListOfIntents(intent);
     this.setDragAndListnerEventToElement(intent.intent_id);
@@ -1606,5 +1616,25 @@ export class IntentService {
     this.saveNewIntent(intent, null, null);
     this.logger.log('[INTENT SERVICE] -> listOfIntents, ', intent);
   }
+
+
+  private resetConnectors(json) {
+    let results = [];
+    function exploreObject(obj) {
+        if (typeof obj === 'object' && obj !== null) {
+            for (let key in obj) {
+                if (typeof obj[key] === 'string' && obj[key].startsWith("#")) {
+                    results.push({ key: key, value: obj[key] });
+                    obj[key] = "";
+                }
+                exploreObject(obj[key]);
+            }
+        }
+    }
+    exploreObject(json);
+    return json;
+    //return results;
+  }
+
 
 }
