@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.4
+-  **added**: inserted blockid and blockname parameters in the page url
+- **bug-fixed**: fixed graphical error when hovering over an empty intent when the "add action" button is displayed
+- **bug-fixed**: get last child in url without parameters
+
 # 1.21.0-rc.3
 - **added**: 5m, 10m, 30m and 1h time slot for rules condition
 - **bug-fixed**: copy "intent" without connectors
