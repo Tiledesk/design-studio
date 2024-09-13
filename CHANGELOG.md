@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.3
+- **added**: 5m, 10m, 30m and 1h time slot for rules condition
+- **bug-fixed**: copy "intent" without connectors
+- **bug-fixed**: delete connector when "intent" is not selected
+- **bug-fixed**: age-old bug of connector deletion error
+
 # 1.21.0-rc.2
 - **added**: removed all listener event when on navigation between tabs
 
