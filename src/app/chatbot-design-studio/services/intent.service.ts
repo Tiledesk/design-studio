@@ -96,6 +96,23 @@ export class IntentService {
     this.changedConnector.next(connector);
   }
 
+        
+  public setStartIntentSelected(blockId, blockName){
+    if(blockName){
+      const foundIntent = this.listOfIntents.find(obj => obj.intent_display_name.trim() === blockName);
+      if (foundIntent) {
+        blockId = foundIntent.intent_id;
+        return blockId;
+      } 
+    }
+    if(blockId){
+      return blockId;
+    }
+    return;
+  }
+
+
+
   public setDefaultIntentSelected(){
     if(this.listOfIntents && this.listOfIntents.length > 0){
       let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
@@ -703,6 +720,7 @@ export class IntentService {
   /** selectIntent */
   public selectIntent(intentID){
     // this.logger.log('[INTENT SERVICE] --> selectIntent',  this.listOfIntents, intentID);
+    this.intentSelected = null;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
     if(this.intentSelected)this.stageService.setDragElement(this.intentSelected.intent_id);
     return this.intentSelected;
@@ -729,7 +747,9 @@ export class IntentService {
     }
     //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
     // this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
-    this.behaviorIntent.next(this.intentSelected);
+    if(this.intentSelected){
+      this.behaviorIntent.next(this.intentSelected);
+    }
     // if(!this.intentSelected)return;
     // chiudo tutti i pannelli
     // this.controllerService.closeAllPanels();

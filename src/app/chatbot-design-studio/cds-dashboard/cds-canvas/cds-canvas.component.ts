@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
 import { Observable, Subscription, skip, timeout } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -49,6 +50,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   listnerEndDragging: (e: CustomEvent) => void;
   listnerDragged: (e: CustomEvent) => void;
   listnerStartDragging: (e: CustomEvent) => void;
+
+  blockId: string | null = null;
+  blockName: string | null = null;
 
   id_faq_kb: string;
   TYPE_OF_MENU = TYPE_OF_MENU;
@@ -119,7 +123,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private controllerService: ControllerService,
     private translate: TranslateService,
     public dashboardService: DashboardService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -127,8 +132,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   ngOnInit(): void {
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
+    this.getParamsFromURL();
     this.initialize();
   }
+
 
   /** */
   ngOnDestroy() {
@@ -153,7 +160,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (this.subscriptionUndoRedo) {
       this.subscriptionUndoRedo.unsubscribe();
     }
-
     document.removeEventListener("connector-drawn", this.listenerConnectorDrawn, false);
     document.removeEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
     document.removeEventListener("start-dragging", this.listnerStartDragging, false);
@@ -165,7 +171,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     document.removeEventListener("connector-draft-released", this.listnerConnectorDraftReleased, false);
     document.removeEventListener("end-dragging", this.listnerEndDragging, false);
     document.removeEventListener("dragged", this.listnerDragged, false);
-
   }
 
   /** */
@@ -181,7 +186,26 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     }, 20000);
   }
 
+  /**
+   * getParamsFromURL
+   */
+  private getParamsFromURL(){
+    this.route.queryParams.subscribe(params => {
+      console.log('[CDS-CANVAS] Block params:', params);
+      this.blockId = params['blockid'];
+      if (this.blockId) {
+        console.log('[CDS-CANVAS] Block ID:', this.blockId);
+      }
+      this.blockName = params['blockname'];
+      if (this.blockName) {
+        console.log('[CDS-CANVAS] Block NAME:', this.blockName);
+      }
+    });
+  }
 
+  /** 
+   * initLoadingStage
+  */
   initLoadingStage(){
     this.stageService.loaded = false;
     this.totElementsOnTheStage = 0;
@@ -196,6 +220,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
 
+  /**
+   * 
+   * @param intentID 
+   */
   onIntentRendered(intentID) {
     if(this.stageService.loaded === false && this.renderedAllElements === false){
       // this.logger.log("[CDS-CANVAS3]  ••••onIntentRendered ••••",  this.stageService.loaded);
@@ -235,15 +263,27 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   private checkAndShowStage(){
-    const allShownTrue = Object.values(this.mapOfConnectors).every(connector => connector.shown == true);
-     this.logger.log("[CDS-CANVAS3]  •••• checkAndshowStage", this.mapOfConnectors, allShownTrue);
-    if(allShownTrue){ 
-      this.stageService.loaded = true;
-      this.loadingProgress = 100;
-      this.renderedAllElements = true;
-      this.labelInfoLoading = 'CDSCanvas.connectorsComplete';
-      this.logger.log("[CDS-CANVAS3]  •••• Tutti i connettori sono stati renderizzati ••••", this.countRenderedElements, this.renderedAllElements);
-    }  
+    if(this.stageService.loaded === false){
+      const allShownTrue = Object.values(this.mapOfConnectors).every(connector => connector.shown == true);
+      this.logger.log("[CDS-CANVAS3]  •••• checkAndshowStage", this.mapOfConnectors, allShownTrue);
+      if(allShownTrue){ 
+        this.stageService.loaded = true;
+        this.loadingProgress = 100;
+        this.renderedAllElements = true;
+        this.labelInfoLoading = 'CDSCanvas.connectorsComplete';
+        setTimeout(() => {
+          if(this.blockId || this.blockName) {
+            const intentId = this.intentService.setStartIntentSelected(this.blockId, this.blockName);
+             this.logger.log("[CDS-CANVAS3]  ••••setStartIntentSelected: ", intentId);
+            if(intentId){
+              this.intentService.setIntentSelected(intentId);
+              this.posCenterIntentSelected(this.intentService.intentSelected);
+            }
+          }
+        }, 0);
+        this.logger.log("[CDS-CANVAS3]  •••• Tutti i connettori sono stati renderizzati ••••", this.countRenderedElements, this.renderedAllElements);
+      }  
+    }
   }
 
   private showStageForLimitTime(){
@@ -720,8 +760,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** posCenterIntentSelected */
   private posCenterIntentSelected(intent) {
-    var stageElement = document.getElementById(intent.intent_id);
-    this.stageService.centerStageOnPosition(stageElement);
+    if(intent && intent.intent_id){
+      var stageElement = document.getElementById(intent.intent_id);
+      this.stageService.centerStageOnPosition(stageElement);
+    }
   }
 
   /**  updateIntent 
