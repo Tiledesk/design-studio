@@ -933,7 +933,7 @@ export class IntentService {
       action.max_tokens = 256;
       action.temperature = 0.7;
       action.top_k = 5;
-      action.model = TYPE_GPT_MODEL['GPT-4o'].value
+      action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
       action.preview = [];
       action.history = false;
     }
@@ -941,7 +941,7 @@ export class IntentService {
       action = new ActionGPTTask();
       action.max_tokens = 256;
       action.temperature = 0.7;
-      action.model = TYPE_GPT_MODEL['GPT-4o'].value
+      action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
       action.assignReplyTo = 'gpt_reply';
       action.preview = [];
     }

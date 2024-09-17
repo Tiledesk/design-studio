@@ -81,7 +81,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   ngOnInit(): void {
     this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive').map((el)=> {
+    this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
       if(ai_models[el.value])
         return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
       else
