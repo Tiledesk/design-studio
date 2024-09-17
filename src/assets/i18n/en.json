@@ -961,8 +961,8 @@
         "gpt-4-turbo-preview": { "description": ""},
         "gpt-4o": { "description": ""},
         "gpt-4o-mini": { "description": ""},
-        "o1-mini": { "description": "test"},
-        "o1-preview": { "description": "test"}
+        "o1-mini": { "description": ""},
+        "o1-preview": { "description": ""}
     },
     "New":"New",
     "Event":"Event",
