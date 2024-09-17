@@ -7,9 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.5
+- **added**: o1-mini and o1-preview gpt models 
+
 # 1.21.0-rc.4
 -  **added**: inserted blockid and blockname parameters in the page url
-- **bug-fixed**: fixed graphical error when hovering over an empty intent when the "add action" button is displayed
+- **bug-fixed**: graphical error when hovering over an empty intent when the "add action" button is displayed
 - **bug-fixed**: get last child in url without parameters
 
 # 1.21.0-rc.3
