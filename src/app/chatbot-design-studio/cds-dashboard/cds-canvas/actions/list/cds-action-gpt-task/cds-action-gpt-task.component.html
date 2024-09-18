@@ -204,7 +204,8 @@
                         [itemSelected]="action.model"
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"
-                        [optionalBindAdditionalText]="'multiplier'" 
+                        [optionalBindAdditionalText]="'multiplier'"
+                        [optionalBindDescription]="'description'"
                         (onSelected)="onChangeSelect($event, 'model')">
                     </cds-select>
                 </div>
@@ -215,17 +216,17 @@
                     <div class="action-wait-content">
 
                         <div class="action-wait-slider ">
-                            <div class="action-wait-range">10</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].min}}</div>
                             <mat-slider 
-                                class="wait-slider" 
-                                thumbLabel 
-                                [displayWith]="formatLabel" 
-                                step="1"  min="10" max="2048"
+                                class="wait-slider"  thumbLabel 
+                                [step]="ai_setting['max_tokens'].step"  
+                                [min]="ai_setting['max_tokens'].min"
+                                [max]="ai_setting['max_tokens'].max"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
                             </mat-slider>
-                            <div class="action-wait-range">2048</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].max}}</div>
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
@@ -241,16 +242,16 @@
                         <div class="action-wait-content">
 
                             <div class="action-wait-slider">
-                                <div class="action-wait-range">0</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].min}}</div>
                                 <mat-slider 
-                                    class="wait-slider" 
-                                    thumbLabel 
-                                    [displayWith]="formatLabel" 
-                                    step="0.05" min="0" max="1" 
+                                    class="wait-slider" thumbLabel
+                                    [step]="ai_setting['temperature'].step"  
+                                    [min]="ai_setting['temperature'].min"
+                                    [max]="ai_setting['temperature'].max" 
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">1</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].max}}</div>
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
