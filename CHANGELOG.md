@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.6
+- **added**: timestamp, now, chatbotToken, UUID, UUIDv4 variables
+
 # 1.21.0-rc.5
 - **added**: o1-mini and o1-preview gpt models 
 
