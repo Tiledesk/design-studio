@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.20.1
+
 # 1.20.0
 
 # 1.20.0-rc.1 
