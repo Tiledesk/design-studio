@@ -894,6 +894,7 @@
         "uploadedDocument":"Uploaded document",
         "uploadedImage":"Uploaded image",
         "leadAttributes":"Lead attributes",
+        "dynamicAttributes":"Dynamic attributes",
         "voiceFlow":"Voice flow",
         "mostUsedELements":{
             "last_user_text":{ "description":"The last text the user typed. This is overwritten on each user reply" },
@@ -909,6 +910,7 @@
             "last_message_id":{ "description":"The unique ID of the last message sent" },
             "conversation_id":{ "description":"This conversation unique ID" },
             "chatbot_name":{ "description":"This chatbot name" },
+            "chatbotToken": { "description":"" },
             "user_id":{ "description":"The user unique ID inside {{BRAND_NAME}} database" },
             "user_agent":{ "description":"The web user agent where this conversation initiated" },
             "chatChannel":{ "description":"The channel where this conversation belongs to. Ex. 'web', 'whatsapp', 'facebook', 'telegram'" },
@@ -939,6 +941,12 @@
             "currentPhoneNumber":{ "description":"The user phone used in the current conversation (i.e. coming from Whatsapp / SMS channels)" },
             "decodedCustomJWT":{ "description":"When the end-user (lead) is strong authenticated this JSON object contains certified info from the authentication provider. To get certified email use {{decodedCustomJWT.email}}. In the same way you can get firstname {{decodedCustomJWT.firstname}}, lastname {{decodedCustomJWT.laastname}} or custom attributes, i.e. {{decodedCustomJWT.attributes.SSN}}" },
             "strongAuthenticated":{ "description":"Indicates that the current user logged in the chat session with 'strong authentication'" }
+        },
+        "dynamicAttributesElements":{
+            "timestamp":{ "description":"" },
+            "now":{ "description":"" },
+            "UUID":{ "description":"" },
+            "UUIDv4":{ "description":"" }
         },
         "voiceFlowElements":{
             "voiceLanguage":{ "description":"Define the main language for the voice system interpreter" },

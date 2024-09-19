@@ -26,6 +26,7 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'last_message_id',                          value: 'last_message_id',                   description: 'CDSvariablesList.systemDefinedElements.last_message_id.description',                          src: '', icon: 'textsms' },
             { name: 'conversation_id',                          value: 'conversation_id',                   description: 'CDSvariablesList.systemDefinedElements.conversation_id.description',                          src: '', icon: 'textsms' },
             { name: 'chatbot_name',                             value: 'chatbot_name',                      description: 'CDSvariablesList.systemDefinedElements.chatbot_name.description',                             src: '', icon: 'person' },
+            { name: 'chatbot_token',                            value: 'chatbotToken',                      description: 'CDSvariablesList.systemDefinedElements.chatbotToken.description',                             src: '', icon: 'key' },
             { name: 'user_id',                                  value: 'user_id',                           description: 'CDSvariablesList.systemDefinedElements.user_id.description',                                  src: '', icon: 'person' },
             { name: 'user_agent',                               value: 'user_agent',                        description: 'CDSvariablesList.systemDefinedElements.user_agent.description',                               src: '', icon: 'person' },
             { name: 'chatChannel',                              value: 'chatChannel',                       description: 'CDSvariablesList.systemDefinedElements.chatChannel.description',                              src: '', icon: 'language' },
@@ -64,6 +65,14 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'current Phone Number',                     value: 'currentPhoneNumber',                description: 'CDSvariablesList.leadAttributesElements.currentPhoneNumber.description',                      src: '', icon:'person'},
             { name: 'decoded Custom JWT',                       value: 'decodedCustomJWT',                  description: 'CDSvariablesList.leadAttributesElements.decodedCustomJWT.description',                        src: '', icon:'password'},
             { name: 'strong Authenticated',                     value: 'strongAuthenticated',               description: 'CDSvariablesList.leadAttributesElements.strongAuthenticated.description',                     src: '', icon:'password'}
+        ]
+    },
+    {   key: 'dynamicAttributes',
+        elements: [
+            { name: 'timestamp',                                value: 'timestamp',                         description: 'CDSvariablesList.dynamicAttributesElements.timestamp.description',                            src: '', icon:'calendar_today'},
+            { name: 'now',                                      value: 'now',                               description: 'CDSvariablesList.dynamicAttributesElements.now.description',                                  src: '', icon:'calendar_today'},
+            { name: 'UUID',                                     value: 'UUID',                              description: 'CDSvariablesList.dynamicAttributesElements.UUID.description',                                 src: '', icon:'code'},
+            { name: 'UUIDv4',                                   value: 'UUIDv4',                            description: 'CDSvariablesList.dynamicAttributesElements.UUIDv4.description',                               src: '', icon:'code'},
         ]
     },
     {   key: 'voiceFlow',

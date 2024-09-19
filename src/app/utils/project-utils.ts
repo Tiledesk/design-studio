@@ -8,6 +8,7 @@ import { LoggerService } from "src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from "src/chat21-core/providers/logger/loggerInstance";
 import { TYPE_ACTION, TYPE_ACTION_VXML } from "../chatbot-design-studio/utils-actions";
 import { AppConfigService } from '../services/app-config';
+import { variableList } from '../chatbot-design-studio/utils-variables';
 
 @Injectable({
     providedIn: 'root'
@@ -230,6 +231,17 @@ export class ProjectPlanUtils {
         
         //MANAGE ACTION LIST
         Object.values(ACTIONS_LIST).filter(el => el.category == actionType).map( el => el.status = 'inactive')
+
+
+        //MANAGE VOICE ATTRIBUTES LIST
+        if(actionType === TYPE_ACTION_CATEGORY.VOICE){
+            let index = variableList.findIndex(el => el.key === 'voiceFlow')
+            if(index > -1){
+                variableList.splice(index,1)
+            }
+        }
+
+
     }
 
 }
