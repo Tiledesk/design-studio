@@ -27,6 +27,8 @@
 # 1.21.0-rc.1
 - **added**: loader while canvas is drawing intents and connectors
 
+# 1.20.0
+
 # 1.20.0-rc.1 
 - **added**: slidet-top animation if autocomplete options is 
 - **bug-fixed**: data.namespace is undefined ig attribute-dialog is opened from gpt actions
