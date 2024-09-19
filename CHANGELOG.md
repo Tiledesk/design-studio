@@ -27,6 +27,8 @@
 # 1.21.0-rc.1
 - **added**: loader while canvas is drawing intents and connectors
 
+# 1.20.1
+
 # 1.20.0
 
 # 1.20.0-rc.1 
