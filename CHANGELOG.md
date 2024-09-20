@@ -7,6 +7,31 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.20.2
+
+# 1.21.0-rc.6
+- **added**: timestamp, now, chatbotToken, UUID, UUIDv4 variables
+
+# 1.21.0-rc.5
+- **added**: o1-mini and o1-preview gpt models 
+
+# 1.21.0-rc.4
+-  **added**: inserted blockid and blockname parameters in the page url
+- **bug-fixed**: graphical error when hovering over an empty intent when the "add action" button is displayed
+- **bug-fixed**: get last child in url without parameters
+
+# 1.21.0-rc.3
+- **added**: 5m, 10m, 30m and 1h time slot for rules condition
+- **bug-fixed**: copy "intent" without connectors
+- **bug-fixed**: delete connector when "intent" is not selected
+- **bug-fixed**: age-old bug of connector deletion error
+
+# 1.21.0-rc.2
+- **added**: removed all listener event when on navigation between tabs
+
+# 1.21.0-rc.1
+- **added**: loader while canvas is drawing intents and connectors
+
 # 1.20.1
 
 # 1.20.0
