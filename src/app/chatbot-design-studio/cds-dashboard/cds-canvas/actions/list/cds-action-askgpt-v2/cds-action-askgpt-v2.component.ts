@@ -21,6 +21,7 @@ import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -67,6 +68,8 @@ export class CdsActionAskgptV2Component implements OnInit {
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
   }
 
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
+  
   private subscriptionChangedConnector: Subscription;
 
   private logger: LoggerService = LoggerInstance.getInstance();

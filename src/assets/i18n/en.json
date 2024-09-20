@@ -303,7 +303,7 @@
         "KnowledgeBaseID":"Knowledge Base ID",
         "ManageKnowledgeBases":"Manage Knowledge Bases",
         "UseKBName": "Use Knowledge Base name",
-        "UseKBNameDescription": "Check this option if you want to use this chatbot across different projects. <a href='https://gethelp.tiledesk.com/' target='_blank'>More info</a>",
+        "UseKBNameDescription": "Check this option if you want to use this chatbot across different projects.",
         "ManageIntegration":"Manage integration",
         "Howitwork":"How it works?",
         "GPTReply":"Assign GPT Reply to",
