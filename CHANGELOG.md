@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.20.3
+- **bug-fixed**: minor improvements
+
+# 1.20.2
+
 # 1.21.0-rc.6
 - **added**: timestamp, now, chatbotToken, UUID, UUIDv4 variables
 
