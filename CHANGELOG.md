@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.7
+-  **added**: improvements on widget support component
+
 # 1.20.3
 - **bug-fixed**: minor improvements
 
