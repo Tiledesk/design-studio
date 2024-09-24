@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.8
+- **bug-fixed**: connector not updated while adding new command
+
 # 1.21.0-rc.7
 -  **added**: improvements on widget support component
 
