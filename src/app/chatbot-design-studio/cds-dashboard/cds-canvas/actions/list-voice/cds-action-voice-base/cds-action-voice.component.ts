@@ -166,7 +166,7 @@ export class CdsActionVoiceComponent implements OnInit {
       this.arrayResponses[previousPos-1] = waitCur;
       this.arrayResponses[previousPos] = msgCur;
       // this.logger.log( 'DROP REPLY ---> ', this.arrayResponses);
-      this.connectorService.updateConnector(this.intentSelected.id);
+      this.connectorService.updateConnector(this.intentSelected.intent_id);
       const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.intentSelected};
       this.onUpdateAndSaveAction(element);
     } catch (error) {
@@ -187,7 +187,7 @@ export class CdsActionVoiceComponent implements OnInit {
       to = from - 2;
       this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]);
       // this.logger.log( 'onMoveUpResponse ---> ', this.arrayResponses);
-      this.connectorService.updateConnector(this.intentSelected.id);
+      this.connectorService.updateConnector(this.intentSelected.intent_id);
       const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
       this.onUpdateAndSaveAction(element);
     } catch (error) {
@@ -206,7 +206,7 @@ export class CdsActionVoiceComponent implements OnInit {
       to = from + 2;
       this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]);
       // this.logger.log( 'onMoveUpResponse ---> ', this.arrayResponses);
-      this.connectorService.updateConnector(this.intentSelected.id);
+      this.connectorService.updateConnector(this.intentSelected.intent_id);
       const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
       this.onUpdateAndSaveAction(element);
     } catch (error) {
