@@ -70,7 +70,7 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
     {   key: 'dynamicAttributes',
         elements: [
             { name: 'timestamp',                                value: 'timestamp',                         description: 'CDSvariablesList.dynamicAttributesElements.timestamp.description',                            src: '', icon:'calendar_today'},
-            { name: 'now',                                      value: 'now',                               description: 'CDSvariablesList.dynamicAttributesElements.now.description',                                  src: '', icon:'calendar_today'},
+            { name: 'now (ISO date)',                           value: 'now',                               description: 'CDSvariablesList.dynamicAttributesElements.now.description',                                  src: '', icon:'calendar_today'},
             { name: 'UUID',                                     value: 'UUID',                              description: 'CDSvariablesList.dynamicAttributesElements.UUID.description',                                 src: '', icon:'code'},
             { name: 'UUIDv4',                                   value: 'UUIDv4',                            description: 'CDSvariablesList.dynamicAttributesElements.UUIDv4.description',                               src: '', icon:'code'},
         ]
