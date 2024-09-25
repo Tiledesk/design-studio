@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.9
+-  **added**: dynamicAttributes var description
+-  **added**: response_type in action gpt task
+
 # 1.21.0-rc.8
 - **bug-fixed**: connector not updated while adding new command
 
