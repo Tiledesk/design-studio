@@ -32,7 +32,7 @@ export class CdsActionReplySettingsComponent implements OnInit {
 
   radioOptions: Array<{name: string, value: string, disabled: boolean, checked: boolean}>= [ 
     {name: 'blind',              value: 'blind',         disabled: false, checked: false  }, 
-    {name: 'consultant',         value: 'consultant',    disabled: false, checked: true   }
+    {name: 'consultation',       value: 'consultation',  disabled: false, checked: true   }
   ]
   // Connectors NoInput- NoMatch //
   idIntentSelected: string;
