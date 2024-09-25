@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.20.5
+- **bug-fixed**: minor improvements
+
 # 1.20.4
 
 # 1.20.3

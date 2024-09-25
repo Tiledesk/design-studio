@@ -292,6 +292,8 @@
         "Prompt":"Prompt",
         "EnterPrompt":"Enter prompt",
         "UseChatHistoryInPrompt":"Use the chat history in the prompt",
+        "ResponseType":"Response as JSON format",
+        "ResponseTypeDescription":"When JSON mode is turned on, the model's output is ensured to be valid JSON, except for in some edge cases that you should detect and handle appropriately",
         "EnterTheQuestion":"Enter the question",
         "SelectNamespace":"Select namespace",
         "SelectKnowledgeBase":"Select Knowledge Base",
@@ -437,6 +439,7 @@
         "Terminator":"Terminator",
         "Timeout": "Timeout",
         "TransferTo": "Transfer to",
+        "TransferType":"Transfer type",
         "BargeIn":"Barge-in",
         "NoMatch":"No match",
         "NoInput":"No input",
@@ -455,7 +458,12 @@
         "SelectedTimeSlot":"Selected time slot",
         "SelectTimeSlot":"Select time slot",
         "IgnoreOperatingHours":"Ignore General operating hours",
-        "IgnoreOperatingHoursDescription": "Check this option if you want to only check agents availability ignoring the General Operating hours settings. <br> This option is also useful if you want to demand opening and closing hours checking to the If Operating Hours Action, specifing a specific time slot"
+        "IgnoreOperatingHoursDescription": "Check this option if you want to only check agents availability ignoring the General Operating hours settings. <br> This option is also useful if you want to demand opening and closing hours checking to the If Operating Hours Action, specifing a specific time slot",
+        "intentsProgress": "Loading intents in progress",
+        "intentsComplete": "Intents loading completed",
+        "connectorsProgress": "Loading connectors in progress",
+        "connectorsComplete": "Connectors loading completed",
+        "loadingCompleteWithErrors":"Loading completed with errors"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -943,10 +951,10 @@
             "strongAuthenticated":{ "description":"Indicates that the current user logged in the chat session with 'strong authentication'" }
         },
         "dynamicAttributesElements":{
-            "timestamp":{ "description":"" },
-            "now":{ "description":"" },
-            "UUID":{ "description":"" },
-            "UUIDv4":{ "description":"" }
+            "timestamp":{ "description":"The current timestamp in millis (Number format)" },
+            "now":{ "description":"The current date in the ISODate format. Ex. 2024-09-25T10:14:41.638Z (String format)" },
+            "UUID":{ "description":"A dynamic generated UUID obtained from a UUIDv4 removing the dashes" },
+            "UUIDv4":{ "description":"A dynamic standard UUIDv4" }
         },
         "voiceFlowElements":{
             "voiceLanguage":{ "description":"Define the main language for the voice system interpreter" },
@@ -954,7 +962,6 @@
             "event":{ "description":"Every handled event during current call flow" },
             "lastBlock":{ "description":"The last triggered block heard by the caller" }
         }
-
     },
     "TYPE_GPT_MODEL": {
         "text-davinci-003": { "description": ""},
