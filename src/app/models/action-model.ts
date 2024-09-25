@@ -392,6 +392,7 @@ export class ActionGPTTask extends Action {
     format_type: string;
     trueIntent: string;
     falseIntent: string;
+    response_type: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.GPT_TASK

@@ -21,6 +21,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -71,6 +72,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   projectPlan: PLAN_NAME
   PLAN_NAME = PLAN_NAME
+  BRAND_BASE_INFO = BRAND_BASE_INFO
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(

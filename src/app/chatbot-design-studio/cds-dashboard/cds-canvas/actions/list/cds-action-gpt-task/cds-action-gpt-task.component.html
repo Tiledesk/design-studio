@@ -274,6 +274,19 @@
                     </cds-textarea>
                 </div>
 
+                <div class="field-box" *ngIf="action.hasOwnProperty('response_type')">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.response_type"
+                            (change)="onChangeCheckbox('response_type')">
+                            {{"CDSCanvas.ResponseType" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <label class="field-description">{{ "CDSCanvas.ResponseTypeDescription" | translate }}
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" href='https://platform.openai.com/docs/guides/structured-outputs/json-mode' target='_blank'>{{ 'LearnMore' | translate }}</a>
+                    </label>
+                </div>
+
             </div>
         </mat-expansion-panel>
     </mat-accordion>
