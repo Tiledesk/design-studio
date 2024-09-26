@@ -214,33 +214,6 @@ export class FaqService {
   }
 
   /**
-   * UPLOAD FAQS CSV
-   * @param formData 
-   * @returns 
-   */
-  public uploadFaqCsv(formData: any) {
-    // const headers = new Headers();
-    /** No need to include Content-Type in Angular 4 */
-    // headers.append('Content-Type', 'multipart/form-data');
-
-    // headers.append('Accept', 'text/csv');
-    // headers.append('Authorization', this.TOKEN);
-    // const options = new RequestOptions({ headers: headers });
-
-    const options = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    const url = this.FAQ_URL + 'uploadcsv';
-    this.logger.log('[FAQ-SERV] UPLOAD FAQS CSV - URL ', url);
-
-    return this._httpClient.post(url, formData, options)
-  }
-
-  /**
    * DELETE FAQ (DELETE)
    * @param id 
    * @returns 
