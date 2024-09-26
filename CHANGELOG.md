@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.20.6
+- **removed**: export as csv option in cds-action-detail component
+
 # 1.20.5
 - **bug-fixed**: minor improvements
 
