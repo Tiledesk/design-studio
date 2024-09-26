@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.10
+- **removed**: export as csv option in cds-action-detail component
+
 # 1.21.0-rc.9
 -  **added**: dynamicAttributes var description
 -  **added**: response_type in action gpt task
