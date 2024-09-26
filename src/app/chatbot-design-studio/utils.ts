@@ -21,7 +21,7 @@ export enum SIDEBAR_PAGES {
 
 export enum SETTINGS_SECTION {
     DETAIL          = 'bot_detail',
-    IMPORT_EXPORT   = 'import_export',
+    IMPORT_EXPORT   = 'export',
     COMMUNITY       = 'community',
     DEVELOPER       = 'developer',
     ADVANCED        = 'advanced'
