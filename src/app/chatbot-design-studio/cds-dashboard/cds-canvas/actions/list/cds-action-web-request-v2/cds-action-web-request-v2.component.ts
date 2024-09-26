@@ -283,6 +283,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
         break;
     }
     this.action.headersString = this.jsonHeader
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
   onChangeTextarea(e, type: 'url' | 'body' | 'setting'){
