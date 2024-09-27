@@ -274,15 +274,15 @@
                     </cds-textarea>
                 </div>
 
-                <div class="field-box" *ngIf="action.hasOwnProperty('response_type')">
+                <div class="field-box" *ngIf="action.hasOwnProperty('formatType')">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
-                            [checked]="action?.response_type"
-                            (change)="onChangeCheckbox('response_type')">
-                            {{"CDSCanvas.ResponseType" | translate}}
+                            [checked]="action?.formatType"
+                            (change)="onChangeCheckbox('formatType')">
+                            {{"CDSCanvas.FormatType" | translate}}
                         </mat-checkbox>
                     </section>
-                    <label class="field-description">{{ "CDSCanvas.ResponseTypeDescription" | translate }}
+                    <label class="field-description">{{ "CDSCanvas.FormatTypeDescription" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" href='https://platform.openai.com/docs/guides/structured-outputs/json-mode' target='_blank'>{{ 'LearnMore' | translate }}</a>
                     </label>
                 </div>
