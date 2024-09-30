@@ -64,8 +64,8 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Feedback? New Ideas?
 
-Visit our [Feedback Board](https://tiledesk.sleekplan.app/) to discuss new ideas, suggestions, and solve issues to make Tiledesk even better for you.
+Visit our [Feedback Board]([https://feedback.tiledesk.com/) to discuss new ideas, suggestions, and solve issues to make Tiledesk even better for you.
 
 ## Public Roadmap
 
-Check our [Public Roadmap](https://tiledesk.sleekplan.app/roadmap) to see activities In Progress, Planned, and Under Review. We value your input in shaping the future of Tiledesk.
+Check our [Public Roadmap](https://feedback.tiledesk.com/roadmap) to see activities In Progress, Planned, and Under Review. We value your input in shaping the future of Tiledesk.
