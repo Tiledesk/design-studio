@@ -53,7 +53,7 @@ Design Studio cannot run as a standalone application; it is tightly integrated w
 
 1. Ensure you have an authenticated Tiledesk environment.
 2. Add a key `tiledesk_token` to your browser’s local storage with your Tiledesk authentication token.
-3. Navigate to your project by accessing the following URL pattern: http://loalhost/#/project/<project_id>/chatbot/<chatbot-id>/blocks
+3. Navigate to your project by accessing the following URL pattern: "http://loalhost/#/project/<project_id>/chatbot/<chatbot-id>/blocks"
 
 Please note that Design Studio depends on prior authentication through the Tiledesk platform to function correctly. You must have a valid Tiledesk token and project to access and use the tool.
 
