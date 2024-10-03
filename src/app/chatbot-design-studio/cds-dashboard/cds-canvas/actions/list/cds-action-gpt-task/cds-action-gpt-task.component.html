@@ -103,7 +103,7 @@
         <section class="disable-input-message-section">
             <mat-checkbox 
                 [checked]="action?.history"
-                (change)="onChangeCheckbox('history')">
+                (change)="onChangeCheckbox($event, 'history')">
                 {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
             </mat-checkbox>
         </section>
@@ -277,8 +277,8 @@
                 <div class="field-box" *ngIf="action.hasOwnProperty('formatType')">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
-                            [checked]="action?.formatType"
-                            (change)="onChangeCheckbox('formatType')">
+                            [checked]="action?.formatType === 'json_object'? true: false "
+                            (change)="onChangeCheckbox($event, 'formatType')">
                             {{"CDSCanvas.FormatType" | translate}}
                         </mat-checkbox>
                     </section>

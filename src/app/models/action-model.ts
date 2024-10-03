@@ -389,7 +389,7 @@ export class ActionGPTTask extends Action {
     temperature: number;
     model: string;
     preview?: Array<any>;
-    formatType: boolean;
+    formatType: 'none' | 'json_object';
     trueIntent: string;
     falseIntent: string;
     constructor() {

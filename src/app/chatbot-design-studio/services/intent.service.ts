@@ -909,6 +909,7 @@ export class IntentService {
       action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
       action.assignReplyTo = 'gpt_reply';
       action.preview = [];
+      action.formatType = 'none'
     }
     if(typeAction === TYPE_ACTION.GPT_ASSISTANT){
       action = new ActionGPTAssistant();

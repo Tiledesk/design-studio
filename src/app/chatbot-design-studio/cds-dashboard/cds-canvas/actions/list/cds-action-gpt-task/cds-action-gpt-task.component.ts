@@ -21,6 +21,8 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -71,6 +73,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   projectPlan: PLAN_NAME
   PLAN_NAME = PLAN_NAME
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -237,9 +240,20 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.updateAndSaveAction.emit();
   }
 
-  onChangeCheckbox(target){
+  onChangeCheckbox(event: MatCheckboxChange, target){
+    console.log('targetttttt', event)
     try {
-      this.action[target] = !this.action[target];
+      this.action[target] = event.checked;
+      switch(target){
+        case 'formatType':{
+          if(event.checked){
+            this.action[target] = 'json_object'
+          }else{
+            this.action[target] = 'none'
+          }
+        }
+          
+      }
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     } catch (error) {
       this.logger.log("Error: ", error);
