@@ -79,7 +79,7 @@
         <section class="disable-input-message-section">
             <mat-checkbox 
                 [checked]="action?.history"
-                (change)="onChangeCheckbox('history')">
+                (change)="onChangeCheckbox($event,'history')">
                 {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
             </mat-checkbox>
         </section>
@@ -90,7 +90,7 @@
         <section class="disable-input-message-section">
             <mat-checkbox 
                 [checked]="action?.history"
-                (change)="onChangeCheckbox('history')">
+                (change)="onChangeCheckbox($event,'history')">
                 {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
             </mat-checkbox>
         </section>
@@ -173,7 +173,7 @@
         <section class="disable-input-message-section">
             <mat-checkbox 
                 [checked]="action?.namespaceAsName"
-                (change)="onChangeCheckbox('namespaceAsName')">
+                (change)="onChangeCheckbox($event,'namespaceAsName')">
                 Use Knwoledge Base name
             </mat-checkbox>
             <label class="field-description">{{ "CDSCanvas.UseKBNameDescription" | translate }}
@@ -306,11 +306,25 @@
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.advancedPrompt"
-                            (change)="onChangeCheckbox('advancedPrompt')">
+                            (change)="onChangeCheckbox($event,'advancedPrompt')">
                             {{"CDSCanvas.AdvancedContext" | translate}}
                         </mat-checkbox>
                     </section>
                     <label class="field-description" *ngIf="action?.advancedPrompt" [innerHTML]='"CDSCanvas.AdvancedContextDesctiption" | translate'></label>
+                </div>
+
+                <!-- // citations -->    
+                <div class="field-box" *ngIf="action.hasOwnProperty('citations')">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.citations"
+                            (change)="onChangeCheckbox($event, 'citations')">
+                            {{"CDSCanvas.Citations" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                        <!-- <a *ngIf="BRAND_BASE_INFO['DOCS']" href='https://platform.openai.com/docs/guides/structured-outputs/json-mode' target='_blank'>{{ 'LearnMore' | translate }}</a> -->
+                    </label>
                 </div>
             
 
@@ -372,6 +386,15 @@
             (selectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')">
         </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="subtitle-label">{{'CDSCanvas.ErrorAutomaticAssign' | translate }}
+            <b>flowError</b>
+            <!-- <span class="tag-container">
+                <span class="tag-label">flowError</span>
+            </span> -->
+        </label> 
     </div>
 
     <hr class="custom-divider">

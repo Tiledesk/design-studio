@@ -321,7 +321,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("action updated: ", this.action)
   }
 
-  async onChangeCheckbox(target){
+  async onChangeCheckbox(event, target){
     try {
         this.action[target] = !this.action[target];
         if (target === "namespaceAsName") {

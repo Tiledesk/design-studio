@@ -901,6 +901,7 @@ export class IntentService {
       action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
       action.preview = [];
       action.history = false;
+      action.citations = false;
     }
     if(typeAction === TYPE_ACTION.GPT_TASK){
       action = new ActionGPTTask();
