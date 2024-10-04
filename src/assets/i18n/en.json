@@ -920,6 +920,7 @@
             "project_id":{ "description":"The name of the project where this chatbot belongs to" },
             "last_message_id":{ "description":"The unique ID of the last message sent" },
             "conversation_id":{ "description":"This conversation unique ID" },
+            "chatbot_id":{ "description":"This chatbot id" },
             "chatbot_name":{ "description":"This chatbot name" },
             "chatbotToken": { "description":"" },
             "user_id":{ "description":"The user unique ID inside {{BRAND_NAME}} database" },
@@ -929,7 +930,7 @@
             "chat_url":{ "description":"The url of the Chat to send to a colleague to chat with this user. Use 'Invite human' action to invite the human to this chat" },
             "user_ip_address":{ "description":"The user IP address, when available" },
             "ticketId":{ "description":"The current conversation ticket ID"},
-            "flowError":{ "description":""}
+            "flowError":{ "description":"The last error generated in the flow"}
         },
         "uploadedDocumentElements":{
             "lastUserDocumentAsAttachmentURL":{ "description":"Useful if you want to have an URL of the uploaded document that can be displayed in chat and you will always download on click" },
