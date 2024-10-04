@@ -270,8 +270,9 @@ export const TYPE_FUNCTION_LIST_FOR_FUNCTIONS: { [key: string]: { name: string, 
 }
 
 export const CERTIFIED_TAGS: Array<{color: string, name: string}> = [
-    { color: "#a16300", name: "Lead-Gen" },
-    { color: "#25833e", name: "Support" }, 
+    { color: "#a16300",     name: "Lead-Gen" },
+    { color: "#25833e",     name: "Support" }, 
+    { color: "#a613ec33",   name: "Internal Processes"}
     // { color: "#00699e", name: "Pre-Sale" }, 
     // { color: "#0049bd", name: "Self-serve" }, 
 ]
