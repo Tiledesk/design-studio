@@ -34,6 +34,7 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'chat_url',                                 value: 'chat_url',                          description: 'CDSvariablesList.systemDefinedElements.chat_url.description',                                 src: '', icon: 'laptop' },
             { name: 'user_ip_address',                          value: 'user_ip_address',                   description: 'CDSvariablesList.systemDefinedElements.user_ip_address.description',                          src: '', icon: 'laptop' },
             { name: 'ticketId',                                 value: 'ticketId',                          description: 'CDSvariablesList.systemDefinedElements.ticketId.description',                                 src: '', icon: 'sell' },
+            { name: 'flowError',                                value: 'flowError',                         description: 'CDSvariablesList.systemDefinedElements.flowError.description',                                src: '', icon: 'error' },
             
         ]
     },

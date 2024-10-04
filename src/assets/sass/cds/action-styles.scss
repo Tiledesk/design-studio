@@ -268,3 +268,21 @@ appdashboard-filter{
 /** ACTION PREVIEW: end **/
 
 
+.tag-container{
+    height: fit-content;
+    padding: 2px;
+    max-width: calc(100% - 25px);
+    background-color: var(--blu);
+    color: var(--color-white-hex);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+}
+
+.tag-label{
+    margin: auto 10px;
+    font-size: 12px;
+    line-height: 22px;
+}
+
