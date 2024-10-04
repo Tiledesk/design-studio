@@ -10,9 +10,11 @@ import { scaleAndcenterStageOnCenterPosition } from '../utils';
 export class StageService {
 
   tiledeskStage: any;
+  loaded: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor() { }
+
 
 
   initializeStage(){

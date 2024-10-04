@@ -1,3 +1,4 @@
+
 <div class="cds-toggle-setting-sidebar-icon-right-wpr" 
     [class.is_opened]="IS_OPEN_INTENTS_LIST"
     (click)="onToogleSidebarIntentsList()">
@@ -36,6 +37,7 @@
     </div>
 
     <div #drawer_of_items_to_zoom_and_drag id="tds_drawer" class="tds-drag-drawer box-right-content">
+       
         <cds-intent *ngFor="let intent of listOfIntents"
             [id]="intent.intent_id"
             class="panel-intent tds_input_block" 
@@ -43,6 +45,7 @@
             [style.left.px]="getIntentPosition(intent.intent_id).x" 
             [intent]="intent"
             [hideActionPlaceholderOfActionPanel]="hideActionPlaceholderOfActionPanel"
+            (componentRendered)="onIntentRendered($event)"
             (actionSelected)=onActionSelected($event) 
             (questionSelected)=onQuestionSelected($event)
             (formSelected)=onIntentFormSelected($event) 
@@ -51,6 +54,8 @@
             (actionDeleted)="onActionDeleted($event)"
             (deleteIntent)="onDeleteIntent($event)">
         </cds-intent>
+   
+        
 
         <cds-event *ngFor="let intent of listOfEvents" 
             [id]="intent.intent_id"
@@ -125,3 +130,10 @@
     (hideContextMenu)="onHideContextMenu($event)">
 </cds-context-menu>
 
+<div id="masck-canv" [class.disabled]="renderedAllElements">
+    <img class="logo" [src]="LOGOS_ITEMS['BASE_LOGO_NO_TEXT'].icon">
+    <div class="loading"> 
+        <span class="info-loading">{{ labelInfoLoading | translate }}</span>
+        <cds-preload-bar class="progress-bar" [progress]="loadingProgress"></cds-preload-bar>
+    </div>
+</div>

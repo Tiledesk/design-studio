@@ -81,14 +81,18 @@ export class CdsHeaderComponent implements OnInit {
 
   manageRouteChanges(){
     /** check INIT ROUTE */
-    const child = this.router.url.split('/').slice(-1)[0];
+    const urlWithoutParams = this.router.url.split('?')[0];
+    const child = urlWithoutParams.split('/').slice(-1)[0];
+    //const child = this.router.url.split('/').slice(-1)[0];
     if(child !== 'blocks'){
       this.isBlockSectionActive = false
     }
 
     /** subscribe to ROUTE changes (ON NAVIGATIONSTART) */
     this.router.events.pipe(filter(event => event instanceof NavigationStart)).subscribe((route: NavigationStart) => {
-      const child = route.url.split('/').slice(-1)[0];
+      const urlWithoutParams = route.url.split('?')[0];
+      const child = urlWithoutParams.split('/').slice(-1)[0];
+      //const child = route.url.split('/').slice(-1)[0];
       this.isBlockSectionActive = true
       if(child !== 'blocks'){
         this.isBlockSectionActive = false

@@ -30,6 +30,8 @@ import { CdsIntentComponent } from './cds-intent/cds-intent.component';
 import { PanelIntentControlsComponent } from './cds-intent/panel-intent-controls/panel-intent-controls.component';
 import { PanelIntentHeaderComponent } from './cds-intent/panel-intent-header/panel-intent-header.component';
 import { CdsVoiceActionsModule } from './actions/list-voice/cds-voice-actions.module';
+import { PreloadBarComponent } from 'src/app/chatbot-design-studio/cds-base-element/preload-bar/preload-bar.component';
+
 
 const routes: Routes = [
   {
@@ -85,6 +87,8 @@ const routes: Routes = [
     //EVENT BASE COMPONENT
     CdsEventComponent,
     CdsRuleComponent,
+
+    PreloadBarComponent,
   ],
   imports: [
     CommonModule,

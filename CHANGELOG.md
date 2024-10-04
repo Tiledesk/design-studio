@@ -15,6 +15,22 @@
 
 # 1.20.4
 
+# 1.21.0-rc.11
+- **bug-fixed**: minor improvements
+
+# 1.21.0-rc.10
+- **removed**: export as csv option in cds-action-detail component
+
+# 1.21.0-rc.9
+-  **added**: dynamicAttributes var description
+-  **added**: response_type in action gpt task
+
+# 1.21.0-rc.8
+- **bug-fixed**: connector not updated while adding new command
+
+# 1.21.0-rc.7
+-  **added**: improvements on widget support component
+
 # 1.20.3
 - **bug-fixed**: minor improvements
 
