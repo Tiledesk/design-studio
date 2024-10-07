@@ -241,6 +241,22 @@ export class ConnectorService {
           }
         }
 
+        /**  CONNECT BLOCK */
+        if(action._tdActionType === TYPE_ACTION.CONNECT_BLOCK){
+          // this.logger.log('[CONNECTOR-SERV] intent_display_name', intent.intent_display_name);
+          if(action.intentName && action.intentName !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId;
+            idConnectorTo = action.intentName.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.intentName = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+            // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
         /**  REPLY  RANDOM_REPLY */
         if( (action._tdActionType === TYPE_ACTION.REPLY || action._tdActionType === TYPE_ACTION.RANDOM_REPLY) ||
             (action._tdActionType === TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType === TYPE_ACTION_VXML.DTMF_MENU || action._tdActionType === TYPE_ACTION_VXML.BLIND_TRANSFER)){

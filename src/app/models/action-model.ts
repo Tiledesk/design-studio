@@ -289,6 +289,15 @@ export class ActionIntentConnected extends Action {
     }
 }
 
+export class ActionConnectBlock extends Action {
+    intentName?: string;
+    json_payload?: Object;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.CONNECT_BLOCK;
+    }
+}
+
 export class ActionEmail extends Action {
     to: string;
     subject: string;
@@ -752,5 +761,19 @@ export class ActionLeadUpdate extends Action {
         super();
         this._tdActionType = TYPE_ACTION.LEAD_UPDATE;
         this.update = {};
+    }
+}
+
+export class ActionClearTranscript extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.CLEAR_TRANSCRIPT;
+    }
+}
+
+export class ActionMoveToUnassigned extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
     }
 }

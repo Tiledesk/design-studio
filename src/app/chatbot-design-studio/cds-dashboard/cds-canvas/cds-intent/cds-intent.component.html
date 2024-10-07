@@ -152,6 +152,13 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-intent>
+
+                    <cds-action-connect-block *ngSwitchCase="TYPE_ACTION.CONNECT_BLOCK" 
+                        class="panel-response" 
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-connect-block>
     
                     <cds-action-email *ngSwitchCase="TYPE_ACTION.EMAIL" 
                         class="panel-response" 
@@ -351,6 +358,14 @@
                         [action]="action" 
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-lead-update>
+
+                    <cds-action-clear-transcript *ngSwitchCase="TYPE_ACTION.CLEAR_TRANSCRIPT" 
+                        [action]="action">
+                    </cds-action-clear-transcript>
+
+                    <cds-action-move-unassigned *ngSwitchCase="TYPE_ACTION.MOVE_TO_UNASSIGNED" 
+                        [action]="action">
+                    </cds-action-move-unassigned>
 
 
                     <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    

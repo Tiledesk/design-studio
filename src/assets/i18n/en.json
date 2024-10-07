@@ -335,6 +335,8 @@
         "SelectADepartment":"Select a department",
         "ChooseADepartment":"Choose a department",
         "END":"END",
+        "CLEAR_TRANSCRIPT":"CLEAR TRANSCRIPT",
+        "MOVE_TO_UNASSIGNED":"MOVE TO UNASSIGNED",
         "ClickToAddCodeSource":"Click to add code source ...",
         "Code":"Code",
         "EnterYourCode":"Enter your code",
@@ -594,7 +596,6 @@
             "DeleteAttribute":"Delete attribute",
             "ReplaceBot":"Replace bot",
             "Wait":"Wait",
-            "LeadUpdate":"Lead update",
             "WebRequest":"Web request",
             "SendEmail":"Send email",
             "WhatsAppStatic":"WhatsApp static",
@@ -609,6 +610,9 @@
             "Code":"Code",
             "SetFunction":"Set function",
             "CaptureUserReply":"Capture user reply",
+            "LeadUpdate":"Lead update",
+            "ClearTranscript":"Clear transcript",
+            "MoveToUnassigned":"Move to unassigned",
             "Qapla":"Qapla'",
             "Make":"Make",
             "Hubspot":"Hubspot",
@@ -815,6 +819,20 @@
                 "TITLE":"Update lead data",
                 "DESCRIPTION":"Update the current lead (the end-user) in the conversation with the specified values",
                 "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/LEAD_UPDATE.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "ClearTranscript":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "MoveToUnassigned":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },

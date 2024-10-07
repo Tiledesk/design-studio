@@ -56,6 +56,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-intent>
 
+                    <cds-action-connect-block *ngSwitchCase="TYPE_ACTION.CONNECT_BLOCK"  
+                        class="panel-response" 
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-connect-block>
+
                     <cds-action-email *ngSwitchCase="TYPE_ACTION.EMAIL"
                         class="panel-response"
                         [action]="elementSelected"
@@ -320,6 +329,17 @@
                         [previewMode]="false" 
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-lead-update>
+
+                    <cds-action-clear-transcript *ngSwitchCase="TYPE_ACTION.CLEAR_TRANSCRIPT" 
+                        [action]="elementSelected"
+                        [previewMode]="false">
+                    </cds-action-clear-transcript>
+
+                    <cds-action-move-unassigned *ngSwitchCase="TYPE_ACTION.MOVE_TO_UNASSIGNED" 
+                        [action]="elementSelected"
+                        [previewMode]="false">
+                    </cds-action-move-unassigned>
+
                     
                     <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"
