@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.13
+-  **added**: 'connect_block', 'move_to_unassigned' and 'clear_transcript' actions
+-  **added**: chatbot_id system-defined variable
+-  **added**: enable 'connect_block' action only if present in project.profile
+
 # 1.21.0-rc.12
 -  **added**: formatType checkbox in action gpt-task
 -  **added**: citations in action askkbv2
