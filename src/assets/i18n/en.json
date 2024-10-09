@@ -348,7 +348,7 @@
         "ChunkLimit":"Chunk limit",
         "SystemContext":"System context",
         "AdvancedContext":"Advanced context",
-        "AdvancedContextDesctiption":"Here you have the most control. be careful, the native prompt is completely overwritten. if you want to use the native 'else' connector you need to make sure to instruct your prompt to respond with &lt;NOANS&gt; when it doesn't find a satisfactory answer and always close with {context}. <br><br> E.g. You are a consultant ... &lt;NOANS&gt; {context}",
+        "AdvancedContextDesctiption":"Here you have the most control. Be careful, the native prompt is completely overwritten. If you want to use the native 'else' connector you need to make sure to instruct your prompt to respond with <NOANS> when it doesn't find a satisfactory answer and always close with {context}. <br><br> E.g. You are a consultant ... &lt;NOANS&gt; {context}",
         "YouAreAwesomeAssistant":"You are an awesome assistant",
         "Preview":"Preview",
         "AnswerPreview":"Answer preview",
