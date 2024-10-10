@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.14
+-  **added**: changed: min value for max_tokens if citations checkbox is enabled
+
 # 1.21.0-rc.13
 -  **added**: 'connect_block', 'move_to_unassigned' and 'clear_transcript' actions
 -  **added**: chatbot_id system-defined variable
