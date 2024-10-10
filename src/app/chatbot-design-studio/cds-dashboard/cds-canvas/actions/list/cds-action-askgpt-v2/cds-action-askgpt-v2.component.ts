@@ -332,6 +332,14 @@ export class CdsActionAskgptV2Component implements OnInit {
           } else {
             this.action.namespace = await this.nameToId(this.action.namespace);
           }
+        }else if(target === 'citations'){
+          if (this.action[target]) {
+            this.ai_setting['max_tokens'].min=1024;
+            this.action.max_tokens = 1024
+          }else{
+            this.ai_setting['max_tokens'].min=10;
+            this.action.max_tokens = 512
+          }
         }
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
 
