@@ -33,7 +33,7 @@ export class CdsPanelActionsComponent implements OnInit {
   indexDrag: number;
 
   hoveredElement: any;
-  positionMenu: any = {'x': 190, 'y': 0 };
+  positionMenu: any = {'x': 200, 'y': 0 };
   isOpen: boolean = false;
   // dropList: CdkDropList;
   // connectedLists: CdkDropList[];
@@ -141,7 +141,7 @@ export class CdsPanelActionsComponent implements OnInit {
       // let x = e.offsetLeft;
       let y = e.offsetTop;
       this.isOpen = true;
-      this.positionMenu = {'x': 190, 'y': y }
+      this.positionMenu = {'x': 200, 'y': y }
     }, 0);
   }
 
