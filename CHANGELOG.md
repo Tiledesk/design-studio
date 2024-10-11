@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.15
+- **added**: image preload resolve for doc images
+- **changed**: info-tooltip doc component UI
+
 # 1.21.0-rc.14
 -  **added**: changed: min value for max_tokens if citations checkbox is enabled
 
