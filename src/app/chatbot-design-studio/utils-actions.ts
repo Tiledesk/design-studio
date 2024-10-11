@@ -20,6 +20,7 @@ export enum TYPE_ACTION {
     GPT_ASSISTANT       = 'gpt_assistant',
     WAIT                = 'wait',
     INTENT              = 'intent',
+    CONNECT_BLOCK       = 'connect_block',
     ASSIGN_VARIABLE     = 'setattribute',
     ASSIGN_VARIABLE_V2  = 'setattribute-v2',
     ASSIGN_FUNCTION     = 'setfunction',
@@ -40,7 +41,9 @@ export enum TYPE_ACTION {
     BREVO               = 'brevo',
     N8N                 = 'n8n',
     CODE                = 'code',
-    LEAD_UPDATE        = 'leadupdate'
+    LEAD_UPDATE         = 'leadupdate',
+    CLEAR_TRANSCRIPT    = 'clear_transcript',
+    MOVE_TO_UNASSIGNED  = 'move_to_unassigned'
 }
 
 export enum TYPE_ACTION_VXML {
@@ -85,10 +88,13 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     CLOSE :                 { name: 'CDSActionList.NAME.Close',                 category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.CLOSE,                src:"assets/images/actions/close.svg",                  status: "active",                       doc: "CDSActionList.DOC.Close"                                          },
     OPEN_HOURS:             { name: 'CDSActionList.NAME.IfOperatingHours',      category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.OPEN_HOURS,           src: "assets/images/actions/open_hours.svg",            status: "active",                       doc: "CDSActionList.DOC.IfOperatingHours"                               },
     ONLINE_AGENTS:          { name: 'CDSActionList.NAME.IfOnlineAgent',         category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.ONLINE_AGENTS,        src: "assets/images/actions/online_agents.svg",         status: "inactive",                     doc: "CDSActionList.DOC.IfOnlineAgent"                                  },
-    ONLINE_AGENTSV2:        { name: 'CDSActionList.NAME.IfOnlineAgent',         category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.ONLINE_AGENTSV2,      src: "assets/images/actions/online_agents.svg",         status: "active", badge: 'NEW',         doc: "CDSActionList.DOC.IfOnlineAgent"                                  },
+    ONLINE_AGENTSV2:        { name: 'CDSActionList.NAME.IfOnlineAgent',         category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.ONLINE_AGENTSV2,      src: "assets/images/actions/online_agents.svg",         status: "active",                       doc: "CDSActionList.DOC.IfOnlineAgent"                                  },
+    CLEAR_TRANSCRIPT:       { name: 'CDSActionList.NAME.ClearTranscript',       category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.CLEAR_TRANSCRIPT,     src:"assets/images/actions/clear_transcript.svg",       status: "active", badge: 'NEW',         doc: "CDSActionList.DOC.ClearTranscript"                                },
+    MOVE_TO_UNASSIGNED:     { name: 'CDSActionList.NAME.MoveToUnassigned',      category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.MOVE_TO_UNASSIGNED,   src:"assets/images/actions/move_to_unassigned.svg",     status: "active", badge: 'NEW',         doc: "CDSActionList.DOC.MoveToUnassigned"                               },
     CONDITION:              { name: 'CDSActionList.NAME.Condition',             category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONDITION,            src: "assets/images/actions/condition.svg",             status: "active",                       doc: "CDSActionList.DOC.Condition"                                      },
     JSON_CONDITION:         { name: 'CDSActionList.NAME.ConditionElse',         category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.JSON_CONDITION,       src: "assets/images/actions/condition.svg",             status: "active",                       doc: "CDSActionList.DOC.ConditionElse"                                  },
     INTENT :                { name: 'CDSActionList.NAME.ConnectBlock',          category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.INTENT,               src:"assets/images/actions/connect_intent.svg",         status: "inactive",                     doc: ""                                                                 },
+    CONNECT_BLOCK :         { name: 'CDSActionList.NAME.ConnectBlock',          category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONNECT_BLOCK,        src:"assets/images/actions/connect_intent.svg",         status: "active", plan: PLAN_NAME.F,     doc: ""                                                                 },
     ASSIGN_VARIABLE:        { name: 'CDSActionList.NAME.SetAttribute',          category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.ASSIGN_VARIABLE,      src: "assets/images/actions/assign_var.svg",            status: "inactive",                     doc: "CDSActionList.DOC.SetAttribute"                                   },
     ASSIGN_VARIABLE_V2:     { name: 'CDSActionList.NAME.SetAttribute',          category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.ASSIGN_VARIABLE_V2,   src: "assets/images/actions/assign_var.svg",            status: "active",                       doc: "CDSActionList.DOC.SetAttribute"                                   },
     DELETE_VARIABLE:        { name: 'CDSActionList.NAME.DeleteAttribute',       category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.DELETE_VARIABLE,      src: "assets/images/actions/delete_var.svg",            status: "active",                       doc: "CDSActionList.DOC.DeleteAttribute"                                },
@@ -117,7 +123,6 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     CUSTOMERIO :            { name: 'CDSActionList.NAME.Customerio',            category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.CUSTOMERIO,           src:"assets/images/actions/customerio.svg",             status: "active", plan: PLAN_NAME.E,    doc: "CDSActionList.DOC.Customerio"                                     },
     BREVO :                 { name: 'CDSActionList.NAME.Brevo',                 category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.BREVO,                src:"assets/images/actions/brevo.svg",                  status: "active", plan: PLAN_NAME.E,    doc: "CDSActionList.DOC.Brevo"                                          },
     N8N :                   { name: 'CDSActionList.NAME.N8n',                   category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.N8N,                  src:"assets/images/actions/n8n.svg",                    status: "active", plan: PLAN_NAME.E,    doc: "CDSActionList.DOC.N8n"                                            },
-
 
     DFTM_FORM:              { name: 'CDSActionList.NAME.DTMFForm',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     DTMF_MENU:              { name: 'CDSActionList.NAME.DTMFMenu',              category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },

@@ -335,6 +335,8 @@
         "SelectADepartment":"Select a department",
         "ChooseADepartment":"Choose a department",
         "END":"END",
+        "CLEAR_TRANSCRIPT":"CLEAR TRANSCRIPT",
+        "MOVE_TO_UNASSIGNED":"MOVE TO UNASSIGNED",
         "ClickToAddCodeSource":"Click to add code source ...",
         "Code":"Code",
         "EnterYourCode":"Enter your code",
@@ -346,7 +348,7 @@
         "ChunkLimit":"Chunk limit",
         "SystemContext":"System context",
         "AdvancedContext":"Advanced context",
-        "AdvancedContextDesctiption":"Here you have the most control. be careful, the native prompt is completely overwritten. if you want to use the native 'else' connector you need to make sure to instruct your prompt to respond with &lt;NOANS&gt; when it doesn't find a satisfactory answer and always close with {context}. <br><br> E.g. You are a consultant ... &lt;NOANS&gt; {context}",
+        "AdvancedContextDesctiption":"Here you have the most control. Be careful, the native prompt is completely overwritten. If you want to use the native 'else' connector you need to make sure to instruct your prompt to respond with <NOANS> when it doesn't find a satisfactory answer and always close with {context}. <br><br> E.g. You are a consultant ... &lt;NOANS&gt; {context}",
         "YouAreAwesomeAssistant":"You are an awesome assistant",
         "Preview":"Preview",
         "AnswerPreview":"Answer preview",
@@ -594,7 +596,6 @@
             "DeleteAttribute":"Delete attribute",
             "ReplaceBot":"Replace bot",
             "Wait":"Wait",
-            "LeadUpdate":"Lead update",
             "WebRequest":"Web request",
             "SendEmail":"Send email",
             "WhatsAppStatic":"WhatsApp static",
@@ -609,6 +610,9 @@
             "Code":"Code",
             "SetFunction":"Set function",
             "CaptureUserReply":"Capture user reply",
+            "LeadUpdate":"Lead update",
+            "ClearTranscript":"Clear transcript",
+            "MoveToUnassigned":"Move to unassigned",
             "Qapla":"Qapla'",
             "Make":"Make",
             "Hubspot":"Hubspot",
@@ -818,6 +822,20 @@
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
+            "ClearTranscript":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
+            "MoveToUnassigned":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
             "Qapla":{
                 "TITLE":"Ask an order status to Qapla'",
                 "DESCRIPTION":"Query the remove Qapla' service",
@@ -920,6 +938,7 @@
             "project_id":{ "description":"The name of the project where this chatbot belongs to" },
             "last_message_id":{ "description":"The unique ID of the last message sent" },
             "conversation_id":{ "description":"This conversation unique ID" },
+            "chatbot_id":{ "description":"This chatbot id" },
             "chatbot_name":{ "description":"This chatbot name" },
             "chatbotToken": { "description":"" },
             "user_id":{ "description":"The user unique ID inside {{BRAND_NAME}} database" },
@@ -929,7 +948,7 @@
             "chat_url":{ "description":"The url of the Chat to send to a colleague to chat with this user. Use 'Invite human' action to invite the human to this chat" },
             "user_ip_address":{ "description":"The user IP address, when available" },
             "ticketId":{ "description":"The current conversation ticket ID"},
-            "flowError":{ "description":""}
+            "flowError":{ "description":"The last error generated in the flow"}
         },
         "uploadedDocumentElements":{
             "lastUserDocumentAsAttachmentURL":{ "description":"Useful if you want to have an URL of the uploaded document that can be displayed in chat and you will always download on click" },

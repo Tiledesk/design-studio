@@ -3,7 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -868,6 +868,9 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.INTENT) {
       action = new ActionIntentConnected();
     }
+    if(typeAction === TYPE_ACTION.CONNECT_BLOCK) {
+      action = new ActionConnectBlock();
+    }
     if(typeAction === TYPE_ACTION.EMAIL) {
       action = new ActionEmail();
     }
@@ -997,6 +1000,15 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.LEAD_UPDATE){
       action = new ActionLeadUpdate();
     }
+    if(typeAction === TYPE_ACTION.CLEAR_TRANSCRIPT){
+      action = new ActionClearTranscript();
+    }
+    if(typeAction === TYPE_ACTION.MOVE_TO_UNASSIGNED){
+      action = new ActionMoveToUnassigned();
+    }
+
+
+    /** VOICE ACTIONS: start */
     if(typeAction === TYPE_ACTION_VXML.DTMF_FORM){
       action = new ActionVoice(TYPE_ACTION_VXML.DTMF_FORM);
       let commandWait = new Wait();
@@ -1078,6 +1090,7 @@ export class IntentService {
       command_form.subType = TYPE_ACTION_VXML.SPEECH_FORM
       action.attributes.commands.push(command_form);
     }
+    /** VOICE ACTIONS: end */
     return action;
   }
   // END ATTRIBUTE FUNCTIONS //

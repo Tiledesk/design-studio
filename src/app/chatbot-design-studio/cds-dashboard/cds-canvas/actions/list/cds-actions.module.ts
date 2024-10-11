@@ -71,6 +71,9 @@ import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { FilterPipe } from 'src/app/pipe/filter.pipe';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
+import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript/cds-action-clear-transcript.component';
+import { CdsActionMoveUnassignedComponent } from './cds-action-move-unassigned/cds-action-move-unassigned.component';
+import { CdsActionConnectBlockComponent } from './cds-action-connect-block/cds-action-connect-block.component';
 
 @NgModule({
   declarations: [
@@ -152,9 +155,13 @@ import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-actio
     AttributesDialogComponent,
     FormDataComponent,
     // action GptTask elements: end //
+    CdsActionClearTranscriptComponent,
+    CdsActionMoveUnassignedComponent,
+    CdsActionConnectBlockComponent,
 
     //PIPES
     FilterPipe,
+    
     
   ],
   imports: [
@@ -241,6 +248,9 @@ import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-actio
     // action GptTask elements: start //
     AttributesDialogComponent,
     // action GptTask elements: end //
+    CdsActionClearTranscriptComponent,
+    CdsActionMoveUnassignedComponent,
+    CdsActionConnectBlockComponent,
 
     //PIPES
     FilterPipe
