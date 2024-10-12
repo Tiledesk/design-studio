@@ -327,7 +327,7 @@
         "AssignTo":"Assign to",
         "SelectAttribute":"Select attribute",
         "SelectOperator":"Select a operator",
-        "HumanHandOver":"Human hand over",
+        "TransferToAHuman":"Transfer to a human",
         "CaptureUserReplyTo":"Capture user reply to",
         "AssignUserReplyTo":"Assign user reply to",
         "Optional": "(Optional)",
@@ -585,7 +585,7 @@
             "Reply":"Reply",
             "ReplyV2":"Advanced reply",
             "RandomReply":"Random reply",
-            "AgentHandoff":"Agent handoff",
+            "AgentHandoff":"Transfer to a human",
             "Close":"Close",
             "IfOperatingHours":"If operating hours",
             "IfOnlineAgent":"If online agents",
@@ -648,11 +648,11 @@
                 "DOC_URL":""
             },
             "AgentHandoff":{
-                "TITLE":"Human handoff",
+                "TITLE":"Transfer to a human",
                 "DESCRIPTION":"This action removes the chatbot from the conversation and moves the flow to a human",
                 "IMAGE":"assets/images/doc/AGENT.png",
                 "VIDEO_URL":"",
-                "DOC_URL":""
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/agent-handoff-action/"
             },
             "Close":{
                 "TITLE":"Close the conversation",
@@ -827,14 +827,14 @@
                 "DESCRIPTION":"",
                 "IMAGE":"",
                 "VIDEO_URL":"",
-                "DOC_URL":""
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/reset-transcript-action/"
             },
             "MoveToUnassigned":{
-                "TITLE":"",
-                "DESCRIPTION":"",
+                "TITLE":"Move chat to unassigned",
+                "DESCRIPTION":"assets/images/doc/MOVE_TO_UNASSIGNED.png",
                 "IMAGE":"",
                 "VIDEO_URL":"",
-                "DOC_URL":""
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/move-to-unassigned-action/"
             },
             "Qapla":{
                 "TITLE":"Ask an order status to Qapla'",

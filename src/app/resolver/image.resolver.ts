@@ -35,6 +35,7 @@ export class ImagePreloaderResolver implements Resolve<boolean> {
       DOC_BASE_URL+'JSON_CONDITION.png',
       DOC_BASE_URL+'LEAD_UPDATE.png',
       DOC_BASE_URL+'MAKE.png',
+      DOC_BASE_URL+'MOVE_TO_UNASSIGNED.png',
       DOC_BASE_URL+'N8N.png',
       DOC_BASE_URL+'ONLINE_AGENTS.png',
       DOC_BASE_URL+'OPEN_HOURS.png',
