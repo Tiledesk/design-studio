@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0-rc.16
+- **added**: doc for new actions
+
 # 1.21.0-rc.15
 - **added**: image preload resolve for doc images
 - **changed**: info-tooltip doc component UI
