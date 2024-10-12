@@ -31,7 +31,7 @@
 
         </div>
 
-        <div class="field-box">
+        <!-- <div class="field-box">
             <label class="title-label">{{'Tags' | translate }}</label>
             <mat-chip-list #chipList>
                 <mat-chip *ngFor="let tag of action?.tags" (removed)="removeTag(tag)">
@@ -53,13 +53,31 @@
                 </cds-text>
                 <span class="input-group-addon cds-group-addon-question-right" (click)="onAddTag()"
                     [ngClass]="{'add-question-btn-disabled': !newTag || newTag?.length === 0}">
-                    <!-- <span class="cds-group-addon-question-right-btn-text"> ADD </span> -->
+                    <!- - <span class="cds-group-addon-question-right-btn-text"> ADD </span> - ->
                     <span class="material-icons cds-group-addon-question-right-btn-icon">
                         add
                     </span>
                 </span>
             </div>
+        </div> -->
+
+        <div class="field-box">
+            <label class="title-label">{{'Tags' | translate }}</label>
+            <cds-textarea 
+                class="text-editable-div"
+                [text]="tagText" 
+                [minRow]="1" [maxRow]="2"
+                popoverVerticalAlign="above"
+                [emojiPikerBtn]="false"
+                [textLimitBtn]="false"
+                [setAttributeBtn]="true"
+                [placeholder]="'CDSCanvas.TagsTypingAliasPlaceholder' | translate "
+                (blur)="onBlur($event)"
+                (changeTextarea)="onChangeTextarea($event, 'tags')">
+            </cds-textarea>
+            <label class="field-description"> {{ 'CDSCanvas.TagsTypingAliasDescription' | translate}} </label>
         </div>
+
 
         <div class="field-box">
             

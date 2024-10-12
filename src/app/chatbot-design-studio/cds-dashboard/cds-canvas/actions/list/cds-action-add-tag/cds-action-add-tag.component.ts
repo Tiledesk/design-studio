@@ -21,6 +21,7 @@ export class CdsActionAddTagComponent implements OnInit {
   
   newTag: string = '';
   autocompleteOptions: Array<string> = [];
+  tagText: string = ''
 
   radioOptions: Array<{name: string, value: string, disabled: boolean, checked: boolean}>= [ 
     {name: 'CDSCanvas.Conversation',            value: 'request',            disabled: false, checked: true  }, 
@@ -35,7 +36,7 @@ export class CdsActionAddTagComponent implements OnInit {
     this.logger.log("[ACTION-ADD-TAG] action", this.action)
     this.checkIfTagAlreadyExist()
     this.logger.log("[ACTION-ADD-TAG] tagsList", tagsList)
-    
+    this.tagText = this.action.tags.join()
   }
 
   onChangeButtonSelect(event: {label: string, value: string, disabled: boolean, checked: boolean}){
@@ -53,6 +54,14 @@ export class CdsActionAddTagComponent implements OnInit {
   onChangeText(text: string){
     this.logger.log("[ACTION-ADD-TAG] onChangeText", text)
     this.newTag = text
+  }
+
+  onChangeTextarea($event: string, property: string) {
+    this.logger.log("[ACTION-ADD-TAG] onEditableDivTextChange event", $event, this.tagText)
+    this.logger.log("[ACTION-ADD-TAG] onEditableDivTextChange property", property)
+    this.tagText = $event// this.action[property] =Object.assign('',  $event).split(',').map(el => el.trim())
+    this.action[property] = this.tagText.split(',')
+    // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
   onAddTag(){
@@ -102,7 +111,7 @@ export class CdsActionAddTagComponent implements OnInit {
   }
 
   onBlur(){
-
+    this.updateAndSaveAction.emit();
   }
 
 }

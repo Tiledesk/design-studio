@@ -442,7 +442,9 @@
         "CheckAgentsAvailability":"Check agents availability",
         "Target":"Target",
         "Conversation":"Conversation",
-        "Contact":"Contact"
+        "Contact":"Contact",
+        "TagsTypingAliasPlaceholder":"tag1, tag2, tag3",
+        "TagsTypingAliasDescription":"Please set a comma separated list of tags that the user can type to tag a conversation or a contact "
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
