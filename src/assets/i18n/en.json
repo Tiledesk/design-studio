@@ -823,16 +823,16 @@
                 "DOC_URL":""
             },
             "ClearTranscript":{
-                "TITLE":"",
+                "TITLE":"Clear the chat transcript",
                 "DESCRIPTION":"",
-                "IMAGE":"",
+                "IMAGE":"assets/images/doc/CLEAR_TRANSCRIPT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/reset-transcript-action/"
             },
             "MoveToUnassigned":{
                 "TITLE":"Move chat to unassigned",
-                "DESCRIPTION":"assets/images/doc/MOVE_TO_UNASSIGNED.png",
-                "IMAGE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"assets/images/doc/MOVE_TO_UNASSIGNED.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/move-to-unassigned-action/"
             },

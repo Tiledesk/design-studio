@@ -22,6 +22,7 @@ export class ImagePreloaderResolver implements Resolve<boolean> {
       DOC_BASE_URL+'BREVO.png',
       DOC_BASE_URL+'CAPTURE_USER_REPLY.png',
       DOC_BASE_URL+'CHANGE_DEPARTMENT.png',
+      DOC_BASE_URL+'CLEAR_TRANSCRIPT.png',
       DOC_BASE_URL+'CLOSE.png',
       DOC_BASE_URL+'CODE.png',
       DOC_BASE_URL+'CONDITION.png',
