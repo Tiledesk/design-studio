@@ -280,7 +280,7 @@
                                     [(ngModel)]="action.top_k"
                                     (change)="updateSliderValue($event.value, 'top_k')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">{{ai_setting['temperature'].max}}</div>
+                                <div class="action-wait-range">{{ai_setting['top_k'].max}}</div>
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
