@@ -671,7 +671,7 @@
             "IfOnlineAgent":{
                 "TITLE":"Check online agents",
                 "DESCRIPTION":"This action checks if there is an available agent in the current department",
-                "IMAGE":"assets/images/docs/ONLINE_AGENTS.png",
+                "IMAGE":"assets/images/doc/ONLINE_AGENTS.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/the-if-online-agent-action-and-its-role-in-conversation-design/"
             },
