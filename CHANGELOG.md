@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.21.0
+
 # 1.21.0-rc.12
 -  **added**: formatType checkbox in action gpt-task
 -  **added**: citations in action askkbv2
