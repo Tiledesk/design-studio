@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.22.0-rc.1
+- **added**: role guard to main root 
+
 # 1.21.0
 
 # 1.21.0-rc.16
