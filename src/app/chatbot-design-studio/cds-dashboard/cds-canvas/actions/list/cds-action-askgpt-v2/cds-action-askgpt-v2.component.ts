@@ -65,7 +65,8 @@ export class CdsActionAskgptV2Component implements OnInit {
   model_list: Array<{ name: string, value: string, multiplier: string}>;
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
     "max_tokens": { name: "max_tokens",  min: 10, max: 2048, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
+    "top_k": { name: "top_k", min: 1, max: 10, step: 1 }
   }
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
@@ -237,7 +238,7 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.action.top_k = 5;
     }
     if(!this.action.hasOwnProperty('max_tokens')){
-      this.action.max_tokens = 512;
+      this.action.max_tokens = 256;
     }
     if(!this.action.hasOwnProperty('temperature')){
       this.action.temperature = 0.7;
@@ -338,7 +339,7 @@ export class CdsActionAskgptV2Component implements OnInit {
             this.action.max_tokens = 1024
           }else{
             this.ai_setting['max_tokens'].min=10;
-            this.action.max_tokens = 512
+            this.action.max_tokens = 256
           }
         }
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
@@ -491,6 +492,7 @@ export class CdsActionAskgptV2Component implements OnInit {
         element.classList.add('preview-container-extended')
       }, 200)
       this.showAiError = true;
+      this.ai_error = this.translate.instant('CDSCanvas.AiError')
       if(err.error.error_code === 13001){
         this.ai_error = this.translate.instant('CDSCanvas.AiQuotaExceeded')
         return;

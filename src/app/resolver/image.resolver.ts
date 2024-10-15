@@ -13,7 +13,7 @@ export class ImagePreloaderResolver implements Resolve<boolean> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     
-    const DOC_BASE_URL = 'https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/'
+    const DOC_BASE_URL = 'assets/images/doc/'
     
     const imageUrls = [
       DOC_BASE_URL+'AGENT.png',
@@ -22,6 +22,7 @@ export class ImagePreloaderResolver implements Resolve<boolean> {
       DOC_BASE_URL+'BREVO.png',
       DOC_BASE_URL+'CAPTURE_USER_REPLY.png',
       DOC_BASE_URL+'CHANGE_DEPARTMENT.png',
+      DOC_BASE_URL+'CLEAR_TRANSCRIPT.png',
       DOC_BASE_URL+'CLOSE.png',
       DOC_BASE_URL+'CODE.png',
       DOC_BASE_URL+'CONDITION.png',
@@ -30,7 +31,7 @@ export class ImagePreloaderResolver implements Resolve<boolean> {
       DOC_BASE_URL+'EMAIL.png',
       DOC_BASE_URL+'GPT_ASSISTANT.png',
       DOC_BASE_URL+'GPT_TASK.png',
-      DOC_BASE_URL+'HIDE_MESSAGE',
+      DOC_BASE_URL+'HIDE_MESSAGE.png',
       DOC_BASE_URL+'HUBSPOT.png',
       DOC_BASE_URL+'JSON_CONDITION.png',
       DOC_BASE_URL+'LEAD_UPDATE.png',
