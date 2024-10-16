@@ -14,7 +14,9 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 export class RoleGuard implements CanActivate {
 
   private logger: LoggerService = LoggerInstance.getInstance();
-  
+  private roles: Array<string> = [];
+  private projectUser: ProjectUser;
+
   constructor(
     private appStorageService: AppStorageService,
     private tiledeskAuthService: TiledeskAuthService,
@@ -27,6 +29,7 @@ export class RoleGuard implements CanActivate {
     const url = state.url;
     const _url = route['_routerState'].url
 
+    this.roles = route.data[0].roles
     /** CHECK USER IS LOGGED IN */
     const queryParams = route.queryParams['jwt']
     
@@ -44,8 +47,11 @@ export class RoleGuard implements CanActivate {
     /** CHECK USER IS IN CURRENT PROJET */
     const projectId= route.params.projectid
     const user = this.tiledeskAuthService.getCurrentUser()
-    const userIsInProject = await this.getProjectUserInProject(projectId, user.uid)
-    if(!userIsInProject){
+    //step 1: check if user is in project as a projectUser
+    const userIsInProject = await this.getProjectUserInProject(projectId, user.uid) 
+    //step 2: check if projectUser has the correct enabled role for current path
+    const roleEnabled = this.roles.includes(this.projectUser.role);
+    if(!userIsInProject || !roleEnabled){
       this.router.navigate([`project/unauthorized`]);
       return false
     }
@@ -57,6 +63,7 @@ export class RoleGuard implements CanActivate {
   getProjectUserInProject(projectId: string, userId: string): Promise<boolean>{
     return new Promise((resolve, reject)=> {
       this.projectsService.getProjectUserByUserId(projectId, userId).subscribe({ next: (projectUser: ProjectUser) => {
+        this.projectUser = projectUser
         resolve(true)
       }, error: (error)=> {
           this.logger.error('[ROLE-GUARD] getProjectUserRole --> ERROR:', error)
