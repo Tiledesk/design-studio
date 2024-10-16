@@ -554,3 +554,61 @@ export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     
     return { point: { x: centerPointX, y: centerPointY }, scale: scale }
 }
+
+export function checkAcceptedFile(fileType, fileUploadAccept ): boolean{
+  
+    if (fileUploadAccept === '*/*') {
+      return true
+    }
+    // Dividi la stringa fileUploadAccept in un array di tipi accettati
+    const acceptedTypes = fileUploadAccept.split(',');
+  
+    // Verifica se il tipo di file è accettato
+    return acceptedTypes.some((accept) => {
+      accept = accept.trim();
+      // Controlla per i tipi MIME con wildcard, come image/*
+      if (accept.endsWith('/*')) {
+        const baseMimeType = fileType.split('/')[0]; // Ottieni la parte principale del MIME type
+        return accept.replace('/*', '') === baseMimeType;
+      }
+      // Controlla per le estensioni di file specifiche come .pdf o .txt
+      return fileType === getMimeTypeFromExtension(accept);
+    });
+  
+}
+  
+function getMimeTypeFromExtension(extension: string): string {
+    // Rimuovi il punto dall'estensione e ottieni il MIME type
+    const mimeTypes: { [key: string]: string } = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.pdf': 'application/pdf',
+        '.txt': 'text/plain',
+        '.doc': 'application/msword',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        // Aggiungi altri tipi MIME se necessario
+    };
+    return mimeTypes[extension] || '';
+}
+
+export function filterImageMimeTypesAndExtensions(fileUploadAccept: string): string[] {
+    
+    if (fileUploadAccept === '*/*') {
+        return ['*/*']
+    }
+    
+    // Lista delle estensioni di immagine comuni
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+  
+    // Dividi la stringa in un array di tipi accettati
+    const acceptedTypes = fileUploadAccept.split(',');
+  
+    // Filtra solo i MIME type che iniziano con "image/" o che sono estensioni di immagine
+    const imageTypesAndExtensions = acceptedTypes
+      .map(type => type.trim().toLowerCase()) // Rimuove gli spazi bianchi e converte a minuscolo
+      .filter(type => type.startsWith('image/') || imageExtensions.includes(type));
+    
+    return imageTypesAndExtensions;
+}
