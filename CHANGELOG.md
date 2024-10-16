@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.22.0-rc.2
+- **added**: fileUploadAccept env variable
+- **added**: uploaded control after file is loaded
+
 # 1.22.0-rc.1
 - **added**: role guard to main root 
 
