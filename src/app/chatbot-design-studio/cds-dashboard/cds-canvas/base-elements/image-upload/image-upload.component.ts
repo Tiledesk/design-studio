@@ -44,7 +44,7 @@ export class CDSImageUploadComponent implements OnInit {
   constructor(
     private uploadService: UploadService,
     private tiledeskAuthService: TiledeskAuthService,
-    private appConfigProvider: AppConfigService,
+    private appConfigService: AppConfigService,
     private sanitizer: DomSanitizer,
   ) { }
 
@@ -52,7 +52,7 @@ export class CDSImageUploadComponent implements OnInit {
   ngOnInit(): void {
     this.initializeApp();
     this.user = this.tiledeskAuthService.getCurrentUser();
-    this.fileUploadAccept = filterImageMimeTypesAndExtensions(this.appConfigProvider.getConfig().fileUploadAccept).join(',');
+    this.fileUploadAccept = filterImageMimeTypesAndExtensions(this.appConfigService.getConfig().fileUploadAccept).join(',');
   }
 
   initializeApp(){
