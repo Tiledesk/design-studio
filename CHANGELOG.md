@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.22.0-rc.3
+- **bug-fixed**: minor fix action gpt-task on preview
+
 # 1.22.0-rc.2
 - **added**: fileUploadAccept env variable
 - **added**: uploaded control after file is loaded
