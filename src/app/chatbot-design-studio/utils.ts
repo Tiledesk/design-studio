@@ -594,6 +594,7 @@ function getMimeTypeFromExtension(extension: string): string {
         '.txt': 'text/plain',
         '.doc': 'application/msword',
         '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.wav' : 'audio/wav'
         // Aggiungi altri tipi MIME se necessario
     };
     return mimeTypes[extension] || '';
