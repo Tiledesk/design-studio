@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.22.0-rc.4
+- **added**: uploaded control in audio base element
+
 # 1.22.0-rc.3
 - **bug-fixed**: minor fix action gpt-task on preview
 
