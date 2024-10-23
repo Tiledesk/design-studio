@@ -8,6 +8,7 @@ import { UploadService } from 'src/chat21-core/providers/abstract/upload.service
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
+import { checkAcceptedFile } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'cds-audio-upload',
@@ -418,12 +419,13 @@ export class CDSAudioUploadComponent implements OnInit {
     if (fileList.length > 0) {
       const file: File = fileList[0];
       var mimeType = fileList[0].type;
-      const isAccepted = this.checkAcceptedFile(mimeType);
-      if (isAccepted === true) {
-        this.handleDropEvent(ev);
-      } else {
+      const canUploadFile = checkAcceptedFile(mimeType, '.wav')
+      if(!canUploadFile){
         this.presentToastOnlyImageFilesAreAllowedToDrag()
+        this.logger.error('[IMAGE-UPLOAD] detectFiles: can not upload current file type--> NOT ALLOWED', '.wav', mimeType)
+        return;
       }
+      this.handleDropEvent(ev);
     }
   }
 
@@ -441,7 +443,7 @@ export class CDSAudioUploadComponent implements OnInit {
 
   // DRAG LEAVE (WHEN LEAVE FROM THE DROP ZONE)
   drag(ev: any) {
-    ev.preventDefault()
+    ev.preventDefault();
     ev.stopPropagation()
     this.isHovering = false
   }
