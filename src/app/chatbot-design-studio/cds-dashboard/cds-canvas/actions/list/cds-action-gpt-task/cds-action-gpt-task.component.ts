@@ -354,7 +354,8 @@ export class CdsActionGPTTaskComponent implements OnInit {
       context: this.action.context,
       model: this.action.model,
       max_tokens: this.action.max_tokens,
-      temperature: this.action.temperature
+      temperature: this.action.temperature,
+      formatType: this.action.formatType
     }
 
     this.showAiError = false;

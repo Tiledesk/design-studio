@@ -15,6 +15,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
+import { checkAcceptedFile, filterImageMimeTypesAndExtensions } from '../../utils';
 const swal = require('sweetalert');
 
 @Component({
@@ -37,6 +38,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
   selectedFiles: FileList;
   isFilePendingToUpload = false;
+  fileUploadAccept: string;
   // botProfileImageurl: string;
   // timeStamp: any;
 
@@ -82,7 +84,8 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
   ngOnInit(): void {
     this.getDeptsByProjectId();
-    this.user = this.tiledeskAuthService.getCurrentUser()
+    this.user = this.tiledeskAuthService.getCurrentUser();
+    this.fileUploadAccept = filterImageMimeTypesAndExtensions(this.appConfigService.getConfig().fileUploadAccept).join(',');
     // this.checkBotImageUploadIsComplete();
   }
 
@@ -417,6 +420,14 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
       const that = this;
       if (event.target.files && event.target.files[0]) {
+
+        const canUploadFile = checkAcceptedFile(event.target.files[0].type, this.fileUploadAccept)
+        if(!canUploadFile){
+          this.logger.error('[IMAGE-UPLOAD] detectFiles: can not upload current file type--> NOT ALLOWED', this.fileUploadAccept)
+          this.isFilePendingToUpload = false;
+          return;
+        }
+        
         const nameFile = event.target.files[0].name;
         const typeFile = event.target.files[0].type;
         const reader = new FileReader();
