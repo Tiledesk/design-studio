@@ -32,4 +32,5 @@ export interface Chatbot extends FaqKb {
     certifiedTags?: Array<{color: string, name: string}>;
     intentsEngine?: 'none' | 'tiledesk-ai',
     imageURL: string;
+    agents_available?: boolean;
 }

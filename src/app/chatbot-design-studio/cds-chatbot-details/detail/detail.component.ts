@@ -65,8 +65,8 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   dept_id: string;
   selected_dept_id: string;
   selected_dept_name: string;
-
   user: UserModel
+
 
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
@@ -497,9 +497,8 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   editBot() {
     // RESOLVE THE BUG 'edit button remains focused after clicking'
     this.elementRef.nativeElement.blur();
-
     // this.logger.log('[CDS-CHATBOT-DTLS] FAQ KB NAME TO UPDATE ', this.faqKb_name);
-    this.faqKbService.updateFaqKb(this.selectedChatbot._id, this.selectedChatbot.name, this.selectedChatbot.url, this.selectedChatbot.type, this.selectedChatbot.description, this.selectedChatbot.webhook_enabled, this.selectedChatbot.webhook_url, this.selectedChatbot.language).subscribe({next:(faqKb) => {
+    this.faqKbService.updateFaqKb(this.selectedChatbot._id, this.selectedChatbot.name, this.selectedChatbot.url, this.selectedChatbot.type, this.selectedChatbot.description, this.selectedChatbot.webhook_enabled, this.selectedChatbot.webhook_url, this.selectedChatbot.language, this.selectedChatbot.agents_available).subscribe({next:(faqKb) => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - FAQ KB UPDATED ', faqKb);
       if (faqKb) {
         this.selectedChatbot.name = faqKb['name']
@@ -507,10 +506,8 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
       }
     }, error: (error) => {
       this.logger.error('[CDS-CHATBOT-DTLS] EDIT BOT -  ERROR ', error);
-
       // =========== NOTIFY ERROR ===========
       this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotError'), 4, 'report_problem');
-
     }, complete: () => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - * COMPLETE *');
       // =========== NOTIFY SUCCESS===========
@@ -528,5 +525,16 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     let redirecturl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.project._id + '/department/edit/'+ deptid
     window.open(redirecturl, '_blank')
   }
+
+
+  onAgentsAvailableChange(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    const isAgentsAvailable = checkbox.checked;
+    this.logger.log('[CDS-CHATBOT-DTLS] isAgentsAvailable: ',isAgentsAvailable);
+    this.selectedChatbot.agents_available = isAgentsAvailable;
+    this.editBot();
+  }
+
+
 
 }

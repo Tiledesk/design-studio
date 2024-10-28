@@ -127,7 +127,7 @@ export class FaqKbService {
    * @param id
    * @param fullName
    */
-  public updateFaqKb(id: string, name: string, urlfaqkb: string, bottype: string, faqKb_description: string, webkookisenalbled: any, webhookurl, resbotlanguage: string) {
+  public updateFaqKb(id: string, name: string, urlfaqkb: string, bottype: string, faqKb_description: string, webkookisenalbled: any, webhookurl, resbotlanguage: string, agents_available: boolean) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -151,6 +151,7 @@ export class FaqKbService {
       body['webhook_enabled'] = webkookisenalbled;
       body['webhook_url'] = webhookurl
       body['language'] = resbotlanguage
+      body['agents_available'] = agents_available
     }
     this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
     return this._httpClient.put(url, JSON.stringify(body), httpOptions)
