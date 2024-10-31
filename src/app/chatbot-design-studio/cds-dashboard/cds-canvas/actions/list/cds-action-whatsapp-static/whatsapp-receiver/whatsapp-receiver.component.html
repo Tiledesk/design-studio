@@ -102,9 +102,15 @@
                     </span>
                 </div>
                 <div class="field-wrapper">
-                    <input type="text" placeholder="+1555123456" value="{{phone_number}}"
-                        (input)="onPhoneNumberChange($event.target.value)" (blur)="onBlur()" (focus)="onFocus()"
-                        maxlength="15">
+                    <cds-textarea id="phone_number"
+                        [emojiPikerBtn]="false"
+                        [textLimitBtn]="false"
+                        [minRow]="1" [maxRow]="1" 
+                        [text]="phone_number" 
+                        [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
+                        (blur)="onBlur($event)" (focus)="onFocus()"
+                        (changeTextarea)="onChangeTextarea($event, 'phone_number')">
+                    </cds-textarea>
                 </div>
             </div>
         </div>
@@ -123,12 +129,21 @@
                     <span>{{ i + 1 }}</span>
                 </div>
                 <div class="field-wrapper">
-                    <input type="text" 
+                    <!-- <input type="text" 
                         placeholder="{{hp}}" 
                         value="{{header_params[i].text}}"
                         (input)="onParamHeaderChange($event.target.value, i+1)" 
                         (blur)="onBlur()" 
-                        (focus)="onFocus()">
+                        (focus)="onFocus()"> -->
+                    <cds-textarea id="header_params"
+                        [emojiPikerBtn]="false"
+                        [textLimitBtn]="false"
+                        [minRow]="1" [maxRow]="1" 
+                        [text]="header_params[i].text" 
+                        [placeholder]="hp"
+                        (blur)="onBlur($event)" (focus)="onFocus()"
+                        (changeTextarea)="onChangeTextarea($event, 'header_params', i+1)">
+                    </cds-textarea>
                 </div>
             </div>
 
@@ -138,35 +153,39 @@
                     <!-- <span>{{</span> {{ i + 1 }} <span>}}</span> -->
                     <span>{{ i + 1 }}</span>
                 </div>
-                <div class="field-wrapper large">
+                <div class="field-wrapper">
                     <!-- <input type="text" placeholder="{{hp}}" (input)="onParamHeaderChange($event.target.value, i+1)"> -->
-                    <input *ngIf="!fileUploadedName" 
-                        type="text" 
+                    <cds-textarea id="header_params" *ngIf="!fileUploadedName"
+                        [emojiPikerBtn]="false"
+                        [textLimitBtn]="false"
+                        [minRow]="1" [maxRow]="1" 
+                        [text]="header_params[i].text" 
                         [placeholder]="'CDSCanvas.InsertValidURLOrUpdateFile' | translate "
-                        (input)="onParamHeaderChange($event.target.value, i+1)" 
-                        (blur)="onBlur()" 
-                        (focus)="onFocus()">
+                        (blur)="onBlur($event)" (focus)="onFocus()"
+                        (changeTextarea)="onChangeTextarea($event, 'header_params', i+1)">
+                    </cds-textarea>
                     <input *ngIf="fileUploadedName" 
                         type="text" 
                         placeholder="{{ fileUploadedName }}"
                         value="{{fileUploadedName}}" 
                         disabled>
+                    <button *ngIf="!isFilePendingToUpload && !fileUploadedName" type="submit" class="icon-only" (click)="fileInput.click()">
+                        <span class="material-icons-outlined">
+                            cloud_upload
+                        </span>
+                        
+                        <input #fileInput type="file" 
+                            [accept]="fileUploadAccept" 
+                            (change)="onFileSelected($event)"
+                            capture="camera" 
+                            id="file-input" 
+                            style="display: none;">
+    
+                    </button>
                 </div>
                 <loading-spinner  class="custom-spinner" *ngIf="isFilePendingToUpload"></loading-spinner>
                
-                <button *ngIf="!isFilePendingToUpload && !fileUploadedName" type="submit" class="icon-only" (click)="fileInput.click()">
-                    <span class="material-icons-outlined">
-                        cloud_upload
-                    </span>
-                    
-                    <input #fileInput type="file" 
-                        [accept]="fileUploadAccept" 
-                        (change)="onFileSelected($event)"
-                        capture="camera" 
-                        id="file-input" 
-                        style="display: none;">
-
-                </button>
+                
 
                 <button *ngIf="!isFilePendingToUpload && fileUploadedName" type="submit" class="icon-only" (click)="removeHeaderFile()">
                     <span class="material-icons-outlined" style="color: #e22828;">
@@ -220,12 +239,15 @@
 
                 </div>
                 <div class="field-wrapper">
-                    <input type="text" 
-                        placeholder="{{bp}}" 
-                        value="{{body_params[i].text}}"
-                        (input)="onParamBodyChange($event.target.value, i+1)" 
-                        (blur)="onBlur()" 
-                        (focus)="onFocus()">
+                    <cds-textarea id="body_params"
+                        [emojiPikerBtn]="false"
+                        [textLimitBtn]="false"
+                        [minRow]="1" [maxRow]="1" 
+                        [text]="body_params[i].text" 
+                        [placeholder]="bp"
+                        (blur)="onBlur($event)" (focus)="onFocus()"
+                        (changeTextarea)="onChangeTextarea($event, 'body_params', i+1)">
+                    </cds-textarea>
                 </div>
             </div>
         </div>
@@ -244,13 +266,16 @@
                     <!-- <span>{{</span> {{ i + 1 }} <span>}}</span> -->
                     <span>{{ i + 1 }}</span>
                 </div>
-                <div class="field-wrapper large">
-                    <input type="text" 
-                        placeholder="'CDSCanvas.InsertValidURL' | translate " 
-                        value="{{buttons_params[i].text}}"
-                        (input)="onParamButtonChange($event.target.value, i+1)" 
-                        (blur)="onBlur()" 
-                        (focus)="onFocus()">
+                <div class="field-wrapper ">
+                    <cds-textarea id="buttons_params"
+                        [emojiPikerBtn]="false"
+                        [textLimitBtn]="false"
+                        [minRow]="1" [maxRow]="1" 
+                        [text]="buttons_params[i].text" 
+                        [placeholder]="'CDSCanvas.InsertValidURL' | translate "
+                        (blur)="onBlur($event)" (focus)="onFocus()"
+                        (changeTextarea)="onChangeTextarea($event, 'buttons_params', i+1)">
+                    </cds-textarea>
                 </div>
 
             </div>

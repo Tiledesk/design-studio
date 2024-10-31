@@ -34,11 +34,11 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   previsioning_url: string;
   sanitizedUrl: any;
   fileUploadAccept: string = "image/*";
-  invalidUrl: Boolean = false;
+  invalidUrl: boolean = false;
   src: any;
   isFilePendingToUpload = false;
   fileUploadedName: string;
-  displayPreview: Boolean = false;
+  displayPreview: boolean = false;
   phone_number: string;
   user: UserModel
 
@@ -157,7 +157,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
         if (this.header_component.example &&
           this.header_component.example.header_text) {
           this.header_component.example.header_text.forEach((p, i) => {
-            this.header_params.push({ index: i + 1, type: "text", text: null })
+            this.header_params.push({ index: i + 1, type: this.header_component.format, text: null })
           })
         }
       }
@@ -217,6 +217,13 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   onPhoneNumberChange(event) {
     // TODO - Aggiungere regex per controllare il numero inserito
     this.phone_number = event;
+    // if(event){
+    //   this.invalidNumber = false;
+    //   var reg = new RegExp('^\\+?(\\d{1,3})?[-.\\s]?\\(?\\d{1,4}\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}$');
+    //   if (!reg.test(this.phone_number)) {
+    //     this.invalidNumber = true
+    //   }
+    // }
 
   }
 
@@ -233,6 +240,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   }
 
   onParamHeaderChange(event, param_num) {
+    console.log('onParamHeaderChange -->', event, param_num, this.header_params[param_num - 1])
     this.header_component = JSON.parse(JSON.stringify(this.header_component_temp));
     if (this.header_params[param_num - 1].type === 'TEXT') {
       this.header_params[param_num - 1].text = event;
@@ -324,9 +332,27 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     this.receiverValue.emit(receiver_out);
   }
 
-  onBlur() {
+  onBlur(event) {
     this.checkParameters();
   }
+
+  onChangeTextarea(text: string, key: string, index?: number){
+    this.logger.log('[WHATSAPP RECEIVER] onChange input ->', key, text)
+    switch(key){
+      case 'phone_number':
+        this.onPhoneNumberChange(text);
+        break;
+      case 'header_params':
+        this.onParamHeaderChange(text, index);
+        break;
+      case 'body_params':
+        this.onParamBodyChange(text, index);
+        break;
+      case 'buttons_params':
+        this.onParamButtonChange(text, index)
+        break;
+    }
+  } 
 
   onFocus() {
     let parameters_container = this.elementRef.nativeElement.querySelector('#parameters-container');
