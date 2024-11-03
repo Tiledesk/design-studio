@@ -116,6 +116,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private logger: LoggerService = LoggerInstance.getInstance()
   
   
+  IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
+ startDraggingPosition: any = null;
+
   constructor(
     private intentService: IntentService,
     private stageService: StageService,
@@ -345,6 +348,18 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       
     });
 
+    /** SUBSCRIBE TO THE STATE INTENT DETAIL PANEL */
+    // this.subscriptionOpenDetailPanel = this.controllerService.isOpenIntentDetailPanel$.subscribe((element: Intent) => {
+    //   if (element) {
+    //     this.closeAllPanels();
+    //     this.IS_OPEN_PANEL_ACTION_DETAIL = true;
+    //     this.removeConnectorDraftAndCloseFloatMenu();
+    //   } else {
+    //     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
+    //   }
+    //   this.logger.log('[CDS-CANVAS]  isOpenActionDetailPanel ', element, this.IS_OPEN_PANEL_ACTION_DETAIL);
+    // });
+
     /** SUBSCRIBE TO THE STATE ACTION DETAIL PANEL */
     this.subscriptionOpenDetailPanel = this.controllerService.isOpenActionDetailPanel$.subscribe((element: { type: TYPE_INTENT_ELEMENT, element: Action | string | Form }) => {
       this.elementIntentSelected = element;
@@ -424,10 +439,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private closeAllPanels(){
     this.IS_OPEN_PANEL_WIDGET = false;
     // this.IS_OPEN_PANEL_ACTION_DETAIL = false;
+    this.IS_OPEN_PANEL_INTENT_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
-    // this.closePanelWidget.next();
   }
   private closeActionDetailPanel(){
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
@@ -491,7 +506,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log('[CDS-CANVAS] start-dragging ', el);
       this.removeConnectorDraftAndCloseFloatMenu();
       this.intentService.setIntentSelectedById(el.id);
-      //this.intentSelected = this.listOfIntents.find((intent) => intent.intent_id === el.id);
+      this.startDraggingPosition = { x: el.offsetLeft, y: el.offsetTop };
       el.style.zIndex = 2;
     };
     document.addEventListener("start-dragging", this.listnerStartDragging, false);
@@ -516,6 +531,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       const el = e.detail.element;
       this.logger.log('[CDS-CANVAS] end-dragging ', el);
       el.style.zIndex = 1;
+      this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected.attributes.position);
+      this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
+      let position = this.intentService.intentSelected.attributes.position;
+      if(this.startDraggingPosition.x === position.x && this.startDraggingPosition.y === position.y){
+        this.onIntentSelected(this.intentService.intentSelected);
+      }
       this.intentService.updateIntentSelected();
     };
     document.addEventListener("end-dragging", this.listnerEndDragging, false);
@@ -989,11 +1010,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // --------------------------------------------------------- // 
   /** onSelectIntent */
   onSelectIntent(intent: Intent) {
-    // this.logger.log('[CDS-CANVAS] onSelectIntent::: ', intent);
+    this.logger.log('[CDS-CANVAS] onSelectIntent::: ', intent);
     if (!this.hasClickedAddAction) {
       this.removeConnectorDraftAndCloseFloatMenu();
     }
-    // this.intentSelected = intent;
     this.intentService.setIntentSelected(intent.intent_id);
     this.posCenterIntentSelected(intent);
     this.closeAllPanels();
@@ -1028,6 +1048,21 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // --------------------------------------------------------- // 
   // START EVENT > INTENT
   // --------------------------------------------------------- //
+
+
+
+  onIntentSelected(intent){
+    this.logger.log('[CDS-CANVAS] onIntentSelected ', intent.intent_id);
+    this.closeAllPanels();
+    this.removeConnectorDraftAndCloseFloatMenu();
+    this.intentService.setIntentSelectedById(intent.intent_id);
+    this.closeActionDetailPanel();
+    setTimeout(() => {
+      this.elementIntentSelected = intent;
+      this.IS_OPEN_PANEL_INTENT_DETAIL = true;
+    }, 0);
+  }
+
   /** onActionSelected  **
    * @ Close WHEN AN ACTION IS SELECTED FROM AN INTENT
    * - actions context menu (static & float)
@@ -1121,7 +1156,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // } else {
     //   this.IS_OPEN_PANEL_WIDGET = !this.IS_OPEN_PANEL_WIDGET;
     // }
-
     if(this.IS_OPEN_PANEL_WIDGET){
       this.controllerService.closeActionDetailPanel();
       this.controllerService.closeButtonPanel();
@@ -1129,7 +1163,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.controllerService.closeAddActionMenu();
       this.connectorService.removeConnectorDraft();
     }
-
     if(intent){
       // this.intentSelected = intent;
       this.intentService.setIntentSelectedById(intent.intent_id);

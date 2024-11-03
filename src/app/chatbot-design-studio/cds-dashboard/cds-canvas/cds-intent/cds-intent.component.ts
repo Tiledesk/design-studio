@@ -34,6 +34,7 @@ export enum HAS_SELECTED_TYPE {
   QUESTION = "HAS_SELECTED_QUESTION",
   FORM = "HAS_SELECTED_FORM",
   ACTION = "HAS_SELECTED_ACTION",
+  INTENT = "HAS_SELECTED_INTENT",
 }
 
 @Component({
@@ -51,6 +52,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() answerSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() formSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() actionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
+  // @Output() intentSelected = new EventEmitter();
   @Output() actionDeleted = new EventEmitter();
   @Output() showPanelActions = new EventEmitter(); // nk
   @Output() testItOut = new EventEmitter<Intent>();
@@ -450,7 +452,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /*********************************************/
+  // onMouseDownIntent(){
+  //   this.elementTypeSelected = null;
+  // }
 
+  // onSelectIntent(){
+  //   if(!this.elementTypeSelected){
+  //     this.intentSelected.emit(this.intent);
+  //   }
+  // }
 
   /** EVENTS  */
 
