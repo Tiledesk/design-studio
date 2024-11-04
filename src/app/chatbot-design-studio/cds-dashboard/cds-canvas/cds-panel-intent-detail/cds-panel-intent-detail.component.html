@@ -3,7 +3,7 @@
 
         <cds-panel-intent-header class="pic-title-text tds_draggable" 
             [class.isStart]="false"
-            [intent]="elementIntentSelected">
+            [intent]="intentSelected">
         </cds-panel-intent-header>
         
         <div class="header-options-wrp icon-action" (click)="maximize = !maximize">
@@ -32,7 +32,7 @@
                     <input type="checkbox" name="agents_available_switch"
                         class="nw-onoffswitch-checkbox" id="agents_available_switch"
                         [(ngModel)]="agents_available" 
-                        (change)="onAgentsAvailableChange($event)">
+                        (change)="onAgentsAvailableChange($event.target.checked)">
                     <label class="nw-onoffswitch-label" for="agents_available_switch"></label>
                 </div>
                 <span class="checkmark" style="line-height: 25px; margin: 20px 20px 10px; float: left;">

@@ -47,7 +47,8 @@
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
-
+        <div *ngIf="intent.agents_available" class="agents-available"><span class="material-icons">boy</span></div>
+        
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
