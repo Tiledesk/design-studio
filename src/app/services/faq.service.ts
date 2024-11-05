@@ -46,10 +46,10 @@ export class FaqService {
   }
 
   /**
-   * EXPORT FAQS AS CSV
-   * @param id_faq_kb 
-   * @returns 
-   */
+  * EXPORT FAQS AS CSV
+  * @param id_faq_kb 
+  * @returns 
+  */
   public exsportFaqsToCsv(id_faq_kb: string) {
     const httpOptions = {
       headers: new HttpHeaders({
@@ -79,22 +79,6 @@ export class FaqService {
 
     return this._httpClient.get(url, httpOptions)
   }
-
-  public exportIntentsToJSON(id_faq_kb: string) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken,
-      }),
-      // responseType: 'text' as 'json'
-    };
-
-    const url = this.SERVER_BASE_PATH + this.project_id + "/faq_kb/exportjson/" + id_faq_kb + "?intentsOnly=true";
-    this.logger.log('[FAQ-SERV] - EXPORT FAQS AS JSON - URL', url);
-
-    return this._httpClient.get(url, httpOptions)
-  }
-
 
   public importChatbotFromJSON(id_faq_kb: string, jsonfile) {
     const options = {
@@ -211,33 +195,6 @@ export class FaqService {
     this.logger.log('[FAQ-SERV] CREATE TRAIN BOT FAQ - BODY ', body);
 
     return this._httpClient.post(url, JSON.stringify(body), httpOptions)
-  }
-
-  /**
-   * UPLOAD FAQS CSV
-   * @param formData 
-   * @returns 
-   */
-  public uploadFaqCsv(formData: any) {
-    // const headers = new Headers();
-    /** No need to include Content-Type in Angular 4 */
-    // headers.append('Content-Type', 'multipart/form-data');
-
-    // headers.append('Accept', 'text/csv');
-    // headers.append('Authorization', this.TOKEN);
-    // const options = new RequestOptions({ headers: headers });
-
-    const options = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    const url = this.FAQ_URL + 'uploadcsv';
-    this.logger.log('[FAQ-SERV] UPLOAD FAQS CSV - URL ', url);
-
-    return this._httpClient.post(url, formData, options)
   }
 
   /**

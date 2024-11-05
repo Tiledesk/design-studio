@@ -98,6 +98,17 @@
         </cds-textarea>
     </div>
 
+
+    <div class="field-box">
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.history"
+                (change)="onChangeCheckbox($event, 'history')">
+                {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
+            </mat-checkbox>
+        </section>
+    </div>
+
     <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
         <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
             [disabled]="!action.question" (click)="execPreview()">
@@ -109,7 +120,9 @@
     <div class="answer-preview" *ngIf="showPreview">
         <div class="header-answer-preview">
             <div class="label-and-button-container">
-                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}</label>
+                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (model_list | filter:{key: 'value', value: action?.model }).name }} )</span>
+                </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
                     <span class="material-icons-round">
@@ -191,7 +204,8 @@
                         [itemSelected]="action.model"
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"
-                        [optionalBindAdditionalText]="'multiplier'" 
+                        [optionalBindAdditionalText]="'multiplier'"
+                        [optionalBindDescription]="'description'"
                         (onSelected)="onChangeSelect($event, 'model')">
                     </cds-select>
                 </div>
@@ -202,17 +216,17 @@
                     <div class="action-wait-content">
 
                         <div class="action-wait-slider ">
-                            <div class="action-wait-range">10</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].min}}</div>
                             <mat-slider 
-                                class="wait-slider" 
-                                thumbLabel 
-                                [displayWith]="formatLabel" 
-                                step="1"  min="10" max="2048"
+                                class="wait-slider"  thumbLabel 
+                                [step]="ai_setting['max_tokens'].step"  
+                                [min]="ai_setting['max_tokens'].min"
+                                [max]="ai_setting['max_tokens'].max"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
                             </mat-slider>
-                            <div class="action-wait-range">2048</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].max}}</div>
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
@@ -228,16 +242,16 @@
                         <div class="action-wait-content">
 
                             <div class="action-wait-slider">
-                                <div class="action-wait-range">0</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].min}}</div>
                                 <mat-slider 
-                                    class="wait-slider" 
-                                    thumbLabel 
-                                    [displayWith]="formatLabel" 
-                                    step="0.05" min="0" max="1" 
+                                    class="wait-slider" thumbLabel
+                                    [step]="ai_setting['temperature'].step"  
+                                    [min]="ai_setting['temperature'].min"
+                                    [max]="ai_setting['temperature'].max" 
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">1</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].max}}</div>
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
@@ -249,16 +263,28 @@
                 <!-- // system context textarea -->
                 <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
-                    <cds-textarea id="context" 
-                        [textLimitBtn]="false" 
+                    <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
-                        [setAttributeBtn]="false"
-                        [minRow]="1" [maxRow]="3" 
+                        [limitCharsText]="10000"
+                        [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
                         [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
                         (blur)="onBlur($event)"
                         (changeTextarea)="onChangeTextarea($event, 'context')">
                     </cds-textarea>
+                </div>
+
+                <div class="field-box" *ngIf="action.hasOwnProperty('formatType')">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.formatType === 'json_object'? true: false "
+                            (change)="onChangeCheckbox($event, 'formatType')">
+                            {{"CDSCanvas.FormatType" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <label class="field-description">{{ "CDSCanvas.FormatTypeDescription" | translate }}
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" href='https://platform.openai.com/docs/guides/structured-outputs/json-mode' target='_blank'>{{ 'LearnMore' | translate }}</a>
+                    </label>
                 </div>
 
             </div>
@@ -278,13 +304,21 @@
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
-            [minRow]="1" 
-            [maxRow]="1" 
+            [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignReplyTo"
             (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')">
         </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="subtitle-label">{{'CDSCanvas.ErrorAutomaticAssign' | translate }}
+            <b>flowError</b>
+            <!-- <span class="tag-container">
+                <span class="tag-label">flowError</span>
+            </span> -->
+        </label> 
     </div>
 
     

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, SimpleChanges } from '@angular/core';
 import { TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from '../../../../utils';
 import { CdkDropList, CdkDragStart, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
 import { ControllerService } from '../../../../services/controller.service';
@@ -6,6 +6,8 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
+import { TranslateService } from '@ngx-translate/core';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -24,10 +26,15 @@ export class CdsPanelActionsComponent implements OnInit {
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   TYPE_OF_MENU = TYPE_OF_MENU;
-
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
+  
   menuItemsList: any;
   isDragging: any = false;
   indexDrag: number;
+
+  hoveredElement: any;
+  positionMenu: any = {'x': 200, 'y': 0 };
+  isOpen: boolean = false;
   // dropList: CdkDropList;
   // connectedLists: CdkDropList[];
   // connectedIDLists: string[];
@@ -36,13 +43,14 @@ export class CdsPanelActionsComponent implements OnInit {
   constructor(
     private controllerService: ControllerService,
     private projectPlanUtils: ProjectPlanUtils,
+    private translate: TranslateService,
     // public dragDropService: DragDropService
   ) { }
 
   ngOnInit(): void {
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
     switch (this.menuType) {
       case TYPE_OF_MENU.ACTION:
         this.menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[this.menuCategory] && el.status !== 'inactive')).map(element => {
@@ -102,6 +110,7 @@ export class CdsPanelActionsComponent implements OnInit {
     if(!this.pos){
       this.pos = {'x': 0, 'y':0};
     }
+
   }
 
 
@@ -115,10 +124,40 @@ export class CdsPanelActionsComponent implements OnInit {
     // // this.dragDropService.connectedIDLists;
   }
 
+
+  openInfo(e, element) {
+    if(!BRAND_BASE_INFO['DOCS']){
+      return;
+    }
+    /**if element doesn't have any doc, close info */
+    if(!element.doc || element.doc===""){
+      this.closeInfo();
+      return; 
+    } 
+
+    setTimeout(() => {
+      this.hoveredElement = element;
+      //this.menuTrigger.openMenu();
+      // let x = e.offsetLeft;
+      let y = e.offsetTop;
+      this.isOpen = true;
+      this.positionMenu = {'x': 200, 'y': y }
+    }, 0);
+  }
+
+  closeInfo() {
+    if(!BRAND_BASE_INFO['DOCS']){
+      return;
+    }
+    setTimeout(() => {this.isOpen = false;},0)
+    this.hoveredElement = null;
+  }
+
   onDragStarted(event:CdkDragStart, currentIndex: number) {
     this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);
     this.controllerService.closeActionDetailPanel();
     this.isDragging = true;
+    this.isOpen = false;
     this.indexDrag = currentIndex;
     
     this.isDraggingMenuElement.emit(this.isDragging);
@@ -182,6 +221,11 @@ export class CdsPanelActionsComponent implements OnInit {
   onDragOver(event: DragEvent) {
     this.logger.log('Drag dragOver!', event);
     // event.preventDefault(); // Annulla l'evento di default che consente il drop
+  }
+
+  onVideoUrlClick(){
+    let url = this.translate.instant(this.hoveredElement.doc+'.VIDEO_URL')
+    window.open (url, '_blank')
   }
 
 }

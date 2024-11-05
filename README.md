@@ -47,6 +47,16 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
 
+## Important Note: Running Design Studio
+
+Design Studio cannot run as a standalone application; it is tightly integrated with the Tiledesk solution. To set up and use Design Studio, follow these steps:
+
+1. Ensure you have an authenticated Tiledesk environment.
+2. Add a key `tiledesk_token` to your browser’s local storage with your Tiledesk authentication token.
+3. Navigate to your project by accessing the following URL pattern: ``http://loalhost/#/project/<project_id>/chatbot/<chatbot-id>/blocks``
+
+Please note that Design Studio depends on prior authentication through the Tiledesk platform to function correctly. You must have a valid Tiledesk token and project to access and use the tool.
+
 ## Community? Questions? Support?
 
 If you need help or have questions, feel free to make a post on our [Forum](https://tiledesk.discourse.group/).
@@ -54,8 +64,8 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Feedback? New Ideas?
 
-Visit our [Feedback Board](https://tiledesk.sleekplan.app/) to discuss new ideas, suggestions, and solve issues to make Tiledesk even better for you.
+Visit our [Feedback Board]([https://feedback.tiledesk.com/) to discuss new ideas, suggestions, and solve issues to make Tiledesk even better for you.
 
 ## Public Roadmap
 
-Check our [Public Roadmap](https://tiledesk.sleekplan.app/roadmap) to see activities In Progress, Planned, and Under Review. We value your input in shaping the future of Tiledesk.
+Check our [Public Roadmap](https://feedback.tiledesk.com/roadmap) to see activities In Progress, Planned, and Under Review. We value your input in shaping the future of Tiledesk.

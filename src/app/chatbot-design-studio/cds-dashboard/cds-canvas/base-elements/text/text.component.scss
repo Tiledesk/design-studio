@@ -47,7 +47,7 @@
                 }
 
                 &.autocompleteOpen{
-                    border-radius: var(--input-border-radius-base) 0 0 0;
+                    border-radius: var(--input-border-radius-base) var(--input-border-radius-base) 0 0;
                 }
                 
             }
@@ -70,31 +70,6 @@
         }
 
     }
-
-    .editor-utils {
-        position: relative;
-        margin: -20px 50px 0px 0px;
-        float: right;
-        .num-chars {
-            background: var(--blu-light-01);
-            padding: 0px 8px;
-            border-radius: 10px;
-            font-size: 0.8em;
-            color: var(--blu);
-            float: right;
-            &.error {
-                background: red;
-                color: white;
-            }
-        }
-        .text-editor-insert-attribute {
-            float: right;
-        }
-        .moji-picker {
-            float: right;
-        }
-    }
-
     
 }
 
@@ -165,4 +140,131 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+
+
+/** box-textarea **/
+.box-textarea {
+    width: 100%;
+    // margin-left: 20px;
+    textarea {
+        border-radius: var(--input-border-radius-base);
+        background: var(--color-white-hex);
+        border: 1px solid var(--blu-light-02);
+        overflow-x: hidden;
+        overflow-y: auto;
+        color: var(--gray);
+        font-size: 1.15em;
+        line-height: 25px;
+        resize: vertical;
+
+        // width: calc(100% - 2.5em);
+        padding: 10px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        margin: 0px;
+        // resize: none;
+        height: 26px;
+        min-height: 26px;
+
+    }
+}
+
+/** editor-utils **/
+.editor-utils {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    position: absolute;
+    bottom: -10px;
+    right: 20px;
+    z-index: 1;
+    // float: right;
+
+    .tpl-text-limit {
+        pointer-events: none;
+        transition: background-color 0.3s, color 0.3s;
+        .num-chars {
+            background: var(--blu-light-01);
+            flex-shrink: 0;
+            padding: 0px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            color: var(--blu);
+            float: right;
+            line-height: 24px;
+            font-weight: 700;
+            // width: 40px;
+            text-align: center;
+            &.error {
+                background: var(--color-red-hex);
+                color: var(--color-white-hex);
+            }
+        }
+    }
+
+    .text-editor-insert-attribute {
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        align-items: center;
+        background: var(--color-white-hex);
+        border-radius: 100%;
+        -webkit-box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
+        cursor: pointer;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        height: 24px;
+        width: 24px;
+        justify-content: center;
+        color: var(--blu);
+        border: 1px solid var(--blu-light-02);
+        &:hover {
+            background: var(--blu);
+            color:var(--color-white-hex) ;
+        }
+    }
+    .emoji-picker {
+        .emoji-picker-button {
+            align-items: center;
+            background: var(--color-white-hex);
+            border-radius: 100%;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 19%);
+            cursor: pointer;
+            display: flex;
+            height: 24px;
+            width: 24px;
+            justify-content: center;
+            color: var(--blu);
+            border: 1px solid var(--blu-light-02);
+            &:hover {
+                background: var(--blu);
+                color:var(--color-white-hex) ;
+            }
+        }
+    }
+    
+}
+
+
+.mat-option{
+    color: var(--gray) !important;
+    height: unset !important;
+    line-height: 25px !important;
+    padding: 10px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+
+    &.mat-active{
+        background-color: #ebf5ff !important;;
+    }
+}
+
+.slide-top {
+	-webkit-animation: slide-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+	        animation: slide-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }

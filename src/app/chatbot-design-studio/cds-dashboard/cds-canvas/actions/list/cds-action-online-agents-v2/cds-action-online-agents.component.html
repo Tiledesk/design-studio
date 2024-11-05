@@ -83,6 +83,18 @@
             </div>
         </div>
 
+        <div class="field-box">
+            <section class="disable-input-message-section">
+                <mat-checkbox 
+                    [checked]="action?.ignoreOperatingHours"
+                    (change)="onChangeCheckbox('ignoreOperatingHours')">
+                    {{"CDSCanvas.IgnoreOperatingHours" | translate}}
+                </mat-checkbox>
+            </section>
+            <label class="field-description" [innerHTML]='"CDSCanvas.IgnoreOperatingHoursDescription" | translate'></label>
+        </div>
+
+
         <hr class="custom-divider">
 
         <!-- trueIntent -->

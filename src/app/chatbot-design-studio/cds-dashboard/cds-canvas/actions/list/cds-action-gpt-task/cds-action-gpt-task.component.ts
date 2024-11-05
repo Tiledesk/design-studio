@@ -21,6 +21,8 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -42,6 +44,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   panelOpenState = false;
   model_list: Array<{ name: string, value: string }>;
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 2048, step: 1},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+  }
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
   // ai_error: string = "Oops! Something went wrong."
@@ -67,6 +73,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
 
   projectPlan: PLAN_NAME
   PLAN_NAME = PLAN_NAME
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -81,7 +88,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   ngOnInit(): void {
     this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    this.model_list = Object.values(TYPE_GPT_MODEL).filter(el=> el.status !== 'inactive').map((el)=> {
+    this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
       if(ai_models[el.value])
         return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
       else
@@ -233,6 +240,26 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.updateAndSaveAction.emit();
   }
 
+  onChangeCheckbox(event: MatCheckboxChange, target){
+    console.log('targetttttt', event)
+    try {
+      this.action[target] = event.checked;
+      switch(target){
+        case 'formatType':{
+          if(event.checked){
+            this.action[target] = 'json_object'
+          }else{
+            this.action[target] = 'none'
+          }
+        }
+          
+      }
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    } catch (error) {
+      this.logger.log("Error: ", error);
+    }
+  }
+
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
     if(event){
       this.action[type]=event.value
@@ -327,7 +354,8 @@ export class CdsActionGPTTaskComponent implements OnInit {
       context: this.action.context,
       model: this.action.model,
       max_tokens: this.action.max_tokens,
-      temperature: this.action.temperature
+      temperature: this.action.temperature,
+      formatType: this.action.formatType
     }
 
     this.showAiError = false;
@@ -339,14 +367,14 @@ export class CdsActionGPTTaskComponent implements OnInit {
       element.classList.remove('preview-container-extended')
     }, 200)
 
-    this.openaiService.previewPrompt(data).subscribe((ai_response: any) => {
+    this.openaiService.previewPrompt(data).subscribe({ next: (ai_response: any) => {
       this.searching = false;
       setTimeout(() => {
         let element = document.getElementById("preview-container");
         element.classList.add('preview-container-extended')
       }, 200)
       this.ai_response = ai_response;
-    }, (err) => {
+    }, error: (err) => {
       this.searching = false;
       this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", err);
       setTimeout(() => {
@@ -359,10 +387,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
         return;
       }
       this.ai_error = this.translate.instant('CDSCanvas.AiError')
-    }, () => {
+    }, complete: () => {
       this.logger.debug("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
       this.searching = false;
-    })
+    }});
 
   }
 

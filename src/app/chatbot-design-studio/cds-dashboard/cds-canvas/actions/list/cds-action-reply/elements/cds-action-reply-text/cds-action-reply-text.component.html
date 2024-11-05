@@ -52,6 +52,7 @@
         class="text-editable-div"
         [text]="response.text" 
         [minRow]="1"
+        [limitCharsText]="limitCharsText"
         popoverVerticalAlign="above"
         (changeTextarea)="onChangeTextarea($event)"
         (blur)="onBlur($event)"

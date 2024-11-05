@@ -315,6 +315,9 @@
   cursor: pointer;
   margin-bottom: -10px;
   min-height: 12px;
+  .csd-open-action-menu-btn-wpr {
+    bottom: -28px;
+  }
 }
 
 .last-action-intent {
@@ -328,15 +331,13 @@
 /* Btn add action
 /* --------------------------------- */
 .csd-open-action-menu-btn-wpr {
-  // height: 32px;
-  // bottom: -50px;
   text-align: center;
   position: absolute;
   display: block;
-  bottom: -28px;
+  bottom: -41px;
   left: 0px;
   right: 0px;
-  
+  padding-top: 20px;
 }
 
 .footer-intent>.csd-open-action-menu-btn-wpr,

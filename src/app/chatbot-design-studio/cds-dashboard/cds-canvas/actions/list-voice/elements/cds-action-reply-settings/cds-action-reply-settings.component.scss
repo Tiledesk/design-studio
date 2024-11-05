@@ -107,3 +107,10 @@ cds-textarea.text-editable-div ::ng-deep{
         font-size: 0.9em !important;
     }
 }
+
+
+cds-radio-buttons {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}

@@ -65,10 +65,10 @@ export class CdsSupportComponent implements OnInit {
 
   private manageWidget(status: "hide" | "show" | "open" | "close" | "start", projectInfo?: any) {
     try {
+      this.logger.log('[CDS-SUPPORT] manageWidget ', window['tiledesk'], status)
       if (window && window['tiledesk']) {
-        this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
         if (status === 'hide') {
-          window['tiledesk'].hide();
+          window['tiledesk'].dispose();
         } else if (status === 'show') {
           window['tiledesk'].show();
         } else if(status === 'open'){
@@ -80,10 +80,10 @@ export class CdsSupportComponent implements OnInit {
       }
 
       if (window && !window['tiledesk']) {
+        this.logger.log('[CDS-SUPPORT] manageWidget window[tiledesk] not exist', status)
         if(status === "start"){
           window['startWidget']();
-          window['tiledesk_widget_login']();
-          window['tiledesk'].setAttributeParameter({ key: 'payload', value: {project:  projectInfo}})
+          window['tiledesk_widget_login']({ key: 'payload', value: {project:  projectInfo}});
         }
       }
       
@@ -94,6 +94,15 @@ export class CdsSupportComponent implements OnInit {
 
   ngOnDestroy(){
     this.manageWidget("hide")
+    
+    //remove script with id tiledesk-jssdk
+    const scriptElement = document.getElementById('tiledesk-jssdk')
+    if (scriptElement) {
+      scriptElement.remove();
+      delete window['tiledesk']
+      delete window['Tiledesk']
+    }
+    
   }
 
 }

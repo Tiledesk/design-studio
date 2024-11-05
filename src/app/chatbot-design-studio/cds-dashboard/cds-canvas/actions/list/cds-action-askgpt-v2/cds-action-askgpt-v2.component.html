@@ -75,13 +75,22 @@
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'question')">
         </cds-textarea>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.history"
+                (change)="onChangeCheckbox($event,'history')">
+                {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
+            </mat-checkbox>
+        </section>
     </div>
 
+    <!-- // Section moved to textarea field box -->
     <!-- <div class="field-box">
         <section class="disable-input-message-section">
             <mat-checkbox 
                 [checked]="action?.history"
-                (change)="onChangeCheckbox('history')">
+                (change)="onChangeCheckbox($event,'history')">
                 {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
             </mat-checkbox>
         </section>
@@ -99,7 +108,9 @@
     <div class="answer-preview" *ngIf="showPreview">
         <div class="header-answer-preview">
             <div class="label-and-button-container">
-                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}</label>
+                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (model_list | filter:{key: 'value', value: action?.model }).name }} )</span>
+                </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
                     <span class="material-icons-round">
@@ -117,7 +128,7 @@
             </div>
 
             <div *ngIf="!searching && !showAiError && ai_response">
-                {{ ai_response }}
+                {{ ai_response?.answer }}
             </div>
 
             <div *ngIf="showAiError">
@@ -126,12 +137,12 @@
 
         </div>
 
-        <!-- <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
+        <div class="usage-container" *ngIf="!searching && !showAiError ">
             <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
-        </div> -->
+            <!-- <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span> -->
+            <!-- <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span> -->
+            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.prompt_token_size }}</span>
+        </div>
 
     </div>
     <!-- PREVIEW - END -->
@@ -139,17 +150,38 @@
 
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.ChooseKB' | translate}}</label>
-        <cds-select id="text-condition" 
+        <cds-select *ngIf="!action?.namespaceAsName" id="text-condition" 
             [items]="listOfNamespaces" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
-            [itemSelected]="action?.namespace" 
+            [itemSelected]="action.namespace" 
             [placeholder]="'CDSCanvas.SelectNamespace' | translate"
             [clearable]="true" 
             (onSelected)="onChangeBlockSelect($event, 'namespace')"
             (onReset)="onResetBlockSelect($event, 'namespace')">
         </cds-select>
+        <!-- KEY -->
+        <cds-text *ngIf="action?.namespaceAsName" id="text"
+            class="sx-input" 
+            [text]="action.namespace"
+            [placeholder]="'CDSCanvas.SelectNamespace' | translate"
+            [autocompleteOptions]="autocompleteOptions"
+            (blur)="onBlur($event)"
+            (onChange)="onChangeTextarea($event, 'namespace')">
+        </cds-text>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.namespaceAsName"
+                (change)="onChangeCheckbox($event,'namespaceAsName')">
+                Use Knwoledge Base name
+            </mat-checkbox>
+            <label class="field-description">{{ "CDSCanvas.UseKBNameDescription" | translate }}
+                <a *ngIf="BRAND_BASE_INFO['DOCS']" href='https://gethelp.tiledesk.com/' target='_blank'>{{ 'LearnMore' | translate }}</a>
+            </label>
+        </section>
     </div>
+
 
     <div class="link-container">
         <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
@@ -174,6 +206,7 @@
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"
                         [optionalBindAdditionalText]="'multiplier'" 
+                        [optionalBindDescription]="'description'" 
                         (onSelected)="onChangeSelect($event, 'model')">
                     </cds-select>
                 </div>
@@ -184,17 +217,17 @@
                     <div class="action-wait-content">
 
                         <div class="action-wait-slider ">
-                            <div class="action-wait-range">10</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].min}}</div>
                             <mat-slider 
-                                class="wait-slider" 
-                                thumbLabel 
-                                [displayWith]="formatLabel" 
-                                step="1"  min="10" max="2048"
+                                class="wait-slider" thumbLabel 
+                                [step]="ai_setting['max_tokens'].step"  
+                                [min]="ai_setting['max_tokens'].min"
+                                [max]="ai_setting['max_tokens'].max"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
                             </mat-slider>
-                            <div class="action-wait-range">2048</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].max}}</div>
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
@@ -210,16 +243,16 @@
                         <div class="action-wait-content">
 
                             <div class="action-wait-slider">
-                                <div class="action-wait-range">0</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].min}}</div>
                                 <mat-slider 
-                                    class="wait-slider" 
-                                    thumbLabel 
-                                    [displayWith]="formatLabel" 
-                                    step="0.05" min="0" max="1" 
+                                    class="wait-slider" thumbLabel
+                                    [step]="ai_setting['temperature'].step"  
+                                    [min]="ai_setting['temperature'].min"
+                                    [max]="ai_setting['temperature'].max" 
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">1</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].max}}</div>
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
@@ -236,16 +269,18 @@
                         <div class="action-wait-content">
 
                             <div class="action-wait-slider">
-                                <div class="action-wait-range">1</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].min}}</div>
                                 <mat-slider 
                                     class="wait-slider" 
                                     thumbLabel 
                                     [displayWith]="formatLabel" 
-                                    step="1" min="1" max="10" 
+                                    [step]="ai_setting['top_k'].step"  
+                                    [min]="ai_setting['top_k'].min"
+                                    [max]="ai_setting['top_k'].max" 
                                     [(ngModel)]="action.top_k"
                                     (change)="updateSliderValue($event.value, 'top_k')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">10</div>
+                                <div class="action-wait-range">{{ai_setting['top_k'].max}}</div>
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
@@ -257,11 +292,10 @@
                 <!-- // system context textarea -->
                 <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
-                    <cds-textarea id="context" 
-                        [textLimitBtn]="false" 
+                    <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
-                        [setAttributeBtn]="false"
-                        [minRow]="1" [maxRow]="3" 
+                        [limitCharsText]="10000"
+                        [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
                         [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
                         (blur)="onBlur($event)"
@@ -274,11 +308,25 @@
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.advancedPrompt"
-                            (change)="onChangeCheckbox('advancedPrompt')">
+                            (change)="onChangeCheckbox($event,'advancedPrompt')">
                             {{"CDSCanvas.AdvancedContext" | translate}}
                         </mat-checkbox>
                     </section>
                     <label class="field-description" *ngIf="action?.advancedPrompt" [innerHTML]='"CDSCanvas.AdvancedContextDesctiption" | translate'></label>
+                </div>
+
+                <!-- // citations -->    
+                <div class="field-box" *ngIf="action.hasOwnProperty('citations')">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.citations"
+                            (change)="onChangeCheckbox($event, 'citations')">
+                            {{"CDSCanvas.Citations" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                        <!-- <a *ngIf="BRAND_BASE_INFO['DOCS']" href='https://platform.openai.com/docs/guides/structured-outputs/json-mode' target='_blank'>{{ 'LearnMore' | translate }}</a> -->
+                    </label>
                 </div>
             
 
@@ -320,8 +368,7 @@
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
-            [minRow]="1" 
-            [maxRow]="1" 
+            [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignReplyTo"
             (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
@@ -335,13 +382,21 @@
             [textLimitBtn]="false"
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
-            [minRow]="1" 
-            [maxRow]="1" 
+            [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignSourceTo"
             (selectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')">
         </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="subtitle-label">{{'CDSCanvas.ErrorAutomaticAssign' | translate }}
+            <b>flowError</b>
+            <!-- <span class="tag-container">
+                <span class="tag-label">flowError</span>
+            </span> -->
+        </label> 
     </div>
 
     <hr class="custom-divider">

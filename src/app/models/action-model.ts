@@ -82,15 +82,18 @@ export class ActionOnlineAgentV2 extends Action {
     stopOnConditionMet: boolean;
     selectedOption: string;
     selectedDepartmentId?: string;
+    ignoreOperatingHours?: boolean;
     constructor() {
         super();
         this.stopOnConditionMet = true;
         this._tdActionType = TYPE_ACTION.ONLINE_AGENTSV2;
         this.selectedOption = 'all'
+        this.ignoreOperatingHours = false;
     }
 }
 
 export class ActionOpenHours extends Action {
+    slotId?: string;
     trueIntent: string;
     falseIntent: string;
     trueIntentAttributes?: string;
@@ -99,6 +102,7 @@ export class ActionOpenHours extends Action {
     constructor() {
         super();
         this.stopOnConditionMet = true;
+        // this.slotId = null;
         this._tdActionType = TYPE_ACTION.OPEN_HOURS;
     }
 }
@@ -285,6 +289,15 @@ export class ActionIntentConnected extends Action {
     }
 }
 
+export class ActionConnectBlock extends Action {
+    intentName?: string;
+    json_payload?: Object;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.CONNECT_BLOCK;
+    }
+}
+
 export class ActionEmail extends Action {
     to: string;
     subject: string;
@@ -369,6 +382,8 @@ export class ActionAskGPTV2 extends Action {
     context: string;
     history: boolean;
     advancedPrompt?: boolean;
+    namespaceAsName: boolean;
+    citations: boolean
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2
@@ -379,10 +394,12 @@ export class ActionGPTTask extends Action {
     question: string;
     assignReplyTo: string;
     context: string;
+    history: boolean;
     max_tokens: number;
     temperature: number;
     model: string;
     preview?: Array<any>;
+    formatType: 'none' | 'json_object';
     trueIntent: string;
     falseIntent: string;
     constructor() {
@@ -484,6 +501,7 @@ export class Setting {
     maxDigits?: number;
     terminators?: string;
     transferTo?: string;
+    transferType?: string;
     bargein?: boolean = true;
     noInputTimeout?: number;
     noInputIntent?: string;
@@ -743,5 +761,28 @@ export class ActionVoice extends Action {
         if (attributes){
             this.attributes = attributes;
         }
+    }
+}
+
+export class ActionLeadUpdate extends Action {
+    update: { [key: string]: string}
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.LEAD_UPDATE;
+        this.update = {};
+    }
+}
+
+export class ActionClearTranscript extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.CLEAR_TRANSCRIPT;
+    }
+}
+
+export class ActionMoveToUnassigned extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
     }
 }

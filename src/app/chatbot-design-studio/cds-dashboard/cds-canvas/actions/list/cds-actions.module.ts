@@ -71,6 +71,10 @@ import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { FilterPipe } from 'src/app/pipe/filter.pipe';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
+import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
+import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript/cds-action-clear-transcript.component';
+import { CdsActionMoveUnassignedComponent } from './cds-action-move-unassigned/cds-action-move-unassigned.component';
+import { CdsActionConnectBlockComponent } from './cds-action-connect-block/cds-action-connect-block.component';
 
 @NgModule({
   declarations: [
@@ -120,6 +124,7 @@ import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-ta
     CdsActionBrevoComponent,
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
+    CdsActionLeadUpdateComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
@@ -152,9 +157,14 @@ import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-ta
     AttributesDialogComponent,
     FormDataComponent,
     // action GptTask elements: end //
+    CdsActionClearTranscriptComponent,
+    CdsActionMoveUnassignedComponent,
+    CdsActionConnectBlockComponent,
 
     //PIPES
-    FilterPipe
+    FilterPipe,
+    
+    
   ],
   imports: [
     CommonModule,
@@ -210,6 +220,7 @@ import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-ta
     CdsActionBrevoComponent,
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
+    CdsActionLeadUpdateComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
@@ -240,6 +251,9 @@ import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-ta
     // action GptTask elements: start //
     AttributesDialogComponent,
     // action GptTask elements: end //
+    CdsActionClearTranscriptComponent,
+    CdsActionMoveUnassignedComponent,
+    CdsActionConnectBlockComponent,
 
     //PIPES
     FilterPipe

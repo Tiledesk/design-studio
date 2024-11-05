@@ -190,6 +190,15 @@ export class CdsActionOnlineAgentsV2Component implements OnInit {
     }
   }
   
+  onChangeCheckbox(target){
+    try {
+      this.action[target] = !this.action[target];
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    } catch (error) {
+      this.logger.log("Error: ", error);
+    }
+  }
+  
 
   onChangeButtonSelect(event: {label: string, value: string, disabled: boolean, checked: boolean}){
     this.radioOptions.forEach(el => { el.value ===event.value? el.checked= true: el.checked = false })

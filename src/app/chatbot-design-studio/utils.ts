@@ -21,7 +21,7 @@ export enum SIDEBAR_PAGES {
 
 export enum SETTINGS_SECTION {
     DETAIL          = 'bot_detail',
-    IMPORT_EXPORT   = 'import_export',
+    IMPORT_EXPORT   = 'export',
     COMMUNITY       = 'community',
     DEVELOPER       = 'developer',
     ADVANCED        = 'advanced'
@@ -47,6 +47,7 @@ export enum TYPE_FUNCTION_VAR {
     capitalizeAsString  = "capitalizeAsString",
     absAsNumber         = "absAsNumber",
     ceilAsNumber        = "ceilAsNumber",
+    convertToNumber     = "convertToNumber",
     floorAsNumber       = "floorAsNumber",
     roundAsNumber       = "roundAsNumber",
     JSONparse           = 'JSONparse',
@@ -179,14 +180,16 @@ export enum OPTIONS {
     MOUSE       = "mouse"
 }
 
-export const TYPE_GPT_MODEL = {
-    'GPT-3':                { name: "GPT-3 (DaVinci)",                  value: "text-davinci-003",      status: "inactive"  },
-    'GPT-3.5' :             { name: "GPT-3.5 Turbo",                    value: "gpt-3.5-turbo",         status: "active"    },
-    'GPT-4' :               { name: "GPT-4",                            value: "gpt-4",                 status: "active"    },
-    'GPT-4-turbo-preview':  { name: "GPT-4 Turbo Preview",              value: "gpt-4-turbo-preview",   status: "active"    },
-    'GPT-4o':               { name: "GPT-4o",                           value: "gpt-4o",                status: "active"    },
-    'GPT-4o-mini':          { name: "GPT-4o mini",                      value: "gpt-4o-mini",           status: "active"    }
-}
+export const TYPE_GPT_MODEL: Array<{name: string, value: string, description: string, status: "active" | "inactive"}> = [
+    { name: "GPT-3 (DaVinci)",                  value: "text-davinci-003",      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
+    { name: "GPT-3.5 Turbo",                    value: "gpt-3.5-turbo",         description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",            status: "active"    },
+    { name: "GPT-4 (Legacy)",                   value: "gpt-4",                 description: "TYPE_GPT_MODEL.gpt-4.description",                    status: "active"    },
+    { name: "GPT-4 Turbo Preview",              value: "gpt-4-turbo-preview",   description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active"    },
+    { name: "GPT-4o",                           value: "gpt-4o",                description: "TYPE_GPT_MODEL.gpt-4o.description",                   status: "active"    },
+    { name: "GPT-4o mini",                      value: "gpt-4o-mini",           description: "TYPE_GPT_MODEL.gpt-4o-mini.description",              status: "active"    },
+    { name: "OpenAI o1-mini",                   value: "o1-mini",               description: "TYPE_GPT_MODEL.o1-mini.description",                  status: "active"    },
+    { name: "OpenAI o1-preview",                value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",               status: "active"    }
+]
 
 export const INTENT_TEMP_ID         = '';
 export const MESSAGE_METADTA_WIDTH  = '100%';
@@ -256,8 +259,9 @@ export const TYPE_FUNCTION_LIST_FOR_VARIABLES: { [key: string]: { name: string, 
     "roundAsNumbers":           { name: "CDSFunctionListForVariable.roundAsNumbers",        type: TYPE_FUNCTION_VAR.roundAsNumber,              src: "assets/images/functions/round.svg"        },
     "floorAsNumbers":           { name: "CDSFunctionListForVariable.floorAsNumbers",        type: TYPE_FUNCTION_VAR.floorAsNumber,              src: "assets/images/functions/floor.svg"        },
     "ceilAsNumbers":            { name: "CDSFunctionListForVariable.ceilAsNumbers",         type: TYPE_FUNCTION_VAR.ceilAsNumber,               src: "assets/images/functions/ceil.svg"         },
-    "JSONparse":                { name: "JSON.parse",                                       type: TYPE_FUNCTION_VAR.JSONparse,                  src: "assets/images/functions/jsonParse.svg"    },
-    "JSONstringify":            { name: "JSON.stringify",                                   type: TYPE_FUNCTION_VAR.JSONstringify,              src: "assets/images/functions/jsonParse.svg"    },
+    "convertToNumber":          { name: "CDSFunctionListForVariable.convertToNumber",       type: TYPE_FUNCTION_VAR.convertToNumber,            src: "assets/images/functions/ceil.svg"         },
+    "JSONparse":                { name: "CDSFunctionListForVariable.JSONparse",             type: TYPE_FUNCTION_VAR.JSONparse,                  src: "assets/images/functions/jsonParse.svg"    },
+    "JSONstringify":            { name: "CDSFunctionListForVariable.JSONstringify",         type: TYPE_FUNCTION_VAR.JSONstringify,              src: "assets/images/functions/jsonParse.svg"    },
 }
 
 export const TYPE_FUNCTION_LIST_FOR_FUNCTIONS: { [key: string]: { name: string, type: TYPE_FUNCTION_FUNC, src?: string } } = {
@@ -266,8 +270,9 @@ export const TYPE_FUNCTION_LIST_FOR_FUNCTIONS: { [key: string]: { name: string, 
 }
 
 export const CERTIFIED_TAGS: Array<{color: string, name: string}> = [
-    { color: "#a16300", name: "Lead-Gen" },
-    { color: "#25833e", name: "Support" }, 
+    { color: "#a16300",     name: "Lead-Gen" },
+    { color: "#25833e",     name: "Support" }, 
+    { color: "#a613ec33",   name: "Internal-Processes"}
     // { color: "#00699e", name: "Pre-Sale" }, 
     // { color: "#0049bd", name: "Self-serve" }, 
 ]
@@ -548,4 +553,69 @@ export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     let centerPointY = (minY + (maxY-minY)/2)*scale;
     
     return { point: { x: centerPointX, y: centerPointY }, scale: scale }
+}
+
+export function checkAcceptedFile(fileType, fileUploadAccept ): boolean{
+  
+    if (fileUploadAccept === '*/*') {
+      return true
+    }
+    // Dividi la stringa fileUploadAccept in un array di tipi accettati
+    const acceptedTypes = fileUploadAccept.split(',');
+  
+    // Verifica se il tipo di file è accettato
+    return acceptedTypes.some((accept) => {
+        accept = accept.trim();
+        // Controlla per i tipi MIME con wildcard, come image/*
+        if (accept.endsWith('/*')) {
+            const baseMimeType = fileType.split('/')[0]; // Ottieni la parte principale del MIME type
+            return accept.replace('/*', '') === baseMimeType;
+        }
+
+        // Controlla se l'accettazione è un MIME type esatto (come image/jpeg)
+        if (accept === fileType) {
+            return true;
+        }
+
+        // Controlla per le estensioni di file specifiche come .pdf o .txt
+        return fileType === getMimeTypeFromExtension(accept);
+    });
+  
+}
+  
+function getMimeTypeFromExtension(extension: string): string {
+    // Rimuovi il punto dall'estensione e ottieni il MIME type
+    const mimeTypes: { [key: string]: string } = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.pdf': 'application/pdf',
+        '.txt': 'text/plain',
+        '.doc': 'application/msword',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.wav' : 'audio/wav'
+        // Aggiungi altri tipi MIME se necessario
+    };
+    return mimeTypes[extension] || '';
+}
+
+export function filterImageMimeTypesAndExtensions(fileUploadAccept: string): string[] {
+    
+    if (fileUploadAccept === '*/*') {
+        return ['*/*']
+    }
+    
+    // Lista delle estensioni di immagine comuni
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+  
+    // Dividi la stringa in un array di tipi accettati
+    const acceptedTypes = fileUploadAccept.split(',');
+  
+    // Filtra solo i MIME type che iniziano con "image/" o che sono estensioni di immagine
+    const imageTypesAndExtensions = acceptedTypes
+      .map(type => type.trim().toLowerCase()) // Rimuove gli spazi bianchi e converte a minuscolo
+      .filter(type => type.startsWith('image/') || imageExtensions.includes(type));
+    
+    return imageTypesAndExtensions;
 }

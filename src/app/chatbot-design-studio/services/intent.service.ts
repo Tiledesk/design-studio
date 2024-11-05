@@ -3,7 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionAddTag } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTag } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -34,6 +34,7 @@ export class IntentService {
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
+  mapOfIntents: any = {}; 
   // selectedIntent: Intent;
   intentSelected: Intent;
   listActions: Array<Action>;
@@ -95,6 +96,23 @@ export class IntentService {
     this.changedConnector.next(connector);
   }
 
+        
+  public setStartIntentSelected(blockId, blockName){
+    if(blockName){
+      const foundIntent = this.listOfIntents.find(obj => obj.intent_display_name.trim() === blockName);
+      if (foundIntent) {
+        blockId = foundIntent.intent_id;
+        return blockId;
+      } 
+    }
+    if(blockId){
+      return blockId;
+    }
+    return;
+  }
+
+
+
   public setDefaultIntentSelected(){
     if(this.listOfIntents && this.listOfIntents.length > 0){
       let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
@@ -137,6 +155,16 @@ export class IntentService {
         }
       };
     }
+  }
+
+
+  public setMapOfIntents(){
+    this.listOfIntents.forEach( intent => {
+      const intentID = intent.intent_id;
+      this.mapOfIntents[intentID] = {'shown': false };
+    });
+    this.logger.log('[CDS-CANVAS-3] mapOfIntents: ', this.mapOfIntents);
+    return this.mapOfIntents;
   }
 
   public updateIntentSelected(){
@@ -692,9 +720,10 @@ export class IntentService {
   /** selectIntent */
   public selectIntent(intentID){
     // this.logger.log('[INTENT SERVICE] --> selectIntent',  this.listOfIntents, intentID);
+    this.intentSelected = null;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
     if(this.intentSelected)this.stageService.setDragElement(this.intentSelected.intent_id);
-   
+    return this.intentSelected;
   }
 
   /** selectAction */
@@ -709,12 +738,18 @@ export class IntentService {
 
   /** setIntentSelected */
   public setIntentSelected(intentID){
-    this.selectIntent(intentID);
+    this.intentSelected = this.selectIntent(intentID);
     this.actionSelectedID = null;
-    this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
+    this.listActions = null;
     this.selectedAction = null;
+    if(this.intentSelected && this.intentSelected.actions){
+      this.listActions = this.intentSelected.actions;
+    }
+    //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
     // this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
-    this.behaviorIntent.next(this.intentSelected);
+    if(this.intentSelected){
+      this.behaviorIntent.next(this.intentSelected);
+    }
     // if(!this.intentSelected)return;
     // chiudo tutti i pannelli
     // this.controllerService.closeAllPanels();
@@ -833,6 +868,9 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.INTENT) {
       action = new ActionIntentConnected();
     }
+    if(typeAction === TYPE_ACTION.CONNECT_BLOCK) {
+      action = new ActionConnectBlock();
+    }
     if(typeAction === TYPE_ACTION.EMAIL) {
       action = new ActionEmail();
     }
@@ -898,17 +936,19 @@ export class IntentService {
       action.max_tokens = 256;
       action.temperature = 0.7;
       action.top_k = 5;
-      action.model = TYPE_GPT_MODEL['GPT-4o'].value
+      action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
       action.preview = [];
       action.history = false;
+      action.citations = false;
     }
     if(typeAction === TYPE_ACTION.GPT_TASK){
       action = new ActionGPTTask();
       action.max_tokens = 256;
       action.temperature = 0.7;
-      action.model = TYPE_GPT_MODEL['GPT-4o'].value
+      action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
       action.assignReplyTo = 'gpt_reply';
       action.preview = [];
+      action.formatType = 'none'
     }
     if(typeAction === TYPE_ACTION.GPT_ASSISTANT){
       action = new ActionGPTAssistant();
@@ -962,6 +1002,18 @@ export class IntentService {
       action.target = 'request';
       action.tags = []
     }
+    if(typeAction === TYPE_ACTION.LEAD_UPDATE){
+      action = new ActionLeadUpdate();
+    }
+    if(typeAction === TYPE_ACTION.CLEAR_TRANSCRIPT){
+      action = new ActionClearTranscript();
+    }
+    if(typeAction === TYPE_ACTION.MOVE_TO_UNASSIGNED){
+      action = new ActionMoveToUnassigned();
+    }
+
+
+    /** VOICE ACTIONS: start */
     if(typeAction === TYPE_ACTION_VXML.DTMF_FORM){
       action = new ActionVoice(TYPE_ACTION_VXML.DTMF_FORM);
       let commandWait = new Wait();
@@ -1006,7 +1058,7 @@ export class IntentService {
       commandWait2.time = 0;
       (action as ActionVoice).attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { transferTo: '', trueIntent: null, falseIntent: null}
+      command_form.settings = { transferTo: '', transferType: 'consultation', trueIntent: null, falseIntent: null}
       command_form.subType = TYPE_ACTION_VXML.BLIND_TRANSFER;
       (action as ActionVoice).attributes.commands.push(command_form);
     }
@@ -1043,6 +1095,7 @@ export class IntentService {
       command_form.subType = TYPE_ACTION_VXML.SPEECH_FORM
       action.attributes.commands.push(command_form);
     }
+    /** VOICE ACTIONS: end */
     return action;
   }
   // END ATTRIBUTE FUNCTIONS //
@@ -1289,8 +1342,12 @@ export class IntentService {
     this.setBehaviorUndoRedo();
     this.logger.log('[INTENT SERVICE] updateIntentNew -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
     this.refreshIntents();
-    let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
-    this.refreshIntent(intentToUpdate)
+    try {
+      let intentToUpdate = this.listOfIntents.find((obj) => obj.intent_id === this.intentSelected.intent_id);
+      this.refreshIntent(intentToUpdate)
+    } catch (error) {
+      this.logger.log('[INTENT SERVICE] -> error, ', error);
+    }
     this.opsUpdate(this.payload);
   }
 
@@ -1586,10 +1643,12 @@ export class IntentService {
     this.arrayCOPYPAST = [];
   }
 
+
   private pasteIntentOntoStage(newIntent, prevIntent_id, newIntent_id){
     let elementJson = JSON.stringify(newIntent).replace(prevIntent_id, newIntent_id);
     let intent = JSON.parse(elementJson);
-    this.connectorService.createConnectorsOfIntent(intent);
+    intent = this.resetConnectors(intent);
+    // this.connectorService.createConnectorsOfIntent(intent);
     // this.connectorService.updateConnectorsOfBlock(intent.intent_id);
     this.addNewIntentToListOfIntents(intent);
     this.setDragAndListnerEventToElement(intent.intent_id);
@@ -1597,5 +1656,25 @@ export class IntentService {
     this.saveNewIntent(intent, null, null);
     this.logger.log('[INTENT SERVICE] -> listOfIntents, ', intent);
   }
+
+
+  private resetConnectors(json) {
+    let results = [];
+    function exploreObject(obj) {
+        if (typeof obj === 'object' && obj !== null) {
+            for (let key in obj) {
+                if (typeof obj[key] === 'string' && obj[key].startsWith("#")) {
+                    results.push({ key: key, value: obj[key] });
+                    obj[key] = "";
+                }
+                exploreObject(obj[key]);
+            }
+        }
+    }
+    exploreObject(json);
+    return json;
+    //return results;
+  }
+
 
 }

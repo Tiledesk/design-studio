@@ -1,4 +1,4 @@
-<div class="panel-intent-detail">
+<div class="panel-intent-detail" [class.minimize]="!maximize" [class.maximize]="maximize">
     <div class="header-panel">
         <cds-action-description
             [actionSelected]="elementIntentSelectedType === typeIntentElement.ACTION? elementSelected : null"
@@ -6,6 +6,11 @@
             [showTip]="elementIntentSelectedType === typeIntentElement.ACTION? true : false"
             [previewMode]="false">
         </cds-action-description>
+        
+        <div class="header-options-wrp icon-action" (click)="maximize = !maximize">
+            <img src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" *ngIf="!maximize">
+            <img src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" *ngIf="maximize">
+        </div>
     </div>
 
     <div id="content-panel" class="content-panel">
@@ -50,6 +55,15 @@
                         (updateAndSaveAction)="onSaveIntent($event)"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-intent>
+
+                    <cds-action-connect-block *ngSwitchCase="TYPE_ACTION.CONNECT_BLOCK"  
+                        class="panel-response" 
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-connect-block>
 
                     <cds-action-email *ngSwitchCase="TYPE_ACTION.EMAIL"
                         class="panel-response"
@@ -208,7 +222,6 @@
                         class="panel-response"
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
-                        [project_id]="project_id"
                         [previewMode]="false"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
@@ -316,6 +329,25 @@
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-add-tag>
+                    
+                    <cds-action-lead-update *ngSwitchCase="TYPE_ACTION.LEAD_UPDATE" 
+                        class="panel-response"
+                        [intentSelected]="intentSelected" 
+                        [action]="elementSelected"
+                        [previewMode]="false" 
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-lead-update>
+
+                    <cds-action-clear-transcript *ngSwitchCase="TYPE_ACTION.CLEAR_TRANSCRIPT" 
+                        [action]="elementSelected"
+                        [previewMode]="false">
+                    </cds-action-clear-transcript>
+
+                    <cds-action-move-unassigned *ngSwitchCase="TYPE_ACTION.MOVE_TO_UNASSIGNED" 
+                        [action]="elementSelected"
+                        [previewMode]="false">
+                    </cds-action-move-unassigned>
+
                     
                     <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"

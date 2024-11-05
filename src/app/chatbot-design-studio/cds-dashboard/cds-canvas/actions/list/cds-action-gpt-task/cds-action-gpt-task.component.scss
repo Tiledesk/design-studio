@@ -185,6 +185,12 @@ cds-select#model-condition ::ng-deep{
     }
 }
 
+mat-checkbox ::ng-deep {
+    .mat-checkbox-ripple{
+        display: none;
+    }
+}
+
 ::ng-deep .ng-dropdown-panel {
     .ng-option .select-item-wrp[additionalText = true]{
         .select-item-wrp{

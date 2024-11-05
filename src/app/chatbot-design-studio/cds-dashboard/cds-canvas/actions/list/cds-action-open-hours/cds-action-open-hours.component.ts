@@ -7,6 +7,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'cds-action-open-hours',
@@ -21,7 +22,6 @@ export class CdsActionOpenHoursComponent implements OnInit {
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
   
-  actionOpenHoursFormGroup: FormGroup
   trueIntentAttributes: any = "";
   falseIntentAttributes: any = "";
 
@@ -36,13 +36,21 @@ export class CdsActionOpenHoursComponent implements OnInit {
   connector: any;
   private subscriptionChangedConnector: Subscription;
   
+  radioOptions: Array<{name: string, category: string, value: string, disabled: boolean, checked: boolean}>= [ 
+    {name: 'CDSCanvas.General',               category: 'general',    value: null,            disabled: false, checked: true  }, 
+    {name: 'CDSCanvas.SelectedTimeSlot',         category: 'timeSlot',   value: '',      disabled: false, checked: false },
+  ]
+  radioOptionSelected = null;
+
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
+  timeSlots: Array<{name: string, value: string, hours: string, active: boolean}>
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
     private formBuilder: FormBuilder,
     private intentService: IntentService,
+    private dashboardService: DashboardService,
   ) { }
 
   ngOnInit(): void {
@@ -74,21 +82,26 @@ export class CdsActionOpenHoursComponent implements OnInit {
   // }
 
   private initialize() {
-    this.actionOpenHoursFormGroup = this.buildForm();
-    this.actionOpenHoursFormGroup.valueChanges.subscribe(form => {
-      this.logger.log('[ACTION-OPEN-HOURS] form valueChanges-->', form)
-      if (form && (form.trueIntent !== ''))
-        this.action = Object.assign(this.action, this.actionOpenHoursFormGroup.value);
-    })
+    if (this.dashboardService.project.timeSlots) {
+      this.timeSlots = Object.keys(this.dashboardService.project.timeSlots).map(key => ({
+        value: key,
+        ...this.dashboardService.project.timeSlots[key]
+      }));
+    }
+
     this.trueIntentAttributes = this.action.trueIntentAttributes;
     this.falseIntentAttributes = this.action.falseIntentAttributes;
     if(this.intentSelected){
       this.initializeConnector();
       this.checkConnectionStatus();
     }
-    if (this.action && this.action.trueIntent) {
-      this.setFormValue()
+
+    this.radioOptionSelected = null;
+    if(this.action && this.action.slotId && this.action.slotId !== null){
+      this.radioOptionSelected = ''
+      this.radioOptions.forEach(el => { el.category === 'timeSlot'? el.checked = true: el.checked = false })
     }
+    this.logger.log('[ACTION-OPEN-HOURS] initialize action -->', this.action)
   }
 
   private checkConnectionStatus(){
@@ -168,21 +181,23 @@ export class CdsActionOpenHoursComponent implements OnInit {
   }
 
 
-  buildForm(): FormGroup {
-    return this.formBuilder.group({
-      trueIntent: ['', Validators.required],
-      falseIntent: ['', Validators.required]
-    })
+  onChangeButtonSelect(event: {label: string, category: string, value: string, disabled: boolean, checked: boolean}){
+    this.radioOptions.forEach(el => { el.value ===event.value? el.checked= true: el.checked = false })
+    this.action.slotId = null;
+    switch (event.category){
+      case 'general': 
+        this.action.slotId = null
+        this.radioOptionSelected = null
+        break;
+      default:
+        this.radioOptionSelected = ''
+        break;
+    }
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
-  setFormValue() {
-    this.actionOpenHoursFormGroup.patchValue({
-      trueIntent: this.action.trueIntent,
-      falseIntent: this.action.falseIntent
-    })
-  }
 
-  onChangeSelect(event:{name: string, value: string}, type : 'trueIntent' | 'falseIntent'){
+  onChangeSelect(event:{name: string, value: string}, type : 'trueIntent' | 'falseIntent' | 'slotId'){
     if(event){
       this.action[type]=event.value
       switch(type){
@@ -197,7 +212,7 @@ export class CdsActionOpenHoursComponent implements OnInit {
     }
   }
 
-  onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
+  onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent' | 'slotId') {
     switch(type){
       case 'trueIntent':
         this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.action.trueIntent})

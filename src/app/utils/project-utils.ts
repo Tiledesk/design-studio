@@ -8,6 +8,7 @@ import { LoggerService } from "src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from "src/chat21-core/providers/logger/loggerInstance";
 import { TYPE_ACTION, TYPE_ACTION_VXML } from "../chatbot-design-studio/utils-actions";
 import { AppConfigService } from '../services/app-config';
+import { variableList } from '../chatbot-design-studio/utils-variables';
 
 @Injectable({
     providedIn: 'root'
@@ -24,6 +25,7 @@ export class ProjectPlanUtils {
         this.project = this.projectService.getCurrentProject();
         this.checkIfKBSCanLoad();
         this.checkIfActionCategoryIsInProject(TYPE_ACTION_CATEGORY.VOICE);
+        this.checkActionCanShow(TYPE_ACTION.CONNECT_BLOCK)
     }
 
     public checkIfCanLoad(actionType: TYPE_ACTION | TYPE_ACTION_VXML, actionPlanAvailability: PLAN_NAME): boolean{
@@ -220,8 +222,14 @@ export class ProjectPlanUtils {
         }
     }
 
+    /** hide action by 
+     *  1. CATEGORY TYPE
+     *  2. ACTION LIST
+     *  3. ATTRIBUTE LIST ASSOCIATED WITH
+     */
     private hideActionType(actionType: TYPE_ACTION_CATEGORY){
         this.logger.log('[PROJECT_PROFILE] hideActionType', actionType);
+        
         //MANAGE ACTION CATEGORIES
         let index = ACTION_CATEGORY.findIndex(el => el.type === getKeyByValue(actionType, TYPE_ACTION_CATEGORY));
         if(index > -1){
@@ -230,6 +238,28 @@ export class ProjectPlanUtils {
         
         //MANAGE ACTION LIST
         Object.values(ACTIONS_LIST).filter(el => el.category == actionType).map( el => el.status = 'inactive')
+
+
+        //MANAGE VOICE ATTRIBUTES LIST
+        if(actionType === TYPE_ACTION_CATEGORY.VOICE){
+            let index = variableList.findIndex(el => el.key === 'voiceFlow')
+            if(index > -1){
+                variableList.splice(index,1)
+            }
+        }
+
+
+    }
+
+    /** CHECK IF ACTION IS IN 'customization' 
+     * IF NOT: 
+     *  --- remove action type from list 
+     */
+    private checkActionCanShow(action: TYPE_ACTION | TYPE_ACTION_VXML){
+        let status = this.checkIfIsEnabledInProject(action)
+        if(!status){
+            Object.values(ACTIONS_LIST).filter(el => el.type == action).map( el => el.status = 'inactive')
+        }
     }
 
 }

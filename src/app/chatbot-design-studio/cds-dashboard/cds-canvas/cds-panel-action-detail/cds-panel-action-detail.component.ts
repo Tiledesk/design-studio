@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, TemplateRef, ViewContainerRef, HostListener } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, TemplateRef, ViewContainerRef, HostListener, ElementRef } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { ConnectorService } from '../../../services/connector.service';
 import { IntentService } from '../../../services/intent.service';
@@ -40,9 +40,10 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   elementIntentSelectedType: string;
   openCardButton = false;
 
+  maximize: boolean = false;
 
-   /** panel reply button configuaration */
-   private subscriptionIntent: Subscription;
+  /** panel reply button configuaration */
+  private subscriptionIntent: Subscription;
 
   
   canShowActionByPlan: { plan: PLAN_NAME, enabled: boolean}= { plan: PLAN_NAME.A, enabled: true}

@@ -35,7 +35,7 @@ export var SUPPORT_OPTIONS: { [key: string]: Array<{ key: string, label: string,
         { key: 'DOCS',          label: 'Docs',          icon: 'description',                    type: TYPE_URL.BLANK,   status:"active",    src: 'https://developer.tiledesk.com/'},
         { key: 'HELP_CENTER',   label: 'HelpCenter',    icon: 'help',                           type: TYPE_URL.BLANK ,  status:"active",    src: 'https://gethelp.tiledesk.com/'},
         { key: 'ROAD_MAP',      label: 'RoadMap',       icon: 'checklist',                      type: TYPE_URL.BLANK,   status:"active",    src: 'https://feedback.tiledesk.com/roadmap'},
-        { key: 'SYSTEM_STATUS', label: 'SystemStatus',  icon: 'health_and_safety',              type: TYPE_URL.BLANK,   status:"active",    src: 'https://tiledesk.instatus.com/'},
+        { key: 'SYSTEM_STATUS', label: 'SystemStatus',  icon: 'health_and_safety',              type: TYPE_URL.BLANK,   status:"active",    src: 'https://tiledesk.statuspage.io/'},
         { key: 'GITHUB',        label: 'GitHubRepo',    icon: 'assets/images/github-mark.svg',  type: TYPE_URL.BLANK,   status:"active",    src: 'https://github.com/Tiledesk'}
     ],
     "CONTACT_US": [

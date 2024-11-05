@@ -19,7 +19,8 @@ export class OperandV2Component implements OnInit {
     operandForm: FormGroup;
     // listOfFunctions: Array<{name: string, value: string, icon?:string}> = [];
     openSelectFunction: boolean = false;
-
+    panelOpenState: boolean = false;
+    
     private logger: LoggerService = LoggerInstance.getInstance();
     
     constructor(private formBuild: FormBuilder) {}

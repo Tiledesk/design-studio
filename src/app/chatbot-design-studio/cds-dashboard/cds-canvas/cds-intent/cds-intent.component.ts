@@ -46,6 +46,7 @@ export enum HAS_SELECTED_TYPE {
 export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() intent: Intent;
   @Input() hideActionPlaceholderOfActionPanel: boolean;
+  @Output() componentRendered = new EventEmitter<string>();
   @Output() questionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() answerSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() formSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
@@ -107,10 +108,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   initSubscriptions() {
-
     let subscribtion: any;
     let subscribtionKey: string;
-
     /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
     subscribtionKey = 'behaviorIntent';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
@@ -186,31 +185,34 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-    this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
-    // this.patchActionIntent();
-    if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
-      this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
-      this.startAction = this.intent.actions[0];
-      // if (!this.startAction._tdActionId) {
-      //   this.startAction = patchActionId(this.intent.actions[0]);
-      //   this.intent.actions = [this.startAction];
-      // }
-      this.isStart = true;
-      //** set 'start' intent as default selected one */
-      // this.intentService.setDefaultIntentSelected();
+    //setTimeout(() => {
+      this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
+      // this.patchActionIntent();
+      if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
+        this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
+        this.startAction = this.intent.actions[0];
+        // if (!this.startAction._tdActionId) {
+        //   this.startAction = patchActionId(this.intent.actions[0]);
+        //   this.intent.actions = [this.startAction];
+        // }
+        this.isStart = true;
+        //** set 'start' intent as default selected one */
+        // this.intentService.setDefaultIntentSelected();
 
-      // //** center stage on 'start' intent */
-      // let startElement = document.getElementById(this.intent.intent_id)
-      // this.stageService.centerStageOnHorizontalPosition(startElement)
-    } else {
-      this.setIntentSelected();
-    }
-    // il setTimeout evita l'effetto che crea un connettore e poi lo sposta nel undo
-    setTimeout(() => {
-      this.setActionIntent();
-    }, 100); 
-    this.isInternalIntent = checkInternalIntent(this.intent)
-    this.addEventListener();
+        // //** center stage on 'start' intent */
+        // let startElement = document.getElementById(this.intent.intent_id)
+        // this.stageService.centerStageOnHorizontalPosition(startElement)
+      } else {
+        this.setIntentSelected();
+      }
+      // il setTimeout evita l'effetto che crea un connettore e poi lo sposta nel undo
+      setTimeout(() => {
+        this.setActionIntent();
+      }, 100); 
+      this.isInternalIntent = checkInternalIntent(this.intent)
+      this.addEventListener();
+    //}, 10000);
+    
   }
 
   private setActionIntent(){
@@ -236,7 +238,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         }
       }  else {
         if(fromId && toId && fromId !== '' && toId !== ''){
-          this.connectorService.createConnectorFromId(fromId, toId); //Sync
+          if(this.stageService.loaded == true){
+            this.connectorService.createConnectorFromId(fromId, toId);
+          }
         }
       }
     } catch (error) {
@@ -264,6 +268,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   ngAfterViewInit() {
+    this.logger.log("[CDS-INTENT]  •••• ngAfterViewInit ••••");
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         const nuovaAltezza = entry.contentRect.height;
@@ -273,8 +278,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     });
     const elementoDom = this.resizeElement.nativeElement;
     resizeObserver.observe(elementoDom);
-    // Per smettere di osservare, puoi chiamare resizeObserver.disconnect();
-    // nel lifecycle hook ngOnDestroy o in un'altra posizione appropriata.
+
+    setTimeout(() => {
+      this.componentRendered.emit(this.intent.intent_id);
+    }, 0);
+   
   }
 
 
