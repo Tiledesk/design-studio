@@ -69,6 +69,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   selected_dept_name: string;
 
   user: UserModel
+  imageURL: string;
 
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
@@ -469,13 +470,15 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     that.logger.debug('[IMAGE-UPLOAD] AppComponent::uploadSingle::', file);
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
-    
+    this.imageURL = null;
     this.uploadService.uploadProfile(this.selectedChatbot._id, currentUpload).then(downloadURL => {
       that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
 
       let url = this.imageRepoService.getImagePhotoUrl(this.selectedChatbot._id)
       this.checkImageExists(url, (existImage)=> {
-        existImage? this.selectedChatbot.imageURL = url: null; 
+        let timestamp = new Date().getTime();
+        existImage? this.imageURL  = url +  '&' + timestamp : null; 
+        this.selectedChatbot.imageURL = url;
       })
       that.isFilePendingToUpload = false;
       // return downloadURL;
