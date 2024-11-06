@@ -10,6 +10,7 @@
   "wsUrlRel": "${WS_URL_RELATIVE}",
   "uploadEngine": "${UPLOAD_ENGINE}",
   "baseImageUrl": "${API_BASEIMAGE_URL}",
+  "fileUploadAccept":"${FILE_UPLOAD_ACCEPT}",
   "logLevel": "${LOG_LEVEL}",
   "aiModels":"${AI_MODELS}",
   "storage_prefix": "cds_sv5",

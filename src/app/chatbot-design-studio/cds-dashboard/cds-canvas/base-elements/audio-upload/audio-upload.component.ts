@@ -8,6 +8,7 @@ import { UploadService } from 'src/chat21-core/providers/abstract/upload.service
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
+import { checkAcceptedFile } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'cds-audio-upload',
@@ -150,48 +151,56 @@ export class CDSAudioUploadComponent implements OnInit {
       
       const that = this;
       if (event.target.files && event.target.files[0]) {
-          const nameFile = event.target.files[0].name;
-          const typeFile = event.target.files[0].type;
-          const size = event.target.files[0].size
-          const reader = new FileReader();
-          that.logger.debug('[AUDIO-UPLOAD] OK preload: ', nameFile, typeFile, reader);
-          reader.addEventListener('load', function () {
-            that.logger.debug('[AUDIO-UPLOAD] addEventListener load', reader.result);
-            // that.isFileSelected = true;
-            // se inizia con image
-            if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
-              const imageXLoad = new Image;
-              that.logger.debug('[AUDIO-UPLOAD] onload ', imageXLoad);
-              imageXLoad.src = reader.result.toString();
-              imageXLoad.title = nameFile;
-              imageXLoad.onload = function () {
-                that.logger.debug('[AUDIO-UPLOAD] onload image');
-                // that.arrayFilesLoad.push(imageXLoad);
-                const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
-                that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: typeFile, size: size };
-                that.logger.debug('[AUDIO-UPLOAD] OK: ', that.arrayFilesLoad[0]);
-                // SEND MESSAGE
-                that.loadFile();
-              };
-            } else {
-              that.logger.debug('[AUDIO-UPLOAD] onload file');
-              const fileXLoad = {
-                src: reader.result.toString(),
-                title: nameFile
-              };
+
+        const canUploadFile = checkAcceptedFile(event.target.files[0].type, '.wav')
+        if(!canUploadFile){
+          this.logger.error('[IMAGE-UPLOAD] detectFiles: can not upload current file type--> NOT ALLOWED', '.wav', event.target.files[0].type)
+          this.isFilePendingToUpload = false;
+          return;
+        }
+
+        const nameFile = event.target.files[0].name;
+        const typeFile = event.target.files[0].type;
+        const size = event.target.files[0].size
+        const reader = new FileReader();
+        that.logger.debug('[AUDIO-UPLOAD] OK preload: ', nameFile, typeFile, reader);
+        reader.addEventListener('load', function () {
+          that.logger.debug('[AUDIO-UPLOAD] addEventListener load', reader.result);
+          // that.isFileSelected = true;
+          // se inizia con image
+          if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
+            const imageXLoad = new Image;
+            that.logger.debug('[AUDIO-UPLOAD] onload ', imageXLoad);
+            imageXLoad.src = reader.result.toString();
+            imageXLoad.title = nameFile;
+            imageXLoad.onload = function () {
+              that.logger.debug('[AUDIO-UPLOAD] onload image');
               // that.arrayFilesLoad.push(imageXLoad);
               const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
-              that.arrayFilesLoad[0] = { uid: uid, file: fileXLoad, type: typeFile, size: size };
+              that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: typeFile, size: size };
               that.logger.debug('[AUDIO-UPLOAD] OK: ', that.arrayFilesLoad[0]);
               // SEND MESSAGE
               that.loadFile();
-            }
-          }, false);
-
-          if (event.target.files[0]) {
-            reader.readAsDataURL(event.target.files[0]);
-            that.logger.debug('[AUDIO-UPLOAD] reader-result: ', event.target.files[0]);
+            };
+          } else {
+            that.logger.debug('[AUDIO-UPLOAD] onload file');
+            const fileXLoad = {
+              src: reader.result.toString(),
+              title: nameFile
+            };
+            // that.arrayFilesLoad.push(imageXLoad);
+            const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
+            that.arrayFilesLoad[0] = { uid: uid, file: fileXLoad, type: typeFile, size: size };
+            that.logger.debug('[AUDIO-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+            // SEND MESSAGE
+            that.loadFile();
           }
+        }, false);
+
+        if (event.target.files[0]) {
+          reader.readAsDataURL(event.target.files[0]);
+          that.logger.debug('[AUDIO-UPLOAD] reader-result: ', event.target.files[0]);
+        }
       }
     }
   }
@@ -418,12 +427,13 @@ export class CDSAudioUploadComponent implements OnInit {
     if (fileList.length > 0) {
       const file: File = fileList[0];
       var mimeType = fileList[0].type;
-      const isAccepted = this.checkAcceptedFile(mimeType);
-      if (isAccepted === true) {
-        this.handleDropEvent(ev);
-      } else {
+      const canUploadFile = checkAcceptedFile(mimeType, '.wav')
+      if(!canUploadFile){
         this.presentToastOnlyImageFilesAreAllowedToDrag()
+        this.logger.error('[IMAGE-UPLOAD] detectFiles: can not upload current file type--> NOT ALLOWED', '.wav', mimeType)
+        return;
       }
+      this.handleDropEvent(ev);
     }
   }
 
@@ -441,7 +451,7 @@ export class CDSAudioUploadComponent implements OnInit {
 
   // DRAG LEAVE (WHEN LEAVE FROM THE DROP ZONE)
   drag(ev: any) {
-    ev.preventDefault()
+    ev.preventDefault();
     ev.stopPropagation()
     this.isHovering = false
   }

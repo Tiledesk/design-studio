@@ -269,16 +269,18 @@
                         <div class="action-wait-content">
 
                             <div class="action-wait-slider">
-                                <div class="action-wait-range">1</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].min}}</div>
                                 <mat-slider 
                                     class="wait-slider" 
                                     thumbLabel 
                                     [displayWith]="formatLabel" 
-                                    step="1" min="1" max="10" 
+                                    [step]="ai_setting['top_k'].step"  
+                                    [min]="ai_setting['top_k'].min"
+                                    [max]="ai_setting['top_k'].max" 
                                     [(ngModel)]="action.top_k"
                                     (change)="updateSliderValue($event.value, 'top_k')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">10</div>
+                                <div class="action-wait-range">{{ai_setting['top_k'].max}}</div>
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->

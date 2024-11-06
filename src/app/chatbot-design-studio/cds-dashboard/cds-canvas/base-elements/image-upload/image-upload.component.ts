@@ -1,3 +1,4 @@
+import { AppConfigService } from './../../../../../services/app-config';
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, SimpleChange, SimpleChanges } from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
 import { Metadata } from 'src/app/models/action-model';
@@ -8,6 +9,7 @@ import { UploadService } from 'src/chat21-core/providers/abstract/upload.service
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
+import { checkAcceptedFile, filterImageMimeTypesAndExtensions } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'cds-image-upload',
@@ -30,6 +32,7 @@ export class CDSImageUploadComponent implements OnInit {
 
   uuid: string = uuidv4()
   
+  fileUploadAccept: string;
   selectedFiles: FileList;
   isFilePendingToUpload: Boolean = false;
   optionSelected: 'upload' | 'link' = 'upload'
@@ -41,6 +44,7 @@ export class CDSImageUploadComponent implements OnInit {
   constructor(
     private uploadService: UploadService,
     private tiledeskAuthService: TiledeskAuthService,
+    private appConfigService: AppConfigService,
     private sanitizer: DomSanitizer,
   ) { }
 
@@ -48,6 +52,7 @@ export class CDSImageUploadComponent implements OnInit {
   ngOnInit(): void {
     this.initializeApp();
     this.user = this.tiledeskAuthService.getCurrentUser();
+    this.fileUploadAccept = filterImageMimeTypesAndExtensions(this.appConfigService.getConfig().fileUploadAccept).join(',');
   }
 
   initializeApp(){
@@ -150,48 +155,57 @@ export class CDSImageUploadComponent implements OnInit {
       
       const that = this;
       if (event.target.files && event.target.files[0]) {
-          const nameFile = event.target.files[0].name;
-          const typeFile = event.target.files[0].type;
-          const size = event.target.files[0].size
-          const reader = new FileReader();
-          that.logger.debug('[IMAGE-UPLOAD] OK preload: ', nameFile, typeFile, reader);
-          reader.addEventListener('load', function () {
-            that.logger.debug('[IMAGE-UPLOAD] addEventListener load', reader.result);
-            // that.isFileSelected = true;
-            // se inizia con image
-            if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
-              const imageXLoad = new Image;
-              that.logger.debug('[IMAGE-UPLOAD] onload ', imageXLoad);
-              imageXLoad.src = reader.result.toString();
-              imageXLoad.title = nameFile;
-              imageXLoad.onload = function () {
-                that.logger.debug('[IMAGE-UPLOAD] onload image');
-                // that.arrayFilesLoad.push(imageXLoad);
-                const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
-                that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: typeFile, size: size };
-                that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
-                // SEND MESSAGE
-                that.loadFile();
-              };
-            } else {
-              that.logger.debug('[[IMAGE-UPLOAD] onload file');
-              const fileXLoad = {
-                src: reader.result.toString(),
-                title: nameFile
-              };
+
+        const canUploadFile = checkAcceptedFile(event.target.files[0].type, this.fileUploadAccept)
+        if(!canUploadFile){
+          this.presentToastOnlyImageFilesAreAllowedToDrag()
+          this.logger.error('[IMAGE-UPLOAD] detectFiles: can not upload current file type--> NOT ALLOWED', this.fileUploadAccept)
+          this.isFilePendingToUpload = false;
+          return;
+        }
+
+        const nameFile = event.target.files[0].name;
+        const typeFile = event.target.files[0].type;
+        const size = event.target.files[0].size
+        const reader = new FileReader();
+        that.logger.debug('[IMAGE-UPLOAD] OK preload: ', nameFile, typeFile, reader);
+        reader.addEventListener('load', function () {
+          that.logger.debug('[IMAGE-UPLOAD] addEventListener load', reader.result);
+          // that.isFileSelected = true;
+          // se inizia con image
+          if (typeFile.startsWith('image') && !typeFile.includes('svg')) {
+            const imageXLoad = new Image;
+            that.logger.debug('[IMAGE-UPLOAD] onload ', imageXLoad);
+            imageXLoad.src = reader.result.toString();
+            imageXLoad.title = nameFile;
+            imageXLoad.onload = function () {
+              that.logger.debug('[IMAGE-UPLOAD] onload image');
               // that.arrayFilesLoad.push(imageXLoad);
               const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
-              that.arrayFilesLoad[0] = { uid: uid, file: fileXLoad, type: typeFile, size: size };
+              that.arrayFilesLoad[0] = { uid: uid, file: imageXLoad, type: typeFile, size: size };
               that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
               // SEND MESSAGE
               that.loadFile();
-            }
-          }, false);
-
-          if (event.target.files[0]) {
-            reader.readAsDataURL(event.target.files[0]);
-            that.logger.debug('[IMAGE-UPLOAD] reader-result: ', event.target.files[0]);
+            };
+          } else {
+            that.logger.debug('[[IMAGE-UPLOAD] onload file');
+            const fileXLoad = {
+              src: reader.result.toString(),
+              title: nameFile
+            };
+            // that.arrayFilesLoad.push(imageXLoad);
+            const uid = (new Date().getTime()).toString(36); // imageXLoad.src.substring(imageXLoad.src.length - 16);
+            that.arrayFilesLoad[0] = { uid: uid, file: fileXLoad, type: typeFile, size: size };
+            that.logger.debug('[IMAGE-UPLOAD] OK: ', that.arrayFilesLoad[0]);
+            // SEND MESSAGE
+            that.loadFile();
           }
+        }, false);
+
+        if (event.target.files[0]) {
+          reader.readAsDataURL(event.target.files[0]);
+          that.logger.debug('[IMAGE-UPLOAD] reader-result: ', event.target.files[0]);
+        }
       }
     }
   }
@@ -418,12 +432,14 @@ export class CDSImageUploadComponent implements OnInit {
     if (fileList.length > 0) {
       const file: File = fileList[0];
       var mimeType = fileList[0].type;
-      const isAccepted = this.checkAcceptedFile(mimeType);
-      if (isAccepted === true) {
-        this.handleDropEvent(ev);
-      } else {
+      // const isAccepted = this.checkAcceptedFile(mimeType);
+      const canUploadFile = checkAcceptedFile(mimeType, this.fileUploadAccept)
+      if(!canUploadFile){
         this.presentToastOnlyImageFilesAreAllowedToDrag()
+        this.logger.error('[IMAGE-UPLOAD] dropEvent: can not upload current file type--> NOT ALLOWED', this.fileUploadAccept)
+        return;
       }
+      this.handleDropEvent(ev);
     }
   }
 

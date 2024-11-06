@@ -27,6 +27,15 @@ export class BrandResources {
         var icon = document.querySelector("link[rel~='icon']") as HTMLElement;
         icon.setAttribute('href', this.brand['FAVICON_URL'])
 
+        /** META sharing ELEMENTS */
+        if(this.brand['META_SHARE_INFO'] && this.brand['META_SHARE_INFO'].length > 0){
+            Object.keys(this.brand['META_SHARE_INFO']).forEach(key => {
+                var meta = document.querySelector("meta[property^='og:"+key.toLowerCase()+"']") as HTMLElement;
+                meta.setAttribute('content', this.brand['META_SHARE_INFO'][key])
+            })
+        }
+        
+
         /** CSS */
         document.documentElement.style.setProperty('--base-brand-color', this.brand['BRAND_PRIMARY_COLOR']);
 
