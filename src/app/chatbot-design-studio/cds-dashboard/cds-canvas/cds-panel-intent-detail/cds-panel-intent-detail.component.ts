@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -9,7 +11,6 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 })
 export class CdsPanelIntentDetailComponent implements OnInit {
   @Input() intentSelected: any;
-  @Input() showSpinner: boolean;
   @Output() savePanelIntentDetail = new EventEmitter();
   @Output() closePanel = new EventEmitter();
   
@@ -17,10 +18,17 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   agents_available: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
-  constructor() { }
+  constructor(
+  ) { 
+  }
 
   ngOnInit(): void {
     this.agents_available = this.intentSelected.agents_available?this.intentSelected.agents_available:false;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.logger.log('[CdsPanelIntentDetailComponent] changes: ', changes)
+
   }
 
 
@@ -34,4 +42,8 @@ export class CdsPanelIntentDetailComponent implements OnInit {
     this.logger.log('[CdsPanelIntentDetailComponent] onSaveIntent:: ', this.intentSelected);
     this.savePanelIntentDetail.emit(this.intentSelected);
   }
+
+  
+
+
 }
