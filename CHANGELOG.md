@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.23.0-rc.1
+- **bug-fixed**: managed right/left swipe to prevend back/next page load
+
 # 1.22.0-rc.4
 - **added**: uploaded control in audio base element
 
