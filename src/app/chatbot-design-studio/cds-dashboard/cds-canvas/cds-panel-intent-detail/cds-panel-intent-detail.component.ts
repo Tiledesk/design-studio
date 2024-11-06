@@ -10,7 +10,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
   styleUrls: ['./cds-panel-intent-detail.component.scss']
 })
 export class CdsPanelIntentDetailComponent implements OnInit {
-  @Input() intentSelected: any;
+  @Input() intentSelected: Intent;
   @Output() savePanelIntentDetail = new EventEmitter();
   @Output() closePanel = new EventEmitter();
   
@@ -28,9 +28,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.logger.log('[CdsPanelIntentDetailComponent] changes: ', changes)
-
   }
-
 
   onAgentsAvailableChange(event: any){
     this.logger.log('[CdsPanelIntentDetailComponent] onAgentsAvailableChange:: ', event);
@@ -42,8 +40,5 @@ export class CdsPanelIntentDetailComponent implements OnInit {
     this.logger.log('[CdsPanelIntentDetailComponent] onSaveIntent:: ', this.intentSelected);
     this.savePanelIntentDetail.emit(this.intentSelected);
   }
-
   
-
-
 }
