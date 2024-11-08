@@ -7,9 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.23.0-rc.2
+- **added**: send-whatsapp action
+
 # 1.23.0-rc.1
 - **bug-fixed**: managed right/left swipe to prevend back/next page load
-
 
 # 1.22.0
 
