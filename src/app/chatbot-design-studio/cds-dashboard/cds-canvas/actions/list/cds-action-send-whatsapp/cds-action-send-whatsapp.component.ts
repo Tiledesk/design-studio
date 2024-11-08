@@ -38,6 +38,7 @@ export class CdsActionSendWhatsappComponent implements OnInit {
 
   ngOnInit(): void {
     this.project_id = this.dashboardService.projectID
+    this.action.payload.id_project = this.project_id
     if (this.previewMode == false) {
       this.logger.log("Whatsapp static project_id: ", this.project_id);
       this.showLoader = true;
