@@ -1,18 +1,20 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { SatPopover } from '@ncstate/sat-popover';
 import { OPERATORS_LIST } from '../../utils';
 import { Condition, Expression, Operator } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { onSwipe } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'appdashboard-filter',
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.scss']
 })
-export class CDSFilterComponent implements OnInit {
-
-  @ViewChild("addConditionFilter") addConditionFilter : SatPopover;
+export class CDSFilterComponent implements OnInit, AfterViewInit, OnDestroy {
+  
+  @ViewChild('addConditionFilter') addConditionFilter: SatPopover;
+  @ViewChild('popoverElement') popoverElement: ElementRef;
 
   @Input() expression: Expression = new Expression();
   @Input() booleanOperators: {}
@@ -25,7 +27,8 @@ export class CDSFilterComponent implements OnInit {
   OPERATORS_LIST = OPERATORS_LIST
 
   logger: LoggerService = LoggerInstance.getInstance()
-  constructor() { }
+  constructor(
+  ) { }
 
   ngOnInit(): void {
     if(!this.expression){
@@ -35,6 +38,23 @@ export class CDSFilterComponent implements OnInit {
 
   ngOnChanges(){
     this.logger.log('[BASE_FILTER] expression selected-->', this.expression)
+  }
+
+  ngAfterViewInit() {
+    this.addConditionFilter.opened.subscribe(() => {
+      this.popoverElement.nativeElement.addEventListener('wheel', this.onSwipe.bind(this));
+    });
+    this.addConditionFilter.closed.subscribe(() => {
+      this.popoverElement.nativeElement.removeEventListener('wheel', this.onSwipe.bind(this));
+    });
+  }
+
+  ngOnDestroy() {
+    this.popoverElement.nativeElement.removeEventListener('wheel', this.onSwipe.bind(this));
+  }
+
+  onSwipe(event: WheelEvent){
+    onSwipe(event);
   }
 
   onOpenConditionDetail(index: number){

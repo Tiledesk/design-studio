@@ -356,6 +356,21 @@ export function getEmbedUrl(url: string) {
         : url;
 }
 
+export function onSwipe(event: WheelEvent) {
+    if (event.deltaX > 0) {
+    //   console.log('Swipe RIGHT');
+      event.preventDefault();
+    } else if (event.deltaX < 0) {
+    //   console.log('Swipe LEFT');
+      event.preventDefault();
+    }
+    // if (event.deltaY > 0) {
+    //   console.log('Swipe DOWN');
+    // } else if (event.deltaY < 0) {
+    //   console.log('Swipe UP');
+    // }
+  }
+
 // export var variableList: { [key: string]: {label: string, elements: Array<any>}} = {
 //     userDefined: {
 //         label: 'User defined',

@@ -28,7 +28,7 @@ import { Subject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
-import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
+import { onSwipe } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -65,8 +65,7 @@ export class CdsDashboardComponent implements OnInit {
     public faqKbService: FaqKbService,
     public faqService: FaqService,
     private openaiService: OpenaiService,
-    private whatsappService: WhatsappService,
-    private stageService: StageService
+    private whatsappService: WhatsappService
   ) {}
 
   
@@ -82,7 +81,7 @@ export class CdsDashboardComponent implements OnInit {
   }
 
   onSwipe(event: WheelEvent){
-    this.stageService.onSwipe(event);
+    onSwipe(event);
   }
 
 

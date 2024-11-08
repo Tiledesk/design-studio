@@ -65,6 +65,7 @@
 </div>
 
 <!-- verticalAlign="below" -->
+
 <sat-popover #addConditionFilter 
     id="addConditionFilter"
     horizontalAlign="center" 
@@ -73,8 +74,11 @@
     (backdropClicked)="addConditionFilter.close()"
     panelClass="base-filter--add-filter-panel"
     interactiveClose="false">
-    <base-condition-row
-        [condition]="selectedCondition"
-        (close)="onDismiss($event)">
-    </base-condition-row>
+    <div #popoverElement>
+        <base-condition-row
+            id="addConditionFilter"
+            [condition]="selectedCondition"
+            (close)="onDismiss($event)">
+        </base-condition-row>
+    </div>
 </sat-popover>

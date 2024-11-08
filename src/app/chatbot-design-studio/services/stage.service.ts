@@ -103,18 +103,4 @@ export class StageService {
     return this.tiledeskStage.scale;
   }
 
-  onSwipe(event: WheelEvent) {
-    if (event.deltaX > 0) {
-      // console.log('Swipe RIGHT');
-      event.preventDefault();
-    } else if (event.deltaX < 0) {
-      // console.log('Swipe LEFT');
-      event.preventDefault();
-    }
-    // if (event.deltaY > 0) {
-    //   console.log('Swipe DOWN');
-    // } else if (event.deltaY < 0) {
-    //   console.log('Swipe UP');
-    // }
-  }
 }

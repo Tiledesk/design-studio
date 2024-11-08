@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, OnDestroy, OnInit, SimpleChanges, ViewChi
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { IntentService } from '../../../services/intent.service';
 import { AppConfigService } from 'src/app/services/app-config';
+import { onSwipe } from 'src/app/chatbot-design-studio/utils';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -17,6 +18,7 @@ import { skip } from 'rxjs/operators';
 export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   @ViewChild('widgetIframe', {static:true}) widgetIframe:ElementRef;
+
 
   @Input() isPanelVisible: boolean = false
   // @Input() intent: Intent;
@@ -64,12 +66,24 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
           {action: 'restart', intentName: this.intentName}, "*");
       }
     })
-
     this.projectID = this.dashboardService.projectID;
     this.selectedChatbot = this.dashboardService.selectedChatbot;
     this.defaultDepartmentId = this.dashboardService.defaultDepartment._id;
     this.setIframeUrl()
   }
+
+  ngAfterViewInit() {
+    this.widgetIframe.nativeElement.addEventListener('wheel', this.onSwipe.bind(this));
+  }
+
+  ngOnDestroy() {
+    this.widgetIframe.nativeElement.removeEventListener('wheel', this.onSwipe.bind(this));
+  }
+
+  onSwipe(event: WheelEvent){
+    onSwipe(event);
+  }
+
 
   setIframeUrl(){
     this.WIDGET_BASE_URL = this.appConfigService.getConfig().widgetBaseUrl;
@@ -114,7 +128,4 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     this.iframeVisibility = !this.iframeVisibility
   }
 
-
-  ngOnDestroy(): void {
-  }
 }
