@@ -49,7 +49,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   // Buttons //
   TYPE_BUTTON = TYPE_BUTTON;
   buttons: Array<any>;
-
+  activeFocus: boolean = true;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(

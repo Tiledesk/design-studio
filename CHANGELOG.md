@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.23.0-rc.1
+- **bug-fixed**: managed right/left swipe to prevend back/next page load
+
+
 # 1.22.0
 
 # 1.22.0-rc.4
@@ -42,6 +46,10 @@
 -  **added**: chatbot_id system-defined variable
 -  **added**: enable 'connect_block' action only if present in project.profile
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master-pre
 # 1.21.0-rc.12
 -  **added**: formatType checkbox in action gpt-task
 -  **added**: citations in action askkbv2

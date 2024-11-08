@@ -47,6 +47,14 @@ export enum TYPE_ACTION {
     SEND_WHATSAPP       = 'send_whatsapp'
 }
 
+export enum TYPE_ACTION_REPLY {
+    TEXT               = 'text',
+    IMAGE              = 'image',
+    FRAME              = 'frame',
+    GALLERY            = 'gallery',
+    REDIRECT           = 'redirect'
+}
+
 export enum TYPE_ACTION_VXML {
     DTMF_FORM           = 'dtmf_form',
     DTMF_MENU           = 'dtmf_menu',
