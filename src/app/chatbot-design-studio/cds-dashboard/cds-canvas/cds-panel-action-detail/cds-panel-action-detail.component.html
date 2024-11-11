@@ -386,9 +386,10 @@
 
                     <cds-action-send-whatsapp *ngSwitchCase="TYPE_ACTION.SEND_WHATSAPP"
                         class="panel-response"
+                        [intentSelected]="intentSelected" 
                         [action]="elementSelected"
-                        [intentName]="intentSelected.intent_display_name"
                         [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-send-whatsapp>
 
