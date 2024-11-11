@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.23.0-rc.4
+- **added**: success/else connectors in send-whatsapp action
+
 # 1.23.0-rc.3
 - **bug-fixed**: project_id is undefined in send-whatsapp action
 
