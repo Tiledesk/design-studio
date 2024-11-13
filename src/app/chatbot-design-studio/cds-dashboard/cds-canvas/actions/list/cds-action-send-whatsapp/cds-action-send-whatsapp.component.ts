@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
@@ -59,6 +59,11 @@ export class CdsActionSendWhatsappComponent implements OnInit {
       this.connector = connector;
       this.updateConnector();
     });
+   
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.logger.log("[ACTION REPLACE BOT] action (on-changes): ", this.action)
     this.initialize();
   }
 
@@ -231,7 +236,7 @@ export class CdsActionSendWhatsappComponent implements OnInit {
     // update receiver
     this.action.payload.receiver_list[index] = event;
     this.logger.log("[ACTION-SEND WHATSAPP] Action updated ", this.action.payload);
-    this.updateAndSaveAction.emit()
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
 }

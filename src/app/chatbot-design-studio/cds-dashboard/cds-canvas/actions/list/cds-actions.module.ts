@@ -54,7 +54,7 @@ import { CdsActionWaitComponent } from './cds-action-wait/cds-action-wait.compon
 import { CdsActionWebRequestComponent } from './cds-action-web-request/cds-action-web-request.component';
 import { CdsActionWhatsappAttributeComponent } from './cds-action-whatsapp-attribute/cds-action-whatsapp-attribute.component';
 import { CdsActionWhatsappStaticComponent } from './cds-action-whatsapp-static/cds-action-whatsapp-static.component';
-import { CdsWhatsappReceiverComponent } from './cds-action-whatsapp-static/whatsapp-receiver/whatsapp-receiver.component';
+import { CdsWhatsappReceiverComponent } from './cds-action-send-whatsapp/whatsapp-receiver/whatsapp-receiver.component';
 import { FormEditAddComponent } from './form/form-edit-add/form-edit-add.component';
 import { FormFieldComponent } from './form/form-field/form-field.component';
 import { CdsFormComponent } from './form/form.component';

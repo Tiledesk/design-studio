@@ -34,7 +34,6 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   previsioning_url: string;
   sanitizedUrl: any;
   fileUploadAccept: string = "image/*";
-  invalidUrl: boolean = false;
   src: any;
   isFilePendingToUpload = false;
   fileUploadedName: string;
@@ -71,9 +70,9 @@ export class CdsWhatsappReceiverComponent implements OnInit {
         }
         if (this.receiver.header_params[i].type === 'IMAGE') {
           hp.image.link = this.receiver.header_params[i].image.link;
-
-          let decoded_url = decodeURIComponent(this.receiver.header_params[i].image.link);
-          this.fileUploadedName = decoded_url.substring(decoded_url.lastIndexOf('/') + 1);
+          // let decoded_url = decodeURIComponent(this.receiver.header_params[i].image.link);
+          // this.fileUploadedName = decoded_url.substring(decoded_url.lastIndexOf('/') + 1);
+          this.fileUploadedName = this.receiver.header_params[i].image.link;
         }
         if (this.receiver.header_params[i].type === 'DOCUMENT') {
           hp.document.link = this.receiver.header_params[i].document.link;
@@ -167,6 +166,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
           this.header_component.example.header_handle.forEach((p, i) => {
             this.header_params.push({ index: i + 1, type: this.header_component.format, image: { link: null } })
           })
+
         }
       }
       else if (this.header_component.format === 'DOCUMENT') {
@@ -240,19 +240,18 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   }
 
   onParamHeaderChange(event, param_num) {
-    console.log('onParamHeaderChange -->', event, param_num, this.header_params[param_num - 1])
+    this.logger.log('[WHATSAPP RECEIVER] onParamHeaderChange -->', event, param_num, this.header_params[param_num - 1])
     this.header_component = JSON.parse(JSON.stringify(this.header_component_temp));
     if (this.header_params[param_num - 1].type === 'TEXT') {
       this.header_params[param_num - 1].text = event;
     }
     if (this.header_params[param_num - 1].type === 'IMAGE') {
       this.header_params[param_num - 1].image.link = event;
-      this.invalidUrl = false;
+      this.fileUploadedName = event;
     }
     if (this.header_params[param_num - 1].type === 'DOCUMENT') {
       this.header_params[param_num - 1].document.link = event;
       this.sanitizeUrl(event);
-      this.invalidUrl = false;
     }
 
     this.header_params.forEach((param, i) => {
@@ -281,21 +280,20 @@ export class CdsWhatsappReceiverComponent implements OnInit {
 
   // evaluate saving partial objects
   checkParameters() {
-    let text_header_result = this.header_params.find(p => !p.text || p.text == '');
-    let media_header_result = this.header_params.find(p => (p.image && (!p.image.link || p.image.link == '')) || (p.document && (!p.document.link || p.document.link == '')) || (p.location && (!p.location.name || !p.location.address || !p.location.latitude || !p.location.longitude)));
+    // let text_header_result = this.header_params.find(p => !p.text || p.text == '');
+    let media_header_result = this.header_params.find(p => (p.text == '') ||  (p.image && (!p.image.link || p.image.link == '')) || (p.document && (!p.document.link || p.document.link == '')) || (p.location && (!p.location.name || !p.location.address || !p.location.latitude || !p.location.longitude)));
     let body_result = this.body_params.find(p => !p.text || p.text == '');
     let url_buttton_result = this.buttons_params.find(p => !p.text || p.text == '');
-
-    if ((!text_header_result || !media_header_result) && !body_result && !url_buttton_result) {
-      if (this.invalidUrl === false) {
-        //this.logger.log(" ** PARAMETRI COMPLETI **")
+    
+    this.logger.log('[WHATSAPP RECEIVER] checkParameters media',media_header_result)
+    this.logger.log('[WHATSAPP RECEIVER] checkParameters body',body_result)
+    this.logger.log('[WHATSAPP RECEIVER] checkParameters url',url_buttton_result)
+    
+    if (( !media_header_result) && !body_result && !url_buttton_result) {
+        this.logger.log(" ** PARAMETRI COMPLETI **")
         this.emitParams();
         let preview_container = this.elementRef.nativeElement.querySelector('#parameters-container');
         preview_container.classList.remove('highlighted');
-      } else {
-        let preview_container = this.elementRef.nativeElement.querySelector('#parameters-container');
-        preview_container.classList.add('highlighted');
-      }
     } else {
       let preview_container = this.elementRef.nativeElement.querySelector('#parameters-container');
       preview_container.classList.add('highlighted');
@@ -328,7 +326,8 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     if (new_buttons_param.length > 0) {
       receiver_out.buttons_params = new_buttons_param;
     }
-    this.logger.log("receiver_out: ", receiver_out);
+    this.logger.log("[WHATSAPP RECEIVER] receiver_out: ", receiver_out, this.receiver);
+    // this.receiver = receiver_out;
     this.receiverValue.emit(receiver_out);
   }
 
@@ -352,7 +351,23 @@ export class CdsWhatsappReceiverComponent implements OnInit {
         this.onParamButtonChange(text, index)
         break;
     }
-  } 
+  }
+
+  onSelectedAttribute(variable: {name: string, value: string}, key: string, index?: number){
+    this.logger.log('[WHATSAPP RECEIVER] onSelectedAttribute input ->', key, variable)
+    switch(key){
+      case 'phone_number':
+        break;
+      case 'header_params':
+        this.fileUploadedName = variable.name
+        break;
+      case 'body_params':
+        break;
+      case 'buttons_params':
+        break;
+    }
+    
+  }
 
   onFocus() {
     let parameters_container = this.elementRef.nativeElement.querySelector('#parameters-container');
@@ -360,7 +375,6 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   }
 
   onHeaderImageError(event) {
-    this.invalidUrl = true;
     event.target.src = this.header_component.example.header_handle[0];
   }
 
@@ -454,7 +468,6 @@ export class CdsWhatsappReceiverComponent implements OnInit {
         this.header_params[0].document.link = data.downloadURL;
         this.sanitizeUrl(data.downloadURL);
       }
-      this.invalidUrl = false;
       this.isFilePendingToUpload = false
       // return downloadURL;
     }).catch(error => {
@@ -465,12 +478,13 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     that.logger.debug('[IMAGE-UPLOAD] reader-result: ', file);
   }
 
-  removeHeaderFile() {
+  removeHeaderFile(index) {
     this.isFilePendingToUpload = true;
+
     this.uploadService.delete(this.user.uid, this.header_params[0].image.link).then((result)=>{
       
       this.isFilePendingToUpload = false;
-      this.fileUploadedName = "";
+      this.fileUploadedName = null;
 
       if (this.header_params[0].image) {
         this.header_params[0].image.link = "";
@@ -478,9 +492,17 @@ export class CdsWhatsappReceiverComponent implements OnInit {
       if (this.header_params[0].document) {
         this.header_params[0].document.link = "";
       }
-
+      this.checkParameters()
     }).catch((error)=> {
-      this.logger.error('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE (FAQ-COMP) deleteUserProfileImage ERORR:', error)
+      this.logger.error('[WHATSAPP-RECEIVER] delete header media file ERORR:', error)
+      
+      if (this.header_params[0].image) {
+        this.header_params[0].image.link = "";
+      }
+      if (this.header_params[0].document) {
+        this.header_params[0].document.link = "";
+      }
+      this.checkParameters()
       this.isFilePendingToUpload = false;
     })     
   }

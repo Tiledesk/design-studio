@@ -1094,8 +1094,7 @@ export class IntentService {
 
     if(typeAction === TYPE_ACTION.SEND_WHATSAPP){
       action = new ActionSendWhatsapp();
-      action.payload  = new WhatsappBroadcast();
-      (action.payload as WhatsappBroadcast).id_project = this.intentSelected.id_project
+      action.payload  = new WhatsappBroadcast()
     }
     return action;
   }

@@ -84,13 +84,6 @@
         </div>
 
         <div *ngIf="selected_template" class="receiver-list">
-
-            <!-- <cds-whatsapp-receiver *ngIf="receiver_list.length == 0" [template]="selected_template"
-                [receiver]="receiver_list[0]" [index]=0 (receiverValue)="onReceiverEmitted($event, 0)"
-                (deleteReceiver)="onReceiverDeleteEmitted($event)">
-            </cds-whatsapp-receiver>
-            -->
-    
     
             <div *ngIf="action.payload.receiver_list.length > 0">
                 <div *ngFor="let rcv of action.payload.receiver_list; let id = index">
