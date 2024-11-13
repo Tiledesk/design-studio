@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.23.0-rc.5
+- **bug-fixed**: image is not saved in [WHATSAPP RECEIVER]
+- **changed**: maxRow increased askgpt-v2 and gpt-task actions
+
 # 1.23.0-rc.4
 - **added**: success/else connectors in send-whatsapp action
 
