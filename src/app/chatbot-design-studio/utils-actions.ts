@@ -41,7 +41,7 @@ export enum TYPE_ACTION {
     BREVO               = 'brevo',
     N8N                 = 'n8n',
     CODE                = 'code',
-    ADD_TAG             = 'addTag',
+    ADD_TAG             = 'add_tags',
     LEAD_UPDATE         = 'leadupdate',
     CLEAR_TRANSCRIPT    = 'clear_transcript',
     MOVE_TO_UNASSIGNED  = 'move_to_unassigned'

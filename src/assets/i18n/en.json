@@ -497,6 +497,7 @@
     "AudioUrl":"Audio File Url",
     "Message":"Message",
     "Every":"Every",
+    "PushTagsToList":"Push to tags List",
     "CDSForm":{
         "FormDescription":"The Forms block allows you to ask more than one question within a single message, making it easier for the customer to provide all the relevant information.",
         "AddAFormToAsk":"Add a Form to ask user data",

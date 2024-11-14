@@ -741,9 +741,10 @@ export class ActionN8n extends Action {
     }
 }
 
-export class ActionAddTag extends Action {
-    tags: Array<string>;
+export class ActionAddTags extends Action {
+    tags: string;
     target: string;
+    pushToList: boolean
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ADD_TAG;
