@@ -509,6 +509,11 @@ export class Setting {
     trueIntent?: string;
     falseIntent?: string;
     incompleteSpeechTimeout?: number;
+    maxtime?: number;
+    finalsilence?: number;
+    beep?: boolean = false;
+    dtmfterm?: boolean = true;
+
 }
 
 export class MessageWithWait extends Message {

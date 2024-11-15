@@ -1090,6 +1090,23 @@ export class IntentService {
       command_form.subType = TYPE_ACTION_VXML.SPEECH_FORM
       action.attributes.commands.push(command_form);
     }
+    if(typeAction === TYPE_ACTION_VXML.AUDIO_RECORD){
+      action = new ActionVoice(TYPE_ACTION_VXML.AUDIO_RECORD);
+      // (action as ActionVoice).attributes.disableInputMessage = false
+      let commandWait = new Wait();
+      commandWait.time = 0;
+      action.attributes.commands.push(commandWait);
+      let command = new Command(TYPE_COMMAND.MESSAGE);
+      command.message = new Message('text', 'A chat message will be played to the caller');
+      action.attributes.commands.push(command);
+      let commandWait2 = new Wait();
+      commandWait2.time = 0
+      action.attributes.commands.push(commandWait2);
+      let command_form = new Command(TYPE_COMMAND.SETTINGS);
+      command_form.settings = { maxtime: 5, noInputIntent: null, finalsilence: 5, beep: false, dtmfterm: false }
+      command_form.subType = TYPE_ACTION_VXML.AUDIO_RECORD
+      action.attributes.commands.push(command_form);
+    }
     /** VOICE ACTIONS: end */
     return action;
   }

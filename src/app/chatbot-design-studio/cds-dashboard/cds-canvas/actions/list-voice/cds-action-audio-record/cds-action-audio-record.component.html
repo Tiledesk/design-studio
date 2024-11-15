@@ -1,0 +1,116 @@
+<div class="cds-action-content" [class.cds-action-preview]="previewMode">
+
+    <div class="box-up" *ngIf="!previewMode">
+
+        <cds-action-reply-tools-voice
+            [idAction]="idAction"
+            (addNewActionReply) = onAddNewActionReply($event)>
+        </cds-action-reply-tools-voice>        
+
+    </div>
+
+    <!-- ---------------------------------------------- -->
+    <!-- Add block placeholder -->
+    <!-- ---------------------------------------------- -->
+    <div *ngIf="arrayResponses?.length === 0"
+        class="reply--action-placeholder">
+        <div class="reply--action-placeholder-text">
+            {{'CDSCanvas.AddContentsToReply' | translate }}
+        </div>
+    </div>
+
+    <div class="box-dw" [class.previewMode]="previewMode">
+
+        <div #scrollMe id="scrollMe" 
+            class="content draggable-list"
+            cdkDropList 
+            (cdkDropListDropped)="drop($event)">
+            
+            <div *ngFor="let command of arrayResponses; let i = index; let odd = odd; let length = count">
+
+                <div *ngIf="odd" cdkDrag
+                    class="draggable-box"
+                    (click)="onOpenPanelActionDetail(command)"
+                    [ngStyle]="{'border': command.type === typeCommand.WAIT? 'none' : ''}">
+
+                    <!-- TEXT RESPONSE: only odd element -->
+                    <div *ngIf="command.message?.type === typeMessage.TEXT" >
+
+                        <div class="response">
+
+                            <!-- *ngIf="typeAction === typeActions.REPLY" -->
+                            <div class="response-drop" 
+                                [ngClass]="{'grabbing':textGrabbing}"
+                                (mousedown)="mouseDown()" 
+                                (mouseup)="mouseUp()" 
+                                cdkDragHandle>
+                            </div>
+
+                            <cds-action-reply-voice-text 
+                                [index] = i
+                                [idAction] = "idAction"
+                                [response] = "command.message"
+                                [wait] = "arrayResponses[i-1]"
+                                [previewMode] = "previewMode"
+                                [actionType]="action._tdActionType"
+                                (moveUpResponse) = onMoveUpResponse($event)
+                                (moveDownResponse) = onMoveDownResponse($event)
+                                (openButtonPanel) = onOpenButtonPanel($event)
+                                (createNewButton) = onCreateNewButton($event)
+                                (deleteButton) = onDeleteButton($event)
+                                (deleteActionReply) = onDeleteActionReply($event)
+                                (updateAndSaveAction) = onUpdateAndSaveAction($event)
+                                (changeActionReply) = onChangeActionReply($event)>
+                            </cds-action-reply-voice-text>
+
+                        </div>
+
+                    </div>
+
+                    <hr class="preview-divider" *ngIf="i !==length-1 && previewMode">
+
+                </div>
+
+
+                <hr class="custom-divider" *ngIf="i ==length-2 && !previewMode">
+
+                <div *ngIf="odd"
+                    (click)="onOpenPanelActionDetail(command)"
+                    [ngStyle]="{'border': command.type === typeCommand.WAIT? 'none' : ''}">
+                    
+                     <!-- TEXT RESPONSE: only odd element -->
+                     <div *ngIf="command.type === typeCommand.SETTINGS">
+                            <div class="response">
+                                <cds-action-reply-voice-settings
+                                    [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
+                                    [index] = i
+                                    [idAction] = "idAction"
+                                    [response] = "command.settings"
+                                    [previewMode] = "previewMode"
+                                    (updateAndSaveAction) = onUpdateAndSaveAction($event)
+                                    (changeActionReply) = onChangeActionReply($event)
+                                    (onConnectorChange)= onConnectorChangeReply($event)>
+                                </cds-action-reply-voice-settings>
+                            </div>
+                     </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- <div class="footer-panel-intent-detail" *ngIf="!previewMode">
+        <div class="disable-input-message">
+            <section class="disable-input-message-section">
+                <mat-checkbox 
+                    [checked]="action?.attributes?.disableInputMessage"
+                    (change)="onDisableInputMessage()">
+                    {{"DisableUserInput" | translate}}
+                </mat-checkbox>
+            </section>
+        </div>
+    </div> -->
+    
+</div>

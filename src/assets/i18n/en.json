@@ -449,6 +449,10 @@
         "NoMatch":"No match",
         "NoInput":"No input",
         "IncompleteSpeechTimeout":"Incomplete Speech Timeout",
+        "MaxTime":"Max time",
+        "FinalSilence":"Final silence",
+        "Dtmfterm":"Dtmfterm",
+        "Beep":"Beep",
         "RequestTimeout":"Request timeout",
         "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. Admitted values range: 1-300k ms",
         "AudioFileAllowed":"You can only upload *.wav audio format with mono, 8 KHz, with PCM 8bit, PCM 16bit, Alaw or uLaw coding",
@@ -623,7 +627,8 @@
             "DTMFMenu":"DTMF menu",
             "BlindTransfer": "Blind transfer",
             "PlayPrompt":"Play prompt",
-            "SpeechForm":"Speech form"
+            "SpeechForm":"Speech form",
+            "AudioRecord":"Audio record"
         },
         "DOC": {
             "Reply":{
@@ -912,7 +917,15 @@
                 "IMAGE":"",
                 "VIDEO_URL":"",
                 "DOC_URL":""
+            },
+            "AudioRecord":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
             }
+
         }
     },
     "CDSvariablesList": {

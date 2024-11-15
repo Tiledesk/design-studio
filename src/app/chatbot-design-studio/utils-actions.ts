@@ -52,6 +52,7 @@ export enum TYPE_ACTION_VXML {
     BLIND_TRANSFER      = 'blind_transfer',
     PLAY_PROMPT         = 'play_prompt',
     SPEECH_FORM         = 'speech_form',
+    AUDIO_RECORD        = 'audio_record'
 }
 
 export enum TYPE_ACTION_CATEGORY {
@@ -129,5 +130,6 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     BLIND_TRANSFER:         { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     PLAY_PROMPT:            { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     SPEECH_FORM:            { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    AUDIO_RECORD:           { name: 'CDSActionList.NAME.AudioRecord',           category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.AUDIO_RECORD,    src:"assets/images/actions-voice/audio_record.svg",     status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 }
 }
 

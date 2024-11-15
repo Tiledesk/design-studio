@@ -403,6 +403,13 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-speech-form>
 
+                    <cds-action-record *ngSwitchCase="TYPE_ACTION_VXML.AUDIO_RECORD"    
+                        class="panel-response"
+                        [intentSelected]="intent" 
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-record>
+
                 </div>
             </span>
             
