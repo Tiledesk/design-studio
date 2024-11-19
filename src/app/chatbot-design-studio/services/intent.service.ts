@@ -1103,7 +1103,7 @@ export class IntentService {
       commandWait2.time = 0
       action.attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { maxtime: 5, noInputIntent: null, finalsilence: 5, beep: false, dtmfterm: false }
+      command_form.settings = { maxtime: 20, noInputIntent: null, finalsilence: 3, beep: true, dtmfterm: false }
       command_form.subType = TYPE_ACTION_VXML.AUDIO_RECORD
       action.attributes.commands.push(command_form);
     }
