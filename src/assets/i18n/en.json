@@ -616,6 +616,7 @@
             "Code":"Code",
             "SetFunction":"Set function",
             "CaptureUserReply":"Capture user reply",
+            "PushTagsToList":"Push to tags List",
             "LeadUpdate":"Lead update",
             "ClearTranscript":"Clear transcript",
             "MoveToUnassigned":"Move to unassigned",

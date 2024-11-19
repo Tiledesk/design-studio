@@ -4,6 +4,8 @@ import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { tagsList } from 'src/app/chatbot-design-studio/utils-variables';
 import { ActionAddTags, ActionCode } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
+import { AppConfigService } from 'src/app/services/app-config';
+import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -23,6 +25,9 @@ export class CdsActionAddTagComponent implements OnInit {
   autocompleteOptions: Array<string> = [];
   tagsList: Array<string> = []
 
+  project_id: string;
+  dashboardLabelUrl: string;
+
   radioOptions: Array<{name: string, value: string, disabled: boolean, checked: boolean}>= [ 
     {name: 'CDSCanvas.Conversation',            value: 'request',            disabled: false, checked: true  }, 
     {name: 'CDSCanvas.Contact',                 value: 'lead',               disabled: false, checked: false },
@@ -30,13 +35,23 @@ export class CdsActionAddTagComponent implements OnInit {
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
-  constructor() { }
+  constructor(
+    private dashboardService: DashboardService,
+    private appConfigService: AppConfigService
+  ) { }
 
   ngOnInit(): void {
     this.logger.log("[ACTION-ADD-TAG] action", this.action)
     // this.checkIfTagAlreadyExist()
     this.logger.log("[ACTION-ADD-TAG] tagsList", tagsList)
+    this.project_id = this.dashboardService.projectID
     this.tagsList = this.action.tags.split(',')
+
+    this.setDasboardTagsUrl()
+  }
+
+  setDasboardTagsUrl(){
+    this.dashboardLabelUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/labels';
   }
 
   onChangeButtonSelect(event: {label: string, value: string, disabled: boolean, checked: boolean}){
