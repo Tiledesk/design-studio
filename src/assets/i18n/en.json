@@ -473,7 +473,10 @@
         "intentsComplete": "Intents loading completed",
         "connectorsProgress": "Loading connectors in progress",
         "connectorsComplete": "Connectors loading completed",
-        "loadingCompleteWithErrors":"Loading completed with errors"
+        "loadingCompleteWithErrors":"Loading completed with errors",
+        "PushTagsToList":"Push to tags List",
+        "PushTagsToListDescription":"Check this option if you want to add tags to global list.",
+        "ViewList":"View list"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -497,7 +500,7 @@
     "AudioUrl":"Audio File Url",
     "Message":"Message",
     "Every":"Every",
-    "PushTagsToList":"Push to tags List",
+    
     "CDSForm":{
         "FormDescription":"The Forms block allows you to ask more than one question within a single message, making it easier for the customer to provide all the relevant information.",
         "AddAFormToAsk":"Add a Form to ask user data",
@@ -616,7 +619,7 @@
             "Code":"Code",
             "SetFunction":"Set function",
             "CaptureUserReply":"Capture user reply",
-            "PushTagsToList":"Push to tags List",
+            
             "LeadUpdate":"Lead update",
             "ClearTranscript":"Clear transcript",
             "MoveToUnassigned":"Move to unassigned",

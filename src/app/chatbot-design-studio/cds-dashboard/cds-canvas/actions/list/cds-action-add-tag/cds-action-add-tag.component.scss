@@ -46,3 +46,33 @@ cds-text#text.sx-input ::ng-deep {
     pointer-events: none;
     background: #aaa;
 }
+
+.cds-action-preview{
+    .action-row-left{
+        width: unset;
+    }
+    
+    .set-attribute-label {
+        color: #6c6859d9;
+        font-size: 12px;
+        margin-bottom: 0;
+        font-weight: 400;
+        // background: #e8e6dd;
+        padding: 0px 3px;
+        height: inherit;
+    }
+    
+    .set-attribute-value {
+        font-size: 12px;
+        font-weight: 600;
+        // background: #ecb606;
+        width: fit-content;
+        // color: #fff;
+        // height: 18px;
+        line-height: 1.5;
+
+        overflow: hidden;
+        word-break: break-word;
+    
+    }    
+}

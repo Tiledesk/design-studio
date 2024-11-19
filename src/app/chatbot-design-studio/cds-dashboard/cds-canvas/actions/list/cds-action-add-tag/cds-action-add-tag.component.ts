@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { tagsList } from 'src/app/chatbot-design-studio/utils-variables';
 import { ActionAddTags, ActionCode } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
@@ -32,7 +33,7 @@ export class CdsActionAddTagComponent implements OnInit {
     {name: 'CDSCanvas.Conversation',            value: 'request',            disabled: false, checked: true  }, 
     {name: 'CDSCanvas.Contact',                 value: 'lead',               disabled: false, checked: false },
   ]
-
+  BRAND_BASE_INFO = BRAND_BASE_INFO
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
