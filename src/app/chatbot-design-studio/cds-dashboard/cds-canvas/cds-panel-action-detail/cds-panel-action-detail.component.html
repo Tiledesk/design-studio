@@ -340,7 +340,7 @@
                         [previewMode]="false">
                     </cds-action-move-unassigned>
 
-                    
+                    <!-- ****** ACTION VOICE: start ******* -->
                     <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"
                         [intentSelected]="intentSelected" 
@@ -382,6 +382,16 @@
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-speech-form>
+                    <!-- ****** ACTION VOICE: end ******* -->
+
+                    <cds-action-send-whatsapp *ngSwitchCase="TYPE_ACTION.SEND_WHATSAPP"
+                        class="panel-response"
+                        [intentSelected]="intentSelected" 
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-send-whatsapp>
 
                     <cds-action-record *ngSwitchCase="TYPE_ACTION_VXML.AUDIO_RECORD"    
                         class="panel-response"

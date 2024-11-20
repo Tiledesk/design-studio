@@ -1,0 +1,41 @@
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+
+    #opt-train-wrp {
+        display: flex;
+        align-items: center;
+
+        label {
+            font-weight: 500;
+            font-family: var(--font-family-poppins);
+            text-transform: capitalize;
+            font-size: 14px;
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+        }
+    }
+}
+
+cds-whatsapp-receiver::ng-deep{
+
+    .whatsapp-receiver{
+        padding: unset;
+
+        .response-controls{
+            position: absolute;
+            margin-left: -25px;
+
+            .control-button.delete{
+                display: none;
+                pointer-events: none;
+            }
+        }
+    }
+}
