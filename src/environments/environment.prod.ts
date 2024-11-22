@@ -11,6 +11,7 @@ export const environment = {
   wsUrl: 'ws://localhost:3000/',
   uploadEngine: 'native',
   baseImageUrl: 'CHANGEIT',
+  fileUploadAccept: "*/*",
   logLevel: 'error',
   aiModels: 'CHANGEIT',
   storage_prefix: "CHANGEIT",

@@ -17,6 +17,7 @@ export class CDSTextareaComponent implements OnInit {
   @ViewChild("addVariable") addVariable: SatPopover;
   @ViewChild("emojiPicker") emojiPicker: SatPopover;
 
+  @Input() activeFocus: boolean = false;
   @Input() placeholder: string = '';
   @Input() text: string = '';
   @Input() limitCharsText: number = TEXT_CHARS_LIMIT;
@@ -35,6 +36,7 @@ export class CDSTextareaComponent implements OnInit {
   @Output() changeTextarea = new EventEmitter();
   @Output() selectedAttribute = new EventEmitter();
   @Output() blur = new EventEmitter();
+  @Output() focus = new EventEmitter();
   @Output() selectedEmoji = new EventEmitter();
   @Output() clearSelectedAttribute = new EventEmitter();
 
@@ -61,6 +63,7 @@ export class CDSTextareaComponent implements OnInit {
   emojiColor: string ="#506493";
   emojiiCategories = [ 'recent', 'people', 'nature', 'activity', 'flags'];
 
+
   private logger: LoggerService = LoggerInstance.getInstance()
   
   constructor() { }
@@ -68,6 +71,8 @@ export class CDSTextareaComponent implements OnInit {
   ngOnInit(): void {
     this.initialize();
   }
+
+
 
   ngOnChanges(changes: SimpleChange) {
     // if(changes && changes['readonly'] && changes['readonly'].previousValue !== changes['readonly'].currentValue){
@@ -85,6 +90,8 @@ export class CDSTextareaComponent implements OnInit {
   ngAfterViewInit() {
     this.getTextArea();
   }
+
+
 
   initialize(){
     this.startText = this.text;
@@ -148,6 +155,7 @@ export class CDSTextareaComponent implements OnInit {
   onFocus(event){
     this.logger.log('[CDS-TEXAREA] - onFocus - isOpen textIsChanged');
     if(this.autoResize) this.maxRow = 5
+    this.focus.emit(event)
   }
 
   onVariableSelected(variableSelected: { name: string, value: string }) {
@@ -185,8 +193,13 @@ export class CDSTextareaComponent implements OnInit {
 
   private getTextArea() {
     this.elTextarea = this.autosize['_textareaElement'] as HTMLInputElement;
-    this.logger.log('[CDS-TEXAREA] - GET TEXT AREA - elTextarea ', this.elTextarea);
-    if (this.elTextarea) {}
+    this.logger.log('[CDS-TEXAREA] - GET TEXT AREA2 - elTextarea ', this.elTextarea);
+    this.logger.log('[CDS-TEXAREA] - activeFocus ', this.activeFocus);
+    if (this.elTextarea && this.activeFocus === true) {
+      setTimeout(() => {
+        this.elTextarea.focus();
+      }, 1000);
+    }
   }
 
   private insertAtCursorPos(elem: HTMLInputElement, attribute) {
