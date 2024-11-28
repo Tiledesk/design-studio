@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.24.0-rc.3
+- **bug-fixed**: minor fix
+
 # 1.24.0-rc.2
 - **added**: voice-twilio action category
 
