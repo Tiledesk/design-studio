@@ -326,6 +326,18 @@ export class ActionWhatsappStatic extends Action {
     }
 }
 
+export class ActionSendWhatsapp extends Action {
+    templateName: string;
+    payload: WhatsappBroadcast;
+    trueIntent: string;
+    falseIntent: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.SEND_WHATSAPP;
+        this.payload = new WhatsappBroadcast();
+    }
+}
+
 export class ActionAgent extends Action{
     constructor() {
         super();
@@ -637,6 +649,16 @@ export class WhatsappBroadcast {
         name: string;
     }
     receiver_list: Array<any>;
+
+    constructor(){
+        this.id_project = null;;
+        this.phone_number_id = null
+        this.template = {
+            language: null,
+            name: null
+        },
+        this.receiver_list= []
+    }
 }
 
 export class ActionQapla extends Action {
@@ -743,6 +765,16 @@ export class ActionN8n extends Action {
         this.assignErrorTo = '';
         this.assignResultTo = '';
         this._tdActionType = TYPE_ACTION.N8N;
+    }
+}
+
+export class ActionAddTags extends Action {
+    tags: string;
+    target: string;
+    pushToList: boolean
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.ADD_TAG;
     }
 }
 

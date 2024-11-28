@@ -392,7 +392,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   //   this.timeStamp = new Date().getTime();
   // }
 
-  // getBotProfileImage(): SafeUrl {
+ // getBotProfileImage(): SafeUrl {
   //   if (this.timeStamp) {
   //     return this.sanitizer.bypassSecurityTrustUrl(this.botProfileImageurl + '&' + this.timeStamp);
   //   }
@@ -504,6 +504,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.uploadService.deleteProfile(this.selectedChatbot._id, this.selectedChatbot.imageURL).then((result)=>{
       // this.botProfileImageExist = false;
       this.selectedChatbot.imageURL = null
+      this.imageURL = null;
       const delete_bot_image_btn = <HTMLElement>document.querySelector('#cds-delete-bot-img-btn');
       delete_bot_image_btn.blur();
     }).catch((error)=> {

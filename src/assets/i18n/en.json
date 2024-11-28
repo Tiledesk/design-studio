@@ -460,6 +460,11 @@
         "CurrentDepartment": "Current department",
         "SelectedDepartment": "Selected Department",
         "CheckAgentsAvailability":"Check agents availability",
+        "Target":"Target",
+        "Conversation":"Conversation",
+        "Contact":"Contact",
+        "TagsTypingAliasPlaceholder":"tag1, tag2, tag3",
+        "TagsTypingAliasDescription":"Please set a comma separated list of tags that the user can type to tag a conversation or a contact ",
         "UpdateProperty":"Update property",
         "SelectProperty":"Select property",
         "CheckOperatingHours":"Check operating hours",
@@ -472,7 +477,10 @@
         "intentsComplete": "Intents loading completed",
         "connectorsProgress": "Loading connectors in progress",
         "connectorsComplete": "Connectors loading completed",
-        "loadingCompleteWithErrors":"Loading completed with errors"
+        "loadingCompleteWithErrors":"Loading completed with errors",
+        "PushTagsToList":"Push to tags List",
+        "PushTagsToListDescription":"Check this option if you want to add tags to global list.",
+        "ViewList":"View list"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -496,6 +504,7 @@
     "AudioUrl":"Audio File Url",
     "Message":"Message",
     "Every":"Every",
+    
     "CDSForm":{
         "FormDescription":"The Forms block allows you to ask more than one question within a single message, making it easier for the customer to provide all the relevant information.",
         "AddAFormToAsk":"Add a Form to ask user data",
@@ -543,7 +552,8 @@
         "Flow":"Flow",
         "Integrations":"Integrations",
         "Special":"Special",
-        "Voice":"Voice"
+        "Voice":"Voice",
+        "VoiceTwilio":"Voice Twilio"
     },
     "CDSOperatorList":{
         "equalAsNumbers":"equal As Numbers",
@@ -614,6 +624,7 @@
             "Code":"Code",
             "SetFunction":"Set function",
             "CaptureUserReply":"Capture user reply",
+            
             "LeadUpdate":"Lead update",
             "ClearTranscript":"Clear transcript",
             "MoveToUnassigned":"Move to unassigned",
@@ -623,12 +634,14 @@
             "Customerio":"Customer.io",
             "Brevo":"Brevo",
             "N8n":"n8n",
+            "AddTag":"Add tag",
             "DTMFForm":"DTMF form",
             "DTMFMenu":"DTMF menu",
             "BlindTransfer": "Blind transfer",
             "PlayPrompt":"Play prompt",
             "SpeechForm":"Speech form",
-            "AudioRecord":"Audio record"
+            "AudioRecord":"Audio record",
+            "SendWhatsapp":"Send Whatsapp"
         },
         "DOC": {
             "Reply":{
@@ -764,6 +777,13 @@
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
+            "SendWhatsApp":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
             "AskTheKnowledgeBase":{
                 "TITLE":"Prompt the KB",
                 "DESCRIPTION":"This action prompts the selected knowledge base to find the best suitable answer from the uploaded contents",
@@ -840,6 +860,13 @@
                 "IMAGE":"assets/images/doc/MOVE_TO_UNASSIGNED.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/move-to-unassigned-action/"
+            },
+            "AddTag": {
+                "TITLE":"Add a new tag",
+                "DESCRIPTION":"This action allow chatbot to automatically tags a conversation or a contact during the conversation flow",
+                "IMAGE":"assets/images/doc/ADD_TAG.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
             },
             "Qapla":{
                 "TITLE":"Ask an order status to Qapla'",

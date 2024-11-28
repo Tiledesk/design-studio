@@ -134,11 +134,10 @@ loading-spinner.custom-spinner ::ng-deep {
 
     .field-wrapper {
         display: flex;
-        width: 50%;
-    }
-
-    .large {
-        width: 80%;
+        width: 100%;
+        cds-textarea{
+            width: 100%;
+        }
     }
 
     .param-number {

@@ -28,7 +28,7 @@ import { Subject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
-
+import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -36,7 +36,8 @@ import { BRAND_BASE_INFO } from '../utils-resources';
   styleUrls: ['./cds-dashboard.component.scss']
 })
 export class CdsDashboardComponent implements OnInit {
-
+  // @ViewChild('chatbot--dashboard') canvas!: ElementRef;
+  
   SIDEBAR_PAGES = SIDEBAR_PAGES;
   initFinished:boolean = false;
   IS_OPEN_SIDEBAR: boolean = false;
@@ -65,7 +66,10 @@ export class CdsDashboardComponent implements OnInit {
     public faqService: FaqService,
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
+    private stageService: StageService
   ) {}
+
+  
 
   ngOnInit() {
     console.log("•••• [CDS DSHBRD] ngOnInit ••••");
@@ -76,6 +80,11 @@ export class CdsDashboardComponent implements OnInit {
     this.executeAsyncFunctionsInSequence();
     this.hideShowWidget('hide');
   }
+
+  onSwipe(event: WheelEvent){
+    this.stageService.onSwipe(event);
+  }
+
 
   checkForChangelogNotify(): boolean { 
     if(!BRAND_BASE_INFO['DOCS']){
