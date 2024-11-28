@@ -543,7 +543,8 @@
         "Flow":"Flow",
         "Integrations":"Integrations",
         "Special":"Special",
-        "Voice":"Voice"
+        "Voice":"Voice",
+        "VoiceTwilio":"Voice Twilio"
     },
     "CDSOperatorList":{
         "equalAsNumbers":"equal As Numbers",

@@ -63,7 +63,8 @@ export enum TYPE_ACTION_CATEGORY {
     INTEGRATIONS    = 'Integrations',
     SPECIAL         = 'Special',
     NEW             = 'New',
-    VOICE           = 'Voice'
+    VOICE           = 'Voice',
+    "VOICE-TWILIO"  = 'Voice Twilio'
 }
 
 export const ACTION_CATEGORY =[
@@ -73,6 +74,7 @@ export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY['VOICE-TWILIO'], TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.VoiceTwilio',  src: 'assets/images/actions_category/voice.svg'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
 ]
 
@@ -132,6 +134,13 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     BLIND_TRANSFER:         { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     PLAY_PROMPT:            { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     SPEECH_FORM:            { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
-    AUDIO_RECORD:           { name: 'CDSActionList.NAME.AudioRecord',           category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.AUDIO_RECORD,    src:"assets/images/actions-voice/audio_record.svg",     status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 }
+    AUDIO_RECORD:           { name: 'CDSActionList.NAME.AudioRecord',           category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.AUDIO_RECORD,    src:"assets/images/actions-voice/audio_record.svg",     status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+
+    DFTM_FORM_TWILIO:       { name: 'CDSActionList.NAME.DTMFForm',              category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    DTMF_MENU_TWILIO:       { name: 'CDSActionList.NAME.DTMFMenu',              category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    BLIND_TRANSFER_TWILIO:  { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+
 }
 

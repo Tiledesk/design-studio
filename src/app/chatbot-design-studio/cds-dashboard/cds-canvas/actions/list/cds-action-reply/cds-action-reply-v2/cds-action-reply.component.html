@@ -21,7 +21,7 @@
 
     <div class="box-dw" [class.previewMode]="previewMode">
 
-        <div class="reply-info" *ngIf="typeAction === typeActions.RANDOM_REPLY">{{actionList.RANDOM_REPLY.description | translate }}</div>
+        <div class="reply-info" *ngIf="typeAction === typeActions.RANDOM_REPLY">{{actionList.RANDOM_REPLY.doc+'.DESCRIPTION' | translate }}</div>
 
         <div #scrollMe id="scrollMe" 
             class="content draggable-list"
