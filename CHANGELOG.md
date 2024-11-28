@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.23.1
+
 # 1.23.0
 
 # 1.22.2
