@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.24.0-rc.2
+- **added**: voice-twilio action category
+
 # 1.24.0-rc.1
 - **added**: add_tags action
 

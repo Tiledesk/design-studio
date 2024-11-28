@@ -636,6 +636,7 @@
             "BlindTransfer": "Blind transfer",
             "PlayPrompt":"Play prompt",
             "SpeechForm":"Speech form",
+            "AudioRecord":"Audio record",
             "SendWhatsapp":"Send Whatsapp"
         },
         "DOC": {
