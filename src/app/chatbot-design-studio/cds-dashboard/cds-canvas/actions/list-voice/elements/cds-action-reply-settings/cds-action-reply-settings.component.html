@@ -216,7 +216,7 @@
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
             <label class="condition-text">{{'CDSCanvas.NoInput' | translate}}</label>
-            <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '70%'}">
+            <div class="delay-wrapper" *ngIf="response.hasOwnProperty('noInputTimeout')" [ngStyle]="{width: canShowFilter? 'auto': '70%'}">
                 <appdashboard-delay-slider
                     [delayTime]="response.noInputTimeout/1000"
                     [label]="'CDSCanvas.timeout'"
