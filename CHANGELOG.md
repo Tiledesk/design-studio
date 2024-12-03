@@ -7,6 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.24.0-rc.3
+- **bug-fixed**: minor fix
+
+# 1.24.0-rc.2
+- **added**: voice-twilio action category
+
+# 1.24.0-rc.1
+- **added**: add_tags action
+
 # 1.23.0-rc.5
 - **bug-fixed**: image is not saved in [WHATSAPP RECEIVER]
 - **changed**: maxRow increased askgpt-v2 and gpt-task actions

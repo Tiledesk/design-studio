@@ -257,7 +257,10 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     if (this.selectedChatbot._id) {
       let url = this.imageRepoService.getImagePhotoUrl(this.selectedChatbot._id)
       this.checkImageExists(url, (existImage)=> {
-        existImage? this.selectedChatbot.imageURL = url: null;
+        if(existImage){
+          this.selectedChatbot.imageURL = url; 
+          this.imageURL = url
+        }
       })
     }
 

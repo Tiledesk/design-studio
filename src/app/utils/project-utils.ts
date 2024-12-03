@@ -25,6 +25,7 @@ export class ProjectPlanUtils {
         this.project = this.projectService.getCurrentProject();
         this.checkIfKBSCanLoad();
         this.checkIfActionCategoryIsInProject(TYPE_ACTION_CATEGORY.VOICE);
+        this.checkIfActionCategoryIsInProject(TYPE_ACTION_CATEGORY['VOICE-TWILIO']);
         this.checkActionCanShow(TYPE_ACTION.CONNECT_BLOCK)
     }
 

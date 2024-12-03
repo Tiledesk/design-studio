@@ -198,7 +198,7 @@ export class ActionWebRequestV2 extends Action {
     constructor(){
         super();
         this.url = '';
-        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":"TiledeskBotRuntime", "Accept":"*/*"};
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":BRAND_BASE_INFO['BRAND_NAME']+" BotRuntime", "Accept":"*/*"};
         this.settings = { timeout: 20000 }
         this.jsonBody = null
         this.bodyType = 'none'
@@ -521,6 +521,11 @@ export class Setting {
     trueIntent?: string;
     falseIntent?: string;
     incompleteSpeechTimeout?: number;
+    maxtime?: number;
+    finalsilence?: number;
+    beep?: boolean = false;
+    dtmfterm?: boolean = true;
+
 }
 
 export class MessageWithWait extends Message {
