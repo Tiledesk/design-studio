@@ -2,4 +2,12 @@
     justify-content: flex-start;
 }
 
+.title-preview-label > span{
+    font-weight: 600;
+}
+.action-row-right.empty{
+    font-style: italic;
+    color: var(--brown) !important;
+}
+
 
