@@ -217,7 +217,7 @@ appdashboard-filter{
     margin: 0px;;
     position: relative;
     .title-preview-label{
-        color: #6c6859;
+        color: var(--brown);
         font-size: 12px; 
         margin: 0px;
     }
@@ -233,8 +233,8 @@ appdashboard-filter{
     flex-direction: row;
 }
 .action-row-left {
-    height: 20px;
-    width: 20px;
+    height: 18px;
+    width: 18px;
     display: flex;
     align-items: center;
     justify-content: center;

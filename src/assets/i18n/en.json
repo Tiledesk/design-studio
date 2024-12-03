@@ -330,6 +330,7 @@
         "TransferToAHuman":"Transfer to a human",
         "CaptureUserReplyTo":"Capture user reply to",
         "AssignUserReplyTo":"Assign user reply to",
+        "AssignUserReplyDescription":"Awaits for the user reply and automatically assign it to the selected attribute. If no attribute is selected the reply is automatically assigned to lastUserText",
         "Optional": "(Optional)",
         "ThenGoToBlock":"Then go to block",
         "SelectADepartment":"Select a department",
@@ -397,6 +398,7 @@
         "Result":"Result",
         "Error":"Error",
         "ChooseBot":"Choose a bot",
+        "ChooseBlock":"Choose a block",
         "ChooseBlockDescription":"Automatically execute this block when this chatbot joins the conversation",
         "ExecuteBlock":"Execute block",
         "ThisRequestNoBody":"This request does not have a body",
@@ -500,7 +502,6 @@
     "AudioUrl":"Audio File Url",
     "Message":"Message",
     "Every":"Every",
-    
     "CDSForm":{
         "FormDescription":"The Forms block allows you to ask more than one question within a single message, making it easier for the customer to provide all the relevant information.",
         "AddAFormToAsk":"Add a Form to ask user data",

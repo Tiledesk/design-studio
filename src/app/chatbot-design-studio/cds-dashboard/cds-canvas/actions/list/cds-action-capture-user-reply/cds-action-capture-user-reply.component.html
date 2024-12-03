@@ -23,8 +23,8 @@
     <div id="capture-user-reply" class="previewContent">
         
         <label class="title-preview-label">{{'CDSCanvas.CaptureUserReplyTo' | translate }}:
-            <span *ngIf="!action?.assignResultTo" class="action-row-right empty">{{'CDSCanvas.SelectAttribute' | translate }}</span>
-            <span *ngIf="action?.assignResultTo" style="font-weight: 600;">{{ action?.assignResultTo }}</span>
+            <span *ngIf="!action?.assignResultTo" class="action-row-right empty">lastUserText</span>
+            <span *ngIf="action?.assignResultTo">{{ action?.assignResultTo }}</span>
         </label>
 
         <cds-connector *ngIf="action?.goToIntent" class="connector"
@@ -50,10 +50,11 @@
             [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignResultTo"
-            [placeholder]="'CDSCanvas.Optional' | translate"
+            [placeholder]="'lastUserText'"
             (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
         </cds-textarea>
+        <label class="field-description"> {{ 'CDSCanvas.AssignUserReplyDescription' | translate}} </label>
     </div>
 
 
