@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.24.0-rc.4
+- **added**: info for default values in action replace-bot and action capture-user-reply
+- **changed**: default avatar for chatbot
+
 # 1.24.0-rc.3
 - **bug-fixed**: minor fix
 
