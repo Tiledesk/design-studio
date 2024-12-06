@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.24.0-rc.5
+- **changed**: project-utils rules
+
 # 1.24.0-rc.4
 - **added**: info for default values in action replace-bot and action capture-user-reply
 - **changed**: default avatar for chatbot
