@@ -865,7 +865,7 @@
             "AddTag": {
                 "TITLE":"Add a new tag",
                 "DESCRIPTION":"This action allow chatbot to automatically tags a conversation or a contact during the conversation flow",
-                "IMAGE":"assets/images/doc/ADD_TAG.png",
+                "IMAGE":"assets/images/doc/ADD_TAGS.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
