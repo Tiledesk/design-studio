@@ -135,7 +135,6 @@ export class ProjectPlanUtils {
     }
 
     public checkIfActionCategoryIsInProject(actionType: TYPE_ACTION_CATEGORY){
-        console.log('aaaaaaa', actionType)
         let categoryKey = getKeyByValue(actionType, TYPE_ACTION_CATEGORY).toLowerCase();
         this.logger.log('[PROJECT_PROFILE] checkIfActionCategoryIsInProject -->', actionType, categoryKey, this.project)
         if (this.project.profile['customization'] === undefined){
