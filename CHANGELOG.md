@@ -7,10 +7,45 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.24.0-rc.6
+- **added**: doc image for add_tags action
+
 # 1.23.2
 # 1.23.1
 
+# 1.24.0-rc.5
+- **changed**: project-utils rules
+
+# 1.24.0-rc.4
+- **added**: info for default values in action replace-bot and action capture-user-reply
+- **changed**: default avatar for chatbot
+
+# 1.24.0-rc.3
+- **bug-fixed**: minor fix
+
+# 1.24.0-rc.2
+- **added**: voice-twilio action category
+
+# 1.24.0-rc.1
+- **added**: add_tags action
+
 # 1.23.0
+
+# 1.23.0-rc.5
+- **bug-fixed**: image is not saved in [WHATSAPP RECEIVER]
+- **changed**: maxRow increased askgpt-v2 and gpt-task actions
+
+# 1.23.0-rc.4
+- **added**: success/else connectors in send-whatsapp action
+
+# 1.23.0-rc.3
+- **bug-fixed**: project_id is undefined in send-whatsapp action
+
+# 1.23.0-rc.2
+- **added**: send-whatsapp action
+
+# 1.23.0-rc.1
+- **bug-fixed**: managed right/left swipe to prevend back/next page load
 
 # 1.22.2
 -  **bug-fixed**: avatar image not uploaded if another one already exists
