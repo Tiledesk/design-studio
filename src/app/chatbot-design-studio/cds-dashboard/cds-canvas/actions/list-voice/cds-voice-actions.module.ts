@@ -17,6 +17,7 @@ import { CdsActionPlayPromptComponent } from './cds-action-play-prompt/cds-actio
 import { CdsActionVoiceComponent } from './cds-action-voice-base/cds-action-voice.component';
 import { CdsActionReplyAudioComponent } from './elements/cds-action-reply-audio/cds-action-reply-audio.component';
 import { CdsActionSpeechFormComponent } from './cds-action-speech-form/cds-action-speech-form.component';
+import { CdsActionAudioRecordComponent } from './cds-action-audio-record/cds-action-audio-record.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { CdsActionSpeechFormComponent } from './cds-action-speech-form/cds-actio
       CdsActionReplyAudioComponent,
       
       // action DTMFForm elements: end //
-    CdsActionVoiceComponent
+    CdsActionVoiceComponent,
+    CdsActionAudioRecordComponent
   ],
   imports: [
     CommonModule,
@@ -58,7 +60,8 @@ import { CdsActionSpeechFormComponent } from './cds-action-speech-form/cds-actio
       CdsActionReplyVoiceButtonComponent,
       CdsActionReplyAudioComponent,
       // action DTMFForm elements: end //
-    CdsActionVoiceComponent
+    CdsActionVoiceComponent,
+    CdsActionAudioRecordComponent
   ]
 })
 export class CdsVoiceActionsModule { }

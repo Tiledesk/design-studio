@@ -220,8 +220,8 @@ export class CdsActionReplySettingsComponent implements OnInit {
     // }
   }
 
-  onChangeToggle(event){
-    this.response.bargein = event
+  onChangeToggle(event, key: string){
+    this.response[key] = event
     this.changeActionReply.emit();
   }
 

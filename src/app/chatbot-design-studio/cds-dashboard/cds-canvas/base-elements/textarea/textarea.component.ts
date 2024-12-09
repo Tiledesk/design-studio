@@ -35,6 +35,7 @@ export class CDSTextareaComponent implements OnInit {
   @Output() changeTextarea = new EventEmitter();
   @Output() selectedAttribute = new EventEmitter();
   @Output() blur = new EventEmitter();
+  @Output() focus = new EventEmitter();
   @Output() selectedEmoji = new EventEmitter();
   @Output() clearSelectedAttribute = new EventEmitter();
 
@@ -148,6 +149,7 @@ export class CDSTextareaComponent implements OnInit {
   onFocus(event){
     this.logger.log('[CDS-TEXAREA] - onFocus - isOpen textIsChanged');
     if(this.autoResize) this.maxRow = 5
+    this.focus.emit(event)
   }
 
   onVariableSelected(variableSelected: { name: string, value: string }) {
