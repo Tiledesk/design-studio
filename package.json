@@ -1,7 +1,7 @@
 {
   "name": "@tiledesk/cds",
   "author": "Tiledesk SRL",
-  "version": "1.24.0-rc.6",
+  "version": "1.24.0",
   "license": "MIT",
   "homepage": "https://www.tiledesk.com",
   "repository": {

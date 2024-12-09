@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.24.0
+
 # 1.24.0-rc.6
 - **added**: doc image for add_tags action
 
