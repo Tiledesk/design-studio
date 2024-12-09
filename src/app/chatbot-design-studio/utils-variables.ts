@@ -90,6 +90,14 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
     }
 ]
 
+export var tagsList: Array<{key: string, elements: Array<any>}> = [ 
+    {   key: 'request',
+        elements: []
+    },
+    {   key: 'lead',
+        elements: []
+    }
+];
 
 export const leadPropertyList: Array<{ name: string, value: string, disabled: boolean, description?: string, src?: string, icon?: string}> = [
     { name: 'email',                value: 'email',             disabled: false },

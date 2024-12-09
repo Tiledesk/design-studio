@@ -41,9 +41,11 @@ export enum TYPE_ACTION {
     BREVO               = 'brevo',
     N8N                 = 'n8n',
     CODE                = 'code',
+    ADD_TAG             = 'add_tags',
     LEAD_UPDATE         = 'leadupdate',
     CLEAR_TRANSCRIPT    = 'clear_transcript',
-    MOVE_TO_UNASSIGNED  = 'move_to_unassigned'
+    MOVE_TO_UNASSIGNED  = 'move_to_unassigned',
+    SEND_WHATSAPP       = 'send_whatsapp'
 }
 
 export enum TYPE_ACTION_VXML {
@@ -62,7 +64,8 @@ export enum TYPE_ACTION_CATEGORY {
     INTEGRATIONS    = 'Integrations',
     SPECIAL         = 'Special',
     NEW             = 'New',
-    VOICE           = 'Voice'
+    VOICE           = 'Voice',
+    "VOICE-TWILIO"  = 'Voice Twilio'
 }
 
 export const ACTION_CATEGORY =[
@@ -72,6 +75,7 @@ export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY['VOICE-TWILIO'], TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.VoiceTwilio',  src: 'assets/images/actions_category/voice.svg'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
 ]
 
@@ -107,6 +111,7 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     EMAIL :                 { name: 'CDSActionList.NAME.SendEmail',             category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.EMAIL,                src:"assets/images/actions/send_email.svg",             status: "active",                       doc: "CDSActionList.DOC.SendEmail"                                      },
     WHATSAPP_STATIC:        { name: 'CDSActionList.NAME.WhatsAppStatic',        category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WHATSAPP_STATIC,      src: "assets/images/actions/whatsapp.svg",              status: "active",                       doc: "CDSActionList.DOC.WhatsAppStatic"                                 },
     WHATSAPP_ATTRIBUTE:     { name: 'CDSActionList.NAME.WhatsAppByAttribute',   category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WHATSAPP_ATTRIBUTE,   src: "assets/images/actions/whatsapp.svg",              status: "active",                       doc: "CDSActionList.DOC.WhatsAppByAttribute"                            },
+    SEND_WHATSAPP:          { name: 'CDSActionList.NAME.SendWhatsapp',          category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.SEND_WHATSAPP,        src: "assets/images/actions/whatsapp.svg",              status: "active",   badge: 'NEW',       doc: ""                                                                 },
     // WHATSAPP_SEGMENT: { name: 'CDSActionList.NAME.WhatsAppBySegment', category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WHATSAPP_SEGMENT, src: "assets/images/actions/whatsapp.svg", status: "active", description: "CDSActionList.DESCRIPTION.WhatsAppBySegment" },
     ASKGPT:                 { name: 'CDSActionList.NAME.AskTheKnowledgeBase',   category: TYPE_ACTION_CATEGORY.AI,                  type: TYPE_ACTION.ASKGPT,               src: "assets/images/actions/ask_to_kb.svg",             status: "inactive",                     doc: "CDSActionList.DOC.AskTheKnowledgeBase",                           },
     ASKGPTV2:               { name: 'CDSActionList.NAME.AskTheKnowledgeBase',   category: TYPE_ACTION_CATEGORY.AI,                  type: TYPE_ACTION.ASKGPTV2,             src: "assets/images/actions/ask_to_kb.svg",             status: "active",                       doc: "CDSActionList.DOC.AskTheKnowledgeBase",                           },
@@ -114,7 +119,8 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     GPT_ASSISTANT:          { name: 'CDSActionList.NAME.GPTAssistant',          category: TYPE_ACTION_CATEGORY.AI,                  type: TYPE_ACTION.GPT_ASSISTANT,        src: "assets/images/actions/openai-assistent.svg",      status: "active",   plan: PLAN_NAME.F,  doc: "CDSActionList.DOC.GPTAssistant",                                  },
     HIDE_MESSAGE:           { name: 'CDSActionList.NAME.HiddenMessage',         category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.HIDE_MESSAGE,         src: "assets/images/actions/hidden_message.svg",        status: "active",                       doc: "CDSActionList.DOC.HiddenMessage",                                 },
     CHANGE_DEPARTMENT:      { name: 'CDSActionList.NAME.ChangeDept',            category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.CHANGE_DEPARTMENT,    src: "assets/images/actions/change_department.svg",     status: "active",                       doc: "CDSActionList.DOC.ChangeDept",                                    },
-    CODE :                  { name: 'CDSActionList.NAME.Code',                  category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.CODE,                 src:"assets/images/actions/code.svg",                   status: "active",   plan: PLAN_NAME.F,  doc: "CDSActionList.DOC.Code",                      disabled: false     },
+    CODE :                  { name: 'CDSActionList.NAME.Code',                  category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.CODE,                 src: "assets/images/actions/code.svg",                  status: "active",   plan: PLAN_NAME.F,  doc: "CDSActionList.DOC.Code",                      disabled: false     },
+    ADD_TAG:                { name: 'CDSActionList.NAME.AddTag',                category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.ADD_TAG,              src: "assets/images/actions/add_tag.svg",               status: "active",                       doc: "CDSActionList.DOC.AddTag",                                        },
     // ASSIGN_FUNCTION: { name: 'CDSActionList.NAME.SetFunction', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY:     { name: 'CDSActionList.NAME.CaptureUserReply',      category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CAPTURE_USER_REPLY,   src: "assets/images/actions/capture_user_reply.svg",    status: "active",                       doc: "CDSActionList.DOC.CaptureUserReply"                               },
     LEAD_UPDATE :           { name: 'CDSActionList.NAME.LeadUpdate',            category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.LEAD_UPDATE,          src:"assets/images/actions/lead_update.svg",            status: "active",                       doc: "CDSActionList.DOC.LeadUpdate"                                     },
@@ -130,6 +136,13 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     BLIND_TRANSFER:         { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     PLAY_PROMPT:            { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     SPEECH_FORM:            { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
-    AUDIO_RECORD:           { name: 'CDSActionList.NAME.AudioRecord',           category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.AUDIO_RECORD,    src:"assets/images/actions-voice/audio_record.svg",     status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 }
+    AUDIO_RECORD:           { name: 'CDSActionList.NAME.AudioRecord',           category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.AUDIO_RECORD,    src:"assets/images/actions-voice/audio_record.svg",     status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+
+    DFTM_FORM_TWILIO:       { name: 'CDSActionList.NAME.DTMFForm',              category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    DTMF_MENU_TWILIO:       { name: 'CDSActionList.NAME.DTMFMenu',              category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    BLIND_TRANSFER_TWILIO:  { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+
 }
 
