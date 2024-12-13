@@ -24,6 +24,20 @@
         </div>
         
     </div>
+
+    <div class="action-row">
+        <div class="action-row-left icon-action">
+            <img src="assets/images/icons/block.svg">
+        </div>
+
+        <div *ngIf="action?.blockName" class="action-row-right"> 
+            {{action.blockName}}
+        </div>
+        <div *ngIf="!action?.blockName" class="action-row-right empty"> 
+            {{'CDSCanvas.ChooseBlock' | translate }}
+        </div>
+        
+    </div>
 </div>
 
 <div *ngIf="!previewMode" class="content-panel-intent-detail">

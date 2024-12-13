@@ -86,6 +86,7 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'callId',                                   value: 'callId',                            description: 'CDSvariablesList.voiceFlowElements.callId.description',                                       src: '', icon:'perm_phone_msg'},
             { name: 'dnis',                                     value: 'dnis',                              description: 'CDSvariablesList.voiceFlowElements.dnis.description',                                         src: '', icon:'perm_phone_msg'},
             { name: 'ani',                                      value: 'ani',                               description: 'CDSvariablesList.voiceFlowElements.ani.description',                                          src: '', icon:'perm_phone_msg'},
+            { name: 'last recorded url',                        value: 'lastRecordedUrl',                   description: 'CDSvariablesList.voiceFlowElements.lastRecordedUrl.description',                              src: '', icon:'audiotrack'},
         ]
     }
 ]
