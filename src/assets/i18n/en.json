@@ -364,6 +364,7 @@
         "ManageGPTKey":"Manage GPT Key",
         "SetHiddenMessage":"Set the hidden message",
         "HiddenMessage":"Hidden message",
+        "HiddenMessageDescription":"Hidden messages are designed to be a useful tool to debug conversations. They are automatically disabled when your chatbot goes public.",
         "EnterAccessToken":"Enter the Access Token",
         "EnterParameters":"Enter parameters",
         "HubspotAccessToken":"Hubspot access token",
@@ -865,7 +866,7 @@
             "AddTag": {
                 "TITLE":"Add a new tag",
                 "DESCRIPTION":"This action allow chatbot to automatically tags a conversation or a contact during the conversation flow",
-                "IMAGE":"assets/images/doc/ADD_TAG.png",
+                "IMAGE":"assets/images/doc/ADD_TAGS.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
@@ -1024,7 +1025,8 @@
             "voiceLanguage":{ "description":"Define the main language for the voice system interpreter" },
             "voiceName":{ "description":"Define the name of the voice chatbot" },
             "event":{ "description":"Every handled event during current call flow" },
-            "lastBlock":{ "description":"The last triggered block heard by the caller" }
+            "lastBlock":{ "description":"The last triggered block heard by the caller" },
+            "lastRecordedUrl": { "description": "The url of the latest recorded audio"}
         }
     },
     "TYPE_GPT_MODEL": {

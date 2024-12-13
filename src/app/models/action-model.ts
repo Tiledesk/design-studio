@@ -172,7 +172,7 @@ export class ActionWebRequest extends Action {
     constructor(){
         super();
         this.url = '';
-        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent": BRAND_BASE_INFO['BRAND_NAME']+" BotRuntime", "Accept":"*/*"};
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent": BRAND_BASE_INFO['BRAND_NAME']+"BotRuntime", "Accept":"*/*"};
         this.jsonBody = JSON.stringify({});
         this.assignTo = '';
         this.assignments = {};
@@ -198,7 +198,7 @@ export class ActionWebRequestV2 extends Action {
     constructor(){
         super();
         this.url = '';
-        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":BRAND_BASE_INFO['BRAND_NAME']+" BotRuntime", "Accept":"*/*"};
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":BRAND_BASE_INFO['BRAND_NAME']+"BotRuntime", "Accept":"*/*"};
         this.settings = { timeout: 20000 }
         this.jsonBody = null
         this.bodyType = 'none'
