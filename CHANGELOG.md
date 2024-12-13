@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.25.0-rc.1
+ **added**: lastRecordedUrl voiceFlow flow variable for action-record
+ 
 # 1.24.0-rc.5
 - **changed**: project-utils rules
 
