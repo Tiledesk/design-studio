@@ -7,9 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.25.0
+
 # 1.25.0-rc.1
  **added**: lastRecordedUrl voiceFlow flow variable for action-record
  
+# 1.24.0
+
 # 1.24.0-rc.5
 - **changed**: project-utils rules
 
@@ -25,6 +29,8 @@
 
 # 1.24.0-rc.1
 - **added**: add_tags action
+
+# 1.23.0
 
 # 1.23.0-rc.5
 - **bug-fixed**: image is not saved in [WHATSAPP RECEIVER]
