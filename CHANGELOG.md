@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.25.0-rc.2
+- **changed**: action-record translations and default values
+
 # 1.25.0-rc.1
  **added**: lastRecordedUrl voiceFlow flow variable for action-record
  
