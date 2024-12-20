@@ -325,7 +325,7 @@
     </div>
 
     <div class="field-box" *ngIf="response.hasOwnProperty('dtmfterm')" style="width: 100%;">
-        <label class="title-label">{{'CDSCanvas.Dtmfterm' | translate}}</label>
+        <label class="title-label">{{'CDSCanvas.TerminateOnDigit' | translate}}</label>
         <cds-toogle
             [checked]="response.dtmfterm"
             [disabled]="false"
@@ -334,7 +334,7 @@
     </div>
 
     <div class="field-box" *ngIf="response.hasOwnProperty('beep')" style="width: 100%;">
-        <label class="title-label">{{'CDSCanvas.Beep' | translate}}</label>
+        <label class="title-label">{{'CDSCanvas.PlayBeep' | translate}}</label>
         <cds-toogle
             [checked]="response.beep"
             [disabled]="false"

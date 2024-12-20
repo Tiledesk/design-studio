@@ -1103,13 +1103,13 @@ export class IntentService {
       commandWait.time = 0;
       action.attributes.commands.push(commandWait);
       let command = new Command(TYPE_COMMAND.MESSAGE);
-      command.message = new Message('text', 'A chat message will be played to the caller');
+      command.message = new Message('text', 'Please, leave a message after the beep');
       action.attributes.commands.push(command);
       let commandWait2 = new Wait();
       commandWait2.time = 0
       action.attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { maxtime: 20, noInputIntent: null, finalsilence: 3, beep: true, dtmfterm: false }
+      command_form.settings = { maxtime: 20, finalsilence: 3, beep: true, dtmfterm: true }
       command_form.subType = TYPE_ACTION_VXML.AUDIO_RECORD
       action.attributes.commands.push(command_form);
     }
