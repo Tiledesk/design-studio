@@ -868,7 +868,7 @@
                 "DESCRIPTION":"This action allow chatbot to automatically tags a conversation or a contact during the conversation flow",
                 "IMAGE":"assets/images/doc/ADD_TAGS.png",
                 "VIDEO_URL":"",
-                "DOC_URL":""
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/tag-action/"
             },
             "Qapla":{
                 "TITLE":"Ask an order status to Qapla'",
