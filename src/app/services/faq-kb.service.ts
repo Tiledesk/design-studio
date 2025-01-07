@@ -109,14 +109,12 @@ export class FaqKbService {
 
 
   public getBotById(id: string): Observable<FaqKb> {
-
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': this.tiledeskToken
       })
     };
-
     let url = this.FAQKB_URL + id;
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY ID - URL', url);
     return this._httpClient.get<FaqKb>(url, httpOptions)

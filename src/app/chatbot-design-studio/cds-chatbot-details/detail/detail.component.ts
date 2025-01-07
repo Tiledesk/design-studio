@@ -89,7 +89,16 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   ngOnChanges() {
     this.logger.log('[CDS-CHATBOT-DTLS] (OnChanges) selectedChatbot ', this.selectedChatbot)
     this.destructureSelectedChatbot(this.selectedChatbot)
+    this.patchAgensAvailable();
   }
+
+
+  private patchAgensAvailable(){
+    if(this.selectedChatbot && this.selectedChatbot.agents_available != false){
+      this.selectedChatbot.agents_available = true;
+    }
+  }
+
 
 
   getDeptsByProjectId() {
@@ -534,7 +543,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.selectedChatbot.agents_available = isAgentsAvailable;
     this.editBot();
   }
-
 
 
 }

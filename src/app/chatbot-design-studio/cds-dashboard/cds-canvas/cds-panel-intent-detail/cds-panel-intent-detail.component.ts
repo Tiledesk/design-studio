@@ -15,7 +15,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   @Output() closePanel = new EventEmitter();
   
   maximize: boolean = false;
-  agents_available: boolean = false;
+  // agents_available: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -23,7 +23,8 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.agents_available = this.intentSelected.agents_available?this.intentSelected.agents_available:false;
+    // this.agents_available = this.intentSelected.agents_available?this.intentSelected.agents_available:true;
+    if(this.intentSelected.agents_available != false) this.intentSelected.agents_available = true;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

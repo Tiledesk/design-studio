@@ -3,7 +3,7 @@ import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
 import { Subject, Subscription } from 'rxjs';
 
-import { checkInternalIntent } from '../../../utils';
+import { checkInternalIntent, TYPE_INTENT_NAME } from '../../../utils';
 import { IntentService } from '../../../services/intent.service';
 // import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
 import { ConnectorService } from '../../../services/connector.service';
@@ -94,6 +94,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isInternalIntent: boolean = false;
   actionIntent: ActionIntentConnected;
   isActionIntent: boolean = false;
+  isAgentsAvailable: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -120,6 +121,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] sto modifico l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
+          this.setAgentsAvailable();
           if (intent['attributesChanged']) {
             this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
             delete intent['attributesChanged'];
@@ -132,6 +134,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             //   return obj._tdActionType !== TYPE_ACTION.INTENT;
             // });
           }
+          
 
 
 
@@ -190,7 +193,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     //setTimeout(() => {
       this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
       // this.patchActionIntent();
-      if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
+      if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
         this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
         this.startAction = this.intent.actions[0];
         // if (!this.startAction._tdActionId) {
@@ -266,8 +269,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         addActionPlaceholderEl.style.opacity = '1';
       }
     }
+    this.setAgentsAvailable();
   }
 
+  private setAgentsAvailable(){
+    if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_START && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+      this.intent.agents_available = true;
+      this.isAgentsAvailable = true;
+    } else {
+      this.isAgentsAvailable = false;
+    }
+  }
 
   ngAfterViewInit() {
     this.logger.log("[CDS-INTENT]  •••• ngAfterViewInit ••••");

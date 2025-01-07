@@ -23,6 +23,8 @@ import { LOGOS_ITEMS } from './../../utils-resources';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
+import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
+
 // const swal = require('sweetalert');
 
 @Component({
@@ -1052,6 +1054,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   onIntentSelected(intent){
+    if (intent.intent_display_name === 'start' || intent.intent_display_name === 'defaultFallback') {
+       return;
+    }  
     this.logger.log('[CDS-CANVAS] onIntentSelected ', intent.intent_id);
     this.closeAllPanels();
     this.removeConnectorDraftAndCloseFloatMenu();
@@ -1059,6 +1064,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.closeActionDetailPanel();
     setTimeout(() => {
       this.elementIntentSelected = intent;
+      if(this.elementIntentSelected){
+
+      }
       this.IS_OPEN_PANEL_INTENT_DETAIL = true;
     }, 0);
   }
