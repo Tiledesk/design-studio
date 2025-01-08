@@ -56,7 +56,7 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
       this.chatbotService.getFaqKbByProjectId().subscribe({ next: (chatbots) => {
         this.logger.log("[ACTION REPLACE BOT] chatbots: ", chatbots);
         //this.bots = bots;
-        this.chatbots_name_list = chatbots.map(a => ({ name: a.name, value: a.name, id: a._id, icon: 'smart_toy'}));
+        this.chatbots_name_list = chatbots.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a._id, icon: 'smart_toy'}));
         resolve(true)
       }, error: (error) => {
         this.logger.error("[ACTION REPLACE BOT] error get bots: ", error);
@@ -98,6 +98,10 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
   onResetBlockSelect(event){
     this.action.blockName = null;
     this.updateAndSaveAction.emit()
+  }
+
+  onChangeCheckbox(event, target){
+    this.action[target] = !this.action[target];
   }
 
 

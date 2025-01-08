@@ -22,7 +22,7 @@
                 <span class="material-icons" *ngIf="item['icon']"
                     [class.intent-start]="item[bindLabelSelect] === 'start'"
                     [class.intent-defaultFallback]="item[bindLabelSelect] === 'defaultFallback'">{{item['icon']}}</span>
-                <span class="label-select">{{item[bindLabelSelect] | translate }}</span>
+                <span class="label-select">{{ item[bindLabelSelect] | translate }}</span>
                 <span *ngIf="optionalBindAdditionalText" class="label-select-option">{{item[optionalBindAdditionalText] | translate }}</span>
             </div>
         </ng-template>

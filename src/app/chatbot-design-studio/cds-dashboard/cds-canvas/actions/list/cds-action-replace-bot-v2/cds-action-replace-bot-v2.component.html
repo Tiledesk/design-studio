@@ -48,11 +48,21 @@
             [items]="chatbots_name_list" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'"
+            [footerButtonText]="action?.nameAsSlug? 'slag': null"
             [searchable]=true
             [clearable]=true
             [itemSelected]="action?.botName" 
             (onSelected)="onChangeSelect($event)">
         </cds-select>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.nameAsSlug"
+                (change)="onChangeCheckbox($event,'nameAsSlug')">
+                {{ 'CDSCanvas.UseChatbotSlug' | translate }}
+            </mat-checkbox>
+        </section>
+
     </div>
 
     <div class="field-box">
