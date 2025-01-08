@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.26.0-rc.2
+- **bug-fixed**: action-replace-bot-v2 not pass value correctly
+
 # 1.26.0-rc.1
 - **added**: slug as chatbot property and action-replace-bot-v2 option when user select a chatbot
 
