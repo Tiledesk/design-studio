@@ -48,7 +48,7 @@
             [items]="chatbots_name_list" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'"
-            [footerButtonText]="action?.nameAsSlug? 'slag': null"
+            [optionalBindDescription]="action.nameAsSlug? 'slug' : null"
             [searchable]=true
             [clearable]=true
             [itemSelected]="action?.botName" 
