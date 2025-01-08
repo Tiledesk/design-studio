@@ -172,7 +172,7 @@ export class ActionWebRequest extends Action {
     constructor(){
         super();
         this.url = '';
-        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent": BRAND_BASE_INFO['BRAND_NAME']+" BotRuntime", "Accept":"*/*"};
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent": BRAND_BASE_INFO['BRAND_NAME']+"BotRuntime", "Accept":"*/*"};
         this.jsonBody = JSON.stringify({});
         this.assignTo = '';
         this.assignments = {};
@@ -198,7 +198,7 @@ export class ActionWebRequestV2 extends Action {
     constructor(){
         super();
         this.url = '';
-        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":"TiledeskBotRuntime", "Accept":"*/*"};
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent":BRAND_BASE_INFO['BRAND_NAME']+"BotRuntime", "Accept":"*/*"};
         this.settings = { timeout: 20000 }
         this.jsonBody = null
         this.bodyType = 'none'
@@ -289,6 +289,15 @@ export class ActionIntentConnected extends Action {
     }
 }
 
+export class ActionConnectBlock extends Action {
+    intentName?: string;
+    json_payload?: Object;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.CONNECT_BLOCK;
+    }
+}
+
 export class ActionEmail extends Action {
     to: string;
     subject: string;
@@ -314,6 +323,18 @@ export class ActionWhatsappStatic extends Action {
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.WHATSAPP_STATIC;
+    }
+}
+
+export class ActionSendWhatsapp extends Action {
+    templateName: string;
+    payload: WhatsappBroadcast;
+    trueIntent: string;
+    falseIntent: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.SEND_WHATSAPP;
+        this.payload = new WhatsappBroadcast();
     }
 }
 
@@ -500,6 +521,11 @@ export class Setting {
     trueIntent?: string;
     falseIntent?: string;
     incompleteSpeechTimeout?: number;
+    maxtime?: number;
+    finalsilence?: number;
+    beep?: boolean = false;
+    dtmfterm?: boolean = true;
+
 }
 
 export class MessageWithWait extends Message {
@@ -623,6 +649,16 @@ export class WhatsappBroadcast {
         name: string;
     }
     receiver_list: Array<any>;
+
+    constructor(){
+        this.id_project = null;;
+        this.phone_number_id = null
+        this.template = {
+            language: null,
+            name: null
+        },
+        this.receiver_list= []
+    }
 }
 
 export class ActionQapla extends Action {
@@ -732,6 +768,16 @@ export class ActionN8n extends Action {
     }
 }
 
+export class ActionAddTags extends Action {
+    tags: string;
+    target: string;
+    pushToList: boolean
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.ADD_TAG;
+    }
+}
+
 export class ActionVoice extends Action {
     text?: string;
     attributes: Attributes;
@@ -752,5 +798,19 @@ export class ActionLeadUpdate extends Action {
         super();
         this._tdActionType = TYPE_ACTION.LEAD_UPDATE;
         this.update = {};
+    }
+}
+
+export class ActionClearTranscript extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.CLEAR_TRANSCRIPT;
+    }
+}
+
+export class ActionMoveToUnassigned extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
     }
 }

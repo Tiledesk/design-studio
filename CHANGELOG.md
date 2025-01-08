@@ -7,6 +7,80 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.25.0-rc.2
+- **changed**: action-record translations and default values
+
+# 1.25.0-rc.1
+ **added**: lastRecordedUrl voiceFlow flow variable for action-record
+ 
+# 1.24.0-rc.5
+- **changed**: project-utils rules
+
+# 1.24.0-rc.4
+- **added**: info for default values in action replace-bot and action capture-user-reply
+- **changed**: default avatar for chatbot
+
+# 1.24.0-rc.3
+- **bug-fixed**: minor fix
+
+# 1.24.0-rc.2
+- **added**: voice-twilio action category
+
+# 1.24.0-rc.1
+- **added**: add_tags action
+
+# 1.23.0-rc.5
+- **bug-fixed**: image is not saved in [WHATSAPP RECEIVER]
+- **changed**: maxRow increased askgpt-v2 and gpt-task actions
+
+# 1.23.0-rc.4
+- **added**: success/else connectors in send-whatsapp action
+
+# 1.23.0-rc.3
+- **bug-fixed**: project_id is undefined in send-whatsapp action
+
+# 1.23.0-rc.2
+- **added**: send-whatsapp action
+
+# 1.23.0-rc.1
+- **bug-fixed**: managed right/left swipe to prevend back/next page load
+
+# 1.22.1
+# 1.22.0
+
+# 1.22.0-rc.4
+- **added**: uploaded control in audio base element
+
+# 1.22.0-rc.3
+- **bug-fixed**: minor fix action gpt-task on preview
+
+# 1.22.0-rc.2
+- **added**: fileUploadAccept env variable
+- **added**: uploaded control after file is loaded
+
+# 1.22.0-rc.1
+- **added**: role guard to main root 
+
+# 1.21.1
+- **bug-fixed**: minor improvements
+
+# 1.21.0
+
+# 1.21.0-rc.16
+- **added**: doc for new actions
+
+# 1.21.0-rc.15
+- **added**: image preload resolve for doc images
+- **changed**: info-tooltip doc component UI
+
+# 1.21.0-rc.14
+-  **added**: changed: min value for max_tokens if citations checkbox is enabled
+
+# 1.21.0-rc.13
+-  **added**: 'connect_block', 'move_to_unassigned' and 'clear_transcript' actions
+-  **added**: chatbot_id system-defined variable
+-  **added**: enable 'connect_block' action only if present in project.profile
+
 # 1.21.0-rc.12
 -  **added**: formatType checkbox in action gpt-task
 -  **added**: citations in action askkbv2

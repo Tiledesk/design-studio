@@ -61,7 +61,7 @@
   }
 
   &.outline-border {
-    outline: 2px solid #6c6859;
+    outline: 2px solid var(--brown);
     border-radius: var(--base-border-radius-preview);
   }
 
@@ -413,7 +413,7 @@
   align-self: start;
   color: #718497;
   opacity: .85;
-  background: #6c6859;
+  background: var(--brown);
 }
 
 .label-action {
@@ -660,7 +660,7 @@ cds-panel-intent-header.isStart ::ng-deep{
   width: 100%;
   min-height: 30px;
   border-radius: 10px;
-  border: 1px solid #6c6859;
+  border: 1px solid var(--brown);
   padding: 12px 6px;
   border-style: dashed;
   // background: rgba(62, 169, 245, 0.1);
@@ -668,13 +668,13 @@ cds-panel-intent-header.isStart ::ng-deep{
 }
 
 .add--action-placeholder-add-icon span {
-  color: #6c6859;
+  color: var(--brown);
   font-size: 30px;
 }
 
 .add--action-placeholder-text {
   font-weight: 400;
-  color: #6c6859;
+  color: var(--brown);
   font-size: 14px;
   text-align: center;
 }

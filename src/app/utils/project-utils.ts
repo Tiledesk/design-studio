@@ -24,7 +24,11 @@ export class ProjectPlanUtils {
     ){ 
         this.project = this.projectService.getCurrentProject();
         this.checkIfKBSCanLoad();
+        this.checkActionCanShowInFT('GPT', TYPE_ACTION.GPT_TASK)
+        this.checkActionCanShowInFT('GPT', TYPE_ACTION.GPT_ASSISTANT)
         this.checkIfActionCategoryIsInProject(TYPE_ACTION_CATEGORY.VOICE);
+        this.checkIfActionCategoryIsInProject(TYPE_ACTION_CATEGORY['VOICE-TWILIO']);
+        this.checkActionCanShow(TYPE_ACTION.CONNECT_BLOCK)
     }
 
     public checkIfCanLoad(actionType: TYPE_ACTION | TYPE_ACTION_VXML, actionPlanAvailability: PLAN_NAME): boolean{
@@ -131,27 +135,26 @@ export class ProjectPlanUtils {
     }
 
     public checkIfActionCategoryIsInProject(actionType: TYPE_ACTION_CATEGORY){
-        
         let categoryKey = getKeyByValue(actionType, TYPE_ACTION_CATEGORY).toLowerCase();
         this.logger.log('[PROJECT_PROFILE] checkIfActionCategoryIsInProject -->', actionType, categoryKey, this.project)
         if (this.project.profile['customization'] === undefined){
             // ------------------------------------------------------------------------ 
             // USECASE: customization obj not exist
             // ------------------------------------------------------------------------
-            this.hideActionType(actionType);
+            this.hideActionCategory(actionType);
             return;
         } else if(this.project.profile['customization'] && this.project.profile['customization'][categoryKey] === undefined){
             // ------------------------------------------------------------------------ 
             // USECASE: customization obj exist AND customization.[actionType] obj not exist
             // ------------------------------------------------------------------------
-            this.hideActionType(actionType);
+            this.hideActionCategory(actionType);
             return;
         } else if(this.project.profile['customization'] && this.project.profile['customization'][categoryKey] !== undefined){
             // ------------------------------------------------------------------------ 
             // USECASE: customization obj AND customization.[actionType] obj exists
             // ------------------------------------------------------------------------
             if(this.project.profile['customization'][categoryKey]===false){
-                this.hideActionType(actionType);
+                this.hideActionCategory(actionType);
                 return true
             }
             return;
@@ -166,28 +169,8 @@ export class ProjectPlanUtils {
         this.logger.log('[PROJECT_PROFILE] checkIfCategoryCanLoad -->', this.project);
 
         // --1: check into env
-        let public_Key = this.appConfigService.getConfig().t2y12PruGU9wUtEGzBJfolMIgK;
-        let keys = public_Key.split("-");
-        this.logger.log('[PROJECT_PROFILE] checkIfCategoryCanLoad keys -->', keys);
-        if (public_Key.includes("KNB") === true) {
-            keys.forEach(key => {
-                // this.logger.log('NavbarComponent public_Key key', key)
-                if (key.includes("KNB")) {
-                    // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - key', key);
-                    let tow = key.split(":");
-                    // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt key&value', mt);
-                    if (tow[1] === "F") {
-                        this.hideActionType(TYPE_ACTION_CATEGORY.AI)
-                        return;
-                    }
-                }
-            });
-    
-        }else {
-            this.logger.log('[PROJECT_PROFILE] keys KNB not exist', keys);
-            this.hideActionType(TYPE_ACTION_CATEGORY.AI)
-            return;
-        }
+        this.checkActionCanShowInFT('KNB', TYPE_ACTION.ASKGPT);
+        this.checkActionCanShowInFT('KNB', TYPE_ACTION.ASKGPTV2);
 
 
         // --2: check into PROJECT PROFILE
@@ -208,21 +191,28 @@ export class ProjectPlanUtils {
             // USECASE: customization obj AND customization.knowledgeBases obj exists with FALSE value
             // ------------------------------------------------------------------------
             if(this.project.profile['customization']['knowledgeBases'] === false){
-                this.hideActionType(TYPE_ACTION_CATEGORY.AI)
+                this.hideAction(TYPE_ACTION.ASKGPT)
+                this.hideAction(TYPE_ACTION.ASKGPTV2)
             }else if(this.project.profile['customization']['knowledgeBases']){
                 // ------------------------------------------------------------------------ 
                 // USECASE: customization obj AND customization.knowledgeBases obj exists with TRUE value
                 // ------------------------------------------------------------------------
                 if(this.project.profile['quotes'] && this.project.profile['quotes']['kbs']){
-                    this.project.profile['quotes']['kbs'] === 0?  this.hideActionType(TYPE_ACTION_CATEGORY.AI): null;
+                    this.project.profile['quotes']['kbs'] === 0?  this.hideAction(TYPE_ACTION.ASKGPTV2): null;
                 }
             }
             return;
         }
     }
 
-    private hideActionType(actionType: TYPE_ACTION_CATEGORY){
+    /** hide action by 
+     *  1. CATEGORY TYPE
+     *  2. ACTION LIST
+     *  3. ATTRIBUTE LIST ASSOCIATED WITH
+     */
+    private hideActionCategory(actionType: TYPE_ACTION_CATEGORY){
         this.logger.log('[PROJECT_PROFILE] hideActionType', actionType);
+        
         //MANAGE ACTION CATEGORIES
         let index = ACTION_CATEGORY.findIndex(el => el.type === getKeyByValue(actionType, TYPE_ACTION_CATEGORY));
         if(index > -1){
@@ -240,8 +230,68 @@ export class ProjectPlanUtils {
                 variableList.splice(index,1)
             }
         }
+    }
 
+    /** hide action by 
+     *  1. ACTION LIST
+     *  2. if no ACTION of same type exist, remove CTEGORY
+     */
+    private hideAction(action: TYPE_ACTION | TYPE_ACTION_VXML){
+        let actionType: TYPE_ACTION_CATEGORY = Object.values(ACTIONS_LIST).find(el => el.type == action).category
 
+        Object.values(ACTIONS_LIST).filter(el => el.type == action).map( el => el.status = 'inactive')
+
+        //MANAGE ACTION CATEGORIES
+        let actions = Object.values(ACTIONS_LIST).filter(el => (el.category == actionType && el.status === 'active'))
+        if(actions.length === 0){
+            let index = ACTION_CATEGORY.findIndex(el => el.type === getKeyByValue(actionType, TYPE_ACTION_CATEGORY));
+            if(index > -1){
+                ACTION_CATEGORY.splice(index,1)
+            }
+        }
+    }
+
+    /** CHECK IF ACTION IS IN 'customization' 
+     * IF NOT: 
+     *  --- remove action type from list 
+     */
+    private checkActionCanShow(action: TYPE_ACTION | TYPE_ACTION_VXML){
+        let status = this.checkIfIsEnabledInProject(action)
+        if(!status){
+            this.hideAction(action)
+        }
+    }
+
+    /** CHECK IF ACTION IS IN 'feature-token' 
+     * IF NOT: 
+     *  --- remove action type from list 
+     */
+    private checkActionCanShowInFT(feature: string, action: TYPE_ACTION | TYPE_ACTION_VXML){
+        this.logger.log('[PROJECT_PROFILE] checkIfCategoryCanLoad -->', feature, action);
+        let status = true;
+        // --1: check into env
+        let public_Key = this.appConfigService.getConfig().t2y12PruGU9wUtEGzBJfolMIgK;
+        let keys = public_Key.split("-");
+        this.logger.log('[PROJECT_PROFILE] checkIfCategoryCanLoad keys -->', keys);
+        if (public_Key.includes(feature) === true) {
+            keys.forEach(key => {
+                // this.logger.log('NavbarComponent public_Key key', key)
+                if (key.includes(feature)) {
+                    // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - key', key);
+                    let tow = key.split(":");
+                    // this.logger.log('PUBLIC-KEY (TRY_ON_WA) - mt key&value', mt);
+                    if (tow[1] === "F") {
+                        this.hideAction(action)
+                        return;
+                    }
+                }
+            });
+    
+        }else {
+            this.logger.log('[PROJECT_PROFILE] keys KNB not exist', keys);
+            this.hideAction(action)
+            return;
+        }
     }
 
 }

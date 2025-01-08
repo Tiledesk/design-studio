@@ -15,6 +15,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
+import { checkAcceptedFile, filterImageMimeTypesAndExtensions } from '../../utils';
 const swal = require('sweetalert');
 
 @Component({
@@ -37,6 +38,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
   selectedFiles: FileList;
   isFilePendingToUpload = false;
+  fileUploadAccept: string;
   // botProfileImageurl: string;
   // timeStamp: any;
 
@@ -66,6 +68,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   selected_dept_id: string;
   selected_dept_name: string;
   user: UserModel
+  imageURL: string;
 
 
   private logger: LoggerService = LoggerInstance.getInstance()
@@ -82,7 +85,8 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
   ngOnInit(): void {
     this.getDeptsByProjectId();
-    this.user = this.tiledeskAuthService.getCurrentUser()
+    this.user = this.tiledeskAuthService.getCurrentUser();
+    this.fileUploadAccept = filterImageMimeTypesAndExtensions(this.appConfigService.getConfig().fileUploadAccept).join(',');
     // this.checkBotImageUploadIsComplete();
   }
 
@@ -262,7 +266,10 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     if (this.selectedChatbot._id) {
       let url = this.imageRepoService.getImagePhotoUrl(this.selectedChatbot._id)
       this.checkImageExists(url, (existImage)=> {
-        existImage? this.selectedChatbot.imageURL = url: null; 
+        if(existImage){
+          this.selectedChatbot.imageURL = url; 
+          this.imageURL = url
+        }
       })
     }
 
@@ -394,7 +401,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   //   this.timeStamp = new Date().getTime();
   // }
 
-  // getBotProfileImage(): SafeUrl {
+ // getBotProfileImage(): SafeUrl {
   //   if (this.timeStamp) {
   //     return this.sanitizer.bypassSecurityTrustUrl(this.botProfileImageurl + '&' + this.timeStamp);
   //   }
@@ -426,6 +433,14 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
 
       const that = this;
       if (event.target.files && event.target.files[0]) {
+
+        const canUploadFile = checkAcceptedFile(event.target.files[0].type, this.fileUploadAccept)
+        if(!canUploadFile){
+          this.logger.error('[IMAGE-UPLOAD] detectFiles: can not upload current file type--> NOT ALLOWED', this.fileUploadAccept)
+          this.isFilePendingToUpload = false;
+          return;
+        }
+        
         const nameFile = event.target.files[0].name;
         const typeFile = event.target.files[0].type;
         const reader = new FileReader();
@@ -467,13 +482,15 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     that.logger.debug('[IMAGE-UPLOAD] AppComponent::uploadSingle::', file);
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
-    
+    this.imageURL = null;
     this.uploadService.uploadProfile(this.selectedChatbot._id, currentUpload).then(downloadURL => {
       that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
 
       let url = this.imageRepoService.getImagePhotoUrl(this.selectedChatbot._id)
       this.checkImageExists(url, (existImage)=> {
-        existImage? this.selectedChatbot.imageURL = url: null; 
+        let timestamp = new Date().getTime();
+        existImage? this.imageURL  = url +  '&' + timestamp : null; 
+        this.selectedChatbot.imageURL = url;
       })
       that.isFilePendingToUpload = false;
       // return downloadURL;
@@ -496,6 +513,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.uploadService.deleteProfile(this.selectedChatbot._id, this.selectedChatbot.imageURL).then((result)=>{
       // this.botProfileImageExist = false;
       this.selectedChatbot.imageURL = null
+      this.imageURL = null;
       const delete_bot_image_btn = <HTMLElement>document.querySelector('#cds-delete-bot-img-btn');
       delete_bot_image_btn.blur();
     }).catch((error)=> {

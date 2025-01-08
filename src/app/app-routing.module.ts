@@ -22,7 +22,8 @@ const routes: Routes = [
 
   { path: 'project/:projectid/chatbot/:faqkbid', 
     loadChildren: () => import('./chatbot-design-studio/cds-dashboard/cds-dashboard.module').then( m => m.CdsDashboardModule),
-    canActivate:[AuthGuard, RoleGuard]
+    canActivate:[AuthGuard, RoleGuard],
+    data: [ { roles: ['owner', 'admin']}]
   },
 
     // Wildcard route for a 404 page

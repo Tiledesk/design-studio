@@ -1,0 +1,9 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+    <div class="action-row">
+        <label class="action-row-right">{{'CDSCanvas.CLEAR_TRANSCRIPT' | translate }}</label>
+    </div>
+</div>
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail">
+    <div class="action-description" [innerHTML]="actions['CLEAR_TRANSCRIPT']?.doc+'.DESCRIPTION' | translate"></div>
+</div>

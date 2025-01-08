@@ -25,6 +25,7 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'project_id',                               value: 'project_id',                        description: 'CDSvariablesList.systemDefinedElements.project_id.description',                               src: '', icon: 'domain' },
             { name: 'last_message_id',                          value: 'last_message_id',                   description: 'CDSvariablesList.systemDefinedElements.last_message_id.description',                          src: '', icon: 'textsms' },
             { name: 'conversation_id',                          value: 'conversation_id',                   description: 'CDSvariablesList.systemDefinedElements.conversation_id.description',                          src: '', icon: 'textsms' },
+            { name: 'chatbot_id',                               value: 'chatbot_id',                        description: 'CDSvariablesList.systemDefinedElements.chatbot_id.description',                               src: '', icon: 'person' },
             { name: 'chatbot_name',                             value: 'chatbot_name',                      description: 'CDSvariablesList.systemDefinedElements.chatbot_name.description',                             src: '', icon: 'person' },
             { name: 'chatbot_token',                            value: 'chatbotToken',                      description: 'CDSvariablesList.systemDefinedElements.chatbotToken.description',                             src: '', icon: 'key' },
             { name: 'user_id',                                  value: 'user_id',                           description: 'CDSvariablesList.systemDefinedElements.user_id.description',                                  src: '', icon: 'person' },
@@ -85,10 +86,19 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'callId',                                   value: 'callId',                            description: 'CDSvariablesList.voiceFlowElements.callId.description',                                       src: '', icon:'perm_phone_msg'},
             { name: 'dnis',                                     value: 'dnis',                              description: 'CDSvariablesList.voiceFlowElements.dnis.description',                                         src: '', icon:'perm_phone_msg'},
             { name: 'ani',                                      value: 'ani',                               description: 'CDSvariablesList.voiceFlowElements.ani.description',                                          src: '', icon:'perm_phone_msg'},
+            { name: 'last recorded url',                        value: 'lastRecordedUrl',                   description: 'CDSvariablesList.voiceFlowElements.lastRecordedUrl.description',                              src: '', icon:'audiotrack'},
         ]
     }
 ]
 
+export var tagsList: Array<{key: string, elements: Array<any>}> = [ 
+    {   key: 'request',
+        elements: []
+    },
+    {   key: 'lead',
+        elements: []
+    }
+];
 
 export const leadPropertyList: Array<{ name: string, value: string, disabled: boolean, description?: string, src?: string, icon?: string}> = [
     { name: 'email',                value: 'email',             disabled: false },

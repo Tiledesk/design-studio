@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MaterialModule } from 'src/app/shared/material.module';
 import { HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Resolve, RouterModule, Routes } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
 import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/change-bot-lang.component';
@@ -32,12 +32,14 @@ import { PanelIntentControlsComponent } from './cds-intent/panel-intent-controls
 import { PanelIntentHeaderComponent } from './cds-intent/panel-intent-header/panel-intent-header.component';
 import { CdsVoiceActionsModule } from './actions/list-voice/cds-voice-actions.module';
 import { PreloadBarComponent } from 'src/app/chatbot-design-studio/cds-base-element/preload-bar/preload-bar.component';
+import { ImagePreloaderResolver } from 'src/app/resolver/image.resolver';
 
 
 const routes: Routes = [
   {
     path: '',
     component: CdsCanvasComponent,
+    resolve: { images: ImagePreloaderResolver}
   }
 ];
 

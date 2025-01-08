@@ -327,14 +327,17 @@
         "AssignTo":"Assign to",
         "SelectAttribute":"Select attribute",
         "SelectOperator":"Select a operator",
-        "HumanHandOver":"Human hand over",
+        "TransferToAHuman":"Transfer to a human",
         "CaptureUserReplyTo":"Capture user reply to",
         "AssignUserReplyTo":"Assign user reply to",
+        "AssignUserReplyDescription":"Awaits for the user reply and automatically assign it to the selected attribute. If no attribute is selected the reply is automatically assigned to lastUserText",
         "Optional": "(Optional)",
         "ThenGoToBlock":"Then go to block",
         "SelectADepartment":"Select a department",
         "ChooseADepartment":"Choose a department",
         "END":"END",
+        "CLEAR_TRANSCRIPT":"CLEAR TRANSCRIPT",
+        "MOVE_TO_UNASSIGNED":"MOVE TO UNASSIGNED",
         "ClickToAddCodeSource":"Click to add code source ...",
         "Code":"Code",
         "EnterYourCode":"Enter your code",
@@ -346,7 +349,7 @@
         "ChunkLimit":"Chunk limit",
         "SystemContext":"System context",
         "AdvancedContext":"Advanced context",
-        "AdvancedContextDesctiption":"Here you have the most control. be careful, the native prompt is completely overwritten. if you want to use the native 'else' connector you need to make sure to instruct your prompt to respond with &lt;NOANS&gt; when it doesn't find a satisfactory answer and always close with {context}. <br><br> E.g. You are a consultant ... &lt;NOANS&gt; {context}",
+        "AdvancedContextDesctiption":"Here you have the most control. Be careful, the native prompt is completely overwritten. If you want to use the native 'else' connector you need to make sure to instruct your prompt to respond with <NOANS> when it doesn't find a satisfactory answer and always close with {context}. <br><br> E.g. You are a consultant ... &lt;NOANS&gt; {context}",
         "YouAreAwesomeAssistant":"You are an awesome assistant",
         "Preview":"Preview",
         "AnswerPreview":"Answer preview",
@@ -361,6 +364,7 @@
         "ManageGPTKey":"Manage GPT Key",
         "SetHiddenMessage":"Set the hidden message",
         "HiddenMessage":"Hidden message",
+        "HiddenMessageDescription":"Hidden messages are designed to be a useful tool to debug conversations. They are automatically disabled when your chatbot goes public.",
         "EnterAccessToken":"Enter the Access Token",
         "EnterParameters":"Enter parameters",
         "HubspotAccessToken":"Hubspot access token",
@@ -395,6 +399,7 @@
         "Result":"Result",
         "Error":"Error",
         "ChooseBot":"Choose a bot",
+        "ChooseBlock":"Choose a block",
         "ChooseBlockDescription":"Automatically execute this block when this chatbot joins the conversation",
         "ExecuteBlock":"Execute block",
         "ThisRequestNoBody":"This request does not have a body",
@@ -447,6 +452,10 @@
         "NoMatch":"No match",
         "NoInput":"No input",
         "IncompleteSpeechTimeout":"Incomplete Speech Timeout",
+        "MaxTime":"Max time",
+        "FinalSilence":"Final silence",
+        "TerminateOnDigit":"Terminate on digit",
+        "PlayBeep":"Play a beep",
         "RequestTimeout":"Request timeout",
         "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. Admitted values range: 1-300k ms",
         "AudioFileAllowed":"You can only upload *.wav audio format with mono, 8 KHz, with PCM 8bit, PCM 16bit, Alaw or uLaw coding",
@@ -454,6 +463,11 @@
         "CurrentDepartment": "Current department",
         "SelectedDepartment": "Selected Department",
         "CheckAgentsAvailability":"Check agents availability",
+        "Target":"Target",
+        "Conversation":"Conversation",
+        "Contact":"Contact",
+        "TagsTypingAliasPlaceholder":"tag1, tag2, tag3",
+        "TagsTypingAliasDescription":"Please set a comma separated list of tags that the user can type to tag a conversation or a contact ",
         "UpdateProperty":"Update property",
         "SelectProperty":"Select property",
         "CheckOperatingHours":"Check operating hours",
@@ -466,7 +480,10 @@
         "intentsComplete": "Intents loading completed",
         "connectorsProgress": "Loading connectors in progress",
         "connectorsComplete": "Connectors loading completed",
-        "loadingCompleteWithErrors":"Loading completed with errors"
+        "loadingCompleteWithErrors":"Loading completed with errors",
+        "PushTagsToList":"Push to tags List",
+        "PushTagsToListDescription":"Check this option if you want to add tags to global list.",
+        "ViewList":"View list"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -537,7 +554,8 @@
         "Flow":"Flow",
         "Integrations":"Integrations",
         "Special":"Special",
-        "Voice":"Voice"
+        "Voice":"Voice",
+        "VoiceTwilio":"Voice Twilio"
     },
     "CDSOperatorList":{
         "equalAsNumbers":"equal As Numbers",
@@ -583,7 +601,7 @@
             "Reply":"Reply",
             "ReplyV2":"Advanced reply",
             "RandomReply":"Random reply",
-            "AgentHandoff":"Agent handoff",
+            "AgentHandoff":"Transfer to a human",
             "Close":"Close",
             "IfOperatingHours":"If operating hours",
             "IfOnlineAgent":"If online agents",
@@ -594,7 +612,6 @@
             "DeleteAttribute":"Delete attribute",
             "ReplaceBot":"Replace bot",
             "Wait":"Wait",
-            "LeadUpdate":"Lead update",
             "WebRequest":"Web request",
             "SendEmail":"Send email",
             "WhatsAppStatic":"WhatsApp static",
@@ -609,79 +626,86 @@
             "Code":"Code",
             "SetFunction":"Set function",
             "CaptureUserReply":"Capture user reply",
+            
+            "LeadUpdate":"Lead update",
+            "ClearTranscript":"Clear transcript",
+            "MoveToUnassigned":"Move to unassigned",
             "Qapla":"Qapla'",
             "Make":"Make",
             "Hubspot":"Hubspot",
             "Customerio":"Customer.io",
             "Brevo":"Brevo",
             "N8n":"n8n",
+            "AddTag":"Add tag",
             "DTMFForm":"DTMF form",
             "DTMFMenu":"DTMF menu",
             "BlindTransfer": "Blind transfer",
             "PlayPrompt":"Play prompt",
-            "SpeechForm":"Speech form"
+            "SpeechForm":"Speech form",
+            "AudioRecord":"Audio record",
+            "SendWhatsapp":"Send Whatsapp"
         },
         "DOC": {
             "Reply":{
                 "TITLE":"Send a message back to the user",
                 "DESCRIPTION":"This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/REPLY.png",
+                "IMAGE":"assets/images/doc/REPLY.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/reply-action/"
             },
             "ReplyV2":{
                 "TITLE":"Advanced reply management with input timeout and no-match",
                 "DESCRIPTION":"This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc.",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/REPLY.png",
+                "IMAGE":"assets/images/doc/REPLY.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/reply-action/"
             },
             "RandomReply":{
                 "TITLE":"Random messages in a set",
                 "DESCRIPTION":"This action sends back randomly selected messages choosen from a static set",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/RANDOM_REPLY.png",
+                "IMAGE":"assets/images/doc/RANDOM_REPLY.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "AgentHandoff":{
-                "TITLE":"Human handoff",
+                "TITLE":"Transfer to a human",
                 "DESCRIPTION":"This action removes the chatbot from the conversation and moves the flow to a human",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/AGENT.png",
+                "IMAGE":"assets/images/doc/AGENT.png",
                 "VIDEO_URL":"",
-                "DOC_URL":""
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/agent-handoff-action/"
             },
             "Close":{
                 "TITLE":"Close the conversation",
                 "DESCRIPTION":"This action closes the current conversation",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CLOSE.png",
+                "IMAGE":"assets/images/doc/CLOSE.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "IfOperatingHours":{
                 "TITLE":"Check opening hours",
                 "DESCRIPTION":"This action checks if the current time is included in some operating hours slot",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/OPEN_HOURS.png",
+                "IMAGE":"assets/images/doc/OPEN_HOURS.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "IfOnlineAgent":{
                 "TITLE":"Check online agents",
                 "DESCRIPTION":"This action checks if there is an available agent in the current department",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/ONLINE_AGENTS.png",
+                "IMAGE":"assets/images/doc/ONLINE_AGENTS.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/the-if-online-agent-action-and-its-role-in-conversation-design/"
             },
             "Condition":{
                 "TITLE":"Condition based branching",
                 "DESCRIPTION":"This action allows branching based on the specified condition",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CONDITION.png",
+                "IMAGE":"assets/images/doc/CONDITION.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "ConditionElse":{
                 "TITLE":"Condition with else branch",
                 "DESCRIPTION":"This action allows branching based on the specified condition with true/false branches",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/JSON_CONDITION.png",
+                "IMAGE":"assets/images/doc/JSON_CONDITION.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
@@ -695,56 +719,56 @@
             "SetAttribute":{
                 "TITLE":"Create or modify a flow attribute",
                 "DESCRIPTION":"With this action you can set the value of a flow attribute or change his type",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/ASSIGN_VARIABLE.png",
+                "IMAGE":"assets/images/doc/ASSIGN_VARIABLE.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "DeleteAttribute":{
                 "TITLE":"Delete a flow attribute",
                 "DESCRIPTION":"With this action you can remove the specified attribute",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/DELETE_VARIABLE.png",
+                "IMAGE":"assets/images/doc/DELETE_VARIABLE.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "ReplaceBot":{
                 "TITLE":"Replace the current bot with another one",
                 "DESCRIPTION":"Replaces the current chatbot with the specied one",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/REPLACE_BOT.png",
+                "IMAGE":"assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
             },
             "Wait":{
                 "TITLE":"Wait before next action",
                 "DESCRIPTION":"Wait the specified amount of time before moving to the next action",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/WAIT.png",
+                "IMAGE":"assets/images/doc/WAIT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "WebRequest":{
                 "TITLE":"Invoke HTTP services",
                 "DESCRIPTION":"Configure and invoke a remote REST API",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/WEB_REQUESTV2.png",
+                "IMAGE":"assets/images/doc/WEB_REQUESTV2.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/web-request-action/"
             },
             "SendEmail":{
                 "TITLE":"Send email",
                 "DESCRIPTION":"Sends an email with the specified fields",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/EMAIL.png",
+                "IMAGE":"assets/images/doc/EMAIL.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/how-the-send-email-action-works/"
             },
             "WhatsAppStatic":{
                 "TITLE":"Send whatsapp message",
                 "DESCRIPTION":"Used to configure a Whatsapp message using a template and use the JSON to send massive Whatsapp messages",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/WHATSAPP_STATIC.png",
+                "IMAGE":"assets/images/doc/WHATSAPP_STATIC.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/#use-the-fast-prototyping-trick-to-generate-the-request-payload"
             },
             "WhatsAppByAttribute":{
                 "TITLE":"Used to send multi Whatsapp messages",
                 "DESCRIPTION":"Used to send massive whatsapp messages using a flow",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/WHATSAPP_ATTRIBUTE.png",
+                "IMAGE":"assets/images/doc/WHATSAPP_ATTRIBUTE.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/"
             },
@@ -755,45 +779,52 @@
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
+            "SendWhatsApp":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
             "AskTheKnowledgeBase":{
                 "TITLE":"Prompt the KB",
                 "DESCRIPTION":"This action prompts the selected knowledge base to find the best suitable answer from the uploaded contents",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/ASKGPT.png",
+                "IMAGE":"assets/images/doc/ASKGPT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/"
             },
             "GPTTask":{
                 "TITLE":"ChatGPT Prompt",
                 "DESCRIPTION":"This action prompts chatGPT",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/GPT_TASK.png",
+                "IMAGE":"assets/images/doc/GPT_TASK.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "GPTAssistant":{
                 "TITLE":"Prompt OpenAI Assistants",
                 "DESCRIPTION":"This action allows you to prompt the connected OpenAI Assistant",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/GPT_ASSISTANT.png",
+                "IMAGE":"assets/images/doc/GPT_ASSISTANT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/chatgpt-assistant-action-beta/"
             },
             "HiddenMessage":{
                 "TITLE":"Send an hidden message (for the end user)",
                 "DESCRIPTION":"Send a hidden message in the current conversation",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/HIDE_MESSAGE.png",
+                "IMAGE":"assets/images/doc/HIDE_MESSAGE.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "ChangeDept":{
                 "TITLE":"Chage the department",
                 "DESCRIPTION":"Change the current conversation department",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CHANGE_DEPARTMENT.png",
+                "IMAGE":"assets/images/doc/CHANGE_DEPARTMENT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "Code":{
                 "TITLE":"Execute a code snippet",
                 "DESCRIPTION":"Execute this code snippet (Nodejs)",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CODE.png",
+                "IMAGE":"assets/images/doc/CODE.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/code-action/"
             },
@@ -807,56 +838,77 @@
             "CaptureUserReply":{
                 "TITLE":"Capture the user reply",
                 "DESCRIPTION":"Wait until user replies, then capture and save the user reply in the specified attribute",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CAPTURE_USER_REPLY.png",
+                "IMAGE":"assets/images/doc/CAPTURE_USER_REPLY.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/capture-user-reply-action/"
             },
             "LeadUpdate":{
                 "TITLE":"Update lead data",
                 "DESCRIPTION":"Update the current lead (the end-user) in the conversation with the specified values",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/LEAD_UPDATE.png",
+                "IMAGE":"assets/images/doc/LEAD_UPDATE.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
+            },
+            "ClearTranscript":{
+                "TITLE":"Clear the chat transcript",
+                "DESCRIPTION":"",
+                "IMAGE":"assets/images/doc/CLEAR_TRANSCRIPT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/reset-transcript-action/"
+            },
+            "MoveToUnassigned":{
+                "TITLE":"Move chat to unassigned",
+                "DESCRIPTION":"",
+                "IMAGE":"assets/images/doc/MOVE_TO_UNASSIGNED.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/move-to-unassigned-action/"
+            },
+            "AddTag": {
+                "TITLE":"Add a new tag",
+                "DESCRIPTION":"This action allow chatbot to automatically tags a conversation or a contact during the conversation flow",
+                "IMAGE":"assets/images/doc/ADD_TAGS.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/tag-action/"
             },
             "Qapla":{
                 "TITLE":"Ask an order status to Qapla'",
                 "DESCRIPTION":"Query the remove Qapla' service",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/QAPLA.png",
+                "IMAGE":"assets/images/doc/QAPLA.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/qapla-integration/"
             },
             "Make":{
                 "TITLE":"Invoke Make.com webhook",
                 "DESCRIPTION":"Invoke the wemote Make webhook",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/MAKE.png",
+                "IMAGE":"assets/images/doc/MAKE.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/makecom-action/"
             },
             "Hubspot":{
                 "TITLE":"Hubspot CRM",
                 "DESCRIPTION":"Send lead data to Hubspot",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/HUBSPOT.png",
+                "IMAGE":"assets/images/doc/HUBSPOT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/hubspot-action/"
             },
             "Customerio":{
                 "TITLE":"Customer.io CRM",
                 "DESCRIPTION":"Send lead data to Customer.io",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/CUSTOMERIO.png",
+                "IMAGE":"assets/images/doc/CUSTOMERIO.png",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
             "Brevo":{
                 "TITLE":"Brevo CRM",
                 "DESCRIPTION":"Send lead data to Brevo",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/BREVO.png",
+                "IMAGE":"assets/images/doc/BREVO.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/brevo-action/"
             },
             "N8n":{
                 "TITLE":"Invoke n8n webhook",
                 "DESCRIPTION":"Invoke the wemote n8n webhook",
-                "IMAGE":"https://assets-tiledesk.s3.eu-west-1.amazonaws.com/images/cds-actions/N8N.png",
+                "IMAGE":"assets/images/doc//N8N.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/n8nio-action/"
             },
@@ -894,7 +946,15 @@
                 "IMAGE":"",
                 "VIDEO_URL":"",
                 "DOC_URL":""
+            },
+            "AudioRecord":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
             }
+
         }
     },
     "CDSvariablesList": {
@@ -920,6 +980,7 @@
             "project_id":{ "description":"The name of the project where this chatbot belongs to" },
             "last_message_id":{ "description":"The unique ID of the last message sent" },
             "conversation_id":{ "description":"This conversation unique ID" },
+            "chatbot_id":{ "description":"This chatbot id" },
             "chatbot_name":{ "description":"This chatbot name" },
             "chatbotToken": { "description":"" },
             "user_id":{ "description":"The user unique ID inside {{BRAND_NAME}} database" },
@@ -929,7 +990,7 @@
             "chat_url":{ "description":"The url of the Chat to send to a colleague to chat with this user. Use 'Invite human' action to invite the human to this chat" },
             "user_ip_address":{ "description":"The user IP address, when available" },
             "ticketId":{ "description":"The current conversation ticket ID"},
-            "flowError":{ "description":""}
+            "flowError":{ "description":"The last error generated in the flow"}
         },
         "uploadedDocumentElements":{
             "lastUserDocumentAsAttachmentURL":{ "description":"Useful if you want to have an URL of the uploaded document that can be displayed in chat and you will always download on click" },
@@ -964,7 +1025,8 @@
             "voiceLanguage":{ "description":"Define the main language for the voice system interpreter" },
             "voiceName":{ "description":"Define the name of the voice chatbot" },
             "event":{ "description":"Every handled event during current call flow" },
-            "lastBlock":{ "description":"The last triggered block heard by the caller" }
+            "lastBlock":{ "description":"The last triggered block heard by the caller" },
+            "lastRecordedUrl": { "description": "The url of the latest recorded audio"}
         }
     },
     "TYPE_GPT_MODEL": {

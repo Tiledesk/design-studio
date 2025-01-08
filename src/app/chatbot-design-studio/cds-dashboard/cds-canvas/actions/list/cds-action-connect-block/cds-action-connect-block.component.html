@@ -1,0 +1,40 @@
+<div *ngIf="previewMode" class="cds-action-preview"  [class.isStart]="isStart">
+
+    <div class="previewContent">
+        <label class="title-label">
+            {{'CDSCanvas.GoTo' | translate }}
+        </label>
+        <cds-connector class="connector"
+            [idConnector] = "idConnector"
+            [idConnection] = "idConnection"
+            [isConnected] = "isConnected">
+        </cds-connector>
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode" class="cds-action-content content-panel-intent-detail">
+
+    <!-- <cds-action-description
+        [elementType]="action._tdActionType">
+    </cds-action-description> -->
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.GoToBlock' | translate }}</label>
+        <cds-select id="text-condition"
+            [items]="intents"
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [clearable]="true" 
+            [itemSelected]="action?.intentName"
+            (onSelected)="onChangeSelect($event)"
+            (onReset)="onResetSelect($event)">
+        </cds-select>
+        <!-- <cds-text id="text-condition" 
+            [control]="actionIntentFormGroup.controls['intentName']"
+            [autocompleteOptions]="intents">
+        </cds-text> -->
+    </div>
+
+   
+</div>

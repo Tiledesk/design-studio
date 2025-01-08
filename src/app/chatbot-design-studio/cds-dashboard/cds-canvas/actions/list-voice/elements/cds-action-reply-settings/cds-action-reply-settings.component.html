@@ -174,6 +174,36 @@
             (changeButtonSelect)="onChangeButtonSelect($event)">
         </cds-radio-buttons>
     </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('maxtime')">
+        <label class="title-label">{{'CDSCanvas.MaxTime' | translate}}</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.maxtime"
+            [minRow]="1" [maxRow]="1" [limitCharsText]="2"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'maxtime')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('finalsilence')">
+        <label class="title-label">{{'CDSCanvas.FinalSilence' | translate}}</label>
+        <!-- <div class="text-editor-wpr" style="position: relative;"> -->
+        <!-- [limitCharsText]="150"  -->
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="response.finalsilence"
+            [minRow]="1" [maxRow]="1" [limitCharsText]="2"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'finalsilence')">
+        </cds-textarea>
+    </div>
     
 
 </div>
@@ -186,7 +216,7 @@
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
             <label class="condition-text">{{'CDSCanvas.NoInput' | translate}}</label>
-            <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '70%'}">
+            <div class="delay-wrapper" *ngIf="response.hasOwnProperty('noInputTimeout')" [ngStyle]="{width: canShowFilter? 'auto': '70%'}">
                 <appdashboard-delay-slider
                     [delayTime]="response.noInputTimeout/1000"
                     [label]="'CDSCanvas.timeout'"
@@ -290,7 +320,25 @@
         <cds-toogle
             [checked]="response.bargein"
             [disabled]="false"
-            (onChangeToggle)="onChangeToggle($event)">
+            (onChangeToggle)="onChangeToggle($event, 'bargein')">
+        </cds-toogle>
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('dtmfterm')" style="width: 100%;">
+        <label class="title-label">{{'CDSCanvas.TerminateOnDigit' | translate}}</label>
+        <cds-toogle
+            [checked]="response.dtmfterm"
+            [disabled]="false"
+            (onChangeToggle)="onChangeToggle($event, 'dtmfterm')">
+        </cds-toogle>
+    </div>
+
+    <div class="field-box" *ngIf="response.hasOwnProperty('beep')" style="width: 100%;">
+        <label class="title-label">{{'CDSCanvas.PlayBeep' | translate}}</label>
+        <cds-toogle
+            [checked]="response.beep"
+            [disabled]="false"
+            (onChangeToggle)="onChangeToggle($event, 'beep')">
         </cds-toogle>
     </div>
 

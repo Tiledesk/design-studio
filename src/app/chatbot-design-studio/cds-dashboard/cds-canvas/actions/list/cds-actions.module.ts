@@ -54,7 +54,7 @@ import { CdsActionWaitComponent } from './cds-action-wait/cds-action-wait.compon
 import { CdsActionWebRequestComponent } from './cds-action-web-request/cds-action-web-request.component';
 import { CdsActionWhatsappAttributeComponent } from './cds-action-whatsapp-attribute/cds-action-whatsapp-attribute.component';
 import { CdsActionWhatsappStaticComponent } from './cds-action-whatsapp-static/cds-action-whatsapp-static.component';
-import { CdsWhatsappReceiverComponent } from './cds-action-whatsapp-static/whatsapp-receiver/whatsapp-receiver.component';
+import { CdsWhatsappReceiverComponent } from './cds-action-send-whatsapp/whatsapp-receiver/whatsapp-receiver.component';
 import { FormEditAddComponent } from './form/form-edit-add/form-edit-add.component';
 import { FormFieldComponent } from './form/form-field/form-field.component';
 import { CdsFormComponent } from './form/form.component';
@@ -70,7 +70,12 @@ import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { FilterPipe } from 'src/app/pipe/filter.pipe';
+import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
+import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript/cds-action-clear-transcript.component';
+import { CdsActionMoveUnassignedComponent } from './cds-action-move-unassigned/cds-action-move-unassigned.component';
+import { CdsActionConnectBlockComponent } from './cds-action-connect-block/cds-action-connect-block.component';
+import { CdsActionSendWhatsappComponent } from './cds-action-send-whatsapp/cds-action-send-whatsapp.component';
 
 @NgModule({
   declarations: [
@@ -119,6 +124,7 @@ import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-actio
     CdsActionCustomerioComponent,
     CdsActionBrevoComponent,
     CdsActionN8nComponent,
+    CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
@@ -152,9 +158,14 @@ import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-actio
     AttributesDialogComponent,
     FormDataComponent,
     // action GptTask elements: end //
+    CdsActionClearTranscriptComponent,
+    CdsActionMoveUnassignedComponent,
+    CdsActionConnectBlockComponent,
+    CdsActionSendWhatsappComponent,
 
     //PIPES
     FilterPipe,
+    
     
   ],
   imports: [
@@ -210,6 +221,7 @@ import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-actio
     CdsActionCustomerioComponent,
     CdsActionBrevoComponent,
     CdsActionN8nComponent,
+    CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
@@ -241,7 +253,11 @@ import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-actio
     // action GptTask elements: start //
     AttributesDialogComponent,
     // action GptTask elements: end //
-
+    CdsActionClearTranscriptComponent,
+    CdsActionMoveUnassignedComponent,
+    CdsActionConnectBlockComponent,
+    CdsActionSendWhatsappComponent,
+    
     //PIPES
     FilterPipe
   ]

@@ -270,14 +270,14 @@ $margin-bottom: 15px;
     align-items: center;
     min-height: 30px;
     border-radius: var(--input-border-radius-base);
-    border: 1px dashed #6c6859;
+    border: 1px dashed var(--brown);
     padding: 6px 12px;
     background: rgba(255,255,255,.8);
     margin: 12px auto;
     width: calc(100% - 5px);
     .reply--action-placeholder-text {
         font-weight: 400;
-        color: #6c6859;
+        color: var(--brown);
         font-size: 14px;
     }
 }
