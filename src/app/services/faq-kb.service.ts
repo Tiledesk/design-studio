@@ -154,6 +154,31 @@ export class FaqKbService {
     this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
     return this._httpClient.put(url, JSON.stringify(body), httpOptions)
   }
+
+  /**
+   * UPDATE (PUT)
+   * @param id
+   * @param fullName
+   */
+  public updateFaqKbAgentsAvailable(id: string, agents_available: boolean) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+
+    let url = this.FAQKB_URL + id;
+    this.logger.log('update BOT - URL ', url);
+    let body = { 
+      'agents_available': agents_available, 
+    };
+    this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
+    return this._httpClient.put(url, JSON.stringify(body), httpOptions)
+  }
+  
+
   // PROJECT_ID/faq_kb/FAQ_KB_ID/language/LANGUAGE
 
   updateFaqKbLanguage (id: string, chatbotlanguage: string) {

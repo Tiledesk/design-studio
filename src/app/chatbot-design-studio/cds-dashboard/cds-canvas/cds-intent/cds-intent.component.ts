@@ -119,7 +119,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (!subscribtion) {
       subscribtion = this.intentService.behaviorIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
-          this.logger.log("[CDS-INTENT] sto modifico l'intent: ", this.intent, " con : ", intent);
+          this.logger.log("[CDS-INTENT] sto modificando l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
           this.setAgentsAvailable();
           if (intent['attributesChanged']) {

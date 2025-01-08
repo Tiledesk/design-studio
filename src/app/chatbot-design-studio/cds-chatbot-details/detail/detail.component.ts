@@ -525,6 +525,30 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     }});
   }
 
+
+  editBotAgentsAvailable() {
+    // RESOLVE THE BUG 'edit button remains focused after clicking'
+    this.elementRef.nativeElement.blur();
+    // this.logger.log('[CDS-CHATBOT-DTLS] FAQ KB NAME TO UPDATE ', this.faqKb_name);
+    this.faqKbService.updateFaqKbAgentsAvailable(this.selectedChatbot._id, this.selectedChatbot.agents_available).subscribe({next:(faqKb) => {
+      this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - FAQ KB UPDATED ', faqKb);
+      if (faqKb) {
+        this.selectedChatbot.name = faqKb['name']
+        this.selectedChatbot.description = faqKb['description']
+      }
+    }, error: (error) => {
+      this.logger.error('[CDS-CHATBOT-DTLS] EDIT BOT -  ERROR ', error);
+      // =========== NOTIFY ERROR ===========
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotError'), 4, 'report_problem');
+    }, complete: () => {
+      this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - * COMPLETE *');
+      // =========== NOTIFY SUCCESS===========
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotSuccess'), 2, 'done');
+      this.selectedChatbot.name
+    }});
+  }
+
+
   goToRoutingAndDepts() {
     let redirecturl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.project._id + '/departments'
     window.open(redirecturl, '_blank')
@@ -541,7 +565,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     const isAgentsAvailable = checkbox.checked;
     this.logger.log('[CDS-CHATBOT-DTLS] isAgentsAvailable: ',isAgentsAvailable);
     this.selectedChatbot.agents_available = isAgentsAvailable;
-    this.editBot();
+    this.editBotAgentsAvailable();
   }
 
 
