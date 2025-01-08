@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.25.0-rc.3
+- **added**: intent and chatbot only agents visibility
+
 # 1.25.0-rc.2
 - **changed**: action-record translations and default values
 
