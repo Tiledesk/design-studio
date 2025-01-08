@@ -1,0 +1,50 @@
+<div class="panel-intent-detail" [class.minimize]="!maximize" [class.maximize]="maximize">
+    <div class="header-panel">
+
+        <cds-panel-intent-header class="pic-title-text tds_draggable" 
+            [class.isStart]="false"
+            [intent]="intentSelected">
+        </cds-panel-intent-header>
+        
+        <div class="header-options-wrp icon-action" (click)="maximize = !maximize">
+            <img src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" *ngIf="!maximize">
+            <img src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" *ngIf="maximize">
+        </div>
+    </div>
+
+    <div id="content-panel" class="content-panel">
+        
+        <!-- ---------------------------------------------------------- -->
+        <!-- Agents available -->
+        <!-- ---------------------------------------------------------- -->
+        <div class="row">
+
+            <!-- <h3 class="card_title__underlined">
+                <span class="card_title__underline">
+                {{ 'Agents available' | translate }}
+                </span>
+            </h3>
+            <div class="section-subtitle"></div> -->
+        
+            <div class="nw-onoffswitch-wrapper" style="clear: both; display: inline-block;">
+                <div class="nw-onoffswitch">
+                    <input type="checkbox" name="agents_available_switch"
+                        class="nw-onoffswitch-checkbox" id="agents_available_switch"
+                        [(ngModel)]="intentSelected.agents_available" 
+                        (change)="onAgentsAvailableChange($event.target.checked)">
+                    <label class="nw-onoffswitch-label" for="agents_available_switch"></label>
+                </div>
+                <span class="checkmark" style="line-height: 25px; margin: 20px 20px 10px; float: left;">
+                    {{ 'Available to agents' | translate }}
+                </span>
+            </div>
+            
+            <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                {{'A block with this option is visible to agents for the purpose to be put back in the conversation' | translate}}
+            </span>
+   
+        </div>
+
+    </div>
+
+</div>

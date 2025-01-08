@@ -220,16 +220,59 @@
         </div>
       </div>
 
+      <!-- <div class="row"> -->
+        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+          <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+            {{'ManageTheBotIn' | translate}}
+            <span class="custom-link" (click)="goToRoutingAndDepts()">
+              {{'RoutingAndDepts' | translate}}
+            </span>
+          </span>
+        </div>
+      <!-- </div> -->
+
     </div>
-    <div class="row">
+    
+
+
+    <!-- ---------------------------------------------------------- -->
+    <!-- Agents available -->
+    <!-- ---------------------------------------------------------- -->
+    <div *ngIf="isVisibleDEP === true" class="row" style="margin-bottom: 4px; margin-top: 30px;">
+
+      <div class="col-sm-10 col-md-10">
+        <h3 class="card_title__underlined">
+          <span class="card_title__underline">
+            {{ 'Agents available' | translate }}
+          </span>
+        </h3>
+      </div>
+      
+      <div class="col-sm-10 col-md-10">
+        <div class="section-subtitle"></div>
+      </div>
+  
+      <div class="col-sm-10 col-md-10 nw-onoffswitch-wrapper" style="clear: both; display: inline-block;">
+        <div class="nw-onoffswitch">
+            <input type="checkbox" name="agents_available_switch"
+                class="nw-onoffswitch-checkbox" id="agents_available_switch"
+                [(ngModel)]="selectedChatbot.agents_available" 
+                (change)="onAgentsAvailableChange($event)">
+            <label class="nw-onoffswitch-label" for="agents_available_switch"></label>
+        </div>
+        <span class="checkmark" style="line-height: 25px; margin: 20px 20px 10px; float: left;">
+            {{ 'Available to agents' | translate }}
+        </span>
+      </div>
 
       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
         <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
-          {{'ManageTheBotIn' | translate}}
-          <span class="custom-link" (click)="goToRoutingAndDepts()">
-            {{'RoutingAndDepts' | translate}}
-          </span>
+          {{'A chatbot with this option is visible to agents for the purpose to be put back in the conversation' | translate}}
         </span>
       </div>
+
     </div>
+
+
+
   </div> <!-- ./ bot details -->

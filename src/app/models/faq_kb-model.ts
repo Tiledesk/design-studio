@@ -18,8 +18,6 @@ export interface FaqKb {
     message_count?: number;
     mainCategory?: any
     language?: string;
-   
-  
 }
 
 export interface Chatbot extends FaqKb {
@@ -33,4 +31,5 @@ export interface Chatbot extends FaqKb {
     intentsEngine?: 'none' | 'tiledesk-ai',
     slug?: string;
     imageURL: string;
+    agents_available?: boolean;
 }

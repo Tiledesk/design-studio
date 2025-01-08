@@ -68,7 +68,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   dept_id: string;
   selected_dept_id: string;
   selected_dept_name: string;
-
   user: UserModel
   imageURL: string;
 
@@ -96,7 +95,16 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   ngOnChanges() {
     this.logger.log('[CDS-CHATBOT-DTLS] (OnChanges) selectedChatbot ', this.selectedChatbot)
     this.destructureSelectedChatbot(this.selectedChatbot)
+    this.patchAgensAvailable();
   }
+
+
+  private patchAgensAvailable(){
+    if(this.selectedChatbot && this.selectedChatbot.agents_available != false){
+      this.selectedChatbot.agents_available = true;
+    }
+  }
+
 
 
   getDeptsByProjectId() {
@@ -528,7 +536,6 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   editBot() {
     // RESOLVE THE BUG 'edit button remains focused after clicking'
     this.elementRef.nativeElement.blur();
-
     // this.logger.log('[CDS-CHATBOT-DTLS] FAQ KB NAME TO UPDATE ', this.faqKb_name);
     this.faqKbService.updateFaqKb(this.selectedChatbot).subscribe({next:(faqKb) => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - FAQ KB UPDATED ', faqKb);
@@ -549,13 +556,36 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
       }
       // =========== NOTIFY ERROR ===========
       this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotError'), 4, 'report_problem');
-
     }, complete: () => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - * COMPLETE *');
       // =========== NOTIFY SUCCESS===========
       this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotSuccess'), 2, 'done');
     }});
   }
+
+
+  editBotAgentsAvailable() {
+    // RESOLVE THE BUG 'edit button remains focused after clicking'
+    this.elementRef.nativeElement.blur();
+    // this.logger.log('[CDS-CHATBOT-DTLS] FAQ KB NAME TO UPDATE ', this.faqKb_name);
+    this.faqKbService.updateFaqKbAgentsAvailable(this.selectedChatbot._id, this.selectedChatbot.agents_available).subscribe({next:(faqKb) => {
+      this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - FAQ KB UPDATED ', faqKb);
+      if (faqKb) {
+        this.selectedChatbot.name = faqKb['name']
+        this.selectedChatbot.description = faqKb['description']
+      }
+    }, error: (error) => {
+      this.logger.error('[CDS-CHATBOT-DTLS] EDIT BOT -  ERROR ', error);
+      // =========== NOTIFY ERROR ===========
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotError'), 4, 'report_problem');
+    }, complete: () => {
+      this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - * COMPLETE *');
+      // =========== NOTIFY SUCCESS===========
+      this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotSuccess'), 2, 'done');
+      this.selectedChatbot.name
+    }});
+  }
+
 
   goToRoutingAndDepts() {
     let redirecturl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.project._id + '/departments'
@@ -566,5 +596,15 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     let redirecturl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.project._id + '/department/edit/'+ deptid
     window.open(redirecturl, '_blank')
   }
+
+
+  onAgentsAvailableChange(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    const isAgentsAvailable = checkbox.checked;
+    this.logger.log('[CDS-CHATBOT-DTLS] isAgentsAvailable: ',isAgentsAvailable);
+    this.selectedChatbot.agents_available = isAgentsAvailable;
+    this.editBotAgentsAvailable();
+  }
+
 
 }
