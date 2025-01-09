@@ -17,7 +17,7 @@
         </div>
 
         <div *ngIf="action?.botName" class="action-row-right"> 
-            {{bot_selected?.value}} <span class="slug" *ngIf="bot_selected?.slug">({{bot_selected?.slug}})</span>
+            {{ getChatbotByNameOrSlug()?.value }}<span class="slug" *ngIf="bot_selected?.slug"> ({{ getChatbotByNameOrSlug()?.slug }})</span>
         </div>
         <div *ngIf="!action?.botName" class="action-row-right empty"> 
             {{'CDSCanvas.ChooseBot' | translate }}

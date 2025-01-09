@@ -90,6 +90,7 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
   onChangeSelect(event: {name: string, value: string, slug: string, id: string}) {
     this.logger.log("[ACTION REPLACE BOT] onChangeActionButton event: ", event)
     this.bot_selected = this.chatbots_name_list.find(el => el.id === event.id)
+    console.log('bottttttt', this.bot_selected)
     if(this.action.nameAsSlug){
       this.action.botName = event.slug;
     }
@@ -122,22 +123,24 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
     this.action[target] = !this.action[target];
     this.chatbots_name_list = this.chatbots_name_list.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a.id, disabled: this.action.nameAsSlug? !a.slug: false, icon: 'smart_toy'}));
     if(event.checked && this.action.botName){
-      this.action.botName = this.getChatbotByNameOrSlug()
+      this.action.botName = this.getChatbotByNameOrSlug().slug
     }
     this.updateAndSaveAction.emit()
   }
 
 
-  private getChatbotByNameOrSlug(): string{
-    let chatbotByName = this.chatbots_name_list.find(el => el.name === this.action.botName)
-    if(chatbotByName){
-      this.bot_selected = chatbotByName
-      return chatbotByName.slug
-    }
-    let chatbotBySlug = this.chatbots_name_list.find(el => el.slug === this.action.botName)
-    if(chatbotBySlug){
-      this.bot_selected = chatbotBySlug
-      return chatbotBySlug.slug
+  getChatbotByNameOrSlug(){
+    if(this.chatbots_name_list){
+      let chatbotByName = this.chatbots_name_list.find(el => el.name === this.action.botName)
+      if(chatbotByName){
+        this.bot_selected = chatbotByName
+        return chatbotByName
+      }
+      let chatbotBySlug = this.chatbots_name_list.find(el => el.slug === this.action.botName)
+      if(chatbotBySlug){
+        this.bot_selected = chatbotBySlug
+        return chatbotBySlug
+      }
     }
   }
 
