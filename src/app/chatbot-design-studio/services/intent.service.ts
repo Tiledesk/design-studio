@@ -792,6 +792,13 @@ export class IntentService {
     // this.intentSelectedID = null;
   }
 
+  /** unselectIntent */
+  public unselectedIntent(){
+    this.intentSelected = null;
+    this.intentSelectedID = null;
+  }
+
+
   /** deleteSelectedAction 
    * deleteConnectorsFromActionByActionId: elimino i connettori in uscita della action
    * aggiorno l'intent con la nuova action 

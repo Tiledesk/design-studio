@@ -40,6 +40,7 @@
        
         <cds-intent *ngFor="let intent of listOfIntents"
             [id]="intent.intent_id"
+            [IS_OPEN_PANEL_INTENT_DETAIL]="IS_OPEN_PANEL_INTENT_DETAIL"
             class="panel-intent tds_input_block" 
             [style.top.px]="getIntentPosition(intent.intent_id).y"
             [style.left.px]="getIntentPosition(intent.intent_id).x" 

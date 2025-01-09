@@ -445,6 +445,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
+    this.intentService.unselectedIntent();
   }
   private closeActionDetailPanel(){
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
@@ -1131,7 +1132,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // -------------------------------------------------------
   onShowPanelActions(event) {
     this.logger.log('[CDS-CANVAS] showPanelActions event:: ', event);
-    this.IS_OPEN_ADD_ACTIONS_MENU = true;
     this.closeAllPanels();
     this.closeActionDetailPanel();
     // this.controllerService.closeActionDetailPanel();
@@ -1142,7 +1142,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // this.intentSelected = event.intent;
     this.intentService.setIntentSelectedById(event.intent.intent_id);
     this.positionFloatMenu = pos;
-    this.logger.log('[CDS-CANVAS] showPanelActions positionFloatMenu ', this.positionFloatMenu)
+    this.logger.log('[CDS-CANVAS] showPanelActions positionFloatMenu ', this.positionFloatMenu);
+    this.IS_OPEN_ADD_ACTIONS_MENU = true;
   }
 
   // -------------------------------------------------------
