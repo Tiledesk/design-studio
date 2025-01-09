@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
+# 1.26.0-rc.4
 # 1.26.0-rc.3
 - **bug-fixed**: chatbot is not correctly selected in action-replace-bot-v2
 
