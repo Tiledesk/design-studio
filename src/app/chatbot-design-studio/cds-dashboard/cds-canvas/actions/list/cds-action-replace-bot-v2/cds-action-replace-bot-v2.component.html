@@ -17,7 +17,7 @@
         </div>
 
         <div *ngIf="action?.botName" class="action-row-right"> 
-            {{action.botName}}
+            {{bot_selected?.value}} <span class="slug" *ngIf="bot_selected?.slug">({{bot_selected?.slug}})</span>
         </div>
         <div *ngIf="!action?.botName" class="action-row-right empty"> 
             {{'CDSCanvas.ChooseBot' | translate }}
@@ -48,11 +48,23 @@
             [items]="chatbots_name_list" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'"
+            [optionalBindAdditionalText]="action.nameAsSlug? 'slug' : null"
             [searchable]=true
             [clearable]=true
-            [itemSelected]="action?.botName" 
-            (onSelected)="onChangeSelect($event)">
+            [itemSelected]="bot_selected?.value" 
+            (onSelected)="onChangeSelect($event)"
+            (onReset)="onResetSelect($event, 'botName')">
         </cds-select>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.nameAsSlug"
+                [disabled]="bot_selected && !bot_selected?.slug"
+                (change)="onChangeCheckbox($event,'nameAsSlug')">
+                {{ 'CDSCanvas.UseChatbotSlug' | translate }}
+            </mat-checkbox>
+        </section>
+
     </div>
 
     <div class="field-box">
@@ -66,7 +78,7 @@
             [clearable]=true
             [itemSelected]="action?.blockName" 
             (onSelected)="onChangeBlockSelect($event)"
-            (onReset)="onResetBlockSelect($event)">
+            (onReset)="onResetSelect($event, 'blockName')">
         </cds-select>
     </div>
 

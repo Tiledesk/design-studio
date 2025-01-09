@@ -7,15 +7,31 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.26.0-rc.3
+- **bug-fixed**: chatbot is not correctly selected in action-replace-bot-v2
+
+# 1.26.0-rc.2
+- **bug-fixed**: action-replace-bot-v2 not pass value correctly
+
+# 1.26.0-rc.1
+- **added**: slug as chatbot property and action-replace-bot-v2 option when user select a chatbot
+
 # 1.25.0-rc.3
 - **added**: intent and chatbot only agents visibility
 
 # 1.25.0-rc.2
 - **changed**: action-record translations and default values
 
+# 1.25.1
+
+# 1.25.0
+
 # 1.25.0-rc.1
  **added**: lastRecordedUrl voiceFlow flow variable for action-record
  
+# 1.24.0
+
 # 1.24.0-rc.5
 - **changed**: project-utils rules
 
@@ -31,6 +47,8 @@
 
 # 1.24.0-rc.1
 - **added**: add_tags action
+
+# 1.23.0
 
 # 1.23.0-rc.5
 - **bug-fixed**: image is not saved in [WHATSAPP RECEIVER]

@@ -16,6 +16,7 @@ import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 import { checkAcceptedFile, filterImageMimeTypesAndExtensions } from '../../utils';
+import { generateSlug } from 'src/app/utils/util';
 const swal = require('sweetalert');
 
 @Component({
@@ -70,6 +71,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   user: UserModel
   imageURL: string;
 
+  chatbotSlugChanged: boolean;
 
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
@@ -521,25 +523,43 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     })    
   }
 
+  onInputChange(event, key: string){
+    switch(key){
+      case 'slug':
+        this.selectedChatbot.slug = generateSlug((event.target as HTMLInputElement).value);
+        this.chatbotSlugChanged= true;
+        break;
+    }
+  }
+
+
   editBot() {
     // RESOLVE THE BUG 'edit button remains focused after clicking'
     this.elementRef.nativeElement.blur();
     // this.logger.log('[CDS-CHATBOT-DTLS] FAQ KB NAME TO UPDATE ', this.faqKb_name);
-    this.faqKbService.updateFaqKb(this.selectedChatbot._id, this.selectedChatbot.name, this.selectedChatbot.url, this.selectedChatbot.type, this.selectedChatbot.description, this.selectedChatbot.webhook_enabled, this.selectedChatbot.webhook_url, this.selectedChatbot.language, this.selectedChatbot.agents_available).subscribe({next:(faqKb) => {
+    this.faqKbService.updateFaqKb(this.selectedChatbot).subscribe({next:(faqKb) => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - FAQ KB UPDATED ', faqKb);
       if (faqKb) {
         this.selectedChatbot.name = faqKb['name']
         this.selectedChatbot.description = faqKb['description']
+
+        this.chatbotSlugChanged = false;
       }
     }, error: (error) => {
       this.logger.error('[CDS-CHATBOT-DTLS] EDIT BOT -  ERROR ', error);
+
+      if(error && error.error.error_code === 12001){
+        // =========== NOTIFY SLUG ALREADY EXISTS ERROR ===========
+        this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.SlugAlreadyExists'), 4, 'report_problem');
+        this.chatbotSlugChanged = false;
+        return
+      }
       // =========== NOTIFY ERROR ===========
       this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotError'), 4, 'report_problem');
     }, complete: () => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - * COMPLETE *');
       // =========== NOTIFY SUCCESS===========
       this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotSuccess'), 2, 'done');
-      this.selectedChatbot.name
     }});
   }
 

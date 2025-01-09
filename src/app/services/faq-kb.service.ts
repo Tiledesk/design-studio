@@ -44,7 +44,7 @@ export class FaqKbService {
    * NOTE: chat21-api-node.js READ THE CURRENT PROJECT ID FROM THE URL SO IT SO NO LONGER NECESSARY TO PASS THE PROJECT 
    * ID AS PARAMETER
    */
-  public getFaqKbByProjectId(): Observable<FaqKb[]> {
+  public getFaqKbByProjectId(): Observable<Chatbot[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ export class FaqKbService {
     const url = this.FAQKB_URL;
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY PROJECT ID - URL', url);
 
-    return this._httpClient.get<FaqKb[]>(url, httpOptions).pipe(map((response) => {
+    return this._httpClient.get<Chatbot[]>(url, httpOptions).pipe(map((response) => {
             const data = response;
             // Does something on data.data
             this.logger.log('[FAQ-KB.SERV] GET FAQ-KB BY PROJECT ID - data', data);
@@ -125,7 +125,7 @@ export class FaqKbService {
    * @param id
    * @param fullName
    */
-  public updateFaqKb(id: string, name: string, urlfaqkb: string, bottype: string, faqKb_description: string, webkookisenalbled: any, webhookurl, resbotlanguage: string, agents_available: boolean) {
+  public updateFaqKb(chatbot: Chatbot) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -134,25 +134,16 @@ export class FaqKbService {
       })
     };
 
-    let url = this.FAQKB_URL + id;
+    let url = this.FAQKB_URL + chatbot._id;
     this.logger.log('update BOT - URL ', url);
-
-    let body = {}
-    body = { 
-      'name': name, 
-      'url': urlfaqkb, 
-      'type': bottype, 
-      'description': faqKb_description
-    };
     
-    if (bottype === 'internal' || bottype === 'tilebot') {
-      body['webhook_enabled'] = webkookisenalbled;
-      body['webhook_url'] = webhookurl
-      body['language'] = resbotlanguage
-      body['agents_available'] = agents_available
-    }
-    this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
-    return this._httpClient.put(url, JSON.stringify(body), httpOptions)
+    // if (chatbot.type === 'internal' || chatbot.type === 'tilebot') {
+    //   chatbot['webhook_enabled'] = webkookisenalbled;
+    //   chatbot['webhook_url'] = webhookurl
+    //   chatbot['language'] = resbotlanguage
+    // }
+    this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', chatbot);
+    return this._httpClient.put(url, JSON.stringify(chatbot), httpOptions)
   }
 
   /**
