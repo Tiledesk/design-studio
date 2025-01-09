@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.26.0-rc.3
+- **bug-fixed**: chatbot is not correctly selected in action-replace-bot-v2
+
 # 1.26.0-rc.2
 - **bug-fixed**: action-replace-bot-v2 not pass value correctly
 
