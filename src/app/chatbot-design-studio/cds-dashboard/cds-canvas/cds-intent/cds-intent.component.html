@@ -1,4 +1,4 @@
-<div #resizeElement [ngClass]="{'cds-intent-active': intentService.intentSelectedID === intent.intent_id}"  class="panel-intent-content tds_draggable" [class.isStart]="isStart" [id]="'intent-content-'+ intent?.intent_id">
+<div #resizeElement [ngClass]="{'cds-intent-active': intentService.intentSelectedID === intent.intent_id && intentService.intentActive}"  class="panel-intent-content tds_draggable" [class.isStart]="isStart" [id]="'intent-content-'+ intent?.intent_id">
 
     <cds-panel-intent-controls
         [isInternalIntent]="isInternalIntent"

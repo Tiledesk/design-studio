@@ -368,6 +368,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       if (element.type) {
         this.closeAllPanels();
         this.IS_OPEN_PANEL_ACTION_DETAIL = true;
+        this.intentService.inactiveIntent();
         this.removeConnectorDraftAndCloseFloatMenu();
         // setTimeout(() => {
         //   this.IS_OPEN_PANEL_ACTION_DETAIL = true;
@@ -445,7 +446,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
-    this.intentService.unselectedIntent();
+    this.intentService.inactiveIntent();
   }
   private closeActionDetailPanel(){
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
@@ -1144,6 +1145,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.positionFloatMenu = pos;
     this.logger.log('[CDS-CANVAS] showPanelActions positionFloatMenu ', this.positionFloatMenu);
     this.IS_OPEN_ADD_ACTIONS_MENU = true;
+    this.intentService.inactiveIntent();
   }
 
   // -------------------------------------------------------
