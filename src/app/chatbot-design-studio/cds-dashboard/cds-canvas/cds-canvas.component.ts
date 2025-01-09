@@ -43,6 +43,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   listnerMovedAndScaled: (e: CustomEvent) => void;
   listnerKeydown: (e: any) => void;
   listnerConnectorSelected: (e: CustomEvent) => void;
+  listnerConnectorDeselected: (e: CustomEvent) => void;
   listnerConnectorUpdated: (e: CustomEvent) => void;
   listnerConnectorDeleted: (e: CustomEvent) => void;
   listnerConnectorCreated: (e: CustomEvent) => void;
@@ -165,6 +166,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     document.removeEventListener("start-dragging", this.listnerStartDragging, false);
     document.removeEventListener("keydown", this.listnerKeydown, false);
     document.removeEventListener("connector-selected", this.listnerConnectorSelected, false);
+    document.removeEventListener("connector-deselected", this.listnerConnectorDeselected, false);
     document.removeEventListener("connector-updated", this.listnerConnectorUpdated, false);
     document.removeEventListener("connector-deleted", this.listnerConnectorDeleted, false);
     document.removeEventListener("connector-created", this.listnerConnectorCreated, false);
@@ -610,6 +612,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.intentService.unselectAction();
     };
     document.addEventListener("connector-selected", this.listnerConnectorSelected, false);
+
+
+    this.listnerConnectorDeselected = (e: CustomEvent) => {
+      this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+    }
+    document.addEventListener('connector-deselected',  this.listnerConnectorDeselected, false);
 
     /**  keydown 
     * check if Ctrl (Windows) or Command (Mac) and Z were pressed at the same time

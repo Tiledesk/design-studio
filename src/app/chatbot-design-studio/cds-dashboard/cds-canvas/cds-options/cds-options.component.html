@@ -1,5 +1,18 @@
 <div class="container">
 
+
+    <div>
+        <label for="alphaRange">Adjust Alpha:</label>
+        <input
+          type="range"
+          id="alphaRange"
+          min="0"
+          max="100"
+          [(ngModel)]="alpha"
+          (input)="updateAlpha()"
+        />
+    </div>
+
     <div size="4" class="cds-elements" mat-button>
         <!-- MOUSE -->
         <div class="cds-element" *ngIf="true" [satPopoverAnchor]="mouseTips"  (click)="mouseTips.toggle()" #divEvent>
