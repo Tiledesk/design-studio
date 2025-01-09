@@ -21,16 +21,16 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
   @Output() updateAndSaveAction = new EventEmitter();
 
   //bots: Chatbot[] = [];
-  chatbots_name_list: Array<{name: string, value: string, id: string, slug: string, icon?:string}>;
+  chatbots_name_list: Array<{name: string, value: string, id: string, slug: string, disabled: boolean, icon?:string}>;
   chatbots_block_name_list: Array<{name: string, value: string, icon?:string}>;
-  bot_selected: {name: string, value: string, id: string, slug: string, icon?:string};
+  bot_selected: {name: string, value: string, id: string, slug: string, disabled: boolean, icon?:string}
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
     private chatbotService: FaqKbService,
     private faqService: FaqService
-    ) { }
+  ) { }
 
   ngOnInit(): void {
     this.logger.log("[ACTION REPLACE BOT] action (on-init): ", this.action)
@@ -62,7 +62,7 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
       this.chatbotService.getFaqKbByProjectId().subscribe({ next: (chatbots) => {
         this.logger.log("[ACTION REPLACE BOT] chatbots: ", chatbots);
         //this.bots = bots;
-        this.chatbots_name_list = chatbots.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a._id, icon: 'smart_toy'}));
+        this.chatbots_name_list = chatbots.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a._id, disabled: this.action.nameAsSlug? !a.slug: false, icon: 'smart_toy'}));
         resolve(true)
       }, error: (error) => {
         this.logger.error("[ACTION REPLACE BOT] error get bots: ", error);
@@ -89,7 +89,7 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
 
   onChangeSelect(event: {name: string, value: string, slug: string, id: string}) {
     this.logger.log("[ACTION REPLACE BOT] onChangeActionButton event: ", event)
-    this.bot_selected = this.chatbots_name_list.find(el => el.name === event.name)
+    this.bot_selected = this.chatbots_name_list.find(el => el.id === event.id)
     if(this.action.nameAsSlug){
       this.action.botName = event.slug;
     }
@@ -105,13 +105,22 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
     this.logger.log("[ACTION REPLACE BOT] action selet block to execute: ", this.action)
   }
 
-  onResetBlockSelect(event){
-    this.action.blockName = null;
+  onResetSelect(event, key: string){
+    switch(key){
+      case 'botName':
+        this.action.botName = null;
+        this.bot_selected = null;
+        break;
+      case 'blockName':
+        this.action.blockName = null
+        break;   
+    }
     this.updateAndSaveAction.emit()
   }
 
   onChangeCheckbox(event: MatCheckbox, target){
     this.action[target] = !this.action[target];
+    this.chatbots_name_list = this.chatbots_name_list.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a.id, disabled: this.action.nameAsSlug? !a.slug: false, icon: 'smart_toy'}));
     if(event.checked && this.action.botName){
       this.action.botName = this.getChatbotByNameOrSlug()
     }
@@ -130,7 +139,6 @@ export class CdsActionReplaceBotV2Component implements OnInit, OnChanges {
       this.bot_selected = chatbotBySlug
       return chatbotBySlug.slug
     }
-
   }
 
 

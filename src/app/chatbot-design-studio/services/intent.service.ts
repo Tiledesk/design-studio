@@ -913,6 +913,7 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.REPLACE_BOTV2){
       action = new  ActionReplaceBotV2();
+      action.nameAsSlug = false;
     }
     if(typeAction === TYPE_ACTION.CHANGE_DEPARTMENT) {
       action = new  ActionChangeDepartment();
