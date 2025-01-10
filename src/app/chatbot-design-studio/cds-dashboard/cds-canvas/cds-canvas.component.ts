@@ -1156,10 +1156,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    // --------------------------------------------------------- // 
   // EVENT > PANEL OPTIONS 
   // --------------------------------------------------------- //
-  async onOptionClicked(option: OPTIONS){
+  async onOptionClicked(resp){
+    let option = resp.option;
+    let alpha = resp.alpha;
+    console.log('onOptionClicked:: ', resp,  option, alpha);
+
     switch(option){
       case OPTIONS.ZOOM_IN: {
-        const result = await  this.stageService.zoom('in');
+        const result = await this.stageService.zoom('in');
         if (result) {
           this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
         }
@@ -1185,6 +1189,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       }
       case OPTIONS.REDO: {
         this.intentService.restoreLastREDO();
+        break;
+      }
+      case OPTIONS.ALPHA: {
+        this.stageService.setAlpha(alpha);
         break;
       }
     }

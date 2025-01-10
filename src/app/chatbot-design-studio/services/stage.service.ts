@@ -103,6 +103,14 @@ export class StageService {
     return this.tiledeskStage.scale;
   }
 
+  setAlpha(alpha){
+    this.tiledeskStage.alpha = alpha;
+  }
+
+  getAlpha(){
+    return this.tiledeskStage.alpha;
+  }
+
   onSwipe(event: WheelEvent) {
     if (event.deltaX > 0) {
       // console.log('Swipe RIGHT');

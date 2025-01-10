@@ -9,10 +9,11 @@ import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
 export class CdsOptionsComponent implements OnInit {
 
   @Input() stateUndoRedo: any;
-  @Output() onOptionClicked = new EventEmitter<OPTIONS>();
-  OPTIONS = OPTIONS
+  @Output() onOptionClicked = new EventEmitter<{ option: OPTIONS; extraData?: any }>();
+  //@Output() onOptionClicked = new EventEmitter<OPTIONS>();
 
-  alpha: number = 30;
+  OPTIONS = OPTIONS;
+  alpha: number = 100;
 
   
 
@@ -23,22 +24,27 @@ export class CdsOptionsComponent implements OnInit {
   }
 
   updateAlpha() {
-    const alphaHex = Math.round((this.alpha / 100) * 255).toString(16).padStart(2, '0');
+    // const alphaHex = Math.round((this.alpha / 100) * 255).toString(16).padStart(2, '0');
     const svgElement = document.querySelector('#tds_svgConnectors') as HTMLElement;
     if (svgElement) {
-      svgElement.style.stroke = `#b1b1b1${alphaHex}`;
+      // svgElement.style.stroke = `#b1b1b1${alphaHex}`;
+      const paths = svgElement.querySelectorAll('path');
+      paths.forEach((path) => {
+        path.setAttribute('opacity', (this.alpha / 100).toString());
+      });
+      // svgElement.setAttribute('opacity', (this.alpha / 100).toString());
     }
-
     const svgLines = document.querySelectorAll('.line-text-connector');
     svgLines.forEach((svgLine) => {
       const element = svgLine as SVGElement;
-      element.setAttribute('opacity', (this.alpha*3 / 100).toString());
+      element.setAttribute('opacity', (this.alpha / 100).toString());
     });
-
+    this.onOptionClicked.emit({ option: OPTIONS.ALPHA, extraData: this.alpha });
   }
 
   onOptionClick(option){
-    this.onOptionClicked.emit(option)
+    // this.onOptionClicked.emit({option: option});
+    this.onOptionClicked.emit({option: option});
   }
 
 }

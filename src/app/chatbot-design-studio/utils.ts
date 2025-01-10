@@ -175,9 +175,10 @@ export enum OPTIONS {
     ZOOM_IN     = 'zoom-in',
     ZOOM_OUT    = 'zoom-out',
     CENTER      = 'center',
-    UNDO        = "undo",
-    REDO        = "redo",
-    MOUSE       = "mouse"
+    UNDO        = 'undo',
+    REDO        = 'redo',
+    MOUSE       = 'mouse',
+    ALPHA       = 'alpha'
 }
 
 export const TYPE_GPT_MODEL: Array<{name: string, value: string, description: string, status: "active" | "inactive"}> = [
