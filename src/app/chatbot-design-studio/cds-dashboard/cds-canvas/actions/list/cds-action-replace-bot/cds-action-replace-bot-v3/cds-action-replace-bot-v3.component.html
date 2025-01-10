@@ -16,10 +16,10 @@
             </svg>
         </div>
 
-        <div *ngIf="action?.botName || action?.botSlug" class="action-row-right"> 
-            {{ action?.botName }}<span class="slug" *ngIf="action?.botSlug"> ({{ action?.botSlug }})</span>
+        <div *ngIf="action?.botId || action?.botSlug" class="action-row-right"> 
+            {{ action?.botId }}<span class="slug" *ngIf="action?.botSlug"> ({{ action?.botSlug }})</span>
         </div>
-        <div *ngIf="!action?.botName && !action?.botSlug" class="action-row-right empty"> 
+        <div *ngIf="!action?.botId && !action?.botSlug" class="action-row-right empty"> 
             {{'CDSCanvas.ChooseBot' | translate }}
         </div>
         
@@ -47,12 +47,12 @@
         <cds-select *ngIf="!action?.useSlug" id="text-condition" 
             [items]="chatbots_name_list" 
             [bindLabelSelect]="'name'"
-            [bindValueSelect]="'value'"
+            [bindValueSelect]="'id'"
             [searchable]=true
             [clearable]=true
-            [itemSelected]="action?.botName" 
+            [itemSelected]="action?.botId" 
             (onSelected)="onChangeSelect($event)"
-            (onReset)="onResetSelect($event, 'botName')">
+            (onReset)="onResetSelect($event, 'botId')">
         </cds-select>
         <!-- KEY -->
         <cds-text *ngIf="action?.useSlug" id="text"

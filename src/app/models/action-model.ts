@@ -243,7 +243,7 @@ export class ActionReplaceBotV2 extends Action {
 }
 
 export class ActionReplaceBotV3 extends Action {
-    botName: string;
+    botId: string;
     botSlug: string;
     useSlug: boolean;
     blockName: string;

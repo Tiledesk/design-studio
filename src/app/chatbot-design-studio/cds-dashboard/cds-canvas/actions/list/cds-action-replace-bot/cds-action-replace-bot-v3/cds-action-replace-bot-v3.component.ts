@@ -45,8 +45,8 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   async initialize(){
     await this.getAllBots();
-    if(this.action && this.action.botName){
-      let selectedChatbot = this.chatbots_name_list.find(el => el.name === this.action.botName)
+    if(this.action && this.action.botId){
+      let selectedChatbot = this.chatbots_name_list.find(el => el.id === this.action.botId)
       if(selectedChatbot){
         this.getAllFaqById(selectedChatbot.id)
       }
@@ -90,7 +90,7 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   onChangeSelect(event: {name: string, value: string, slug: string, id: string}) {
     this.logger.log("[ACTION REPLACE BOT] onChangeActionButton event: ", event)
-    this.action.botName = event.value;
+    this.action.botId = event.id;
     this.action.botSlug = event.slug;
     this.getAllFaqById(event.id)
     this.updateAndSaveAction.emit()
@@ -101,8 +101,7 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
     this.action.botSlug = $event
-    this.action.botName = this.chatbots_name_list.find(el => el.slug === $event)?.value ?? null;
-    console.log('actionnnnnnn', this.action)
+    this.action.botId = this.chatbots_name_list.find(el => el.slug === $event)?.id ?? null;
     // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -111,8 +110,10 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
   }
 
   onAutocompleteOptionSelected(option: string, property: string){
-    this.action.botName = option.split('(')[0].trim();
-    this.action.botSlug = this.chatbots_name_list.find(el => el.name === this.action.botName).slug
+    let name = option.split('(')[0].trim()
+    let slug = option.split('(')[1].trim().slice(0, -1);
+    this.action.botId = this.chatbots_name_list.find(el => (el.name === name && el.slug === slug)).id
+    this.action.botSlug = this.chatbots_name_list.find(el => el.id === this.action.botId).slug
   }
 
   onChangeBlockSelect(event: {name: string, value: string}){
@@ -123,8 +124,8 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   onResetSelect(event, key: string){
     switch(key){
-      case 'botName':
-        this.action.botName = null;
+      case 'botId':
+        this.action.botId = null;
         break;
       case 'blockName':
         this.action.blockName = null
@@ -138,21 +139,21 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     this.chatbots_name_list = this.chatbots_name_list.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a.id, disabled: this.action.useSlug? !a.slug: false, icon: 'smart_toy'}));
     if (target === "useSlg") {
       if (this.action[target]) {
-        if (this.action.botName) {
-          this.action.botSlug = this.getChatbotByNameOrSlug().slug
+        if (this.action.botId) {
+          this.action.botSlug = this.getChatbotByIdOrSlug().slug
         }
       } else {
-        this.action.botName = this.getChatbotByNameOrSlug().value
+        this.action.botId = this.getChatbotByIdOrSlug().value
       }
     }
     this.updateAndSaveAction.emit()
   }
 
-  getChatbotByNameOrSlug(){
+  getChatbotByIdOrSlug(){
     if(this.chatbots_name_list){
-      let chatbotByName = this.chatbots_name_list.find(el => el.name === this.action.botName)
-      if(chatbotByName){
-        return chatbotByName
+      let chatbotById = this.chatbots_name_list.find(el => el.id === this.action.botId)
+      if(chatbotById){
+        return chatbotById
       }
       let chatbotBySlug = this.chatbots_name_list.find(el => el.slug === this.action.botSlug)
       if(chatbotBySlug){
