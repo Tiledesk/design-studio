@@ -112,8 +112,8 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
   onAutocompleteOptionSelected(option: string, property: string){
     let name = option.split('(')[0].trim()
     let slug = option.split('(')[1].trim().slice(0, -1);
-    this.action.botId = this.chatbots_name_list.find(el => (el.name === name && el.slug === slug)).id
-    this.action.botSlug = this.chatbots_name_list.find(el => el.id === this.action.botId).slug
+    this.action.botId = this.chatbots_name_list.find(el => (el.name === name && el.slug === slug))?.id ?? null
+    this.action.botSlug = this.chatbots_name_list.find(el => el.id === this.action.botId)?.slug ?? null
   }
 
   onChangeBlockSelect(event: {name: string, value: string}){
@@ -143,7 +143,7 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
           this.action.botSlug = this.getChatbotByIdOrSlug().slug
         }
       } else {
-        this.action.botId = this.getChatbotByIdOrSlug().value
+        this.action.botId = this.getChatbotByIdOrSlug().id
       }
     }
     this.updateAndSaveAction.emit()
@@ -162,16 +162,12 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     }
   }
 
-  formatBotSlug(slug: string, element: HTMLElement){
+  formatBotSlug(slug: string){
     if (slug.startsWith('{{') && slug.endsWith('}}')) {
-      //add variable css class
-      element.classList.add('set-attribute-value')
       //not use ( )
       return slug.slice(2, slug.length - 2);
-    }else{
-      //use ( )
     }
-    return slug
+    return '(' + slug + ')'
   }
 
 
