@@ -1,4 +1,4 @@
-<div #resizeElement class="panel-intent-content tds_draggable" [class.isStart]="isStart" [id]="'intent-content-'+ intent?.intent_id">
+<div #resizeElement [ngClass]="{'cds-intent-active': intentService.intentSelectedID === intent.intent_id}"  class="panel-intent-content tds_draggable" [class.isStart]="isStart" [id]="'intent-content-'+ intent?.intent_id">
 
     <cds-panel-intent-controls
         [isInternalIntent]="isInternalIntent"
@@ -47,7 +47,9 @@
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
-
+       
+        <div *ngIf="isAgentsAvailable" class="agents-available"><span class="material-icons">boy</span></div>
+        
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->

@@ -7,6 +7,23 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.26.0-rc.5
+# 1.26.0-rc.4
+# 1.26.0-rc.3
+- **bug-fixed**: chatbot is not correctly selected in action-replace-bot-v2
+
+# 1.26.0-rc.2
+- **bug-fixed**: action-replace-bot-v2 not pass value correctly
+
+# 1.26.0-rc.1
+- **added**: slug as chatbot property and action-replace-bot-v2 option when user select a chatbot
+
+# 1.25.0-rc.3
+- **added**: intent and chatbot only agents visibility
+
+# 1.25.0-rc.2
+- **changed**: action-record translations and default values
+
 # 1.25.1
 
 # 1.25.0

@@ -41,7 +41,7 @@ export class IntentService {
   selectedAction: Action;
 
   actionSelectedID: string;
-  // intentSelectedID: string;
+  intentSelectedID: string;
 
   previousIntentId: string = '';
   // preDisplayName: string = 'untitled_block_';
@@ -114,6 +114,7 @@ export class IntentService {
 
 
   public setDefaultIntentSelected(){
+    this.intentSelectedID = null;
     if(this.listOfIntents && this.listOfIntents.length > 0){
       let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
       // this.logger.log('setDefaultIntentSelected: ', startIntent, startIntent[0]);
@@ -128,15 +129,22 @@ export class IntentService {
 
 
   public setIntentSelectedById(intent_id?){
+    this.logger.log('[INTENT SERVICE] ::: setIntentSelectedById:: ', intent_id);
     if(this.listOfIntents && this.listOfIntents.length > 0 && intent_id){
       this.intentSelected = this.listOfIntents.find(obj => ( obj.intent_id === intent_id));
+      this.intentSelectedID = intent_id;
+
+      this.controllerService.closeAllPanels();
+      this.unselectAction();
     } else {
       this.intentSelected = null;
+      this.intentSelectedID = null;
     }
   }
 
   public setIntentSelectedByIntent(intent){
     this.intentSelected = intent;
+    this.intentSelectedID = this.intentSelected.intent_id;
   }
 
   public setIntentSelectedPosition(x, y){
@@ -720,14 +728,19 @@ export class IntentService {
   /** selectIntent */
   public selectIntent(intentID){
     // this.logger.log('[INTENT SERVICE] --> selectIntent',  this.listOfIntents, intentID);
+    this.intentSelectedID = null;
     this.intentSelected = null;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
-    if(this.intentSelected)this.stageService.setDragElement(this.intentSelected.intent_id);
+    if(this.intentSelected){
+      this.stageService.setDragElement(this.intentSelected.intent_id);
+      this.intentSelectedID = this.intentSelected.intent_id;
+    }
     return this.intentSelected;
   }
 
   /** selectAction */
   public selectAction(intentID, actionId){
+    this.intentSelectedID = null;
     this.actionSelectedID = actionId;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
     this.listActions = this.intentSelected.actions;
@@ -738,7 +751,9 @@ export class IntentService {
 
   /** setIntentSelected */
   public setIntentSelected(intentID){
+    this.logger.log('[INTENT SERVICE] ::: setIntentSelected:: ', intentID);
     this.intentSelected = this.selectIntent(intentID);
+    this.intentSelectedID = this.intentSelected.intent_id;
     this.actionSelectedID = null;
     this.listActions = null;
     this.selectedAction = null;
@@ -757,6 +772,7 @@ export class IntentService {
 
 
   public async setStartIntent(){
+    this.intentSelectedID = null;
     this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
     this.logger.log('[CDS-CANVAS]  intentSelected: ', this.intentSelected);
     if(this.intentSelected){
@@ -897,6 +913,7 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.REPLACE_BOTV2){
       action = new  ActionReplaceBotV2();
+      action.nameAsSlug = false;
     }
     if(typeAction === TYPE_ACTION.REPLACE_BOTV3){
       action = new  ActionReplaceBotV3();
