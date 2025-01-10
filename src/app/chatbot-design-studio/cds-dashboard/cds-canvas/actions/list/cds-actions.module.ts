@@ -77,6 +77,8 @@ import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript
 import { CdsActionMoveUnassignedComponent } from './cds-action-move-unassigned/cds-action-move-unassigned.component';
 import { CdsActionConnectBlockComponent } from './cds-action-connect-block/cds-action-connect-block.component';
 import { CdsActionSendWhatsappComponent } from './cds-action-send-whatsapp/cds-action-send-whatsapp.component';
+import { VariableCssClassPipe } from 'src/app/pipe/variablecssClass.pipe';
+import { GetVariableNamePipe } from 'src/app/pipe/get-variable-name.pipe';
 
 @NgModule({
   declarations: [
@@ -167,7 +169,8 @@ import { CdsActionSendWhatsappComponent } from './cds-action-send-whatsapp/cds-a
 
     //PIPES
     FilterPipe,
-    
+    GetVariableNamePipe,
+    VariableCssClassPipe
     
   ],
   imports: [
@@ -262,7 +265,9 @@ import { CdsActionSendWhatsappComponent } from './cds-action-send-whatsapp/cds-a
     CdsActionSendWhatsappComponent,
     
     //PIPES
-    FilterPipe
+    FilterPipe,
+    GetVariableNamePipe,
+    VariableCssClassPipe
   ]
 })
 export class CdsActionsModule { }

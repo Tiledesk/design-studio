@@ -162,6 +162,18 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     }
   }
 
+  formatBotSlug(slug: string, element: HTMLElement){
+    if (slug.startsWith('{{') && slug.endsWith('}}')) {
+      //add variable css class
+      element.classList.add('set-attribute-value')
+      //not use ( )
+      return slug.slice(2, slug.length - 2);
+    }else{
+      //use ( )
+    }
+    return slug
+  }
+
 
 
 

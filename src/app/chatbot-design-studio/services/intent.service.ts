@@ -37,6 +37,7 @@ export class IntentService {
   mapOfIntents: any = {}; 
   // selectedIntent: Intent;
   intentSelected: Intent;
+  intentActive: boolean;
   listActions: Array<Action>;
   selectedAction: Action;
 
@@ -115,6 +116,7 @@ export class IntentService {
 
   public setDefaultIntentSelected(){
     this.intentSelectedID = null;
+    this.intentActive = false;
     if(this.listOfIntents && this.listOfIntents.length > 0){
       let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
       // this.logger.log('setDefaultIntentSelected: ', startIntent, startIntent[0]);
@@ -133,18 +135,20 @@ export class IntentService {
     if(this.listOfIntents && this.listOfIntents.length > 0 && intent_id){
       this.intentSelected = this.listOfIntents.find(obj => ( obj.intent_id === intent_id));
       this.intentSelectedID = intent_id;
-
+      this.intentActive = true;
       this.controllerService.closeAllPanels();
       this.unselectAction();
     } else {
       this.intentSelected = null;
       this.intentSelectedID = null;
+      this.intentActive = false;
     }
   }
 
   public setIntentSelectedByIntent(intent){
     this.intentSelected = intent;
     this.intentSelectedID = this.intentSelected.intent_id;
+    this.intentActive = true;
   }
 
   public setIntentSelectedPosition(x, y){
@@ -729,11 +733,13 @@ export class IntentService {
   public selectIntent(intentID){
     // this.logger.log('[INTENT SERVICE] --> selectIntent',  this.listOfIntents, intentID);
     this.intentSelectedID = null;
+    this.intentActive = false;
     this.intentSelected = null;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
     if(this.intentSelected){
       this.stageService.setDragElement(this.intentSelected.intent_id);
       this.intentSelectedID = this.intentSelected.intent_id;
+      this.intentActive = true;
     }
     return this.intentSelected;
   }
@@ -741,6 +747,7 @@ export class IntentService {
   /** selectAction */
   public selectAction(intentID, actionId){
     this.intentSelectedID = null;
+    this.intentActive = false;
     this.actionSelectedID = actionId;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
     this.listActions = this.intentSelected.actions;
@@ -754,6 +761,7 @@ export class IntentService {
     this.logger.log('[INTENT SERVICE] ::: setIntentSelected:: ', intentID);
     this.intentSelected = this.selectIntent(intentID);
     this.intentSelectedID = this.intentSelected.intent_id;
+    this.intentActive = true;
     this.actionSelectedID = null;
     this.listActions = null;
     this.selectedAction = null;
@@ -773,6 +781,7 @@ export class IntentService {
 
   public async setStartIntent(){
     this.intentSelectedID = null;
+    this.intentActive = false;
     this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
     this.logger.log('[CDS-CANVAS]  intentSelected: ', this.intentSelected);
     if(this.intentSelected){
@@ -791,6 +800,12 @@ export class IntentService {
     this.actionSelectedID = null;
     // this.intentSelectedID = null;
   }
+
+  /** unselectIntent */
+  public inactiveIntent(){
+    this.intentActive = false;
+  }
+
 
   /** deleteSelectedAction 
    * deleteConnectorsFromActionByActionId: elimino i connettori in uscita della action

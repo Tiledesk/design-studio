@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.26.0-rc.6
+- **added**: action-replace-bot-v3
+
 # 1.26.0-rc.5
 # 1.26.0-rc.4
 # 1.26.0-rc.3
