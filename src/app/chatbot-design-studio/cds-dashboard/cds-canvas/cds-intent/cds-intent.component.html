@@ -227,6 +227,11 @@
                         [action]="action">
                     </cds-action-replace-bot-v2>
 
+                    <cds-action-replace-bot-v3 *ngSwitchCase="TYPE_ACTION.REPLACE_BOTV3" 
+                        class="panel-response"
+                        [action]="action">
+                    </cds-action-replace-bot-v3>
+
                     <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE" 
                         class="panel-response"
                         [action]="action">

@@ -236,10 +236,20 @@ export class ActionReplaceBot extends Action {
 export class ActionReplaceBotV2 extends Action {
     botName: string;
     blockName: string;
-    nameAsSlug: boolean
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.REPLACE_BOTV2;
+    }
+}
+
+export class ActionReplaceBotV3 extends Action {
+    botName: string;
+    botSlug: string;
+    useSlug: boolean;
+    blockName: string;
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.REPLACE_BOTV3;
     }
 }
 

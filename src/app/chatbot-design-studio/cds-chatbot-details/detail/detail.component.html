@@ -140,7 +140,7 @@
         <input id="slug" name="slug" [(ngModel)]="selectedChatbot.slug" (change)="onInputChange($event,'slug')" class="input csd-chatbot-dtls-input"
           type="text" placeholder="{{ 'BotsAddEditPage.AddSlagToYourChatbot' | translate }}">
         <br>
-        <span *ngIf="chatbotSlugChanged" style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+        <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
           {{'BotsAddEditPage.SlugAlert' | translate}}
         </span>
       </div>
