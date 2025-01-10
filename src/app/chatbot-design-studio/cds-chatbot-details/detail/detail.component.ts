@@ -517,7 +517,7 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     this.elementRef.nativeElement.blur();
 
     // this.logger.log('[CDS-CHATBOT-DTLS] FAQ KB NAME TO UPDATE ', this.faqKb_name);
-    this.faqKbService.updateFaqKb(this.selectedChatbot._id, this.selectedChatbot.name, this.selectedChatbot.url, this.selectedChatbot.type, this.selectedChatbot.description, this.selectedChatbot.webhook_enabled, this.selectedChatbot.webhook_url, this.selectedChatbot.language).subscribe({next:(faqKb) => {
+    this.faqKbService.updateFaqKb(this.selectedChatbot).subscribe({next:(faqKb) => {
       this.logger.log('[CDS-CHATBOT-DTLS] EDIT BOT - FAQ KB UPDATED ', faqKb);
       if (faqKb) {
         this.selectedChatbot.name = faqKb['name']
@@ -525,6 +525,12 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
       }
     }, error: (error) => {
       this.logger.error('[CDS-CHATBOT-DTLS] EDIT BOT -  ERROR ', error);
+
+      if(error && error.error.error_code === 12001){
+        // =========== NOTIFY SLUG ALREADY EXISTS ERROR ===========
+        this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.SlugAlreadyExists'), 4, 'report_problem');
+        return
+      }
 
       // =========== NOTIFY ERROR ===========
       this.notify.showWidgetStyleUpdateNotification(this.translationsMap.get('CDSSetting.UpdateBotError'), 4, 'report_problem');

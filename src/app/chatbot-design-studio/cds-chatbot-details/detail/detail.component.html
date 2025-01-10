@@ -125,6 +125,28 @@
     </div> -->
 
 
+    <!-- SPACER -->
+    <div class="col-sm-12" style="height:10px"></div>
+
+
+    <!-- ------------------------------------------------------------------------------------------- -->
+    <!-- Slug  -->
+    <!-- ------------------------------------------------------------------------------------------- -->
+    <div class="row" style="margin-bottom: 16px;">
+      <label class="col-sm-2 cds-custom-label">
+        {{ 'BotsAddEditPage.Slug' | translate }}
+      </label>
+      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+        <input id="slug" name="slug" [(ngModel)]="selectedChatbot.slug" class="input csd-chatbot-dtls-input"
+          type="text" placeholder="{{ 'BotsAddEditPage.AddSlagToYourChatbot' | translate }}">
+        <br>
+        <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+          {{'BotsAddEditPage.SlugAlert' | translate}}
+        </span>
+      </div>
+    </div>
+
+
     <!-- ------------------------------------------------------------------------------------------- -->
     <!-- Update button  -->
     <!-- ------------------------------------------------------------------------------------------- -->

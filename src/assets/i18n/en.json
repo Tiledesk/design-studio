@@ -60,6 +60,9 @@
         "AddBot": "Add Bot",
         "EditBot": "Edit Bot",
         "BotName": "Name",
+        "Slug":"Slug",
+        "AddSlagToYourChatbot":"Add a slug to your chatbot",
+        "SlugAlert":"Be careful in modifying the slug name. It is used to reference chatbots in the flow",
         "CreateBot": "Create Bot",
         "UpdateBot": "Update Bot",
         "UpdateBotName": "Update Bot",
@@ -218,7 +221,8 @@
         "YourPublicEmail":"Your public email",
         "UpdateYourProfile":"Update your profile",
         "Processing": "Processing...",
-        "SearchABlock":"search a block..."
+        "SearchABlock":"search a block...",
+        "SlugAlreadyExists":"An error occurred: slug already exists"
     },
     "BotDetails": "Bot details",
     "Developer": "Developer",
@@ -483,7 +487,9 @@
         "loadingCompleteWithErrors":"Loading completed with errors",
         "PushTagsToList":"Push to tags List",
         "PushTagsToListDescription":"Check this option if you want to add tags to global list.",
-        "ViewList":"View list"
+        "ViewList":"View list",
+        "UseBotSlug":"Use bot slug",
+        "ChooseBotBySlug":"Choose bot by slug"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",

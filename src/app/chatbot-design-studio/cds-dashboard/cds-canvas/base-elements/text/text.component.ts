@@ -30,6 +30,7 @@ export class CDSTextComponent implements OnInit {
   @Input() readonly: boolean = false;
   @Output() blur = new EventEmitter();
   @Output() onChange = new EventEmitter<string>();
+  @Output() onOptionSelected = new EventEmitter<string>();
   @Output() selectedAttribute = new EventEmitter();
   
   filteredOptions: Observable<string[]>;
@@ -84,6 +85,10 @@ export class CDSTextComponent implements OnInit {
       this.myInput.nativeElement.classList.remove('autocompleteOpen')
       this.utilsComponent.nativeElement.classList.remove('slide-top')
     }
+  }
+
+  onOptionSelectedFN(event){
+    this.onOptionSelected.emit(event.option.value)
   }
 
 
