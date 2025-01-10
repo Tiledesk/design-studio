@@ -17,7 +17,7 @@
         </div>
 
         <div *ngIf="action?.botName || action?.botSlug" class="action-row-right"> 
-            {{ action?.botName }}<span class="slug" *ngIf="action?.botSlug"> ({{ action?.botSlug }})</span>
+            {{ action?.botName }}<div class="slug" [ngClass]="action?.botSlug | variableCssClass"  *ngIf="action?.botSlug"> {{action?.botSlug | getVariableName }} </div>
         </div>
         <div *ngIf="!action?.botName && !action?.botSlug" class="action-row-right empty"> 
             {{'CDSCanvas.ChooseBot' | translate }}

@@ -62,17 +62,9 @@ cds-text#text.sx-input ::ng-deep {
         height: inherit;
     }
     
-    .set-attribute-value {
-        font-size: 12px;
+    .set-option-value {
         font-weight: 600;
-        // background: #ecb606;
-        width: fit-content;
-        // color: #fff;
-        // height: 18px;
-        line-height: 1.5;
-
-        overflow: hidden;
-        word-break: break-word;
-    
+        background: unset;
+        color: unset;
     }    
 }

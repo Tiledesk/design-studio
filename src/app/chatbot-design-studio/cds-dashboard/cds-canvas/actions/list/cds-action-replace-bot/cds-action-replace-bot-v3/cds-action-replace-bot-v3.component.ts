@@ -102,7 +102,6 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
     this.action.botSlug = $event
     this.action.botName = this.chatbots_name_list.find(el => el.slug === $event)?.value ?? null;
-    console.log('actionnnnnnn', this.action)
     // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -159,6 +158,18 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
         return chatbotBySlug
       }
     }
+  }
+
+  formatBotSlug(slug: string, element: HTMLElement){
+    if (slug.startsWith('{{') && slug.endsWith('}}')) {
+      //add variable css class
+      element.classList.add('set-attribute-value')
+      //not use ( )
+      return slug.slice(2, slug.length - 2);
+    }else{
+      //use ( )
+    }
+    return slug
   }
 
 
