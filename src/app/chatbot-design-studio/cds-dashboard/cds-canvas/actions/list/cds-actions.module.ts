@@ -40,9 +40,9 @@ import { CdsActionMakeComponent } from './cds-action-make/cds-action-make.compon
 import { CdsActionOnlineAgentsComponent } from './cds-action-online-agents/cds-action-online-agents.component';
 import { CdsActionOpenHoursComponent } from './cds-action-open-hours/cds-action-open-hours.component';
 import { CdsActionQaplaComponent } from './cds-action-qapla/cds-action-qapla.component';
-import { CdsActionReplaceBotV2Component } from './cds-action-replace-bot-v2/cds-action-replace-bot-v2.component';
-import { CdsActionReplaceBotV3Component } from './cds-action-replace-bot-v3/cds-action-replace-bot-v3.component';
-import { CdsActionReplaceBotComponent } from './cds-action-replace-bot/cds-action-replace-bot.component';
+import { CdsActionReplaceBotV2Component } from './cds-action-replace-bot/cds-action-replace-bot-v2/cds-action-replace-bot-v2.component';
+import { CdsActionReplaceBotV3Component } from './cds-action-replace-bot/cds-action-replace-bot-v3/cds-action-replace-bot-v3.component';
+import { CdsActionReplaceBotComponent } from './cds-action-replace-bot/cds-action-replace-bot-v1/cds-action-replace-bot.component';
 import { CdsActionReplyComponent } from './cds-action-reply/cds-action-reply-v1/cds-action-reply.component';
 import { CdsActionReplyButtonComponent } from './cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button.component';
 import { CdsActionReplyFrameComponent } from './cds-action-reply/elements/cds-action-reply-frame/cds-action-reply-frame.component';
