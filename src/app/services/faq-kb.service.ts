@@ -44,7 +44,7 @@ export class FaqKbService {
    * NOTE: chat21-api-node.js READ THE CURRENT PROJECT ID FROM THE URL SO IT SO NO LONGER NECESSARY TO PASS THE PROJECT 
    * ID AS PARAMETER
    */
-  public getFaqKbByProjectId(): Observable<Chatbot[]> {
+  public getFaqKbByProjectId(): Observable<FaqKb[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ export class FaqKbService {
     const url = this.FAQKB_URL;
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY PROJECT ID - URL', url);
 
-    return this._httpClient.get<Chatbot[]>(url, httpOptions).pipe(map((response) => {
+    return this._httpClient.get<FaqKb[]>(url, httpOptions).pipe(map((response) => {
             const data = response;
             // Does something on data.data
             this.logger.log('[FAQ-KB.SERV] GET FAQ-KB BY PROJECT ID - data', data);
@@ -109,12 +109,14 @@ export class FaqKbService {
 
 
   public getBotById(id: string): Observable<FaqKb> {
+
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': this.tiledeskToken
       })
     };
+
     let url = this.FAQKB_URL + id;
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY ID - URL', url);
     return this._httpClient.get<FaqKb>(url, httpOptions)
@@ -125,33 +127,7 @@ export class FaqKbService {
    * @param id
    * @param fullName
    */
-  public updateFaqKb(chatbot: Chatbot) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-
-    let url = this.FAQKB_URL + chatbot._id;
-    this.logger.log('update BOT - URL ', url);
-    
-    // if (chatbot.type === 'internal' || chatbot.type === 'tilebot') {
-    //   chatbot['webhook_enabled'] = webkookisenalbled;
-    //   chatbot['webhook_url'] = webhookurl
-    //   chatbot['language'] = resbotlanguage
-    // }
-    this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', chatbot);
-    return this._httpClient.put(url, JSON.stringify(chatbot), httpOptions)
-  }
-
-  /**
-   * UPDATE (PUT)
-   * @param id
-   * @param fullName
-   */
-  public updateFaqKbAgentsAvailable(id: string, agents_available: boolean) {
+  public updateFaqKb(id: string, name: string, urlfaqkb: string, bottype: string, faqKb_description: string, webkookisenalbled: any, webhookurl, resbotlanguage: string) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -162,14 +138,23 @@ export class FaqKbService {
 
     let url = this.FAQKB_URL + id;
     this.logger.log('update BOT - URL ', url);
-    let body = { 
-      'agents_available': agents_available, 
+
+    let body = {}
+    body = { 
+      'name': name, 
+      'url': urlfaqkb, 
+      'type': bottype, 
+      'description': faqKb_description
     };
+    
+    if (bottype === 'internal' || bottype === 'tilebot') {
+      body['webhook_enabled'] = webkookisenalbled;
+      body['webhook_url'] = webhookurl
+      body['language'] = resbotlanguage
+    }
     this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', body);
     return this._httpClient.put(url, JSON.stringify(body), httpOptions)
   }
-  
-
   // PROJECT_ID/faq_kb/FAQ_KB_ID/language/LANGUAGE
 
   updateFaqKbLanguage (id: string, chatbotlanguage: string) {

@@ -197,8 +197,6 @@
         font-size: 14px;
         overflow: hidden;
         max-width: 170px;
-        display: flex;
-        align-items: center;
         // max-width: 150px; //GAB
     }
 
@@ -311,8 +309,4 @@
 
 .hidden {
     display: none;
-}
-
-.agents-available{
-    font-size: 16px;
-}
+  }

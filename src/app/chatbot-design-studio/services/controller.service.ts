@@ -18,9 +18,6 @@ export class ControllerService {
   private buttonSource = new Subject<Button>();
   public isOpenButtonPanel$ = this.buttonSource.asObservable();
 
-  private intentSource = new Subject<any>();
-  public isOpenIntentPanel$ = this.intentSource.asObservable();
-
   private actionSource = new Subject<{type: TYPE_INTENT_ELEMENT, element: Action | string | Form}>();
   public isOpenActionDetailPanel$ = this.actionSource.asObservable();
 
@@ -40,15 +37,6 @@ export class ControllerService {
     this.buttonSource.next(null);
   }
 
-  // action intent panel
-  public openIntentDetailPanel(intent){
-    this.intentSource.next(intent);
-  }
-
-  public closeIntentDetailPanel(){
-    this.intentSource.next(null);
-  }
-
   // action detail panel
   public openActionDetailPanel(type: TYPE_INTENT_ELEMENT, element: Action | string | Form){
     this.actionSource.next({type, element});
@@ -65,7 +53,6 @@ export class ControllerService {
 
 
   public closeAllPanels(){
-    this.intentSource.next(null);
     this.addActionMenu.next(null);
     this.buttonSource.next(null);
     this.actionSource.next({type: null, element: null});

@@ -78,7 +78,7 @@
     border-radius: unset;
     border: unset;
     max-width: var(--startIntentMaxWith);
-    outline: unset!important;
+    outline: unset;
   }
 
 
@@ -97,12 +97,6 @@
     overflow: hidden;
   }
 
-  .agents-available {
-    margin-top: -70px;
-    margin-left: -10px;
-    display: block;
-    position: absolute;
-  }
   // --------------------------------
   // https://stackoverflow.com/questions/9476923/css3-animate-border-color
 
@@ -307,11 +301,8 @@
   opacity: 1;
 }
 
-.cds-intent-active {
-  outline: 2px solid var(--action-selected-color) !important;
-}
-
 .cds-action-active {
+  // border: 3px solid #0f172a !important;
   outline: 2px solid var(--action-selected-color) !important;
 }
 

@@ -19,8 +19,7 @@
                 (blur)="onBlur($event)"
                 (ngModelChange)="onChangeText($event)"/>
             <div class="input-suffix" *ngIf="customPrefix"> / </div>
-            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" 
-                (opened)="onOpenClose('open')" (closed)="onOpenClose('close')" (optionSelected)="onOptionSelectedFN($event)">
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (opened)="onOpenClose('open')" (closed)="onOpenClose('close')">
                 <mat-option *ngFor="let option of filteredOptions | async" [value]="option" [title]="option">
                   {{option}}
                 </mat-option>

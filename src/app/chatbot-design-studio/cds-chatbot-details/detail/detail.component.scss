@@ -241,64 +241,9 @@ input[type="file"] {
     margin-left: 8px;
 }
 
+
+
 .custom-link {
     color: #0f62ff;
     cursor: pointer;
 }
-
-
-
-
-// --------------------
-// SWITCH BTN
-// --------------------
-// --------- start new on-off btn logo ---------
-.nw-onoffswitch {
-    position: relative;
-    width: 45px;
-    margin-top: 20px;
-    display: block;
-    float: left;
-}
-.nw-onoffswitch-checkbox {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-.nw-onoffswitch-label {
-    display: block;
-    overflow: hidden;
-    cursor: pointer;
-    height: 25px;
-    padding: 0;
-    line-height: 25px;
-    border: 2px solid #e3e3e3;
-    border-radius: 25px;
-    background-color: #ffffff;
-    transition: background-color 0.3s ease-in;
-}
-.nw-onoffswitch-label:before {
-    content: "";
-    display: block;
-    width: 25px;
-    margin: 0px;
-    background: #ffffff;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 20px;
-    border: 2px solid #e3e3e3;
-    border-radius: 25px;
-    transition: all 0.3s ease-in 0s;
-}
-.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
-    background-color: var(--blu);
-}
-.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
-.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
-    border-color: var(--blu);
-}
-.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
-    right: 0px;
-}
-// --------- ./end new on-off btn logo ---------
