@@ -60,7 +60,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   ai_error: string = "";
 
   temp_variables = [];
-  autocompleteOptions: Array<string> = [];
+  autocompleteOptions: Array<{label: string, value: string}> = [];
 
   model_list: Array<{ name: string, value: string, multiplier: string}>;
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
@@ -214,7 +214,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPT] getListNamespaces", namaspaceList)
       this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
-      namaspaceList.forEach(el => this.autocompleteOptions.push(el.name))
+      namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
   }

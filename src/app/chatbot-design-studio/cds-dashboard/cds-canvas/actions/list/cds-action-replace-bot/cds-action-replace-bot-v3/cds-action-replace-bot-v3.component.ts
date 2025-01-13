@@ -25,7 +25,7 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
   chatbots_block_name_list: Array<{name: string, value: string, icon?:string}>;
   bot_selected: Chatbot;
 
-  autocompleteOptions: Array<string> = [];
+  autocompleteOptions: Array<{label: string, value: string}> = [];
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -62,7 +62,7 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
         this.chatbots_name_list = chatbots.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a._id, disabled: this.action.useSlug? !a.slug: false, icon: 'smart_toy'}));
         chatbots.forEach(el => {
           if(el.slug)
-            this.autocompleteOptions.push(el.name + ' (' + el.slug + ')')
+            this.autocompleteOptions.push({label: el.name + ' (' + el.slug + ')', value: el.slug})
         })
         resolve(true)
       }, error: (error) => {
@@ -98,8 +98,8 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
   }
 
   onChangeTextarea($event: string, property: string) {
-    this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
-    this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
+    this.logger.log("[ACTION REPLACE BOT] onEditableDivTextChange event", $event)
+    this.logger.log("[ACTION REPLACE BOT] onEditableDivTextChange property", property)
     this.action.botSlug = $event
     this.action.botId = this.chatbots_name_list.find(el => el.slug === $event)?.id ?? null;
     // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
@@ -109,11 +109,9 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     this.updateAndSaveAction.emit();
   }
 
-  onAutocompleteOptionSelected(option: string, property: string){
-    let name = option.split('(')[0].trim()
-    let slug = option.split('(')[1].trim().slice(0, -1);
-    this.action.botId = this.chatbots_name_list.find(el => (el.name === name && el.slug === slug))?.id ?? null
-    this.action.botSlug = this.chatbots_name_list.find(el => el.id === this.action.botId)?.slug ?? null
+  onAutocompleteOptionSelected(option: {label: string, value: string}, property: string){
+    this.logger.log("[ACTION REPLACE BOT] onAutocompleteOptionSelected option:",option)
+    this.action.botId = this.chatbots_name_list.find(el => (el.slug === option.value))?.id ?? null
   }
 
   onChangeBlockSelect(event: {name: string, value: string}){
