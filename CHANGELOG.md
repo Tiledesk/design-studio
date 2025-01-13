@@ -10,6 +10,9 @@
 # 1.26.0-rc.7
 - **changed**: botName with botId in action-replace-bot-v3
 
+# 1.26.0-rc.7
+- **changed**: botName with botId in action-replace-bot-v3
+
 # 1.26.0-rc.6
 - **added**: action-replace-bot-v3
 
