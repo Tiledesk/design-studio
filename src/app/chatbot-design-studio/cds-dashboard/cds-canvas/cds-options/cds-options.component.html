@@ -1,18 +1,16 @@
 <div class="container">
 
-
-    <div>
-        <label for="alphaRange">Adjust Alpha:</label>
-        <input
-          type="range"
-          id="alphaRange"
-          min="0"
-          [max]="alphaStart"
-          step="10"
-          [(ngModel)]="alpha"
-          (input)="updateAlpha()"
-        />
+     <!-- OPTIONS -->
+    <div size="4" class="cds-elements" (click)="onTogleMoreMenu()">
+        <div class="cds-button-element">
+            <div class="cds-box-button">
+                <span class="box-img">
+                    <span class="material-icons-outlined">more_vert</span>
+                </span>
+            </div>
+        </div>
     </div>
+    
 
     <div size="4" class="cds-elements" mat-button>
         <!-- MOUSE -->
@@ -116,3 +114,17 @@
         (close)="mouseTips.close()">
     </cds-mouse-tips>
 </sat-popover>
+
+
+<div *ngIf="isMoreMenu" size="4" class="cds-elements vertical-slider-container">
+    <input
+      type="range"
+      id="alphaRange"
+      class="vertical-slider"
+      min="0"
+      [max]="alphaStart"
+      step="10"
+      [(ngModel)]="alpha"
+      (input)="updateAlpha()"
+    />
+  </div>

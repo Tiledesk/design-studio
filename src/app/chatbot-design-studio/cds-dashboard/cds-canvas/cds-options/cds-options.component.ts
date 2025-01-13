@@ -14,6 +14,7 @@ export class CdsOptionsComponent implements OnInit {
   OPTIONS = OPTIONS;
   alphaStart: number = 100;
   alpha:number;
+  isMoreMenu: boolean = false;
 
   
 
@@ -47,4 +48,8 @@ export class CdsOptionsComponent implements OnInit {
     this.onOptionClicked.emit({option: option});
   }
 
+
+  onTogleMoreMenu(){
+    this.isMoreMenu = !this.isMoreMenu;
+  }
 }

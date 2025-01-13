@@ -25,7 +25,7 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    console.log('[CDS-ADD-CONNECTOR MENU] ', this.connector);
+    // console.log('[CDS-ADD-CONNECTOR MENU] ', this.connector);
   }
 
   onAddActionFromConnectorMenu(type){

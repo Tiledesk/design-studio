@@ -193,14 +193,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    */
   private getParamsFromURL(){
     this.route.queryParams.subscribe(params => {
-      console.log('[CDS-CANVAS] Block params:', params);
+      // console.log('[CDS-CANVAS] Block params:', params);
       this.blockId = params['blockid'];
       if (this.blockId) {
-        console.log('[CDS-CANVAS] Block ID:', this.blockId);
+        // console.log('[CDS-CANVAS] Block ID:', this.blockId);
       }
       this.blockName = params['blockname'];
       if (this.blockName) {
-        console.log('[CDS-CANVAS] Block NAME:', this.blockName);
+        // console.log('[CDS-CANVAS] Block NAME:', this.blockName);
       }
     });
   }
@@ -1159,7 +1159,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   async onOptionClicked(resp){
     let option = resp.option;
     let alpha = resp.alpha;
-    console.log('onOptionClicked:: ', resp,  option, alpha);
+    // console.log('onOptionClicked:: ', resp,  option, alpha);
 
     switch(option){
       case OPTIONS.ZOOM_IN: {

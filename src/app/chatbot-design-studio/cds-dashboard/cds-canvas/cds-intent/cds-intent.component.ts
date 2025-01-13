@@ -62,6 +62,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   subscriptions: Array<{ key: string, value: Subscription }> = [];
   private unsubscribe$: Subject<any> = new Subject<any>();
   alphaConnectors: number;
+  connectorsIn: any;
 
 
   // intentElement: any;
@@ -179,7 +180,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       subscribtion = this.stageService.alphaConnectors$.subscribe(value => {
         this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
         this.alphaConnectors = value;
-        //this.getAllConnectorsIn();
+        this.getAllConnectorsIn();
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -227,21 +228,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     //}, 10000);
   }
 
-
-  public onClickedConnectorsIn(){
-    let connIn = this.connectorService.searchConnectorsInByIntent(this.intent.intent_id);
-    console.log("ID: ",this.intent.intent_id+" CONNECTORS IN: ", connIn);
-    connIn.forEach((connector) => {
-      console.log("ID: ",connector.id);
-      const svgElement = document.getElementById(connector.id) as HTMLElement;
-      if(svgElement){
-        svgElement.setAttribute('opacity', (1).toString());
-      }
-    });
-    // creo 2 funzioni in connectorService per mostrare/mascondere i connettori passati!!
+  private getAllConnectorsIn(){
+    if(this.intent){
+      this.connectorsIn = this.connectorService.searchConnectorsInByIntent(this.intent.intent_id);
+    }
   }
-
-
 
 
   private setActionIntent(){
