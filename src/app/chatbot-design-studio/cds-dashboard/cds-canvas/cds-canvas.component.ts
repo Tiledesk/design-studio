@@ -615,7 +615,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
     this.listnerConnectorDeselected = (e: CustomEvent) => {
-      this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+      //this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     }
     document.addEventListener('connector-deselected',  this.listnerConnectorDeselected, false);
 
@@ -1192,6 +1192,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         break;
       }
       case OPTIONS.ALPHA: {
+        this.logger.log("[CDS-CANVAS] alphaConnectors: ", alpha);
         this.stageService.setAlpha(alpha);
         break;
       }

@@ -9,18 +9,18 @@ import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
 export class CdsOptionsComponent implements OnInit {
 
   @Input() stateUndoRedo: any;
-  @Output() onOptionClicked = new EventEmitter<{ option: OPTIONS; extraData?: any }>();
-  //@Output() onOptionClicked = new EventEmitter<OPTIONS>();
+  @Output() onOptionClicked = new EventEmitter<{ option: OPTIONS; alpha?: any }>();
 
   OPTIONS = OPTIONS;
-  alpha: number = 100;
+  alphaStart: number = 100;
+  alpha:number;
 
   
 
   constructor() { }
 
   ngOnInit(): void {
-
+    this.alpha = this.alphaStart;
   }
 
   updateAlpha() {
@@ -39,7 +39,7 @@ export class CdsOptionsComponent implements OnInit {
       const element = svgLine as SVGElement;
       element.setAttribute('opacity', (this.alpha / 100).toString());
     });
-    this.onOptionClicked.emit({ option: OPTIONS.ALPHA, extraData: this.alpha });
+    this.onOptionClicked.emit({ option: OPTIONS.ALPHA, alpha: this.alpha });
   }
 
   onOptionClick(option){

@@ -7,7 +7,7 @@
           type="range"
           id="alphaRange"
           min="0"
-          max="100"
+          [max]="alphaStart"
           step="10"
           [(ngModel)]="alpha"
           (input)="updateAlpha()"

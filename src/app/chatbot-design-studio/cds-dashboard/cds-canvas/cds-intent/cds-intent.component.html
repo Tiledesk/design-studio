@@ -1,4 +1,7 @@
 <div #resizeElement class="panel-intent-content tds_draggable" [class.isStart]="isStart" [id]="'intent-content-'+ intent?.intent_id">
+    <cds-connector-in *ngIf="!isStart && alphaConnectors < 1"
+    (onClickedConnectorsIn)="onClickedConnectorsIn()">
+    </cds-connector-in>
 
     <cds-panel-intent-controls
         [isInternalIntent]="isInternalIntent"

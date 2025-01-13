@@ -63,27 +63,20 @@ $toogle-sidebar-width: 22px;
 
 
 ::ng-deep #tds_svgConnectors{
-  stroke: #b1b1b7;
+  stroke: #b1b1b750;
   .tds_path {
     animation: dash 30s linear infinite;
     stroke-dasharray: 6;
     stroke-width: 3px;
     stroke: gray;
   }
-
   .tds_connector {
-    // stroke: black;
-    // stroke-width: 2px;
-    // stroke: #b1b1b7;
-    // stroke: #b1b1b730;
     stroke-width: 3px;
   }
-  
   .tds_connector_over {
     stroke: gray;
     stroke-width: 3px;
   }
-  
   .tds_connector_selected {
     stroke: #3ea9f5;
     stroke-width: 3px;
@@ -91,15 +84,15 @@ $toogle-sidebar-width: 22px;
 }
 
 ::ng-deep #tds_arrow {
-  stroke: #b1b1b7;
+  stroke: #b1b1b750;
   .tds_connector {
-    fill: #b1b1b7;
+    fill: #b1b1b750;
   }
 }
 
 
 ::ng-deep .line-text-connector {
-  stroke: #b1b1b7;
+  stroke: #b1b1b750;
 }
 
 

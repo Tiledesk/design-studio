@@ -61,6 +61,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   subscriptions: Array<{ key: string, value: Subscription }> = [];
   private unsubscribe$: Subject<any> = new Subject<any>();
+  alphaConnectors: number;
+
 
   // intentElement: any;
   // idSelectedAction: string;
@@ -107,9 +109,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.initSubscriptions()
   }
 
+  // aggiungo un pignulo su intent che sul hover del mouse cambia in 1 opacity di tutti i connettori in ingresso
   initSubscriptions() {
     let subscribtion: any;
     let subscribtionKey: string;
+
     /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
     subscribtionKey = 'behaviorIntent';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
@@ -131,8 +135,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             // });
           }
 
-
-
           //UPDATE QUESTIONS
           if (this.intent.question) {
             const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
@@ -148,7 +150,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           } else {
             this.formSize = 0;
           }
-
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
@@ -171,6 +172,18 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.subscriptions.push(subscribe);
     }
 
+    /** SUBSCRIBE TO THE ALPHA CONNECTOR VALUE */
+    subscribtionKey = 'alphaConnectors';
+    subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
+    if (!subscribtion) {
+      subscribtion = this.stageService.alphaConnectors$.subscribe(value => {
+        this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
+        this.alphaConnectors = value;
+        //this.getAllConnectorsIn();
+      });
+      const subscribe = { key: subscribtionKey, value: subscribtion };
+      this.subscriptions.push(subscribe);
+    }
   }
 
 
@@ -212,8 +225,24 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.addEventListener();
     //}, 10000);
-    
   }
+
+
+  public onClickedConnectorsIn(){
+    let connIn = this.connectorService.searchConnectorsInByIntent(this.intent.intent_id);
+    console.log("ID: ",this.intent.intent_id+" CONNECTORS IN: ", connIn);
+    connIn.forEach((connector) => {
+      console.log("ID: ",connector.id);
+      const svgElement = document.getElementById(connector.id) as HTMLElement;
+      if(svgElement){
+        svgElement.setAttribute('opacity', (1).toString());
+      }
+    });
+    // creo 2 funzioni in connectorService per mostrare/mascondere i connettori passati!!
+  }
+
+
+
 
   private setActionIntent(){
     try {
