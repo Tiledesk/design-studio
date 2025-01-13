@@ -22,10 +22,10 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   //bots: Chatbot[] = [];
   chatbots_name_list: Array<{name: string, value: string, id: string, slug: string, icon?:string}>;
-  chatbots_block_name_list: Array<{name: string, value: string, icon?:string}>;
   bot_selected: Chatbot;
 
   autocompleteOptions: Array<{label: string, value: string}> = [];
+  autocompleteOptionsBlockName: Array<{label: string, value: string}> = [];
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -79,8 +79,8 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
   getAllFaqById(chatbotId: string){
     this.logger.log("[ACTION REPLACE BOT] get AllFaqById: ",chatbotId);
     this.faqService.getAllFaqByFaqKbId(chatbotId).subscribe({ next: (faks: Intent[])=> {
-      this.chatbots_block_name_list = faks.map((el => ({name: el.intent_display_name, value: el.intent_display_name})))
-      this.logger.log("[ACTION REPLACE BOT] get AllFaqById: ", this.chatbots_block_name_list);
+      faks.forEach(el => this.autocompleteOptionsBlockName.push({label: el.intent_display_name, value: el.intent_display_name}))
+      this.logger.log("[ACTION REPLACE BOT] get AllFaqById: ", this.autocompleteOptionsBlockName);
     }, error: (error)=> {
       this.logger.error("[ACTION REPLACE BOT] error get AllFaqById: ", error);
     }, complete: () => {
@@ -97,11 +97,18 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     this.logger.log("[ACTION REPLACE BOT] action edited: ", this.action)
   }
 
-  onChangeTextarea($event: string, property: string) {
-    this.logger.log("[ACTION REPLACE BOT] onEditableDivTextChange event", $event)
+  onChangeTextarea(event: string, property: string) {
+    this.logger.log("[ACTION REPLACE BOT] onEditableDivTextChange event", event)
     this.logger.log("[ACTION REPLACE BOT] onEditableDivTextChange property", property)
-    this.action.botSlug = $event
-    this.action.botId = this.chatbots_name_list.find(el => el.slug === $event)?.id ?? null;
+    switch(property){
+      case 'botSlug':
+        this.action.botSlug = event
+        this.action.botId = this.chatbots_name_list.find(el => el.slug === event)?.id ?? null;
+        break; 
+      case 'blockName':
+        this.action.blockName = event
+        break; 
+    }
     // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -109,9 +116,13 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     this.updateAndSaveAction.emit();
   }
 
-  onAutocompleteOptionSelected(option: {label: string, value: string}, property: string){
+  onAutocompleteOptionSelected(option: {label: string, value: string}, key: string){
     this.logger.log("[ACTION REPLACE BOT] onAutocompleteOptionSelected option:",option)
-    this.action.botId = this.chatbots_name_list.find(el => (el.slug === option.value))?.id ?? null
+    switch(key){
+      case 'botSlug':
+        this.action.botId = this.chatbots_name_list.find(el => (el.slug === option.value))?.id ?? null
+        break; 
+    }
   }
 
   onChangeBlockSelect(event: {name: string, value: string}){

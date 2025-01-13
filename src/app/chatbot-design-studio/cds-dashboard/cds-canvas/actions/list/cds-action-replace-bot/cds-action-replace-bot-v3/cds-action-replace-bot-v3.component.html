@@ -76,16 +76,15 @@
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.ExecuteBlock' | translate }}</label>
         <label class="subtitle-label">{{'CDSCanvas.ChooseBlockDescription' | translate }}</label>
-        <cds-select id="text-condition" 
-            [items]="chatbots_block_name_list" 
-            [bindLabelSelect]="'name'"
-            [bindValueSelect]="'value'"
-            [searchable]=true
-            [clearable]=true
-            [itemSelected]="action?.blockName" 
-            (onSelected)="onChangeBlockSelect($event)"
-            (onReset)="onResetSelect($event, 'blockName')">
-        </cds-select>
+        <cds-text id="blockName"
+            class="sx-input" 
+            [text]="action?.blockName"
+            [placeholder]="'CDSCanvas.ChooseBotBySlug' | translate"
+            [autocompleteOptions]="autocompleteOptionsBlockName"
+            (blur)="onBlur($event)"
+            (onChange)="onChangeTextarea($event, 'blockName')"
+            (onOptionSelected)="onAutocompleteOptionSelected($event, 'blockName')">
+        </cds-text>
     </div>
 
 </div>
