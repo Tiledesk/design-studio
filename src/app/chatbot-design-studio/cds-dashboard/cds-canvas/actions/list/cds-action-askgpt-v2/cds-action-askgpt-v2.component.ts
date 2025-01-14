@@ -206,13 +206,13 @@ export class CdsActionAskgptV2Component implements OnInit {
       new_attributes.push({ name: "kb_source", value: "kb_source" });
     }
     variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
-    this.logger.debug("[ACTION ASKGPTV2] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
+    this.logger.debug("[ACTION-ASKGPTV2] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
 
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
-      this.logger.log("[ACTION-ASKGPT] getListNamespaces", namaspaceList)
+      this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
       this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
       namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
@@ -246,8 +246,8 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   onChangeTextarea($event: string, property: string) {
-    this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
-    this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
+    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", $event)
+    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property)
     this.action[property] = $event
     // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
@@ -268,7 +268,7 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.logger.log("event: ", event);
       this.action.model = event.value;
       
-      this.logger.log("[ACTION-ASKGPT] updated action", this.action);
+      this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   }
@@ -350,8 +350,8 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   updateSliderValue(event, target) {
-    this.logger.debug("[ACTION GPT-TASK] updateSliderValue event: ", event)
-    this.logger.debug("[ACTION GPT-TASK] updateSliderValue target: ", target)
+    this.logger.debug("[ACTION-ASKGPTV2] updateSliderValue event: ", event)
+    this.logger.debug("[ACTION-ASKGPTV2] updateSliderValue target: ", target)
     this.action[target] = event;
     this.updateAndSaveAction.emit();
   }
@@ -519,7 +519,6 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   saveAttributes(attributes) {
-    this.logger.log("attributes: ", attributes);
     attributes.forEach(a => {
       let index = this.action.preview.findIndex(v => v.name === a.name)
       if (index != -1) {
