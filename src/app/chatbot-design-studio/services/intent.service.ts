@@ -3,7 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3 } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -37,11 +37,12 @@ export class IntentService {
   mapOfIntents: any = {}; 
   // selectedIntent: Intent;
   intentSelected: Intent;
+  intentActive: boolean;
   listActions: Array<Action>;
   selectedAction: Action;
 
   actionSelectedID: string;
-  // intentSelectedID: string;
+  intentSelectedID: string;
 
   previousIntentId: string = '';
   // preDisplayName: string = 'untitled_block_';
@@ -114,6 +115,8 @@ export class IntentService {
 
 
   public setDefaultIntentSelected(){
+    this.intentSelectedID = null;
+    this.intentActive = false;
     if(this.listOfIntents && this.listOfIntents.length > 0){
       let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
       // this.logger.log('setDefaultIntentSelected: ', startIntent, startIntent[0]);
@@ -128,15 +131,24 @@ export class IntentService {
 
 
   public setIntentSelectedById(intent_id?){
+    this.logger.log('[INTENT SERVICE] ::: setIntentSelectedById:: ', intent_id);
     if(this.listOfIntents && this.listOfIntents.length > 0 && intent_id){
       this.intentSelected = this.listOfIntents.find(obj => ( obj.intent_id === intent_id));
+      this.intentSelectedID = intent_id;
+      this.intentActive = true;
+      this.controllerService.closeAllPanels();
+      this.unselectAction();
     } else {
       this.intentSelected = null;
+      this.intentSelectedID = null;
+      this.intentActive = false;
     }
   }
 
   public setIntentSelectedByIntent(intent){
     this.intentSelected = intent;
+    this.intentSelectedID = this.intentSelected.intent_id;
+    this.intentActive = true;
   }
 
   public setIntentSelectedPosition(x, y){
@@ -720,14 +732,22 @@ export class IntentService {
   /** selectIntent */
   public selectIntent(intentID){
     // this.logger.log('[INTENT SERVICE] --> selectIntent',  this.listOfIntents, intentID);
+    this.intentSelectedID = null;
+    this.intentActive = false;
     this.intentSelected = null;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
-    if(this.intentSelected)this.stageService.setDragElement(this.intentSelected.intent_id);
+    if(this.intentSelected){
+      this.stageService.setDragElement(this.intentSelected.intent_id);
+      this.intentSelectedID = this.intentSelected.intent_id;
+      this.intentActive = true;
+    }
     return this.intentSelected;
   }
 
   /** selectAction */
   public selectAction(intentID, actionId){
+    this.intentSelectedID = null;
+    this.intentActive = false;
     this.actionSelectedID = actionId;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
     this.listActions = this.intentSelected.actions;
@@ -738,7 +758,10 @@ export class IntentService {
 
   /** setIntentSelected */
   public setIntentSelected(intentID){
+    this.logger.log('[INTENT SERVICE] ::: setIntentSelected:: ', intentID);
     this.intentSelected = this.selectIntent(intentID);
+    this.intentSelectedID = this.intentSelected.intent_id;
+    this.intentActive = true;
     this.actionSelectedID = null;
     this.listActions = null;
     this.selectedAction = null;
@@ -757,6 +780,8 @@ export class IntentService {
 
 
   public async setStartIntent(){
+    this.intentSelectedID = null;
+    this.intentActive = false;
     this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
     this.logger.log('[CDS-CANVAS]  intentSelected: ', this.intentSelected);
     if(this.intentSelected){
@@ -775,6 +800,12 @@ export class IntentService {
     this.actionSelectedID = null;
     // this.intentSelectedID = null;
   }
+
+  /** unselectIntent */
+  public inactiveIntent(){
+    this.intentActive = false;
+  }
+
 
   /** deleteSelectedAction 
    * deleteConnectorsFromActionByActionId: elimino i connettori in uscita della action
@@ -897,6 +928,11 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.REPLACE_BOTV2){
       action = new  ActionReplaceBotV2();
+      action.nameAsSlug = false;
+    }
+    if(typeAction === TYPE_ACTION.REPLACE_BOTV3){
+      action = new  ActionReplaceBotV3();
+      action.useSlug = false;
     }
     if(typeAction === TYPE_ACTION.CHANGE_DEPARTMENT) {
       action = new  ActionChangeDepartment();

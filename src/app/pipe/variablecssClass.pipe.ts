@@ -1,16 +1,16 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'getVariableName'
+  name: 'variableCssClass' 
 })
-export class GetVariableNamePipe implements PipeTransform {
+export class VariableCssClassPipe implements PipeTransform {
 
   transform(value: string): string {
     let matches = value.match(new RegExp(/{{[^{}]*}}/g));
     if (!matches || matches.length == 0) {
-      return value;
+      return '';
     }
-    return matches[0].slice(2, matches[0].length - 2);
+    return 'set-attribute-value';
   }
 
 }
