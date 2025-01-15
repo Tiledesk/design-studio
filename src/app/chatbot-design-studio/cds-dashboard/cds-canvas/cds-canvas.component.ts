@@ -45,6 +45,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   listnerMovedAndScaled: (e: CustomEvent) => void;
   listnerKeydown: (e: any) => void;
   listnerConnectorSelected: (e: CustomEvent) => void;
+  listnerConnectorDeselected: (e: CustomEvent) => void;
   listnerConnectorUpdated: (e: CustomEvent) => void;
   listnerConnectorDeleted: (e: CustomEvent) => void;
   listnerConnectorCreated: (e: CustomEvent) => void;
@@ -170,6 +171,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     document.removeEventListener("start-dragging", this.listnerStartDragging, false);
     document.removeEventListener("keydown", this.listnerKeydown, false);
     document.removeEventListener("connector-selected", this.listnerConnectorSelected, false);
+    document.removeEventListener("connector-deselected", this.listnerConnectorDeselected, false);
     document.removeEventListener("connector-updated", this.listnerConnectorUpdated, false);
     document.removeEventListener("connector-deleted", this.listnerConnectorDeleted, false);
     document.removeEventListener("connector-created", this.listnerConnectorCreated, false);
@@ -196,14 +198,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    */
   private getParamsFromURL(){
     this.route.queryParams.subscribe(params => {
-      console.log('[CDS-CANVAS] Block params:', params);
+      // console.log('[CDS-CANVAS] Block params:', params);
       this.blockId = params['blockid'];
       if (this.blockId) {
-        console.log('[CDS-CANVAS] Block ID:', this.blockId);
+        // console.log('[CDS-CANVAS] Block ID:', this.blockId);
       }
       this.blockName = params['blockname'];
       if (this.blockName) {
-        console.log('[CDS-CANVAS] Block NAME:', this.blockName);
+        // console.log('[CDS-CANVAS] Block NAME:', this.blockName);
       }
     });
   }
@@ -635,6 +637,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.intentService.unselectAction();
     };
     document.addEventListener("connector-selected", this.listnerConnectorSelected, false);
+
+
+    this.listnerConnectorDeselected = (e: CustomEvent) => {
+      //this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+    }
+    document.addEventListener('connector-deselected',  this.listnerConnectorDeselected, false);
 
     /**  keydown 
     * check if Ctrl (Windows) or Command (Mac) and Z were pressed at the same time
@@ -1192,10 +1200,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    // --------------------------------------------------------- // 
   // EVENT > PANEL OPTIONS 
   // --------------------------------------------------------- //
-  async onOptionClicked(option: OPTIONS){
+  async onOptionClicked(resp){
+    let option = resp.option;
+    let alpha = resp.alpha;
+    // console.log('onOptionClicked:: ', resp,  option, alpha);
+
     switch(option){
       case OPTIONS.ZOOM_IN: {
-        const result = await  this.stageService.zoom('in');
+        const result = await this.stageService.zoom('in');
         if (result) {
           this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
         }
@@ -1221,6 +1233,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       }
       case OPTIONS.REDO: {
         this.intentService.restoreLastREDO();
+        break;
+      }
+      case OPTIONS.ALPHA: {
+        this.logger.log("[CDS-CANVAS] alphaConnectors: ", alpha);
+        this.stageService.setAlpha(alpha);
         break;
       }
     }

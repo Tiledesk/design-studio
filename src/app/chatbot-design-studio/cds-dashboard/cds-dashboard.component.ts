@@ -72,7 +72,6 @@ export class CdsDashboardComponent implements OnInit {
   
 
   ngOnInit() {
-    console.log("•••• [CDS DSHBRD] ngOnInit ••••");
     // ---------------------------------------
     // Changelog alert
     // ---------------------------------------

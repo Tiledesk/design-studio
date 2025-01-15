@@ -3,18 +3,21 @@ import { TiledeskStage } from 'src/assets/js/tiledesk-stage.js';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { scaleAndcenterStageOnCenterPosition } from '../utils';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StageService {
 
+  private alphaConnectorsSubject = new BehaviorSubject<number>(60);
+  alphaConnectors$ = this.alphaConnectorsSubject.asObservable();
+
   tiledeskStage: any;
   loaded: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor() { }
-
 
 
   initializeStage(){
@@ -103,6 +106,7 @@ export class StageService {
     return this.tiledeskStage.scale;
   }
 
+
   onSwipe(event: WheelEvent) {
     if (event.deltaX > 0) {
       // console.log('Swipe RIGHT');
@@ -117,4 +121,15 @@ export class StageService {
     //   console.log('Swipe UP');
     // }
   }
+
+  setAlpha(alpha: number): void {
+    this.alphaConnectorsSubject.next(alpha);
+  }
+
+  getAlpha(): number {
+    return this.alphaConnectorsSubject.getValue();
+  }
+
+
+
 }

@@ -64,10 +64,10 @@ export class TiledeskConnectors {
     // this.connectorSelectedId = null;
 
     this.markers = [
-      { id: this.ids['arrow'], fill: this.colors['black'], class: this.classes['tds_connector'] },
-      { id: this.ids['arrow_draft'], fill: this.colors['gray'], class: this.classes['tds_connector_draft'] },
-      { id: this.ids['arrow_over'], fill: this.colors['gray'], class: this.classes['tds_connector_over'] },
-      { id: this.ids['arrow_selected'], fill: this.colors['blue'], class: this.classes['tds_connector_selected'] }
+      { id: this.ids['arrow'], fill: this.colors['black'], class: this.classes['connector'] },
+      { id: this.ids['arrow_draft'], fill: this.colors['gray'], class: this.classes['connector_draft'] },
+      { id: this.ids['arrow_over'], fill: this.colors['gray'], class: this.classes['connector_over'] },
+      { id: this.ids['arrow_selected'], fill: this.colors['blue'], class: this.classes['connector_selected'] }
     ]
 
     this.#createSvgContainer();
@@ -735,6 +735,12 @@ export class TiledeskConnectors {
       connector.setAttributeNS(null, "class", "connector");
       connector.setAttributeNS(null, "pointer-events", "stroke");
 
+      // Quando il connettore perde il focus (blur), deselezionalo
+      connector.addEventListener('blur', () => { 
+        const deselectEvent = new CustomEvent("connector-deselected");
+        document.dispatchEvent(deselectEvent);
+      });
+
       connector.addEventListener('mouseover', (e) => {
         //// console.log("mouseover e", e.currentTarget);
         if (this.selectedConnector !== null) { // jump highlighting current selection
@@ -778,6 +784,7 @@ export class TiledeskConnectors {
       const x = (frontPoint.x + backPoint.x) / 2;
       const y = (frontPoint.y + backPoint.y) / 2;
       let group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      group.setAttributeNS(null, "class", `line-text-connector`);
       let lineText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       lineText.setAttributeNS(null, "id", "label_"+id);
       lineText.setAttributeNS(null, "x", String(x));

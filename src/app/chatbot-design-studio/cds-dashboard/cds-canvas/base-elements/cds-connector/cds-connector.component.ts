@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'cds-connector',
@@ -10,9 +10,48 @@ export class CdsConnectorComponent implements OnInit {
   @Input() idConnection: string;
   @Input() isConnected: boolean;
 
+  @Output() onShowConnector = new EventEmitter();
+  @Output() onHideConnector = new EventEmitter();
+
   constructor() { }
 
   ngOnInit(): void {
-    
   }
+
+  public showConnector(){
+    if(this.idConnection && this.isConnected){
+      const idConnection = this.idConnection.replace('#', '');
+      const svgElement = document.getElementById(idConnection) as HTMLElement;
+      if(svgElement){
+        svgElement.setAttribute('opacity', (1).toString());
+      }
+      const svgElementRec = document.getElementById('rect_'+idConnection) as HTMLElement;
+      if(svgElementRec){
+        svgElementRec.setAttribute('opacity', (1).toString());
+      }
+      const svgElementTxt = document.getElementById('label_'+idConnection) as HTMLElement;
+      if(svgElementTxt){
+        svgElementTxt.setAttribute('opacity', (1).toString());
+      }
+    }
+  }
+
+  public hideConnector(){
+    if(this.idConnection && this.isConnected){
+      const idConnection = this.idConnection.replace('#', '');
+      const svgElement = document.getElementById(idConnection) as HTMLElement;
+      if(svgElement){
+        svgElement.setAttribute('opacity', (0).toString());
+      }
+      const svgElementRec = document.getElementById('rect_'+idConnection) as HTMLElement;
+      if(svgElementRec){
+        svgElementRec.setAttribute('opacity', (0).toString());
+      }
+      const svgElementTxt = document.getElementById('label_'+idConnection) as HTMLElement;
+      if(svgElementTxt){
+        svgElementTxt.setAttribute('opacity', (0).toString());
+      }
+    }
+  }
+
 }
