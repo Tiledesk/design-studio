@@ -18,7 +18,8 @@ export class CdsConnectorInComponent implements OnInit {
     }
   }
 
-  public showConnectorsIn(){
+  public showConnectorsIn(event: MouseEvent){
+    event.stopPropagation();
     if(this.connectorsIn){
       this.connectorsIn.forEach((connector) => {
         const svgElement = document.getElementById(connector.id) as HTMLElement;
@@ -38,7 +39,8 @@ export class CdsConnectorInComponent implements OnInit {
     }
   }
 
-  public hideConnectorsIn(){
+  public hideConnectorsIn(event: MouseEvent){
+    event.stopPropagation();
     if(this.connectorsIn){
       this.connectorsIn.forEach((connector) => {
         const svgElement = document.getElementById(connector.id) as HTMLElement;

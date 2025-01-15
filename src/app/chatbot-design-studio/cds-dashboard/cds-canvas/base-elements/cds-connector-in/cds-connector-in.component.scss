@@ -1,4 +1,7 @@
 .action-connector {
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: 2;
     display: flex;
     -webkit-box-align: center;
     align-items: center;
