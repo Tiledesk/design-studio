@@ -24,9 +24,11 @@
                 {{ 'Agents available' | translate }}
                 </span>
             </h3>
-            <div class="section-subtitle"></div> -->
-        
-            <div class="nw-onoffswitch-wrapper" style="clear: both; display: inline-block;">
+            <div class="section-subtitle"></div> 
+            -->
+           
+            <div class="nw-onoffswitch-wrapper" style="clear: both; display: inline-block;"> 
+                <div *ngIf="intentSelected.agents_available" class="agents-available"><span class="material-icons">boy</span></div>
                 <div class="nw-onoffswitch">
                     <input type="checkbox" name="agents_available_switch"
                         class="nw-onoffswitch-checkbox" id="agents_available_switch"
