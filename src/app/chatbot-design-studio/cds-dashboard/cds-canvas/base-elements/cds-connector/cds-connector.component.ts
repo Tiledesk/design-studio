@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 
 @Component({
   selector: 'cds-connector',
@@ -13,13 +14,16 @@ export class CdsConnectorComponent implements OnInit {
   @Output() onShowConnector = new EventEmitter();
   @Output() onHideConnector = new EventEmitter();
 
-  constructor() { }
+  constructor(
+    private stageService: StageService
+  ) { }
 
   ngOnInit(): void {
   }
 
   public showConnector(){
-    if(this.idConnection && this.isConnected){
+    const alphaConnector = Number(this.stageService.getAlpha());
+    if(alphaConnector == 0 && this.idConnection && this.isConnected){
       const idConnection = this.idConnection.replace('#', '');
       const svgElement = document.getElementById(idConnection) as HTMLElement;
       if(svgElement){
@@ -37,7 +41,8 @@ export class CdsConnectorComponent implements OnInit {
   }
 
   public hideConnector(){
-    if(this.idConnection && this.isConnected){
+    const alphaConnector = this.stageService.getAlpha();
+    if(alphaConnector == 0 && this.idConnection && this.isConnected){
       const idConnection = this.idConnection.replace('#', '');
       const svgElement = document.getElementById(idConnection) as HTMLElement;
       if(svgElement){

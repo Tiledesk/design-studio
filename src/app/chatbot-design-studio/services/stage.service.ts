@@ -123,11 +123,13 @@ export class StageService {
   }
 
   setAlpha(alpha: number): void {
+    this.tiledeskStage.alphaConnectors = alpha;
     this.alphaConnectorsSubject.next(alpha);
   }
 
   getAlpha(): number {
-    return this.alphaConnectorsSubject.getValue();
+    return this.tiledeskStage.alphaConnectors;
+    // return this.alphaConnectorsSubject.getValue();
   }
 
 

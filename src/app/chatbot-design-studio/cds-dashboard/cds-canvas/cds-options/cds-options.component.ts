@@ -26,7 +26,7 @@ export class CdsOptionsComponent implements OnInit {
     this.alpha = this.alphaStart;
   }
 
-  updateAlpha() {
+  updateAlphaConnectors() {
     const svgElement = document.querySelector('#tds_svgConnectors') as HTMLElement;
     if (svgElement) {
       const paths = svgElement.querySelectorAll('path');
@@ -44,12 +44,12 @@ export class CdsOptionsComponent implements OnInit {
     this.onOptionClicked.emit({ option: OPTIONS.ALPHA, alpha: this.alpha });
   }
 
-  forceAlphaFocus(): void {
+  forceAlphaConnectorsFocus(): void {
     this.alphaInput.nativeElement.focus();
   }
 
 
-  closeMenu(){
+  closeAlphaConnectorsMenu(){
     this.isMoreMenu = false;
   }
 
@@ -59,12 +59,12 @@ export class CdsOptionsComponent implements OnInit {
   }
 
 
-  onTogleMoreMenu(){
+  onTogleAlphaConnectorsMenu(){
     this.isMoreMenu = !this.isMoreMenu;
     if(this.isMoreMenu){
       setTimeout(() => {
         if (this.alphaInput) {
-          this.forceAlphaFocus();
+          this.forceAlphaConnectorsFocus();
         }
       }, 0);
     } 

@@ -1,7 +1,7 @@
 <div class="container">
 
      <!-- OPTIONS -->
-    <div size="4" class="cds-elements" (click)="onTogleMoreMenu()">
+    <div size="4" class="cds-elements" (click)="onTogleAlphaConnectorsMenu()">
         <div class="cds-button-element">
             <div class="cds-box-button">
                 <span class="box-img">
@@ -127,7 +127,7 @@
         [max]="alphaStart"
         step="10"
         [(ngModel)]="alpha"
-        (blur)="closeMenu()"
-        (input)="updateAlpha()"
+        (blur)="closeAlphaConnectorsMenu()"
+        (input)="updateAlphaConnectors()"
     />
 </div>
