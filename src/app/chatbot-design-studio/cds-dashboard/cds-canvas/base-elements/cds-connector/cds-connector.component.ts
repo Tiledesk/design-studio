@@ -25,10 +25,14 @@ export class CdsConnectorComponent implements OnInit {
       if(svgElement){
         svgElement.setAttribute('opacity', (1).toString());
       }
-      // const svgElementTxt = document.getElementById('rect_'+idConnection) as HTMLElement;
-      // if(svgElementTxt){
-      //   svgElementTxt.setAttribute('opacity', (1).toString());
-      // }
+      const svgElementRec = document.getElementById('rect_'+idConnection) as HTMLElement;
+      if(svgElementRec){
+        svgElementRec.setAttribute('opacity', (1).toString());
+      }
+      const svgElementTxt = document.getElementById('label_'+idConnection) as HTMLElement;
+      if(svgElementTxt){
+        svgElementTxt.setAttribute('opacity', (1).toString());
+      }
     }
   }
 
@@ -39,11 +43,14 @@ export class CdsConnectorComponent implements OnInit {
       if(svgElement){
         svgElement.setAttribute('opacity', (0).toString());
       }
-
-      // const svgElementTxt = document.getElementById('rect_'+idConnection) as HTMLElement;
-      // if(svgElementTxt){
-      //   svgElementTxt.setAttribute('opacity', (0).toString());
-      // }
+      const svgElementRec = document.getElementById('rect_'+idConnection) as HTMLElement;
+      if(svgElementRec){
+        svgElementRec.setAttribute('opacity', (0).toString());
+      }
+      const svgElementTxt = document.getElementById('label_'+idConnection) as HTMLElement;
+      if(svgElementTxt){
+        svgElementTxt.setAttribute('opacity', (0).toString());
+      }
     }
   }
 

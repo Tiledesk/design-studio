@@ -25,7 +25,16 @@ export class CdsConnectorInComponent implements OnInit {
         if(svgElement){
           svgElement.setAttribute('opacity', (1).toString());
         }
+        const svgElementRec = document.getElementById('rect_'+connector.id) as HTMLElement;
+        if(svgElementRec){
+          svgElementRec.setAttribute('opacity', (1).toString());
+        }
+        const svgElementTxt = document.getElementById('label_'+connector.id) as HTMLElement;
+        if(svgElementTxt){
+          svgElementTxt.setAttribute('opacity', (1).toString());
+        }
       });
+     
     }
   }
 
@@ -36,7 +45,16 @@ export class CdsConnectorInComponent implements OnInit {
         if(svgElement){
           svgElement.setAttribute('opacity', (0).toString());
         }
+        const svgElementRec = document.getElementById('rect_'+connector.id) as HTMLElement;
+        if(svgElementRec){
+          svgElementRec.setAttribute('opacity', (0).toString());
+        }
+        const svgElementTxt = document.getElementById('label_'+connector.id) as HTMLElement;
+        if(svgElementTxt){
+          svgElementTxt.setAttribute('opacity', (0).toString());
+        }
       });
+      
     }
   }
 

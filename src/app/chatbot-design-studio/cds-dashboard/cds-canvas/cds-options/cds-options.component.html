@@ -5,7 +5,8 @@
         <div class="cds-button-element">
             <div class="cds-box-button">
                 <span class="box-img">
-                    <span class="material-icons-outlined">more_vert</span>
+                    <span *ngIf="alpha>0" class="material-icons-outlined">visibility</span>
+                    <span *ngIf="alpha==0" class="material-icons-outlined">visibility_off</span>
                 </span>
             </div>
         </div>
@@ -118,13 +119,15 @@
 
 <div *ngIf="isMoreMenu" size="4" class="cds-elements vertical-slider-container">
     <input
-      type="range"
-      id="alphaRange"
-      class="vertical-slider"
-      min="0"
-      [max]="alphaStart"
-      step="10"
-      [(ngModel)]="alpha"
-      (input)="updateAlpha()"
+        #alphaInput
+        type="range"
+        id="alphaRange"
+        class="vertical-slider"
+        min="0"
+        [max]="alphaStart"
+        step="10"
+        [(ngModel)]="alpha"
+        (blur)="closeMenu()"
+        (input)="updateAlpha()"
     />
-  </div>
+</div>
