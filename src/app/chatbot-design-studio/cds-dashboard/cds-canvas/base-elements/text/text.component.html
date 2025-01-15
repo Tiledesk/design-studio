@@ -21,8 +21,8 @@
             <div class="input-suffix" *ngIf="customPrefix"> / </div>
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" 
                 (opened)="onOpenClose('open')" (closed)="onOpenClose('close')" (optionSelected)="onOptionSelectedFN($event)">
-                <mat-option *ngFor="let option of filteredOptions | async" [value]="option" [title]="option">
-                  {{option}}
+                <mat-option *ngFor="let option of filteredOptions | async" [value]="option.value" [title]="option.label">
+                  {{option.label}}
                 </mat-option>
             </mat-autocomplete>
         </mat-form-field>

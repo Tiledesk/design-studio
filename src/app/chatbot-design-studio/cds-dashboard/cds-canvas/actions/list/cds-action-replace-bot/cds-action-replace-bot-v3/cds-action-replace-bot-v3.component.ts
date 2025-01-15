@@ -21,11 +21,11 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
   @Output() updateAndSaveAction = new EventEmitter();
 
   //bots: Chatbot[] = [];
-  chatbots_name_list: Array<{name: string, value: string, id: string, slug: string, icon?:string}>;
-  chatbots_block_name_list: Array<{name: string, value: string, icon?:string}>;
+  chatbots_name_list: Array<{name: string, value: string, id: string, slug: string, icon?:string}> = [];
   bot_selected: Chatbot;
 
-  autocompleteOptions: Array<string> = [];
+  autocompleteOptions: Array<{label: string, value: string}> = [];
+  autocompleteOptionsBlockName: Array<{label: string, value: string}> = [];
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -45,8 +45,8 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   async initialize(){
     await this.getAllBots();
-    if(this.action && this.action.botName){
-      let selectedChatbot = this.chatbots_name_list.find(el => el.name === this.action.botName)
+    if(this.action){
+      let selectedChatbot = this.getChatbotByIdOrSlug()
       if(selectedChatbot){
         this.getAllFaqById(selectedChatbot.id)
       }
@@ -62,7 +62,7 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
         this.chatbots_name_list = chatbots.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a._id, disabled: this.action.useSlug? !a.slug: false, icon: 'smart_toy'}));
         chatbots.forEach(el => {
           if(el.slug)
-            this.autocompleteOptions.push(el.name + ' (' + el.slug + ')')
+            this.autocompleteOptions.push({label: el.name + ' (' + el.slug + ')', value: el.slug})
         })
         resolve(true)
       }, error: (error) => {
@@ -78,9 +78,13 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   getAllFaqById(chatbotId: string){
     this.logger.log("[ACTION REPLACE BOT] get AllFaqById: ",chatbotId);
-    this.faqService.getAllFaqByFaqKbId(chatbotId).subscribe({ next: (faks: Intent[])=> {
-      this.chatbots_block_name_list = faks.map((el => ({name: el.intent_display_name, value: el.intent_display_name})))
-      this.logger.log("[ACTION REPLACE BOT] get AllFaqById: ", this.chatbots_block_name_list);
+    this.faqService.getAllFaqByFaqKbId(chatbotId).subscribe({ next: (faks)=> {
+      // faks.forEach(el => this.autocompleteOptionsBlockName.push({label: el.intent_display_name, value: el.intent_display_name}))
+      this.autocompleteOptionsBlockName = faks.map((faq) => ({
+        label: faq.intent_display_name,
+        value: faq.intent_display_name
+      }));
+      this.logger.log("[ACTION REPLACE BOT] get AllFaqById blocks: ", this.autocompleteOptionsBlockName);
     }, error: (error)=> {
       this.logger.error("[ACTION REPLACE BOT] error get AllFaqById: ", error);
     }, complete: () => {
@@ -90,18 +94,27 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   onChangeSelect(event: {name: string, value: string, slug: string, id: string}) {
     this.logger.log("[ACTION REPLACE BOT] onChangeActionButton event: ", event)
-    this.action.botName = event.value;
+    this.action.botId = event.id;
     this.action.botSlug = event.slug;
+    this.action.blockName = '' //rest blockName when chatbot is changed
     this.getAllFaqById(event.id)
     this.updateAndSaveAction.emit()
     this.logger.log("[ACTION REPLACE BOT] action edited: ", this.action)
   }
 
-  onChangeTextarea($event: string, property: string) {
-    this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange event", $event)
-    this.logger.log("[ACTION-ASKGPT] onEditableDivTextChange property", property)
-    this.action.botSlug = $event
-    this.action.botName = this.chatbots_name_list.find(el => el.slug === $event)?.value ?? null;
+  async onChangeTextarea(event: string, property: string) {
+    this.logger.log("[ACTION REPLACE BOT] onEditableDivTextChange event", event)
+    this.logger.log("[ACTION REPLACE BOT] onEditableDivTextChange property", property)
+    switch(property){
+      case 'botSlug':
+        this.action.botSlug = event;
+        (this.chatbots_name_list?.length === 0 || !this.chatbots_name_list)? await this.getAllBots(): null;
+        this.action.botId = this.chatbots_name_list.find(el => el.slug === event)?.id ?? null;
+        break; 
+      case 'blockName':
+        this.action.blockName = event
+        break; 
+    }
     // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -109,9 +122,13 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     this.updateAndSaveAction.emit();
   }
 
-  onAutocompleteOptionSelected(option: string, property: string){
-    this.action.botName = option.split('(')[0].trim();
-    this.action.botSlug = this.chatbots_name_list.find(el => el.name === this.action.botName).slug
+  onAutocompleteOptionSelected(option: {label: string, value: string}, key: string){
+    this.logger.log("[ACTION REPLACE BOT] onAutocompleteOptionSelected option:",option)
+    switch(key){
+      case 'botSlug':
+        this.action.botId = this.chatbots_name_list.find(el => (el.slug === option.value))?.id ?? null
+        break; 
+    }
   }
 
   onChangeBlockSelect(event: {name: string, value: string}){
@@ -122,8 +139,9 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   onResetSelect(event, key: string){
     switch(key){
-      case 'botName':
-        this.action.botName = null;
+      case 'botId':
+        this.action.botId = null;
+        this.action.botSlug = null;
         break;
       case 'blockName':
         this.action.blockName = null
@@ -137,21 +155,21 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     this.chatbots_name_list = this.chatbots_name_list.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a.id, disabled: this.action.useSlug? !a.slug: false, icon: 'smart_toy'}));
     if (target === "useSlg") {
       if (this.action[target]) {
-        if (this.action.botName) {
-          this.action.botSlug = this.getChatbotByNameOrSlug().slug
+        if (this.action.botId) {
+          this.action.botSlug = this.getChatbotByIdOrSlug().slug
         }
       } else {
-        this.action.botName = this.getChatbotByNameOrSlug().value
+        this.action.botId = this.getChatbotByIdOrSlug().id
       }
     }
     this.updateAndSaveAction.emit()
   }
 
-  getChatbotByNameOrSlug(){
+  getChatbotByIdOrSlug(){
     if(this.chatbots_name_list){
-      let chatbotByName = this.chatbots_name_list.find(el => el.name === this.action.botName)
-      if(chatbotByName){
-        return chatbotByName
+      let chatbotById = this.chatbots_name_list.find(el => el.id === this.action.botId)
+      if(chatbotById){
+        return chatbotById
       }
       let chatbotBySlug = this.chatbots_name_list.find(el => el.slug === this.action.botSlug)
       if(chatbotBySlug){
@@ -160,16 +178,18 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     }
   }
 
-  formatBotSlug(slug: string, element: HTMLElement){
+  formatBotSlug(slug: string){
     if (slug.startsWith('{{') && slug.endsWith('}}')) {
-      //add variable css class
-      element.classList.add('set-attribute-value')
       //not use ( )
       return slug.slice(2, slug.length - 2);
-    }else{
-      //use ( )
     }
-    return slug
+    
+    let matches = slug.match(new RegExp(/{{[^{}]*}}/g));
+    if (matches && matches.length > 0) {
+      return slug;
+    }
+
+    return '(' + slug + ')'
   }
 
 

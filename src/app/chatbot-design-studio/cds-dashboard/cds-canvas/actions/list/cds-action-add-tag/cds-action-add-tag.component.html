@@ -45,36 +45,6 @@
 
         </div>
 
-        <!-- <div class="field-box">
-            <label class="title-label">{{'Tags' | translate }}</label>
-            <mat-chip-list #chipList>
-                <mat-chip *ngFor="let tag of action?.tags" (removed)="removeTag(tag)">
-                    {{tag}}
-                    <button matChipRemove>
-                        <mat-icon>cancel</mat-icon>
-                    </button>
-                </mat-chip>
-            </mat-chip-list>
-            <div class="cds-input-group">
-                <cds-text id="text"
-                    class="sx-input" 
-                    [text]="newTag"
-                    [placeholder]="'CDSCanvas.AddTagAndPressEnter' | translate"
-                    [autocompleteOptions]="autocompleteOptions"
-                    (blur)="onBlur($event)"
-                    (keydown.enter)="onAddTag($event)"
-                    (onChange)="onChangeText($event)">
-                </cds-text>
-                <span class="input-group-addon cds-group-addon-question-right" (click)="onAddTag()"
-                    [ngClass]="{'add-question-btn-disabled': !newTag || newTag?.length === 0}">
-                    <!- - <span class="cds-group-addon-question-right-btn-text"> ADD </span> - ->
-                    <span class="material-icons cds-group-addon-question-right-btn-icon">
-                        add
-                    </span>
-                </span>
-            </div>
-        </div> -->
-
         <div class="field-box">
             <label class="title-label">{{'Tags' | translate }}</label>
             <cds-textarea 

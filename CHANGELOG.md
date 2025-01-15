@@ -7,6 +7,18 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.26.0-rc.9
+- **bug-fixed**: autocompleteOption is not showed in action-replace-bot-v3
+
+# 1.26.0-rc.8
+- **added**: autocompleteOptions on blockName into action-replace-bot-v3
+- **changed**: autocompleteOptions in cds-text as array label-value
+
+# 1.26.0-rc.7
+- **changed**: botName with botId in action-replace-bot-v3
+
+# 1.26.0-rc.7
+- **changed**: botName with botId in action-replace-bot-v3
 
 # 1.26.0-rc.6
 - **added**: action-replace-bot-v3

@@ -102,6 +102,10 @@
     margin-left: -10px;
     display: block;
     position: absolute;
+
+    span.material-icons{
+      color: var(--intent-header-icon-color)
+    }
   }
   // --------------------------------
   // https://stackoverflow.com/questions/9476923/css3-animate-border-color
