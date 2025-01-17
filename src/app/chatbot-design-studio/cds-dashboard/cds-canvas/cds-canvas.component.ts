@@ -534,7 +534,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
           x: el.x,
           y: el.y
         }
-        this.stageService.savePosition(this.id_faq_kb, pos);
+        this.stageService.savePositionByPos(this.id_faq_kb, pos);
       }, 500);
 
     };
@@ -829,7 +829,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private posCenterIntentSelected(intent) {
     if(intent && intent.intent_id){
       var stageElement = document.getElementById(intent.intent_id);
-      this.stageService.centerStageOnPosition(stageElement);
+      let id_faq_kb = this.dashboardService.id_faq_kb;
+      this.stageService.centerStageOnPosition(id_faq_kb, stageElement);
     }
   }
 

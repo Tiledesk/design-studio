@@ -789,8 +789,9 @@ export class IntentService {
       //** center stage on 'start' intent */
       let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
       if(startElement){
-        //this.stageService.centerStageOnHorizontalPosition(startElement);
-        this.stageService.centerStageOnPosition(startElement);
+        // this.stageService.centerStageOnHorizontalPosition(startElement);
+        let id_faq_kb = this.dashboardService.id_faq_kb;
+        this.stageService.centerStageOnPosition(id_faq_kb, startElement);
       }
     }
   }

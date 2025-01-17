@@ -64,11 +64,12 @@ export class StageService {
   }
 
 
-  centerStageOnPosition(stageElement){
+  centerStageOnPosition(id_faq_kb, stageElement){
     let intervalId = setInterval(async () => {
       const result = await this.tiledeskStage.centerStageOnPosition(stageElement);
       if (result === true) {
         clearInterval(intervalId);
+        this.savePositionByStageElement(id_faq_kb, stageElement);
       }
     }, 100);
     setTimeout(() => {
@@ -76,11 +77,12 @@ export class StageService {
     }, 1000);
   }
 
-  centerStageOnTopPosition(pos){
+  centerStageOnTopPosition(id_faq_kb, pos){
     let intervalId = setInterval(async () => {
       const result = await this.tiledeskStage.centerStageOnTopPosition(pos);
       if (result === true) {
         clearInterval(intervalId);
+        this.savePositionByPos(id_faq_kb, pos);
       }
     }, 100);
     setTimeout(() => {
@@ -88,22 +90,23 @@ export class StageService {
     }, 1000);
   }
 
-  centerStageOnHorizontalPosition(pos){
-    let intervalId = setInterval(async () => {
-      const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
-      if (result === true) {
-        clearInterval(intervalId);
-      }
-    }, 100);
-    setTimeout(() => {
-      clearInterval(intervalId);
-    }, 1000);
-  }
+  // centerStageOnHorizontalPosition(pos){
+  //   let intervalId = setInterval(async () => {
+  //     const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
+  //     if (result === true) {
+  //       clearInterval(intervalId);
+  //       this.savePositionByPos(id_faq_kb, pos);
+  //     }
+  //   }, 100);
+  //   setTimeout(() => {
+  //     clearInterval(intervalId);
+  //   }, 1000);
+  // }
 
-  translatePosition(pos){
-    const result = this.tiledeskStage.translatePosition(pos);
-    return result;
-  }
+
+
+
+
 
 
   setDragElement(elementId:string) {
@@ -163,7 +166,6 @@ export class StageService {
 
   setZoom(){
     let scale = this.settings.zoom;
-    console.log('setZoom: ', scale);
     setTimeout(() => {
       this.tiledeskStage.centerStageOnCenterPosition(scale);
     }, 0);
@@ -172,18 +174,27 @@ export class StageService {
   setPosition(){
     let position = this.settings.position;
     let scale = this.settings.zoom;
-    // console.log('setPosition: ', position);
     setTimeout(() => {
       this.translateAndScale(position, scale);
     }, 0);
   }
   
-  savePosition(id_faq_kb, position){;
-    const newPosition = this.translatePosition(position);
-    //console.log('savePosition: ', newPosition);
+  savePositionByPos(id_faq_kb, position){
+    const scale = this.tiledeskStage.scale;
+    console.log('savePositionByPos:: ', position, scale);
+    const newPosition = this.tiledeskStage.translatePosition(position);
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, newPosition);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
   }
 
+
+  savePositionByStageElement(id_faq_kb, ElementRef){
+    const scale = this.tiledeskStage.scale;
+    const position = this.tiledeskStage.savePositionByStageElement(ElementRef, scale);
+    console.log('savePositionByStageElement:: ', position, scale);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, position);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
+  }
 
   translateAndScale(pos, scale){
     this.tiledeskStage.translateAndScale(pos, scale);

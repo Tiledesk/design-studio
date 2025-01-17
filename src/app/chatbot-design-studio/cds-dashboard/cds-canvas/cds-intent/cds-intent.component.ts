@@ -170,7 +170,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
           var stageElement = document.getElementById(intent.intent_id);
-          this.stageService.centerStageOnTopPosition(stageElement)
+          this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement)
           this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6)
         }
       });
