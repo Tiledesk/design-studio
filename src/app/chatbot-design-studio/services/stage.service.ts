@@ -4,20 +4,46 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { scaleAndcenterStageOnCenterPosition } from '../utils';
 import { BehaviorSubject } from 'rxjs';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+
+enum STAGE_SETTINGS {
+  AlphaConnector = 'alpha_connectors',
+  Zoom = 'zoom',
+  Position = 'position',
+}
+
+export interface Settings {
+  alpha_connectors: number;
+  zoom: number;
+  position: {
+    x: number;
+    y: number;
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class StageService {
-
-  private alphaConnectorsSubject = new BehaviorSubject<number>(60);
+  private alphaConnectorsSubject = new BehaviorSubject<number>(100);
   alphaConnectors$ = this.alphaConnectorsSubject.asObservable();
 
   tiledeskStage: any;
   loaded: boolean = false;
+  // settings: any;
+  settings: Settings = {
+    alpha_connectors: 100,
+    zoom: 1,
+    position: {
+      x: 506,
+      y: -2.5
+    }
+  };
 
   private logger: LoggerService = LoggerInstance.getInstance()
-  constructor() { }
+  constructor(
+    public appStorageService: AppStorageService
+  ) { }
 
 
   initializeStage(){
@@ -28,9 +54,19 @@ export class StageService {
     this.tiledeskStage.setDrawer();
   }
 
-  centerStageOnPosition(pos){
+  initStageSettings(id_faq_kb){
+    let response = JSON.parse(this.appStorageService.getItem(id_faq_kb+'_stage'));
+    if(response){
+      this.settings = response;
+    }
+    // this.alphaConnectorsSubject.next(this.settings.alpha_connectors);
+    return this.settings;
+  }
+
+
+  centerStageOnPosition(stageElement){
     let intervalId = setInterval(async () => {
-      const result = await this.tiledeskStage.centerStageOnPosition(pos);
+      const result = await this.tiledeskStage.centerStageOnPosition(stageElement);
       if (result === true) {
         clearInterval(intervalId);
       }
@@ -64,6 +100,11 @@ export class StageService {
     }, 1000);
   }
 
+  translatePosition(pos){
+    const result = this.tiledeskStage.translatePosition(pos);
+    return result;
+  }
+
 
   setDragElement(elementId:string) {
     const element = document.getElementById(elementId);
@@ -71,41 +112,27 @@ export class StageService {
     if(element)this.tiledeskStage.setDragElement(element);
   }
   
-
   physicPointCorrector(point){
     return this.tiledeskStage.physicPointCorrector(point);
   }
 
 
-  async zoom(event: 'in' | 'out'){
-    return await this.tiledeskStage.zoom(event);
-    // return new Promise((resolve) => {
-    //   const element = document.getElementById(elementId);
-    //   let intervalId = setInterval(async () => {
-    //     const result = await this.tiledeskStage.zoom(event, element);
-    //     if (result === true) {
-    //       clearInterval(intervalId);
-    //       resolve(result);
-    //     }
-    //   }, 100);
-    //   setTimeout(() => {
-    //     clearInterval(intervalId);
-    //     resolve(false);
-    //   }, 1000);
-    // });
+  async zoom(id_faq_kb, event: 'in' | 'out'){
+    let resp = await this.tiledeskStage.zoom(event);
+    let scale = this.tiledeskStage.scale;
+    this.settings.zoom = scale;
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
+    return resp;
   }
 
   scaleAndCenter(listOfintents){
     let resp = scaleAndcenterStageOnCenterPosition(listOfintents);
     return this.tiledeskStage.translateAndScale(resp.point, resp.scale);
-    // this.logger.log('[CDS-CANVAS] moved-and-scaled ', el)
   }
   
-
   getScale(){
     return this.tiledeskStage.scale;
   }
-
 
   onSwipe(event: WheelEvent) {
     if (event.deltaX > 0) {
@@ -122,16 +149,82 @@ export class StageService {
     // }
   }
 
-  setAlpha(alpha: number): void {
-    this.tiledeskStage.alphaConnectors = alpha;
+  
+  setAlphaConnectors(id_faq_kb?: string, alpha?: number){
+    if(id_faq_kb && alpha >= 0){
+      this.saveSettings(id_faq_kb, STAGE_SETTINGS.AlphaConnector, alpha);
+      this.settings.alpha_connectors = alpha;
+    } else if(this.settings && this.settings.alpha_connectors >= 0){
+      alpha = Number(this.settings.alpha_connectors);
+    }
+    this.updateAlphaConnectors(alpha);
     this.alphaConnectorsSubject.next(alpha);
   }
 
-  getAlpha(): number {
-    return this.tiledeskStage.alphaConnectors;
-    // return this.alphaConnectorsSubject.getValue();
+  setZoom(){
+    let scale = this.settings.zoom;
+    console.log('setZoom: ', scale);
+    setTimeout(() => {
+      this.tiledeskStage.centerStageOnCenterPosition(scale);
+    }, 0);
   }
 
+  setPosition(){
+    let position = this.settings.position;
+    let scale = this.settings.zoom;
+    // console.log('setPosition: ', position);
+    setTimeout(() => {
+      this.translateAndScale(position, scale);
+    }, 0);
+  }
+  
+  savePosition(id_faq_kb, position){;
+    const newPosition = this.translatePosition(position);
+    //console.log('savePosition: ', newPosition);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, newPosition);
+  }
+
+
+  translateAndScale(pos, scale){
+    this.tiledeskStage.translateAndScale(pos, scale);
+  }
+
+  getAlpha(): number {
+    return this.settings.alpha_connectors;
+  }
+
+
+
+
+
+  saveSettings(id_faq_kb, type, alpha){
+    let settings = JSON.parse(this.appStorageService.getItem(id_faq_kb+'_stage'));
+    if(settings){
+      this.settings = settings;
+    }
+    this.settings[type] = alpha;
+    // centerStageOnCenterPosition
+    this.appStorageService.setItem(id_faq_kb+'_stage', JSON.stringify(this.settings));
+  }
+
+
+
+  updateAlphaConnectors(alpha) {
+    const svgElement = document.querySelector('#tds_svgConnectors') as HTMLElement;
+    if (svgElement) {
+      const paths = svgElement.querySelectorAll('path');
+      paths.forEach((path) => {
+        path.setAttribute('opacity', (alpha / 100).toString());
+      });
+    }
+    const svgLines = document.querySelectorAll('.line-text-connector');
+    svgLines.forEach((svgLine) => {
+      const rect = svgLine.querySelector('rect');
+      rect.setAttribute('opacity', (alpha / 100).toString());
+      const text = svgLine.querySelector('text');
+      text.setAttribute('opacity', (alpha / 100).toString());
+    });
+  }
 
 
 }

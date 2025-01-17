@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Input, Output, ViewChild, ElementRef } from '@angular/core';
 import { timeInterval } from 'rxjs';
+import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
@@ -9,38 +10,36 @@ import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
 })
 export class CdsOptionsComponent implements OnInit {
   @ViewChild('alphaInput') alphaInput!: ElementRef;
-
+  @Input() id_faq_kb: any;
   @Input() stateUndoRedo: any;
   @Output() onOptionClicked = new EventEmitter<{ option: OPTIONS; alpha?: any }>();
 
   OPTIONS = OPTIONS;
-  alphaStart: number = 100;
   alpha:number;
   isMoreMenu: boolean = false;
-
+  stageSettings: any;
+  
   
 
-  constructor() { }
+  constructor(
+    private stageService: StageService
+  ) { }
 
   ngOnInit(): void {
-    this.alpha = this.alphaStart;
+    this.initialize();
+  }
+
+
+  private initialize(){
+    this.stageSettings = this.stageService.initStageSettings(this.id_faq_kb);
+    if(this.stageSettings){
+      this.alpha = this.stageSettings.alpha_connectors;
+    } else {
+      this.alpha = 1;
+    }
   }
 
   updateAlphaConnectors() {
-    const svgElement = document.querySelector('#tds_svgConnectors') as HTMLElement;
-    if (svgElement) {
-      const paths = svgElement.querySelectorAll('path');
-      paths.forEach((path) => {
-        path.setAttribute('opacity', (this.alpha / 100).toString());
-      });
-    }
-    const svgLines = document.querySelectorAll('.line-text-connector');
-    svgLines.forEach((svgLine) => {
-      const rect = svgLine.querySelector('rect');
-      rect.setAttribute('opacity', (this.alpha / 100).toString());
-      const text = svgLine.querySelector('text');
-      text.setAttribute('opacity', (this.alpha / 100).toString());
-    });
     this.onOptionClicked.emit({ option: OPTIONS.ALPHA, alpha: this.alpha });
   }
 
@@ -48,16 +47,14 @@ export class CdsOptionsComponent implements OnInit {
     this.alphaInput.nativeElement.focus();
   }
 
-
   closeAlphaConnectorsMenu(){
     this.isMoreMenu = false;
   }
 
+
   onOptionClick(option){
-    // this.onOptionClicked.emit({option: option});
     this.onOptionClicked.emit({option: option});
   }
-
 
   onTogleAlphaConnectorsMenu(){
     this.isMoreMenu = !this.isMoreMenu;

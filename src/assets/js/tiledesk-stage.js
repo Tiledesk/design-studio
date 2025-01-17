@@ -232,6 +232,7 @@ export class TiledeskStage {
 
 
     centerStageOnPosition(stageElement, scale=1){
+        console.log('centerStageOnPosition: ');
         if(stageElement){
             var w = stageElement.offsetWidth*scale;
             var h = stageElement.offsetHeight*scale;
@@ -240,6 +241,7 @@ export class TiledeskStage {
             const posX = x+w/2;
             const posY = y+h/2;
             const pos = {x: posX, y: posY}
+            console.log('centerStageOnPosition: ', pos);
             return this.translateAndScale(pos, scale);
         } else {
             return false;
@@ -273,6 +275,7 @@ export class TiledeskStage {
             this.drawer.style.transform = cmd;
             this.tx = newX;
             this.ty = newY;
+            console.log('translateAndScale: ', newX, newY);
             setTimeout(() => {
                 this.drawer.style.removeProperty('transition');
                 // remove class animation
@@ -283,7 +286,19 @@ export class TiledeskStage {
         }
     }
 
+    translatePosition(pos){
+        var originRec = this.container.getBoundingClientRect();
+        let newX = (originRec.width/2)-pos.x;
+        let newY = (originRec.height/2)-pos.y;
+        const newPosition = {
+            x: newX, 
+            y: newY
+        }
+        return newPosition;
+    }
+
     centerStageOnTopPosition(stageElement){
+        console.log('centerStageOnTopPosition: ');
         if(stageElement){
             // var stageElement = document.getElementById(intent.intent_id);
             var w = stageElement.offsetWidth;
@@ -320,6 +335,7 @@ export class TiledeskStage {
 
 
     centerStageOnHorizontalPosition(stageElement){
+        console.log('centerStageOnHorizontalPosition: ', stageElement);
         if(stageElement){
             // var stageElement = document.getElementById(intent.intent_id);
             var w = stageElement.offsetWidth;
