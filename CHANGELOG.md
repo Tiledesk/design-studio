@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.26.0-rc.11
+- **bug-fixed**: hide connector on mouseover only if alphaConnectors is 0
+
 # 1.26.0-rc.10
 - **bug-fixed**: panel-intent-header error intent_display_name
 - **added**: icon boy in panel-intent-detail
