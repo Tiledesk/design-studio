@@ -219,12 +219,21 @@ export class TiledeskStage {
     centerStageOnPosition(stageElement, scale=1){
         // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnPosition ••••");
         const pos = this.setPositionByStageElement(stageElement, scale);
+
+        const originRec = this.container.getBoundingClientRect();
+        let diff = stageElement.offsetHeight-originRec.height;
+        if(diff>0){
+            pos.y = pos.y-(diff/2+25);
+        }  
+
         if(pos){
             return this.translateAndScale(pos, scale);
         } else {
             return false;
         }
     }
+
+    
 
     centerStageOnCenterPosition(scale=1){
         // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnCenterPosition ••••");
@@ -255,7 +264,6 @@ export class TiledeskStage {
             this.ty = newY;
             setTimeout(() => {
                 this.drawer.style.removeProperty('transition');
-                // remove class animation
             }, 300);
             return true;
         } else {
@@ -322,28 +330,25 @@ export class TiledeskStage {
     centerStageOnHorizontalPosition(stageElement){
         // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnHorizontalPosition ••••");
         if(stageElement){
-            // var stageElement = document.getElementById(intent.intent_id);
-            var w = stageElement.offsetWidth;
-            var h = stageElement.offsetHeight;
-            var x = stageElement.offsetLeft;
-            var y = stageElement.offsetTop;
-
+            const w = stageElement.offsetWidth;
+            const h = stageElement.offsetHeight;
+            const x = stageElement.offsetLeft;
+            const y = stageElement.offsetTop;
             this.drawer.style.transition = "transform 0.3s ease-in-out";
-            var originRec = this.container.getBoundingClientRect();
+            const originRec = this.container.getBoundingClientRect();
             let newX = (90)-(x+w/2);
             let newY = (originRec.height/2)-(y+h/2)-20;
             let tcmd = `translate(${newX}px, ${newY}px)`;
             let scmd = `scale(${1})`;
-            //  let scmd = `scale(${this.scale})`;
             const cmd = tcmd + " " + scmd;
             this.drawer.style.transform = cmd;
             setTimeout(() => {
                 this.drawer.style.removeProperty('transition');
-                // remove class animation
             }, 300);
             return true;
         } else {
             return false;
         }
     }  
-  }
+  
+}  

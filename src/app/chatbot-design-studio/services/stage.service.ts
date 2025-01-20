@@ -66,11 +66,13 @@ export class StageService {
     this.tiledeskStage.setDrawer();
   }
 
+  /**  centerStageOnHorizontalPosition 
+   * called start element only
+  */
   centerStageOnHorizontalPosition(ElementRef){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnHorizontalPosition ••••");
-    const pos = this.setPositionByStageElement(ElementRef);
     let intervalId = setInterval(async () => {
-      const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
+      const result = await this.tiledeskStage.centerStageOnHorizontalPosition(ElementRef);
       if (result === true) {
         clearInterval(intervalId);
       }
@@ -80,6 +82,7 @@ export class StageService {
     }, 1000);
   }
 
+  /** */
   centerStageOnPosition(id_faq_kb, stageElement){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnPosition ••••");
     let intervalId = setInterval(async () => {
@@ -108,22 +111,6 @@ export class StageService {
       clearInterval(intervalId);
     }, 1000);
   }
-
-  // centerStageOnTopPosition(id_faq_kb, pos){
-  //   this.logger.log("[CDS-STAGE]  •••• centerStageOnTopPosition ••••");
-  //   let intervalId = setInterval(async () => {
-  //     const result = await this.tiledeskStage.centerStageOnTopPosition(pos);
-  //     //const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
-  //     if (result === true) {
-  //       clearInterval(intervalId);
-  //       this.savePositionByPos(id_faq_kb, pos);
-  //     }
-  //   }, 100);
-  //   setTimeout(() => {
-  //     clearInterval(intervalId);
-  //   }, 1000);
-  // }
-
 
 
   setDragElement(elementId:string) {
@@ -272,7 +259,7 @@ export class StageService {
       this.settings = settings;
     }
     this.settings[type] = value;
-    //this.appStorageService.setItem(id_faq_kb+'_stage', JSON.stringify(this.settings));
+    this.appStorageService.setItem(id_faq_kb+'_stage', JSON.stringify(this.settings));
   }
 
 }
