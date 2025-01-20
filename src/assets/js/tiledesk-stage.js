@@ -77,6 +77,7 @@ export class TiledeskStage {
 
 
     moveAndZoom(event) {
+        // console.log("[TILEDESK-STAGE-JS]  •••• moveAndZoom ••••");
         event.preventDefault();
         const dx = event.deltaX;
         const dy = event.deltaY;
@@ -149,6 +150,7 @@ export class TiledeskStage {
 
 
     setDragElement(element) {
+        // console.log("[TILEDESK-STAGE-JS]  •••• setDragElement ••••");
         let pos_mouse_x;
         let pos_mouse_y;
         element.onmousedown = (function(event) {
@@ -215,7 +217,8 @@ export class TiledeskStage {
 
 
     centerStageOnPosition(stageElement, scale=1){
-        const pos = this.savePositionByStageElement(stageElement, scale);
+        // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnPosition ••••");
+        const pos = this.setPositionByStageElement(stageElement, scale);
         if(pos){
             return this.translateAndScale(pos, scale);
         } else {
@@ -224,8 +227,9 @@ export class TiledeskStage {
     }
 
     centerStageOnCenterPosition(scale=1){
-        var originRec = this.container.getBoundingClientRect();
-        var originDrawer = this.drawer.getBoundingClientRect();
+        // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnCenterPosition ••••");
+        let originRec = this.container.getBoundingClientRect();
+        let originDrawer = this.drawer.getBoundingClientRect();
         let diffX = (originRec.x - originDrawer.x);
         let diffY = (originRec.y - originDrawer.y);
         let percScale = scale/this.scale;
@@ -236,10 +240,11 @@ export class TiledeskStage {
     }
 
     translateAndScale(pos, scale=1){
+        // console.log("[TILEDESK-STAGE-JS]  •••• translateAndScale ••••");
         if(pos){
             this.scale = scale;
             this.drawer.style.transition = "transform 0.3s ease-in-out";
-            var originRec = this.container.getBoundingClientRect();
+            let originRec = this.container.getBoundingClientRect();
             let newX = (originRec.width/2)-pos.x;
             let newY = (originRec.height/2)-pos.y;
             let tcmd = `translate(${newX}px, ${newY}px)`;
@@ -259,7 +264,7 @@ export class TiledeskStage {
     }
 
     translatePosition(pos){
-        var originRec = this.container.getBoundingClientRect();
+        let originRec = this.container.getBoundingClientRect();
         let newX = (originRec.width/2)-pos.x;
         let newY = (originRec.height/2)-pos.y;
         const newPosition = {
@@ -269,12 +274,12 @@ export class TiledeskStage {
         return newPosition;
     }
 
-    savePositionByStageElement(stageElement, scale){
+    setPositionByStageElement(stageElement, scale=1){
         if(stageElement){
-            var w = stageElement.offsetWidth*scale;
-            var h = stageElement.offsetHeight*scale;
-            var x = stageElement.offsetLeft*scale;
-            var y = stageElement.offsetTop*scale;
+            const w = stageElement.offsetWidth*scale;
+            const h = stageElement.offsetHeight*scale;
+            const x = stageElement.offsetLeft*scale;
+            const y = stageElement.offsetTop*scale;
             const posX = x+w/2;
             const posY = y+h/2;
             const pos = {x: posX, y: posY}
@@ -283,8 +288,10 @@ export class TiledeskStage {
             return false;
         }
     }
+    
 
     centerStageOnTopPosition(stageElement){
+        // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnTopPosition ••••");
         if(stageElement){
             // var stageElement = document.getElementById(intent.intent_id);
             var w = stageElement.offsetWidth;
@@ -310,8 +317,10 @@ export class TiledeskStage {
         }
     }
 
+    
 
     centerStageOnHorizontalPosition(stageElement){
+        // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnHorizontalPosition ••••");
         if(stageElement){
             // var stageElement = document.getElementById(intent.intent_id);
             var w = stageElement.offsetWidth;

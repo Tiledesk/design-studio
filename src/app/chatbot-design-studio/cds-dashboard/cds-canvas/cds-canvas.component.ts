@@ -203,15 +203,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    */
   private getParamsFromURL(){
     this.route.queryParams.subscribe(params => {
-      // console.log('[CDS-CANVAS] Block params:', params);
       this.blockId = params['blockid'];
-      if (this.blockId) {
-        // console.log('[CDS-CANVAS] Block ID:', this.blockId);
-      }
+      if (this.blockId) { /* empty */ }
       this.blockName = params['blockname'];
-      if (this.blockName) {
-        // console.log('[CDS-CANVAS] Block NAME:', this.blockName);
-      }
+      if (this.blockName) { /* empty */ }
     });
   }
 
@@ -238,7 +233,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    */
   onIntentRendered(intentID) {
     if(this.stageService.loaded === false && this.renderedAllElements === false){
-      // this.logger.log("[CDS-CANVAS3]  ••••onIntentRendered ••••",  this.stageService.loaded);
       this.labelInfoLoading = 'CDSCanvas.intentsProgress';
       if(this.mapOfIntents[intentID] && this.mapOfIntents[intentID].shown === false) {
         this.mapOfIntents[intentID].shown = true;
@@ -292,14 +286,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   private settingStage(){
-    this.logger.log("[CDS-CANVAS 1]  settingStage: ", this.stageService.settings.position);
+    this.logger.log("[CDS-CANVAS]  settingStage: ", this.stageService.settings.position);
     this.stageService.setAlphaConnectors();
     // this.stageService.setZoom();
     if(this.stageService.settings.position){
-      this.logger.log("[CDS-CANVAS 1]  setPosition: ", this.stageService.settings.position);
+      this.logger.log("[CDS-CANVAS]  setPosition: ", this.stageService.settings.position);
       this.stageService.setPosition();
     } else {
-      this.logger.log("[CDS-CANVAS 1]  setStartIntent: ", this.blockId, this.blockName);
+      this.logger.log("[CDS-CANVAS]  setStartIntent: ", this.blockId, this.blockName);
       // if(this.blockId || this.blockName) {
       //   const intentId = this.intentService.setStartIntentSelected(this.blockId, this.blockName);
       //   this.logger.log("[CDS-CANVAS 1]  ••••setStartIntentSelected: ", intentId);
@@ -535,7 +529,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
           y: el.y
         }
         this.stageService.savePositionByPos(this.id_faq_kb, pos);
-      }, 500);
+      }, 100);
 
     };
     document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
@@ -657,7 +651,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     * unselect action and intent (unselectAction)
     */  
     this.listnerConnectorSelected = (e: CustomEvent) => {
-      //console.log("[CDS-CANVAS] connector-selected:", e, e.detail.mouse_pos);
       this.closeAllPanels();
       this.closeActionDetailPanel();
       this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
@@ -830,6 +823,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if(intent && intent.intent_id){
       var stageElement = document.getElementById(intent.intent_id);
       let id_faq_kb = this.dashboardService.id_faq_kb;
+      this.logger.log('[CDS-CANVAS] posCenterIntentSelected: ', stageElement);
       this.stageService.centerStageOnPosition(id_faq_kb, stageElement);
     }
   }
@@ -1239,8 +1233,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // let id_faq_kb = this.dashboardService.id_faq_kb;
     let option = resp.option;
     let alpha = resp.alpha;
-    // console.log('onOptionClicked:: ', resp,  option, alpha);
-
     switch(option){
       case OPTIONS.ZOOM_IN: {
         const result = await this.stageService.zoom(this.id_faq_kb, 'in');

@@ -783,14 +783,15 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
-    this.logger.log('[CDS-CANVAS]  intentSelected: ', this.intentSelected);
+    this.logger.log('[CDS-INTENT] intentSelected: ', this.intentSelected);
     if(this.intentSelected){
       this.setDefaultIntentSelected();
       //** center stage on 'start' intent */
       let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
       if(startElement){
-        // this.stageService.centerStageOnHorizontalPosition(startElement);
         let id_faq_kb = this.dashboardService.id_faq_kb;
+        this.logger.log('[CDS-INTENT] setStartIntent: ', startElement);
+        // this.stageService.centerStageOnPosition(id_faq_kb, startElement);
         this.stageService.centerStageOnPosition(id_faq_kb, startElement);
       }
     }

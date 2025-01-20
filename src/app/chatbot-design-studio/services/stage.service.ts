@@ -25,22 +25,24 @@ export interface Settings {
   providedIn: 'root'
 })
 export class StageService {
-  private alphaConnectorsSubject = new BehaviorSubject<number>(100);
+  private readonly alphaConnectorsSubject = new BehaviorSubject<number>(100);
   alphaConnectors$ = this.alphaConnectorsSubject.asObservable();
 
   tiledeskStage: any;
   loaded: boolean = false;
-  // settings: any;
+
   settings: Settings = {
     alpha_connectors: 100,
     zoom: 1,
-    position: {
-      x: 506,
-      y: -2.5
-    }
+    position: null
   };
 
-  private logger: LoggerService = LoggerInstance.getInstance()
+  // {
+  //   x: 506,
+  //   y: -2.5
+  // }
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
     public appStorageService: AppStorageService
   ) { }
@@ -50,21 +52,36 @@ export class StageService {
     this.tiledeskStage = new TiledeskStage('tds_container', 'tds_drawer', 'tds_draggable');
   }
 
-  setDrawer(){
-    this.tiledeskStage.setDrawer();
-  }
-
-  initStageSettings(id_faq_kb){
+  /** initStageSettings */
+  initStageSettings(id_faq_kb: string){
     let response = JSON.parse(this.appStorageService.getItem(id_faq_kb+'_stage'));
     if(response){
       this.settings = response;
     }
-    // this.alphaConnectorsSubject.next(this.settings.alpha_connectors);
     return this.settings;
   }
 
+  /** setDrawer */
+  setDrawer(){
+    this.tiledeskStage.setDrawer();
+  }
+
+  centerStageOnHorizontalPosition(ElementRef){
+    this.logger.log("[CDS-STAGE]  •••• centerStageOnHorizontalPosition ••••");
+    const pos = this.setPositionByStageElement(ElementRef);
+    let intervalId = setInterval(async () => {
+      const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
+      if (result === true) {
+        clearInterval(intervalId);
+      }
+    }, 100);
+    setTimeout(() => {
+      clearInterval(intervalId);
+    }, 1000);
+  }
 
   centerStageOnPosition(id_faq_kb, stageElement){
+    this.logger.log("[CDS-STAGE]  •••• centerStageOnPosition ••••");
     let intervalId = setInterval(async () => {
       const result = await this.tiledeskStage.centerStageOnPosition(stageElement);
       if (result === true) {
@@ -77,12 +94,14 @@ export class StageService {
     }, 1000);
   }
 
-  centerStageOnTopPosition(id_faq_kb, pos){
+  centerStageOnTopPosition(id_faq_kb, stageElement){
+    this.logger.log("[CDS-STAGE]  •••• centerStageOnTopPosition ••••");
     let intervalId = setInterval(async () => {
-      const result = await this.tiledeskStage.centerStageOnTopPosition(pos);
+      const result = await this.tiledeskStage.centerStageOnTopPosition(stageElement);
+      //const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
       if (result === true) {
         clearInterval(intervalId);
-        this.savePositionByPos(id_faq_kb, pos);
+        this.savePositionByStageElement(id_faq_kb, stageElement);
       }
     }, 100);
     setTimeout(() => {
@@ -90,9 +109,11 @@ export class StageService {
     }, 1000);
   }
 
-  // centerStageOnHorizontalPosition(pos){
+  // centerStageOnTopPosition(id_faq_kb, pos){
+  //   this.logger.log("[CDS-STAGE]  •••• centerStageOnTopPosition ••••");
   //   let intervalId = setInterval(async () => {
-  //     const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
+  //     const result = await this.tiledeskStage.centerStageOnTopPosition(pos);
+  //     //const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
   //     if (result === true) {
   //       clearInterval(intervalId);
   //       this.savePositionByPos(id_faq_kb, pos);
@@ -102,10 +123,6 @@ export class StageService {
   //     clearInterval(intervalId);
   //   }, 1000);
   // }
-
-
-
-
 
 
 
@@ -129,6 +146,7 @@ export class StageService {
   }
 
   scaleAndCenter(listOfintents){
+    this.logger.log("[STAGE SERVICE] scaleAndCenter ");
     let resp = scaleAndcenterStageOnCenterPosition(listOfintents);
     return this.tiledeskStage.translateAndScale(resp.point, resp.scale);
   }
@@ -136,23 +154,25 @@ export class StageService {
   getScale(){
     return this.tiledeskStage.scale;
   }
-
-  onSwipe(event: WheelEvent) {
-    if (event.deltaX > 0) {
-      // console.log('Swipe RIGHT');
-      event.preventDefault();
-    } else if (event.deltaX < 0) {
-      // console.log('Swipe LEFT');
-      event.preventDefault();
-    }
-    // if (event.deltaY > 0) {
-    //   console.log('Swipe DOWN');
-    // } else if (event.deltaY < 0) {
-    //   console.log('Swipe UP');
-    // }
+  getAlpha(): number {
+    return this.settings.alpha_connectors;
   }
 
-  
+  /** onSwipe */
+  onSwipe(event: WheelEvent) {
+    if (event.deltaX > 0) {
+      event.preventDefault();
+    } 
+    else if (event.deltaX < 0) {
+      event.preventDefault();
+    } else {
+      return;
+    }
+  }
+
+  /** SET FUNCTIONS */
+
+  /** setAlphaConnectors */
   setAlphaConnectors(id_faq_kb?: string, alpha?: number){
     if(id_faq_kb && alpha >= 0){
       this.saveSettings(id_faq_kb, STAGE_SETTINGS.AlphaConnector, alpha);
@@ -164,64 +184,10 @@ export class StageService {
     this.alphaConnectorsSubject.next(alpha);
   }
 
-  setZoom(){
-    let scale = this.settings.zoom;
-    setTimeout(() => {
-      this.tiledeskStage.centerStageOnCenterPosition(scale);
-    }, 0);
-  }
-
-  setPosition(){
-    let position = this.settings.position;
-    let scale = this.settings.zoom;
-    setTimeout(() => {
-      this.translateAndScale(position, scale);
-    }, 0);
-  }
-  
-  savePositionByPos(id_faq_kb, position){
-    const scale = this.tiledeskStage.scale;
-    console.log('savePositionByPos:: ', position, scale);
-    const newPosition = this.tiledeskStage.translatePosition(position);
-    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, newPosition);
-    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
-  }
-
-
-  savePositionByStageElement(id_faq_kb, ElementRef){
-    const scale = this.tiledeskStage.scale;
-    const position = this.tiledeskStage.savePositionByStageElement(ElementRef, scale);
-    console.log('savePositionByStageElement:: ', position, scale);
-    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, position);
-    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
-  }
-
-  translateAndScale(pos, scale){
-    this.tiledeskStage.translateAndScale(pos, scale);
-  }
-
-  getAlpha(): number {
-    return this.settings.alpha_connectors;
-  }
-
-
-
-
-
-  saveSettings(id_faq_kb, type, alpha){
-    let settings = JSON.parse(this.appStorageService.getItem(id_faq_kb+'_stage'));
-    if(settings){
-      this.settings = settings;
-    }
-    this.settings[type] = alpha;
-    // centerStageOnCenterPosition
-    this.appStorageService.setItem(id_faq_kb+'_stage', JSON.stringify(this.settings));
-  }
-
-
-
-  updateAlphaConnectors(alpha) {
-    const svgElement = document.querySelector('#tds_svgConnectors') as HTMLElement;
+  /** updateAlphaConnectors */
+  updateAlphaConnectors(alpha: number) {
+    const svgElement = document.querySelector('#tds_svgConnectors'); 
+    // document.querySelector('#tds_svgConnectors') as HTMLElement;
     if (svgElement) {
       const paths = svgElement.querySelectorAll('path');
       paths.forEach((path) => {
@@ -237,5 +203,76 @@ export class StageService {
     });
   }
 
+    
+  /** setZoom 
+   * ! NOT USED !
+   * */
+  setZoom(){
+    let scale = this.settings.zoom;
+    setTimeout(() => {
+      this.tiledeskStage.centerStageOnCenterPosition(scale);
+    }, 0);
+  }
+
+  /** setPosition */
+  setPosition(){
+    this.logger.log("[STAGE SERVICE] setPosition ");
+    let position = this.settings.position;
+    let scale = this.settings.zoom;
+    setTimeout(() => {
+      this.translateAndScale(position, scale);
+    }, 0);
+  }
+  
+  /**
+   * savePositionByPos
+   * @param id_faq_kb 
+   * @param position 
+   * called on moved-and-scaled and centerStageOnTopPosition
+   */
+  savePositionByPos(id_faq_kb:string, position:any){
+    const scale = this.tiledeskStage.scale;
+    const newPosition = this.tiledeskStage.translatePosition(position);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, newPosition);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
+  }
+
+  /**
+   * savePositionByStageElement
+   * @param id_faq_kb 
+   * @param ElementRef 
+   * called on centerStageOnPosition
+   */
+  savePositionByStageElement(id_faq_kb:string, ElementRef:any){
+    const scale = this.tiledeskStage.scale;
+    const position = this.tiledeskStage.setPositionByStageElement(ElementRef, scale);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, position);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
+  }
+
+  setPositionByStageElement(ElementRef:any){
+    const scale = this.tiledeskStage.scale;
+    const position = this.tiledeskStage.setPositionByStageElement(ElementRef, scale);
+    return position;
+  }
+
+
+  /** translateAndScale */
+  translateAndScale(pos:any, scale:number){
+    this.tiledeskStage.translateAndScale(pos, scale);
+  }
+
+
+
+
+  /** saveSettings */
+  saveSettings(id_faq_kb:string, type:STAGE_SETTINGS, value:any){
+    let settings = JSON.parse(this.appStorageService.getItem(id_faq_kb+'_stage'));
+    if(settings){
+      this.settings = settings;
+    }
+    this.settings[type] = value;
+    //this.appStorageService.setItem(id_faq_kb+'_stage', JSON.stringify(this.settings));
+  }
 
 }
