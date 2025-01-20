@@ -63,7 +63,7 @@ $toogle-sidebar-width: 22px;
 
 
 ::ng-deep #tds_svgConnectors{
-  stroke: #b1b1b7;// #b1b1b750;
+  stroke: #b1b1b7;
   .tds_path {
     animation: dash 30s linear infinite;
     stroke-dasharray: 6;
@@ -76,10 +76,12 @@ $toogle-sidebar-width: 22px;
   .tds_connector_over {
     stroke: gray;
     stroke-width: 3px;
+    opacity: 1;
   }
   .tds_connector_selected {
     stroke: #3ea9f5;
     stroke-width: 3px;
+    opacity: 1;
   }
 }
 
