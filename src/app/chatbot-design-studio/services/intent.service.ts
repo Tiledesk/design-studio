@@ -293,7 +293,9 @@ export class IntentService {
   /** create a new intent when drag an action on the stage */
   public createNewIntent(id_faq_kb: string, action: any, pos:any){
     let intent = new Intent();
-    intent.id_faq_kb = id_faq_kb;
+    // intent.id_faq_kb = id_faq_kb;
+    const chatbot_id = this.dashboardService.id_faq_kb;
+    intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
     // let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
