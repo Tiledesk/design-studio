@@ -53,7 +53,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
   methodSelectedHeader = true;
   methodSelectedBody = false;
   headerAttributes: any;
-  autocompleteHeaderOptions: Array<string> = []
+  autocompleteHeaderOptions: Array<{label: string, value: string}> = [];
 
   valueIsInvalid: boolean = false;
 
@@ -214,7 +214,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
     if(this.intentSelected){
       this.initializeConnector();
     }
-    HEADER_TYPE.forEach(el => this.autocompleteHeaderOptions.push(el.label))
+    HEADER_TYPE.forEach(el => this.autocompleteHeaderOptions.push({label: el.label, value: el.value}))
   
   }
 

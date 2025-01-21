@@ -28,7 +28,7 @@ export class RulesAddComponent implements OnInit {
 
   
   ruleFormGroup: FormGroup
-  autocompleteOptions: Array<string> = [];
+  autocompleteOptions: Array<{label: string, value: string}> = [];
   isPanelExpanded: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -53,7 +53,7 @@ export class RulesAddComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges){
     if(this.listOfIntents){
-      this.listOfIntents.forEach(value => this.autocompleteOptions.push('/'+value.intent_display_name))
+      this.listOfIntents.forEach(value => this.autocompleteOptions.push({label: '/'+value.intent_display_name, value: '/'+value.intent_display_name}))
     }
   }
 

@@ -12,7 +12,7 @@ export class AttributesComponent implements OnInit {
 
   @Output() changeAttributes = new EventEmitter();
   @Input() attributes: any;
-  @Input() autocompleteOptions: Array<string> = [];
+  @Input() autocompleteOptions: Array<{label: string, value: string}> = [];
   @Input() method: any;
   @Input() openBlock: boolean;
 

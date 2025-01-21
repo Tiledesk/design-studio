@@ -216,6 +216,9 @@ appdashboard-filter{
     padding: 5px 10px;;
     margin: 0px;;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     .title-preview-label{
         color: var(--brown);
         font-size: 12px; 
