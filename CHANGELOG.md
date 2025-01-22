@@ -9,6 +9,7 @@
 
 # 1.26.0-rc.13
 - **bug-fixed**: copy and paste intent/action from different chatbots; 
+- **bug-fixed**: added vertical scroll to bot details page;
 
 # 1.26.0-rc.12
 - **added**: save the stage settings to local storage and load it at startup
