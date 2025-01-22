@@ -56,10 +56,12 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
   async getAllBots() {
     // this.chatbotService.getAllBotByProjectId().subscribe((chatbots) => {
     return new Promise((resolve, reject) => {
+      
       this.chatbotService.getFaqKbByProjectId().subscribe({ next: (chatbots) => {
-        this.logger.log("[ACTION REPLACE BOT] chatbots: ", chatbots);
+        this.logger.log("[ACTION REPLACE BOT] chatbots: ", chatbots, this.autocompleteOptions);
         //this.bots = bots;
-        this.chatbots_name_list = chatbots.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a._id, disabled: this.action.useSlug? !a.slug: false, icon: 'smart_toy'}));
+        this.autocompleteOptions = [];
+        this.chatbots_name_list = chatbots.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a._id, icon: 'smart_toy'}));
         chatbots.forEach(el => {
           if(el.slug)
             this.autocompleteOptions.push({label: el.name + ' (' + el.slug + ')', value: el.slug})
@@ -78,8 +80,10 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   getAllFaqById(chatbotId: string){
     this.logger.log("[ACTION REPLACE BOT] get AllFaqById: ",chatbotId);
+    
     this.faqService.getAllFaqByFaqKbId(chatbotId).subscribe({ next: (faks)=> {
       // faks.forEach(el => this.autocompleteOptionsBlockName.push({label: el.intent_display_name, value: el.intent_display_name}))
+      this.autocompleteOptionsBlockName = [];
       this.autocompleteOptionsBlockName = faks.map((faq) => ({
         label: faq.intent_display_name,
         value: faq.intent_display_name
@@ -152,7 +156,7 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   onChangeCheckbox(event: MatCheckbox, target){
     this.action[target] = !this.action[target];
-    this.chatbots_name_list = this.chatbots_name_list.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a.id, disabled: this.action.useSlug? !a.slug: false, icon: 'smart_toy'}));
+    this.chatbots_name_list = this.chatbots_name_list.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a.id, icon: 'smart_toy'}));
     if (target === "useSlg") {
       if (this.action[target]) {
         if (this.action.botId) {

@@ -7,6 +7,23 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.26.0
+
+# 1.26.0-rc.11
+- **bug-fixed**: hide connector on mouseover only if alphaConnectors is 0
+
+# 1.26.0-rc.10
+- **bug-fixed**: panel-intent-header error intent_display_name
+- **added**: icon boy in panel-intent-detail
+- **added**: button to show/hide connectors
+
+# 1.26.0-rc.9
+- **bug-fixed**: autocompleteOption is not showed in action-replace-bot-v3
+
+# 1.26.0-rc.8
+- **added**: autocompleteOptions on blockName into action-replace-bot-v3
+- **changed**: autocompleteOptions in cds-text as array label-value
+
 # 1.26.0-rc.7
 - **changed**: botName with botId in action-replace-bot-v3
 
