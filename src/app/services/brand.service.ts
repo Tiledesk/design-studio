@@ -189,11 +189,11 @@ export class BrandService {
       if (url && url !== 'CHANGEIT') {
         const data = await this.httpClient.get(url).toPromise();
 
-        console.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
+        // console.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);
 
         this.brand =data
 
-        console.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
+        // console.log('[BRAND-SERV] loadBrand - brand: ', this.brand);
 
         const resources = new BrandResources(this);
         resources.loadResources()

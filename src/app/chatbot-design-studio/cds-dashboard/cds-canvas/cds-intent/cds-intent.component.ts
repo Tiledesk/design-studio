@@ -63,6 +63,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   subscriptions: Array<{ key: string, value: Subscription }> = [];
   private unsubscribe$: Subject<any> = new Subject<any>();
+  alphaConnectors: number;
+  connectorsIn: any;
+
 
   // intentElement: any;
   // idSelectedAction: string;
@@ -110,9 +113,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.initSubscriptions()
   }
 
+  // aggiungo un pignulo su intent che sul hover del mouse cambia in 1 opacity di tutti i connettori in ingresso
   initSubscriptions() {
     let subscribtion: any;
     let subscribtionKey: string;
+
     /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
     subscribtionKey = 'behaviorIntent';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
@@ -136,8 +141,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           }
           
 
-
-
           //UPDATE QUESTIONS
           if (this.intent.question) {
             const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
@@ -153,7 +156,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           } else {
             this.formSize = 0;
           }
-
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
@@ -167,15 +169,27 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
-          var stageElement = document.getElementById(intent.intent_id);
-          this.stageService.centerStageOnTopPosition(stageElement)
-          this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6)
+          const stageElement = document.getElementById(intent.intent_id);
+          this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
+          this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
     }
 
+    /** SUBSCRIBE TO THE ALPHA CONNECTOR VALUE */
+    subscribtionKey = 'alphaConnectors';
+    subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
+    if (!subscribtion) {
+      subscribtion = this.stageService.alphaConnectors$.subscribe(value => {
+        this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
+        this.alphaConnectors = value;
+        this.getAllConnectorsIn();
+      });
+      const subscribe = { key: subscribtionKey, value: subscribtion };
+      this.subscriptions.push(subscribe);
+    }
   }
 
 
@@ -217,8 +231,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.addEventListener();
     //}, 10000);
-    
   }
+
+  private getAllConnectorsIn(){
+    if(this.intent){
+      this.connectorsIn = this.connectorService.searchConnectorsInByIntent(this.intent.intent_id);
+    }
+  }
+
 
   private setActionIntent(){
     try {
