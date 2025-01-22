@@ -55,6 +55,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() showPanelActions = new EventEmitter(); // nk
   @Output() testItOut = new EventEmitter<Intent>();
   @Output() deleteIntent = new EventEmitter();
+  @Output() colorIntent = new EventEmitter();
 
   @ViewChild('resizeElement', { static: false }) resizeElement: ElementRef;
   @ViewChild('openActionMenuBtn', { static: false }) openActionMenuBtnRef: ElementRef;
@@ -730,10 +731,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** ******************************
    * intent controls options: START
    * ****************************** */
-  onOptionIntentControlClicked(event: 'webhook' | 'delete' | 'test' | 'copy'){
+  onOptionIntentControlClicked(event: 'webhook' | 'color' | 'delete' | 'test' | 'copy'){
     switch(event){
       case 'webhook':
         this.toggleIntentWebhook(this.intent);
+        break;
+      case 'color':
+        this.onColorIntent(this.intent)
         break;
       case 'delete':
         this.onDeleteIntent(this.intent)
@@ -778,8 +782,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onDeleteIntent(intent: Intent) {
-    // this.intentService.setIntentSelected(this.intent.intent_id);
     this.deleteIntent.emit(intent);
+  }
+
+  onColorIntent(intent: Intent) {
+    this.colorIntent.emit(intent);
   }
 
   /** ******************************

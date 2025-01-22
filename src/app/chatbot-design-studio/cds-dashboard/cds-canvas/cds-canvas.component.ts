@@ -113,6 +113,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   IS_OPEN_CONTEXT_MENU: boolean = false;
   positionContextMenu: any = { 'x': 0, 'y': 0 };
 
+  /** panel color menu */
+  IS_OPEN_COLOR_MENU: boolean = false;
+  positionColortMenu: any = { 'x': 0, 'y': 0 };
+
   private logger: LoggerService = LoggerInstance.getInstance()
   
   
@@ -427,6 +431,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
+    this.IS_OPEN_COLOR_MENU = false;
     // this.closePanelWidget.next();
   }
   private closeActionDetailPanel(){
@@ -756,6 +761,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.connectorService.removeConnectorDraft();
     this.IS_OPEN_ADD_ACTIONS_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
+    this.IS_OPEN_COLOR_MENU = false;
   }
 
   /** posCenterIntentSelected */
@@ -1022,6 +1028,26 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     //   }
     // })
   }
+
+  
+    /** onColorIntent */
+    onColorIntent(intent: Intent) {
+      this.logger.log('[CDS-CANVAS0] onColorIntent: ', intent.intent_id);
+      this.closeAllPanels();
+
+      const element = document.getElementById(intent.intent_id);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        const topRightX = rect.left;
+        const topRightY = rect.top;
+        console.log(`Coordinate angolo in alto a destra: X=${topRightX}, Y=${topRightY}`);
+        this.positionColortMenu.x = topRightX;
+        this.positionColortMenu.y = topRightY;
+        this.IS_OPEN_COLOR_MENU = true;
+      } else {
+        console.error(`Elemento con ID '${intent.intent_id}' non trovato.`);
+      }
+    }
   // --------------------------------------------------------- //
  
 
@@ -1040,7 +1066,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (!this.hasClickedAddAction) {
       this.removeConnectorDraftAndCloseFloatMenu();
     }
-    //this.intentService.setIntentSelectedById(intent_id);
+    // this.intentService.setIntentSelectedById(intent_id);
     // this.intentSelected = this.listOfIntents.find(el => el.intent_id === this.intentService.intentSelected.intent_id);
     this.controllerService.openActionDetailPanel(TYPE_INTENT_ELEMENT.ACTION, event.action);
   }
@@ -1057,7 +1083,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (!this.hasClickedAddAction) {
       this.removeConnectorDraftAndCloseFloatMenu();
     }
-    //this.intentService.setIntentSelectedById(intent_id);
+    // this.intentService.setIntentSelectedById(intent_id);
     // this.intentSelected = this.listOfIntents.find(el => el.intent_id === this.intentService.intentSelected.intent_id);
     this.controllerService.openActionDetailPanel(TYPE_INTENT_ELEMENT.QUESTION, question);
   }
@@ -1073,7 +1099,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (!this.hasClickedAddAction) {
       this.removeConnectorDraftAndCloseFloatMenu();
     }
-    //this.intentService.setIntentSelectedById(intent_id);
+    // this.intentService.setIntentSelectedById(intent_id);
     // this.intentSelected = this.listOfIntents.find(el => el.intent_id === this.intentService.intentSelected.intent_id);
     this.controllerService.openActionDetailPanel(TYPE_INTENT_ELEMENT.FORM, intentform);
   }
