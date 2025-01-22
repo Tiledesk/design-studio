@@ -30,7 +30,7 @@
             <img src="assets/images/icons/block.svg">
         </div>
 
-        <div *ngIf="action?.blockName" class="action-row-right"> 
+        <div *ngIf="action?.blockName" class="action-row-right" [ngClass]="action?.blockName | variableCssClass"> 
             {{action.blockName}}
         </div>
         <div *ngIf="!action?.blockName" class="action-row-right empty"> 
@@ -79,7 +79,6 @@
         <cds-text id="blockName"
             class="sx-input" 
             [text]="action?.blockName"
-            [placeholder]="'CDSCanvas.ChooseBotBySlug' | translate"
             [autocompleteOptions]="autocompleteOptionsBlockName"
             (blur)="onBlur($event)"
             (onChange)="onChangeTextarea($event, 'blockName')"
