@@ -305,7 +305,8 @@ export class IntentService {
   /** create a new intent when drag an action on the stage */
   public createNewIntent(id_faq_kb: string, action: any, pos:any){
     let intent = new Intent();
-    intent.id_faq_kb = id_faq_kb;
+    const chatbot_id = this.dashboardService.id_faq_kb;
+    intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
     // let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
@@ -783,13 +784,16 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
-    this.logger.log('[CDS-CANVAS]  intentSelected: ', this.intentSelected);
+    this.logger.log('[CDS-INTENT] intentSelected: ', this.intentSelected);
     if(this.intentSelected){
       this.setDefaultIntentSelected();
       //** center stage on 'start' intent */
       let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
       if(startElement){
+        let id_faq_kb = this.dashboardService.id_faq_kb;
+        this.logger.log('[CDS-INTENT] setStartIntent: ', startElement);
         this.stageService.centerStageOnHorizontalPosition(startElement);
+        // this.stageService.centerStageOnPosition(id_faq_kb, startElement);
       }
     }
   }

@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.26.0-rc.13
+- **bug-fixed**: copy and paste intent/action from different chatbots; 
+
+# 1.26.0-rc.12
+- **added**: save the stage settings to local storage and load it at startup
+- **bug-fixed**: set the position to the top of the intent when the element height is greater than the stage size; 
+
 # 1.26.0-rc.11
 - **bug-fixed**: hide connector on mouseover only if alphaConnectors is 0
 
