@@ -2,6 +2,12 @@
     width: 100%;
 }
 
+.scrollMePage{
+    max-height: calc(100vh - 130px);
+    overflow-y: scroll;
+    display: block;
+}
+
 ::ng-deep .custom-mat-tooltip-in-faq-table {
     background-color: #555555 !important;
     color: #fff !important;
