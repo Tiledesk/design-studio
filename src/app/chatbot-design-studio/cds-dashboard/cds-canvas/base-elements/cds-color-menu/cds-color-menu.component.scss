@@ -25,3 +25,36 @@
     border: 2px solid var(--gray-02);
     box-shadow: none;
 }
+
+.hMygBq {
+    width: 100%;
+    display: flex;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+.vf-tooltip{
+    display: inline;
+    margin-right: 10.5px;
+}
+
+.YJeac {
+    transition: transform 0.15s;
+    border-radius: 50%;
+    border: 2px solid rgba(161, 173, 186, 0.133);
+    padding: 3.5px;
+    background: rgba(161, 173, 186, 0.133);
+}
+.bDcMJb {
+    width: 22px;
+    height: 22px;
+    position: relative;
+    border-radius: 50%;
+    box-shadow: rgba(0, 0, 0, 0.118) 0px -2px 0px 0px inset;
+    background: rgb(161, 173, 186);
+    background-blend-mode: screen;
+    cursor: pointer;
+}
+.YJeac:hover {
+    transform: scale(1.1);
+}
