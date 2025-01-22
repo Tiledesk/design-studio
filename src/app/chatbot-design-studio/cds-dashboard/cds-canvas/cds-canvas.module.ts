@@ -33,6 +33,7 @@ import { PanelIntentHeaderComponent } from './cds-intent/panel-intent-header/pan
 import { CdsVoiceActionsModule } from './actions/list-voice/cds-voice-actions.module';
 import { PreloadBarComponent } from 'src/app/chatbot-design-studio/cds-base-element/preload-bar/preload-bar.component';
 import { ImagePreloaderResolver } from 'src/app/resolver/image.resolver';
+import { CdsConnectorInComponent } from './base-elements/cds-connector-in/cds-connector-in.component';
 
 
 const routes: Routes = [
@@ -95,6 +96,7 @@ const routes: Routes = [
     CdsRuleComponent,
 
     PreloadBarComponent,
+     CdsConnectorInComponent,
   ],
   imports: [
     CommonModule,
