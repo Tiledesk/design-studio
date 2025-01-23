@@ -6,7 +6,7 @@
 .color-menu {
     display: block;
     height: 100px;
-    width: 264px;
+    width: 265px;
     position: absolute;
     top: 0;
     left: 0;
@@ -16,7 +16,7 @@
     line-height: 18px;
     list-style: none;
     overflow: hidden;
-    padding: 0;
+    padding: 10px 10px;
     border-radius: 8px;
     background: rgb(255,255,255);
     will-change: transform;
@@ -26,35 +26,51 @@
     box-shadow: none;
 }
 
-.hMygBq {
-    width: 100%;
-    display: flex;
-    -webkit-box-pack: start;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-}
-.vf-tooltip{
-    display: inline;
-    margin-right: 10.5px;
+.title {
+    padding: 10px 0;
 }
 
-.YJeac {
-    transition: transform 0.15s;
-    border-radius: 50%;
-    border: 2px solid rgba(161, 173, 186, 0.133);
-    padding: 3.5px;
-    background: rgba(161, 173, 186, 0.133);
+.color-palette {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
 }
-.bDcMJb {
+
+.color-tooltip {
+    display: inline;
+    margin-right: 8px;
+    background: none;
+    border: none;
+    padding: 0px;
+}
+
+.color-button {
+    transition: transform 0.25s;
+    border-radius: 50%;
+    border: 0px solid rgba(161, 173, 186, 0.133);
+    padding: 5px;
+    background: rgba(var(--main-color), 0.2);
+}
+
+.color-button:hover {
+    transform: scale(1.2);
+}
+
+.color-circle {
     width: 22px;
     height: 22px;
     position: relative;
     border-radius: 50%;
     box-shadow: rgba(0, 0, 0, 0.118) 0px -2px 0px 0px inset;
-    background: rgb(161, 173, 186);
+    background: rgba(var(--main-color), 1);
     background-blend-mode: screen;
     cursor: pointer;
 }
-.YJeac:hover {
-    transform: scale(1.1);
-}
+
+.red { --main-color: 255, 0, 0 }
+.green { --main-color: 0, 255, 0 }
+.blue { --main-color: 0, 0, 255 }
+.yellow { --main-color: 255, 255, 0 }
+.cyan { --main-color: 0, 255, 255 }
+.magenta { --main-color: 255, 0, 255 }

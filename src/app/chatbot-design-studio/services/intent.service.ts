@@ -86,6 +86,12 @@ export class IntentService {
   }
 
 
+
+  //  public onChangeColor(color){
+  //   this.logger.log('[INTENT SERVICE] ::: onChangeColor:: ', color);
+  //   this.changedConnector.next(color);
+  // }
+
   /**
    * onChangedConnector
    * funzione chiamata sul 'connector-created', 'connector-deleted'
