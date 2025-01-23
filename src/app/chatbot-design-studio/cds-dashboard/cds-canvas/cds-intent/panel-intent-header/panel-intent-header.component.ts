@@ -31,13 +31,16 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     this.intentService.getIntents().subscribe(intents => {
       if(intents){
         this.listOfIntents = intents;
+        if(this.intent){
+          this.intentName = this.intent.intent_display_name;
+        }
       }
     })
   }
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    this. initialize();
+    this.initialize();
   }
 
   ngOnChanges() {

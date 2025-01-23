@@ -136,22 +136,6 @@ div {
         height: inherit;
     }
     
-    .set-attribute-value {
-        font-size: 12px;
-        font-weight: 400;
-        background: #ecb606;
-        width: fit-content;
-        padding: 0px 6px;
-        border-radius: 4px;
-        color: #fff;
-        // height: 18px;
-        line-height: 1.5;
-
-        overflow: hidden;
-        word-break: break-word;
-    
-    }
-
     .icon-action img {
         height: 16px;
         filter: brightness(0) saturate(100%) invert(42%) sepia(2%) saturate(2720%) hue-rotate(9deg) brightness(91%) contrast(81%);
