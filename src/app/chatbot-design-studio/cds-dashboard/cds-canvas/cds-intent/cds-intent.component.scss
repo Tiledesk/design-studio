@@ -46,7 +46,7 @@
   cursor: grab;
   position: relative;
   margin: 0px;
-  background-color: var(--intent-background);
+  // background-color: var(--intent-background);
   padding: var(--base-padding-preview);
   border-radius: var(--base-border-radius-preview);
   outline: 1px solid var(--intent-border-color);
@@ -54,24 +54,19 @@
     display: block;
     border-radius: 10px;
     position: absolute;
-    // inset: -3px;
-    // border: 1px solid rgb(221, 212, 183);
     content: "";
     transition: box-shadow 0.15s ease 0s;
   }
-
   &.outline-border {
     outline: 2px solid var(--brown);
     border-radius: var(--base-border-radius-preview);
   }
-
   &.ripple-effect {
     animation-name: ripple_effect;
     animation-duration: 1s;
     animation-iteration-count: 1s;
     border-radius: var(--base-border-radius-preview);
   }
-
   &.isStart{
     background-color: unset;
     padding: 0;
@@ -81,18 +76,14 @@
     outline: unset;
   }
 
-
   .pic-header {
     display: flex;
     justify-content: space-between;
     min-height: 30px;
     width: auto;
-    margin: 0px; //10px 0px;
-    overflow-x: hidden;
+    margin: 0px;
     position: relative;
-    // border: 2px solid rgb(255, 255, 255);
     padding: 0 0px 10px 0px;
-    // background-color: rgb(235, 226, 198);
     background-color: var(--intent-header-background);
     overflow: hidden;
   }

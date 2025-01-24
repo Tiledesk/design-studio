@@ -1,37 +1,16 @@
 <div class="color-menu">
     <div class="title">Color themes</div>
     <div class="color-palette">
-        <button class="color-tooltip" (click)="onChangeColor(INTENT_COLORS.COLOR1);">
-            <div class="color-button red">
-                <div class="color-circle red"></div>
-            </div>
-        </button>
-        <button class="color-tooltip" (click)="onChangeColor(INTENT_COLORS.COLOR2);">
-            <div class="color-button green">
-                <div class="color-circle green"></div>
-            </div>
-        </button>
-        <button class="color-tooltip" (click)="onChangeColor(INTENT_COLORS.COLOR3);">
-            <div class="color-button blue">
-                <div class="color-circle blue"></div>
-            </div>
-        </button>
-        <button class="color-tooltip" (click)="onChangeColor(INTENT_COLORS.COLOR4);">
-            <div class="color-button yellow">
-                <div class="color-circle yellow"></div>
-            </div>
-        </button>
-        <button class="color-tooltip" (click)="onChangeColor(INTENT_COLORS.COLOR5);">
-            <div class="color-button cyan">
-                <div class="color-circle cyan"></div>
-            </div>
-        </button>
-        <button class="color-tooltip" (click)="onChangeColor(INTENT_COLORS.COLOR6);">
-            <div class="color-button magenta">
-                <div class="color-circle magenta"></div>
-            </div>
-        </button>
-    </div>
+
+  
+    <button *ngFor="let color of colorValues; let i = index" 
+        class="color-tooltip"
+        (click)="onChangeColor(i)">
+        <div class="color-button" [ngStyle]="{'background-color': 'rgba(var('+color+'), 0.3)'}">
+            <div class="color-circle" [ngStyle]="{'background-color': 'rgb(var('+color+'))'}"></div>
+        </div>
+    </button>
+
 
 </div>
 

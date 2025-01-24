@@ -1,4 +1,9 @@
-<div #resizeElement class="panel-intent-content tds_draggable" [class.isStart]="isStart" [id]="'intent-content-'+ intent?.intent_id">
+
+ <!-- [ngStyle]="{'background-color': 'var(--intent-background)'}" -->
+  <div #resizeElement class="panel-intent-content tds_draggable" 
+    [class.isStart]="isStart" 
+    [id]="'intent-content-'+ intent?.intent_id"
+    [ngStyle]="{'background-color': 'rgba(var('+intentColor+'), 0.25)'}">
 
     <cds-panel-intent-controls
         [isInternalIntent]="isInternalIntent"

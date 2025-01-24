@@ -1031,10 +1031,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   
     /** onColorIntent */
-    onColorIntent(intent: Intent) {
+    onChangeColorIntent(intent: Intent) {
       this.logger.log('[CDS-CANVAS0] onColorIntent: ', intent.intent_id);
       this.closeAllPanels();
-
       const element = document.getElementById(intent.intent_id);
       if (element) {
         const rect = element.getBoundingClientRect();

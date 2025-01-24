@@ -50,7 +50,7 @@
     border-radius: 50%;
     border: 0px solid rgba(161, 173, 186, 0.133);
     padding: 5px;
-    background: rgba(var(--main-color), 0.2);
+    // background: rgba(var(--main-color), 0.2);
 }
 
 .color-button:hover {
@@ -63,14 +63,14 @@
     position: relative;
     border-radius: 50%;
     box-shadow: rgba(0, 0, 0, 0.118) 0px -2px 0px 0px inset;
-    background: rgba(var(--main-color), 1);
+    // background: rgba(var(--main-color), 1);
     background-blend-mode: screen;
     cursor: pointer;
 }
 
-.red { --main-color: 255, 0, 0 }
-.green { --main-color: 0, 255, 0 }
-.blue { --main-color: 0, 0, 255 }
-.yellow { --main-color: 255, 255, 0 }
-.cyan { --main-color: 0, 255, 255 }
-.magenta { --main-color: 255, 0, 255 }
+// .red { --main-color: 255, 0, 0 }
+// .green { --main-color: 0, 255, 0 }
+// .blue { --main-color: 0, 0, 255 }
+// .yellow { --main-color: 255, 255, 0 }
+// .cyan { --main-color: 0, 255, 255 }
+// .magenta { --main-color: 255, 0, 255 }

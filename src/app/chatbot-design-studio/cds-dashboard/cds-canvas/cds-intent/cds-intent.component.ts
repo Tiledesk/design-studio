@@ -27,7 +27,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
-
+import { INTENT_COLORS } from 'src/app/chatbot-design-studio/utils';
 
 export enum HAS_SELECTED_TYPE {
   ANSWER = "HAS_SELECTED_ANSWER",
@@ -55,7 +55,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() showPanelActions = new EventEmitter(); // nk
   @Output() testItOut = new EventEmitter<Intent>();
   @Output() deleteIntent = new EventEmitter();
-  @Output() colorIntent = new EventEmitter();
+  @Output() changeColorIntent = new EventEmitter();
 
   @ViewChild('resizeElement', { static: false }) resizeElement: ElementRef;
   @ViewChild('openActionMenuBtn', { static: false }) openActionMenuBtnRef: ElementRef;
@@ -93,6 +93,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isInternalIntent: boolean = false;
   actionIntent: ActionIntentConnected;
   isActionIntent: boolean = false;
+  
+
+  /** INTENT ATTRIBUTES */
+  intentColor: any = INTENT_COLORS.COLOR1;
+  // position?: any;
+  // nextBlockAction?: any;
+  // connectors?: any;
+  // color?: any;
+
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -105,7 +114,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     private renderer: Renderer2,
     private appStorageService: AppStorageService
   ) {
-    this.initSubscriptions()
+    this.initSubscriptions();
   }
 
   initSubscriptions() {
@@ -163,9 +172,24 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
-          var stageElement = document.getElementById(intent.intent_id);
+          const stageElement = document.getElementById(intent.intent_id);
           this.stageService.centerStageOnTopPosition(stageElement)
           this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6)
+        }
+      });
+      const subscribe = { key: subscribtionKey, value: subscribtion };
+      this.subscriptions.push(subscribe);
+    }
+
+    /** SUBSCRIBE TO THE CHANGE INTENT COLOR */
+    subscribtionKey = 'changeIntentColor';
+    subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
+    if (!subscribtion) {
+      subscribtion = this.intentService.behaviorIntentColor.pipe(takeUntil(this.unsubscribe$)).subscribe(resp => {
+        this.logger.log("[CDS-INTENT] changeIntentColor: ", resp, " con : ");
+        if(resp.intentId && resp.intentId === this.intent.intent_id){
+          const intentColor = resp.color;
+          this.changeIntentColor(intentColor);
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
@@ -213,7 +237,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.addEventListener();
     //}, 10000);
-    
+    this.setIntentAttribute();
   }
 
   private setActionIntent(){
@@ -284,8 +308,20 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.componentRendered.emit(this.intent.intent_id);
     }, 0);
    
+
+
+
+
   }
 
+  setIntentAttribute(){
+    if(this.intent.attributes?.color){
+      const coloreValue = INTENT_COLORS[this.intent.attributes?.color as keyof typeof INTENT_COLORS];
+      this.intentColor = coloreValue;
+    } else {
+      this.intentColor = INTENT_COLORS.COLOR1;
+    }
+  }
 
   ngOnDestroy() {
     this.unsubscribe();
@@ -421,7 +457,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * retrocompatibility patch.
    */
   private patchAttributesPosition() {
-    if (!this.intent.attributes || !this.intent.attributes.position) {
+    if (!this.intent.attributes) {
       this.intent['attributes'] = {};
     }
     if (!this.intent.attributes.position) {
@@ -786,9 +822,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onColorIntent(intent: Intent) {
-    this.colorIntent.emit(intent);
+    this.intentService.setIntentSelected(this.intent.intent_id);
+    this.changeColorIntent.emit(intent);
   }
 
+  changeIntentColor(color){
+    const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
+    console.log('changeIntentColor:: ', coloreValue);
+    this.intentColor = coloreValue;
+    this.intent.attributes.color = color;
+    this.intentService.updateIntent(this.intent); 
+  }
   /** ******************************
    * intent controls options: END 
    * ****************************** */

@@ -31,6 +31,7 @@ export class IntentService {
   testIntent = new BehaviorSubject<Intent>(null);
   BStestiTout = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
+  behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
@@ -87,10 +88,11 @@ export class IntentService {
 
 
 
-  //  public onChangeColor(color){
-  //   this.logger.log('[INTENT SERVICE] ::: onChangeColor:: ', color);
-  //   this.changedConnector.next(color);
-  // }
+   public setIntentColor(color){
+    const intentId = this.intentSelected.intent_id;
+    this.logger.log('[INTENT SERVICE] ::: setIntentColor:: ', intentId, color);
+    this.behaviorIntentColor.next({ intentId: intentId, color: color });
+  }
 
   /**
    * onChangedConnector

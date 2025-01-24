@@ -1,12 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-export enum INTENT_COLORS {
-  COLOR1 = 'color1',
-  COLOR2 = 'color2',
-  COLOR3 = 'color3',
-  COLOR4 = 'color4',
-  COLOR5 = 'color5',
-  COLOR6 = 'color6',
-}
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+import { INTENT_COLORS } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'cds-color-menu',
@@ -15,20 +9,27 @@ export enum INTENT_COLORS {
 })
 
 export class CdsColorMenuComponent implements OnInit {
+  @Input() intentId: string;
   @Input() positions: any;
   @Output() hideColortMenu = new EventEmitter(); 
 
-  INTENT_COLORS = INTENT_COLORS;
+  colorKeys = Object.keys(INTENT_COLORS);
+  colorValues = Object.values(INTENT_COLORS);
 
-  constructor() { }
+
+  constructor(
+    private readonly intentService: IntentService
+  ) { }
 
   ngOnInit(): void {
-    // empty
+    //empty
   }
 
 
-  onChangeColor(event:INTENT_COLORS){
-    console.log("COLOR: ", event);
+  onChangeColor(index){
+    const color = this.colorKeys[index];
+    console.log("COLOR: ", color);
+    this.intentService.setIntentColor(color);
   }
 
 }

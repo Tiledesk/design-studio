@@ -32,6 +32,7 @@ export class IntentAttributes {
     position?: any;
     nextBlockAction?: any;
     connectors?: any;
+    color?: any;
     constructor() {
         this.position = {x:0, y:0};
         this.nextBlockAction = {
@@ -40,6 +41,7 @@ export class IntentAttributes {
             intentName: ""
         };
         this.connectors = {}
+        this.color = '#cfe2ff';
     }
 }
 
