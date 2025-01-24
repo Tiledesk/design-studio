@@ -1,8 +1,6 @@
 <div class="color-menu">
-    <div class="title">Color themes</div>
+    <div class="menu-title">Color themes</div>
     <div class="color-palette">
-
-  
     <button *ngFor="let color of colorValues; let i = index" 
         class="color-tooltip"
         (click)="onChangeColor(i)">
@@ -10,7 +8,5 @@
             <div class="color-circle" [ngStyle]="{'background-color': 'rgb(var('+color+'))'}"></div>
         </div>
     </button>
-
-
 </div>
 

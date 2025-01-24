@@ -10,17 +10,13 @@
   --base-border-radius-preview: #{var(--border-radius-base-preview)};
   --base-padding-preview: #{var(--padding-base-preview)};
   --action-selected-color: #{var(--action-color-selected)};
-
   --add-action-btn-background: #{var(--add-action-btn-background-preview)};
   --add-action-btn-color: #{var(--add-action-btn-color-preview)};
   --add-action-btn-hover-color: #{var(--add-action-btn-hover-color-preview)};
-
   --base-color: #{var(--blu)};
   --startIntentMaxWith: 160px;
-
   --base-border-radius-base: #{var(--button-border-radius-base)};
 }
-
 
 
 #customDragPreview {
@@ -68,12 +64,22 @@
     border-radius: var(--base-border-radius-preview);
   }
   &.isStart{
-    background-color: unset;
+    background-color: unset!important;
     padding: 0;
     border-radius: unset;
     border: unset;
     max-width: var(--startIntentMaxWith);
     outline: unset;
+  }
+
+  .intent-background-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      z-index: -1;
   }
 
   .pic-header {

@@ -19,7 +19,7 @@ export class PanelIntentControlsComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this. initialize();
+    this.initialize();
   }
 
   initialize(){
@@ -32,7 +32,6 @@ export class PanelIntentControlsComponent implements OnInit {
     } else if (this.webhookEnabled) {
       this.webHookTooltipText = "Disable webhook";
     }
-    
   }
 
   toggleIntentWebhook(){
