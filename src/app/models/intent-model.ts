@@ -41,7 +41,6 @@ export class IntentAttributes {
             intentName: ""
         };
         this.connectors = {}
-        this.color = '#cfe2ff';
     }
 }
 

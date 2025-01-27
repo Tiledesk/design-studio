@@ -76,7 +76,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   
 
   /** INTENT ATTRIBUTES */
-  intentColor: any = INTENT_COLORS.COLOR1;
+  intentColor: any = INTENT_COLORS.COLOR2;
   // position?: any;
   // nextBlockAction?: any;
   // connectors?: any;
@@ -164,10 +164,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.intentService.behaviorIntentColor.pipe(takeUntil(this.unsubscribe$)).subscribe(resp => {
-        if(resp.intentId && resp.intentId === this.intent.intent_id){
-          const intentColor = resp.color;
-          this.changeIntentColor(intentColor);
+        if(resp.intentId && resp.intentId === this.intent?.intent_id){
+          if(resp.color){
+            this.changeIntentColor(resp.color);
+          }
         }
+        
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -370,12 +372,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (!this.intent?.attributes) {
       this.intent['attributes'] = {};
     }
-    if(this.intent.attributes?.color){
-      const coloreValue = INTENT_COLORS[this.intent.attributes?.color as keyof typeof INTENT_COLORS];
+    if(this.intent.attributes.color && this.intent.attributes.color !== undefined){
+      const coloreValue = INTENT_COLORS[this.intent.attributes.color as keyof typeof INTENT_COLORS];
       this.intentColor = coloreValue;
     } else {
       this.intentColor = INTENT_COLORS.COLOR1;
     }
+
   }
 
   private setIntentSelected() {
@@ -384,7 +387,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.questionCount = 0;
     try {
       if (this.intent) {
-        this.logger.log("setIntentSelected:: ", this.intent.actions);
         /** // this.patchAllActionsId(); */
         this.patchAttributesPosition();
         /** // this.listOfActions = this.intent.actions.filter(function(obj) {
