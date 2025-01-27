@@ -70,6 +70,10 @@
     border: unset;
     max-width: var(--startIntentMaxWith);
     outline: unset;
+    .intent-background-overlay {
+      background-color: transparent!important;
+      outline: unset!important;
+    }
   }
 
   .intent-background-overlay {
