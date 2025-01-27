@@ -42,7 +42,7 @@
   cursor: grab;
   position: relative;
   margin: 0px;
-  // background-color: var(--intent-background);
+  // background-color: rgba(var(--intent-color), 0.35);
   padding: var(--base-padding-preview);
   border-radius: var(--base-border-radius-preview);
   outline: 1px solid var(--intent-border-color);

@@ -5,12 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 export const preDisplayName:string  = 'untitled_block_';
 
 export enum INTENT_COLORS {
-    COLOR1 = '--intent-color-background',
-    COLOR2 = '--intent-color-red',
-    COLOR3 = '--intent-color-green',
-    COLOR4 = '--intent-color-blu',
-    COLOR5 = '--intent-color-orange',
-    COLOR6 = '--intent-color-purple',
+    COLOR1 = '80,100,147',
+    COLOR2 = '61,130,226',
+    COLOR3 = '86,179,101',
+    COLOR4 = '203,98,103',
+    COLOR5 = '220,136,121',
+    COLOR6 = '182,139,206',
   }
 
 export enum SIDEBAR_PAGES {

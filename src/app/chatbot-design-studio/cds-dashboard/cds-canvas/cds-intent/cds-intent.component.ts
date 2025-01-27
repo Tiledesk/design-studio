@@ -372,12 +372,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (!this.intent?.attributes) {
       this.intent['attributes'] = {};
     }
+
     if(this.intent.attributes.color && this.intent.attributes.color !== undefined){
-      const coloreValue = INTENT_COLORS[this.intent.attributes.color as keyof typeof INTENT_COLORS];
-      this.intentColor = coloreValue;
-    } else {
-      this.intentColor = INTENT_COLORS.COLOR1;
-    }
+      const nwColor = this.intent.attributes.color;// INTENT_COLORS[this.intent.attributes.color];
+      document.documentElement.style.setProperty('--intent-color', `${nwColor}`);
+      // const coloreValue = INTENT_COLORS[this.intent.attributes.color as keyof typeof INTENT_COLORS];
+      this.intentColor = nwColor;
+    } 
+    // else {
+    //   this.intentColor = INTENT_COLORS.COLOR1;
+    // }
 
   }
 
@@ -804,10 +808,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   changeIntentColor(color){
-    const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
-    this.intentColor = coloreValue;
+    // const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
+    this.intentColor = color;
     this.intent.attributes.color = color;
-    this.intentService.updateIntent(this.intent); 
+    // if(INTENT_COLORS[color]){
+    if(color){
+      // const nwColor = INTENT_COLORS[color];
+      document.documentElement.style.setProperty('--intent-color', `${color}`);
+      this.intentService.updateIntent(this.intent); 
+    }
   }
   /** ******************************
    * intent controls options: END 

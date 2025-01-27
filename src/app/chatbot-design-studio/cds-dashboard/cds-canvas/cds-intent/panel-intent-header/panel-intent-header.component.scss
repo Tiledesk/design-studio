@@ -63,10 +63,11 @@
             padding: 0; //0 0 0 10px;
             margin:0;
             // color: $gray;
-            color: var(--blu);
+            // color: var(--blu);
             font-size: 1.0em;
             // z-index: 2;
             position: relative;
+            // color: rgb(var(--intent-color));
         }
         .btn-save {
             position: absolute;

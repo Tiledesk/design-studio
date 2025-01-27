@@ -1,12 +1,31 @@
 <div class="color-menu">
+
+    <!-- src/app/color-slider/color-slider.component.html -->
     <div class="menu-title">Color themes</div>
+
+
+    <div class="color-slider-container">
+        <!-- Slider per la selezione del colore -->
+        <input 
+            type="range" 
+            min="0" 
+            max="359" 
+            step="1" 
+            [(ngModel)]="hue" 
+            (input)="onSliderChange($event)" 
+            class="color-slider"
+        />
+    </div>
+
+    
+
     <div class="color-palette">
-    <button *ngFor="let color of colorValues; let i = index" 
-        class="color-tooltip"
-        (click)="onChangeColor(i)">
-        <div class="color-button" [ngStyle]="{'background-color': 'rgba(var('+color+'), 0.3)'}">
-            <div class="color-circle" [ngStyle]="{'background-color': 'rgb(var('+color+'))'}"></div>
-        </div>
-    </button>
-</div>
+        <button *ngFor="let color of colorValues; let i = index" 
+            class="color-tooltip"
+            (click)="onChangeColor(i)">
+            <div class="color-button" [ngStyle]="{'background-color': 'rgba('+color+', 0.35)'}">
+                <div class="color-circle" [ngStyle]="{'background-color': 'rgb('+color+')'}"></div>
+            </div>
+        </button>
+    </div>
 

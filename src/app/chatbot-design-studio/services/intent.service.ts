@@ -1505,7 +1505,7 @@ export class IntentService {
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         this.faqService.opsUpdate(payload).subscribe((resp: any) => {
-          this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
+          // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);
           resolve(true);

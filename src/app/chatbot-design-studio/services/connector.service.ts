@@ -203,7 +203,7 @@ export class ConnectorService {
    * create connectors from Intent
    */
   public createConnectorsOfIntent(intent:any){
-    if(intent.attributes && intent.attributes.nextBlockAction){
+    if(intent.attributes?.nextBlockAction){
       let idConnectorFrom = null;
       let idConnectorTo = null;
       let nextBlockAction = intent.attributes.nextBlockAction;
@@ -214,7 +214,7 @@ export class ConnectorService {
           nextBlockAction.intentName = '';
           idConnectorTo = null;
         }
-        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
         this.createConnector(intent, idConnectorFrom, idConnectorTo);
       }
     }
@@ -235,7 +235,7 @@ export class ConnectorService {
               action.intentName = '';
               idConnectorTo = null;
             }
-            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
@@ -251,7 +251,7 @@ export class ConnectorService {
               action.intentName = '';
               idConnectorTo = null;
             }
-            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
@@ -870,6 +870,7 @@ export class ConnectorService {
   }
 
   private createConnector(intent, idConnectorFrom, idConnectorTo){
+    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent);
     const connectorsAttributes = intent.attributes.connectors;
     if(idConnectorFrom && idConnectorTo){
       const connectorID = idConnectorFrom+'/'+idConnectorTo;
@@ -1259,7 +1260,7 @@ export class ConnectorService {
           nextBlockAction.intentName = '';
           idConnectorTo = null;
         }
-        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
         const connectorID = idConnectorFrom+'/'+idConnectorTo;
         this.mapOfConnectors[connectorID] =  {'shown': false };
       }
@@ -1281,7 +1282,7 @@ export class ConnectorService {
               action.intentName = '';
               idConnectorTo = null;
             }
-            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             const connectorID = idConnectorFrom+'/'+idConnectorTo;
         this.mapOfConnectors[connectorID] =  {'shown': false };

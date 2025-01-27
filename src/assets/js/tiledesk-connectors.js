@@ -722,8 +722,8 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes=null) {
-    // console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
-    var label = null;
+    console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    let label = null;
     if(attributes && attributes.label){
       label = attributes.label;
     }
@@ -734,7 +734,7 @@ export class TiledeskConnectors {
       connector.setAttributeNS(null, "id", id);
       connector.setAttributeNS(null, "class", "connector");
       connector.setAttributeNS(null, "pointer-events", "stroke");
-
+      
       connector.addEventListener('mouseover', (e) => {
         //// console.log("mouseover e", e.currentTarget);
         if (this.selectedConnector !== null) { // jump highlighting current selection

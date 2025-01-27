@@ -5,7 +5,7 @@
 
 .color-menu {
     display: block;
-    height: 100px;
+    height: 106px;
     width: 265px;
     position: absolute;
     top: 0;
@@ -21,26 +21,27 @@
     background: rgb(255,255,255);
     will-change: transform;
     animation: .15s ease 0s 1 normal none running fadein, .15s ease 0s 1 normal none running movein, .1s ease 0s 1 normal none running scaleY;
-    margin: -200px 0 0 0;
+    margin: -206px 0 0 0;
     border: 2px solid var(--gray-02);
     box-shadow: none;
 }
 
 .menu-title {
-    padding: 10px 0;
+    padding: 0px 0;
     font-weight: 500;
+    font-size: 14px;
 }
 
 .color-palette {
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     flex-wrap: nowrap;
 }
 
 .color-tooltip {
     display: inline;
-    margin-right: 8px;
+    margin-right: 0px;
     background: none;
     border: none;
     padding: 0px;
@@ -51,7 +52,6 @@
     border-radius: 50%;
     border: 0px solid rgba(161, 173, 186, 0.133);
     padding: 5px;
-    // background: rgba(var(--main-color), 0.2);
 }
 
 .color-button:hover {
@@ -59,19 +59,101 @@
 }
 
 .color-circle {
-    width: 22px;
-    height: 22px;
+    width: 16px;
+    height: 16px;
     position: relative;
     border-radius: 50%;
     box-shadow: rgba(0, 0, 0, 0.118) 0px -2px 0px 0px inset;
-    // background: rgba(var(--main-color), 1);
     background-blend-mode: screen;
     cursor: pointer;
 }
 
-// .red { --main-color: 255, 0, 0 }
-// .green { --main-color: 0, 255, 0 }
-// .blue { --main-color: 0, 0, 255 }
-// .yellow { --main-color: 255, 255, 0 }
-// .cyan { --main-color: 0, 255, 255 }
-// .magenta { --main-color: 255, 0, 255 }
+
+
+.color-slider-container {
+    width: 100%;
+    margin: 10px auto;
+    text-align: center;
+
+    .color-slider {
+      width: 100%;
+      height: 10px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: linear-gradient(to right, 
+        rgb(200, 0, 0),
+        rgb(200, 200, 0),
+        rgb(0, 200, 0), 
+        rgb(0, 200, 200), 
+        rgb(0, 0, 200), 
+        rgb(200, 0, 200), 
+        rgb(200, 0, 0));
+      outline: none;
+      border-radius: 5px;
+      margin: 0px 0;
+  
+      /* Slider thumb */
+      /* custom Thumb - Ciambella */
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 26px;
+        height: 26px;
+        border: 8px solid white; 
+        outline: 1px solid rgba(128, 128, 128, 0.2);
+        border-radius: 50%;
+        background: transparent; 
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: background 0.3s ease, border-color 0.3s ease;
+        position: relative;
+      }
+  
+      &::-webkit-slider-thumb:hover {
+        border-color: rgb(180, 180, 180); /* Change border color on mouseover */
+      }
+  
+      /* Firefox */
+      &::-moz-range-thumb {
+        width: 26px;
+        height: 26px;
+        border: 5px solid #ffffff;
+        border-radius: 50%;
+        background: transparent;
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: background 0.3s ease, border-color 0.3s ease;
+        position: relative;
+      }
+  
+      &::-moz-range-thumb:hover {
+        border-color: rgb(180, 180, 180);
+      }
+  
+      /* Internet Explorer */
+      &::-ms-thumb {
+        width: 26px;
+        height: 26px;
+        border: 5px solid #ffffff;
+        border-radius: 50%;
+        background: transparent;
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: background 0.3s ease, border-color 0.3s ease;
+        position: relative;
+      }
+  
+      &::-ms-thumb:hover {
+        border-color: rgb(180, 180, 180);
+      }
+  
+      /* Remove default arrows in IE */
+      &::-ms-track {
+        width: 100%;
+        cursor: pointer;
+        background: transparent; 
+        border-color: transparent;
+        color: transparent;
+      }
+    }
+  }
