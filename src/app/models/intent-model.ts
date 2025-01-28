@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Action } from './action-model';
+import { INTENT_COLORS } from 'src/app/chatbot-design-studio/utils';
 
 export class Intent {
     webhook_enabled?: boolean;
@@ -41,6 +42,7 @@ export class IntentAttributes {
             intentName: ""
         };
         this.connectors = {}
+        this.color = INTENT_COLORS.COLOR1
     }
 }
 

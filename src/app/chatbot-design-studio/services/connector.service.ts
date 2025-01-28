@@ -1201,6 +1201,24 @@ export class ConnectorService {
     return arrayConnectors;
   }
 
+   /**
+   * searchConnectorsInOfIntent
+   * @param intent_id 
+   * @returns 
+   */
+   public searchConnectorsOutByIntent(intent_id: string): Array<any>{
+    const connectors = Object.keys(this.tiledeskConnectors.connectors)
+    .filter(key => key.includes(intent_id) && key.startsWith(intent_id) )
+    .reduce((filteredMap, key) => {
+      filteredMap[key] = this.tiledeskConnectors.connectors[key];
+      return filteredMap;
+    }, {});
+    const arrayConnectors = Object.values(connectors);
+    this.logger.log('[CONNECTOR-SERV] -----> searchConnectorsOutByIntent::: ', arrayConnectors);
+    return arrayConnectors;
+  }
+  
+
   /*************************************************/
 
 
@@ -1913,4 +1931,35 @@ export class ConnectorService {
       });
     }
   }
+
+
+  /** addCustomMarker
+   * add custom market arrow to each connector 
+   * */
+  addCustomMarker(connectorId: any, color: string) {;
+    const element = document.getElementById(connectorId);
+    if (element) {
+      this.tiledeskConnectors.addCustomMarker(element, color);
+    }
+  }
+
+
+  /**  setConnectorColor 
+   * get all connectors that start with intentid
+   * iterate the array of connectors and change the connector color 
+   * add the arrow with same color of connector
+  */
+  setConnectorColor(intentId: any, color: string, opacity: number) {
+    let rgba = `rgba(${color}, ${opacity})`;
+    const listOfConnectors = this.searchConnectorsOutByIntent(intentId);
+    listOfConnectors.forEach(connector => {
+      const element = document.getElementById(connector.id);
+      if (element) {
+        // //element.style.setProperty('stroke', rgba, 'important');
+        element.style.setProperty('stroke', rgba);
+        this.addCustomMarker(connector.id, rgba);
+      }
+    });
+  }
+
 }

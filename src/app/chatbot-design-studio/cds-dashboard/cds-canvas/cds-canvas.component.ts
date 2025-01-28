@@ -16,7 +16,7 @@ import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
 
 // UTILS //
-import { TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
+import { INTENT_COLORS, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
 import { LOGOS_ITEMS } from './../../utils-resources';
 
 
@@ -253,7 +253,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   checkAllConnectors(connector){
-    this.logger.log("[CDS-CANVAS3]  •••• checkAllConnectors ••••", connector);
+    // this.logger.log("[CDS-CANVAS3]  •••• checkAllConnectors ••••", connector);
     if(this.stageService.loaded === false && this.renderedAllElements === false){
       this.labelInfoLoading = 'CDSCanvas.connectorsProgress';
       if(this.mapOfConnectors[connector.id] && this.mapOfConnectors[connector.id].shown === false) {
@@ -346,7 +346,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       // if(intents.length > 0 || (intents.length == 0 && this.listOfIntents.length>0)){
       //   this.listOfIntents = this.intentService.hiddenEmptyIntents(intents);
       // }
-      
     });
 
     /** SUBSCRIBE TO THE STATE ACTION DETAIL PANEL */
@@ -467,16 +466,29 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // ---------------------------------------------------------
   // START Stage and Connectors event listeners
   // ---------------------------------------------------------
+
+  setConnectorColor(connector: any){
+    const idIntentFrom = connector.id.split('/')[0];
+    const intent = this.intentService.getIntentFromId(idIntentFrom);
+    const color = intent?.attributes?.color ?? INTENT_COLORS.COLOR1;
+    const opacity = 0.35;
+    this.connectorService.setConnectorColor(intent.intent_id, color, opacity);
+    // this.connectorService.addCustomMarker(connector.id, color, opacity);
+  }
+
   setListnerEvents(){
     /** LISTENER OF TILEDESK STAGE */
-
     /** triggers when a connector is drawn on the stage  */
     this.listenerConnectorDrawn = (e: CustomEvent) => {
-      const connector = e.detail.connector;
-      this.checkAllConnectors(connector);
-    };
-    document.addEventListener("connector-drawn", this.listenerConnectorDrawn, false);
+    const connector = e.detail.connector;
+    this.setConnectorColor(connector);
+    this.checkAllConnectors(connector);
+  };
+  document.addEventListener("connector-drawn", this.listenerConnectorDrawn, false);
     
+
+    
+
     /** moved-and-scaled ** 
     * fires when I move the stage (move or scale it):
     * - set the scale

@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 export const preDisplayName:string  = 'untitled_block_';
 
 export enum INTENT_COLORS {
+    // COLOR0 = '110,134,191',
     COLOR1 = '80,100,147',
     COLOR2 = '61,130,226',
     COLOR3 = '86,179,101',

@@ -158,12 +158,12 @@
     --input-disabled: #f9f9f9;
 
 
-    /* INTEN DEFAULT COLORS*/
+    /* INTEN DEFAULT COLORS */
     --intent-color: 80, 100, 147;
-    // --intent-color-background: 80, 100, 147;
-    // --intent-color-blu: 61,130,226;
-    // --intent-color-red: 203,98,103;
-    // --intent-color-green: 86,179,101;
-    // --intent-color-orange: 220,136,121;
-    // --intent-color-purple: 182,139,206;
+ 
+    /* CONNECTOR COLORS */
+    --connector-default-color: rgb(177, 177, 183);
+    --connector-over-color: rgb(128, 128, 128);
+    --connector-selected-color: rgb(62, 169, 245);
+
 }

@@ -807,6 +807,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.changeColorIntent.emit(intent);
   }
 
+
+
+  setConnectorColor(color: string){
+    const nwColor = color ?? INTENT_COLORS.COLOR1;
+    const opacity = 0.35;
+    const intentFromId = this.intent.intent_id;
+    this.connectorService.setConnectorColor(intentFromId, nwColor, opacity);
+  }
+
+
   changeIntentColor(color){
     // const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
     this.intentColor = color;
@@ -815,6 +825,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if(color){
       // const nwColor = INTENT_COLORS[color];
       document.documentElement.style.setProperty('--intent-color', `${color}`);
+      this.setConnectorColor(color);
       this.intentService.updateIntent(this.intent); 
     }
   }
