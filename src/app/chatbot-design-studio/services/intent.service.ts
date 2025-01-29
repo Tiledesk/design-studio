@@ -31,6 +31,7 @@ export class IntentService {
   testIntent = new BehaviorSubject<Intent>(null);
   BStestiTout = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
+  behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
@@ -86,6 +87,13 @@ export class IntentService {
 
   }
 
+
+
+   public setIntentColor(color){
+    const intentId = this.intentSelected.intent_id;
+    this.logger.log('[INTENT SERVICE] ::: setIntentColor:: ', intentId, color);
+    this.behaviorIntentColor.next({ intentId: intentId, color: color });
+  }
 
   /**
    * onChangedConnector
@@ -305,7 +313,6 @@ export class IntentService {
   /** create a new intent when drag an action on the stage */
   public createNewIntent(id_faq_kb: string, action: any, pos:any){
     let intent = new Intent();
-    // intent.id_faq_kb = id_faq_kb;
     const chatbot_id = this.dashboardService.id_faq_kb;
     intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
@@ -785,13 +792,16 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
-    this.logger.log('[CDS-CANVAS]  intentSelected: ', this.intentSelected);
+    this.logger.log('[CDS-INTENT] intentSelected: ', this.intentSelected);
     if(this.intentSelected){
       this.setDefaultIntentSelected();
       //** center stage on 'start' intent */
       let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
       if(startElement){
+        let id_faq_kb = this.dashboardService.id_faq_kb;
+        this.logger.log('[CDS-INTENT] setStartIntent: ', startElement);
         this.stageService.centerStageOnHorizontalPosition(startElement);
+        // this.stageService.centerStageOnPosition(id_faq_kb, startElement);
       }
     }
   }
@@ -1535,7 +1545,7 @@ export class IntentService {
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         this.faqService.opsUpdate(payload).subscribe((resp: any) => {
-          this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
+          // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);
           resolve(true);

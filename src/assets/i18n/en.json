@@ -276,6 +276,7 @@
         "Drag":"Drag",
         "DeleteConnector":"Delete connector",
         "LineText":"Line text",
+        "ColorBlock":"Block color",
         "DeleteBlock":"Delete block",
         "CopyBlock":"Copy block",
         "Paste":"Paste",

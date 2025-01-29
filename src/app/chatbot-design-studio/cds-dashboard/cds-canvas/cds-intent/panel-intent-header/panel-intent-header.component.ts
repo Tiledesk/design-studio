@@ -14,6 +14,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   @ViewChild('myInput', { static: true }) myInput!: ElementRef<HTMLInputElement>;
 
   @Input() intent: Intent;
+  @Input() intentColor: string;
   @Output() saveIntent = new EventEmitter();
 
   listOfIntents: Intent[];
