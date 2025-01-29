@@ -25,6 +25,7 @@ import { CdsRuleComponent } from '../cds-rule/cds-rule.component';
 import { CdsPanelConnectorMenuComponent } from './cds-panel-connector-menu/cds-panel-connector-menu.component';
 import { CdsActionsModule } from './actions/list/cds-actions.module';
 import { CdsActionDetailPanelComponent } from './cds-panel-action-detail/cds-panel-action-detail.component';
+import { CdsPanelIntentDetailComponent } from './cds-panel-intent-detail/cds-panel-intent-detail.component';
 import { BaseElementModule } from 'src/app/shared/base-element.module';
 import { CdsIntentComponent } from './cds-intent/cds-intent.component';
 import { PanelIntentControlsComponent } from './cds-intent/panel-intent-controls/panel-intent-controls.component';
@@ -33,6 +34,7 @@ import { CdsVoiceActionsModule } from './actions/list-voice/cds-voice-actions.mo
 import { PreloadBarComponent } from 'src/app/chatbot-design-studio/cds-base-element/preload-bar/preload-bar.component';
 import { ImagePreloaderResolver } from 'src/app/resolver/image.resolver';
 import { CdsColorMenuComponent } from './base-elements/cds-color-menu/cds-color-menu.component';
+import { CdsConnectorInComponent } from './base-elements/cds-connector-in/cds-connector-in.component';
 
 
 const routes: Routes = [
@@ -57,6 +59,9 @@ const routes: Routes = [
 
     //CDS PANEL ACTION DETAIL
     CdsActionDetailPanelComponent,
+
+    //CDS PANEL INENT DETAIL
+    CdsPanelIntentDetailComponent,
 
     //CDS PANEL WIDGET
     CdsPanelWidgetComponent,
@@ -93,6 +98,7 @@ const routes: Routes = [
 
     PreloadBarComponent,
      CdsColorMenuComponent,
+     CdsConnectorInComponent,
   ],
   imports: [
     CommonModule,

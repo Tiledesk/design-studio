@@ -94,7 +94,8 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
       'CDSSetting.ThereHasBeenAnErrorProcessing',
       'CDSSetting.FileUploadedSuccessfully',
       'CDSSetting.AnErrorOccurredUpdatingProfile',
-      'CDSSetting.UserProfileUpdated'
+      'CDSSetting.UserProfileUpdated',
+      'CDSSetting.SlugAlreadyExists'
 
     ]
 
@@ -109,6 +110,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
                           .set('CDSSetting.FileUploadedSuccessfully', text['CDSSetting.FileUploadedSuccessfully'])
                           .set('CDSSetting.ThereHasBeenAnErrorProcessing', text['CDSSetting.AnErrorOccurredUpdatingProfile'])
                           .set('CDSSetting.ThereHasBeenAnErrorProcessing', text['CDSSetting.UserProfileUpdated'])
+                          .set('CDSSetting.SlugAlreadyExists', text['CDSSetting.SlugAlreadyExists'])
 
     })
 

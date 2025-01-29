@@ -63,28 +63,42 @@ $toogle-sidebar-width: 22px;
 
 
 ::ng-deep #tds_svgConnectors{
+  stroke: #b1b1b7;
   .tds_path {
     animation: dash 30s linear infinite;
     stroke-dasharray: 6;
     stroke-width: 3px;
     stroke: var(--connector-default-color);
   }
-
   .tds_connector {
     stroke: var(--connector-default-color);
     stroke-width: 3px;
   }
-  
   .tds_connector_over {
     stroke:var(--connector-over-color) !important;
     stroke-width: 3px;
+    opacity: 1;
   }
-  
   .tds_connector_selected {
     stroke: var(--connector-selected-color) !important;
     stroke-width: 3px;
+    opacity: 1;
   }
 }
+
+::ng-deep #tds_arrow {
+  stroke: #b1b1b7;
+  .tds_connector {
+    fill: #b1b1b7;
+  }
+}
+
+
+::ng-deep .line-text-connector {
+  stroke: #b1b1b7;
+}
+
+
 
 
 #floatMenuElement {

@@ -65,7 +65,7 @@
             <div *ngFor="let intent of filteredIntents; let id = index" id="intent_{{id}}" class="intent"
                 [ngClass]="{'active': idSelectedIntent === intent.intent_id}"
                 value="intent.intent_id" (click)="onSelectIntent(intent)">
-
+                
                 <div class="icon-container">
                     <img src="assets/images/icons/block.svg"
                         [class.active-icon]="idSelectedIntent === intent.intent_id"
@@ -74,13 +74,14 @@
 
                 <div class="item-box" *ngIf="IS_OPEN">
                     <div>
-                        <p class="intent-display-name ellips">{{intent.intent_display_name}}</p>
+                        <p class="intent-display-name ellips"><span *ngIf="intent.agents_available" class="agents-available material-icons">boy</span>{{intent.intent_display_name}}</p>
                         <div class="icon-list">
                             <p *ngIf="intent.questions" class="ai-icon icon" style="margin-bottom: 0px">Ai</p>
                             <span *ngIf="intent.webhook_enabled" class="material-icons icon webhook-icon">webhook</span>
                             <span *ngIf="intent.form" class="material-icons icon list-alt-icon">list_alt</span>
-                            <div *ngIf="intent?.actions && intent?.actions?.length > 0" class="actions"><span
-                                    class="material-icons icon bolt-icon">bolt</span>
+                            <div *ngIf="intent?.actions && intent?.actions?.length > 0" class="actions">
+                                
+                                <span class="material-icons icon bolt-icon">bolt</span>
                                 <p class="action-counter icon">{{ intent.actions?.length }}</p>
                             </div>
                         </div>

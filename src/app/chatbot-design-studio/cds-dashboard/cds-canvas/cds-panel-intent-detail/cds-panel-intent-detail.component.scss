@@ -1,0 +1,180 @@
+:host{
+    $margin-left: 10px;
+    $padding: 10px; 
+    --panel-width: 480px;
+}
+
+.panel-intent-detail {
+    // position: relative;
+    display: block;
+    width: var(--panel-width);
+    min-width: 400px;
+    height: 100%; //auto
+    max-height: 100%;
+    // border-radius: 16px;
+    overflow: hidden;
+    padding: 0;
+    background-color: white;
+    border-left: 1px solid var(--gray-light-02);
+    // margin: 0 auto 0 auto; // nk
+    inset: 0 0 0 200px;
+
+    &.minimize {
+        --panel-width: 480px;
+    }
+
+    &.maximize {
+        --panel-width: 680px;
+    }
+}
+
+.header-panel {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--blu-light-03);
+    z-index: 2;
+    padding: 0 0 10px 10px;
+    display: flex;
+    align-items: center;
+    cds-action-description{
+        width: 100%;
+    }
+    cds-panel-intent-header{
+        width: 100%;
+    }
+}
+
+.header-options-wrp{
+    display: flex;
+    padding: 10px;
+    &:hover{
+        cursor: pointer;
+    }
+}
+
+.content-panel{
+    // height: calc(100% - 73px); // nk
+    // height: calc(100% - 100px); // nk
+    // overflow: hidden; // nk
+    overflow: hidden auto;
+    padding: 20px 30px 30px;
+}
+
+.panel-form { 
+    height: 100%;
+    min-height: 400px;
+}
+
+.card-buttons {
+    position: absolute;
+    display: none;
+    top: 0;
+    right: 0;
+    margin: 0;
+    outline: none;
+    width: 380px;
+    height: 100%;
+    color: #fff;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: transparent;
+    overflow: visible;
+    z-index: 14;
+    border-radius: 1em;
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+                0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    &.active{
+        display: block;
+    }
+}
+  
+
+.card-buttons-handle {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: #ccc;
+    cursor: move;
+    width: 24px;
+    height: 24px;
+    z-index: 1;
+}
+
+.block-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 60px;
+
+
+    .lock-icon {
+        font-size: 40px;
+        margin-bottom: 16px;
+        color: #506493b0;
+    }
+}
+
+.agents-available {
+    position: absolute;
+    margin-left: -26px;
+    margin-top: 20px;
+}
+
+// --------------------
+// SWITCH BTN
+// --------------------
+// --------- start new on-off btn logo ---------
+.nw-onoffswitch {
+    position: relative;
+    width: 45px;
+    margin-top: 20px;
+    display: block;
+    float: left;
+}
+.nw-onoffswitch-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.nw-onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    height: 25px;
+    padding: 0;
+    line-height: 25px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease-in;
+}
+.nw-onoffswitch-label:before {
+    content: "";
+    display: block;
+    width: 25px;
+    margin: 0px;
+    background: #ffffff;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 20px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    transition: all 0.3s ease-in 0s;
+}
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
+    background-color: var(--blu);
+}
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
+    border-color: var(--blu);
+}
+.nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
+    right: 0px;
+}
+// --------- ./end new on-off btn logo ---------

@@ -22,11 +22,13 @@ export class Intent {
     id?: string;
     attributes?: IntentAttributes;
     type?: string;
+    agents_available?: boolean
     constructor() {
         this.intent_id = uuidv4();
         this.actions = [];
         this.attributes = new IntentAttributes();
         this.type = 'intent';
+        this.agents_available = false;
     }
 }
 export class IntentAttributes {

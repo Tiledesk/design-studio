@@ -22,13 +22,13 @@
                 <span class="material-icons" *ngIf="item['icon']"
                     [class.intent-start]="item[bindLabelSelect] === 'start'"
                     [class.intent-defaultFallback]="item[bindLabelSelect] === 'defaultFallback'">{{item['icon']}}</span>
-                <span class="label-select">{{item[bindLabelSelect] | translate }}</span>
+                <span class="label-select">{{ item[bindLabelSelect] | translate }}</span>
                 <span *ngIf="optionalBindAdditionalText" class="label-select-option">{{item[optionalBindAdditionalText] | translate }}</span>
             </div>
         </ng-template>
 
         <ng-template ng-option-tmp let-item="item" let-index="index">
-            <div class="select-item-wrp" [attr.additionalText]="optionalBindAdditionalText && !item['icon']? true: false"> 
+            <div class="select-item-wrp" [attr.additionalText]="optionalBindAdditionalText && !item['icon']? true: false" [disabled]="item?.disabled"> 
                 <div style="width: 100%; display: flex; flex-direction: column;">
                     <div class="select-item-wrp">
                         <span class="material-icons" *ngIf="item['icon']"
@@ -38,7 +38,7 @@
                         <span *ngIf="optionalBindAdditionalText" class="label-select-option">{{item[optionalBindAdditionalText] | translate }}</span>
                     </div>
                     <div class="select-item-wrp">
-                        <span *ngIf="optionalBindDescription" class="label-select-option description">{{item[optionalBindDescription] | translate }}</span>
+                        <span *ngIf="optionalBindDescription" class="label-select-option description" [class.description-margin]="item['icon']">{{item[optionalBindDescription] | translate }}</span>
                     </div>
                 </div>
                 <div *ngIf="deleteButton" class="icon-container" (click)="$event.stopPropagation(); onDeleteButtonClick(item[bindValueSelect])">

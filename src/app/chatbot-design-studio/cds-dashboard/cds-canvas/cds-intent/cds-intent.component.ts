@@ -1,25 +1,26 @@
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
 import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, CdkDropListGroup, CdkDropList, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
-import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
-import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
-import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
-import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
+import { IntentService } from '../../../services/intent.service';
+// import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
+import { ConnectorService } from '../../../services/connector.service';
+import { StageService } from '../../../services/stage.service';
+import { ControllerService } from '../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, replaceItemInArrayForKey, checkInternalIntent } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent } from 'src/app/chatbot-design-studio/utils';
 
 export enum HAS_SELECTED_TYPE {
   ANSWER = "HAS_SELECTED_ANSWER",
   QUESTION = "HAS_SELECTED_QUESTION",
   FORM = "HAS_SELECTED_FORM",
   ACTION = "HAS_SELECTED_ACTION",
+  INTENT = "HAS_SELECTED_INTENT",
 }
 
 @Component({
@@ -36,6 +37,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() answerSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() formSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() actionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
+  // @Output() intentSelected = new EventEmitter();
   @Output() actionDeleted = new EventEmitter();
   @Output() showPanelActions = new EventEmitter(); // nk
   @Output() testItOut = new EventEmitter<Intent>();
@@ -49,7 +51,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   subscriptions: Array<{ key: string, value: Subscription }> = [];
-  private readonly unsubscribe$: Subject<any> = new Subject<any>();
+  private unsubscribe$: Subject<any> = new Subject<any>();
+  alphaConnectors: number;
+  connectorsIn: any;
+
+
+  // intentElement: any;
+  // idSelectedAction: string;
+  // form: Form;
   formSize: number = 0;
   questionCount: number = 0;
   listOfActions: Action[];
@@ -73,6 +82,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isInternalIntent: boolean = false;
   actionIntent: ActionIntentConnected;
   isActionIntent: boolean = false;
+  isAgentsAvailable: boolean = false;
   
 
   /** INTENT ATTRIBUTES */
@@ -97,9 +107,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.initSubscriptions();
   }
 
+  // aggiungo un pignulo su intent che sul hover del mouse cambia in 1 opacity di tutti i connettori in ingresso
   initSubscriptions() {
     let subscribtion: any;
     let subscribtionKey: string;
+
 
     /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
     subscribtionKey = 'behaviorIntent';
@@ -107,8 +119,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (!subscribtion) {
       subscribtion = this.intentService.behaviorIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
-          this.logger.log("[CDS-INTENT] sto modifico l'intent: ", this.intent, " con : ", intent);
+          this.logger.log("[CDS-INTENT] sto modificando l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
+          this.setAgentsAvailable();
           if (intent['attributesChanged']) {
             this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
             delete intent['attributesChanged'];
@@ -121,6 +134,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             //   return obj._tdActionType !== TYPE_ACTION.INTENT;
             // });
           }
+          
 
           //UPDATE QUESTIONS
           if (this.intent.question) {
@@ -151,14 +165,26 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
           const stageElement = document.getElementById(intent.intent_id);
-          this.stageService.centerStageOnTopPosition(stageElement)
-          this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6)
+          this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
+          this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
     }
 
+    /** SUBSCRIBE TO THE ALPHA CONNECTOR VALUE */
+    subscribtionKey = 'alphaConnectors';
+    subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
+    if (!subscribtion) {
+      subscribtion = this.stageService.alphaConnectors$.subscribe(value => {
+        this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
+        this.alphaConnectors = value;
+        this.getAllConnectorsIn();
+      });
+      const subscribe = { key: subscribtionKey, value: subscribtion };
+      this.subscriptions.push(subscribe);
+    }
     /** SUBSCRIBE TO THE CHANGE INTENT COLOR */
     subscribtionKey = 'changeIntentColor';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
@@ -179,34 +205,75 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   ngOnInit(): void {
-    this.logger.log('CdsPanelIntentComponent ngOnInit -->', this.intent);
-    if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === 'start') {
-      this.logger.log('CdsPanelIntentComponent START -->',this.intent.actions[0]); 
-      this.startAction = this.intent.actions[0];
-      /**  if (!this.startAction._tdActionId) {
-      //   this.startAction = patchActionId(this.intent.actions[0]);
-      //   this.intent.actions = [this.startAction];
-      // }  */
-      this.isStart = true;
-      /** set 'start' intent as default selected one 
-      // this.intentService.setDefaultIntentSelected();
-      
-      // /** center stage on 'start' intent */
-      // let startElement = document.getElementById(this.intent.intent_id)
-      // this.stageService.centerStageOnHorizontalPosition(startElement)
-      // */
-    } else {
-      this.setIntentSelected();
-    }
-    // il setTimeout evita l'effetto che crea un connettore e poi lo sposta nel undo
-    setTimeout(() => {
-      this.setActionIntent();
-    }, 100); 
-    this.isInternalIntent = checkInternalIntent(this.intent)
-    this.addEventListener();
-    this.setIntentAttribute();
+    //setTimeout(() => {
+      this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
+      // this.patchActionIntent();
+      if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
+        this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
+        this.startAction = this.intent.actions[0];
+        // if (!this.startAction._tdActionId) {
+        //   this.startAction = patchActionId(this.intent.actions[0]);
+        //   this.intent.actions = [this.startAction];
+        // }
+        this.isStart = true;
+        //** set 'start' intent as default selected one */
+        // this.intentService.setDefaultIntentSelected();
+
+        // //** center stage on 'start' intent */
+        // let startElement = document.getElementById(this.intent.intent_id)
+        // this.stageService.centerStageOnHorizontalPosition(startElement)
+      } else {
+        this.setIntentSelected();
+      }
+      // il setTimeout evita l'effetto che crea un connettore e poi lo sposta nel undo
+      setTimeout(() => {
+        this.setActionIntent();
+      }, 100); 
+      this.isInternalIntent = checkInternalIntent(this.intent)
+      this.addEventListener();
+      this.setIntentAttribute();
+    //}, 10000);
   }
 
+  private getAllConnectorsIn(){
+    if(this.intent){
+      this.connectorsIn = this.connectorService.searchConnectorsInByIntent(this.intent.intent_id);
+    }
+  }
+
+
+  // private setActionIntent(){
+  //   try {
+  //     let connectorID = '';
+  //     let fromId, toId;
+  //     if(this.intent.attributes.nextBlockAction){
+  //       this.actionIntent = this.intent.attributes.nextBlockAction;
+  //       fromId = this.actionIntent._tdActionId?this.intent.intent_id+'/'+this.actionIntent._tdActionId:null;
+  //       toId = this.actionIntent.intentName?this.actionIntent.intentName.replace("#", ""):null;
+  //     } else {
+  //       this.actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
+  //       this.intent.attributes.nextBlockAction = this.actionIntent;
+  //     }
+  //     this.logger.log('[CDS-INTENT] actionIntent1 :: ', this.actionIntent);
+  //     // this.logger.log('[CDS-INTENT] connectorID:: ', connectorID, fromId, toId);
+  //     this.isActionIntent = this.intent.actions.some(obj => obj._tdActionType === TYPE_ACTION.INTENT);
+  //     if(this.isActionIntent){
+  //       this.actionIntent = null;
+  //       if(fromId && toId && fromId !== '' && toId !== ''){
+  //         connectorID = fromId+"/"+toId;
+  //         this.connectorService.deleteConnector(connectorID);
+  //       }
+  //     }  else {
+  //       if(fromId && toId && fromId !== '' && toId !== ''){
+  //         if(this.stageService.loaded == true){
+  //           this.connectorService.createConnectorFromId(fromId, toId);
+  //         }
+  //       }
+  //     }
+  //   } catch (error) {
+  //     this.logger.log('[CDS-INTENT] error: ', error);
+  //   }
+  // }
 
   ngOnChanges(changes: SimpleChanges): void {
     // Fixed bug where an empty intent's action placeholder remains visible if an action is dragged from the left action menu
@@ -228,8 +295,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
+    this.setAgentsAvailable();
   }
 
+  private setAgentsAvailable(){
+    if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_START && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+      this.intent.agents_available = true;
+      this.isAgentsAvailable = true;
+    } else {
+      this.isAgentsAvailable = false;
+    }
+  }
 
   ngAfterViewInit() {
     this.logger.log("[CDS-INTENT]  •••• ngAfterViewInit ••••");
@@ -469,7 +545,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /*********************************************/
+  // onMouseDownIntent(){
+  //   this.elementTypeSelected = null;
+  // }
 
+  // onSelectIntent(){
+  //   if(!this.elementTypeSelected){
+  //     this.intentSelected.emit(this.intent);
+  //   }
+  // }
 
   /** EVENTS  */
 

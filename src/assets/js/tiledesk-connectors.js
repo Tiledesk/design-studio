@@ -769,7 +769,13 @@ export class TiledeskConnectors {
       connector.setAttributeNS(null, "id", id);
       connector.setAttributeNS(null, "class", "connector");
       connector.setAttributeNS(null, "pointer-events", "stroke");
-      
+
+      // Quando il connettore perde il focus (blur), deselezionalo
+      connector.addEventListener('blur', () => { 
+        const deselectEvent = new CustomEvent("connector-deselected");
+        document.dispatchEvent(deselectEvent);
+      });
+
       connector.addEventListener('mouseover', (e) => {
         if (this.selectedConnector !== null) {
           if (this.selectedConnector.id !== e.currentTarget.id) {
@@ -813,6 +819,7 @@ export class TiledeskConnectors {
       const x = (frontPoint.x + backPoint.x) / 2;
       const y = (frontPoint.y + backPoint.y) / 2;
       let group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      group.setAttributeNS(null, "class", `line-text-connector`);
       let lineText = document.createElementNS("http://www.w3.org/2000/svg", "text");
       lineText.setAttributeNS(null, "id", "label_"+id);
       lineText.setAttributeNS(null, "x", String(x));

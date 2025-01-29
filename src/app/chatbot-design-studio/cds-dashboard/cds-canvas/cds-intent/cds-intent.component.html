@@ -2,11 +2,17 @@
  <!-- [ngStyle]="{'background-color': 'var(--intent-background)'}" 
   [ngStyle]="{'background-color': 'rgba(var('+intentColor+'), 0.25)'}">-->
 
-  <div #resizeElement class="panel-intent-content tds_draggable" 
+  <div #resizeElement [ngClass]="{'cds-intent-active': intentService.intentSelectedID === intent.intent_id && intentService.intentActive}"  class="panel-intent-content tds_draggable" 
     [class.isStart]="isStart" 
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{'background-color': 'rgba('+intentColor+', 0.35)'}">
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
+
+    <cds-connector-in *ngIf="!isStart && alphaConnectors < 1 && connectorsIn.length>0"
+    [connectorsIn]="connectorsIn"
+    (onShowConnectorsIn)="onShowConnectorsIn()"
+    (onHideConnectorsIn)="onHideConnectorsIn()">
+    </cds-connector-in>
 
     <cds-panel-intent-controls
         [isInternalIntent]="isInternalIntent"
@@ -56,7 +62,9 @@
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
-
+       
+        <div *ngIf="isAgentsAvailable" class="agents-available"><span class="material-icons">boy</span></div>
+        
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
@@ -233,6 +241,11 @@
                         class="panel-response"
                         [action]="action">
                     </cds-action-replace-bot-v2>
+
+                    <cds-action-replace-bot-v3 *ngSwitchCase="TYPE_ACTION.REPLACE_BOTV3" 
+                        class="panel-response"
+                        [action]="action">
+                    </cds-action-replace-bot-v3>
 
                     <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE" 
                         class="panel-response"

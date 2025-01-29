@@ -8,7 +8,7 @@ import { FormArray, FormGroup, FormGroupDirective } from '@angular/forms';
 })
 export class ActionComponent implements OnInit {
 
-  @Input() autocompleteOptions: string[]
+  @Input() autocompleteOptions: Array<{label: string, value: string}>;
   actionForm: FormGroup;
   constructor(private rootFormGroup: FormGroupDirective,) { }
 

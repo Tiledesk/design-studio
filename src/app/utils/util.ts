@@ -99,3 +99,18 @@ export function loadTokenMultiplier(ai_models) {
 
     return models
 }
+
+export function generateSlug(name) {
+    return name
+      .toLowerCase()
+      .trim()
+      .normalize("NFD") // Normalize characters with accents
+      .replace(/[\u0300-\u036f]/g, "") // Removes diacritics (e.g. à becomes a)
+      .replace(/[^a-z0-9\s-_]/g, "") // Remove special characters
+      .replace(/\s+/g, "-") // Replaces spaces with dashes
+      .replace(/_/g, "-")
+      .replace(/-+/g, "-"); // Removes consecutive hyphens
+}
+
+// Projects created after this date will no longer be able to use the free plan when the trial expires.
+export const freePlanLimitDate: Date = new Date('2025-01-16T00:00:00');

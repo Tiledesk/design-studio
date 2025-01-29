@@ -40,10 +40,12 @@
        
         <cds-intent *ngFor="let intent of listOfIntents"
             [id]="intent.intent_id"
+            [IS_OPEN_PANEL_INTENT_DETAIL]="IS_OPEN_PANEL_INTENT_DETAIL"
             class="panel-intent tds_input_block" 
             [style.top.px]="getIntentPosition(intent.intent_id).y"
             [style.left.px]="getIntentPosition(intent.intent_id).x" 
             [intent]="intent"
+            [alpha]=""
             [hideActionPlaceholderOfActionPanel]="hideActionPlaceholderOfActionPanel"
             (componentRendered)="onIntentRendered($event)"
             (actionSelected)=onActionSelected($event) 
@@ -56,7 +58,6 @@
             (deleteIntent)="onDeleteIntent($event)">
         </cds-intent>
    
-        
 
         <cds-event *ngFor="let intent of listOfEvents" 
             [id]="intent.intent_id"
@@ -78,6 +79,7 @@
 
     <cds-options class="cds-panel-elements" 
         id="cds-options-panel"
+        [id_faq_kb] = "id_faq_kb"
         [stateUndoRedo]="stateUndoRedo"
         (onOptionClicked)="onOptionClicked($event)">
     </cds-options>
@@ -102,6 +104,15 @@
     [button]=buttonSelected 
     (saveButton)=onSaveButton($event)>
 </cds-panel-button-configuration>
+
+<cds-panel-intent-detail *ngIf="IS_OPEN_PANEL_INTENT_DETAIL"
+    id="intent-detail" 
+    class="cds-generic-panel"
+    [project_id]="projectID"
+    [intentSelected]="elementIntentSelected"
+    (closePanel)="closeAllPanels()"
+    (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
+</cds-panel-intent-detail>
 
 
 <cds-panel-action-detail *ngIf="IS_OPEN_PANEL_ACTION_DETAIL"

@@ -1,4 +1,6 @@
-import { Component, EventEmitter, OnInit, Input, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Input, Output, ViewChild, ElementRef } from '@angular/core';
+import { timeInterval } from 'rxjs';
+import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
@@ -7,23 +9,61 @@ import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
   styleUrls: ['./cds-options.component.scss']
 })
 export class CdsOptionsComponent implements OnInit {
-
+  @ViewChild('alphaInput') alphaInput!: ElementRef;
+  @Input() id_faq_kb: any;
   @Input() stateUndoRedo: any;
-  @Output() onOptionClicked = new EventEmitter<OPTIONS>();
-  OPTIONS = OPTIONS
+  @Output() onOptionClicked = new EventEmitter<{ option: OPTIONS; alpha?: any }>();
 
-
-
+  OPTIONS = OPTIONS;
+  alpha:number;
+  isMoreMenu: boolean = false;
+  stageSettings: any;
+  
   
 
-  constructor() { }
+  constructor(
+    private stageService: StageService
+  ) { }
 
   ngOnInit(): void {
-
+    this.initialize();
   }
+
+
+  private initialize(){
+    this.stageSettings = this.stageService.initStageSettings(this.id_faq_kb);
+    if(this.stageSettings){
+      this.alpha = this.stageSettings.alpha_connectors;
+    } else {
+      this.alpha = 1;
+    }
+  }
+
+  updateAlphaConnectors() {
+    this.onOptionClicked.emit({ option: OPTIONS.ALPHA, alpha: this.alpha });
+  }
+
+  forceAlphaConnectorsFocus(): void {
+    this.alphaInput.nativeElement.focus();
+  }
+
+  closeAlphaConnectorsMenu(){
+    this.isMoreMenu = false;
+  }
+
 
   onOptionClick(option){
-    this.onOptionClicked.emit(option)
+    this.onOptionClicked.emit({option: option});
   }
 
+  onTogleAlphaConnectorsMenu(){
+    this.isMoreMenu = !this.isMoreMenu;
+    if(this.isMoreMenu){
+      setTimeout(() => {
+        if (this.alphaInput) {
+          this.forceAlphaConnectorsFocus();
+        }
+      }, 0);
+    } 
+  }
 }
