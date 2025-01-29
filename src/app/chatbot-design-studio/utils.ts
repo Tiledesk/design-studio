@@ -9,8 +9,8 @@ export enum INTENT_COLORS {
     COLOR1 = '80,100,147',
     COLOR2 = '61,130,226',
     COLOR3 = '86,179,101',
-    COLOR4 = '203,98,103',
-    COLOR5 = '220,136,121',
+    COLOR4 = '204,68,75',
+    COLOR5 = '210,130,40',
     COLOR6 = '182,139,206',
   }
 
