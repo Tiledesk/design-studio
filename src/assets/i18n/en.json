@@ -294,6 +294,7 @@
         "Success":"Success",
         "Else":"else",
         "Prompt":"Prompt",
+        "UserQuestion":"User question",
         "EnterPrompt":"Enter prompt",
         "UseChatHistoryInPrompt":"Use the chat history in the prompt",
         "FormatType":"Response as JSON format",
