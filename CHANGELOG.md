@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.26.0
+
+# 1.26.0-rc.14
+- **added**: management for free expired plan
+
 # 1.26.0-rc.13
 - **bug-fixed**: copy and paste intent/action from different chatbots; 
 - **bug-fixed**: added vertical scroll to bot details page;
