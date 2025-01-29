@@ -7,7 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.26.0
+# 1.26.0-rc.15
+- **added**: added panel to change intent and connector colors
 
 # 1.26.0-rc.14
 - **added**: management for free expired plan
