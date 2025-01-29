@@ -258,13 +258,27 @@ appdashboard-filter{
     justify-content: center;
 }
 .action-row-right {
+    // // font-size: 12px;
+    // // font-weight: 400;
+    // // color: var(--brown-85);
+    // // white-space: nowrap;
+    // // overflow: hidden;
+    // // text-overflow: ellipsis;
+    // // height: auto;
+    // // max-height: 240px;
+
     font-size: 12px;
     font-weight: 400;
     color: var(--brown-85);
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 8;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    max-height: 240px;
 }
+
+
+
 .action-row-right.empty,
 .set-attribute-value.empty{
     background: none !important;
