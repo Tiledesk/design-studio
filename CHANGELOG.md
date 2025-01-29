@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.26.0-rc.16
+- **bug-fixed**: change connector default color and alpha  
+
 # 1.26.0-rc.15
 - **added**: added panel to change intent and connector colors
 
