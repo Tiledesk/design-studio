@@ -76,7 +76,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   
 
   /** INTENT ATTRIBUTES */
-  intentColor: any = INTENT_COLORS.COLOR2;
+  intentColor: any = INTENT_COLORS.COLOR1;
   // position?: any;
   // nextBlockAction?: any;
   // connectors?: any;
@@ -811,7 +811,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   setConnectorColor(color: string){
     const nwColor = color ?? INTENT_COLORS.COLOR1;
-    const opacity = 0.35;
+    const opacity = 0.7;
     const intentFromId = this.intent.intent_id;
     this.connectorService.setConnectorColor(intentFromId, nwColor, opacity);
   }
