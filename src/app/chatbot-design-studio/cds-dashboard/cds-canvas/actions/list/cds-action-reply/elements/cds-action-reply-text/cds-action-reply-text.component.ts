@@ -87,7 +87,6 @@ export class CdsActionReplyTextComponent implements OnInit {
     } else {
       this.delayTime = 500/1000;
     } 
-    console.log("WAIT TIME::: ", this.index, this.wait, this.delayTime);
     // //this.delayTime = (this.wait?.time || this.wait.time === 0)? (this.wait.time/1000) : 500/1000;
     this.checkButtons();
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);
