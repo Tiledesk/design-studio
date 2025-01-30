@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.3
+- **bug-fixed**: set delayTime to 0 on the first text message of a reply 
+- **bug-fixed**: change "Prompt" whit "User question" in cds-action-askgpt-v2 
+- **bug-fixed**: slug in line in cds-action-replace-bot-v3 
+- **bug-fixed**: text displayed in action gpt with up to 10 prompt lines
+- **bug-fixed**: set the height of text boxes in button-panel to 5 lines
 
 # 1.27.0-rc.2
 - **bug-fixed**: change connector default color and alpha  
