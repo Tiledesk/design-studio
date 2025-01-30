@@ -111,3 +111,6 @@ export function generateSlug(name) {
       .replace(/_/g, "-")
       .replace(/-+/g, "-"); // Removes consecutive hyphens
 }
+
+// Projects created after this date will no longer be able to use the free plan when the trial expires.
+export const freePlanLimitDate: Date = new Date('2025-01-29T00:00:00');

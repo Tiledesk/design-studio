@@ -214,6 +214,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
     if(this.intentSelected){
       this.initializeConnector();
     }
+    this.autocompleteHeaderOptions = [];
     HEADER_TYPE.forEach(el => this.autocompleteHeaderOptions.push({label: el.label, value: el.value}))
   
   }
