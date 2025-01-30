@@ -15,7 +15,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { UserModel } from 'src/chat21-core/models/user';
 import { UploadModel } from 'src/chat21-core/models/upload';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
-import { checkAcceptedFile, filterImageMimeTypesAndExtensions } from '../../utils';
+import { checkAcceptedFile, DOCS_LINK, filterImageMimeTypesAndExtensions } from '../../utils';
 import { generateSlug } from 'src/app/utils/util';
 const swal = require('sweetalert');
 
@@ -34,6 +34,8 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
   @Input() isVisibleDEP: boolean;
   @Input() translationsMap: Map<string, string> = new Map();
 
+
+  DOCS_LINK = DOCS_LINK.BOT_DETAIL;
   // botProfileImageExist: boolean;
   // id_faq_kb: string;
 

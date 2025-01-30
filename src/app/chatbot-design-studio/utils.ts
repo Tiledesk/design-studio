@@ -4,6 +4,23 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const preDisplayName:string  = 'untitled_block_';
 
+export const DOCS_LINK = {
+    ASKGPTV2 : { 
+        namespace_as_name: { link: 'https://gethelp.tiledesk.com/', target: '_blank'},
+        advanced_prompt: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#advanced-context', target: '_blank' }, 
+        citations: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#get-contents-sources', target: '_blank' }
+    }, 
+    GPT_TASK : {
+        json_mode: { link: 'https://platform.openai.com/docs/guides/structured-outputs/json-mode', target: '_blank' }
+    },
+    FULFILLMENT : {
+        webhook_data_model: { link: 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model', target: '_blank' }
+    },
+    BOT_DETAIL: {
+        chatbot_slug: { link: 'https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/#replace-bot-using-the-chatbot-slug', target: '_blank' }
+    }
+}
+
 export enum TYPE_INTENT_NAME {
     TOPIC_INTERNAL                  = 'internal',
     DISPLAY_NAME_START              = "start",
