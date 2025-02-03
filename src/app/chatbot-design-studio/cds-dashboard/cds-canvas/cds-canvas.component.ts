@@ -508,7 +508,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     const idIntentFrom = connector.id.split('/')[0];
     const intent = this.intentService.getIntentFromId(idIntentFrom);
     const color = intent?.attributes?.color ?? INTENT_COLORS.COLOR1;
-    const opacity = 0.7;
+    const opacity = 1;
     this.connectorService.setConnectorColor(intent.intent_id, color, opacity);
     // this.connectorService.addCustomMarker(connector.id, color, opacity);
   }
