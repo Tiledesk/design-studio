@@ -64,7 +64,6 @@ export class MQTTArchivedConversationsHandler extends ArchivedConversationsHandl
         const conversation = this.archivedConversations.find(conv => conv.conversation_with === conversationWith);
         this.logger.log('[MQTTArchivedConversationsHandler] getConversationDetail found locally? *****: ', conversation);
         if (conversation) {
-            console.log('found!');
             callback(conversation);
         } else {
             this.logger.log('[MQTTArchivedConversationsHandler] getConversationDetail Not found locally, remote.getConversationDetail *****: ', conversation);
@@ -187,7 +186,7 @@ export class MQTTArchivedConversationsHandler extends ArchivedConversationsHandl
             this.setClosingConversation(conversation.conversation_with, false);
             this.logger.debug('[MQTTArchivedConversationsHandler] conversations:', conversation.uid, this.archivedConversations);
             const index = this.searchIndexInArrayForConversationWith(this.archivedConversations, conversation.conversation_with);
-            console.log("NUOVA CONVER;.uid2" + conversation.uid)
+            // console.log("NUOVA CONVER;.uid2" + conversation.uid)
             if (index > -1) {
                 this.logger.debug('[MQTTArchivedConversationsHandler] TROVATO')
                 this.archivedConversations.splice(index, 1, conversation);

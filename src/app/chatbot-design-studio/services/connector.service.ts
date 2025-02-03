@@ -203,7 +203,7 @@ export class ConnectorService {
    * create connectors from Intent
    */
   public createConnectorsOfIntent(intent:any){
-    if(intent.attributes && intent.attributes.nextBlockAction){
+    if(intent.attributes?.nextBlockAction){
       let idConnectorFrom = null;
       let idConnectorTo = null;
       let nextBlockAction = intent.attributes.nextBlockAction;
@@ -214,7 +214,7 @@ export class ConnectorService {
           nextBlockAction.intentName = '';
           idConnectorTo = null;
         }
-        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
         this.createConnector(intent, idConnectorFrom, idConnectorTo);
       }
     }
@@ -235,7 +235,7 @@ export class ConnectorService {
               action.intentName = '';
               idConnectorTo = null;
             }
-            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
@@ -251,7 +251,7 @@ export class ConnectorService {
               action.intentName = '';
               idConnectorTo = null;
             }
-            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
@@ -870,6 +870,7 @@ export class ConnectorService {
   }
 
   private createConnector(intent, idConnectorFrom, idConnectorTo){
+    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent);
     const connectorsAttributes = intent.attributes.connectors;
     if(idConnectorFrom && idConnectorTo){
       const connectorID = idConnectorFrom+'/'+idConnectorTo;
@@ -1200,6 +1201,24 @@ export class ConnectorService {
     return arrayConnectors;
   }
 
+   /**
+   * searchConnectorsInOfIntent
+   * @param intent_id 
+   * @returns 
+   */
+   public searchConnectorsOutByIntent(intent_id: string): Array<any>{
+    const connectors = Object.keys(this.tiledeskConnectors.connectors)
+    .filter(key => key.includes(intent_id) && key.startsWith(intent_id) )
+    .reduce((filteredMap, key) => {
+      filteredMap[key] = this.tiledeskConnectors.connectors[key];
+      return filteredMap;
+    }, {});
+    const arrayConnectors = Object.values(connectors);
+    this.logger.log('[CONNECTOR-SERV] -----> searchConnectorsOutByIntent::: ', arrayConnectors);
+    return arrayConnectors;
+  }
+  
+
   /*************************************************/
 
 
@@ -1259,7 +1278,7 @@ export class ConnectorService {
           nextBlockAction.intentName = '';
           idConnectorTo = null;
         }
-        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+        this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
         const connectorID = idConnectorFrom+'/'+idConnectorTo;
         this.mapOfConnectors[connectorID] =  {'shown': false };
       }
@@ -1281,7 +1300,7 @@ export class ConnectorService {
               action.intentName = '';
               idConnectorTo = null;
             }
-            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', idConnectorFrom, idConnectorTo);
+            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             const connectorID = idConnectorFrom+'/'+idConnectorTo;
         this.mapOfConnectors[connectorID] =  {'shown': false };
@@ -1912,4 +1931,35 @@ export class ConnectorService {
       });
     }
   }
+
+
+  /** addCustomMarker
+   * add custom market arrow to each connector 
+   * */
+  addCustomMarker(connectorId: any, color: string) {;
+    const element = document.getElementById(connectorId);
+    if (element) {
+      this.tiledeskConnectors.addCustomMarker(element, color);
+    }
+  }
+
+
+  /**  setConnectorColor 
+   * get all connectors that start with intentid
+   * iterate the array of connectors and change the connector color 
+   * add the arrow with same color of connector
+  */
+  setConnectorColor(intentId: any, color: string, opacity: number) {
+    let rgba = `rgba(${color}, ${opacity})`;
+    const listOfConnectors = this.searchConnectorsOutByIntent(intentId);
+    listOfConnectors.forEach(connector => {
+      const element = document.getElementById(connector.id);
+      if (element) {
+        // //element.style.setProperty('stroke', rgba, 'important');
+        element.style.setProperty('stroke', rgba);
+        this.addCustomMarker(connector.id, rgba);
+      }
+    });
+  }
+
 }

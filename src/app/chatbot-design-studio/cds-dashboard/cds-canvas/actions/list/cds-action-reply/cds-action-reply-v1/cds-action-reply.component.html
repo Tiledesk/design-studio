@@ -32,14 +32,13 @@
 
                 <div *ngIf="odd" cdkDrag
                     class="draggable-box"
-                    (click)="onOpenPanelActionDetail(command)"
+                    (onClick)="onOpenPanelActionDetail(command)"
                     [ngStyle]="{'border': command.type === typeCommand.WAIT? 'none' : ''}">
 
                     <!-- TEXT RESPONSE: only odd element -->
                     <div *ngIf="command.message?.type === typeMessage.TEXT" >
 
                         <div class="response">
-
                             <!-- *ngIf="typeAction === typeActions.REPLY" -->
                             <div class="response-drop" 
                                 [ngClass]="{'grabbing':textGrabbing}"

@@ -120,7 +120,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     UnauthorizedComponent,
     HomeComponent,
     NotFoundComponent,
-    NetworkOfflineComponent
+    NetworkOfflineComponent,
   ],
   imports: [
     // TooltipModule.forRoot(CutomTooltipOptions as TooltipOptions),

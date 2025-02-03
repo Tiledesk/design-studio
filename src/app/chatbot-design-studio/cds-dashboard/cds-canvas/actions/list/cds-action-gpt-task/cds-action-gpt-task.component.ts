@@ -242,7 +242,6 @@ export class CdsActionGPTTaskComponent implements OnInit {
   }
 
   onChangeCheckbox(event: MatCheckboxChange, target){
-    console.log('targetttttt', event)
     try {
       this.action[target] = event.checked;
       switch(target){
