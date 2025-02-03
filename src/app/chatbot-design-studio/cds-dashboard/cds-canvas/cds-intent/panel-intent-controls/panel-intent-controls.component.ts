@@ -51,4 +51,8 @@ export class PanelIntentControlsComponent implements OnInit {
     this.onOptionClicked.emit('copy')
   }
 
+  onOpenIntentPanel(){
+    this.onOptionClicked.emit('open')
+  }
+
 }

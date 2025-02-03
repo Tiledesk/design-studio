@@ -3,6 +3,20 @@
 
     <div class="intent-header-actions-wpr">
         <!-- ---------------------------------- -->
+        <!-- Panel intent  -->
+        <!-- ---------------------------------- -->
+        <button *ngIf="!isInternalIntent"
+            class="intent-header-action-btn icon"
+            (click)="$event.stopPropagation();onOpenIntentPanel()" 
+            matTooltipClass="cds-mat-tooltip"
+            [matTooltip]="'CDSCanvas.IntentPanel' | translate" 
+            #tooltip="matTooltip" 
+            matTooltipPosition='above' 
+            matTooltipHideDelay="100">
+            <img src="assets/images/icons/more_vert.svg" alt="open intent panel">
+        </button>
+
+        <!-- ---------------------------------- -->
         <!-- Delete intent  -->
         <!-- ---------------------------------- -->
         <div  *ngIf="!isInternalIntent"
