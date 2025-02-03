@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.4
+- **changed**: set the default connector alpha to 0.7
+- **changed**: open intent detail panel only when press more button 
+- **bug-fixed**: "start" and "defaulFallback" names not allowed in block rename 
+
 # 1.27.0-rc.3
 - **bug-fixed**: set delayTime to 0 on the first text message of a reply 
 - **bug-fixed**: change "Prompt" whit "User question" in cds-action-askgpt-v2 
