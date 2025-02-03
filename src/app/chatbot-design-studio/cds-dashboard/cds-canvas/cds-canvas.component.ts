@@ -567,10 +567,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       el.style.zIndex = 1;
       this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected.attributes.position);
       this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
-      let position = this.intentService.intentSelected.attributes.position;
-      if(this.startDraggingPosition.x === position.x && this.startDraggingPosition.y === position.y){
-        this.onIntentSelected(this.intentService.intentSelected);
-      }
+      // // let position = this.intentService.intentSelected.attributes.position;
+      // // if(this.startDraggingPosition.x === position.x && this.startDraggingPosition.y === position.y){
+      // //  this.onIntentSelected(this.intentService.intentSelected);
+      // // }
       this.intentService.updateIntentSelected();
     };
     document.addEventListener("end-dragging", this.listnerEndDragging, false);
@@ -1082,6 +1082,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     //     this.deleteIntent(intent);
     //   }
     // })
+  }
+
+  /** onOpenIntent */
+  onOpenIntent(intent: Intent){
+    this.onIntentSelected(intent);
   }
   // --------------------------------------------------------- //
  
