@@ -32,7 +32,7 @@ export class StageService {
   loaded: boolean = false;
 
   settings: Settings = {
-    alpha_connectors: 100,
+    alpha_connectors: 70,
     zoom: 1,
     position: null
   };
