@@ -82,7 +82,7 @@
     --blu-02: rgb(91, 114, 167);
     --blu-03: rgb(61,64,68);
     --blu-04: #647283;
-    --blu-05: #8ab4f8;;
+    --blu-05: #8ab4f8;
     --blu-light-01: rgb(244, 246, 251);
     --blu-light-02: #b6c2df;
     --blu-light-03: rgb(224, 227, 241);
@@ -157,4 +157,14 @@
     /** SETTINGS section **/
     --input-placeholder: #a0a0a0;
     --input-disabled: #f9f9f9;
+
+
+    /* INTEN DEFAULT COLORS */
+    --intent-color: 80, 100, 147;
+ 
+    /* CONNECTOR COLORS */
+    --connector-default-color: rgb(177, 177, 183);
+    --connector-over-color: rgb(128, 128, 128);
+    --connector-selected-color: rgb(62, 169, 245);
+
 }

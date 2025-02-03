@@ -31,6 +31,7 @@ export class IntentService {
   testIntent = new BehaviorSubject<Intent>(null);
   BStestiTout = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
+  behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
@@ -86,6 +87,13 @@ export class IntentService {
 
   }
 
+
+
+   public setIntentColor(color){
+    const intentId = this.intentSelected.intent_id;
+    this.logger.log('[INTENT SERVICE] ::: setIntentColor:: ', intentId, color);
+    this.behaviorIntentColor.next({ intentId: intentId, color: color });
+  }
 
   /**
    * onChangedConnector
@@ -1537,7 +1545,7 @@ export class IntentService {
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         this.faqService.opsUpdate(payload).subscribe((resp: any) => {
-          this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
+          // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);
           resolve(true);

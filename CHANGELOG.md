@@ -7,8 +7,25 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.3
+- **bug-fixed**: set delayTime to 0 on the first text message of a reply 
+- **bug-fixed**: change "Prompt" whit "User question" in cds-action-askgpt-v2 
+- **bug-fixed**: slug in line in cds-action-replace-bot-v3 
+- **bug-fixed**: text displayed in action gpt with up to 10 prompt lines
+- **bug-fixed**: set the height of text boxes in button-panel to 5 lines
+
+# 1.27.0-rc.2
+- **bug-fixed**: change connector default color and alpha  
+
+# 1.27.0-rc.1
+- **added**: added panel to change intent and connector colors
+
+# 1.26.0-rc.14
+- **added**: management for free expired plan
+
 # 1.26.0-rc.13
 - **bug-fixed**: copy and paste intent/action from different chatbots; 
+- **bug-fixed**: added vertical scroll to bot details page;
 
 # 1.26.0-rc.12
 - **added**: save the stage settings to local storage and load it at startup
@@ -28,9 +45,6 @@
 # 1.26.0-rc.8
 - **added**: autocompleteOptions on blockName into action-replace-bot-v3
 - **changed**: autocompleteOptions in cds-text as array label-value
-
-# 1.26.0-rc.7
-- **changed**: botName with botId in action-replace-bot-v3
 
 # 1.26.0-rc.7
 - **changed**: botName with botId in action-replace-bot-v3

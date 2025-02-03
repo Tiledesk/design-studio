@@ -68,18 +68,19 @@ $toogle-sidebar-width: 22px;
     animation: dash 30s linear infinite;
     stroke-dasharray: 6;
     stroke-width: 3px;
-    stroke: gray;
+    stroke: var(--connector-default-color);
   }
   .tds_connector {
+    stroke: var(--connector-default-color);
     stroke-width: 3px;
   }
   .tds_connector_over {
-    stroke: gray;
+    stroke:var(--connector-over-color) !important;
     stroke-width: 3px;
     opacity: 1;
   }
   .tds_connector_selected {
-    stroke: #3ea9f5;
+    stroke: var(--connector-selected-color) !important;
     stroke-width: 3px;
     opacity: 1;
   }

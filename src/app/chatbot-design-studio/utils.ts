@@ -4,11 +4,15 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const preDisplayName:string  = 'untitled_block_';
 
-export enum TYPE_INTENT_NAME {
-    TOPIC_INTERNAL                  = 'internal',
-    DISPLAY_NAME_START              = "start",
-    DISPLAY_NAME_DEFAULT_FALLBACK   = "defaultFallback",
-}
+export enum INTENT_COLORS {
+    // COLOR0 = '110,134,191',
+    COLOR1 = '80,100,147',
+    COLOR2 = '61,130,226',
+    COLOR3 = '86,179,101',
+    COLOR4 = '204,68,75',
+    COLOR5 = '210,130,40',
+    COLOR6 = '182,139,206',
+  }
 
 export enum SIDEBAR_PAGES {
     INTENTS     = 'cds-sb-intents',
@@ -31,6 +35,12 @@ export enum EXTERNAL_URL {
     getchatbotinfo = "https://tiledesk.com/community/getchatbotinfo/chatbotId/",
     getFulFillMentDoc = 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model',
     getChangelogUrl = 'https://feedback.tiledesk.com/changelog'
+}
+
+export enum TYPE_INTENT_NAME {
+    TOPIC_INTERNAL                  = 'internal',
+    DISPLAY_NAME_START              = "start",
+    DISPLAY_NAME_DEFAULT_FALLBACK   = "defaultFallback",
 }
 
 export enum TYPE_MATH_OPERATOR {

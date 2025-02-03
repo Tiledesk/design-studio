@@ -3,7 +3,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { IntentService } from '../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { preDisplayName } from '../../../../utils';
+import { INTENT_COLORS, preDisplayName } from '../../../../utils';
 
 @Component({
   selector: 'cds-panel-intent-header',
@@ -14,6 +14,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   @ViewChild('myInput', { static: true }) myInput!: ElementRef<HTMLInputElement>;
 
   @Input() intent: Intent;
+  @Input() intentColor: string;
   @Output() saveIntent = new EventEmitter();
 
   listOfIntents: Intent[];
@@ -58,6 +59,9 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     }
     this.intentNameAlreadyExist = false;
     this.intentNameNotHasSpecialCharacters = true;
+    if(!this.intentColor){
+      this.intentColor = INTENT_COLORS.COLOR1;
+    }
   }
 
 

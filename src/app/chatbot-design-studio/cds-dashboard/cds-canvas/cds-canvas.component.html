@@ -54,6 +54,7 @@
             (showPanelActions)="onShowPanelActions($event)"
             (testItOut)="onTestItOut($event)"
             (actionDeleted)="onActionDeleted($event)"
+            (changeColorIntent)="onChangeColorIntent($event)"
             (deleteIntent)="onDeleteIntent($event)"
             (openIntent)="onOpenIntent($event)">
         </cds-intent>
@@ -142,8 +143,16 @@
     (hideContextMenu)="onHideContextMenu($event)">
 </cds-context-menu>
 
+<cds-color-menu *ngIf="IS_OPEN_COLOR_MENU"
+    class="context-menu"
+    [style.top.px]="positionColortMenu.y" 
+    [style.left.px]="positionColortMenu.x"
+    [positions]="positionColortMenu"
+    (hideColortMenu)="onHideColortMenu($event)">
+</cds-color-menu>
+
 <div id="masck-canv" [class.disabled]="renderedAllElements">
-    <img class="logo" [src]="LOGOS_ITEMS['BASE_LOGO_NO_TEXT'].icon">
+    <img class="logo" [src]="LOGOS_ITEMS['BASE_LOGO_NO_TEXT'].icon" alt="logo">
     <div class="loading"> 
         <span class="info-loading">{{ labelInfoLoading | translate }}</span>
         <cds-preload-bar class="progress-bar" [progress]="loadingProgress"></cds-preload-bar>

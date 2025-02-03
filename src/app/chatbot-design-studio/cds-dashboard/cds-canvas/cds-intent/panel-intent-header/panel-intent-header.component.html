@@ -11,6 +11,7 @@
         <input 
             #myInput type="text" 
             class="input ellips form-control tds_draggable"
+            [ngStyle]="{'color': 'rgba('+intentColor+', 1)'}"
             [(ngModel)]="intentName"
             [readonly]="intentName === 'start' || intentName === 'defaultFallback'"
             [placeholder]="'CDSCanvas.EnterIntentName' | translate"

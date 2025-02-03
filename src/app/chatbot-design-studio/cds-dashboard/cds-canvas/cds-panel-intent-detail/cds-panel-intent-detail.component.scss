@@ -5,24 +5,19 @@
 }
 
 .panel-intent-detail {
-    // position: relative;
     display: block;
     width: var(--panel-width);
     min-width: 400px;
     height: 100%; //auto
     max-height: 100%;
-    // border-radius: 16px;
     overflow: hidden;
     padding: 0;
     background-color: white;
     border-left: 1px solid var(--gray-light-02);
-    // margin: 0 auto 0 auto; // nk
     inset: 0 0 0 200px;
-
     &.minimize {
         --panel-width: 480px;
     }
-
     &.maximize {
         --panel-width: 680px;
     }
@@ -55,9 +50,6 @@
 }
 
 .content-panel{
-    // height: calc(100% - 73px); // nk
-    // height: calc(100% - 100px); // nk
-    // overflow: hidden; // nk
     overflow: hidden auto;
     padding: 20px 30px 30px;
 }
@@ -110,8 +102,6 @@
     align-items: center;
     justify-content: center;
     padding-top: 60px;
-
-
     .lock-icon {
         font-size: 40px;
         margin-bottom: 16px;
