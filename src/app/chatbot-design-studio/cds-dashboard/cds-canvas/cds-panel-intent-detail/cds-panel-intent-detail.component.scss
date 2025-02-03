@@ -142,7 +142,17 @@
     border-radius: 25px;
     background-color: #ffffff;
     transition: background-color 0.3s ease-in;
+    &.checked{
+        border-color: var(--blu);
+        background-color: var(--blu);
+        &:before {
+            border-color: var(--blu);
+            right: 0px;
+        }
+    }
 }
+
+
 .nw-onoffswitch-label:before {
     content: "";
     display: block;
@@ -157,6 +167,7 @@
     border-radius: 25px;
     transition: all 0.3s ease-in 0s;
 }
+
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
     background-color: var(--blu);
 }
