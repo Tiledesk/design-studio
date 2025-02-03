@@ -20,8 +20,8 @@
         <ng-template ng-label-tmp let-item="item">
             <div class="select-item-wrp">
                 <span class="material-icons" *ngIf="item['icon']"
-                    [class.intent-start]="item[bindLabelSelect] === 'start'"
-                    [class.intent-defaultFallback]="item[bindLabelSelect] === 'defaultFallback'">{{item['icon']}}</span>
+                    [class.intent-start]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.SART"
+                    [class.intent-defaultFallback]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK">{{item['icon']}}</span>
                 <span class="label-select">{{ item[bindLabelSelect] | translate }}</span>
                 <span *ngIf="optionalBindAdditionalText" class="label-select-option">{{item[optionalBindAdditionalText] | translate }}</span>
             </div>
@@ -32,8 +32,8 @@
                 <div style="width: 100%; display: flex; flex-direction: column;">
                     <div class="select-item-wrp">
                         <span class="material-icons" *ngIf="item['icon']"
-                            [class.intent-start]="item[bindLabelSelect] === 'start'"
-                            [class.intent-defaultFallback]="item[bindLabelSelect] === 'defaultFallback'">{{item['icon']}}</span>
+                            [class.intent-start]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.SART"
+                            [class.intent-defaultFallback]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK">{{item['icon']}}</span>
                         <span class="label-select">{{ item[bindLabelSelect] | translate }}</span>
                         <span *ngIf="optionalBindAdditionalText" class="label-select-option">{{item[optionalBindAdditionalText] | translate }}</span>
                     </div>

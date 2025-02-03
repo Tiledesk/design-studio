@@ -3,7 +3,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { IntentService } from '../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { preDisplayName } from '../../../../utils';
+import { RESERVED_INTENT_NAMES, preDisplayName } from '../../../../utils';
 
 @Component({
   selector: 'cds-panel-intent-header',
@@ -16,6 +16,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   @Input() intent: Intent;
   @Output() saveIntent = new EventEmitter();
 
+  RESERVED_INTENT_NAMES = RESERVED_INTENT_NAMES;
   listOfIntents: Intent[];
   intentName: string;
   intentNameResult: boolean = true;
@@ -74,17 +75,28 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   private checkIntentName(name: string) {
     this.intentNameResult = true;
     this.intentNameAlreadyExist = false;
+    this.logger.log("[PANEL-INTENT-HEADER] checkIntentName name:", name);
+
     if(!this.intentName || this.intentName.trim().length == 0 || this.intentName === preDisplayName) {
-      this.logger.log("[PANEL-INTENT-HEADER] error 1");
       this.intentNameResult = false;
+      return this.intentNameResult;
     }
-    for (let i = 0; i < this.listOfIntents.length; i++) {
-      if (this.listOfIntents[i].intent_display_name === name && this.listOfIntents[i].intent_id !== this.intent.intent_id) { 
+    
+    if (name === RESERVED_INTENT_NAMES.START || name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) { 
+      this.intentNameAlreadyExist = true;
+      this.intentNameResult = false;
+      return this.intentNameResult;
+    }
+
+    for (const element of this.listOfIntents) {
+      if (element.intent_display_name === name && element.intent_id !== this.intent.intent_id) { 
         this.intentNameAlreadyExist = true;
         this.intentNameResult = false;
-        break;
+        return this.intentNameResult;
+        // break;
       }
     }
+
     this.intentNameNotHasSpecialCharacters = this.checkIntentNameMachRegex(name);
     if(!this.intentNameNotHasSpecialCharacters){
       this.logger.log("[PANEL-INTENT-HEADER] error 3");
@@ -112,8 +124,9 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   /** onChangeIntentName */
   onChangeIntentName(event) {
     const result = this.checkIntentName(event);
-    this.intent.intent_display_name = event.trim();
+    this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName", result);
     if(result){
+      this.intent.intent_display_name = event.trim();
       this.intentName = event;
       // this.onSaveIntent();
       // this.intentService.setIntentSelected(this.intent.intent_id);

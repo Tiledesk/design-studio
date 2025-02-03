@@ -16,7 +16,7 @@ import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
 
 // UTILS //
-import { TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
+import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS } from '../../utils';
 import { LOGOS_ITEMS } from './../../utils-resources';
 
 
@@ -1056,7 +1056,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   onIntentSelected(intent){
-    if (intent.intent_display_name === 'start' || intent.intent_display_name === 'defaultFallback') {
+    if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
        return;
     }  
     this.logger.log('[CDS-CANVAS] onIntentSelected ', intent.intent_id);

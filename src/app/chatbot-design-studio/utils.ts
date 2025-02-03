@@ -21,6 +21,12 @@ export const DOCS_LINK = {
     }
 }
 
+
+export enum RESERVED_INTENT_NAMES {
+    START              = 'start',
+    DEFAULT_FALLBACK   = "defaultFallback",
+}
+
 export enum TYPE_INTENT_NAME {
     TOPIC_INTERNAL                  = 'internal',
     DISPLAY_NAME_START              = "start",

@@ -1,6 +1,7 @@
 import { FormControl, FormGroup } from '@angular/forms';
 import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { NgSelectComponent } from '@ng-select/ng-select';
+import { RESERVED_INTENT_NAMES } from '../../utils';
 
 @Component({
   selector: 'cds-select',
@@ -32,11 +33,13 @@ export class SelectComponent implements OnInit {
   @Output() onReset = new EventEmitter();
   @Output() onDeleted = new EventEmitter();
 
+  RESERVED_INTENT_NAMES: RESERVED_INTENT_NAMES;
   valueFormGroup: FormGroup 
   
   constructor() { }
 
   ngOnInit(): void {
+    // empty
   }
 
   ngOnChanges(){
