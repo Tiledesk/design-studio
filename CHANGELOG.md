@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.5
+- **changed**: set intent selected last level on the stage (always visible)
+- **bug-fixed**: "start" and "defaulFallback" names duplicate in intent list 
+
 # 1.27.0-rc.4
 - **changed**: set the default connector alpha to 0.7
 - **changed**: open intent detail panel only when press more button 
