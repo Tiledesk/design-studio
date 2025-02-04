@@ -49,9 +49,9 @@ export class StageService {
     }, 1000);
   }
 
-  centerStageOnHorizontalPosition(pos){
+  centerStageOnHorizontalPosition(pos, left=0){
     let intervalId = setInterval(async () => {
-      const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
+      const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos, left);
       if (result === true) {
         clearInterval(intervalId);
       }
@@ -98,6 +98,7 @@ export class StageService {
     // this.logger.log('[CDS-CANVAS] moved-and-scaled ', el)
   }
   
+
 
   getScale(){
     return this.tiledeskStage.scale;

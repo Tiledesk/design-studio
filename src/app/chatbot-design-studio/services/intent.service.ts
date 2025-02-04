@@ -808,7 +808,12 @@ export class IntentService {
       //** center stage on 'start' intent */
       let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
       if(startElement){
-        this.stageService.centerStageOnHorizontalPosition(startElement);
+        let left = 0;
+        const element = document.getElementById('cdsPanelIntentList');
+        if (element) {
+          left = element.offsetWidth;
+        }
+        this.stageService.centerStageOnHorizontalPosition(startElement, left);
       }
     }
   }

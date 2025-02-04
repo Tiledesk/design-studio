@@ -330,7 +330,7 @@ cds-fulfillment {
 
 /*********** START Draggable  *************/
 .tds-drag-container {
-  position: relative;
+  position: absolute;
   display: block;
   background-size: 16px 16px;
   background-image: radial-gradient(var(--container-background) 1.14286px, var(--container-points-color) 1.14286px);

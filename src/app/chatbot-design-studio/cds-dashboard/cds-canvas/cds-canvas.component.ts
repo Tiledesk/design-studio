@@ -790,7 +790,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private posCenterIntentSelected(intent) {
     if(intent && intent.intent_id){
       var stageElement = document.getElementById(intent.intent_id);
-      this.stageService.centerStageOnPosition(stageElement);
+      //this.stageService.centerStageOnPosition(stageElement);
     }
   }
 

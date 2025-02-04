@@ -264,7 +264,7 @@ export class TiledeskStage {
         if(pos){
             this.scale = scale;
             this.drawer.style.transition = "transform 0.3s ease-in-out";
-            var originRec = this.container.getBoundingClientRect();
+            let originRec = this.container.getBoundingClientRect();
             let newX = (originRec.width/2)-pos.x;
             let newY = (originRec.height/2)-pos.y;
             let tcmd = `translate(${newX}px, ${newY}px)`;
@@ -319,7 +319,7 @@ export class TiledeskStage {
     }
 
 
-    centerStageOnHorizontalPosition(stageElement){
+    centerStageOnHorizontalPosition(stageElement, left=0){
         if(stageElement){
             // var stageElement = document.getElementById(intent.intent_id);
             var w = stageElement.offsetWidth;
@@ -329,7 +329,7 @@ export class TiledeskStage {
 
             this.drawer.style.transition = "transform 0.3s ease-in-out";
             var originRec = this.container.getBoundingClientRect();
-            let newX = (90)-(x+w/2);
+            let newX = (90)-(x+w/2) + left;
             // console.log('newX:', newX);
             let newY = (originRec.height/2)-(y+h/2)-20;
             // console.log('newX:', newY);
