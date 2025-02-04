@@ -98,9 +98,11 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
 
   /** initialize */
   private initialize(intents){
-    // intents = this.intentService.hiddenEmptyIntents(intents);
-    this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK));
-    this.defaultIntents = intents.filter(obj => ( obj.intent_display_name.trim() !== TYPE_INTENT_NAME.DISPLAY_NAME_START && obj.intent_display_name.trim() !== TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK));
+    // // intents = this.intentService.hiddenEmptyIntents(intents);
+    // // this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK) && obj.attributes.readonly);
+   
+    this.internalIntents = intents.filter(obj => (obj.attributes.readonly));
+    this.defaultIntents = intents.filter(obj => (!obj.attributes.readonly));
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DISPLAY_NAME_START, 0);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK, 1);
     this.filteredIntents = this.defaultIntents;
@@ -113,18 +115,8 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     if(!resp){
       this.idSelectedIntent = null;
     }
-
-    this.ddd();
   }
 
-
-ddd(){
-  this.listOfIntents.forEach(intent => {
-    if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK){
-      intent.attributes.readonly = true;
-    }
-  });
-}
 
   /** EVENTS  */
 

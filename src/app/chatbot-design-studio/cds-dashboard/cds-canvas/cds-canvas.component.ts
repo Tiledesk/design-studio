@@ -485,6 +485,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       if (intent.actions) {
         intent.actions = intent.actions.filter(obj => obj !== null);
       }
+      if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK){
+        intent.attributes.readonly = true;
+      }
     });
     this.refreshIntents();
   }

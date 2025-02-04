@@ -25,7 +25,6 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   intentNameNotHasSpecialCharacters: boolean = true;
   id_faq_kb: string;
   isFocused: boolean = false;
-  readonly: boolean = false;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   constructor(
@@ -65,9 +64,6 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
       this.intentColor = INTENT_COLORS.COLOR1;
     }
     this.logger.log("[PANEL-INTENT-HEADER] initialize name:", this.intent);
-    if (this.intent.intent_display_name === RESERVED_INTENT_NAMES.START || this.intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK){
-      this.readonly = true;
-    }
   }
 
 
@@ -146,11 +142,11 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   }
 
   onBlur(event){
-    if ((this.intentName === RESERVED_INTENT_NAMES.START || this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) && !this.readonly){
+    console.log("onBlur!!!", this.intent);
+    if ((this.intentName === RESERVED_INTENT_NAMES.START || this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) && this.intent.attributes.readonly === false){
       this.intentName = this.intentName+"_";
       this.intent.intent_display_name = this.intentName;
     }
-
     this.intentNameResult = true;
     this.intentNameAlreadyExist = false;
     this.myInput.nativeElement.blur();
