@@ -2,23 +2,18 @@ import { Injectable } from '@angular/core';
 import { TiledeskStage } from 'src/assets/js/tiledesk-stage.js';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { scaleAndcenterStageOnCenterPosition } from '../utils';
+import { STAGE_SETTINGS, scaleAndcenterStageOnCenterPosition } from '../utils';
 import { BehaviorSubject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 
-enum STAGE_SETTINGS {
-  AlphaConnector = 'alpha_connectors',
-  Zoom = 'zoom',
-  Position = 'position',
-}
-
 export interface Settings {
-  alpha_connectors: number;
-  zoom: number;
+  alpha_connectors: any;
+  zoom: any;
   position: {
     x: number;
     y: number;
   };
+  maximize: boolean;
 }
 
 @Injectable({
@@ -34,7 +29,8 @@ export class StageService {
   settings: Settings = {
     alpha_connectors: 70,
     zoom: 1,
-    position: null
+    position: null,
+    maximize: false
   };
 
   // {
@@ -101,7 +97,7 @@ export class StageService {
     this.logger.log("[CDS-STAGE]  •••• centerStageOnTopPosition ••••");
     let intervalId = setInterval(async () => {
       const result = await this.tiledeskStage.centerStageOnTopPosition(stageElement);
-      //const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
+      // // const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
       if (result === true) {
         clearInterval(intervalId);
         this.savePositionByStageElement(id_faq_kb, stageElement);
@@ -138,6 +134,10 @@ export class StageService {
     return this.tiledeskStage.translateAndScale(resp.point, resp.scale);
   }
   
+  getMaximize(){
+    return this.settings.maximize;
+  }
+
   getScale(){
     return this.tiledeskStage.scale;
   }
