@@ -441,12 +441,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** closeAllPanels */
   private closeAllPanels(){
     this.IS_OPEN_PANEL_WIDGET = false;
-    // this.IS_OPEN_PANEL_ACTION_DETAIL = false;
+    // // this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
-    this.intentService.inactiveIntent();
+    // // this.intentService.inactiveIntent();
   }
   private closeActionDetailPanel(){
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
@@ -534,7 +534,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.listnerEndDragging = (e: CustomEvent) => {
       const el = e.detail.element;
       this.logger.log('[CDS-CANVAS] end-dragging ', el);
-      el.style.zIndex = 1;
+      // // el.style.zIndex = 1;
       this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected.attributes.position);
       this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
       let position = this.intentService.intentSelected.attributes.position;

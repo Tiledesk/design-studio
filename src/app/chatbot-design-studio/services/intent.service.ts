@@ -138,12 +138,29 @@ export class IntentService {
       this.intentActive = true;
       this.controllerService.closeAllPanels();
       this.unselectAction();
+      this.resetZindex();
     } else {
       this.intentSelected = null;
       this.intentSelectedID = null;
       this.intentActive = false;
+      this.resetZindex();
     }
   }
+
+
+  private resetZindex(){
+    this.listOfIntents.forEach(element => {
+      let zIndex = 1;
+      const el = document.getElementById(element.intent_id);
+      if (el) {
+        el.style.zIndex = String(zIndex);
+        // // console.log('Elemento trovato:', el, intent_id, zIndex);
+      } else {
+        // // console.error('Elemento non trovato');
+      }
+    });
+  }
+
 
   public setIntentSelectedByIntent(intent){
     this.intentSelected = intent;
