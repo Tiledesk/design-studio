@@ -3,7 +3,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { IntentService } from '../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { preDisplayName } from '../../../../utils';
+import { INTENT_COLORS, RESERVED_INTENT_NAMES, preDisplayName } from '../../../../utils';
 
 @Component({
   selector: 'cds-panel-intent-header',
@@ -14,8 +14,10 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   @ViewChild('myInput', { static: true }) myInput!: ElementRef<HTMLInputElement>;
 
   @Input() intent: Intent;
+  @Input() intentColor: string;
   @Output() saveIntent = new EventEmitter();
 
+  RESERVED_INTENT_NAMES = RESERVED_INTENT_NAMES;
   listOfIntents: Intent[];
   intentName: string;
   intentNameResult: boolean = true;
@@ -24,7 +26,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   id_faq_kb: string;
   isFocused: boolean = false;
 
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private readonly logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     public intentService: IntentService
   ) { 
@@ -58,6 +60,10 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     }
     this.intentNameAlreadyExist = false;
     this.intentNameNotHasSpecialCharacters = true;
+    if(!this.intentColor){
+      this.intentColor = INTENT_COLORS.COLOR1;
+    }
+    this.logger.log("[PANEL-INTENT-HEADER] initialize name:", this.intent);
   }
 
 
@@ -74,17 +80,22 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   private checkIntentName(name: string) {
     this.intentNameResult = true;
     this.intentNameAlreadyExist = false;
+   
+
     if(!this.intentName || this.intentName.trim().length == 0 || this.intentName === preDisplayName) {
-      this.logger.log("[PANEL-INTENT-HEADER] error 1");
       this.intentNameResult = false;
+      return this.intentNameResult;
     }
-    for (let i = 0; i < this.listOfIntents.length; i++) {
-      if (this.listOfIntents[i].intent_display_name === name && this.listOfIntents[i].intent_id !== this.intent.intent_id) { 
+
+    for (const element of this.listOfIntents) {
+      if (element.intent_display_name === name && element.intent_id !== this.intent.intent_id) { 
         this.intentNameAlreadyExist = true;
         this.intentNameResult = false;
-        break;
+        return this.intentNameResult;
+        // break;
       }
     }
+
     this.intentNameNotHasSpecialCharacters = this.checkIntentNameMachRegex(name);
     if(!this.intentNameNotHasSpecialCharacters){
       this.logger.log("[PANEL-INTENT-HEADER] error 3");
@@ -111,18 +122,36 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   /** onChangeIntentName */
   onChangeIntentName(event) {
-    const result = this.checkIntentName(event);
-    this.intent.intent_display_name = event.trim();
-    if(result){
-      this.intentName = event;
-      // this.onSaveIntent();
-      // this.intentService.setIntentSelected(this.intent.intent_id);
+    this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName", event);
+    if (event === RESERVED_INTENT_NAMES.START || event === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) { 
+      this.intent.intent_display_name = event.trim();
+      this.intentNameResult = false;
+      this.intentNameAlreadyExist = true;
+      this.logger.log("[PANEL-INTENT-HEADER] entro", event, this.intentName, this.intent);
+    } else {
+      const result = this.checkIntentName(event);
+      if(result){
+        this.intent.intent_display_name = event.trim();
+        this.intentName = event;
+        // this.onSaveIntent();
+        // this.intentService.setIntentSelected(this.intent.intent_id);
+      }
     }
+   
+    
   }
 
   onBlur(event){
+    console.log("onBlur!!!", this.intent);
+    if ((this.intentName === RESERVED_INTENT_NAMES.START || this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) && this.intent.attributes.readonly === false){
+      this.intentName = this.intentName+"_";
+      this.intent.intent_display_name = this.intentName;
+    }
+    this.intentNameResult = true;
+    this.intentNameAlreadyExist = false;
     this.myInput.nativeElement.blur();
     const result = this.checkIntentName(this.intentName);
+
     if(result){
       this.onSaveIntent();
     }

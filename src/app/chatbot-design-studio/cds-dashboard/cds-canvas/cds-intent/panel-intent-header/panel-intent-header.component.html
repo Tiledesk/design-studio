@@ -1,8 +1,8 @@
 <div class="header" (click)="onSelectIntent($event)">
-    <div *ngIf="intentName === 'start'" class="intent-icon">
+    <div *ngIf="intentName === RESERVED_INTENT_NAMES.START && intent.attributes.readonly" class="intent-icon">
         <span class="material-icons rocket">rocket_launch</span>
     </div>
-    <div *ngIf="intentName === 'defaultFallback'" class="intent-icon">
+    <div *ngIf="intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK && intent.attributes.readonly" class="intent-icon">
         <span class="material-icons undo ">undo</span>
     </div>
 
@@ -11,8 +11,9 @@
         <input 
             #myInput type="text" 
             class="input ellips form-control tds_draggable"
+            [ngStyle]="{'color': 'rgba('+intentColor+', 1)'}"
             [(ngModel)]="intentName"
-            [readonly]="intentName === 'start' || intentName === 'defaultFallback'"
+            [readonly]="intent.attributes.readonly"
             [placeholder]="'CDSCanvas.EnterIntentName' | translate"
             (ngModelChange)="onChangeIntentName($event)"
             (mouseup)="onMouseUpInput($event)" 

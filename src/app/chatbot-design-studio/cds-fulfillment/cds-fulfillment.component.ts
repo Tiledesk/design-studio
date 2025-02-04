@@ -8,6 +8,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { DOCS_LINK } from '../utils';
 
 @Component({
   selector: 'cds-fulfillment',
@@ -22,6 +23,7 @@ export class CdsFulfillmentComponent implements OnInit {
   //webhookUrl: string;
   tparams: any;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
+  DOCS_LINK = DOCS_LINK.FULFILLMENT;
   
   WEBHOOK_URL_IS_EMPTY: boolean;
   WEBHOOK_URL_HAS_ERROR: boolean;
@@ -130,10 +132,10 @@ export class CdsFulfillmentComponent implements OnInit {
     }
   }
 
-  openWebhookRequirementsDoc() {
-    const url = 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model';
-    window.open(url, '_blank');
-  }
+  // openWebhookRequirementsDoc() {
+  //   const url = 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model';
+  //   window.open(url, '_blank');
+  // }
 
 
 }

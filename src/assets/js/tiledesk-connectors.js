@@ -1,7 +1,7 @@
 export class TiledeskConnectors {
 
   constructor(drawerId, classes, connectors) {
-    //this.connectors = [];
+    // //this.connectors = [];
     this.svgContainerId = "tds_svgContainer";
     this.svgConnectorsId = "tds_svgConnectors";
     this.ids = {
@@ -474,7 +474,6 @@ export class TiledeskConnectors {
 
   /** createSvgContainer */
   #createSvgContainer() {
-
     const drawer = document.getElementById(this.drawerId);
     if (!drawer) return;
     let svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -484,11 +483,10 @@ export class TiledeskConnectors {
     svgContainer.style.top = "0px";
     svgContainer.style.position = "absolute";
     svgContainer.style.zIndex = "inherit";
-
     // Create the `<defs>` element and attributes
     const defsElement = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    // Create `<marker>` element and attributes
     this.markers.forEach(element => {
-      // Create `<marker>` element and attributes
       const markerElement = document.createElementNS("http://www.w3.org/2000/svg", "marker");
       markerElement.setAttribute("id", element.id);
       markerElement.setAttribute("markerWidth", "10");
@@ -509,7 +507,6 @@ export class TiledeskConnectors {
     });
     // Add the `<defs>` come figlio di <svg>
     svgContainer.appendChild(defsElement);
-
     // Create `<g>` element and attributes
     const gElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
     gElement.id = this.svgConnectorsId;
@@ -517,11 +514,47 @@ export class TiledeskConnectors {
     gElement.setAttribute("stroke", this.colors['black']);
     gElement.setAttribute("stroke-width", "3");
     svgContainer.appendChild(gElement);
-
     // Add the `<g>` come figlio di <svg>
     drawer.appendChild(svgContainer);
-
     this.svgContainer = document.getElementById(this.svgConnectorsId);
+  }
+
+
+  addCustomMarker(element, color) {
+    const markerId = `marker_${element.id}`;
+    const tds_svgContainer = document.getElementById('tds_svgContainer');
+    if (!tds_svgContainer) {
+      console.warn('Element #tds_svgContainer not found.');
+      return;
+    }
+    const defs = tds_svgContainer.querySelector('defs');
+    if (!defs) {
+      console.warn('<defs> not found in #tds_svgContainer.');
+      return;
+    }
+    // Check if the marker already exists and remove it
+    const existingMarker = document.getElementById(markerId);
+    if (existingMarker) {
+      defs.removeChild(existingMarker);
+    }
+    // Create new marker
+    const markerElement = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+    markerElement.setAttribute("id", markerId);
+    markerElement.setAttribute("markerWidth", "10");
+    markerElement.setAttribute("markerHeight", "20");
+    markerElement.setAttribute("refX", "10");
+    markerElement.setAttribute("refY", "10");
+    markerElement.setAttribute("markerUnits", "userSpaceOnUse");
+    markerElement.setAttribute("orient", "auto");
+    const polygonElement = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    polygonElement.setAttribute("fill", color);
+    polygonElement.setAttribute("class", this.ids['arrow_custom']);
+    polygonElement.setAttribute("points", "10 6, 10 14, 2 10");
+    markerElement.appendChild(polygonElement);
+    // Add marker to <defs>
+    defs.appendChild(markerElement);
+    // Assign marker to element
+    element.setAttributeNS(null, 'marker-start', `url(#${markerId})`);
   }
 
   /** createConnectors */
@@ -556,11 +589,13 @@ export class TiledeskConnectors {
 
   /** removeSelection */
   #removeSelection(target) {
-    // // console.log("---> resetting connector selection?", this.selectedConnector, target)
+    // console.log("---> resetting connector selection?", this.selectedConnector, target)
     if (this.selectedConnector) {
       if (!target.id || (this.selectedConnector.id !== target.id)) {
         this.selectedConnector.setAttributeNS(null, "class", this.classes["connector"]);
-        this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
+        ////this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
+        const markerId = `marker_${this.selectedConnector.id}`;
+        this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + markerId + ")");
         this.selectedConnector = null;
       }
     }
@@ -671,7 +706,7 @@ export class TiledeskConnectors {
           }
         });
       document.dispatchEvent(fire_event);
-      // console.log("connector-draft-released fired!");
+      // // console.log("connector-draft-released fired!");
     }
   }
 
@@ -722,8 +757,8 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes=null) {
-    // console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
-    var label = null;
+    // // console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    let label = null;
     if(attributes && attributes.label){
       label = attributes.label;
     }
@@ -742,8 +777,7 @@ export class TiledeskConnectors {
       });
 
       connector.addEventListener('mouseover', (e) => {
-        //// console.log("mouseover e", e.currentTarget);
-        if (this.selectedConnector !== null) { // jump highlighting current selection
+        if (this.selectedConnector !== null) {
           if (this.selectedConnector.id !== e.currentTarget.id) {
             e.currentTarget.setAttributeNS(null, "class", this.classes["connector_over"]);
             connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow_over'] + ")");
@@ -755,19 +789,20 @@ export class TiledeskConnectors {
         }
       });
       connector.addEventListener('mouseleave', (e) => {
-        //// console.log("mouseleave e", e.currentTarget);
+        // // console.log("mouseleave e", e.currentTarget);
         if (!e.currentTarget.classList.contains(this.classes["connector_selected"])) {
           e.currentTarget.setAttributeNS(null, "class", this.classes["connector"]);
-          connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
+          const markerId = `marker_${e.currentTarget.id}`;
+          connector.setAttributeNS(null, "marker-start", "url(#" + markerId + ")");
         }
       });
       connector.addEventListener('click', (e) => {
         let pos_x_phis = e.clientX;
         let pos_y_phis = e.clientY;
         let mouse_pos_logic = this.logicPoint({ x: pos_x_phis, y: pos_y_phis });
-        let toPointPhis = { x: pos_x_phis, y: pos_y_phis };
-        // console.log("clicked e", e, toPointPhis, mouse_pos_logic);
-        // console.log("clicked e", e.currentTarget);
+        // // let toPointPhis = { x: pos_x_phis, y: pos_y_phis };
+        // // console.log("clicked e", e, toPointPhis, mouse_pos_logic);
+        // // console.log("clicked e", e.currentTarget);
         if (this.selectedConnector) {
           this.selectedConnector.setAttributeNS(null, "class", this.classes["connector"]);
           this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
@@ -809,7 +844,7 @@ export class TiledeskConnectors {
       rect.setAttributeNS(null, "fill", "#fcfafa");
       rect.setAttributeNS(null, "stroke", "none");
       rect.setAttributeNS(null, "rx", "8"); 
-      // rect.setAttributeNS(null, "style", `left:${x}; top:${y};`);
+      // //rect.setAttributeNS(null, "style", `left:${x}; top:${y};`);
       group.appendChild(rect);
       group.appendChild(lineText);
       this.svgContainer.appendChild(group);
@@ -822,11 +857,10 @@ export class TiledeskConnectors {
     controlFront.y = frontPoint.y;
     controlBack.x = backPoint.x + 200;
     controlBack.y = backPoint.y;
-    let d = "M" + (frontPoint.x - 10) + " " + frontPoint.y + " " + "C " + controlFront.x + " " + controlFront.y + " " + controlBack.x + " " + controlBack.y + " " + backPoint.x + " " + backPoint.y;// + " marker-end=\"url(#arrowhead)\"";
+    let d = "M" + (frontPoint.x - 10) + " " + frontPoint.y + " " + "C " + controlFront.x + " " + controlFront.y + " " + controlBack.x + " " + controlBack.y + " " + backPoint.x + " " + backPoint.y;
     connector.setAttributeNS(null, "d", d);
     connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
     this.updateLineTextPosition(id, frontPoint, backPoint);
-
 
     const event = new CustomEvent("connector-drawn", { detail: { connector: connector } });
     document.dispatchEvent(event);
@@ -837,8 +871,8 @@ export class TiledeskConnectors {
     let rect = document.getElementById("rect_"+id);
     if (lineText && rect) {
       const bbox = lineText.getBBox();
-      var rectWidth = 0;
-      var rectHeight = 0;
+      let rectWidth = 0;
+      let rectHeight = 0;
       if(lineText.textContent && lineText.textContent !== ''){
         rectWidth = bbox.width + 10;
         rectHeight = bbox.height + 10;
@@ -863,7 +897,7 @@ export class TiledeskConnectors {
   /** Coordinate from phisical to logical */
   logicPoint(coords) {
     const drawer = document.getElementById(this.drawerId);
-    var drawer_rect = drawer.getBoundingClientRect();
+    let drawer_rect = drawer.getBoundingClientRect();
     // https://stackoverflow.com/questions/24883585/mouse-coordinates-dont-match-after-scaling-and-panning-canvas
     const shift_x = this.#toLogicScale(drawer_rect.left); //d_rect.left / scale
     const shift_y = this.#toLogicScale(drawer_rect.top); //d_rect.top / scale
@@ -875,22 +909,22 @@ export class TiledeskConnectors {
   /** elementLogicCenter */
   elementLogicCenter(element) {
     const rect = element.getBoundingClientRect();
-    //// console.log("Logic center of phisical rect:", rect);
+    // // console.log("Logic center of phisical rect:", rect);
     let logic_rect_pos = this.logicPoint({ x: rect.left, y: rect.top })
-    //// console.log("center: logic_rect_pos:", logic_rect_pos);
+    // // console.log("center: logic_rect_pos:", logic_rect_pos);
     const logic_width = this.#toLogicScale(rect.width);
-    //// console.log("center: logic_width:", logic_width);
+    // // console.log("center: logic_width:", logic_width);
     const logic_height = this.#toLogicScale(rect.height);
-    //// console.log("center: logic_height:", logic_height);
+    // // console.log("center: logic_height:", logic_height);
     let center_x = logic_rect_pos.x + logic_width / 2;
     let center_y = logic_rect_pos.y + logic_height / 2;
-    //// console.log("center_x:", center_x);
-    //// console.log("center_y:", center_y);
+    // // console.log("center_x:", center_x);
+    // // console.log("center_y:", center_y);
     return { x: center_x, y: center_y };
   }
 
   elementLogicTopLeft(element) {
-    // console.log('elementLogicTopLeft');
+    // // console.log('elementLogicTopLeft');
     let elConnectable = this.#searchClassInParents(element, this.classes["input_block"]);
     if (elConnectable) {
       const block_rect = elConnectable.getBoundingClientRect();
@@ -922,32 +956,32 @@ export class TiledeskConnectors {
 
 
   updateConnectorsOutOfItent(element) {
-    // console.log("updateConnectorsOutOfItent ----> ", this.blocks, element.id);
+    // // console.log("updateConnectorsOutOfItent ----> ", this.blocks, element.id);
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) { return; }
-    // console.log("block :---> ", block);
+    // // console.log("block :---> ", block);
     for (const [key, conn_id] of Object.entries(block.outConnectors)) {
       let conn = this.connectors[conn_id];
-      // console.log("conn :---> ", this.connectors, conn_id);
+      // // console.log("conn :---> ", this.connectors, conn_id);
       if (conn) {
-        // console.log("OUT :---> ", conn);
+        // // console.log("OUT :---> ", conn);
         const elFrom = document.getElementById(conn.fromId);
         if (elFrom) {
           conn.fromPoint = this.elementLogicCenter(elFrom);
-          // console.log("conn.fromPoint :---> ", elFrom, conn.fromId, conn.fromPoint);
+          // // console.log("conn.fromPoint :---> ", elFrom, conn.fromId, conn.fromPoint);
         }
         const elToId = document.getElementById(conn.toId);
         if (elToId) {
           conn.toPoint = this.elementLogicTopLeft(elToId);
-          // console.log("conn.toPoint :---> ", elToId, conn.toId, conn.toPoint);
+          // // console.log("conn.toPoint :---> ", elToId, conn.toId, conn.toPoint);
         }
-        // console.log("conn :---> ", elFrom, elToId);
+        // // console.log("conn :---> ", elFrom, elToId);
         if(elFrom && elToId){
           this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
           conn['notify']='';
-          // const event = new CustomEvent("connector-updated", { detail: { connector: conn } });
-          // document.dispatchEvent(event);
+          // // const event = new CustomEvent("connector-updated", { detail: { connector: conn } });
+          // // document.dispatchEvent(event);
         } else {
           this.deleteConnector(conn_id, false, true);
         }
@@ -1005,7 +1039,7 @@ export class TiledeskConnectors {
   //   };
   // }
   updateConnectorsOfItent(element) {
-    // console.log("updateConnectorsOfItent ----> ", this.blocks, element.id);
+    // // console.log("updateConnectorsOfItent ----> ", this.blocks, element.id);
     this.updateConnectorsOutOfItent(element);
   }
 

@@ -33,6 +33,16 @@
     padding: 3px 0px;
   }
   
+  button.intent-header-action-btn {
+    border: none;
+    border-left: solid 1px var(--gray-light-02);
+    background-color: rgba(255, 255, 255, 0);
+    img {
+      width: auto;
+      height: 100%;
+    }
+  }
+
   .intent-header-action-btn {
     cursor: pointer;
     border-left: solid 1px var(--gray-light-02);

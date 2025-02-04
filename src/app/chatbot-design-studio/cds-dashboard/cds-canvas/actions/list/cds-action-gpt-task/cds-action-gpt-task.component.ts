@@ -15,7 +15,7 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 
 //UTILS
 import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog.component';
-import { TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
@@ -74,6 +74,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   projectPlan: PLAN_NAME
   PLAN_NAME = PLAN_NAME
   BRAND_BASE_INFO = BRAND_BASE_INFO;
+  DOCS_LINK = DOCS_LINK.GPT_TASK;
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(

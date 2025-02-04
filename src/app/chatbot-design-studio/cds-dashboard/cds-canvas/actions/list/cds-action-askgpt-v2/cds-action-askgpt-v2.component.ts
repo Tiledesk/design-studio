@@ -16,7 +16,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
@@ -70,6 +70,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
+  DOCS_LINK = DOCS_LINK.ASKGPTV2;
   
   private subscriptionChangedConnector: Subscription;
 
@@ -108,7 +109,6 @@ export class CdsActionAskgptV2Component implements OnInit {
     }
     this.getListNamespaces();
     this.patchActionsKey();
-
   }
 
   ngOnDestroy() {

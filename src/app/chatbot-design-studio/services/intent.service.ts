@@ -7,7 +7,7 @@ import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, A
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
+import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
@@ -31,6 +31,7 @@ export class IntentService {
   testIntent = new BehaviorSubject<Intent>(null);
   BStestiTout = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
+  behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
@@ -87,6 +88,13 @@ export class IntentService {
   }
 
 
+
+   public setIntentColor(color){
+    const intentId = this.intentSelected.intent_id;
+    this.logger.log('[INTENT SERVICE] ::: setIntentColor:: ', intentId, color);
+    this.behaviorIntentColor.next({ intentId: intentId, color: color });
+  }
+
   /**
    * onChangedConnector
    * funzione chiamata sul 'connector-created', 'connector-deleted'
@@ -138,11 +146,27 @@ export class IntentService {
       this.intentActive = true;
       this.controllerService.closeAllPanels();
       this.unselectAction();
+      this.resetZindex();
     } else {
       this.intentSelected = null;
       this.intentSelectedID = null;
       this.intentActive = false;
+      this.resetZindex();
     }
+  }
+
+
+  private resetZindex(){
+    this.listOfIntents.forEach(element => {
+      let zIndex = 1;
+      const el = document.getElementById(element.intent_id);
+      if (el) {
+        el.style.zIndex = String(zIndex);
+        // // console.log('Elemento trovato:', el, intent_id, zIndex);
+      } else {
+        // // console.error('Elemento non trovato');
+      }
+    });
   }
 
   public setIntentSelectedByIntent(intent){
@@ -719,9 +743,9 @@ export class IntentService {
    */
   public getListOfIntents(): Array<{name: string, value: string, icon?:string}>{
     return this.listOfIntents.map(a => {
-      if (a.intent_display_name.trim() === 'start') {
+      if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.START) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'rocket_launch' }
-      } else if (a.intent_display_name.trim() === 'defaultFallback') {
+      } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'undo' }
       } else {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'label_important_outline' }
@@ -1537,7 +1561,7 @@ export class IntentService {
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         this.faqService.opsUpdate(payload).subscribe((resp: any) => {
-          this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
+          // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);
           resolve(true);
