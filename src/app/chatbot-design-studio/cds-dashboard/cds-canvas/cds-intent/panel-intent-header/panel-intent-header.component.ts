@@ -24,8 +24,9 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   intentNameNotHasSpecialCharacters: boolean = true;
   id_faq_kb: string;
   isFocused: boolean = false;
+  readonly: boolean = false;
 
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private readonly logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     public intentService: IntentService
   ) { 
@@ -59,6 +60,10 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     }
     this.intentNameAlreadyExist = false;
     this.intentNameNotHasSpecialCharacters = true;
+    this.logger.log("[PANEL-INTENT-HEADER] initialize name:", this.intent);
+    if (this.intent.intent_display_name === RESERVED_INTENT_NAMES.START || this.intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK){
+      this.readonly = true;
+    }
   }
 
 
@@ -75,15 +80,9 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   private checkIntentName(name: string) {
     this.intentNameResult = true;
     this.intentNameAlreadyExist = false;
-    this.logger.log("[PANEL-INTENT-HEADER] checkIntentName name:", name);
+   
 
     if(!this.intentName || this.intentName.trim().length == 0 || this.intentName === preDisplayName) {
-      this.intentNameResult = false;
-      return this.intentNameResult;
-    }
-    
-    if (name === RESERVED_INTENT_NAMES.START || name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) { 
-      this.intentNameAlreadyExist = true;
       this.intentNameResult = false;
       return this.intentNameResult;
     }
@@ -123,19 +122,36 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   /** onChangeIntentName */
   onChangeIntentName(event) {
-    const result = this.checkIntentName(event);
-    this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName", result);
-    if(result){
+    this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName", event);
+    if (event === RESERVED_INTENT_NAMES.START || event === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) { 
       this.intent.intent_display_name = event.trim();
-      this.intentName = event;
-      // this.onSaveIntent();
-      // this.intentService.setIntentSelected(this.intent.intent_id);
+      this.intentNameResult = false;
+      this.intentNameAlreadyExist = true;
+      this.logger.log("[PANEL-INTENT-HEADER] entro", event, this.intentName, this.intent);
+    } else {
+      const result = this.checkIntentName(event);
+      if(result){
+        this.intent.intent_display_name = event.trim();
+        this.intentName = event;
+        // this.onSaveIntent();
+        // this.intentService.setIntentSelected(this.intent.intent_id);
+      }
     }
+   
+    
   }
 
   onBlur(event){
+    if ((this.intentName === RESERVED_INTENT_NAMES.START || this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) && !this.readonly){
+      this.intentName = this.intentName+"_";
+      this.intent.intent_display_name = this.intentName;
+    }
+
+    this.intentNameResult = true;
+    this.intentNameAlreadyExist = false;
     this.myInput.nativeElement.blur();
     const result = this.checkIntentName(this.intentName);
+
     if(result){
       this.onSaveIntent();
     }
