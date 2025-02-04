@@ -8,7 +8,7 @@ import { IntentService } from '../../../services/intent.service';
 import { Intent } from 'src/app/models/intent-model';
 
 // UTILS //
-import { moveItemToPosition, TYPE_INTENT_NAME } from '../../../utils';
+import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME } from '../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -113,17 +113,29 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     if(!resp){
       this.idSelectedIntent = null;
     }
+
+    this.ddd();
   }
 
+
+ddd(){
+  this.listOfIntents.forEach(intent => {
+    if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK){
+      intent.attributes.readonly = true;
+    }
+  });
+}
 
   /** EVENTS  */
 
   /** onGetIconForName */
-  onGetIconForName(name: string){
+  onGetIconForName(intent: Intent){
+    let name = intent.intent_display_name;
+    let readonly = intent.attributes.readonly;
     let icon = this.ICON_DEFAULT;
-    if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
+    if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START && readonly) {
       icon = this.ICON_ROCKET;
-    } else if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK) {
+    } else if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK && readonly) {
       icon = this.ICON_UNDO;
     }
     return icon;

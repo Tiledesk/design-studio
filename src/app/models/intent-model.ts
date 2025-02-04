@@ -36,6 +36,7 @@ export class IntentAttributes {
     nextBlockAction?: any;
     connectors?: any;
     color?: any;
+    readonly?: boolean;
     constructor() {
         this.position = {x:0, y:0};
         this.nextBlockAction = {
@@ -45,6 +46,7 @@ export class IntentAttributes {
         };
         this.connectors = {}
         this.color = INTENT_COLORS.COLOR1
+        this.readonly = false;
     }
 }
 
