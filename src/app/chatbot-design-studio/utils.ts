@@ -30,7 +30,7 @@ export enum STAGE_SETTINGS {
 
 export enum RESERVED_INTENT_NAMES {
     START              = 'start',
-    DEFAULT_FALLBACK   = "defaultFallback",
+    DEFAULT_FALLBACK   = 'defaultFallback',
 }
 
 export enum INTENT_COLORS {
