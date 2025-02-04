@@ -156,7 +156,7 @@ export class IntentService {
   }
 
 
-  private resetZindex(intent_id?){
+  private resetZindex(){
     this.listOfIntents.forEach(element => {
       let zIndex = 1;
       const el = document.getElementById(element.intent_id);
