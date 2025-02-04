@@ -10,6 +10,7 @@
 # 1.27.0-rc.5
 - **changed**: set intent selected last level on the stage (always visible)
 - **bug-fixed**: "start" and "defaulFallback" names duplicate in intent list 
+- **added**: added maximus parameter to LocalStorage (stores the size of the action panel)
 
 # 1.27.0-rc.4
 - **changed**: set the default connector alpha to 0.7

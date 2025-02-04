@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const preDisplayName:string  = 'untitled_block_';
 
-
 export const DOCS_LINK = {
     ASKGPTV2 : { 
         namespace_as_name: { link: 'https://gethelp.tiledesk.com/', target: '_blank'},
@@ -22,10 +21,16 @@ export const DOCS_LINK = {
     }
 }
 
+export enum STAGE_SETTINGS {
+    AlphaConnector = 'alpha_connectors',
+    Zoom = 'zoom',
+    Position = 'position',
+    Maximize = 'maximize'
+}
 
 export enum RESERVED_INTENT_NAMES {
     START              = 'start',
-    DEFAULT_FALLBACK   = "defaultFallback",
+    DEFAULT_FALLBACK   = 'defaultFallback',
 }
 
 export enum INTENT_COLORS {
