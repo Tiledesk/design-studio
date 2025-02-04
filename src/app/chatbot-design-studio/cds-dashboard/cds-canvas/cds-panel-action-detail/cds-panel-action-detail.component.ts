@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange
 import { Subject, Subscription } from 'rxjs';
 import { ConnectorService } from '../../../services/connector.service';
 import { IntentService } from '../../../services/intent.service';
-import { TYPE_INTENT_ELEMENT } from '../../../utils';
+import { TYPE_INTENT_ELEMENT, STAGE_SETTINGS } from '../../../utils';
 import { Intent, Form} from 'src/app/models/intent-model';
 import { Action} from 'src/app/models/action-model';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -13,7 +13,7 @@ import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
-
+import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 
 @Component({
   selector: 'cds-panel-action-detail',
@@ -55,7 +55,8 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
     private dashboardService: DashboardService,
     private projectPlanUtils: ProjectPlanUtils,
     private appConfigService: AppConfigService,
-    private tiledeskAuthService: TiledeskAuthService
+    private tiledeskAuthService: TiledeskAuthService, 
+    private stageService: StageService
   ) { }
 
   ngOnInit(): void {
@@ -89,17 +90,13 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
   initialize(){
     this.intentSelected = this.intentService.intentSelected;
     this.logger.log('[PANEL-INTENT-DETAIL] (initialize)', this.elementIntentSelected);
+    this.maximize = this.stageService.getMaximize();
     try{
       this.elementIntentSelectedType = this.elementIntentSelected.type;
-      this.elementSelected = this.elementIntentSelected.element; // this.intentService.selectedAction;
-      // this.elementSelected = JSON.parse(JSON.stringify(this.elementIntentSelected.element));
-      // this.elementSelectedIndex = this.elementIntentSelected.index
-      // this.elementSelectedMaxLength = [...Array(this.elementIntentSelected.maxLength).keys()]
+      this.elementSelected = this.elementIntentSelected.element;
       this.logger.log('[PANEL-INTENT-DETAIL] (OnChanges) elementIntentSelectedType ', this.elementIntentSelectedType);
       this.logger.log('[PANEL-INTENT-DETAIL] (OnChanges) elementSelected ', this.elementSelected);
-      
       this.checkActionAvailabilty()
-
     }catch(error){
       this.logger.log('[CDS-PANEL-INTENT-DETAIL] (ngOnChanges) ERROR', error);
     }
@@ -108,7 +105,7 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
 
   checkActionAvailabilty(){
     let action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType)
-    if(action && action.plan){
+    if(action?.plan){
       this.canShowActionByPlan = {plan: action.plan, enabled: this.projectPlanUtils.checkIfCanLoad(action.type, action.plan)}
       this.logger.log('[PANEL-INTENT-DETAIL] --> checkIfCanLoad status', this.canShowActionByPlan)
     }
@@ -266,6 +263,12 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
         this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, true);
         break;
     }
+  }
+
+  onChangeMaximize(){
+    this.maximize = !this.maximize;
+    const id_faq_kb = this.dashboardService.id_faq_kb;
+    this.stageService.saveSettings(id_faq_kb, STAGE_SETTINGS.Maximize, this.maximize);
   }
 
 }

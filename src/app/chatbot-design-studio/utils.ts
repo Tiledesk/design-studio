@@ -4,6 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const preDisplayName:string  = 'untitled_block_';
 
+export enum STAGE_SETTINGS {
+    AlphaConnector = 'alpha_connectors',
+    Zoom = 'zoom',
+    Position = 'position',
+    Maximize = 'maximize'
+}
+
 export enum TYPE_INTENT_NAME {
     TOPIC_INTERNAL                  = 'internal',
     DISPLAY_NAME_START              = "start",
