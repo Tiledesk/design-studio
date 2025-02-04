@@ -8,6 +8,7 @@
 
 <div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
     <cds-panel-intent-list 
+        id="cdsPanelIntentList"
         class="panel-intent-list"
         [IS_OPEN]="IS_OPEN_INTENTS_LIST"
         (selectIntent)=onSelectIntent($event) 

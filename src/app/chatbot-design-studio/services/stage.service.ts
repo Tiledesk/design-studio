@@ -69,10 +69,10 @@ export class StageService {
   /**  centerStageOnHorizontalPosition 
    * called start element only
   */
-  centerStageOnHorizontalPosition(ElementRef){
+  centerStageOnHorizontalPosition(ElementRef, left=0){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnHorizontalPosition ••••");
     let intervalId = setInterval(async () => {
-      const result = await this.tiledeskStage.centerStageOnHorizontalPosition(ElementRef);
+      const result = await this.tiledeskStage.centerStageOnHorizontalPosition(ElementRef, left);
       if (result === true) {
         clearInterval(intervalId);
       }

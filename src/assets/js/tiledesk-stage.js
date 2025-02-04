@@ -327,8 +327,8 @@ export class TiledeskStage {
 
     
 
-    centerStageOnHorizontalPosition(stageElement){
-        // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnHorizontalPosition ••••");
+    centerStageOnHorizontalPosition(stageElement, left=0){
+        /// console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnHorizontalPosition ••••");
         if(stageElement){
             const w = stageElement.offsetWidth;
             const h = stageElement.offsetHeight;
@@ -336,7 +336,7 @@ export class TiledeskStage {
             const y = stageElement.offsetTop;
             this.drawer.style.transition = "transform 0.3s ease-in-out";
             const originRec = this.container.getBoundingClientRect();
-            let newX = (90)-(x+w/2);
+            let newX = (90)-(x+w/2) + left;
             let newY = (originRec.height/2)-(y+h/2)-20;
             let tcmd = `translate(${newX}px, ${newY}px)`;
             let scmd = `scale(${1})`;
