@@ -3,9 +3,9 @@
 
     <div class="intent-header-actions-wpr">
         <!-- ---------------------------------- -->
-        <!-- Panel intent  -->
+        <!-- Panel intent  *ngIf="!isInternalIntent" -->
         <!-- ---------------------------------- -->
-        <button *ngIf="!isInternalIntent"
+        <button 
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onOpenIntentPanel()" 
             matTooltipClass="cds-mat-tooltip"
@@ -19,7 +19,7 @@
         <!-- ---------------------------------- -->
         <!-- Color intent  -->
         <!-- ---------------------------------- -->
-        <button *ngIf="!isInternalIntent"
+        <button *ngIf="!isStart"
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onColorIntent()" 
             matTooltipClass="cds-mat-tooltip"
@@ -31,9 +31,10 @@
         </button>
 
         <!-- ---------------------------------- -->
-        <!-- Delete intent  -->
+        <!-- Delete intent  *ngIf="!isInternalIntent" -->
         <!-- ---------------------------------- -->
-        <button *ngIf="!isInternalIntent"
+        <button 
+            *ngIf="!isInternalIntent"
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onDeleteIntent()" 
             matTooltipClass="cds-mat-tooltip"
@@ -50,6 +51,7 @@
         <!--  -->
         <!-- *ngIf="copyElementEnabled"  -->
         <button 
+            *ngIf="!isInternalIntent"
             class="intent-header-action-btn icon"
             matTooltipClass="cds-mat-tooltip" 
             [matTooltip]="'CDSCanvas.CopyBlock' | translate" 
@@ -80,7 +82,8 @@
         <!-- ---------------------------------- -->
         <!-- Test intent play btn  -->
         <!-- ---------------------------------- -->
-        <button *ngIf="deleteOptionEnabled" class="intent-header-action-btn icon"
+        <button *ngIf="!isStart" 
+            class="intent-header-action-btn icon"
             (click)="openTestSiteInPopupWindow()" 
             matTooltipClass="cds-mat-tooltip"
             [matTooltip]="'CDSCanvas.StartTest' | translate" 

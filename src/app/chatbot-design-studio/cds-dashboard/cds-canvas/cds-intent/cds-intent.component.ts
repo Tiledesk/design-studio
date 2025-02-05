@@ -72,6 +72,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   // menuType: string = 'action';
   positionMenu: any;
   isStart = false;
+  isDefaultFallback = false;
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;
@@ -208,24 +209,31 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
     //setTimeout(() => {
       this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
-      // this.patchActionIntent();
-      if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
-        this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
-        this.startAction = this.intent.actions[0];
-        // if (!this.startAction._tdActionId) {
-        //   this.startAction = patchActionId(this.intent.actions[0]);
-        //   this.intent.actions = [this.startAction];
-        // }
-        this.isStart = true;
-        //** set 'start' intent as default selected one */
-        // this.intentService.setDefaultIntentSelected();
 
-        // //** center stage on 'start' intent */
-        // let startElement = document.getElementById(this.intent.intent_id)
-        // this.stageService.centerStageOnHorizontalPosition(startElement)
+      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+        this.isDefaultFallback = true;
+      }
+      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START){
+        this.isStart = true;
+        this.startAction = this.intent.actions[0];
       } else {
         this.setIntentSelected();
       }
+      
+
+      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
+      //   this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
+      //   this.startAction = this.intent.actions[0];
+      //   this.isStart = true;
+      //   //** set 'start' intent as default selected one */
+      //   // this.intentService.setDefaultIntentSelected();
+
+      //   // //** center stage on 'start' intent */
+      //   // /let startElement = document.getElementById(this.intent.intent_id)
+      //   // /this.stageService.centerStageOnHorizontalPosition(startElement)
+      // } else {
+      //   this.setIntentSelected();
+      // }
       // il setTimeout evita l'effetto che crea un connettore e poi lo sposta nel undo
       setTimeout(() => {
         this.setActionIntent();

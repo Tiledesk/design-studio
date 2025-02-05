@@ -9,6 +9,7 @@ export class PanelIntentControlsComponent implements OnInit {
 
   @Input() isInternalIntent: boolean = false;
   @Input() isStart: boolean = false;
+  @Input() isDefaultFallback: boolean = false;
   @Input() deleteOptionEnabled: boolean = true;
   @Input() webhookEnabled: boolean = false;
   @Output() onOptionClicked = new EventEmitter();
