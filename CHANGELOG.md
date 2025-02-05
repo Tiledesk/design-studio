@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # 1.27.0-rc.6
+- **changed**: customize intent "panel controls" by intent type
 - **changed**: "cds-panel-intent-list" overlayed on stage
 
 # 1.27.0-rc.5
