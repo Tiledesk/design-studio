@@ -811,7 +811,7 @@ export class IntentService {
         let left = 0;
         const element = document.getElementById('cdsPanelIntentList');
         if (element) {
-          left = element.offsetWidth;
+          left = element.offsetWidth+100;
         }
         this.stageService.centerStageOnHorizontalPosition(startElement, left);
       }
