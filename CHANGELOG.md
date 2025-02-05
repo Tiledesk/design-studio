@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.6
+- **changed**: "cds-panel-intent-list" overlayed on stage
+
 # 1.27.0-rc.5
 - **changed**: set intent selected last level on the stage (always visible)
 - **bug-fixed**: "start" and "defaulFallback" names duplicate in intent list 
