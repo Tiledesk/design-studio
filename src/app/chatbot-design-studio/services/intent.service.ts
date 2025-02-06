@@ -790,11 +790,11 @@ export class IntentService {
     this.actionSelectedID = null;
     this.listActions = null;
     this.selectedAction = null;
-    if(this.intentSelected && this.intentSelected.actions){
+    if(this.intentSelected?.actions){
       this.listActions = this.intentSelected.actions;
     }
-    //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
-    // this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
+    // //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
+    // //this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
     if(this.intentSelected){
       this.behaviorIntent.next(this.intentSelected);
     }

@@ -270,7 +270,7 @@ export class StageService {
     let cdsAddActionMenuWidth = 270;
     let pos = positionFloatMenu.x+cdsAddActionMenuWidth;
     let cont = this.tiledeskStage.container.offsetWidth;
-    // this.logger.log("[CDS SERVICE] setPositionActionsMenu", pos, cont);
+    // /this.logger.log("[CDS SERVICE] setPositionActionsMenu", pos, cont);
     if(cont<pos){
       positionFloatMenu.x = positionFloatMenu.x+cdsSidebarWidth-cdsAddActionMenuWidth;
     } else {

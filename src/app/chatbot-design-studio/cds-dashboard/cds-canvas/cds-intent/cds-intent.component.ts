@@ -903,6 +903,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   openIntentPanel(intent: Intent){
+    this.intentService.setIntentSelected(this.intent.intent_id);
     this.openIntent.emit(intent);
   }
 

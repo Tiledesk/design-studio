@@ -437,7 +437,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.listOfIntents = this.intentService.listOfIntents;
       this.initListOfIntents();
       this.initLoadingStage();
-      // this.intentService.setStartIntent();
+      // // this.intentService.setStartIntent();
       this.mapOfIntents = await this.intentService.setMapOfIntents();
       this.mapOfConnectors = await this.connectorService.setMapOfConnectors(this.listOfIntents);
       const numIntents = Object.values(this.mapOfIntents).length;
@@ -462,13 +462,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** closeAllPanels */
   private closeAllPanels(){
     this.IS_OPEN_PANEL_WIDGET = false;
-    // // this.IS_OPEN_PANEL_ACTION_DETAIL = false;
+    this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
     // // this.IS_OPEN_COLOR_MENU = false;
-    // this.intentService.inactiveIntent();
+    // // this.intentService.inactiveIntent();
   }
   private closeActionDetailPanel(){
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
@@ -1348,9 +1348,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   onSavePanelIntentDetail(intentSelected: any) {
     this.logger.log('[CDS-CANVAS] onSavePanelIntentDetail intentSelected ', intentSelected)
     if (intentSelected && intentSelected != null) {
-      // this.intentSelected = intentSelected;
-      this.intentService.setIntentSelectedByIntent(intentSelected);
-      // this.intentService.onUpdateIntentFromActionPanel(intentSelected);
+      // // this.intentService.setIntentSelectedByIntent(intentSelected);
+      // // this.intentSelected = intentSelected;
+      // // this.intentService.onUpdateIntentFromActionPanel(intentSelected);
       this.intentService.updateIntent(intentSelected);
     } else {
       // this.onOpenDialog();
