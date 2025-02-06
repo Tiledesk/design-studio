@@ -786,19 +786,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** openFloatMenuOnConnectorDraftReleased */
   private openFloatMenuOnConnectorDraftReleased(detail){
     this.logger.log("[CDS CANVAS] ho rilasciato in un punto qualsiasi dello stage e quindi apro il float menu", detail);
-    this.positionFloatMenu = this.stageService.physicPointCorrector(detail.menuPoint);
-    let marginLeft = this.IS_OPEN_INTENTS_LIST?290:60;
-    this.positionFloatMenu.x = this.positionFloatMenu.x+marginLeft;
+    this.positionFloatMenu = this.stageService.setPositionActionsMenu(detail.menuPoint);
     detail.menuPoint = this.positionFloatMenu;
     this.closeAllPanels();
     this.closeActionDetailPanel();
     this.IS_OPEN_ADD_ACTIONS_MENU = true;
     this.hasClickedAddAction = false;
-    // this.IS_OPEN_PANEL_WIDGET = false;
-    // this.controllerService.closeActionDetailPanel();
+    // //this.IS_OPEN_PANEL_WIDGET = false;
+    // //this.controllerService.closeActionDetailPanel();
     this.connectorService.createConnectorDraft(detail);
     this.logger.log('[CDS CANVAS] OPEN MENU hasClickedAddAction', this.hasClickedAddAction);
   }
+
+
 
   /** setDragAndListnerEventToElements */
   private setDragAndListnerEventToElements() {
@@ -1219,12 +1219,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log('[CDS-CANVAS] showPanelActions event:: ', event);
     this.closeAllPanels();
     this.closeActionDetailPanel();
-    // this.controllerService.closeActionDetailPanel();
-    // this.controllerService.closeButtonPanel();
+    // /this.controllerService.closeActionDetailPanel();
+    // /this.controllerService.closeButtonPanel();
     this.hasClickedAddAction = event.addAction;
     this.logger.log('[CDS-CANVAS] showPanelActions hasClickedAddAction:: ', this.hasClickedAddAction);
     const pos = { 'x': event.x, 'y': event.y }
-    // this.intentSelected = event.intent;
+    // /this.intentSelected = event.intent;
     this.intentService.setIntentSelectedById(event.intent.intent_id);
     this.positionFloatMenu = pos;
     this.logger.log('[CDS-CANVAS] showPanelActions positionFloatMenu ', this.positionFloatMenu);

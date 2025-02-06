@@ -262,4 +262,20 @@ export class StageService {
     this.appStorageService.setItem(id_faq_kb+'_stage', JSON.stringify(this.settings));
   }
 
+
+
+  public setPositionActionsMenu(point){
+    let positionFloatMenu = this.physicPointCorrector(point);
+    let cdsSidebarWidth = 60;
+    let cdsAddActionMenuWidth = 270;
+    let pos = positionFloatMenu.x+cdsAddActionMenuWidth;
+    let cont = this.tiledeskStage.container.offsetWidth+cdsSidebarWidth;
+    if(cont<pos){
+      positionFloatMenu.x = positionFloatMenu.x+cdsSidebarWidth-cdsAddActionMenuWidth;
+    } else {
+      positionFloatMenu.x = positionFloatMenu.x+cdsSidebarWidth;
+    }
+    return positionFloatMenu;
+    // /this.logger.log("[CDS CANVAS] this.positionFloatMenu", pos, cont);
+  }
 }

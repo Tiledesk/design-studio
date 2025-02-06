@@ -393,6 +393,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     document.addEventListener(
       "connector-moved-out-of-intent", (e: CustomEvent) => {
         this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
+
+        // !!!se il connettore è a meno di Xpx dalla fine dello stage sposta lo stage!!!!
         if (e.detail?.toId === this.intent.intent_id) {
           const intentContentEl = document.querySelector(`#intent-content-${e.detail.toId}`);
           if (intentContentEl instanceof HTMLElement) {

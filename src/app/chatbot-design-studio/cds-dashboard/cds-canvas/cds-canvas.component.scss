@@ -7,12 +7,8 @@ $margin-left-card: 30px;
 $margin-top-card: 30px;
 $box-left-width: 230px;
 $box-left-width-closed: 0px;
-
 $toogle-sidebar-width: 22px;
 
-// .menu--context--add{
-//   height: auto;
-// }
 
 :host {
   display: flex;
@@ -32,7 +28,6 @@ $toogle-sidebar-width: 22px;
   height: 100%;
   transform: translateX(100%);
   animation: slide-in 0.2s ease-in-out forwards;
-  // animation-delay: 0.2s;
   animation-delay: 0s;
 
   &#action-detail{
