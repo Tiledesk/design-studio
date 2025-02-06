@@ -7,7 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.7
+- **bug-fixed**: "start" position 
+
 # 1.27.0-rc.6
+- **changed**: customize intent "panel controls" by intent type
 - **changed**: "cds-panel-intent-list" overlayed on stage
 
 # 1.27.0-rc.5
