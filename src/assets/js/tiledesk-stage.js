@@ -73,7 +73,8 @@ export class TiledeskStage {
             }
 
         }).bind(this);
-      }
+    }
+
 
 
     moveAndZoom(event) {
@@ -89,10 +90,10 @@ export class TiledeskStage {
             this.ty += event.deltaY * direction;
             this.transform();
         } else {
-            var originRec = this.container.getBoundingClientRect();            
+            let originRec = this.container.getBoundingClientRect();            
             // zoom
-            var zoom_target = {x:0,y:0}
-            var zoom_point = {x:0,y:0}
+            let zoom_target = {x:0,y:0}
+            let zoom_point = {x:0,y:0}
             zoom_point.x = event.pageX - this.drawer.offsetLeft-originRec.x;
             zoom_point.y = event.pageY - this.drawer.offsetTop-originRec.y;
             zoom_target.x = (zoom_point.x - this.tx)/this.scale;

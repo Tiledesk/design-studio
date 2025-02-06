@@ -269,13 +269,14 @@ export class StageService {
     let cdsSidebarWidth = 60;
     let cdsAddActionMenuWidth = 270;
     let pos = positionFloatMenu.x+cdsAddActionMenuWidth;
-    let cont = this.tiledeskStage.container.offsetWidth+cdsSidebarWidth;
+    let cont = this.tiledeskStage.container.offsetWidth;
+    // this.logger.log("[CDS SERVICE] setPositionActionsMenu", pos, cont);
     if(cont<pos){
       positionFloatMenu.x = positionFloatMenu.x+cdsSidebarWidth-cdsAddActionMenuWidth;
     } else {
       positionFloatMenu.x = positionFloatMenu.x+cdsSidebarWidth;
     }
     return positionFloatMenu;
-    // /this.logger.log("[CDS CANVAS] this.positionFloatMenu", pos, cont);
+    
   }
 }
