@@ -12,7 +12,7 @@ export class PanelIntentControlsComponent implements OnInit {
   @Input() isDefaultFallback: boolean = false;
   @Input() deleteOptionEnabled: boolean = true;
   @Input() webhookEnabled: boolean = false;
-  @Output() onOptionClicked = new EventEmitter();
+  @Output() optionClicked = new EventEmitter();
 
   webHookTooltipText: string;
   copyElementEnabled: boolean = true;
@@ -36,27 +36,27 @@ export class PanelIntentControlsComponent implements OnInit {
   }
 
   toggleIntentWebhook(){
-    this.onOptionClicked.emit('webhook');
+    this.optionClicked.emit('webhook');
   }
 
   onColorIntent(){
-    this.onOptionClicked.emit('color');
+    this.optionClicked.emit('color');
   }
 
   onDeleteIntent(){
-    this.onOptionClicked.emit('delete');
+    this.optionClicked.emit('delete');
   }
 
   openTestSiteInPopupWindow(){
-    this.onOptionClicked.emit('test');
+    this.optionClicked.emit('test');
   }
 
   onCopyIntent(){
-    this.onOptionClicked.emit('copy');
+    this.optionClicked.emit('copy');
   }
 
   onOpenIntentPanel(){
-    this.onOptionClicked.emit('open')
+    this.optionClicked.emit('open')
   }
 
 }

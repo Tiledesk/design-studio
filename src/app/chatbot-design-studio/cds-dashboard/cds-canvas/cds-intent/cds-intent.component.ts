@@ -308,7 +308,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setAgentsAvailable(){
-    if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_START && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+    // /if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_START && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+    if(this.intent.agents_available != false){ 
       this.intent.agents_available = true;
       this.isAgentsAvailable = true;
     } else {
@@ -840,7 +841,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** ******************************
    * intent controls options: START
    * ****************************** */
-  onOptionIntentControlClicked(event: 'webhook' | 'color' | 'delete' | 'test' | 'copy' | 'open'){
+  onOptionClicked(event: 'webhook' | 'color' | 'delete' | 'test' | 'copy' | 'open'){
     switch(event){
       case 'webhook':
         this.toggleIntentWebhook(this.intent);

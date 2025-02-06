@@ -102,7 +102,10 @@
     margin-left: -10px;
     display: block;
     position: absolute;
-
+    &.isStart{
+      margin-top: -25px;
+      margin-left: 10px;
+    }
     span.material-icons{
       color: var(--intent-header-icon-color)
     }

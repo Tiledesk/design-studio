@@ -1109,7 +1109,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   
     /** onColorIntent */
     onChangeColorIntent(intent: Intent) {
-      this.logger.log('[CDS-CANVAS0] onColorIntent: ', intent.intent_id);
+      this.logger.log('[CDS-CANVAS] onColorIntent: ', intent.intent_id);
       this.closeAllPanels();
       const element = document.getElementById(intent.intent_id);
       if (element) {
@@ -1127,6 +1127,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** onOpenIntent */
   onOpenIntent(intent: Intent){
+    this.logger.log('[CDS-CANVAS] onOpenIntent: ', intent.intent_id);
     this.onIntentSelected(intent);
   }
   // --------------------------------------------------------- //
@@ -1139,9 +1140,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   onIntentSelected(intent){
-    if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
-       return;
-    }  
+    /// if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
+    //    return;
+    // }  
     this.logger.log('[CDS-CANVAS] onIntentSelected ', intent.intent_id);
     this.closeAllPanels();
     this.removeConnectorDraftAndCloseFloatMenu();
@@ -1150,7 +1151,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     setTimeout(() => {
       this.elementIntentSelected = intent;
       if(this.elementIntentSelected){
-
+        // empty
       }
       this.IS_OPEN_PANEL_INTENT_DETAIL = true;
     }, 0);
