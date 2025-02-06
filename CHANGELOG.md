@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.8
+- **bug-fixed**: set "action menu" position inside stage
+- **bug-fixed**: close "action panel" when pressing outside it
+- **bug-fixed**: select only one intent or action at a time
+
 # 1.27.0-rc.7
 - **bug-fixed**: "start" position 
 
