@@ -19,6 +19,7 @@ export class ConnectorService {
   connectorDraft: any = {};
   listOfIntents: any;
   mapOfConnectors: any = {};
+  scale: number = 1;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -29,12 +30,17 @@ export class ConnectorService {
     this.tiledeskConnectors.mousedown(document);
   }
 
+  /** setScale
+   * set the scale when loading the page, taking it from localStorage 
+   * */
+  setScale(scale: number){
+    this.scale = scale;
+    this.tiledeskConnectors.scale = scale;
+  }
  
   /*************************************************/
   /** CREATE CONNECTOR                             */
   /*************************************************/
-
-
   public async setMapOfConnectors(listOfIntents){
     this.mapOfConnectors = await this.createMapOfConnectors(listOfIntents);
     return this.mapOfConnectors;
