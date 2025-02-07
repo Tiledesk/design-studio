@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.9
+- **added**: cds-action-ai-prompt
+
 # 1.27.0-rc.8
 - **bug-fixed**: set "action menu" position inside stage
 - **bug-fixed**: close "action panel" when pressing outside it
