@@ -445,6 +445,24 @@ export class ActionGPTAssistant extends Action {
     }
 }
 
+export class ActionAiPrompt extends Action {
+    question: string;
+    assignReplyTo: string;
+    context: string;
+    history: boolean;
+    max_tokens: number;
+    temperature: number;
+    llm: string;
+    model: string;
+    preview?: Array<any>;
+    trueIntent: string;
+    falseIntent: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.AI_PROMPT
+    }
+}
+
 export class ActionCaptureUserReply extends Action {
     assignResultTo: string;
     goToIntent: string;

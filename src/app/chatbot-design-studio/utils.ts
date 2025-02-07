@@ -208,6 +208,39 @@ export const TYPE_GPT_MODEL: Array<{name: string, value: string, description: st
     { name: "OpenAI o1-preview",                value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",               status: "active"    }
 ]
 
+
+/************             AI PROMPT MODEL: START        ************************/
+export const COHERE_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
+    { name: "Command-r",         value: "command-r",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Command-r-plus",    value: "command-r-plus",  description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+]
+
+export const GOOGLE_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
+    { name: "Gemini-pro",         value: "gemini-pro",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+]
+
+export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
+    { name: "Claude-3-5 sonnet",         value: "claude-3-5-sonnet-20240620",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+]
+
+export const GROQ_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
+    { name: "Llama3-70b",         value: "llama3-70b-8192",         description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Llama3-8b",          value: "llama3-8b-8192",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Llama-3.1-8b",       value: "llama-3.1-8b-instant",    description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Llama-3.1-70b",      value: "llama-3.1-70b-versatile", description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Mixtral-8x7b",       value: "Mixtral-8x7b-32768",      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Gemma-7b-It",        value: "Gemma-7b-It",             description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+]
+
+export const LLM_MODEL: Array<{name: string, value: string, description: string, status: "active" | "inactive", models: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> }> = [
+    { name: "Cohere - engine",         value: "cohere",            description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active",   models: COHERE_MODEL     },
+    { name: "Google - engine",         value: "google",            description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",            status: "active",   models: GOOGLE_MODEL     },
+    { name: "Anthropic - engine",      value: "anthropic",         description: "TYPE_GPT_MODEL.gpt-4.description",                    status: "active",   models: ANTHROPIC_MODEL  },
+    { name: "Groq - engine",           value: "groq",              description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active",   models: ANTHROPIC_MODEL  },
+]
+/************             AI PROMPT MODEL: END        ************************/
+
+
 export const INTENT_TEMP_ID         = '';
 export const MESSAGE_METADTA_WIDTH  = '100%';
 export const MESSAGE_METADTA_HEIGHT = 230;

@@ -46,7 +46,8 @@ export enum TYPE_ACTION {
     LEAD_UPDATE         = 'leadupdate',
     CLEAR_TRANSCRIPT    = 'clear_transcript',
     MOVE_TO_UNASSIGNED  = 'move_to_unassigned',
-    SEND_WHATSAPP       = 'send_whatsapp'
+    SEND_WHATSAPP       = 'send_whatsapp',
+    AI_PROMPT           = 'ai_prompt'
 }
 
 export enum TYPE_ACTION_REPLY {
@@ -127,10 +128,11 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     ASKGPTV2:               { name: 'CDSActionList.NAME.AskTheKnowledgeBase',   category: TYPE_ACTION_CATEGORY.AI,                  type: TYPE_ACTION.ASKGPTV2,             src: "assets/images/actions/ask_to_kb.svg",             status: "active",                       doc: "CDSActionList.DOC.AskTheKnowledgeBase",                           },
     GPT_TASK:               { name: 'CDSActionList.NAME.GPTTask',               category: TYPE_ACTION_CATEGORY.AI,                  type: TYPE_ACTION.GPT_TASK,             src: "assets/images/actions/openai-icon.svg",           status: "active",                       doc: "CDSActionList.DOC.GPTTask",                                       },
     GPT_ASSISTANT:          { name: 'CDSActionList.NAME.GPTAssistant',          category: TYPE_ACTION_CATEGORY.AI,                  type: TYPE_ACTION.GPT_ASSISTANT,        src: "assets/images/actions/openai-assistent.svg",      status: "active",   plan: PLAN_NAME.F,  doc: "CDSActionList.DOC.GPTAssistant",                                  },
+    AI_PROMPT:              { name: 'CDSActionList.NAME.AiPrompt',              category: TYPE_ACTION_CATEGORY.AI,                  type: TYPE_ACTION.AI_PROMPT,            src: "assets/images/actions/ai-prompt.svg",             status: "active",   badge: 'NEW',       doc: "CDSActionList.DOC.AiPrompt",                                      },
     HIDE_MESSAGE:           { name: 'CDSActionList.NAME.HiddenMessage',         category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.HIDE_MESSAGE,         src: "assets/images/actions/hidden_message.svg",        status: "active",                       doc: "CDSActionList.DOC.HiddenMessage",                                 },
     CHANGE_DEPARTMENT:      { name: 'CDSActionList.NAME.ChangeDept',            category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.CHANGE_DEPARTMENT,    src: "assets/images/actions/change_department.svg",     status: "active",                       doc: "CDSActionList.DOC.ChangeDept",                                    },
     CODE :                  { name: 'CDSActionList.NAME.Code',                  category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.CODE,                 src: "assets/images/actions/code.svg",                  status: "active",   plan: PLAN_NAME.F,  doc: "CDSActionList.DOC.Code",                      disabled: false     },
-    ADD_TAG:                { name: 'CDSActionList.NAME.AddTag',                category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.ADD_TAG,              src: "assets/images/actions/add_tag.svg",               status: "active",   badge: 'NEW',       doc: "CDSActionList.DOC.AddTag",                                        },
+    ADD_TAG:                { name: 'CDSActionList.NAME.AddTag',                category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.ADD_TAG,              src: "assets/images/actions/add_tag.svg",               status: "active",                       doc: "CDSActionList.DOC.AddTag",                                        },
     // ASSIGN_FUNCTION: { name: 'CDSActionList.NAME.SetFunction', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY:     { name: 'CDSActionList.NAME.CaptureUserReply',      category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CAPTURE_USER_REPLY,   src: "assets/images/actions/capture_user_reply.svg",    status: "active",                       doc: "CDSActionList.DOC.CaptureUserReply"                               },
     LEAD_UPDATE :           { name: 'CDSActionList.NAME.LeadUpdate',            category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.LEAD_UPDATE,          src:"assets/images/actions/lead_update.svg",            status: "active",                       doc: "CDSActionList.DOC.LeadUpdate"                                     },

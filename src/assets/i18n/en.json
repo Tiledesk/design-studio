@@ -306,8 +306,11 @@
         "SelectKnowledgeBase":"Select Knowledge Base",
         "SelectABlock":"Select a block",
         "ChooseKB":"Choose Knowledge Base",
+        "LLM":"LLM",
         "Model": "Model",
         "SelectKnowledgeBaseModel":"Select AI Model",
+        "SelectLL":"Select LLM ",
+        "SelectLLMModel":"Select an LLM model",
         "QuestionToSubmit":"Question to submit",
         "KnowledgeBaseID":"Knowledge Base ID",
         "ManageKnowledgeBases":"Manage Knowledge Bases",
@@ -367,6 +370,7 @@
         "MaxTokensForAnswer":"Max tokens for the answer",
         "Total":"Total",
         "ManageGPTKey":"Manage GPT Key",
+        "ManageIntegrationKey":"Manage integration key",
         "SetHiddenMessage":"Set the hidden message",
         "HiddenMessage":"Hidden message",
         "HiddenMessageDescription":"Hidden messages are designed to be a useful tool to debug conversations. They are automatically disabled when your chatbot goes public.",
@@ -629,6 +633,7 @@
             "AskTheKnowledgeBaseV2":"Ask knowledge base V2",
             "GPTTask":"ChatGPT task",
             "GPTAssistant":"ChatGPT assistant",
+            "AiPrompt":"Ai prompt",
             "HiddenMessage":"Hidden message",
             "ChangeDept":"Change department",
             "Code":"Code",
@@ -814,6 +819,13 @@
                 "IMAGE":"assets/images/doc/GPT_ASSISTANT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/chatgpt-assistant-action-beta/"
+            },
+            "AiPrompt":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
             },
             "HiddenMessage":{
                 "TITLE":"Send an hidden message (for the end user)",

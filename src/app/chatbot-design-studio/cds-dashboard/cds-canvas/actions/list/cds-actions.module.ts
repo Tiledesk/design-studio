@@ -79,6 +79,8 @@ import { CdsActionConnectBlockComponent } from './cds-action-connect-block/cds-a
 import { CdsActionSendWhatsappComponent } from './cds-action-send-whatsapp/cds-action-send-whatsapp.component';
 import { VariableCssClassPipe } from 'src/app/pipe/variablecssClass.pipe';
 import { GetVariableNamePipe } from 'src/app/pipe/get-variable-name.pipe';
+import { CdsActionAiPromptComponent } from './cds-action-ai-prompt/cds-action-ai-prompt.component';
+import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attributes-dialog/attributes-dialog.component';
 
 @NgModule({
   declarations: [
@@ -166,11 +168,15 @@ import { GetVariableNamePipe } from 'src/app/pipe/get-variable-name.pipe';
     CdsActionMoveUnassignedComponent,
     CdsActionConnectBlockComponent,
     CdsActionSendWhatsappComponent,
+    CdsActionAiPromptComponent,
+    // action Ai Prompt elements: start //
+    AttributesDialogAiPromptComponent,
+    // action Ai Prompt elements: end //
 
     //PIPES
     FilterPipe,
     GetVariableNamePipe,
-    VariableCssClassPipe
+    VariableCssClassPipe,
     
   ],
   imports: [
@@ -263,6 +269,10 @@ import { GetVariableNamePipe } from 'src/app/pipe/get-variable-name.pipe';
     CdsActionMoveUnassignedComponent,
     CdsActionConnectBlockComponent,
     CdsActionSendWhatsappComponent,
+    CdsActionAiPromptComponent,
+    // action Ai Prompt elements: start //
+    AttributesDialogAiPromptComponent,
+    // action Ai Prompt elements: end //
     
     //PIPES
     FilterPipe,

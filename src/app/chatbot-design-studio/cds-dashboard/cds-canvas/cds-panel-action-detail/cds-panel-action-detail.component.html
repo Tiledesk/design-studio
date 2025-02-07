@@ -253,6 +253,16 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-gpt-assistant>
 
+                    <cds-action-ai-prompt *ngSwitchCase="TYPE_ACTION.AI_PROMPT"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-ai-prompt>
+
                     <cds-action-capture-user-reply *ngSwitchCase="TYPE_ACTION.CAPTURE_USER_REPLY"
                         class="panel-response"
                         [intentSelected]="intentSelected"
