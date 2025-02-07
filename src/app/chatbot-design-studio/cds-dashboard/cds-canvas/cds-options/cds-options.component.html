@@ -1,12 +1,16 @@
 <div class="container">
 
-     <!-- OPTIONS -->
+    <!-- OPTIONS -->
     <div size="4" class="cds-elements" (click)="onTogleAlphaConnectorsMenu()">
         <div class="cds-button-element">
             <div class="cds-box-button">
                 <span class="box-img">
-                    <span *ngIf="alpha>0" class="material-icons-outlined">visibility</span>
-                    <span *ngIf="alpha==0" class="material-icons-outlined">visibility_off</span>
+            
+                    <span *ngIf="alpha > 0; else hideIcon" class="material-icons-outlined">visibility</span>
+                    <ng-template #hideIcon>
+                    <span class="material-icons-outlined">visibility_off</span>
+                    </ng-template>
+
                 </span>
             </div>
         </div>

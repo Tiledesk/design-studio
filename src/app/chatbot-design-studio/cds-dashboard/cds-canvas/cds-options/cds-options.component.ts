@@ -15,14 +15,14 @@ export class CdsOptionsComponent implements OnInit {
   @Output() onOptionClicked = new EventEmitter<{ option: OPTIONS; alpha?: any }>();
 
   OPTIONS = OPTIONS;
-  alpha:number;
+  alpha: number;
   isMoreMenu: boolean = false;
   stageSettings: any;
   
   
 
   constructor(
-    private stageService: StageService
+    private readonly stageService: StageService
   ) { }
 
   ngOnInit(): void {
@@ -31,12 +31,7 @@ export class CdsOptionsComponent implements OnInit {
 
 
   private initialize(){
-    this.stageSettings = this.stageService.initStageSettings(this.id_faq_kb);
-    if(this.stageSettings){
-      this.alpha = this.stageSettings.alpha_connectors;
-    } else {
-      this.alpha = 1;
-    }
+    this.alpha = this.stageService.alpha_connectors;
   }
 
   updateAlphaConnectors() {

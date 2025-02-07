@@ -191,12 +191,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** */
   ngAfterViewInit() {
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
-    //this.addEventListener();
+    this.stageSettings = this.stageService.initStageSettings(this.id_faq_kb);
     this.stageService.initializeStage();
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
     this.changeDetectorRef.detectChanges();
-  
     setTimeout(() => {
       this.showStageForLimitTime();
     }, 20000);
@@ -285,6 +284,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
           this.settingStage();
         }, 0);
         this.logger.log("[CDS-CANVAS]  •••• Tutti i connettori sono stati renderizzati ••••", this.countRenderedElements, this.renderedAllElements);
+
+        // aggiorno il valore di scale nel connectorService solo dopo che tutti i connettori sono stati creati
+        this.connectorService.setScale(this.stageSettings.zoom);
       }  
     }
   }
@@ -292,7 +294,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private settingStage(){
     this.logger.log("[CDS-CANVAS]  settingStage: ", this.stageService.settings.position);
     this.stageService.setAlphaConnectors();
-    // this.stageService.setZoom();
     if(this.stageService.settings.position){
       this.logger.log("[CDS-CANVAS]  setPosition: ", this.stageService.settings.position);
       this.stageService.setPosition();

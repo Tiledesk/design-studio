@@ -25,18 +25,15 @@ export class StageService {
 
   tiledeskStage: any;
   loaded: boolean = false;
+  alpha_connectors: number = 70;
 
   settings: Settings = {
-    alpha_connectors: 70,
+    alpha_connectors: this.alpha_connectors,
     zoom: 1,
     position: null,
     maximize: false
   };
 
-  // {
-  //   x: 506,
-  //   y: -2.5
-  // }
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -161,11 +158,13 @@ export class StageService {
 
   /** setAlphaConnectors */
   setAlphaConnectors(id_faq_kb?: string, alpha?: number){
+    // //console.log("[STAGE SERVICE] setAlphaConnectors: ", alpha);
     if(id_faq_kb && alpha >= 0){
-      this.saveSettings(id_faq_kb, STAGE_SETTINGS.AlphaConnector, alpha);
+      // // this.saveSettings(id_faq_kb, STAGE_SETTINGS.AlphaConnector, alpha);
       this.settings.alpha_connectors = alpha;
-    } else if(this.settings && this.settings.alpha_connectors >= 0){
-      alpha = Number(this.settings.alpha_connectors);
+    } else {
+      // // if(this.settings && this.settings.alpha_connectors >= 0){
+      alpha = Number(this.alpha_connectors);
     }
     this.updateAlphaConnectors(alpha);
     this.alphaConnectorsSubject.next(alpha);
