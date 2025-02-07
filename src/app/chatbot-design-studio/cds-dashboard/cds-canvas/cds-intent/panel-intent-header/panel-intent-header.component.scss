@@ -3,14 +3,12 @@
 }
 
 .header {
-    // position: relative;
     display: flex;
     justify-content: space-between;
     gap: 10px;
     width: 100%;
     height: var(--height-header-panel-intent);
     max-height: var(--height-header-panel-intent);
-    // margin-top: 10px;
     .onff-intent-webhook {
       font-size: 13px;
       line-height: normal;
@@ -63,10 +61,11 @@
             padding: 0; //0 0 0 10px;
             margin:0;
             // color: $gray;
-            color: var(--blu);
+            // color: var(--blu);
             font-size: 1.0em;
             // z-index: 2;
             position: relative;
+            // color: rgb(var(--intent-color));
         }
         .btn-save {
             position: absolute;

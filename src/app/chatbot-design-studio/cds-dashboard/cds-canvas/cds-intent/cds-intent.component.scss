@@ -10,17 +10,13 @@
   --base-border-radius-preview: #{var(--border-radius-base-preview)};
   --base-padding-preview: #{var(--padding-base-preview)};
   --action-selected-color: #{var(--action-color-selected)};
-
   --add-action-btn-background: #{var(--add-action-btn-background-preview)};
   --add-action-btn-color: #{var(--add-action-btn-color-preview)};
   --add-action-btn-hover-color: #{var(--add-action-btn-hover-color-preview)};
-
   --base-color: #{var(--blu)};
   --startIntentMaxWith: 160px;
-
   --base-border-radius-base: #{var(--button-border-radius-base)};
 }
-
 
 
 #customDragPreview {
@@ -46,7 +42,6 @@
   cursor: grab;
   position: relative;
   margin: 0px;
-  background-color: var(--intent-background);
   padding: var(--base-padding-preview);
   border-radius: var(--base-border-radius-preview);
   outline: 1px solid var(--intent-border-color);
@@ -54,45 +49,50 @@
     display: block;
     border-radius: 10px;
     position: absolute;
-    // inset: -3px;
-    // border: 1px solid rgb(221, 212, 183);
     content: "";
     transition: box-shadow 0.15s ease 0s;
   }
-
   &.outline-border {
     outline: 2px solid var(--brown);
     border-radius: var(--base-border-radius-preview);
   }
-
   &.ripple-effect {
     animation-name: ripple_effect;
     animation-duration: 1s;
     animation-iteration-count: 1s;
     border-radius: var(--base-border-radius-preview);
   }
-
   &.isStart{
-    background-color: unset;
+    background-color: unset!important;
     padding: 0;
     border-radius: unset;
     border: unset;
     max-width: var(--startIntentMaxWith);
     outline: unset!important;
+    .intent-background-overlay {
+      background-color: transparent!important;
+      outline: unset!important;
+    }
   }
 
+  .intent-background-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      z-index: -1;
+  }
 
   .pic-header {
     display: flex;
     justify-content: space-between;
     min-height: 30px;
     width: auto;
-    margin: 0px; //10px 0px;
-    overflow-x: hidden;
+    margin: 0px;
     position: relative;
-    // border: 2px solid rgb(255, 255, 255);
     padding: 0 0px 10px 0px;
-    // background-color: rgb(235, 226, 198);
     background-color: var(--intent-header-background);
     overflow: hidden;
   }
@@ -102,7 +102,10 @@
     margin-left: -10px;
     display: block;
     position: absolute;
-
+    &.isStart{
+      margin-top: -25px;
+      margin-left: 10px;
+    }
     span.material-icons{
       color: var(--intent-header-icon-color)
     }

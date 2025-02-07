@@ -7,9 +7,51 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.27.0
+# 1.27.0-rc.8
+- **bug-fixed**: set "action menu" position inside stage
+- **bug-fixed**: close "action panel" when pressing outside it
+- **bug-fixed**: select only one intent or action at a time
 
-# 1.26.0
+# 1.27.0-rc.7
+- **bug-fixed**: "start" position 
+
+# 1.27.0-rc.6
+- **changed**: customize intent "panel controls" by intent type
+- **changed**: "cds-panel-intent-list" overlayed on stage
+
+# 1.27.0-rc.5
+- **changed**: set intent selected last level on the stage (always visible)
+- **bug-fixed**: "start" and "defaulFallback" names duplicate in intent list 
+- **added**: added maximus parameter to LocalStorage (stores the size of the action panel)
+
+# 1.27.0-rc.4
+- **changed**: set the default connector alpha to 0.7
+- **changed**: open intent detail panel only when press more button 
+- **bug-fixed**: "start" and "defaulFallback" names not allowed in block rename 
+
+# 1.27.0-rc.3
+- **bug-fixed**: set delayTime to 0 on the first text message of a reply 
+- **bug-fixed**: change "Prompt" whit "User question" in cds-action-askgpt-v2 
+- **bug-fixed**: slug in line in cds-action-replace-bot-v3 
+- **bug-fixed**: text displayed in action gpt with up to 10 prompt lines
+- **bug-fixed**: set the height of text boxes in button-panel to 5 lines
+
+# 1.27.0-rc.2
+- **bug-fixed**: change connector default color and alpha  
+
+# 1.27.0-rc.1
+- **added**: added panel to change intent and connector colors
+
+# 1.26.0-rc.14
+- **added**: management for free expired plan
+
+# 1.26.0-rc.13
+- **bug-fixed**: copy and paste intent/action from different chatbots; 
+- **bug-fixed**: added vertical scroll to bot details page;
+
+# 1.26.0-rc.12
+- **added**: save the stage settings to local storage and load it at startup
+- **bug-fixed**: set the position to the top of the intent when the element height is greater than the stage size; 
 
 # 1.26.0-rc.11
 - **bug-fixed**: hide connector on mouseover only if alphaConnectors is 0

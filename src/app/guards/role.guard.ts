@@ -57,7 +57,6 @@ export class RoleGuard implements CanActivate {
     // console.log('[ROLE-GUARD] userIsInProject:', userIsInProject)
     const projectUser = await this.getProjects(projectId)
    
-   
 
     if (projectUser) {
       const project = projectUser.id_project
@@ -133,5 +132,4 @@ export class RoleGuard implements CanActivate {
   //     })
   //   })
   // }
-
 }

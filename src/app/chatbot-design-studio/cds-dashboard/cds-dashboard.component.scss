@@ -63,6 +63,7 @@ cds-sidebar {
   display: flex;
   min-width: var(--sidebar-base-width);
   overflow-y: hidden;
+  z-index: 100;
 }
 
 // .cds-content {

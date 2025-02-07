@@ -74,10 +74,10 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
     if(this.menuItemsList){
       this.filterMenuItemsList = this.menuItemsList.sort((el1, el2)=> this.translate.instant(el1.value.name).localeCompare(this.translate.instant(el2.value.name)));
     }
-
     //set autofocus on search input element (only when component is active)
     if(this.isActive){
-      setTimeout(()=>{ // this will make the execution after the above boolean has changed
+      setTimeout(()=>{ 
+        // this will make the execution after the above boolean has changed
         this.searchElement.nativeElement.focus();
       },500); 
     }
@@ -92,7 +92,6 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
   // }
 
   onSearchAction(searchText) {
-
     searchText = searchText.toLocaleLowerCase()
     if (!searchText) {
      this.filterMenuItemsList = this.menuItemsList

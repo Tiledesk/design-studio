@@ -7,7 +7,7 @@ import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, A
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL, LLM_MODEL } from '../utils';
+import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL, LLM_MODEL } from '../utils';
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
@@ -31,6 +31,7 @@ export class IntentService {
   testIntent = new BehaviorSubject<Intent>(null);
   BStestiTout = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
+  behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
@@ -87,6 +88,13 @@ export class IntentService {
   }
 
 
+
+   public setIntentColor(color){
+    const intentId = this.intentSelected.intent_id;
+    this.logger.log('[INTENT SERVICE] ::: setIntentColor:: ', intentId, color);
+    this.behaviorIntentColor.next({ intentId: intentId, color: color });
+  }
+
   /**
    * onChangedConnector
    * funzione chiamata sul 'connector-created', 'connector-deleted'
@@ -138,11 +146,27 @@ export class IntentService {
       this.intentActive = true;
       this.controllerService.closeAllPanels();
       this.unselectAction();
+      this.resetZindex();
     } else {
       this.intentSelected = null;
       this.intentSelectedID = null;
       this.intentActive = false;
+      this.resetZindex();
     }
+  }
+
+
+  private resetZindex(){
+    this.listOfIntents.forEach(element => {
+      let zIndex = 1;
+      const el = document.getElementById(element.intent_id);
+      if (el) {
+        el.style.zIndex = String(zIndex);
+        // // console.log('Elemento trovato:', el, intent_id, zIndex);
+      } else {
+        // // console.error('Elemento non trovato');
+      }
+    });
   }
 
   public setIntentSelectedByIntent(intent){
@@ -305,7 +329,6 @@ export class IntentService {
   /** create a new intent when drag an action on the stage */
   public createNewIntent(id_faq_kb: string, action: any, pos:any){
     let intent = new Intent();
-    // intent.id_faq_kb = id_faq_kb;
     const chatbot_id = this.dashboardService.id_faq_kb;
     intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
@@ -720,9 +743,9 @@ export class IntentService {
    */
   public getListOfIntents(): Array<{name: string, value: string, icon?:string}>{
     return this.listOfIntents.map(a => {
-      if (a.intent_display_name.trim() === 'start') {
+      if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.START) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'rocket_launch' }
-      } else if (a.intent_display_name.trim() === 'defaultFallback') {
+      } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'undo' }
       } else {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'label_important_outline' }
@@ -767,11 +790,11 @@ export class IntentService {
     this.actionSelectedID = null;
     this.listActions = null;
     this.selectedAction = null;
-    if(this.intentSelected && this.intentSelected.actions){
+    if(this.intentSelected?.actions){
       this.listActions = this.intentSelected.actions;
     }
-    //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
-    // this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
+    // //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
+    // //this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
     if(this.intentSelected){
       this.behaviorIntent.next(this.intentSelected);
     }
@@ -785,13 +808,22 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
-    this.logger.log('[CDS-CANVAS]  intentSelected: ', this.intentSelected);
+    this.logger.log('[CDS-INTENT] intentSelected: ', this.intentSelected);
     if(this.intentSelected){
       this.setDefaultIntentSelected();
       //** center stage on 'start' intent */
       let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
       if(startElement){
-        this.stageService.centerStageOnHorizontalPosition(startElement);
+        /// let id_faq_kb = this.dashboardService.id_faq_kb;
+        /// this.logger.log('[CDS-INTENT] setStartIntent: ', startElement);
+        /// this.stageService.centerStageOnHorizontalPosition(startElement);
+        let left = 0;
+        const element = document.getElementById('cdsPanelIntentList');
+        if (element) {
+          left = element.offsetWidth+100;
+        }
+        this.stageService.centerStageOnHorizontalPosition(startElement, left);
+
       }
     }
   }
@@ -1544,7 +1576,7 @@ export class IntentService {
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         this.faqService.opsUpdate(payload).subscribe((resp: any) => {
-          this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
+          // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);
           resolve(true);

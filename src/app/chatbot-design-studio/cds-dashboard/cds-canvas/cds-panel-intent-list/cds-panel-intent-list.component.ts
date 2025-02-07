@@ -8,7 +8,7 @@ import { IntentService } from '../../../services/intent.service';
 import { Intent } from 'src/app/models/intent-model';
 
 // UTILS //
-import { moveItemToPosition, TYPE_INTENT_NAME } from '../../../utils';
+import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME } from '../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -98,9 +98,11 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
 
   /** initialize */
   private initialize(intents){
-    // intents = this.intentService.hiddenEmptyIntents(intents);
-    this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK));
-    this.defaultIntents = intents.filter(obj => ( obj.intent_display_name.trim() !== TYPE_INTENT_NAME.DISPLAY_NAME_START && obj.intent_display_name.trim() !== TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK));
+    // // intents = this.intentService.hiddenEmptyIntents(intents);
+    // // this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK) && obj.attributes.readonly);
+   
+    this.internalIntents = intents.filter(obj => (obj.attributes.readonly));
+    this.defaultIntents = intents.filter(obj => (!obj.attributes.readonly));
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DISPLAY_NAME_START, 0);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK, 1);
     this.filteredIntents = this.defaultIntents;
@@ -119,11 +121,13 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   /** EVENTS  */
 
   /** onGetIconForName */
-  onGetIconForName(name: string){
+  onGetIconForName(intent: Intent){
+    let name = intent.intent_display_name;
+    let readonly = intent.attributes.readonly;
     let icon = this.ICON_DEFAULT;
-    if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
+    if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START && readonly) {
       icon = this.ICON_ROCKET;
-    } else if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK) {
+    } else if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK && readonly) {
       icon = this.ICON_UNDO;
     }
     return icon;

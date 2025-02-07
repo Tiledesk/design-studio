@@ -8,6 +8,7 @@
 
 <div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
     <cds-panel-intent-list 
+        id="cdsPanelIntentList"
         class="panel-intent-list"
         [IS_OPEN]="IS_OPEN_INTENTS_LIST"
         (selectIntent)=onSelectIntent($event) 
@@ -26,6 +27,7 @@
 <div id="tds_container" class="box-right tds-drag-container" cdkDropListGroup (contextmenu)="onShowContextMenu($event)">
 
     <cds-panel-elements class="cds-panel-elements" 
+        [ngStyle]="{'left': IS_OPEN_INTENTS_LIST ? '230px' : '0px'}"
         (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
         (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
     </cds-panel-elements>
@@ -45,6 +47,7 @@
             [style.top.px]="getIntentPosition(intent.intent_id).y"
             [style.left.px]="getIntentPosition(intent.intent_id).x" 
             [intent]="intent"
+            [alpha]=""
             [hideActionPlaceholderOfActionPanel]="hideActionPlaceholderOfActionPanel"
             (componentRendered)="onIntentRendered($event)"
             (actionSelected)=onActionSelected($event) 
@@ -53,7 +56,9 @@
             (showPanelActions)="onShowPanelActions($event)"
             (testItOut)="onTestItOut($event)"
             (actionDeleted)="onActionDeleted($event)"
-            (deleteIntent)="onDeleteIntent($event)">
+            (changeColorIntent)="onChangeColorIntent($event)"
+            (deleteIntent)="onDeleteIntent($event)"
+            (openIntent)="onOpenIntent($event)">
         </cds-intent>
    
 
@@ -77,6 +82,7 @@
 
     <cds-options class="cds-panel-elements" 
         id="cds-options-panel"
+        [id_faq_kb] = "id_faq_kb"
         [stateUndoRedo]="stateUndoRedo"
         (onOptionClicked)="onOptionClicked($event)">
     </cds-options>
@@ -84,6 +90,7 @@
 
 
 </div>
+
 
 <cds-add-action-menu class="menu--context--add" 
     [style.top.px]="15" 
@@ -139,8 +146,16 @@
     (hideContextMenu)="onHideContextMenu($event)">
 </cds-context-menu>
 
+<cds-color-menu *ngIf="IS_OPEN_COLOR_MENU"
+    class="context-menu"
+    [style.top.px]="positionColortMenu.y" 
+    [style.left.px]="positionColortMenu.x"
+    [positions]="positionColortMenu"
+    (hideColortMenu)="onHideColortMenu($event)">
+</cds-color-menu>
+
 <div id="masck-canv" [class.disabled]="renderedAllElements">
-    <img class="logo" [src]="LOGOS_ITEMS['BASE_LOGO_NO_TEXT'].icon">
+    <img class="logo" [src]="LOGOS_ITEMS['BASE_LOGO_NO_TEXT'].icon" alt="logo">
     <div class="loading"> 
         <span class="info-loading">{{ labelInfoLoading | translate }}</span>
         <cds-preload-bar class="progress-bar" [progress]="loadingProgress"></cds-preload-bar>

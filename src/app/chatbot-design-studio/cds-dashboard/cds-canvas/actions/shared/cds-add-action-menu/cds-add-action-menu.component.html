@@ -6,20 +6,14 @@
         </div>
     </div>
 
-    <!-- *ngIf="menuItemsList.length>0" -->
-   <!-- > filtered {{ filterMenuItemsList | json }}
-   >> original {{ menuItemsList | json }} 
-[style.height.px]="contentHeight"
--->
     <div  id="panel-actions-div" class="actions-drawer" style="overflow-y: auto;">
-
         <div  class="action-list" id="action_list_drop_connect">
             <div class="menu-dragging">
                 <div class="action-box" *ngFor="let item of filterMenuItemsList; let i = index;" (click)="onAddActionFromActionMenu(item)">
                     <div class="actions--btns-wpr">
                         <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                             <button class="btn btn-tdblu-no-boxshadow action-btn">
-                                <img [src]="item?.value?.src" [title]="item?.value?.name | translate">
+                                <img [src]="item?.value?.src" [title]="item?.value?.name | translate" [alt]="item?.value?.name" />
                             </button>
                         </div>
                         <div *ngIf="item.value.name" class="action--btn-text">{{item?.value?.name | translate}}</div>

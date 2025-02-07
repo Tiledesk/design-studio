@@ -7,11 +7,12 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 })
 export class PanelIntentControlsComponent implements OnInit {
 
-  @Input() isInternalIntent: boolean = false
-  @Input() isStart: boolean = false
-  @Input() deleteOptionEnabled: boolean = true
-  @Input() webhookEnabled: boolean = false
-  @Output() onOptionClicked = new EventEmitter()
+  @Input() isInternalIntent: boolean = false;
+  @Input() isStart: boolean = false;
+  @Input() isDefaultFallback: boolean = false;
+  @Input() deleteOptionEnabled: boolean = true;
+  @Input() webhookEnabled: boolean = false;
+  @Output() optionClicked = new EventEmitter();
 
   webHookTooltipText: string;
   copyElementEnabled: boolean = true;
@@ -19,7 +20,7 @@ export class PanelIntentControlsComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this. initialize();
+    this.initialize();
   }
 
   initialize(){
@@ -28,27 +29,34 @@ export class PanelIntentControlsComponent implements OnInit {
 
   onMouseOverWebhookBtn() {
     if (!this.webhookEnabled) {
-      this.webHookTooltipText = "Enable webhook"
+      this.webHookTooltipText = "Enable webhook";
     } else if (this.webhookEnabled) {
-      this.webHookTooltipText = "Disable webhook"
+      this.webHookTooltipText = "Disable webhook";
     }
-    
   }
 
   toggleIntentWebhook(){
-    this.onOptionClicked.emit('webhook')
+    this.optionClicked.emit('webhook');
+  }
+
+  onColorIntent(){
+    this.optionClicked.emit('color');
   }
 
   onDeleteIntent(){
-    this.onOptionClicked.emit('delete')
+    this.optionClicked.emit('delete');
   }
 
   openTestSiteInPopupWindow(){
-    this.onOptionClicked.emit('test')
+    this.optionClicked.emit('test');
   }
 
   onCopyIntent(){
-    this.onOptionClicked.emit('copy')
+    this.optionClicked.emit('copy');
+  }
+
+  onOpenIntentPanel(){
+    this.optionClicked.emit('open')
   }
 
 }

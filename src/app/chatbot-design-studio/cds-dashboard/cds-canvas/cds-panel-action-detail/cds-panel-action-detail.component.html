@@ -7,7 +7,7 @@
             [previewMode]="false">
         </cds-action-description>
         
-        <div class="header-options-wrp icon-action" (click)="maximize = !maximize">
+        <div class="header-options-wrp icon-action" (click)="onChangeMaximize()">
             <img src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" *ngIf="!maximize">
             <img src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" *ngIf="maximize">
         </div>
