@@ -27,7 +27,7 @@
 
         <div class="action-row-right">
             <div *ngIf="action?.llm" class="action-row-right">
-                {{ (llm_models | filter:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">( {{ (llm_options_models | filter:{key: 'value', value: action?.model }).name }} )</span>
+                {{ (llm_models | filter:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">({{action?.model}})</span>
             </div>
             <div *ngIf="!action?.llm" class="action-row-right empty">
                 {{'CDSCanvas.ChooseTheAIModel' | translate }}
