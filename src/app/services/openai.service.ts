@@ -62,7 +62,7 @@ export class OpenaiService {
       })
     }
 
-    const url = this.URL_TILEDESK_OPENAI + "/llm/";
+    const url = this.URL_TILEDESK_OPENAI + "/llm/preview";
     this.logger.debug('[OPENAI.SERVICE] - preview prompt LLM URL: ', url);
 
     return this.httpClient.post(url, data, httpOptions);
