@@ -203,7 +203,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   private initializeAttributes() {
     let new_attributes = [];
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'gpt_reply')) {
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'ai_reply')) {
       new_attributes.push({ name: "ai_reply", value: "ai_reply" });
     }
     variableList.find(el => el.key ==='userDefined').elements = [...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
@@ -235,6 +235,7 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.action[target] = event.value;
     if(target === 'llm'){
       this.llm_options_models = this.llm_models.find(el => el.value === event.value).models
+      this.action.model= null;
     }
     this.updateAndSaveAction.emit();
   }
@@ -363,7 +364,7 @@ export class CdsActionAiPromptComponent implements OnInit {
       element.classList.remove('preview-container-extended')
     }, 200)
 
-    this.openaiService.previewPrompt(data).subscribe({ next: (ai_response: any) => {
+    this.openaiService.previewLLMPrompt(data).subscribe({ next: (ai_response: any) => {
       this.searching = false;
       setTimeout(() => {
         let element = document.getElementById("preview-container");

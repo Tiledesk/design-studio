@@ -7,9 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.13
+- **changed**: minor ui fix
+
+# 1.27.0-rc.12
+- **changed**: cds-action-ai UI improvements
+
+# 1.27.0-rc.11
 # 1.27.0-rc.10
-- **bug-fixed**: fixed the starting position when changing scale when create a new connector
-- **bug-fixed**: reset alpha color connectors when reload ds
+- **added**: /llm api for cds-action-ai-prompt preview 
 
 # 1.27.0-rc.9
 - **added**: cds-action-ai-prompt
