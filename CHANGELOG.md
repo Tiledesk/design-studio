@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.10
+- **added**: /llm api for cds-action-ai-prompt preview 
+
 # 1.27.0-rc.9
 - **added**: cds-action-ai-prompt
 
