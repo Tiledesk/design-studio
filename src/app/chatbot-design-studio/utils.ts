@@ -236,7 +236,7 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
     { name: "Cohere",         value: "cohere",            description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active",   models: COHERE_MODEL     },
     { name: "Google",         value: "google",            description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",            status: "active",   models: GOOGLE_MODEL     },
     { name: "Anthropic",      value: "anthropic",         description: "TYPE_GPT_MODEL.gpt-4.description",                    status: "active",   models: ANTHROPIC_MODEL  },
-    { name: "Groq",           value: "groq",              description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active",   models: ANTHROPIC_MODEL  },
+    { name: "Groq",           value: "groq",              description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active",   models: GROQ_MODEL  },
 ]
 /************             AI PROMPT MODEL: END        ************************/
 

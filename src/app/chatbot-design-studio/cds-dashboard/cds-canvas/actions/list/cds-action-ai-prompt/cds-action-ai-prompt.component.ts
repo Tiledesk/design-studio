@@ -235,6 +235,7 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.action[target] = event.value;
     if(target === 'llm'){
       this.llm_options_models = this.llm_models.find(el => el.value === event.value).models
+      this.action.model= null;
     }
     this.updateAndSaveAction.emit();
   }
