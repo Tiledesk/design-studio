@@ -19,7 +19,7 @@
 
                     <div class="item-box" *ngIf="IS_OPEN">
                         <div>
-                            <p class="intent-display-name ellips">{{intent.intent_display_name}}</p>
+                            <p class="intent-display-name ellips"><span *ngIf="intent.agents_available" class="agents-available material-icons">boy</span>{{intent.intent_display_name}}</p>
                             <div class="icon-list">
                                 <p *ngIf="intent.questions" class="ai-icon icon" style="margin-bottom: 0px">Ai</p>
                                 <span *ngIf="intent.webhook_enabled" class="material-icons icon webhook-icon">webhook</span>

@@ -122,19 +122,19 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   /** onChangeIntentName */
   onChangeIntentName(event) {
-    this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName", event);
+    this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName", event, this.intent);
     if (event === RESERVED_INTENT_NAMES.START || event === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) { 
-      this.intent.intent_display_name = event.trim();
+      // /this.intent.intent_display_name = event.trim();
       this.intentNameResult = false;
       this.intentNameAlreadyExist = true;
       this.logger.log("[PANEL-INTENT-HEADER] entro", event, this.intentName, this.intent);
     } else {
       const result = this.checkIntentName(event);
       if(result){
-        this.intent.intent_display_name = event.trim();
+        // /this.intent.intent_display_name = event.trim();
         this.intentName = event;
-        // this.onSaveIntent();
-        // this.intentService.setIntentSelected(this.intent.intent_id);
+        // /this.onSaveIntent();
+        // /this.intentService.setIntentSelected(this.intent.intent_id);
       }
     }
    
@@ -142,18 +142,22 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   }
 
   onBlur(event){
-    console.log("onBlur!!!", this.intent);
+    this.logger.log("[PANEL-INTENT-HEADER]  onBlur!!!", this.intent);
     if ((this.intentName === RESERVED_INTENT_NAMES.START || this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) && this.intent.attributes.readonly === false){
-      this.intentName = this.intentName+"_";
+      // /this.intentName = this.intentName+"_";
+      // /this.intent.intent_display_name = this.intentName;
+      this.intentNameResult = false;
+      this.intentNameAlreadyExist = true;
+      this.intentName = this.intent.intent_display_name;
+    } else {
       this.intent.intent_display_name = this.intentName;
-    }
-    this.intentNameResult = true;
-    this.intentNameAlreadyExist = false;
-    this.myInput.nativeElement.blur();
-    const result = this.checkIntentName(this.intentName);
-
-    if(result){
-      this.onSaveIntent();
+      this.intentNameResult = true;
+      this.intentNameAlreadyExist = false;
+      this.myInput.nativeElement.blur();
+      const result = this.checkIntentName(this.intentName);
+      if(result){
+        this.onSaveIntent();
+      }
     }
   }
 
@@ -191,7 +195,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   onSaveIntent() {
     this.logger.log("[PANEL-INTENT-HEADER] SALVO!!!");
     // this.intentService.setIntentSelected(this.intent.intent_id);
-    this.intent.intent_display_name = this.intentName.trim();
+    //this.intent.intent_display_name = this.intentName.trim();
     this.intentService.changeIntentName(this.intent);
   }
 

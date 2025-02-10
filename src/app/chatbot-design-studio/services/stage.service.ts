@@ -121,13 +121,23 @@ export class StageService {
     let resp = await this.tiledeskStage.zoom(event);
     let scale = this.tiledeskStage.scale;
     this.settings.zoom = scale;
+    let position = {
+      x: this.settings.position.x*scale,
+      y: this.settings.position.y*scale
+    }
+    this.settings.position = position;
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, position);
     return resp;
   }
 
-  scaleAndCenter(listOfintents){
+  scaleAndCenter(id_faq_kb, listOfintents){
     this.logger.log("[STAGE SERVICE] scaleAndCenter ");
     let resp = scaleAndcenterStageOnCenterPosition(listOfintents);
+    const scale = resp.scale;
+    const position = resp.point
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, position);
+    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
     return this.tiledeskStage.translateAndScale(resp.point, resp.scale);
   }
   
@@ -139,7 +149,7 @@ export class StageService {
     return this.tiledeskStage.scale;
   }
   getAlpha(): number {
-    return this.settings.alpha_connectors;
+    return this.alpha_connectors;
   }
 
   /** onSwipe */
@@ -162,6 +172,7 @@ export class StageService {
     if(id_faq_kb && alpha >= 0){
       // // this.saveSettings(id_faq_kb, STAGE_SETTINGS.AlphaConnector, alpha);
       this.settings.alpha_connectors = alpha;
+      this.alpha_connectors = alpha;
     } else {
       // // if(this.settings && this.settings.alpha_connectors >= 0){
       alpha = Number(this.alpha_connectors);

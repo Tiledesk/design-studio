@@ -468,9 +468,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
-    // // this.IS_OPEN_COLOR_MENU = false;
+    this.IS_OPEN_COLOR_MENU = false;
     // // this.intentService.inactiveIntent();
   }
+
+  private closeExtraPanels(){
+    this.IS_OPEN_COLOR_MENU = false;
+  }
+
   private closeActionDetailPanel(){
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
   }
@@ -1032,6 +1037,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     intent.id = INTENT_TEMP_ID;
     this.intentService.setDragAndListnerEventToElement(intent.intent_id);
     this.intentService.setIntentSelected(intent.intent_id);
+    this.closeExtraPanels();
     // this.intentSelected = intent;
     const savedIntent = await this.intentService.saveNewIntent(intent, nowIntent, prevIntent);
   }
@@ -1263,6 +1269,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       // this.intentSelected = intent;
       this.intentService.setIntentSelectedById(intent.intent_id);
       this.intentService.setIntentSelected(intent.intent_id);
+      this.closeExtraPanels();
     }
 
   }
@@ -1278,7 +1285,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // EVENT > PANEL OPTIONS 
   // --------------------------------------------------------- //
   async onOptionClicked(resp){
-    // let id_faq_kb = this.dashboardService.id_faq_kb;
+    // //let id_faq_kb = this.dashboardService.id_faq_kb;
+    this.closeExtraPanels();
     let option = resp.option;
     let alpha = resp.alpha;
     switch(option){
@@ -1297,7 +1305,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         break;
       }
       case OPTIONS.CENTER: {
-        const result = await this.stageService.scaleAndCenter(this.listOfIntents);
+        const result = await this.stageService.scaleAndCenter(this.id_faq_kb, this.listOfIntents);
         if (result) {
           this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
         }
