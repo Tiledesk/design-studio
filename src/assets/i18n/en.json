@@ -304,6 +304,7 @@
         "Citations":"Get contents sources",
         "CitationsDescription":"Use this option to get accurate sources of documents used to generate the reply.",
         "EnterTheQuestion":"Enter the question",
+        "ChooseTheAIModel":"Choose the AI model",
         "SelectNamespace":"Select namespace",
         "UseKnwoledgeBaseName":"Use Knwoledge Base name",
         "SelectKnowledgeBase":"Select Knowledge Base",
