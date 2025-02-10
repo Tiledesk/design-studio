@@ -40,11 +40,6 @@ export class OpenaiService {
     this.GPT_API_URL = "http://tiledesk-backend.h8dahhe4edc7cahh.francecentral.azurecontainer.io:8000/api";
   }
 
-
-  ////////////////////////////////////////////////////////
-  //////////////////// OPENAI - START ////////////////////
-  ////////////////////////////////////////////////////////
-
   previewPrompt(data) {
     const httpOptions = {
       headers: new HttpHeaders({
@@ -59,9 +54,19 @@ export class OpenaiService {
     return this.httpClient.post(url, data, httpOptions);
   }
 
-  ////////////////////////////////////////////////////////
-  //////////////////// OPENAI - START ////////////////////
-  ////////////////////////////////////////////////////////
+  previewLLMPrompt(data) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    }
+
+    const url = this.URL_TILEDESK_OPENAI + "/llm/";
+    this.logger.debug('[OPENAI.SERVICE] - preview prompt LLM URL: ', url);
+
+    return this.httpClient.post(url, data, httpOptions);
+  }
 
   ////////////////////////////////////////////////////////
   //////////////////// ASK KB - START ////////////////////
@@ -100,55 +105,4 @@ export class OpenaiService {
   //////////////////// ASK KB - START ////////////////////
   ////////////////////////////////////////////////////////
 
-
-  askGpt(data) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken // remove it for pugliai endpoint
-      })
-    }
-
-    // const url = this.GPT_API_URL + "/qa";
-    const url = this.URL_TILEDESK_OPENAI + "/kbsettings/qa";
-    this.logger.debug('[OPENAI.SERVICE] - ask gpt URL: ', url);
-
-    return this.httpClient.post(url, data, httpOptions);
-  }
-
-  startScraping(data) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken // remove it for pugliai endpoint
-      })
-    }
-
-    // const url = this.GPT_API_URL + "/scrape";
-    const url = this.URL_TILEDESK_OPENAI + "/kbsettings/startscrape";
-    this.logger.debug('[OPENAI.SERVICE] - scraping URL: ', url);
-
-    return this.httpClient.post(url, data, httpOptions);
-
-  }
-
-  checkScrapingStatus(data) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken // remove it for pugliai endpoint
-      })
-    }
-
-    // const url = this.GPT_API_URL + "/scrape/status";
-    const url = this.URL_TILEDESK_OPENAI + "/kbsettings/checkstatus";
-    this.logger.debug('[OPENAI.SERVICE] - check scraping URL: ', url);
-
-    return this.httpClient.post(url, data, httpOptions);
-  }
-
-
-
-
-  
 }
