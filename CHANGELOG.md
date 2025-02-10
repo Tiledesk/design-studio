@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.13
+- **changed**: minor ui fix
+
 # 1.27.0-rc.12
 - **changed**: cds-action-ai UI improvements
 
