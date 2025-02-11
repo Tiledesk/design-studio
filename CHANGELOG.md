@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.16
+- **bug-fixed**: answer in cds-action-ai-prompt
+
+# 1.27.0-rc.15
+- **bug-fixed**: RESERVED_INTENT_NAMES is undefined in cds-select component
+
 # 1.27.0-rc.14
 - **bug-fixed**: change the position value in localstorage when saving the zoom
 - **bug-fixed**: close the color panel when I select a different intent or click a button in the options panel
