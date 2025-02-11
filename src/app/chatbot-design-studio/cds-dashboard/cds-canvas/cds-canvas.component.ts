@@ -280,37 +280,29 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.loadingProgress = 100;
         this.renderedAllElements = true;
         this.labelInfoLoading = 'CDSCanvas.connectorsComplete';
+        this.logger.log("[CDS-CANVAS]  •••• Tutti i connettori sono stati renderizzati ••••", this.countRenderedElements, this.renderedAllElements);
         setTimeout(() => {
           this.settingStage();
-        }, 0);
-        this.logger.log("[CDS-CANVAS]  •••• Tutti i connettori sono stati renderizzati ••••", this.countRenderedElements, this.renderedAllElements);
-
-        // aggiorno il valore di scale nel connectorService solo dopo che tutti i connettori sono stati creati
-        this.connectorService.setScale(this.stageSettings.zoom);
+        }, 1000);
       }  
     }
   }
 
   private settingStage(){
-    this.logger.log("[CDS-CANVAS]  settingStage: ", this.stageService.settings.position);
+    // //aggiorno il valore di scale nel connectorService solo dopo che tutti i connettori sono stati creati
+    this.connectorService.setScale(this.stageSettings.zoom);
+    this.logger.log("[CDS-CANVAS]  •••• imposto scala dei connettori ••••",this.stageSettings.zoom);
+
     this.stageService.setAlphaConnectors();
+    this.logger.log("[CDS-CANVAS]  •••• imposto alpha ••••: ", this.stageService.settings.position);
+   
     if(this.stageService.settings.position){
-      this.logger.log("[CDS-CANVAS]  setPosition: ", this.stageService.settings.position);
+      this.logger.log("[CDS-CANVAS]  •••• imposto position ••••: ", this.stageService.settings.position);
       this.stageService.setPosition();
     } else {
-      this.logger.log("[CDS-CANVAS]  setStartIntent: ", this.blockId, this.blockName);
-      // if(this.blockId || this.blockName) {
-      //   const intentId = this.intentService.setStartIntentSelected(this.blockId, this.blockName);
-      //   this.logger.log("[CDS-CANVAS 1]  ••••setStartIntentSelected: ", intentId);
-      //   if(intentId){
-      //     this.logger.log("[CDS-CANVAS 1]  setIntentSelected: ", intentId);
-      //     this.intentService.setIntentSelected(intentId);
-      //     this.posCenterIntentSelected(this.intentService.intentSelected);
-      //   }
-      // }
+      this.logger.log("[CDS-CANVAS]  •••• se è la prima volta che carico il bot quindi this.stageService.settings.position non esiste ••••:: ", this.blockId, this.blockName);
       this.intentService.setStartIntent();
     }
-
   }
 
 
