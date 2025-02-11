@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.17
+- **bug-fixed**: connectors position on chatbot update/load/refresh
+
 # 1.27.0-rc.16
 - **bug-fixed**: answer in cds-action-ai-prompt
 
