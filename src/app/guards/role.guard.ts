@@ -79,18 +79,17 @@ export class RoleGuard implements CanActivate {
               dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + projectId + '/unauthorized-to-upgrade'
               // return false
             }
-            console.log('dashbordBaseUrl', dashbordBaseUrl)
             window.open(dashbordBaseUrl, '_self').focus();
           }
         } else {
-          console.log('[ROLE-GUARD] --->  projectCreationDate < freePlanLimitDate ')
+          // console.log('[ROLE-GUARD] --->  projectCreationDate < freePlanLimitDate ')
         }
       }
     }
 
     //step 2: check if projectUser has the correct enabled role for current path
     const roleEnabled = this.roles.includes(projectUser.role);
-    console.log('[ROLE-GUARD] roleEnabled:', roleEnabled)
+    // console.log('[ROLE-GUARD] roleEnabled:', roleEnabled)
     if (!projectUser || !roleEnabled) {
       this.router.navigate([`project/unauthorized`]);
       return false
@@ -108,10 +107,10 @@ export class RoleGuard implements CanActivate {
         
         next: (projectUser) => {
          const filteredProjectUsers = projectUser.filter(projectUser => projectUser.id_project._id === projectId)
-          console.log('[ROLE-GUARD] ----> filteredProjects 2 <---- :',  filteredProjectUsers)
+          // console.log('[ROLE-GUARD] ----> filteredProjects 2 <---- :',  filteredProjectUsers)
           resolve(filteredProjectUsers[0])
         }, error: (error) => {
-          this.logger.error('[ROLE-GUARD] getProjectUserRole --> ERROR:', error)
+          // this.logger.error('[ROLE-GUARD] getProjectUserRole --> ERROR:', error)
           resolve(error)
         }
       })

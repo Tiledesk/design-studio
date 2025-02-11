@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.16
+- **bug-fixed**: answer in cds-action-ai-prompt
+
 # 1.27.0-rc.15
 - **bug-fixed**: RESERVED_INTENT_NAMES is undefined in cds-select component
 
