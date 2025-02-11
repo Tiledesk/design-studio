@@ -33,7 +33,7 @@ export class SelectComponent implements OnInit {
   @Output() onReset = new EventEmitter();
   @Output() onDeleted = new EventEmitter();
 
-  RESERVED_INTENT_NAMES: RESERVED_INTENT_NAMES;
+  RESERVED_INTENT_NAMES = RESERVED_INTENT_NAMES;
   valueFormGroup: FormGroup 
   
   constructor() { }

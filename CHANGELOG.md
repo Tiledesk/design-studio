@@ -7,9 +7,29 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.15
+- **bug-fixed**: RESERVED_INTENT_NAMES is undefined in cds-select component
+
+# 1.27.0-rc.14
+- **bug-fixed**: change the position value in localstorage when saving the zoom
+- **bug-fixed**: close the color panel when I select a different intent or click a button in the options panel
+- **bug-fixed**: connector alpha equal to generic connector alpha when create a new connector
+- **bug-fixed**: show man icon in cds-panel-intent-list for "start" and "defaultfallback"
+- **bug-fixed**: set connector alpha to 1 when mouse hover connector-out
+- **bug-fixed**: Do not save or change the intent name when the name is "start" or "defaultfallback"
+- **bug-fixed**: change z-index on the color panel by moving it below
+
+
+# 1.27.0-rc.13
+- **changed**: minor ui fix
+
+# 1.27.0-rc.12
+- **changed**: cds-action-ai UI improvements
+
 # 1.27.0-rc.11
 # 1.27.0-rc.10
-- **added**: /llm api for cds-action-ai-prompt preview 
+- **bug-fixed**: fixed the starting position when changing scale when create a new connector
+- **bug-fixed**: reset alpha color connectors when reload ds
 
 # 1.27.0-rc.9
 - **added**: cds-action-ai-prompt

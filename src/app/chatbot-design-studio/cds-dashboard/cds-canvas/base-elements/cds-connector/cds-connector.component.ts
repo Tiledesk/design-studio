@@ -15,25 +15,25 @@ export class CdsConnectorComponent implements OnInit {
   @Output() onHideConnector = new EventEmitter();
 
   constructor(
-    private stageService: StageService
+    private readonly stageService: StageService
   ) { }
 
   ngOnInit(): void {
+    // empty
   }
 
   public showConnector(){
-    const alphaConnector = Number(this.stageService.getAlpha());
-    if(alphaConnector == 0 && this.idConnection && this.isConnected){
-      const idConnection = this.idConnection.replace('#', '');
-      const svgElement = document.getElementById(idConnection) as HTMLElement;
+    if(this.idConnection && this.isConnected){
+      const idConnection = this.idConnection?.replace('#', '');
+      const svgElement: HTMLElement = document.getElementById(idConnection);
       if(svgElement){
         svgElement.setAttribute('opacity', (1).toString());
       }
-      const svgElementRec = document.getElementById('rect_'+idConnection) as HTMLElement;
+      const svgElementRec: HTMLElement = document.getElementById('rect_'+idConnection);
       if(svgElementRec){
         svgElementRec.setAttribute('opacity', (1).toString());
       }
-      const svgElementTxt = document.getElementById('label_'+idConnection) as HTMLElement;
+      const svgElementTxt: HTMLElement = document.getElementById('label_'+idConnection);
       if(svgElementTxt){
         svgElementTxt.setAttribute('opacity', (1).toString());
       }
@@ -41,20 +41,20 @@ export class CdsConnectorComponent implements OnInit {
   }
 
   public hideConnector(){
-    const alphaConnector = this.stageService.getAlpha();
-    if(alphaConnector == 0 && this.idConnection && this.isConnected){
+    const alphaConnector = this.stageService.getAlpha()/100;
+    if(this.idConnection && this.isConnected){
       const idConnection = this.idConnection.replace('#', '');
-      const svgElement = document.getElementById(idConnection) as HTMLElement;
+      const svgElement:HTMLElement = document.getElementById(idConnection);
       if(svgElement){
-        svgElement.setAttribute('opacity', (0).toString());
+        svgElement.setAttribute('opacity', (alphaConnector).toString());
       }
-      const svgElementRec = document.getElementById('rect_'+idConnection) as HTMLElement;
+      const svgElementRec:HTMLElement = document.getElementById('rect_'+idConnection);
       if(svgElementRec){
-        svgElementRec.setAttribute('opacity', (0).toString());
+        svgElementRec.setAttribute('opacity', (alphaConnector).toString());
       }
-      const svgElementTxt = document.getElementById('label_'+idConnection) as HTMLElement;
+      const svgElementTxt:HTMLElement = document.getElementById('label_'+idConnection);
       if(svgElementTxt){
-        svgElementTxt.setAttribute('opacity', (0).toString());
+        svgElementTxt.setAttribute('opacity', (alphaConnector).toString());
       }
     }
   }

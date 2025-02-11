@@ -487,7 +487,6 @@
     </cds-action-intent>
 
     <div class="footer-intent">
-       
         <div *ngIf="!isStart && listOfActions?.length > 0" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">    

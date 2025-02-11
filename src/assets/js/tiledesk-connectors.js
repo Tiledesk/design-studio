@@ -1,6 +1,6 @@
 export class TiledeskConnectors {
 
-  constructor(drawerId, classes, connectors) {
+  constructor(drawerId, classes, connectors, scale=1) {
     // //this.connectors = [];
     this.svgContainerId = "tds_svgContainer";
     this.svgConnectorsId = "tds_svgConnectors";
@@ -54,7 +54,7 @@ export class TiledeskConnectors {
 
     // this.svgContainer = document.getElementById("svgConnectors");
     this.drawerId = drawerId;
-    this.scale = 1;
+    this.scale = scale;
     // connector draft drawing (cubic bezier)
     this.drawingBack = { x: 0, y: 0 };
     this.controlBack = { x: 0, y: 0 };
@@ -71,8 +71,10 @@ export class TiledeskConnectors {
     ]
 
     this.#createSvgContainer();
-    this.#createConnectors();
+    //this.#createConnectors();
     this.#setEventListners();
+
+    // console.log("[JS] constructor *** ", this.scale);
 
   }
 
@@ -392,7 +394,7 @@ export class TiledeskConnectors {
     this.connectableId = null;
     if (target.addEventListener) {
       target.addEventListener("mousedown", (event) => {
-        // console.log("mousedown  el.id:", event.target.id);
+        // /console.log("[JS] mousedown  el.id:", event.target.id);
         let el = event.target;
         this.#removeSelection(el);
         let elConnectable = this.#searchClassInParents(el, this.classes["connectable"]);
@@ -401,8 +403,8 @@ export class TiledeskConnectors {
           // // console.log("connectable", elConnectable.id);
           this.fromId = elConnectable.id;
           this.drawingBack = this.elementLogicCenter(elConnectable);
-          this.ref_handleMouseMove;
-          this.ref_handleMouseUp;
+          // //this.ref_handleMouseMove;
+          // //this.ref_handleMouseUp;
           target.addEventListener("mousemove", this.ref_handleMouseMove = this.#handleMouseMove.bind(this), false);
           target.addEventListener("mouseup", this.ref_handleMouseUp = this.#handleMouseUp.bind(this), false);
         }
@@ -559,8 +561,8 @@ export class TiledeskConnectors {
 
   /** createConnectors */
   #createConnectors() {
-    //// console.log('createConnectors: ', this.connectors);
-    for (const [key, value] of Object.entries(this.connectors)) {
+    console.log('[JS] createConnectors: ', this.connectors);
+    for (const [value] of Object.entries(this.connectors)) {
       this.createConnector(value.fromId, value.toId, value.fromPoint, value.toPoint, false, false, null);
     }
   }
@@ -605,7 +607,7 @@ export class TiledeskConnectors {
 
   /** handleMouseMove */
   #handleMouseMove(event) {
-    console.log("move...", event.target.id);
+    // /console.log("[JS] handleMouseMove...", event.target.id);
     let mouse_pos_logic;
     const target = event.target;
     let elConnectable = this.#searchClassInParents(target, this.classes["input_block"]);
@@ -658,10 +660,10 @@ export class TiledeskConnectors {
 
   /** handleMouseUp */
   #handleMouseUp(event) {
-    console.log("mouse up event...", event.target.classList);
+    // /console.log("[JS] handleMouseUp:::::  ", event.target.classList);
     this.target.removeEventListener("mousemove", this.ref_handleMouseMove, false);
     this.target.removeEventListener("mouseup", this.ref_handleMouseUp, false);
-    // console.log('handleMouseUp ------> ', event.target, event.srcElement);
+
     const connectable = this.classes["connectable"];
     if (event.target && event.target.classList && event.target.classList.contains(connectable)) {
       return null;
@@ -675,7 +677,7 @@ export class TiledeskConnectors {
     }
 
     if (elConnectable) {
-      console.log("handleMouseUp:::::  ");
+      // /console.log("[JS] handleMouseUp:::::  elConnectable");
       this.createConnector(this.fromId, elConnectable.id, this.drawingBack, this.toPoint, true, true, null);
       const connectorReleaseOnIntent = new CustomEvent("connector-release-on-intent",
         {
@@ -734,6 +736,7 @@ export class TiledeskConnectors {
 
   /** drawConnectorDraft */
   #drawConnectorDraft() {
+    console.log("[JS] drawConnectorDraft:::::  ");
     let connector = document.getElementById("connectorDraft");
     if (!connector) {
       connector = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -757,7 +760,7 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes=null) {
-    // // console.log("drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    // /console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
     let label = null;
     if(attributes && attributes.label){
       label = attributes.label;
