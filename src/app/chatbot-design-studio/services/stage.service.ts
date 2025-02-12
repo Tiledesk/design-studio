@@ -62,12 +62,31 @@ export class StageService {
   /**  centerStageOnHorizontalPosition 
    * called start element only
   */
-  centerStageOnHorizontalPosition(ElementRef, left=0){
+  centerStageOnHorizontalPosition(id_faq_kb, ElementRef, left=0){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnHorizontalPosition ••••");
     let intervalId = setInterval(async () => {
       const result = await this.tiledeskStage.centerStageOnHorizontalPosition(ElementRef, left);
       if (result === true) {
         clearInterval(intervalId);
+      }
+    }, 100);
+    setTimeout(() => {
+      clearInterval(intervalId);
+    }, 1000);
+  }
+
+
+  /** 
+   * quando seleziono un elemento dal menu di sinistra, imposto sempre lo scale a 1
+  */
+  centerStageOnElement(id_faq_kb, stageElement){
+    this.logger.log("[CDS-STAGE]  •••• centerStageOnElement ••••");
+    let intervalId = setInterval(async () => {
+      let scale = 1;
+      const result = await this.tiledeskStage.centerStageOnElement(stageElement, scale);
+      if (result === true) {
+        clearInterval(intervalId);
+        this.savePositionByStageElement(id_faq_kb);
       }
     }, 100);
     setTimeout(() => {
@@ -82,7 +101,7 @@ export class StageService {
       const result = await this.tiledeskStage.centerStageOnPosition(stageElement);
       if (result === true) {
         clearInterval(intervalId);
-        this.savePositionByStageElement(id_faq_kb, stageElement);
+        this.savePositionByStageElement(id_faq_kb);
       }
     }, 100);
     setTimeout(() => {
@@ -97,7 +116,7 @@ export class StageService {
       // // const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
       if (result === true) {
         clearInterval(intervalId);
-        this.savePositionByStageElement(id_faq_kb, stageElement);
+        this.savePositionByStageElement(id_faq_kb);
       }
     }, 100);
     setTimeout(() => {
@@ -117,18 +136,25 @@ export class StageService {
   }
 
 
-  async zoom(id_faq_kb, event: 'in' | 'out'){
-    let resp = await this.tiledeskStage.zoom(event);
-    let scale = this.tiledeskStage.scale;
-    this.settings.zoom = scale;
-    let position = {
-      x: this.settings.position.x*scale,
-      y: this.settings.position.y*scale
+  /**
+   * quando premo + o - per cambiare lo zoom
+   * @param id_faq_kb 
+   * @param event 
+   * @returns 
+   */
+  async changeScale(id_faq_kb, event: 'in' | 'out'){
+    let result = await this.tiledeskStage.changeScale(event);
+    if (result === true) {
+      this.savePositionByStageElement(id_faq_kb);
     }
-    this.settings.position = position;
-    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
-    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, position);
-    return resp;
+    // let scale = this.tiledeskStage.scale;
+    // this.settings.zoom = scale;
+    // let position = {
+    //   x: this.settings.position.x*scale,
+    //   y: this.settings.position.y*scale
+    // }
+    //this.settings.position = position;
+    return result;
   }
 
   scaleAndCenter(id_faq_kb, listOfintents){
@@ -240,12 +266,13 @@ export class StageService {
    * @param ElementRef 
    * called on centerStageOnPosition
    */
-  savePositionByStageElement(id_faq_kb:string, ElementRef:any){
+  savePositionByStageElement(id_faq_kb:string){
     const scale = this.tiledeskStage.scale;
-    const position = this.tiledeskStage.setPositionByStageElement(ElementRef, scale);
+    const position = this.tiledeskStage.position;
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, position);
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
   }
+
 
   setPositionByStageElement(ElementRef:any){
     const scale = this.tiledeskStage.scale;

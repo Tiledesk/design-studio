@@ -283,7 +283,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.logger.log("[CDS-CANVAS]  •••• Tutti i connettori sono stati renderizzati ••••", this.countRenderedElements, this.renderedAllElements);
         setTimeout(() => {
           this.settingStage();
-        }, 1000);
+        }, 100);
       }  
     }
   }
@@ -840,11 +840,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** posCenterIntentSelected */
   private posCenterIntentSelected(intent) {
-    if(intent && intent.intent_id){
-      var stageElement = document.getElementById(intent.intent_id);
+    if(intent?.intent_id){
+      let stageElement = document.getElementById(intent.intent_id);
       let id_faq_kb = this.dashboardService.id_faq_kb;
       this.logger.log('[CDS-CANVAS] posCenterIntentSelected: ', stageElement);
-      this.stageService.centerStageOnPosition(id_faq_kb, stageElement);
+      this.stageService.centerStageOnElement(id_faq_kb, stageElement);
     }
   }
 
@@ -1283,14 +1283,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     let alpha = resp.alpha;
     switch(option){
       case OPTIONS.ZOOM_IN: {
-        const result = await this.stageService.zoom(this.id_faq_kb, 'in');
+        const result = await this.stageService.changeScale(this.id_faq_kb, 'in');
         if (result) {
           this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
         }
         break;
       }
       case OPTIONS.ZOOM_OUT: {
-        const result = await this.stageService.zoom(this.id_faq_kb, 'out');
+        const result = await this.stageService.changeScale(this.id_faq_kb, 'out');
         if (result) {
           this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
         }

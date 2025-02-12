@@ -822,7 +822,8 @@ export class IntentService {
         if (element) {
           left = element.offsetWidth+100;
         }
-        this.stageService.centerStageOnHorizontalPosition(startElement, left);
+        let id_faq_kb = this.dashboardService.id_faq_kb;
+        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
 
       }
     }

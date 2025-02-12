@@ -14,6 +14,7 @@ export class TiledeskStage {
 
 
     isDragging = false;
+    position = {x: 0, y: 0};
     // isDraggingElement = false;
     // isDraggingElement = false;
 
@@ -113,14 +114,24 @@ export class TiledeskStage {
         
     }
 
-    zoom(event){
+    // richiamato solo quando premo sul plsante più e meno
+    changeScale(event){
         let scale = 1;
         if (event === 'in'){
             scale = Math.min(Math.max(0.125, (this.scale + this.scaleStep)), 4);
         } else if (event === 'out'){
             scale = Math.min(Math.max(0.125, (this.scale - this.scaleStep)), 4);
         }
-        return this.centerStageOnCenterPosition(scale);
+        let originRec = this.container.getBoundingClientRect();
+        let originDrawer = this.drawer.getBoundingClientRect();
+        let diffX = (originRec.x - originDrawer.x);
+        let diffY = (originRec.y - originDrawer.y);
+        let percScale = scale/this.scale;
+        let x1 = ((originRec.width/2)*percScale)+diffX*percScale;
+        let y1 = ((originRec.height/2)*percScale)+diffY*percScale;
+        const pos = {x: x1, y: y1}
+        this.position = pos;
+        return this.translateAndScale(pos, scale);
     }
     
     transform() {
@@ -234,7 +245,39 @@ export class TiledeskStage {
         }
     }
 
-    
+
+    // quando seleziono un elemento dal menu di sinistra centro lo stage sull'elemento selezionato
+    centerStageOnElement(stageElement, scale=1){
+        const pos = this.setPositionByStageElement(stageElement, scale);
+        const originRec = this.container.getBoundingClientRect();
+        let diff = (stageElement.offsetHeight*scale-originRec.height);
+        console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnElement ••••", stageElement.offsetHeight, originRec.height, diff);
+        if(diff>0){
+            pos.y = pos.y-(diff/2+10);
+        }  
+        if(pos){
+            this.position = pos;
+            this.scale = scale;
+            this.drawer.style.transition = "transform 0.3s ease-in-out";
+            let originRec = this.container.getBoundingClientRect();
+            let newX = (originRec.width/2)-pos.x;
+            let newY = (originRec.height/2)-pos.y;
+            let tcmd = `translate(${newX}px, ${newY}px)`;
+            let scmd = `scale(${scale})`;
+            const cmd = tcmd + " " + scmd;
+            this.drawer.style.transform = cmd;
+            this.tx = newX;
+            this.ty = newY;
+            setTimeout(() => {
+                this.drawer.style.removeProperty('transition');
+            }, 300);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     centerStageOnCenterPosition(scale=1){
         // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnCenterPosition ••••");

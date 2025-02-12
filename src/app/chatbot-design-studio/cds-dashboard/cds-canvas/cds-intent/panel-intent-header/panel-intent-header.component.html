@@ -13,7 +13,7 @@
             class="input ellips form-control tds_draggable"
             [ngStyle]="{'color': 'rgba('+intentColor+', 1)'}"
             [(ngModel)]="intentName"
-            [readonly]="intent.attributes.readonly"
+            [readonly]="intent.attributes?.readonly"
             [placeholder]="'CDSCanvas.EnterIntentName' | translate"
             (ngModelChange)="onChangeIntentName($event)"
             (mouseup)="onMouseUpInput($event)" 

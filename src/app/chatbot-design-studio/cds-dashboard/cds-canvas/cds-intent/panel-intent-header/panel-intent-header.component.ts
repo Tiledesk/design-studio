@@ -146,8 +146,8 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     if ((this.intentName === RESERVED_INTENT_NAMES.START || this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) && this.intent.attributes.readonly === false){
       // /this.intentName = this.intentName+"_";
       // /this.intent.intent_display_name = this.intentName;
-      this.intentNameResult = false;
-      this.intentNameAlreadyExist = true;
+      this.intentNameResult = true;
+      this.intentNameAlreadyExist = false;
       this.intentName = this.intent.intent_display_name;
     } else {
       this.intent.intent_display_name = this.intentName;
