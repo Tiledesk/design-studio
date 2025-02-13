@@ -124,10 +124,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   private logger: LoggerService = LoggerInstance.getInstance()
   
-  
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   startDraggingPosition: any = null;
-  stageSettings: any;
+
 
   constructor(
     private intentService: IntentService,
@@ -191,8 +190,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** */
   ngAfterViewInit() {
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
-    this.stageSettings = this.stageService.initStageSettings(this.id_faq_kb);
-    this.stageService.initializeStage();
+    this.stageService.initializeStage(this.id_faq_kb);
+    // this.stageService.initStageSettings(this.id_faq_kb);
+    
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
     this.changeDetectorRef.detectChanges();
@@ -290,13 +290,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   private settingStage(){
     // //aggiorno il valore di scale nel connectorService solo dopo che tutti i connettori sono stati creati
-    this.connectorService.setScale(this.stageSettings.zoom);
-    this.logger.log("[CDS-CANVAS]  •••• imposto scala dei connettori ••••",this.stageSettings.zoom);
+    if(this.stageService.settings?.zoom){
+      this.connectorService.setScale(this.stageService.settings?.zoom);
+      this.logger.log("[CDS-CANVAS]  •••• imposto scala dei connettori ••••",this.stageService.settings?.zoom);
+    }
 
     this.stageService.setAlphaConnectorsByLocalStorage();
     this.logger.log("[CDS-CANVAS]  •••• imposto alpha ••••: ");
-   
-    if(this.stageService.settings.position){
+
+    if(this.stageService.settings?.position){
       this.logger.log("[CDS-CANVAS]  •••• imposto position ••••: ", this.stageService);
       this.stageService.setPositionByLocalStorage();
     } else {
