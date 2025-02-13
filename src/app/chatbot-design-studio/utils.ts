@@ -232,11 +232,11 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     { name: "Gemma-7b-It",        value: "Gemma-7b-It",             description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
 ]
 
-export const LLM_MODEL: Array<{name: string, value: string, description: string, icon: string, status: "active" | "inactive", models: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> }> = [
-    { name: "Cohere",         value: "cohere",            description: "",      icon:"assets/images/icons/ai_prompt/cohere.svg",      status: "active",   models: COHERE_MODEL        },
-    { name: "Google",         value: "google",            description: "",      icon:"assets/images/icons/ai_prompt/google.svg",      status: "active",   models: GOOGLE_MODEL        },
-    { name: "Anthropic",      value: "anthropic",         description: "",      icon:"assets/images/icons/ai_prompt/anthropic.svg",   status: "active",   models: ANTHROPIC_MODEL     },
-    { name: "Groq",           value: "groq",              description: "",      icon:"assets/images/icons/ai_prompt/groq.svg",        status: "active",   models: GROQ_MODEL          },
+export const LLM_MODEL: Array<{name: string, value: string, description: string, src: string, status: "active" | "inactive", models: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> }> = [
+    { name: "Cohere",         value: "cohere",            description: "",      src:"assets/images/icons/ai_prompt/cohere.svg",      status: "active",   models: COHERE_MODEL        },
+    { name: "Google",         value: "google",            description: "",      src:"assets/images/icons/ai_prompt/google.svg",      status: "active",   models: GOOGLE_MODEL        },
+    { name: "Anthropic",      value: "anthropic",         description: "",      src:"assets/images/icons/ai_prompt/anthropic.svg",   status: "active",   models: ANTHROPIC_MODEL     },
+    { name: "Groq",           value: "groq",              description: "",      src:"assets/images/icons/ai_prompt/groq.svg",        status: "active",   models: GROQ_MODEL          },
 ]
 /************             AI PROMPT MODEL: END        ************************/
 
