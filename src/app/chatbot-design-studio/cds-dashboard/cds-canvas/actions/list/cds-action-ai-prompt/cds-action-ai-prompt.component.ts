@@ -15,7 +15,7 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 
 //UTILS
 import { AttributesDialogAiPromptComponent } from './attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, LLM_MODEL, TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
@@ -23,6 +23,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { LLM_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
 
 @Component({
   selector: 'cds-action-ai-prompt',
@@ -43,8 +44,8 @@ export class CdsActionAiPromptComponent implements OnInit {
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
-  llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string }> }> = [];
-  llm_options_models: Array<{ name: string, value: string }> = [];
+  llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
+  llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
     "max_tokens": { name: "max_tokens",  min: 10, max: 2048, step: 1},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
@@ -122,7 +123,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   private initialize(){
     if(this.action.llm){
-      this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models
+      this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
     }
   }
 
@@ -234,7 +235,7 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.debug("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
     if(target === 'llm'){
-      this.llm_options_models = this.llm_models.find(el => el.value === event.value).models
+      this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
       this.action.model= null;
     }
     this.updateAndSaveAction.emit();
