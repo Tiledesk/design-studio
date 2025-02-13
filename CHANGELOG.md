@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0-rc.18
+- **bug-fixed**: bug fixing: on change scale and position in stage service
+
 # 1.27.0-rc.17
 - **bug-fixed**: connectors position on chatbot update/load/refresh
 
