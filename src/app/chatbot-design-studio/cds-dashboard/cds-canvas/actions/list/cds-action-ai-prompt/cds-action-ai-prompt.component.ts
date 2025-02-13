@@ -43,7 +43,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
-  llm_models: Array<{ name: string, value: string, models: Array<{ name: string, value: string }> }> = [];
+  llm_models: Array<{ name: string, value: string, icon: string, models: Array<{ name: string, value: string }> }> = [];
   llm_options_models: Array<{ name: string, value: string }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
     "max_tokens": { name: "max_tokens",  min: 10, max: 2048, step: 1},

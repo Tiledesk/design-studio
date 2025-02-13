@@ -22,7 +22,8 @@
     <div class="action-row">
 
         <div id="gpt-icon" class="action-row-left icon-action">
-            <img src="assets/images/actions/openai-icon.svg">
+            <img *ngIf="!action?.llm" src="assets/images/icons/add_ai_model.svg">
+            <img *ngIf="action?.llm" src="{{ (llm_models | filter:{key: 'value', value: action?.llm }).icon }}">
         </div>
 
         <div class="action-row-right">
