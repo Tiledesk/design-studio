@@ -342,26 +342,23 @@ export class TiledeskStage {
     }
     
 
-    centerStageOnTopPosition(stageElement){
-        // console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnTopPosition ••••");
+    centerStageOnTopPosition(stageElement, scale=1){
+        // //console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnTopPosition ••••");
         if(stageElement){
-            // var stageElement = document.getElementById(intent.intent_id);
-            var w = stageElement.offsetWidth;
-            var h = stageElement.offsetHeight;
-            var x = stageElement.offsetLeft;
-            var y = stageElement.offsetTop;
+            const w = stageElement.offsetWidth;
+            // //const h = stageElement.offsetHeight;
+            const x = stageElement.offsetLeft;
+            const y = stageElement.offsetTop;
             this.drawer.style.transition = "transform 0.3s ease-in-out";
-            var originRec = this.container.getBoundingClientRect();
+            const originRec = this.container.getBoundingClientRect();
             let newX = (originRec.width/2)-(x+w/2);
             let newY = (50)-(y);
             let tcmd = `translate(${newX}px, ${newY}px)`;
-            let scmd = `scale(${1})`;
-            // let scmd = `scale(${this.scale})`;
+            let scmd = `scale(${scale})`;
             const cmd = tcmd + " " + scmd;
             this.drawer.style.transform = cmd;
             setTimeout(() => {
                 this.drawer.style.removeProperty('transition');
-                // remove class animation
             }, 300);
             return true;
         } else {

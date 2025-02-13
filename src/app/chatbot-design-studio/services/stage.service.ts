@@ -5,6 +5,8 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { STAGE_SETTINGS, scaleAndcenterStageOnCenterPosition } from '../utils';
 import { BehaviorSubject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+import { ConnectorService } from './connector.service';
+
 
 export interface Settings {
   alpha_connectors: any;
@@ -37,7 +39,8 @@ export class StageService {
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    public appStorageService: AppStorageService
+    public appStorageService: AppStorageService,
+    public connectorService: ConnectorService
   ) { }
 
 
@@ -77,7 +80,8 @@ export class StageService {
 
 
   /** 
-   * quando seleziono un elemento dal menu di sinistra, imposto sempre lo scale a 1
+   * centerStageOnElement
+   * called when I select an intent from the left "intent list menu", always set the scale to 1
   */
   centerStageOnElement(id_faq_kb, stageElement){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnElement ••••");
@@ -86,7 +90,7 @@ export class StageService {
       const result = await this.tiledeskStage.centerStageOnElement(stageElement, scale);
       if (result === true) {
         clearInterval(intervalId);
-        this.savePositionByStageElement(id_faq_kb);
+        this.savePositionAndScale(id_faq_kb);
       }
     }, 100);
     setTimeout(() => {
@@ -94,14 +98,19 @@ export class StageService {
     }, 1000);
   }
 
-  /** */
+
+  /**
+   * centerStageOnPosition
+   * @param id_faq_kb 
+   * @param stageElement 
+   */
   centerStageOnPosition(id_faq_kb, stageElement){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnPosition ••••");
     let intervalId = setInterval(async () => {
       const result = await this.tiledeskStage.centerStageOnPosition(stageElement);
       if (result === true) {
         clearInterval(intervalId);
-        this.savePositionByStageElement(id_faq_kb);
+        this.savePositionAndScale(id_faq_kb);
       }
     }, 100);
     setTimeout(() => {
@@ -109,14 +118,23 @@ export class StageService {
     }, 1000);
   }
 
+
+  /**
+   * centerStageOnTopPosition
+   * called when I select an intent from the "intentLiveActive" in intent component, always set the scale to 1
+   * !!! questa azione NON salva lo scale e NON salva la posizione DA CORREGGERE !!!
+   * @param id_faq_kb 
+   * @param stageElement 
+   */
   centerStageOnTopPosition(id_faq_kb, stageElement){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnTopPosition ••••");
     let intervalId = setInterval(async () => {
-      const result = await this.tiledeskStage.centerStageOnTopPosition(stageElement);
+      let scale = 1;
+      const result = await this.tiledeskStage.centerStageOnTopPosition(stageElement, scale);
       // // const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
       if (result === true) {
         clearInterval(intervalId);
-        this.savePositionByStageElement(id_faq_kb);
+        this.savePositionAndScale(id_faq_kb);
       }
     }, 100);
     setTimeout(() => {
@@ -136,44 +154,58 @@ export class StageService {
   }
 
 
+
+
+
+
+
+
+
+
   /**
-   * quando premo + o - per cambiare lo zoom
+   * changeScale
+   * This function is called when I change the stage scale by pressing the + and - buttons in the cds-options menu
    * @param id_faq_kb 
    * @param event 
-   * @returns 
    */
-  async changeScale(id_faq_kb, event: 'in' | 'out'){
+  async changeScale(id_faq_kb:string, event: 'in' | 'out'){
+    // //this.logger.log("[STAGE SERVICE] changeScale");
     let result = await this.tiledeskStage.changeScale(event);
     if (result === true) {
-      this.savePositionByStageElement(id_faq_kb);
+      // this.connectorService.setScale(this.tiledeskStage.scale);
+      this.savePositionAndScale(id_faq_kb);
     }
-    // let scale = this.tiledeskStage.scale;
-    // this.settings.zoom = scale;
-    // let position = {
-    //   x: this.settings.position.x*scale,
-    //   y: this.settings.position.y*scale
-    // }
-    //this.settings.position = position;
-    return result;
   }
 
-  scaleAndCenter(id_faq_kb, listOfintents){
-    this.logger.log("[STAGE SERVICE] scaleAndCenter ");
+
+
+  /**
+   * scaleAndCenter
+   * This function is called when I press the "center" button in the cds-options menu to center all the chatbot intents in the stage
+   * @param id_faq_kb 
+   * @param listOfintents 
+   */
+  async scaleAndCenter(id_faq_kb:string, listOfintents){
+    // //this.logger.log("[STAGE SERVICE] scaleAndCenter");
     let resp = scaleAndcenterStageOnCenterPosition(listOfintents);
-    const scale = resp.scale;
-    const position = resp.point
-    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, position);
-    this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
-    return this.tiledeskStage.translateAndScale(resp.point, resp.scale);
+    if(resp){
+      const result = this.tiledeskStage.translateAndScale(resp.point, resp.scale);
+      if(result){
+        this.tiledeskStage.scale = resp.scale;
+        this.tiledeskStage.position = resp.point;
+        // this.connectorService.setScale(this.tiledeskStage.scale);
+        this.savePositionAndScale(id_faq_kb);
+      }
+    }
   }
   
+
+
+
   getMaximize(){
     return this.settings.maximize;
   }
 
-  getScale(){
-    return this.tiledeskStage.scale;
-  }
   getAlpha(): number {
     return this.alpha_connectors;
   }
@@ -226,16 +258,6 @@ export class StageService {
     });
   }
 
-    
-  /** setZoom 
-   * ! NOT USED !
-   * */
-  setZoom(){
-    let scale = this.settings.zoom;
-    setTimeout(() => {
-      this.tiledeskStage.centerStageOnCenterPosition(scale);
-    }, 0);
-  }
 
   /** setPosition */
   setPosition(){
@@ -246,6 +268,18 @@ export class StageService {
       this.translateAndScale(position, scale);
     }, 0);
   }
+
+  setPositionByStageElement(ElementRef:any){
+    const scale = this.tiledeskStage.scale;
+    const position = this.tiledeskStage.setPositionByStageElement(ElementRef, scale);
+    return position;
+  }
+
+  /** translateAndScale */
+  translateAndScale(pos:any, scale:number){
+    this.tiledeskStage.translateAndScale(pos, scale);
+  }
+
   
   /**
    * savePositionByPos
@@ -256,37 +290,23 @@ export class StageService {
   savePositionByPos(id_faq_kb:string, position:any){
     const scale = this.tiledeskStage.scale;
     const newPosition = this.tiledeskStage.translatePosition(position);
+    this.connectorService.setScale(this.tiledeskStage.scale);
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, newPosition);
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
   }
 
   /**
-   * savePositionByStageElement
+   * savePositionAndScale
    * @param id_faq_kb 
-   * @param ElementRef 
    * called on centerStageOnPosition
    */
-  savePositionByStageElement(id_faq_kb:string){
+  savePositionAndScale(id_faq_kb:string){
     const scale = this.tiledeskStage.scale;
     const position = this.tiledeskStage.position;
+    this.connectorService.setScale(this.tiledeskStage.scale);
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, position);
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
   }
-
-
-  setPositionByStageElement(ElementRef:any){
-    const scale = this.tiledeskStage.scale;
-    const position = this.tiledeskStage.setPositionByStageElement(ElementRef, scale);
-    return position;
-  }
-
-
-  /** translateAndScale */
-  translateAndScale(pos:any, scale:number){
-    this.tiledeskStage.translateAndScale(pos, scale);
-  }
-
-
 
 
   /** saveSettings */
@@ -301,8 +321,14 @@ export class StageService {
 
 
 
+  /**
+   * calcolo la posizione del action menu sul float per decidere se visualizzarlo a dx o sx del puntatore
+   * @param point 
+   * @returns 
+   */
   public setPositionActionsMenu(point){
     let positionFloatMenu = this.physicPointCorrector(point);
+    // // const element = document.getElementById('cdsPanelIntentList');
     let cdsSidebarWidth = 60;
     let cdsAddActionMenuWidth = 270;
     let pos = positionFloatMenu.x+cdsAddActionMenuWidth;
@@ -314,6 +340,5 @@ export class StageService {
       positionFloatMenu.x = positionFloatMenu.x+cdsSidebarWidth;
     }
     return positionFloatMenu;
-    
   }
 }

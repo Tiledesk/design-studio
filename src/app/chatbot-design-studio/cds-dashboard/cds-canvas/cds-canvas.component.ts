@@ -1283,24 +1283,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     let alpha = resp.alpha;
     switch(option){
       case OPTIONS.ZOOM_IN: {
-        const result = await this.stageService.changeScale(this.id_faq_kb, 'in');
-        if (result) {
-          this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
-        }
+        await this.stageService.changeScale(this.id_faq_kb, 'in');
         break;
       }
       case OPTIONS.ZOOM_OUT: {
-        const result = await this.stageService.changeScale(this.id_faq_kb, 'out');
-        if (result) {
-          this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
-        }
+        await this.stageService.changeScale(this.id_faq_kb, 'out');
         break;
       }
       case OPTIONS.CENTER: {
-        const result = await this.stageService.scaleAndCenter(this.id_faq_kb, this.listOfIntents);
-        if (result) {
-          this.connectorService.tiledeskConnectors.scale = this.stageService.getScale();
-        }
+        await this.stageService.scaleAndCenter(this.id_faq_kb, this.listOfIntents);
         break;
       }
       case OPTIONS.UNDO: {
