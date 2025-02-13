@@ -26,7 +26,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     { name: "Deepseek-r1-distill-llama-70b",        value: "deepseek-r1-distill-llama-70b",         description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Qwen-2.5-32b",                         value: "qwen-2.5-32b",                          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Gemma2-9b-it",                         value: "gemma2-9b-it",                          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
-    { name: "Allam-2-7b",                           value: "allam-2-7b",                            description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Allam-2-7b",                           value: "allam-2-7b",                            description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
     { name: "Mixtral-8x7b-32768",                   value: "mixtral-8x7b-32768",                    description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
 ]
 
