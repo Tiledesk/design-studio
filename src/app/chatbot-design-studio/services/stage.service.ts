@@ -39,7 +39,7 @@ export class StageService {
   ) { }
 
 
-  initializeStage(){
+  initializeStage(id_faq_kb){
     this.tiledeskStage = new TiledeskStage('tds_container', 'tds_drawer', 'tds_draggable');
     this.alpha_connectors = DEFAULT_ALPHA_CONNECTORS;
     this.loaded = false;
@@ -49,10 +49,11 @@ export class StageService {
       position: null,
       maximize: false
     };
+    this.initStageSettings(id_faq_kb);
   }
 
   /** initStageSettings */
-  initStageSettings(id_faq_kb: string){
+  private initStageSettings(id_faq_kb: string){
     let response = JSON.parse(this.appStorageService.getItem(id_faq_kb+'_stage'));
     if(response){
       this.settings = response;
