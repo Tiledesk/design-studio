@@ -296,6 +296,7 @@ export class TiledeskStage {
         // console.log("[TILEDESK-STAGE-JS]  •••• translateAndScale ••••");
         if(pos){
             this.scale = scale;
+            this.position = pos;
             this.drawer.style.transition = "transform 0.3s ease-in-out";
             let originRec = this.container.getBoundingClientRect();
             let newX = (originRec.width/2)-pos.x;

@@ -293,12 +293,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.connectorService.setScale(this.stageSettings.zoom);
     this.logger.log("[CDS-CANVAS]  •••• imposto scala dei connettori ••••",this.stageSettings.zoom);
 
-    this.stageService.setAlphaConnectors();
-    this.logger.log("[CDS-CANVAS]  •••• imposto alpha ••••: ", this.stageService.settings.position);
+    this.stageService.setAlphaConnectorsByLocalStorage();
+    this.logger.log("[CDS-CANVAS]  •••• imposto alpha ••••: ");
    
     if(this.stageService.settings.position){
-      this.logger.log("[CDS-CANVAS]  •••• imposto position ••••: ", this.stageService.settings.position);
-      this.stageService.setPosition();
+      this.logger.log("[CDS-CANVAS]  •••• imposto position ••••: ", this.stageService);
+      this.stageService.setPositionByLocalStorage();
     } else {
       this.logger.log("[CDS-CANVAS]  •••• se è la prima volta che carico il bot quindi this.stageService.settings.position non esiste ••••:: ", this.blockId, this.blockName);
       this.intentService.setStartIntent();
