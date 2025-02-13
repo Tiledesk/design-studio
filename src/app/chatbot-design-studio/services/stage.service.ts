@@ -52,6 +52,7 @@ export class StageService {
     this.initStageSettings(id_faq_kb);
   }
 
+
   /** initStageSettings */
   private initStageSettings(id_faq_kb: string){
     let response = JSON.parse(this.appStorageService.getItem(id_faq_kb+'_stage'));
@@ -66,8 +67,9 @@ export class StageService {
     this.tiledeskStage.setDrawer();
   }
 
-  /**  centerStageOnHorizontalPosition 
-   * called start element only
+  /**  
+   * centerStageOnHorizontalPosition 
+   * called only if is the first time load the chatbot then stageService.settings.position does not exist,  set the scale to 1
   */
   centerStageOnHorizontalPosition(id_faq_kb, ElementRef, left=0){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnHorizontalPosition ••••");
@@ -104,29 +106,8 @@ export class StageService {
 
 
   /**
-   * centerStageOnPosition
-   * @param id_faq_kb 
-   * @param stageElement 
-   */
-  centerStageOnPosition(id_faq_kb, stageElement){
-    this.logger.log("[CDS-STAGE]  •••• centerStageOnPosition ••••");
-    let intervalId = setInterval(async () => {
-      const result = await this.tiledeskStage.centerStageOnPosition(stageElement);
-      if (result === true) {
-        clearInterval(intervalId);
-        this.savePositionAndScale(id_faq_kb);
-      }
-    }, 100);
-    setTimeout(() => {
-      clearInterval(intervalId);
-    }, 1000);
-  }
-
-
-  /**
    * centerStageOnTopPosition
    * called when I select an intent from the "intentLiveActive" in intent component, always set the scale to 1
-   * !!! questa azione NON salva lo scale e NON salva la posizione DA CORREGGERE !!!
    * @param id_faq_kb 
    * @param stageElement 
    */
@@ -152,18 +133,6 @@ export class StageService {
     this.logger.log("[STAGE SERVICE] imposto il drag sull'elemento ", elementId, element);
     if(element)this.tiledeskStage.setDragElement(element);
   }
-  
-  physicPointCorrector(point){
-    return this.tiledeskStage.physicPointCorrector(point);
-  }
-
-
-
-
-
-
-
-
 
 
   /**
@@ -176,7 +145,6 @@ export class StageService {
     // //this.logger.log("[STAGE SERVICE] changeScale");
     let result = await this.tiledeskStage.changeScale(event);
     if (result === true) {
-      // this.connectorService.setScale(this.tiledeskStage.scale);
       this.savePositionAndScale(id_faq_kb);
     }
   }
@@ -195,15 +163,11 @@ export class StageService {
     if(resp){
       const result = this.tiledeskStage.translateAndScale(resp.point, resp.scale);
       if(result){
-        this.tiledeskStage.scale = resp.scale;
-        this.tiledeskStage.position = resp.point;
-        // this.connectorService.setScale(this.tiledeskStage.scale);
         this.savePositionAndScale(id_faq_kb);
       }
     }
   }
   
-
 
   /** */
   getMaximize(){
@@ -320,7 +284,6 @@ export class StageService {
   /**
    * savePositionAndScale
    * @param id_faq_kb 
-   * called on centerStageOnPosition
    */
   savePositionAndScale(id_faq_kb:string){
     const scale = this.tiledeskStage.scale;
@@ -338,7 +301,7 @@ export class StageService {
    * @returns 
   */
   public setPositionActionsMenu(point){
-    let positionFloatMenu = this.physicPointCorrector(point);
+    let positionFloatMenu = this.tiledeskStage.physicPointCorrector(point);
     let pos = positionFloatMenu.x+CDS_ADD_ACTION_MENU_WIDTH;
     let cont = this.tiledeskStage.container.offsetWidth;
     // /this.logger.log("[CDS SERVICE] setPositionActionsMenu", pos, cont);
