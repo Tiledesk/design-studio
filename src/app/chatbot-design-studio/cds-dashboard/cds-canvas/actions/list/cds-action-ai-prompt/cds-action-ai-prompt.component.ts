@@ -43,8 +43,8 @@ export class CdsActionAiPromptComponent implements OnInit {
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
-  llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string }> }> = [];
-  llm_options_models: Array<{ name: string, value: string }> = [];
+  llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
+  llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
     "max_tokens": { name: "max_tokens",  min: 10, max: 2048, step: 1},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
@@ -122,7 +122,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   private initialize(){
     if(this.action.llm){
-      this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models
+      this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
     }
   }
 
@@ -234,7 +234,7 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.debug("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
     if(target === 'llm'){
-      this.llm_options_models = this.llm_models.find(el => el.value === event.value).models
+      this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
       this.action.model= null;
     }
     this.updateAndSaveAction.emit();
