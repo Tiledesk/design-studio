@@ -31,7 +31,7 @@ export class CdsOptionsComponent implements OnInit {
 
 
   private initialize(){
-    this.alpha = this.stageService.alpha_connectors;
+    this.alpha = this.stageService.getAlpha();
   }
 
   updateAlphaConnectors() {

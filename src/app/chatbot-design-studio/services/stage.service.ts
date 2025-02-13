@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { TiledeskStage } from 'src/assets/js/tiledesk-stage.js';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { STAGE_SETTINGS, scaleAndcenterStageOnCenterPosition } from '../utils';
+import { DEFAULT_ALPHA_CONNECTORS, CDS_ADD_ACTION_MENU_WIDTH, CDS_SIDEBAR_WIDTH, STAGE_SETTINGS, scaleAndcenterStageOnCenterPosition } from '../utils';
 import { BehaviorSubject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { ConnectorService } from './connector.service';
@@ -21,20 +21,15 @@ export interface Settings {
 @Injectable({
   providedIn: 'root'
 })
+
 export class StageService {
   private readonly alphaConnectorsSubject = new BehaviorSubject<number>(100);
   alphaConnectors$ = this.alphaConnectorsSubject.asObservable();
 
-  tiledeskStage: any;
+  private tiledeskStage: any;
+  private alpha_connectors: number;
+  settings: Settings;
   loaded: boolean = false;
-  alpha_connectors: number = 70;
-
-  settings: Settings = {
-    alpha_connectors: this.alpha_connectors,
-    zoom: 1,
-    position: null,
-    maximize: false
-  };
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -46,6 +41,14 @@ export class StageService {
 
   initializeStage(){
     this.tiledeskStage = new TiledeskStage('tds_container', 'tds_drawer', 'tds_draggable');
+    this.alpha_connectors = DEFAULT_ALPHA_CONNECTORS;
+    this.loaded = false;
+    this. settings = {
+      alpha_connectors: DEFAULT_ALPHA_CONNECTORS,
+      zoom: 1,
+      position: null,
+      maximize: false
+    };
   }
 
   /** initStageSettings */
@@ -201,14 +204,16 @@ export class StageService {
   
 
 
-
+  /** */
   getMaximize(){
     return this.settings.maximize;
   }
 
+  /** */
   getAlpha(): number {
     return this.alpha_connectors;
   }
+
 
   /** onSwipe */
   onSwipe(event: WheelEvent) {
@@ -224,25 +229,41 @@ export class StageService {
 
   /** SET FUNCTIONS */
 
-  /** setAlphaConnectors */
-  setAlphaConnectors(id_faq_kb?: string, alpha?: number){
+  /**
+   * setAlphaConnectorsByLocalStorage
+   */
+  setAlphaConnectorsByLocalStorage(){
+    if(this.settings?.alpha_connectors){
+      this.alpha_connectors = this.settings?.alpha_connectors;
+    } else {
+      this.alpha_connectors = DEFAULT_ALPHA_CONNECTORS;
+    }
+    this.updateAlphaConnectors(this.alpha_connectors);
+    this.alphaConnectorsSubject.next(this.alpha_connectors);
+  }
+
+
+  /** 
+   * setAlphaConnectors 
+   * !!! NON SALVO PIù NEL LOCAL STORAGE !!!
+   * */
+  setAlphaConnectors(id_faq_kb: string, alpha: number){
     // //console.log("[STAGE SERVICE] setAlphaConnectors: ", alpha);
-    if(id_faq_kb && alpha >= 0){
+    if(alpha >= 0){
       // // this.saveSettings(id_faq_kb, STAGE_SETTINGS.AlphaConnector, alpha);
       this.settings.alpha_connectors = alpha;
       this.alpha_connectors = alpha;
-    } else {
-      // // if(this.settings && this.settings.alpha_connectors >= 0){
-      alpha = Number(this.alpha_connectors);
-    }
-    this.updateAlphaConnectors(alpha);
-    this.alphaConnectorsSubject.next(alpha);
+      this.updateAlphaConnectors(alpha);
+      this.alphaConnectorsSubject.next(alpha);
+    } 
   }
 
-  /** updateAlphaConnectors */
+
+  /** 
+   * updateAlphaConnectors 
+   * */
   updateAlphaConnectors(alpha: number) {
     const svgElement = document.querySelector('#tds_svgConnectors'); 
-    // document.querySelector('#tds_svgConnectors') as HTMLElement;
     if (svgElement) {
       const paths = svgElement.querySelectorAll('path');
       paths.forEach((path) => {
@@ -259,25 +280,24 @@ export class StageService {
   }
 
 
-  /** setPosition */
-  setPosition(){
-    this.logger.log("[STAGE SERVICE] setPosition ");
-    let position = this.settings.position;
-    let scale = this.settings.zoom;
-    setTimeout(() => {
-      this.translateAndScale(position, scale);
-    }, 0);
-  }
-
-  setPositionByStageElement(ElementRef:any){
-    const scale = this.tiledeskStage.scale;
-    const position = this.tiledeskStage.setPositionByStageElement(ElementRef, scale);
-    return position;
-  }
-
-  /** translateAndScale */
-  translateAndScale(pos:any, scale:number){
-    this.tiledeskStage.translateAndScale(pos, scale);
+  /** 
+   * setPositionByLocalStorage 
+   * 
+  */
+  setPositionByLocalStorage(){
+    this.logger.log("[STAGE SERVICE] setPositionByLocalStorage ");
+    let position, scale;
+    if(this.settings?.position){
+      position = this.settings.position;
+    }
+    if(this.settings?.zoom){
+      scale = this.settings.zoom;
+    }
+    if(scale && position){
+      setTimeout(() => {
+        this.tiledeskStage.translateAndScale(position, scale);
+      }, 0);
+    }
   }
 
   
@@ -285,7 +305,7 @@ export class StageService {
    * savePositionByPos
    * @param id_faq_kb 
    * @param position 
-   * called on moved-and-scaled and centerStageOnTopPosition
+   * called on moved-and-scaled and centerStageOnElement, centerStageOnPosition, centerStageOnTopPosition, changeScale, scaleAndCenter
    */
   savePositionByPos(id_faq_kb:string, position:any){
     const scale = this.tiledeskStage.scale;
@@ -294,6 +314,7 @@ export class StageService {
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Position, newPosition);
     this.saveSettings(id_faq_kb, STAGE_SETTINGS.Zoom, scale);
   }
+
 
   /**
    * savePositionAndScale
@@ -309,8 +330,32 @@ export class StageService {
   }
 
 
-  /** saveSettings */
-  saveSettings(id_faq_kb:string, type:STAGE_SETTINGS, value:any){
+  /**
+   * setPositionActionsMenu
+   * calculates the position of the "FLOAT ADD ACTION MENU" to display it on the right or left of the connector
+   * @param point 
+   * @returns 
+  */
+  public setPositionActionsMenu(point){
+    let positionFloatMenu = this.physicPointCorrector(point);
+    let pos = positionFloatMenu.x+CDS_ADD_ACTION_MENU_WIDTH;
+    let cont = this.tiledeskStage.container.offsetWidth;
+    // /this.logger.log("[CDS SERVICE] setPositionActionsMenu", pos, cont);
+    if(cont<pos){
+      positionFloatMenu.x = positionFloatMenu.x+CDS_SIDEBAR_WIDTH-CDS_ADD_ACTION_MENU_WIDTH;
+    } else {
+      positionFloatMenu.x = positionFloatMenu.x+CDS_SIDEBAR_WIDTH;
+    }
+    return positionFloatMenu;
+  }
+
+
+
+
+  /** saveSettings 
+   * save settings stage parameters in local storage
+  */
+  public saveSettings(id_faq_kb:string, type:STAGE_SETTINGS, value:any){
     let settings = JSON.parse(this.appStorageService.getItem(id_faq_kb+'_stage'));
     if(settings){
       this.settings = settings;
@@ -319,26 +364,4 @@ export class StageService {
     this.appStorageService.setItem(id_faq_kb+'_stage', JSON.stringify(this.settings));
   }
 
-
-
-  /**
-   * calcolo la posizione del action menu sul float per decidere se visualizzarlo a dx o sx del puntatore
-   * @param point 
-   * @returns 
-   */
-  public setPositionActionsMenu(point){
-    let positionFloatMenu = this.physicPointCorrector(point);
-    // // const element = document.getElementById('cdsPanelIntentList');
-    let cdsSidebarWidth = 60;
-    let cdsAddActionMenuWidth = 270;
-    let pos = positionFloatMenu.x+cdsAddActionMenuWidth;
-    let cont = this.tiledeskStage.container.offsetWidth;
-    // /this.logger.log("[CDS SERVICE] setPositionActionsMenu", pos, cont);
-    if(cont<pos){
-      positionFloatMenu.x = positionFloatMenu.x+cdsSidebarWidth-cdsAddActionMenuWidth;
-    } else {
-      positionFloatMenu.x = positionFloatMenu.x+cdsSidebarWidth;
-    }
-    return positionFloatMenu;
-  }
 }

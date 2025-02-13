@@ -271,6 +271,12 @@ export const TIME_WAIT_DEFAULT      = 500;
 export const TEXT_CHARS_LIMIT       = 1024;
 export const classCardButtonNoClose = 'card-buttons-no-close';
 
+export const CDS_SIDEBAR_WIDTH = 60;
+export const CDS_PANEL_INTENT_LIST_WIDTH = 230;
+export const CDS_ADD_ACTION_MENU_WIDTH = 270;
+export const DEFAULT_ALPHA_CONNECTORS = 50;
+
+
 
 
 export function calculatingRemainingCharacters(text: string, limit: number): number {
