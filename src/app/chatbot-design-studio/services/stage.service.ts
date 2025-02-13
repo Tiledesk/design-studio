@@ -27,7 +27,7 @@ export class StageService {
   alphaConnectors$ = this.alphaConnectorsSubject.asObservable();
 
   private tiledeskStage: any;
-  private alpha_connectors: number;
+  private alpha_connectors: number = DEFAULT_ALPHA_CONNECTORS;
   settings: Settings;
   loaded: boolean = false;
 
