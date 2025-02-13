@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.27.0
+
 # 1.27.0-rc.20
 - **bug-fixed**: initStageSettings
 - **bug-fixed**: set default alpha_connectors
