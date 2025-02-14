@@ -499,7 +499,9 @@
         "PushTagsToListDescription":"Check this option if you want to add tags to global list.",
         "ViewList":"View list",
         "UseBotSlug":"Use bot slug",
-        "ChooseBotBySlug":"Choose bot by slug"
+        "ChooseBotBySlug":"Choose bot by slug",
+        "VisibilityConnectors":"Visibility of connectors",
+        "ChangeAlphaConnectors":"Change alpha of the connectors color"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
