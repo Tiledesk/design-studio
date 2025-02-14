@@ -7,7 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.27.0
+# 1.28.0
+
+# 1.28.0-rc.1
+- **changed**: added sat-popover on change alpha color
+- **bug-fixed**: element position start only the first time
+- **bug-fixed**: cleanup of "stageService" file
 
 # 1.27.0-rc.20
 - **bug-fixed**: initStageSettings
