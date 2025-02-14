@@ -13,6 +13,7 @@
 - **changed**: added sat-popover on change alpha color
 - **bug-fixed**: element position start only the first time
 - **bug-fixed**: cleanup of "stageService" file
+- **bug-fixed**: on live test of chatbot or intent, save scale and position
 
 # 1.27.0-rc.20
 - **bug-fixed**: initStageSettings
