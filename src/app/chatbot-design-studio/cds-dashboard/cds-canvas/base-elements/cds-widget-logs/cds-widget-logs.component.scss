@@ -1,0 +1,29 @@
+
+  
+  .tds-widget-log-container {
+    min-height: 200px;
+    max-height: 500px;
+    background-color: #fcfafa;
+    width: 100%;
+    height: 150px;
+    z-index: 20;
+    position: absolute;
+    bottom: 0;
+    overflow: hidden; 
+}
+
+
+.resize-handle {
+    width: 100%;
+    height: 30px; 
+    background-color: #efefef;
+    border-top: 1px solid var(--gray-light-02);
+    border-bottom: 1px solid var(--gray-light-02);
+    cursor: ns-resize; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 14px;
+    padding: 0 20px;
+    font-weight: 500;
+}

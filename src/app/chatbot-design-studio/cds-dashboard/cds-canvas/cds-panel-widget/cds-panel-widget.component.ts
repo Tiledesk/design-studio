@@ -1,6 +1,8 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { IntentService } from '../../../services/intent.service';
+import { LogService } from 'src/app/services/log.service';
+
 import { AppConfigService } from 'src/app/services/app-config';
 
 // SERVICES //
@@ -41,7 +43,8 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private elementRef: ElementRef,
     private intentService: IntentService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private logService: LogService
   ) {
   }
 
@@ -101,6 +104,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
         let message = event_data.data.message
         //publish ACTIVE INTENT only if widget-panel is visible
         if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
+          this.onOpenwidget(message);
           let intentName = message.attributes.intentName
           this.intentService.setLiveActiveIntent(intentName)
         }else{
@@ -117,4 +121,15 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
   }
+
+
+  onOpenwidget(message){
+    const support_group_id = message.recipient?message.recipient:null;
+    const projectId = message.attributes?.projectId?message.attributes?.projectId:null;
+    //console.log("APRO I FRAME!!! support_group_id, projectId", support_group_id, projectId);
+    let serverBaseURL = this.appConfigService.getConfig().apiUrl;
+    this.logService.initialize(serverBaseURL, projectId, support_group_id);
+  }
+
+
 }

@@ -86,10 +86,13 @@
         [stateUndoRedo]="stateUndoRedo"
         (onOptionClicked)="onOptionClicked($event)">
     </cds-options>
-    
-
 
 </div>
+
+
+<cds-widget-logs *ngIf="IS_OPEN_WIDGET_LOG"
+></cds-widget-logs>
+
 
 
 <cds-add-action-menu class="menu--context--add" 
