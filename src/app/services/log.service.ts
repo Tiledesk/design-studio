@@ -14,7 +14,7 @@ export class LogService {
 
   SERVER_BASE_PATH: string;
   LOG_URL: any;
-  logs: any;
+  logs: any = null;
   
   private tiledeskToken: string;
   private project_id: string;
@@ -31,21 +31,22 @@ export class LogService {
     support_group_id = "support-group-62c3f10152dc7400352bab0d-bbbc598e4759420f9541f46a3df0fd16";
     this.LOG_URL = serverBaseUrl + projectId + '/logs/flows/' + support_group_id;
     this.logger.log('[LOG-SERV] initialize', serverBaseUrl, this.LOG_URL);
+    this.logs = '';
+  }
 
-    this.getLastLogs().subscribe({ next: (resp)=> {
-      this.logger.log("[LOG-SERV] get AllFaqById blocks: ", resp);
-      this.logs = resp;
-      this.BSWidgetLoaded.next(resp)
-    }, error: (error)=> {
-      this.logger.error("[LOG-SERV] error get AllFaqById: ", error);
-    }, complete: () => {
-      this.logger.log("[LOG-SERV] get AllFaqById completed.");
-    }})
 
-    
+  public resetLogService(){
+    this.logs = null;
   }
 
   
+  public initLogService(resp: any){
+    this.logs = resp;
+    this.BSWidgetLoaded.next(resp);
+  }
+
+
+
   public getLastLogs(): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({

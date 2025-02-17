@@ -131,8 +131,8 @@
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-action-detail> 
 
-<!-- *ngIf="IS_OPEN_PANEL_WIDGET" intent]="intentSelected" -->
-<cds-panel-widget  *ngIf="testitOutFirstClick"
+<!-- *ngIf="IS_OPEN_PANEL_WIDGET" intent]="intentSelected" testitOutFirstClick -->
+<cds-panel-widget  *ngIf="IS_OPEN_PANEL_WIDGET"
     id="widget-preview" 
     class="cds-generic-panel"
     [class.isVisible]="IS_OPEN_PANEL_WIDGET"

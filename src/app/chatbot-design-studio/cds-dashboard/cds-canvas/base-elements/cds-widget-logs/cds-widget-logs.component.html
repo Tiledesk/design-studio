@@ -1,8 +1,15 @@
-<div id="tds_widget_log" class="tds-widget-log-container">
-    <div class="resize-handle" (mousedown)="initResize($event)">Logs</div>
-    <div class="content">
-        tutti i log
-        
-        {{logs}}
+<div *ngIf="listOfLogs"  id="cds_widget_log" class="cds-widget-log-container" [class.closed]="isClosed">
+    <div class="resize-handle" (mousedown)="initResize($event)">
+        Logs
+        <div class="button-toggle" (click)="toggleLog()">
+            <img class="active-icon" [ngClass]="isClosed ? 'arrow-down' : 'arrow-up'" src="assets/images/icons/keyboard_arrow_down.svg" alt="button toggle">
+        </div>
     </div>
+    <div class="content-log" (scroll)="onScroll($event)" (wheel)="onWheel($event)">
+        <!-- <div class="row-log"></div> -->
+        <div *ngFor="let log of listOfLogs; let i = index;" class="row-log">
+            <span class="row-log-time">{{log.rows?.timestamp | date: 'dd/MM/yy HH:mm:ss'}} </span><span class="row-log-level" [ngClass]="log.rows?.level">{{log.rows?.level}} </span> <span class="row-log-text">{{log.rows?.text}}</span>
+        </div>
+    </div> 
 </div>
+

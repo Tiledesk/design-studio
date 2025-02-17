@@ -436,7 +436,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
     /** SUBSCRIBE TO THE LOADED WIDGET */
     this.subscriptionWidgetLoaded = this.logService.BSWidgetLoaded.subscribe((event: any) => {
-      this.logger.log("[CDS-CANVAS] ho caricato il widget!!!: ", event);
+      this.logger.log("[CDS-CANVAS] logService loaded ", event);
       if(event){
         this.IS_OPEN_WIDGET_LOG = true;
       }
@@ -477,6 +477,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** closeAllPanels */
   private closeAllPanels(){
     this.IS_OPEN_PANEL_WIDGET = false;
+    this.IS_OPEN_WIDGET_LOG = false;
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
@@ -1261,10 +1262,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // - button configuration panel  
   // -------------------------------------------------------
   onTestItOut(intent: Intent) {
-    // this.testItOut.emit(true);
+    // // this.testItOut.emit(true);
     this.testitOutFirstClick = true;
+    this.IS_OPEN_PANEL_WIDGET = true;
     this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
-    this.IS_OPEN_PANEL_WIDGET = true
     this.intentService.startTestWithIntent(intent);
    
     // this.logService.initialize(serverBaseURL, this.project._id, support_group_id);
