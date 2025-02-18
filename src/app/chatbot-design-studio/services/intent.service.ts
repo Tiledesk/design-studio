@@ -825,7 +825,6 @@ export class IntentService {
         }
         let id_faq_kb = this.dashboardService.id_faq_kb;
         this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
-
       }
     }
   }

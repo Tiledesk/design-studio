@@ -62,54 +62,63 @@
     min-height: 370px;
 }
 
+::ng-deep .alpha-color-connectors-panel {
+  // position: relative;
+  box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;
+  background: rgb(255,255,255);
+  border-radius: 4px;
+  margin: 10px;
+  max-height: 80%;
+  min-height: 100px;
+}
 
 
 
-.vertical-slider-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 120px;
-    width: 47px;
-    border-radius: 8px;
-    position: absolute;
-    bottom: 55px;
-  }
+// .vertical-slider-container {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     height: 120px;
+//     width: 47px;
+//     border-radius: 8px;
+//     position: absolute;
+//     bottom: 55px;
+//   }
   
-  .vertical-slider {
-    appearance: none;
-    width: 90px;
-    height: 4px;
-    transform: rotate(-90deg);
-    transform-origin: center;
-    margin: 0;
-    background: #506493;
-    border-radius: 2px;
-  }
+//   .vertical-slider {
+//     appearance: none;
+//     width: 90px;
+//     height: 4px;
+//     transform: rotate(-90deg);
+//     transform-origin: center;
+//     margin: 0;
+//     background: #506493;
+//     border-radius: 2px;
+//   }
   
-  .vertical-slider::-webkit-slider-thumb {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    margin-top: -8px;
-    background-color: #ffffff;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 1px solid #d3d3d3;
-    box-shadow: -2px 0px 4px rgba(0, 0, 0, 0.2);
-  }
+//   .vertical-slider::-webkit-slider-thumb {
+//     appearance: none;
+//     width: 20px;
+//     height: 20px;
+//     margin-top: -8px;
+//     background-color: #ffffff;
+//     border-radius: 50%;
+//     cursor: pointer;
+//     border: 1px solid #d3d3d3;
+//     box-shadow: -2px 0px 4px rgba(0, 0, 0, 0.2);
+//   }
   
-.vertical-slider::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 4px;
-    background: #506493;
-    border-radius: 4px;
-  }
+// .vertical-slider::-webkit-slider-runnable-track {
+//     width: 100%;
+//     height: 4px;
+//     background: #506493;
+//     border-radius: 4px;
+//   }
   
-  .vertical-slider::-moz-range-track {
-    width: 100%;
-    height: 4px;
-    background: #506493;
-    border-radius: 4px;
-  }
+//   .vertical-slider::-moz-range-track {
+//     width: 100%;
+//     height: 4px;
+//     background: #506493;
+//     border-radius: 4px;
+//   }
   
