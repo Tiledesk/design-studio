@@ -428,3 +428,8 @@ svg:not(:root) {
   }
 }
 
+cds-widget-logs {
+  width: calc(100% - 460px);
+  position: absolute;
+  bottom: 0;
+}
