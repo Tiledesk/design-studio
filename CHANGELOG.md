@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.28.1
+- **added**: doc for AI_PROMPT and WHATSAPP actions
+
 # 1.28.0
 
 # 1.27.0-rc.20
