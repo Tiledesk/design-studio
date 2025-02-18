@@ -11,6 +11,8 @@
 
 # 1.28.0-rc.2
 - **added**: added OpenIntentListState in local storage
+- **added**: added widget log panel
+- **changed**: new panel to change alpha color
 
 # 1.28.0-rc.1
 - **changed**: added sat-popover on change alpha color
