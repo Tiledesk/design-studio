@@ -16,6 +16,7 @@ export interface Settings {
     y: number;
   };
   maximize: boolean;
+  open_intent_list_state: boolean;
 }
 
 @Injectable({
@@ -47,7 +48,8 @@ export class StageService {
       alpha_connectors: DEFAULT_ALPHA_CONNECTORS,
       zoom: 1,
       position: null,
-      maximize: false
+      maximize: false, 
+      open_intent_list_state: true
     };
     this.initStageSettings(id_faq_kb);
   }
