@@ -143,13 +143,13 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', support_group_id, projectId);
     let serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.logService.initialize(serverBaseURL, projectId, support_group_id); 
-    this.logService.getLastLogs().subscribe({ next: (resp)=> {
-      this.logService.initLogService(resp);
-    }, error: (error)=> {
-      this.logger.error("[LOG-SERV] initLogService error: ", error);
-    }, complete: () => {
-      this.logger.log("[LOG-SERV] initLogService completed.");
-    }})
+    // this.logService.getLastLogs().subscribe({ next: (resp)=> {
+    //   this.logService.initLogService(resp);
+    // }, error: (error)=> {
+    //   this.logger.error("[LOG-SERV] initLogService error: ", error);
+    // }, complete: () => {
+    //   this.logger.log("[LOG-SERV] initLogService completed.");
+    // }})
   }
 
 

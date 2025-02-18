@@ -21,6 +21,13 @@ export const DOCS_LINK = {
     }
 }
 
+export enum LOG_LEVELS {
+    DEFAULT       = 'default',
+    INFO          = 'info',
+    WARNINGS      = 'warnings',
+    ERRORS        = 'errors'
+}
+
 export enum STAGE_SETTINGS {
     AlphaConnector = 'alpha_connectors',
     Zoom = 'zoom',

@@ -10,14 +10,13 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 })
 
 export class LogService {
-  BSWidgetLoaded = new BehaviorSubject<any>(null);
+  BSWidgetLoaded = new BehaviorSubject<boolean>(null);
 
   SERVER_BASE_PATH: string;
   LOG_URL: any;
   logs: any = null;
   
   private tiledeskToken: string;
-  private project_id: string;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
@@ -28,10 +27,11 @@ export class LogService {
 
   async initialize(serverBaseUrl: string, projectId: string, support_group_id: string){
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
-    support_group_id = "support-group-62c3f10152dc7400352bab0d-bbbc598e4759420f9541f46a3df0fd16";
+    // // support_group_id = "support-group-62c3f10152dc7400352bab0d-bbbc598e4759420f9541f46a3df0fd16";
     this.LOG_URL = serverBaseUrl + projectId + '/logs/flows/' + support_group_id;
     this.logger.log('[LOG-SERV] initialize', serverBaseUrl, this.LOG_URL);
     this.logs = '';
+    this.BSWidgetLoaded.next(true);
   }
 
 
@@ -42,31 +42,31 @@ export class LogService {
   
   public initLogService(resp: any){
     this.logs = resp;
-    this.BSWidgetLoaded.next(resp);
+    // this.BSWidgetLoaded.next(resp);
   }
 
 
 
-  public getLastLogs(): Observable<any> {
+  public getLastLogs(logLevel?): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': this.tiledeskToken
       })
     };
-    let url = this.LOG_URL;
+    let url = this.LOG_URL+'?logLevel='+logLevel;
     this.logger.log('[LOG-SERV] - GET LOG - URL', url);
     return this._httpClient.get<any>(url, httpOptions)
   }
 
-  public getOtherLogs(timestamp: string, direction: "prev"|"next"): Observable<any> {
+  public getOtherLogs(timestamp: string, direction: "prev"|"next", logLevel?): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': this.tiledeskToken
       })
     };
-    let url = this.LOG_URL + '?timestamp=' + timestamp + "&direction=" + direction;
+    let url = this.LOG_URL + '?timestamp=' + timestamp + "&direction=" + direction +'&logLevel='+logLevel;
     this.logger.log('[LOG-SERV] - GET LOG - URL', url);
     return this._httpClient.get<any>(url, httpOptions)
   }
