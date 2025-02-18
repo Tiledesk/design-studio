@@ -18,6 +18,7 @@ export class ImagePreloaderResolver implements Resolve<boolean> {
     const imageUrls = [
       DOC_BASE_URL+'ADD_TAGS.png',
       DOC_BASE_URL+'AGENT.png',
+      DOC_BASE_URL+'AI_PROMPT.png',
       DOC_BASE_URL+'ASKGPT.png',
       DOC_BASE_URL+'ASSIGN_VARIABLE.png',
       DOC_BASE_URL+'BREVO.png',
@@ -49,6 +50,7 @@ export class ImagePreloaderResolver implements Resolve<boolean> {
       DOC_BASE_URL+'WEB_REQUESTV2.png',
       DOC_BASE_URL+'WHATSAPP_ATTRIBUTE.png',
       DOC_BASE_URL+'WHATSAPP_STATIC.png',
+      DOC_BASE_URL+'WHATSAPP.png'
 
       
     ];
