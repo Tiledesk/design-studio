@@ -138,34 +138,54 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
 
-  onScroll(event: any) {
-    const element = event.target;
-    const atBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
-    const atTop = element.scrollTop === 0;
-    if (atBottom && !this.scrollBottom) {
-      this.logger.log('[CDS-WIDGET-LOG] - Sei arrivato alla fine del div');
-      this.scrollBottom = true;
-      this.loadLogs("next");
-    } 
-    if (atTop && !this.scrollTop) {
-      this.scrollTop = true;
-      this.logger.log('[CDS-WIDGET-LOG] - Sei arrivato all\'inizio del div.');
-      this.loadLogs("prev");
-    } 
-    else if(!atTop && !atBottom){
-      this.scrollTop = false;
-      this.scrollBottom = false;
-    }
-  }
+  // onScroll(event: any) {
+  //   const element = event.target;
+  //   const atBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
+  //   const atTop = element.scrollTop === 0;
+  //   if (atBottom && !this.scrollBottom) {
+  //     this.logger.log('[CDS-WIDGET-LOG] - Sei arrivato alla fine del div');
+  //     this.scrollBottom = true;
+  //     this.loadLogs("next");
+  //   } 
+  //   if (atTop && !this.scrollTop) {
+  //     this.scrollTop = true;
+  //     this.logger.log('[CDS-WIDGET-LOG] - Sei arrivato all\'inizio del div.');
+  //     this.loadLogs("prev");
+  //   } 
+  //   else if(!atTop && !atBottom){
+  //     this.scrollTop = false;
+  //     this.scrollBottom = false;
+  //   }
+  // }
 
   onWheel(event: any) {
     const element = event.target;
-    const atTop = element.scrollTop === 0;
-    if (atTop && event.deltaY < 0 && this.scrollTop === null) {
-      this.scrollTop = true;
-      this.logger.log('[CDS-WIDGET-LOG] - Sei già all\'inizio del div e stai scrollando ulteriormente verso l\'alto.');
-      this.loadLogs("prev");
+    if (event.deltaY < 0) {
+      // this.logger.log('[CDS-WIDGET-LOG] Scroll verso l\'alto');
+      const atTop = element.scrollTop === 0;
+      this.scrollBottom = false;
+      if (atTop && !this.scrollTop) {
+          this.scrollTop = true;
+          this.loadLogs("prev");
+          this.logger.log('[CDS-WIDGET-LOG] Sei già all\'inizio del div e stai scrollando ulteriormente verso l\'alto.');
+      }
+    } else if (event.deltaY > 0) {
+      // this.logger.log('[CDS-WIDGET-LOG] Scroll verso il basso');
+      const atBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
+      this.scrollTop = false;
+      if (atBottom && !this.scrollBottom) {
+        this.scrollBottom = true;
+        this.loadLogs("next");
+        this.logger.log('[CDS-WIDGET-LOG] Sei già alla fine del div e stai scrollando ulteriormente verso il basso.');
+      }
     }
+
+
+    // if (atTop && event.deltaY < 0 && this.scrollTop === null) {
+    //   this.scrollTop = true;
+    //   this.logger.log('[CDS-WIDGET-LOG] - Sei già all\'inizio del div e stai scrollando ulteriormente verso l\'alto.');
+    //   this.loadLogs("prev");
+    // }
   }
 
   toggleLog() {

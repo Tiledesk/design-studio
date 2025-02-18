@@ -1263,31 +1263,25 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // -------------------------------------------------------
   onTestItOut(intent: Intent) {
     // // this.testItOut.emit(true);
+    this.closeAllPanels();
     this.testitOutFirstClick = true;
-    this.IS_OPEN_PANEL_WIDGET = true;
     this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
     this.intentService.startTestWithIntent(intent);
-   
-    // this.logService.initialize(serverBaseURL, this.project._id, support_group_id);
-    // if(typeof event === "boolean"){
-    //   this.IS_OPEN_PANEL_WIDGET = true;
-    // } else {
-    //   this.IS_OPEN_PANEL_WIDGET = !this.IS_OPEN_PANEL_WIDGET;
-    // }
-    if(this.IS_OPEN_PANEL_WIDGET){
-      this.controllerService.closeActionDetailPanel();
-      this.controllerService.closeButtonPanel();
-      // this.intentService.setLiveActiveIntent(null);
-      this.controllerService.closeAddActionMenu();
-      this.connectorService.removeConnectorDraft();
-    }
+    this.controllerService.closeActionDetailPanel();
+    this.controllerService.closeButtonPanel();
+    // // this.intentService.setLiveActiveIntent(null);
+    this.controllerService.closeAddActionMenu();
+    this.connectorService.removeConnectorDraft();
     if(intent){
-      // this.intentSelected = intent;
+      // // this.intentSelected = intent;
       this.intentService.setIntentSelectedById(intent.intent_id);
       this.intentService.setIntentSelected(intent.intent_id);
       this.closeExtraPanels();
     }
 
+    setTimeout(() => {
+      this.IS_OPEN_PANEL_WIDGET = true;
+    }, 500);
   }
 
   /** onActionDeleted */

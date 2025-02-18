@@ -14,7 +14,7 @@
             <img class="active-icon" [ngClass]="isClosed ? 'arrow-down' : 'arrow-up'" src="assets/images/icons/keyboard_arrow_down.svg" alt="button toggle">
         </div>
     </div>
-    <div class="content-log" (scroll)="onScroll($event)" (wheel)="onWheel($event)">
+    <div class="content-log" (wheel)="onWheel($event)">
         <div *ngIf="loadingPrev" class="row-log-loading">
             <div class="dot"></div>
             <div class="dot"></div>

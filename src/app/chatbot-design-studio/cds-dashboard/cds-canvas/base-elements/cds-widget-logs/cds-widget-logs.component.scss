@@ -1,6 +1,6 @@
 .cds-widget-log-container {
   min-height: 200px;
-  max-height: 800px;
+  max-height: calc(100vh - 65px);
   background-color: #ffffff;
   width: 100%;
   height: 200px;
@@ -59,7 +59,7 @@
   font-size: 12px;
   padding: 10px;
   color: var(--gray);
-  overflow-y: scroll;
+  overflow-y: auto;
   height: calc(100% - 30px);
   position: relative;
   width: 100%;
@@ -72,14 +72,18 @@
 
 
 .row-log-time {
-  font-size: 10px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight:initial;
   color: var(--gray);
+  display: inline-block;
+  width: 110px;
 }
 
 .row-log-level {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
+  display: inline-block;
+  width: 55px;
   &.info{
     color: #1b6ef3;
   }
@@ -93,9 +97,9 @@
 
 .row-log-text {
   font-size: 12px;
-  line-height: 1.4;
-  display: inline-block;
   color: var(--gray);
+  display: inline-block;
+  width: calc(100% - 165px);
 }
 
 
