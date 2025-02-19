@@ -209,7 +209,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
     //setTimeout(() => {
       this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
-
       if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
