@@ -294,6 +294,7 @@ export class IntentService {
           this.patchActionId(faqs);
           this.listOfIntents = JSON.parse(JSON.stringify(faqs));
           this.prevListOfIntent = JSON.parse(JSON.stringify(faqs));
+          this.intentAnalyzer();
         } else {
           this.listOfIntents = [];
           this.prevListOfIntent = [];
@@ -309,6 +310,17 @@ export class IntentService {
     });
   }
 
+
+  private intentAnalyzer() {
+    this.listOfIntents.forEach(intent => {
+      if (intent.actions) {
+        intent.actions = intent.actions.filter(obj => obj !== null);
+      }
+      if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK){
+        intent.attributes.readonly = true;
+      }
+    });
+  }
 
   /**
    * patchActionId
