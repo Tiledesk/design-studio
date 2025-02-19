@@ -430,7 +430,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     const getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
     if (getAllIntents) {
       this.listOfIntents = this.intentService.listOfIntents;
-      this.initListOfIntents();
+      // this.initListOfIntents();
+      this.refreshIntents();
       this.initLoadingStage();
       // // this.intentService.setStartIntent();
       this.mapOfIntents = await this.intentService.setMapOfIntents();
@@ -480,14 +481,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   /** initListOfIntents */
-  private initListOfIntents() {
-    this.listOfIntents.forEach(intent => {
-      if (intent.actions) {
-        intent.actions = intent.actions.filter(obj => obj !== null);
-      }
-    });
-    this.refreshIntents();
-  }
+  // private initListOfIntents() {
+  //   this.listOfIntents.forEach(intent => {
+  //     if (intent.actions) {
+  //       intent.actions = intent.actions.filter(obj => obj !== null);
+  //     }
+  //   });
+  //   this.refreshIntents();
+  // }
 
   /** SET DRAG STAGE AND CREATE CONNECTORS *
   * set drag and listner on intents, 
