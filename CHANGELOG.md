@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 # 1.28.1
+- **bug-fixed**: error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
+- **bug-fixed**: defaultfallback and start intents error to display in cds-panel-intent-list
+
+# 1.28.1
 - **added**: doc for AI_PROMPT and WHATSAPP actions
 
 # 1.28.0
