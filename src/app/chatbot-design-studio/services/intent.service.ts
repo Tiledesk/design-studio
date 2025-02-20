@@ -61,7 +61,6 @@ export class IntentService {
   operationsUndo: any = [];
   operationsRedo: any = [];
   // newPosition: any = {'x':0, 'y':0};
-  
 
   private changedConnector = new Subject<any>();
   public isChangedConnector$ = this.changedConnector.asObservable();
@@ -177,7 +176,7 @@ export class IntentService {
   }
 
   public setIntentSelectedPosition(x, y){
-    if (this.intentSelected && this.intentSelected.attributes) {
+    if (this.intentSelected?.attributes) {
       if (!this.intentSelected.attributes.position) {
         this.intentSelected.attributes.position = {};
       }

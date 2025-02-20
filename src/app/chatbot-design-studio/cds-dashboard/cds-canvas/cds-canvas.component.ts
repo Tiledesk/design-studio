@@ -122,21 +122,21 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   IS_OPEN_COLOR_MENU: boolean = false;
   positionColortMenu: any = { 'x': 0, 'y': 0 };
 
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private readonly logger: LoggerService = LoggerInstance.getInstance()
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   startDraggingPosition: any = null;
 
 
   constructor(
-    private intentService: IntentService,
-    private stageService: StageService,
-    private connectorService: ConnectorService,
-    private controllerService: ControllerService,
-    private translate: TranslateService,
-    public dashboardService: DashboardService,
-    private changeDetectorRef: ChangeDetectorRef,
-    private route: ActivatedRoute, 
+    private readonly intentService: IntentService,
+    private readonly stageService: StageService,
+    private readonly connectorService: ConnectorService,
+    private readonly controllerService: ControllerService,
+    // private translate: TranslateService,
+    public readonly dashboardService: DashboardService,
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly route: ActivatedRoute, 
     public appStorageService: AppStorageService
   ) {
     this.setSubscriptions();
@@ -192,7 +192,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
     // this.stageService.initStageSettings(this.id_faq_kb);
-    
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
     this.changeDetectorRef.detectChanges();
@@ -427,7 +426,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    private async initialize(){
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
-    const getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
+    let getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
     if (getAllIntents) {
       this.listOfIntents = this.intentService.listOfIntents;
       // // this.initListOfIntents();

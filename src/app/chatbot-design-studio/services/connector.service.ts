@@ -87,6 +87,10 @@ export class ConnectorService {
     }
   }
 
+
+
+
+
   /**
    * createConnectors
    * @param intents 
@@ -904,15 +908,17 @@ export class ConnectorService {
   }
 
   private createConnector(intent, idConnectorFrom, idConnectorTo){
-    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent);
-    const connectorsAttributes = intent.attributes.connectors;
-    if(idConnectorFrom && idConnectorTo){
-      const connectorID = idConnectorFrom+'/'+idConnectorTo;
-      let attributes = null;
-      if(connectorsAttributes && connectorsAttributes[connectorID]){
-        attributes = connectorsAttributes[connectorID]
-      }
-      this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
+    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent, idConnectorFrom, idConnectorTo);
+      const connectorsAttributes = intent.attributes.connectors;
+      if(idConnectorFrom && idConnectorTo){
+        const connectorID = idConnectorFrom+'/'+idConnectorTo;
+        let attributes = null;
+        if(connectorsAttributes?.connectorID){
+          attributes = connectorsAttributes[connectorID]
+        }
+        this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
+    } else {
+      this.logger.log('[CONNECTOR-SERV] - il connettore è rotto non esiste intent ->', idConnectorTo);
     }
   }
   /*************************************************/

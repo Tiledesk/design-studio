@@ -13,7 +13,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID } from 'src/app/chatbot-design-studio/utils';
 
 export enum HAS_SELECTED_TYPE {
   ANSWER = "HAS_SELECTED_ANSWER",
@@ -214,11 +214,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
       if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START){
         this.isStart = true;
+        if(this.intent.actions.length === 0){
+          let action = new Action;
+          action._tdActionType =  "intent";
+          this.intent.actions.push(action);
+        }
         this.startAction = this.intent.actions[0];
       } else {
         this.setIntentSelected();
       }
       
+      // this.logger.log('[CDS-INTENT] patchBrokenConnectors -->', this.intent);
 
       // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
       //   this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
