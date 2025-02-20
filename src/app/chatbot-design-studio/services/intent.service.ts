@@ -1734,12 +1734,13 @@ export class IntentService {
     this.logger.log('[INTENT SERVICE] -> pasteElementToStage, ', element, point);
     if(element && element.type === 'INTENT'){
       let newIntent_id = uuidv4();
-      let prevIntent = element.element;
+      let prevIntent = this.replaceId(element.element, '_tdActionId');
       let newAction = prevIntent.actions[0];
       let newIntent = this.createNewIntent(element.chatbot, newAction, 0);
       newIntent.attributes = prevIntent.attributes;
       newIntent.attributes.position = point;
       newIntent.actions = prevIntent.actions;
+      this.logger.log('[INTENT SERVICE] -> prevIntent ', prevIntent);
       this.pasteIntentOntoStage(newIntent, prevIntent.intent_id, newIntent_id);
     } else if(element && element.type === 'ACTION'){
       // let newAction = element.element;
@@ -1792,5 +1793,18 @@ export class IntentService {
     //return results;
   }
 
+
+  private replaceId(obj: any, keyToReplace: string) {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (key === keyToReplace) {
+          obj[key] = uuidv4();
+        } else if (typeof obj[key] === "object" && obj[key] !== null) {
+          this.replaceId(obj[key], keyToReplace);
+        }
+      }
+    }
+    return obj;
+  }
 
 }
