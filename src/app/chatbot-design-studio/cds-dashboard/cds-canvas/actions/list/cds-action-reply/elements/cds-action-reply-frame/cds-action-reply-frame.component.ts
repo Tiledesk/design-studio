@@ -54,14 +54,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
 
 
   private initialize(){
-    if(this.index == 1 && (this.wait?.time == 500 || this.wait?.time == 0)) {
-      this.delayTime = 0
-    } else if(this.wait?.time && this.wait.time > 0){
-      this.delayTime = this.wait.time/1000; 
-    } else {
-      this.delayTime = 500/1000;
-    } 
-    // // this.delayTime = (this.wait && this.wait.time  || this.wait.time === 0)? (this.wait.time/1000) : 500/1000;
+    this.delayTime = (this.wait?.time && this.wait?.time !== 0)? (this.wait.time/1000) : 500/1000;
     if(this.response?._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
       this.filterConditionExist = true
     }
@@ -138,7 +131,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
 
   /** */
   onLoadPathElement(){
-    //this.response.metadata.height = '1000px';
+    // // this.response.metadata.height = '1000px';
     this.changeActionReply.emit();
   }
 
