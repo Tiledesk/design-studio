@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.28.1-rc.1
+- **added**: create a new intent (float action menu) of the same color as the parent intent
+- **bug-fixed**: fixed error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
+- **bug-fixed**: fix default fallback and start blocks error to display in cds-panel-intent-list
+
 # 1.28.1
 - **bug-fixed**: error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
 - **bug-fixed**: defaultfallback and start intents error to display in cds-panel-intent-list
@@ -15,6 +20,17 @@
 - **added**: doc for AI_PROMPT and WHATSAPP actions
 
 # 1.28.0
+
+# 1.28.0-rc.2
+- **added**: added OpenIntentListState in local storage
+- **added**: added widget log panel
+- **changed**: new panel to change alpha color
+
+# 1.28.0-rc.1
+- **changed**: added sat-popover on change alpha color
+- **bug-fixed**: element position start only the first time
+- **bug-fixed**: cleanup of "stageService" file
+- **bug-fixed**: on live test of chatbot or intent, save scale and position
 
 # 1.27.0-rc.20
 - **bug-fixed**: initStageSettings

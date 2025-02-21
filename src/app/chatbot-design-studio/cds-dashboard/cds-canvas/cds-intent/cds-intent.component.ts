@@ -397,7 +397,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     document.addEventListener(
       "connector-moved-out-of-intent", (e: CustomEvent) => {
-        this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
+        // // this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
 
         // !!!se il connettore è a meno di Xpx dalla fine dello stage sposta lo stage!!!!
         if (e.detail?.toId === this.intent.intent_id) {
@@ -931,9 +931,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
     this.intentColor = color;
     this.intent.attributes.color = color;
-    // if(INTENT_COLORS[color]){
     if(color){
-      // const nwColor = INTENT_COLORS[color];
       document.documentElement.style.setProperty('--intent-color', `${color}`);
       this.setConnectorColor(color);
       this.intentService.updateIntent(this.intent); 
