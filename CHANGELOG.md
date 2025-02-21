@@ -7,6 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.28.2-rc.1
+- **bug-fixed**: action reply, set time to zero only if it is the first action and it is an action reply text
+- **bug-fixed**: error in action reply: in image and frame (undefined params); cds-textarea change element id which is always "text-area"
+- **bug-fixed**: on copy and paste of an intent, changes all ids of the intent (idactions etc)
+- **bug-fixed**: patch on intent start if there is no action
+- **bug-fixed**: patch to check all connectors! if there are corrupt connectors, delete them! but I don't save, I keep everything in memory
+
+
 # 1.28.1-rc.1
 - **added**: create a new intent (float action menu) of the same color as the parent intent
 - **bug-fixed**: fixed error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
