@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.28.3
+- **bug-fixed**: widget into iframe not allows to use microphone
+
 # 1.28.1
 - **bug-fixed**: error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
 - **bug-fixed**: defaultfallback and start intents error to display in cds-panel-intent-list
