@@ -109,3 +109,32 @@
         border-radius: 50%;
     }
 }
+
+.block-contract-connector {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    display: none;
+}
+
+.connector-line {
+    font-size: 20px;
+    display: flex;
+}
+
+.connector-to-intent {
+    display: flex;
+    background-color: white;
+    font-size: 10px;
+    width: max-content;
+    max-width: 200px;
+    height: 24px;
+    overflow: hidden;
+    padding: 0px 10px;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    border: 1px solid rgb(230 230 230);
+    border-radius: 6px;
+}

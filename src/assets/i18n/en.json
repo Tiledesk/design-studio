@@ -275,6 +275,7 @@
         "ContactSales":"Contact Sales",
         "Drag":"Drag",
         "DeleteConnector":"Delete connector",
+        "ShowHideConnector":"show/hide connector",
         "LineText":"Line text",
         "IntentPanel": "Settings panel",
         "ColorBlock":"Block color",

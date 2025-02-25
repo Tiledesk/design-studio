@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 
 @Component({
@@ -14,12 +15,26 @@ export class CdsConnectorComponent implements OnInit {
   @Output() onShowConnector = new EventEmitter();
   @Output() onHideConnector = new EventEmitter();
 
+  intent_display_name: string;
+
   constructor(
-    private readonly stageService: StageService
+    private readonly stageService: StageService,
+    private readonly intentService: IntentService
   ) { }
 
   ngOnInit(): void {
-    // empty
+    this.getIntentDisplayName();
+  }
+
+  getIntentDisplayName(){
+    if(this.idConnection){
+      let intentId = this.idConnection.substring(this.idConnection.lastIndexOf('/') + 1);
+      intentId = intentId.replace(/#/g, '');
+      const intent = this.intentService.getIntentFromId(intentId);
+      if(intent){
+        this.intent_display_name = intent.intent_display_name;
+      }
+    }
   }
 
   public showConnector(){

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
 import { StageService } from '../services/stage.service';
-import { TYPE_BUTTON, isElementOnTheStage, generateShortUID } from '../utils';
+import { TYPE_BUTTON, isElementOnTheStage, generateShortUID, getOpacityFromRgba, getColorFromRgba } from '../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Setting } from 'src/app/models/action-model';
@@ -1301,7 +1301,7 @@ export class ConnectorService {
 
 
   public createListOfConnectorsByIntent(intent:any){
-    if(intent.attributes && intent.attributes.nextBlockAction){
+    if(intent.attributes?.nextBlockAction){
       let idConnectorFrom = null;
       let idConnectorTo = null;
       let nextBlockAction = intent.attributes.nextBlockAction;
@@ -1337,7 +1337,7 @@ export class ConnectorService {
             this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             const connectorID = idConnectorFrom+'/'+idConnectorTo;
-        this.mapOfConnectors[connectorID] =  {'shown': false };
+            this.mapOfConnectors[connectorID] =  {'shown': false };
           }
         }
 
@@ -1994,6 +1994,32 @@ export class ConnectorService {
         this.addCustomMarker(connector.id, rgba);
       }
     });
+  }
+
+
+
+  setDisplayConnectorByIdConnector(connectorId: string) {
+    let connector = this.mapOfConnectors[connectorId];
+    const element = document.getElementById(connectorId);
+    this.logger.log('[CONNECTOR-SERV] show-hide:: ', connector);
+    if (element) {
+      if(this.mapOfConnectors[connectorId].display === false){
+        this.mapOfConnectors[connectorId].display = true;
+      }
+      else {
+        this.mapOfConnectors[connectorId].display = false;
+      } 
+      this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
+      element.setAttribute('display', connector.display?'block':'none');
+      const elementRect = document.getElementById('rect_'+connectorId);
+      if(elementRect){
+        elementRect.setAttribute('display', connector.display?'block':'none');
+      }
+      const elementLabel = document.getElementById('label_'+connectorId);
+      if(elementLabel){
+        elementLabel.setAttribute('display', connector.display?'block':'none');
+      }
+    }
   }
 
 }

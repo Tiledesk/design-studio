@@ -1,5 +1,19 @@
 <div class="intent-header-actions-container">
   <div class="intent-header-actions-wpr">
+    
+    <!-- ---------------------------------- -->
+    <!-- show/hide intent  -->
+    <!-- ---------------------------------- -->
+    <div class="intent-header-action-btn icon"
+      matTooltipClass="cds-mat-tooltip"
+      [matTooltip]="'CDSCanvas.ShowHideConnector' | translate"
+      matTooltipPosition="above"
+      matTooltipHideDelay="100"
+      (click)="onAddActionFromConnectorMenu(typeOfmenu.SHOW_HIDE)">
+      <img *ngIf="displayConnector === true" src="assets/images/icons/visibility.svg" alt="hide connector" />
+      <img *ngIf="displayConnector === false" src="assets/images/icons/visibility_off.svg" alt="show connector" />
+    </div>
+
     <!-- ---------------------------------- -->
     <!-- Delete intent  -->
     <!-- ---------------------------------- -->
@@ -9,7 +23,7 @@
       matTooltipPosition="above"
       matTooltipHideDelay="100"
       (click)="onAddActionFromConnectorMenu(typeOfmenu.DELETE)">
-      <img src="assets/images/icons/bin.svg" />
+      <img src="assets/images/icons/bin.svg" alt="delete" />
     </div>
     <div class="intent-header-action-btn icon"
       matTooltipClass="cds-mat-tooltip"
@@ -17,7 +31,7 @@
       matTooltipPosition="above"
       matTooltipHideDelay="100"
       (click)="onShowLineTextArea()">
-      <img src="assets/images/icons/line_text.svg" />
+      <img src="assets/images/icons/line_text.svg" alt="line text" />
     </div>
   </div>
 
