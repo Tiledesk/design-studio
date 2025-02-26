@@ -211,6 +211,24 @@ export class ActionWebRequestV2 extends Action {
     }
 }
 
+export class ActionWebRespose extends Action {
+    payload: string;
+    status: string;
+    headersString: any;
+    bodyType: string;
+    assignTo: string;
+    assignments: {}
+    constructor(){
+        super();
+        this.payload = JSON.stringify({});
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent": BRAND_BASE_INFO['BRAND_NAME']+"BotRuntime", "Accept":"*/*"};
+        this.bodyType = 'json'
+        this.assignTo = '';
+        this.assignments = {};
+        this._tdActionType = TYPE_ACTION.WEB_RESPONSE;
+    }
+}
+
 export class FormData {
     name: string;
     value: string;
