@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.28.3-rc.1
+- **bug-fixed**: widget into iframe not allows to use microphone
+
 # 1.28.1-rc.1
 - **added**: create a new intent (float action menu) of the same color as the parent intent
 - **bug-fixed**: fixed error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
