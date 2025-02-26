@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.1
+- **added**: close intent as default internal intent for voice chatbot
+
 # 1.28.3
 - **bug-fixed**: widget into iframe not allows to use microphone
 
