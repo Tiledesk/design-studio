@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_OF_MENU } from '../../../utils';
 import { TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
@@ -13,7 +13,7 @@ import { TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-st
 })
 export class CdsPanelElementsComponent implements OnInit {
   @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
-  @ViewChild('menuElement', { static: false }) private menuElement: ElementRef;
+  @ViewChild('menuElement', { static: false }) private readonly menuElement: ElementRef;
 
 
   @Output() addNewElement = new EventEmitter();
@@ -34,6 +34,7 @@ export class CdsPanelElementsComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    // // empty
   }
 
   onHideActionPlaceholderOfActionPanel(event) {
@@ -51,20 +52,20 @@ export class CdsPanelElementsComponent implements OnInit {
     setTimeout(() => {
       this.menuType = type;
       this.menuCategory = category;
-      //this.menuTrigger.openMenu();
-      // let x = e.offsetLeft;
+      // //this.menuTrigger.openMenu();
+      // //let x = e.offsetLeft;
       let y = e.offsetTop;
       this.isOpen = true;
-      if(this.isDraggingMenuElement == false){
+      if(this.isDraggingMenuElement === false){
         this.positionMenu = {'x': 85, 'y': y }
       }
     }, 0);
   }
   
   onCloseMenu() {
-    // this.menuTrigger.closeMenu();
+    // // this.menuTrigger.closeMenu();
     setTimeout(() => {
-      if(this.isOverMenu == false && this.isDraggingMenuElement == false){
+      if(this.isOverMenu === false && this.isDraggingMenuElement === false){
         this.isOpen = false;
       }
     }, 0);
@@ -81,7 +82,7 @@ export class CdsPanelElementsComponent implements OnInit {
   // }
 
   onAddNewElement(){
-    // this.addNewElement.emit();
+    // //this.addNewElement.emit();
   }
 
   onOverMenu(){

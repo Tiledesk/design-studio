@@ -29,6 +29,7 @@ import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storag
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
+import { WebhookService } from 'src/app/services/webhook.service';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -66,7 +67,8 @@ export class CdsDashboardComponent implements OnInit {
     public faqService: FaqService,
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
-    private stageService: StageService
+    private stageService: StageService,
+    private readonly webhookService: WebhookService,
   ) {}
 
   
@@ -183,7 +185,8 @@ export class CdsDashboardComponent implements OnInit {
     this.faqService.initialize(serverBaseURL, this.project._id)
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
-    this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
+    this.whatsappService.initialize(whatsappBaseUrl, this.project._id);
+    this.webhookService.initialize(serverBaseURL, this.project._id);
 
     this.hideShowWidget('hide')
 

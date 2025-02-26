@@ -22,6 +22,14 @@
                 
                 <div [ngSwitch]="elementSelected._tdActionType" *ngIf="canShowActionByPlan.enabled">
 
+                    <cds-action-webhook *ngSwitchCase="TYPE_ACTION.WEBHOOK"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-webhook>
+
                     <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY"
                         class="panel-response"
                         [intentSelected]="intentSelected"

@@ -27,19 +27,20 @@ export class CdsActionDescriptionComponent implements OnInit {
   tparams: any;
   BRAND_BASE_INFO = BRAND_BASE_INFO
 
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private brandService: BrandService
+    private readonly brandService: BrandService
   ) {
     const brand = brandService.getBrand();
     this.tparams = brand;
    }
 
   ngOnInit(): void { 
+    // // empty
   }
 
   ngOnChanges(){
-    // this.logger.log('[ActionDescriptionComponent] ngOnChanges:: ', this.actionSelected, this.elementType);
+    // // this.logger.log('[ActionDescriptionComponent] ngOnChanges:: ', this.actionSelected, this.elementType);
     if(this.actionSelected){
       this.elementType = this.actionSelected._tdActionType;
       if(this.actionSelected._tdActionTitle && this.actionSelected._tdActionTitle != ""){
@@ -63,7 +64,7 @@ export class CdsActionDescriptionComponent implements OnInit {
           this.element = Object.values(ACTIONS_LIST).find(el => el.type === this.elementType)
           break;
       }
-      // this.element = ELEMENTS_LIST.find(item => item.type === this.elementType);
+      // // this.element = ELEMENTS_LIST.find(item => item.type === this.elementType);
       this.logger.log('[ActionDescriptionComponent] action:: ', this.element);
     } catch (error) {
       this.logger.log("[ActionDescriptionComponent] error ", error);

@@ -10,7 +10,7 @@
             <div class="cds-button-element">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <img class="active-icon" [src]="actionCategory.src">
+                        <img class="active-icon" [src]="actionCategory.src" alt="active-icon">
                     </span>
                     <span class="box-title">{{ actionCategory.name | translate}}</span>
                 </div>
@@ -54,19 +54,19 @@
     </div>
 
     <!-- EVENT -->
-    <!-- <div size="4" class="cds-elements" mat-button> 
+    <div size="4" class="cds-elements" mat-button> 
         <div class="cds-element" (click)="onAddNewElement()" (mouseout)="onCloseMenu()" (mouseleave)="onCloseMenu()"
             (mouseover)="onOpenMenu(divEvent, TYPE_OF_MENU.EVENT)" #divEvent>
             <div class="cds-button-element">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <img class="active-icon" src="assets/images/icons/event.svg">
+                        <img class="active-icon" src="assets/images/icons/event.svg" alt="event">
                     </span>
                     <span class="box-title">{{ 'Event' | translate}}</span>
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <div #menuElement id="menuElement" 
         [style.display]="isOpen?'block':'none'" 

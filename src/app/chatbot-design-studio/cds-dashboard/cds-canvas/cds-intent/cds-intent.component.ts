@@ -13,7 +13,8 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_EVENT_CATEGORY, INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent } from 'src/app/chatbot-design-studio/utils';
+import { WebhookService } from 'src/app/services/webhook.service';
 
 export enum HAS_SELECTED_TYPE {
   ANSWER = "HAS_SELECTED_ANSWER",
@@ -71,8 +72,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isOpen: boolean = true;
   // menuType: string = 'action';
   positionMenu: any;
-  isStart = false;
-  isDefaultFallback = false;
+
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;
@@ -86,6 +86,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isActionIntent: boolean = false;
   isAgentsAvailable: boolean = false;
   
+  /** TYPE OF INTENTS */
+  isStart = false;
+  isDefaultFallback = false;
+  isWebhook = false;
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -104,7 +108,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     private readonly controllerService: ControllerService,
     private readonly elemenRef: ElementRef,
     private readonly renderer: Renderer2,
-    private readonly appStorageService: AppStorageService
+    private readonly appStorageService: AppStorageService,
+    private readonly webhookService: WebhookService
   ) {
     this.initSubscriptions();
   }
@@ -205,10 +210,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-
   ngOnInit(): void {
     //setTimeout(() => {
       this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
+      if(this.intent.attributes.type === TYPE_EVENT_CATEGORY.WEBHOOK){
+        this.intent.intent_display_name = TYPE_EVENT_CATEGORY.WEBHOOK;
+        this.isWebhook = true;
+        this.startAction = this.intent.actions[0];
+        this.createWebhook(this.intent.id_faq_kb, this.intent.intent_id);
+      }
       if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
@@ -356,8 +366,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.logger.log('[CDS-INTENT] connector-release-on-intent e ', e)
         if (e.detail.toId === this.intent.intent_id) {
           const intentContentEl = document.querySelector(`#intent-content-${e.detail.toId}`);
-          // const blockHeaderEl = <HTMLElement>document.querySelector(`#block-header-${e.detail.toId}`);
-          // this.logger.log('[CDS-INTENT] Connector released on intent -  blockHeaderEl', blockHeaderEl)
+          // //const blockHeaderEl = <HTMLElement>document.querySelector(`#block-header-${e.detail.toId}`);
+          // //this.logger.log('[CDS-INTENT] Connector released on intent -  blockHeaderEl', blockHeaderEl)
           if (intentContentEl instanceof HTMLElement) {
             this.logger.log('[CDS-INTENT] Connector released on intent -  intentContentEl', intentContentEl)
             intentContentEl.classList.remove("outline-border")
@@ -411,6 +421,18 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   /** CUSTOM FUNCTIONS  */
+
+  /** createWebhook */
+  createWebhook(chatbot_id, intent_id){
+    this.webhookService.createWebhook(chatbot_id, intent_id).subscribe({ next: (resp: string)=> {
+      this.logger.log("[CDS-INTENT] createWebhook : ", resp);
+    }, error: (error)=> {
+      this.logger.error("[CDS-INTENT] error createWebhook: ", error);
+    }, complete: () => {
+      this.logger.log("[CDS-INTENT] createWebhook completed.");
+    }});
+  }
+
 
   /** setActionIntent */
   private setActionIntent(){

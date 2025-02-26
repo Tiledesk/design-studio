@@ -90,7 +90,7 @@ export class CdsActionIntentComponent implements OnInit {
 
 
   private updateConnector(){
-    this.logger.log('[CDS-ACTION-INTENT] **************************2222', this.action.intentName);
+    this.logger.log('[CDS-ACTION-INTENT] **************************', this.action.intentName);
     this.isConnected = this.action.intentName?true:false;
     const array = this.connector.fromId.split("/");
     const idIntent= array[0];

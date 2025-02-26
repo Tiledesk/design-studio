@@ -3,7 +3,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { IntentService } from '../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { INTENT_COLORS, RESERVED_INTENT_NAMES, preDisplayName } from '../../../../utils';
+import { TYPE_EVENT_CATEGORY, INTENT_COLORS, RESERVED_INTENT_NAMES, preDisplayName } from '../../../../utils';
 
 @Component({
   selector: 'cds-panel-intent-header',
@@ -18,7 +18,9 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   @Output() saveIntent = new EventEmitter();
 
   RESERVED_INTENT_NAMES = RESERVED_INTENT_NAMES;
+  TYPE_EVENT_CATEGORY = TYPE_EVENT_CATEGORY;
   listOfIntents: Intent[];
+  intentType: string;
   intentName: string;
   intentNameResult: boolean = true;
   intentNameAlreadyExist: boolean = false
@@ -52,6 +54,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   /******************* CUSTOM FUNCTIONS *******************/ 
   /** initialize */
   private initialize(){
+    this.intentType = this.intent.attributes?.type;
     this.listOfIntents = this.intentService.listOfIntents;
     if (this.intent.intent_display_name === undefined && this.intent.intent_display_name.trim().length === 0) {
       this.intentService.setDisplayName();
@@ -194,8 +197,8 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   /** */
   onSaveIntent() {
     this.logger.log("[PANEL-INTENT-HEADER] SALVO!!!");
-    // this.intentService.setIntentSelected(this.intent.intent_id);
-    //this.intent.intent_display_name = this.intentName.trim();
+    // //this.intentService.setIntentSelected(this.intent.intent_id);
+    // //this.intent.intent_display_name = this.intentName.trim();
     this.intentService.changeIntentName(this.intent);
   }
 

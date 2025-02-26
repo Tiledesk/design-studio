@@ -3,12 +3,12 @@
   [ngStyle]="{'background-color': 'rgba(var('+intentColor+'), 0.25)'}">-->
 
   <div #resizeElement [ngClass]="{'cds-intent-active': intentService.intentSelectedID === intent.intent_id && intentService.intentActive}"  class="panel-intent-content tds_draggable" 
-    [class.isStart]="isStart" 
+    [class.isStart]="isStart || isWebhook" 
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{'background-color': 'rgba('+intentColor+', 0.35)'}">
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
-    <cds-connector-in *ngIf="!isStart && alphaConnectors < 1 && connectorsIn?.length>0"
+    <cds-connector-in *ngIf="!isStart && !isWebhook && alphaConnectors < 1 && connectorsIn?.length>0"
     [connectorsIn]="connectorsIn"
     (onShowConnectorsIn)="onShowConnectorsIn()"
     (onHideConnectorsIn)="onHideConnectorsIn()">
@@ -18,6 +18,7 @@
         [isInternalIntent]="isInternalIntent"
         [isStart]="isStart"
         [isDefaultFallback]="isDefaultFallback"
+        [isWebhook]="isWebhook"
         [deleteOptionEnabled]="listOfActions?.length > 0"
         [webhookEnabled]="intent.webhook_enabled"
         (optionClicked)="onOptionClicked($event)">
@@ -25,15 +26,15 @@
 
     <div class="pic-header" 
         [id]="'block-header-'+ intent?.intent_id"
-        [ngClass]="{'cds-start': isStart}">
+        [ngClass]="{'cds-start': isStart || isWebhook}">
 
         <cds-panel-intent-header class="pic-title-text tds_draggable" 
-            [class.isStart]="isStart"
+            [class.isStart]="isStart || isWebhook"
             [intentColor]="intentColor"
             [intent]="intent">
         </cds-panel-intent-header>
 
-        <div *ngIf="!isStart" class="cds-intent-options">
+        <div *ngIf="!isStart && !isWebhook" class="cds-intent-options">
             <div class="option" 
                 (click)="onSelectQuestion(HAS_SELECTED_TYPE.QUESTION)"
                 [attr.active]="questionCount > 0">
@@ -44,9 +45,12 @@
                 <img src="assets/images/form.svg" [title]="'Form' | translate" alt="Form">
             </div>
         </div>
+
     </div>
 
     <div *ngIf="isAgentsAvailable" class="agents-available" [class.isStart]="isStart"><span class="material-icons">boy</span></div>
+
+
 
     <div *ngIf="isStart" class="cds-start-content">
         <cds-action-intent class="panel-response" 
@@ -57,8 +61,25 @@
         </cds-action-intent>
     </div>
 
+    <div *ngIf="isWebhook" class="cds-webhook-content" (click)="onSelectAction(startAction, 0, startAction._tdActionId)">
+        <cds-action-intent class="panel-response" 
+            [isStart]="isWebhook" 
+            [intentSelected]="intent"
+            [action]="startAction"
+            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+        </cds-action-intent>
+    </div>
 
-    <div *ngIf="!isStart" class="actions-list-wpr"  
+
+    <!-- <div *ngIf="isStart" class="cds-start-content">
+        <cds-action-intent class="panel-response" 
+            [intentSelected]="intent"
+            [action]="startAction" 
+            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+        </cds-action-intent>
+    </div> -->
+
+    <div *ngIf="!isStart && !isWebhook" class="actions-list-wpr"  
         cdkDropList
         [cdkDropListData]="listOfActions"
         (cdkDropListDropped)="onDropAction($event)"
@@ -478,7 +499,7 @@
         
     </div>
     
-    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
+    <cds-action-intent *ngIf="!isStart && !isWebhook && intent && actionIntent && !isActionIntent"
         class="panel-response last-action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"
@@ -487,7 +508,7 @@
     </cds-action-intent>
 
     <div class="footer-intent">
-        <div *ngIf="!isStart && listOfActions?.length > 0" class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart && !isWebhook && listOfActions?.length > 0" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">    
                 + {{ 'CDSCanvas.AddAction' | translate}}

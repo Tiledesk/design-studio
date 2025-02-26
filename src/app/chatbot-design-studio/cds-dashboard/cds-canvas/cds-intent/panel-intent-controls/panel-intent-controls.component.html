@@ -5,7 +5,7 @@
         <!-- ---------------------------------- -->
         <!-- Panel intent  *ngIf="!isInternalIntent" -->
         <!-- ---------------------------------- -->
-        <button 
+        <button *ngIf="showMore"
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onOpenIntentPanel()" 
             matTooltipClass="cds-mat-tooltip"
@@ -19,7 +19,7 @@
         <!-- ---------------------------------- -->
         <!-- Color intent  -->
         <!-- ---------------------------------- -->
-        <button *ngIf="!isStart"
+        <button *ngIf="showColor"
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onColorIntent()" 
             matTooltipClass="cds-mat-tooltip"
@@ -33,8 +33,7 @@
         <!-- ---------------------------------- -->
         <!-- Delete intent  *ngIf="!isInternalIntent" -->
         <!-- ---------------------------------- -->
-        <button 
-            *ngIf="!isInternalIntent"
+        <button *ngIf="showDelete"
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onDeleteIntent()" 
             matTooltipClass="cds-mat-tooltip"
@@ -50,8 +49,7 @@
         <!-- ---------------------------------- -->
         <!--  -->
         <!-- *ngIf="copyElementEnabled"  -->
-        <button 
-            *ngIf="!isInternalIntent"
+        <button *ngIf="showCopy"
             class="intent-header-action-btn icon"
             matTooltipClass="cds-mat-tooltip" 
             [matTooltip]="'CDSCanvas.CopyBlock' | translate" 
@@ -82,7 +80,7 @@
         <!-- ---------------------------------- -->
         <!-- Test intent play btn  -->
         <!-- ---------------------------------- -->
-        <button *ngIf="!isStart" 
+        <button *ngIf="showPlay" 
             class="intent-header-action-btn icon"
             (click)="openTestSiteInPopupWindow()" 
             matTooltipClass="cds-mat-tooltip"

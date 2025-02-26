@@ -176,8 +176,7 @@ import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attrib
     //PIPES
     FilterPipe,
     GetVariableNamePipe,
-    VariableCssClassPipe,
-    
+    VariableCssClassPipe
   ],
   imports: [
     CommonModule,

@@ -47,7 +47,8 @@ export enum TYPE_ACTION {
     CLEAR_TRANSCRIPT    = 'clear_transcript',
     MOVE_TO_UNASSIGNED  = 'move_to_unassigned',
     SEND_WHATSAPP       = 'send_whatsapp',
-    AI_PROMPT           = 'ai_prompt'
+    AI_PROMPT           = 'ai_prompt',
+    WEBHOOK             = 'webhook'
 }
 
 export enum TYPE_ACTION_REPLY {
@@ -75,7 +76,8 @@ export enum TYPE_ACTION_CATEGORY {
     SPECIAL         = 'Special',
     NEW             = 'New',
     VOICE           = 'Voice',
-    "VOICE-TWILIO"  = 'Voice Twilio'
+    "VOICE-TWILIO"  = 'Voice Twilio',
+    EVENTS          = 'Events'
 }
 
 export const ACTION_CATEGORY =[
@@ -155,6 +157,8 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     BLIND_TRANSFER_TWILIO:  { name: 'CDSActionList.NAME.BlindTransfer',         category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
+    
+    WEBHOOK:                { name: 'CDSActionList.NAME.Webhook',               category: TYPE_ACTION_CATEGORY.EVENTS,                type: TYPE_ACTION.WEBHOOK,              src:"assets/images/icons/webhook2.svg",                 status: "active",                       doc: ""                                                                 },
 
 }
 

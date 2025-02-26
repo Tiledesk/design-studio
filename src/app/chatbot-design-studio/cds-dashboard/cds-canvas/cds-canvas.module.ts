@@ -35,7 +35,7 @@ import { PreloadBarComponent } from 'src/app/chatbot-design-studio/cds-base-elem
 import { ImagePreloaderResolver } from 'src/app/resolver/image.resolver';
 import { CdsColorMenuComponent } from './base-elements/cds-color-menu/cds-color-menu.component';
 import { CdsConnectorInComponent } from './base-elements/cds-connector-in/cds-connector-in.component';
-
+import { CdsActionWebhookComponent } from './actions/list/cds-action-webhook/cds-action-webhook.component';
 
 const routes: Routes = [
   {
@@ -97,8 +97,10 @@ const routes: Routes = [
     CdsRuleComponent,
 
     PreloadBarComponent,
-     CdsColorMenuComponent,
-     CdsConnectorInComponent,
+    CdsColorMenuComponent,
+    CdsConnectorInComponent,
+
+    CdsActionWebhookComponent
   ],
   imports: [
     CommonModule,

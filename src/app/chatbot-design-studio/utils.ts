@@ -143,8 +143,9 @@ export enum TYPE_MESSAGE {
 }
 
 export enum TYPE_EVENT_CATEGORY {
-    TRIGGER     = 'trigger',
-    RULE        = 'rule'
+    WEBHOOK     = 'webhook'
+    // TRIGGER     = 'trigger',
+    // RULE        = 'rule'
 }
 
 export enum TYPE_OPERATOR {
@@ -265,8 +266,9 @@ export const INTENT_ELEMENT = {
 
 
 export const EVENTS_LIST = {
-    TRIGGER:    { name: 'Trigger',  type: TYPE_EVENT_CATEGORY.TRIGGER,  src: "assets/images/events/trigger.svg" },
-    RULE:       { name: 'Rule',     type: TYPE_EVENT_CATEGORY.RULE,     src: "assets/images/events/rule.svg"    },
+    WEBHOOK:    { name: 'Webhook',  type: TYPE_EVENT_CATEGORY.WEBHOOK,  src: "assets/images/events/trigger.svg" },
+    // TRIGGER:    { name: 'Trigger',  type: TYPE_EVENT_CATEGORY.TRIGGER,  src: "assets/images/events/trigger.svg" },
+    // RULE:       { name: 'Rule',     type: TYPE_EVENT_CATEGORY.RULE,     src: "assets/images/events/rule.svg"    },
 }
 
 export const OPERATORS_LIST: { [key: string]: { name: string, type: TYPE_OPERATOR, src?: string } } = {

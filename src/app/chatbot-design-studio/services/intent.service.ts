@@ -3,11 +3,11 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebhook } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
+import { TYPE_EVENT_CATEGORY, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
@@ -346,9 +346,16 @@ export class IntentService {
     intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
-    // let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
-    // intent.actions.push(actionIntent);
+    // //let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
+    // //intent.actions.push(actionIntent);
     intent.actions.push(action);
+
+    if(action._tdActionType === TYPE_EVENT_CATEGORY.WEBHOOK){
+      intent.attributes.readonly = true;
+      intent.attributes.type = TYPE_EVENT_CATEGORY.WEBHOOK;
+    }
+   
+
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
   }
@@ -699,10 +706,10 @@ export class IntentService {
    * @param intent 
    */
   public addNewIntentToListOfIntents(intent){
-    // this.logger.log("[CDS-INTENT-SERVICES] aggiungo l'intent alla lista di intent");
+    // // this.logger.log("[CDS-INTENT-SERVICES] aggiungo l'intent alla lista di intent");
     this.listOfIntents.push(intent);
     this.refreshIntents();
-    // this.behaviorIntents.next(this.listOfIntents);
+    // // this.behaviorIntents.next(this.listOfIntents);
   }
 
   /**
@@ -898,7 +905,7 @@ export class IntentService {
    * @returns 
    */
   public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML) {
-    // this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
+    this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
     let action: any;
 
     if(typeAction === TYPE_ACTION.REPLY){
@@ -1212,6 +1219,13 @@ export class IntentService {
       action = new ActionSendWhatsapp();
       action.payload  = new WhatsappBroadcast()
     }
+
+    /** WEBHOOK */
+    if(typeAction === TYPE_ACTION.WEBHOOK){
+      action = new ActionWebhook();
+    }
+
+
     return action;
   }
   // END ATTRIBUTE FUNCTIONS //

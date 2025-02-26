@@ -480,6 +480,15 @@ export class ActionCode extends Action {
     }   
 }
 
+export class ActionWebhook extends Action {
+    intentName?: string;
+    json_payload?: Object;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.WEBHOOK;
+    }
+}
+
 export class Operation {
     operators?: Array<TYPE_MATH_OPERATOR>
     operands: Array<Operand>
