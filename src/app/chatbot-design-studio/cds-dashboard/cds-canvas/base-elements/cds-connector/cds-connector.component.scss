@@ -111,10 +111,11 @@
 }
 
 .block-contract-connector {
+    display: none;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    display: none;
+    opacity: 1;
 }
 
 .connector-line {

@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 
@@ -16,14 +17,18 @@ export class CdsConnectorComponent implements OnInit {
   @Output() onHideConnector = new EventEmitter();
 
   intent_display_name: string;
+  idContractConnector: string;
 
   constructor(
     private readonly stageService: StageService,
-    private readonly intentService: IntentService
+    private readonly intentService: IntentService,
+    private readonly connectorService: ConnectorService
   ) { }
 
   ngOnInit(): void {
     this.getIntentDisplayName();
+    const idConnection = this.idConnection?.replace('#', '');
+    this.idContractConnector = 'contract_'+idConnection;
   }
 
   getIntentDisplayName(){
@@ -74,4 +79,17 @@ export class CdsConnectorComponent implements OnInit {
     }
   }
 
+
+  public mostra(){
+    this.connectorService.showHideConnectorByIdConnector(this.idConnection, "block");
+  }
+
+  public nascondi(){
+    this.connectorService.showHideConnectorByIdConnector(this.idConnection, "none");
+  }
+
+  public ripristina(){
+    this.connectorService.setDisplayConnectorByIdConnector(this.idConnector);
+  }
+  
 }

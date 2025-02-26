@@ -2009,15 +2009,42 @@ export class ConnectorService {
       else {
         this.mapOfConnectors[connectorId].display = false;
       } 
-      this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
-      element.setAttribute('display', connector.display?'block':'none');
+      // // this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
+      // // element.setAttribute('display', connector.display?'block':'none');
+      element.style.setProperty('display', connector.display?'block':'none');
       const elementRect = document.getElementById('rect_'+connectorId);
       if(elementRect){
-        elementRect.setAttribute('display', connector.display?'block':'none');
+        elementRect.style.setProperty('display', connector.display?'block':'none');
       }
       const elementLabel = document.getElementById('label_'+connectorId);
       if(elementLabel){
-        elementLabel.setAttribute('display', connector.display?'block':'none');
+        elementLabel.style.setProperty('display', connector.display?'block':'none');
+      }
+      const elementContract = document.getElementById('contract_'+connectorId);
+      this.logger.log('[CONNECTOR-SERV] show-hide:: elementContract ', 'contract_'+connectorId, elementContract);
+      if(elementContract){
+        // elementContract.style.setProperty('opacity', connector.display?'0':'1');
+        elementContract.style.setProperty('display', connector.display?'none':'flex');
+      }
+    }
+  }
+
+
+
+  showHideConnectorByIdConnector(connectorId: string, display: 'block'|'none') {
+    let connector = this.mapOfConnectors[connectorId];
+    const element = document.getElementById(connectorId);
+    this.logger.log('[CONNECTOR-SERV] show-hide:: ', connector);
+    if (element) {
+      this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
+      element.style.setProperty('display', display);
+      const elementRect = document.getElementById('rect_'+connectorId);
+      if(elementRect){
+        elementRect.style.setProperty('display', display);
+      }
+      const elementLabel = document.getElementById('label_'+connectorId);
+      if(elementLabel){
+        elementLabel.style.setProperty('display', display);
       }
     }
   }
