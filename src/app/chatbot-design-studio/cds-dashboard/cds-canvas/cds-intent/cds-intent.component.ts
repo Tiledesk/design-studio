@@ -209,10 +209,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
     //setTimeout(() => {
       this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
-      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
-      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START){
+      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.START){
         this.isStart = true;
         this.startAction = this.intent.actions[0];
       } else {
@@ -220,7 +220,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
       
 
-      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
+      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.START) {
       //   this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
       //   this.startAction = this.intent.actions[0];
       //   this.isStart = true;
@@ -307,7 +307,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setAgentsAvailable(){
-    // /if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_START && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+    // /if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.START && this.intent.intent_display_name != TYPE_INTENT_NAME.DEFAULT_FALLBACK){
     if(this.intent.agents_available != false){ 
       this.intent.agents_available = true;
       this.isAgentsAvailable = true;
