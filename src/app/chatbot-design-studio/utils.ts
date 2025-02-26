@@ -21,11 +21,19 @@ export const DOCS_LINK = {
     }
 }
 
+export enum LOG_LEVELS {
+    DEFAULT       = 'default',
+    INFO          = 'info',
+    WARNINGS      = 'warnings',
+    ERRORS        = 'errors'
+}
+
 export enum STAGE_SETTINGS {
     AlphaConnector = 'alpha_connectors',
     Zoom = 'zoom',
     Position = 'position',
-    Maximize = 'maximize'
+    Maximize = 'maximize',
+    openIntentListState = 'open_intent_list_state'
 }
 
 export enum RESERVED_INTENT_NAMES {

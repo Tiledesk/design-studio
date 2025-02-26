@@ -340,14 +340,15 @@ export class IntentService {
  
 
   /** create a new intent when drag an action on the stage */
-  public createNewIntent(id_faq_kb: string, action: any, pos:any){
+  public createNewIntent(id_faq_kb: string, action: any, pos:any, color?: string){
     let intent = new Intent();
     const chatbot_id = this.dashboardService.id_faq_kb;
     intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
-    // let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
-    // intent.actions.push(actionIntent);
+    if(color){
+      intent.attributes.color = color;
+    }
     intent.actions.push(action);
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
@@ -839,7 +840,6 @@ export class IntentService {
         }
         let id_faq_kb = this.dashboardService.id_faq_kb;
         this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
-
       }
     }
   }
