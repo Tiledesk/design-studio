@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.4
+- **added**: added webhook
+
 # 1.29.0-rc.3
 - **changed**: web-response action UI improvements
 
