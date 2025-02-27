@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.6
+ - **added**: updateWebhook (ds-webhook-webresponse-PRE1)
+
 # 1.29.0-rc.5
 - **bug-fixed**: there is a webhook default value == false
 
