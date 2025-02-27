@@ -5,6 +5,8 @@ import { TEXT_CHARS_LIMIT, TYPE_METHOD_ATTRIBUTE, TYPE_UPDATE_ACTION } from 'src
 import { TYPE_METHOD_REQUEST, HEADER_TYPE, RESPONSE_STATUS_TYPE } from 'src/app/chatbot-design-studio/utils-request';
 import { ActionWebRespose } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { WebhookService } from 'src/app/services/webhook.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -63,12 +65,16 @@ export class CdsActionWebResponseComponent implements OnInit {
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private intentService: IntentService
+    private intentService: IntentService,
+    private readonly dashboardService: DashboardService,
+    private readonly webhookService: WebhookService
   ) { }
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
     this.logger.debug("[ACTION-WEB-RESPONSE] action detail: ", this.action);
+    // const chatbot_id = this.dashboardService.id_faq_kb;
+    // this.webhookService.updateWebhook(chatbot_id, true);
   }
 
   /** */
@@ -81,9 +87,6 @@ export class CdsActionWebResponseComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges) {
     this.logger.log('[ACTION-WEB-RESPONSE] onChanges' , this.action, this.intentSelected )
     this.initialize();
-    // if (this.action && this.action.assignStatusTo) {
-    //   this.hasSelectedVariable = true
-    // }
   }
 
   // private checkConnectionStatus(){

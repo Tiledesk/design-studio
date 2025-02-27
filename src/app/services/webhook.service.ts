@@ -12,6 +12,7 @@ export class WebhookService {
   SERVER_BASE_PATH: string;
   WEBHOOK_URL: any;
   thereIsWebhook: boolean = false;
+  thereIsWebResponse: boolean = false;
 
   private tiledeskToken: string;
   private project_id: string;
@@ -99,25 +100,48 @@ export class WebhookService {
   }
 
 
-  checkActionForDelete(action: any){
-    if(action._tdActionType == 'web_response'){
-      // updateWebhook(chatbot_id: string){
+  checkActions(chatbot_id, listOfIntents){
+    let thereIsWebResponse = false;
+    for (const intent of listOfIntents) {
+      for (const action of intent.actions) {
+        if (action._tdActionType === 'web_response') {
+          thereIsWebResponse = true;
+          break;
+        }
+      }
+      if (thereIsWebResponse === true) {
+        break;
+      }
     }
+    this.updateWebhook(chatbot_id, thereIsWebResponse).subscribe({ next: (resp: any)=> {
+      this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
+    }, error: (error)=> {
+      this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
+    }, complete: () => {
+      this.logger.log("[cds-action-webhook] updateWebhook completed.");
+    }});
   }
-  updateWebhook(chatbot_id: string){
-    // this.thereIsWebhook = false;
-    // this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
-    // this.logger.log('[WEBHOOK_URL.SERV] deleteWebhook');
-    // const httpOptions = {
-    //   headers: new HttpHeaders({
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'application/json',
-    //     'Authorization': this.tiledeskToken
-    //   })
-    // };
-    // let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
-    // this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
-    // return this._httpClient.delete<any>(url, httpOptions);
+
+
+  updateWebhook(chatbot_id: string, thereIsWebResponse: boolean){
+    this.logger.log('[WEBHOOK_URL.SERV] - updateWebhook1 ', thereIsWebResponse, this.thereIsWebResponse);
+    if(this.thereIsWebResponse !== thereIsWebResponse){
+      this.thereIsWebResponse = thereIsWebResponse;
+      this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': this.tiledeskToken
+        })
+      };
+      let body = { 
+        'async': this.thereIsWebResponse,
+      };
+      let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
+      this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
+      return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
+    }
   }
 
 

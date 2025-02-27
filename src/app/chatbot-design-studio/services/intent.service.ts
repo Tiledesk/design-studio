@@ -875,11 +875,10 @@ export class IntentService {
    * onUpdateIntentWithTimeout2: salvo l'intent
   */
   public deleteSelectedAction(){
-    // // this.logger.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
+    this.logger.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
     if(this.intentSelected.intent_id && this.actionSelectedID){
       this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
       let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
-
       intentToUpdate.actions = intentToUpdate.actions.filter((action: any) => action._tdActionId !== this.actionSelectedID);
       this.listOfIntents = this.listOfIntents.map((intent) => {
         if (intent.intent_id === this.intentSelected.intent_id) {
@@ -890,6 +889,8 @@ export class IntentService {
       this.refreshIntent(intentToUpdate);
       this.controllerService.closeAllPanels();
       const responseIntent = this.updateIntent(intentToUpdate);
+
+     
       // // if(responseIntent){
       //   this.logger.log('update Intent: OK');
       // }
@@ -943,7 +944,6 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.WEB_RESPONSE){
       action = new ActionWebRespose();
-      this.webhookService.updateWebhook('test');
     }
     if(typeAction === TYPE_ACTION.AGENT){
       action = new ActionAgent();
@@ -1426,7 +1426,7 @@ export class IntentService {
   /************************************************/
   /** */
   public async updateIntent(intent: Intent, fromIntent?: Intent){
-    this.logger.log('[INTENT SERVICE] -> updateIntentNew, ', intent, fromIntent);
+    this.logger.log('[INTENT SERVICE] -> updateIntentNew, ', intent, this.listActions);
     const intentPrev = this.prevListOfIntent.find((obj) => obj.intent_id === intent.intent_id);
     this.operationsUndo = [];
     this.operationsRedo = [];

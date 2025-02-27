@@ -27,6 +27,7 @@ import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
+import { WebhookService } from 'src/app/services/webhook.service';
 
 // const swal = require('sweetalert');
 
@@ -147,7 +148,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly route: ActivatedRoute, 
     public appStorageService: AppStorageService,
-    public logService: LogService
+    public logService: LogService,
+    private readonly webhookService: WebhookService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -378,6 +380,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.subscriptionListOfIntents = this.intentService.getIntents().subscribe(intents => {
       this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
       this.listOfIntents = intents;
+      const chatbot_id = this.dashboardService.id_faq_kb;
+      this.webhookService.checkActions(chatbot_id, intents);
       // if(intents.length > 0 || (intents.length == 0 && this.listOfIntents.length>0)){
       //   this.listOfIntents = this.intentService.hiddenEmptyIntents(intents);
       // }
