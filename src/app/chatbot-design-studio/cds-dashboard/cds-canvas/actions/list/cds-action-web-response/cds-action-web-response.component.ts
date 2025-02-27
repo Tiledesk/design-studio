@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
-import { TEXT_CHARS_LIMIT, TYPE_METHOD_ATTRIBUTE, TYPE_UPDATE_ACTION, TYPE_METHOD_REQUEST, HEADER_TYPE } from 'src/app/chatbot-design-studio/utils';
-import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
-import { ActionWebRequestV2, ActionWebRespose } from 'src/app/models/action-model';
+import { TEXT_CHARS_LIMIT, TYPE_METHOD_ATTRIBUTE, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_METHOD_REQUEST, HEADER_TYPE, RESPONSE_STATUS_TYPE } from 'src/app/chatbot-design-studio/utils-request';
+import { ActionWebRespose } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -35,7 +35,7 @@ export class CdsActionWebResponseComponent implements OnInit {
   private subscriptionChangedConnector: Subscription;
   
   methods: Array<{label: string, value: string}>;
-  optionSelected: 'header' | 'body' = 'header'
+  optionSelected: 'header' | 'body' = 'body'
   pattern = "^[a-zA-Z_]*[a-zA-Z_]+[a-zA-Z0-9_]*$";
 
   limitCharsText = TEXT_CHARS_LIMIT;
@@ -48,11 +48,12 @@ export class CdsActionWebResponseComponent implements OnInit {
   methodSelectedBody = false;
   headerAttributes: any;
   autocompleteHeaderOptions: Array<{label: string, value: string}> = [];
+  autocompleteStatusOptions: Array<{label: string, value: string}> = [];
 
   valueIsInvalid: boolean = false;
-
   // hasSelectedVariable: boolean = false;
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
+  type
   assignments: {} = {}
 
   bodyOptions: Array<{name: string, value: string, disabled: boolean, checked: boolean}>= [ 
@@ -67,7 +68,7 @@ export class CdsActionWebResponseComponent implements OnInit {
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    this.logger.debug("[ACTION-WEB-REQUEST-v2] action detail: ", this.action);
+    this.logger.debug("[ACTION-WEB-RESPONSE] action detail: ", this.action);
   }
 
   /** */
@@ -78,7 +79,7 @@ export class CdsActionWebResponseComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.logger.log('[ACTION-WEB-REQUEST-v2] onChanges' , this.action, this.intentSelected )
+    this.logger.log('[ACTION-WEB-RESPONSE] onChanges' , this.action, this.intentSelected )
     this.initialize();
     // if (this.action && this.action.assignStatusTo) {
     //   this.hasSelectedVariable = true
@@ -119,7 +120,7 @@ export class CdsActionWebResponseComponent implements OnInit {
     this.assignments = this.action.assignments
     this.autocompleteHeaderOptions = [];
     HEADER_TYPE.forEach(el => this.autocompleteHeaderOptions.push({label: el.label, value: el.value}))
-  
+    RESPONSE_STATUS_TYPE.forEach(el => this.autocompleteStatusOptions.push({label: el.label, value: el.value}))
   }
 
 
@@ -167,7 +168,7 @@ export class CdsActionWebResponseComponent implements OnInit {
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
-  onChangeTextarea(e, type: 'body'){
+  onChangeTextarea(e, type: string){
     switch(type){
       case 'body': {
         this.body = e;
@@ -178,6 +179,9 @@ export class CdsActionWebResponseComponent implements OnInit {
           // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
         // }, 0);
         break;
+      }
+      default: {
+        this.action[type]=e
       }
     }
   }
@@ -208,8 +212,8 @@ export class CdsActionWebResponseComponent implements OnInit {
   }
 
   onSelectedAttribute(event, property) {
-    this.logger.log("[ACTION-WEB-REQUEST-v2] onEditableDivTextChange event", event)
-    this.logger.log("[ACTION-WEB-REQUEST-v2] onEditableDivTextChange property", property)
+    this.logger.log("[ACTION-WEB-RESPONSE] onEditableDivTextChange event", event)
+    this.logger.log("[ACTION-WEB-RESPONSE] onEditableDivTextChange property", property)
     this.action[property] = event.value;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
