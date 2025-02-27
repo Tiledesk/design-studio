@@ -23,55 +23,57 @@
 
     
      <!-- HERADER-BODY OPTION -->
-    <div class="cds-web-request-options no-footer">
+    <div class="field-box">
+        <div class="cds-web-request-options no-footer">
 
-        <mat-button-toggle-group [(ngModel)]="optionSelected" (change)="onChangeOption($event)">
-            <!-- <mat-button-toggle value="header">Header</mat-button-toggle> -->
-            <mat-button-toggle value="body">Body</mat-button-toggle>
-            <!-- <mat-button-toggle value="settings">Settings</mat-button-toggle> -->
-        </mat-button-toggle-group>
-
-    </div>
-
-    <div class="cds-web-request-row"  *ngIf="optionSelected === 'header'">
-        <cds-attributes
-            class="cds-attributes"
-            [method]="typeMethodAttribute.INPUT"
-            [attributes]="jsonHeader"
-            [autocompleteOptions]="autocompleteHeaderOptions"
-            (changeAttributes)="onChangeAttributes($event)">
-        </cds-attributes>
-    </div>
+            <mat-button-toggle-group [(ngModel)]="optionSelected" (change)="onChangeOption($event)">
+                <!-- <mat-button-toggle value="header">Header</mat-button-toggle> -->
+                <mat-button-toggle value="body">Body</mat-button-toggle>
+                <!-- <mat-button-toggle value="settings">Settings</mat-button-toggle> -->
+            </mat-button-toggle-group>
     
-    <div class="cds-web-request-row" *ngIf="optionSelected === 'body'" [ngSwitch]="action?.bodyType ">
-
-        <cds-radio-buttons
-            [items]="bodyOptions"
-            [rows]="1" [columns]="3"
-            (changeButtonSelect)="onChangeButtonSelect($event)">
-        </cds-radio-buttons>
-
-        <cds-textarea id="body" *ngSwitchCase="'json'"
-            [ngClass]="{'jsonError': !jsonIsValid}"
-            class = "text-editable-div"
-            [text]="body"
-            [limitCharsText]="1000000"
-            [emojiPikerBtn]="false"
-            [setAttributeBtn]="true"
-            [minRow]="5" [maxRow]="10"
-            [readonly]="false"
-            (blur)="onBlur($event)"
-            (changeTextarea)="onChangeTextarea($event, 'body')">
-        </cds-textarea>
-
-        <div class="cds-web-request-row-body center" *ngSwitchCase="'none'">
-            <span>{{'CDSCanvas.ThisRequestNoBody' | translate }}</span>
         </div>
-
-        <div class="cds-web-request-row-body center json-error-yes" *ngIf="action?.bodyType === 'body' && !jsonIsValid">
-            <span>{{errorMessage}}</span>
+    
+        <div class="cds-web-request-row"  *ngIf="optionSelected === 'header'">
+            <cds-attributes
+                class="cds-attributes"
+                [method]="typeMethodAttribute.INPUT"
+                [attributes]="jsonHeader"
+                [autocompleteOptions]="autocompleteHeaderOptions"
+                (changeAttributes)="onChangeAttributes($event)">
+            </cds-attributes>
         </div>
-
+        
+        <div class="cds-web-request-row" *ngIf="optionSelected === 'body'" [ngSwitch]="action?.bodyType ">
+    
+            <cds-radio-buttons
+                [items]="bodyOptions"
+                [rows]="1" [columns]="3"
+                (changeButtonSelect)="onChangeButtonSelect($event)">
+            </cds-radio-buttons>
+    
+            <cds-textarea id="body" *ngSwitchCase="'json'"
+                [ngClass]="{'jsonError': !jsonIsValid}"
+                class = "text-editable-div"
+                [text]="body"
+                [limitCharsText]="1000000"
+                [emojiPikerBtn]="false"
+                [setAttributeBtn]="true"
+                [minRow]="5" [maxRow]="10"
+                [readonly]="false"
+                (blur)="onBlur($event)"
+                (changeTextarea)="onChangeTextarea($event, 'body')">
+            </cds-textarea>
+    
+            <div class="cds-web-request-row-body center" *ngSwitchCase="'none'">
+                <span>{{'CDSCanvas.ThisRequestNoBody' | translate }}</span>
+            </div>
+    
+            <div class="cds-web-request-row-body center json-error-yes" *ngIf="action?.bodyType === 'body' && !jsonIsValid">
+                <span>{{errorMessage}}</span>
+            </div>
+    
+        </div>
     </div>
 
 
