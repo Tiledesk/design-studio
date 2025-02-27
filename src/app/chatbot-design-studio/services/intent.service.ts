@@ -18,6 +18,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ExpressionType } from '@angular/compiler';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
+import { WebhookService } from 'src/app/services/webhook.service';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -83,7 +84,8 @@ export class IntentService {
     private controllerService: ControllerService,
     private stageService: StageService,
     private dashboardService: DashboardService,
-    private tiledeskAuthService: TiledeskAuthService
+    private tiledeskAuthService: TiledeskAuthService,
+    private readonly webhookService: WebhookService
   ) { 
 
   }
@@ -1527,6 +1529,22 @@ export class IntentService {
     /** deleteIntent2 */
     public async deleteIntentNew(intent: Intent){
       this.logger.log('[INTENT SERVICE] -> deleteIntent, ', intent);
+      if(intent.attributes.type === TYPE_EVENT_CATEGORY.WEBHOOK){
+        this.logger.log('[INTENT SERVICE] -> deleteWebhook, ', intent);
+        const chatbot_id = this.dashboardService.id_faq_kb;
+        
+
+        this.webhookService.deleteWebhook(chatbot_id).subscribe({ next: (resp: any)=> {
+          this.logger.log("[cds-action-webhook] regenerateWebhook : ", resp);
+        }, error: (error)=> {
+          this.logger.error("[cds-action-webhook] error regenerateWebhook: ", error);
+        }, complete: () => {
+          this.logger.log("[cds-action-webhook] regenerateWebhook completed.");
+        }});
+        
+
+        
+      }
       this.operationsUndo = [];
       this.operationsRedo = [];
       this.payload = {

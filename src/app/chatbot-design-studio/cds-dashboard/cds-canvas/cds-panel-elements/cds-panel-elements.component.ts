@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_OF_MENU } from '../../../utils';
 import { TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
+import { WebhookService } from 'src/app/services/webhook.service';
 
 
 @Component({
@@ -29,9 +30,13 @@ export class CdsPanelElementsComponent implements OnInit {
   TYPE_OF_MENU = TYPE_OF_MENU;
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
-  ACTION_CATEGORY = ACTION_CATEGORY
+  ACTION_CATEGORY = ACTION_CATEGORY;
+
+  thereIsWebhook: boolean = false;
   
-  constructor() { }
+  constructor(
+    private readonly webhookService: WebhookService
+  ) { }
 
   ngOnInit(): void {
     // // empty
@@ -48,6 +53,11 @@ export class CdsPanelElementsComponent implements OnInit {
   } 
 
   onOpenMenu(e, type, category?: string) {
+    this.thereIsWebhook = this.webhookService.thereIsWebhook;
+    // console.log('[CDS-panel-element] type::  ', type)
+    if (type === TYPE_OF_MENU.EVENT && this.thereIsWebhook === true) {
+      return;
+    }
     this.onMouseOverActionMenuSx.emit(true)
     setTimeout(() => {
       this.menuType = type;
@@ -55,6 +65,8 @@ export class CdsPanelElementsComponent implements OnInit {
       // //this.menuTrigger.openMenu();
       // //let x = e.offsetLeft;
       let y = e.offsetTop;
+
+
       this.isOpen = true;
       if(this.isDraggingMenuElement === false){
         this.positionMenu = {'x': 85, 'y': y }

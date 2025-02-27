@@ -266,7 +266,7 @@ export const INTENT_ELEMENT = {
 
 
 export const EVENTS_LIST = {
-    WEBHOOK:    { name: 'Webhook',  type: TYPE_EVENT_CATEGORY.WEBHOOK,  src: "assets/images/events/trigger.svg" },
+    WEBHOOK:    { name: 'Webhook',  type: TYPE_EVENT_CATEGORY.WEBHOOK,  src: "assets/images/icons/webhook2.svg" },
     // TRIGGER:    { name: 'Trigger',  type: TYPE_EVENT_CATEGORY.TRIGGER,  src: "assets/images/events/trigger.svg" },
     // RULE:       { name: 'Rule',     type: TYPE_EVENT_CATEGORY.RULE,     src: "assets/images/events/rule.svg"    },
 }

@@ -15,16 +15,16 @@ export class ControllerService {
   isOpenButtonPanel: boolean = false;
   buttonSelected: Button;
 
-  private buttonSource = new Subject<Button>();
+  private readonly buttonSource = new Subject<Button>();
   public isOpenButtonPanel$ = this.buttonSource.asObservable();
 
-  private intentSource = new Subject<any>();
+  private readonly intentSource = new Subject<any>();
   public isOpenIntentPanel$ = this.intentSource.asObservable();
 
-  private actionSource = new Subject<{type: TYPE_INTENT_ELEMENT, element: Action | string | Form}>();
+  private readonly actionSource = new Subject<{type: TYPE_INTENT_ELEMENT, element: Action | string | Form}>();
   public isOpenActionDetailPanel$ = this.actionSource.asObservable();
 
-  private addActionMenu = new Subject<any>();
+  private readonly addActionMenu = new Subject<any>();
   public isOpenAddActionMenu$ = this.addActionMenu.asObservable();
 
   constructor() {
