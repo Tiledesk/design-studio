@@ -11,7 +11,7 @@ export class WebhookService {
 
   SERVER_BASE_PATH: string;
   WEBHOOK_URL: any;
-  thereIsWebhook: boolean = true;
+  thereIsWebhook: boolean = false;
 
   private tiledeskToken: string;
   private project_id: string;
