@@ -181,10 +181,10 @@ export class CdsDashboardComponent implements OnInit {
     let whatsappBaseUrl = this.appConfigService.getConfig().whatsappTemplatesBaseUrl
 
     this.departmentService.initialize(serverBaseURL, this.project._id);
-    this.faqKbService.initialize(serverBaseURL, this.project._id)
-    this.faqService.initialize(serverBaseURL, this.project._id)
-    this.kbService.initialize(serverBaseURL, this.project._id)
-    this.openaiService.initialize(serverBaseURL, this.project._id)
+    this.faqKbService.initialize(serverBaseURL, this.project._id);
+    this.faqService.initialize(serverBaseURL, this.project._id);
+    this.kbService.initialize(serverBaseURL, this.project._id);
+    this.openaiService.initialize(serverBaseURL, this.project._id);
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id);
     this.webhookService.initialize(serverBaseURL, this.project._id);
 

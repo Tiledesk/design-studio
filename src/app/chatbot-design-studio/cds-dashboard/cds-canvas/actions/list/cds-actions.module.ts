@@ -81,6 +81,7 @@ import { VariableCssClassPipe } from 'src/app/pipe/variablecssClass.pipe';
 import { GetVariableNamePipe } from 'src/app/pipe/get-variable-name.pipe';
 import { CdsActionAiPromptComponent } from './cds-action-ai-prompt/cds-action-ai-prompt.component';
 import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attributes-dialog/attributes-dialog.component';
+import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-action-web-response.component';
 
 @NgModule({
   declarations: [
@@ -172,6 +173,7 @@ import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attrib
     // action Ai Prompt elements: start //
     AttributesDialogAiPromptComponent,
     // action Ai Prompt elements: end //
+    CdsActionWebResponseComponent,
 
     //PIPES
     FilterPipe,
@@ -272,6 +274,7 @@ import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attrib
     // action Ai Prompt elements: start //
     AttributesDialogAiPromptComponent,
     // action Ai Prompt elements: end //
+    CdsActionWebResponseComponent,
     
     //PIPES
     FilterPipe,

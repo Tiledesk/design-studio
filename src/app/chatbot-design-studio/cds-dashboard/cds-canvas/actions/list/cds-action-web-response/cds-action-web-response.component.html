@@ -1,0 +1,94 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="action-row">
+        <div class="action-row-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
+                <path d="M7.3,16.4l-4.9-4.9c-0.6-0.6-0.6-1.5,0-2.1c0.6-0.6,1.5-0.6,2.1,0l2.8,2.8L15.5,4c0.6-0.6,1.5-0.6,2.1,0 c0.6,0.6,0.6,1.5,0,2.1L7.3,16.4z"/>
+            </svg>
+        </div>
+        <div *ngIf="action.status" class="action-row-right">
+            <b>{{'CDSCanvas.Status' | translate }}: </b> <span [ngClass]="action?.status | variableCssClass"> {{action?.status | getVariableName }} </span>
+        </div>
+
+        <div *ngIf="!action.status" class="action-row-right">
+            {{'CDSCanvas.StatusNotSelected' | translate}}
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Details -->
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer" #scrollMe id="scrollMe" >
+
+    
+     <!-- HERADER-BODY OPTION -->
+    <div class="field-box">
+        <div class="cds-web-request-options no-footer">
+
+            <mat-button-toggle-group [(ngModel)]="optionSelected" (change)="onChangeOption($event)">
+                <!-- <mat-button-toggle value="header">Header</mat-button-toggle> -->
+                <mat-button-toggle value="body">Body</mat-button-toggle>
+                <!-- <mat-button-toggle value="settings">Settings</mat-button-toggle> -->
+            </mat-button-toggle-group>
+    
+        </div>
+    
+        <div class="cds-web-request-row"  *ngIf="optionSelected === 'header'">
+            <cds-attributes
+                class="cds-attributes"
+                [method]="typeMethodAttribute.INPUT"
+                [attributes]="jsonHeader"
+                [autocompleteOptions]="autocompleteHeaderOptions"
+                (changeAttributes)="onChangeAttributes($event)">
+            </cds-attributes>
+        </div>
+        
+        <div class="cds-web-request-row" *ngIf="optionSelected === 'body'" [ngSwitch]="action?.bodyType ">
+    
+            <cds-radio-buttons
+                [items]="bodyOptions"
+                [rows]="1" [columns]="3"
+                (changeButtonSelect)="onChangeButtonSelect($event)">
+            </cds-radio-buttons>
+    
+            <cds-textarea id="body" *ngSwitchCase="'json'"
+                [ngClass]="{'jsonError': !jsonIsValid}"
+                class = "text-editable-div"
+                [text]="body"
+                [limitCharsText]="1000000"
+                [emojiPikerBtn]="false"
+                [setAttributeBtn]="true"
+                [minRow]="5" [maxRow]="10"
+                [readonly]="false"
+                (blur)="onBlur($event)"
+                (changeTextarea)="onChangeTextarea($event, 'body')">
+            </cds-textarea>
+    
+            <div class="cds-web-request-row-body center" *ngSwitchCase="'none'">
+                <span>{{'CDSCanvas.ThisRequestNoBody' | translate }}</span>
+            </div>
+    
+            <div class="cds-web-request-row-body center json-error-yes" *ngIf="action?.bodyType === 'body' && !jsonIsValid">
+                <span>{{errorMessage}}</span>
+            </div>
+    
+        </div>
+    </div>
+
+
+    <!-- RESPONSE STATUS OPTION -->
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.ResponseStatus' | translate }}</label>
+        <cds-text id="text"
+            class="sx-input" 
+            [text]="action.status"
+            [placeholder]="'CDSCanvas.ResponseStatus' | translate"
+            [autocompleteOptions]="autocompleteStatusOptions"
+            (blur)="onBlur($event)"
+            (onChange)="onChangeTextarea($event, 'status')">
+        </cds-text>
+
+    </div>
+    
+</div>
