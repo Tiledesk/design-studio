@@ -7,10 +7,11 @@
             </svg>
         </div>
         <div *ngIf="action.status" class="action-row-right">
-            <b>{{'CDSCanvas.Status' | translate }}:</b>{{action.status}}
+            <b>{{'CDSCanvas.Status' | translate }}: </b> <span [ngClass]="action?.status | variableCssClass"> {{action?.status | getVariableName }} </span>
         </div>
+
         <div *ngIf="!action.status" class="action-row-right">
-            {{'CDSCanvas.EnterEmailSubject' | translate}}
+            {{'CDSCanvas.StatusNotSelected' | translate}}
         </div>
     </div>
 
@@ -21,22 +22,22 @@
 <div *ngIf="!previewMode" class="content-panel-intent-detail no-footer" #scrollMe id="scrollMe" >
 
     <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.Status' | translate }}</label>
-        <cds-textarea id="assignTo" 
-            [textLimitBtn]="false" 
-            [emojiPikerBtn]="false" 
-            [setAttributeBtn]="true"
-            [minRow]="1" [maxRow]="1"
+        <label class="title-label">{{'CDSCanvas.ResponseStatus' | translate }}</label>
+        <cds-text id="text"
+            class="sx-input" 
             [text]="action.status"
-            (selectedAttribute)="onSelectedAttribute($event, 'status')"
-            (clearSelectedAttribute)="onSelectedAttribute($event, 'status')">
-        </cds-textarea>
+            [placeholder]="'CDSCanvas.ResponseStatus' | translate"
+            [autocompleteOptions]="autocompleteStatusOptions"
+            (blur)="onBlur($event)"
+            (onChange)="onChangeTextarea($event, 'status')">
+        </cds-text>
+
     </div>
 
     <div class="cds-web-request-options no-footer">
 
         <mat-button-toggle-group [(ngModel)]="optionSelected" (change)="onChangeOption($event)">
-            <mat-button-toggle value="header">Header</mat-button-toggle>
+            <!-- <mat-button-toggle value="header">Header</mat-button-toggle> -->
             <mat-button-toggle value="body">Body</mat-button-toggle>
             <!-- <mat-button-toggle value="settings">Settings</mat-button-toggle> -->
         </mat-button-toggle-group>
@@ -81,8 +82,6 @@
         <div class="cds-web-request-row-body center json-error-yes" *ngIf="action?.bodyType === 'body' && !jsonIsValid">
             <span>{{errorMessage}}</span>
         </div>
-
-
 
     </div>
     
