@@ -7,6 +7,25 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.3
+- **changed**: web-response action UI improvements
+
+# 1.29.0-rc.2
+- **added**: web-response action
+
+# 1.29.0-rc.1
+- **added**: close intent as default internal intent for voice chatbot
+
+# 1.28.3
+- **bug-fixed**: widget into iframe not allows to use microphone
+
+# 1.28.3-rc.1
+- **bug-fixed**: widget into iframe not allows to use microphone
+
+# 1.28.1
+- **bug-fixed**: error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
+- **bug-fixed**: defaultfallback and start intents error to display in cds-panel-intent-list
+
 # 1.28.2-rc.1
 - **bug-fixed**: action reply, set time to zero only if it is the first action and it is an action reply text
 - **bug-fixed**: error in action reply: in image and frame (undefined params); cds-textarea change element id which is always "text-area"
@@ -19,10 +38,6 @@
 - **added**: create a new intent (float action menu) of the same color as the parent intent
 - **bug-fixed**: fixed error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
 - **bug-fixed**: fix default fallback and start blocks error to display in cds-panel-intent-list
-
-# 1.28.1
-- **bug-fixed**: error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
-- **bug-fixed**: defaultfallback and start intents error to display in cds-panel-intent-list
 
 # 1.28.1
 - **added**: doc for AI_PROMPT and WHATSAPP actions

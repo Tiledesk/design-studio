@@ -5,6 +5,9 @@
     <div *ngIf="intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK && intent.attributes.readonly" class="intent-icon">
         <span class="material-icons undo ">undo</span>
     </div>
+    <div *ngIf="intentName === RESERVED_INTENT_NAMES.CLOSE && intent.attributes.readonly" class="intent-icon">
+        <span class="material-icons call_end ">call_end</span>
+    </div>
 
     <div class="form-group" 
         [ngClass]="{'is-error':intentNameResult === false || intentNameAlreadyExist}">

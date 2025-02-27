@@ -3,7 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -126,7 +126,7 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     if(this.listOfIntents && this.listOfIntents.length > 0){
-      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
+      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START));
       // this.logger.log('setDefaultIntentSelected: ', startIntent, startIntent[0]);
       if(startIntent && startIntent.length>0){
         this.intentSelected = startIntent[0];
@@ -760,6 +760,8 @@ export class IntentService {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'rocket_launch' }
       } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'undo' }
+      } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.CLOSE) {
+        return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'call_end' }
       } else {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'label_important_outline' }
       }
@@ -933,6 +935,9 @@ export class IntentService {
       action.assignResultTo= 'result'
       action.assignStatusTo = 'status';
       action.assignErrorTo = 'error';
+    }
+    if(typeAction === TYPE_ACTION.WEB_RESPONSE){
+      action = new ActionWebRespose();
     }
     if(typeAction === TYPE_ACTION.AGENT){
       action = new ActionAgent();
