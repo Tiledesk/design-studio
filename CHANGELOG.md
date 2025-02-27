@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.3
+- **changed**: web-response action UI improvements
+
 # 1.29.0-rc.2
 - **added**: web-response action
 
