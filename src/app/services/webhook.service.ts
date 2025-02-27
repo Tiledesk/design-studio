@@ -99,4 +99,26 @@ export class WebhookService {
   }
 
 
+  checkActionForDelete(action: any){
+    if(action._tdActionType == 'web_response'){
+      // updateWebhook(chatbot_id: string){
+    }
+  }
+  updateWebhook(chatbot_id: string){
+    // this.thereIsWebhook = false;
+    // this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    // this.logger.log('[WEBHOOK_URL.SERV] deleteWebhook');
+    // const httpOptions = {
+    //   headers: new HttpHeaders({
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json',
+    //     'Authorization': this.tiledeskToken
+    //   })
+    // };
+    // let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
+    // this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
+    // return this._httpClient.delete<any>(url, httpOptions);
+  }
+
+
 }

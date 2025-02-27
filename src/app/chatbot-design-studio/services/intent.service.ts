@@ -875,10 +875,11 @@ export class IntentService {
    * onUpdateIntentWithTimeout2: salvo l'intent
   */
   public deleteSelectedAction(){
-    // this.logger.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
+    // // this.logger.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
     if(this.intentSelected.intent_id && this.actionSelectedID){
       this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
       let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
+
       intentToUpdate.actions = intentToUpdate.actions.filter((action: any) => action._tdActionId !== this.actionSelectedID);
       this.listOfIntents = this.listOfIntents.map((intent) => {
         if (intent.intent_id === this.intentSelected.intent_id) {
@@ -887,17 +888,12 @@ export class IntentService {
         return intent;
       });
       this.refreshIntent(intentToUpdate);
-      // this.connectorService.updateConnector(intentToUpdate.intent_id);
       this.controllerService.closeAllPanels();
-      // this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
-      // const responseIntent = this.onUpdateIntentWithTimeout2(intentToUpdate, 0, true);
       const responseIntent = this.updateIntent(intentToUpdate);
-      if(responseIntent){
-        // this.connectorService.movedConnector(intentToUpdate.intent_id);
-        this.logger.log('update Intent: OK');
-      }
+      // // if(responseIntent){
+      //   this.logger.log('update Intent: OK');
+      // }
       this.unselectAction();
-      // this.logger.log('deleteSelectedAction', intentToUpdate);
     }
   } 
 
@@ -947,6 +943,7 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.WEB_RESPONSE){
       action = new ActionWebRespose();
+      this.webhookService.updateWebhook('test');
     }
     if(typeAction === TYPE_ACTION.AGENT){
       action = new ActionAgent();

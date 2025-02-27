@@ -636,8 +636,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (event === 'edit') {
       this.onSelectAction(action, index, action._tdActionId)
     } else if (event === 'delete') {
-      this.intentService.selectAction(this.intent.intent_id, action._tdActionId)
+      this.intentService.selectAction(this.intent.intent_id, action._tdActionId);
       this.intentService.deleteSelectedAction();
+      this.webhookService.checkActionForDelete(action);
       // this.actionDeleted.emit(true)
     } else if (event === 'copy') {
       this.copyAction(action);
