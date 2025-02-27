@@ -82,9 +82,10 @@ export class CDSTextComponent implements OnInit {
     if(event === 'open'){
       this.myInput.nativeElement.classList.add('autocompleteOpen')
       this.utilsComponent.nativeElement.classList.add('slide-top')
-    }else {
+    } else {
       this.myInput.nativeElement.classList.remove('autocompleteOpen')
       this.utilsComponent.nativeElement.classList.remove('slide-top')
+      this.autoComplete.closePanel();
     }
   }
 

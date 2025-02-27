@@ -394,7 +394,8 @@ $circle-size: 40px;
     // color: #0aae10;
     color: var(--color-green-hex);
   }
-  span.undo {
+  span.undo,
+  span.call_end {
     color: var(--color-red-hex)
   }
 }

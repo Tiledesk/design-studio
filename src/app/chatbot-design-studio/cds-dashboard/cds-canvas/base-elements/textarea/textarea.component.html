@@ -1,10 +1,9 @@
 <div class="text-editor-wrapper" >
     <div [class.focus-in]="expand" [class.focus-out]="!expand">
         <div class="text-editor">
-            <!-- [readonly]="readonly" -->
+            <!-- [readonly]="readonly" id="text-area" -->
             <mat-form-field class="box-textarea" appearance="fill">
                 <textarea matInput
-                    id="text-area"
                     #autosize="cdkTextareaAutosize"
                     [class.invalid]="control.invalid"
                     [maxlength]="limitCharsText"
