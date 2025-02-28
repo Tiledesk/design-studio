@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ActionWebhook } from 'src/app/models/action-model';
+// import { ActionWebhook } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { Project } from 'src/app/models/project-model';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -17,7 +17,7 @@ export class CdsActionWebhookComponent implements OnInit {
 
 
   @Input() intentSelected: Intent;
-  @Input() action: ActionWebhook;
+  @Input() action: any;
   @Input() previewMode: boolean = true;
   
   @Output() updateIntentFromConnectorModification = new EventEmitter();

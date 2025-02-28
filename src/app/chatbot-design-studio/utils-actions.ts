@@ -158,7 +158,7 @@ export const ACTIONS_LIST: {[key: string]: {name: string, category: TYPE_ACTION_
     PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.F,    doc: ""                                                                 },
     
-    WEBHOOK:                { name: 'CDSActionList.NAME.Webhook',               category: TYPE_ACTION_CATEGORY.EVENTS,                type: TYPE_ACTION.WEBHOOK,            src:"assets/images/icons/webhook2.svg",                 status: "active",                       doc: ""                                                                 },
+    WEBHOOK:                { name: 'CDSActionList.NAME.Webhook',               category: TYPE_ACTION_CATEGORY.EVENTS,              type: TYPE_ACTION.INTENT,               src:"assets/images/icons/webhook2.svg",                 status: "active",                       doc: ""                                                                 },
 
 }
 
