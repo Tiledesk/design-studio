@@ -338,7 +338,26 @@ export class IntentService {
       });
     });
   }
- 
+
+
+  public createNewIntentFromAction(typeAction: string, action: any, pos:any, color?: string){
+    let intent = new Intent();
+    const chatbot_id = this.dashboardService.id_faq_kb;
+    intent.id_faq_kb = chatbot_id;
+    intent.attributes.position = pos;
+    intent.intent_display_name = this.setDisplayName();
+    if(color){
+      intent.attributes.color = color;
+    }
+    intent.actions.push(action);
+    if(typeAction === TYPE_EVENT_CATEGORY.WEBHOOK){
+      intent.intent_display_name = TYPE_EVENT_CATEGORY.WEBHOOK;
+      intent.attributes.readonly = true;
+      intent.attributes.type = TYPE_EVENT_CATEGORY.WEBHOOK;
+    }
+    this.logger.log("[INTENT SERVICE] createNewIntentFromAction ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
+    return intent;
+  }
 
   /** create a new intent when drag an action on the stage */
   public createNewIntent(id_faq_kb: string, action: any, pos:any, color?: string){
@@ -351,13 +370,6 @@ export class IntentService {
       intent.attributes.color = color;
     }
     intent.actions.push(action);
-
-    if(action._tdActionType === TYPE_EVENT_CATEGORY.WEBHOOK){
-      intent.attributes.readonly = true;
-      intent.attributes.type = TYPE_EVENT_CATEGORY.WEBHOOK;
-    }
-   
-
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
   }

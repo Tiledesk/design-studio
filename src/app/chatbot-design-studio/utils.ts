@@ -76,10 +76,11 @@ export enum EXTERNAL_URL {
 }
 
 export enum TYPE_INTENT_NAME {
-    TOPIC_INTERNAL                  = "internal",
-    START              = "start",
-    DEFAULT_FALLBACK   = "defaultFallback",
-    CLOSE                           = "close"
+    TOPIC_INTERNAL      = "internal",
+    START               = "start",
+    DEFAULT_FALLBACK    = "defaultFallback",
+    CLOSE               = "close",
+    WEBHOOK             = "webhook"
 }
 
 export enum TYPE_MATH_OPERATOR {

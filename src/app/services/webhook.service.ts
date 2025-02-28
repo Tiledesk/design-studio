@@ -113,13 +113,30 @@ export class WebhookService {
         break;
       }
     }
-    this.updateWebhook(chatbot_id, thereIsWebResponse).subscribe({ next: (resp: any)=> {
-      this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
-    }, error: (error)=> {
-      this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
-    }, complete: () => {
-      this.logger.log("[cds-action-webhook] updateWebhook completed.");
-    }});
+
+    const updateWebhookObs = this.updateWebhook(chatbot_id, thereIsWebResponse);
+    if (updateWebhookObs) {
+      updateWebhookObs.subscribe({
+        next: (resp: any) => {
+          this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
+        },
+        error: (error) => {
+          this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
+        },
+        complete: () => {
+          this.logger.log("[cds-action-webhook] updateWebhook completed.");
+        }
+      });
+    } else {
+      this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
+    }
+    // this.updateWebhook(chatbot_id, thereIsWebResponse).subscribe({ next: (resp: any)=> {
+    //   this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
+    // }, error: (error)=> {
+    //   this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
+    // }, complete: () => {
+    //   this.logger.log("[cds-action-webhook] updateWebhook completed.");
+    // }});
   }
 
 

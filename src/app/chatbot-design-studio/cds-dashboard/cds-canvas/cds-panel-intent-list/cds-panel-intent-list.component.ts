@@ -41,6 +41,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
 
   ICON_DEFAULT = 'package_2';
   ICON_ROCKET = 'rocket_launch';
+  ICON_WEBHOOK = 'webhook';
   ICON_UNDO = 'undo';
   ICON_CLOSE = 'call_end'
 
@@ -133,6 +134,8 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
       icon = this.ICON_ROCKET;
     } else if (name.trim() === TYPE_INTENT_NAME.DEFAULT_FALLBACK && readonly) {
       icon = this.ICON_UNDO;
+    } else if (name.trim() === TYPE_INTENT_NAME.WEBHOOK && readonly){
+      icon = this.ICON_WEBHOOK;
     } else if (name.trim() === TYPE_INTENT_NAME.CLOSE && readonly){
       icon = this.ICON_CLOSE;
     }

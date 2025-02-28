@@ -70,7 +70,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     this.intentService.testIntent.subscribe((intent: Intent) => {
       if(intent && intent.intent_display_name){
         this.intentName = intent.intent_display_name
-        this.widgetIframe.nativeElement.contentWindow.postMessage(
+        this.widgetIframe.nativeElement.contentWindow?.postMessage(
           {action: 'restart', intentName: this.intentName}, "*");
       }
     })

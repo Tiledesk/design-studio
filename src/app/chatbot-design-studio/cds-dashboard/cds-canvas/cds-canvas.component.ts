@@ -1010,7 +1010,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   async createNewIntentFromPanelElement(pos, element){
     let typeElement = element.value?.type;
     const newAction = this.intentService.createNewAction(typeElement);
-    let intent = this.intentService.createNewIntent(this.id_faq_kb, newAction, pos);
+    let intent = this.intentService.createNewIntentFromAction(typeElement, newAction, pos);
+    // // let intent = this.intentService.createNewIntent(this.id_faq_kb, newAction, pos);
     this.intentService.addNewIntentToListOfIntents(intent);
     const newIntent = await this.settingAndSaveNewIntent(pos, intent, null, null);
   }
