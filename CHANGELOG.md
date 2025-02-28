@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.8
+- **bug-fixed**: restore type action from intent to webhook
+
 # 1.29.0-rc.7
 - **bug-fixed**: type webhook action = INTENT
 - **bug-fixed**: chaned async value in regenerateWebhook and updateWbhook
