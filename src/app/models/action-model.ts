@@ -504,7 +504,7 @@ export class ActionWebhook extends Action {
     json_payload?: Object;
     constructor() {
         super();
-        this._tdActionType = TYPE_ACTION.INTENT;
+        this._tdActionType = TYPE_ACTION.WEBHOOK;
     }
 }
 

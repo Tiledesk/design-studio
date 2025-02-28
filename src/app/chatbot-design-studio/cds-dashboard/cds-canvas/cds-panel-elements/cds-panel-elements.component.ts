@@ -54,7 +54,7 @@ export class CdsPanelElementsComponent implements OnInit {
 
   onOpenMenu(e, type, category?: string) {
     this.thereIsWebhook = this.webhookService.thereIsWebhook;
-    // console.log('[CDS-panel-element] type::  ', type)
+    // //console.log('[CDS-panel-element] type::  ', type, this.thereIsWebhook);
     if (type === TYPE_OF_MENU.EVENT && this.thereIsWebhook === true) {
       return;
     }

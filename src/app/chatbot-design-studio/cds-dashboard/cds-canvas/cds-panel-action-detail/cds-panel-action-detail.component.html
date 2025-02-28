@@ -8,8 +8,8 @@
         </cds-action-description>
         
         <div class="header-options-wrp icon-action" (click)="onChangeMaximize()">
-            <img src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" *ngIf="!maximize">
-            <img src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" *ngIf="maximize">
+            <img src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" *ngIf="!maximize" alt="maximize">
+            <img src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" *ngIf="maximize" alt="minimize">
         </div>
     </div>
 
@@ -21,8 +21,8 @@
                 -->
                 
                 <div [ngSwitch]="elementSelected._tdActionType" *ngIf="canShowActionByPlan.enabled">
-
-                    <cds-action-webhook *ngSwitchCase="TYPE_ACTION.WEBHOOK"
+                    <cds-action-webhook 
+                        *ngSwitchCase="TYPE_ACTION.WEBHOOK"
                         class="panel-response"
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"

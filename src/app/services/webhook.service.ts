@@ -28,7 +28,7 @@ export class WebhookService {
     this.logger.log('[WEBHOOK_URL.SERV] initialize', serverBaseUrl);
     this.SERVER_BASE_PATH = serverBaseUrl;
     this.project_id = projectId;
-    this.WEBHOOK_URL = this.SERVER_BASE_PATH + this.project_id 
+    this.WEBHOOK_URL = this.SERVER_BASE_PATH + this.project_id;
   }
 
   getWebhook(chatbot_id: string){
@@ -47,6 +47,7 @@ export class WebhookService {
   }
 
   createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean){
+    this.thereIsWebhook = true;
     if(this.thereIsWebResponse !== thereIsWebResponse){
       this.thereIsWebResponse = thereIsWebResponse;
     }
