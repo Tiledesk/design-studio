@@ -12,7 +12,7 @@ export class WebhookService {
   SERVER_BASE_PATH: string;
   WEBHOOK_URL: any;
   thereIsWebhook: boolean = false;
-  thereIsWebResponse: boolean = false;
+  thereIsWebResponse: boolean = true;
 
   private tiledeskToken: string;
   private project_id: string;
@@ -46,8 +46,10 @@ export class WebhookService {
     return this._httpClient.get<any>(url, httpOptions);
   }
 
-  createWebhook(chatbot_id: string, intent_id: string){
-    this.thereIsWebhook = true;
+  createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean){
+    if(this.thereIsWebResponse !== thereIsWebResponse){
+      this.thereIsWebResponse = thereIsWebResponse;
+    }
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] createWebhook');
     const httpOptions = {
@@ -59,7 +61,8 @@ export class WebhookService {
     };
     let body = { 
       'chatbot_id': chatbot_id,
-      'block_id': intent_id
+      'block_id': intent_id, 
+      'async': thereIsWebResponse
     };
     this.logger.log('[WEBHOOK_URL.SERV]  createWebhook - BODY ', body);
     let url = this.WEBHOOK_URL + '/webhooks/';
@@ -101,43 +104,37 @@ export class WebhookService {
 
 
   checkActions(chatbot_id, listOfIntents){
-    let thereIsWebResponse = false;
+    let thereIsWebResponse = true;
     for (const intent of listOfIntents) {
       for (const action of intent.actions) {
         if (action._tdActionType === 'web_response') {
-          thereIsWebResponse = true;
+          thereIsWebResponse = false;
           break;
         }
       }
-      if (thereIsWebResponse === true) {
+      if (thereIsWebResponse === false) {
         break;
       }
     }
+    return thereIsWebResponse;
+  } 
 
-    const updateWebhookObs = this.updateWebhook(chatbot_id, thereIsWebResponse);
-    if (updateWebhookObs) {
-      updateWebhookObs.subscribe({
-        next: (resp: any) => {
-          this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
-        },
-        error: (error) => {
-          this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
-        },
-        complete: () => {
-          this.logger.log("[cds-action-webhook] updateWebhook completed.");
-        }
-      });
-    } else {
-      this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
-    }
-    // this.updateWebhook(chatbot_id, thereIsWebResponse).subscribe({ next: (resp: any)=> {
-    //   this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
-    // }, error: (error)=> {
-    //   this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
-    // }, complete: () => {
-    //   this.logger.log("[cds-action-webhook] updateWebhook completed.");
-    // }});
-  }
+    // const updateWebhookObs = this.updateWebhook(chatbot_id, thereIsWebResponse);
+    // if (updateWebhookObs) {
+    //   updateWebhookObs.subscribe({
+    //     next: (resp: any) => {
+    //       this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
+    //     },
+    //     error: (error) => {
+    //       this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
+    //     },
+    //     complete: () => {
+    //       this.logger.log("[cds-action-webhook] updateWebhook completed.");
+    //     }
+    //   });
+    // } else {
+    //   this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
+    // }
 
 
   updateWebhook(chatbot_id: string, thereIsWebResponse: boolean){

@@ -217,6 +217,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.intent.intent_display_name = TYPE_EVENT_CATEGORY.WEBHOOK;
         this.isWebhook = true;
         this.startAction = this.intent.actions[0];
+        
         this.createWebhook(this.intent.id_faq_kb, this.intent.intent_id);
       }
       if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
@@ -430,7 +431,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /** createWebhook */
   createWebhook(chatbot_id, intent_id){
-    this.webhookService.createWebhook(chatbot_id, intent_id).subscribe({ next: (resp: string)=> {
+    let listOfIntents = this.intentService.listOfIntents;
+    const thereIsWebResponse = this.webhookService.checkActions(chatbot_id, listOfIntents);
+    this.webhookService.createWebhook(chatbot_id, intent_id, thereIsWebResponse).subscribe({ next: (resp: string)=> {
       this.logger.log("[CDS-INTENT] createWebhook : ", resp);
     }, error: (error)=> {
       this.logger.error("[CDS-INTENT] error createWebhook: ", error);
