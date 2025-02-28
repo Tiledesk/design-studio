@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.7
+- **bug-fixed**: type webhook action = INTENT
+- **bug-fixed**: chaned async value in regenerateWebhook and updateWbhook
+
 # 1.29.0-rc.6
  - **added**: updateWebhook (ds-webhook-webresponse-PRE1)
 
