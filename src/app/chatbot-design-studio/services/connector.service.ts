@@ -232,18 +232,18 @@ export class ConnectorService {
         this.logger.log('[CONNECTOR-SERV] createConnectors:: ACTION ', action);
         
         /** WEBHOOK */
-        // if(action._tdActionType === TYPE_ACTION.WEBHOOK){
-        //   if(action.intentName && action.intentName !== ''){
-        //     idConnectorFrom = intent.intent_id+'/'+action._tdActionId;
-        //     idConnectorTo = action.intentName.replace("#", "");
-        //     if(!this.intentExists(idConnectorTo)){
-        //       action.intentName = '';
-        //       idConnectorTo = null;
-        //     }
-        //     this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
-        //     this.createConnector(intent, idConnectorFrom, idConnectorTo);
-        //   }
-        // }
+        if(action._tdActionType === TYPE_ACTION.WEBHOOK){
+          if(action.intentName && action.intentName !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId;
+            idConnectorTo = action.intentName.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.intentName = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
 
 
         /**  INTENT */
