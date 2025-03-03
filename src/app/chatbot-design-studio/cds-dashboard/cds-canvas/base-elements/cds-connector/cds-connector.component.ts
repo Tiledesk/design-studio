@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
@@ -18,6 +18,7 @@ export class CdsConnectorComponent implements OnInit {
 
   intent_display_name: string;
   idContractConnector: string;
+  restoreConnector: boolean = false;
 
   constructor(
     private readonly stageService: StageService,
@@ -27,8 +28,21 @@ export class CdsConnectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.getIntentDisplayName();
+    this.setIdContractConnector();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.idConnection) {
+      this.getIntentDisplayName();
+      // console.log('idConnection è cambiato da', changes.idConnection.previousValue, 'a', changes.idConnection.currentValue);
+      this.setIdContractConnector();
+    }
+  }
+
+  setIdContractConnector(){
     const idConnection = this.idConnection?.replace('#', '');
     this.idContractConnector = 'contract_'+idConnection;
+    // console.log('idConnection: ', idConnection, ' a: ', this.idContractConnector);
   }
 
   getIntentDisplayName(){
@@ -43,6 +57,7 @@ export class CdsConnectorComponent implements OnInit {
   }
 
   public showConnector(){
+    // // console.log('showConnector: ', this.idConnection, this.isConnected);
     if(this.idConnection && this.isConnected){
       const idConnection = this.idConnection?.replace('#', '');
       const svgElement: HTMLElement = document.getElementById(idConnection);
@@ -80,16 +95,23 @@ export class CdsConnectorComponent implements OnInit {
   }
 
 
-  public mostra(){
+
+  public showConnectorDefault(){
+    this.restoreConnector = false;
     this.connectorService.showHideConnectorByIdConnector(this.idConnection, "block");
   }
 
-  public nascondi(){
-    this.connectorService.showHideConnectorByIdConnector(this.idConnection, "none");
+  public hideConnectorDefault(){
+    if(this.restoreConnector === false){
+      this.connectorService.showHideConnectorByIdConnector(this.idConnection, "none");
+    }
   }
 
-  public ripristina(){
-    this.connectorService.setDisplayConnectorByIdConnector(this.idConnector);
+  public restoreConnectorDefault(event: MouseEvent): void {
+    event.stopPropagation();
+    this.restoreConnector = true;
+    this.connectorService.setDisplayConnectorByIdConnector(this.idConnection);
+    this.connectorService.showHideConnectorByIdConnector(this.idConnection, "block");
   }
   
 }

@@ -6,8 +6,7 @@
     <!-- ---------------------------------- -->
     <div class="intent-header-action-btn icon"
       matTooltipClass="cds-mat-tooltip"
-      [matTooltip]="'CDSCanvas.ShowHideConnector' | translate"
-      matTooltipPosition="above"
+      [matTooltip]="displayConnector?('CDSCanvas.HideConnector' | translate):('CDSCanvas.ShowConnector' | translate)"
       matTooltipHideDelay="100"
       (click)="onAddActionFromConnectorMenu(typeOfmenu.SHOW_HIDE)">
       <img *ngIf="displayConnector === true" src="assets/images/icons/visibility.svg" alt="hide connector" />
