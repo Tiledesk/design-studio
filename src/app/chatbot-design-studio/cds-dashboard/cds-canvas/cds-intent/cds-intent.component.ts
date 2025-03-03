@@ -13,7 +13,8 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_EVENT_CATEGORY, INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID } from 'src/app/chatbot-design-studio/utils';
+import { WebhookService } from 'src/app/services/webhook.service';
 
 export enum HAS_SELECTED_TYPE {
   ANSWER = "HAS_SELECTED_ANSWER",
@@ -71,8 +72,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isOpen: boolean = true;
   // menuType: string = 'action';
   positionMenu: any;
-  isStart = false;
-  isDefaultFallback = false;
+
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;
@@ -86,6 +86,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isActionIntent: boolean = false;
   isAgentsAvailable: boolean = false;
   
+  /** TYPE OF INTENTS */
+  isStart = false;
+  isDefaultFallback = false;
+  isWebhook = false;
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -104,7 +108,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     private readonly controllerService: ControllerService,
     private readonly elemenRef: ElementRef,
     private readonly renderer: Renderer2,
-    private readonly appStorageService: AppStorageService
+    private readonly appStorageService: AppStorageService,
+    private readonly webhookService: WebhookService
   ) {
     this.initSubscriptions();
   }
@@ -205,22 +210,34 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-
   ngOnInit(): void {
     //setTimeout(() => {
       this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
-      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+      if(this.intent.attributes.type === TYPE_EVENT_CATEGORY.WEBHOOK){
+        this.intent.intent_display_name = TYPE_EVENT_CATEGORY.WEBHOOK;
+        this.isWebhook = true;
+        this.startAction = this.intent.actions[0];
+        
+        this.createWebhook(this.intent.id_faq_kb, this.intent.intent_id);
+      }
+      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
-      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START){
+      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.START){
         this.isStart = true;
+        if(this.intent.actions.length === 0){
+          let action = new Action;
+          action._tdActionType =  "intent";
+          this.intent.actions.push(action);
+        }
         this.startAction = this.intent.actions[0];
       } else {
         this.setIntentSelected();
       }
       
+      // this.logger.log('[CDS-INTENT] patchBrokenConnectors -->', this.intent);
 
-      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
+      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.START) {
       //   this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
       //   this.startAction = this.intent.actions[0];
       //   this.isStart = true;
@@ -307,7 +324,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setAgentsAvailable(){
-    // /if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_START && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+    // /if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.START && this.intent.intent_display_name != TYPE_INTENT_NAME.DEFAULT_FALLBACK){
     if(this.intent.agents_available != false){ 
       this.intent.agents_available = true;
       this.isAgentsAvailable = true;
@@ -356,8 +373,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.logger.log('[CDS-INTENT] connector-release-on-intent e ', e)
         if (e.detail.toId === this.intent.intent_id) {
           const intentContentEl = document.querySelector(`#intent-content-${e.detail.toId}`);
-          // const blockHeaderEl = <HTMLElement>document.querySelector(`#block-header-${e.detail.toId}`);
-          // this.logger.log('[CDS-INTENT] Connector released on intent -  blockHeaderEl', blockHeaderEl)
+          // //const blockHeaderEl = <HTMLElement>document.querySelector(`#block-header-${e.detail.toId}`);
+          // //this.logger.log('[CDS-INTENT] Connector released on intent -  blockHeaderEl', blockHeaderEl)
           if (intentContentEl instanceof HTMLElement) {
             this.logger.log('[CDS-INTENT] Connector released on intent -  intentContentEl', intentContentEl)
             intentContentEl.classList.remove("outline-border")
@@ -391,7 +408,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     document.addEventListener(
       "connector-moved-out-of-intent", (e: CustomEvent) => {
-        this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
+        // // this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
 
         // !!!se il connettore è a meno di Xpx dalla fine dello stage sposta lo stage!!!!
         if (e.detail?.toId === this.intent.intent_id) {
@@ -411,6 +428,20 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   /** CUSTOM FUNCTIONS  */
+
+  /** createWebhook */
+  createWebhook(chatbot_id, intent_id){
+    let listOfIntents = this.intentService.listOfIntents;
+    const thereIsWebResponse = this.webhookService.checkActions(chatbot_id, listOfIntents);
+    this.webhookService.createWebhook(chatbot_id, intent_id, thereIsWebResponse).subscribe({ next: (resp: string)=> {
+      this.logger.log("[CDS-INTENT] createWebhook : ", resp);
+    }, error: (error)=> {
+      this.logger.error("[CDS-INTENT] error createWebhook: ", error);
+    }, complete: () => {
+      this.logger.log("[CDS-INTENT] createWebhook completed.");
+    }});
+  }
+
 
   /** setActionIntent */
   private setActionIntent(){
@@ -608,7 +639,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (event === 'edit') {
       this.onSelectAction(action, index, action._tdActionId)
     } else if (event === 'delete') {
-      this.intentService.selectAction(this.intent.intent_id, action._tdActionId)
+      this.intentService.selectAction(this.intent.intent_id, action._tdActionId);
       this.intentService.deleteSelectedAction();
       // this.actionDeleted.emit(true)
     } else if (event === 'copy') {
@@ -925,9 +956,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
     this.intentColor = color;
     this.intent.attributes.color = color;
-    // if(INTENT_COLORS[color]){
     if(color){
-      // const nwColor = INTENT_COLORS[color];
       document.documentElement.style.setProperty('--intent-color', `${color}`);
       this.setConnectorColor(color);
       this.intentService.updateIntent(this.intent); 

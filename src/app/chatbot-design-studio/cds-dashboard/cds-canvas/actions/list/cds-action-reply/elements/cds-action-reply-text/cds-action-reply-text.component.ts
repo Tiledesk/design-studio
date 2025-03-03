@@ -51,10 +51,11 @@ export class CdsActionReplyTextComponent implements OnInit {
   buttons: Array<any>;
   activeFocus: boolean = true;
 
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
-    private connectorService: ConnectorService,
-    private intentService: IntentService
+    private readonly connectorService: ConnectorService,
+    private readonly intentService: IntentService
   ) { }
 
   // SYSTEM FUNCTIONS //
@@ -179,7 +180,7 @@ export class CdsActionReplyTextComponent implements OnInit {
 
   /** onChangeDelayTime */
   onChangeDelayTime(value:number){
-    console.log('onChangeDelayTime:: ', value);
+    // // console.log('onChangeDelayTime:: ', value);
     this.delayTime = value;
     this.wait.time = value*1000;
     this.canShowFilter = true;
@@ -189,7 +190,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
-    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
+    this.filterConditionExist = expression?.conditions.length > 0? true : false;
     this.changeActionReply.emit();
   }
 

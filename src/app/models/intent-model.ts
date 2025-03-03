@@ -37,6 +37,7 @@ export class IntentAttributes {
     connectors?: any;
     color?: any;
     readonly?: boolean;
+    type?: string;
     constructor() {
         this.position = {x:0, y:0};
         this.nextBlockAction = {

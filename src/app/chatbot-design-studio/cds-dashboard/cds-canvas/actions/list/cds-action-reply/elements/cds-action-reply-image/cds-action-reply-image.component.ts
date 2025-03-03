@@ -81,10 +81,10 @@ export class CdsActionReplyImageComponent implements OnInit {
   // PRIVATE FUNCTIONS //
 
   private initialize(){
-    this.delayTime = (this.wait && this.wait.time  || this.wait.time === 0)? (this.wait.time/1000) : 500/1000;
+    this.delayTime = (this.wait?.time && this.wait?.time !== 0)? (this.wait.time/1000) : 500/1000;
     this.checkButtons();
-    // this.patchButtons();
-    // this.buttons = this.response?.attributes?.attachment?.buttons;
+    // // this.patchButtons();
+    // // this.buttons = this.response?.attributes?.attachment?.buttons;
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);
     this.idIntent = this.idAction.split('/')[0];
 

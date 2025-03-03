@@ -28,13 +28,8 @@ export class CdsActionReplyComponent implements OnInit {
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
-  // idIntentSelected: string;
   idAction: string;
-
   openCardButton: boolean = false;
-  // buttonSelected: Button;
-  // newButton: boolean = false;
-
   typeCommand = TYPE_COMMAND;
   typeResponse = TYPE_RESPONSE;
   typeMessage = TYPE_MESSAGE;
@@ -55,13 +50,13 @@ export class CdsActionReplyComponent implements OnInit {
   titlePlaceholder: string;
 
 
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private intentService: IntentService,
-    private controllerService: ControllerService,
-    private connectorService: ConnectorService,
-    private changeDetectorRef: ChangeDetectorRef
+    private readonly intentService: IntentService,
+    private readonly controllerService: ControllerService,
+    private readonly connectorService: ConnectorService,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) { }
 
   // manageTooltip(){}
@@ -90,7 +85,6 @@ export class CdsActionReplyComponent implements OnInit {
     this.action._tdActionId = this.action._tdActionId?this.action._tdActionId:generateShortUID();
     this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
     // this.initialize();
-
     this.changeDetectorRef.detectChanges();
   }
 
@@ -157,8 +151,8 @@ export class CdsActionReplyComponent implements OnInit {
   }
 
   /** */
-  drop(event: CdkDragDrop<string[]>) {
-    // this.logger.log( 'DROP REPLY ---> ',event, this.arrayResponses);
+  async drop(event: CdkDragDrop<string[]>) {
+    // //this.logger.log( 'DROP REPLY ---> ',event, this.arrayResponses);
     this.textGrabbing = false;
     try {
       let currentPos = event.currentIndex*2+1;
@@ -171,10 +165,10 @@ export class CdsActionReplyComponent implements OnInit {
       this.arrayResponses[currentPos] = msgPre;
       this.arrayResponses[previousPos-1] = waitCur;
       this.arrayResponses[previousPos] = msgCur;
-      // this.logger.log( 'DROP REPLY ---> ', this.arrayResponses);
+      // // this.logger.log( 'DROP REPLY ---> ', this.arrayResponses);
       this.connectorService.updateConnector(this.intentSelected.intent_id);
       const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.intentSelected};
-      this.onUpdateAndSaveAction(element);
+      await this.onUpdateAndSaveAction(element);
     } catch (error) {
       this.logger.log('drop ERROR', error);
     }
@@ -192,7 +186,7 @@ export class CdsActionReplyComponent implements OnInit {
       from = index;
       to = from - 2;
       this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]);
-      // this.logger.log( 'onMoveUpResponse ---> ', this.arrayResponses);
+      // // this.logger.log( 'onMoveUpResponse ---> ', this.arrayResponses);
       this.connectorService.updateConnector(this.intentSelected.intent_id);
       const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
       this.onUpdateAndSaveAction(element);
@@ -349,7 +343,7 @@ export class CdsActionReplyComponent implements OnInit {
    * */
   public async onUpdateAndSaveAction(element) {
     this.logger.log('[cds-action-reply] onUpdateAndSaveAction:::: ', this.action, element);
-    // this.connectorService.updateConnector(this.intentSelected.intent_id);
+    // //this.connectorService.updateConnector(this.intentSelected.intent_id);
     this.updateAndSaveAction.emit(this.action);
   }
 

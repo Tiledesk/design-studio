@@ -501,7 +501,12 @@
         "PushTagsToListDescription":"Check this option if you want to add tags to global list.",
         "ViewList":"View list",
         "UseBotSlug":"Use bot slug",
-        "ChooseBotBySlug":"Choose bot by slug"
+        "ChooseBotBySlug":"Choose bot by slug",
+        "LogLevels": "Log levels",
+        "VisibilityConnectors":"Visibility of connectors",
+        "ChangeAlphaConnectors":"Change alpha of the connectors color",
+        "ResponseStatus":"Response status",
+        "StatusNotSelected":"Status not selected"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -631,6 +636,7 @@
             "ReplaceBot":"Replace bot",
             "Wait":"Wait",
             "WebRequest":"Web request",
+            "WebResponse":"Web response",
             "SendEmail":"Send email",
             "WhatsAppStatic":"WhatsApp static",
             "WhatsAppByAttribute":"WhatsApp by attribute",
@@ -662,7 +668,9 @@
             "PlayPrompt":"Play prompt",
             "SpeechForm":"Speech form",
             "AudioRecord":"Audio record",
-            "SendWhatsapp":"Send Whatsapp"
+            "SendWhatsapp":"Send Whatsapp",
+
+            "Webhook":"Webhook"
         },
         "DOC": {
             "Reply":{
@@ -769,6 +777,13 @@
                 "IMAGE":"assets/images/doc/WEB_REQUESTV2.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/web-request-action/"
+            },
+            "WebResponse":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
             },
             "SendEmail":{
                 "TITLE":"Send email",

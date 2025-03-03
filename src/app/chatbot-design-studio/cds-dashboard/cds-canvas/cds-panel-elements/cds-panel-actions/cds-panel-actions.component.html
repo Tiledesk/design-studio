@@ -50,23 +50,25 @@
         </div>
 
         <div *ngIf="menuType === TYPE_OF_MENU.EVENT" 
+            
             [style.display]="isDragging?'none':'block'" class="menu-dragging">
             <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
+                disabled
                 cdkDrag 
                 (cdkDragStarted)="onDragStarted($event, i)" 
                 (cdkDragMoved)="onDragMoved($event)" 
                 (cdkDragEnded)="onDragEnd($event)">
-
+                
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
                 <div class="actions-btns-wpr">
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <img [src]="item.value.src" [title]="item.value.name | translate">
+                        <img [src]="item.value.src" [title]="item.value.name | translate" [alt]="item.value.name | translate">
                     </div>
                     <div *ngIf="item.value.name" class="action-btn-text">{{item.value.name | translate}}</div>
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <button class="btn btn-tdblu-no-boxshadow drag-btn">
-                            <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate ">
+                            <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate" alt="drag" >
                         </button>
                     </div>
                 </div>

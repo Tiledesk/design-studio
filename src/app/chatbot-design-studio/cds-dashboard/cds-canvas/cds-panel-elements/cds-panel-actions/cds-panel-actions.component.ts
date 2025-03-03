@@ -8,7 +8,7 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
-// import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
+
 
 @Component({
   selector: 'cds-panel-actions',
@@ -35,11 +35,13 @@ export class CdsPanelActionsComponent implements OnInit {
   hoveredElement: any;
   positionMenu: any = {'x': 200, 'y': 0 };
   isOpen: boolean = false;
+
   // dropList: CdkDropList;
   // connectedLists: CdkDropList[];
   // connectedIDLists: string[];
   
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
     private controllerService: ControllerService,
     private projectPlanUtils: ProjectPlanUtils,
@@ -48,7 +50,11 @@ export class CdsPanelActionsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // // empty
   }
+
+
+
 
   ngOnChanges(changes: SimpleChanges) {
     switch (this.menuType) {
@@ -110,7 +116,6 @@ export class CdsPanelActionsComponent implements OnInit {
     if(!this.pos){
       this.pos = {'x': 0, 'y':0};
     }
-
   }
 
 

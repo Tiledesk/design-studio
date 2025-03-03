@@ -1,0 +1,18 @@
+
+
+<div class="webhook-block">
+    <div class="webhook-icon">
+        <img src="assets/images/icons/webhook2.svg" alt="webhook">
+    </div>
+    <input class="webhook-link" type="text" [value]="webhookUrl">
+</div>
+
+<div class="webhook-buttons">
+    <button type="button" class="btn btn-primary cds-blue-button" (click)="regenerateWebhook()">regenerate</button>
+    <button type="button" class="btn btn-primary cds-blue-button" (click)="copyText()">copy</button>
+</div>
+
+<p *ngIf="messageText" class="webhook-message fade-in-out">
+    {{ messageText }}
+</p>
+

@@ -203,6 +203,27 @@
     }
   }
 
+  .cds-webhook-content {
+    width: 43px;
+    height: 43px;
+    background-color: #ffffff00;
+    display: flex;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 0px;
+    padding: 6px 20px 0px 0px;
+    margin-right: 0px;
+    border-radius: 20px;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    cursor: pointer;
+    .title-label {
+      display: none;
+    }
+  }
+
   .pic-header-title {
     border-radius: 5px;
     overflow-x: hidden;

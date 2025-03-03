@@ -3,11 +3,11 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebhook, ActionWebRespose } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
+import { TYPE_EVENT_CATEGORY, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { ConnectorService } from '../services/connector.service';
 import { ControllerService } from '../services/controller.service';
 import { StageService } from '../services/stage.service';
@@ -18,6 +18,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ExpressionType } from '@angular/compiler';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
+import { WebhookService } from 'src/app/services/webhook.service';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -61,7 +62,6 @@ export class IntentService {
   operationsUndo: any = [];
   operationsRedo: any = [];
   // newPosition: any = {'x':0, 'y':0};
-  
 
   private changedConnector = new Subject<any>();
   public isChangedConnector$ = this.changedConnector.asObservable();
@@ -83,7 +83,8 @@ export class IntentService {
     private controllerService: ControllerService,
     private stageService: StageService,
     private dashboardService: DashboardService,
-    private tiledeskAuthService: TiledeskAuthService
+    private tiledeskAuthService: TiledeskAuthService,
+    private readonly webhookService: WebhookService
   ) { 
 
   }
@@ -127,7 +128,7 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     if(this.listOfIntents && this.listOfIntents.length > 0){
-      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
+      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START));
       // this.logger.log('setDefaultIntentSelected: ', startIntent, startIntent[0]);
       if(startIntent && startIntent.length>0){
         this.intentSelected = startIntent[0];
@@ -177,7 +178,7 @@ export class IntentService {
   }
 
   public setIntentSelectedPosition(x, y){
-    if (this.intentSelected && this.intentSelected.attributes) {
+    if (this.intentSelected?.attributes) {
       if (!this.intentSelected.attributes.position) {
         this.intentSelected.attributes.position = {};
       }
@@ -337,17 +338,37 @@ export class IntentService {
       });
     });
   }
- 
 
-  /** create a new intent when drag an action on the stage */
-  public createNewIntent(id_faq_kb: string, action: any, pos:any){
+
+  public createNewIntentFromAction(typeAction: string, action: any, pos:any, color?: string){
     let intent = new Intent();
     const chatbot_id = this.dashboardService.id_faq_kb;
     intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
-    // let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
-    // intent.actions.push(actionIntent);
+    if(color){
+      intent.attributes.color = color;
+    }
+    intent.actions.push(action);
+    if(typeAction === TYPE_EVENT_CATEGORY.WEBHOOK){
+      intent.intent_display_name = TYPE_EVENT_CATEGORY.WEBHOOK;
+      intent.attributes.readonly = true;
+      intent.attributes.type = TYPE_EVENT_CATEGORY.WEBHOOK;
+    }
+    this.logger.log("[INTENT SERVICE] createNewIntentFromAction ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
+    return intent;
+  }
+
+  /** create a new intent when drag an action on the stage */
+  public createNewIntent(id_faq_kb: string, action: any, pos:any, color?: string){
+    let intent = new Intent();
+    const chatbot_id = this.dashboardService.id_faq_kb;
+    intent.id_faq_kb = chatbot_id;
+    intent.attributes.position = pos;
+    intent.intent_display_name = this.setDisplayName();
+    if(color){
+      intent.attributes.color = color;
+    }
     intent.actions.push(action);
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
@@ -699,10 +720,10 @@ export class IntentService {
    * @param intent 
    */
   public addNewIntentToListOfIntents(intent){
-    // this.logger.log("[CDS-INTENT-SERVICES] aggiungo l'intent alla lista di intent");
+    // // this.logger.log("[CDS-INTENT-SERVICES] aggiungo l'intent alla lista di intent");
     this.listOfIntents.push(intent);
     this.refreshIntents();
-    // this.behaviorIntents.next(this.listOfIntents);
+    // // this.behaviorIntents.next(this.listOfIntents);
   }
 
   /**
@@ -760,6 +781,8 @@ export class IntentService {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'rocket_launch' }
       } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'undo' }
+      } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.CLOSE) {
+        return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'call_end' }
       } else {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'label_important_outline' }
       }
@@ -837,7 +860,6 @@ export class IntentService {
         }
         let id_faq_kb = this.dashboardService.id_faq_kb;
         this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
-
       }
     }
   }
@@ -865,7 +887,7 @@ export class IntentService {
    * onUpdateIntentWithTimeout2: salvo l'intent
   */
   public deleteSelectedAction(){
-    // this.logger.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
+    this.logger.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
     if(this.intentSelected.intent_id && this.actionSelectedID){
       this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
       let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
@@ -877,17 +899,14 @@ export class IntentService {
         return intent;
       });
       this.refreshIntent(intentToUpdate);
-      // this.connectorService.updateConnector(intentToUpdate.intent_id);
       this.controllerService.closeAllPanels();
-      // this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
-      // const responseIntent = this.onUpdateIntentWithTimeout2(intentToUpdate, 0, true);
       const responseIntent = this.updateIntent(intentToUpdate);
-      if(responseIntent){
-        // this.connectorService.movedConnector(intentToUpdate.intent_id);
-        this.logger.log('update Intent: OK');
-      }
+
+     
+      // // if(responseIntent){
+      //   this.logger.log('update Intent: OK');
+      // }
       this.unselectAction();
-      // this.logger.log('deleteSelectedAction', intentToUpdate);
     }
   } 
 
@@ -898,7 +917,7 @@ export class IntentService {
    * @returns 
    */
   public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML) {
-    // this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
+    this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
     let action: any;
 
     if(typeAction === TYPE_ACTION.REPLY){
@@ -934,6 +953,9 @@ export class IntentService {
       action.assignResultTo= 'result'
       action.assignStatusTo = 'status';
       action.assignErrorTo = 'error';
+    }
+    if(typeAction === TYPE_ACTION.WEB_RESPONSE){
+      action = new ActionWebRespose();
     }
     if(typeAction === TYPE_ACTION.AGENT){
       action = new ActionAgent();
@@ -1212,6 +1234,13 @@ export class IntentService {
       action = new ActionSendWhatsapp();
       action.payload  = new WhatsappBroadcast()
     }
+
+    /** WEBHOOK */
+    if(typeAction === TYPE_ACTION.WEBHOOK){
+      action = new ActionWebhook();
+    }
+
+
     return action;
   }
   // END ATTRIBUTE FUNCTIONS //
@@ -1409,7 +1438,7 @@ export class IntentService {
   /************************************************/
   /** */
   public async updateIntent(intent: Intent, fromIntent?: Intent){
-    this.logger.log('[INTENT SERVICE] -> updateIntentNew, ', intent, fromIntent);
+    this.logger.log('[INTENT SERVICE] -> updateIntentNew, ', intent, this.listActions);
     const intentPrev = this.prevListOfIntent.find((obj) => obj.intent_id === intent.intent_id);
     this.operationsUndo = [];
     this.operationsRedo = [];
@@ -1513,6 +1542,22 @@ export class IntentService {
     /** deleteIntent2 */
     public async deleteIntentNew(intent: Intent){
       this.logger.log('[INTENT SERVICE] -> deleteIntent, ', intent);
+      if(intent.attributes.type === TYPE_EVENT_CATEGORY.WEBHOOK){
+        this.logger.log('[INTENT SERVICE] -> deleteWebhook, ', intent);
+        const chatbot_id = this.dashboardService.id_faq_kb;
+        
+
+        this.webhookService.deleteWebhook(chatbot_id).subscribe({ next: (resp: any)=> {
+          this.logger.log("[cds-action-webhook] regenerateWebhook : ", resp);
+        }, error: (error)=> {
+          this.logger.error("[cds-action-webhook] error regenerateWebhook: ", error);
+        }, complete: () => {
+          this.logger.log("[cds-action-webhook] regenerateWebhook completed.");
+        }});
+        
+
+        
+      }
       this.operationsUndo = [];
       this.operationsRedo = [];
       this.payload = {
@@ -1734,12 +1779,13 @@ export class IntentService {
     this.logger.log('[INTENT SERVICE] -> pasteElementToStage, ', element, point);
     if(element && element.type === 'INTENT'){
       let newIntent_id = uuidv4();
-      let prevIntent = element.element;
+      let prevIntent = this.replaceId(element.element, '_tdActionId');
       let newAction = prevIntent.actions[0];
       let newIntent = this.createNewIntent(element.chatbot, newAction, 0);
       newIntent.attributes = prevIntent.attributes;
       newIntent.attributes.position = point;
       newIntent.actions = prevIntent.actions;
+      this.logger.log('[INTENT SERVICE] -> prevIntent ', prevIntent);
       this.pasteIntentOntoStage(newIntent, prevIntent.intent_id, newIntent_id);
     } else if(element && element.type === 'ACTION'){
       // let newAction = element.element;
@@ -1792,5 +1838,18 @@ export class IntentService {
     //return results;
   }
 
+
+  private replaceId(obj: any, keyToReplace: string) {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (key === keyToReplace) {
+          obj[key] = uuidv4();
+        } else if (typeof obj[key] === "object" && obj[key] !== null) {
+          this.replaceId(obj[key], keyToReplace);
+        }
+      }
+    }
+    return obj;
+  }
 
 }
