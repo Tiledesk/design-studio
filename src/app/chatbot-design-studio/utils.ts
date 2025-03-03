@@ -43,8 +43,8 @@ export enum RESERVED_INTENT_NAMES {
 }
 
 export enum INTENT_COLORS {
-    // COLOR0 = '110,134,191',
-    COLOR1 = '80,100,147',
+    COLOR1 = '156,163,205',
+    // COLOR1 = '80,100,147',
     COLOR2 = '61,130,226',
     COLOR3 = '86,179,101',
     COLOR4 = '204,68,75',
