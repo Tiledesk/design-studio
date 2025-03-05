@@ -3,6 +3,14 @@
 <div class="webhook-copilot">
 
     
+    <div class="webhook-icon-copilot">
+        <img src="assets/images/icons/copilot.svg" alt="copilot">
+        <span *ngIf="!action.copilot" class="copilot-label">{{ 'CDSCanvas.CopilotDisabled' | translate }}</span>
+        <span *ngIf="action.copilot" class="copilot-label">{{'CDSCanvas.CopilotEnabled' | translate }}</span>
+    </div>
+    
+
+    
     <div class="copilot-onoffswitch">
         <label class="copilot-onoffswitch-label" for="copilot_switch" [class.checked]="action.copilot">
             <input type="checkbox" name="copilote_switch"
@@ -11,12 +19,7 @@
             (change)="updateCopilotWebhook($event.target.checked)" />
         </label>
     </div>
-    <div class="webhook-icon-copilot">
-        <img src="assets/images/icons/copilot.svg" alt="copilot">
-    </div>
-    <span *ngIf="!action.copilot" class="copilot-label">{{ 'CDSCanvas.CopilotDisabled' | translate }}</span>
-    <span *ngIf="action.copilot" class="copilot-label">{{'CDSCanvas.CopilotEnabled' | translate }}</span>
-
+    
 </div>
 
 <div class="webhook-block">

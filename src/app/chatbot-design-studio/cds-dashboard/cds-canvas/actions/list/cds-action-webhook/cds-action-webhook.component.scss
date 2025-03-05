@@ -6,6 +6,7 @@
     margin: 20px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 
 .webhook-link {
@@ -144,7 +145,7 @@
 }
 
 .webhook-icon-copilot {
-    width: 30px;
+    width: auto;
     height: 30px;
     display: flex;
     img {
@@ -162,5 +163,7 @@
 
 .copilot-label{
     font-size: 12px;
+    line-height: 30px;
+    margin-left: 10px;
 }
 // --------- ./end new on-off btn logo ---------
