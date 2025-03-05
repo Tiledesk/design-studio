@@ -31,6 +31,7 @@ export enum STAGE_SETTINGS {
 export enum RESERVED_INTENT_NAMES {
     START              = 'start',
     DEFAULT_FALLBACK   = 'defaultFallback',
+    WEBHOOK            = 'webhook',
 }
 
 export enum INTENT_COLORS {
@@ -70,6 +71,7 @@ export enum TYPE_INTENT_NAME {
     TOPIC_INTERNAL                  = 'internal',
     DISPLAY_NAME_START              = "start",
     DISPLAY_NAME_DEFAULT_FALLBACK   = "defaultFallback",
+    WEBHOOK                         = 'webhook',
 }
 
 export enum TYPE_MATH_OPERATOR {

@@ -57,7 +57,7 @@ export class CdsPanelActionsComponent implements OnInit {
     switch (this.menuType) {
       case TYPE_OF_MENU.ACTION:
         this.menuItemsList = this.actionsList;
-        
+        /*
         // this.projectPlanUtils.checkIfActionIsInChatbotType(TYPE_CHATBOT.WEBHOOK);
         // this.logger.log('[CDS-PANEL-ACTIONS] ACTIONS_LIST:: ', ACTIONS_LIST);
         // this.menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[this.menuCategory] && el.status !== 'inactive')).map(element => {
@@ -67,7 +67,7 @@ export class CdsPanelActionsComponent implements OnInit {
         //     canLoad: element.plan? this.projectPlanUtils.checkIfCanLoad(element.type, element.plan) : true
         //   };
         // }); 
-      
+        */
         break;
       case TYPE_OF_MENU.EVENT:
         this.menuItemsList = Object.values(EVENTS_LIST).map(element => {

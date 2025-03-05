@@ -311,12 +311,17 @@ export class IntentService {
   }
 
 
+  public isReservedIntent(intentName: string): intentName is RESERVED_INTENT_NAMES {
+    return Object.values(RESERVED_INTENT_NAMES).includes(intentName as RESERVED_INTENT_NAMES);
+  }
+
+  
   private intentAnalyzer() {
     this.listOfIntents.forEach(intent => {
       if (intent.actions) {
         intent.actions = intent.actions.filter(obj => obj !== null);
       }
-      if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK){
+      if (this.isReservedIntent(intent.intent_display_name)) {
         intent.attributes.readonly = true;
       }
     });
@@ -760,6 +765,8 @@ export class IntentService {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'rocket_launch' }
       } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'undo' }
+      } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.WEBHOOK) {
+        return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'webhook' }
       } else {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'label_important_outline' }
       }

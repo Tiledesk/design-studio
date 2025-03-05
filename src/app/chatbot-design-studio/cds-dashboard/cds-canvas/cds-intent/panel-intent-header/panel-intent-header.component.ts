@@ -11,7 +11,7 @@ import { INTENT_COLORS, RESERVED_INTENT_NAMES, preDisplayName } from '../../../.
   styleUrls: ['./panel-intent-header.component.scss']
 })
 export class PanelIntentHeaderComponent implements OnInit, OnChanges {
-  @ViewChild('myInput', { static: true }) myInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('inputIntentName', { static: true }) inputIntentName!: ElementRef<HTMLInputElement>;
 
   @Input() intent: Intent;
   @Input() intentColor: string;
@@ -20,11 +20,19 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   RESERVED_INTENT_NAMES = RESERVED_INTENT_NAMES;
   listOfIntents: Intent[];
   intentName: string;
-  intentNameResult: boolean = true;
-  intentNameAlreadyExist: boolean = false
-  intentNameNotHasSpecialCharacters: boolean = true;
+ 
+  
   id_faq_kb: string;
   isFocused: boolean = false;
+
+  isStart: boolean = false;
+  isDefaultFallback: boolean = false;
+  isWebhook: boolean = false;
+  isNotErrorName: boolean = true;
+
+  intentNameAlreadyExist: boolean = false
+  intentNameNotHasSpecialCharacters: boolean = true;
+  
 
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   constructor(
@@ -50,25 +58,33 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   }
 
   /******************* CUSTOM FUNCTIONS *******************/ 
+
   /** initialize */
   private initialize(){
     this.listOfIntents = this.intentService.listOfIntents;
+    this.intentNameAlreadyExist = false;
+    this.intentNameNotHasSpecialCharacters = true;
     if (this.intent.intent_display_name === undefined && this.intent.intent_display_name.trim().length === 0) {
       this.intentService.setDisplayName();
     } else {
       this.intentName = this.intent.intent_display_name;
     }
-    this.intentNameAlreadyExist = false;
-    this.intentNameNotHasSpecialCharacters = true;
+    if(this.intentName === RESERVED_INTENT_NAMES.START) {
+      this.isStart = true;
+      this.intentNameAlreadyExist = true;
+    } else if(this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
+      this.isDefaultFallback = true;
+      this.intentNameAlreadyExist = true;
+    } else if(this.intentName === RESERVED_INTENT_NAMES.WEBHOOK) {
+      this.isWebhook = true;
+      this.intentNameAlreadyExist = true;
+    }
     if(!this.intentColor){
       this.intentColor = INTENT_COLORS.COLOR1;
     }
     this.logger.log("[PANEL-INTENT-HEADER] initialize name:", this.intent);
   }
 
-
-
-  // funzione
 
   /** checkIntentNameMachRegex */
   private checkIntentNameMachRegex(intentname) {
@@ -78,84 +94,69 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   /** checkIntentName */
   private checkIntentName(name: string) {
-    this.intentNameResult = true;
     this.intentNameAlreadyExist = false;
-   
-
     if(!this.intentName || this.intentName.trim().length == 0 || this.intentName === preDisplayName) {
-      this.intentNameResult = false;
-      return this.intentNameResult;
+      return false;
     }
-
     for (const element of this.listOfIntents) {
       if (element.intent_display_name === name && element.intent_id !== this.intent.intent_id) { 
         this.intentNameAlreadyExist = true;
-        this.intentNameResult = false;
-        return this.intentNameResult;
-        // break;
+        return false;
       }
     }
-
     this.intentNameNotHasSpecialCharacters = this.checkIntentNameMachRegex(name);
     if(!this.intentNameNotHasSpecialCharacters){
-      this.logger.log("[PANEL-INTENT-HEADER] error 3");
-      this.intentNameResult = false;
+      return false;
     }
-    return this.intentNameResult;
+    return true;
   }
   /******************* END CUSTOM FUNCTIONS *******************/ 
 
 
   /******************* EVENT FUNCTIONS *******************/ 
-
   onSelectIntent(event){
     this.logger.log("[PANEL-INTENT-HEADER] onSelectIntent",event, this.intent);
-    // this.intentService.setIntentSelected(this.intent.intent_id);
+    // // this.intentService.setIntentSelected(this.intent.intent_id);
   }
 
   /** onMouseUpInput */
   onMouseUpInput(event){
     this.logger.log("[PANEL-INTENT-HEADER] onMouseUpInput");
     this.isFocused = true;
-    this.myInput.nativeElement.focus();
+    this.inputIntentName.nativeElement.focus();
   }
 
   /** onChangeIntentName */
   onChangeIntentName(event) {
     this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName", event, this.intent);
-    if (event === RESERVED_INTENT_NAMES.START || event === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) { 
-      // /this.intent.intent_display_name = event.trim();
-      this.intentNameResult = false;
+    if(this.intentService.isReservedIntent(event)){
+      this.logger.log("[PANEL-INTENT-HEADER] isReservedIntent TRUE");
       this.intentNameAlreadyExist = true;
-      this.logger.log("[PANEL-INTENT-HEADER] entro", event, this.intentName, this.intent);
+      this.isNotErrorName = false;
     } else {
-      const result = this.checkIntentName(event);
-      if(result){
-        // /this.intent.intent_display_name = event.trim();
+      this.logger.log("[PANEL-INTENT-HEADER] isReservedIntent FALSE");
+      this.intentNameAlreadyExist = false;
+      this.isNotErrorName = this.checkIntentName(event);
+      if(this.isNotErrorName){
         this.intentName = event;
-        // /this.onSaveIntent();
-        // /this.intentService.setIntentSelected(this.intent.intent_id);
       }
     }
-   
-    
   }
+
 
   onBlur(event){
     this.logger.log("[PANEL-INTENT-HEADER]  onBlur!!!", this.intent);
-    if ((this.intentName === RESERVED_INTENT_NAMES.START || this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) && this.intent.attributes.readonly === false){
-      // /this.intentName = this.intentName+"_";
-      // /this.intent.intent_display_name = this.intentName;
-      this.intentNameResult = true;
-      this.intentNameAlreadyExist = false;
+    if(this.intentService.isReservedIntent(this.intentName) && this.intent.attributes.readonly === false){
+      this.intentNameAlreadyExist = true;
       this.intentName = this.intent.intent_display_name;
+      this.logger.log("[PANEL-INTENT-HEADER]  isReservedIntent true");
     } else {
-      this.intent.intent_display_name = this.intentName;
-      this.intentNameResult = true;
       this.intentNameAlreadyExist = false;
-      this.myInput.nativeElement.blur();
-      const result = this.checkIntentName(this.intentName);
-      if(result){
+      this.logger.log("[PANEL-INTENT-HEADER]  isReservedIntent true");
+      this.isNotErrorName = this.checkIntentName(this.intentName);
+      if(this.isNotErrorName){
+        this.intent.intent_display_name = this.intentName;
+        this.inputIntentName.nativeElement.blur();
         this.onSaveIntent();
       }
     }
@@ -164,38 +165,18 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   /** ENTER KEYBOARD EVENT*/
   onEnterButtonPressed(event) {
     this.logger.log('[PANEL-INTENT-HEADER] onEnterButtonPressed Intent name: onEnterButtonPressed event', event)
-    // // this.checkIntentName(this.intentName);
-    // // this.onSaveIntent();
-    // event.target.blur()
-    this.myInput.nativeElement.blur();
-    // this.intentService.selectIntent(this.intent);
+    this.inputIntentName.nativeElement.blur();
   }
 
   /** doubleClickFunction */
   doubleClickFunction(event){
     this.logger.log("[PANEL-INTENT-HEADER] doubleClickFunction");
-    this.myInput.nativeElement.select();
-    // this.intentService.selectIntent(this.intent);
+    this.inputIntentName.nativeElement.select();
   }
 
-  // onMouseBlur(){
-  //   this.logger.log("[PANEL-INTENT-HEADER] onMouseBlur");
-  //   this.isFocused = false;
-  // }
-
-  // /** BLUR EVENT*/
-  // onBlurIntentName(event) {
-  //   // this.checkIntentName(this.intentName);
-  //   // this.onSaveIntent();
-  // }
-
- 
-
-  /** */
+  /** onSaveIntent */
   onSaveIntent() {
     this.logger.log("[PANEL-INTENT-HEADER] SALVO!!!");
-    // this.intentService.setIntentSelected(this.intent.intent_id);
-    //this.intent.intent_display_name = this.intentName.trim();
     this.intentService.changeIntentName(this.intent);
   }
 

@@ -20,7 +20,8 @@ export class ProjectPlanUtils {
     private logger: LoggerService = LoggerInstance.getInstance()
     constructor(
         private projectService: ProjectService,
-        private appConfigService: AppConfigService
+        private appConfigService: AppConfigService,
+        
     ){ 
         this.project = this.projectService.getCurrentProject();
         this.checkIfKBSCanLoad();
@@ -135,8 +136,8 @@ export class ProjectPlanUtils {
     }
 
 
-    public checkIfActionIsInChatbotType(chatbotType: TYPE_CHATBOT){
-        Object.values(ACTIONS_LIST).filter(el => !el.chatbot_types.includes(chatbotType)).map( el => el.status = 'inactive')
+    public checkIfActionIsInChatbotType(subType: TYPE_CHATBOT){
+        Object.values(ACTIONS_LIST).filter(el => !el.chatbot_types.includes(subType)).map( el => el.status = 'inactive')
     }
 
     public checkIfActionCategoryIsInProject(actionType: TYPE_ACTION_CATEGORY){

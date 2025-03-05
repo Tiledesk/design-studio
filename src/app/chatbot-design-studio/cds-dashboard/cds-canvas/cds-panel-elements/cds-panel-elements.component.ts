@@ -6,6 +6,7 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 
 @Component({
@@ -39,10 +40,11 @@ export class CdsPanelElementsComponent implements OnInit {
   actionsList: Array<any> = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
-actionCategory: any;
+  actionCategory: any;
   
   constructor(
-    private readonly projectPlanUtils: ProjectPlanUtils
+    private readonly projectPlanUtils: ProjectPlanUtils,
+    private readonly dashboardService: DashboardService
   ) { }
 
   ngOnInit(): void {
@@ -117,7 +119,8 @@ actionCategory: any;
 
   createActionListByCategory(){
     ACTION_CATEGORY.forEach(category => {
-      this.projectPlanUtils.checkIfActionIsInChatbotType(TYPE_CHATBOT.WEBHOOK);
+      const subtype = TYPE_CHATBOT.WEBHOOK;//this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+      this.projectPlanUtils.checkIfActionIsInChatbotType(subtype as TYPE_CHATBOT);
       let menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[category.type] && el.status !== 'inactive')).map(element => {
         return {
           type: TYPE_OF_MENU.ACTION,

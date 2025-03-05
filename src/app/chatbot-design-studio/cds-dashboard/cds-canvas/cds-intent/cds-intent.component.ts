@@ -5,7 +5,6 @@ import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, 
 import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
 import { IntentService } from '../../../services/intent.service';
-// import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
 import { ConnectorService } from '../../../services/connector.service';
 import { StageService } from '../../../services/stage.service';
 import { ControllerService } from '../../../services/controller.service';
@@ -49,17 +48,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('openActionMenuBtn', { static: false }) openActionMenuBtnRef: ElementRef;
 
 
-
-
   subscriptions: Array<{ key: string, value: Subscription }> = [];
-  private unsubscribe$: Subject<any> = new Subject<any>();
+  unsubscribe$: Subject<any> = new Subject<any>();
+
   alphaConnectors: number;
   connectorsIn: any;
-
-
-  // intentElement: any;
-  // idSelectedAction: string;
-  // form: Form;
   formSize: number = 0;
   questionCount: number = 0;
   listOfActions: Action[];
@@ -69,7 +62,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   ACTIONS_LIST = ACTIONS_LIST;
   elementTypeSelected: HAS_SELECTED_TYPE
   isOpen: boolean = true;
-  // menuType: string = 'action';
   positionMenu: any;
   isStart = false;
   isDefaultFallback = false;
@@ -89,11 +81,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
-  // position?: any;
-  // nextBlockAction?: any;
-  // connectors?: any;
-  // color?: any;
-
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -109,11 +96,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.initSubscriptions();
   }
 
-  // aggiungo un pignulo su intent che sul hover del mouse cambia in 1 opacity di tutti i connettori in ingresso
+
   initSubscriptions() {
     let subscribtion: any;
     let subscribtionKey: string;
-
 
     /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
     subscribtionKey = 'behaviorIntent';
@@ -209,10 +195,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
     //setTimeout(() => {
       this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
-      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
-      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START){
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
         this.isStart = true;
         this.startAction = this.intent.actions[0];
       } else {

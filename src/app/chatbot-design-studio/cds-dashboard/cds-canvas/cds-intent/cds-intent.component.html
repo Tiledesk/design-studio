@@ -1,30 +1,27 @@
-
- <!-- [ngStyle]="{'background-color': 'var(--intent-background)'}" 
-  [ngStyle]="{'background-color': 'rgba(var('+intentColor+'), 0.25)'}">-->
-
-  <div #resizeElement [ngClass]="{'cds-intent-active': intentService.intentSelectedID === intent.intent_id && intentService.intentActive}"  class="panel-intent-content tds_draggable" 
+<div #resizeElement class="panel-intent-content tds_draggable"
+    [ngClass]="{'cds-intent-active': intentService.intentSelectedID === intent.intent_id && intentService.intentActive}"  
     [class.isStart]="isStart" 
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{'background-color': 'rgba('+intentColor+', 0.35)'}">
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
+
     <cds-connector-in *ngIf="!isStart && alphaConnectors < 1 && connectorsIn?.length>0"
-    [connectorsIn]="connectorsIn"
-    (onShowConnectorsIn)="onShowConnectorsIn()"
-    (onHideConnectorsIn)="onHideConnectorsIn()">
+        [connectorsIn]="connectorsIn"
+        (onShowConnectorsIn)="onShowConnectorsIn()"
+        (onHideConnectorsIn)="onHideConnectorsIn()">
     </cds-connector-in>
 
     <cds-panel-intent-controls
         [isInternalIntent]="isInternalIntent"
-        [isStart]="isStart"
-        [isDefaultFallback]="isDefaultFallback"
+        [display_name]="intent.intent_display_name"
         [deleteOptionEnabled]="listOfActions?.length > 0"
         [webhookEnabled]="intent.webhook_enabled"
         (optionClicked)="onOptionClicked($event)">
     </cds-panel-intent-controls>
 
-    <div class="pic-header" 
-        [id]="'block-header-'+ intent?.intent_id"
+    <div  [id]="'block-header-'+ intent?.intent_id"
+        class="pic-header" 
         [ngClass]="{'cds-start': isStart}">
 
         <cds-panel-intent-header class="pic-title-text tds_draggable" 
@@ -45,10 +42,11 @@
             </div>
         </div>
     </div>
-
+    
     <div *ngIf="isAgentsAvailable" class="agents-available" [class.isStart]="isStart"><span class="material-icons">boy</span></div>
 
-    <div *ngIf="isStart" class="cds-start-content">
+    <div *ngIf="isStart" class="cds-start-content"
+        (click)="onSelectAction(startAction, 0, startAction._tdActionId)">
         <cds-action-intent class="panel-response" 
             [isStart]="isStart" 
             [intentSelected]="intent"
@@ -56,7 +54,6 @@
             (updateAndSaveAction)="onUpdateAndSaveAction($event)">
         </cds-action-intent>
     </div>
-
 
     <div *ngIf="!isStart" class="actions-list-wpr"  
         cdkDropList
