@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.10
+- **added**: added copilot parameter in action webhook
+
 
 # 1.29.0-rc.9
 - **bug-fixed**: css textarea in action web request
