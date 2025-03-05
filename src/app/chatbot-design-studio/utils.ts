@@ -44,7 +44,8 @@ export enum RESERVED_INTENT_NAMES {
 
 export enum INTENT_COLORS {
     // COLOR0 = '110,134,191',
-    COLOR1 = '80,100,147',
+    // COLOR1 = '80,100,147',
+    COLOR1 = '156,163,205',
     COLOR2 = '61,130,226',
     COLOR3 = '86,179,101',
     COLOR4 = '204,68,75',
@@ -555,3 +556,28 @@ export function filterImageMimeTypesAndExtensions(fileUploadAccept: string): str
       .filter(type => type.startsWith('image/') || imageExtensions.includes(type));
     return imageTypesAndExtensions;
 }
+
+
+export function getOpacityFromRgba(rgba) {
+    const rgbaRegex = /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(\d*\.?\d+)\s*\)$/;
+    const match = rgba.match(rgbaRegex);
+    if (match) {
+        return parseFloat(match[1]);
+    }
+    return null;
+}
+
+export function getColorFromRgba(rgba) {
+    const rgbaRegex1 = /^rgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*\d*\.?\d+\s*\)$/;
+    const rgbaRegex2 = /^rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)$/;
+    let match1 = rgba.match(rgbaRegex1);
+    let match2 = rgba.match(rgbaRegex2);
+    if (match1) {
+        const [r, g, b] = [parseInt(match1[1]), parseInt(match1[2]), parseInt(match1[3])];
+        return `${r}, ${g}, ${b}`;
+    } else  if (match2) {
+        const [r, g, b] = [parseInt(match2[1]), parseInt(match2[2]), parseInt(match2[3])];
+        return `${r}, ${g}, ${b}`;
+    }
+    return null;
+  }

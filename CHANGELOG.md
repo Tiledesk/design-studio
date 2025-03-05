@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.29.0-rc.9
+- **bug-fixed**: css textarea in action web request
+- **bug-fixed**: number of characters web request
+- **changed**: default intent color
+- **added**: show/hide single connector
+
 # 1.29.0-rc.8
 - **bug-fixed**: restore type action from intent to webhook
 
