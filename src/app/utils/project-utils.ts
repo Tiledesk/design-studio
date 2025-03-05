@@ -1,5 +1,5 @@
 import { filter } from 'rxjs';
-import { ACTIONS_LIST, ACTION_CATEGORY, TYPE_ACTION_CATEGORY, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, ACTIONS_LIST, ACTION_CATEGORY, TYPE_ACTION_CATEGORY, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
 import { Injectable, OnInit } from "@angular/core";
 import { ProjectService } from "../services/projects.service";
 import { Project } from "../models/project-model";
@@ -132,6 +132,11 @@ export class ProjectPlanUtils {
 
 
         return true
+    }
+
+
+    public checkIfActionIsInChatbotType(chatbotType: TYPE_CHATBOT){
+        Object.values(ACTIONS_LIST).filter(el => !el.chatbot_types.includes(chatbotType)).map( el => el.status = 'inactive')
     }
 
     public checkIfActionCategoryIsInProject(actionType: TYPE_ACTION_CATEGORY){

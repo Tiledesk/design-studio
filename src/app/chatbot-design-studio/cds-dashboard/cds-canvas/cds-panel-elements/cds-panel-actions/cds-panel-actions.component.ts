@@ -5,7 +5,7 @@ import { ControllerService } from '../../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
-import { ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
@@ -18,6 +18,7 @@ import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 export class CdsPanelActionsComponent implements OnInit {
   @ViewChild('action_list_drop_connect') actionListDropConnect: CdkDropList;
 
+  @Input() actionsList: Array<any>;
   @Input() menuType: string;
   @Input() menuCategory: string;
   @Input() pos: any;
@@ -39,27 +40,34 @@ export class CdsPanelActionsComponent implements OnInit {
   // connectedLists: CdkDropList[];
   // connectedIDLists: string[];
   
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
-    private controllerService: ControllerService,
-    private projectPlanUtils: ProjectPlanUtils,
-    private translate: TranslateService,
+    private readonly controllerService: ControllerService,
+    private readonly projectPlanUtils: ProjectPlanUtils,
+    private readonly translate: TranslateService,
     // public dragDropService: DragDropService
   ) { }
 
   ngOnInit(): void {
+    // //empty
   }
 
   ngOnChanges(changes: SimpleChanges) {
     switch (this.menuType) {
       case TYPE_OF_MENU.ACTION:
-        this.menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[this.menuCategory] && el.status !== 'inactive')).map(element => {
-          return {
-            type: TYPE_OF_MENU.ACTION,
-            value: element,
-            canLoad: element.plan? this.projectPlanUtils.checkIfCanLoad(element.type, element.plan) : true
-          };
-        });
+        this.menuItemsList = this.actionsList;
+        
+        // this.projectPlanUtils.checkIfActionIsInChatbotType(TYPE_CHATBOT.WEBHOOK);
+        // this.logger.log('[CDS-PANEL-ACTIONS] ACTIONS_LIST:: ', ACTIONS_LIST);
+        // this.menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[this.menuCategory] && el.status !== 'inactive')).map(element => {
+        //   return {
+        //     type: TYPE_OF_MENU.ACTION,
+        //     value: element,
+        //     canLoad: element.plan? this.projectPlanUtils.checkIfCanLoad(element.type, element.plan) : true
+        //   };
+        // }); 
+      
         break;
       case TYPE_OF_MENU.EVENT:
         this.menuItemsList = Object.values(EVENTS_LIST).map(element => {
@@ -115,6 +123,7 @@ export class CdsPanelActionsComponent implements OnInit {
 
 
   ngAfterViewInit(){
+    
     // this.dragDropService.addConnectedIDList('action_list_drop_connect');
     // // this.dragDropService.addConnectedIDList('cds-box-right-content');
     // this.dragDropService.addConnectedList(this.actionListDropConnect);

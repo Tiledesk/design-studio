@@ -1,7 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_OF_MENU } from '../../../utils';
-import { TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
+import { ProjectPlanUtils } from 'src/app/utils/project-utils';
+import { TranslateService } from '@ngx-translate/core';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 
 @Component({
@@ -29,11 +33,20 @@ export class CdsPanelElementsComponent implements OnInit {
   TYPE_OF_MENU = TYPE_OF_MENU;
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
-  ACTION_CATEGORY = ACTION_CATEGORY
+  ACTION_CATEGORY = ACTION_CATEGORY;
+
+  actionsByCategory = {};
+  actionsList: Array<any> = [];
   
-  constructor() { }
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+actionCategory: any;
+  
+  constructor(
+    private readonly projectPlanUtils: ProjectPlanUtils
+  ) { }
 
   ngOnInit(): void {
+    this.createActionListByCategory();
   }
 
   onHideActionPlaceholderOfActionPanel(event) {
@@ -51,11 +64,12 @@ export class CdsPanelElementsComponent implements OnInit {
     setTimeout(() => {
       this.menuType = type;
       this.menuCategory = category;
-      //this.menuTrigger.openMenu();
+      this.actionsList = this.actionsByCategory[category];
+      // this.menuTrigger.openMenu();
       // let x = e.offsetLeft;
       let y = e.offsetTop;
       this.isOpen = true;
-      if(this.isDraggingMenuElement == false){
+      if(this.isDraggingMenuElement === false){
         this.positionMenu = {'x': 85, 'y': y }
       }
     }, 0);
@@ -98,6 +112,25 @@ export class CdsPanelElementsComponent implements OnInit {
     if(event === false){
       this.onCloseMenu();
     }
+  }
+
+
+  createActionListByCategory(){
+    ACTION_CATEGORY.forEach(category => {
+      this.projectPlanUtils.checkIfActionIsInChatbotType(TYPE_CHATBOT.WEBHOOK);
+      let menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[category.type] && el.status !== 'inactive')).map(element => {
+        return {
+          type: TYPE_OF_MENU.ACTION,
+          value: element,
+          canLoad: element.plan? this.projectPlanUtils.checkIfCanLoad(element.type, element.plan) : true
+        };
+      });
+      if(menuItemsList.length>0){
+        this.actionsByCategory[category.type] = menuItemsList;
+      }
+      this.logger.log('[CDS-PANEL-ELEMENTS] menuItemsList:: ', category.type, menuItemsList);
+    });
+    this.logger.log('[CDS-PANEL-ELEMENTS] actionsByCategory:: ', this.actionsByCategory);
   }
 
 }
