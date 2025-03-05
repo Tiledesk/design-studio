@@ -159,5 +159,24 @@ export class WebhookService {
     }
   }
 
+  updateCopilotWebhook(chatbot_id: string, copilot: boolean){
+    this.logger.log('[WEBHOOK_URL.SERV] - updateCopilotWebhook ', copilot);
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    let body = { 
+      'copilot': copilot,
+    };
+    let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
+    this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
+    return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
+    
+  }
+
 
 }

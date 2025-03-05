@@ -502,9 +502,11 @@ export class ActionCode extends Action {
 export class ActionWebhook extends Action {
     intentName?: string;
     json_payload?: Object;
+    copilot: boolean
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.WEBHOOK;
+        this.copilot = false;
     }
 }
 

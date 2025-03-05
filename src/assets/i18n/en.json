@@ -504,7 +504,9 @@
         "VisibilityConnectors":"Visibility of connectors",
         "ChangeAlphaConnectors":"Change alpha of the connectors color",
         "ResponseStatus":"Response status",
-        "StatusNotSelected":"Status not selected"
+        "StatusNotSelected":"Status not selected",
+        "CopilotEnabled":"Copilot enabled",
+        "CopilotDisabled":"Copilot disabled"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",

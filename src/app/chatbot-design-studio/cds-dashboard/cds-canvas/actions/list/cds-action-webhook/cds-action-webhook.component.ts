@@ -76,6 +76,19 @@ export class CdsActionWebhookComponent implements OnInit {
   }
 
 
+  updateCopilotWebhook(copilot){
+    this.logger.log("[cds-action-webhook] updateCopilotWebhook : ", copilot);
+    this.webhookService.updateCopilotWebhook(this.chatbot_id, copilot).subscribe({ next: (resp: any)=> {
+      this.logger.log("[cds-action-webhook] updateCopilotWebhook : ", resp);
+      this.updateAndSaveAction.emit();
+    }, error: (error)=> {
+      this.logger.error("[cds-action-webhook] error updateCopilotWebhook: ", error);
+    }, complete: () => {
+      this.logger.log("[cds-action-webhook] updateCopilotWebhook completed.");
+    }});
+  }
+
+
 
 
 

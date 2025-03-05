@@ -2,6 +2,11 @@
     margin: 20px;
     display: flex;
 }
+.webhook-copilot {
+    margin: 20px;
+    display: flex;
+    align-items: center;
+}
 
 .webhook-link {
     border: 1px solid #f2f2f2;
@@ -73,3 +78,89 @@
     100% { opacity: 0; }
   }
   
+
+  // --------------------
+// SWITCH BTN
+// --------------------
+// --------- start new on-off btn logo ---------
+.copilot-onoffswitch {
+    position: relative;
+    width: 45px;
+    display: block;
+    float: left;
+    margin: 0 5px 0 0;
+}
+.copilot-onoffswitch-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.copilot-onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    height: 25px;
+    padding: 0;
+    line-height: 25px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease-in;
+    &.checked{
+        border-color: var(--blu);
+        background-color: var(--blu);
+        &:before {
+            border-color: var(--blu);
+            right: 0px;
+        }
+    }
+}
+
+
+.copilot-onoffswitch-label:before {
+    content: "";
+    display: block;
+    width: 25px;
+    margin: 0px;
+    background: #ffffff;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 20px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    transition: all 0.3s ease-in 0s;
+}
+
+.copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label {
+    background-color: var(--blu);
+}
+.copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label,
+.copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label:before {
+    border-color: var(--blu);
+}
+.copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label:before {
+    right: 0px;
+}
+
+.webhook-icon-copilot {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    img {
+        width: 22px;
+        height: 22px;
+        border-radius: 4px;
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+        // filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+    }
+}
+
+.copilot-label{
+    font-size: 12px;
+}
+// --------- ./end new on-off btn logo ---------
