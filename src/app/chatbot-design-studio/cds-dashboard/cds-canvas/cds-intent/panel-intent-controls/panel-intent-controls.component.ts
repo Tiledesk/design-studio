@@ -46,7 +46,7 @@ export class PanelIntentControlsComponent implements OnInit {
       this.showCopy = false;
       this.showPlay = true;
     } else if(this.display_name === RESERVED_INTENT_NAMES.WEBHOOK){
-      this.showMore = false;
+      this.showMore = true;
       this.showColor = false;
       this.showDelete = false;
       this.showCopy = false;

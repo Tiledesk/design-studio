@@ -192,7 +192,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
     // this.stageService.initStageSettings(this.id_faq_kb);
-    
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
     this.changeDetectorRef.detectChanges();
