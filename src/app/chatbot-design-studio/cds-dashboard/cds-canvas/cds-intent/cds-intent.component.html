@@ -1,8 +1,11 @@
+<!-- [ngClass]="{'cds-intent-active': intentService.intentSelectedID === intent.intent_id && intentService.intentActive}"   -->
 <div #resizeElement class="panel-intent-content tds_draggable"
-    [ngClass]="{'cds-intent-active': intentService.intentSelectedID === intent.intent_id && intentService.intentActive}"  
+    [class.cds-intent-active]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive" 
     [class.isStart]="isStart" 
     [id]="'intent-content-'+ intent?.intent_id"
-    [ngStyle]="{'background-color': 'rgba('+intentColor+', 0.35)'}">
+    [ngStyle]="{'background-color': 'rgba('+intentColor+', 0.35)'}"
+    (click)="onSelectActionIfWebhook(startAction, 0, startAction._tdActionId)">
+
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
 
@@ -41,12 +44,12 @@
                 <img src="assets/images/form.svg" [title]="'Form' | translate" alt="Form">
             </div>
         </div>
+
     </div>
     
     <div *ngIf="isAgentsAvailable" class="agents-available" [class.isStart]="isStart"><span class="material-icons">boy</span></div>
 
-    <div *ngIf="isStart" class="cds-start-content"
-        (click)="onSelectAction(startAction, 0, startAction._tdActionId)">
+    <div *ngIf="isStart" class="cds-start-content">
         <cds-action-intent class="panel-response" 
             [isStart]="isStart" 
             [intentSelected]="intent"
@@ -61,8 +64,6 @@
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
-        
-        
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
@@ -99,7 +100,7 @@
             (cdkDragMoved)="onDragMove($event)"
             [id]="action._tdActionId" 
             class="box-action" 
-            tabindex="0" 
+            tabindex=-1
             [ngClass]="{
             'cds-action-active': intentService.actionSelectedID === action._tdActionId, 
             'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),

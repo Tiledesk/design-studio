@@ -65,6 +65,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   positionMenu: any;
   isStart = false;
   isDefaultFallback = false;
+
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;
@@ -202,7 +203,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
         this.isStart = true;
         this.startAction = this.intent.actions[0];
-      } else {
+      }
+      else {
         this.setIntentSelected();
       }
       
@@ -226,7 +228,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.addEventListener();
-      this.setIntentAttribute();
+      this.setIntentAttributes();
     //}, 10000);
   }
 
@@ -442,15 +444,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /** setIntentAttribute */
-  private setIntentAttribute(){
+  private setIntentAttributes(){
     if (!this.intent?.attributes) {
       this.intent['attributes'] = {};
     }
-
     if(this.intent.attributes.color && this.intent.attributes.color !== undefined){
       const nwColor = this.intent.attributes.color;// INTENT_COLORS[this.intent.attributes.color];
       document.documentElement.style.setProperty('--intent-color', `${nwColor}`);
-      // const coloreValue = INTENT_COLORS[this.intent.attributes.color as keyof typeof INTENT_COLORS];
+      // // const coloreValue = INTENT_COLORS[this.intent.attributes.color as keyof typeof INTENT_COLORS];
       this.intentColor = nwColor;
     } 
     // else {
@@ -555,12 +556,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /** EVENTS  */
 
-  onSelectAction(action, index: number, idAction) {
+  onSelectActionIfWebhook(action: any, index: number, idAction: HAS_SELECTED_TYPE){
+    if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+      this.onSelectAction(action, index, idAction);
+    }
+  }
+
+  onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE) {
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
     this.logger.log('[CDS-INTENT] onActionSelected index: ', index);
     this.logger.log('[CDS-INTENT] onActionSelected idAction: ', idAction);
     this.elementTypeSelected = idAction;
-    /** // this.intentService.setIntentSelected(this.intent.intent_id);*/
     this.intentService.selectAction(this.intent.intent_id, idAction);
     this.actionSelected.emit({ action: action, index: index, maxLength: this.listOfActions.length });
   }

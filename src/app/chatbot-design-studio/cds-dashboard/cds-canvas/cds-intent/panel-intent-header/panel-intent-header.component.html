@@ -4,14 +4,15 @@
         <span class="material-icons rocket">rocket_launch</span>
     </div>
     <div *ngIf="isDefaultFallback" class="intent-icon">
-        <span class="material-icons undo ">undo</span>
+        <span class="material-icons undo">undo</span>
     </div>
     <div *ngIf="isWebhook" class="intent-icon">
-        <span class="material-icons webhook ">webhook</span>
+        <span class="material-icons webhook">webhook</span>
     </div>
 
-    <div class="form-group"
-        [ngClass]="{'is-error':!isNotErrorName}">
+    <div class="form-group" 
+        [class.is-error]="!isNotErrorName"
+        [class.is-start]="isStart || isWebhook">
         <input 
             #inputIntentName type="text" 
             class="input ellips form-control tds_draggable"
