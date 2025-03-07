@@ -31,7 +31,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   isNotErrorName: boolean = true;
 
   intentNameAlreadyExist: boolean = false
-  intentNameNotHasSpecialCharacters: boolean = true;
+  intentNameNOTHasSpecialCharacters: boolean = true;
   
 
   private readonly logger: LoggerService = LoggerInstance.getInstance()
@@ -63,21 +63,21 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   private initialize(){
     this.listOfIntents = this.intentService.listOfIntents;
     this.intentNameAlreadyExist = false;
-    this.intentNameNotHasSpecialCharacters = true;
-    if (this.intent.intent_display_name === undefined && this.intent.intent_display_name.trim().length === 0) {
+    this.intentNameNOTHasSpecialCharacters = true;
+    if (this.intent.intent_display_name === undefined || this.intent.intent_display_name.trim().length === 0) {
       this.intentService.setDisplayName();
     } else {
       this.intentName = this.intent.intent_display_name;
     }
     if(this.intentName === RESERVED_INTENT_NAMES.START) {
       this.isStart = true;
-      this.intentNameAlreadyExist = true;
+      // this.intentNameAlreadyExist = true;
     } else if(this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
       this.isDefaultFallback = true;
-      this.intentNameAlreadyExist = true;
+      // this.intentNameAlreadyExist = true;
     } else if(this.intentName === RESERVED_INTENT_NAMES.WEBHOOK) {
       this.isWebhook = true;
-      this.intentNameAlreadyExist = true;
+      // this.intentNameAlreadyExist = true;
     }
     if(!this.intentColor){
       this.intentColor = INTENT_COLORS.COLOR1;
@@ -104,8 +104,8 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
         return false;
       }
     }
-    this.intentNameNotHasSpecialCharacters = this.checkIntentNameMachRegex(name);
-    if(!this.intentNameNotHasSpecialCharacters){
+    this.intentNameNOTHasSpecialCharacters = this.checkIntentNameMachRegex(name);
+    if(!this.intentNameNOTHasSpecialCharacters){
       return false;
     }
     return true;
@@ -129,8 +129,8 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   /** onChangeIntentName */
   onChangeIntentName(event) {
     this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName", event, this.intent);
-    if(this.intentService.isReservedIntent(event)){
-      this.logger.log("[PANEL-INTENT-HEADER] isReservedIntent TRUE");
+    if(this.intentService.isReservedIntent(event) && !this.intent.attributes.readonly){
+      this.logger.log("[PANEL-INTENT-HEADER] isReservedIntent TRUE", this.intent.attributes.readonly);
       this.intentNameAlreadyExist = true;
       this.isNotErrorName = false;
     } else {

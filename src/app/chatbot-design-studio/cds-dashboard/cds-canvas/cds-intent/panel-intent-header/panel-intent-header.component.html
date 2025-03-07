@@ -26,7 +26,7 @@
             (blur)="onBlur($event)"
             (keydown.enter)="onEnterButtonPressed($event)">
         <div *ngIf="intentNameAlreadyExist" class="error---msg">{{ 'CDSCanvas.ErrorBlockName' | translate }}</div>
-        <div *ngIf="!intentNameNotHasSpecialCharacters" class="error---msg">{{ 'CDSCanvas.ErrorBlockCharacter' | translate }}</div>
+        <div *ngIf="!intentNameNOTHasSpecialCharacters" class="error---msg">{{ 'CDSCanvas.ErrorBlockCharacter' | translate }}</div>
 
     </div> 
 </div>

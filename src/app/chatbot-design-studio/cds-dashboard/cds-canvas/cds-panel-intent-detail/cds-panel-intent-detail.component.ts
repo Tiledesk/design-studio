@@ -127,14 +127,14 @@ export class CdsPanelIntentDetailComponent implements OnInit {
     if (navigator?.clipboard) {
       try {
         await navigator.clipboard.writeText(this.webhookUrl);
-        this.logger.log('Testo copiato con successo!');
+        this.logger.log('Text copied successfully!');
         this.showMessage('Text copied successfully!');
       } catch (err) {
-        this.logger.error('Errore nella copia:', err);
+        this.logger.error('Error copying text:', err);
         this.showMessage('Error copying text: ' +JSON.stringify(err));
       }
     } else {
-      this.logger.log('Clipboard API non è supportata da questo browser.');
+      this.logger.log('Clipboard API not supported by your browser.');
       this.showMessage('Clipboard API not supported by your browser.');
     }
   }
