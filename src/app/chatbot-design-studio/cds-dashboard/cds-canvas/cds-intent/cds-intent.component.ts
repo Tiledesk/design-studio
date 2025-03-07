@@ -556,11 +556,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /** EVENTS  */
 
-  onSelectActionIfWebhook(action: any, index: number, idAction: HAS_SELECTED_TYPE){
-    if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
-      this.onSelectAction(action, index, idAction);
-    }
-  }
+  // onSelectActionIfWebhook(action: any, index: number, idAction: HAS_SELECTED_TYPE){
+  //   if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+  //     this.onSelectAction(action, index, idAction);
+  //   }
+  // }
 
   onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE) {
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
@@ -893,6 +893,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.deleteIntent.emit(intent);
   }
 
+  openWebhookIntentPanel(intent: Intent){
+    const webhookIntent = this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK ? true:false;
+    if(webhookIntent){
+      this.openIntentPanel(intent);
+    }
+  }
 
   openIntentPanel(intent: Intent){
     this.intentService.setIntentSelected(this.intent.intent_id);
