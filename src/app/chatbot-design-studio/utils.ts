@@ -21,17 +21,26 @@ export const DOCS_LINK = {
     }
 }
 
+export enum LOG_LEVELS {
+    DEFAULT       = 'default',
+    INFO          = 'info',
+    WARNINGS      = 'warnings',
+    ERRORS        = 'errors'
+}
+
 export enum STAGE_SETTINGS {
     AlphaConnector = 'alpha_connectors',
     Zoom = 'zoom',
     Position = 'position',
-    Maximize = 'maximize'
+    Maximize = 'maximize',
+    openIntentListState = 'open_intent_list_state'
 }
 
 export enum RESERVED_INTENT_NAMES {
     START              = 'start',
     DEFAULT_FALLBACK   = 'defaultFallback',
     WEBHOOK            = 'webhook',
+    CLOSE              = 'close'
 }
 
 export enum INTENT_COLORS {
@@ -68,10 +77,11 @@ export enum EXTERNAL_URL {
 }
 
 export enum TYPE_INTENT_NAME {
-    TOPIC_INTERNAL                  = 'internal',
-    DISPLAY_NAME_START              = "start",
-    DISPLAY_NAME_DEFAULT_FALLBACK   = "defaultFallback",
+    TOPIC_INTERNAL                  = "internal",
+    START              = "start",
+    DEFAULT_FALLBACK   = "defaultFallback",
     WEBHOOK                         = 'webhook',
+    CLOSE                           = "close"
 }
 
 export enum TYPE_MATH_OPERATOR {
@@ -435,9 +445,10 @@ export function deleteItemInArrayForKey(key, array, item) {
 }
 
 
-export function checkInternalIntent(intent: Intent): boolean{
-    return intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START ||  intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK ? true: false
+export function checkInternalIntent(intent: Intent): boolean {
+    return (Object.values(TYPE_INTENT_NAME)as string[]).includes(intent.intent_display_name);
 }
+
 
 export function findFreeId (array, key) {
     const sortedArray = array

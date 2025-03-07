@@ -127,7 +127,7 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     if(this.listOfIntents && this.listOfIntents.length > 0){
-      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
+      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START));
       // this.logger.log('setDefaultIntentSelected: ', startIntent, startIntent[0]);
       if(startIntent && startIntent.length>0){
         this.intentSelected = startIntent[0];
@@ -345,14 +345,15 @@ export class IntentService {
  
 
   /** create a new intent when drag an action on the stage */
-  public createNewIntent(id_faq_kb: string, action: any, pos:any){
+  public createNewIntent(id_faq_kb: string, action: any, pos:any, color?: string){
     let intent = new Intent();
     const chatbot_id = this.dashboardService.id_faq_kb;
     intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
-    // let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
-    // intent.actions.push(actionIntent);
+    if(color){
+      intent.attributes.color = color;
+    }
     intent.actions.push(action);
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
@@ -767,6 +768,8 @@ export class IntentService {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'undo' }
       } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.WEBHOOK) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'webhook' }
+      } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.CLOSE) {
+        return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'call_end' }
       } else {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'label_important_outline' }
       }
@@ -844,7 +847,6 @@ export class IntentService {
         }
         let id_faq_kb = this.dashboardService.id_faq_kb;
         this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
-
       }
     }
   }
