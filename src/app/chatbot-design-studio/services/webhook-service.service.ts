@@ -105,7 +105,7 @@ export class WebhookService {
   }
 
 
-  checkActions(chatbot_id, listOfIntents){
+  checkIfThereIsWebResponse(chatbot_id, listOfIntents){
     let thereIsWebResponse = true;
     for (const intent of listOfIntents) {
       for (const action of intent.actions) {
