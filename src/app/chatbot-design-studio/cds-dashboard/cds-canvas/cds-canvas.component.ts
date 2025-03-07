@@ -396,7 +396,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       if(intents.length>0){
         this.listOfIntents = intents;
         const chatbot_id = this.dashboardService.id_faq_kb;
-        const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse(intents);
+        const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
         const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
         if (updateWebhookObs) {
           updateWebhookObs.subscribe({

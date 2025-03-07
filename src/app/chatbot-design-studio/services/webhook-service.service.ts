@@ -4,6 +4,7 @@ import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storag
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TYPE_ACTION } from '../utils-actions';
+import { IntentService } from './intent.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,7 @@ export class WebhookService {
 
   constructor(
     public appStorageService: AppStorageService,
+    private readonly intentService: IntentService,
     private readonly _httpClient: HttpClient
   ) { }
 
@@ -67,7 +69,7 @@ export class WebhookService {
     let body = { 
       'chatbot_id': chatbot_id,
       'block_id': intent_id, 
-      'async': thereIsWebResponse
+      'async': !thereIsWebResponse
     };
     this.logger.log('[WEBHOOK_URL.SERV]  createWebhook - BODY ', body);
     let url = this.WEBHOOK_URL + '/webhooks/';
@@ -108,7 +110,8 @@ export class WebhookService {
   }
 
 
-  checkIfThereIsWebResponse(listOfIntents){
+  checkIfThereIsWebResponse(){
+    const listOfIntents = this.intentService.listOfIntents;
     let thereIsWebResponse = false;
     for (const intent of listOfIntents) {
       for (const action of intent.actions) {
