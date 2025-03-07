@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.29.0-rc.12
+- **bug-fixed**: webhook css + services
+
 # 1.29.0-rc.11
 - **added**: new webhook
 
