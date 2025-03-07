@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.15
+- **bug-fixed**: new set thereIsWebResponse on createWebhook
 
 # 1.29.0-rc.14
 - **bug-fixed**: set thereIsWebResponse on createWebhook
