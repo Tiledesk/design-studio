@@ -79,6 +79,13 @@ export enum TYPE_ACTION_CATEGORY {
     "VOICE-TWILIO"  = 'Voice Twilio'
 }
 
+export enum STARTING_NAMES {
+    'chatbot'   = 'start',
+    'webhook'   = 'webhook',
+    'copilot'   = 'webhook',
+}
+   
+
 export enum TYPE_CHATBOT {
     CHATBOT       = 'chatbot',
     WEBHOOK       = 'webhook',

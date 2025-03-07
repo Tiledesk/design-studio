@@ -16,7 +16,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
-import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
+import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
@@ -826,11 +826,15 @@ export class IntentService {
     // this.controllerService.closeAllPanels();
   }
 
+  
 
   public async setStartIntent(){
     this.intentSelectedID = null;
     this.intentActive = false;
-    this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
+    const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    let startingName = STARTING_NAMES[subtype];
+    this.logger.log('[CDS-INTENT] startingName: ', startingName);
+    this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === startingName);
     this.logger.log('[CDS-INTENT] intentSelected: ', this.intentSelected);
     if(this.intentSelected){
       this.setDefaultIntentSelected();
