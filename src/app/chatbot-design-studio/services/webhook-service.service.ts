@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TYPE_ACTION } from '../utils-actions';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class WebhookService {
   SERVER_BASE_PATH: string;
   WEBHOOK_URL: any;
   thereIsWebhook: boolean = false;
-  thereIsNotWebResponse: boolean;
+  thereIsWebResponse: boolean;
 
   private tiledeskToken: string;
   private project_id: string;
@@ -48,9 +49,8 @@ export class WebhookService {
   }
 
   createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean){
-    this.thereIsNotWebResponse = true;
-    if(this.thereIsNotWebResponse !== thereIsWebResponse){
-      this.thereIsNotWebResponse = thereIsWebResponse;
+    if(this.thereIsWebResponse !== thereIsWebResponse){
+      this.thereIsWebResponse = thereIsWebResponse;
     }
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] createWebhook');
@@ -105,11 +105,11 @@ export class WebhookService {
   }
 
 
-  checkIfThereIsWebResponse(chatbot_id, listOfIntents){
+  checkIfThereIsWebResponse(listOfIntents){
     let thereIsWebResponse = false;
     for (const intent of listOfIntents) {
       for (const action of intent.actions) {
-        if (action._tdActionType === 'web_response') {
+        if (action._tdActionType === TYPE_ACTION.WEB_RESPONSE) {
           thereIsWebResponse = true;
           break;
         }
@@ -121,11 +121,19 @@ export class WebhookService {
     return thereIsWebResponse;
   } 
 
+  /**
+   * updateWebhook
+   * @param chatbot_id 
+   * @param thereIsWebResponse 
+   * @returns 
+   */
   updateWebhook(chatbot_id: string, thereIsWebResponse: boolean){
-    this.logger.log('[WEBHOOK_URL.SERV] - thereIsWebResponse  ', thereIsWebResponse, this.thereIsNotWebResponse);
-    this.thereIsNotWebResponse = (this.thereIsNotWebResponse === undefined)?!thereIsWebResponse:this.thereIsNotWebResponse;
-    if(this.thereIsNotWebResponse === thereIsWebResponse){
-      this.thereIsNotWebResponse = thereIsWebResponse;
+    this.logger.log('[WEBHOOK_URL.SERV] - thereIsWebResponse  ', thereIsWebResponse, this.thereIsWebResponse);
+    if(this.thereIsWebResponse === undefined){
+      this.thereIsWebResponse = thereIsWebResponse;
+    }
+    if(this.thereIsWebResponse !== thereIsWebResponse){
+      this.thereIsWebResponse = thereIsWebResponse;
       this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
       const httpOptions = { 
         headers: new HttpHeaders({
@@ -135,7 +143,7 @@ export class WebhookService {
         })
       };
       let body = { 
-        'async': this.thereIsNotWebResponse,
+        'async': !this.thereIsWebResponse,
       };
       let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
       this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
@@ -143,6 +151,13 @@ export class WebhookService {
     }
   }
 
+
+  /**
+   * updateCopilotWebhook
+   * @param chatbot_id 
+   * @param copilot 
+   * @returns 
+   */
   updateCopilotWebhook(chatbot_id: string, copilot: boolean){
     this.logger.log('[WEBHOOK_URL.SERV] - updateCopilotWebhook ', copilot);
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
@@ -159,7 +174,6 @@ export class WebhookService {
     let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
     this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
     return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
-    
   }
 
 

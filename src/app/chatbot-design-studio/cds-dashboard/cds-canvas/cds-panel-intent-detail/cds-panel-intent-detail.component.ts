@@ -89,11 +89,22 @@ export class CdsPanelIntentDetailComponent implements OnInit {
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
     }, error: (error)=> {
       this.logger.error("[CdsPanelIntentDetailComponent] error getWebhook: ", error);
+      this.createWebhook();
     }, complete: () => {
       this.logger.log("[CdsPanelIntentDetailComponent] getWebhook completed.");
     }});
   }
 
+  createWebhook(){
+    this.webhookService.createWebhook(this.chatbot_id, this.intent.intent_id, true).subscribe({ next: (resp: any)=> {
+      this.logger.log("[CdsPanelIntentDetailComponent] createWebhook : ", resp);
+      this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
+    }, error: (error)=> {
+      this.logger.error("[CdsPanelIntentDetailComponent] error createWebhook: ", error);
+    }, complete: () => {
+      this.logger.log("[CdsPanelIntentDetailComponent] createWebhook completed.");
+    }});
+  }
 
   regenerateWebhook(){
     this.webhookService.regenerateWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {

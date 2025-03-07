@@ -393,24 +393,26 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     */
     this.subscriptionListOfIntents = this.intentService.getIntents().subscribe(intents => {
       this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
-      this.listOfIntents = intents;
-      const chatbot_id = this.dashboardService.id_faq_kb;
-      const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse(chatbot_id, intents);
-      const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
-      if (updateWebhookObs) {
-        updateWebhookObs.subscribe({
-          next: (resp: any) => {
-            this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
-          },
-          error: (error) => {
-            this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
-          },
-          complete: () => {
-            this.logger.log("[cds-action-webhook] updateWebhook completed.");
-          }
-        });
-      } else {
-        this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
+      if(intents.length>0){
+        this.listOfIntents = intents;
+        const chatbot_id = this.dashboardService.id_faq_kb;
+        const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse(intents);
+        const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
+        if (updateWebhookObs) {
+          updateWebhookObs.subscribe({
+            next: (resp: any) => {
+              this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
+            },
+            error: (error) => {
+              this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
+            },
+            complete: () => {
+              this.logger.log("[cds-action-webhook] updateWebhook completed.");
+            }
+          });
+        } else {
+          this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
+        }
       }
     });
 
