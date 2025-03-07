@@ -7,6 +7,32 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0
+
+# 1.29.0-rc.15
+- **bug-fixed**: new set thereIsWebResponse on createWebhook
+
+# 1.29.0-rc.14
+- **bug-fixed**: set thereIsWebResponse on createWebhook
+
+# 1.29.0-rc.13
+- **bug-fixed**: select default intent by subtype
+
+# 1.29.0-rc.12
+- **bug-fixed**: webhook css + services
+
+# 1.29.0-rc.11
+- **added**: new webhook
+
+# 1.29.0-rc.3
+- **changed**: web-response action UI improvements
+
+# 1.29.0-rc.2
+- **added**: web-response action
+
+# 1.29.0-rc.1
+- **added**: close intent as default internal intent for voice chatbot
+
 # 1.28.3
 - **bug-fixed**: widget into iframe not allows to use microphone
 
