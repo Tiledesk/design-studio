@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.13
+- **bug-fixed**: select default intent by subtype
 
 # 1.29.0-rc.12
 - **bug-fixed**: webhook css + services
