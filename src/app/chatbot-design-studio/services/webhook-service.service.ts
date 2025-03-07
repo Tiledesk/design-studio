@@ -13,7 +13,7 @@ export class WebhookService {
   SERVER_BASE_PATH: string;
   WEBHOOK_URL: any;
   thereIsWebhook: boolean = false;
-  thereIsWebResponse: boolean = true;
+  thereIsNotWebResponse: boolean;
 
   private tiledeskToken: string;
   private project_id: string;
@@ -48,9 +48,9 @@ export class WebhookService {
   }
 
   createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean){
-    this.thereIsWebhook = true;
-    if(this.thereIsWebResponse !== thereIsWebResponse){
-      this.thereIsWebResponse = thereIsWebResponse;
+    this.thereIsNotWebResponse = true;
+    if(this.thereIsNotWebResponse !== thereIsWebResponse){
+      this.thereIsNotWebResponse = thereIsWebResponse;
     }
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] createWebhook');
@@ -106,15 +106,15 @@ export class WebhookService {
 
 
   checkIfThereIsWebResponse(chatbot_id, listOfIntents){
-    let thereIsWebResponse = true;
+    let thereIsWebResponse = false;
     for (const intent of listOfIntents) {
       for (const action of intent.actions) {
         if (action._tdActionType === 'web_response') {
-          thereIsWebResponse = false;
+          thereIsWebResponse = true;
           break;
         }
       }
-      if (thereIsWebResponse === false) {
+      if (thereIsWebResponse === true) {
         break;
       }
     }
@@ -122,11 +122,12 @@ export class WebhookService {
   } 
 
   updateWebhook(chatbot_id: string, thereIsWebResponse: boolean){
-    this.logger.log('[WEBHOOK_URL.SERV] - updateWebhook1 ', thereIsWebResponse, this.thereIsWebResponse);
-    if(this.thereIsWebResponse !== thereIsWebResponse){
-      this.thereIsWebResponse = thereIsWebResponse;
+    this.logger.log('[WEBHOOK_URL.SERV] - thereIsWebResponse  ', thereIsWebResponse, this.thereIsNotWebResponse);
+    this.thereIsNotWebResponse = (this.thereIsNotWebResponse === undefined)?!thereIsWebResponse:this.thereIsNotWebResponse;
+    if(this.thereIsNotWebResponse === thereIsWebResponse){
+      this.thereIsNotWebResponse = thereIsWebResponse;
       this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
-      const httpOptions = {
+      const httpOptions = { 
         headers: new HttpHeaders({
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -134,7 +135,7 @@ export class WebhookService {
         })
       };
       let body = { 
-        'async': this.thereIsWebResponse,
+        'async': this.thereIsNotWebResponse,
       };
       let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
       this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
