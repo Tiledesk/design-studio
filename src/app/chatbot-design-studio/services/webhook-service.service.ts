@@ -49,6 +49,9 @@ export class WebhookService {
   }
 
   createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean){
+    if(this.thereIsWebResponse === undefined){
+      this.thereIsWebResponse = thereIsWebResponse;
+    }
     if(this.thereIsWebResponse !== thereIsWebResponse){
       this.thereIsWebResponse = thereIsWebResponse;
     }
