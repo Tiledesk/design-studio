@@ -47,7 +47,8 @@ export enum TYPE_ACTION {
     CLEAR_TRANSCRIPT    = 'clear_transcript',
     MOVE_TO_UNASSIGNED  = 'move_to_unassigned',
     SEND_WHATSAPP       = 'send_whatsapp',
-    AI_PROMPT           = 'ai_prompt'
+    AI_PROMPT           = 'ai_prompt',
+    WEB_RESPONSE        = 'web_response'
 }
 
 export enum TYPE_ACTION_REPLY {
@@ -138,6 +139,7 @@ export const ACTIONS_LIST: {
     WAIT :                  { name: 'CDSActionList.NAME.Wait',                  chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.WAIT,                 src:"assets/images/actions/wait.svg",                   status: "active",                       doc: "CDSActionList.DOC.Wait"                                           },
     // WEB_REQUEST : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUEST, src:"assets/images/actions/web_request.svg", status: "active", description: ''},
     WEB_REQUESTV2 :         { name: 'CDSActionList.NAME.WebRequest',            chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WEB_REQUESTV2,        src:"assets/images/actions/web_request.svg",            status: "active",                       doc: "CDSActionList.DOC.WebRequest"                                     },
+    WEB_RESPONSE :          { name: 'CDSActionList.NAME.WebResponse',           chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WEB_RESPONSE,         src:"assets/images/actions/web_response.svg",           status: "active",                       doc: ""                                                                 },
     EMAIL :                 { name: 'CDSActionList.NAME.SendEmail',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.EMAIL,                src:"assets/images/actions/send_email.svg",             status: "active",                       doc: "CDSActionList.DOC.SendEmail"                                      },
     WHATSAPP_STATIC:        { name: 'CDSActionList.NAME.WhatsAppStatic',        chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WHATSAPP_STATIC,      src: "assets/images/actions/whatsapp.svg",              status: "active",                       doc: "CDSActionList.DOC.WhatsAppStatic"                                 },
     WHATSAPP_ATTRIBUTE:     { name: 'CDSActionList.NAME.WhatsAppByAttribute',   chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WHATSAPP_ATTRIBUTE,   src: "assets/images/actions/whatsapp.svg",              status: "active",                       doc: "CDSActionList.DOC.WhatsAppByAttribute"                            },
