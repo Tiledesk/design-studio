@@ -117,7 +117,7 @@ export class CDSTextareaComponent implements OnInit {
   /** */
   onClickTextareaOpenSetAttributePopover(){
     this.logger.log('onClickTextareaOpenSetAttributePopover', this.readonly, this.setAttributeBtn);
-    if(this.readonly === true  && this.setAttributeBtn == true){
+    if(this.readonly === true  && this.setAttributeBtn === true){
       this.addVariable.toggle();
       this.openSetAttributePopover();
     }
