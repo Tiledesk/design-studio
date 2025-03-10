@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.30.0-rc.0
+- **added**: hide/show single connector
+- **bug-fixed**: web request 
+- **changed**: change default intent color 
+
 # 1.29.0-rc.15
 - **bug-fixed**: new set thereIsWebResponse on createWebhook
 
