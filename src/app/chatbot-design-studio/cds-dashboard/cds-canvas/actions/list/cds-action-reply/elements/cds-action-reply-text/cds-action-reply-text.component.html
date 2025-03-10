@@ -64,6 +64,14 @@
 
 
 
+<cds-action-reply-jsonbuttons
+    *ngIf="!previewMode"
+    [jsonBody]="jsonBody"
+    (changeJsonButtons)="onChangeJsonButtons($event)">
+</cds-action-reply-jsonbuttons>
+
+
+
 <div class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
     
     <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies" cdkDrag > 
@@ -80,6 +88,7 @@
             [previewMode]="previewMode"
             (onButtonControl)="onButtonControl($event, i)">
         </cds-action-reply-button>    
+
         <cds-connector *ngIf="previewMode && button.type !== TYPE_BUTTON.URL"
             class="button-connector"
             cdkDragDisabled
@@ -93,4 +102,5 @@
     <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', index)">
     + {{'CDSCanvas.AddButton' | translate }}
     </div>
+
 </div>

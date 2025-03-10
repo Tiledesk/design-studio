@@ -82,6 +82,7 @@ import { GetVariableNamePipe } from 'src/app/pipe/get-variable-name.pipe';
 import { CdsActionAiPromptComponent } from './cds-action-ai-prompt/cds-action-ai-prompt.component';
 import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attributes-dialog/attributes-dialog.component';
 import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-action-web-response.component';
+import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 
 @NgModule({
   declarations: [
@@ -179,6 +180,7 @@ import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-act
     FilterPipe,
     GetVariableNamePipe,
     VariableCssClassPipe,
+    CdsActionReplyJsonbuttonsComponent,
     
   ],
   imports: [

@@ -51,10 +51,15 @@ export class CdsActionReplyTextComponent implements OnInit {
   buttons: Array<any>;
   activeFocus: boolean = true;
 
-  private logger: LoggerService = LoggerInstance.getInstance();
+  // showJsonBody: boolean =  false;
+  // jsonPlaceholder: any;
+  jsonBody: any;
+
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
-    private connectorService: ConnectorService,
-    private intentService: IntentService
+    private readonly connectorService: ConnectorService,
+    private readonly intentService: IntentService
   ) { }
 
   // SYSTEM FUNCTIONS //
@@ -80,6 +85,10 @@ export class CdsActionReplyTextComponent implements OnInit {
   // PRIVATE FUNCTIONS //
 
   private initialize(){
+    this.jsonBody = '';
+    if(this.response?.attributes?.attachment?.json_buttons){
+      this.jsonBody = this.response?.attributes?.attachment?.json_buttons;
+    }
     if(this.index == 1 && (this.wait?.time == 500 || this.wait?.time == 0)) {
        this.delayTime = 0
     } else if(this.wait?.time && this.wait.time > 0){
@@ -171,6 +180,15 @@ export class CdsActionReplyTextComponent implements OnInit {
 
 
   // EVENT FUNCTIONS //
+  onClickJsonButtons(){
+    this.jsonBody = "";
+  }
+  /** changeJsonButtons */
+  onChangeJsonButtons(json:any){
+    this.response.attributes.attachment.json_buttons = JSON.stringify(json);
+    this.logger.log('[ACTION REPLY TEXT] onChangeJsonButtons', this.response);
+    this.changeActionReply.emit();
+  }
 
   /** onClickDelayTime */
   onClickDelayTime(opened: boolean){
