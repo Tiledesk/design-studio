@@ -7,14 +7,60 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.0-rc.15
+- **bug-fixed**: new set thereIsWebResponse on createWebhook
+
+# 1.29.0-rc.14
+- **bug-fixed**: set thereIsWebResponse on createWebhook
+
+# 1.29.0-rc.13
+- **bug-fixed**: select default intent by subtype
+
+# 1.29.0-rc.12
+- **bug-fixed**: webhook css + services
+
+# 1.29.0-rc.11
+- **added**: new webhook
+
+# 1.29.0-rc.3
+- **changed**: web-response action UI improvements
+
+# 1.29.0-rc.2
+- **added**: web-response action
+
+# 1.29.0-rc.1
+- **added**: close intent as default internal intent for voice chatbot
+
+# 1.28.3
+- **bug-fixed**: widget into iframe not allows to use microphone
+
+# 1.28.3-rc.1
+- **bug-fixed**: widget into iframe not allows to use microphone
+
 # 1.28.1
 - **bug-fixed**: error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
 - **bug-fixed**: defaultfallback and start intents error to display in cds-panel-intent-list
+
+# 1.28.1-rc.1
+- **added**: create a new intent (float action menu) of the same color as the parent intent
+- **bug-fixed**: fixed error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
+- **bug-fixed**: fix default fallback and start blocks error to display in cds-panel-intent-list
 
 # 1.28.1
 - **added**: doc for AI_PROMPT and WHATSAPP actions
 
 # 1.28.0
+
+# 1.28.0-rc.2
+- **added**: added OpenIntentListState in local storage
+- **added**: added widget log panel
+- **changed**: new panel to change alpha color
+
+# 1.28.0-rc.1
+- **changed**: added sat-popover on change alpha color
+- **bug-fixed**: element position start only the first time
+- **bug-fixed**: cleanup of "stageService" file
+- **bug-fixed**: on live test of chatbot or intent, save scale and position
 
 # 1.27.0-rc.20
 - **bug-fixed**: initStageSettings
