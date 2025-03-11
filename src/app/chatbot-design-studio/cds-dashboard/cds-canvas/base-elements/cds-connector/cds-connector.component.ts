@@ -1,4 +1,6 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 
 @Component({
@@ -14,15 +16,48 @@ export class CdsConnectorComponent implements OnInit {
   @Output() onShowConnector = new EventEmitter();
   @Output() onHideConnector = new EventEmitter();
 
+  intent_display_name: string;
+  idContractConnector: string;
+  restoreConnector: boolean = false;
+
   constructor(
-    private readonly stageService: StageService
+    private readonly stageService: StageService,
+    private readonly intentService: IntentService,
+    private readonly connectorService: ConnectorService
   ) { }
 
   ngOnInit(): void {
-    // empty
+    this.getIntentDisplayName();
+    this.setIdContractConnector();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.idConnection) {
+      this.getIntentDisplayName();
+      // console.log('idConnection è cambiato da', changes.idConnection.previousValue, 'a', changes.idConnection.currentValue);
+      this.setIdContractConnector();
+    }
+  }
+
+  setIdContractConnector(){
+    const idConnection = this.idConnection?.replace('#', '');
+    this.idContractConnector = 'contract_'+idConnection;
+    // console.log('idConnection: ', idConnection, ' a: ', this.idContractConnector);
+  }
+
+  getIntentDisplayName(){
+    if(this.idConnection){
+      let intentId = this.idConnection.substring(this.idConnection.lastIndexOf('/') + 1);
+      intentId = intentId.replace(/#/g, '');
+      const intent = this.intentService.getIntentFromId(intentId);
+      if(intent){
+        this.intent_display_name = intent.intent_display_name;
+      }
+    }
   }
 
   public showConnector(){
+    // // console.log('showConnector: ', this.idConnection, this.isConnected);
     if(this.idConnection && this.isConnected){
       const idConnection = this.idConnection?.replace('#', '');
       const svgElement: HTMLElement = document.getElementById(idConnection);
@@ -59,4 +94,24 @@ export class CdsConnectorComponent implements OnInit {
     }
   }
 
+
+
+  public showConnectorDefault(){
+    this.restoreConnector = false;
+    this.connectorService.showHideConnectorByIdConnector(this.idConnection, "block");
+  }
+
+  public hideConnectorDefault(){
+    if(this.restoreConnector === false){
+      this.connectorService.showHideConnectorByIdConnector(this.idConnection, "none");
+    }
+  }
+
+  public restoreConnectorDefault(event: MouseEvent): void {
+    event.stopPropagation();
+    this.restoreConnector = true;
+    this.connectorService.setDisplayConnectorByIdConnector(this.idConnection);
+    this.connectorService.showHideConnectorByIdConnector(this.idConnection, "block");
+  }
+  
 }

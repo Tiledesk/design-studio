@@ -275,6 +275,8 @@
         "ContactSales":"Contact Sales",
         "Drag":"Drag",
         "DeleteConnector":"Delete connector",
+        "HideConnector":"hide connector",
+        "ShowConnector":"show connector",
         "LineText":"Line text",
         "IntentPanel": "Settings panel",
         "ColorBlock":"Block color",
@@ -503,6 +505,9 @@
         "ChooseBotBySlug":"Choose bot by slug",
         "CopilotEnabled":"Copilot enabled",
         "CopilotDisabled":"Copilot disabled",
+        "LogLevels": "Log levels",
+        "VisibilityConnectors":"Visibility of connectors",
+        "ChangeAlphaConnectors":"Change alpha of the connectors color",
         "ResponseStatus":"Response status",
         "StatusNotSelected":"Status not selected"
     },

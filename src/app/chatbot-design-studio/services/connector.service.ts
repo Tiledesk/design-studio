@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
 import { StageService } from '../services/stage.service';
-import { TYPE_BUTTON, isElementOnTheStage, generateShortUID } from '../utils';
+import { TYPE_BUTTON, isElementOnTheStage, generateShortUID, getOpacityFromRgba, getColorFromRgba } from '../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Setting } from 'src/app/models/action-model';
@@ -56,7 +56,8 @@ export class ConnectorService {
       fromPoint: detail.fromPoint,
       toPoint: detail.toPoint,
       menuPoint: detail.menuPoint,
-      target: detail.target
+      target: detail.target, 
+      color: detail.color
     }
   }
 
@@ -66,6 +67,7 @@ export class ConnectorService {
    */
   public addConnectorToList(connector){
     this.listOfConnectors[connector.id] = connector;
+    this.mapOfConnectors[connector.id] =  {'shown': true };
     this.logger.log('[CONNECTOR-SERV] addConnector::  connector ', connector)
   }
 
@@ -1301,7 +1303,7 @@ export class ConnectorService {
 
 
   public createListOfConnectorsByIntent(intent:any){
-    if(intent.attributes && intent.attributes.nextBlockAction){
+    if(intent.attributes?.nextBlockAction){
       let idConnectorFrom = null;
       let idConnectorTo = null;
       let nextBlockAction = intent.attributes.nextBlockAction;
@@ -1337,7 +1339,7 @@ export class ConnectorService {
             this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             const connectorID = idConnectorFrom+'/'+idConnectorTo;
-        this.mapOfConnectors[connectorID] =  {'shown': false };
+            this.mapOfConnectors[connectorID] =  {'shown': false };
           }
         }
 
@@ -1994,6 +1996,62 @@ export class ConnectorService {
         this.addCustomMarker(connector.id, rgba);
       }
     });
+  }
+
+
+
+  setDisplayConnectorByIdConnector(connectorId: string) {
+    connectorId = connectorId.replace("#", "");
+    if(this.mapOfConnectors[connectorId]?.display === false){
+      this.mapOfConnectors[connectorId] = {display: true}
+    } else {
+      this.mapOfConnectors[connectorId] = {display: false}
+    }
+    let connector = this.mapOfConnectors[connectorId];
+    const element = document.getElementById(connectorId);
+
+    this.logger.log('[CONNECTOR-SERV] setDisplayConnectorByIdConnector:: ', this.mapOfConnectors, connector, connectorId, element);
+    if (element) {
+      // // this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
+      // // element.setAttribute('display', connector.display?'block':'none');
+      element.style.setProperty('display', connector.display?'block':'none');
+      const elementRect = document.getElementById('rect_'+connectorId);
+      if(elementRect){
+        elementRect.style.setProperty('display', connector.display?'block':'none');
+      }
+      const elementLabel = document.getElementById('label_'+connectorId);
+      if(elementLabel){
+        elementLabel.style.setProperty('display', connector.display?'block':'none');
+      }
+
+      const elementContract = document.getElementById('contract_'+connectorId);
+      this.logger.log('[CONNECTOR-SERV] show-hide:: elementContract ', 'contract_'+connectorId, elementContract);
+      if(elementContract){
+        // elementContract.style.setProperty('opacity', connector.display?'0':'1');
+        elementContract.style.setProperty('display', connector.display?'none':'flex');
+      }
+    }
+  }
+
+
+
+  showHideConnectorByIdConnector(connectorId: string, display: 'block'|'none') {
+    connectorId = connectorId.replace("#", "");
+    let connector = this.mapOfConnectors[connectorId];
+    const element = document.getElementById(connectorId);
+    this.logger.log('[CONNECTOR-SERV] show-hide:: ',this.mapOfConnectors, connectorId, element);
+    if (element) {
+      this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
+      element.style.setProperty('display', display);
+      const elementRect = document.getElementById('rect_'+connectorId);
+      if(elementRect){
+        elementRect.style.setProperty('display', display);
+      }
+      const elementLabel = document.getElementById('label_'+connectorId);
+      if(elementLabel){
+        elementLabel.style.setProperty('display', display);
+      }
+    }
   }
 
 }
