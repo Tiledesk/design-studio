@@ -105,15 +105,8 @@ appdashboard-filter{
 
 /** BUTTONS: start **/
 .buttons-response {
-    // display: flex;
-    // flex-wrap: wrap;
-    // margin: 12px 0 0 0;
-    // width: 100%;
-    // font-size: var(--font-size-base);
-    // padding: 0 25px;
-
     display: flex;
-    margin: 15px 0 0;
+    margin: 10px 0 0 0;
     gap: 6px;
     width: 100%;
     font-size: 14px;
@@ -121,12 +114,65 @@ appdashboard-filter{
     flex-direction: row;
     float: right;
     justify-content: flex-start;
-    /* align-content: flex-end; */
     flex-wrap: wrap;
-    // align-items: flex-end;
     align-items: baseline;
-
+    opacity: 1;
+    &.disabled {
+        opacity: 0.5;
+    }
 }
+
+.buttons-json-response {
+    margin: 0;
+    font-size: 14px;
+    padding: 0 var(--input-base-margin);
+    .button-json {
+        float: right;
+        margin-left: auto;
+    }
+    &.json-shown {
+        .button-json {
+            border: 1px solid var(--blu);
+            color: var(--blu);
+        }
+    }
+}
+
+.json-text {
+    position: relative;
+    .button-controls {
+        position: absolute;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        justify-content: space-between;
+        display: inline-flex;
+        left: 0;
+        top: 0;
+        .control-button {
+            cursor: pointer;
+            color: var(--blu);
+            transition: color 0.3s;
+            height: 24px;
+            width: 24px;
+            background: var(--blu-light-02);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            em {
+                font-size: 16px;
+                color: var(--blu);
+                transition: color 0.3s;
+            }
+        }
+    }
+}
+
+.json-text:hover .button-controls {
+    opacity: 1;
+}
+
+
 .custom-placeholder {
     margin: 10px 5px;
     background: #dfdfdf;
@@ -147,15 +193,15 @@ appdashboard-filter{
     font-size: 0.7em;
     font-weight: 400;
     line-height: var(--button-height-base);
-    // margin: 0px 5px 0;
     order: 1;
     padding: 0 10px;
     transition: all .3s;
     min-width: 100px;
     text-align: center;
     width: fit-content;
-    // margin-right: 10px;
+    // margin-left: auto;
 }
+
 /** BUTTONS: end **/
 
 /** DELETE - UP/DOWN LEFT BUTTONS: start **/
@@ -257,6 +303,7 @@ appdashboard-filter{
     align-items: center;
     justify-content: center;
 }
+
 .action-row-right {
     // // font-size: 12px;
     // // font-weight: 400;

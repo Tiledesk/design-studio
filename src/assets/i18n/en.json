@@ -275,6 +275,8 @@
         "ContactSales":"Contact Sales",
         "Drag":"Drag",
         "DeleteConnector":"Delete connector",
+        "HideConnector":"hide connector",
+        "ShowConnector":"show connector",
         "LineText":"Line text",
         "IntentPanel": "Settings panel",
         "ColorBlock":"Block color",
@@ -442,6 +444,7 @@
         "ClickToAddText":"Click to add text ...",
         "ClickToAddAudioURL":"Click to add audio file ...",
         "AddButton":"Add button",
+        "JsonButtons":"Json buttons",
         "AddOption":"Add option",
         "SelectOption":"Select an option",
         "AddCard":"Add card",
@@ -511,7 +514,10 @@
         "Copy":"Copy",
         "TextCopied":"Text copied successfully!",
         "TextErrorCopied":"Error copying text",
-        "ApiNotSupported":"Clipboard API not supported by your browser."
+        "ApiNotSupported":"Clipboard API not supported by your browser.",
+        "LogLevels": "Log levels",
+        "VisibilityConnectors":"Visibility of connectors",
+        "ChangeAlphaConnectors":"Change alpha of the connectors color"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",

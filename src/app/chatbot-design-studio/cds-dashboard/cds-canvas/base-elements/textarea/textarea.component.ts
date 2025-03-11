@@ -64,7 +64,7 @@ export class CDSTextareaComponent implements OnInit {
   emojiiCategories = [ 'recent', 'people', 'nature', 'activity', 'flags'];
 
 
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private readonly logger: LoggerService = LoggerInstance.getInstance()
   
   constructor() { }
 

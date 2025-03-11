@@ -202,10 +202,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.showIntentOptions = false;
       }
 
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
         this.isStart = true;
         this.showIntentOptions = false;
         this.startAction = this.intent.actions[0];
@@ -216,7 +216,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
       
 
-      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START) {
+      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.START) {
       //   this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
       //   this.startAction = this.intent.actions[0];
       //   this.isStart = true;
@@ -303,7 +303,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setAgentsAvailable(){
-    // /if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_START && this.intent.intent_display_name != TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+    // /if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.START && this.intent.intent_display_name != TYPE_INTENT_NAME.DEFAULT_FALLBACK){
     if(this.intent.agents_available != false){ 
       this.intent.agents_available = true;
       this.isAgentsAvailable = true;
@@ -387,7 +387,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     document.addEventListener(
       "connector-moved-out-of-intent", (e: CustomEvent) => {
-        this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
+        // // this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
 
         // !!!se il connettore è a meno di Xpx dalla fine dello stage sposta lo stage!!!!
         if (e.detail?.toId === this.intent.intent_id) {
@@ -931,9 +931,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
     this.intentColor = color;
     this.intent.attributes.color = color;
-    // if(INTENT_COLORS[color]){
     if(color){
-      // const nwColor = INTENT_COLORS[color];
       document.documentElement.style.setProperty('--intent-color', `${color}`);
       this.setConnectorColor(color);
       this.intentService.updateIntent(this.intent); 

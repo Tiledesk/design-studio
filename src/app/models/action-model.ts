@@ -604,11 +604,13 @@ export class Metadata {
 
 export class Attachment {
     type: string;
+    json_buttons?: string;
     buttons?: Button[];
     gallery?: GalleryElement[];
     constructor() {
         this.type = TYPE_ATTACHMENT.TEMPLATE;
         this.buttons = [];
+        this.json_buttons = '';
     }
 }
 

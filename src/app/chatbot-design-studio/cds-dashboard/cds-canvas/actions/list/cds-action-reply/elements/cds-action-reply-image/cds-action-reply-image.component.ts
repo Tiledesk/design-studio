@@ -23,7 +23,8 @@ export class CdsActionReplyImageComponent implements OnInit {
   @Output() createNewButton = new EventEmitter();
   @Output() deleteButton = new EventEmitter();
   @Output() openButtonPanel = new EventEmitter();
-
+  @Output() changeJsonButtons = new EventEmitter();
+  
   @Input() idAction: string;
   @Input() response: Message;
   @Input() wait: Wait;
@@ -34,12 +35,6 @@ export class CdsActionReplyImageComponent implements OnInit {
   // Connector //
   connector: any;
   private subscriptionChangedConnector: Subscription;
-
-  // Textarea //
-  // limitCharsText: number;
-  // leftCharsText: number;
-  // textMessage: string;
-  // alertCharsText: boolean;
 
   // Delay //
   delayTime: number;
@@ -52,12 +47,16 @@ export class CdsActionReplyImageComponent implements OnInit {
   // Buttons //
   buttons: Array<any>;
   TYPE_BUTTON = TYPE_BUTTON;
+
+  showJsonBody: boolean =  false;
+  jsonBody: string;
+
   
-  
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor( 
-    private connectorService: ConnectorService,
-    private intentService: IntentService
+    private readonly connectorService: ConnectorService,
+    private readonly intentService: IntentService
   ) { }
 
 
@@ -81,10 +80,13 @@ export class CdsActionReplyImageComponent implements OnInit {
   // PRIVATE FUNCTIONS //
 
   private initialize(){
+    this.jsonBody = '';
+    if(this.response?.attributes?.attachment?.json_buttons){
+      this.jsonBody = this.response?.attributes?.attachment?.json_buttons;
+      this.showJsonBody = true;
+    }
     this.delayTime = (this.wait && this.wait.time  || this.wait.time === 0)? (this.wait.time/1000) : 500/1000;
     this.checkButtons();
-    // this.patchButtons();
-    // this.buttons = this.response?.attributes?.attachment?.buttons;
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);
     this.idIntent = this.idAction.split('/')[0];
 
@@ -105,25 +107,6 @@ export class CdsActionReplyImageComponent implements OnInit {
     }
   }
 
-  // private patchButtons(){
-  //   this.logger.log('patchButtons:: ', this.response);
-  //   let buttons = this.response?.attributes?.attachment?.buttons;
-  //   if(!buttons)return;
-  //   buttons.forEach(button => {
-  //     if(!button.__uid || button.__uid === undefined){
-  //       const idButton = generateShortUID();
-  //       const idActionConnector = this.idAction+'/'+idButton;
-  //       button.__uid = idButton;
-  //       button.__idConnector = idActionConnector;
-  //       if(button.action && button.action !== ''){
-  //         button.__isConnected = true;
-  //       } else {
-  //         button.__isConnected = false;
-  //       }
-  //     }
-  //   }); 
-  // }
-
 
   private updateConnector(){
     try {
@@ -140,26 +123,17 @@ export class CdsActionReplyImageComponent implements OnInit {
           buttonChanged.__idConnection = null;
           buttonChanged.action = '';
           buttonChanged.type = TYPE_BUTTON.TEXT;
-          // if(this.connector.notify)
-          // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-          // this.changeActionReply.emit();
           this.updateAndSaveAction.emit();
         } else {
-          // ADD / EDIT
-          // buttonChanged.__isConnected = true;
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.action = buttonChanged.action? buttonChanged.action : '#' + this.connector.toId;
           buttonChanged.type = TYPE_BUTTON.ACTION;
           if(!buttonChanged.__isConnected){
             buttonChanged.__isConnected = true;
             buttonChanged.__idConnection = this.connector.fromId+"/"+this.connector.toId;
-            // if(this.connector.notify)
-            // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-            // this.changeActionReply.emit();
             this.updateAndSaveAction.emit();
           } 
         }
-        // this.changeActionReply.emit();
       }
     } catch (error) {
       this.logger.error('error: ', error);
@@ -169,6 +143,19 @@ export class CdsActionReplyImageComponent implements OnInit {
 
 
   // EVENT FUNCTIONS //
+
+  /** changeJsonButtons */
+  onChangeJsonButtons(json:any){
+    this.logger.log('[ACTION REPLY TEXT] onChangeJsonButtons', json);
+    if(json && json.trim() !== ''){
+      this.showJsonBody = true;
+    } else {
+      this.showJsonBody = false;
+    }
+    this.jsonBody = json;
+    this.response.attributes.attachment.json_buttons =  JSON.stringify(json);
+    this.changeJsonButtons.emit( this.response);
+  }
 
   /** onClickDelayTime */
   onClickDelayTime(opened: boolean){
@@ -215,8 +202,6 @@ export class CdsActionReplyImageComponent implements OnInit {
   onChangeTextarea(text:string) {
     if(!this.previewMode){
       this.response.text = text;
-
-      // this.changeActionReply.emit();
     }
   }
 

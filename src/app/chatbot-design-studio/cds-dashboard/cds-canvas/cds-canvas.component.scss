@@ -29,7 +29,9 @@ $toogle-sidebar-width: 22px;
   transform: translateX(100%);
   animation: slide-in 0.2s ease-in-out forwards;
   animation-delay: 0s;
-  z-index: 2;
+  &#intent-detail {
+    z-index: 10;
+  }
   &#action-detail{
     z-index: 10;
   }
@@ -426,3 +428,8 @@ svg:not(:root) {
   }
 }
 
+cds-widget-logs {
+  width: calc(100% - 460px);
+  position: absolute;
+  bottom: 0;
+}
