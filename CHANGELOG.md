@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.30.0-rc.3
+- **changed**: Webhook: remove chat actions (tagAction)
+- **changed**: Webhook: remove training and form sentences from blocks
+- **bug-fixed**: when I create a copilot webhook I pass in the body copilot:true
+- **bug-fixed**: in the chatbot copilot webhook check the async loop
+
 # 1.28.3
 - **bug-fixed**: widget into iframe not allows to use microphone
 
