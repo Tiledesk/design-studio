@@ -48,8 +48,6 @@ export enum TYPE_ACTION {
     SEND_WHATSAPP       = 'send_whatsapp',
     AI_PROMPT           = 'ai_prompt',
     WEB_RESPONSE        = 'web_response'
-    AI_PROMPT           = 'ai_prompt',
-    WEB_RESPONSE        = 'web_response'
 }
 
 export enum TYPE_ACTION_REPLY {
