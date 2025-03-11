@@ -430,6 +430,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     /** SUBSCRIBE TO THE STATE ACTION REPLY BUTTON PANEL */
     this.subscriptionOpenButtonPanel = this.controllerService.isOpenButtonPanel$.subscribe((button: Button) => {
       this.buttonSelected = button;
+      this.logger.log('[CDS-CANVAS]  isOpenButtonPanel ', button);
+
       if (button) {
         this.closeAllPanels();
         this.closeActionDetailPanel();

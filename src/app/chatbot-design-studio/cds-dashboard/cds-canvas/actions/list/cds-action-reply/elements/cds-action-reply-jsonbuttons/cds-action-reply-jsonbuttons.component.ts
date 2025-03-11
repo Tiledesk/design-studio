@@ -21,11 +21,11 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    // empty
+    this.initialize();
   }
 
   ngAfterViewInit (): void {
-    this.initialize();
+    // empty
   }
 
   initialize(){
@@ -50,6 +50,9 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
     if(this.jsonBody && this.jsonBody.trim() !== ''){
       this.showJsonBody = true;
       this.jsonBody = JSON.parse(this.jsonBody);
+    } else {
+      this.showJsonBody = false;
+      this.jsonBody = '';
     }
   }
 
