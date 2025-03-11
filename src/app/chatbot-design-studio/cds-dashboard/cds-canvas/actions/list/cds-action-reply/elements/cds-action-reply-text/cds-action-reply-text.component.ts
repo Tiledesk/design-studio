@@ -1,5 +1,5 @@
 
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
@@ -27,6 +27,7 @@ export class CdsActionReplyTextComponent implements OnInit {
   @Output() createNewButton = new EventEmitter();
   @Output() deleteButton = new EventEmitter();
   @Output() openButtonPanel = new EventEmitter();
+  @Output() changeJsonButtons = new EventEmitter();
 
   @Input() idAction: string;
   @Input() response: Message;
@@ -76,13 +77,8 @@ export class CdsActionReplyTextComponent implements OnInit {
       this.subscriptionChangedConnector.unsubscribe();
     }
   }
-  
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   this.logger.log('CdsActionReplyTextComponent ngOnChanges:: ', this.response);
-  // }
 
   // PRIVATE FUNCTIONS //
-
   private initialize(){
     this.jsonBody = '';
     if(this.response?.attributes?.attachment?.json_buttons){
@@ -178,14 +174,15 @@ export class CdsActionReplyTextComponent implements OnInit {
   /** changeJsonButtons */
   onChangeJsonButtons(json:any){
     this.logger.log('[ACTION REPLY TEXT] onChangeJsonButtons', json);
+    this.jsonBody = json;
     if(json && json.trim() !== ''){
       this.showJsonBody = true;
+      this.response.attributes.attachment.json_buttons = JSON.stringify(json);
     } else {
       this.showJsonBody = false;
+      this.response.attributes.attachment.json_buttons = '';
     }
-    this.jsonBody = json;
-    this.response.attributes.attachment.json_buttons =  JSON.stringify(json);
-    this.changeActionReply.emit();
+    this.changeJsonButtons.emit(this.response);
   }
 
   /** onClickDelayTime */
@@ -205,7 +202,8 @@ export class CdsActionReplyTextComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
-    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
+    // // this.filterConditionExist = expression && expression?.conditions.length > 0?true:false;
+    this.filterConditionExist = !!(expression && expression?.conditions.length > 0);
     this.changeActionReply.emit();
   }
 
@@ -228,15 +226,12 @@ export class CdsActionReplyTextComponent implements OnInit {
   onChangeTextarea(text:string) {
     if(!this.previewMode){
       this.response.text = text;
-      // this.changeActionReply.emit();
     }
   }
 
   onBlur(event){
     this.logger.log('[ACTION REPLY TEXT] onBlur', event.target.value, this.response.text);
-    // if(event.target.value !== this.response.text){
-      this.changeActionReply.emit();
-    // }
+    this.changeActionReply.emit();
   }
 
   onSelectedAttribute(variableSelected: {name: string, value: string}){
@@ -271,6 +266,7 @@ export class CdsActionReplyTextComponent implements OnInit {
     this.changeActionReply.emit();
   }  
 
+  /** checkForVariablesInsideText */
   checkForVariablesInsideText(text: string){
     text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g, 'g')).forEach(match => {
       let createTag = '<span class="tag">' + match + '</span>'
