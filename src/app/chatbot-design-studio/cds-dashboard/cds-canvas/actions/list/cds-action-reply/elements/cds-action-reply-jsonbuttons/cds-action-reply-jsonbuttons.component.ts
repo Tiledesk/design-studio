@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'cds-action-reply-jsonbuttons',
@@ -14,6 +16,8 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   @Input() jsonBody: string;
   @Output() changeJsonButtons = new EventEmitter();
   
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor() { }
 
   ngOnInit(): void {
@@ -67,14 +71,16 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   /** onChangeJsonTextarea */
   onChangeJsonTextarea(text:string) {
     this.jsonBody = text;
+    // this.changeJsonButtons.emit(text);
   }
 
   /** onBlurJsonTextarea */
   onBlurJsonTextarea(event:any){
-    if(!this.jsonBody || this.jsonBody.trim() === ''){
+    this.logger.log('[ACTION REPLY jsonbuttons] onBlurJsonTextarea ', event);
+    const json = event.target?.value;
+    if(!json || json.trim() === ''){
       this.showJsonBody = false;
     }
-    const json = event.target.value;
     this.changeJsonButtons.emit(json);
   }
     

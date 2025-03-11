@@ -106,7 +106,7 @@ appdashboard-filter{
 /** BUTTONS: start **/
 .buttons-response {
     display: flex;
-    margin: 0;
+    margin: 10px 0 0 0;
     gap: 6px;
     width: 100%;
     font-size: 14px;
@@ -116,6 +116,10 @@ appdashboard-filter{
     justify-content: flex-start;
     flex-wrap: wrap;
     align-items: baseline;
+    opacity: 1;
+    &.disabled {
+        opacity: 0.5;
+    }
 }
 
 .buttons-json-response {
@@ -123,7 +127,7 @@ appdashboard-filter{
     font-size: 14px;
     padding: 0 var(--input-base-margin);
     .button-json {
-        float: left;
+        float: right;
         margin-left: auto;
     }
     &.json-shown {
@@ -156,7 +160,7 @@ appdashboard-filter{
             align-items: center;
             justify-content: center;
             em {
-                font-size: 1.15em;
+                font-size: 16px;
                 color: var(--blu);
                 transition: color 0.3s;
             }

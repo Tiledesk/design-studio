@@ -52,12 +52,16 @@ export class CdsActionReplyImageComponent implements OnInit {
   // Buttons //
   buttons: Array<any>;
   TYPE_BUTTON = TYPE_BUTTON;
+
+  showJsonBody: boolean =  false;
+  jsonBody: string;
+
   
-  
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor( 
-    private connectorService: ConnectorService,
-    private intentService: IntentService
+    private readonly connectorService: ConnectorService,
+    private readonly intentService: IntentService
   ) { }
 
 
@@ -81,6 +85,11 @@ export class CdsActionReplyImageComponent implements OnInit {
   // PRIVATE FUNCTIONS //
 
   private initialize(){
+    this.jsonBody = '';
+    if(this.response?.attributes?.attachment?.json_buttons){
+      this.jsonBody = this.response?.attributes?.attachment?.json_buttons;
+      this.showJsonBody = true;
+    }
     this.delayTime = (this.wait && this.wait.time  || this.wait.time === 0)? (this.wait.time/1000) : 500/1000;
     this.checkButtons();
     // this.patchButtons();
@@ -169,6 +178,19 @@ export class CdsActionReplyImageComponent implements OnInit {
 
 
   // EVENT FUNCTIONS //
+
+  /** changeJsonButtons */
+  onChangeJsonButtons(json:any){
+    this.logger.log('[ACTION REPLY TEXT] onChangeJsonButtons', json);
+    if(json && json.trim() !== ''){
+      this.showJsonBody = true;
+    } else {
+      this.showJsonBody = false;
+    }
+    this.jsonBody = json;
+    this.response.attributes.attachment.json_buttons =  JSON.stringify(json);
+    this.changeActionReply.emit();
+  }
 
   /** onClickDelayTime */
   onClickDelayTime(opened: boolean){
