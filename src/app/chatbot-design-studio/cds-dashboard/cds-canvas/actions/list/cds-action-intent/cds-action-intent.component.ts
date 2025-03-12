@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
+import { ACTIONS_LIST, checkConnectionStatusByConnector } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-intent',
@@ -62,19 +62,10 @@ export class CdsActionIntentComponent implements OnInit {
 
 
   private checkConnectionStatus(){
-    this.logger.log('[CDS-ACTION-INTENT] **************************11111');
-    if(this.action.intentName){
-     this.isConnected = true;
-     const posId = this.action.intentName.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.intentName.slice(posId+1);
-        this.idConnection = this.idConnector+"/"+toId;
-      }
-    } else {
-     this.isConnected = false;
-     this.idConnection = null;
-    }
-  }
+    const resp = checkConnectionStatusByConnector(this.action.intentName, this.idConnector);
+    this.isConnected  = resp.isConnected;
+    this.idConnection = resp.idConnection;
+  } 
 
   private initialize() {
     this.logger.log('[CDS-ACTION-INTENT] - initialize - isConnected ', this.action.intentName);

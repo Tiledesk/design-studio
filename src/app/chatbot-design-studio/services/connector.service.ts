@@ -1999,38 +1999,81 @@ export class ConnectorService {
 
 
 
+  // setDisplayConnectorByIdConnector2(connectorId: string) {
+  //   connectorId = connectorId.replace("#", "");
+  //   this.toggleConnectorDisplay(connectorId);
+  //   // if(this.mapOfConnectors[connectorId]?.display === false){
+  //   //   this.mapOfConnectors[connectorId] = {display: true}
+  //   // } else {
+  //   //   this.mapOfConnectors[connectorId] = {display: false}
+  //   // }
+  //   let connector = this.mapOfConnectors[connectorId];
+  //   const element = document.getElementById(connectorId);
+
+  //   this.logger.log('[CONNECTOR-SERV] setDisplayConnectorByIdConnector:: ', this.mapOfConnectors, connector, connectorId, element);
+  //   if (element) {
+  //     // // this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
+  //     // // element.setAttribute('display', connector.display?'block':'none');
+  //     element.style.setProperty('display', connector.display?'block':'none');
+  //     const elementRect = document.getElementById('rect_'+connectorId);
+  //     if(elementRect){
+  //       elementRect.style.setProperty('display', connector.display?'block':'none');
+  //     }
+  //     const elementLabel = document.getElementById('label_'+connectorId);
+  //     if(elementLabel){
+  //       elementLabel.style.setProperty('display', connector.display?'block':'none');
+  //     }
+
+  //     const elementContract = document.getElementById('contract_'+connectorId);
+  //     this.logger.log('[CONNECTOR-SERV] show-hide:: elementContract ', 'contract_'+connectorId, elementContract);
+  //     if(elementContract){
+  //       elementContract.style.setProperty('display', connector.display?'none':'flex');
+  //     }
+  //   }
+  // }
+
+
   setDisplayConnectorByIdConnector(connectorId: string) {
     connectorId = connectorId.replace("#", "");
+    this.toggleConnectorDisplay(connectorId);
+    const connector = this.mapOfConnectors[connectorId];
+    const element = document.getElementById(connectorId);
+    this.logger.log('[CONNECTOR-SERV] setDisplayConnectorByIdConnector:: ', this.mapOfConnectors, connector, connectorId, element);
+    if (element) {
+        this.updateElementDisplay(element, connector.display, connectorId);
+    }
+  }
+
+  private toggleConnectorDisplay(connectorId: string): void {
     if(this.mapOfConnectors[connectorId]?.display === false){
       this.mapOfConnectors[connectorId] = {display: true}
     } else {
       this.mapOfConnectors[connectorId] = {display: false}
     }
-    let connector = this.mapOfConnectors[connectorId];
-    const element = document.getElementById(connectorId);
+  }
 
-    this.logger.log('[CONNECTOR-SERV] setDisplayConnectorByIdConnector:: ', this.mapOfConnectors, connector, connectorId, element);
+  private updateElementDisplay(element: HTMLElement, display: boolean, connectorId: string): void {
+    element.style.setProperty('display', display ? 'block' : 'none');
+    this.updateElementById('rect_' + connectorId, display ? 'block' : 'none');
+    this.updateElementById('label_' + connectorId, display ? 'block' : 'none');
+    this.updateElementContract('contract_' + connectorId, display);
+  }
+
+  private updateElementById(elementId: string, displayValue: string): void {
+    const element = document.getElementById(elementId);
     if (element) {
-      // // this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
-      // // element.setAttribute('display', connector.display?'block':'none');
-      element.style.setProperty('display', connector.display?'block':'none');
-      const elementRect = document.getElementById('rect_'+connectorId);
-      if(elementRect){
-        elementRect.style.setProperty('display', connector.display?'block':'none');
-      }
-      const elementLabel = document.getElementById('label_'+connectorId);
-      if(elementLabel){
-        elementLabel.style.setProperty('display', connector.display?'block':'none');
-      }
-
-      const elementContract = document.getElementById('contract_'+connectorId);
-      this.logger.log('[CONNECTOR-SERV] show-hide:: elementContract ', 'contract_'+connectorId, elementContract);
-      if(elementContract){
-        // elementContract.style.setProperty('opacity', connector.display?'0':'1');
-        elementContract.style.setProperty('display', connector.display?'none':'flex');
-      }
+        element.style.setProperty('display', displayValue);
     }
   }
+
+  private updateElementContract(elementId: string, display: boolean): void {
+    const elementContract = document.getElementById(elementId);
+    this.logger.log('[CONNECTOR-SERV] show-hide:: elementContract ', elementId, elementContract);
+    if (elementContract) {
+        elementContract.style.setProperty('display', display ? 'none' : 'flex');
+    }
+  }
+
 
 
 

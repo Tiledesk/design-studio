@@ -9,6 +9,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-json-condition',
@@ -89,43 +90,13 @@ export class CdsActionJsonConditionComponent implements OnInit {
       this.listOfIntents = this.intentService.getListOfIntents();
       this.checkConnectionStatus();
     }
-  
-    // private checkConnectionStatus(){
-    //   if(this.action.trueIntent){
-    //    this.isConnectedTrue = true;
-    //   } else {
-    //    this.isConnectedTrue = false;
-    //   }
-    //   if(this.action.falseIntent){
-    //     this.isConnectedFalse = true;
-    //    } else {
-    //     this.isConnectedFalse = false;
-    //    }
-    // }
 
     private checkConnectionStatus(){
-      if(this.action.trueIntent){
-        this.isConnectedTrue = true;
-        const posId = this.action.trueIntent.indexOf("#");
-        if (posId !== -1) {
-          const toId = this.action.trueIntent.slice(posId+1);
-          this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-        }
-      } else {
-       this.isConnectedTrue = false;
-       this.idConnectionTrue = null;
-      }
-      if(this.action.falseIntent){
-        this.isConnectedFalse = true;
-        const posId = this.action.falseIntent.indexOf("#");
-        if (posId !== -1) {
-          const toId = this.action.falseIntent.slice(posId+1);
-          this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-        }
-       } else {
-        this.isConnectedFalse = false;
-        this.idConnectionFalse = null;
-       }
+      const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+      this.isConnectedTrue    = resp.isConnectedTrue;
+      this.isConnectedFalse   = resp.isConnectedFalse;
+      this.idConnectionTrue   = resp.idConnectionTrue;
+      this.idConnectionFalse  = resp.idConnectionFalse;
     }
   
     private updateConnector(){

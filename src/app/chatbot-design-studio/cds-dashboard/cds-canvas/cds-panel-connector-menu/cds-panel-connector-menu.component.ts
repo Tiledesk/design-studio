@@ -38,7 +38,7 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
       'type': type,
       'connector': this.connector
     }
-    console.log('[CDS-ADD-CONNECTOR MENU] onAddActionFromConnectorMenu - connector: ', this.connector);
+    console.log('[CDS-ADD-CONNECTOR MENU] onAddActionFromConnectorMenu - connector: ', type, this.connector);
     this.addActionFromConnectorMenu.emit(event);
   }
 

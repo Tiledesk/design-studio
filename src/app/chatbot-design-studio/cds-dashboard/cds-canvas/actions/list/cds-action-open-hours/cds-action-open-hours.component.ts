@@ -8,6 +8,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-open-hours',
@@ -104,31 +105,6 @@ export class CdsActionOpenHoursComponent implements OnInit {
     this.logger.log('[ACTION-OPEN-HOURS] initialize action -->', this.action)
   }
 
-  private checkConnectionStatus(){
-    if(this.action.trueIntent){
-      this.isConnectedTrue = true;
-      const posId = this.action.trueIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.trueIntent.slice(posId+1);
-        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-      }
-    } else {
-     this.isConnectedTrue = false;
-     this.idConnectionTrue = null;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-      const posId = this.action.falseIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.falseIntent.slice(posId+1);
-        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-      }
-     } else {
-      this.isConnectedFalse = false;
-      this.idConnectionFalse = null;
-     }
-  }
-
 
   private initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
@@ -137,6 +113,16 @@ export class CdsActionOpenHoursComponent implements OnInit {
     this.listOfIntents = this.intentService.getListOfIntents()
   }
 
+
+  private checkConnectionStatus(){
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
+  }
+
+  
   private updateConnector(){
     try {
       const array = this.connector.fromId.split("/");

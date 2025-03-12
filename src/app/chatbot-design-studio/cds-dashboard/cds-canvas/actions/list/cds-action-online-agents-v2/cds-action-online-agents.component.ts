@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Department } from 'src/app/models/department-model';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
 
 
 @Component({
@@ -113,7 +114,6 @@ export class CdsActionOnlineAgentsV2Component implements OnInit {
   
 
   private initializeConnector() {
-    // this.isConnected = false;
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
@@ -122,31 +122,14 @@ export class CdsActionOnlineAgentsV2Component implements OnInit {
   }
 
 
-
   private checkConnectionStatus(){
-    if(this.action.trueIntent){
-      this.isConnectedTrue = true;
-      const posId = this.action.trueIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.trueIntent.slice(posId+1);
-        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-      }
-    } else {
-     this.isConnectedTrue = false;
-     this.idConnectionTrue = null;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-      const posId = this.action.falseIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.falseIntent.slice(posId+1);
-        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-      }
-     } else {
-      this.isConnectedFalse = false;
-      this.idConnectionFalse = null;
-     }
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
   }
+
 
   private updateConnector(){
     try {

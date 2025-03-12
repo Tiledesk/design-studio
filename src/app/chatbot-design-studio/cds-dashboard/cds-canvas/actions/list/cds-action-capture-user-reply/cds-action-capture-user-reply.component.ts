@@ -6,6 +6,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ActionCaptureUserReply } from 'src/app/models/action-model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
+import { checkConnectionStatusByConnector } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-capture-user-reply',
@@ -65,18 +66,24 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
     this.checkConnectionStatus();
   }
 
+  // private checkConnectionStatus(){
+  //   if(this.action.goToIntent){
+  //    this.isConnected = true;
+  //    const posId = this.action.goToIntent.indexOf("#");
+  //     if (posId !== -1) {
+  //       const toId = this.action.goToIntent.slice(posId+1);
+  //       this.idConnection = this.idConnector+"/"+toId;
+  //     }
+  //   } else {
+  //    this.isConnected = false;
+  //    this.idConnection = null;
+  //   }
+  // }
+
   private checkConnectionStatus(){
-    if(this.action.goToIntent){
-     this.isConnected = true;
-     const posId = this.action.goToIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.goToIntent.slice(posId+1);
-        this.idConnection = this.idConnector+"/"+toId;
-      }
-    } else {
-     this.isConnected = false;
-     this.idConnection = null;
-    }
+    const resp = checkConnectionStatusByConnector(this.action.goToIntent, this.idConnector);
+    this.isConnected  = resp.isConnected;
+    this.idConnection = resp.idConnection;
   }
 
   private updateConnector(){

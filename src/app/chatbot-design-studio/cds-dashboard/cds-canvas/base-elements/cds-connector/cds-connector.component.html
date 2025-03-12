@@ -11,7 +11,7 @@
         
     </div>
 
-    <div [id]="idContractConnector" class="block-contract-connector" (click)="restoreConnectorDefault($event)" (mouseenter)="showConnectorDefault()" (mouseleave)="hideConnectorDefault()">
+    <div *ngIf="idConnection" [id]="idContractConnector" class="block-contract-connector" (click)="restoreConnectorDefault($event)" (mouseenter)="showConnectorDefault()" (mouseleave)="hideConnectorDefault()">
         <em class="connector-line material-icons-outlined">trending_flat</em><span class="connector-to-intent">{{intent_display_name}}</span>
     </div>
     

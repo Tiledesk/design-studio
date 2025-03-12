@@ -16,6 +16,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 //UTILS
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-askgpt',
@@ -59,14 +60,13 @@ export class CdsActionAskgptComponent implements OnInit {
   variableListUserDefined: Array<{ name: string, value: string }> // = variableList.userDefined 
   spinner: boolean = false;
 
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
-    // private openaikbService: OpenaiService,
-    private kbService: KnowledgeBaseService,
+    private readonly kbService: KnowledgeBaseService,
     public dialog: MatDialog,
-    private intentService: IntentService,
-    private appConfigService: AppConfigService,
+    private readonly intentService: IntentService,
+    private readonly appConfigService: AppConfigService,
   ) { }
 
   ngOnInit(): void {
@@ -82,7 +82,7 @@ export class CdsActionAskgptComponent implements OnInit {
     if(this.intentSelected){
       this.initializeConnector();
     }
-    if (this.previewMode == false) {
+    if (this.previewMode === false) {
       this.onDetailModeLoad();
     }
   }
@@ -125,29 +125,37 @@ export class CdsActionAskgptComponent implements OnInit {
   // }
 
 
+  // private checkConnectionStatus(){
+  //   if(this.action.trueIntent){
+  //     this.isConnectedTrue = true;
+  //     const posId = this.action.trueIntent.indexOf("#");
+  //     if (posId !== -1) {
+  //       const toId = this.action.trueIntent.slice(posId+1);
+  //       this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
+  //     }
+  //   } else {
+  //     this.isConnectedTrue = false;
+  //     this.idConnectionTrue = null;
+  //   }
+  //   if(this.action.falseIntent){
+  //     this.isConnectedFalse = true;
+  //     const posId = this.action.falseIntent.indexOf("#");
+  //     if (posId !== -1) {
+  //       const toId = this.action.falseIntent.slice(posId+1);
+  //       this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
+  //     }
+  //    } else {
+  //     this.isConnectedFalse = false;
+  //     this.idConnectionFalse = null;
+  //    }
+  // }
+
   private checkConnectionStatus(){
-    if(this.action.trueIntent){
-      this.isConnectedTrue = true;
-      const posId = this.action.trueIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.trueIntent.slice(posId+1);
-        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-      }
-    } else {
-      this.isConnectedTrue = false;
-      this.idConnectionTrue = null;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-      const posId = this.action.falseIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.falseIntent.slice(posId+1);
-        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-      }
-     } else {
-      this.isConnectedFalse = false;
-      this.idConnectionFalse = null;
-     }
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
   }
 
 

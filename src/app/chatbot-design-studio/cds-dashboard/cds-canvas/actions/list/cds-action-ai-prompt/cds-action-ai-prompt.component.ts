@@ -24,6 +24,7 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { LLM_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-ai-prompt',
@@ -78,14 +79,15 @@ export class CdsActionAiPromptComponent implements OnInit {
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.GPT_TASK;
   
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
-    private dialog: MatDialog,
-    private openaiService: OpenaiService,
-    private intentService: IntentService,
-    private appConfigService: AppConfigService,
-    private translate: TranslateService,
-    private dashboardService: DashboardService
+    private readonly dialog: MatDialog,
+    private readonly openaiService: OpenaiService,
+    private readonly intentService: IntentService,
+    private readonly appConfigService: AppConfigService,
+    private readonly translate: TranslateService,
+    private readonly dashboardService: DashboardService
   ) { }
 
   ngOnInit(): void {
@@ -106,13 +108,14 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.initializeAttributes();
 
     if (!this.action.preview) {
-      this.action.preview = []; // per retrocompatibilità
+      this.action.preview = [];
     }
 
     this.initialize();
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    // // empty
   }
 
   ngOnDestroy() {
@@ -134,30 +137,13 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.listOfIntents = this.intentService.getListOfIntents();
     this.checkConnectionStatus();
   }
-
+  
   private checkConnectionStatus(){
-    if(this.action.trueIntent){
-      this.isConnectedTrue = true;
-      const posId = this.action.trueIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.trueIntent.slice(posId+1);
-        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-      }
-    } else {
-      this.isConnectedTrue = false;
-      this.idConnectionTrue = null;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-      const posId = this.action.falseIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.falseIntent.slice(posId+1);
-        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-      }
-     } else {
-      this.isConnectedFalse = false;
-      this.idConnectionFalse = null;
-     }
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
   }
 
   private updateConnector(){

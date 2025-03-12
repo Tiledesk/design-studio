@@ -13,7 +13,7 @@ import { ActionMake } from 'src/app/models/action-model';
 //UTILS
 import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
-import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
+import { ACTIONS_LIST, checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-make',
@@ -77,51 +77,20 @@ export class CdsActionMakeComponent implements OnInit {
     }
   }
 
-
-  // private checkConnectionStatus(){
-  //   if(this.action.trueIntent){
-  //    this.isConnectedTrue = true;
-  //   } else {
-  //    this.isConnectedTrue = false;
-  //   }
-  //   if(this.action.falseIntent){
-  //     this.isConnectedFalse = true;
-  //    } else {
-  //     this.isConnectedFalse = false;
-  //    }
-  // }
-
-  private checkConnectionStatus(){
-    if(this.action.trueIntent){
-      this.isConnectedTrue = true;
-      const posId = this.action.trueIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.trueIntent.slice(posId+1);
-        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-      }
-    } else {
-     this.isConnectedTrue = false;
-     this.idConnectionTrue = null;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-      const posId = this.action.falseIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.falseIntent.slice(posId+1);
-        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-      }
-     } else {
-      this.isConnectedFalse = false;
-      this.idConnectionFalse = null;
-     }
-  }
-  
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
     this.checkConnectionStatus();
+  }
+
+  private checkConnectionStatus(){
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
   }
 
   private updateConnector(){

@@ -12,6 +12,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 //UTILS
 import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-action-hubspot',
@@ -33,8 +34,11 @@ export class CdsActionHubspotComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
+  idConnectionTrue: string;
+  idConnectionFalse: string;
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
+  
   connector: any;
   private subscriptionChangedConnector: Subscription;
   
@@ -75,26 +79,20 @@ export class CdsActionHubspotComponent implements OnInit {
     }
   }
 
-
-  private checkConnectionStatus(){
-    if(this.action.trueIntent){
-     this.isConnectedTrue = true;
-    } else {
-     this.isConnectedTrue = false;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-     } else {
-      this.isConnectedFalse = false;
-     }
-  }
-
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
     this.checkConnectionStatus();
+  }
+
+  private checkConnectionStatus(){
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
   }
 
   private updateConnector(){

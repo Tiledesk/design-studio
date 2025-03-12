@@ -2,6 +2,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChang
 import { Subscription } from 'rxjs';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
 import { ActionSendWhatsapp } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -28,6 +29,8 @@ export class CdsActionSendWhatsappComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
+  idConnectionTrue: string;
+  idConnectionFalse: string;
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
@@ -74,19 +77,6 @@ export class CdsActionSendWhatsappComponent implements OnInit {
     }
   }
 
-  private checkConnectionStatus(){
-    if(this.action.trueIntent){
-     this.isConnectedTrue = true;
-    } else {
-     this.isConnectedTrue = false;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-     } else {
-      this.isConnectedFalse = false;
-     }
-  }
-
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
@@ -95,6 +85,16 @@ export class CdsActionSendWhatsappComponent implements OnInit {
     this.checkConnectionStatus();
   }
 
+
+  private checkConnectionStatus(){
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
+  }
+
+  
   private updateConnector(){
     try {
       const array = this.connector.fromId.split("/");

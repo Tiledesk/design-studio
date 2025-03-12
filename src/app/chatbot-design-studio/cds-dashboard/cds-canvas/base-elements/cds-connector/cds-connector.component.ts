@@ -35,14 +35,19 @@ export class CdsConnectorComponent implements OnInit {
     if (changes.idConnection) {
       this.getIntentDisplayName();
       // console.log('idConnection è cambiato da', changes.idConnection.previousValue, 'a', changes.idConnection.currentValue);
-      this.setIdContractConnector();
+      //this.setIdContractConnector();
     }
   }
 
   setIdContractConnector(){
-    const idConnection = this.idConnection?.replace('#', '');
-    this.idContractConnector = 'contract_'+idConnection;
-    // console.log('idConnection: ', idConnection, ' a: ', this.idContractConnector);
+    console.log('setIdContractConnector::::: idConnector: ', this.idConnector);
+    console.log('setIdContractConnector::::: idConnection: ', this.idConnection);
+    console.log('setIdContractConnector::::: isConnected: ', this.isConnected);
+    if(this.idConnection){
+      const idConnection = this.idConnection?.replace('#', '');
+      this.idContractConnector = 'contract_'+idConnection;
+      //console.log('setIdContractConnector::::: idConnection: ', this.idConnection, ' a: ', this.idContractConnector);
+    } 
   }
 
   getIntentDisplayName(){
