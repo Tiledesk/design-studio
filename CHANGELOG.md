@@ -7,6 +7,16 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.30.0-rc.2
+- **changed**: Webhook remove chat actions (tagAction)
+- **changed**: Webhook remove training and form sentences from blocks
+- **bug-fixed**: when I create a copilot webhook passing in the body copilot:true
+- **bug-fixed**: in the chatbot copilot webhook check the async loop
+
+# 1.30.0-rc.1
+- **added**: added json buttons
+- **changed**: hide Button typing alias in action reply
+
 # 1.30.0-rc.0
 - **added**: hide/show single connector
 - **bug-fixed**: web request 

@@ -23,7 +23,7 @@ import { LOGOS_ITEMS } from './../../utils-resources';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
-import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_ACTION, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { storage } from 'firebase';
 import { WebhookService } from '../../services/webhook-service.service';
@@ -131,22 +131,25 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** panel widget log */
   IS_OPEN_WIDGET_LOG: boolean = false;
   
-
-  private logger: LoggerService = LoggerInstance.getInstance()
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   startDraggingPosition: any = null;
 
+  chatbotSubtype: string;
+
+
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
 
   constructor(
-    private intentService: IntentService,
-    private stageService: StageService,
-    private connectorService: ConnectorService,
-    private controllerService: ControllerService,
-    private translate: TranslateService,
+    private readonly intentService: IntentService,
+    private readonly stageService: StageService,
+    private readonly connectorService: ConnectorService,
+    private readonly controllerService: ControllerService,
+    private readonly translate: TranslateService,
     public dashboardService: DashboardService,
-    private changeDetectorRef: ChangeDetectorRef,
-    private route: ActivatedRoute, 
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly route: ActivatedRoute, 
     public appStorageService: AppStorageService,
     public webhookService: WebhookService,
     public logService: LogService
@@ -511,6 +514,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if(copyPasteTEMP){
       this.intentService.arrayCOPYPAST = copyPasteTEMP['copy'];
     }
+
+    // ---------------------------------------
+    // set subtype chatbot
+    // ---------------------------------------
+    this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
   }
 
 
