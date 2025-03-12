@@ -177,7 +177,7 @@ export class CdsActionReplyTextComponent implements OnInit {
     this.jsonBody = json;
     if(json && json.trim() !== ''){
       this.showJsonBody = true;
-      this.response.attributes.attachment.json_buttons = JSON.stringify(json);
+      this.response.attributes.attachment.json_buttons = json; //JSON.stringify(json);
     } else {
       this.showJsonBody = false;
       this.response.attributes.attachment.json_buttons = '';
