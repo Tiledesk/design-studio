@@ -22,7 +22,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
-import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-askgpt-v2',

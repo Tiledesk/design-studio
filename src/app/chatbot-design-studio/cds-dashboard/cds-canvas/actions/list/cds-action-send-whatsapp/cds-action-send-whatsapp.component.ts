@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChang
 import { Subscription } from 'rxjs';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
-import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ActionSendWhatsapp } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { DashboardService } from 'src/app/services/dashboard.service';

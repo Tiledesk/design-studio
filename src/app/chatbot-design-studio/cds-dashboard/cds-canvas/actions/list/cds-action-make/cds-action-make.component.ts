@@ -13,7 +13,8 @@ import { ActionMake } from 'src/app/models/action-model';
 //UTILS
 import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
-import { ACTIONS_LIST, checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
+import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-make',

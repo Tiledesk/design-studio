@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
-import { ACTIONS_LIST, checkConnectionStatusByConnector, } from 'src/app/chatbot-design-studio/utils-actions';
+import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 import { ActionConnectBlock } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { checkConnectionStatusByConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-connect-block',

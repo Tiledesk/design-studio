@@ -6,7 +6,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ActionCaptureUserReply } from 'src/app/models/action-model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
-import { checkConnectionStatusByConnector } from 'src/app/chatbot-design-studio/utils-actions';
+import { checkConnectionStatusByConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-capture-user-reply',

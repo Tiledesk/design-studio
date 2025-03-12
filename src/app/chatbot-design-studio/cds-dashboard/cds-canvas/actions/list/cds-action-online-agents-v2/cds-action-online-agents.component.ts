@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Department } from 'src/app/models/department-model';
-import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-connectors';
 
 
 @Component({

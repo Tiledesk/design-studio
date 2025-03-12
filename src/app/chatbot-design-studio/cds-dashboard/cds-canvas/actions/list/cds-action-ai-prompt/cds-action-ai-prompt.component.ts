@@ -24,7 +24,7 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { LLM_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
-import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-ai-prompt',

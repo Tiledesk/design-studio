@@ -6,7 +6,8 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { ACTIONS_LIST, checkConnectionStatusByConnector } from 'src/app/chatbot-design-studio/utils-actions';
+import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
+import { checkConnectionStatusByConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-intent',

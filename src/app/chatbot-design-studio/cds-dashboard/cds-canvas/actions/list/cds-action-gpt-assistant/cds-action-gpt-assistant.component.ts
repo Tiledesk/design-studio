@@ -7,7 +7,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
-import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-actions';
+import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-gpt-assistant',
