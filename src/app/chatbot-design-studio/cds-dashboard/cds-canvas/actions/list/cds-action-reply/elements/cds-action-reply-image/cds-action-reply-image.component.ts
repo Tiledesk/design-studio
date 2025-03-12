@@ -153,7 +153,7 @@ export class CdsActionReplyImageComponent implements OnInit {
       this.showJsonBody = false;
     }
     this.jsonBody = json;
-    this.response.attributes.attachment.json_buttons =  JSON.stringify(json);
+    this.response.attributes.attachment.json_buttons =  json; //JSON.stringify(json);
     this.changeJsonButtons.emit( this.response);
   }
 
