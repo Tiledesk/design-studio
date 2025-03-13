@@ -353,7 +353,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     document.addEventListener(
       "connector-release-on-intent", (e: CustomEvent) => {
-        this.logger.log('[CDS-INTENT] connector-release-on-intent e ', e)
+        // //this.logger.log('[CDS-INTENT] connector-release-on-intent e ', e)
         if (e.detail.toId === this.intent.intent_id) {
           const intentContentEl = document.querySelector(`#intent-content-${e.detail.toId}`);
           // const blockHeaderEl = <HTMLElement>document.querySelector(`#block-header-${e.detail.toId}`);
@@ -373,7 +373,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     document.addEventListener(
       "connector-moved-over-intent", (e: CustomEvent) => {
-        this.logger.log('[CDS-INTENT] Connector Moved over intent e ', e);
+        // //this.logger.log('[CDS-INTENT] Connector Moved over intent e ', e);
         if (e.detail?.toId === this.intent.intent_id) {
           this.connectorIsOverAnIntent = true;
           this.logger.log('[CDS-INTENT] Connector Moved over intent connectorIsOverAnIntent ', this.connectorIsOverAnIntent)
@@ -391,8 +391,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
     document.addEventListener(
       "connector-moved-out-of-intent", (e: CustomEvent) => {
-        this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
-
+        // // this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
         // !!!se il connettore è a meno di Xpx dalla fine dello stage sposta lo stage!!!!
         if (e.detail?.toId === this.intent.intent_id) {
           const intentContentEl = document.querySelector(`#intent-content-${e.detail.toId}`);
@@ -774,7 +773,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * called when the action is modified
    * */
   public async onUpdateAndSaveAction(object) {
-    this.logger.log('[CDS-INTENT] onUpdateAndSaveAction::::', object);
+    //this.logger.log('[CDS-INTENT] onUpdateAndSaveAction::::', object);
     let connector = null;
     /** 
     // if(object && object.type && object.type === 'connector'){
@@ -789,7 +788,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // const action  = object.element; 
     // */
     if(object?._tdActionId){
-      replaceItemInArrayForKey('_tdActionId', this.intent.actions, object);
+      this.intent.actions = replaceItemInArrayForKey('_tdActionId', this.intent.actions, object);
     }
     /** // this.setActionIntentInListOfActions(); */
     this.logger.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
