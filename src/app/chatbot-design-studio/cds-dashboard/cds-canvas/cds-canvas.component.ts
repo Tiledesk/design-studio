@@ -84,6 +84,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** panel list of intent */ 
   IS_OPEN_INTENTS_LIST: boolean = true;
 
+  /** */
+  private subscriptionChangedConnectorAttributes: Subscription;
+
   /** panel add action menu */
   private subscriptionOpenAddActionMenu: Subscription;
   IS_OPEN_ADD_ACTIONS_MENU: boolean = false;
@@ -152,6 +155,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** */
   ngOnDestroy() {
+
+    if (this.subscriptionChangedConnectorAttributes) {
+      this.subscriptionChangedConnectorAttributes.unsubscribe();
+    }
     if (this.subscriptionListOfIntents) {
       this.subscriptionListOfIntents.unsubscribe();
     }
@@ -346,6 +353,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // --------------------------------------------------------- //
   
   private setSubscriptions(){
+
+    this.subscriptionChangedConnectorAttributes = this.connectorService.observableChangedConnectorAttributes.subscribe((connector: any) => {
+      this.logger.log('[CDS-CANVAS] --- AGGIORNATO connettore ',connector);
+      if (connector) {
+       
+      }
+    });
+
 
     this.subscriptionUndoRedo = this.intentService.behaviorUndoRedo.subscribe((undoRedo: any) => {
       this.logger.log('[cds-panel-intent-list] --- AGGIORNATO undoRedo ',undoRedo);

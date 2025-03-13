@@ -6,6 +6,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Setting } from 'src/app/models/action-model';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
+import { Subject } from 'rxjs';
 /** CLASSE DI SERVICES PER GESTIRE I CONNETTORI **/
 
 
@@ -14,6 +15,10 @@ import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
 })
 
 export class ConnectorService {
+
+  private readonly subjectChangedConnectorAttributes = new Subject<any>();
+  observableChangedConnectorAttributes = this.subjectChangedConnectorAttributes.asObservable();
+  
   listOfConnectors: any = {};
   tiledeskConnectors: any;
   connectorDraft: any = {};
@@ -21,7 +26,7 @@ export class ConnectorService {
   mapOfConnectors: any = {};
   scale: number = 1;
 
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
   
   constructor() {}
 
@@ -2037,12 +2042,18 @@ export class ConnectorService {
     connectorId = connectorId.replace("#", "");
     this.toggleConnectorDisplay(connectorId);
     const connector = this.mapOfConnectors[connectorId];
-    const element = document.getElementById(connectorId);
-    this.logger.log('[CONNECTOR-SERV] setDisplayConnectorByIdConnector:: ', this.mapOfConnectors, connector, connectorId, element);
-    if (element) {
+    if(connector){
+      connector.id = connectorId;
+      const element = document.getElementById(connectorId);
+      this.logger.log('[CONNECTOR-SERV] setDisplayConnectorByIdConnector:: ', this.mapOfConnectors, connector, connectorId, element);
+      if (element) {
         this.updateElementDisplay(element, connector.display, connectorId);
+        // // this.subjectChangedConnectorAttributes.next(connector);
+      }
     }
   }
+
+
 
   private toggleConnectorDisplay(connectorId: string): void {
     if(this.mapOfConnectors[connectorId]?.display === false){

@@ -34,19 +34,15 @@ export class CdsConnectorComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.idConnection) {
       this.getIntentDisplayName();
-      // console.log('idConnection è cambiato da', changes.idConnection.previousValue, 'a', changes.idConnection.currentValue);
-      //this.setIdContractConnector();
+      this.idConnection = changes.idConnection.currentValue;
+      this.setIdContractConnector();
     }
   }
 
   setIdContractConnector(){
-    console.log('setIdContractConnector::::: idConnector: ', this.idConnector);
-    console.log('setIdContractConnector::::: idConnection: ', this.idConnection);
-    console.log('setIdContractConnector::::: isConnected: ', this.isConnected);
     if(this.idConnection){
       const idConnection = this.idConnection?.replace('#', '');
       this.idContractConnector = 'contract_'+idConnection;
-      //console.log('setIdContractConnector::::: idConnection: ', this.idConnection, ' a: ', this.idContractConnector);
     } 
   }
 
