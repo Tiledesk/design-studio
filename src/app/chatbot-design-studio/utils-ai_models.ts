@@ -5,7 +5,9 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
 ]
 
 export const GOOGLE_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
-    { name: "Gemini-pro",         value: "gemini-pro",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Gemini-pro",         value: "gemini-pro",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Gemini 1.5 Flash",   value: "gemini-1.5-flash",       description: "TYPE_GPT_MODEL.text-davinci-003.description",   status: "active" },
+    { name: "Gemini 2.0 Flash",   value: "gemini-2.0-flash",       description: "TYPE_GPT_MODEL.text-davinci-003.description",   status: "active" },
 ]
 
 export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
