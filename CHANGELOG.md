@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.29.2
+
 # 1.29.1
 - **added**: deepseek-chat llm model and claude 3.7
 - **removed**: mixtral-8x7b-32768 model
