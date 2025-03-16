@@ -32,7 +32,8 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
 
   onAddActionFromConnectorMenu(type){
     if(type === this.typeOfmenu.SHOW_HIDE){
-      this.displayConnector =!this.displayConnector;
+      this.displayConnector = false;
+      this.connector['display'] = this.displayConnector;
     }
     let event = { 
       'type': type,
@@ -49,9 +50,11 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
   onBlur(ev){
     const testoTextArea = ev.target.value;
     // // console.log('[CDS-ADD-CONNECTOR MENU]  onBlur:: ', testoTextArea);
+    this.connector['label'] = testoTextArea;
+
     let event = { 
       'type': TYPE_OF_MENU.LINE_TEXT, 
-      'label': testoTextArea
+      'connector': this.connector
     }
     this.showLineTextarea = false;
     this.addActionFromConnectorMenu.emit(event);

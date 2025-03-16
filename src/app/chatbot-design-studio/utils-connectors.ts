@@ -51,3 +51,66 @@ export function checkConnectionStatusByConnector(toIntentId: any, idConnector: s
     }
     return result;
 }
+
+
+
+export function updateConnector(connector, action, isConnectedTrue, isConnectedFalse, idConnectionTrue, idConnectionFalse): any {
+    if (!connector?.fromId) {
+        return;
+    }
+    const segments = connector.fromId.split('/');
+    if (segments.length < 2) {
+        return;
+    }
+    const idAction = segments[1];
+    if (idAction !== action._tdActionId) {
+        return;
+    }
+    const lastSegment = segments[segments.length - 1];
+    const isTrueSegment = lastSegment === 'true';
+    const isFalseSegment = lastSegment === 'false';
+    let resp = {
+        action: action,
+        isConnectedTrue: isConnectedTrue,
+        isConnectedFalse: isConnectedFalse,
+        idConnectionTrue: idConnectionTrue,
+        idConnectionFalse: idConnectionFalse,
+        emit: false
+    }
+      // Gestione della cancellazione del connector
+    if (connector.deleted) {
+        if (isTrueSegment) {
+            resp.action.trueIntent = null;
+            resp.isConnectedTrue = false;
+            resp.idConnectionTrue = null;
+        }
+        if (isFalseSegment) {
+            resp.action.falseIntent = null;
+            resp.isConnectedFalse = false;
+            resp.idConnectionFalse = null;
+        }
+        if (connector.save) {
+            resp.emit = true;
+        }
+        return resp;
+    }
+    // Aggiornamento per il ramo "true"
+    if (isTrueSegment) {
+        resp.action.trueIntent = '#' + connector.toId;
+        resp.isConnectedTrue = true;
+        resp.idConnectionTrue = connector.id;
+        if (connector.save) {
+            resp.emit = true;
+        }
+    }
+    // Aggiornamento per il ramo "false"
+    if (isFalseSegment) {
+        resp.action.falseIntent = '#' + connector.toId;
+        resp.isConnectedFalse = true;
+        resp.idConnectionFalse = connector.id;
+        if (connector.save) {
+            resp.emit = true;
+        }
+    }
+    return resp;
+  }

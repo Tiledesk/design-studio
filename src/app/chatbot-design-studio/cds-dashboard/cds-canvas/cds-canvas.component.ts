@@ -125,7 +125,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   IS_OPEN_COLOR_MENU: boolean = false;
   positionColortMenu: any = { 'x': 0, 'y': 0 };
 
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private readonly logger: LoggerService = LoggerInstance.getInstance()
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   startDraggingPosition: any = null;
@@ -355,10 +355,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private setSubscriptions(){
 
     this.subscriptionChangedConnectorAttributes = this.connectorService.observableChangedConnectorAttributes.subscribe((connector: any) => {
-      this.logger.log('[CDS-CANVAS] --- AGGIORNATO connettore ',connector);
-      if (connector) {
-       
-      }
+      this.logger.log('[CDS-CANVAS] --- AGGIORNATO connettore ', connector);
+      // if (connector) {
+      //   this.intentService.updateIntentAttributeConnectors(connector);
+      // }
     });
 
 
@@ -514,9 +514,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     const idIntentFrom = connector.id.split('/')[0];
     const intent = this.intentService.getIntentFromId(idIntentFrom);
     const color = intent?.attributes?.color ?? INTENT_COLORS.COLOR1;
-    const opacity = 1;
+    const opacity = this.stageService.getAlpha()/100;
+    this.logger.log('[CDS-CANVAS] setConnectorColor ', connector, opacity);
     this.connectorService.setConnectorColor(intent.intent_id, color, opacity);
-    // // this.connectorService.addCustomMarker(connector.id, color, opacity);
   }
 
   setListnerEvents(){
@@ -632,6 +632,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       delete connector['deleted'];
       this.connectorService.addConnectorToList(connector);
       this.intentService.onChangedConnector(connector);
+
+      // this.logger.log('[CDS-CANVAS] --- AGGIORNATO connettore ', connector);
+      // if (connector) {
+      //   this.intentService.updateIntentAttributeConnectors(connector);
+      // }
+
     };
     document.addEventListener("connector-created", this.listnerConnectorCreated, false);
 
@@ -677,14 +683,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.listnerConnectorSelected = (e: CustomEvent) => {
       this.closeAllPanels();
       this.closeActionDetailPanel();
+      this.setConnectorSelected(e.detail.connector.id);
       this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
       this.mousePosition = e.detail.mouse_pos;
       this.mousePosition.x -= -10;
       this.mousePosition.y -= 25;
-      //this.connectorSelected =  e.detail.connector;
-      this.setConnectorSelected(e.detail.connector.id);
-      // this.IS_OPEN_ADD_ACTIONS_MENU = true;
-      // this.positionFloatMenu = e.detail.mouse_pos;
       this.intentService.unselectAction();
     };
     document.addEventListener("connector-selected", this.listnerConnectorSelected, false);
@@ -1393,20 +1396,18 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * setConnectorSelected
    * @param idConnector 
    */
-  setConnectorSelected(idConnector){
+  setConnectorSelected(idConnection){
+    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
     this.connectorSelected = {};
     const intentId = idConnector.split('/')[0];
     let intent = this.intentService.getIntentFromId(intentId);
-    this.connectorSelected = {
-      id: idConnector
-    }
-    try {
-      if(intent.attributes.connectors && intent.attributes.connectors[idConnector]){
+    if(intent.attributes?.connectors){
+      if(intent.attributes.connectors[idConnector]){
         this.connectorSelected = intent.attributes.connectors[idConnector];
       }
-    } catch (error) {
-      this.logger.log("Error: ", error);
     }
+    this.connectorSelected.id = idConnection;
+    this.logger.log("[CDS-CANVAS] setConnectorSelected: ", this.connectorSelected, idConnector);
   }
 
 
@@ -1416,42 +1417,33 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    */
   async onAddActionFromConnectorMenu(event) {
     let intent: Intent;
+    this.logger.log('[CDS-CANVAS] onAddActionFromConnectorMenu:: ', event, this.connectorSelected);
+    
     if(this.connectorSelected?.id){
       const intentId = this.connectorSelected.id.split('/')[0];
       intent = this.intentService.getIntentFromId(intentId);
       if(intent && !intent.attributes?.connectors){
         intent.attributes['connectors'] = {};
       } 
-
       if(event.type === "show-hide" && event.connector){
-        this.logger.log('[CDS-CANVAS] show-hide:: ', event);
-        this.connectorService.setDisplayConnectorByIdConnector(event.connector.id);
-        // this.intentService.updateIntent(intent);
+        this.logger.log('[CDS-CANVAS] show-hide:: ', event.connector);
+        this.connectorService.hideDefaultConnector(event.connector.id);
+        this.connectorService.showContractConnector(event.connector.id);
+        this.intentService.updateIntentAttributeConnectors( event.connector);
         this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
       }
-
       if(event.type === "delete"){
         this.logger.log('[CDS-CANVAS] delete connector:: ', intentId, intent);
-        if(intent.attributes?.connectors[this.connectorSelected.id]){
-          delete intent.attributes.connectors[this.connectorSelected.id];
-        }
-        this.connectorService.updateConnectorAttributes(this.connectorSelected.id, event);
-        this.connectorService.deleteConnector( this.connectorSelected.id, true, true);
-        this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
-      }
-
-      if(event.type === "line-text"){
-        this.logger.log('[CDS-CANVAS] line-text:: ', this.connectorSelected);
-        if(!intent.attributes.connectors[this.connectorSelected.id]){
-          intent.attributes.connectors[this.connectorSelected.id] = {};
-        }
-        intent.attributes.connectors[this.connectorSelected.id]['id'] = this.connectorSelected.id;
-        intent.attributes.connectors[this.connectorSelected.id]['label'] = event.label;
+        this.connectorService.deleteConnector(intent, event.connector.id, true, true);
         this.intentService.updateIntent(intent);
-        this.connectorService.updateConnectorAttributes(this.connectorSelected.id, event);
         this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
       }
-
+      if(event.type === "line-text"){
+        this.logger.log('[CDS-CANVAS] line-text:: ', event.connector);
+        this.connectorService.updateConnectorLabel(this.connectorSelected.id, event.connector.label);
+        this.intentService.updateIntentAttributeConnectors(event.connector);
+        this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+      }
     }
     
   }

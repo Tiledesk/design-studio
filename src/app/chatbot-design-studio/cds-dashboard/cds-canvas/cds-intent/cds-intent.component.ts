@@ -383,7 +383,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             intentContentEl.classList.add("outline-border");
           }
         } else {
-          this.logger.log('[CDS-INTENT] Connector Moved over intent here yes 2 ')
+          // //this.logger.log('[CDS-INTENT] Connector Moved over intent here yes 2 ')
         }
       },
       true
@@ -430,7 +430,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.actionIntent = null;
         if(fromId && toId && fromId !== '' && toId !== ''){
           connectorID = fromId+"/"+toId;
-          this.connectorService.deleteConnector(connectorID);
+          this.connectorService.deleteConnector(this.intent, connectorID);
         }
       } else if(fromId && toId && fromId !== '' && toId !== ''){
           if(this.stageService.loaded === true){

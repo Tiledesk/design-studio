@@ -760,11 +760,13 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes=null) {
-    // /console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    // // console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
     let label = null;
-    if(attributes && attributes.label){
+    if(attributes?.label){
       label = attributes.label;
     }
+    const display = (attributes?.display===false)?'none':'flex';
+
     let connector = document.getElementById(id);
     if (!connector) {
       connector = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -772,7 +774,7 @@ export class TiledeskConnectors {
       connector.setAttributeNS(null, "id", id);
       connector.setAttributeNS(null, "class", "connector");
       connector.setAttributeNS(null, "pointer-events", "stroke");
-
+      connector.setAttributeNS(null, "display", display);
       // Quando il connettore perde il focus (blur), deselezionalo
       connector.addEventListener('blur', () => { 
         const deselectEvent = new CustomEvent("connector-deselected");
@@ -832,8 +834,10 @@ export class TiledeskConnectors {
       lineText.setAttributeNS(null, "stroke", "none");
       lineText.setAttributeNS(null, "fill", "#b1b1b7");
       lineText.setAttributeNS(null, "style", `font-size: 12px;`);
+      lineText.setAttributeNS(null, "display", display);
       lineText.textContent = label;
       group.appendChild(lineText);
+
       const bbox = lineText.getBBox();
       group.removeChild(lineText);
       const rectWidth = bbox.width?bbox.width+10:0;
@@ -847,9 +851,12 @@ export class TiledeskConnectors {
       rect.setAttributeNS(null, "fill", "#fcfafa");
       rect.setAttributeNS(null, "stroke", "none");
       rect.setAttributeNS(null, "rx", "8"); 
+      rect.setAttributeNS(null, "display", display);
       // //rect.setAttributeNS(null, "style", `left:${x}; top:${y};`);
       group.appendChild(rect);
       group.appendChild(lineText);
+      
+
       this.svgContainer.appendChild(group);
     }
 

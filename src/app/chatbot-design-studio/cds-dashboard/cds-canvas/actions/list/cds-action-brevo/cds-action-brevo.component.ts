@@ -94,6 +94,7 @@ export class CdsActionBrevoComponent implements OnInit {
     this.checkConnectionStatus();
   }
 
+  
   private updateConnector(){
     try {
       const array = this.connector.fromId.split("/");

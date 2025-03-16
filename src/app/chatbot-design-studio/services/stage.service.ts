@@ -271,13 +271,13 @@ export class StageService {
         path.setAttribute('opacity', (alpha / 100).toString());
       });
     }
-    const svgLines = document.querySelectorAll('.line-text-connector');
-    svgLines.forEach((svgLine) => {
-      const rect = svgLine.querySelector('rect');
-      rect.setAttribute('opacity', (alpha / 100).toString());
-      const text = svgLine.querySelector('text');
-      text.setAttribute('opacity', (alpha / 100).toString());
-    });
+    // const svgLines = document.querySelectorAll('.line-text-connector');
+    // svgLines.forEach((svgLine) => {
+    //   const rect = svgLine.querySelector('rect');
+    //   rect.setAttribute('opacity', (alpha / 100).toString());
+    //   const text = svgLine.querySelector('text');
+    //   text.setAttribute('opacity', (alpha / 100).toString());
+    // });
   }
 
 

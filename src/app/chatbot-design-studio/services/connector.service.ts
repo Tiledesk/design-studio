@@ -910,13 +910,13 @@ export class ConnectorService {
   }
 
   private createConnector(intent, idConnectorFrom, idConnectorTo){
-    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent);
+    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent, );
     const connectorsAttributes = intent.attributes.connectors;
     if(idConnectorFrom && idConnectorTo){
-      const connectorID = idConnectorFrom+'/'+idConnectorTo;
+      const connectorID = idConnectorFrom;
       let attributes = null;
-      if(connectorsAttributes && connectorsAttributes[connectorID]){
-        attributes = connectorsAttributes[connectorID]
+      if(connectorsAttributes?.[connectorID]){
+        attributes = connectorsAttributes[connectorID];
       }
       this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
     }
@@ -1004,9 +1004,11 @@ export class ConnectorService {
    * @param connectorID 
    * 
    */
-  public deleteConnector(connectorID, save=false, notify=true) {
+  public deleteConnector(intent, connectorID, save=false, notify=true) {
     this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', connectorID, save, notify);
-    this.deleteConnectorAttributes(connectorID);
+    if(intent.attributes?.connectors[connectorID]){
+      delete intent.attributes.connectors[connectorID];
+    }
     this.tiledeskConnectors.deleteConnector(connectorID, save, notify);
   }
 
@@ -1049,16 +1051,6 @@ export class ConnectorService {
       };
     }
   }
-
-
-  private deleteConnectorAttributes(connectorID){
-    const intentId = connectorID.split('/')[0];
-    let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
-    if(intent && intent.attributes && intent.attributes.connectors && intent.attributes.connectors[connectorID]){
-      delete intent.attributes.connectors[connectorID];
-    }
-    this.updateConnectorAttributes(connectorID, null);
-  }
   /*************************************************/
 
 
@@ -1084,31 +1076,35 @@ export class ConnectorService {
   }
 
 
-  public updateConnectorAttributes(elementID, attributes=null) {
-    // console.log("updateConnectorAttributes:::::  ",elementID,  attributes);
+  public updateConnectorAttributes(connectors: any, connector: any) {
+    if(!connectors[connector.id]){
+      connectors[connector.id] = {};
+    }
+    Object.keys(connector).forEach(key => {
+      connectors[connector.id][key] = connector[key]
+    });
+  }
+
+
+
+  public updateConnectorLabel(elementID: string, label: string) {
+    console.log("updateConnectorAttributes:::::  ",elementID,  label);
     const lineText = document.getElementById("label_"+elementID);
     if(lineText){
-      var label = null;
-      if(attributes && attributes.label){
-        label = attributes.label;
-      }
       lineText.textContent = label;
       this.updateLineTextPosition(elementID, label);
     }
-    // update position lineText
   }
 
   
-  updateLineTextPosition(id, label){
+  updateLineTextPosition(id: string, label: string){
     let lineText = document.getElementById("label_"+id);
     let rect = document.getElementById("rect_"+id);
-    var rectLabel = lineText.getBoundingClientRect();
-    // console.log("lineText.style:::::  ", rectLabel);
+    let rectLabel = lineText.getBoundingClientRect();
+    // // console.log("lineText.style:::::  ", rectLabel);
     if (lineText && rect) {
-      // const rectWidth = rectLabel.width + 10;
-      // const rectHeight = rectLabel.height + 10;
-      var rectWidth = 0;
-      var rectHeight = 0;
+      let rectWidth = 0;
+      let rectHeight = 0;
       if(label && label !== ''){
         rectWidth = rectLabel.width + 10;
         rectHeight = rectLabel.height + 10;
@@ -1990,13 +1986,15 @@ export class ConnectorService {
    * add the arrow with same color of connector
   */
   setConnectorColor(intentId: any, color: string, opacity: number) {
-    let rgba = `rgba(${color}, ${opacity})`;
+    let rgba = `rgba(${color}, 1)`; // ${opacity}
     const listOfConnectors = this.searchConnectorsOutByIntent(intentId);
     listOfConnectors.forEach(connector => {
       const element = document.getElementById(connector.id);
+      let op: string = opacity.toString();
       if (element) {
-        // //element.style.setProperty('stroke', rgba, 'important');
         element.style.setProperty('stroke', rgba);
+        // element.style.setProperty('opacity', op);
+        element.setAttributeNS(null, "opacity", op);
         this.addCustomMarker(connector.id, rgba);
       }
     });
@@ -2004,106 +2002,72 @@ export class ConnectorService {
 
 
 
-  // setDisplayConnectorByIdConnector2(connectorId: string) {
-  //   connectorId = connectorId.replace("#", "");
-  //   this.toggleConnectorDisplay(connectorId);
-  //   // if(this.mapOfConnectors[connectorId]?.display === false){
-  //   //   this.mapOfConnectors[connectorId] = {display: true}
-  //   // } else {
-  //   //   this.mapOfConnectors[connectorId] = {display: false}
-  //   // }
-  //   let connector = this.mapOfConnectors[connectorId];
-  //   const element = document.getElementById(connectorId);
 
-  //   this.logger.log('[CONNECTOR-SERV] setDisplayConnectorByIdConnector:: ', this.mapOfConnectors, connector, connectorId, element);
-  //   if (element) {
-  //     // // this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
-  //     // // element.setAttribute('display', connector.display?'block':'none');
-  //     element.style.setProperty('display', connector.display?'block':'none');
-  //     const elementRect = document.getElementById('rect_'+connectorId);
-  //     if(elementRect){
-  //       elementRect.style.setProperty('display', connector.display?'block':'none');
-  //     }
-  //     const elementLabel = document.getElementById('label_'+connectorId);
-  //     if(elementLabel){
-  //       elementLabel.style.setProperty('display', connector.display?'block':'none');
-  //     }
+  /**
+   * restoreDefaultConnector
+   * richiamato da cds-connector
+   * scatta quando premo su connector contract per ripristinare il connettore,
+   * cioè nascondere il connector contract e mostrare il connettore normale
+   */
+  showDefaultConnector(idConnection: string){
+    idConnection = idConnection.replace("#", "");
+    this.logger.log('[CONNECTOR-SERV] showDefaultConnector:: ', idConnection);
+    this.setDisplayElementById(idConnection, 'flex');
+    this.setDisplayElementById('rect_' + idConnection, 'flex');
+    this.setDisplayElementById('label_' + idConnection, 'flex');
+  }
 
-  //     const elementContract = document.getElementById('contract_'+connectorId);
-  //     this.logger.log('[CONNECTOR-SERV] show-hide:: elementContract ', 'contract_'+connectorId, elementContract);
-  //     if(elementContract){
-  //       elementContract.style.setProperty('display', connector.display?'none':'flex');
-  //     }
-  //   }
-  // }
+  // setDisplayConnectorByIdConnector(connectorId: string) {
+  /**
+   * restoreDefaultConnector
+   * richiamato da cds-canvas
+   * scatta quando premo sul pulsante per nascondere il connettore
+   * nasconde il connettore normale e mostra il connector contract
+   */
+  hideDefaultConnector(idConnection: string){
+    idConnection = idConnection.replace("#", "");
+    // // this.logger.log('[CONNECTOR-SERV] hideDefaultConnector:: ', idConnection);
+    this.setDisplayElementById(idConnection, 'none');
+    this.setDisplayElementById('rect_' + idConnection, 'none');
+    this.setDisplayElementById('label_' + idConnection, 'none');
+  }
 
+  hideContractConnector(idConnection: string){
+    idConnection = idConnection.replace("#", "");
+    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+    this.setDisplayElementById('contract_' + idConnector, 'none');
+    // const connector = {id:idConnector, display:true};
+    // this.subjectChangedConnectorAttributes.next(connector);
+  }
 
-  setDisplayConnectorByIdConnector(connectorId: string) {
-    connectorId = connectorId.replace("#", "");
-    this.toggleConnectorDisplay(connectorId);
-    const connector = this.mapOfConnectors[connectorId];
-    if(connector){
-      connector.id = connectorId;
-      const element = document.getElementById(connectorId);
-      this.logger.log('[CONNECTOR-SERV] setDisplayConnectorByIdConnector:: ', this.mapOfConnectors, connector, connectorId, element);
-      if (element) {
-        this.updateElementDisplay(element, connector.display, connectorId);
-        // // this.subjectChangedConnectorAttributes.next(connector);
-      }
-    }
+  showContractConnector(idConnection: string){
+    idConnection = idConnection.replace("#", "");
+    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+    this.setDisplayElementById('contract_' + idConnector, 'flex');
+    // const connector = {id:idConnector, display:false};
+    // this.subjectChangedConnectorAttributes.next(connector);
   }
 
 
-
-  private toggleConnectorDisplay(connectorId: string): void {
-    if(this.mapOfConnectors[connectorId]?.display === false){
-      this.mapOfConnectors[connectorId] = {display: true}
-    } else {
-      this.mapOfConnectors[connectorId] = {display: false}
-    }
-  }
-
-  private updateElementDisplay(element: HTMLElement, display: boolean, connectorId: string): void {
-    element.style.setProperty('display', display ? 'block' : 'none');
-    this.updateElementById('rect_' + connectorId, display ? 'block' : 'none');
-    this.updateElementById('label_' + connectorId, display ? 'block' : 'none');
-    this.updateElementContract('contract_' + connectorId, display);
-  }
-
-  private updateElementById(elementId: string, displayValue: string): void {
+  setDisplayElementById(elementId: string, displayValue: string): void {
+    // this.logger.log('[CONNECTOR-SERV] setDisplayElementById:: ', elementId, displayValue);
     const element = document.getElementById(elementId);
     if (element) {
-        element.style.setProperty('display', displayValue);
+      this.logger.log('[CONNECTOR-SERV] setDisplayElementById :: ', elementId, displayValue);
+      element.style.setProperty('display', displayValue);
     }
   }
 
-  private updateElementContract(elementId: string, display: boolean): void {
-    const elementContract = document.getElementById(elementId);
-    this.logger.log('[CONNECTOR-SERV] show-hide:: elementContract ', elementId, elementContract);
-    if (elementContract) {
-        elementContract.style.setProperty('display', display ? 'none' : 'flex');
-    }
-  }
-
-
-
-
-  showHideConnectorByIdConnector(connectorId: string, display: 'block'|'none') {
-    connectorId = connectorId.replace("#", "");
-    let connector = this.mapOfConnectors[connectorId];
-    const element = document.getElementById(connectorId);
-    this.logger.log('[CONNECTOR-SERV] show-hide:: ',this.mapOfConnectors, connectorId, element);
-    if (element) {
-      this.logger.log('[CONNECTOR-SERV] show-hide:: connector.opacity ', connector.opacity);
-      element.style.setProperty('display', display);
-      const elementRect = document.getElementById('rect_'+connectorId);
-      if(elementRect){
-        elementRect.style.setProperty('display', display);
-      }
-      const elementLabel = document.getElementById('label_'+connectorId);
-      if(elementLabel){
-        elementLabel.style.setProperty('display', display);
-      }
+  showHideConnectorByIdConnector(idConnection: string, shown: boolean) {
+    if(idConnection){
+      const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+      const displayConnector = shown?'flex':'none';
+      const displayContractConnector = shown?'none':'flex';
+      this.logger.log('[CONNECTOR-SERV] showHideConnectorByIdConnector:: ', idConnection, displayConnector, displayContractConnector);
+      this.setDisplayElementById(idConnection, displayConnector);
+      this.setDisplayElementById('rect_' + idConnection, displayConnector);
+      this.setDisplayElementById('label_' + idConnection, displayConnector);
+      this.setDisplayElementById('contract_' + idConnector, displayContractConnector);
     }
   }
 

@@ -1793,4 +1793,21 @@ export class IntentService {
   }
 
 
+  updateIntentAttributeConnectors(connector: any){
+    if(connector.id){
+      const idConnector = connector.id.substring(0, connector.id.lastIndexOf('/'));
+      const intentId = idConnector.split('/')[0];
+      let intent = this.getIntentFromId(intentId);
+      if (!intent.attributes?.connectors?.[idConnector]) {
+        intent.attributes.connectors[idConnector] = {};
+      }
+      Object.keys(connector).forEach(key => {
+        intent.attributes.connectors[idConnector][key] = connector[key];
+      });
+      this.updateIntent(intent);
+      this.logger.log('[INTENT SERVICE] -> updateIntentAttributeConnectors, ', intent);
+    }
+  }
+
+
 }
