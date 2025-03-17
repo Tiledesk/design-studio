@@ -1,4 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  SimpleChanges,
+} from '@angular/core';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
@@ -7,7 +14,7 @@ import { Intent } from 'src/app/models/intent-model';
 @Component({
   selector: 'cds-connector',
   templateUrl: './cds-connector.component.html',
-  styleUrls: ['./cds-connector.component.scss']
+  styleUrls: ['./cds-connector.component.scss'],
 })
 export class CdsConnectorComponent implements OnInit {
   @Input() idConnector: string;
@@ -29,7 +36,7 @@ export class CdsConnectorComponent implements OnInit {
     private readonly stageService: StageService,
     private readonly intentService: IntentService,
     private readonly connectorService: ConnectorService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     // empty
@@ -37,11 +44,12 @@ export class CdsConnectorComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // console.log("AAAAAAAAAAAAAAA: ", changes, this.connector);
-    // if(changes.idConnection) {
-    //   this.idConnection = changes.idConnection.currentValue;
-    //   this.getToIntentDisplayName();
-    // }
+    // console.log('AAAAAAAAAAAAAAA: ', changes);
+    // console.log('BBBBBBBBBBBBBBB: ', this.connector);
+    if (this.connector) {
+      this.idConnection = this.connector.id;
+      this.getToIntentDisplayName();
+    }
   }
 
   // ngAfterViewInit(){
@@ -50,91 +58,105 @@ export class CdsConnectorComponent implements OnInit {
   //   }, 0);
   // }
 
-
-  setIdContractConnector(){
+  setIdContractConnector() {
     this.setIntentConnector();
     this.getToIntentDisplayName();
   }
 
-
-
-  setIntentConnector(){
+  setIntentConnector() {
     let display = true;
-    if(this.idConnector){
-      this.idContractConnector = 'contract_'+this.idConnector;
-      console.log("intent >>>>>>>>> ", this.idConnector);
+    if (this.idConnector) {
+      this.idContractConnector = 'contract_' + this.idConnector;
+      console.log('intent >>>>>>>>> ', this.idConnector);
       const intentId = this.idConnector.split('/')[0];
       const intent = this.intentService.getIntentFromId(intentId);
-      if(intent){
-        
+      if (intent) {
         const connectors = intent.attributes?.connectors;
-        if(connectors?.[this.idConnector]){
+        if (connectors?.[this.idConnector]) {
           this.connector = connectors[this.idConnector];
-          this.idContractConnector = 'contract_'+this.idConnector;
+          this.idContractConnector = 'contract_' + this.idConnector;
           display = this.connector.display;
           // this.connectorService.showHideConnectorByIdConnector(this.idConnection, this.connector.display);
         }
-        const displayConnector = display?'none':'flex';
-        console.log("intent >>>>>>>>> ", this.idConnector, " >>> ", displayConnector);
-        //this.connectorService.setDisplayElementById(this.idContractConnector, displayConnector); 
+        const displayConnector = display ? 'none' : 'flex';
+        console.log(
+          'intent >>>>>>>>> ',
+          this.idConnector,
+          ' >>> ',
+          displayConnector
+        );
+        //this.connectorService.setDisplayElementById(this.idContractConnector, displayConnector);
       }
 
-      this.displayConnector = display?'none':'flex';
-      console.log("setIntentConnector >>>>>>>>> ", this.idContractConnector, this.displayConnector );
-      
+      this.displayConnector = display ? 'none' : 'flex';
+      console.log(
+        'setIntentConnector >>>>>>>>> ',
+        this.idContractConnector,
+        this.displayConnector
+      );
     }
   }
 
-  getToIntentDisplayName(){
-    if(this.idConnection){
-      let intentId = this.idConnection.substring(this.idConnection.lastIndexOf('/') + 1);
+  getToIntentDisplayName() {
+    if (this.idConnection) {
+      let intentId = this.idConnection.substring(
+        this.idConnection.lastIndexOf('/') + 1
+      );
       intentId = intentId.replace(/#/g, '');
       const intent = this.intentService.getIntentFromId(intentId);
-      if(intent){
+      console.log('getToIntentDisplayName: ', intent, this.intent_display_name);
+      if (intent) {
         this.intent_display_name = intent.intent_display_name;
       }
     }
   }
 
-  public showConnector(){
+  public showConnector() {
     // // console.log('showConnector: ', this.idConnection, this.isConnected);
-    if(this.idConnection && this.isConnected){
+    if (this.idConnection && this.isConnected) {
       const idConnection = this.idConnection?.replace('#', '');
       const svgElement: HTMLElement = document.getElementById(idConnection);
-      if(svgElement){
+      if (svgElement) {
         svgElement.setAttribute('opacity', (1).toString());
       }
-      const svgElementRec: HTMLElement = document.getElementById('rect_'+idConnection);
-      if(svgElementRec){
+      const svgElementRec: HTMLElement = document.getElementById(
+        'rect_' + idConnection
+      );
+      if (svgElementRec) {
         svgElementRec.setAttribute('opacity', (1).toString());
       }
-      const svgElementTxt: HTMLElement = document.getElementById('label_'+idConnection);
-      if(svgElementTxt){
+      const svgElementTxt: HTMLElement = document.getElementById(
+        'label_' + idConnection
+      );
+      if (svgElementTxt) {
         svgElementTxt.setAttribute('opacity', (1).toString());
       }
     }
   }
 
-  public hideConnector(){
-    const alphaConnector = this.stageService.getAlpha()/100;
-    if(this.idConnection && this.isConnected){
+  public hideConnector() {
+    const alphaConnector = this.stageService.getAlpha() / 100;
+    if (this.idConnection && this.isConnected) {
       const idConnection = this.idConnection.replace('#', '');
-      const svgElement:HTMLElement = document.getElementById(idConnection);
-      if(svgElement){
-        svgElement.setAttribute('opacity', (alphaConnector).toString());
+      const svgElement: HTMLElement = document.getElementById(idConnection);
+      if (svgElement) {
+        svgElement.setAttribute('opacity', alphaConnector.toString());
       }
-      const svgElementRec:HTMLElement = document.getElementById('rect_'+idConnection);
-      if(svgElementRec){
-        svgElementRec.setAttribute('opacity', (alphaConnector).toString());
+
+      const svgElementRec: HTMLElement = document.getElementById(
+        'rect_' + idConnection
+      );
+      if (svgElementRec) {
+        svgElementRec.setAttribute('opacity', (1).toString());
       }
-      const svgElementTxt:HTMLElement = document.getElementById('label_'+idConnection);
-      if(svgElementTxt){
-        svgElementTxt.setAttribute('opacity', (alphaConnector).toString());
+      const svgElementTxt: HTMLElement = document.getElementById(
+        'label_' + idConnection
+      );
+      if (svgElementTxt) {
+        svgElementTxt.setAttribute('opacity', (1).toString());
       }
     }
   }
-
-
 
   public showConnectorDefault(event: MouseEvent): void {
     event.stopPropagation();
@@ -144,7 +166,7 @@ export class CdsConnectorComponent implements OnInit {
 
   public hideConnectorDefault(event: MouseEvent): void {
     event.stopPropagation();
-    if(this.restoreConnector === false){
+    if (this.restoreConnector === false) {
       this.connectorService.hideDefaultConnector(this.idConnection);
     }
   }
@@ -154,8 +176,7 @@ export class CdsConnectorComponent implements OnInit {
     this.restoreConnector = true;
     this.connectorService.showDefaultConnector(this.idConnection);
     this.connectorService.hideContractConnector(this.idConnection);
-    const connector = {id:this.idConnection, display:true};
+    const connector = { id: this.idConnection, display: true };
     this.intentService.updateIntentAttributeConnectors(connector);
   }
-  
 }

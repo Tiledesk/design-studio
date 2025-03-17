@@ -1435,7 +1435,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       if(event.type === "delete"){
         this.logger.log('[CDS-CANVAS] delete connector:: ', intentId, intent);
         this.connectorService.deleteConnector(intent, event.connector.id, true, true);
-        this.intentService.updateIntent(intent);
+        // // this.intentService.updateIntent(intent);
         this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
       }
       if(event.type === "line-text"){

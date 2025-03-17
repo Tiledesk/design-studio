@@ -1004,12 +1004,13 @@ export class ConnectorService {
    * @param connectorID 
    * 
    */
-  public deleteConnector(intent, connectorID, save=false, notify=true) {
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', connectorID, save, notify);
-    if(intent.attributes?.connectors[connectorID]){
-      delete intent.attributes.connectors[connectorID];
+  public deleteConnector(intent, idConnection, save=false, notify=true) {
+    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
+    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+    if(intent.attributes?.connectors[idConnector]){
+      delete intent.attributes.connectors[idConnector];
     }
-    this.tiledeskConnectors.deleteConnector(connectorID, save, notify);
+    this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 
 

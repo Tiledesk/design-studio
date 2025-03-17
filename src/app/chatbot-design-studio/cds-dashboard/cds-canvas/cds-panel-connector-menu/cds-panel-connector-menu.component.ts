@@ -32,9 +32,11 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
 
   onAddActionFromConnectorMenu(type){
     if(type === this.typeOfmenu.SHOW_HIDE){
+      // hide connctor!
       this.displayConnector = false;
       this.connector['display'] = this.displayConnector;
     }
+
     let event = { 
       'type': type,
       'connector': this.connector
