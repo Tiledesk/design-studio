@@ -29,17 +29,17 @@ $toogle-sidebar-width: 22px;
   transform: translateX(100%);
   animation: slide-in 0.2s ease-in-out forwards;
   animation-delay: 0s;
-
+  &#intent-detail {
+    z-index: 10;
+  }
   &#action-detail{
     z-index: 10;
-    
   }
   &#button-configuration{
     z-index: 11
   }
   &#widget-preview{
     z-index: 12;
-
     &.isVisible{
       width: 0;
       visibility: visible;
@@ -426,3 +426,8 @@ svg:not(:root) {
   }
 }
 
+cds-widget-logs {
+  width: calc(100% - 460px);
+  position: absolute;
+  bottom: 0;
+}

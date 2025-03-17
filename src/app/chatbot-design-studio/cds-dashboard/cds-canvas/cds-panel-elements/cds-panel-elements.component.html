@@ -5,12 +5,16 @@
     <div size="4" class="cds-elements" mat-button>
 
         <!-- ACTIONS -->
-        <div *ngFor="let actionCategory of ACTION_CATEGORY" class="cds-element" (click)="onAddNewElement()"  (mouseout)="onCloseMenu()" (mouseleave)="onCloseMenu()"
-            (mouseover)="onOpenMenu(div3, TYPE_OF_MENU.ACTION, actionCategory.type)" #div3>
-            <div class="cds-button-element">
+        
+        <div #div3 *ngFor="let actionCategory of ACTION_CATEGORY" class="cds-element" 
+            (click)="onAddNewElement()"  
+            (mouseout)="onCloseMenu()" 
+            (mouseleave)="onCloseMenu()"
+            (mouseover)="onOpenMenu(div3, TYPE_OF_MENU.ACTION, actionCategory.type)">
+            <div *ngIf="actionsByCategory[actionCategory.type]" class="cds-button-element">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <img class="active-icon" [src]="actionCategory.src">
+                        <img class="active-icon" [src]="actionCategory.src" alt="">
                     </span>
                     <span class="box-title">{{ actionCategory.name | translate}}</span>
                 </div>
@@ -68,6 +72,7 @@
         </div>
     </div> -->
 
+    <!-- [actions]="actionsByCategory[actionCategory.type]" -->
     <div #menuElement id="menuElement" 
         [style.display]="isOpen?'block':'none'" 
         [style.top.px]="positionMenu.y"
@@ -75,6 +80,7 @@
         (mouseover)="onOverMenu()" 
         (mouseleave)="onLeaveMenu()">
         <cds-panel-actions 
+            [actionsList]="actionsList"
             [menuType]="menuType" 
             [menuCategory]="menuCategory"
             (isDraggingMenuElement)="onDraggingMenuElement($event)"

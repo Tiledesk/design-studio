@@ -3,9 +3,9 @@
 
     <div class="intent-header-actions-wpr">
         <!-- ---------------------------------- -->
-        <!-- Panel intent  *ngIf="!isInternalIntent" -->
+        <!-- Panel intent -->
         <!-- ---------------------------------- -->
-        <button 
+        <button *ngIf="showMore"
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onOpenIntentPanel()" 
             matTooltipClass="cds-mat-tooltip"
@@ -19,7 +19,7 @@
         <!-- ---------------------------------- -->
         <!-- Color intent  -->
         <!-- ---------------------------------- -->
-        <button *ngIf="!isStart"
+        <button *ngIf="showColor"
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onColorIntent()" 
             matTooltipClass="cds-mat-tooltip"
@@ -31,10 +31,9 @@
         </button>
 
         <!-- ---------------------------------- -->
-        <!-- Delete intent  *ngIf="!isInternalIntent" -->
+        <!-- Delete intent  -->
         <!-- ---------------------------------- -->
-        <button 
-            *ngIf="!isInternalIntent"
+        <button *ngIf="showDelete"
             class="intent-header-action-btn icon"
             (click)="$event.stopPropagation();onDeleteIntent()" 
             matTooltipClass="cds-mat-tooltip"
@@ -48,10 +47,7 @@
         <!-- ---------------------------------- -->
         <!-- copy intent  -->
         <!-- ---------------------------------- -->
-        <!--  -->
-        <!-- *ngIf="copyElementEnabled"  -->
-        <button 
-            *ngIf="!isInternalIntent"
+        <button *ngIf="showCopy"
             class="intent-header-action-btn icon"
             matTooltipClass="cds-mat-tooltip" 
             [matTooltip]="'CDSCanvas.CopyBlock' | translate" 
@@ -63,26 +59,9 @@
         </button>
 
         <!-- ---------------------------------- -->
-        <!-- Enable / disable intent webhook  -->
-        <!-- ---------------------------------- -->
-        <!--  -->
-        <!-- <div *ngIf="deleteOptionEnabled" 
-            class="intent-header-action-btn icon"
-            [ngClass]="{'webhook-enabled': webhookEnabled }"
-            (mouseover)="onMouseOverWebhookBtn()" 
-            (click)="toggleIntentWebhook()"
-            matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{webHookTooltipText}}" 
-            #tooltip="matTooltip"
-            matTooltipPosition='above' 
-            matTooltipHideDelay="100">
-            <img src="assets/images/icons/webhook.svg">
-        </div> -->
-
-        <!-- ---------------------------------- -->
         <!-- Test intent play btn  -->
         <!-- ---------------------------------- -->
-        <button *ngIf="!isStart" 
+        <button *ngIf="showPlay" 
             class="intent-header-action-btn icon"
             (click)="openTestSiteInPopupWindow()" 
             matTooltipClass="cds-mat-tooltip"

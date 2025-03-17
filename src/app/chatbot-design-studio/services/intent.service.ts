@@ -1,13 +1,13 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
-import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
+import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
 
 // SERVICES //
@@ -128,7 +128,7 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     if(this.listOfIntents && this.listOfIntents.length > 0){
-      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
+      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START));
       // this.logger.log('setDefaultIntentSelected: ', startIntent, startIntent[0]);
       if(startIntent && startIntent.length>0){
         this.intentSelected = startIntent[0];
@@ -312,12 +312,17 @@ export class IntentService {
   }
 
 
+  public isReservedIntent(intentName: string): intentName is RESERVED_INTENT_NAMES {
+    return Object.values(RESERVED_INTENT_NAMES).includes(intentName as RESERVED_INTENT_NAMES);
+  }
+
+  
   private intentAnalyzer() {
     this.listOfIntents.forEach(intent => {
       if (intent.actions) {
         intent.actions = intent.actions.filter(obj => obj !== null);
       }
-      if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK){
+      if (this.isReservedIntent(intent.intent_display_name)) {
         intent.attributes.readonly = true;
       }
     });
@@ -341,14 +346,15 @@ export class IntentService {
  
 
   /** create a new intent when drag an action on the stage */
-  public createNewIntent(id_faq_kb: string, action: any, pos:any){
+  public createNewIntent(id_faq_kb: string, action: any, pos:any, color?: string){
     let intent = new Intent();
     const chatbot_id = this.dashboardService.id_faq_kb;
     intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
-    // let actionIntent = this.createNewAction(TYPE_ACTION.INTENT);
-    // intent.actions.push(actionIntent);
+    if(color){
+      intent.attributes.color = color;
+    }
     intent.actions.push(action);
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
@@ -761,6 +767,10 @@ export class IntentService {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'rocket_launch' }
       } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'undo' }
+      } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.WEBHOOK) {
+        return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'webhook' }
+      } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.CLOSE) {
+        return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'call_end' }
       } else {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'label_important_outline' }
       }
@@ -817,11 +827,15 @@ export class IntentService {
     // this.controllerService.closeAllPanels();
   }
 
+  
 
   public async setStartIntent(){
     this.intentSelectedID = null;
     this.intentActive = false;
-    this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === 'start');
+    const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    let startingName = STARTING_NAMES[subtype];
+    this.logger.log('[CDS-INTENT] startingName: ', startingName);
+    this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === startingName);
     this.logger.log('[CDS-INTENT] intentSelected: ', this.intentSelected);
     if(this.intentSelected){
       this.setDefaultIntentSelected();
@@ -838,7 +852,6 @@ export class IntentService {
         }
         let id_faq_kb = this.dashboardService.id_faq_kb;
         this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
-
       }
     }
   }
@@ -935,6 +948,9 @@ export class IntentService {
       action.assignResultTo= 'result'
       action.assignStatusTo = 'status';
       action.assignErrorTo = 'error';
+    }
+    if(typeAction === TYPE_ACTION.WEB_RESPONSE){
+      action = new ActionWebRespose();
     }
     if(typeAction === TYPE_ACTION.AGENT){
       action = new ActionAgent();

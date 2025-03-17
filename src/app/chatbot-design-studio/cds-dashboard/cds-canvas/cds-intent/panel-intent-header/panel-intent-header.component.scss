@@ -9,6 +9,7 @@
     width: 100%;
     height: var(--height-header-panel-intent);
     max-height: var(--height-header-panel-intent);
+    padding-top: 6px;
     .onff-intent-webhook {
       font-size: 13px;
       line-height: normal;
@@ -20,16 +21,39 @@
     .has--error {
         background-color: var(--color-red-hex);
     }
+
     .form-group {
         width: 100%;
         margin: 0;
         padding: 0;
+        &.is-start {
+          margin-left: -40px;
+          input {
+            padding-left: 30px;
+          }
+        }
+        &.is-error {
+          .form-control {
+              background-image: linear-gradient(var(--color-red-hex), var(--color-red-hex)),
+                  linear-gradient(var(--gray-light-01), var(--gray-light-01));
+              background-size: 100% 2px, 100% 1px;
+              transition-duration: 0.3s;
+          }
+        }
+        &.is-focused:not(.is-error) {
+            .form-control {
+                background-image: linear-gradient(var(--blu), var(--blu)),
+                    linear-gradient(var(--gray-light-01), var(--gray-light-01));
+                background-size: 100% 2px, 100% 1px;
+                transition-duration: 0.3s;
+            }
+        }
         .form-control {
+            height: auto;
             border: 0;
             background-size: 0 2px, 100% 0px;
             background-image: linear-gradient(var(--gray-light-01), var(--gray-light-01));
             transition-duration: 0.2s;
-            /*  height: var(---height-header-panel-intent);*/
             &[readonly]{
               cursor: grab;
               background-image: none !important;
@@ -46,26 +70,17 @@
             font-size: 1.0em;
             line-height: var(--height-header-panel-intent);
             color: var(--gray-light-01);
-            // z-index: 1;
             &.noDisplay {
                 display: none;
             }
         }
         input {
-            // position: absolute;
             display: block;
-            // width: var(--width-title);
             top: 0;
-            // left: 30px;
-            // margin-top: 6px;
-            padding: 0; //0 0 0 10px;
+            padding: 0;
             margin:0;
-            // color: $gray;
-            // color: var(--blu);
             font-size: 1.0em;
-            // z-index: 2;
             position: relative;
-            // color: rgb(var(--intent-color));
         }
         .btn-save {
             position: absolute;
@@ -75,25 +90,6 @@
             padding: 8px;
         }
 
-    }
-
-    .form-group {
-        &.is-error {
-            .form-control {
-                background-image: linear-gradient(var(--color-red-hex), var(--color-red-hex)),
-                    linear-gradient(var(--gray-light-01), var(--gray-light-01));
-                background-size: 100% 2px, 100% 1px;
-                transition-duration: 0.3s;
-            }
-        }
-        &.is-focused:not(.is-error) {
-            .form-control {
-                background-image: linear-gradient(var(--blu), var(--blu)),
-                    linear-gradient(var(--gray-light-01), var(--gray-light-01));
-                background-size: 100% 2px, 100% 1px;
-                transition-duration: 0.3s;
-            }
-        }
     }
 }
 
@@ -107,12 +103,7 @@
 
 
 .onff-intent-webhook {
-    // position: absolute;
-    // right: 180px;
-    // top: 22px;
     align-self: center;
-    // margin-top: 8px;
-
 }
 
 .switch-label {
@@ -121,7 +112,6 @@
     right: -40px;
     font-size: 14px;
     color: #e8eaed;
-
 }
 
 
@@ -135,38 +125,29 @@ $circle-size: 40px;
     height: $circle-size;
     text-align: center;
     right: 0px;
-    // position: absolute;
     margin: 5px 10px 5px 5px;
 }
 
 .loading-btn {
   $root: &;
-  
   position: relative;
   display: inline-block;
   width: 100%;
   height: 100%;
-  
   &#cds-save-intent-btn{
     background: #3ea9f5;
     border: 1px solid #3ea9f5;
     box-shadow: none;
   }
-  
   margin: 0px;
-//   border-radius: 16px;
-
   cursor: pointer;
-
   transition: all .33s ease-in-out;
-  
   &#cds-save-intent-btn:hover {
     background: rgba(138, 180, 248, 0.8);
     box-shadow: none;
     background-color: #1e293b;
     border: 1px solid white;
   }
-
   &, &:focus {
     outline: none;
   }
@@ -373,28 +354,19 @@ $circle-size: 40px;
   height: 30px;
   min-width: 190px;
   justify-content: center;
-  // display: flex;
-  // background: #ffffff3d;
-  // padding-left: 10px;
-  // margin-right: 12px;
-  // border-radius: 4px;
-  // /* gap: 20px; */
-  // padding: 10px;
-  // border-radius: 30px;
-  // height: 30px;
-  // width: 200px;
-  // text-align: end;
 }
 
 .intent-icon {
   position: relative;
-  top: 5px;
-  
+  top: 0px;
   span.rocket {
-    // color: #0aae10;
     color: var(--color-green-hex);
   }
-  span.undo {
+  span.undo,
+  span.call_end {
     color: var(--color-red-hex)
+  }
+  span.webhook {
+    color: var(--color-yellow-hex)
   }
 }

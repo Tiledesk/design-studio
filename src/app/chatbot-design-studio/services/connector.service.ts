@@ -69,7 +69,8 @@ export class ConnectorService {
       fromPoint: detail.fromPoint,
       toPoint: detail.toPoint,
       menuPoint: detail.menuPoint,
-      target: detail.target
+      target: detail.target, 
+      color: detail.color
     }
   }
 

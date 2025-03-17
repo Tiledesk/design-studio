@@ -1,0 +1,24 @@
+<div class="buttons-json-response" [class.json-shown]="showJsonBody">
+    <div class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
+        + {{'CDSCanvas.JsonButtons' | translate }}
+    </div>
+</div>
+<div *ngIf="showJsonBody" class="json-text">
+    <cds-textarea
+        class = "text-editable-div"
+        [text]="jsonBody"
+        [placeholder]="jsonPlaceholder"
+        [limitCharsText]="10000"
+        [emojiPikerBtn]="false"
+        [setAttributeBtn]="true"
+        [minRow]="5" [maxRow]="10"
+        [readonly]="false"
+        (blur)="onBlurJsonTextarea($event)"
+        (changeTextarea)="onChangeJsonTextarea($event)">
+    </cds-textarea>
+    <div class="button-controls">
+        <div class="control-button delete" (click)="$event.stopPropagation(); onDeleteJsonButtons()">
+            <em class="material-icons">delete</em>
+        </div>
+    </div>
+</div>
