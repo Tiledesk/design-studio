@@ -1123,7 +1123,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         const rect = element.getBoundingClientRect();
         const topRightX = rect.left;
         const topRightY = rect.top;
-        console.log(`Coordinate angolo in alto a destra: X=${topRightX}, Y=${topRightY}`);
+        this.logger.log('[CDS-CANVAS] `Coordinate angolo in alto a destra: X=${topRightX}, Y=${topRightY}`');
         this.positionColortMenu.x = topRightX;
         this.positionColortMenu.y = topRightY;
         this.IS_OPEN_COLOR_MENU = true;

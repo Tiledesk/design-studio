@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
-import { StageService } from '../services/stage.service';
 import { TYPE_BUTTON, isElementOnTheStage, generateShortUID, getOpacityFromRgba, getColorFromRgba } from '../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+
 import { Setting } from 'src/app/models/action-model';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
 import { Subject } from 'rxjs';
+
+
+// SERVICES //
+// import { StageService } from '../services/stage.service';
+
+
 /** CLASSE DI SERVICES PER GESTIRE I CONNETTORI **/
 
 
@@ -15,6 +21,7 @@ import { Subject } from 'rxjs';
 })
 
 export class ConnectorService {
+ 
 
   private readonly subjectChangedConnectorAttributes = new Subject<any>();
   observableChangedConnectorAttributes = this.subjectChangedConnectorAttributes.asObservable();
@@ -28,7 +35,8 @@ export class ConnectorService {
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
-  constructor() {}
+  constructor(
+  ) {}
 
   initializeConnectors(){
     this.tiledeskConnectors = new TiledeskConnectors("tds_drawer", {"input_block": "tds_input_block"}, {});
@@ -1007,10 +1015,13 @@ export class ConnectorService {
   public deleteConnector(intent, idConnection, save=false, notify=true) {
     this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
     const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
-    if(intent.attributes?.connectors[idConnector]){
+    this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
+    if(idConnector && intent.attributes?.connectors[idConnector]){
       delete intent.attributes.connectors[idConnector];
     }
+    this.logger.log('[CONNECTOR-SERV] 111111 ');
     this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
+    this.logger.log('[CONNECTOR-SERV] 22222 ');
   }
 
 
@@ -1048,7 +1059,9 @@ export class ConnectorService {
       }, {});
       for (const [key, connector] of Object.entries(listOfConnectors)) {
         this.logger.log('delete connector :: ', key );
-        this.deleteConnector(key, save, notify);
+        const intentId = connectorID.split('/')[0];
+        const intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
+        this.deleteConnector(intent, key, save, notify);
       };
     }
   }
@@ -1078,6 +1091,10 @@ export class ConnectorService {
 
 
   public updateConnectorAttributes(connectors: any, connector: any) {
+    this.logger.log('[CONNECTOR-SERV] updateConnectorAttributes:::::  ',connectors,  connector);
+    if(!connector){
+      return;
+    }
     if(!connectors[connector.id]){
       connectors[connector.id] = {};
     }
@@ -1089,7 +1106,7 @@ export class ConnectorService {
 
 
   public updateConnectorLabel(elementID: string, label: string) {
-    console.log("updateConnectorAttributes:::::  ",elementID,  label);
+    this.logger.log('[CONNECTOR-SERV] updateConnectorLabel:::::  ',elementID,  label);
     const lineText = document.getElementById("label_"+elementID);
     if(lineText){
       lineText.textContent = label;

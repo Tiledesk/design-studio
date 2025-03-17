@@ -114,3 +114,47 @@ export function updateConnector(connector, action, isConnectedTrue, isConnectedF
     }
     return resp;
   }
+
+
+
+    export function updateSingleConnector(connector, action, isConnected, idConnection): any {
+        if (!connector?.fromId) {
+            return;
+        }
+        const segments = connector.fromId.split('/');
+        if (segments.length < 2) {
+            return;
+        }
+        const idAction = segments[1];
+        if (idAction !== action._tdActionId) {
+            return;
+        }
+        const lastSegment = segments[segments.length - 1];
+        let resp = {
+            action: action,
+            isConnected: isConnected,
+            idConnection: idConnection,
+            emit: false
+        }
+        if(connector.deleted){ 
+            // DELETE 
+            action.goToIntent = null;
+            resp.isConnected = false;
+            resp.idConnection = null;
+        } else { 
+            // ADD / EDIT
+            resp.isConnected = true;
+            resp.idConnection = connector.fromId+"/"+connector.toId;
+            action.goToIntent = "#"+connector.toId;
+        };
+        // Aggiornamento per il ramo "false"
+        if (lastSegment) {
+            resp.action.falseIntent = '#' + connector.toId;
+            resp.isConnected = true;
+            resp.idConnection = connector.id;
+            if (connector.save) {
+                resp.emit = true;
+            }
+        }
+        return resp;
+    }

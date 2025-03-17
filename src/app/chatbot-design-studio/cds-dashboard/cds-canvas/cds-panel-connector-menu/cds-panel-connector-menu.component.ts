@@ -41,7 +41,7 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
       'type': type,
       'connector': this.connector
     }
-    console.log('[CDS-ADD-CONNECTOR MENU] onAddActionFromConnectorMenu - connector: ', type, this.connector);
+    // // console.log('[CDS-ADD-CONNECTOR MENU] onAddActionFromConnectorMenu - connector: ', type, this.connector);
     this.addActionFromConnectorMenu.emit(event);
   }
 
@@ -53,7 +53,6 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
     const testoTextArea = ev.target.value;
     // // console.log('[CDS-ADD-CONNECTOR MENU]  onBlur:: ', testoTextArea);
     this.connector['label'] = testoTextArea;
-
     let event = { 
       'type': TYPE_OF_MENU.LINE_TEXT, 
       'connector': this.connector

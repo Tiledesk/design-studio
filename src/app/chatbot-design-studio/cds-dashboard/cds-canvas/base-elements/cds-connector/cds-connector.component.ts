@@ -44,12 +44,17 @@ export class CdsConnectorComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // console.log('AAAAAAAAAAAAAAA: ', changes);
-    // console.log('BBBBBBBBBBBBBBB: ', this.connector);
-    if (this.connector) {
-      this.idConnection = this.connector.id;
+    if (changes.idConnection?.currentValue ) {
+      // // console.log('AAAAAAAAAAAAAAA: ', changes);
+      this.idConnection = changes.idConnection?.currentValue;
       this.getToIntentDisplayName();
     }
+    // // if (this.connector ) {
+    //   // non dovrebbe MAI passare di qua
+    //   // console.log('BBBBBBBBBBBBBBB: ', this.connector);
+    //   this.idConnection = this.connector.id;
+    //   this.getToIntentDisplayName();
+    // }
   }
 
   // ngAfterViewInit(){
@@ -67,7 +72,6 @@ export class CdsConnectorComponent implements OnInit {
     let display = true;
     if (this.idConnector) {
       this.idContractConnector = 'contract_' + this.idConnector;
-      console.log('intent >>>>>>>>> ', this.idConnector);
       const intentId = this.idConnector.split('/')[0];
       const intent = this.intentService.getIntentFromId(intentId);
       if (intent) {
@@ -76,24 +80,12 @@ export class CdsConnectorComponent implements OnInit {
           this.connector = connectors[this.idConnector];
           this.idContractConnector = 'contract_' + this.idConnector;
           display = this.connector.display;
-          // this.connectorService.showHideConnectorByIdConnector(this.idConnection, this.connector.display);
+          // // this.connectorService.showHideConnectorByIdConnector(this.idConnection, this.connector.display);
         }
-        const displayConnector = display ? 'none' : 'flex';
-        console.log(
-          'intent >>>>>>>>> ',
-          this.idConnector,
-          ' >>> ',
-          displayConnector
-        );
-        //this.connectorService.setDisplayElementById(this.idContractConnector, displayConnector);
+        // // const displayConnector = display ? 'none' : 'flex';
+        // // this.connectorService.setDisplayElementById(this.idContractConnector, displayConnector);
       }
-
       this.displayConnector = display ? 'none' : 'flex';
-      console.log(
-        'setIntentConnector >>>>>>>>> ',
-        this.idContractConnector,
-        this.displayConnector
-      );
     }
   }
 
@@ -104,11 +96,11 @@ export class CdsConnectorComponent implements OnInit {
       );
       intentId = intentId.replace(/#/g, '');
       const intent = this.intentService.getIntentFromId(intentId);
-      console.log('getToIntentDisplayName: ', intent, this.intent_display_name);
       if (intent) {
         this.intent_display_name = intent.intent_display_name;
       }
     }
+    console.log('getToIntentDisplayName: ', this.idConnection, this.intent_display_name);
   }
 
   public showConnector() {
