@@ -13,7 +13,7 @@ import { ActionWebRequestV2 } from 'src/app/models/action-model';
 //UTILS
 import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, HEADER_TYPE } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
-import { checkConnectionStatusOfAction } from 'src/app/chatbot-design-studio/utils-connectors';
+import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-web-request-v2',
@@ -123,41 +123,19 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.idConnectionFalse  = resp.idConnectionFalse;
   }
 
+  /** */
   private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idAction= array[1];
-      if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){
-          if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null;
-            this.isConnectedTrue = false;
-            this.idConnectionTrue = null;
-          }        
-          if(array[array.length -1] === 'false'){
-            this.action.falseIntent = null;
-            this.isConnectedFalse = false;
-            this.idConnectionFalse = null;
-          }
-          if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-        } else { 
-          this.logger.debug('[ACTION-WEB-REQUEST-v2] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-          if(array[array.length -1] === 'true'){
-            this.isConnectedTrue = true;
-            this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
-            this.action.trueIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }        
-          if(array[array.length -1] === 'false'){
-            this.isConnectedFalse = true;
-            this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
-            this.action.falseIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }
-        }
-      }
-    } catch (error) {
-      this.logger.error('[ACTION-ASKGPT] updateConnector error: ', error);
+    this.logger.log('[ACTION WEB-REQUEST-v2] updateConnector:');
+    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
+    if(resp){
+      this.isConnectedTrue    = resp.isConnectedTrue;
+      this.isConnectedFalse   = resp.isConnectedFalse;
+      this.idConnectionTrue   = resp.idConnectionTrue;
+      this.idConnectionFalse  = resp.idConnectionFalse;
+      this.logger.log('[ACTION WEB-REQUEST-v2] updateConnector:', resp);
+      if (resp.emit) {
+        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
+      } 
     }
   }
 

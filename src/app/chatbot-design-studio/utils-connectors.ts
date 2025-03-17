@@ -138,6 +138,7 @@ export function updateConnector(connector, action, isConnectedTrue, isConnectedF
         }
         if(connector.deleted){ 
             // DELETE 
+            action.intentName = null;
             action.goToIntent = null;
             resp.isConnected = false;
             resp.idConnection = null;
@@ -146,8 +147,9 @@ export function updateConnector(connector, action, isConnectedTrue, isConnectedF
             resp.isConnected = true;
             resp.idConnection = connector.fromId+"/"+connector.toId;
             action.goToIntent = "#"+connector.toId;
+            action.intentName = "#"+connector.toId;
         };
-        // Aggiornamento per il ramo "false"
+        // Aggiornamento per il ramo 
         if (lastSegment) {
             resp.action.falseIntent = '#' + connector.toId;
             resp.isConnected = true;
