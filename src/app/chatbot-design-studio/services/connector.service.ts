@@ -1019,9 +1019,9 @@ export class ConnectorService {
     if(idConnector && intent.attributes?.connectors[idConnector]){
       delete intent.attributes.connectors[idConnector];
     }
-    this.logger.log('[CONNECTOR-SERV] 111111 ');
+    this.hideContractConnector(idConnection);
     this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
-    this.logger.log('[CONNECTOR-SERV] 22222 ');
+
   }
 
 
