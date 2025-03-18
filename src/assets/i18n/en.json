@@ -500,7 +500,9 @@
         "ViewList":"View list",
         "UseBotSlug":"Use bot slug",
         "ChooseBotBySlug":"Choose bot by slug",
-        "LogLevels": "Log levels"
+        "LogLevels": "Log levels",
+        "LoadingAfter": "loading ... after",
+        "LoadingBefore": "loading ... before"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
