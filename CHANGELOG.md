@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 
+# 1.30.0-rc.6
+- **canged**: changed graphics of the log widget
+
+
 # 1.30.0-rc.5
 - **added**: JSON buttons models
 - **added**: more info JSON buttons
