@@ -15,6 +15,9 @@
     <div  *ngIf="!showJsonBody" class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
         + {{'CDSCanvas.JsonButtons' | translate }}
     </div>
+    <label class="field-description more-info">{{ "CDSCanvas.MoreOnJSONButtons" | translate }}
+        <a [href]="link.more_json_uttons.link" [target]='link.more_json_uttons.target'>{{ 'CDSCanvas.ViewList' | translate }}</a>
+    </label>
 </div>
 
 

@@ -18,6 +18,9 @@ export const DOCS_LINK = {
     },
     BOT_DETAIL: {
         chatbot_slug: { link: 'https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/#replace-bot-using-the-chatbot-slug', target: '_blank' }
+    },
+    JSON_BUTTONS: {
+        more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
     }
 }
 

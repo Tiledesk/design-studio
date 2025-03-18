@@ -127,7 +127,7 @@ appdashboard-filter{
     font-size: 14px;
     padding: 0 var(--input-base-margin);
     .button-json {
-        float: right;
+        float: none;
         margin-left: auto;
     }
     &.json-shown {
@@ -135,6 +135,11 @@ appdashboard-filter{
             border: 1px solid var(--blu);
             color: var(--blu);
         }
+    }
+    .more-info {
+        text-align: end;
+        width: 100%;
+        padding: 0 3px;
     }
 }
 
