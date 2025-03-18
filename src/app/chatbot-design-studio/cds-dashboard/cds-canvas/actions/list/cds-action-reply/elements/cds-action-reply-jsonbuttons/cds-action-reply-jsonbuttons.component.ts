@@ -2,6 +2,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
+import { LIST_JSON_MODEL_REPLY_V1, LIST_JSON_MODEL_REPLY_V2, JSON_MODEL_PLACEHOLDER } from 'src/app/chatbot-design-studio/utils-jsonbuttons';
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
+
 @Component({
   selector: 'cds-action-reply-jsonbuttons',
   templateUrl: './cds-action-reply-jsonbuttons.component.html',
@@ -10,15 +14,17 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 export class CdsActionReplyJsonbuttonsComponent implements OnInit {
 
   showJsonBody: boolean =  false;
-  jsonPlaceholder: any;
-  // jsonBody: any;
+  jsonPlaceholder: string = JSON_MODEL_PLACEHOLDER;
+  listType: any = {};
 
   @Input() jsonBody: string;
   @Output() changeJsonButtons = new EventEmitter();
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
-  constructor() { }
+  constructor(
+    private readonly intentService: IntentService
+  ) { }
 
   ngOnInit(): void {
     this.initialize();
@@ -29,33 +35,34 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   }
 
   initialize(){
-    this.jsonPlaceholder = `[
-        {
-          "type": "action",
-          "value": "operator",
-          "action": "hand off",
-          "alias": "handoff, human"
-        },
-        {
-          "type": "url",
-          "value": "My link",
-          "link": "https://www.mylink.com",
-          "target": "blank"
-        },
-        {
-          "type": "text",
-          "value": "Hello"
-        }
-    ]`;
+    this.listType = LIST_JSON_MODEL_REPLY_V1; 
+    if(this.intentService.selectedAction._tdActionType !== TYPE_ACTION.REPLY){
+      this.listType = LIST_JSON_MODEL_REPLY_V2; 
+    };
     if(this.jsonBody && this.jsonBody.trim() !== ''){
       this.showJsonBody = true;
-      // //this.jsonBody = JSON.parse(this.jsonBody);
     } else {
       this.showJsonBody = false;
       this.jsonBody = '';
     }
   }
 
+
+  // ACTIONS //
+
+  /** onDeleteJsonButtons */
+  onChangeJsonButtonsType(event){
+    this.jsonBody = event['value'];
+    this.showJsonBody = true;
+    this.changeJsonButtons.emit(this.jsonBody);
+  }
+
+  /** onDeleteJsonButtons */
+  onResetJsonButtonsType(event){
+    this.jsonBody = '';
+    this.showJsonBody = false;
+    this.changeJsonButtons.emit(this.jsonBody);
+  }
 
   /** onClickJsonButtons */
   onClickJsonButtons(){
@@ -74,7 +81,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   /** onChangeJsonTextarea */
   onChangeJsonTextarea(text:string) {
     this.jsonBody = text;
-    // this.changeJsonButtons.emit(text);
+    // // this.changeJsonButtons.emit(text);
   }
 
   /** onBlurJsonTextarea */
