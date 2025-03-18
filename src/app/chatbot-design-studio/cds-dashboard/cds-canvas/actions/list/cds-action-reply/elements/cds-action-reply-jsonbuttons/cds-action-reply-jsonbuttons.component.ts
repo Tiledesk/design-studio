@@ -5,6 +5,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { LIST_JSON_MODEL_REPLY_V1, LIST_JSON_MODEL_REPLY_V2, JSON_MODEL_PLACEHOLDER } from 'src/app/chatbot-design-studio/utils-jsonbuttons';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
+import { DOCS_LINK } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'cds-action-reply-jsonbuttons',
@@ -16,6 +17,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   showJsonBody: boolean =  false;
   jsonPlaceholder: string = JSON_MODEL_PLACEHOLDER;
   listType: any = {};
+  link: any;
 
   @Input() jsonBody: string;
   @Output() changeJsonButtons = new EventEmitter();
@@ -45,6 +47,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
       this.showJsonBody = false;
       this.jsonBody = '';
     }
+    this.link = DOCS_LINK.JSON_BUTTONS;
   }
 
 

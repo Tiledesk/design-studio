@@ -507,6 +507,7 @@
         "CopilotDisabled":"Copilot disabled",
         "ResponseStatus":"Response status",
         "StatusNotSelected":"Status not selected",
+        "MoreOnJSONButtons":"More on JSON buttons.",
         "AvailableToAgents":"Available to agents",
         "InfoAvailableToAgents":"A block with this option is visible to agents for the purpose to be put back in the conversation",
         "Create":"Create",
