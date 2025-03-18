@@ -275,6 +275,8 @@
         "ContactSales":"Contact Sales",
         "Drag":"Drag",
         "DeleteConnector":"Delete connector",
+        "HideConnector":"hide connector",
+        "ShowConnector":"show connector",
         "LineText":"Line text",
         "IntentPanel": "Settings panel",
         "ColorBlock":"Block color",
@@ -504,7 +506,18 @@
         "CopilotEnabled":"Copilot enabled",
         "CopilotDisabled":"Copilot disabled",
         "ResponseStatus":"Response status",
-        "StatusNotSelected":"Status not selected"
+        "StatusNotSelected":"Status not selected",
+        "AvailableToAgents":"Available to agents",
+        "InfoAvailableToAgents":"A block with this option is visible to agents for the purpose to be put back in the conversation",
+        "Create":"Create",
+        "Regenerate":"Regenerate",
+        "Copy":"Copy",
+        "TextCopied":"Text copied successfully!",
+        "TextErrorCopied":"Error copying text",
+        "ApiNotSupported":"Clipboard API not supported by your browser.",
+        "LogLevels": "Log levels",
+        "VisibilityConnectors":"Visibility of connectors",
+        "ChangeAlphaConnectors":"Change alpha of the connectors color"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",

@@ -105,7 +105,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
     await this.initAuthentication();
     this.setLanguage(null);
-
   }
 
 
