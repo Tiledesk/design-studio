@@ -24,10 +24,10 @@
         </div>
 
         <label class="title-preview-label">{{'CDSCanvas.Success' | translate}}</label>
-        
         <cds-connector class="connector-true"
-            [idConnector] = "idConnectorTrue"
-            [isConnected] = "isConnectedTrue">
+            [idConnector]   = "idConnectorTrue"
+            [idConnection]  = "idConnectionTrue"
+            [isConnected]   = "isConnectedTrue">
         </cds-connector>
     </div>
 
@@ -35,9 +35,10 @@
 
     <div class="previewContent">
        <label class="title-preview-label">{{'CDSCanvas.Else' | translate}}</label>
-        <cds-connector class="connector-false"
-            [idConnector] = "idConnectorFalse"
-            [isConnected] = "isConnectedFalse">
+       <cds-connector class="connector-false"
+            [idConnector]   = "idConnectorFalse"
+            [idConnection]  = "idConnectionFalse"
+            [isConnected]   = "isConnectedFalse">
         </cds-connector>
     </div>
 </div>

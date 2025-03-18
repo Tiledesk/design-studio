@@ -1,0 +1,44 @@
+<div class="buttons-json-response" [class.json-shown]="showJsonBody">
+    <!-- [itemSelected]="listType[0]?.name" -->
+    <cds-select 
+        *ngIf="showJsonBody"
+        id="text-condition" 
+        [items]="listType" 
+        [bindLabelSelect]="'name'"
+        [bindValueSelect]="'value'" 
+        [placeholder]="'CDSCanvas.SelectABlock' | translate "
+        (onSelected)="onChangeJsonButtonsType($event)"
+        (onReset)="onResetJsonButtonsType($event)"
+        [clearable]="true">
+    </cds-select>
+
+    <div  *ngIf="!showJsonBody" class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
+        + {{'CDSCanvas.JsonButtons' | translate }}
+    </div>
+    <label class="field-description more-info">{{ "CDSCanvas.MoreOnJSONButtons" | translate }}
+        <a [href]="link.more_json_uttons.link" [target]='link.more_json_uttons.target'>{{ 'CDSCanvas.ViewList' | translate }}</a>
+    </label>
+</div>
+
+
+
+
+<div *ngIf="showJsonBody" class="json-text">
+    <cds-textarea
+        class = "text-editable-div"
+        [text]="jsonBody"
+        [placeholder]="jsonPlaceholder"
+        [limitCharsText]="10000"
+        [emojiPikerBtn]="false"
+        [setAttributeBtn]="true"
+        [minRow]="5" [maxRow]="10"
+        [readonly]="false"
+        (blur)="onBlurJsonTextarea($event)"
+        (changeTextarea)="onChangeJsonTextarea($event)">
+    </cds-textarea>
+    <div class="button-controls">
+        <div class="control-button delete" (click)="$event.stopPropagation(); onDeleteJsonButtons()">
+            <em class="material-icons">delete</em>
+        </div>
+    </div>
+</div>

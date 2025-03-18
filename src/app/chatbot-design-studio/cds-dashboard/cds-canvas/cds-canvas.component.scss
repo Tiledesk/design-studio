@@ -29,17 +29,17 @@ $toogle-sidebar-width: 22px;
   transform: translateX(100%);
   animation: slide-in 0.2s ease-in-out forwards;
   animation-delay: 0s;
-
+  &#intent-detail {
+    z-index: 10;
+  }
   &#action-detail{
     z-index: 10;
-    
   }
   &#button-configuration{
     z-index: 11
   }
   &#widget-preview{
     z-index: 12;
-
     &.isVisible{
       width: 0;
       visibility: visible;
@@ -275,11 +275,9 @@ cds-fulfillment {
   border-radius: 50%;
   padding: 0;
   margin: 0;
-  // background-color: brown;
   display: block;
   position: absolute;
-  // overflow: hidden;
-  z-index: 1;
+  z-index: 3;
 }
 
 
