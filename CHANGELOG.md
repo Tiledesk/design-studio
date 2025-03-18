@@ -7,6 +7,17 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.30.0-rc.4
+- **bug-fixed**: opacity label connector
+- **bug-fixed**: show hide label connector
+- **bug-fixed**: hide the label when the connector is not visible
+- **bug-fixed**: remove the label when I remove a connector
+- **bug-fixed**: hide contracted connector when delete or change connector from panel action
+- **bug-fixed**: chack show-hide connectors on all actions
+- **bug-fixed**: change z-index at connector menu
+- **canged**: save the state of the contracted connector in the intent json
+
+
 # 1.30.0-rc.3
 - **bug-fixed**: disabled JSON.parse in action jsonbuttons
 
