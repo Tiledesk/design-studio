@@ -1,7 +1,7 @@
-<div class="buttons-json-response" [class.json-shown]="showJsonBody">
+<div class="buttons-json-response" [class.json-shown]="showJsonButton">
     <!--  -->
     <cds-select 
-        *ngIf="showJsonBody"
+        *ngIf="showJsonButton"
         class="text-condition" 
         [items]="listType" 
         [itemSelect]="exampleSelected"
