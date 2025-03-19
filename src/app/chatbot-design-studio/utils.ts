@@ -28,7 +28,8 @@ export enum LOG_LEVELS {
     DEFAULT       = 'default',
     INFO          = 'info',
     WARNINGS      = 'warnings',
-    ERRORS        = 'errors'
+    WARN          = 'warn',
+    ERROR         = 'error'
 }
 
 export enum STAGE_SETTINGS {

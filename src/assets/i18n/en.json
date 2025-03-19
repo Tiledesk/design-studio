@@ -519,6 +519,8 @@
         "TextErrorCopied":"Error copying text",
         "ApiNotSupported":"Clipboard API not supported by your browser.",
         "LogLevels": "Log levels",
+        "LoadingAfter": "loading ... after",
+        "LoadingBefore": "loading ... before",
         "VisibilityConnectors":"Visibility of connectors",
         "ChangeAlphaConnectors":"Change alpha of the connectors color"
     },

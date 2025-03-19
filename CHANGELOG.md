@@ -7,6 +7,16 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.30.0-rc.6
+- **canged**: changed graphics of the log widget
+
+
+# 1.30.0-rc.5
+- **added**: JSON buttons models
+- **added**: more info JSON buttons
+
+
 # 1.30.0-rc.4
 - **bug-fixed**: opacity label connector
 - **bug-fixed**: show hide label connector

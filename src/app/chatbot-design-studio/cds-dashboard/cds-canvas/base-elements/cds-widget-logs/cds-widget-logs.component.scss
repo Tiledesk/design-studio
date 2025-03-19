@@ -8,7 +8,6 @@
   position: absolute;
   bottom: 0;
   overflow: hidden; 
-  
   &.closed {
     height: 30px!important;
     min-height: 30px;
@@ -57,7 +56,6 @@
   display: inline-block;
   text-align: left;
   font-size: 12px;
-  padding: 10px;
   color: var(--gray);
   overflow-y: auto;
   height: calc(100% - 30px);
@@ -67,8 +65,30 @@
 
 
 .row-log {
-  padding: 0;
+  padding: 0 10px;
+  display: flex;
+  height: auto;
+  min-height: 24px;
+  overflow:visible;
+  border-bottom: 1px solid var(--gray-light-02);
+  .row-log-button {
+    display: inline-block;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    margin-top: 2px;
+    transition: transform 0.3s ease;
+    &.open {
+      transform: rotate(90deg); 
+    }
+  }
+  &.closed{
+    height: 25px;
+    overflow: hidden;
+  }
 }
+
 
 
 .row-log-time {
@@ -76,7 +96,7 @@
   font-weight:initial;
   color: var(--gray);
   display: inline-block;
-  width: 110px;
+  width: 120px;
 }
 
 .row-log-level {
@@ -106,10 +126,28 @@
 
 .row-log-loading {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
-  height: 20px;
-  padding: 10px 0 15px;
+  height: 25px;
+  padding: 2px 5px;
+  background: var(--blu-light-01);
+  .loading-loader {
+    margin-left: 10px;
+    margin-top: 0px;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--blu); //#3498db;
+    border-top: 2px solid var(--gray-light-02);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  .loading-label {
+    font-size: 11px;
+    margin: 0 10px;
+    font-weight: 500;
+    color: var(--blu);
+  }
 }
 
 .dot {
@@ -145,11 +183,11 @@
 
 .dropdown-container {
   position: absolute;
-  top: 2px;
+  top: 3px;
   label {
     font-family: var(--font-family-poppins);
     color: var(--blu);
-    font-size: 16px;
+    font-size: 12px;
     padding-right: 10px;
   }
   select {
@@ -158,5 +196,17 @@
     border: none;
     color: var(--blu);
     background-color: #fafafa;
+  }
+}
+
+
+
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
