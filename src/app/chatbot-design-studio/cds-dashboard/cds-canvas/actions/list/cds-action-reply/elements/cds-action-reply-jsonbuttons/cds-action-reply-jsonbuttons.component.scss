@@ -57,6 +57,7 @@ cds-textarea.text-editable-div {
     ::ng-deep .ng-select .ng-select-container {
         justify-content: flex-end;
         border: 0px solid var(--blu-light-02);
+        box-shadow: none;
     }
     ::ng-deep .ng-select .ng-select-container:hover {
         box-shadow: none;
