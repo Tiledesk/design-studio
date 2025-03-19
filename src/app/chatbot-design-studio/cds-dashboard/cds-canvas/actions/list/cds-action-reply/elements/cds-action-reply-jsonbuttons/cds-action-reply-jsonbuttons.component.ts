@@ -18,6 +18,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   jsonPlaceholder: string = JSON_MODEL_PLACEHOLDER;
   listType: any = {};
   link: any;
+  exampleSelected: null;
 
   @Input() jsonBody: string;
   @Output() changeJsonButtons = new EventEmitter();
@@ -57,6 +58,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   onChangeJsonButtonsType(event){
     this.jsonBody = event['value'];
     this.showJsonBody = true;
+    this.exampleSelected = null;
     this.changeJsonButtons.emit(this.jsonBody);
   }
 
@@ -64,6 +66,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   onResetJsonButtonsType(event){
     this.jsonBody = '';
     this.showJsonBody = false;
+    this.exampleSelected = null;
     this.changeJsonButtons.emit(this.jsonBody);
   }
 
