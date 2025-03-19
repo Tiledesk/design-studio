@@ -28,7 +28,7 @@ export const JSON_MODEL_ACTION_BUTTONS = `[
   {
     "type":"action",
     "value":"Sales",
-      "action":"sales"
+    "action":"sales"
   }
 ]`;
 
