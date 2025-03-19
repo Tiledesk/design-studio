@@ -19,7 +19,7 @@ cds-textarea.text-editable-div {
     display: block;
     position: relative;
     width: 100%;
-    height: auto;
+    height: 36px;
     margin-bottom: -1px;
 }
 
@@ -66,7 +66,7 @@ cds-textarea.text-editable-div {
         display:none!important;
     }
     ::ng-deep .ng-select .ng-select-container .ng-clear-wrapper {
-        // display:none!important;
+        display:none!important;
     }
     ::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option span.label-select {
         font-size: 12px!important;
