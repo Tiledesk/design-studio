@@ -505,7 +505,9 @@
         "CopilotDisabled":"Copilot disabled",
         "ResponseStatus":"Response status",
         "StatusNotSelected":"Status not selected",
-        "MoreOnJSONButtons":"More on JSON buttons."
+        "More":"More ",
+        "JSONButtons":" JSON buttons.",
+        "Examples": "Examples"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",

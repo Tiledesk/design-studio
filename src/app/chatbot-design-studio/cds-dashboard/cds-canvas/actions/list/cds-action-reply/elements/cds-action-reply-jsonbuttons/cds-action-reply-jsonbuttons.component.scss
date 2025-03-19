@@ -28,3 +28,35 @@ cds-textarea.text-editable-div {
     position: relative;
     padding: 0;
 }
+
+.field-description {
+    display: block;
+    text-align: right;
+    margin-top: 15px;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.text-condition {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    ::ng-deep .select-bot-box {
+        min-width: 125px;
+    }
+    ::ng-deep .ng-placeholder {
+        font-size: 12px;
+        display:block!important;
+    }
+}
+
+::ng-deep .ng-value .ng-star-inserted {
+    display:none!important;
+}
+::ng-deep .ng-select .ng-select-container .ng-clear-wrapper {
+    display:none!important;
+}
+
+::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option span.label-select {
+    font-size: 12px!important;
+}
