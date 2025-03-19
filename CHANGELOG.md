@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.30.0-rc.8
+- **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
+- **bug-fixed**: Fixed logic example in JSON buttons 
+- **bug-fixed**: Fixed errors explode row in widget log
+- **bug-fixed**: scroll to bottom in widget log
+
 # 1.30.0-rc.7
 - **bug-fixed**: Fixed graphic errors in JSON buttons 
 
