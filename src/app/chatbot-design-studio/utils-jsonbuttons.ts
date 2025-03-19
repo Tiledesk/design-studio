@@ -23,7 +23,7 @@ export const JSON_MODEL_ACTION_BUTTONS = `[
   {
     "type":"action",
     "value":"Support",
-      "action":"support"
+    "action":"support"
   },
   {
     "type":"action",
