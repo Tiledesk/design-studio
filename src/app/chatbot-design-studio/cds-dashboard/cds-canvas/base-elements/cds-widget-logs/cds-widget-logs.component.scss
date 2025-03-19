@@ -70,21 +70,25 @@
   height: auto;
   min-height: 24px;
   overflow:visible;
+  max-height: 1000px;
   border-bottom: 1px solid var(--gray-light-02);
+  transition: max-height 0.3s ease, padding 0.3s ease;
   .row-log-button {
     display: inline-block;
     cursor: pointer;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     font-size: 20px;
-    margin-top: 2px;
+    margin-top: 3px;
     transition: transform 0.3s ease;
+
     &.open {
       transform: rotate(90deg); 
     }
   }
+ 
   &.closed{
-    height: 25px;
+    max-height: 25px;
     overflow: hidden;
   }
 }
@@ -116,6 +120,7 @@
 }
 
 .row-log-text {
+  height: fit-content;
   font-size: 12px;
   color: var(--gray);
   display: inline-block;
@@ -131,6 +136,7 @@
   height: 25px;
   padding: 2px 5px;
   background: var(--blu-light-01);
+  margin-bottom: 20px;
   .loading-loader {
     margin-left: 10px;
     margin-top: 0px;

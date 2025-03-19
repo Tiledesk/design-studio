@@ -3,9 +3,9 @@
         <div class="dropdown-container">
             <label for="logLevel">{{ 'CDSCanvas.LogLevels' | translate }}:</label>
             <select id="logLevel" [(ngModel)]="selectedLogLevel" (change)="onLogLevelChange($event)">
-                <option [value]="LOG_LEVELS.DEFAULT">{{LOG_LEVELS.DEFAULT}}</option>
+                <option [value]="LOG_LEVELS.DEBUG">{{LOG_LEVELS.DEBUG}}</option>
                 <option [value]="LOG_LEVELS.INFO">{{LOG_LEVELS.INFO}}</option>
-                <option [value]="LOG_LEVELS.WARN">{{LOG_LEVELS.WARNINGS}}</option>
+                <option [value]="LOG_LEVELS.WARN">{{LOG_LEVELS.WARN}}</option>
                 <option [value]="LOG_LEVELS.ERROR">{{LOG_LEVELS.ERROR}}</option>
             </select>
         </div>
@@ -23,10 +23,10 @@
             <div class="dot"></div> -->
         </div>
         <div *ngFor="let log of listOfLogs; let i = index;" class="row-log" [class.closed]="!log.open">
-            <span class="row-log-button material-icons-outlined" [class.open]="log.open"  (click)="onToggleRowLog(i)">chevron_right</span>
+            <span [id]="'row-log-button_'+i" class="row-log-button material-icons-outlined" [class.open]="log.open" (click)="onToggleRowLog(i)">chevron_right</span>
             <span class="row-log-time">{{log.rows?.timestamp | date: 'dd/MM/yyyy HH:mm:ss'}} </span>
             <span class="row-log-level" [ngClass]="log.rows?.level">{{log.rows?.level}}</span>
-            <span class="row-log-text">{{log.rows?.text}}</span>
+            <span [id]="'row-log-text_'+i" class="row-log-text">{{log.rows?.text}}</span>
         </div>
         <div *ngIf="loadingNext" class="row-log-loading">
             <div class="loading-loader"></div>
