@@ -16,7 +16,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   @Input() jsonBody: string;
   @Output() changeJsonButtons = new EventEmitter();
 
-  jsonBodyOld: string;
+  // jsonBodyOld: string;
   showJsonButton: boolean =  false;
   showJsonBody: boolean =  false;
   jsonPlaceholder: string = JSON_MODEL_PLACEHOLDER;
@@ -46,7 +46,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
     if(this.jsonBody && this.jsonBody.trim() !== ''){
       this.showJsonBody = true;
       this.showJsonButton = true;
-      this.jsonBodyOld = this.jsonBody;
+      // this.jsonBodyOld = this.jsonBody;
     } else {
       this.showJsonBody = false;
       this.jsonBody = '';
@@ -61,7 +61,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
 
   /** onDeleteJsonButtons */
   onChangeJsonButtonsType(event){
-    this.jsonBodyOld = JSON.parse(JSON.stringify(this.jsonBody));
+    // this.jsonBodyOld = JSON.parse(JSON.stringify(this.jsonBody));
     this.jsonBody = event['value'];
     this.showJsonBody = true;
     this.exampleSelected = null;
@@ -70,8 +70,8 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
 
   /** onDeleteJsonButtons */
   onResetJsonButtonsType(event){
-    this.logger.log('[ACTION REPLY jsonbuttons] onResetJsonButtonsType ', this.jsonBodyOld);
-    this.jsonBody = this.jsonBodyOld;
+    this.logger.log('[ACTION REPLY jsonbuttons] onResetJsonButtonsType ', this.jsonBody);
+    // this.jsonBody = this.jsonBodyOld;
     // this.showJsonBody = false;
     this.exampleSelected = null;
     this.changeJsonButtons.emit(this.jsonBody);
@@ -96,9 +96,11 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   /** onChangeJsonTextarea */
   onChangeJsonTextarea(text:string) {
     this.jsonBody = text;
-    // if(!text || text.trim() === ''){
-    //   this.showJsonButton = true;
-    // }
+    if(!text || text.trim() === ''){
+      this.showJsonButton = true;
+    } else {
+      this.showJsonButton = false;
+    }
     //this.changeJsonButtons.emit(text);
   }
 
