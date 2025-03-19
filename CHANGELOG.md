@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.30.0-rc.9
+- **canged**: Hide examples button if text exists in JSON buttons
+
 # 1.30.0-rc.8
 - **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
 - **bug-fixed**: Fixed logic example in JSON buttons 
@@ -19,7 +22,6 @@
 
 # 1.30.0-rc.6
 - **canged**: changed graphics of the log widget
-
 
 # 1.30.0-rc.5
 - **added**: JSON buttons models
