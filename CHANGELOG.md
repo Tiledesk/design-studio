@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.30.0-rc.10
+- **bug-fixed**: fixed ExpressionChangedAfterItHasBeenCheckedError
 
 # 1.30.0-rc.9
 - **canged**: Hide examples button if text exists in JSON buttons
