@@ -16,18 +16,18 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   @Input() jsonBody: string;
   @Output() changeJsonButtons = new EventEmitter();
 
-  // jsonBodyOld: string;
   showJsonButton: boolean =  false;
   showJsonBody: boolean =  false;
   jsonPlaceholder: string = JSON_MODEL_PLACEHOLDER;
   listType: any = {};
   link: any;
-  exampleSelected: null;
+  // exampleSelected: null;
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
-    private readonly intentService: IntentService
+    private readonly intentService: IntentService,
+    // private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -35,7 +35,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
   }
 
   ngAfterViewInit (): void {
-    // empty
+    // // this.cdr.detectChanges();
   }
 
   initialize(){
@@ -46,13 +46,11 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
     if(this.jsonBody && this.jsonBody.trim() !== ''){
       this.showJsonBody = true;
       this.showJsonButton = true;
-      // this.jsonBodyOld = this.jsonBody;
     } else {
-      this.showJsonBody = false;
       this.jsonBody = '';
+      this.showJsonBody = false;
       this.showJsonButton = false;
     }
-    
     this.link = DOCS_LINK.JSON_BUTTONS;
   }
 
@@ -61,19 +59,15 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
 
   /** onDeleteJsonButtons */
   onChangeJsonButtonsType(event){
-    // this.jsonBodyOld = JSON.parse(JSON.stringify(this.jsonBody));
-    this.jsonBody = event['value'];
+    this.jsonBody = event['value']?event['value']:'';
     this.showJsonBody = true;
-    this.exampleSelected = null;
+    this.showJsonButton = false;
     this.changeJsonButtons.emit(this.jsonBody);
   }
 
   /** onDeleteJsonButtons */
   onResetJsonButtonsType(event){
     this.logger.log('[ACTION REPLY jsonbuttons] onResetJsonButtonsType ', this.jsonBody);
-    // this.jsonBody = this.jsonBodyOld;
-    // this.showJsonBody = false;
-    this.exampleSelected = null;
     this.changeJsonButtons.emit(this.jsonBody);
   }
 
@@ -87,30 +81,27 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
 
   /** onDeleteJsonButtons */
   onDeleteJsonButtons(){
-    this.showJsonBody = false;
     this.jsonBody = '';
+    this.showJsonBody = false;
     this.showJsonButton = false;
     this.changeJsonButtons.emit();
   }
 
   /** onChangeJsonTextarea */
   onChangeJsonTextarea(text:string) {
-    this.jsonBody = text;
     if(!text || text.trim() === ''){
       this.showJsonButton = true;
     } else {
+      this.jsonBody = text;
       this.showJsonButton = false;
     }
-    //this.changeJsonButtons.emit(text);
+    // // this.changeJsonButtons.emit(text);
   }
 
   /** onBlurJsonTextarea */
   onBlurJsonTextarea(event:any){
     this.logger.log('[ACTION REPLY jsonbuttons] onBlurJsonTextarea ', event);
     const json = event.target?.value;
-    if(!json || json.trim() === ''){
-      // this.showJsonBody = false;
-    }
     this.changeJsonButtons.emit(json);
   }
     
