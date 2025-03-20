@@ -7,6 +7,18 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.30.0
+- **canged**: Hide examples button if text exists in JSON buttons
+- **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
+- **bug-fixed**: Fixed logic example in JSON buttons 
+- **bug-fixed**: Fixed graphic errors in JSON buttons 
+- **added**: JSON buttons models
+- **added**: more info JSON buttons
+- **bug-fixed**: disabled JSON.parse in action jsonbuttons
+- **added**: added json buttons
+
+
 # 1.29.2
 
 # 1.29.1
