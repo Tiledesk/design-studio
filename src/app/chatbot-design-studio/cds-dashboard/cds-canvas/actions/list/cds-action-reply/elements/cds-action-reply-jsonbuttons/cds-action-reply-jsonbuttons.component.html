@@ -1,10 +1,7 @@
 <div class="buttons-json-response" [class.json-shown]="showJsonButton">
-    <!--  -->
-    <cds-select 
-        *ngIf="showJsonButton"
+    <cds-select *ngIf="showJsonButton"
         class="text-condition" 
         [items]="listType" 
-        [itemSelect]="exampleSelected"
         [bindLabelSelect]="'name'"
         [bindValueSelect]="'value'" 
         [placeholder]="'CDSCanvas.Examples' | translate "
@@ -15,7 +12,7 @@
         (onReset)="onResetJsonButtonsType($event)"
         [clearable]="true">
     </cds-select>
-    <div  *ngIf="!showJsonBody" class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
+    <div *ngIf="!showJsonBody" class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
         + {{'CDSCanvas.JsonButtons' | translate }}
     </div>
 </div>
