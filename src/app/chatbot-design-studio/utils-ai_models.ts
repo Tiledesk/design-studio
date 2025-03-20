@@ -5,11 +5,14 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
 ]
 
 export const GOOGLE_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
-    { name: "Gemini-pro",         value: "gemini-pro",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Gemini-pro",         value: "gemini-pro",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Gemini 1.5 Flash",   value: "gemini-1.5-flash",       description: "TYPE_GPT_MODEL.text-davinci-003.description",   status: "active" },
+    { name: "Gemini 2.0 Flash",   value: "gemini-2.0-flash",       description: "TYPE_GPT_MODEL.text-davinci-003.description",   status: "active" },
 ]
 
 export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
-    { name: "Claude-3-5 sonnet",         value: "claude-3-5-sonnet-20240620",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Claude-3.5 Sonnet",                value: "claude-3-5-sonnet-20240620",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Claude-3.7 Sonnet",                value: "claude-3-7-sonnet-20250219",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
 ]
 
 export const GROQ_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
@@ -27,7 +30,11 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     { name: "Qwen-2.5-32b",                         value: "qwen-2.5-32b",                          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Gemma2-9b-it",                         value: "gemma2-9b-it",                          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Allam-2-7b",                           value: "allam-2-7b",                            description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
-    { name: "Mixtral-8x7b-32768",                   value: "mixtral-8x7b-32768",                    description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Mixtral-8x7b-32768",                   value: "mixtral-8x7b-32768",                    description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+]
+
+export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
+    { name: "Deepseek-chat",                value: "deepseek-chat",                    description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active" },
 ]
 
 export const LLM_MODEL: Array<{name: string, value: string, description: string, src: string, status: "active" | "inactive", models: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> }> = [
@@ -35,5 +42,6 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
     { name: "Google",         value: "google",            description: "",      src:"assets/images/icons/ai_prompt/google.svg",      status: "active",   models: GOOGLE_MODEL        },
     { name: "Anthropic",      value: "anthropic",         description: "",      src:"assets/images/icons/ai_prompt/anthropic.svg",   status: "active",   models: ANTHROPIC_MODEL     },
     { name: "Groq",           value: "groq",              description: "",      src:"assets/images/icons/ai_prompt/groq.svg",        status: "active",   models: GROQ_MODEL          },
+    { name: "Deepseek",       value: "deepseek",          description: "",      src:"assets/images/icons/ai_prompt/deepseek.svg",    status: "active",   models: DEEPSEEK_MODEL      },
 ]
 /************             AI PROMPT MODEL: END        ************************/
