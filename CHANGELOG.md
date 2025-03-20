@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.30.1
+- **bug-fixed**: fixed ExpressionChangedAfterItHasBeenCheckedError
+
 # 1.30.0
 - **canged**: Hide examples button if text exists in JSON buttons
 - **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
@@ -31,6 +34,8 @@
 - **added**: deepseek-chat llm model and claude 3.7
 - **removed**: mixtral-8x7b-32768 model
 
+# 1.30.0-rc.10
+- **bug-fixed**: fixed ExpressionChangedAfterItHasBeenCheckedError
 
 # 1.30.0-rc.9
 - **canged**: Hide examples button if text exists in JSON buttons
