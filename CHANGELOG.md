@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 
+# 1.30.0-rc.11
+- **bug-fixed**: css text-align and font-size in ng-select
+- **bug-fixed**: added cds-select onReset in operand cds-action-assign-variable-v2
+
 # 1.30.0-rc.10
 - **bug-fixed**: fixed ExpressionChangedAfterItHasBeenCheckedError
 

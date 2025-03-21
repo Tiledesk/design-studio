@@ -135,21 +135,20 @@
             height: 14px;
             width: 14px;
             display: flex;
+            align-items: center;
         }
 
     } 
 
     .ng-value-container .ng-input{
         display: flex;
-        // top: 0px !important;
-        // height: 43px;
     }
 
     .ng-clear-wrapper{
         height: 14px;
         width: 14px;
         display: flex;
-
+        align-items: center;
     }
 
     .ng-dropdown-panel,
