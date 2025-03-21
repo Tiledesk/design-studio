@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 
 //MODELS
@@ -14,6 +14,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 //UTILS
 import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-n8n',
@@ -35,37 +36,40 @@ export class CdsActionN8nComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
+  idConnectionTrue: string;
+  idConnectionFalse: string;
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
+
   connector: any;
   private subscriptionChangedConnector: Subscription;
   
+  helpUrl = "https://gethelp.tiledesk.com/articles/n8nio-action/";
   pattern = "^[a-zA-Z_]*[a-zA-Z_]+[a-zA-Z0-9_]*$";
-
   limitCharsText = TEXT_CHARS_LIMIT;
   jsonParameters: string; 
   errorMessage: string;
-
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
   assignments: {} = {}
 
-  
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
-    private intentService: IntentService,
-    private appConfigService: AppConfigService
+    private readonly intentService: IntentService,
+    private readonly appConfigService: AppConfigService
   ) { }
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    this.logger.debug("[ACTION-N8N] action detail: ", this.action);
+    this.logger.log("[ACTION-N8N] action detail: ", this.action);
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION-N8N] isChangedConnector -->', connector);
+      this.logger.log('[ACTION-N8N] isChangedConnector -->', connector);
       this.connector = connector;
       this.updateConnector();
     });
     this.initialize();
   }
+
 
   /** */
   ngOnDestroy() {
@@ -74,20 +78,7 @@ export class CdsActionN8nComponent implements OnInit {
     }
   }
 
-
-  private checkConnectionStatus(){
-    if(this.action.trueIntent){
-     this.isConnectedTrue = true;
-    } else {
-     this.isConnectedTrue = false;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-     } else {
-      this.isConnectedFalse = false;
-     }
-  }
-
+  /** */
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
@@ -96,43 +87,30 @@ export class CdsActionN8nComponent implements OnInit {
     this.checkConnectionStatus();
   }
 
-  private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idAction= array[1];
-      if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){
-          if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null
-            this.isConnectedTrue = false
-          }        
-          if(array[array.length -1] === 'false'){
-            this.action.falseIntent = null
-            this.isConnectedFalse = false;
-          }
-          if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-        } else { 
-          this.logger.debug('[ACTION-CUSTOMER] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-          if(array[array.length -1] === 'true'){
-            this.isConnectedTrue = true;
-            this.action.trueIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }        
-          if(array[array.length -1] === 'false'){
-            this.isConnectedFalse = true;
-            if(this.action.falseIntent !== '#'+this.connector.toId){
-              this.action.falseIntent = '#'+this.connector.toId;
-              if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-            } 
-          }
-        }
-
-      }
-    } catch (error) {
-      this.logger.error('[ACTION-ASKGPT] updateConnector error: ', error);
-    }
+  /** */
+  private checkConnectionStatus(){
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
   }
 
+  /** */
+  private updateConnector(){
+    this.logger.log('[ACTION-N8N] updateConnector:');
+    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
+    if(resp){
+      this.isConnectedTrue    = resp.isConnectedTrue;
+      this.isConnectedFalse   = resp.isConnectedFalse;
+      this.idConnectionTrue   = resp.idConnectionTrue;
+      this.idConnectionFalse  = resp.idConnectionFalse;
+      this.logger.log('[ACTION-N8N] updateConnector:', resp);
+      if (resp.emit) {
+        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
+      } 
+    }
+  }
   
   // CUSTOM FUNCTIONS //
   private initialize(){
@@ -143,6 +121,7 @@ export class CdsActionN8nComponent implements OnInit {
     }
   }
 
+  /** */
   private initializeAttributes() {
     let new_attributes = [];
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'n8n_status')) {
@@ -155,7 +134,7 @@ export class CdsActionN8nComponent implements OnInit {
       new_attributes.push({ name: "n8n_result", value: "n8n_result" });
     }
     variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
-    this.logger.debug("[ACTION-N8N] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined').elements);
+    this.logger.log("[ACTION-N8N] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined').elements);
   }
 
 
@@ -164,12 +143,10 @@ export class CdsActionN8nComponent implements OnInit {
   // EVENT FUNCTIONS //
   onChangeTextarea(e, type: 'url'){
     this.logger.log('type; ', type);
-    switch(type){
-      case 'url' : {
-        this.action.url = e;
-        this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        this.logger.log("[ACTION N8N] this.action", this.action);
-      }
+    if(type === 'url'){
+      this.action.url = e;
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+      this.logger.log("[ACTION N8N] this.action", this.action);
     }
   }
 
@@ -181,22 +158,21 @@ export class CdsActionN8nComponent implements OnInit {
   }
 
   onSelectedAttribute(event, property) {
-    this.logger.log("[ACTION-N8N] onEditableDivTextChange event", event)
-    this.logger.log("[ACTION-N8N] onEditableDivTextChange property", property)
+    this.logger.log("[ACTION-N8N] onEditableDivTextChange event", event);
+    this.logger.log("[ACTION-N8N] onEditableDivTextChange property", property);
     this.action[property] = event.value;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
     if(event){
-      this.action[type]=event.value
-
+      this.action[type]=event.value;
       switch(type){
         case 'trueIntent':
-          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent});
           break;
         case 'falseIntent':
-          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent});
           break;
       }
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
@@ -206,21 +182,23 @@ export class CdsActionN8nComponent implements OnInit {
   onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
     switch(type){
       case 'trueIntent':
-        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.action.trueIntent});
         break;
       case 'falseIntent':
-        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorFalse, toId: this.action.falseIntent});
         break;
     }
     this.action[type] = null;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
+
   goToIntegration(){
-    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name=' + this.action._tdActionType
-    window.open(url, '_blank')
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name=' + this.action._tdActionType;
+    window.open(url, '_blank');
   }
+
   goToHelp(){
-    let url = "https://gethelp.tiledesk.com/articles/n8nio-action/"
-    window.open(url, '_blank')
+    let url = this.helpUrl;
+    window.open(url, '_blank');
   }
 }

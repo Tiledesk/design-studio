@@ -1,5 +1,4 @@
 <div *ngIf="previewMode" class="cds-action-preview">
-
     <div class="action-row-left">
        
         <span class="web-request-action-method" *ngIf="action.method">
@@ -24,9 +23,9 @@
         <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
         
         <cds-connector class="connector-true"
-            [idConnector] = "idConnectorTrue"
-            [idConnection] = "idConnectionTrue"
-            [isConnected] = "isConnectedTrue">
+            [idConnector]   = "idConnectorTrue"
+            [idConnection]  = "idConnectionTrue"
+            [isConnected]   = "isConnectedTrue">
         </cds-connector>
     </div>
 
@@ -35,9 +34,9 @@
     <div class="previewContent">
        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
-            [idConnector] = "idConnectorFalse"
-            [idConnection] = "idConnectionFalse"
-            [isConnected] = "isConnectedFalse">
+            [idConnector]   = "idConnectorFalse"
+            [idConnection]  = "idConnectionFalse"
+            [isConnected]   = "isConnectedFalse">
         </cds-connector>
     </div>
 
@@ -59,12 +58,12 @@
         <cds-textarea id="url"
             class="text-editable-div"
             [text]="action.url" 
-            [minRow]="1" [maxRow]="5"
+            [minRow]="1" [maxRow]="1"
             popoverVerticalAlign="above"
             [textLimitBtn]="false"
             [emojiPikerBtn]="false"
             [setAttributeBtn]="true"
-            [autoResize]="true"
+            [autoResize]="false"
             [placeholder]="'CDSCanvas.EnterRequestURL' | translate"
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'url')">
@@ -112,7 +111,7 @@
             [ngClass]="{'jsonError': !jsonIsValid}"
             class = "text-editable-div"
             [text]="body"
-            [limitCharsText]="1000000"
+            [limitCharsText]="10000"
             [emojiPikerBtn]="false"
             [setAttributeBtn]="true"
             [minRow]="5" [maxRow]="10"

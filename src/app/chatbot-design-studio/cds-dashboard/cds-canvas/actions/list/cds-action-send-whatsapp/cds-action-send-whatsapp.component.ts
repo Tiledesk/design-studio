@@ -2,6 +2,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChang
 import { Subscription } from 'rxjs';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ActionSendWhatsapp } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -28,6 +29,8 @@ export class CdsActionSendWhatsappComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
+  idConnectionTrue: string;
+  idConnectionFalse: string;
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
@@ -74,19 +77,6 @@ export class CdsActionSendWhatsappComponent implements OnInit {
     }
   }
 
-  private checkConnectionStatus(){
-    if(this.action.trueIntent){
-     this.isConnectedTrue = true;
-    } else {
-     this.isConnectedTrue = false;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-     } else {
-      this.isConnectedFalse = false;
-     }
-  }
-
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
@@ -95,47 +85,37 @@ export class CdsActionSendWhatsappComponent implements OnInit {
     this.checkConnectionStatus();
   }
 
-  private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idAction= array[1];
-      if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){
-          if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null
-            this.isConnectedTrue = false
-          }        
-          if(array[array.length -1] === 'false'){
-            this.action.falseIntent = null
-            this.isConnectedFalse = false;
-          }
-          if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-        } else { 
-          this.logger.debug('[ACTION-SEND WHATSAPP] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-          if(array[array.length -1] === 'true'){
-            this.isConnectedTrue = true;
-            this.action.trueIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }        
-          if(array[array.length -1] === 'false'){
-            this.isConnectedFalse = true;
-            if(this.action.falseIntent !== '#'+this.connector.toId){
-              this.action.falseIntent = '#'+this.connector.toId;
-              if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-            } 
-          }
-        }
 
-      }
-    } catch (error) {
-      this.logger.error('[ACTION-SEND WHATSAPP] updateConnector error: ', error);
+  private checkConnectionStatus(){
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
+  }
+
+  /** */
+  private updateConnector(){
+    this.logger.log('[ACTION REPLACE BOT] updateConnector:');
+    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
+    if(resp){
+      this.isConnectedTrue    = resp.isConnectedTrue;
+      this.isConnectedFalse   = resp.isConnectedFalse;
+      this.idConnectionTrue   = resp.idConnectionTrue;
+      this.idConnectionFalse  = resp.idConnectionFalse;
+      this.logger.log('[ACTION REPLACE BOT] updateConnector:', resp);
+      if (resp.emit) {
+        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
+      } 
     }
   }
+  
+
 
   private initialize(){
     this.project_id = this.dashboardService.projectID
     this.action.payload.id_project = this.project_id
-    if (this.previewMode == false) {
+    if (this.previewMode === false) {
       this.logger.log("Whatsapp static project_id: ", this.project_id);
       this.showLoader = true;
       this.getTemplates();

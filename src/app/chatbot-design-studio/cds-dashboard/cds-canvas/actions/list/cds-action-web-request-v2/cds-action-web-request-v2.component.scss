@@ -181,30 +181,31 @@ cds-select#method ::ng-deep{
 cds-textarea#url ::ng-deep {
     display: flex;
     width: 100%;
-    // padding: 6px 0px 0px 0;
-    .focus-out {
-        position: relative;
-        textarea{
-            height: 23px !important;
-        }
-    }
-    .focus-in {
-        position: absolute;
-        z-index: 2;
-        width: 100%;
-        textarea{
-            min-height: 23px !important;
-        }
-    }
 
     textarea {
         border-radius: 0px var(--input-border-radius-base) var(--input-border-radius-base) 0px;
-        resize: none !important; 
-        padding: 6px 16px !important;
-
-        // height: 23px !important;
-        min-height: 23px !important;
+        padding: 8px 16px 3px 10px;
+        resize: vertical;
+        min-height: 24px;
+        max-height: 24px;
+        line-height: 23px;
+        position: relative;
+        width: 100%;
     }
+    .focus-out {
+        textarea{
+            overflow-y: hidden!important;
+        }
+    }
+    .focus-in {
+        z-index: 2;
+        textarea{
+            overflow-y: auto !important;
+            max-height: 80px !important;
+        }
+    }
+
+    
 }
 
 cds-textarea#body.jsonError ::ng-deep,
@@ -244,3 +245,8 @@ mat-button-toggle{
     
 }
 
+
+.action-row-left {
+    width: auto;
+    justify-content: flex-start;
+}
