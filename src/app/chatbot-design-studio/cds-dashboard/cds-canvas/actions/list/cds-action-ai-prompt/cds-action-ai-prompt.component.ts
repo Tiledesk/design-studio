@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 //MODELS
 import { ActionAiPrompt } from 'src/app/models/action-model';
@@ -23,7 +23,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { LLM_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { ProjectService } from 'src/app/services/projects.service';
 
 @Component({
   selector: 'cds-action-ai-prompt',
@@ -31,7 +32,7 @@ import { LLM_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
   styleUrls: ['./cds-action-ai-prompt.component.scss']
 })
 export class CdsActionAiPromptComponent implements OnInit {
-
+  
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
   
   @Input() intentSelected: Intent;
@@ -77,15 +78,18 @@ export class CdsActionAiPromptComponent implements OnInit {
   PLAN_NAME = PLAN_NAME
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.GPT_TASK;
+
+  autocompleteOptions: Array<{label: string, value: string}> = [];
   
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private dialog: MatDialog,
-    private openaiService: OpenaiService,
-    private intentService: IntentService,
-    private appConfigService: AppConfigService,
-    private translate: TranslateService,
-    private dashboardService: DashboardService
+    private readonly dialog: MatDialog,
+    private readonly openaiService: OpenaiService,
+    private readonly intentService: IntentService,
+    private readonly appConfigService: AppConfigService,
+    private readonly translate: TranslateService,
+    private readonly dashboardService: DashboardService,
+    private readonly projectService: ProjectService
   ) { }
 
   ngOnInit(): void {
@@ -104,15 +108,14 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.initializeConnector();
     }
     this.initializeAttributes();
-
     if (!this.action.preview) {
       this.action.preview = []; // per retrocompatibilità
     }
-
     this.initialize();
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    // empty
   }
 
   ngOnDestroy() {
@@ -123,9 +126,70 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   private initialize(){
     if(this.action.llm){
+      this.initLLMModels();
       this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
     }
   }
+
+
+  initLLMModels(){
+    this.autocompleteOptions = [];
+    this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
+    if(this.action.llm){
+      let filteredModels;
+      if(this.action.llm === 'ollama') {
+        this.getIntegrationByName();
+      } else {
+        filteredModels = this.getModelsByName(this.action.llm);
+        filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
+        this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
+      }
+    }
+  }
+
+  getModelsByName(value: string): any[] {
+    const model = LLM_MODEL.find((model) => model.value === value);
+    this.logger.log('[ACTION AI_PROMPT] initLLMModels',model);
+    switch (model.name) {
+      case "Cohere":
+        return COHERE_MODEL;
+      case 'Google':
+        return GOOGLE_MODEL;
+      case 'Anthropic':
+        return ANTHROPIC_MODEL;
+      case 'Groq':
+        return GROQ_MODEL;
+      case 'Deepseek':
+        return DEEPSEEK_MODEL;
+      case 'Ollama':
+        return OLLAMA_MODEL;
+      default:
+        return [];
+    }
+  }
+
+  async getIntegrationByName(): Promise<any[]> {
+    const projectID = this.dashboardService.projectID;
+    const integrationName = 'ollama';
+    try {
+      const response: any = await firstValueFrom(
+        this.projectService.getIntegrationByName(projectID, integrationName)
+      );
+      this.logger.log('[ACTION AI_PROMPT] - integration response:', response);
+      if (response?.value?.models?.length > 0) {
+        this.logger.warn('[ACTION AI_PROMPT] models: ', response?.value?.models);
+        response?.value?.models.forEach(el => this.autocompleteOptions.push({label: el, value: el}));
+      } else {
+        this.logger.warn('[ACTION AI_PROMPT] No models found in integration response');
+        return [];
+      }
+    } catch (error) {
+      this.logger.error('[ACTION AI_PROMPT] getIntegrationByName ERROR:', error);
+      return [];
+    }
+  }
+
+
 
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
@@ -211,15 +275,27 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.debug("[ACTION AI_PROMPT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
-  onChangeTextarea($event: string, property: string) {
-    this.logger.debug("[ACTION AI_PROMPT] changeTextarea event: ", $event);
-    this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
-    this.action[property] = $event;
+  onChangeTextarea(event: string, property: string) {
+    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event);
+    // this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
+    this.action[property] = event;
     // this.checkVariables();
+    // this.updateAndSaveAction.emit();
     // this.updateAndSaveAction.emit();
   }
 
-  onBlur(event){
+
+
+  
+
+  onOptionSelected(event: any, property: string){
+    this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
+    this.action[property] = event.value;
+    this.updateAndSaveAction.emit();
+  }
+
+  onBlur(event: string){
+    this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action);
     this.updateAndSaveAction.emit();
   }
 
@@ -231,21 +307,21 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
   onChangeSelect(event, target) {
-    this.logger.debug("[ACTION AI_PROMPT] onChangeSelect event: ", event.value)
-    this.logger.debug("[ACTION AI_PROMPT] onChangeSelect target: ", target)
+    this.logger.log("[ACTION AI_PROMPT] onChangeSelect event: ", event.value)
+    this.logger.log("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
     if(target === 'llm'){
       this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
       this.action.model= null;
+      this.initLLMModels();
     }
     this.updateAndSaveAction.emit();
   }
 
   updateSliderValue(event, target) {
-    this.logger.debug("[ACTION AI_PROMPT] updateSliderValue event: ", event)
-    this.logger.debug("[ACTION AI_PROMPT] updateSliderValue target: ", target)
+    this.logger.log("[ACTION AI_PROMPT] updateSliderValue event: ", event)
+    this.logger.log("[ACTION AI_PROMPT] updateSliderValue target: ", target)
     this.action[target] = event;
-
     this.updateAndSaveAction.emit();
   }
 
