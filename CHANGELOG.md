@@ -12,32 +12,63 @@
 - **bug-fixed**: css text-align and font-size in ng-select
 - **bug-fixed**: added cds-select onReset in operand cds-action-assign-variable-v2
 
-# 1.30.2
-- **bug-fixed**: deleted log widget
 
-# 1.30.1
+# 1.30.0-rc.11
+- **bug-fixed**: css text-align and font-size in ng-select
+- **bug-fixed**: added cds-select onReset in operand cds-action-assign-variable-v2
+
+# 1.30.0-rc.10
 - **bug-fixed**: fixed ExpressionChangedAfterItHasBeenCheckedError
 
-# 1.30.0
-- **changed**: Hide examples button if text exists in JSON buttons
-- **bug-fixed**: Fixed graphic errors examples button in JSON buttons
-- **bug-fixed**: Fixed logic example in JSON buttons
-- **bug-fixed**: Fixed graphic errors in JSON buttons
+# 1.30.0-rc.9
+- **canged**: Hide examples button if text exists in JSON buttons
+
+# 1.30.0-rc.8
+- **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
+- **bug-fixed**: Fixed logic example in JSON buttons 
+- **bug-fixed**: Fixed errors explode row in widget log
+- **bug-fixed**: scroll to bottom in widget log
+
+# 1.30.0-rc.7
+- **bug-fixed**: Fixed graphic errors in JSON buttons 
+
+# 1.30.0-rc.6
+- **canged**: changed graphics of the log widget
+
+# 1.30.0-rc.5
 - **added**: JSON buttons models
 - **added**: more info JSON buttons
+
+
+# 1.30.0-rc.4
+- **bug-fixed**: opacity label connector
+- **bug-fixed**: show hide label connector
+- **bug-fixed**: hide the label when the connector is not visible
+- **bug-fixed**: remove the label when I remove a connector
+- **bug-fixed**: hide contracted connector when delete or change connector from panel action
+- **bug-fixed**: chack show-hide connectors on all actions
+- **bug-fixed**: change z-index at connector menu
+- **canged**: save the state of the contracted connector in the intent json
+
+
+# 1.30.0-rc.3
 - **bug-fixed**: disabled JSON.parse in action jsonbuttons
+
+
+# 1.30.0-rc.2
+- **changed**: Webhook remove chat actions (tagAction)
+- **changed**: Webhook remove training and form sentences from blocks
+- **bug-fixed**: when I create a copilot webhook passing in the body copilot:true
+- **bug-fixed**: in the chatbot copilot webhook check the async loop
+
+# 1.30.0-rc.1
 - **added**: added json buttons
-- **canged**: Hide examples button if text exists in JSON buttons
-- **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
+- **changed**: hide Button typing alias in action reply
 
-
-# 1.29.2
-
-# 1.29.1
-- **added**: deepseek-chat llm model and claude 3.7
-- **removed**: mixtral-8x7b-32768 model
-
-# 1.29.0
+# 1.30.0-rc.0
+- **added**: hide/show single connector
+- **bug-fixed**: web request 
+- **changed**: change default intent color 
 
 # 1.29.0-rc.15
 - **bug-fixed**: new set thereIsWebResponse on createWebhook
@@ -66,14 +97,33 @@
 # 1.28.3
 - **bug-fixed**: widget into iframe not allows to use microphone
 
+# 1.28.3-rc.1
+- **bug-fixed**: widget into iframe not allows to use microphone
+
 # 1.28.1
 - **bug-fixed**: error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
 - **bug-fixed**: defaultfallback and start intents error to display in cds-panel-intent-list
+
+# 1.28.1-rc.1
+- **added**: create a new intent (float action menu) of the same color as the parent intent
+- **bug-fixed**: fixed error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
+- **bug-fixed**: fix default fallback and start blocks error to display in cds-panel-intent-list
 
 # 1.28.1
 - **added**: doc for AI_PROMPT and WHATSAPP actions
 
 # 1.28.0
+
+# 1.28.0-rc.2
+- **added**: added OpenIntentListState in local storage
+- **added**: added widget log panel
+- **changed**: new panel to change alpha color
+
+# 1.28.0-rc.1
+- **changed**: added sat-popover on change alpha color
+- **bug-fixed**: element position start only the first time
+- **bug-fixed**: cleanup of "stageService" file
+- **bug-fixed**: on live test of chatbot or intent, save scale and position
 
 # 1.27.0-rc.20
 - **bug-fixed**: initStageSettings
