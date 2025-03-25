@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.30.4
+- **changed**: added LLM Ollama and changed template selection from select to input with autocomplete
+
 # 1.30.3
 - **bug-fixed**: css text-align and font-size in ng-select
 - **bug-fixed**: added cds-select onReset in operand cds-action-assign-variable-v2
