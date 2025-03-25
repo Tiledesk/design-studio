@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.31.0-rc.3
+- **bug-fixed**: css center label in contract connector
+- **changed**: chaged max_token in ai actions
+- **changed**: open Advanced if they are valued in "Set attribute" action
 
 # 1.31.0-rc.2
 - **bug-fixed**: autocomplete panel dismissed when clicking on variables button
