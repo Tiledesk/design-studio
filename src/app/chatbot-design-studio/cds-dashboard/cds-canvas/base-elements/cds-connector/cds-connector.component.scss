@@ -136,10 +136,11 @@
     height: 24px;
     overflow: hidden;
     padding: 0px 10px;
-    justify-content: flex-start;
     flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    border: 1px solid rgb(230 230 230);
+    // // border: 1px solid rgb(230, 230, 230);
+    outline: 1px solid rgb(230, 230, 230);
+    border: none;
     border-radius: 6px;
+    margin: 0px;
+    align-items: center;
 }
