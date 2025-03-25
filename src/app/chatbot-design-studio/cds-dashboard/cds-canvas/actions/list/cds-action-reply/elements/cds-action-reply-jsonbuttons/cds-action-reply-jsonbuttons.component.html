@@ -1,8 +1,25 @@
-<div class="buttons-json-response" [class.json-shown]="showJsonBody">
-    <div class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
+<div class="buttons-json-response" [class.json-shown]="showJsonButton">
+    <cds-select *ngIf="showJsonButton"
+        class="text-condition" 
+        [items]="listType" 
+        [bindLabelSelect]="'name'"
+        [bindValueSelect]="'value'" 
+        [placeholder]="'CDSCanvas.Examples' | translate "
+        [deleteButton]="false"
+        [clearable]="false"
+        [searchable]="false"
+        (onSelected)="onChangeJsonButtonsType($event)"
+        (onReset)="onResetJsonButtonsType($event)"
+        [clearable]="true">
+    </cds-select>
+    <div *ngIf="!showJsonBody" class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
         + {{'CDSCanvas.JsonButtons' | translate }}
     </div>
 </div>
+
+
+
+
 <div *ngIf="showJsonBody" class="json-text">
     <cds-textarea
         class = "text-editable-div"
@@ -22,3 +39,8 @@
         </div>
     </div>
 </div>
+
+<label *ngIf="showJsonBody" class="field-description more-info2">
+    <a [href]="link.more_json_uttons.link" [target]='link.more_json_uttons.target'>{{ 'CDSCanvas.More' | translate }} </a>
+    <span> {{ "CDSCanvas.JSONButtons" | translate }}</span>
+</label>

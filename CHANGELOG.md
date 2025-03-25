@@ -7,6 +7,60 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.31.0-rc.2
+- **bug-fixed**: autocomplete panel dismissed when clicking on variables button
+- **bug-fixed**: added models ollama
+
+
+# 1.31.0-rc.1
+- **added**: Ollama AI type and select custom models
+- **canged**: select AI model with autocomplete
+
+
+# 1.30.3
+- **bug-fixed**: css text-align and font-size in ng-select
+- **bug-fixed**: added cds-select onReset in operand cds-action-assign-variable-v2
+
+
+# 1.30.0-rc.11
+- **bug-fixed**: css text-align and font-size in ng-select
+- **bug-fixed**: added cds-select onReset in operand cds-action-assign-variable-v2
+
+# 1.30.0-rc.10
+- **bug-fixed**: fixed ExpressionChangedAfterItHasBeenCheckedError
+
+# 1.30.0-rc.9
+- **canged**: Hide examples button if text exists in JSON buttons
+
+# 1.30.0-rc.8
+- **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
+- **bug-fixed**: Fixed logic example in JSON buttons 
+- **bug-fixed**: Fixed errors explode row in widget log
+- **bug-fixed**: scroll to bottom in widget log
+
+# 1.30.0-rc.7
+- **bug-fixed**: Fixed graphic errors in JSON buttons 
+
+# 1.30.0-rc.6
+- **canged**: changed graphics of the log widget
+
+# 1.30.0-rc.5
+- **added**: JSON buttons models
+- **added**: more info JSON buttons
+
+
+# 1.30.0-rc.4
+- **bug-fixed**: opacity label connector
+- **bug-fixed**: show hide label connector
+- **bug-fixed**: hide the label when the connector is not visible
+- **bug-fixed**: remove the label when I remove a connector
+- **bug-fixed**: hide contracted connector when delete or change connector from panel action
+- **bug-fixed**: chack show-hide connectors on all actions
+- **bug-fixed**: change z-index at connector menu
+- **canged**: save the state of the contracted connector in the intent json
+
+
 # 1.30.0-rc.3
 - **bug-fixed**: disabled JSON.parse in action jsonbuttons
 

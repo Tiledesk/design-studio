@@ -26,7 +26,9 @@ export class CdsWidgetLogsComponent implements OnInit {
   loadingPrev: boolean =  true;
   loadingNext: boolean =  false;
   LOG_LEVELS = LOG_LEVELS;
-  selectedLogLevel = LOG_LEVELS.DEFAULT;
+  selectedLogLevel = LOG_LEVELS.DEBUG;
+
+  // logMoc = [{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Executing Action Reply  {\n  \"_tdActionType\": \"reply\",\n  \"text\": \"I didn't understand. Can you rephrase your question?\",\n  \"attributes\": {\n    \"commands\": [\n      {\n        \"type\": \"wait\",\n        \"time\": 500\n      },\n      {\n        \"type\": \"message\",\n        \"message\": {\n          \"type\": \"text\",\n          \"text\": \"I didn't understand. Can you rephrase your question?\"\n        }\n      }\n    ],\n    \"fillParams\": true\n  }\n}","level":"info","_id":"67d9a14199ecba3167ed67fd","timestamp":"2025-03-18T16:37:21.826Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Action Reply terminated","level":"info","_id":"67d9a14299ecba3167ed6804","timestamp":"2025-03-18T16:37:22.500Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Executing Action Reply  {\n  \"_tdActionType\": \"reply\",\n  \"text\": \"I didn't understand. Can you rephrase your question?\",\n  \"attributes\": {\n    \"commands\": [\n      {\n        \"type\": \"wait\",\n        \"time\": 500\n      },\n      {\n        \"type\": \"message\",\n        \"message\": {\n          \"type\": \"text\",\n          \"text\": \"I didn't understand. Can you rephrase your question?\"\n        }\n      }\n    ],\n    \"fillParams\": true\n  }\n}","level":"info","_id":"67d9a14699ecba3167ed6809","timestamp":"2025-03-18T16:37:26.789Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Action Reply terminated","level":"info","_id":"67d9a14799ecba3167ed6816","timestamp":"2025-03-18T16:37:27.380Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Executing Action Reply  {\n  \"_tdActionType\": \"reply\",\n  \"text\": \"I didn't understand. Can you rephrase your question?\",\n  \"attributes\": {\n    \"commands\": [\n      {\n        \"type\": \"wait\",\n        \"time\": 500\n      },\n      {\n        \"type\": \"message\",\n        \"message\": {\n          \"type\": \"text\",\n          \"text\": \"I didn't understand. Can you rephrase your question?\"\n        }\n      }\n    ],\n    \"fillParams\": true\n  }\n}","level":"info","_id":"67d9a14899ecba3167ed681e","timestamp":"2025-03-18T16:37:28.688Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Action Reply terminated","level":"info","_id":"67d9a14999ecba3167ed6831","timestamp":"2025-03-18T16:37:29.285Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Executing Action Reply  {\n  \"_tdActionType\": \"reply\",\n  \"text\": \"I didn't understand. Can you rephrase your question?\",\n  \"attributes\": {\n    \"commands\": [\n      {\n        \"type\": \"wait\",\n        \"time\": 500\n      },\n      {\n        \"type\": \"message\",\n        \"message\": {\n          \"type\": \"text\",\n          \"text\": \"I didn't understand. Can you rephrase your question?\"\n        }\n      }\n    ],\n    \"fillParams\": true\n  }\n}","level":"info","_id":"67d9a14a99ecba3167ed683c","timestamp":"2025-03-18T16:37:30.254Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Action Reply terminated","level":"info","_id":"67d9a14a99ecba3167ed6855","timestamp":"2025-03-18T16:37:30.841Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Executing Action Reply  {\n  \"_tdActionType\": \"reply\",\n  \"text\": \"I didn't understand. Can you rephrase your question?\",\n  \"attributes\": {\n    \"commands\": [\n      {\n        \"type\": \"wait\",\n        \"time\": 500\n      },\n      {\n        \"type\": \"message\",\n        \"message\": {\n          \"type\": \"text\",\n          \"text\": \"I didn't understand. Can you rephrase your question?\"\n        }\n      }\n    ],\n    \"fillParams\": true\n  }\n}","level":"info","_id":"67d9a14d99ecba3167ed6863","timestamp":"2025-03-18T16:37:33.805Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Executing Action Reply  {\n  \"_tdActionType\": \"reply\",\n  \"text\": \"I didn't understand. Can you rephrase your question?\",\n  \"attributes\": {\n    \"commands\": [\n      {\n        \"type\": \"wait\",\n        \"time\": 500\n      },\n      {\n        \"type\": \"message\",\n        \"message\": {\n          \"type\": \"text\",\n          \"text\": \"I didn't understand. Can you rephrase your question?\"\n        }\n      }\n    ],\n    \"fillParams\": true\n  }\n}","level":"info","_id":"67d9a14e99ecba3167ed6882","timestamp":"2025-03-18T16:37:34.418Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Action Reply terminated","level":"info","_id":"67d9a14e99ecba3167ed6886","timestamp":"2025-03-18T16:37:34.420Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"},{"_id":"67d9a1410611804b01c80ba8","request_id":"support-group-67d958cf7fec42002d5950c8-c480ddba9788441eb24a195cbc4fa671","__v":0,"createdAt":"2025-03-18T16:37:21.822Z","rows":{"text":"Action Reply terminated","level":"info","_id":"67d9a14f99ecba3167ed68b8","timestamp":"2025-03-18T16:37:35.011Z"},"shortExp":"2025-03-18T16:37:35.010Z","updatedAt":"2025-03-18T16:37:35.010Z"}]
 
   constructor(
     private readonly el: ElementRef, 
@@ -50,7 +52,7 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.logService.getLastLogs(this.selectedLogLevel).subscribe({ next: (resp)=> {
       this.logService.initLogService(resp);
       this.loadingPrev = false;
-      this.listOfLogs = resp;
+      this.listOfLogs = resp; // //this.logMoc;//
     }, error: (error)=> {
       setTimeout(() => {
         this.loadingPrev = false;
@@ -94,6 +96,8 @@ export class CdsWidgetLogsComponent implements OnInit {
         setTimeout(() => {
           this.loadingPrev = false;
           this.loadingNext = false;
+          this.scrollTop = false;
+          this.scrollBottom = false;
         }, 1000);
         this.logger.log("[CDS-WIDGET-LOG] initLogService completed.");
       }});
@@ -159,9 +163,10 @@ export class CdsWidgetLogsComponent implements OnInit {
   // }
 
   onWheel(event: any) {
+    // //this.logger.log('[CDS-WIDGET-LOG] onWheel');
     const element = event.target;
     if (event.deltaY < 0) {
-      // this.logger.log('[CDS-WIDGET-LOG] Scroll verso l\'alto');
+      this.logger.log('[CDS-WIDGET-LOG] Scroll verso l alto');
       const atTop = element.scrollTop === 0;
       this.scrollBottom = false;
       if (atTop && !this.scrollTop) {
@@ -170,26 +175,50 @@ export class CdsWidgetLogsComponent implements OnInit {
           this.logger.log('[CDS-WIDGET-LOG] Sei già all\'inizio del div e stai scrollando ulteriormente verso l\'alto.');
       }
     } else if (event.deltaY > 0) {
-      // this.logger.log('[CDS-WIDGET-LOG] Scroll verso il basso');
+      this.logger.log('[CDS-WIDGET-LOG] Scroll verso il basso');
       const atBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
       this.scrollTop = false;
+      this.logger.log('[CDS-WIDGET-LOG] Scroll verso il basso', element.scrollHeight,  element.scrollTop, element.clientHeight, atBottom);
       if (atBottom && !this.scrollBottom) {
         this.scrollBottom = true;
         this.loadLogs("next");
         this.logger.log('[CDS-WIDGET-LOG] Sei già alla fine del div e stai scrollando ulteriormente verso il basso.');
       }
     }
-
-
-    // if (atTop && event.deltaY < 0 && this.scrollTop === null) {
-    //   this.scrollTop = true;
-    //   this.logger.log('[CDS-WIDGET-LOG] - Sei già all\'inizio del div e stai scrollando ulteriormente verso l\'alto.');
-    //   this.loadLogs("prev");
-    // }
   }
 
-  toggleLog() {
+  onToggleLog() {
     this.isClosed = !this.isClosed;
+  }
+
+  onToggleRowLog(i) {
+    if(this.isButtonEnabled(i)){
+      if(this.listOfLogs[i]['open']){
+        this.listOfLogs[i]['open'] = !this.listOfLogs[i]['open'];
+      } else {
+        this.listOfLogs[i]['open'] = true;
+      }
+    }
+    
+  }
+
+
+  isButtonEnabled(index: number): boolean {
+    const blockTextId = "row-log-text_"+index;
+    const elementText = document.getElementById(blockTextId);
+    const blockButtonId = "row-log-button_"+index;
+    const elementButton = document.getElementById(blockButtonId);
+    if (elementText && elementButton) {
+      if(elementText.offsetHeight > elementButton.offsetHeight){
+        this.logger.log(`[CDS-WIDGET-LOG] ENABLED: ${elementText.offsetHeight}, ${elementButton.offsetHeight} px`);
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      this.logger.log(`[CDS-WIDGET-LOG] DISABLED: ${elementText.offsetHeight}, ${elementButton.offsetHeight} px`);
+      return false;
+    }
   }
 
 
