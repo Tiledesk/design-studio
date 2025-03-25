@@ -79,6 +79,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   PLAN_NAME = PLAN_NAME
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.GPT_TASK;
+  llm_model = LLM_MODEL;
 
   autocompleteOptions: Array<{label: string, value: string}> = [];
   
@@ -93,9 +94,12 @@ export class CdsActionAiPromptComponent implements OnInit {
     private readonly projectService: ProjectService
   ) { }
 
+
   ngOnInit(): void {
-    this.logger.debug("[ACTION AI_PROMPT] ngOnInit action: ", this.action);
-    this.llm_models = LLM_MODEL.filter(el => el.status === 'active');
+    this.logger.log("[ACTION AI_PROMPT] ngOnInit action: ", this.action);
+    this.getOllamaModels();
+    this.logger.log("[ACTION AI_PROMPT] HO AGGIORNATO  llm_model: ", this.llm_model);
+    this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION AI_PROMPT] isChangedConnector -->', connector);
@@ -115,6 +119,7 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.initialize();
   }
 
+
   ngOnChanges(changes: SimpleChanges) {
     // // empty
   }
@@ -133,61 +138,48 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
 
+  async getOllamaModels(){
+    this.llm_model.forEach(async (model) => {
+      if (model.value === "ollama") {
+        const NEW_MODELS = await this.getIntegrationByName();
+        this.logger.log('[ACTION AI_PROMPT] - NEW_MODELS:', NEW_MODELS.value.models);
+        if(NEW_MODELS?.value?.models){
+          const models = NEW_MODELS?.value?.models.map(item => ({
+            name: item,
+            value: item
+          }));
+          model.models = models;
+        }
+      }
+    });
+  }
+
+  async getIntegrationByName(){
+    const projectID = this.dashboardService.projectID;
+    const integrationName = 'ollama';
+    try {
+        const response = await firstValueFrom(this.projectService.getIntegrationByName(projectID, integrationName));
+        this.logger.log('[ACTION AI_PROMPT] - integration response:', response.value);
+        return response;
+    } catch (error) {
+      this.logger.log('[ACTION AI_PROMPT] getIntegrationByName ERROR:', error);
+    }
+  }
+
+
   initLLMModels(){
     this.autocompleteOptions = [];
     this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
     if(this.action.llm){
-      let filteredModels;
-      if(this.action.llm === 'ollama') {
-        this.getIntegrationByName();
-      } else {
-        filteredModels = this.getModelsByName(this.action.llm);
-        filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
-        this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
-      }
+      const filteredModels = this.getModelsByName(this.action.llm);
+      filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
+      this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
     }
   }
 
   getModelsByName(value: string): any[] {
-    const model = LLM_MODEL.find((model) => model.value === value);
-    this.logger.log('[ACTION AI_PROMPT] initLLMModels',model);
-    switch (model.name) {
-      case "Cohere":
-        return COHERE_MODEL;
-      case 'Google':
-        return GOOGLE_MODEL;
-      case 'Anthropic':
-        return ANTHROPIC_MODEL;
-      case 'Groq':
-        return GROQ_MODEL;
-      case 'Deepseek':
-        return DEEPSEEK_MODEL;
-      case 'Ollama':
-        return OLLAMA_MODEL;
-      default:
-        return [];
-    }
-  }
-
-  async getIntegrationByName(): Promise<any[]> {
-    const projectID = this.dashboardService.projectID;
-    const integrationName = 'ollama';
-    try {
-      const response: any = await firstValueFrom(
-        this.projectService.getIntegrationByName(projectID, integrationName)
-      );
-      this.logger.log('[ACTION AI_PROMPT] - integration response:', response);
-      if (response?.value?.models?.length > 0) {
-        this.logger.warn('[ACTION AI_PROMPT] models: ', response?.value?.models);
-        response?.value?.models.forEach(el => this.autocompleteOptions.push({label: el, value: el}));
-      } else {
-        this.logger.warn('[ACTION AI_PROMPT] No models found in integration response');
-        return [];
-      }
-    } catch (error) {
-      this.logger.error('[ACTION AI_PROMPT] getIntegrationByName ERROR:', error);
-      return [];
-    }
+    const model = this.llm_model.find((model) => model.value === value);
+    return model.models;
   }
 
 
