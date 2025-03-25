@@ -85,9 +85,11 @@ export class CDSTextComponent implements OnInit {
     } else {
       this.myInput.nativeElement.classList.remove('autocompleteOpen')
       this.utilsComponent.nativeElement.classList.remove('slide-top')
-      this.autoComplete.closePanel();
+      //this.autoComplete.closePanel();
     }
   }
+
+
 
   onOptionSelectedFN(event){
     const selectedOption = this.autocompleteOptions.find(option => option.value === event.option.value);
@@ -123,7 +125,8 @@ export class CDSTextComponent implements OnInit {
 
   openSetAttributePopover() {
     // this.emojiPicker.toggle()
-    this.myInput.nativeElement.focus();
+    //this.myInput.nativeElement.focus();
+    this.utilsComponent.nativeElement.focus();
     this.onOpenClose('close')
   }
 
