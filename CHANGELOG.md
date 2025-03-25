@@ -8,6 +8,11 @@
 *Tiledesk SRL*
 
 
+# 1.31.0-rc.1
+- **added**: Ollama AI type and select custom models
+- **canged**: select AI model with autocomplete
+
+
 # 1.30.3
 - **bug-fixed**: css text-align and font-size in ng-select
 - **bug-fixed**: added cds-select onReset in operand cds-action-assign-variable-v2
