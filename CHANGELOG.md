@@ -8,6 +8,11 @@
 *Tiledesk SRL*
 
 
+# 1.31.0-rc.2
+- **bug-fixed**: autocomplete panel dismissed when clicking on variables button
+- **bug-fixed**: added models ollama
+
+
 # 1.31.0-rc.1
 - **added**: Ollama AI type and select custom models
 - **canged**: select AI model with autocomplete
