@@ -40,9 +40,11 @@ export class OperandV2Component implements OnInit {
             }
             if (data.function !== null) {
                 this.operand.function = data.function;
-                this.openSelectFunction = true
+                this.openSelectFunction = true;
+                this.panelOpenState = true;
             } else {
                 delete(this.operand.function);
+                this.panelOpenState = false;
             }
         });
         if (this.operand) {

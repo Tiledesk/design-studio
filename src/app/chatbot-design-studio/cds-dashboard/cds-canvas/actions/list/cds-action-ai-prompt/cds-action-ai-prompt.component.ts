@@ -48,7 +48,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 2048, step: 1},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 9999, step: 1},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
   }
   ai_response: string = "";
