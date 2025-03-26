@@ -1,9 +1,9 @@
-
 <div class="cds-toggle-setting-sidebar-icon-right-wpr" 
     [class.is_opened]="IS_OPEN_INTENTS_LIST"
     (click)="onToogleSidebarIntentsList()">
     <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->
-    <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span>
+    <!-- <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span> -->
+    <mat-icon *ngIf="!IS_OPEN_INTENTS_LIST" class="toggle-setting-sidebar-icon" svgIcon="chevron_right" aria-hidden="true"></mat-icon>
 </div>
 
 <div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
@@ -18,8 +18,9 @@
     <div class="cds-toggle-setting-sidebar-icon-left-wpr" 
         [class.is_opened]="IS_OPEN_INTENTS_LIST"
         (click)="onToogleSidebarIntentsList()">
-        <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span>
+        <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->
         <!-- <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span> -->
+        <mat-icon *ngIf="IS_OPEN_INTENTS_LIST" class="toggle-setting-sidebar-icon" svgIcon="chevron_left" aria-hidden="true"></mat-icon>
     </div>
 </div>
 

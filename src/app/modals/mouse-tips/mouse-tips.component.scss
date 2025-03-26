@@ -49,16 +49,18 @@
         font-size: 0.75rem;
     }
 
-    .section{
+    .section {
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
         align-items: center;
         width: 150px;
-
+        mat-icon {
+            width: auto;
+            height: 80px;
+        }
         img {
             height: 80px;
-            // filter: drop-shadow(5px 5px 10px #00000030)
         }
     }
 

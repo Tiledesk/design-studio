@@ -28,7 +28,6 @@
     height: 45px;
     padding-left: 12px;
     opacity: 1;
-    // transform: translate3d(0, 20px, 0);
     transition: 0.25s all ease-in-out;
   }
   
@@ -37,11 +36,6 @@
     right: 12px !important;
   }
   
-//   .panel-intent-content:hover .intent-header-actions-container {
-//     top: -28px;
-//     opacity: 1;
-//     transform: translate3d(0, 0, 0);
-//   }
   
   .intent-header-actions-wpr {
     background: #fff;
@@ -52,14 +46,6 @@
     padding: 3px 0px;
   }
   
-  .intent-header-action-btn {
-    cursor: pointer;
-    border-left: solid 1px var(--gray-light-02);
-    padding: 2px 8px;
-    display: flex;
-  
-  }
-  
   .intent-header-action-btn:first-child {
     border-left: unset;
   }
@@ -67,12 +53,27 @@
   .icon.webhook-enabled  img {
     filter: brightness(0) saturate(100%) invert(41%) sepia(79%) saturate(1263%) hue-rotate(121deg) brightness(101%) contrast(82%);
   }
-  
-  .icon img {
-    filter: brightness(0) saturate(100%) invert(46%) sepia(0%) saturate(0%) hue-rotate(216deg) brightness(94%) contrast(91%);
+
+
+  .intent-header-action-btn {
+    cursor: pointer;
+    border-left: solid 1px var(--gray-light-02);
+    padding: 2px 4px;
+    display: flex;
+    mat-icon {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      ::ng-deep svg {
+        fill: var(--gray);
+      }
+    }
   }
-  .icon:hover {
-    img {
-      filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+
+  .intent-header-action-btn:hover {
+    mat-icon {
+      ::ng-deep svg {
+          fill: var(--blu);
+      }
     }
   }

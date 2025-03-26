@@ -461,6 +461,14 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
 
+  getLlmIcon(llm: string): string {
+    this.logger.log("[ACTION AI_PROMPT] getLlmIcon ******: ", llm);
+    const filteredModel = this.llm_models.find((model) => model.value === llm);
+    this.logger.log("[ACTION AI_PROMPT] filteredModel ******: ", filteredModel);
+    return filteredModel ? filteredModel.value : '';
+  }
+
+
   // getResponsePreview() {
 
   //   this.showPreview = true;

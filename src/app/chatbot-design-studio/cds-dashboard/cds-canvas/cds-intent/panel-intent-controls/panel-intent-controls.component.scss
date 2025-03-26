@@ -12,6 +12,28 @@
     transform: translate3d(0, 20px, 0);
     transition: 0.25s all ease-in-out;
   }
+
+
+  .intent-header-action-btn {
+    mat-icon {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      ::ng-deep svg {
+        fill: var(--gray);
+      }
+    }
+  }
+
+
+  .intent-header-action-btn:hover {
+    mat-icon {
+      ::ng-deep svg {
+          fill: var(--blu);
+      }
+    }
+  }
+
   
   .panel-intent-content:hover .intent-header-actions-container-on-start {
     top: -19px !important;
@@ -32,6 +54,7 @@
     border: none;
     border-left: solid 1px var(--gray-light-02);
     background-color: rgba(255, 255, 255, 0);
+
     img {
       width: auto;
       height: 100%;
@@ -41,7 +64,7 @@
   .intent-header-action-btn {
     cursor: pointer;
     border-left: solid 1px var(--gray-light-02);
-    padding: 2px 8px;
+    padding: 2px 3px;
     display: flex;
   
   }

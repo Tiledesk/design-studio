@@ -20,9 +20,10 @@
     </div>
 
     <div class="action-row">
-
         <div id="gpt-icon" class="action-row-left icon-action">
-            <img *ngIf="!action?.llm" src="assets/images/icons/add_ai_model.svg" alt="ai model">
+            <mat-icon *ngIf="!action?.llm" svgIcon="add_ai_model" aria-hidden="true"></mat-icon>
+            <!-- <img *ngIf="!action?.llm" src="assets/images/icons/add_ai_model.svg" alt="ai model"> -->
+            <!-- <mat-icon *ngIf="action?.llm" [svgIcon]="getLlmIcon(action?.llm)" aria-hidden="true"></mat-icon> -->
             <img *ngIf="action?.llm" src="{{ (llm_models | filter:{key: 'value', value: action?.llm }).src }}" alt="">
         </div>
 
