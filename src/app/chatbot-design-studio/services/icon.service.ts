@@ -283,6 +283,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/block.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'bolt',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/bolt.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'chevron_left',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/chevron_left.svg')
     );
@@ -311,6 +315,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/edit.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'electric_bolt',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/electric_bolt.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'event',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/event.svg')
     );
@@ -335,6 +343,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/list_alt.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'man',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/man.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'more_vert',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/more_vert.svg')
     );
@@ -345,6 +357,10 @@ export class IconService {
     this.matIconRegistry.addSvgIcon(
       'play',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/play.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'search',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/search.svg')
     );
     this.matIconRegistry.addSvgIcon(
       'unfold',
