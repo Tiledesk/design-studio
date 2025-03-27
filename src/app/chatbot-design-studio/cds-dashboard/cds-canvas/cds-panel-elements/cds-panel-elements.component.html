@@ -75,7 +75,7 @@
 
     <!-- [actions]="actionsByCategory[actionCategory.type]" -->
     <div #menuElement id="menuElement" 
-        [style.display]="isOpen?'block':'none'" 
+        [style.display]="isOpen?'block':'block'" 
         [style.top.px]="positionMenu.y"
         [style.left.px]="positionMenu.x" 
         (mouseover)="onOverMenu()" 

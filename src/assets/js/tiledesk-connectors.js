@@ -1,29 +1,28 @@
 export class TiledeskConnectors {
-
-  constructor(drawerId, classes, connectors, scale=1) {
+  constructor(drawerId, classes, connectors, scale = 1) {
     // //this.connectors = [];
     this.svgContainerId = "tds_svgContainer";
     this.svgConnectorsId = "tds_svgConnectors";
     this.ids = {
-      "arrow": "tds_arrow",
-      "arrow_draft": "tds_arrow_draft",
-      "arrow_over": "tds_arrow_over",
-      "arrow_selected": "tds_arrow_selected"
-    }
+      arrow: "tds_arrow",
+      arrow_draft: "tds_arrow_draft",
+      arrow_over: "tds_arrow_over",
+      arrow_selected: "tds_arrow_selected",
+    };
     this.classes = {
-      "connector_selected": "tds_connector_selected",
-      "input_block": "tds_input_block",
-      "connectable": "tds_connectable",
-      "connector": "tds_connector",
-      "connector_over": "tds_connector_over",
-      "path": "tds_path",
-      "connector_draft": "tds_connector_draft",
-    }
+      connector_selected: "tds_connector_selected",
+      input_block: "tds_input_block",
+      connectable: "tds_connectable",
+      connector: "tds_connector",
+      connector_over: "tds_connector_over",
+      path: "tds_path",
+      connector_draft: "tds_connector_draft",
+    };
     this.colors = {
-      "black": "#b1b1b7",
-      "gray": "gray",
-      "blue": "#3ea9f5"
-    }
+      black: "#b1b1b7",
+      gray: "gray",
+      blue: "#3ea9f5",
+    };
 
     if (classes && classes["connector_selected"]) {
       this.classes["connector_selected"] = classes["connector_selected"];
@@ -51,7 +50,6 @@ export class TiledeskConnectors {
     }
     this.blocks = {};
 
-
     // this.svgContainer = document.getElementById("svgConnectors");
     this.drawerId = drawerId;
     this.scale = scale;
@@ -64,23 +62,40 @@ export class TiledeskConnectors {
     // this.connectorSelectedId = null;
 
     this.markers = [
-      { id: this.ids['arrow'], fill: this.colors['black'], class: this.classes['connector'] },
-      { id: this.ids['arrow_draft'], fill: this.colors['gray'], class: this.classes['connector_draft'] },
-      { id: this.ids['arrow_over'], fill: this.colors['gray'], class: this.classes['connector_over'] },
-      { id: this.ids['arrow_selected'], fill: this.colors['blue'], class: this.classes['connector_selected'] }
-    ]
+      {
+        id: this.ids["arrow"],
+        fill: this.colors["black"],
+        class: this.classes["connector"],
+      },
+      {
+        id: this.ids["arrow_draft"],
+        fill: this.colors["gray"],
+        class: this.classes["connector_draft"],
+      },
+      {
+        id: this.ids["arrow_over"],
+        fill: this.colors["gray"],
+        class: this.classes["connector_over"],
+      },
+      {
+        id: this.ids["arrow_selected"],
+        fill: this.colors["blue"],
+        class: this.classes["connector_selected"],
+      },
+    ];
 
     this.#createSvgContainer();
     //this.#createConnectors();
     this.#setEventListners();
 
     // console.log("[JS] constructor *** ", this.scale);
-
   }
 
-
   #setEventListners() {
-    document.addEventListener('keydown', this.onKeyPressDeleteConnector.bind(this));
+    document.addEventListener(
+      "keydown",
+      this.onKeyPressDeleteConnector.bind(this)
+    );
     // Rimuovi l'event listener
     // document.removeEventListener('keydown', onKeyPressDeleteConnector);
     // document.removeEventListener('keydown', this.onKeyPressDeleteConnector);
@@ -89,27 +104,27 @@ export class TiledeskConnectors {
     // document.removeEventListener(this.onKeyPressDeleteConnector);
   }
 
-
-
-
-
-
-
-
   // PUBLIC FUNCTIONS //
 
-
-  createConnector(fromId, toId, fromPoint, toPoint, save=false, notify=true, attributes=null) {
+  createConnector(
+    fromId,
+    toId,
+    fromPoint,
+    toPoint,
+    save = false,
+    notify = true,
+    attributes = null
+  ) {
     // console.log("createConnector:::::  ", fromId, toId, fromPoint, toPoint);
-    if(!fromPoint || !toPoint)return;
+    if (!fromPoint || !toPoint) return;
     const id = fromId + "/" + toId;
     let connector = {
       id: id,
       fromId: fromId,
       toId: toId,
       fromPoint: fromPoint,
-      toPoint: toPoint
-    }
+      toPoint: toPoint,
+    };
     this.connectors[connector.id] = connector;
     // connector as outConnector in outBlock
     const parentBlockId = fromId.split("/")[0];
@@ -131,21 +146,21 @@ export class TiledeskConnectors {
     this.#drawConnector(id, fromPoint, toPoint, attributes);
     this.removeConnectorDraft();
     // console.log("connector CREATED id, save, notify:", id, save, notify);
-    connector['save'] = save;
-    if(notify){
-      const event = new CustomEvent("connector-created", { detail: { connector: connector } });
+    connector["save"] = save;
+    if (notify) {
+      const event = new CustomEvent("connector-created", {
+        detail: { connector: connector },
+      });
       document.dispatchEvent(event);
     }
   }
-
-
 
   /* ***************************  DELETE *************************** */
   deleteAllConnectors() {
     // console.log('deleteAllConnectors::: ', this.connectors);
     for (const [key, connector] of Object.entries(this.connectors)) {
       this.deleteConnector(connector.id);
-    };
+    }
   }
 
   deleteConnectorsThatGoToTheBlockWithId(blockId) {
@@ -159,7 +174,7 @@ export class TiledeskConnectors {
     // console.log("[JS] connectors :---> ", this.connectors);
   }
 
-  deleteConnectorsOutOfBlock(blockId, save=false, notify=true) {
+  deleteConnectorsOutOfBlock(blockId, save = false, notify = true) {
     // console.log("[JS] deleteConnectorsOutOfBlock ----> ", blockId);
     for (var connectorId in this.connectors) {
       if (connectorId.startsWith(blockId)) {
@@ -170,7 +185,6 @@ export class TiledeskConnectors {
     // console.log("[JS] blocks :---> ", this.blocks);
     // console.log("[JS] connectors :---> ", this.connectors);
   }
-
 
   deleteConnectorsOfBlockThatDontExist(blockId) {
     // console.log("[JS] deleteConnectorsOfBlockThatDontExist ----> ", blockId);
@@ -184,7 +198,7 @@ export class TiledeskConnectors {
         // console.log("[JS] idConnectorElement ----> ", idConnectorElement);
         let connectorElement = document.getElementById(idConnectorElement);
         // console.log("[JS] connectorElement ----> ", connectorElement);
-        if(!connectorElement)this.deleteConnector(connectorId);
+        if (!connectorElement) this.deleteConnector(connectorId);
       }
     }
     // console.log("[JS] blocks :---> ", this.blocks);
@@ -211,9 +225,8 @@ export class TiledeskConnectors {
   //   }
   // }
 
-
   /**  */
-  deleteConnectorsOfBlock(blockId, save=false, notify=false) {
+  deleteConnectorsOfBlock(blockId, save = false, notify = false) {
     // console.log("[JS] deleteConnectorsOfBlock ----> ", blockId);
     let arrayOfDeletedConnectors = [];
     for (var connectorId in this.connectors) {
@@ -231,30 +244,34 @@ export class TiledeskConnectors {
     // console.log("[JS] blocks :---> ", this.blocks);
     // console.log("[JS] connectors :---> ", this.connectors);
     // console.log("[JS] arrayOfDeletedConnectors :---> ", arrayOfDeletedConnectors);
-    return arrayOfDeletedConnectors; 
+    return arrayOfDeletedConnectors;
   }
 
-
-
-  deleteConnector(connectorId, save=false, notify=true) {
-    // console.log('[JS] connectorId: ', connectorId);
-    // console.log('[JS] this.blocks: ', this.blocks);
-    // console.log('[JS] this.connectors: ', this.connectors);
+  deleteConnector(connectorId, save = false, notify = true) {
     let connectorElement = document.getElementById(connectorId);
-    // console.log('[JS] this.connectorElement: ', connectorElement);
+    let labelElement = document.getElementById("label_" + connectorId);
+    let rectElement = document.getElementById("rect_" + connectorId);
+    // // console.log('[JS] this.connectorElement: ', connectorElement);
     if (connectorElement) {
       connectorElement.remove();
+      if (labelElement) {
+        labelElement.remove();
+      }
+      if (rectElement) {
+        rectElement.remove();
+      }
       const connectorDeleted = this.connectors[connectorId];
       delete this.connectors[connectorId];
       if (connectorDeleted && notify) {
-        connectorDeleted['save'] = save;
-        // this.#removeConnector(connectorDeleted, );
-        const customEvent = new CustomEvent("connector-deleted", { detail: { connector: connectorDeleted } });
+        connectorDeleted["save"] = save;
+        // // this.#removeConnector(connectorDeleted, );
+        const customEvent = new CustomEvent("connector-deleted", {
+          detail: { connector: connectorDeleted },
+        });
         document.dispatchEvent(customEvent);
       }
     }
   }
-
 
   deleteConnectorInBlock(connectorId) {
     // console.log("deleteConnectorInBlock ----> ", this.blocks, connectorId, this.selectedConnector);
@@ -284,11 +301,13 @@ export class TiledeskConnectors {
 
   onKeyPressDeleteConnector(event) {
     // console.log('onKeyPressDeleteConnector:::: ', event, this.selectedConnector);
-    if (event.key === 'Delete' || event.key === 'Backspace' && this.selectedConnector) {
+    if (
+      event.key === "Delete" ||
+      (event.key === "Backspace" && this.selectedConnector)
+    ) {
       this.deleteConnector(this.selectedConnector.id, true, true);
     }
   }
-
 
   deleteConnectorFromAction(blockId, connId) {
     // console.log("deleteConnectorFromAction ----> ", connId, blockId);
@@ -311,7 +330,10 @@ export class TiledeskConnectors {
     for (var key in this.blocks) {
       var node = this.blocks[key];
       for (var connectorKey in node.outConnectors) {
-        if (connectorKey.includes(intentId) && !connectorKey.startsWith(intentId)) {
+        if (
+          connectorKey.includes(intentId) &&
+          !connectorKey.startsWith(intentId)
+        ) {
           // // console.log('DEL CONNECTOR : ', node.outConnectors[connectorKey]);
           delete node.outConnectors[connectorKey];
           this.deleteConnector(connectorKey);
@@ -319,8 +341,6 @@ export class TiledeskConnectors {
       }
     }
   }
-
-
 
   deleteConnectorsFromActionByActionId(actionId) {
     // // console.log("deleteConnectorsFromActionByActionId ----> ", actionId);
@@ -349,7 +369,6 @@ export class TiledeskConnectors {
     }
   }
 
-
   deleteConnectorsBrokenOutOfBlock(blockId) {
     // // console.log("[JS] deleteConnectorsBrokenOutOfBlock ----> ", this.connectors);
     for (var connectorId in this.connectors) {
@@ -357,9 +376,9 @@ export class TiledeskConnectors {
         // // console.log("[JS] deleteConnectorsBrokenOutOfBlock ----> ", connectorId, blockId);
         let connector = this.connectors[connectorId];
         // // console.log("[JS] deleteConnectorsBrokenOutOfBlock ----> ", connector);
-        const fromEle = document.getElementById(connector['fromId']);
-        const toEle = document.getElementById(connector['toId']);
-        if(!fromEle || !toEle){
+        const fromEle = document.getElementById(connector["fromId"]);
+        const toEle = document.getElementById(connector["toId"]);
+        if (!fromEle || !toEle) {
           this.deleteConnector(connectorId, false, false);
         }
       }
@@ -371,8 +390,8 @@ export class TiledeskConnectors {
   /** */
   createBlock(blockId) {
     let block = {
-      id: blockId
-    }
+      id: blockId,
+    };
     block.inConnectors = {}; //new Map();
     block.outConnectors = {}; //new Map();
     return block;
@@ -393,25 +412,39 @@ export class TiledeskConnectors {
     // // console.log("mousedown");
     this.connectableId = null;
     if (target.addEventListener) {
-      target.addEventListener("mousedown", (event) => {
-        // /console.log("[JS] mousedown  el.id:", event.target.id);
-        let el = event.target;
-        this.#removeSelection(el);
-        let elConnectable = this.#searchClassInParents(el, this.classes["connectable"]);
-        // // console.log("connectable? ", elConnectable);
-        if (elConnectable) {
-          // // console.log("connectable", elConnectable.id);
-          this.fromId = elConnectable.id;
-          this.drawingBack = this.elementLogicCenter(elConnectable);
-          // //this.ref_handleMouseMove;
-          // //this.ref_handleMouseUp;
-          target.addEventListener("mousemove", this.ref_handleMouseMove = this.#handleMouseMove.bind(this), false);
-          target.addEventListener("mouseup", this.ref_handleMouseUp = this.#handleMouseUp.bind(this), false);
-        }
-        else {
-          // console.log("un-connectable");
-        }
-      }, false);
+      target.addEventListener(
+        "mousedown",
+        (event) => {
+          // /console.log("[JS] mousedown  el.id:", event.target.id);
+          let el = event.target;
+          this.#removeSelection(el);
+          let elConnectable = this.#searchClassInParents(
+            el,
+            this.classes["connectable"]
+          );
+          // // console.log("connectable? ", elConnectable);
+          if (elConnectable) {
+            // // console.log("connectable", elConnectable.id);
+            this.fromId = elConnectable.id;
+            this.drawingBack = this.elementLogicCenter(elConnectable);
+            // //this.ref_handleMouseMove;
+            // //this.ref_handleMouseUp;
+            target.addEventListener(
+              "mousemove",
+              (this.ref_handleMouseMove = this.#handleMouseMove.bind(this)),
+              false
+            );
+            target.addEventListener(
+              "mouseup",
+              (this.ref_handleMouseUp = this.#handleMouseUp.bind(this)),
+              false
+            );
+          } else {
+            // console.log("un-connectable");
+          }
+        },
+        false
+      );
       /* 
       target.addEventListener("click", (event) => {
           // console.log("clicked el.id:", event.target.id)
@@ -423,9 +456,6 @@ export class TiledeskConnectors {
     }
   }
 
-
-
-
   removeConnectorDraft() {
     let connector = document.getElementById("connectorDraft");
     if (connector) {
@@ -433,9 +463,8 @@ export class TiledeskConnectors {
     }
   }
 
-
   moved(element, x, y) {
-  //  console.log("moving ----> ", element.id, x, y);
+    //  console.log("moving ----> ", element.id, x, y);
     const blockId = element.id;
     let block = this.blocks[blockId];
     if (!block) {
@@ -454,7 +483,7 @@ export class TiledeskConnectors {
         // // console.log("conn.fromPoint :---> ", conn.fromPoint);
         this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
       }
-    };
+    }
     // block.inConnectors.forEach((conn_id, key) => {
     for (const [key, conn_id] of Object.entries(block.inConnectors)) {
       //for (k in block.inConnectors.keys) {
@@ -466,11 +495,8 @@ export class TiledeskConnectors {
         conn.toPoint.y = y + 20;
         this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
       }
-    };
+    }
   }
-
-
-
 
   /** PRIVATE FUNCTIONS */
 
@@ -478,7 +504,10 @@ export class TiledeskConnectors {
   #createSvgContainer() {
     const drawer = document.getElementById(this.drawerId);
     if (!drawer) return;
-    let svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    let svgContainer = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    );
     svgContainer.id = this.svgContainerId;
     svgContainer.style.overflow = "visible";
     svgContainer.style.left = "0px";
@@ -486,10 +515,16 @@ export class TiledeskConnectors {
     svgContainer.style.position = "absolute";
     svgContainer.style.zIndex = "inherit";
     // Create the `<defs>` element and attributes
-    const defsElement = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    const defsElement = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "defs"
+    );
     // Create `<marker>` element and attributes
-    this.markers.forEach(element => {
-      const markerElement = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+    this.markers.forEach((element) => {
+      const markerElement = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "marker"
+      );
       markerElement.setAttribute("id", element.id);
       markerElement.setAttribute("markerWidth", "10");
       markerElement.setAttribute("markerHeight", "20");
@@ -498,7 +533,10 @@ export class TiledeskConnectors {
       markerElement.setAttribute("markerUnits", "userSpaceOnUse");
       markerElement.setAttribute("orient", "auto");
       // Create `<polygon>` element and attributes
-      const polygonElement = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      const polygonElement = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polygon"
+      );
       polygonElement.setAttribute("fill", element.fill);
       polygonElement.setAttribute("class", element.class);
       polygonElement.setAttribute("points", "10 6, 10 14, 2 10");
@@ -510,10 +548,13 @@ export class TiledeskConnectors {
     // Add the `<defs>` come figlio di <svg>
     svgContainer.appendChild(defsElement);
     // Create `<g>` element and attributes
-    const gElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    const gElement = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "g"
+    );
     gElement.id = this.svgConnectorsId;
     gElement.setAttribute("fill", "white");
-    gElement.setAttribute("stroke", this.colors['black']);
+    gElement.setAttribute("stroke", this.colors["black"]);
     gElement.setAttribute("stroke-width", "3");
     svgContainer.appendChild(gElement);
     // Add the `<g>` come figlio di <svg>
@@ -521,17 +562,16 @@ export class TiledeskConnectors {
     this.svgContainer = document.getElementById(this.svgConnectorsId);
   }
 
-
   addCustomMarker(element, color) {
     const markerId = `marker_${element.id}`;
-    const tds_svgContainer = document.getElementById('tds_svgContainer');
+    const tds_svgContainer = document.getElementById("tds_svgContainer");
     if (!tds_svgContainer) {
-      console.warn('Element #tds_svgContainer not found.');
+      console.warn("Element #tds_svgContainer not found.");
       return;
     }
-    const defs = tds_svgContainer.querySelector('defs');
+    const defs = tds_svgContainer.querySelector("defs");
     if (!defs) {
-      console.warn('<defs> not found in #tds_svgContainer.');
+      console.warn("<defs> not found in #tds_svgContainer.");
       return;
     }
     // Check if the marker already exists and remove it
@@ -540,7 +580,10 @@ export class TiledeskConnectors {
       defs.removeChild(existingMarker);
     }
     // Create new marker
-    const markerElement = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+    const markerElement = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "marker"
+    );
     markerElement.setAttribute("id", markerId);
     markerElement.setAttribute("markerWidth", "10");
     markerElement.setAttribute("markerHeight", "20");
@@ -548,22 +591,33 @@ export class TiledeskConnectors {
     markerElement.setAttribute("refY", "10");
     markerElement.setAttribute("markerUnits", "userSpaceOnUse");
     markerElement.setAttribute("orient", "auto");
-    const polygonElement = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    const polygonElement = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "polygon"
+    );
     polygonElement.setAttribute("fill", color);
-    polygonElement.setAttribute("class", this.ids['arrow_custom']);
+    polygonElement.setAttribute("class", this.ids["arrow_custom"]);
     polygonElement.setAttribute("points", "10 6, 10 14, 2 10");
     markerElement.appendChild(polygonElement);
     // Add marker to <defs>
     defs.appendChild(markerElement);
     // Assign marker to element
-    element.setAttributeNS(null, 'marker-start', `url(#${markerId})`);
+    element.setAttributeNS(null, "marker-start", `url(#${markerId})`);
   }
 
   /** createConnectors */
   #createConnectors() {
-    console.log('[JS] createConnectors: ', this.connectors);
+    console.log("[JS] createConnectors: ", this.connectors);
     for (const [value] of Object.entries(this.connectors)) {
-      this.createConnector(value.fromId, value.toId, value.fromPoint, value.toPoint, false, false, null);
+      this.createConnector(
+        value.fromId,
+        value.toId,
+        value.fromPoint,
+        value.toPoint,
+        false,
+        false,
+        null
+      );
     }
   }
 
@@ -593,24 +647,33 @@ export class TiledeskConnectors {
   #removeSelection(target) {
     // console.log("---> resetting connector selection?", this.selectedConnector, target)
     if (this.selectedConnector) {
-      if (!target.id || (this.selectedConnector.id !== target.id)) {
-        this.selectedConnector.setAttributeNS(null, "class", this.classes["connector"]);
+      if (!target.id || this.selectedConnector.id !== target.id) {
+        this.selectedConnector.setAttributeNS(
+          null,
+          "class",
+          this.classes["connector"]
+        );
         ////this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
         const markerId = `marker_${this.selectedConnector.id}`;
-        this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + markerId + ")");
+        this.selectedConnector.setAttributeNS(
+          null,
+          "marker-start",
+          "url(#" + markerId + ")"
+        );
         this.selectedConnector = null;
       }
     }
   }
-
-
 
   /** handleMouseMove */
   #handleMouseMove(event) {
     // /console.log("[JS] handleMouseMove...", event.target.id);
     let mouse_pos_logic;
     const target = event.target;
-    let elConnectable = this.#searchClassInParents(target, this.classes["input_block"]);
+    let elConnectable = this.#searchClassInParents(
+      target,
+      this.classes["input_block"]
+    );
     if (elConnectable && elConnectable.id && this.fromId) {
       // console.log("1 connectable? ", this.fromId, elConnectable.id);
       // if (this.fromId.startsWith(elConnectable.id)) {
@@ -627,29 +690,32 @@ export class TiledeskConnectors {
       this.toPointPhis = { x: pos_x_phis, y: pos_y_phis };
       if (!this.connectableId) {
         this.connectableId = elConnectable.id;
-        const connectorMovedOverIntent = new CustomEvent("connector-moved-over-intent",
+        const connectorMovedOverIntent = new CustomEvent(
+          "connector-moved-over-intent",
           {
             detail: {
               fromId: this.fromId,
-              toId: elConnectable.id
-            }
-          })
+              toId: elConnectable.id,
+            },
+          }
+        );
         document.dispatchEvent(connectorMovedOverIntent);
         // console.log("connector-moved-over-intent!");
       }
-    }
-    else {
+    } else {
       let pos_x_phis = event.clientX;
       let pos_y_phis = event.clientY;
       mouse_pos_logic = this.logicPoint({ x: pos_x_phis, y: pos_y_phis });
       this.toPoint = mouse_pos_logic;
       this.toPointPhis = { x: pos_x_phis, y: pos_y_phis };
-      const connectorMovedOutOfIntent = new CustomEvent("connector-moved-out-of-intent",
+      const connectorMovedOutOfIntent = new CustomEvent(
+        "connector-moved-out-of-intent",
         {
           detail: {
-            toId: this.connectableId
-          }
-        })
+            toId: this.connectableId,
+          },
+        }
+      );
       document.dispatchEvent(connectorMovedOutOfIntent);
       // console.log("connector-moved-out-of-intent!");
       this.connectableId = null;
@@ -661,14 +727,25 @@ export class TiledeskConnectors {
   /** handleMouseUp */
   #handleMouseUp(event) {
     // /console.log("[JS] handleMouseUp:::::  ", event.target.classList);
-    this.target.removeEventListener("mousemove", this.ref_handleMouseMove, false);
+    this.target.removeEventListener(
+      "mousemove",
+      this.ref_handleMouseMove,
+      false
+    );
     this.target.removeEventListener("mouseup", this.ref_handleMouseUp, false);
 
     const connectable = this.classes["connectable"];
-    if (event.target && event.target.classList && event.target.classList.contains(connectable)) {
+    if (
+      event.target &&
+      event.target.classList &&
+      event.target.classList.contains(connectable)
+    ) {
       return null;
     }
-    let elConnectable = this.#searchClassInParents(event.target, this.classes["input_block"]);
+    let elConnectable = this.#searchClassInParents(
+      event.target,
+      this.classes["input_block"]
+    );
     if (elConnectable && elConnectable.id && this.fromId) {
       // console.log("2 connectable? ", this.fromId, elConnectable.id);
       // if (this.fromId.startsWith(elConnectable.id)) {
@@ -678,8 +755,17 @@ export class TiledeskConnectors {
 
     if (elConnectable) {
       // /console.log("[JS] handleMouseUp:::::  elConnectable");
-      this.createConnector(this.fromId, elConnectable.id, this.drawingBack, this.toPoint, true, true, null);
-      const connectorReleaseOnIntent = new CustomEvent("connector-release-on-intent",
+      this.createConnector(
+        this.fromId,
+        elConnectable.id,
+        this.drawingBack,
+        this.toPoint,
+        true,
+        true,
+        null
+      );
+      const connectorReleaseOnIntent = new CustomEvent(
+        "connector-release-on-intent",
         {
           detail: {
             fromId: this.fromId,
@@ -687,26 +773,25 @@ export class TiledeskConnectors {
             fromPoint: this.drawingBack,
             toPoint: this.toPoint,
             menuPoint: this.toPointPhis,
-            target: event.target
-          }
-        });
+            target: event.target,
+          },
+        }
+      );
       document.dispatchEvent(connectorReleaseOnIntent);
-    }
-    else if (this.drawingBack && this.toPoint) {
+    } else if (this.drawingBack && this.toPoint) {
       // quando rilascio il connector sullo stage e apro il float menu
       // quando rilascio il connector in un altro punto qualsiasi
       // // console.log("connector released on an unsupported element!");
       // this.removeConnectorDraft();
-      const fire_event = new CustomEvent("connector-draft-released",
-        {
-          detail: {
-            fromId: this.fromId,
-            fromPoint: this.drawingBack,
-            toPoint: this.toPoint,
-            menuPoint: this.toPointPhis,
-            target: event.target
-          }
-        });
+      const fire_event = new CustomEvent("connector-draft-released", {
+        detail: {
+          fromId: this.fromId,
+          fromPoint: this.drawingBack,
+          toPoint: this.toPoint,
+          menuPoint: this.toPointPhis,
+          target: event.target,
+        },
+      });
       document.dispatchEvent(fire_event);
       // // console.log("connector-draft-released fired!");
     }
@@ -722,10 +807,12 @@ export class TiledeskConnectors {
   #updateControlPoints() {
     if (this.drawingFront.x < this.drawingBack.x) {
       const front_back_dist_x = this.drawingBack.x - this.drawingFront.x;
-      this.controlFront.x = this.drawingFront.x - (front_back_dist_x);
-      this.controlBack.x = this.drawingBack.x + (front_back_dist_x);
+      this.controlFront.x = this.drawingFront.x - front_back_dist_x;
+      this.controlBack.x = this.drawingBack.x + front_back_dist_x;
     } else {
-      const front_back_half_dist = Math.round((this.drawingFront.x - this.drawingBack.x) / 2);
+      const front_back_half_dist = Math.round(
+        (this.drawingFront.x - this.drawingBack.x) / 2
+      );
       this.controlFront.x = this.drawingBack.x + front_back_half_dist;
       this.controlBack.x = this.drawingBack.x + front_back_half_dist;
     }
@@ -733,13 +820,15 @@ export class TiledeskConnectors {
     this.controlBack.y = this.drawingBack.y;
   }
 
-
   /** drawConnectorDraft */
   #drawConnectorDraft() {
     console.log("[JS] drawConnectorDraft:::::  ");
     let connector = document.getElementById("connectorDraft");
     if (!connector) {
-      connector = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      connector = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path"
+      );
       connector.setAttributeNS(null, "fill", "transparent");
       connector.setAttributeNS(null, "id", "connectorDraft");
       this.svgContainer.appendChild(connector);
@@ -750,56 +839,109 @@ export class TiledeskConnectors {
     controlFront.y = this.drawingFront.y;
     controlBack.x = this.drawingBack.x + 200;
     controlBack.y = this.drawingBack.y;
-    let d = "M" + (this.drawingFront.x - 10) + " " + this.drawingFront.y + " " + "C " + controlFront.x + " " + controlFront.y + " " + controlBack.x + " " + controlBack.y + " " + this.drawingBack.x + " " + this.drawingBack.y;
+    let d =
+      "M" +
+      (this.drawingFront.x - 10) +
+      " " +
+      this.drawingFront.y +
+      " " +
+      "C " +
+      controlFront.x +
+      " " +
+      controlFront.y +
+      " " +
+      controlBack.x +
+      " " +
+      controlBack.y +
+      " " +
+      this.drawingBack.x +
+      " " +
+      this.drawingBack.y;
     connector.setAttributeNS(null, "d", d);
-    connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow_draft'] + ")");
+    connector.setAttributeNS(
+      null,
+      "marker-start",
+      "url(#" + this.ids["arrow_draft"] + ")"
+    );
     connector.setAttributeNS(null, "class", this.classes["path"]);
   }
 
-  /** 
+  /**
    * Creates or modify a connector in HTML
    */
-  #drawConnector(id, backPoint, frontPoint, attributes=null) {
-    // /console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+  #drawConnector(id, backPoint, frontPoint, attributes = null) {
+    // // console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
     let label = null;
-    if(attributes && attributes.label){
+    if (attributes?.label) {
       label = attributes.label;
     }
+    const display = attributes?.display === false ? "none" : "flex";
+
     let connector = document.getElementById(id);
     if (!connector) {
-      connector = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      connector = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path"
+      );
       connector.setAttributeNS(null, "fill", "transparent");
       connector.setAttributeNS(null, "id", id);
       connector.setAttributeNS(null, "class", "connector");
       connector.setAttributeNS(null, "pointer-events", "stroke");
-
+      connector.setAttributeNS(null, "display", display);
       // Quando il connettore perde il focus (blur), deselezionalo
-      connector.addEventListener('blur', () => { 
+      connector.addEventListener("blur", () => {
         const deselectEvent = new CustomEvent("connector-deselected");
         document.dispatchEvent(deselectEvent);
       });
 
-      connector.addEventListener('mouseover', (e) => {
+      connector.addEventListener("mouseover", (e) => {
         if (this.selectedConnector !== null) {
           if (this.selectedConnector.id !== e.currentTarget.id) {
-            e.currentTarget.setAttributeNS(null, "class", this.classes["connector_over"]);
-            connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow_over'] + ")");
+            e.currentTarget.setAttributeNS(
+              null,
+              "class",
+              this.classes["connector_over"]
+            );
+            connector.setAttributeNS(
+              null,
+              "marker-start",
+              "url(#" + this.ids["arrow_over"] + ")"
+            );
           }
-        }
-        else {
-          e.currentTarget.setAttributeNS(null, "class", this.classes["connector_over"]);
-          connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow_over'] + ")");
+        } else {
+          e.currentTarget.setAttributeNS(
+            null,
+            "class",
+            this.classes["connector_over"]
+          );
+          connector.setAttributeNS(
+            null,
+            "marker-start",
+            "url(#" + this.ids["arrow_over"] + ")"
+          );
         }
       });
-      connector.addEventListener('mouseleave', (e) => {
+      connector.addEventListener("mouseleave", (e) => {
         // // console.log("mouseleave e", e.currentTarget);
-        if (!e.currentTarget.classList.contains(this.classes["connector_selected"])) {
-          e.currentTarget.setAttributeNS(null, "class", this.classes["connector"]);
+        if (
+          !e.currentTarget.classList.contains(
+            this.classes["connector_selected"]
+          )
+        ) {
+          e.currentTarget.setAttributeNS(
+            null,
+            "class",
+            this.classes["connector"]
+          );
           const markerId = `marker_${e.currentTarget.id}`;
-          connector.setAttributeNS(null, "marker-start", "url(#" + markerId + ")");
+          connector.setAttributeNS(
+            null,
+            "marker-start",
+            "url(#" + markerId + ")"
+          );
         }
       });
-      connector.addEventListener('click', (e) => {
+      connector.addEventListener("click", (e) => {
         let pos_x_phis = e.clientX;
         let pos_y_phis = e.clientY;
         let mouse_pos_logic = this.logicPoint({ x: pos_x_phis, y: pos_y_phis });
@@ -807,13 +949,31 @@ export class TiledeskConnectors {
         // // console.log("clicked e", e, toPointPhis, mouse_pos_logic);
         // // console.log("clicked e", e.currentTarget);
         if (this.selectedConnector) {
-          this.selectedConnector.setAttributeNS(null, "class", this.classes["connector"]);
-          this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
+          this.selectedConnector.setAttributeNS(
+            null,
+            "class",
+            this.classes["connector"]
+          );
+          this.selectedConnector.setAttributeNS(
+            null,
+            "marker-start",
+            "url(#" + this.ids["arrow"] + ")"
+          );
         }
         this.selectedConnector = e.currentTarget;
-        this.selectedConnector.setAttributeNS(null, "class", this.classes["connector_selected"]);
-        this.selectedConnector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow_selected'] + ")");
-        const event = new CustomEvent("connector-selected", { detail: { connector: connector, mouse_pos: mouse_pos_logic } });
+        this.selectedConnector.setAttributeNS(
+          null,
+          "class",
+          this.classes["connector_selected"]
+        );
+        this.selectedConnector.setAttributeNS(
+          null,
+          "marker-start",
+          "url(#" + this.ids["arrow_selected"] + ")"
+        );
+        const event = new CustomEvent("connector-selected", {
+          detail: { connector: connector, mouse_pos: mouse_pos_logic },
+        });
         document.dispatchEvent(event);
       });
       this.svgContainer.appendChild(connector);
@@ -823,8 +983,11 @@ export class TiledeskConnectors {
       const y = (frontPoint.y + backPoint.y) / 2;
       let group = document.createElementNS("http://www.w3.org/2000/svg", "g");
       group.setAttributeNS(null, "class", `line-text-connector`);
-      let lineText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      lineText.setAttributeNS(null, "id", "label_"+id);
+      let lineText = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+      );
+      lineText.setAttributeNS(null, "id", "label_" + id);
       lineText.setAttributeNS(null, "x", String(x));
       lineText.setAttributeNS(null, "y", String(y));
       lineText.setAttributeNS(null, "text-anchor", "middle");
@@ -832,24 +995,28 @@ export class TiledeskConnectors {
       lineText.setAttributeNS(null, "stroke", "none");
       lineText.setAttributeNS(null, "fill", "#b1b1b7");
       lineText.setAttributeNS(null, "style", `font-size: 12px;`);
+      lineText.setAttributeNS(null, "display", display);
       lineText.textContent = label;
       group.appendChild(lineText);
+
       const bbox = lineText.getBBox();
       group.removeChild(lineText);
-      const rectWidth = bbox.width?bbox.width+10:0;
-      const rectHeight = bbox.height?bbox.height+10:0;
+      const rectWidth = bbox.width ? bbox.width + 10 : 0;
+      const rectHeight = bbox.height ? bbox.height + 10 : 0;
       let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      rect.setAttributeNS(null, "id", "rect_"+id);
-      rect.setAttributeNS(null, "x", String( x - rectWidth / 2));
-      rect.setAttributeNS(null, "y", String( y - rectHeight / 2));
+      rect.setAttributeNS(null, "id", "rect_" + id);
+      rect.setAttributeNS(null, "x", String(x - rectWidth / 2));
+      rect.setAttributeNS(null, "y", String(y - rectHeight / 2));
       rect.setAttributeNS(null, "width", String(rectWidth));
       rect.setAttributeNS(null, "height", String(rectHeight));
       rect.setAttributeNS(null, "fill", "#fcfafa");
       rect.setAttributeNS(null, "stroke", "none");
-      rect.setAttributeNS(null, "rx", "8"); 
+      rect.setAttributeNS(null, "rx", "8");
+      rect.setAttributeNS(null, "display", display);
       // //rect.setAttributeNS(null, "style", `left:${x}; top:${y};`);
       group.appendChild(rect);
       group.appendChild(lineText);
+
       this.svgContainer.appendChild(group);
     }
 
@@ -860,31 +1027,54 @@ export class TiledeskConnectors {
     controlFront.y = frontPoint.y;
     controlBack.x = backPoint.x + 200;
     controlBack.y = backPoint.y;
-    let d = "M" + (frontPoint.x - 10) + " " + frontPoint.y + " " + "C " + controlFront.x + " " + controlFront.y + " " + controlBack.x + " " + controlBack.y + " " + backPoint.x + " " + backPoint.y;
+    let d =
+      "M" +
+      (frontPoint.x - 10) +
+      " " +
+      frontPoint.y +
+      " " +
+      "C " +
+      controlFront.x +
+      " " +
+      controlFront.y +
+      " " +
+      controlBack.x +
+      " " +
+      controlBack.y +
+      " " +
+      backPoint.x +
+      " " +
+      backPoint.y;
     connector.setAttributeNS(null, "d", d);
-    connector.setAttributeNS(null, "marker-start", "url(#" + this.ids['arrow'] + ")");
+    connector.setAttributeNS(
+      null,
+      "marker-start",
+      "url(#" + this.ids["arrow"] + ")"
+    );
     this.updateLineTextPosition(id, frontPoint, backPoint);
 
-    const event = new CustomEvent("connector-drawn", { detail: { connector: connector } });
+    const event = new CustomEvent("connector-drawn", {
+      detail: { connector: connector },
+    });
     document.dispatchEvent(event);
   }
 
-  updateLineTextPosition(id, frontPoint, backPoint){
-    let lineText = document.getElementById("label_"+id);
-    let rect = document.getElementById("rect_"+id);
+  updateLineTextPosition(id, frontPoint, backPoint) {
+    let lineText = document.getElementById("label_" + id);
+    let rect = document.getElementById("rect_" + id);
     if (lineText && rect) {
       const bbox = lineText.getBBox();
       let rectWidth = 0;
       let rectHeight = 0;
-      if(lineText.textContent && lineText.textContent !== ''){
+      if (lineText.textContent && lineText.textContent !== "") {
         rectWidth = bbox.width + 10;
         rectHeight = bbox.height + 10;
-      } 
+      }
       const x = (frontPoint.x + backPoint.x) / 2;
       const y = (frontPoint.y + backPoint.y) / 2;
       lineText.setAttributeNS(null, "x", String(x));
       lineText.setAttributeNS(null, "y", String(y));
-      rect.setAttributeNS(null, "x",  String(x - rectWidth / 2));
+      rect.setAttributeNS(null, "x", String(x - rectWidth / 2));
       rect.setAttributeNS(null, "y", String(y - rectHeight / 2));
       rect.setAttributeNS(null, "width", String(rectWidth));
       rect.setAttributeNS(null, "height", String(rectHeight));
@@ -913,7 +1103,7 @@ export class TiledeskConnectors {
   elementLogicCenter(element) {
     const rect = element.getBoundingClientRect();
     // // console.log("Logic center of phisical rect:", rect);
-    let logic_rect_pos = this.logicPoint({ x: rect.left, y: rect.top })
+    let logic_rect_pos = this.logicPoint({ x: rect.left, y: rect.top });
     // // console.log("center: logic_rect_pos:", logic_rect_pos);
     const logic_width = this.#toLogicScale(rect.width);
     // // console.log("center: logic_width:", logic_width);
@@ -928,7 +1118,10 @@ export class TiledeskConnectors {
 
   elementLogicTopLeft(element) {
     // // console.log('elementLogicTopLeft');
-    let elConnectable = this.#searchClassInParents(element, this.classes["input_block"]);
+    let elConnectable = this.#searchClassInParents(
+      element,
+      this.classes["input_block"]
+    );
     if (elConnectable) {
       const block_rect = elConnectable.getBoundingClientRect();
       let pos_x_phis = block_rect.left;
@@ -941,7 +1134,6 @@ export class TiledeskConnectors {
       return mouse_pos_logic;
     }
   }
-
 
   // createConnectorFromId(fromId, toId, save=false, undo=false, notify=false) {
   //   // console.log("createConnectorFromId fromId - toId:", fromId, toId);
@@ -956,13 +1148,13 @@ export class TiledeskConnectors {
   //   return false;
   // }
 
-
-
   updateConnectorsOutOfItent(element) {
     // // console.log("updateConnectorsOutOfItent ----> ", this.blocks, element.id);
     const blockId = element.id;
     let block = this.blocks[blockId];
-    if (!block) { return; }
+    if (!block) {
+      return;
+    }
     // // console.log("block :---> ", block);
     for (const [key, conn_id] of Object.entries(block.outConnectors)) {
       let conn = this.connectors[conn_id];
@@ -980,19 +1172,17 @@ export class TiledeskConnectors {
           // // console.log("conn.toPoint :---> ", elToId, conn.toId, conn.toPoint);
         }
         // // console.log("conn :---> ", elFrom, elToId);
-        if(elFrom && elToId){
+        if (elFrom && elToId) {
           this.#drawConnector(conn.id, conn.fromPoint, conn.toPoint);
-          conn['notify']='';
+          conn["notify"] = "";
           // // const event = new CustomEvent("connector-updated", { detail: { connector: conn } });
           // // document.dispatchEvent(event);
         } else {
           this.deleteConnector(conn_id, false, true);
         }
-        
       }
-    };
+    }
   }
-
 
   // updateConnectorAttributes(id, attributes=null) {
   //   console.log("updateConnectorAttributes:::::  ", attributes);
@@ -1045,5 +1235,4 @@ export class TiledeskConnectors {
     // // console.log("updateConnectorsOfItent ----> ", this.blocks, element.id);
     this.updateConnectorsOutOfItent(element);
   }
-
 }
