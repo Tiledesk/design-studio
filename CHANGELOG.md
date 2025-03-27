@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.31.0-rc.4
+- **added**: added lazy loading icons
+
+
 # 1.31.0-rc.3
 - **bug-fixed**: css center label in contract connector
 - **changed**: chaged max_token in ai actions
