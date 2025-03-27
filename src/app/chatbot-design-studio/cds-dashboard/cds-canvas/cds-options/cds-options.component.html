@@ -6,9 +6,12 @@
             <div class="cds-box-button">
                 <span class="box-img">
             
-                    <span *ngIf="alpha > 0; else hideIcon" class="material-icons-outlined">visibility</span>
+                    <!-- <span *ngIf="alpha > 0; else hideIcon" class="material-icons-outlined">visibility</span> -->
+                    <mat-icon *ngIf="alpha > 0; else hideIcon" class="icon" svgIcon="visibility" aria-hidden="true"></mat-icon>
+
                     <ng-template #hideIcon>
-                    <span class="material-icons-outlined">visibility_off</span>
+                        <!-- <span class="material-icons-outlined">visibility_off</span> -->
+                        <mat-icon class="icon" svgIcon="visibility_off" aria-hidden="true"></mat-icon>
                     </ng-template>
 
                 </span>
@@ -23,7 +26,8 @@
             <div class="cds-button-element">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <span class="material-icons-outlined">mouse</span>
+                        <!-- <span class="material-icons-outlined">mouse</span> -->
+                        <mat-icon class="icon" svgIcon="mouse" aria-hidden="true"></mat-icon>
                     </span>
                     <!-- <span class="box-title">Event</span> -->
                 </div>
@@ -38,7 +42,8 @@
             <div class="cds-button-element">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <span class="material-icons">add</span>
+                        <!-- <span class="material-icons">add</span> -->
+                        <mat-icon class="icon" svgIcon="add" aria-hidden="true"></mat-icon>
                     </span>
                     <!-- <span class="box-title">{{actionCategory.name}}</span> -->
                 </div>
@@ -51,7 +56,8 @@
             <div class="cds-button-element">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <span class="material-icons">remove</span>
+                        <!-- <span class="material-icons">remove</span> -->
+                        <mat-icon class="icon" svgIcon="remove" aria-hidden="true"></mat-icon>
                     </span>
                     <!-- <span class="box-title">{{actionCategory.name}}</span> -->
                 </div>
@@ -66,7 +72,8 @@
             <div class="cds-button-element">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <span class="material-icons">control_camera</span>
+                        <!-- <span class="material-icons">control_camera</span> -->
+                        <mat-icon class="icon" svgIcon="control_camera" aria-hidden="true"></mat-icon>
                     </span>
                     <!-- <span class="box-title">Event</span> -->
                 </div>
@@ -83,7 +90,8 @@
             <div class="cds-button-element" [class.is_disabled]="!stateUndoRedo.undo">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <span class="material-icons">undo</span>
+                        <!-- <span class="material-icons">undo</span> -->
+                        <mat-icon class="icon" svgIcon="undo" aria-hidden="true"></mat-icon>
                     </span>
                 </div>
             </div>
@@ -94,7 +102,8 @@
             <div class="cds-button-element" [class.is_disabled]="!stateUndoRedo.redo">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <span class="material-icons">redo</span>
+                        <!-- <span class="material-icons">redo</span> -->
+                        <mat-icon class="icon" svgIcon="redo" aria-hidden="true"></mat-icon>
                     </span>
                 </div>
             </div>

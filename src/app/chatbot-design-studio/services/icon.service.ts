@@ -295,6 +295,14 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/chevron_right.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'close',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/close.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'control_camera',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/control_camera.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'copilot',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/copilot.svg')
     );
@@ -351,6 +359,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/more_vert.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'mouse',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/mouse.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'palette',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/palette.svg')
     );
@@ -359,12 +371,32 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/play.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'redo',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/redo.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'remove',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/remove.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'search',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/search.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'undo',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/undo.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'unfold',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/unfold.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'visibility',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/visibility.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'visibility_off',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/visibility_off.svg')
     );
     this.matIconRegistry.addSvgIcon(
       'webhook',

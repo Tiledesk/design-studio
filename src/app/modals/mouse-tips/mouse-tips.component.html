@@ -3,9 +3,10 @@
         <div class="header-title">{{ "CDSModalMouseTrackPad.HowToMove" | translate }}</div>
         <mat-dialog-actions>
             <button (click)="onClose()">
-                <span class="material-icons">
+                <mat-icon svgIcon="close" aria-hidden="true"></mat-icon>
+                <!-- <span class="material-icons">
                     close
-                </span>
+                </span> -->
             </button>
             <!-- <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Install</button> -->
         </mat-dialog-actions>
@@ -21,31 +22,31 @@
 
         <div *ngIf="optionSelected === 'mouse'" class="tips-container">
             <div class="section">
-                <mat-icon svgIcon="whell_and_drag" aria-hidden="true"></mat-icon>
-                <!-- <img src="assets/images/icons/mouse_trackpad/whell_and_drag.svg"> -->
+                <!-- <mat-icon svgIcon="whell_and_drag" aria-hidden="true"></mat-icon> -->
+                <img src="assets/images/icons/mouse_trackpad/whell_and_drag.svg">
                 <label>{{ "CDSModalMouseTrackPad.ClickWhellDragToMove" | translate }}</label>
             </div>   
             <div class="section">
-                <mat-icon svgIcon="whell_scroll" aria-hidden="true"></mat-icon>
-                <!-- <img src="assets/images/icons/mouse_trackpad/whell_scroll.svg"> -->
+                <!-- <mat-icon svgIcon="whell_scroll" aria-hidden="true"></mat-icon> -->
+                <img src="assets/images/icons/mouse_trackpad/whell_scroll.svg">
                 <label>{{ "CDSModalMouseTrackPad.ScrollMouseWheel" | translate }}</label>
             </div>
             <div class="section">
-                <mat-icon svgIcon="mouse_and_whell_zoom" aria-hidden="true"></mat-icon>
-                <!-- <img src="assets/images/icons/mouse_trackpad/mouse_and_whell_zoom.svg"> -->
+                <!-- <mat-icon svgIcon="mouse_and_whell_zoom" aria-hidden="true"></mat-icon> -->
+                <img src="assets/images/icons/mouse_trackpad/mouse_and_whell_zoom.svg">
                 <label>{{ "CDSModalMouseTrackPad.CtrlButtonWheelToZoom" | translate }}</label>
             </div>
         </div>
 
         <div *ngIf="optionSelected === 'trackpad'" class="tips-container">
             <div class="section">
-                <mat-icon svgIcon="pinch_to_zoom" aria-hidden="true"></mat-icon>
-                <!-- <img src="assets/images/icons/mouse_trackpad/pinch_to_zoom.svg"> -->
+                <!-- <mat-icon svgIcon="pinch_to_zoom" aria-hidden="true"></mat-icon> -->
+                <img src="assets/images/icons/mouse_trackpad/pinch_to_zoom.svg">
                 <label>{{ "CDSModalMouseTrackPad.PinchToZoom" | translate }}</label>
             </div>
             <div class="section">
-                <mat-icon svgIcon="slide_to_move" aria-hidden="true"></mat-icon>
-                <!-- <img src="assets/images/icons/mouse_trackpad/slide_to_move.svg"> -->
+                <!-- <mat-icon svgIcon="slide_to_move" aria-hidden="true"></mat-icon> -->
+                <img src="assets/images/icons/mouse_trackpad/slide_to_move.svg">
                 <label>{{ "CDSModalMouseTrackPad.SlideToMove" | translate }}</label>
             </div>
             <div class="section">

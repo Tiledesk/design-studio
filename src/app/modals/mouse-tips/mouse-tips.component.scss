@@ -28,6 +28,11 @@
         position: relative;
         padding: 0px;
     }
+    mat-icon {
+        ::ng-deep svg {
+            fill: var(--blu);
+        }
+    }
 }
 
 .title-label{
