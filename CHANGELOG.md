@@ -8,6 +8,11 @@
 *Tiledesk SRL*
 
 
+# 1.31.0-rc.5
+- **bug-fixed**: bug fixed select model Ai
+- **changed**: web request changed json body from {{attribute}} to {{attribute | json}}
+
+
 # 1.31.0-rc.4
 - **added**: added lazy loading icons
 
