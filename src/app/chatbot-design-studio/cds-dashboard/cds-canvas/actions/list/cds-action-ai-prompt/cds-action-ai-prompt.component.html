@@ -95,7 +95,7 @@
             [text]="action.question" 
             [placeholder]="'CDSCanvas.EnterPrompt' | translate"
             (blur)="onBlur($event)"
-            (changeTextarea)="onChangeTextarea($event, 'question')">
+            (changeTextarea)="onChangeTextarea($event, $event, 'question')">
         </cds-textarea>
     </div>
 
@@ -233,7 +233,7 @@
                         [autocompleteOptions]="autocompleteOptions"
                         (onOptionSelected)="onOptionSelected($event, 'model')"
                         (blur)="onBlur($event)"
-                        (onChange)="onChangeTextarea($event, 'model')">
+                        (onChange)="onChangeTextarea($event, actionLabelModel, 'model')">
                     </cds-text>
                 </div>
 
@@ -301,7 +301,7 @@
                         [text]="action.context" 
                         [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
                         (blur)="onBlur($event)"
-                        (changeTextarea)="onChangeTextarea($event, 'context')">
+                        (changeTextarea)="onChangeTextarea($event, $event, 'context')">
                     </cds-textarea>
                 </div>
 

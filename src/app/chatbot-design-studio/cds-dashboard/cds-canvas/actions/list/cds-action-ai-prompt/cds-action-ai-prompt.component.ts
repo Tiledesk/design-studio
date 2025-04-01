@@ -175,6 +175,7 @@ export class CdsActionAiPromptComponent implements OnInit {
       filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
       this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
     }
+    this.actionLabelModel = this.action['labelModel'];
   }
 
   getModelsByName(value: string): any[] {
@@ -268,10 +269,14 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.debug("[ACTION AI_PROMPT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
-  onChangeTextarea(event: string, property: string) {
-    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event);
+  onChangeTextarea(event: string, labelModel: string, property: string) {
+    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, property);
     // this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
     this.action[property] = event;
+    if(property === 'model'){
+      this.action['labelModel'] = labelModel;
+    }
+
     // this.checkVariables();
     // this.updateAndSaveAction.emit();
     // this.updateAndSaveAction.emit();
@@ -398,7 +403,7 @@ export class CdsActionAiPromptComponent implements OnInit {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
 
-          if (attr && attr.value) {
+          if (attr?.value) {
             this.temp_variables.push({ name: name, value: attr.value });
 
           } else if (attr && !attr.value) {
