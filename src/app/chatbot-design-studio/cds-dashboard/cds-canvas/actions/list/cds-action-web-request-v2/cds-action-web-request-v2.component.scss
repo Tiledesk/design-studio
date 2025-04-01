@@ -186,6 +186,9 @@ cds-textarea#url ::ng-deep {
         width: 100%;
     }
     .focus-out {
+        width: 100%;
+    }
+    .focus-out {
         textarea{
             min-height: 23px!important;
             max-height: 175px!important;
@@ -249,6 +252,10 @@ mat-button-toggle{
 }
 
 
+.action-row-left {
+    width: auto;
+    justify-content: flex-start;
+}
 .action-row-left {
     width: auto;
     justify-content: flex-start;
