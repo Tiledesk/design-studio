@@ -1,21 +1,8 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-// .action-controls {
-//     opacity: 0;
-//     pointer-events: none;
-//     position: absolute;
-//     right: calc(100% - 10px);
-//     // top: -5px;
-//     top: -4px;
-//     transition: opacity 0.2s, -webkit-transform 0.2s;
-//     transition: opacity 0.2s, transform 0.2s;
-//     transition: opacity 0.2s, transform 0.2s, -webkit-transform 0.2s;
-//     z-index: 1;
-// }
 
 .action-control-btns-wpr {
     z-index: 10;
-    // background-color: #ebe2c6; 
     background-color: rgb(255, 255, 255);
     box-shadow: rgba(0, 27, 71, 0.08) 0px 3px 8px;
     display: flex;
@@ -24,26 +11,40 @@
     padding: 3px 0px;
     border-radius: 14px;
     height: 25px;
-    // gap: 8px;
 }
 
 .action-control-btn:first-child {
     border-left: unset;
 }
+
+
 .action-control-btn {
     cursor: pointer;
     border-left: solid 1px var(--gray-light-02);
-    padding: 2px 8px;
+    padding: 2px 4px;
     display: flex;
-    height: 20px
-  
-}
-
-.icon img {
-    filter: brightness(0) saturate(100%) invert(46%) sepia(0%) saturate(0%) hue-rotate(216deg) brightness(94%) contrast(91%);
-}
-.icon:hover {
-    img {
-        filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+    height: 20px;
+    mat-icon {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        ::ng-deep svg {
+            fill: var(--gray);
+        }
     }
 }
+
+.action-control-btn:hover {
+    mat-icon {
+        ::ng-deep svg {
+            fill: var(--blu);
+        }
+    }
+}
+
+// .action-control-btn .icon {
+//     filter: brightness(0) saturate(100%) invert(46%) sepia(0%) saturate(0%) hue-rotate(216deg) brightness(94%) contrast(91%);
+// }
+// .action-control-btn:hover .icon {
+//     filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+// }

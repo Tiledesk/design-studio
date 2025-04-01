@@ -183,6 +183,9 @@ cds-textarea#url ::ng-deep {
     width: 100%;
     .focus-out {
         position: relative;
+        width: 100%;
+    }
+    .focus-out {
         textarea{
             min-height: 23px!important;
             max-height: 175px!important;
@@ -191,11 +194,10 @@ cds-textarea#url ::ng-deep {
         }
     }
     .focus-in {
-        position: absolute;
         z-index: 2;
-        width: 100%;
         textarea{
-            min-height: 23px!important;
+            overflow-y: auto !important;
+            max-height: 80px!important;
             max-height: 175px!important;
             line-height: 30px !important;
             padding: 3px 16px 1px !important;
@@ -246,3 +248,8 @@ mat-button-toggle{
     
 }
 
+
+.action-row-left {
+    width: auto;
+    justify-content: flex-start;
+}
