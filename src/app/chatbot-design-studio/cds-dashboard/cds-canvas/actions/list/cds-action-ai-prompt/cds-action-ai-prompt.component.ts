@@ -62,6 +62,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   showAiError: boolean = false;
   searching: boolean = false;
   temp_variables = [];
+  actionLabelModel: string = "";
 
   // Connectors
   idIntentSelected: string;
@@ -282,6 +283,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   onOptionSelected(event: any, property: string){
     this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
+    this.actionLabelModel = event.label;
     this.action[property] = event.value;
     this.updateAndSaveAction.emit();
   }

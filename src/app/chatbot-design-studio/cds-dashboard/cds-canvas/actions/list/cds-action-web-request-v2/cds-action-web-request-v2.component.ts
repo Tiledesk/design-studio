@@ -67,7 +67,8 @@ export class CdsActionWebRequestV2Component implements OnInit {
       {name: 'Json',       value: 'json',      disabled: false, checked: false },
       {name: 'form-data',  value: 'form-data', disabled: false, checked: false }
   ]
-  
+  bodyType: 'none' | 'json' | 'form-data' = 'none';
+
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private intentService: IntentService
@@ -200,8 +201,12 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.jsonHeader = this.action.headersString
     this.bodyOptions.forEach(el => { el.value ===this.action.bodyType? el.checked= true: el.checked = false })
     // this.jsonIsValid = this.isValidJson(this.action.jsonBody);
-    if(this.action.jsonBody){
-      this.body = this.action.jsonBody;
+
+
+
+    if(this.action.jsonBody){ 
+      this.body = this.checkAndSetJsonBody(this.action.jsonBody);
+      // // this.body = this.action.jsonBody;
       this.body = this.formatJSON(this.body, "\t");
     }
     this.jsonSettings = { timeout: 20000}
@@ -269,18 +274,22 @@ export class CdsActionWebRequestV2Component implements OnInit {
   }
 
   onChangeButtonSelect(event: {name: string, value: string, disabled: boolean, checked: boolean}){
-    this.bodyOptions.forEach(el => { el.value ===event.value? el.checked= true: el.checked = false })
+    this.bodyOptions.forEach(el => { el.value ===event.value? el.checked = true: el.checked = false })
     this.action.bodyType= event.value
     switch (event.value){
       case 'none':
+        this.bodyType = 'none';
         this.body = JSON.stringify({})
         delete this.jsonHeader['Content-Type']
         break;
       case 'json':
-        this.body = this.action.jsonBody
-        this.jsonHeader['Content-Type'] = 'application/json'
+        this.bodyType = 'json';
+        // // this.body = this.action.jsonBody;
+        this.jsonHeader['Content-Type'] = 'application/json';
+        this.body = this.checkAndSetJsonBody(this.action.jsonBody);
         break;
       case 'form-data':
+        this.bodyType = 'form-data';
         this.jsonHeader['Content-Type'] = 'multipart/form-data'
         break;
     }
@@ -288,13 +297,27 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
+
+
+  checkAndSetJsonBody(jsonBody){
+    this.logger.log('[ACTION-WEB-REQUEST-v2] jsonBody:: ', jsonBody);
+    return jsonBody.replace(/{{(.*?)}}/g, (match, content) => {
+      if (match.includes('| json') || match.includes('|json')) {
+        return match;
+      } else {
+        return `{{ ${content.trim()} | json }}`;
+      }
+    });
+  }
+
+
+
+
   onChangeTextarea(e, type: 'url' | 'body' | 'setting'){
     switch(type){
       case 'body': {
         this.body = e;
-        this.action.jsonBody = this.body;
-        
-        // setTimeout(() => {
+        // // setTimeout(() => {
           // this.jsonIsValid = this.isValidJson(this.body);
           // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
         // }, 0);
@@ -319,6 +342,8 @@ export class CdsActionWebRequestV2Component implements OnInit {
   }
 
   onBlur(event){
+    this.action.jsonBody = this.checkAndSetJsonBody(this.body);
+    this.body = this.action.jsonBody;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -359,7 +384,6 @@ export class CdsActionWebRequestV2Component implements OnInit {
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
     if(event){
       this.action[type]=event.value
-
       switch(type){
         case 'trueIntent':
           this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
