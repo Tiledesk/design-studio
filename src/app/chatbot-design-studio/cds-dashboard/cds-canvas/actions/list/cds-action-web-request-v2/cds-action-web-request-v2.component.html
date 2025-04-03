@@ -1,5 +1,4 @@
 <div *ngIf="previewMode" class="cds-action-preview">
-
     <div class="action-row-left">
        
         <span class="web-request-action-method" *ngIf="action.method">
@@ -24,9 +23,9 @@
         <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
         
         <cds-connector class="connector-true"
-            [idConnector] = "idConnectorTrue"
-            [idConnection] = "idConnectionTrue"
-            [isConnected] = "isConnectedTrue">
+            [idConnector]   = "idConnectorTrue"
+            [idConnection]  = "idConnectionTrue"
+            [isConnected]   = "isConnectedTrue">
         </cds-connector>
     </div>
 
@@ -35,9 +34,9 @@
     <div class="previewContent">
        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
-            [idConnector] = "idConnectorFalse"
-            [idConnection] = "idConnectionFalse"
-            [isConnected] = "isConnectedFalse">
+            [idConnector]   = "idConnectorFalse"
+            [idConnection]  = "idConnectionFalse"
+            [isConnected]   = "isConnectedFalse">
         </cds-connector>
     </div>
 
@@ -64,7 +63,7 @@
             [textLimitBtn]="false"
             [emojiPikerBtn]="true"
             [setAttributeBtn]="true"
-            [autoResize]="true"
+            [autoResize]="false"
             [placeholder]="'CDSCanvas.EnterRequestURL' | translate"
             [showTextPreview]="true"
             (blur)="onBlur($event)"
@@ -113,7 +112,7 @@
             [ngClass]="{'jsonError': !jsonIsValid}"
             class = "text-editable-div"
             [text]="body"
-            [limitCharsText]="1000000"
+            [limitCharsText]="10000"
             [emojiPikerBtn]="false"
             [setAttributeBtn]="true"
             [minRow]="5" [maxRow]="10"
