@@ -1,10 +1,17 @@
 <div class="text-editor-wrapper" >
+    
+    <div *ngIf="!readonly" class="div-textarea" [class.hidden]="!showTextPreview" (click)="onClickDivTextArea();"><span class="label-text">{{labelDivTextArea}}</span></div>
+ 
+
+
     <div [class.focus-in]="expand" [class.focus-out]="!expand">
-        <div class="text-editor">
+        <div class="text-editor" [class.hidden]="showTextPreview">
             <!-- [readonly]="readonly" -->
+             <!-- {{maxRow}} expand = false;  -->
             <mat-form-field class="box-textarea" appearance="fill">
                 <textarea matInput
                     id="text-area"
+                    #textAreaRef
                     #autosize="cdkTextareaAutosize"
                     [class.invalid]="control.invalid"
                     [maxlength]="limitCharsText"
@@ -14,17 +21,18 @@
                     cdkAutosizeMinRows="{{minRow}}"
                     cdkAutosizeMaxRows="{{maxRow}}"
                     [(ngModel)]="text"
+                    (ngModelChange)="onChangeTextArea($event)"
                     (click)="onClickTextareaOpenSetAttributePopover();"
                     (keydown)="openAttributesList($event)"
-                    (blur)="onBlur($event); expand = false;"
-                    (focus)="onFocus($event); expand = true;"
-                    (ngModelChange)="onChangeTextArea($event)">
+                    (blur)="onBlur($event); "
+                    (focus)="onFocus($event); "
+                    >
                 </textarea>
             </mat-form-field>
     
             <div *ngIf="showUtils === true" unselectable="on" tabIndex="-1" class="editor-utils">
     
-                <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="addVariable.toggle(); openSetAttributePopover();">
+                <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="onOpenAddVariable()">
                     <span class="material-icons" style="font-size: 16px;">
                         data_object
                     </span>

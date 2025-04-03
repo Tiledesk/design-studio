@@ -183,37 +183,23 @@ cds-textarea#url ::ng-deep {
     width: 100%;
     .focus-out {
         position: relative;
-        textarea{
-            min-height: 23px!important;
-            max-height: 175px!important;
-            height: 23px!important;
-            line-height: 23px!important;
-        }
     }
     .focus-in {
         position: absolute;
         z-index: 2;
         width: 100%;
-        textarea{
-            min-height: 23px!important;
-            max-height: 175px!important;
-            line-height: 30px !important;
-            padding: 3px 16px 1px !important;
-        }
     }
     textarea {
         border-radius: 0px var(--input-border-radius-base) var(--input-border-radius-base) 0px;
-        resize: none !important; 
-        padding: 6px 16px !important;
-        min-height: 23px !important;
+        min-height: 27px;
     }
 }
 
 cds-textarea#body.jsonError ::ng-deep,
 cds-textarea#timeout.jsonError ::ng-deep {
-    textarea {
-        border: 1px solid red !important;
-    }
+    // textarea {
+    //     border: 1px solid red !important;
+    // }
 }
 
 /** button TOOGLE */

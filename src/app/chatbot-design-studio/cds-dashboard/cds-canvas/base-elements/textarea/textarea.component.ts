@@ -12,7 +12,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
   styleUrls: ['./textarea.component.scss']
 })
 export class CDSTextareaComponent implements OnInit {
-
+  @ViewChild('textAreaRef') textAreaRef!: ElementRef;
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   @ViewChild("addVariable") addVariable: SatPopover;
   @ViewChild("emojiPicker") emojiPicker: SatPopover;
@@ -31,7 +31,9 @@ export class CDSTextareaComponent implements OnInit {
   @Input() maxRow: number = 20;
   @Input() readonly: boolean = false;
   @Input() autoResize: boolean = false;
-  @Input() popoverVerticalAlign: string = 'below'
+  @Input() popoverVerticalAlign: string = 'below';
+  @Input() showTextPreview: boolean = false;
+
 
   @Output() changeTextarea = new EventEmitter();
   @Output() selectedAttribute = new EventEmitter();
@@ -51,6 +53,7 @@ export class CDSTextareaComponent implements OnInit {
   isSelected: boolean = false;
   textIsChanged: boolean = false;
   startText: string;
+  vengoDa: string;
   // strPlaceholder: string;
 
   // Wrapper management // 
@@ -63,6 +66,10 @@ export class CDSTextareaComponent implements OnInit {
   emojiColor: string ="#506493";
   emojiiCategories = [ 'recent', 'people', 'nature', 'activity', 'flags'];
 
+  minRowOrigin: number = 1;
+  maxRowOrigin: number = 1;
+  labelDivTextArea: String;
+  showTextPreviewOrigin: boolean;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   
@@ -94,6 +101,10 @@ export class CDSTextareaComponent implements OnInit {
 
 
   initialize(){
+    this.showTextPreviewOrigin = this.showTextPreview;
+    this.labelDivTextArea = this.text;
+    this.maxRowOrigin = this.maxRow;
+    this.minRowOrigin = this.minRow;
     this.startText = this.text;
     this.textIsChanged = false;
     if (this.text) {
@@ -116,7 +127,7 @@ export class CDSTextareaComponent implements OnInit {
 
   /** */
   onClickTextareaOpenSetAttributePopover(){
-    this.logger.log('onClickTextareaOpenSetAttributePopover', this.readonly, this.setAttributeBtn);
+    this.logger.log('[CDS-TEXAREA] - onClickTextareaOpenSetAttributePopover', this.readonly, this.setAttributeBtn);
     if(this.readonly === true  && this.setAttributeBtn === true){
       this.addVariable.toggle();
       this.openSetAttributePopover();
@@ -124,6 +135,7 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   onChangeTextArea(event) {
+    this.logger.log('[CDS-TEXAREA] - onChangeTextArea ');
     // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
     this.calculatingleftCharsText();
     if(this.readonly && event){
@@ -140,25 +152,41 @@ export class CDSTextareaComponent implements OnInit {
     if(!this.isSelected || !this.readonly){
       this.changeTextarea.emit(event.toString().trim());
     }
+
+    //this.vengoDa = "onChangeTextArea";
   }
 
+
+
+
   onBlur(event){
-    if(this.autoResize) this.maxRow = 1;
-    this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen());
-    if(!this.addVariable.isOpen() && !this.emojiPicker.isOpen() && this.textIsChanged){
-      this.textIsChanged = false;
-      this.startText = this.text;
-      this.blur.emit(event);
+    if (this.vengoDa === "addVariable"){
+      this.vengoDa = '';
+      return;
     }
+    setTimeout(() => {
+      this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen(), this.vengoDa);
+      if(!this.addVariable.isOpen() && !this.emojiPicker.isOpen()){ //&& this.textIsChanged
+        this.showTextPreview = this.showTextPreviewOrigin;
+        this.maxRow = this.minRowOrigin;
+        this.textIsChanged = false;
+        this.startText = this.text;
+        this.blur.emit(event);
+     }
+    }, 500);
   }
 
   onFocus(event){
-    this.logger.log('[CDS-TEXAREA] - onFocus - isOpen textIsChanged');
-    if(this.autoResize) this.maxRow = 5
+    this.maxRow = this.maxRowOrigin;
+    this.logger.log('[CDS-TEXAREA] - onFocus - isOpen textIsChanged', event);
+    // if(this.autoResize) this.maxRow = 5
     this.focus.emit(event)
   }
 
+
+
   onVariableSelected(variableSelected: { name: string, value: string }) {
+    this.logger.log('[CDS-TEXAREA] - onVariableSelected ');
     this.isSelected = true;
     let valueTextArea = {name: '', value: ''};
     if (this.elTextarea) {
@@ -174,7 +202,7 @@ export class CDSTextareaComponent implements OnInit {
     } else {
       // this.onChangeTextArea(valueTextArea.name);
     }
-    this.addVariable.close();
+    this.onCloseAddVariable();
     this.selectedAttribute.emit(variableSelected);
   }
 
@@ -203,6 +231,7 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   private insertAtCursorPos(elem: HTMLInputElement, attribute) {
+    this.logger.log('[CDS-TEXAREA] - insertAtCursorPos ');
     let cursor_pos = elem.selectionStart;
     var textarea_txt = elem.value;
     var txt_to_add = attribute;
@@ -224,6 +253,7 @@ export class CDSTextareaComponent implements OnInit {
     } else {
       this.text = `${event.emoji.native}`;
     }
+    this.vengoDa = "onAddEmoji";
     this.emojiPicker.close();
     this.selectedEmoji.emit(event)
   }
@@ -238,11 +268,35 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   openAttributesList(event) {
-    // const keyCode = event.which || event.keyCode;
-    // const key = event.key;
-    // if (keyCode === 219 && key === "{") { // '{' keyboard code
-    //   this.addVariable.toggle();;
-    // }
+    const keyCode = event.which || event.keyCode;
+    const key = event.key;
+    if (keyCode === 219 && key === "{") { // '{' keyboard code
+      this.addVariable.toggle();
+    }
   }
 
+  onClickDivTextArea(){
+    this.logger.log('[CDS-TEXAREA] - onClickDivTextArea ');
+    const textarea = this.textAreaRef.nativeElement;
+    this.maxRow = this.maxRowOrigin;
+    this.showTextPreview = false;
+    setTimeout(() => {
+      textarea.focus();
+    }, 0);
+  }
+
+
+
+  onOpenAddVariable(){
+    this.logger.log('[CDS-TEXAREA] - onOpenAddVariable ');
+    this.addVariable.open(); 
+    this.openSetAttributePopover();
+  }
+
+
+  onCloseAddVariable(){
+    this.logger.log('[CDS-TEXAREA] - onCloseAddVariable ');
+    this.vengoDa = "addVariable";
+    this.addVariable.close();
+  }
 }

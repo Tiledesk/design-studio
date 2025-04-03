@@ -217,3 +217,15 @@ mat-form-field.box-textarea ::ng-deep {
         }
     }
 }
+
+.div-textarea {
+    &.hidden {
+        display: none;
+    }
+}
+
+.text-editor {
+    &.hidden {
+        display: none;
+    }
+}
