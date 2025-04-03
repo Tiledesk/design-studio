@@ -53,7 +53,7 @@ export class CDSTextareaComponent implements OnInit {
   isSelected: boolean = false;
   textIsChanged: boolean = false;
   startText: string;
-  vengoDa: string;
+  comeFrom: string;
   // strPlaceholder: string;
 
   // Wrapper management // 
@@ -161,12 +161,12 @@ export class CDSTextareaComponent implements OnInit {
 
 
   onBlur(event){
-    if (this.vengoDa === "addVariable"){
-      this.vengoDa = '';
+    if (this.comeFrom === "addVariable" || this.comeFrom === "emojiPicker"){
+      this.comeFrom = '';
       return;
     }
     setTimeout(() => {
-      this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen(), this.vengoDa);
+      this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen(), this.comeFrom);
       if(!this.addVariable.isOpen() && !this.emojiPicker.isOpen()){ //&& this.textIsChanged
         this.showTextPreview = this.showTextPreviewOrigin;
         this.maxRow = this.minRowOrigin;
@@ -254,8 +254,7 @@ export class CDSTextareaComponent implements OnInit {
     } else {
       this.text = `${event.emoji.native}`;
     }
-    this.vengoDa = "onAddEmoji";
-    this.emojiPicker.close();
+    this.onCloseAddEmoji();
     this.selectedEmoji.emit(event)
   }
   
@@ -297,7 +296,21 @@ export class CDSTextareaComponent implements OnInit {
 
   onCloseAddVariable(){
     this.logger.log('[CDS-TEXAREA] - onCloseAddVariable ');
-    this.vengoDa = "addVariable";
+    this.comeFrom = "addVariable";
     this.addVariable.close();
+  }
+
+
+  onOpenAddEmoji(){
+    this.logger.log('[CDS-TEXAREA] - onOpenAddEmoji ');
+    this.emojiPicker.open(); 
+    this.openSetAttributePopover();
+  }
+
+
+  onCloseAddEmoji(){
+    this.logger.log('[CDS-TEXAREA] - onCloseAddEmoji ');
+    this.comeFrom = "emojiPicker";
+    this.emojiPicker.close();
   }
 }

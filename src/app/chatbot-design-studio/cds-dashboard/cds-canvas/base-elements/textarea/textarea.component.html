@@ -41,7 +41,7 @@
                 </div>
         
                 <div *ngIf="emojiPikerBtn" class="emoji-picker">
-                    <div class="emoji-picker-button" aria-expanded="false" [satPopoverAnchor]="emojiPicker" (click)="emojiPicker.toggle();">
+                    <div class="emoji-picker-button" aria-expanded="false" [satPopoverAnchor]="emojiPicker" (click)="onOpenAddEmoji();">
                         <span class="material-icons-outlined" style="font-size: 16px;">
                             emoji_emotions
                         </span>
