@@ -146,6 +146,7 @@ export class CDSTextareaComponent implements OnInit {
       if(this.startText !== event){
         this.textIsChanged = true;
         this.text = event;
+        this.labelDivTextArea = event;
         // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', this.text, this.textIsChanged);
       }
     }

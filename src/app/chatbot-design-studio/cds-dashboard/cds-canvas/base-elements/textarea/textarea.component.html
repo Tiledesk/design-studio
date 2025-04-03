@@ -7,7 +7,10 @@
     <div [class.focus-in]="expand" [class.focus-out]="!expand">
         <div class="text-editor" [class.hidden]="showTextPreview">
             <!-- [readonly]="readonly" -->
-             <!-- {{maxRow}} expand = false;  -->
+             <!-- 
+                (blur)="onBlur($event); expand = false;"
+                (focus)="onFocus($event); expand = false;  
+            -->
             <mat-form-field class="box-textarea" appearance="fill">
                 <textarea matInput
                     id="text-area"
@@ -24,9 +27,8 @@
                     (ngModelChange)="onChangeTextArea($event)"
                     (click)="onClickTextareaOpenSetAttributePopover();"
                     (keydown)="openAttributesList($event)"
-                    (blur)="onBlur($event); "
-                    (focus)="onFocus($event); "
-                    >
+                    (blur)="onBlur($event); expand = false;"
+                    (focus)="onFocus($event); expand = false;" >
                 </textarea>
             </mat-form-field>
     

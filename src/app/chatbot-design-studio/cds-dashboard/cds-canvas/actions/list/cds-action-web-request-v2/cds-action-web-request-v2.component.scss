@@ -180,13 +180,16 @@ cds-select#method ::ng-deep{
 
 cds-textarea#url ::ng-deep {
     display: flex;
-    width: 100%;
-    .focus-out {
-        position: relative;
-    }
-    .focus-in {
-        position: absolute;
-        z-index: 2;
+    width: calc(100% - 120px);
+    // .focus-out {
+    //     position: relative;
+    // }
+    // .focus-in {
+    //     position: absolute;
+    //     z-index: 2;
+    //     width: 100%;
+    // }
+    .div-textarea {
         width: 100%;
     }
     textarea {
@@ -228,7 +231,4 @@ mat-button-toggle{
     &::ng-deep .mat-button-toggle-label-content {
         line-height: 36px;
     }
-
-    
 }
-
