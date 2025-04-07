@@ -429,7 +429,10 @@ svg:not(:root) {
 }
 
 cds-widget-logs {
-  width: calc(100% - 460px);
+  width: calc(100% - 60px);
   position: absolute;
   bottom: 0;
+  &.small{
+    width: calc(100% - 460px);
+  }
 }

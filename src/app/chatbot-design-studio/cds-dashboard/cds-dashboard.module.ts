@@ -20,7 +20,6 @@ import { CdsPublishOnCommunityModalComponent } from 'src/app/modals/cds-publish-
 import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service';
 import { FilterPipe } from 'src/app/pipe/filter.pipe';
 
-
 const routes: Routes = [
   { path: '', 
     component: CdsDashboardComponent,

@@ -1,9 +1,13 @@
-import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
 import { LOG_LEVELS } from 'src/app/chatbot-design-studio/utils';
 import { LogService } from 'src/app/services/log.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
+import { MqttClient } from 'src/assets/js/MqttClient.js';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'cds-widget-logs',
@@ -13,18 +17,30 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 
 
 export class CdsWidgetLogsComponent implements OnInit {
+  private subscriptionWidgetLoadedNewMessage: Subscription;
+  // @Input() IS_OPEN_PANEL_WIDGET: boolean = false;
+
+  @Input() 
+  set IS_OPEN_PANEL_WIDGET(value: boolean) {
+    if (!value) {
+      this.closeLog();
+    }
+  }
+
+  
   listOfLogs: Array<any>;
   private startY: number;
   private startHeight: number;
   private mouseMoveListener: () => void;
   private mouseUpListener: () => void;
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   isClosed = false;
   logContainer: any;
-  scrollTop: boolean = null;
-  scrollBottom: boolean = null;
-  loadingPrev: boolean =  true;
-  loadingNext: boolean =  false;
+  // scrollTop: boolean = null;
+  // scrollBottom: boolean = null;
+  // loadingPrev: boolean =  true;
+  // loadingNext: boolean =  false;
   LOG_LEVELS = LOG_LEVELS;
   selectedLogLevel = LOG_LEVELS.DEBUG;
 
@@ -33,84 +49,109 @@ export class CdsWidgetLogsComponent implements OnInit {
   constructor(
     private readonly el: ElementRef, 
     private readonly renderer: Renderer2,
-    private readonly logService: LogService
+    private readonly logService: LogService,
+    public tiledeskAuthService: TiledeskAuthService,
+    public dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
-    if(this.logService.logs){
-      this.listOfLogs = this.logService.logs;
-      this.logger.log('[CDS-WIDGET-LOG] - logger', this.listOfLogs);
-    }
+    this.listOfLogs = [];
+    // if(this.logService.logs){
+    //   this.listOfLogs = this.logService.logs;
+    //   this.logger.log('[CDS-WIDGET-LOG] - logger', this.listOfLogs);
+    // }
   }
 
   ngAfterViewInit() {
-    this.getLastLogs();
+    this.subscriptions();
+    this.logService.initLogService();
+    this.initResize();
+    // this.starterLog();
+    // this.getLastLogs();
   }
 
-  getLastLogs(){
-    this.listOfLogs = [];
-    this.logService.getLastLogs(this.selectedLogLevel).subscribe({ next: (resp)=> {
-      this.logService.initLogService(resp);
-      this.loadingPrev = false;
-      this.listOfLogs = resp; // //this.logMoc;//
-    }, error: (error)=> {
-      setTimeout(() => {
-        this.loadingPrev = false;
-        this.loadingNext = false;
-      }, 1000);
-      this.logger.error("[LOG-SERV] initLogService error: ", error);
-    }, complete: () => {
-      setTimeout(() => {
-        this.loadingPrev = false;
-        this.loadingNext = false;
-      }, 1000);
-      this.logger.log("[LOG-SERV] initLogService completed.");
-    }})
+
+  ngOnDestroy() {
+    if (this.subscriptionWidgetLoadedNewMessage) {
+      this.subscriptionWidgetLoadedNewMessage.unsubscribe();
+    }
   }
 
-  loadLogs(dir: "prev"|"next"){
-    let log: any;
-    if(dir === "prev"){
-      log = this.listOfLogs[0];
-      this.loadingPrev = true;
-    } else {
-      log =  this.listOfLogs[this.listOfLogs.length - 1];
-      this.loadingNext = true;
-    }
-    if(log){
-      const timestamp = log.rows?.timestamp;
-      this.logService.getOtherLogs(timestamp, dir, this.selectedLogLevel).subscribe({ next: (resp)=> {
-        if(dir === "prev"){
-          this.listOfLogs = [...resp, ...this.listOfLogs];
-        } else {
-          this.listOfLogs = [...this.listOfLogs, ...resp];
-        }
-        this.logger.log("[CDS-WIDGET-LOG] ho caricato error: ", resp);
-      }, error: (error)=> {
-        setTimeout(() => {
-          this.loadingPrev = false;
-          this.loadingNext = false;
-        }, 1000);
-        this.logger.error("[CDS-WIDGET-LOG] initLogService error: ", error);
-      }, complete: () => {
-        setTimeout(() => {
-          this.loadingPrev = false;
-          this.loadingNext = false;
-          this.scrollTop = false;
-          this.scrollBottom = false;
-        }, 1000);
-        this.logger.log("[CDS-WIDGET-LOG] initLogService completed.");
-      }});
-    } else {
-      this.getLastLogs();
-    }
+
+  subscriptions(){
+    this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage .subscribe((message: any) => {
+      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
+      if(message){
+        this.listOfLogs.push(message);
+      }
+    });  
   }
+
+
+  // getLastLogs(){
+  //   this.listOfLogs = [];
+  //   this.logService.getLastLogs(this.selectedLogLevel).subscribe({ next: (resp)=> {
+  //     this.logService.initLogService();
+  //     this.loadingPrev = false;
+  //     this.listOfLogs = resp; // //this.logMoc;//
+  //   }, error: (error)=> {
+  //     setTimeout(() => {
+  //       this.loadingPrev = false;
+  //       this.loadingNext = false;
+  //     }, 1000);
+  //     this.logger.error("[LOG-SERV] initLogService error: ", error);
+  //   }, complete: () => {
+  //     setTimeout(() => {
+  //       this.loadingPrev = false;
+  //       this.loadingNext = false;
+  //     }, 1000);
+  //     this.logger.log("[LOG-SERV] initLogService completed.");
+  //   }})
+  // }
+
+  // loadLogs(dir: "prev"|"next"){
+  //   let log: any;
+  //   if(dir === "prev"){
+  //     log = this.listOfLogs[0];
+  //     this.loadingPrev = true;
+  //   } else {
+  //     log =  this.listOfLogs[this.listOfLogs.length - 1];
+  //     this.loadingNext = true;
+  //   }
+  //   if(log){
+  //     const timestamp = log.rows?.timestamp;
+  //     this.logService.getOtherLogs(timestamp, dir, this.selectedLogLevel).subscribe({ next: (resp)=> {
+  //       if(dir === "prev"){
+  //         this.listOfLogs = [...resp, ...this.listOfLogs];
+  //       } else {
+  //         this.listOfLogs = [...this.listOfLogs, ...resp];
+  //       }
+  //       this.logger.log("[CDS-WIDGET-LOG] ho caricato error: ", resp);
+  //     }, error: (error)=> {
+  //       setTimeout(() => {
+  //         this.loadingPrev = false;
+  //         this.loadingNext = false;
+  //       }, 1000);
+  //       this.logger.error("[CDS-WIDGET-LOG] initLogService error: ", error);
+  //     }, complete: () => {
+  //       setTimeout(() => {
+  //         this.loadingPrev = false;
+  //         this.loadingNext = false;
+  //         this.scrollTop = false;
+  //         this.scrollBottom = false;
+  //       }, 1000);
+  //       this.logger.log("[CDS-WIDGET-LOG] initLogService completed.");
+  //     }});
+  //   } else {
+  //     this.getLastLogs();
+  //   }
+  // }
 
 
   onLogLevelChange(event: any) {
-    this.selectedLogLevel = event.target.value;
-    this.loadingPrev = true;
-    this.getLastLogs();
+    // this.selectedLogLevel = event.target.value;
+    // this.loadingPrev = true;
+    // this.getLastLogs();
   }
 
 
@@ -142,6 +183,18 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
 
+  starterLog(){
+    this.logger.log('[CdsWidgetLogsComponent] >>> starterLog ');
+    this.logService.starterLog();
+    // alla chiusura del log richiamo mqtt_client.close()
+  }
+
+  closeLog(){
+    this.logger.log('[CdsWidgetLogsComponent] >>> closeLog ');
+    this.logService.closeLog();
+  }
+
+
   // onScroll(event: any) {
   //   const element = event.target;
   //   const atBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
@@ -162,30 +215,30 @@ export class CdsWidgetLogsComponent implements OnInit {
   //   }
   // }
 
-  onWheel(event: any) {
-    // //this.logger.log('[CDS-WIDGET-LOG] onWheel');
-    const element = event.target;
-    if (event.deltaY < 0) {
-      this.logger.log('[CDS-WIDGET-LOG] Scroll verso l alto');
-      const atTop = element.scrollTop === 0;
-      this.scrollBottom = false;
-      if (atTop && !this.scrollTop) {
-          this.scrollTop = true;
-          this.loadLogs("prev");
-          this.logger.log('[CDS-WIDGET-LOG] Sei già all\'inizio del div e stai scrollando ulteriormente verso l\'alto.');
-      }
-    } else if (event.deltaY > 0) {
-      this.logger.log('[CDS-WIDGET-LOG] Scroll verso il basso');
-      const atBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
-      this.scrollTop = false;
-      this.logger.log('[CDS-WIDGET-LOG] Scroll verso il basso', element.scrollHeight,  element.scrollTop, element.clientHeight, atBottom);
-      if (atBottom && !this.scrollBottom) {
-        this.scrollBottom = true;
-        this.loadLogs("next");
-        this.logger.log('[CDS-WIDGET-LOG] Sei già alla fine del div e stai scrollando ulteriormente verso il basso.');
-      }
-    }
-  }
+  // onWheel(event: any) {
+  //   // //this.logger.log('[CDS-WIDGET-LOG] onWheel');
+  //   const element = event.target;
+  //   if (event.deltaY < 0) {
+  //     this.logger.log('[CDS-WIDGET-LOG] Scroll verso l alto');
+  //     const atTop = element.scrollTop === 0;
+  //     this.scrollBottom = false;
+  //     if (atTop && !this.scrollTop) {
+  //         this.scrollTop = true;
+  //         this.loadLogs("prev");
+  //         this.logger.log('[CDS-WIDGET-LOG] Sei già all\'inizio del div e stai scrollando ulteriormente verso l\'alto.');
+  //     }
+  //   } else if (event.deltaY > 0) {
+  //     this.logger.log('[CDS-WIDGET-LOG] Scroll verso il basso');
+  //     const atBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
+  //     this.scrollTop = false;
+  //     this.logger.log('[CDS-WIDGET-LOG] Scroll verso il basso', element.scrollHeight,  element.scrollTop, element.clientHeight, atBottom);
+  //     if (atBottom && !this.scrollBottom) {
+  //       this.scrollBottom = true;
+  //       this.loadLogs("next");
+  //       this.logger.log('[CDS-WIDGET-LOG] Sei già alla fine del div e stai scrollando ulteriormente verso il basso.');
+  //     }
+  //   }
+  // }
 
   onToggleLog() {
     this.isClosed = !this.isClosed;
@@ -199,7 +252,6 @@ export class CdsWidgetLogsComponent implements OnInit {
         this.listOfLogs[i]['open'] = true;
       }
     }
-    
   }
 
 

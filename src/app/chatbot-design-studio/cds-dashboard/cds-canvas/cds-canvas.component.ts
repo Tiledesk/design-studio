@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { Observable, Subscription, skip, timeout } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, skip, timeout } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -105,6 +105,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private subscriptionOpenWidgetPanel: Subscription;
   testitOutFirstClick: boolean = false;
   IS_OPEN_PANEL_WIDGET: boolean = false;
+  // Variabile osservabile
+  private _isOpenPanelWidget = new BehaviorSubject<boolean>(false);
+  public isOpenPanelWidget$ = this._isOpenPanelWidget.asObservable();
+       
 
   /** panel widget loaded */
   private subscriptionWidgetLoaded: Subscription;
@@ -477,7 +481,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** closeAllPanels */
   private closeAllPanels(){
     this.IS_OPEN_PANEL_WIDGET = false;
-    this.IS_OPEN_WIDGET_LOG = false;
+    this._isOpenPanelWidget.next(false);
+
+    this.IS_OPEN_WIDGET_LOG = true; // false di default
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
@@ -485,6 +491,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_CONTEXT_MENU = false;
     this.IS_OPEN_COLOR_MENU = false;
     // // this.intentService.inactiveIntent();
+
+    
   }
 
   private closeExtraPanels(){
@@ -1281,6 +1289,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
     setTimeout(() => {
       this.IS_OPEN_PANEL_WIDGET = true;
+      this._isOpenPanelWidget.next(true);
     }, 500);
   }
 

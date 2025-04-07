@@ -89,8 +89,9 @@
 
 </div>
 
-
-<cds-widget-logs *ngIf="IS_OPEN_WIDGET_LOG"
+<cds-widget-logs *ngIf="IS_OPEN_WIDGET_LOG" 
+[class.small]="IS_OPEN_PANEL_WIDGET"
+[IS_OPEN_PANEL_WIDGET]="IS_OPEN_PANEL_WIDGET"
 ></cds-widget-logs>
 
 

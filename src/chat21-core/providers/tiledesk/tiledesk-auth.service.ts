@@ -45,6 +45,28 @@ export class TiledeskAuthService {
   }
 
 
+
+
+  createCustomTokenByRequestId(tiledeskToken: string, id_project: string, request_id: string) {
+    const headers = new HttpHeaders({
+      'Content-type': 'application/json',
+      Authorization: tiledeskToken
+    });
+    const requestOptions = { headers: headers };
+    const that = this;
+    let URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID = this.SERVER_BASE_URL + id_project+ '/logs/flows/auth/'+request_id;
+    return new Promise((resolve, reject) => {
+      this.http.get(URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID, requestOptions).subscribe({next: (data)=>{
+        this.logger.log('[TILEDESK-AUTH-SERV] - createCustomTokenByRequestId', data);
+        if (data['token']) {
+          resolve(data);
+        }
+      }, error: (error)=>{
+        reject(error)
+      }})
+    });
+  }
+
   /**
    * @param email
    * @param password
