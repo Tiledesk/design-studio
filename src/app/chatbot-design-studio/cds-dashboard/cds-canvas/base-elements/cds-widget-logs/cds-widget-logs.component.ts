@@ -4,6 +4,7 @@ import { LogService } from 'src/app/services/log.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'cds-widget-logs',
@@ -40,7 +41,8 @@ export class CdsWidgetLogsComponent implements OnInit {
   constructor(
     private readonly el: ElementRef, 
     private readonly renderer: Renderer2,
-    private readonly logService: LogService
+    private readonly logService: LogService,
+    private readonly dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -48,8 +50,10 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   ngAfterViewInit() {
+    this.logger.log("[CDS-WIDGET-LOG] ngOnInit dashboardService.selectedChatbot ", this.dashboardService.selectedChatbot);
+    const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype === 'webhook';
     this.subscriptions();
-    this.logService.initLogService();
+    this.logService.initLogService(chatbotSubtype);
     this.initResize();
   }
 
@@ -101,13 +105,13 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   starterLog(){
-    this.logger.log('[CdsWidgetLogsComponent] >>> starterLog ');
+    this.logger.log('[CDS-WIDGET-LOG] >>> starterLog ');
     this.logService.starterLog();
     // alla chiusura del log richiamo mqtt_client.close()
   }
 
   closeLog(){
-    this.logger.log('[CdsWidgetLogsComponent] >>> closeLog ');
+    this.logger.log('[CDS-WIDGET-LOG] >>> closeLog ');
     this.logService.closeLog();
   }
 

@@ -141,8 +141,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     const support_group_id = message.recipient?message.recipient:null;
     const recipient = message.recipient?message.recipient:null;
     const projectId = message.attributes?.projectId?message.attributes?.projectId:null;
-    this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', message);
-    
+    this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', recipient, projectId);
     let serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.logService.initialize(serverBaseURL, projectId, support_group_id, recipient); 
 

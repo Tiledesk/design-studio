@@ -44,7 +44,9 @@ export class LogService {
   ) { }
 
 
-  public initLogService(){
+
+  public initLogService(chatbotSubtype){
+    //this.chatbotSubtype = chatbotSubtype;
     this.mqtt_client = new MqttClient({
       appId: MQTT_CLIENT.appId,
       MQTTendpoint: MQTT_CLIENT.MQTTendpoint, 
@@ -103,7 +105,8 @@ export class LogService {
       }
 
       // alla chiusura del log richiamo mqtt_client.close()
-    }
+  }
+
 
 
 
