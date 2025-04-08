@@ -5,7 +5,6 @@ import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, 
 import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
 import { IntentService } from '../../../services/intent.service';
-// import { ControllerService } from 'app/chatbot-design-studio/services/controller.service';
 import { ConnectorService } from '../../../services/connector.service';
 import { StageService } from '../../../services/stage.service';
 import { ControllerService } from '../../../services/controller.service';
@@ -37,7 +36,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() answerSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() formSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() actionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
-  // @Output() intentSelected = new EventEmitter();
+
   @Output() actionDeleted = new EventEmitter();
   @Output() showPanelActions = new EventEmitter(); // nk
   @Output() testItOut = new EventEmitter<Intent>();
@@ -49,17 +48,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('openActionMenuBtn', { static: false }) openActionMenuBtnRef: ElementRef;
 
 
-
-
   subscriptions: Array<{ key: string, value: Subscription }> = [];
-  private unsubscribe$: Subject<any> = new Subject<any>();
+  unsubscribe$: Subject<any> = new Subject<any>();
+
   alphaConnectors: number;
   connectorsIn: any;
-
-
-  // intentElement: any;
-  // idSelectedAction: string;
-  // form: Form;
   formSize: number = 0;
   questionCount: number = 0;
   listOfActions: Action[];
@@ -69,10 +62,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   ACTIONS_LIST = ACTIONS_LIST;
   elementTypeSelected: HAS_SELECTED_TYPE
   isOpen: boolean = true;
-  // menuType: string = 'action';
   positionMenu: any;
   isStart = false;
   isDefaultFallback = false;
+
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;
@@ -89,11 +82,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
-  // position?: any;
-  // nextBlockAction?: any;
-  // connectors?: any;
-  // color?: any;
-
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -109,11 +97,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.initSubscriptions();
   }
 
-  // aggiungo un pignulo su intent che sul hover del mouse cambia in 1 opacity di tutti i connettori in ingresso
+
   initSubscriptions() {
     let subscribtion: any;
     let subscribtionKey: string;
-
 
     /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
     subscribtionKey = 'behaviorIntent';
@@ -210,13 +197,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     //setTimeout(() => {
       this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
 
-      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
-      if(this.intent.attributes.readonly && this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START){
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
         this.isStart = true;
         this.startAction = this.intent.actions[0];
-      } else {
+      }
+      else {
         this.setIntentSelected();
       }
       
@@ -240,7 +228,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.addEventListener();
-      this.setIntentAttribute();
+      this.setIntentAttributes();
     //}, 10000);
   }
 
@@ -456,15 +444,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /** setIntentAttribute */
-  private setIntentAttribute(){
+  private setIntentAttributes(){
     if (!this.intent?.attributes) {
       this.intent['attributes'] = {};
     }
-
     if(this.intent.attributes.color && this.intent.attributes.color !== undefined){
       const nwColor = this.intent.attributes.color;// INTENT_COLORS[this.intent.attributes.color];
       document.documentElement.style.setProperty('--intent-color', `${nwColor}`);
-      // const coloreValue = INTENT_COLORS[this.intent.attributes.color as keyof typeof INTENT_COLORS];
+      // // const coloreValue = INTENT_COLORS[this.intent.attributes.color as keyof typeof INTENT_COLORS];
       this.intentColor = nwColor;
     } 
     // else {
@@ -569,12 +556,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /** EVENTS  */
 
-  onSelectAction(action, index: number, idAction) {
+  // onSelectActionIfWebhook(action: any, index: number, idAction: HAS_SELECTED_TYPE){
+  //   if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+  //     this.onSelectAction(action, index, idAction);
+  //   }
+  // }
+
+  onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE) {
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
     this.logger.log('[CDS-INTENT] onActionSelected index: ', index);
     this.logger.log('[CDS-INTENT] onActionSelected idAction: ', idAction);
     this.elementTypeSelected = idAction;
-    /** // this.intentService.setIntentSelected(this.intent.intent_id);*/
     this.intentService.selectAction(this.intent.intent_id, idAction);
     this.actionSelected.emit({ action: action, index: index, maxLength: this.listOfActions.length });
   }
@@ -901,6 +893,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.deleteIntent.emit(intent);
   }
 
+  openWebhookIntentPanel(intent: Intent){
+    const webhookIntent = this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK ? true:false;
+    if(webhookIntent){
+      this.openIntentPanel(intent);
+    }
+  }
 
   openIntentPanel(intent: Intent){
     this.intentService.setIntentSelected(this.intent.intent_id);

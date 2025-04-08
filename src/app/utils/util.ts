@@ -76,28 +76,26 @@ export function secondsToDhms(seconds) {
 }
 
 export function loadTokenMultiplier(ai_models) { 
-    let models_string = ai_models.replace(/ /g,'');
-
     let models = {};
-    if (!models_string) {
-        return models;
-    }
-
-    let models_string_trimmed = models_string.replace(/ /g,'');
-    let splitted_string = models_string_trimmed.split(";");
-
-    splitted_string.forEach(m => {
-        let m_split = m.split(":");
-        let multiplier = null;
-        if (!m_split[1]) {
-            multiplier = null;
-        } else {
-            multiplier = Number(m_split[1]);;
+    if(ai_models){
+        let models_string = ai_models.replace(/ /g,'');
+        if (!models_string) {
+            return models;
         }
-        models[m_split[0]] = multiplier;
-    })
-
-    return models
+        let models_string_trimmed = models_string.replace(/ /g,'');
+        let splitted_string = models_string_trimmed.split(";");
+        splitted_string.forEach(m => {
+            let m_split = m.split(":");
+            let multiplier = null;
+            if (!m_split[1]) {
+                multiplier = null;
+            } else {
+                multiplier = Number(m_split[1]);;
+            }
+            models[m_split[0]] = multiplier;
+        })
+    }
+    return models;
 }
 
 export function generateSlug(name) {

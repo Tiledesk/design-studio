@@ -24,7 +24,6 @@
         </appdashboard-delay-slider>
     </div>
     
-    <!-- ||  -->
     <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
         <span class="material-icons-outlined">filter_alt</span>
         {{'CDSCanvas.Filter' | translate }}
@@ -40,6 +39,8 @@
     </div>
 </div>
 
+
+
 <div *ngIf="previewMode" class="text-editor-wrapper previewMode">
     <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
     <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate }}</div>
@@ -47,7 +48,6 @@
 
 
 <div  *ngIf="!previewMode" class="text-editor-wrapper">
-
     <cds-textarea 
         class="text-editable-div"
         [activeFocus]="activeFocus"
@@ -59,14 +59,17 @@
         (blur)="onBlur($event)"
         (selectedAttribute)="onSelectedAttribute($event)">
     </cds-textarea>    
-
 </div> 
 
 
 
-<div class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
+
+
+
+
+<div class="buttons-response button-replies" [class.previewMode]="previewMode" [class.disabled]="showJsonBody" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
     
-    <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies" cdkDrag > 
+    <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element"  cdkDragBoundary=".button-replies" cdkDrag > 
         
         <!-- DRAG PLACEHOLDER -->
         <cds-action-reply-button class="custom-placeholder" *cdkDragPlaceholder
@@ -80,6 +83,7 @@
             [previewMode]="previewMode"
             (onButtonControl)="onButtonControl($event, i)">
         </cds-action-reply-button>    
+
         <cds-connector *ngIf="previewMode && button.type !== TYPE_BUTTON.URL"
             class="button-connector"
             cdkDragDisabled
@@ -93,4 +97,12 @@
     <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', index)">
     + {{'CDSCanvas.AddButton' | translate }}
     </div>
+
 </div>
+
+
+<cds-action-reply-jsonbuttons
+    *ngIf="!previewMode"
+    [jsonBody]="jsonBody"
+    (changeJsonButtons)="onChangeJsonButtons($event)">
+</cds-action-reply-jsonbuttons>

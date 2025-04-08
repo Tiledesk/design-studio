@@ -42,8 +42,9 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   ICON_DEFAULT = 'package_2';
   ICON_ROCKET = 'rocket_launch';
   ICON_UNDO = 'undo';
+  ICON_WEBHOOK = 'webhook';
 
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private readonly logger: LoggerService = LoggerInstance.getInstance()
   
   constructor(
     private intentService: IntentService
@@ -52,12 +53,12 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    // console.log('ngOnInit:: ');
+    // // console.log('ngOnInit:: ');
     this.idSelectedIntent = null;
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    //console.log('[CdsPanelIntentListComponent] ngOnChanges::', this.listOfIntents);
+    // //console.log('[CdsPanelIntentListComponent] ngOnChanges::', this.listOfIntents);
   }
 
   /** ngOnDestroy */
@@ -99,10 +100,11 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   /** initialize */
   private initialize(intents){
     // // intents = this.intentService.hiddenEmptyIntents(intents);
-    // // this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK) && obj.attributes.readonly);
-   
-    this.internalIntents = intents.filter(obj => (obj.attributes.readonly));
-    this.defaultIntents = intents.filter(obj => (!obj.attributes.readonly));
+    // // this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK));
+    this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true);
+    this.logger.log('[cds-panel-intent-list] --- internalIntents ',this.internalIntents);
+    this.defaultIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true);
+    this.logger.log('[cds-panel-intent-list] --- defaultIntents ',this.defaultIntents);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DISPLAY_NAME_START, 0);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK, 1);
     this.filteredIntents = this.defaultIntents;
@@ -129,6 +131,8 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
       icon = this.ICON_ROCKET;
     } else if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK && readonly) {
       icon = this.ICON_UNDO;
+    } else if (name.trim() === TYPE_INTENT_NAME.WEBHOOK && readonly){
+      icon = this.ICON_WEBHOOK;
     }
     return icon;
   }

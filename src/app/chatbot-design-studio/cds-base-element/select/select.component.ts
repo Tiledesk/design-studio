@@ -12,7 +12,7 @@ export class SelectComponent implements OnInit {
   @ViewChild('ngSelect', { static: true }) ngSelect: NgSelectComponent;
 
   @Input() items: []
-  @Input() itemSelected: any
+  @Input() itemSelected: any;
   @Input() bindLabelSelect: string;
   @Input() bindValueSelect: string;
   @Input() optionalBindAdditionalText: string; 

@@ -1,15 +1,20 @@
 <div class="header" (click)="onSelectIntent($event)">
-    <div *ngIf="intentName === RESERVED_INTENT_NAMES.START && intent.attributes.readonly" class="intent-icon">
+
+    <div *ngIf="isStart" class="intent-icon">
         <span class="material-icons rocket">rocket_launch</span>
     </div>
-    <div *ngIf="intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK && intent.attributes.readonly" class="intent-icon">
-        <span class="material-icons undo ">undo</span>
+    <div *ngIf="isDefaultFallback" class="intent-icon">
+        <span class="material-icons undo">undo</span>
+    </div>
+    <div *ngIf="isWebhook" class="intent-icon">
+        <span class="material-icons webhook">webhook</span>
     </div>
 
     <div class="form-group" 
-        [ngClass]="{'is-error':intentNameResult === false || intentNameAlreadyExist}">
+        [class.is-error]="!isNotErrorName"
+        [class.is-start]="isStart || isWebhook">
         <input 
-            #myInput type="text" 
+            #inputIntentName type="text" 
             class="input ellips form-control tds_draggable"
             [ngStyle]="{'color': 'rgba('+intentColor+', 1)'}"
             [(ngModel)]="intentName"
@@ -21,24 +26,7 @@
             (blur)="onBlur($event)"
             (keydown.enter)="onEnterButtonPressed($event)">
         <div *ngIf="intentNameAlreadyExist" class="error---msg">{{ 'CDSCanvas.ErrorBlockName' | translate }}</div>
-        <div *ngIf="intentNameNotHasSpecialCharacters === false" class="error---msg">{{ 'CDSCanvas.ErrorBlockCharacter' | translate }}</div>
+        <div *ngIf="!intentNameNOTHasSpecialCharacters" class="error---msg">{{ 'CDSCanvas.ErrorBlockCharacter' | translate }}</div>
 
     </div> 
-
-    <!-- <div class="btns-wpr">
-        <div class="onff-intent-webhook">
-            <mat-slide-toggle labelPosition="before" [checked]="intentSelected.webhook_enabled"
-                (change)="toggleIntentWebhook($event)">
-                <span *ngIf="intentSelected.webhook_enabled">webhook enabled </span>
-                <span *ngIf="!intentSelected.webhook_enabled">webhook disabled </span>
-            </mat-slide-toggle>
-        </div>
-        <!- - <div class="loading-btn-wrapper">
-            <button id="cds-save-intent-btn" class="btn btn-primary cds-blue-button loading-btn" [disabled]="showSpinner"
-                type="button" (click)="onSaveIntent()">
-                <span style="color: #202124;font-weight: 500" class="loading-btn__text"> {{ 'Save' | translate }}</span>
-            </button>
-        </div> - ->
-    </div> -->
-
 </div>

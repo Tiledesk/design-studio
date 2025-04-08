@@ -3,7 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -294,6 +294,7 @@ export class IntentService {
           this.patchActionId(faqs);
           this.listOfIntents = JSON.parse(JSON.stringify(faqs));
           this.prevListOfIntent = JSON.parse(JSON.stringify(faqs));
+          this.intentAnalyzer();
         } else {
           this.listOfIntents = [];
           this.prevListOfIntent = [];
@@ -309,6 +310,22 @@ export class IntentService {
     });
   }
 
+
+  public isReservedIntent(intentName: string): intentName is RESERVED_INTENT_NAMES {
+    return Object.values(RESERVED_INTENT_NAMES).includes(intentName as RESERVED_INTENT_NAMES);
+  }
+
+  
+  private intentAnalyzer() {
+    this.listOfIntents.forEach(intent => {
+      if (intent.actions) {
+        intent.actions = intent.actions.filter(obj => obj !== null);
+      }
+      if (this.isReservedIntent(intent.intent_display_name)) {
+        intent.attributes.readonly = true;
+      }
+    });
+  }
 
   /**
    * patchActionId
@@ -748,6 +765,8 @@ export class IntentService {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'rocket_launch' }
       } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'undo' }
+      } else if (a.intent_display_name.trim() === RESERVED_INTENT_NAMES.WEBHOOK) {
+        return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'webhook' }
       } else {
         return { name: a.intent_display_name, value: '#' + a.intent_id, icon: 'label_important_outline' }
       }
@@ -922,6 +941,9 @@ export class IntentService {
       action.assignResultTo= 'result'
       action.assignStatusTo = 'status';
       action.assignErrorTo = 'error';
+    }
+    if(typeAction === TYPE_ACTION.WEB_RESPONSE){
+      action = new ActionWebRespose();
     }
     if(typeAction === TYPE_ACTION.AGENT){
       action = new ActionAgent();

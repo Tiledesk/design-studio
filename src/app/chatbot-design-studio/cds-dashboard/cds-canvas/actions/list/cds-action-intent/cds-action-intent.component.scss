@@ -3,15 +3,15 @@
     margin: 0px;
     position: relative;
     &.isStart{
-        padding: 5px 10px;
+        // padding: 5px 10px;
+        padding: 0px;
     }
 }
 
 
 .previewContent{
-    padding: 5px 5px;
-    top: calc(50% - 14px);
-
+    // padding: 5px 5px;
+    // top: calc(50% - 14px);
     .title-label{
      color: var(--brown);
      font-size: 12px; 
