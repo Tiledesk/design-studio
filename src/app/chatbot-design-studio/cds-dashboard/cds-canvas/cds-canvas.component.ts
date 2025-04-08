@@ -106,8 +106,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   testitOutFirstClick: boolean = false;
   IS_OPEN_PANEL_WIDGET: boolean = false;
   // Variabile osservabile
-  private _isOpenPanelWidget = new BehaviorSubject<boolean>(false);
-  public isOpenPanelWidget$ = this._isOpenPanelWidget.asObservable();
+  // private _isOpenPanelWidget = new BehaviorSubject<boolean>(false);
+  // public isOpenPanelWidget$ = this._isOpenPanelWidget.asObservable();
        
 
   /** panel widget loaded */
@@ -481,8 +481,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** closeAllPanels */
   private closeAllPanels(){
     this.IS_OPEN_PANEL_WIDGET = false;
-    this._isOpenPanelWidget.next(false);
-
+    // this._isOpenPanelWidget.next(false);
     this.IS_OPEN_WIDGET_LOG = true; // false di default
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
@@ -491,8 +490,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_CONTEXT_MENU = false;
     this.IS_OPEN_COLOR_MENU = false;
     // // this.intentService.inactiveIntent();
+  }
 
-    
+  onClosePanelLog(){
+    this.IS_OPEN_WIDGET_LOG = false;
   }
 
   private closeExtraPanels(){
@@ -1289,7 +1290,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
     setTimeout(() => {
       this.IS_OPEN_PANEL_WIDGET = true;
-      this._isOpenPanelWidget.next(true);
+      // this._isOpenPanelWidget.next(true);
     }, 500);
   }
 

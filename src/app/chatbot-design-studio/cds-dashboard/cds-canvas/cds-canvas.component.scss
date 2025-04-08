@@ -432,6 +432,11 @@ cds-widget-logs {
   width: calc(100% - 60px);
   position: absolute;
   bottom: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   &.small{
     width: calc(100% - 460px);
   }
