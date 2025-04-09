@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.31.0-rc.7
+- **bug-fixed**: bug fixed chatlog
+
+
 # 1.31.0-rc.6
 - **changed**: refactored textarea
 
