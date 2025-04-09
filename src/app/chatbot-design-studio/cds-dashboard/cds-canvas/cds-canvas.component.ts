@@ -500,6 +500,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log('[CDS-CANVAS] totElementsOnTheStage ::', this.stageService.loaded, numIntents, numConnectors);
       // scaleAndcenterStageOnCenterPosition(this.listOfIntents)
     }
+
     this.subscriptionOpenWidgetPanel = this.intentService.BStestiTout.pipe(skip(1)).subscribe((event) => this.onTestItOut(event));
 
     // ---------------------------------------
@@ -1310,10 +1311,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.closeExtraPanels();
     }
 
-    setTimeout(() => {
-      this.IS_OPEN_PANEL_WIDGET = true;
-      // this._isOpenPanelWidget.next(true);
-    }, 500);
+    if(this.dashboardService.selectedChatbot.subtype !== 'webhook'){
+      setTimeout(() => {
+        this.IS_OPEN_PANEL_WIDGET = true;
+        // this._isOpenPanelWidget.next(true);
+      }, 500);
+    } else {
+      this.IS_OPEN_PANEL_WIDGET = false;
+      this.IS_OPEN_WIDGET_LOG = true;
+    }
+   
   }
 
   /** onActionDeleted */

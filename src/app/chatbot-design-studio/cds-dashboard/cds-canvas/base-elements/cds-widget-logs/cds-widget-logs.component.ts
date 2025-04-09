@@ -5,6 +5,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 
 @Component({
   selector: 'cds-widget-logs',
@@ -42,7 +43,8 @@ export class CdsWidgetLogsComponent implements OnInit {
     private readonly el: ElementRef, 
     private readonly renderer: Renderer2,
     private readonly logService: LogService,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly intentService: IntentService,
   ) {}
 
   ngOnInit(): void {
@@ -50,11 +52,22 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.logger.log("[CDS-WIDGET-LOG] ngOnInit dashboardService.selectedChatbot ", this.dashboardService.selectedChatbot);
-    const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype === 'webhook';
+    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit dashboardService.selectedChatbot ", this.dashboardService.selectedChatbot);
+    const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
+    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit chatbotSubtype ", chatbotSubtype);
     this.subscriptions();
+    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit subscriptions ");
     this.logService.initLogService(chatbotSubtype);
+    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initLogService ");
     this.initResize();
+    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initResize ");
+
+    if(chatbotSubtype === 'webhook'){
+      this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initializeChatbot ");
+      let intentName = 'webhook';
+      this.intentService.setLiveActiveIntent(intentName);
+      this.logService.initializeChatbot(null);
+    }
   }
 
 
@@ -77,7 +90,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   initResize(event?: MouseEvent) {
-    this.startY = event.clientY;
+    this.startY = event?.clientY;
     this.logContainer = this.el.nativeElement.querySelector('#cds_widget_log');
     if(this.logContainer && !this.isClosed){
       this.startHeight = this.logContainer.offsetHeight;
@@ -106,8 +119,6 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   starterLog(){
     this.logger.log('[CDS-WIDGET-LOG] >>> starterLog ');
-    this.logService.starterLog();
-    // alla chiusura del log richiamo mqtt_client.close()
   }
 
   closeLog(){

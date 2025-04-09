@@ -1,12 +1,15 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, lastValueFrom } from 'rxjs';
+
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from './dashboard.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { MqttClient } from 'src/assets/js/MqttClient.js';
+import { WebhookService } from '../chatbot-design-studio/services/webhook-service.service';
+
 
 
 export enum MQTT_CLIENT {
@@ -28,11 +31,7 @@ export class LogService {
   SERVER_BASE_PATH: string;
   LOG_URL: any;
   logs: any = null;
-  
   public mqtt_client: any;
-  private tiledeskToken: string;
-  private mqtt_token: string;
-  public request_id: string;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
@@ -40,7 +39,8 @@ export class LogService {
     public appStorageService: AppStorageService,
     private readonly _httpClient: HttpClient,
     public dashboardService: DashboardService,
-    public tiledeskAuthService: TiledeskAuthService
+    public tiledeskAuthService: TiledeskAuthService,
+    public webhookService: WebhookService
   ) { }
 
 
@@ -54,25 +54,64 @@ export class LogService {
     })
   }
 
-
-  async initialize(serverBaseUrl: string, projectId: string, support_group_id: string, request_id: string){
-    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
-    if(request_id){
-      this.request_id = request_id;
+  async initializeChatbot(request_id: string){
+    if(!request_id){
+      // is webhook
+      const webhook_id = await this.getWebhook();
+      this.logger.log("[LOG-SERV] webhook_id : ", webhook_id);
+      request_id = await this.getNewRequestId(webhook_id);
+      this.logger.log("[LOG-SERV] request_id : ", request_id);
     }
-    this.starterLog();
-    // // support_group_id = "support-group-62c3f10152dc7400352bab0d-bbbc598e4759420f9541f46a3df0fd16";
-    // this.LOG_URL = serverBaseUrl + projectId + '/logs/flows/' + support_group_id;
-    this.logger.log('[LOG-SERV] initialize', serverBaseUrl, this.LOG_URL);
+    let resp = await this.getToken(request_id);
+    this.starterLog(resp);
+    this.logger.log('[LOG-SERV] initializeChatbot', this.LOG_URL);
     this.logs = '';
     this.BSWidgetLoaded.next(true);
   }
 
+  async getWebhook(): Promise<any | null> {
+    const chatbot_id = this.dashboardService.id_faq_kb;
+    try {
+      const resp = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
+      this.logger.log("[LOG-SERV] getWebhook : ", resp);
+      return resp.webhook_id;
+    } catch (error) {
+      this.logger.error("[LOG-SERV] error getWebhook: ", error);
+      return null;
+    } finally {
+      this.logger.log("[LOG-SERV] getWebhook completed.");
+    }
+  }
 
-  async getToken(): Promise<any|null> {
+
+  async getNewRequestId(webhook_id): Promise<any|null> {
     const tiledeskToken = localStorage.getItem('tiledesk_token');
     const project_id = this.dashboardService.projectID;
-    const request_id = this.request_id;// "support-group-6790c1a05ee3a700132d4fa0-78fa3328a7ad43e0b547467d93dde083";
+    try {
+      const resp = await this.tiledeskAuthService.createNewRequestId(
+        tiledeskToken,
+        project_id, 
+        webhook_id
+      );
+      this.logger.log('[CdsWidgetLogsComponent] >>> createNewRequestId ok ', resp);
+      if(resp['request_id']){
+        return resp['request_id'];
+      } else {
+        return null;
+      }
+    } catch (error: any) {
+      this.logger.error('[CdsWidgetLogsComponent] createNewRequestId error::', error);
+      if (error.status && error.status === 401) {
+        // gestione errore
+      }
+      return null;
+    }
+  }
+
+  async getToken(request_id): Promise<any|null> {
+    const tiledeskToken = localStorage.getItem('tiledesk_token');
+    const project_id = this.dashboardService.projectID;
+    // const request_id = this.request_id;
     try {
       const resp = await this.tiledeskAuthService.createCustomTokenByRequestId(
         tiledeskToken,
@@ -91,65 +130,25 @@ export class LogService {
   }
 
 
-  async starterLog(){
-      this.logger.log('[CdsWidgetLogsComponent] >>> starterLog ');
-      let resp = await this.getToken();
-      this.logger.log('[CdsWidgetLogsComponent] >>> mqtt_token ok ', resp);
-      if(this.mqtt_client && resp){
-        this.mqtt_token = resp['token'];
-        this.request_id = resp['request_id'];
-        this.mqtt_client.connect(this.request_id, this.mqtt_token, (message)=>{
-          this.logger.log("[CdsWidgetLogsComponent] message: ", message);
-          this.BSWidgetLoadedNewMessage.next(message.payload);
-        });
-      }
-
-      // alla chiusura del log richiamo mqtt_client.close()
+  async starterLog(resp){
+    this.logger.log('[CdsWidgetLogsComponent] >>> starterLog ');
+    this.logger.log('[CdsWidgetLogsComponent] >>> mqtt_token ok ', resp);
+    if(this.mqtt_client && resp){
+      const mqtt_token = resp['token'];
+      const request_id = resp['request_id'];
+      this.mqtt_client.connect(request_id, mqtt_token, (message)=>{
+        this.logger.log("[CdsWidgetLogsComponent] message: ", message);
+        this.BSWidgetLoadedNewMessage.next(message.payload);
+      });
+    }
   }
 
-
-
-
-
-  closeLog(){
-    this.mqtt_client.close();
+  public closeLog(){
+    this.mqtt_client?.close();
   }
-
-
-
-
 
   public resetLogService(){
     this.logs = null;
-  }
-
-  
-
-
-
-
-  public getLastLogs(logLevel?): Observable<any> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-    let url = this.LOG_URL+'?logLevel='+logLevel;
-    this.logger.log('[LOG-SERV] - GET LOG - URL', url);
-    return this._httpClient.get<any>(url, httpOptions)
-  }
-
-  public getOtherLogs(timestamp: string, direction: "prev"|"next", logLevel?): Observable<any> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-    let url = this.LOG_URL + '?timestamp=' + timestamp + "&direction=" + direction +'&logLevel='+logLevel;
-    this.logger.log('[LOG-SERV] - GET LOG - URL', url);
-    return this._httpClient.get<any>(url, httpOptions)
   }
 
 

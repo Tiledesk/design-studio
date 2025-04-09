@@ -107,21 +107,22 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
      *  - get intent name from message attributes
      *  - set live active intent and start animation
      */
+
     window.addEventListener('message', (event_data)=> {
-      // if(event_data && event_data.origin.includes('widget')){
-        let message = event_data.data.message
+      if(event_data && event_data?.data?.source?.includes('widget')){
+        let message = event_data?.data?.data?.message
         //publish ACTIVE INTENT only if widget-panel is visible
         if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
           if(this.logService?.logs === null){
-            this.logger.log('[CDS-PANEL-WIDGET] message  INIZIALIZZO!! ', message, this.logService?.logs);
+            this.logger.log('[CDS-PANEL-WIDGET] message  INIZIALIZZO!! ', this.logService?.logs);
             this.initLogService(message);
           }
-          let intentName = message.attributes.intentName
-          this.intentService.setLiveActiveIntent(intentName)
+          let intentName = message.attributes.intentName;
+          this.intentService.setLiveActiveIntent(intentName);
         }else{
-          this.intentService.setLiveActiveIntent(null)
+          this.intentService.setLiveActiveIntent(null);
         }
-      // }
+      }
     })
   }
 
@@ -138,15 +139,10 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   }
 
   initLogService(message){
-    const support_group_id = message.recipient?message.recipient:null;
     const recipient = message.recipient?message.recipient:null;
-    const projectId = message.attributes?.projectId?message.attributes?.projectId:null;
-    this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', recipient, projectId);
-    let serverBaseURL = this.appConfigService.getConfig().apiUrl;
-    this.logService.initialize(serverBaseURL, projectId, support_group_id, recipient); 
-
-
-
+    this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', recipient);
+    // let serverBaseURL = this.appConfigService.getConfig().apiUrl;
+    this.logService.initializeChatbot(recipient); 
     // this.logService.getLastLogs().subscribe({ next: (resp)=> {
     //   this.logService.initLogService(resp);
     // }, error: (error)=> {
