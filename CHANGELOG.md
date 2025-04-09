@@ -8,8 +8,12 @@
 *Tiledesk SRL*
 
 
+# 1.31.0-rc.8
+- **changed**: added auto scroll to bottom in logpanel
+
+
 # 1.31.0-rc.7
-- **bug-fixed**: bug fixed chatlog
+- **added**: bug fixed chatlog webhook
 
 
 # 1.31.0-rc.6
