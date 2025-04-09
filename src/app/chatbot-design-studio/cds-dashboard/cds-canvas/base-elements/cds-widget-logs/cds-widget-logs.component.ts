@@ -59,8 +59,6 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit subscriptions ");
     this.logService.initLogService(chatbotSubtype);
     this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initLogService ");
-    this.initResize();
-    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initResize ");
 
     if(chatbotSubtype === 'webhook'){
       this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initializeChatbot ");
@@ -90,7 +88,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   initResize(event?: MouseEvent) {
-    this.startY = event?.clientY;
+    this.startY = event.clientY;
     this.logContainer = this.el.nativeElement.querySelector('#cds_widget_log');
     if(this.logContainer && !this.isClosed){
       this.startHeight = this.logContainer.offsetHeight;
@@ -100,7 +98,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   resize(event: MouseEvent) {
-    if(this.logContainer){
+    if (this.logContainer && this.startHeight !== undefined && this.startY !== undefined) {
       const newHeight = this.startHeight - (event.clientY - this.startY);
       if (newHeight < 30) {
         this.isClosed = true;
@@ -111,9 +109,18 @@ export class CdsWidgetLogsComponent implements OnInit {
     }
   }
 
-  stopResize() {
-    if (this.mouseMoveListener) this.mouseMoveListener();
-    if (this.mouseUpListener) this.mouseUpListener();
+
+  stopResize(event?: MouseEvent) {
+    this.logger.log('[CDS-WIDGET-LOG] >>> stopResize ', this.mouseUpListener);
+    if (this.mouseMoveListener) {
+      this.mouseMoveListener(); 
+      this.mouseMoveListener = null;
+    }
+    if (this.mouseUpListener) {
+      this.mouseUpListener(); 
+      this.mouseUpListener = null;
+    }
+    this.logger.log("[CDS-WIDGET-LOG] stopResize: ridimensionamento interrotto.");
   }
 
 
@@ -141,8 +148,7 @@ export class CdsWidgetLogsComponent implements OnInit {
     } else {
       this.filteredLogs = this.listOfLogs.filter(log => log.level === this.selectedLogLevel);
     }
-
-     this.logger.log('[CDS-WIDGET-LOG] filterLogMessage:', this.filteredLogs);
+    this.logger.log('[CDS-WIDGET-LOG] filterLogMessage:', this.filteredLogs);
   }
 
 
@@ -162,6 +168,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   onCloseLog(){
+    this.closeLog();
     this.closePanelLog.emit();
   }
 

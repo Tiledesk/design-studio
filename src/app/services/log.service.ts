@@ -144,6 +144,7 @@ export class LogService {
   }
 
   public closeLog(){
+    this.logger.log('[CdsWidgetLogsComponent] >>> closeLog ');
     this.mqtt_client?.close();
   }
 

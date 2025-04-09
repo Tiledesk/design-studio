@@ -18,7 +18,7 @@ export class MqttClient {
 
     if (options.MQTTendpoint) {
       if (options.MQTTendpoint.startsWith('/')) {
-        console.log("MQTTendpoint relative url");
+        // console.log("MQTTendpoint relative url");
         let loc = window.location;
         if (window.frameElement && window.frameElement.getAttribute('tiledesk_context') === 'parent') {
           loc = window.parent.location;
@@ -64,7 +64,7 @@ export class MqttClient {
     this.client = mqtt.connect(this.endpoint, options);
 
     this.client.on('connect', () => {
-      console.log("Client connected. Request: " + request_id);
+    //   console.log("Client connected. Request: " + request_id);
       if (!this.connected) {
         this.connected = true;
         this.start(callback);
@@ -97,16 +97,17 @@ export class MqttClient {
       if (err) {
         console.error("Subscribe error: ", err);
       } else {
-        console.log("Subscribed to: " + this.topic_inbox);
+        // console.log("Subscribed to: " + this.topic_inbox);
         subscribedCallback();
       }
     });
   }
 
   close(callback) {
+    // console.log("Unsubscribed from", this.topic_inbox);
     if (this.topic_inbox) {
       this.client.unsubscribe(this.topic_inbox, (err) => {
-        console.log("Unsubscribed from", this.topic_inbox);
+        // console.log("close ", err);
         this.client.end(() => {
           this.connected = false;
           this.on_message_handler = null;
