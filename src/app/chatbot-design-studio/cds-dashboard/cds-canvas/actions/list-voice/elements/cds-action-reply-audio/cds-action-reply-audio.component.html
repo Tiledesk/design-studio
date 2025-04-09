@@ -44,7 +44,10 @@
     
     <div class="text-editor">
         <div *ngIf="!response.metadata.src" class="response-frame-panel no-image">
-            <div class="image"><img src="assets/images/icons/add_audio.svg"></div>
+            <div class="image">
+                <mat-icon svgIcon="add_audio" aria-hidden="true"></mat-icon>
+                <img src="assets/images/icons/add_audio.svg">
+            </div>
             <div class="text">{{'CDSCanvas.ClickToAddAudioURL' | translate}}</div>
         </div>
         <div *ngIf="response.metadata.src" class="response-frame-panel no-image">

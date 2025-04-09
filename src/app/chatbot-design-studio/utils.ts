@@ -35,18 +35,21 @@ export enum STAGE_SETTINGS {
     AlphaConnector = 'alpha_connectors',
     Zoom = 'zoom',
     Position = 'position',
-    Maximize = 'maximize'
+    Maximize = 'maximize',
+    openIntentListState = 'open_intent_list_state'
 }
 
 export enum RESERVED_INTENT_NAMES {
     START              = 'start',
     DEFAULT_FALLBACK   = 'defaultFallback',
     WEBHOOK            = 'webhook',
+    CLOSE              = 'close'
 }
 
 export enum INTENT_COLORS {
     // COLOR0 = '110,134,191',
-    COLOR1 = '80,100,147',
+    // COLOR1 = '80,100,147',
+    COLOR1 = '156,163,205',
     COLOR2 = '61,130,226',
     COLOR3 = '86,179,101',
     COLOR4 = '204,68,75',
@@ -78,10 +81,11 @@ export enum EXTERNAL_URL {
 }
 
 export enum TYPE_INTENT_NAME {
-    TOPIC_INTERNAL                  = 'internal',
-    DISPLAY_NAME_START              = "start",
-    DISPLAY_NAME_DEFAULT_FALLBACK   = "defaultFallback",
+    TOPIC_INTERNAL                  = "internal",
+    START              = "start",
+    DEFAULT_FALLBACK   = "defaultFallback",
     WEBHOOK                         = 'webhook',
+    CLOSE                           = "close"
 }
 
 export enum TYPE_MATH_OPERATOR {
@@ -445,9 +449,10 @@ export function deleteItemInArrayForKey(key, array, item) {
 }
 
 
-export function checkInternalIntent(intent: Intent): boolean{
-    return intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_START ||  intent.intent_display_name === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK ? true: false
+export function checkInternalIntent(intent: Intent): boolean {
+    return (Object.values(TYPE_INTENT_NAME)as string[]).includes(intent.intent_display_name);
 }
+
 
 export function findFreeId (array, key) {
     const sortedArray = array
@@ -539,21 +544,41 @@ function getMimeTypeFromExtension(extension: string): string {
 }
 
 export function filterImageMimeTypesAndExtensions(fileUploadAccept: string): string[] {
-    
     if (fileUploadAccept === '*/*') {
         return ['*/*']
     }
-    
     // Lista delle estensioni di immagine comuni
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
-  
     // Dividi la stringa in un array di tipi accettati
     const acceptedTypes = fileUploadAccept.split(',');
-  
     // Filtra solo i MIME type che iniziano con "image/" o che sono estensioni di immagine
     const imageTypesAndExtensions = acceptedTypes
       .map(type => type.trim().toLowerCase()) // Rimuove gli spazi bianchi e converte a minuscolo
       .filter(type => type.startsWith('image/') || imageExtensions.includes(type));
-    
     return imageTypesAndExtensions;
 }
+
+
+export function getOpacityFromRgba(rgba) {
+    const rgbaRegex = /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(\d*\.?\d+)\s*\)$/;
+    const match = rgba.match(rgbaRegex);
+    if (match) {
+        return parseFloat(match[1]);
+    }
+    return null;
+}
+
+export function getColorFromRgba(rgba) {
+    const rgbaRegex1 = /^rgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*\d*\.?\d+\s*\)$/;
+    const rgbaRegex2 = /^rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)$/;
+    let match1 = rgba.match(rgbaRegex1);
+    let match2 = rgba.match(rgbaRegex2);
+    if (match1) {
+        const [r, g, b] = [parseInt(match1[1]), parseInt(match1[2]), parseInt(match1[3])];
+        return `${r}, ${g}, ${b}`;
+    } else  if (match2) {
+        const [r, g, b] = [parseInt(match2[1]), parseInt(match2[2]), parseInt(match2[3])];
+        return `${r}, ${g}, ${b}`;
+    }
+    return null;
+  }

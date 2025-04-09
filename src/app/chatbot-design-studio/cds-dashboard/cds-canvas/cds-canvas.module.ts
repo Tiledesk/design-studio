@@ -36,6 +36,7 @@ import { ImagePreloaderResolver } from 'src/app/resolver/image.resolver';
 import { CdsColorMenuComponent } from './base-elements/cds-color-menu/cds-color-menu.component';
 import { CdsConnectorInComponent } from './base-elements/cds-connector-in/cds-connector-in.component';
 import { CdsWidgetLogsComponent } from './base-elements/cds-widget-logs/cds-widget-logs.component';
+import { ChangeAlphaColorComponent } from 'src/app/modals/change-alpha-color/change-alpha-color.component';
 
 
 const routes: Routes = [
@@ -92,14 +93,15 @@ const routes: Routes = [
 
     //MODALS
     MouseTipsComponent,
+    ChangeAlphaColorComponent,
 
     //EVENT BASE COMPONENT
     CdsEventComponent,
     CdsRuleComponent,
 
     PreloadBarComponent,
-     CdsColorMenuComponent,
-     CdsConnectorInComponent,
+    CdsColorMenuComponent,
+    CdsConnectorInComponent,
      CdsWidgetLogsComponent,
   ],
   imports: [

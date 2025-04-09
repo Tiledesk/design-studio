@@ -57,7 +57,8 @@ div.operand-wrp {
     }
 }
 
-.disable-input-message{
+.disable-input-message {
+    display: none;
     span.material-icons,
     span.material-icons-outlined{
         font-size: 16px;

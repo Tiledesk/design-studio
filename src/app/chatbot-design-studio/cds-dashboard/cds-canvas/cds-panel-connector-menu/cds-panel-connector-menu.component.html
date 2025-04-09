@@ -1,23 +1,40 @@
 <div class="intent-header-actions-container">
   <div class="intent-header-actions-wpr">
+    
+    <!-- ---------------------------------- -->
+    <!-- show/hide intent  -->
+    <!-- ---------------------------------- -->
+    <div class="intent-header-action-btn icon"
+      matTooltipClass="cds-mat-tooltip"
+      [matTooltip]="displayConnector?('CDSCanvas.HideConnector' | translate):('CDSCanvas.ShowConnector' | translate)"
+      matTooltipHideDelay="100"
+      (click)="onAddActionFromConnectorMenu(typeOfmenu.SHOW_HIDE)">
+      <mat-icon *ngIf="displayConnector" class="icon" svgIcon="visibility" aria-hidden="true"></mat-icon>
+      <mat-icon *ngIf="!displayConnector" class="icon" svgIcon="visibility_off" aria-hidden="true"></mat-icon>
+      <!-- <img *ngIf="displayConnector === true" src="assets/images/icons/visibility.svg" alt="hide connector" />
+      <img *ngIf="displayConnector === false" src="assets/images/icons/visibility_off.svg" alt="show connector" /> -->
+    </div>
+
     <!-- ---------------------------------- -->
     <!-- Delete intent  -->
     <!-- ---------------------------------- -->
-    <div class="intent-header-action-btn icon"
+    <div class="intent-header-action-btn"
       matTooltipClass="cds-mat-tooltip"
       [matTooltip]="'CDSCanvas.DeleteConnector' | translate"
       matTooltipPosition="above"
       matTooltipHideDelay="100"
       (click)="onAddActionFromConnectorMenu(typeOfmenu.DELETE)">
-      <img src="assets/images/icons/bin.svg" />
+      <mat-icon class="icon" svgIcon="bin" aria-hidden="true"></mat-icon>
+      <!-- <img src="assets/images/icons/bin.svg" alt="delete" /> -->
     </div>
-    <div class="intent-header-action-btn icon"
+    <div class="intent-header-action-btn"
       matTooltipClass="cds-mat-tooltip"
       [matTooltip]="'CDSCanvas.LineText' | translate"
       matTooltipPosition="above"
       matTooltipHideDelay="100"
       (click)="onShowLineTextArea()">
-      <img src="assets/images/icons/line_text.svg" />
+      <mat-icon class="icon" svgIcon="line_text" aria-hidden="true"></mat-icon>
+      <!-- <img src="assets/images/icons/line_text.svg" alt="line text" /> -->
     </div>
   </div>
 
