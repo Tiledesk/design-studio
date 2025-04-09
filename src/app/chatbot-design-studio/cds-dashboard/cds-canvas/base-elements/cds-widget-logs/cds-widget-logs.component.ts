@@ -59,7 +59,6 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit subscriptions ");
     this.logService.initLogService(chatbotSubtype);
     this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initLogService ");
-
     if(chatbotSubtype === 'webhook'){
       this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initializeChatbot ");
       let intentName = 'webhook';
@@ -81,6 +80,7 @@ export class CdsWidgetLogsComponent implements OnInit {
       this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
       if(message){
         this.listOfLogs.push(message);
+        this.scrollToBottom();
       }
       this.filterLogMessage();
     });  
@@ -124,6 +124,17 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
 
+  private scrollToBottom(): void {
+    const logContainer = this.el.nativeElement.querySelector('#content-scroll-log');
+    this.logger.log("[CDS-WIDGET-LOG] scrollToBottom: ", logContainer, logContainer.offsetHeight);
+    setTimeout(() => {
+      if(logContainer) {
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }
+    }, 300);
+  }
+
+
   starterLog(){
     this.logger.log('[CDS-WIDGET-LOG] >>> starterLog ');
   }
@@ -132,10 +143,6 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.logger.log('[CDS-WIDGET-LOG] >>> closeLog ');
     this.logService.closeLog();
   }
-
-
-
-
 
   onLogLevelChange(event: any) {
     this.selectedLogLevel = event.target.value;

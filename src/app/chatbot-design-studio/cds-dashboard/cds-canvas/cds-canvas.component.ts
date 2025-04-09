@@ -547,7 +547,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private closeAllPanels(){
     this.IS_OPEN_PANEL_WIDGET = false;
     // this._isOpenPanelWidget.next(false);
-    this.IS_OPEN_WIDGET_LOG = false; // false di default
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
