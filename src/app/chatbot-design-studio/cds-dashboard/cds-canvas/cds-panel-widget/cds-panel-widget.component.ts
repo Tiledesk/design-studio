@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { IntentService } from '../../../services/intent.service';
 import { LogService } from 'src/app/services/log.service';
@@ -23,6 +23,8 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   @ViewChild('widgetIframe', {static:true}) widgetIframe:ElementRef;
   @Input() isPanelVisible: boolean = false;
+  @Output() newConversation = new EventEmitter();
+
   // @Input() intent: Intent;
   // @Input() projectID: string;
   // @Input() id_faq_kb: string;
@@ -82,6 +84,16 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     this.setIframeUrl()
   }
 
+
+  ngAfterViewInit() {
+    const iframe = document.querySelector('iframe');
+    if (iframe) {
+      iframe.addEventListener('load', (event) => {
+        this.onLoaded(event);
+      });
+    }
+  }
+
   setIframeUrl(){
     this.WIDGET_BASE_URL = this.appConfigService.getConfig().widgetBaseUrl;
     const testItOutUrl = this.WIDGET_BASE_URL + "assets/twp" + '/chatbot-panel.html'
@@ -100,7 +112,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   }
 
   onLoaded(event){
-    this.loading= false
+    this.loading= false;
     this.logger.log('[CDS-PANEL-WIDGET] onLoaded!! ', event);
     /** enable the live stage navigation when widget iframe receive a new message from the chatbot
      *  - get message from widget page
@@ -109,18 +121,28 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
      */
 
     window.addEventListener('message', (event_data)=> {
-      if(event_data && event_data?.data?.source?.includes('widget')){
-        let message = event_data?.data?.data?.message
-        //publish ACTIVE INTENT only if widget-panel is visible
-        if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
-          if(this.logService?.logs === null){
-            this.logger.log('[CDS-PANEL-WIDGET] message  INIZIALIZZO!! ', this.logService?.logs);
-            this.initLogService(message);
+      
+      if(event_data && event_data?.data?.source?.includes('widget') &&  event_data?.data?.event === 'onNewConversation'){
+        this.logger.log('[CDS-PANEL-WIDGET] OPEN NEW CONVERSATION ', event_data);
+        const conversation_id = event_data?.data?.data?.conversation_id;
+        this.newConversation.emit(conversation_id);
+      }
+
+      else if(event_data && event_data?.data?.source?.includes('widget') ){
+        
+        let message = event_data?.data?.data?.message;
+        this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message);
+        const request_id = message?.recipient;
+        this.newConversation.emit(request_id);
+
+        if(message.status>0){
+          //publish ACTIVE INTENT only if widget-panel is visible
+          if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
+            let intentName = message.attributes.intentName;
+            this.intentService.setLiveActiveIntent(intentName);
+          }else{
+            this.intentService.setLiveActiveIntent(null);
           }
-          let intentName = message.attributes.intentName;
-          this.intentService.setLiveActiveIntent(intentName);
-        }else{
-          this.intentService.setLiveActiveIntent(null);
         }
       }
     })
@@ -137,20 +159,5 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   resetLogService(){
     this.logService.resetLogService();
   }
-
-  initLogService(message){
-    const recipient = message.recipient?message.recipient:null;
-    this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', recipient);
-    // let serverBaseURL = this.appConfigService.getConfig().apiUrl;
-    this.logService.initializeChatbot(recipient); 
-    // this.logService.getLastLogs().subscribe({ next: (resp)=> {
-    //   this.logService.initLogService(resp);
-    // }, error: (error)=> {
-    //   this.logger.error("[LOG-SERV] initLogService error: ", error);
-    // }, complete: () => {
-    //   this.logger.log("[LOG-SERV] initLogService completed.");
-    // }})
-  }
-
 
 }

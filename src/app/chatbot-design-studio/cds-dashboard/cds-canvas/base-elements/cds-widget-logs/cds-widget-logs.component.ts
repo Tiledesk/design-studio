@@ -1,11 +1,13 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, Renderer2 } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, Renderer2, SimpleChanges } from '@angular/core';
 import { LOG_LEVELS } from 'src/app/chatbot-design-studio/utils';
 import { LogService } from 'src/app/services/log.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subscription } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 
 @Component({
   selector: 'cds-widget-logs',
@@ -23,6 +25,10 @@ export class CdsWidgetLogsComponent implements OnInit {
       this.closeLog();
     }
   }
+
+  
+
+  @Input() request_id: string;
   @Output() closePanelLog = new EventEmitter();
 
   listOfLogs: Array<any> = [];
@@ -32,6 +38,8 @@ export class CdsWidgetLogsComponent implements OnInit {
   LOG_LEVELS = LOG_LEVELS;
   selectedLogLevel = LOG_LEVELS.DEBUG;
   isOpenPanelWidget: boolean;
+  mqtt_token: string;
+  // request_id: string;
 
   private startY: number;
   private startHeight: number;
@@ -44,28 +52,114 @@ export class CdsWidgetLogsComponent implements OnInit {
     private readonly renderer: Renderer2,
     private readonly logService: LogService,
     private readonly dashboardService: DashboardService,
-    private readonly intentService: IntentService,
+    private readonly webhookService: WebhookService,
+    private readonly tiledeskAuthService: TiledeskAuthService
   ) {}
 
   ngOnInit(): void {
     //empty
+    this.subscriptions();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['request_id'] && !changes['request_id'].isFirstChange()) {
+      // this.request_id = changes['request_id'].currentValue;
+      this.initializeChatbot();
+    }
   }
 
   ngAfterViewInit() {
-    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit dashboardService.selectedChatbot ", this.dashboardService.selectedChatbot);
+    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit selectedChatbot ", this.dashboardService.selectedChatbot);
+    //this.initializeChatbot();
+  }
+
+
+  async initializeChatbot(){
+    this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
+    this.closeLog();
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
-    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit chatbotSubtype ", chatbotSubtype);
-    this.subscriptions();
-    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit subscriptions ");
-    this.logService.initLogService(chatbotSubtype);
-    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initLogService ");
     if(chatbotSubtype === 'webhook'){
-      this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit initializeChatbot ");
-      let intentName = 'webhook';
-      this.intentService.setLiveActiveIntent(intentName);
-      this.logService.initializeChatbot(null);
+      const webhook_id = await this.getWebhook();
+      this.logger.log("[CDS-WIDGET-LOG] webhook_id : ", webhook_id);
+      this.request_id = await this.getNewRequestId(webhook_id);
+      this.logger.log("[CDS-WIDGET-LOG] request_id : ", this.request_id);
+    } else {
+      this.request_id = this.logService.request_id;
+    }
+
+    if(this.request_id){
+      let resp = await this.getToken(this.request_id);
+      if(resp){
+        this.mqtt_token = resp['token']?resp['token']:null;
+        this.request_id = resp['request_id']?resp['request_id']:null;
+        this.starterLog();
+      }
     }
   }
+
+
+
+  async getWebhook(): Promise<any | null> {
+      const chatbot_id = this.dashboardService.id_faq_kb;
+      try {
+        const resp = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
+        this.logger.log("[CDS-WIDGET-LOG] getWebhook : ", resp);
+        return resp.webhook_id;
+      } catch (error) {
+        this.logger.error("[CDS-WIDGET-LOG] error getWebhook: ", error);
+        return null;
+      } finally {
+        this.logger.log("[CDS-WIDGET-LOG] getWebhook completed.");
+      }
+  }
+
+
+  async getNewRequestId(webhook_id): Promise<any|null> {
+    const tiledeskToken = localStorage.getItem('tiledesk_token');
+    const project_id = this.dashboardService.projectID;
+    try {
+      const resp = await this.tiledeskAuthService.createNewRequestId(
+        tiledeskToken,
+        project_id, 
+        webhook_id
+      );
+      this.logger.log('[CDS-WIDGET-LOG] >>> createNewRequestId ok ', resp);
+      if(resp['request_id']){
+        return resp['request_id'];
+      } else {
+        return null;
+      }
+    } catch (error: any) {
+      this.logger.error('[CDS-WIDGET-LOG] createNewRequestId error::', error);
+      if (error.status && error.status === 401) {
+        // error
+      }
+      return null;
+    }
+  }
+
+
+  async getToken(request_id): Promise<any|null> {
+    const tiledeskToken = localStorage.getItem('tiledesk_token');
+    const project_id = this.dashboardService.projectID;
+    try {
+      const resp = await this.tiledeskAuthService.createCustomTokenByRequestId(
+        tiledeskToken,
+        project_id,
+        request_id
+      );
+      this.logger.log('[CDS-WIDGET-LOG] >>> getToken ok ', resp);
+      return resp;
+    } catch (error: any) {
+      this.logger.error('[CDS-WIDGET-LOG] getToken error::', error);
+      if (error.status && error.status === 401) {
+        // error
+      }
+      return null;
+    }
+  }
+
+
 
 
   ngOnDestroy() {
@@ -88,9 +182,10 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   initResize(event?: MouseEvent) {
+    this.logger.log('[CDS-WIDGET-LOG] >>> initResize ',event);
     this.startY = event.clientY;
     this.logContainer = this.el.nativeElement.querySelector('#cds_widget_log');
-    if(this.logContainer && !this.isClosed){
+    if(this.logContainer){
       this.startHeight = this.logContainer.offsetHeight;
       this.mouseMoveListener = this.renderer.listen('document', 'mousemove', this.resize.bind(this));
       this.mouseUpListener = this.renderer.listen('document', 'mouseup', this.stopResize.bind(this));
@@ -98,6 +193,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   resize(event: MouseEvent) {
+    // this.logger.log('[CDS-WIDGET-LOG] >>> resize ');
     if (this.logContainer && this.startHeight !== undefined && this.startY !== undefined) {
       const newHeight = this.startHeight - (event.clientY - this.startY);
       if (newHeight < 30) {
@@ -137,6 +233,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   starterLog(){
     this.logger.log('[CDS-WIDGET-LOG] >>> starterLog ');
+    this.logService.starterLog(this.mqtt_token, this.request_id);
   }
 
   closeLog(){
@@ -185,7 +282,7 @@ export class CdsWidgetLogsComponent implements OnInit {
     const elementText = document.getElementById(blockTextId);
     const blockButtonId = "row-log-button_"+index;
     const elementButton = document.getElementById(blockButtonId);
-    if (elementText && elementButton) {
+    if (elementText) {
       if(elementText.offsetHeight > elementButton.offsetHeight){
         this.logger.log(`[CDS-WIDGET-LOG] ENABLED: ${elementText.offsetHeight}, ${elementButton.offsetHeight} px`);
         return true;

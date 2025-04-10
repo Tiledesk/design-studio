@@ -4,10 +4,6 @@ import mqtt from 'mqtt';
 import { v4 as uuidv4 } from 'uuid';
 
 export class MqttClient {
-
-
-
-
   constructor(options) {
     if (!options) {
       throw new Error("Missing MQTT data. Required options: MQTTendpoint, appId.")
