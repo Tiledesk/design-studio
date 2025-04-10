@@ -140,6 +140,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   startDraggingPosition: any = null;
+  mesage_request_id: string;
 
 
   constructor(
@@ -473,12 +474,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     });    
 
     /** SUBSCRIBE TO THE LOADED WIDGET */
-    this.subscriptionWidgetLoaded = this.logService.BSWidgetLoaded.subscribe((event: any) => {
-      this.logger.log("[CDS-CANVAS] logService loaded ", event);
-      if(event){
-        this.IS_OPEN_WIDGET_LOG = true;
-      }
-    });    
+    // this.subscriptionWidgetLoaded = this.logService.BSWidgetLoaded.subscribe((event: any) => {
+    //   this.logger.log("[CDS-CANVAS] logService loaded ", event);
+    //   if(event){
+    //     //this.IS_OPEN_WIDGET_LOG = true;
+    //   }
+    // });    
   }
 
    /** initialize */
@@ -1316,8 +1317,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         // this._isOpenPanelWidget.next(true);
       }, 500);
     } else {
-      this.IS_OPEN_PANEL_WIDGET = false;
+      this.logService.initialize(null); 
       this.IS_OPEN_WIDGET_LOG = true;
+      this.IS_OPEN_PANEL_WIDGET = false;
     }
    
   }
@@ -1500,25 +1502,29 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   public onShowContextMenu(event: MouseEvent): void {
-      event.preventDefault();
-      this.logger.log('[CDS-CANVAS] onShowContextMenu:: ', event);
-      // this.showCustomMenu(x, y);
-
-      // Recupera l'elemento che ha scatenato l'evento
-      const targetElement = event.target as HTMLElement;
-      const customAttributeValue = targetElement.getAttribute('custom-attribute');
-
-      if(customAttributeValue === 'tds_container'){
-        // sto incollando sullo stage
-        this.positionContextMenu.x = event.clientX;
-        this.positionContextMenu.y = event.offsetY;
-        this.IS_OPEN_CONTEXT_MENU = true;
-        this.logger.log('Attributi dell\'elemento premuto:', customAttributeValue);
-      }
+    event.preventDefault();
+    this.logger.log('[CDS-CANVAS] onShowContextMenu:: ', event);
+    const targetElement = event.target as HTMLElement;
+    const customAttributeValue = targetElement.getAttribute('custom-attribute');
+    if(customAttributeValue === 'tds_container'){
+      this.positionContextMenu.x = event.clientX;
+      this.positionContextMenu.y = event.offsetY;
+      this.IS_OPEN_CONTEXT_MENU = true;
+    }
   }
 
   public onHideContextMenu(){
     this.IS_OPEN_CONTEXT_MENU = false;
+  }
+
+
+  public onNewConversation(request_id){
+    this.logger.log('[CDS-CANVAS] onNewConversation:: ', this.logService.request_id, request_id);
+    if(this.logService.request_id !== request_id){
+      this.logService.initialize(request_id); 
+      this.IS_OPEN_WIDGET_LOG = true;
+      this.mesage_request_id = request_id;
+    } 
   }
 
 }
