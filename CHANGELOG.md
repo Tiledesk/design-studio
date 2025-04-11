@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.31.0-rc.9
+- **bug-fixed**: bug fixed connect ws widget
+
 
 # 1.31.0-rc.8
 - **changed**: added auto scroll to bottom in logpanel
