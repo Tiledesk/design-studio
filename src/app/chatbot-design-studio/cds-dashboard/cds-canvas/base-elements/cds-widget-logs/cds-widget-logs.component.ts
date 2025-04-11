@@ -62,7 +62,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['request_id'] && !changes['request_id'].isFirstChange()) {
+    if (changes['request_id']) { // && !changes['request_id'].isFirstChange()
       // this.request_id = changes['request_id'].currentValue;
       this.initializeChatbot();
     }
