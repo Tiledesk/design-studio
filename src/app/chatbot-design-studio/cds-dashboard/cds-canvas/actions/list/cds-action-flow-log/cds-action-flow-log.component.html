@@ -1,0 +1,33 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+    <div class="action-row">
+        <div class="action-row-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="none">
+                <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h440l200 200v440q0 33-23.5 56.5T760-120H200Zm0-80h560v-400H600v-160H200v560Zm80-80h400v-80H280v80Zm0-320h200v-80H280v80Zm0 160h400v-80H280v80Zm-80-320v160-160 560-560Z"/>
+            </svg>
+        </div>
+        <div *ngIf="action?.log" class="action-row-right">
+            {{action?.log}}
+        </div>
+        <div *ngIf="!action?.log" class="action-row-right empty">
+            {{'CDSCanvas.SetFlowLog' | translate }}
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.FlowLog' | translate }}:</label>
+        <cds-textarea 
+            class="text-editable-div" 
+            [text]="action?.log" 
+            [minRow]="10"
+            popoverVerticalAlign="above"
+            [emojiPikerBtn]="false"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextArea($event)">
+        </cds-textarea>
+        <!-- <label class="field-description"> {{ 'CDSCanvas.FlowLogDescription' | translate}} </label> -->
+    </div>
+
+</div>

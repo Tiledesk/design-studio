@@ -276,9 +276,15 @@ appdashboard-filter{
         margin: 0px;
     }
     .icon-action img{
-        height: 16px;
+        height: 17px;
         filter: brightness(0) saturate(100%) invert(42%) sepia(2%) saturate(2720%) hue-rotate(9deg) brightness(91%) contrast(81%);
     }
+
+    .icon-action mat-icon{
+        height: 17px;
+        color: var(--brown-85);
+    }
+
 
     .set-attribute-value {
         font-size: 12px;
@@ -288,9 +294,7 @@ appdashboard-filter{
         padding: 0px 6px;
         border-radius: 4px;
         color: #fff;
-        // height: 18px;
         line-height: 1.5;
-
         overflow: hidden;
         word-break: break-word;
     }  
@@ -308,6 +312,7 @@ appdashboard-filter{
     align-items: center;
     justify-content: center;
 }
+
 .action-row-right {
     // // font-size: 12px;
     // // font-weight: 400;

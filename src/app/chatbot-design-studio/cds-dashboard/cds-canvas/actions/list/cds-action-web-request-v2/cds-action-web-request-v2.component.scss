@@ -180,38 +180,29 @@ cds-select#method ::ng-deep{
 
 cds-textarea#url ::ng-deep {
     display: flex;
-    width: 100%;
-    // padding: 6px 0px 0px 0;
-    .focus-out {
-        position: relative;
-        textarea{
-            height: 23px !important;
-        }
-    }
-    .focus-in {
-        position: absolute;
-        z-index: 2;
+    width: calc(100% - 120px);
+    // .focus-out {
+    //     position: relative;
+    // }
+    // .focus-in {
+    //     position: absolute;
+    //     z-index: 2;
+    //     width: 100%;
+    // }
+    .div-textarea {
         width: 100%;
-        textarea{
-            min-height: 23px !important;
-        }
     }
-
     textarea {
         border-radius: 0px var(--input-border-radius-base) var(--input-border-radius-base) 0px;
-        resize: none !important; 
-        padding: 6px 16px !important;
-
-        // height: 23px !important;
-        min-height: 23px !important;
+        min-height: 27px;
     }
 }
 
 cds-textarea#body.jsonError ::ng-deep,
 cds-textarea#timeout.jsonError ::ng-deep {
-    textarea {
-        border: 1px solid red !important;
-    }
+    // textarea {
+    //     border: 1px solid red !important;
+    // }
 }
 
 /** button TOOGLE */
@@ -240,7 +231,14 @@ mat-button-toggle{
     &::ng-deep .mat-button-toggle-label-content {
         line-height: 36px;
     }
-
-    
 }
 
+
+.action-row-left {
+    width: auto;
+    justify-content: flex-start;
+}
+.action-row-left {
+    width: auto;
+    justify-content: flex-start;
+}

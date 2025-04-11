@@ -1,0 +1,41 @@
+
+<div class="container">
+    <div class="cds-modal-header">
+        <div class="header-title">{{'CDSCanvas.VisibilityConnectors' | translate}}</div>
+        <mat-dialog-actions>
+            <button (click)="onClose()">
+                <span class="material-icons">
+                    close
+                </span>
+            </button>
+        </mat-dialog-actions>
+    </div>
+
+    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+
+
+    <div class="header-subtitle">{{'CDSCanvas.ChangeAlphaConnectors' | translate}}</div>
+    <div class="content">
+        <div class="numbers">0</div>
+        <div class="cds-elements horizontal-slider-container">
+            <input
+                #alphaInput
+                type="range"
+                id="alphaRange"
+                class="horizontal-slider"
+                min="0"
+                max="100"
+                step="10"
+                [(ngModel)]="alpha"
+                (input)="updateAlphaConnectors()"
+            />
+            <span class="slider-value">{{alpha}}</span>
+        </div>
+        <div class="numbers">100</div>
+    </div>
+
+
+</div>
+
+
+

@@ -491,6 +491,18 @@ export class ActionCaptureUserReply extends Action {
     }   
 }
 
+export class ActionFlowLog extends Action {
+    level: string;
+    log: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.FLOW_LOG;
+        this.level = "info";
+        this.log = "log";
+    }
+}
+
+
 export class ActionCode extends Action {
     source: string
     constructor() {

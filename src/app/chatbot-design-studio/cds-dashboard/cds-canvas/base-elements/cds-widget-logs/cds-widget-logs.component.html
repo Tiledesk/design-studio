@@ -1,0 +1,30 @@
+
+<div id="cds_widget_log" class="cds-widget-log-container" [class.closed]="isClosed">
+    <div class="resize-handle" (mousedown)="initResize($event)"> 
+        <div class="dropdown-container">
+            <!-- <label for="logLevel">{{ 'CDSCanvas.LogLevels' | translate }}:</label> -->
+            <select id="logLevel" [(ngModel)]="selectedLogLevel" (change)="onLogLevelChange($event)">
+                <option [value]="LOG_LEVELS.DEBUG">{{LOG_LEVELS.DEBUG}}</option>
+                <option [value]="LOG_LEVELS.INFO">{{LOG_LEVELS.INFO}}</option>
+                <option [value]="LOG_LEVELS.WARN">{{LOG_LEVELS.WARN}}</option>
+                <option [value]="LOG_LEVELS.ERROR">{{LOG_LEVELS.ERROR}}</option>
+            </select>
+        </div>
+
+        <div *ngIf="isOpenPanelWidget" class="button-toggle" (click)="onToggleLog()">
+            <img class="active-icon" [ngClass]="isClosed ? 'arrow-down' : 'arrow-up'" src="assets/images/icons/keyboard_arrow_down.svg" alt="button toggle">
+        </div>
+        <div *ngIf="!isOpenPanelWidget" class="button-toggle" (click)="onCloseLog()">
+            <img class="active-icon" src="assets/images/icons/close.svg" alt="button close">
+        </div>
+    </div>
+    <div id="content-scroll-log" class="content-log">
+        <div *ngFor="let log of filteredLogs; let i = index;" class="row-log" [class.closed]="!log?.open" (click)="onToggleRowLog(i)">
+            <span [id]="'row-log-button_'+i" class="row-log-button material-icons-outlined" [class.open]="log?.open" (click)="onToggleRowLog(i)">chevron_right</span>
+            <span class="row-log-time">{{log?.timestamp | date: 'dd/MM/yyyy HH:mm:ss'}} </span>
+            <span class="row-log-level" [ngClass]="log?.level">{{log?.level}}</span>
+            <span [id]="'row-log-text_'+i" class="row-log-text">{{log?.text}}</span>
+        </div>
+    </div> 
+</div>
+
