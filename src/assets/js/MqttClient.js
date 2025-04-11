@@ -1,6 +1,6 @@
 // mqtt-client.js (crea questo file nella tua Angular app sotto /src/assets o /src/app/libs)
 
-import mqtt from 'mqtt';
+// import mqtt from 'mqtt';
 import { v4 as uuidv4 } from 'uuid';
 
 export class MqttClient {
