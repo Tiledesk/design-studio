@@ -1,5 +1,6 @@
 {
-    "files.associations": {
-        "*.svg": "plaintext"
+    "workbench.editorAssociations": {
+        "*.json": "default",
+        "*.svg": "default"
     }
 }

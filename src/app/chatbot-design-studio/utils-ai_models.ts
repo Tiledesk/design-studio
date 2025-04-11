@@ -16,7 +16,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
 ]
 
 export const GROQ_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
-    { name: "Llama-3.2-11b-vision-preview",         value: "llama-3.2-11b-vision-preview",         description: "TYPE_GPT_MODEL.text-davinci-003.description",          status: "active" },
+    { name: "Llama-3.2-11b-vision-preview",         value: "llama-3.2-11b-vision-preview",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Llama-3.1-8b-instant",                 value: "llama-3.1-8b-instant",                  description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Llama-3.2-3b-preview",                 value: "llama-3.2-3b-preview",                  description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Llama-3.2-90b-vision-preview",         value: "llama-3.2-90b-vision-preview",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },

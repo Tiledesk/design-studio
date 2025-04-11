@@ -133,16 +133,16 @@
         display: flex;
         width: calc(50% - 2px);
         textarea {
-            padding: 0 0 0 10px !important;
-            border-radius: 0 var(--base-radius) var(--base-radius) 0;
+            // padding: 0 0 0 10px !important;
+            // border-radius: 0 var(--base-radius) var(--base-radius) 0;
         }
     }
 
     cds-textarea#assignTo.assigned ::ng-deep {
         display: flex;
         textarea {
-            background: transparent;
-            padding: 0!important;
+            // background: transparent;
+            // padding: 0!important;
         }
     }
 
@@ -160,19 +160,21 @@
             z-index: 1;
         }
         textarea {
-            max-height: 41px;
-            cursor: default;
-            display: flex;
-            position: relative;
-            border-radius: var(--base-radius) 0 0 var(--base-radius);
-            font-weight: 500;
-            font-size: 14px;
-            margin: 3px 0px 3px 0;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            padding: 0!important;
-            resize: none!important;
+            // max-height: 41px;
+            // cursor: default;
+            // display: flex;
+            // position: relative;
+            border-radius: 0 var(--base-radius) var(--base-radius) 0;
+            // font-weight: 500;
+            // font-size: 14px;
+            // margin: 3px 0px 3px 0;
+            // padding: 0!important;
+            // resize: none!important;
+        }
+
+        .div-textarea{
+            margin: 3px 0;
+            height: auto;
         }
 
         .text-editor-wrapper {
