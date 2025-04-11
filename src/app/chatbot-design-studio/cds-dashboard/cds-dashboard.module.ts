@@ -7,9 +7,6 @@ import { CdsDashboardComponent } from './cds-dashboard.component';
 import { CdsSidebarComponent } from './cds-sidebar/cds-sidebar.component';
 import { CdsHeaderComponent } from './cds-header/cds-header.component';
 
-
-
-
 import { MaterialModule } from 'src/app/shared/material.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';

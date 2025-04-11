@@ -507,7 +507,9 @@
         "StatusNotSelected":"Status not selected",
         "More":"More ",
         "JSONButtons":" JSON buttons.",
-        "Examples": "Examples"
+        "Examples": "Examples",
+        "FlowLog": "Log",
+        "SetFlowLog":"Set the log"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -663,6 +665,7 @@
             "Brevo":"Brevo",
             "N8n":"n8n",
             "AddTag":"Add tag",
+            "FlowLog":"Flow log",
             "DTMFForm":"DTMF form",
             "DTMFMenu":"DTMF menu",
             "BlindTransfer": "Blind transfer",
@@ -909,6 +912,13 @@
                 "IMAGE":"assets/images/doc/ADD_TAGS.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/tag-action/"
+            },
+            "FlowLog": {
+                "TITLE":"Add a log",
+                "DESCRIPTION":"This action allows you to add the log to the conversation flow.",
+                "IMAGE":"assets/images/doc/LOG.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/action-log"
             },
             "Qapla":{
                 "TITLE":"Ask an order status to Qapla'",

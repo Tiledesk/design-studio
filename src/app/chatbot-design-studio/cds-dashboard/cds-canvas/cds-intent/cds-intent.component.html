@@ -462,6 +462,13 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-record>
 
+                    <cds-action-flow-log *ngSwitchCase="TYPE_ACTION.FLOW_LOG"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-flow-log>
+
                 </div>
             </span>
             
