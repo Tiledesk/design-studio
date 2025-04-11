@@ -237,6 +237,10 @@ export class IconService {
       'assets/images/actions/whatsapp.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/whatsapp.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/flow_log.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/flow_log.svg')
+    );
 
 
 

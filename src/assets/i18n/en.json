@@ -510,6 +510,8 @@
         "More":"More ",
         "JSONButtons":" JSON buttons.",
         "Examples": "Examples",
+        "FlowLog": "Log",
+        "SetFlowLog":"Set the log",
         "AvailableToAgents":"Available to agents",
         "InfoAvailableToAgents":"A block with this option is visible to agents for the purpose to be put back in the conversation",
         "Create":"Create",
@@ -678,6 +680,7 @@
             "Brevo":"Brevo",
             "N8n":"n8n",
             "AddTag":"Add tag",
+            "FlowLog":"Flow log",
             "DTMFForm":"DTMF form",
             "DTMFMenu":"DTMF menu",
             "BlindTransfer": "Blind transfer",
@@ -924,6 +927,13 @@
                 "IMAGE":"assets/images/doc/ADD_TAGS.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/tag-action/"
+            },
+            "FlowLog": {
+                "TITLE":"Add a log",
+                "DESCRIPTION":"This action allows you to add the log to the conversation flow.",
+                "IMAGE":"assets/images/doc/LOG.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/action-log"
             },
             "Qapla":{
                 "TITLE":"Ask an order status to Qapla'",

@@ -7,6 +7,22 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.31.0-rc.10
+- **added**: action flow log
+
+# 1.31.0-rc.9
+- **bug-fixed**: bug fixed connect ws widget
+
+
+# 1.31.0-rc.8
+- **changed**: added auto scroll to bottom in logpanel
+
+
+# 1.31.0-rc.7
+- **added**: bug fixed chatlog webhook
+
+
 # 1.31.0-rc.6
 - **changed**: refactored textarea
 
