@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 
+# 1.31.0-rc.12
+- **bug-fixed**: MqttClient subscription deleted on new widget message (MqttClient subscription only when open widget)
+
+
 # 1.31.0-rc.11
 - **bug-fixed**: update intent on change textarea
 - **bug-fixed**: deleted log APP-COMP appconfig
