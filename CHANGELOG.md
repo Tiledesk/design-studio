@@ -8,6 +8,25 @@
 *Tiledesk SRL*
 
 
+# 1.31.0-rc.10
+- **added**: action flow log
+
+# 1.31.0-rc.9
+- **bug-fixed**: bug fixed connect ws widget
+
+
+# 1.31.0-rc.8
+- **changed**: added auto scroll to bottom in logpanel
+
+
+# 1.31.0-rc.7
+- **added**: bug fixed chatlog webhook
+
+
+# 1.31.0-rc.6
+- **changed**: refactored textarea
+
+
 # 1.31.0-rc.5
 - **bug-fixed**: bug fixed select model Ai
 - **changed**: web request changed json body from {{attribute}} to {{attribute | json}}
