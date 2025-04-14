@@ -9,22 +9,23 @@
 
 <div *ngIf="!metadata.src && optionSelected === 'upload'" class="wrapper">
 
+<label class="inputUploadImage" [for]="'uploadImage_'+ uuid">
     <!-- 'UPLOAD use case'  -->
     <div *ngIf="optionSelected === 'upload'"
         class="dropUploadImage"
         [ngClass]="{'is-in-drop-event': isHovering === true}"
         (drop)="drop($event)"
         (dragover)="allowDrop($event)" 
-        (dragleave)="drag($event)">    
+        (dragleave)="drag($event)"> 
 
         <div *ngIf="!isFilePendingToUpload">
-            <label class="inputUploadImage" [for]="'uploadImage_'+ uuid">
+            <!-- <label class="inputUploadImage" [for]="'uploadImage_'+ uuid"> -->
                 <div class="image">
                     <mat-icon class="base-icon-color" svgIcon="add_image" aria-hidden="true"></mat-icon>
                     <!-- <img class="base-icon-color" src="assets/images/icons/add_image.svg"> -->
                 </div>
                 <input #imageInput style="display:none" type="file" [id]="'uploadImage_'+ uuid" [accept]="fileUploadAccept" (change)="detectFiles($event)" />
-            </label>
+            <!-- </label> -->
         
             <div class="labelDropUploadImage">
                 <span *ngIf="isHovering === false">
@@ -44,11 +45,15 @@
         
     </div>
 
+
+</label>
+
 </div>
+
 
 <div *ngIf="optionSelected === 'link'" class="wrapper">
     
-    <!-- 'LINK use case'  -->
+    <!-- 'LINK use case' -->
     <div *ngIf="optionSelected === 'link'" class="dropUploadImage link">  
         
         <div *ngIf="!isFilePendingToUpload" class="field-box">
@@ -64,8 +69,6 @@
                 (changeTextarea)="onChangeTextarea($event)">
             </cds-textarea>
         </div>
-
-         <!-- -->
          <loading-spinner  *ngIf="isFilePendingToUpload"
             class="custom-spinner">
         </loading-spinner>
@@ -80,4 +83,5 @@
     <div class="control-button delete" (click)="onDeletePathElement($event)">
         <em class="material-icons">clear</em>
     </div>
-</div>
+</div> 
+
