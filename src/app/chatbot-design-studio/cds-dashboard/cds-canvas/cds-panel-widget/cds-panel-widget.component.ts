@@ -121,7 +121,6 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
      */
 
     window.addEventListener('message', (event_data)=> {
-      
       if(event_data && event_data?.data?.source?.includes('widget') &&  event_data?.data?.event === 'onNewConversation'){
         this.logger.log('[CDS-PANEL-WIDGET] OPEN NEW CONVERSATION ', event_data);
         const conversation_id = event_data?.data?.data?.conversation_id;
@@ -129,11 +128,10 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
       }
 
       else if(event_data && event_data?.data?.source?.includes('widget') ){
-        
         let message = event_data?.data?.data?.message;
         this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message);
-        const request_id = message?.recipient;
-        this.newConversation.emit(request_id);
+        // const request_id = message?.recipient;
+        // this.newConversation.emit(request_id);
 
         if(message.status>0){
           //publish ACTIVE INTENT only if widget-panel is visible
