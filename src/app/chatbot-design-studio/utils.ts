@@ -488,8 +488,8 @@ export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
 
 export function checkAcceptedFile(fileType, fileUploadAccept ): boolean{
   
-    if (fileUploadAccept === '*/*') {
-      return true
+    if (fileUploadAccept === '*/*' || !fileUploadAccept) {
+      return true;
     }
     // Dividi la stringa fileUploadAccept in un array di tipi accettati
     const acceptedTypes = fileUploadAccept.split(',');
@@ -532,8 +532,7 @@ function getMimeTypeFromExtension(extension: string): string {
 }
 
 export function filterImageMimeTypesAndExtensions(fileUploadAccept: string): string[] {
-    
-    if (fileUploadAccept === '*/*') {
+    if (fileUploadAccept === '*/*' || !fileUploadAccept) {
         return ['*/*']
     }
     
