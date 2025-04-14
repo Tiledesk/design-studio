@@ -63,6 +63,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   showAiError: boolean = false;
   searching: boolean = false;
   temp_variables = [];
+  actionLabelModel: string = "";
 
   // Connectors
   idIntentSelected: string;
@@ -133,6 +134,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   private initialize(){
     if(this.action.llm){
       this.initLLMModels();
+      this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
       this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
     }
   }
@@ -170,6 +172,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   initLLMModels(){
     this.autocompleteOptions = [];
     this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
+    this.actionLabelModel =  '';
     if(this.action.llm){
       const filteredModels = this.getModelsByName(this.action.llm);
       filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
@@ -266,10 +269,14 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.debug("[ACTION AI_PROMPT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
-  onChangeTextarea(event: string, property: string) {
-    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event);
+  onChangeTextarea(event: string, labelModel: string, property: string) {
+    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, property);
     // this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
     this.action[property] = event;
+    if(property === 'model'){
+      this.action['labelModel'] = labelModel;
+    }
+
     // this.checkVariables();
     // this.updateAndSaveAction.emit();
     // this.updateAndSaveAction.emit();
@@ -281,6 +288,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   onOptionSelected(event: any, property: string){
     this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
+    this.actionLabelModel = event.label;
     this.action[property] = event.value;
     this.updateAndSaveAction.emit();
   }
@@ -395,7 +403,7 @@ export class CdsActionAiPromptComponent implements OnInit {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
 
-          if (attr && attr.value) {
+          if (attr?.value) {
             this.temp_variables.push({ name: name, value: attr.value });
 
           } else if (attr && !attr.value) {

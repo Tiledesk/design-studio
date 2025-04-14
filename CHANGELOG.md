@@ -7,6 +7,45 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.31.0-rc.12
+- **bug-fixed**: MqttClient subscription deleted on new widget message (MqttClient subscription only when open widget)
+
+
+# 1.31.0-rc.11
+- **bug-fixed**: update intent on change textarea
+- **bug-fixed**: deleted log APP-COMP appconfig
+
+
+# 1.31.0-rc.10
+- **added**: action flow log
+
+
+# 1.31.0-rc.9
+- **bug-fixed**: bug fixed connect ws widget
+
+
+# 1.31.0-rc.8
+- **changed**: added auto scroll to bottom in logpanel
+
+
+# 1.31.0-rc.7
+- **added**: bug fixed chatlog webhook
+
+
+# 1.31.0-rc.6
+- **changed**: refactored textarea
+
+
+# 1.31.0-rc.5
+- **bug-fixed**: bug fixed select model Ai
+- **changed**: web request changed json body from {{attribute}} to {{attribute | json}}
+
+
+# 1.31.0-rc.4
+- **added**: added lazy loading icons
+
+
 # 1.31.0-rc.3
 - **bug-fixed**: css center label in contract connector
 - **changed**: chaged max_token in ai actions

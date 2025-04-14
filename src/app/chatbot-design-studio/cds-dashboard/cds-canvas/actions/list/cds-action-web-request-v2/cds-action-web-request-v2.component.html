@@ -58,13 +58,14 @@
         <cds-textarea id="url"
             class="text-editable-div"
             [text]="action.url" 
-            [minRow]="1" [maxRow]="1"
+            [minRow]="1" [maxRow]="4"
             popoverVerticalAlign="above"
             [textLimitBtn]="false"
             [emojiPikerBtn]="false"
             [setAttributeBtn]="true"
             [autoResize]="false"
             [placeholder]="'CDSCanvas.EnterRequestURL' | translate"
+            [showTextPreview]="true"
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'url')">
         </cds-textarea>

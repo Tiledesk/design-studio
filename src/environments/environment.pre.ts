@@ -24,5 +24,10 @@ export const environment = {
     messagingSenderId: 'CHANGEIT',
     appId: 'CHANGEIT',
     vapidKey: 'CHANGEIT'
-  }
+  },
+  chat21Config: {
+    appId: 'tilechat',
+    MQTTendpoint: 'mqtt://localhost:15675/ws', // MQTT endpoint
+    APIendpoint: 'http://localhost:8004/api'
+  },
 };
