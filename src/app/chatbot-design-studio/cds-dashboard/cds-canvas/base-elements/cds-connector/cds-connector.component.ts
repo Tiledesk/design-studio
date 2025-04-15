@@ -100,7 +100,7 @@ export class CdsConnectorComponent implements OnInit {
         this.intent_display_name = intent.intent_display_name;
       }
     }
-    console.log('getToIntentDisplayName: ', this.idConnection, this.intent_display_name);
+    //console.log('getToIntentDisplayName: ', this.idConnection, this.intent_display_name);
   }
 
   public showConnector() {
