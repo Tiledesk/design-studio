@@ -165,16 +165,16 @@ export class CDSTextareaComponent implements OnInit {
       this.comeFrom = '';
       return;
     }
-    // setTimeout(() => {
+    setTimeout(() => {
       this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen(), this.comeFrom);
       if(!this.addVariable.isOpen() && !this.emojiPicker.isOpen()){ //&& this.textIsChanged
         this.showTextPreview = this.showTextPreviewOrigin;
-        this.maxRow = this.minRowOrigin;
+        //this.maxRow = this.minRowOrigin;
         this.textIsChanged = false;
         this.startText = this.text;
         this.blur.emit(event);
      }
-    // }, 500);
+    }, 0);
   }
 
   onFocus(event){
