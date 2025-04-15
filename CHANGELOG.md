@@ -8,8 +8,23 @@
 *Tiledesk SRL*
 
 
+# 1.31.0-rc.12
+- **bug-fixed**: view voice icons
+- **bug-fixed**: MqttClient subscription deleted on new widget message (MqttClient subscription only when open widget)
+- **bug-fixed**: upload images
+- **bug-fixed**: click upload images on the whole div
+- **changed**: commented cds-changelog
+- **changed**: increased minimum number of lines in json body
+
+
+# 1.31.0-rc.11
+- **bug-fixed**: update intent on change textarea
+- **bug-fixed**: deleted log APP-COMP appconfig
+
+
 # 1.31.0-rc.10
 - **added**: action flow log
+
 
 # 1.31.0-rc.9
 - **bug-fixed**: bug fixed connect ws widget

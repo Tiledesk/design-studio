@@ -86,9 +86,42 @@ export class IconService {
       'assets/images/actions_category/special.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/special.svg')
     );
+
+
     this.matIconRegistry.addSvgIcon(
       'assets/images/actions_category/voice.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/voice.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions_category/twilio-voice.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/voice.svg')
+    );
+
+    
+
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions-voice/dtmf_form.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions-voice/dtmf_form.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions-voice/dtmf_menu.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions-voice/dtmf_menu.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions-voice/blind_transfer.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions-voice/blind_transfer.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions-voice/play_prompt.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions-voice/play_prompt.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions-voice/speech_form.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions-voice/speech_form.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions-voice/audio_record.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions-voice/audio_record.svg')
     );
 
 
