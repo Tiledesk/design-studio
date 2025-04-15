@@ -607,6 +607,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (event === 'edit') {
       this.onSelectAction(action, index, action._tdActionId)
     } else if (event === 'delete') {
+      
+      this.intent.attributes.connectors = this.intentService.deleteIntentAttributesConnectorByAction(action._tdActionId, this.intent);
+      
       this.intentService.selectAction(this.intent.intent_id, action._tdActionId)
       this.intentService.deleteSelectedAction();
       // this.actionDeleted.emit(true)
@@ -615,6 +618,21 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+
+
+
+  // deleteIntentAttributesConnectorByAction(actionId){
+  //   const connectorsList = this.intent.attributes?.connectors;
+  //   const filteredData = Object.keys(connectorsList)
+  //   .filter(key => !key.includes(actionId))
+  //   .reduce((acc, key) => {
+  //     acc[key] = connectorsList[key];
+  //     return acc;
+  //   }, {});
+  //   this.intent.attributes.connectors = filteredData;
+  //   this.logger.log('[CDS-INTENT] deleteConnectorOfAction', this.intent.attributes.connectors);
+  //   // this.connectorService.deleteConnector(this.intent, event.connector.id, true, true);
+  // }
   /**
    * onKeydown
    * delete selected action by keydown backspace

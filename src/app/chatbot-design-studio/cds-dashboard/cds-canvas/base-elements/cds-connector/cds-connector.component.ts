@@ -46,12 +46,17 @@ export class CdsConnectorComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.idConnection?.currentValue ) {
+    if (changes['isConnected']) {
+      if(this.isConnected === false) {
+        this.displayConnector = 'none';
+      }
+    } else if (changes.idConnection?.currentValue ) {
       // // console.log('AAAAAAAAAAAAAAA: ', changes);
       this.idConnection = changes.idConnection?.currentValue;
       this.getIntentDisplayName();
     }
   }
+
 
   ngOnDestroy() {
     if (this.subscriptionChangeIntent) {
@@ -63,7 +68,7 @@ export class CdsConnectorComponent implements OnInit {
     if (!this.subscriptionChangeIntent) {
       this.subscriptionChangeIntent = this.intentService.behaviorIntent.subscribe(intent => {
         const idToIntent = this.idConnection?.split('/').pop();
-        if (intent?.intent_id === idToIntent) {
+        if (intent?.intent_id && intent.intent_id === idToIntent) {
           this.intent_display_name = intent.intent_display_name;
         }
       });
