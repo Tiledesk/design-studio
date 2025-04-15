@@ -32,7 +32,8 @@
                 &.intent-start{
                     color: var(--color-green-hex);
                 }
-                &.intent-defaultFallback{
+                &.intent-defaultFallback,
+                &.intent-close{
                     color: var(--color-red-hex)
                 }
             }
@@ -113,7 +114,8 @@
                 &.intent-start{
                     color: var(--color-green-hex);
                 }
-                &.intent-defaultFallback{
+                &.intent-defaultFallback,
+                &.intent-close{
                     color: var(--color-red-hex)
                 }
             }
@@ -133,21 +135,20 @@
             height: 14px;
             width: 14px;
             display: flex;
+            align-items: center;
         }
 
     } 
 
     .ng-value-container .ng-input{
         display: flex;
-        // top: 0px !important;
-        // height: 43px;
     }
 
     .ng-clear-wrapper{
         height: 14px;
         width: 14px;
         display: flex;
-
+        align-items: center;
     }
 
     .ng-dropdown-panel,

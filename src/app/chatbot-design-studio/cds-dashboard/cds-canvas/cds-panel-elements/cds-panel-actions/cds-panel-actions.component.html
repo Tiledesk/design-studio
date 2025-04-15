@@ -1,4 +1,4 @@
-<div *ngIf="menuItemsList.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
+<div *ngIf="menuItemsList?.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
 
     <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect 
         cdkDropList [cdkDropListData]="menuItemsList">
@@ -35,14 +35,17 @@
                     [attr.id]="'menu-trigger-' + i">
                     
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <img [src]="item.value.src" [title]="item.value.name | translate">
+                        <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
+                        <!-- <img [src]="item.value.src" [title]="item.value.name | translate" alt=""> -->
                     </div>
                     <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name | translate}}</div>
                     <span *ngIf="!item.canLoad" class="trigger-beta-badge">PRO</span>
                     <span *ngIf="item.value.badge" class="trigger-beta-badge">{{item.value.badge}}</span>
+
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <button class="btn btn-tdblu-no-boxshadow drag-btn">
-                            <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate ">
+                            <mat-icon class="svg-icon" svgIcon="drag_indicator" aria-hidden="true"></mat-icon>
+                            <!-- <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate" alt=""> -->
                         </button>
                     </div>
                 </div>
@@ -61,12 +64,12 @@
 
                 <div class="actions-btns-wpr">
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <img [src]="item.value.src" [title]="item.value.name | translate">
+                        <img [src]="item.value.src" [title]="item.value.name | translate" alt="">
                     </div>
                     <div *ngIf="item.value.name" class="action-btn-text">{{item.value.name | translate}}</div>
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <button class="btn btn-tdblu-no-boxshadow drag-btn">
-                            <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate ">
+                            <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate" alt="">
                         </button>
                     </div>
                 </div>
@@ -86,19 +89,19 @@
             <div class="caret_tooltip"></div>
             <div class="info-tooltip-header">
                 <div *ngIf="hoveredElement?.src && hoveredElement?.name" class="action-btn-icon">
-                    <img [src]="hoveredElement.src" [title]="hoveredElement.name | translate">
+                    <img [src]="hoveredElement.src" [title]="hoveredElement.name | translate" alt="">
                 </div>
                 <div *ngIf="hoveredElement?.name" class="action-btn-text truncate">{{hoveredElement.name | translate:BRAND_BASE_INFO}}</div>
             </div>
             <div class="info-tooltip-content">
                 <span class="title" [innerHTML]="hoveredElement?.doc+'.TITLE' | translate"></span>
                 <span class="description" [innerHTML]="hoveredElement?.doc+'.DESCRIPTION' | translate: BRAND_BASE_INFO"></span>
-                <img class="image" [src]="hoveredElement?.doc+'.IMAGE' | translate">
+                <img class="image" [src]="hoveredElement?.doc+'.IMAGE' | translate" alt="">
             </div>
             <div class="info-tooltip-footer">
                 <a *ngIf="(hoveredElement?.doc+'.DOC_URL' | translate)" [href]="hoveredElement?.doc+'.DOC_URL' | translate" target="_blank">{{'LearnMore' | translate}}</a>
                 <button *ngIf="(hoveredElement?.doc+'.VIDEO_URL' | translate)" id="watch-video" class="btn btn-primary cds-blue-button" type="button" (click)="onVideoUrlClick()">
-                    <img src="assets/images/icons/youtube.svg" width="14px" height="14px">
+                    <img src="assets/images/icons/youtube.svg" width="14px" height="14px" alt="">
                     <div>{{'WatchVideo' | translate}}</div>
                 </button>
             </div>

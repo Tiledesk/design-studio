@@ -199,6 +199,14 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-web-request-v2>
 
+                    <cds-action-web-response *ngSwitchCase="TYPE_ACTION.WEB_RESPONSE"    
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-web-response>
+
                     <cds-action-whatsapp-attribute *ngSwitchCase="TYPE_ACTION.WHATSAPP_ATTRIBUTE"
                         class="panel-response"
                         [action]="elementSelected"
@@ -425,6 +433,13 @@
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-record>
+
+                    <cds-action-flow-log *ngSwitchCase="TYPE_ACTION.FLOW_LOG"
+                        class="panel-response"   
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-flow-log>
 
                     <!-- <cds-action-assign-function *ngSwitchCase="TYPE_ACTION.ASSIGN_FUNCTION"
                         [action]="elementSelected">

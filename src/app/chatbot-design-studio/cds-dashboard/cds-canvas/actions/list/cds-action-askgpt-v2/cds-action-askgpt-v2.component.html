@@ -1,5 +1,4 @@
 <div *ngIf="previewMode" class="cds-action-content cds-action-preview" style="position: relative;">
-
     <div class="action-row">
         <div class="action-row-left">
             <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
@@ -17,10 +16,10 @@
 
     <div class="action-row">
         <!-- <div class="action-row-left">
-            <img src="assets/images/actions/openai-icon.svg">
+            <img src="assets/images/actions/openai_icon.svg">
         </div> -->
         <div id="gpt-icon" class="action-row-left icon-action">
-            <img src="assets/images/actions/openai-icon.svg">
+            <img src="assets/images/actions/openai_icon.svg">
         </div>
         <div *ngIf="action?.model" class="action-row-right">
             <!-- {{getValue('name')}} -->
@@ -215,7 +214,6 @@
                 <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.MaxTokens' | translate }}</label>
                     <div class="action-wait-content">
-
                         <div class="action-wait-slider ">
                             <div class="action-wait-range">{{ai_setting['max_tokens'].min}}</div>
                             <mat-slider 

@@ -185,6 +185,7 @@ input[type=number] {
     .tpl-text-limit {
         pointer-events: none;
         transition: background-color 0.3s, color 0.3s;
+        min-width: 45px;
         .num-chars {
             background: var(--blu-light-01);
             flex-shrink: 0;

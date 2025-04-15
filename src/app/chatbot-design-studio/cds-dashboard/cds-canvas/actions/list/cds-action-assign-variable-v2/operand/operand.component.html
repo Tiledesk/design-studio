@@ -20,7 +20,7 @@
     </div>
 
     <mat-accordion>
-        <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
+        <mat-expansion-panel [expanded]="panelOpenState" (opened)="panelOpenState = true" (closed)="panelOpenState = false"
             class="custom-expansion-panel">
             <mat-expansion-panel-header class="disable_ripple">
                 <mat-panel-title>
@@ -39,7 +39,8 @@
                         [placeholder]="'CDSCanvas.ApplyAFunctionToValue' | translate"
                         [itemSelected]="operandForm.value.function"
                         [clearable]="true"
-                        (onSelected)="onSelectedFunction($event)">
+                        (onSelected)="onSelectedFunction($event)"
+                        (onReset)="onResetFunction($event)">
                     </cds-select>
                 </div>
 

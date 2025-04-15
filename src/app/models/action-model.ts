@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import { TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_METHOD_REQUEST, TYPE_OPERATOR } from '../chatbot-design-studio/utils';
+import { TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_OPERATOR } from '../chatbot-design-studio/utils';
 import { BRAND_BASE_INFO } from '../chatbot-design-studio/utils-resources';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../chatbot-design-studio/utils-actions';
+import { TYPE_METHOD_REQUEST } from '../chatbot-design-studio/utils-request';
 
 export class Action {
     _tdActionType: string;
@@ -208,6 +209,24 @@ export class ActionWebRequestV2 extends Action {
         this.assignments = {};
         this.method = TYPE_METHOD_REQUEST.GET;
         this._tdActionType = TYPE_ACTION.WEB_REQUESTV2;
+    }
+}
+
+export class ActionWebRespose extends Action {
+    payload: string;
+    status: string;
+    headersString: any;
+    bodyType: string;
+    assignTo: string;
+    assignments: {}
+    constructor(){
+        super();
+        this.payload = JSON.stringify({});
+        this.headersString = {"Content-Type":"*/*", "Cache-Control":"no-cache", "User-Agent": BRAND_BASE_INFO['BRAND_NAME']+"BotRuntime", "Accept":"*/*"};
+        this.bodyType = 'json'
+        this.assignTo = '';
+        this.assignments = {};
+        this._tdActionType = TYPE_ACTION.WEB_RESPONSE;
     }
 }
 
@@ -472,6 +491,18 @@ export class ActionCaptureUserReply extends Action {
     }   
 }
 
+export class ActionFlowLog extends Action {
+    level: string;
+    log: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.FLOW_LOG;
+        this.level = "info";
+        this.log = "log";
+    }
+}
+
+
 export class ActionCode extends Action {
     source: string
     constructor() {
@@ -585,11 +616,13 @@ export class Metadata {
 
 export class Attachment {
     type: string;
+    json_buttons?: string;
     buttons?: Button[];
     gallery?: GalleryElement[];
     constructor() {
         this.type = TYPE_ATTACHMENT.TEMPLATE;
         this.buttons = [];
+        this.json_buttons = '';
     }
 }
 

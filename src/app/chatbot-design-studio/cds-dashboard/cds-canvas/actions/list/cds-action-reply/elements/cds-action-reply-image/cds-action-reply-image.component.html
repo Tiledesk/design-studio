@@ -43,7 +43,9 @@
     
     <div class="image-editor">
         <div *ngIf="!response.metadata.src" class="response-image-uploader-wrapper no-image">
-            <div class="image"><img src="assets/images/icons/add_image.svg"></div>
+            <div class="image">
+                <mat-icon svgIcon="add_image" aria-hidden="true"></mat-icon>
+            </div>
             <div class="text">{{'CDSCanvas.ClickToAddImage' | translate }}</div>
         </div>
         <div *ngIf="response.metadata.src" class="response-image-uploader-wrapper">
@@ -89,7 +91,7 @@
 
 </div>
 
-<div class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
+<div class="buttons-response button-replies" [class.previewMode]="previewMode" [class.disabled]="showJsonBody" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
     
     <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies" cdkDrag> 
    
@@ -121,3 +123,9 @@
         + {{'CDSCanvas.AddButton' | translate }}
     </div>
 </div>
+
+<cds-action-reply-jsonbuttons
+    *ngIf="!previewMode"
+    [jsonBody]="jsonBody"
+    (changeJsonButtons)="onChangeJsonButtons($event)">
+</cds-action-reply-jsonbuttons>
