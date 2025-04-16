@@ -266,6 +266,7 @@ export class StageService {
    * updateAlphaConnectors 
    * */
   updateAlphaConnectors(alpha: number) {
+    this.logger.log("[CDS-STAGE]  •••• updateAlphaConnectors ••••", alpha);
     const svgElement = document.querySelector('#tds_svgConnectors'); 
     if (svgElement) {
       const paths = svgElement.querySelectorAll('path');
@@ -273,12 +274,13 @@ export class StageService {
         path.setAttribute('opacity', (alpha / 100).toString());
       });
     }
+    const alphaLabel = (alpha>0)?1:0;
     const svgLines = document.querySelectorAll('.line-text-connector');
     svgLines.forEach((svgLine) => {
       const rect = svgLine.querySelector('rect');
-      rect.setAttribute('opacity', (alpha / 100).toString());
+      rect.setAttribute('opacity', alphaLabel.toString());
       const text = svgLine.querySelector('text');
-      text.setAttribute('opacity', (alpha / 100).toString());
+      text.setAttribute('opacity', alphaLabel.toString());
     });
   }
 

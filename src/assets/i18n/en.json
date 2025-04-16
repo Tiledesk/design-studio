@@ -275,6 +275,8 @@
         "ContactSales":"Contact Sales",
         "Drag":"Drag",
         "DeleteConnector":"Delete connector",
+        "HideConnector":"hide connector",
+        "ShowConnector":"show connector",
         "LineText":"Line text",
         "IntentPanel": "Settings panel",
         "ColorBlock":"Block color",
@@ -442,6 +444,7 @@
         "ClickToAddText":"Click to add text ...",
         "ClickToAddAudioURL":"Click to add audio file ...",
         "AddButton":"Add button",
+        "JsonButtons":"Json buttons",
         "AddOption":"Add option",
         "SelectOption":"Select an option",
         "AddCard":"Add card",
@@ -499,7 +502,16 @@
         "PushTagsToListDescription":"Check this option if you want to add tags to global list.",
         "ViewList":"View list",
         "UseBotSlug":"Use bot slug",
-        "ChooseBotBySlug":"Choose bot by slug"
+        "ChooseBotBySlug":"Choose bot by slug",
+        "VisibilityConnectors":"Visibility of connectors",
+        "ChangeAlphaConnectors":"Change alpha of the connectors color",
+        "CopilotEnabled":"Copilot enabled",
+        "CopilotDisabled":"Copilot disabled",
+        "ResponseStatus":"Response status",
+        "StatusNotSelected":"Status not selected",
+        "More":"More ",
+        "JSONButtons":" JSON buttons.",
+        "Examples": "Examples"
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -629,6 +641,7 @@
             "ReplaceBot":"Replace bot",
             "Wait":"Wait",
             "WebRequest":"Web request",
+            "WebResponse":"Web response",
             "SendEmail":"Send email",
             "WhatsAppStatic":"WhatsApp static",
             "WhatsAppByAttribute":"WhatsApp by attribute",
@@ -768,6 +781,13 @@
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/web-request-action/"
             },
+            "WebResponse":{
+                "TITLE":"",
+                "DESCRIPTION":"",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
+            },
             "SendEmail":{
                 "TITLE":"Send email",
                 "DESCRIPTION":"Sends an email with the specified fields",
@@ -796,12 +816,12 @@
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },
-            "SendWhatsApp":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
+            "SendWhatsapp":{
+                "TITLE":"Send Whatsapp",
+                "DESCRIPTION":"Send a Whatsapp message using the specified template",
+                "IMAGE":"assets/images/doc/WHATSAPP.png",
                 "VIDEO_URL":"",
-                "DOC_URL":""
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/send-whatsapp-message/"
             },
             "AskTheKnowledgeBase":{
                 "TITLE":"Prompt the KB",
@@ -825,11 +845,11 @@
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/chatgpt-assistant-action-beta/"
             },
             "AiPrompt":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
+                "TITLE":"AI Prompt multiple LLM",
+                "DESCRIPTION":"The AI Prompt Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
+                "IMAGE":"assets/images/doc/AI_PROMPT.png",
                 "VIDEO_URL":"",
-                "DOC_URL":""
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
             },
             "HiddenMessage":{
                 "TITLE":"Send an hidden message (for the end user)",
@@ -932,7 +952,7 @@
             "N8n":{
                 "TITLE":"Invoke n8n webhook",
                 "DESCRIPTION":"Invoke the wemote n8n webhook",
-                "IMAGE":"assets/images/doc//N8N.png",
+                "IMAGE":"assets/images/doc/N8N.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/n8nio-action/"
             },

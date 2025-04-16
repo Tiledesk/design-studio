@@ -7,6 +7,7 @@ import { ActionConnectBlock } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { checkConnectionStatusByConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-connect-block',
@@ -57,19 +58,10 @@ export class CdsActionConnectBlockComponent implements OnInit {
   }
 
   private checkConnectionStatus(){
-    this.logger.log('[CDS-ACTION-INTENT] **************************11111');
-    if(this.action.intentName){
-     this.isConnected = true;
-     const posId = this.action.intentName.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.intentName.slice(posId+1);
-        this.idConnection = this.idConnector+"/"+toId;
-      }
-    } else {
-     this.isConnected = false;
-     this.idConnection = null;
-    }
-  }
+    const resp = checkConnectionStatusByConnector(this.action.intentName, this.idConnector);
+    this.isConnected  = resp.isConnected;
+    this.idConnection = resp.idConnection;
+  } 
 
   private initialize() {
     this.logger.log('[CDS-ACTION-INTENT] - initialize - isConnected ', this.action.intentName);

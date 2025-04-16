@@ -7,8 +7,79 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.30.4
+- **changed**: added LLM Ollama and changed template selection from select to input with autocomplete
+
+# 1.30.3
+- **bug-fixed**: css text-align and font-size in ng-select
+- **bug-fixed**: added cds-select onReset in operand cds-action-assign-variable-v2
+
+# 1.30.2
+- **bug-fixed**: deleted log widget
+
+# 1.30.1
+- **bug-fixed**: fixed ExpressionChangedAfterItHasBeenCheckedError
+
+# 1.30.0
+- **changed**: Hide examples button if text exists in JSON buttons
+- **bug-fixed**: Fixed graphic errors examples button in JSON buttons
+- **bug-fixed**: Fixed logic example in JSON buttons
+- **bug-fixed**: Fixed graphic errors in JSON buttons
+- **added**: JSON buttons models
+- **added**: more info JSON buttons
+- **bug-fixed**: disabled JSON.parse in action jsonbuttons
+- **added**: added json buttons
+- **canged**: Hide examples button if text exists in JSON buttons
+- **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
+
+
+# 1.29.2
+
+# 1.29.1
+- **added**: deepseek-chat llm model and claude 3.7
+- **removed**: mixtral-8x7b-32768 model
+
+# 1.29.0
+
+# 1.29.0-rc.15
+- **bug-fixed**: new set thereIsWebResponse on createWebhook
+
+# 1.29.0-rc.14
+- **bug-fixed**: set thereIsWebResponse on createWebhook
+
+# 1.29.0-rc.13
+- **bug-fixed**: select default intent by subtype
+
+# 1.29.0-rc.12
+- **bug-fixed**: webhook css + services
+
+# 1.29.0-rc.11
+- **added**: new webhook
+
+# 1.29.0-rc.3
+- **changed**: web-response action UI improvements
+
+# 1.29.0-rc.2
+- **added**: web-response action
+
+# 1.29.0-rc.1
+- **added**: close intent as default internal intent for voice chatbot
+
+# 1.28.3
+- **bug-fixed**: widget into iframe not allows to use microphone
+
+# 1.28.1
+- **bug-fixed**: error in loadTokenMultiplier undefined value, called in CdsActionGPTTaskComponent
+- **bug-fixed**: defaultfallback and start intents error to display in cds-panel-intent-list
+
+# 1.28.1
+- **added**: doc for AI_PROMPT and WHATSAPP actions
+
 # 1.28.0-rc.1
 - **added**: added OpenIntentListState in local storage
+
+# 1.28.0
 
 # 1.27.0-rc.20
 - **bug-fixed**: initStageSettings

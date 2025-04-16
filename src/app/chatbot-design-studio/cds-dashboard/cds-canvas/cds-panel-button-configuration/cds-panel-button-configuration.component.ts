@@ -9,6 +9,7 @@ import { IntentService } from '../../../services/intent.service';
 import { ConnectorService } from '../../../services/connector.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 
 
 
@@ -26,42 +27,37 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   // @Output() closeButtonPanel = new EventEmitter();
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  // buttonLabelResult: boolean;
-  
   typeOfButton = TYPE_BUTTON;
   typeOfUrl = TYPE_URL;
   buttonTypes = BUTTON_TYPES;
   urlTypes = URL_TYPES;
-
   buttonLabel: string;
   buttonType: string;
-  // labelAction: string;
   urlType: string;
   buttonUrl: string;
   errorUrl: boolean;
   buttonAction: string;
-  // clickInside: boolean;
   buttonAttributes: any;
   openBlockAttributes: boolean = false;
+  showAlias: boolean = false;
 
-  // emojiPikerBtn: boolean = true
-  // isEmojiPickerVisible: boolean = false;
-  // emojiPerLine: number = 8;
-  // emojiColor: string ="#ac8b2c";
-  // emojiiCategories = [ 'recent', 'people', 'nature', 'activity'];
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
 
-  private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
-    private controllerService: ControllerService,
-    private intentService: IntentService,
-    private connectorService: ConnectorService
+    private readonly controllerService: ControllerService,
+    private readonly intentService: IntentService,
+    private readonly connectorService: ConnectorService
   ) { }
 
 
   // SYSTEM FUNCTIONS //  
 
   ngOnInit(): void {
-    // this.initialize();
+    // // empty
+    this.logger.log('*** selectedAction: ', this.intentService.selectedAction);
+    if(this.intentService.selectedAction._tdActionType !== TYPE_ACTION.REPLY){
+      this.showAlias = true;
+    };
   }
 
   ngOnChanges() {
