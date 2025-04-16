@@ -12,6 +12,7 @@
                         class="text-editable-div" 
                         [class.invalid]="(globalForm.controls.key.errors?.pattern || globalForm.controls.key.errors?.required) && (globalForm.controls.key.dirty || globalForm.controls.key.touched)"
                         [control]="globalForm.get('key')"
+                        [setAttributeBtn]="false"
                         [placeholder]="'CDSGlobals.GLOBAL_KEY' | translate">
                     </cds-text>
                 </div>

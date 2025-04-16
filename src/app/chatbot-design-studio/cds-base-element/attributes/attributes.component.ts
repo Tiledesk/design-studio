@@ -1,4 +1,3 @@
-import { HEADER_TYPE } from './../../utils';
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { TYPE_METHOD_ATTRIBUTE } from '../../utils';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
