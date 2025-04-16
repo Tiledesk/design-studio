@@ -42,6 +42,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   ICON_DEFAULT = 'package_2';
   ICON_ROCKET = 'rocket_launch';
   ICON_UNDO = 'undo';
+  ICON_WEBHOOK = 'webhook';
 
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   
@@ -130,6 +131,8 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
       icon = this.ICON_ROCKET;
     } else if (name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_DEFAULT_FALLBACK && readonly) {
       icon = this.ICON_UNDO;
+    } else if (name.trim() === TYPE_INTENT_NAME.WEBHOOK && readonly){
+      icon = this.ICON_WEBHOOK;
     }
     return icon;
   }

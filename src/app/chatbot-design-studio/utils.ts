@@ -18,6 +18,9 @@ export const DOCS_LINK = {
     },
     BOT_DETAIL: {
         chatbot_slug: { link: 'https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/#replace-bot-using-the-chatbot-slug', target: '_blank' }
+    },
+    JSON_BUTTONS: {
+        more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
     }
 }
 
@@ -31,6 +34,7 @@ export enum STAGE_SETTINGS {
 export enum RESERVED_INTENT_NAMES {
     START              = 'start',
     DEFAULT_FALLBACK   = 'defaultFallback',
+    WEBHOOK            = 'webhook',
 }
 
 export enum INTENT_COLORS {
@@ -71,6 +75,7 @@ export enum TYPE_INTENT_NAME {
     TOPIC_INTERNAL                  = 'internal',
     DISPLAY_NAME_START              = "start",
     DISPLAY_NAME_DEFAULT_FALLBACK   = "defaultFallback",
+    WEBHOOK                         = 'webhook',
 }
 
 export enum TYPE_MATH_OPERATOR {
@@ -171,24 +176,6 @@ export enum TYPE_OPERATOR {
 
 export enum TYPE_ATTACHMENT {
     TEMPLATE = "template"
-}
-
-export enum TYPE_METHOD_REQUEST {
-    GET         = 'GET', 
-    POST        = 'POST', 
-    PUT         = 'PUT',
-    PATCH       = 'PATCH',
-    DELETE      = 'DELETE', 
-    COPY        = 'COPY', 
-    HEAD        = 'HEAD',
-    OPTIONS     = 'OPTIONS',
-    LINK        = 'LINK', 
-    UNLINK      = 'UNLINK', 
-    PURGE       = 'PURGE',
-    LOCK        = 'LOCK',
-    UNLOCK      = 'UNLOCK', 
-    PROPFIND    = 'PROPFIND', 
-    VIEW        = 'VIEW'
 }
 
 export enum TYPE_METHOD_ATTRIBUTE {
@@ -337,57 +324,6 @@ export const URL_TYPES: Array<{ label: string, value: TYPE_URL }> = [
     { label: "self", value: TYPE_URL.SELF },
 ]
 
-export const HEADER_TYPE: Array<{ label: string, value: string }> = [
-    { label: "Accept", value: "Accept" },
-    { label: "Accept-Charset", value: "Accept-Charset" },
-    { label: "Accept-Encoding", value: "Accept-Encoding" },
-    { label: "Accept-Language", value: "Accept-Language" },
-    { label: "Access-Control-Request-Headers", value: "Access-Control-Request-Headers" },
-    { label: "Access-Control-Request-Method", value: "Access-Control-Request-Method" },
-    { label: "Authorization", value: "Authorization" },
-    { label: "Cache-Control", value: "Cache-Control" },
-    { label: "Connection", value: "Connection" },
-    { label: "Content-MD5", value: "Content-MD5" },
-    { label: "Content-Length", value: "Content-Length" },
-    { label: "Content-Transfer-Encoding", value: "Content-Transfer-Encoding" },
-    { label: "Content-Type", value: "Content-Type" },
-    { label: "Cookie", value: "Cookie" },
-    { label: "Cookie 2", value: "Cookie 2" },
-    { label: "Date", value: "Date" },
-    { label: "Expect", value: "Expect" },
-    { label: "From", value: "From" },
-    { label: "Host", value: "Host" },
-    { label: "If-Match", value: "If-Match" },
-    { label: "If-Modified-Since", value: "If-Modified-Since" },
-    { label: "If-None-Match", value: "If-None-Match" },
-    { label: "If-Range", value: "If-Range" },
-    { label: "If-Unmodified-Since", value: "If-Unmodified-Since" },
-    { label: "Keep-Alive", value: "Keep-Alive" },
-    { label: "Max-Forwards", value: "Max-Forwards" },
-    { label: "Origin", value: "Origin" },
-    { label: "Pragma", value: "Pragma" },
-    { label: "Proxy-Authorization", value: "Proxy-Authorization" },
-    { label: "Range", value: "Range" },
-    { label: "Referer", value: "Referer" },
-    { label: "TE", value: "TE" },
-    { label: "Trailer", value: "Trailer" },
-    { label: "Transfer-Encoding", value: "Transfer-Encoding" },
-    { label: "Upgrade", value: "Upgrade" },
-    { label: "User-Agent", value: "User-Agent" },
-    { label: "Via", value: "Via" },
-    { label: "Warning", value: "Warning" },
-    { label: "X-Requested-With", value: "X-Requested-With" },
-    { label: "X-Do-Not-Track", value: "X-Do-Not-Track" },
-    { label: "DNT", value: "DNT" },
-    { label: "x-api-key", value: "x-api-key" },
-    { label: "x-mock-match-request-body", value: "x-mock-match-request-body" },
-    { label: "x-mock-match-request-headers", value: "x-mock-match-request-headers" },
-    { label: "x-mock-response-id", value: "x-mock-response-id" },
-    { label: "x-mock-response-name", value: "x-mock-response-name" },
-    { label: "x-mock-response-code", value: "x-mock-response-code" },
-    { label: "x-mock-response-delay", value: "x-mock-response-delay" },
-]
-
 export function OperatorValidator(control: AbstractControl): { [key: string]: boolean } | null {
     if (control.value in TYPE_OPERATOR) {
         return null;
@@ -403,58 +339,6 @@ export function getEmbedUrl(url: string) {
         ? 'https://www.youtube.com/embed/' + match[2]
         : url;
 }
-
-// export var variableList: { [key: string]: {label: string, elements: Array<any>}} = {
-//     userDefined: {
-//         label: 'User defined',
-//         elements: []
-//     },
-//     mostUsed: {
-//         label: 'Most used',
-//         elements: [
-//             { name: 'last_user_text', value: 'last_user_text', description: 'The last text the user typed. This is overwritten on each user reply', src: '', icon: 'send' },
-//             { name: 'user_country', value: 'user_country', description: 'The user Country as decoded by Tiledesk',src: '', icon: 'language' },
-//             { name: 'user_city', value: 'user_city', description: 'The user City as decoded by Tiledesk', src: '', icon: 'language' },
-//             { name: 'user_language', value: 'user_language', description: 'The user language decoded on channel', src: '', icon: 'language' },
-//             { name: 'transcript', value: 'transcript', description: 'All the conversation messages exchanged with this chatbot during the chat', src: '', icon: 'description'},
-//         ]
-//     },
-//     systemDefined: {
-//         label: 'System defined',
-//         elements: [
-//             { name: 'department_id', value: 'department_id', description: 'The ID of the department where this chatbot is activated', src: '', icon: 'domain' },
-//             { name: 'department_name', value: 'department_name', description: 'The name of the department where this chatbot is activated', src: '', icon: 'domain' },
-//             { name: 'project_id', value: 'project_id', description: 'The name of the project where this chatbot belongs to', src: '', icon: 'domain' },
-//             { name: 'last_message_id', value: 'last_message_id', description: 'The unique ID of the last message sent', src: '', icon: 'textsms' },
-//             { name: 'conversation_id', value: 'conversation_id', description: 'This conversation unique ID', src: '', icon: 'textsms' },
-//             { name: 'chatbot_name', value: 'chatbot_name', description: 'This chatbot name', src: '', icon: 'person' },
-//             { name: 'user_id', value: 'user_id', description: 'The user unique ID inside Tiledesk database', src: '', icon: 'person' },
-//             { name: 'user_agent', value: 'user_agent', description: 'The web user agent where this conversation initiated', src: '', icon: 'person' },
-//             { name: 'chatChannel', value: 'chatChannel', description: 'The channel where this conversation belongs to. Ex. "web", "whatsapp", "facebook", "telegram"', src: '', icon: 'language' },
-//             { name: 'user_source_page', value: 'user_source_page', description: 'The page where this conversations is runinng. Only available on channel "web"', src: '', icon: 'language' },
-//             { name: 'chat_url', value: 'chat_url', description: 'The url of the Chat to send to a colleague to chat with this user. Use "Invite human" action to invite the human to this chat.', src: '', icon: 'laptop' },
-//             { name: 'user_ip_address', value: 'user_ip_address', description: 'The user IP address, when available',src: '', icon: 'laptop' },
-//         ]
-//     },
-//     uploadedDocument: {
-//         label: 'Uploaded document',
-//         elements: [
-//             { name: 'lastUserDocumentURL', value: 'lastUserDocumentURL', description: 'The public URL to access the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
-//             { name: 'lastUserDocumentName', value: 'lastUserDocumentName', description: 'The name of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
-//             { name: 'lastUserDocumentType', value: 'lastUserDocumentType', description: 'The type of the document uploaded by the user. It\'s empy if no document is uploaded', src: '', icon:'upload_file'},
-//         ]
-//     },
-//     uploadedImage: {
-//         label: 'Uploaded image',
-//         elements: [
-//             { name: 'lastUserImageURL', value: 'lastUserImageURL', description: 'The public URL to access the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-//             { name: 'lastUserImageName', value: 'lastUserImageName', description: 'The name of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-//             { name: 'lastUserImageType', value: 'lastUserImageType', description: 'The type of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-//             { name: 'lastUserImageWidth', value: 'lastUserImageWidth', description: 'The height in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'},
-//             { name: 'lastUserImageHeight', value: 'lastUserImageHeight', description: 'The wdth in pixel of the image uploaded by the user. It\'s empy if no image is uploaded', src: '', icon:'image'}
-//         ]
-//     }
-// }
 
 
 export function generateShortUID(index?) {

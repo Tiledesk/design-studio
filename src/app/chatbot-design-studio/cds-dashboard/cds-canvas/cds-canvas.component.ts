@@ -26,6 +26,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { storage } from 'firebase';
+import { WebhookService } from '../../services/webhook-service.service';
 
 // const swal = require('sweetalert');
 
@@ -140,7 +141,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public dashboardService: DashboardService,
     private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute, 
-    public appStorageService: AppStorageService
+    public appStorageService: AppStorageService,
+    public webhookService: WebhookService,
+    
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -199,7 +202,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
     // this.stageService.initStageSettings(this.id_faq_kb);
-    
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
     this.changeDetectorRef.detectChanges();
@@ -369,17 +371,47 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       }
     });
 
+    // /** SUBSCRIBE TO THE LIST OF INTENTS **
+    //  * Creo una sottoscrizione all'array di INTENT per averlo sempre aggiornato
+    //  * ad ogni modifica (aggiunta eliminazione di un intent)
+    // */
+    // this.subscriptionListOfIntents = this.intentService.getIntents().subscribe(intents => {
+    //   this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
+    //   this.listOfIntents = intents;
+    //   // if(intents.length > 0 || (intents.length == 0 && this.listOfIntents.length>0)){
+    //   //   this.listOfIntents = this.intentService.hiddenEmptyIntents(intents);
+    //   // }
+    // });
+
+
     /** SUBSCRIBE TO THE LIST OF INTENTS **
      * Creo una sottoscrizione all'array di INTENT per averlo sempre aggiornato
      * ad ogni modifica (aggiunta eliminazione di un intent)
     */
     this.subscriptionListOfIntents = this.intentService.getIntents().subscribe(intents => {
       this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
-      this.listOfIntents = intents;
-      // if(intents.length > 0 || (intents.length == 0 && this.listOfIntents.length>0)){
-      //   this.listOfIntents = this.intentService.hiddenEmptyIntents(intents);
-      // }
-    });
+      if(intents.length>0){
+        this.listOfIntents = intents;
+        const chatbot_id = this.dashboardService.id_faq_kb;
+        const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
+        const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
+        if (updateWebhookObs) {
+          updateWebhookObs.subscribe({
+            next: (resp: any) => {
+              this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
+            },
+            error: (error) => {
+              this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
+            },
+            complete: () => {
+              this.logger.log("[cds-action-webhook] updateWebhook completed.");
+            }
+          });
+        } else {
+          this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
+        }
+      }
+    })
 
     /** SUBSCRIBE TO THE STATE INTENT DETAIL PANEL */
     // this.subscriptionOpenDetailPanel = this.controllerService.isOpenIntentDetailPanel$.subscribe((element: Intent) => {
@@ -413,6 +445,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     /** SUBSCRIBE TO THE STATE ACTION REPLY BUTTON PANEL */
     this.subscriptionOpenButtonPanel = this.controllerService.isOpenButtonPanel$.subscribe((button: Button) => {
       this.buttonSelected = button;
+      this.logger.log('[CDS-CANVAS]  isOpenButtonPanel ', button);
+
       if (button) {
         this.closeAllPanels();
         this.closeActionDetailPanel();

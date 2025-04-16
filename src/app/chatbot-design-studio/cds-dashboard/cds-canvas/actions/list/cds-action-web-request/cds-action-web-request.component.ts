@@ -1,8 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ActionWebRequest } from 'src/app/models/action-model';
-import { TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT } from '../../../../../utils';
+import { TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from '../../../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TYPE_METHOD_REQUEST } from 'src/app/chatbot-design-studio/utils-request';
 
 @Component({
   selector: 'cds-action-web-request',

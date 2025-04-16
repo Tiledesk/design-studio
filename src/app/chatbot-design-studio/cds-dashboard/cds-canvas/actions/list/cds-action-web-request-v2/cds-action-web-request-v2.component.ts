@@ -11,9 +11,10 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionWebRequestV2 } from 'src/app/models/action-model';
 
 //UTILS
-import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, HEADER_TYPE } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { HEADER_TYPE, TYPE_METHOD_REQUEST } from 'src/app/chatbot-design-studio/utils-request';
 
 @Component({
   selector: 'cds-action-web-request-v2',
