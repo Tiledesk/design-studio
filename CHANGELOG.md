@@ -7,6 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.31.0-rc.14
+- **bug-fixed**: deleted the connector object from the intent attributes connectors node when:
+delete an intent (delete all incoming connectors)
+delete an action (delete all outgoing connectors)
+- **bug-fixed**: when rename an intent change the name of the block-contract-connector
+
+
 # 1.31.0-rc.13
 - **bug-fixed**: autodimension textarea onblur
 - **bug-fixed**: click upload images on the whole div
