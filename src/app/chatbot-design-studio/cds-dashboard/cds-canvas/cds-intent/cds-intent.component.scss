@@ -189,15 +189,13 @@
   }
 
   .cds-start-content {
-    margin-top: 0px;
-    padding: 2px 0px;
-    margin-right: 0;
-    width: 30px;
-    height: 43px;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
     position: absolute;
-    right: 20px;
-    top: 13px;
-
+    right: 11px;
+    top: 11px;
     .title-label {
       display: none;
     }

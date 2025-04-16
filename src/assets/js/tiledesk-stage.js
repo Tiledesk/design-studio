@@ -15,8 +15,6 @@ export class TiledeskStage {
 
     isDragging = false;
     position = {x: 0, y: 0};
-    // isDraggingElement = false;
-    // isDraggingElement = false;
 
     constructor(containerId, drawerId, classDraggable) {
         this.containerId = containerId;
@@ -162,11 +160,10 @@ export class TiledeskStage {
 
 
     setDragElement(element) {
-        // console.log("[TILEDESK-STAGE-JS]  •••• setDragElement ••••");
+        // //console.log("[TILEDESK-STAGE-JS]  •••• setDragElement ••••");
         let pos_mouse_x;
         let pos_mouse_y;
         element.onmousedown = (function(event) {
-            //this.isDraggingElement = true;
             if (!event.target.classList.contains(this.classDraggable)) {
                 return false;
             }

@@ -87,8 +87,6 @@
         (onOptionClicked)="onOptionClicked($event)">
     </cds-options>
     
-
-
 </div>
 
 
@@ -113,7 +111,7 @@
     id="intent-detail" 
     class="cds-generic-panel"
     [project_id]="projectID"
-    [intentSelected]="elementIntentSelected"
+    [intent]="elementIntentSelected"
     (closePanel)="closeAllPanels()"
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-intent-detail>

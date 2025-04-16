@@ -89,7 +89,7 @@
 
 </div>
 
-<div class="buttons-response button-replies" [class.previewMode]="previewMode" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
+<div class="buttons-response button-replies" [class.previewMode]="previewMode" [class.disabled]="showJsonBody" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
     
     <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies" cdkDrag> 
    
@@ -121,3 +121,9 @@
         + {{'CDSCanvas.AddButton' | translate }}
     </div>
 </div>
+
+<cds-action-reply-jsonbuttons
+    *ngIf="!previewMode"
+    [jsonBody]="jsonBody"
+    (changeJsonButtons)="onChangeJsonButtons($event)">
+</cds-action-reply-jsonbuttons>

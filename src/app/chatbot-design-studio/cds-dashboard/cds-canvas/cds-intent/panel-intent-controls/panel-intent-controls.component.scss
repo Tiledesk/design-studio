@@ -17,18 +17,14 @@
     top: -19px !important;
     right: 12px !important;
   }
-  
-//   .panel-intent-content:hover .intent-header-actions-container {
-//     top: -28px;
-//     opacity: 1;
-//     transform: translate3d(0, 0, 0);
-//   }
+
   
   .intent-header-actions-wpr {
     background: #fff;
     height: 25px;
     border-radius: 14px;
     box-shadow: #001b4714 0 3px 8px;
+    outline: 1px solid #0000000a;
     display: flex;
     padding: 3px 0px;
   }

@@ -417,5 +417,11 @@ export class CdsActionReplyComponent implements OnInit {
     // this.logger.log('onFocusOutEvent ::::::: ', event);
     // this.onCloseButtonPanel()
   }
+
+  onChangeJsonButtons(event: any, i: number){
+    this.logger.log('[cds-action-reply] onChangeJsonButtons ::::::: ', event, i);
+    // // this.arrayResponses[i].message = event;
+    this.onChangeActionReply(event);
+  }
   
 }

@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
-import { StageService } from '../services/stage.service';
-import { TYPE_BUTTON, isElementOnTheStage, generateShortUID } from '../utils';
+import { TYPE_BUTTON, isElementOnTheStage, generateShortUID, getOpacityFromRgba, getColorFromRgba } from '../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+
 import { Setting } from 'src/app/models/action-model';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
+import { Subject } from 'rxjs';
+
+
+// SERVICES //
+// import { StageService } from '../services/stage.service';
+
+
 /** CLASSE DI SERVICES PER GESTIRE I CONNETTORI **/
 
 
@@ -14,6 +21,11 @@ import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
 })
 
 export class ConnectorService {
+ 
+
+  private readonly subjectChangedConnectorAttributes = new Subject<any>();
+  observableChangedConnectorAttributes = this.subjectChangedConnectorAttributes.asObservable();
+  
   listOfConnectors: any = {};
   tiledeskConnectors: any;
   connectorDraft: any = {};
@@ -21,9 +33,10 @@ export class ConnectorService {
   mapOfConnectors: any = {};
   scale: number = 1;
 
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
   
-  constructor() {}
+  constructor(
+  ) {}
 
   initializeConnectors(){
     this.tiledeskConnectors = new TiledeskConnectors("tds_drawer", {"input_block": "tds_input_block"}, {});
@@ -67,6 +80,7 @@ export class ConnectorService {
    */
   public addConnectorToList(connector){
     this.listOfConnectors[connector.id] = connector;
+    this.mapOfConnectors[connector.id] =  {'shown': true };
     this.logger.log('[CONNECTOR-SERV] addConnector::  connector ', connector)
   }
 
@@ -905,13 +919,13 @@ export class ConnectorService {
   }
 
   private createConnector(intent, idConnectorFrom, idConnectorTo){
-    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent);
+    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent, );
     const connectorsAttributes = intent.attributes.connectors;
     if(idConnectorFrom && idConnectorTo){
-      const connectorID = idConnectorFrom+'/'+idConnectorTo;
+      const connectorID = idConnectorFrom;
       let attributes = null;
-      if(connectorsAttributes && connectorsAttributes[connectorID]){
-        attributes = connectorsAttributes[connectorID]
+      if(connectorsAttributes?.[connectorID]){
+        attributes = connectorsAttributes[connectorID];
       }
       this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
     }
@@ -999,10 +1013,15 @@ export class ConnectorService {
    * @param connectorID 
    * 
    */
-  public deleteConnector(connectorID, save=false, notify=true) {
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', connectorID, save, notify);
-    this.deleteConnectorAttributes(connectorID);
-    this.tiledeskConnectors.deleteConnector(connectorID, save, notify);
+  public deleteConnector(intent, idConnection, save=false, notify=true) {
+    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
+    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+    this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
+    if(idConnector && intent.attributes?.connectors[idConnector]){
+      delete intent.attributes.connectors[idConnector];
+    }
+    this.hideContractConnector(idConnection);
+    this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 
 
@@ -1040,19 +1059,11 @@ export class ConnectorService {
       }, {});
       for (const [key, connector] of Object.entries(listOfConnectors)) {
         this.logger.log('delete connector :: ', key );
-        this.deleteConnector(key, save, notify);
+        const intentId = connectorID.split('/')[0];
+        const intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
+        this.deleteConnector(intent, key, save, notify);
       };
     }
-  }
-
-
-  private deleteConnectorAttributes(connectorID){
-    const intentId = connectorID.split('/')[0];
-    let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
-    if(intent && intent.attributes && intent.attributes.connectors && intent.attributes.connectors[connectorID]){
-      delete intent.attributes.connectors[connectorID];
-    }
-    this.updateConnectorAttributes(connectorID, null);
   }
   /*************************************************/
 
@@ -1079,31 +1090,39 @@ export class ConnectorService {
   }
 
 
-  public updateConnectorAttributes(elementID, attributes=null) {
-    // console.log("updateConnectorAttributes:::::  ",elementID,  attributes);
+  public updateConnectorAttributes(connectors: any, connector: any) {
+    this.logger.log('[CONNECTOR-SERV] updateConnectorAttributes:::::  ',connectors,  connector);
+    if(!connector){
+      return;
+    }
+    if(!connectors[connector.id]){
+      connectors[connector.id] = {};
+    }
+    Object.keys(connector).forEach(key => {
+      connectors[connector.id][key] = connector[key]
+    });
+  }
+
+
+
+  public updateConnectorLabel(elementID: string, label: string) {
+    this.logger.log('[CONNECTOR-SERV] updateConnectorLabel:::::  ',elementID,  label);
     const lineText = document.getElementById("label_"+elementID);
     if(lineText){
-      var label = null;
-      if(attributes && attributes.label){
-        label = attributes.label;
-      }
       lineText.textContent = label;
       this.updateLineTextPosition(elementID, label);
     }
-    // update position lineText
   }
 
   
-  updateLineTextPosition(id, label){
+  updateLineTextPosition(id: string, label: string){
     let lineText = document.getElementById("label_"+id);
     let rect = document.getElementById("rect_"+id);
-    var rectLabel = lineText.getBoundingClientRect();
-    // console.log("lineText.style:::::  ", rectLabel);
+    let rectLabel = lineText.getBoundingClientRect();
+    // // console.log("lineText.style:::::  ", rectLabel);
     if (lineText && rect) {
-      // const rectWidth = rectLabel.width + 10;
-      // const rectHeight = rectLabel.height + 10;
-      var rectWidth = 0;
-      var rectHeight = 0;
+      let rectWidth = 0;
+      let rectHeight = 0;
       if(label && label !== ''){
         rectWidth = rectLabel.width + 10;
         rectHeight = rectLabel.height + 10;
@@ -1302,7 +1321,7 @@ export class ConnectorService {
 
 
   public createListOfConnectorsByIntent(intent:any){
-    if(intent.attributes && intent.attributes.nextBlockAction){
+    if(intent.attributes?.nextBlockAction){
       let idConnectorFrom = null;
       let idConnectorTo = null;
       let nextBlockAction = intent.attributes.nextBlockAction;
@@ -1338,7 +1357,7 @@ export class ConnectorService {
             this.logger.log('[CONNECTOR-SERV] -> CREATE CONNECTOR', intent, idConnectorFrom, idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
             const connectorID = idConnectorFrom+'/'+idConnectorTo;
-        this.mapOfConnectors[connectorID] =  {'shown': false };
+            this.mapOfConnectors[connectorID] =  {'shown': false };
           }
         }
 
@@ -1985,16 +2004,89 @@ export class ConnectorService {
    * add the arrow with same color of connector
   */
   setConnectorColor(intentId: any, color: string, opacity: number) {
-    let rgba = `rgba(${color}, ${opacity})`;
+    let rgba = `rgba(${color}, 1)`; // ${opacity}
     const listOfConnectors = this.searchConnectorsOutByIntent(intentId);
     listOfConnectors.forEach(connector => {
       const element = document.getElementById(connector.id);
+      let op: string = opacity.toString();
       if (element) {
-        // //element.style.setProperty('stroke', rgba, 'important');
         element.style.setProperty('stroke', rgba);
+        // element.style.setProperty('opacity', op);
+        element.setAttributeNS(null, "opacity", op);
         this.addCustomMarker(connector.id, rgba);
       }
     });
+  }
+
+
+
+
+  /**
+   * restoreDefaultConnector
+   * richiamato da cds-connector
+   * scatta quando premo su connector contract per ripristinare il connettore,
+   * cioè nascondere il connector contract e mostrare il connettore normale
+   */
+  showDefaultConnector(idConnection: string){
+    idConnection = idConnection.replace("#", "");
+    this.logger.log('[CONNECTOR-SERV] showDefaultConnector:: ', idConnection);
+    this.setDisplayElementById(idConnection, 'flex');
+    this.setDisplayElementById('rect_' + idConnection, 'flex');
+    this.setDisplayElementById('label_' + idConnection, 'flex');
+  }
+
+  // setDisplayConnectorByIdConnector(connectorId: string) {
+  /**
+   * restoreDefaultConnector
+   * richiamato da cds-canvas
+   * scatta quando premo sul pulsante per nascondere il connettore
+   * nasconde il connettore normale e mostra il connector contract
+   */
+  hideDefaultConnector(idConnection: string){
+    idConnection = idConnection.replace("#", "");
+    // // this.logger.log('[CONNECTOR-SERV] hideDefaultConnector:: ', idConnection);
+    this.setDisplayElementById(idConnection, 'none');
+    this.setDisplayElementById('rect_' + idConnection, 'none');
+    this.setDisplayElementById('label_' + idConnection, 'none');
+  }
+
+  hideContractConnector(idConnection: string){
+    idConnection = idConnection.replace("#", "");
+    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+    this.setDisplayElementById('contract_' + idConnector, 'none');
+    // const connector = {id:idConnector, display:true};
+    // this.subjectChangedConnectorAttributes.next(connector);
+  }
+
+  showContractConnector(idConnection: string){
+    idConnection = idConnection.replace("#", "");
+    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+    this.setDisplayElementById('contract_' + idConnector, 'flex');
+    // const connector = {id:idConnector, display:false};
+    // this.subjectChangedConnectorAttributes.next(connector);
+  }
+
+
+  setDisplayElementById(elementId: string, displayValue: string): void {
+    // this.logger.log('[CONNECTOR-SERV] setDisplayElementById:: ', elementId, displayValue);
+    const element = document.getElementById(elementId);
+    if (element) {
+      this.logger.log('[CONNECTOR-SERV] setDisplayElementById :: ', elementId, displayValue);
+      element.style.setProperty('display', displayValue);
+    }
+  }
+
+  showHideConnectorByIdConnector(idConnection: string, shown: boolean) {
+    if(idConnection){
+      const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+      const displayConnector = shown?'flex':'none';
+      const displayContractConnector = shown?'none':'flex';
+      this.logger.log('[CONNECTOR-SERV] showHideConnectorByIdConnector:: ', idConnection, displayConnector, displayContractConnector);
+      this.setDisplayElementById(idConnection, displayConnector);
+      this.setDisplayElementById('rect_' + idConnection, displayConnector);
+      this.setDisplayElementById('label_' + idConnection, displayConnector);
+      this.setDisplayElementById('contract_' + idConnector, displayContractConnector);
+    }
   }
 
 }
