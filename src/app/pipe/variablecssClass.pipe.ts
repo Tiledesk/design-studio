@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class VariableCssClassPipe implements PipeTransform {
 
   transform(value: string): string {
-    let matches = value.match(new RegExp(/{{[^{}]*}}/g));
+    let matches = value.match(new RegExp(/^{{.*?}}$/g));
     if (!matches || matches.length == 0) {
       return '';
     }

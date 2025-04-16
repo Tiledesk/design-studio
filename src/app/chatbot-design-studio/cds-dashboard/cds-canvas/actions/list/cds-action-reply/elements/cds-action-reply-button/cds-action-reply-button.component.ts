@@ -17,6 +17,7 @@ export class CdsActionReplyButtonComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    // empty
   }
 
   onDeleteButton(){
