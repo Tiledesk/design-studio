@@ -32,16 +32,16 @@ cds-connector.connector {
     right: -28px;
     top: calc(50% - 10px);
 }
-cds-connector.connector-isStart {
-    position: absolute;
-    right: -20px;
-    top: calc(50% - 13px);
-}
+// cds-connector.connector-isStart {
+//     position: absolute;
+//     right: -20px;
+//     top: calc(50% - 13px);
+// }
 cds-connector.connector-isLast {
     position: absolute;
     right: -32px;
     top: calc(50% - 18px);
-
+    
     .point-connector-empty {
         // outline: 2px solid;
         // border: 0px;
@@ -62,6 +62,7 @@ cds-connector.connector-isLast {
         // background: #b1b1b7;
         width: 10px;
         height: 10px;
+        margin: auto;
     }
 
     &:hover{

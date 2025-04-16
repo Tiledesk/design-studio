@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 //MODELS
 import { ActionAiPrompt } from 'src/app/models/action-model';
@@ -23,7 +23,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { LLM_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { ProjectService } from 'src/app/services/projects.service';
 
 @Component({
   selector: 'cds-action-ai-prompt',
@@ -31,7 +33,7 @@ import { LLM_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
   styleUrls: ['./cds-action-ai-prompt.component.scss']
 })
 export class CdsActionAiPromptComponent implements OnInit {
-
+  
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
   
   @Input() intentSelected: Intent;
@@ -77,20 +79,28 @@ export class CdsActionAiPromptComponent implements OnInit {
   PLAN_NAME = PLAN_NAME
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.GPT_TASK;
+  llm_model = LLM_MODEL;
+
+  autocompleteOptions: Array<{label: string, value: string}> = [];
   
-  private logger: LoggerService = LoggerInstance.getInstance();
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
-    private dialog: MatDialog,
-    private openaiService: OpenaiService,
-    private intentService: IntentService,
-    private appConfigService: AppConfigService,
-    private translate: TranslateService,
-    private dashboardService: DashboardService
+    private readonly dialog: MatDialog,
+    private readonly openaiService: OpenaiService,
+    private readonly intentService: IntentService,
+    private readonly appConfigService: AppConfigService,
+    private readonly translate: TranslateService,
+    private readonly dashboardService: DashboardService,
+    private readonly projectService: ProjectService
   ) { }
 
+
   ngOnInit(): void {
-    this.logger.debug("[ACTION AI_PROMPT] ngOnInit action: ", this.action);
-    this.llm_models = LLM_MODEL.filter(el => el.status === 'active');
+    this.logger.log("[ACTION AI_PROMPT] ngOnInit action: ", this.action);
+    this.getOllamaModels();
+    this.logger.log("[ACTION AI_PROMPT] HO AGGIORNATO  llm_model: ", this.llm_model);
+    this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION AI_PROMPT] isChangedConnector -->', connector);
@@ -104,15 +114,15 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.initializeConnector();
     }
     this.initializeAttributes();
-
     if (!this.action.preview) {
-      this.action.preview = []; // per retrocompatibilità
+      this.action.preview = [];
     }
-
     this.initialize();
   }
 
+
   ngOnChanges(changes: SimpleChanges) {
+    // // empty
   }
 
   ngOnDestroy() {
@@ -123,9 +133,57 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   private initialize(){
     if(this.action.llm){
+      this.initLLMModels();
       this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
     }
   }
+
+
+  async getOllamaModels(){
+    this.llm_model.forEach(async (model) => {
+      if (model.value === "ollama") {
+        const NEW_MODELS = await this.getIntegrationByName();
+        this.logger.log('[ACTION AI_PROMPT] - NEW_MODELS:', NEW_MODELS.value.models);
+        if(NEW_MODELS?.value?.models){
+          const models = NEW_MODELS?.value?.models.map(item => ({
+            name: item,
+            value: item
+          }));
+          model.models = models;
+        }
+      }
+    });
+  }
+
+  async getIntegrationByName(){
+    const projectID = this.dashboardService.projectID;
+    const integrationName = 'ollama';
+    try {
+        const response = await firstValueFrom(this.projectService.getIntegrationByName(projectID, integrationName));
+        this.logger.log('[ACTION AI_PROMPT] - integration response:', response.value);
+        return response;
+    } catch (error) {
+      this.logger.log('[ACTION AI_PROMPT] getIntegrationByName ERROR:', error);
+    }
+  }
+
+
+  initLLMModels(){
+    this.autocompleteOptions = [];
+    this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
+    if(this.action.llm){
+      const filteredModels = this.getModelsByName(this.action.llm);
+      filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
+      this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
+    }
+  }
+
+  getModelsByName(value: string): any[] {
+    const model = this.llm_model.find((model) => model.value === value);
+    return model.models;
+  }
+
+
 
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
@@ -134,72 +192,70 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.listOfIntents = this.intentService.getListOfIntents();
     this.checkConnectionStatus();
   }
-
+  
   private checkConnectionStatus(){
-    if(this.action.trueIntent){
-      this.isConnectedTrue = true;
-      const posId = this.action.trueIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.trueIntent.slice(posId+1);
-        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-      }
-    } else {
-      this.isConnectedTrue = false;
-      this.idConnectionTrue = null;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-      const posId = this.action.falseIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.falseIntent.slice(posId+1);
-        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-      }
-     } else {
-      this.isConnectedFalse = false;
-      this.idConnectionFalse = null;
-     }
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
   }
 
   private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idAction= array[1];
-      if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){
-          if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null;
-            this.isConnectedTrue = false;
-            this.idConnectionTrue = null;
-          }        
-          if(array[array.length -1] === 'false'){
-            this.action.falseIntent = null;
-            this.isConnectedFalse = false;
-            this.idConnectionFalse = null;
-          }
-          if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-        } else { 
-          // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
-          this.logger.debug('[ACTION AI_PROMPT] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-          if(array[array.length -1] === 'true'){
-            // this.action.trueIntent = '#'+this.connector.toId;
-            this.isConnectedTrue = true;
-            this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
-            this.action.trueIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }        
-          if(array[array.length -1] === 'false'){
-            // this.action.falseIntent = '#'+this.connector.toId;
-            this.isConnectedFalse = true;
-            this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
-            this.action.falseIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }
-        }
-      }
-    } catch (error) {
-      this.logger.error('[ACTION AI_PROMPT] updateConnector error: ', error);
+    this.logger.log('[ACTION AI_PROMPT] updateConnector:');
+    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
+    if(resp){
+      this.isConnectedTrue    = resp.isConnectedTrue;
+      this.isConnectedFalse   = resp.isConnectedFalse;
+      this.idConnectionTrue   = resp.idConnectionTrue;
+      this.idConnectionFalse  = resp.idConnectionFalse;
+      this.logger.log('[ACTION AI_PROMPT] updateConnector:', resp);
+      if (resp.emit) {
+        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
+      } 
     }
   }
+
+  // private updateConnector2(){
+  //   try {
+  //     const array = this.connector.fromId.split("/");
+  //     const idAction= array[1];
+  //     if(idAction === this.action._tdActionId){
+  //       if(this.connector.deleted){
+  //         if(array[array.length -1] === 'true'){
+  //           this.action.trueIntent = null;
+  //           this.isConnectedTrue = false;
+  //           this.idConnectionTrue = null;
+  //         }        
+  //         if(array[array.length -1] === 'false'){
+  //           this.action.falseIntent = null;
+  //           this.isConnectedFalse = false;
+  //           this.idConnectionFalse = null;
+  //         }
+  //         if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+  //       } else { 
+  //         // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
+  //         this.logger.debug('[ACTION AI_PROMPT] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
+  //         if(array[array.length -1] === 'true'){
+  //           // this.action.trueIntent = '#'+this.connector.toId;
+  //           this.isConnectedTrue = true;
+  //           this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
+  //           this.action.trueIntent = '#'+this.connector.toId;
+  //           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+  //         }        
+  //         if(array[array.length -1] === 'false'){
+  //           // this.action.falseIntent = '#'+this.connector.toId;
+  //           this.isConnectedFalse = true;
+  //           this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
+  //           this.action.falseIntent = '#'+this.connector.toId;
+  //           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+  //         }
+  //       }
+  //     }
+  //   } catch (error) {
+  //     this.logger.error('[ACTION AI_PROMPT] updateConnector error: ', error);
+  //   }
+  // }
 
 
   private initializeAttributes() {
@@ -211,15 +267,27 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.debug("[ACTION AI_PROMPT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
-  onChangeTextarea($event: string, property: string) {
-    this.logger.debug("[ACTION AI_PROMPT] changeTextarea event: ", $event);
-    this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
-    this.action[property] = $event;
+  onChangeTextarea(event: string, property: string) {
+    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event);
+    // this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
+    this.action[property] = event;
     // this.checkVariables();
+    // this.updateAndSaveAction.emit();
     // this.updateAndSaveAction.emit();
   }
 
-  onBlur(event){
+
+
+  
+
+  onOptionSelected(event: any, property: string){
+    this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
+    this.action[property] = event.value;
+    this.updateAndSaveAction.emit();
+  }
+
+  onBlur(event: string){
+    this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action);
     this.updateAndSaveAction.emit();
   }
 
@@ -231,21 +299,21 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
   onChangeSelect(event, target) {
-    this.logger.debug("[ACTION AI_PROMPT] onChangeSelect event: ", event.value)
-    this.logger.debug("[ACTION AI_PROMPT] onChangeSelect target: ", target)
+    this.logger.log("[ACTION AI_PROMPT] onChangeSelect event: ", event.value)
+    this.logger.log("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
     if(target === 'llm'){
       this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
       this.action.model= null;
+      this.initLLMModels();
     }
     this.updateAndSaveAction.emit();
   }
 
   updateSliderValue(event, target) {
-    this.logger.debug("[ACTION AI_PROMPT] updateSliderValue event: ", event)
-    this.logger.debug("[ACTION AI_PROMPT] updateSliderValue target: ", target)
+    this.logger.log("[ACTION AI_PROMPT] updateSliderValue event: ", event)
+    this.logger.log("[ACTION AI_PROMPT] updateSliderValue target: ", target)
     this.action[target] = event;
-
     this.updateAndSaveAction.emit();
   }
 

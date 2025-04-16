@@ -4,6 +4,14 @@
     --panel-width: 480px;
 }
 
+
+
+.row {
+    // background-color: rgb(224 227 241 / 21%);
+    margin: 0 0 10px;
+    padding: 20px 24px; 
+}
+
 .panel-intent-detail {
     display: block;
     width: var(--panel-width);
@@ -33,6 +41,20 @@
     padding: 0 0 10px 10px;
     display: flex;
     align-items: center;
+
+    ::ng-deep .intent-icon {
+        position: relative;
+        top: 0px;
+        span.rocket {
+            color: var(--blu);
+        }
+        span.undo {
+            color: var(--blu);
+        }
+        span.webhook {
+            color: var(--blu);
+        }
+    }
     cds-action-description{
         width: 100%;
     }
@@ -51,7 +73,7 @@
 
 .content-panel{
     overflow: hidden auto;
-    padding: 20px 30px 30px;
+    padding: 20px;
 }
 
 .panel-form { 
@@ -111,8 +133,8 @@
 
 .agents-available {
     position: absolute;
-    margin-left: -26px;
-    margin-top: 20px;
+    margin-left: -24px;
+    margin-top: 0px;
 }
 
 // --------------------
@@ -122,9 +144,24 @@
 .nw-onoffswitch {
     position: relative;
     width: 45px;
-    margin-top: 20px;
     display: block;
     float: left;
+}
+
+.nw-onoffswitch-wrapper {
+    padding: 0;
+    clear: both; 
+    display: inline-block;
+    &.info {
+        color: #9aa0a6;
+        font-size: 12px;
+        font-weight: 400;
+    }
+    .checkmark{
+        line-height: 25px; 
+        margin: 0px 10px 10px; 
+        float: left;
+    } 
 }
 .nw-onoffswitch-checkbox {
     position: absolute;
@@ -179,3 +216,181 @@
     right: 0px;
 }
 // --------- ./end new on-off btn logo ---------
+
+
+
+// --------- webhho --------- //
+
+.webhook-block {
+    margin: 0 0 20px;
+    display: flex;
+    padding: 0;
+}
+.webhook-copilot {
+    margin: 0 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+}
+
+.webhook-link {
+    border: 1px solid #f2f2f2;
+    cursor: default;
+    display: flex;
+    outline: none;
+    position: relative;
+    width: 100%;
+    height: 30px;
+    border-radius: 0 6px 6px 0;
+    background: #f2f2f2;
+    font-size: 12px;
+    margin: 0;
+    padding: 0 6px 0 6px;
+    color: var(--blu);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.webhook-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    background-color: var(--blu-light-03);
+    border-radius: 6px 0 0 6px;
+    img {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        color: var(--blu);
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+        filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+    }
+}
+
+.webhook-buttons {
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0;
+    .cds-blue-button {
+        margin-left: 10px;
+    }    
+}
+
+.webhook-message {
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+}
+
+.fade-in-out {
+    animation: fadeInOut 5s forwards;
+  }
+  
+  @keyframes fadeInOut {
+    /* da 0% a 10% → fade-in */
+    0%   { opacity: 0; }
+    1%   { opacity: 0.1; }
+    10%  { opacity: 1; }
+  
+    /* da 10% a 90% → visibile */
+    90%  { opacity: 1; }
+    /* da 90% a 100% → fade-out */
+    100% { opacity: 0; }
+  }
+  
+
+// --------------------
+// SWITCH BTN
+// --------------------
+// --------- start new on-off btn logo ---------
+.copilot-onoffswitch {
+    position: relative;
+    width: 45px;
+    display: block;
+    float: left;
+    margin: 0 5px 0 0;
+}
+.copilot-onoffswitch-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.copilot-onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    height: 25px;
+    padding: 0;
+    line-height: 25px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease-in;
+    &.checked{
+        border-color: var(--blu);
+        background-color: var(--blu);
+        &:before {
+            border-color: var(--blu);
+            right: 0px;
+        }
+    }
+}
+
+
+.copilot-onoffswitch-label:before {
+    content: "";
+    display: block;
+    width: 25px;
+    margin: 0px;
+    background: #ffffff;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 20px;
+    border: 2px solid #e3e3e3;
+    border-radius: 25px;
+    transition: all 0.3s ease-in 0s;
+}
+
+.copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label {
+    background-color: var(--blu);
+}
+.copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label,
+.copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label:before {
+    border-color: var(--blu);
+}
+.copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label:before {
+    right: 0px;
+}
+
+.webhook-icon-copilot {
+    width: auto;
+    height: 30px;
+    display: flex;
+    img {
+        width: 22px;
+        height: 22px;
+        border-radius: 4px;
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+        filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+    }
+}
+
+.copilot-label{
+    font-size: 12px;
+    line-height: 30px;
+    margin-left: 10px;
+}
+
+// --------- end webhho --------- //
