@@ -60,7 +60,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     const appconfig = this.appConfigService.getConfig();
-    this.logger.log('[APP-COMP] ngOnInit  appconfig', appconfig)
+    // this.logger.log('[APP-COMP] ngOnInit  appconfig', appconfig)
     this.persistence = appconfig.authPersistence;
     this.appStorageService.initialize(environment.storage_prefix, this.persistence, '')
 
@@ -84,7 +84,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const storedToken = localStorage.getItem('tiledesk_token');
       this.logger.log('[APP-COMP] ngOnInit AUTOLOGIN storedToken ', storedToken)
-      this.logger.log('[APP-COMP] ngOnInit AUTOLOGIN SAVE THE PARAMS TOKEN ', token)
       if (storedToken !== token) {
         localStorage.setItem('tiledesk_token', token);
       } else {
@@ -114,7 +113,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
     await this.initAuthentication();
     this.setLanguage(null);
-
   }
 
 

@@ -24,6 +24,7 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
 
 @Component({
@@ -83,6 +84,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   autocompleteOptions: Array<{label: string, value: string}> = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
     private readonly dialog: MatDialog,
     private readonly openaiService: OpenaiService,
@@ -113,14 +115,14 @@ export class CdsActionAiPromptComponent implements OnInit {
     }
     this.initializeAttributes();
     if (!this.action.preview) {
-      this.action.preview = []; // per retrocompatibilità
+      this.action.preview = [];
     }
     this.initialize();
   }
 
 
   ngOnChanges(changes: SimpleChanges) {
-    // empty
+    // // empty
   }
 
   ngOnDestroy() {
@@ -190,72 +192,70 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.listOfIntents = this.intentService.getListOfIntents();
     this.checkConnectionStatus();
   }
-
+  
   private checkConnectionStatus(){
-    if(this.action.trueIntent){
-      this.isConnectedTrue = true;
-      const posId = this.action.trueIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.trueIntent.slice(posId+1);
-        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-      }
-    } else {
-      this.isConnectedTrue = false;
-      this.idConnectionTrue = null;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-      const posId = this.action.falseIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.falseIntent.slice(posId+1);
-        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-      }
-     } else {
-      this.isConnectedFalse = false;
-      this.idConnectionFalse = null;
-     }
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
   }
 
   private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idAction= array[1];
-      if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){
-          if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null;
-            this.isConnectedTrue = false;
-            this.idConnectionTrue = null;
-          }        
-          if(array[array.length -1] === 'false'){
-            this.action.falseIntent = null;
-            this.isConnectedFalse = false;
-            this.idConnectionFalse = null;
-          }
-          if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-        } else { 
-          // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
-          this.logger.debug('[ACTION AI_PROMPT] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-          if(array[array.length -1] === 'true'){
-            // this.action.trueIntent = '#'+this.connector.toId;
-            this.isConnectedTrue = true;
-            this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
-            this.action.trueIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }        
-          if(array[array.length -1] === 'false'){
-            // this.action.falseIntent = '#'+this.connector.toId;
-            this.isConnectedFalse = true;
-            this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
-            this.action.falseIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }
-        }
-      }
-    } catch (error) {
-      this.logger.error('[ACTION AI_PROMPT] updateConnector error: ', error);
+    this.logger.log('[ACTION AI_PROMPT] updateConnector:');
+    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
+    if(resp){
+      this.isConnectedTrue    = resp.isConnectedTrue;
+      this.isConnectedFalse   = resp.isConnectedFalse;
+      this.idConnectionTrue   = resp.idConnectionTrue;
+      this.idConnectionFalse  = resp.idConnectionFalse;
+      this.logger.log('[ACTION AI_PROMPT] updateConnector:', resp);
+      if (resp.emit) {
+        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
+      } 
     }
   }
+
+  // private updateConnector2(){
+  //   try {
+  //     const array = this.connector.fromId.split("/");
+  //     const idAction= array[1];
+  //     if(idAction === this.action._tdActionId){
+  //       if(this.connector.deleted){
+  //         if(array[array.length -1] === 'true'){
+  //           this.action.trueIntent = null;
+  //           this.isConnectedTrue = false;
+  //           this.idConnectionTrue = null;
+  //         }        
+  //         if(array[array.length -1] === 'false'){
+  //           this.action.falseIntent = null;
+  //           this.isConnectedFalse = false;
+  //           this.idConnectionFalse = null;
+  //         }
+  //         if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+  //       } else { 
+  //         // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
+  //         this.logger.debug('[ACTION AI_PROMPT] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
+  //         if(array[array.length -1] === 'true'){
+  //           // this.action.trueIntent = '#'+this.connector.toId;
+  //           this.isConnectedTrue = true;
+  //           this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
+  //           this.action.trueIntent = '#'+this.connector.toId;
+  //           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+  //         }        
+  //         if(array[array.length -1] === 'false'){
+  //           // this.action.falseIntent = '#'+this.connector.toId;
+  //           this.isConnectedFalse = true;
+  //           this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
+  //           this.action.falseIntent = '#'+this.connector.toId;
+  //           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+  //         }
+  //       }
+  //     }
+  //   } catch (error) {
+  //     this.logger.error('[ACTION AI_PROMPT] updateConnector error: ', error);
+  //   }
+  // }
 
 
   private initializeAttributes() {

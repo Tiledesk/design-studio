@@ -1,5 +1,18 @@
 <div class="intent-header-actions-container">
   <div class="intent-header-actions-wpr">
+    
+    <!-- ---------------------------------- -->
+    <!-- show/hide intent  -->
+    <!-- ---------------------------------- -->
+    <div class="intent-header-action-btn icon"
+      matTooltipClass="cds-mat-tooltip"
+      [matTooltip]="displayConnector?('CDSCanvas.HideConnector' | translate):('CDSCanvas.ShowConnector' | translate)"
+      matTooltipHideDelay="100"
+      (click)="onAddActionFromConnectorMenu(typeOfmenu.SHOW_HIDE)">
+      <img *ngIf="displayConnector === true" src="assets/images/icons/visibility.svg" alt="hide connector" />
+      <img *ngIf="displayConnector === false" src="assets/images/icons/visibility_off.svg" alt="show connector" />
+    </div>
+
     <!-- ---------------------------------- -->
     <!-- Delete intent  -->
     <!-- ---------------------------------- -->

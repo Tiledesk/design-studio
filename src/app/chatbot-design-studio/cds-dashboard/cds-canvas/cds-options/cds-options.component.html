@@ -1,8 +1,9 @@
 <div class="container">
 
-    <!-- OPTIONS -->
-    <div size="4" class="cds-elements" (click)="onTogleAlphaConnectorsMenu()">
-        <div class="cds-button-element">
+    <!-- OPTIONS (click)="onTogleAlphaConnectorsMenu() -->
+    <div size="4" class="cds-elements">
+        <!-- ALPHA COLOR CONNECTORS -->
+        <div class="cds-button-element" *ngIf="true" [satPopoverAnchor]="alphaColorConnectors"  (click)="alphaColorConnectors.toggle()">
             <div class="cds-box-button">
                 <span class="box-img">
             
@@ -13,7 +14,6 @@
                         <!-- <span class="material-icons-outlined">visibility_off</span> -->
                         <mat-icon class="icon" svgIcon="visibility_off" aria-hidden="true"></mat-icon>
                     </ng-template>
-
                 </span>
             </div>
         </div>
@@ -36,7 +36,6 @@
     </div>
 
     <div size="4" class="cds-elements" mat-button>
-
         <!-- + -->
         <div class="cds-element" (click)="onOptionClick(OPTIONS.ZOOM_IN)" #div3>
             <div class="cds-button-element">
@@ -49,8 +48,6 @@
                 </div>
             </div>
         </div>
-
-
         <!-- - -->
         <div class="cds-element" (click)="onOptionClick(OPTIONS.ZOOM_OUT)" #div3>
             <div class="cds-button-element">
@@ -63,7 +60,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <div size="4" class="cds-elements" mat-button>
@@ -130,17 +126,17 @@
 </sat-popover>
 
 
-<div *ngIf="isMoreMenu" size="4" class="cds-elements vertical-slider-container">
-    <input
-        #alphaInput
-        type="range"
-        id="alphaRange"
-        class="vertical-slider"
-        min="0"
-        max="100"
-        step="10"
-        [(ngModel)]="alpha"
-        (blur)="closeAlphaConnectorsMenu()"
-        (input)="updateAlphaConnectors()"
-    />
-</div>
+
+<sat-popover #alphaColorConnectors
+    id="alphaColorConnectors"
+    horizontalAlign="center" 
+    verticalAlign="above" 
+    hasBackdrop 
+    (backdropClicked)="alphaColorConnectors.close()"
+    panelClass="alpha-color-connectors-panel"
+    interactiveClose="false">
+    <cds-change-alpha-color
+        (changeAlphaConnectors)="onChangeAlphaConnectors($event)"
+        (close)="alphaColorConnectors.close()">
+    </cds-change-alpha-color>
+</sat-popover>
