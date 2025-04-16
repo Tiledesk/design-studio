@@ -507,7 +507,10 @@
         "StatusNotSelected":"Status not selected",
         "More":"More ",
         "JSONButtons":" JSON buttons.",
-        "Examples": "Examples"
+        "Examples": "Examples",
+        "VisibilityConnectors":"Visibility of connectors",
+        "ChangeAlphaConnectors":"Change alpha of the connectors color"
+
     },
     "Alert": {
         "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
