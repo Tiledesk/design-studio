@@ -6,10 +6,11 @@ import {
   EventEmitter,
   SimpleChanges,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
-import { Intent } from 'src/app/models/intent-model';
+// import { Intent } from 'src/app/models/intent-model';
 
 @Component({
   selector: 'cds-connector',
@@ -17,6 +18,7 @@ import { Intent } from 'src/app/models/intent-model';
   styleUrls: ['./cds-connector.component.scss'],
 })
 export class CdsConnectorComponent implements OnInit {
+  private subscriptionChangeIntent: Subscription;
   @Input() idConnector: string;
   @Input() idConnection: string;
   @Input() isConnected: boolean;
@@ -39,33 +41,44 @@ export class CdsConnectorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // empty
+    this.initSubscriptions();
     this.setIdContractConnector();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.idConnection?.currentValue ) {
-      // // console.log('AAAAAAAAAAAAAAA: ', changes);
+    if (changes.isConnected?.currentValue === false) {
+      this.displayConnector = 'none';
+      const element = document.getElementById(this.idContractConnector);
+      if (element) {
+        element.style.display = 'none'; // Nasconde il div
+      }
+    } else if (changes.idConnection?.currentValue) {
       this.idConnection = changes.idConnection?.currentValue;
-      this.getToIntentDisplayName();
+      this.getIntentDisplayName();
     }
-    // // if (this.connector ) {
-    //   // non dovrebbe MAI passare di qua
-    //   // console.log('BBBBBBBBBBBBBBB: ', this.connector);
-    //   this.idConnection = this.connector.id;
-    //   this.getToIntentDisplayName();
-    // }
   }
 
-  // ngAfterViewInit(){
-  //   setTimeout(() => {
-  //     this.setIdContractConnector();
-  //   }, 0);
-  // }
+
+  ngOnDestroy() {
+    if (this.subscriptionChangeIntent) {
+      this.subscriptionChangeIntent.unsubscribe();
+    }
+  }
+
+  initSubscriptions(){
+    if (!this.subscriptionChangeIntent) {
+      this.subscriptionChangeIntent = this.intentService.behaviorIntent.subscribe(intent => {
+        const idToIntent = this.idConnection?.split('/').pop();
+        if (intent?.intent_id && intent.intent_id === idToIntent) {
+          this.intent_display_name = intent.intent_display_name;
+        }
+      });
+    }
+  }
 
   setIdContractConnector() {
     this.setIntentConnector();
-    this.getToIntentDisplayName();
+    this.getIntentDisplayName();
   }
 
   setIntentConnector() {
@@ -89,7 +102,7 @@ export class CdsConnectorComponent implements OnInit {
     }
   }
 
-  getToIntentDisplayName() {
+  getIntentDisplayName() {
     if (this.idConnection) {
       let intentId = this.idConnection.substring(
         this.idConnection.lastIndexOf('/') + 1

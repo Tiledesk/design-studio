@@ -8,15 +8,30 @@
 *Tiledesk SRL*
 
 
+# 1.30.4
+- **changed**: added LLM Ollama and changed template selection from select to input with autocomplete
+
+# 1.30.3
+- **bug-fixed**: css text-align and font-size in ng-select
+- **bug-fixed**: added cds-select onReset in operand cds-action-assign-variable-v2
+
+# 1.30.2
+- **bug-fixed**: deleted log widget
+
+# 1.30.1
+- **bug-fixed**: fixed ExpressionChangedAfterItHasBeenCheckedError
+
 # 1.30.0
-- **canged**: Hide examples button if text exists in JSON buttons
-- **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
-- **bug-fixed**: Fixed logic example in JSON buttons 
-- **bug-fixed**: Fixed graphic errors in JSON buttons 
+- **changed**: Hide examples button if text exists in JSON buttons
+- **bug-fixed**: Fixed graphic errors examples button in JSON buttons
+- **bug-fixed**: Fixed logic example in JSON buttons
+- **bug-fixed**: Fixed graphic errors in JSON buttons
 - **added**: JSON buttons models
 - **added**: more info JSON buttons
 - **bug-fixed**: disabled JSON.parse in action jsonbuttons
 - **added**: added json buttons
+- **canged**: Hide examples button if text exists in JSON buttons
+- **bug-fixed**: Fixed graphic errors examples button in JSON buttons 
 
 
 # 1.29.2
@@ -123,6 +138,9 @@
 
 # 1.28.1
 - **added**: doc for AI_PROMPT and WHATSAPP actions
+
+# 1.28.0-rc.1
+- **added**: added OpenIntentListState in local storage
 
 # 1.28.0
 

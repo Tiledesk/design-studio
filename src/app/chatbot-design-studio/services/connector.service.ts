@@ -1022,7 +1022,6 @@ export class ConnectorService {
     }
     this.hideContractConnector(idConnection);
     this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
-
   }
 
 

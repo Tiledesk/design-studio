@@ -667,7 +667,6 @@
             "Code":"Code",
             "SetFunction":"Set function",
             "CaptureUserReply":"Capture user reply",
-            
             "LeadUpdate":"Lead update",
             "ClearTranscript":"Clear transcript",
             "MoveToUnassigned":"Move to unassigned",

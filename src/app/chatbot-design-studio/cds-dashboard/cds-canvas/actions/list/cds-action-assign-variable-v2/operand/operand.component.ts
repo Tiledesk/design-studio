@@ -21,7 +21,7 @@ export class OperandV2Component implements OnInit {
     openSelectFunction: boolean = false;
     panelOpenState: boolean = false;
     
-    private logger: LoggerService = LoggerInstance.getInstance();
+    private readonly logger: LoggerService = LoggerInstance.getInstance();
     
     constructor(private formBuild: FormBuilder) {}
 
@@ -96,6 +96,7 @@ export class OperandV2Component implements OnInit {
     }
 
     onSelectedFunction(event: any) {
+        this.logger.log('[operand-v2] onSelectedFunction', this.operand, event);
         if(event){
             this.operandForm.get('function').setValue(event.value);
         } else {
@@ -103,6 +104,15 @@ export class OperandV2Component implements OnInit {
         }
         this.onChangeOperand.emit(this.operand)
     }
+
+    onResetFunction(event: any) {
+        this.logger.log('[operand-v2] onResetFunction', this.operand, event);
+        if(!event){
+            this.operandForm.get('function').setValue(null);
+            this.onChangeOperand.emit(this.operand);
+        }
+    }
+
 
     onToggleSelectFunction(){
         this.openSelectFunction = !this.openSelectFunction;

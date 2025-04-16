@@ -1565,9 +1565,36 @@ export class IntentService {
       this.setBehaviorUndoRedo();
       this.logger.log('[INTENT SERVICE] -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
       this.refreshIntents();
+      // this.
       this.opsUpdate(this.payload);
     }
+    
 
+    public deleteIntentAttributesConnectorByIntent(intentId, intent) {
+      this.logger.log('[INTENT SERVICE] -> deleteIntentAttributesConnectorByIntent, ', intentId,  intent);
+      const connectorsList = intent.attributes?.connectors;
+      if(!connectorsList) return;
+      const filteredData = Object.keys(connectorsList)
+      .filter(key => !connectorsList[key].id.endsWith(intentId))
+      .reduce((acc, key) => {
+        acc[key] = connectorsList[key];
+        return acc;
+      }, {});
+      return filteredData;
+    }
+
+
+    public deleteIntentAttributesConnectorByAction(actionId, intent) {
+      const connectorsList = intent.attributes?.connectors;
+      if(!connectorsList) return;
+      const filteredData = Object.keys(connectorsList)
+      .filter(key => !key.includes(actionId))
+      .reduce((acc, key) => {
+        acc[key] = connectorsList[key];
+        return acc;
+      }, {});
+      return filteredData;
+    }
 
 
     /** */
@@ -1578,6 +1605,8 @@ export class IntentService {
         const splitFromId = element.fromId.split('/');
         const intentToUpdateId = splitFromId[0];
         let intent = this.listOfIntents.find((intent: any) => intent.intent_id === intentToUpdateId);
+        intent.attributes.connectors = this.deleteIntentAttributesConnectorByIntent(intent_id, intent);
+        this.logger.log('[INTENT SERVICE] -> findsIntentsToUpdate::: ', intent);
         intentsToUpdate.push(intent);
       });
       return intentsToUpdate;
