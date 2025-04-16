@@ -25,13 +25,15 @@
 
 .block-connector {
     display: flex;
-    width: 100%;
+    margin: 2px;
+    padding: 2px;
     height: 100%;
-    align-self: center;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
+    // display: flex;
+    // align-self: center;
+    // -webkit-box-align: center;
+    // align-items: center;
+    // -webkit-box-pack: center;
+    // justify-content: center;
 
     // &[disabled = "true"]{
     //     cursor: not-allowed !important;
@@ -108,4 +110,37 @@
         content: "";
         border-radius: 50%;
     }
+}
+
+.block-contract-connector {
+    display: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    opacity: 1;
+    margin-left: -4px;
+    cursor: pointer;
+}
+
+.connector-line {
+    font-size: 20px;
+    display: flex;
+}
+
+.connector-to-intent {
+    display: flex;
+    background-color: white;
+    font-size: 10px;
+    width: max-content;
+    max-width: 200px;
+    height: 24px;
+    overflow: hidden;
+    padding: 0px 10px;
+    flex-direction: row;
+    // // border: 1px solid rgb(230, 230, 230);
+    outline: 1px solid rgb(230, 230, 230);
+    border: none;
+    border-radius: 6px;
+    margin: 0px;
+    align-items: center;
 }

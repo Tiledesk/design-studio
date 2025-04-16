@@ -64,7 +64,7 @@ export class CDSTextareaComponent implements OnInit {
   emojiiCategories = [ 'recent', 'people', 'nature', 'activity', 'flags'];
 
 
-  private logger: LoggerService = LoggerInstance.getInstance()
+  private readonly logger: LoggerService = LoggerInstance.getInstance()
   
   constructor() { }
 
@@ -117,7 +117,7 @@ export class CDSTextareaComponent implements OnInit {
   /** */
   onClickTextareaOpenSetAttributePopover(){
     this.logger.log('onClickTextareaOpenSetAttributePopover', this.readonly, this.setAttributeBtn);
-    if(this.readonly === true  && this.setAttributeBtn == true){
+    if(this.readonly === true  && this.setAttributeBtn === true){
       this.addVariable.toggle();
       this.openSetAttributePopover();
     }
