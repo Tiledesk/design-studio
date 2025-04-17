@@ -85,7 +85,7 @@ export class ProjectPlanUtils {
                 }
                 case PLAN_NAME.C.toUpperCase(): {
                     this.logger.log('case C')
-                    currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.F.toUpperCase());
+                    currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.G.toUpperCase());
                     break;
                 }
                 default: {

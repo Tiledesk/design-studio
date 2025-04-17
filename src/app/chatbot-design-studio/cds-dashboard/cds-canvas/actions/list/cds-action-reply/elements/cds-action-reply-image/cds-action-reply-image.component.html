@@ -43,7 +43,9 @@
     
     <div class="image-editor">
         <div *ngIf="!response.metadata.src" class="response-image-uploader-wrapper no-image">
-            <div class="image"><img src="assets/images/icons/add_image.svg"></div>
+            <div class="image">
+                <mat-icon svgIcon="add_image" aria-hidden="true"></mat-icon>
+            </div>
             <div class="text">{{'CDSCanvas.ClickToAddImage' | translate }}</div>
         </div>
         <div *ngIf="response.metadata.src" class="response-image-uploader-wrapper">

@@ -119,6 +119,13 @@ $base-padding: 6px;
     width: 16px;
 }
 
+.action-btn-icon .svg-icon {
+    width: 16px;
+    color: var(--gray-light-01);
+    filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+}
+
+
 .action-btn-text{
     // display: inline-flex;
     color: $text-color;

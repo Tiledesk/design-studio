@@ -50,7 +50,7 @@ export class WebhookService {
     return this._httpClient.get<any>(url, httpOptions);
   }
 
-  createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean){
+  createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean, copilot: boolean){
     if(this.thereIsWebResponse === undefined){
       this.thereIsWebResponse = thereIsWebResponse;
     }
@@ -69,7 +69,8 @@ export class WebhookService {
     let body = { 
       'chatbot_id': chatbot_id,
       'block_id': intent_id, 
-      'async': !thereIsWebResponse
+      'async': !thereIsWebResponse,
+      'copilot': copilot
     };
     this.logger.log('[WEBHOOK_URL.SERV]  createWebhook - BODY ', body);
     let url = this.WEBHOOK_URL + '/webhooks/';

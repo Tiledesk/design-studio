@@ -32,7 +32,8 @@
                 &.intent-start{
                     color: var(--color-green-hex);
                 }
-                &.intent-defaultFallback{
+                &.intent-defaultFallback,
+                &.intent-close{
                     color: var(--color-red-hex)
                 }
             }
@@ -113,7 +114,8 @@
                 &.intent-start{
                     color: var(--color-green-hex);
                 }
-                &.intent-defaultFallback{
+                &.intent-defaultFallback,
+                &.intent-close{
                     color: var(--color-red-hex)
                 }
             }

@@ -192,7 +192,6 @@ export class CdsActionReplyTextComponent implements OnInit {
 
   /** onChangeDelayTime */
   onChangeDelayTime(value:number){
-    console.log('onChangeDelayTime:: ', value);
     this.delayTime = value;
     this.wait.time = value*1000;
     this.canShowFilter = true;

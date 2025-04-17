@@ -14,7 +14,8 @@
             <div *ngIf="actionsByCategory[actionCategory.type]" class="cds-button-element">
                 <div class="cds-box-button">
                     <span class="box-img">
-                        <img class="active-icon" [src]="actionCategory.src" alt="">
+                        <mat-icon [svgIcon]="actionCategory.src" aria-hidden="true"></mat-icon>
+                        <!-- <img class="active-icon" [src]="actionCategory.src" alt=""> -->
                     </span>
                     <span class="box-title">{{ actionCategory.name | translate}}</span>
                 </div>

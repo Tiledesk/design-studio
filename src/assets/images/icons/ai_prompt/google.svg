@@ -1,11 +1,11 @@
 <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 512 512">
   <defs>
-    <style>
+    <!-- <style>
       .cls-1 {
         fill: url(#radial-gradient);
         stroke-width: 0px;
       }
-    </style>
+    </style> -->
     <radialGradient id="radial-gradient" cx="-37.1" cy="650.9" fx="-37.1" fy="650.9" r="32" gradientTransform="translate(-27793.3 84523.4) rotate(18.7) scale(17 -136.4)" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#9168c0"/>
       <stop offset=".3" stop-color="#5684d1"/>

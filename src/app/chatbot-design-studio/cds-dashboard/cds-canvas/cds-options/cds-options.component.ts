@@ -1,5 +1,4 @@
 import { Component, EventEmitter, OnInit, Input, Output, ViewChild, ElementRef } from '@angular/core';
-import { timeInterval } from 'rxjs';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
 
@@ -34,9 +33,9 @@ export class CdsOptionsComponent implements OnInit {
     this.alpha = this.stageService.getAlpha();
   }
 
-  updateAlphaConnectors() {
-    this.onOptionClicked.emit({ option: OPTIONS.ALPHA, alpha: this.alpha });
-  }
+  // updateAlphaConnectors() {
+  //   this.onOptionClicked.emit({ option: OPTIONS.ALPHA, alpha: this.alpha });
+  // }
 
   forceAlphaConnectorsFocus(): void {
     this.alphaInput.nativeElement.focus();
@@ -60,5 +59,9 @@ export class CdsOptionsComponent implements OnInit {
         }
       }, 0);
     } 
+  }
+
+  onChangeAlphaConnectors(alpha){
+    this.onOptionClicked.emit({ option: OPTIONS.ALPHA, alpha: alpha });
   }
 }

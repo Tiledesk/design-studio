@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+import { TranslateService } from '@ngx-translate/core';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 import { RESERVED_INTENT_NAMES } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { Intent } from 'src/app/models/intent-model';
 import { Project } from 'src/app/models/project-model';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -33,13 +34,15 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   webhookUrl: string;
   messageText: string = '';
   action: any = {};
+  chatbotSubtype: string;
 
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private readonly webhookService: WebhookService,
     private readonly appConfigService: AppConfigService,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly translate: TranslateService
   ) { 
   }
 
@@ -64,9 +67,11 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   }
 
   initializeWebhook(){
+    this.webhookUrl = '';
     this.isWebhook = true;
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.chatbot_id = this.dashboardService.id_faq_kb;
+    this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
     this.getWebhook();
   }
 
@@ -88,14 +93,25 @@ export class CdsPanelIntentDetailComponent implements OnInit {
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
     }, error: (error)=> {
       this.logger.error("[CdsPanelIntentDetailComponent] error getWebhook: ", error);
-      this.createWebhook();
+      // // this.createWebhook();
     }, complete: () => {
       this.logger.log("[CdsPanelIntentDetailComponent] getWebhook completed.");
     }});
   }
 
+  
+  newWebhook(){
+    this.logger.log("[CdsPanelIntentDetailComponent] newWebhook.", this.project);
+    if(this.webhookUrl && this.webhookUrl.trim() !== ''){
+      this.regenerateWebhook();
+    } else {
+      this.createWebhook();
+    }
+  }
+
   createWebhook(){
-    this.webhookService.createWebhook(this.chatbot_id, this.intent.intent_id, true).subscribe({ next: (resp: any)=> {
+    const copilot = this.chatbotSubtype === TYPE_CHATBOT.COPILOT;
+    this.webhookService.createWebhook(this.chatbot_id, this.intent.intent_id, true, copilot).subscribe({ next: (resp: any)=> {
       this.logger.log("[CdsPanelIntentDetailComponent] createWebhook : ", resp);
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
     }, error: (error)=> {
@@ -139,14 +155,18 @@ export class CdsPanelIntentDetailComponent implements OnInit {
       try {
         await navigator.clipboard.writeText(this.webhookUrl);
         this.logger.log('Text copied successfully!');
-        this.showMessage('Text copied successfully!');
+        let translatedString = this.translate.instant('CDSCanvas.TextCopied');
+        this.showMessage(translatedString);
+        
       } catch (err) {
         this.logger.error('Error copying text:', err);
-        this.showMessage('Error copying text: ' +JSON.stringify(err));
+        let translatedString = this.translate.instant('CDSCanvas.TextErrorCopied');
+        this.showMessage(translatedString+': ' +JSON.stringify(err));
       }
     } else {
       this.logger.log('Clipboard API not supported by your browser.');
-      this.showMessage('Clipboard API not supported by your browser.');
+      let translatedString = this.translate.instant('CDSCanvas.ApiNotSupported');
+      this.showMessage(translatedString);
     }
   }
 

@@ -362,7 +362,8 @@ $circle-size: 40px;
   span.rocket {
     color: var(--color-green-hex);
   }
-  span.undo {
+  span.undo,
+  span.call_end {
     color: var(--color-red-hex)
   }
   span.webhook {

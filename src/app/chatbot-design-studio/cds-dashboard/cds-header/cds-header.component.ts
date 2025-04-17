@@ -314,7 +314,7 @@ export class CdsHeaderComponent implements OnInit {
     // const url = testItOutUrl + '?tiledesk_projectid=' + this.projectID + '&tiledesk_participants=bot_' + this.id_faq_kb + "&tiledesk_departmentID=" + this.defaultDepartmentId + '&td_draft=true'
     // let params = `toolbar=no,menubar=no,width=815,height=727,left=100,top=100`;
     // window.open(url, '_blank', params);
-    let intentStart = this.intentService.listOfIntents.find(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.DISPLAY_NAME_START));
+    let intentStart = this.intentService.listOfIntents.find(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START));
     this.intentService.openTestItOut(intentStart)
   }
 

@@ -32,6 +32,10 @@
         margin-top: 25px;
         padding-left: 10px;
 
+        .icon-container {
+            padding-right: 3px;
+        }
+
         .custom-input {
             background-color: transparent;
             border-radius: 6px;
@@ -80,7 +84,6 @@
     width: 100%;
     display: flex;
     flex-direction: row;
-    //justify-content: space-between;
     justify-content: flex-end;
     padding: 10px 0px;
 
@@ -95,7 +98,6 @@
         flex-direction: row;
         font-size: 14px;
         align-items: center;
-        //border: dashed 1px;
         padding: 0px 14px 0px 10px;
         border-radius: 16px;
         cursor: pointer;
@@ -113,7 +115,6 @@
 
     .new-intent-button:hover {
         background-color: var(--background-color-hover);
-        //border: 1px solid white;
 
         .plus-icon {
             font-size: 16px;
@@ -133,11 +134,23 @@
     height: 100%;
     align-items: center;
     color: var(--icon-color-active);
+    mat-icon {
+        height: 100%;
+        display: flex;
+        // align-items: center;
+        align-items: flex-start;
+        ::ng-deep svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--gray);
+        }
+    }
 
     img {
         width: 18px;
         filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
     }
+
     .material-icons{
         font-size: 18px;
         color: var(--text-color);
@@ -171,6 +184,26 @@
     padding-left: 10px;
     opacity: 0.7;
 
+    mat-icon {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        ::ng-deep svg {
+            height: 12px;
+            fill: var(--gray);
+        }
+    }
+
+    .icon-container {
+        mat-icon {
+            ::ng-deep svg {
+                width: 18px;
+                height: 18px;
+                fill: var(--gray);
+            }
+        }
+    }
+
     .item-box {
         display: flex;
         flex-direction: row;
@@ -178,10 +211,7 @@
         justify-content: space-between;
         align-items: center;
         position: relative;
-        // margin: 2px 0px;
     }
-
-    // .item-box-default {}
 
     .delete-box {
         display: none;
@@ -199,24 +229,31 @@
         max-width: 170px;
         display: flex;
         align-items: center;
-        // max-width: 150px; //GAB
     }
 
     .icon-list {
         display: flex;
         flex-direction: row;
         gap: 3px;
-
         .ai-icon,
         .webhook-icon,
         .list-alt-icon,
         .bolt-icon {
+            line-height: 100%;
             font-size: 12px;
         }
-
+        .ai-icon {
+            width: 14px;
+        }
         .actions {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
+            width: 24px;
+            height: fit-content;
+            justify-content: center;
+            mat-icon {
+                width: 12px;
+            }
         }
 
         .action-counter {
@@ -225,13 +262,14 @@
             padding: 0px;
             margin: 0px;
         }
+
     }
 }
 
 .intent:hover {
-    // background-color: var(--blu);
     box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
     opacity: 1;
+
     .delete-box {
         display: block;
 
@@ -243,15 +281,26 @@
     .delete-box:hover {
         .delete-icon {
             font-size: 20px;
-            // color: var(--color-red-hex);
             color: var(--color-white-hex);
             transition: 0.3s;
         }
     }
 
-    .icon-container{
-        color: var(--text-color-hover) !important;
+    .icon-list {
+        mat-icon {
+            ::ng-deep svg {
+                fill: var(--blu);
+            }
+        }
+    }
 
+    .icon-container {
+        color: var(--text-color-hover) !important;
+        mat-icon {
+            ::ng-deep svg {
+                fill: var(--blu);
+            }
+        }
         img{
             filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
         }
@@ -269,18 +318,15 @@
     .list-alt-icon,
     .bolt-icon,
     .action-counter{
-        color: var(--gray-light-01);
+        // // color: var(--gray-light-01);
+        color: var(--blu);
     }
 
 }
 
 .active {
-    // background-color: var(--background-color-active) !important;
-    // border-right: solid 5px var(--icon-color-active);
-    // border-radius: 6px 10px 10px 6px;
     opacity: 1;
     .intent-display-name {
-        // color: #333;
         color: var(--text-color-active);
         font-weight: 600;
         margin-bottom: 0px;
@@ -288,7 +334,6 @@
 
     .icon-container{
         color: var(--icon-color-active) !important;
-
         .material-icons{
             color: var(--icon-color-active) !important;
         }
@@ -313,6 +358,13 @@
     display: none;
 }
 
-.agents-available{
+
+mat-icon.agents-available {
+    ::ng-deep svg {
+        height: 16px;
+    }
+}
+
+.agents-available {
     font-size: 16px;
 }

@@ -21,11 +21,9 @@ mat-form-field.mat-focused ::ng-deep {
             .mat-form-field-infix {
                 textarea {
                     border: 1px solid var(--blu) ;
-                    // outline: 0px solid var(--blu);
                     transition: border 0.3s;
                     &.invalid{
                         border: 1px solid red !important;
-                        // outline: 0px solid red !important;
                         transition: border 0.3s;
                     }
                 }
@@ -39,7 +37,6 @@ mat-form-field.box-textarea ::ng-deep {
         .mat-form-field-flex {
             border-radius: 4px 4px 0 0;
             padding: 0px;
-            // padding: 0 0.75em 0 0.75em;
             margin: 0;
             background-color: transparent !important;
         }
@@ -58,7 +55,6 @@ mat-form-field.box-textarea ::ng-deep {
 /** box-textarea **/
 .box-textarea {
     width: 100%;
-    // margin-left: 20px;
     textarea {
         border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
@@ -69,18 +65,16 @@ mat-form-field.box-textarea ::ng-deep {
         font-size: 1.15em;
         line-height: 25px;
         resize: vertical;
-
-        // width: calc(100% - 2.5em);
         padding: 10px;
         padding-top: 4px;
         padding-bottom: 4px;
         margin: 0px;
-        // resize: none;
         height: 26px;
         min-height: 26px;
-
     }
 }
+
+
 
 /** editor-utils **/
 .editor-utils {

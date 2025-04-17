@@ -67,6 +67,7 @@ import { NetworkOfflineComponent } from './modals/network-offline/network-offlin
 import { BrandResources } from './chatbot-design-studio/BrandResources';
 import { FilterPipe } from './pipe/filter.pipe';
 
+
 // FACTORIES
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');

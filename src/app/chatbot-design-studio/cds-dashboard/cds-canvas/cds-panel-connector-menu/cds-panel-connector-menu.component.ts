@@ -3,7 +3,8 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 enum TYPE_OF_MENU {
   DELETE = 'delete',
-  LINE_TEXT = 'line-text'
+  LINE_TEXT = 'line-text',
+  SHOW_HIDE = 'show-hide',
 }
 
 
@@ -21,18 +22,24 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
 
   typeOfmenu = TYPE_OF_MENU; 
   showLineTextarea: boolean = false;
+  displayConnector: boolean = true;
 
   constructor() { }
 
   ngOnInit(): void {
-    // console.log('[CDS-ADD-CONNECTOR MENU] ', this.connector);
+    // // console.log('[CDS-ADD-CONNECTOR MENU] ', this.connector);
   }
 
   onAddActionFromConnectorMenu(type){
-    let event = { 
-      'type': type
+    if(type === this.typeOfmenu.SHOW_HIDE){
+      this.displayConnector = false;
+      this.connector['display'] = this.displayConnector;
     }
-    // console.log('[CDS-ADD-CONNECTOR MENU] onAddActionFromConnectorMenu - connector: ', event);
+    let event = { 
+      'type': type,
+      'connector': this.connector
+    }
+    // // console.log('[CDS-ADD-CONNECTOR MENU] onAddActionFromConnectorMenu - connector: ', type, this.connector);
     this.addActionFromConnectorMenu.emit(event);
   }
 
@@ -42,10 +49,12 @@ export class CdsPanelConnectorMenuComponent implements OnInit {
   
   onBlur(ev){
     const testoTextArea = ev.target.value;
-    // console.log('[CDS-ADD-CONNECTOR MENU]  onBlur:: ', testoTextArea);
+    // // console.log('[CDS-ADD-CONNECTOR MENU]  onBlur:: ', testoTextArea);
+    this.connector['label'] = testoTextArea;
+    this.connector['display'] = true;
     let event = { 
       'type': TYPE_OF_MENU.LINE_TEXT, 
-      'label': testoTextArea
+      'connector': this.connector
     }
     this.showLineTextarea = false;
     this.addActionFromConnectorMenu.emit(event);

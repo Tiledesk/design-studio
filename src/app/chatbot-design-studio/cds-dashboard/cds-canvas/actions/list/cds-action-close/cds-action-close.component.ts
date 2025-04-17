@@ -17,6 +17,7 @@ export class CdsActionCloseComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    // // empty
   }
 
 }
