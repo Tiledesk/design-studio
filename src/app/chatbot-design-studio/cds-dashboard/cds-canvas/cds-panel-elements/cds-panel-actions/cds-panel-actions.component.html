@@ -35,13 +35,15 @@
                     [attr.id]="'menu-trigger-' + i">
                     
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <img [src]="item.value.src" [title]="item.value.name | translate" alt="">
+                        <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
+                        <!-- <img [src]="item.value.src" [title]="item.value.name | translate" alt=""> -->
                     </div>
                     <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name | translate}}</div>
                     <span *ngIf="!item.canLoad" class="trigger-beta-badge">PRO</span>
                     <span *ngIf="item.value.badge" class="trigger-beta-badge">{{item.value.badge}}</span>
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <button class="btn btn-tdblu-no-boxshadow drag-btn">
+                            <!-- <mat-icon class="active-icon" [svgIcon]="actionCategory.src" aria-hidden="true"></mat-icon> -->
                             <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate" alt="">
                         </button>
                     </div>
