@@ -37,7 +37,9 @@ $max-height: 230px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-    
+                mat-icon {
+                    color: var(--blu);
+                }
                 img {
                     max-height: 90%;
                     max-width: 90%;

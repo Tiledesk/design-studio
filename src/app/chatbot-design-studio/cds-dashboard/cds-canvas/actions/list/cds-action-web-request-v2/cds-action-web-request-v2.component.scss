@@ -189,6 +189,7 @@ cds-textarea#url ::ng-deep {
             max-height: 175px!important;
             height: 23px!important;
             line-height: 23px!important;
+            overflow-y: hidden!important;
         }
     }
     .focus-in {
@@ -200,7 +201,7 @@ cds-textarea#url ::ng-deep {
             max-height: 175px!important;
             line-height: 30px!important;
             padding: 3px 16px 1px!important;
-
+            overflow-y: auto !important;
         }
     }
 
