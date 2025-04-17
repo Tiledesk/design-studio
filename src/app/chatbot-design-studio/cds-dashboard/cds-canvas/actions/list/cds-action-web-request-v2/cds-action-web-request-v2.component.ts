@@ -11,8 +11,10 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionWebRequestV2 } from 'src/app/models/action-model';
 
 //UTILS
-import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TYPE_METHOD_REQUEST, TEXT_CHARS_LIMIT, HEADER_TYPE } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { HEADER_TYPE, TYPE_METHOD_REQUEST } from 'src/app/chatbot-design-studio/utils-request';
 
 @Component({
   selector: 'cds-action-web-request-v2',
@@ -67,9 +69,12 @@ export class CdsActionWebRequestV2Component implements OnInit {
       {name: 'form-data',  value: 'form-data', disabled: false, checked: false }
   ]
   
-  private logger: LoggerService = LoggerInstance.getInstance();
+  bodyType: 'none' | 'json' | 'form-data' = 'none';
+
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
-    private intentService: IntentService
+    private readonly intentService: IntentService
   ) { }
 
   // SYSTEM FUNCTIONS //
@@ -105,44 +110,6 @@ export class CdsActionWebRequestV2Component implements OnInit {
     // }
   }
 
-  // private checkConnectionStatus(){
-  //   if(this.action.trueIntent){
-  //    this.isConnectedTrue = true;
-  //   } else {
-  //    this.isConnectedTrue = false;
-  //   }
-  //   if(this.action.falseIntent){
-  //     this.isConnectedFalse = true;
-  //    } else {
-  //     this.isConnectedFalse = false;
-  //    }
-  // }
-
-  private checkConnectionStatus(){
-    if(this.action.trueIntent){
-      this.isConnectedTrue = true;
-      const posId = this.action.trueIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.trueIntent.slice(posId+1);
-        this.idConnectionTrue = this.idConnectorTrue+"/"+toId;
-      }
-    } else {
-     this.isConnectedTrue = false;
-     this.idConnectionTrue = null;
-    }
-    if(this.action.falseIntent){
-      this.isConnectedFalse = true;
-      const posId = this.action.falseIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.falseIntent.slice(posId+1);
-        this.idConnectionFalse = this.idConnectorFalse+"/"+toId;
-      }
-     } else {
-      this.isConnectedFalse = false;
-      this.idConnectionFalse = null;
-     }
-  }
-
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
@@ -151,41 +118,27 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.checkConnectionStatus();
   }
 
+  private checkConnectionStatus(){
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
+  }
+
+  /** */
   private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idAction= array[1];
-      if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){
-          if(array[array.length -1] === 'true'){
-            this.action.trueIntent = null;
-            this.isConnectedTrue = false;
-            this.idConnectionTrue = null;
-          }        
-          if(array[array.length -1] === 'false'){
-            this.action.falseIntent = null;
-            this.isConnectedFalse = false;
-            this.idConnectionFalse = null;
-          }
-          if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-        } else { 
-          this.logger.debug('[ACTION-WEB-REQUEST-v2] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-          if(array[array.length -1] === 'true'){
-            this.isConnectedTrue = true;
-            this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
-            this.action.trueIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }        
-          if(array[array.length -1] === 'false'){
-            this.isConnectedFalse = true;
-            this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
-            this.action.falseIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }
-        }
-      }
-    } catch (error) {
-      this.logger.error('[ACTION-ASKGPT] updateConnector error: ', error);
+    this.logger.log('[ACTION WEB-REQUEST-v2] updateConnector:');
+    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
+    if(resp){
+      this.isConnectedTrue    = resp.isConnectedTrue;
+      this.isConnectedFalse   = resp.isConnectedFalse;
+      this.idConnectionTrue   = resp.idConnectionTrue;
+      this.idConnectionFalse  = resp.idConnectionFalse;
+      this.logger.log('[ACTION WEB-REQUEST-v2] updateConnector:', resp);
+      if (resp.emit) {
+        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
+      } 
     }
   }
 
@@ -199,8 +152,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.jsonHeader = this.action.headersString
     this.bodyOptions.forEach(el => { el.value ===this.action.bodyType? el.checked= true: el.checked = false })
     // this.jsonIsValid = this.isValidJson(this.action.jsonBody);
-    if(this.action.jsonBody){
-      this.body = this.action.jsonBody;
+
+    if(this.action.jsonBody){ 
+      this.body = this.checkAndSetJsonBody(this.action.jsonBody);
       this.body = this.formatJSON(this.body, "\t");
     }
     this.jsonSettings = { timeout: 20000}
@@ -268,18 +222,21 @@ export class CdsActionWebRequestV2Component implements OnInit {
   }
 
   onChangeButtonSelect(event: {name: string, value: string, disabled: boolean, checked: boolean}){
-    this.bodyOptions.forEach(el => { el.value ===event.value? el.checked= true: el.checked = false })
+    this.bodyOptions.forEach(el => { el.value ===event.value? el.checked = true: el.checked = false })
     this.action.bodyType= event.value
     switch (event.value){
       case 'none':
+        this.bodyType = 'none';
         this.body = JSON.stringify({})
         delete this.jsonHeader['Content-Type']
         break;
       case 'json':
-        this.body = this.action.jsonBody
-        this.jsonHeader['Content-Type'] = 'application/json'
+        this.bodyType = 'json';
+        this.jsonHeader['Content-Type'] = 'application/json';
+        this.body = this.checkAndSetJsonBody(this.action.jsonBody);
         break;
       case 'form-data':
+        this.bodyType = 'form-data';
         this.jsonHeader['Content-Type'] = 'multipart/form-data'
         break;
     }
@@ -287,12 +244,24 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
+
+  checkAndSetJsonBody(jsonBody){
+    this.logger.log('[ACTION-WEB-REQUEST-v2] jsonBody:: ', jsonBody);
+    return jsonBody.replace(/{{(.*?)}}/g, (match, content) => {
+      if (match.includes('| json') || match.includes('|json')) {
+        return match;
+      } else {
+        return `{{ ${content.trim()} | json }}`;
+      }
+    });
+  }
+
+
   onChangeTextarea(e, type: 'url' | 'body' | 'setting'){
     switch(type){
       case 'body': {
         this.body = e;
-        this.action.jsonBody = this.body;
-        
+        //this.action.jsonBody = this.body;
         // setTimeout(() => {
           // this.jsonIsValid = this.isValidJson(this.body);
           // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
@@ -318,6 +287,8 @@ export class CdsActionWebRequestV2Component implements OnInit {
   }
 
   onBlur(event){
+    this.action.jsonBody = this.checkAndSetJsonBody(this.body);
+    this.body = this.action.jsonBody;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 

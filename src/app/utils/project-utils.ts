@@ -1,5 +1,5 @@
 import { filter } from 'rxjs';
-import { ACTIONS_LIST, ACTION_CATEGORY, TYPE_ACTION_CATEGORY, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, ACTIONS_LIST, ACTION_CATEGORY, TYPE_ACTION_CATEGORY, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
 import { Injectable, OnInit } from "@angular/core";
 import { ProjectService } from "../services/projects.service";
 import { Project } from "../models/project-model";
@@ -20,7 +20,8 @@ export class ProjectPlanUtils {
     private logger: LoggerService = LoggerInstance.getInstance()
     constructor(
         private projectService: ProjectService,
-        private appConfigService: AppConfigService
+        private appConfigService: AppConfigService,
+        
     ){ 
         this.project = this.projectService.getCurrentProject();
         this.checkIfKBSCanLoad();
@@ -84,7 +85,7 @@ export class ProjectPlanUtils {
                 }
                 case PLAN_NAME.C.toUpperCase(): {
                     this.logger.log('case C')
-                    currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.F.toUpperCase());
+                    currentPlanNameKey = Object.keys(PLAN_NAME).filter(x => PLAN_NAME[x].toUpperCase() == PLAN_NAME.G.toUpperCase());
                     break;
                 }
                 default: {
@@ -132,6 +133,11 @@ export class ProjectPlanUtils {
 
 
         return true
+    }
+
+
+    public checkIfActionIsInChatbotType(subType: TYPE_CHATBOT){
+        Object.values(ACTIONS_LIST).filter(el => !el.chatbot_types.includes(subType)).map( el => el.status = 'inactive')
     }
 
     public checkIfActionCategoryIsInProject(actionType: TYPE_ACTION_CATEGORY){

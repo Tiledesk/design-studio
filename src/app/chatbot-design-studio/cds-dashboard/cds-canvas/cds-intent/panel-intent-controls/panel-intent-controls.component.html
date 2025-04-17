@@ -3,94 +3,78 @@
 
     <div class="intent-header-actions-wpr">
         <!-- ---------------------------------- -->
-        <!-- Panel intent  *ngIf="!isInternalIntent" -->
+        <!-- Panel intent -->
         <!-- ---------------------------------- -->
-        <button 
-            class="intent-header-action-btn icon"
+        <button *ngIf="showMore"
+            class="intent-header-action-btn"
             (click)="$event.stopPropagation();onOpenIntentPanel()" 
             matTooltipClass="cds-mat-tooltip"
             [matTooltip]="'CDSCanvas.IntentPanel' | translate" 
             #tooltip="matTooltip" 
             matTooltipPosition='above' 
             matTooltipHideDelay="100">
-            <img src="assets/images/icons/more_vert.svg" alt="open intent panel">
+            <mat-icon class="icon" svgIcon="more_vert" aria-hidden="true"></mat-icon>
+            <!-- <img src="assets/images/icons/more_vert.svg" alt="open intent panel"> -->
         </button>
 
         <!-- ---------------------------------- -->
         <!-- Color intent  -->
         <!-- ---------------------------------- -->
-        <button *ngIf="!isStart"
-            class="intent-header-action-btn icon"
+        <button *ngIf="showColor"
+            class="intent-header-action-btn"
             (click)="$event.stopPropagation();onColorIntent()" 
             matTooltipClass="cds-mat-tooltip"
             [matTooltip]="'CDSCanvas.ColorBlock' | translate" 
             #tooltip="matTooltip" 
             matTooltipPosition='above' 
             matTooltipHideDelay="100">
-            <img src="assets/images/icons/palette.svg" alt="change color">
+            <mat-icon class="icon" svgIcon="palette" aria-hidden="true"></mat-icon>
+            <!-- <img src="assets/images/icons/palette.svg" alt="change color"> -->
         </button>
 
         <!-- ---------------------------------- -->
-        <!-- Delete intent  *ngIf="!isInternalIntent" -->
+        <!-- Delete intent  -->
         <!-- ---------------------------------- -->
-        <button 
-            *ngIf="!isInternalIntent"
-            class="intent-header-action-btn icon"
+        <button *ngIf="showDelete"
+            class="intent-header-action-btn"
             (click)="$event.stopPropagation();onDeleteIntent()" 
             matTooltipClass="cds-mat-tooltip"
             [matTooltip]="'CDSCanvas.DeleteBlock' | translate" 
             #tooltip="matTooltip" 
             matTooltipPosition='above' 
             matTooltipHideDelay="100">
-            <img src="assets/images/icons/bin.svg" alt="delete">
+            <mat-icon class="icon" svgIcon="bin" aria-hidden="true"></mat-icon>
+            <!-- <img src="assets/images/icons/bin.svg" alt="delete"> -->
         </button>
 
         <!-- ---------------------------------- -->
         <!-- copy intent  -->
         <!-- ---------------------------------- -->
-        <!--  -->
-        <!-- *ngIf="copyElementEnabled"  -->
-        <button 
-            *ngIf="!isInternalIntent"
-            class="intent-header-action-btn icon"
+        <button *ngIf="showCopy"
+            class="intent-header-action-btn"
             matTooltipClass="cds-mat-tooltip" 
             [matTooltip]="'CDSCanvas.CopyBlock' | translate" 
             #tooltip="matTooltip"
             matTooltipPosition='above' 
             matTooltipHideDelay="100"
             (click)="onCopyIntent()">
-            <img src="assets/images/icons/copy.svg" alt="copy">
+            <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+            <!-- <img src="assets/images/icons/copy.svg" alt="copy"> -->
         </button>
-
-        <!-- ---------------------------------- -->
-        <!-- Enable / disable intent webhook  -->
-        <!-- ---------------------------------- -->
-        <!--  -->
-        <!-- <div *ngIf="deleteOptionEnabled" 
-            class="intent-header-action-btn icon"
-            [ngClass]="{'webhook-enabled': webhookEnabled }"
-            (mouseover)="onMouseOverWebhookBtn()" 
-            (click)="toggleIntentWebhook()"
-            matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{webHookTooltipText}}" 
-            #tooltip="matTooltip"
-            matTooltipPosition='above' 
-            matTooltipHideDelay="100">
-            <img src="assets/images/icons/webhook.svg">
-        </div> -->
 
         <!-- ---------------------------------- -->
         <!-- Test intent play btn  -->
         <!-- ---------------------------------- -->
-        <button *ngIf="!isStart" 
-            class="intent-header-action-btn icon"
+        <button *ngIf="showPlay" 
+            class="intent-header-action-btn"
             (click)="openTestSiteInPopupWindow()" 
             matTooltipClass="cds-mat-tooltip"
             [matTooltip]="'CDSCanvas.StartTest' | translate" 
             #tooltip="matTooltip" 
             matTooltipPosition='above'
             matTooltipHideDelay="100">
-            <img src="assets/images/icons/play.svg" alt="play">
+            <mat-icon class="icon" svgIcon="play" aria-hidden="true"></mat-icon>
+            <!-- <img src="assets/images/icons/play.svg" alt="play"> -->
         </button>
     </div>
 </div>
