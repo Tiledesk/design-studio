@@ -185,7 +185,10 @@ cds-textarea#url ::ng-deep {
     .focus-out {
         position: relative;
         textarea{
-            height: 23px !important;
+            min-height: 23px!important;
+            max-height: 175px!important;
+            height: 23px!important;
+            line-height: 23px!important;
         }
     }
     .focus-in {
@@ -193,7 +196,11 @@ cds-textarea#url ::ng-deep {
         z-index: 2;
         width: 100%;
         textarea{
-            min-height: 23px !important;
+            min-height: 23px!important;
+            max-height: 175px!important;
+            line-height: 30px!important;
+            padding: 3px 16px 1px!important;
+
         }
     }
 
@@ -201,8 +208,6 @@ cds-textarea#url ::ng-deep {
         border-radius: 0px var(--input-border-radius-base) var(--input-border-radius-base) 0px;
         resize: none !important; 
         padding: 6px 16px !important;
-
-        // height: 23px !important;
         min-height: 23px !important;
     }
 }
