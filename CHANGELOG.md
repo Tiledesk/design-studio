@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.31.2-rc.1
+- **added**: AI_MODELS added
+
 # 1.31.0-rc.14
 - **bug-fixed**: deleted the connector object from the intent attributes connectors node when:
 delete an intent (delete all incoming connectors)
