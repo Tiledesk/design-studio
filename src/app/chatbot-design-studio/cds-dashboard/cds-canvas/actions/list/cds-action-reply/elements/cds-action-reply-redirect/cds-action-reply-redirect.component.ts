@@ -42,11 +42,11 @@ export class CdsActionReplyRedirectComponent implements OnInit {
   }
 
   private initialize(){
-    this.delayTime = (this.wait && this.wait.time  || this.wait.time === 0)? (this.wait.time/1000) : 500/1000;
+    this.delayTime = (this.wait?.time && this.wait?.time !== 0)? (this.wait.time/1000) : 500/1000;
     try {
       this.metadata = this.response.metadata;
 
-      if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
+      if(this.response?._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
         this.filterConditionExist = true
       }
 

@@ -42,7 +42,7 @@ export class WebSocketJs {
   
   constructor() {
 
-    this.logger.log("[WEBSOCKET-JS] HELLO !!!");
+    // this.logger.log("[WEBSOCKET-JS] HELLO !!!");
     this.topics = [];
     this.callbacks = new Map();
 

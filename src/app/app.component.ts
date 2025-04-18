@@ -18,6 +18,7 @@ import { NetworkService } from './services/network.service';
 import { MatDialog } from '@angular/material/dialog';
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
+import { IconService } from './chatbot-design-studio/services/icon.service';
 
 @Component({
   selector: 'app-root',
@@ -49,10 +50,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private imageRepoService: ImageRepoService,
     private scriptService: ScriptService,
     private networkService: NetworkService,
+    private iconService: IconService
   ){
 
   }
   
+
+  
+
   ngOnInit(): void {
     const appconfig = this.appConfigService.getConfig();
     this.persistence = appconfig.authPersistence;
@@ -78,7 +83,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const storedToken = localStorage.getItem('tiledesk_token');
       this.logger.log('[APP-COMP] ngOnInit AUTOLOGIN storedToken ', storedToken)
-      this.logger.log('[APP-COMP] ngOnInit AUTOLOGIN SAVE THE PARAMS TOKEN ', token)
       if (storedToken !== token) {
         localStorage.setItem('tiledesk_token', token);
       } else {
@@ -94,6 +98,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   private async initialize(){
+
+    // Lazy loading icons in App
+    this.iconService.registerIcons();
+
     let serverBaseURL = this.appConfigService.getConfig().apiUrl
     this.tiledeskAuthService.initialize(serverBaseURL);
 
@@ -104,7 +112,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
     await this.initAuthentication();
     this.setLanguage(null);
-
   }
 
 

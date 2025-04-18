@@ -210,7 +210,7 @@ export class CdsActionReplyV2Component implements OnInit {
       this.arrayResponses[currentPos] = msgPre;
       this.arrayResponses[previousPos-1] = waitCur;
       this.arrayResponses[previousPos] = msgCur;
-      // this.logger.log( 'DROP REPLY ---> ', this.arrayResponses);
+      // // this.logger.log( 'DROP REPLY ---> ', this.arrayResponses);
       this.connectorService.updateConnector(this.intentSelected.intent_id);
       const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.intentSelected};
       this.onUpdateAndSaveAction(element);

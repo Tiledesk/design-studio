@@ -15,22 +15,19 @@ export class CDSElementFromUrlComponent implements OnInit {
   @Output() onChangeMetadata = new EventEmitter();
   @Output() onDeletedMetadata = new EventEmitter<any>();
 
-  // showAddImage = false;
-  pathElement: string;
+  pathElement: string = '';
   pathElementUrl: any;
   widthElement: string = '100%';
   heightElement: string;
 
   constructor(
-    private sanitizer: DomSanitizer
+    private readonly sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
     if(this.metadata.src == ''){
       // this.showAddImage = true;
     }
-    // this.pathElement = "https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=0";
-    // this.sanitizer.bypassSecurityTrustResourceUrl(this.pathElement);
   }
 
 

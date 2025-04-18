@@ -6,6 +6,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ActionCaptureUserReply } from 'src/app/models/action-model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
+import { checkConnectionStatusByConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-capture-user-reply',
@@ -44,7 +45,7 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
       let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
       if(connector.fromId.startsWith(connectorId)){
         this.connector = connector;
-        this.updateConnector();
+        this.updateSingleConnector();
       }
     });
     this.initializeConnector();
@@ -65,42 +66,64 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
     this.checkConnectionStatus();
   }
 
+  // private checkConnectionStatus(){
+  //   if(this.action.goToIntent){
+  //    this.isConnected = true;
+  //    const posId = this.action.goToIntent.indexOf("#");
+  //     if (posId !== -1) {
+  //       const toId = this.action.goToIntent.slice(posId+1);
+  //       this.idConnection = this.idConnector+"/"+toId;
+  //     }
+  //   } else {
+  //    this.isConnected = false;
+  //    this.idConnection = null;
+  //   }
+  // }
+
   private checkConnectionStatus(){
-    if(this.action.goToIntent){
-     this.isConnected = true;
-     const posId = this.action.goToIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.goToIntent.slice(posId+1);
-        this.idConnection = this.idConnector+"/"+toId;
-      }
-    } else {
-     this.isConnected = false;
-     this.idConnection = null;
-    }
+    const resp = checkConnectionStatusByConnector(this.action.goToIntent, this.idConnector);
+    this.isConnected  = resp.isConnected;
+    this.idConnection = resp.idConnection;
   }
 
-  private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idAction= array[1];
-      if(idAction === this.action._tdActionId){
-        if(this.connector.deleted){ 
-          // DELETE 
-          this.action.goToIntent = null;
-          this.isConnected = false;
-          this.idConnection = null;
-        } else { 
-          // ADD / EDIT
-          this.isConnected = true;
-          this.idConnection = this.connector.fromId+"/"+this.connector.toId;
-          this.action.goToIntent = "#"+this.connector.toId;
-        };
-        if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+
+    /** */
+    private updateSingleConnector(){
+      this.logger.log('[ACTION-CAPTURE-USER-REPLY] updateSingleConnector:');
+      const resp = updateSingleConnector(this.connector, this.action, this.isConnected, this.idConnection);
+      if(resp){
+        this.isConnected  = resp.isConnected;
+        this.idConnection = resp.idConnection;
+        this.logger.log('[ACTION-CAPTURE-USER-REPLY] updateSingleConnector:', resp);
+        if (resp.emit) {
+          this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
+        } 
       }
-    } catch (error) {
-      this.logger.error('[ACTION-CAPTURE-USER-REPLY] updateConnector error: ', error);
     }
-  }
+
+
+  // private updateConnector2(){
+  //   try {
+  //     const array = this.connector.fromId.split("/");
+  //     const idAction= array[1];
+  //     if(idAction === this.action._tdActionId){
+  //       if(this.connector.deleted){ 
+  //         // DELETE 
+  //         this.action.goToIntent = null;
+  //         this.isConnected = false;
+  //         this.idConnection = null;
+  //       } else { 
+  //         // ADD / EDIT
+  //         this.isConnected = true;
+  //         this.idConnection = this.connector.fromId+"/"+this.connector.toId;
+  //         this.action.goToIntent = "#"+this.connector.toId;
+  //       };
+  //       if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
+  //     }
+  //   } catch (error) {
+  //     this.logger.error('[ACTION-CAPTURE-USER-REPLY] updateConnector error: ', error);
+  //   }
+  // }
 
   onSelectedAttribute(event, property) {
     this.logger.log("[ACTION-CAPTURE-USER-REPLY] onEditableDivTextChange event", event)
