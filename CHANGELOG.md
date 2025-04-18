@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.31.1
+- **bug-fixed**: disabled widget log 
 
 # 1.31.0
 
