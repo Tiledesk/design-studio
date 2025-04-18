@@ -8,6 +8,78 @@
 *Tiledesk SRL*
 
 
+# 1.31.0
+
+
+# 1.31.0-rc.14
+- **bug-fixed**: deleted the connector object from the intent attributes connectors node when:
+delete an intent (delete all incoming connectors)
+delete an action (delete all outgoing connectors)
+- **bug-fixed**: when rename an intent change the name of the block-contract-connector
+
+
+# 1.31.0-rc.13
+- **bug-fixed**: autodimension textarea onblur
+- **bug-fixed**: click upload images on the whole div
+
+# 1.31.0-rc.12
+- **bug-fixed**: view voice icons
+- **bug-fixed**: MqttClient subscription deleted on new widget message (MqttClient subscription only when open widget)
+- **bug-fixed**: upload images
+- **bug-fixed**: click upload images on the whole div
+- **changed**: commented cds-changelog
+- **changed**: increased minimum number of lines in json body
+
+
+# 1.31.0-rc.11
+- **bug-fixed**: update intent on change textarea
+- **bug-fixed**: deleted log APP-COMP appconfig
+
+
+# 1.31.0-rc.10
+- **added**: action flow log
+
+
+# 1.31.0-rc.9
+- **bug-fixed**: bug fixed connect ws widget
+
+
+# 1.31.0-rc.8
+- **changed**: added auto scroll to bottom in logpanel
+
+
+# 1.31.0-rc.7
+- **added**: bug fixed chatlog webhook
+
+
+# 1.31.0-rc.6
+- **changed**: refactored textarea
+
+
+# 1.31.0-rc.5
+- **bug-fixed**: bug fixed select model Ai
+- **changed**: web request changed json body from {{attribute}} to {{attribute | json}}
+
+
+# 1.31.0-rc.4
+- **added**: added lazy loading icons
+
+
+# 1.31.0-rc.3
+- **bug-fixed**: css center label in contract connector
+- **changed**: chaged max_token in ai actions
+- **changed**: open Advanced if they are valued in "Set attribute" action
+
+# 1.31.0-rc.2
+- **bug-fixed**: autocomplete panel dismissed when clicking on variables button
+- **bug-fixed**: added models ollama
+
+
+# 1.31.0-rc.1
+- **added**: Ollama AI type and select custom models
+- **canged**: select AI model with autocomplete
+
+
 # 1.30.4
 - **changed**: added LLM Ollama and changed template selection from select to input with autocomplete
 

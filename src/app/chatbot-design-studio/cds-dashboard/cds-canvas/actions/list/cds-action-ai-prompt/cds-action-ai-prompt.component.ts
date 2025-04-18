@@ -147,8 +147,8 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.llm_model.forEach(async (model) => {
       if (model.value === "ollama") {
         const NEW_MODELS = await this.getIntegrationByName();
-        this.logger.log('[ACTION AI_PROMPT] - NEW_MODELS:', NEW_MODELS.value.models);
         if(NEW_MODELS?.value?.models){
+          this.logger.log('[ACTION AI_PROMPT] - NEW_MODELS:', NEW_MODELS.value.models);
           const models = NEW_MODELS?.value?.models.map(item => ({
             name: item,
             value: item
