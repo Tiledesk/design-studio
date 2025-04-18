@@ -495,7 +495,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.subscriptionWidgetLoaded = this.logService.BSWidgetLoaded.subscribe((event: any) => {
       this.logger.log("[CDS-CANVAS] logService loaded ", event);
       if(event){
-        this.IS_OPEN_WIDGET_LOG = true;
+        //this.IS_OPEN_WIDGET_LOG = true;
       }
     });    
   }
