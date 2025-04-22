@@ -87,7 +87,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.logger.debug("[ACTION-ASKGPTV2] action detail: ", this.action);
+    this.logger.log("[ACTION-ASKGPTV2] action detail: ", this.action);
     this.project_id = this.dashboardService.projectID
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
     this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {

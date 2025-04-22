@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { Observable, Subscription, skip, timeout } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, skip, timeout } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -26,8 +26,8 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { TYPE_ACTION, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { storage } from 'firebase';
-import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
+import { WebhookService } from '../../services/webhook-service.service';
 
 // const swal = require('sweetalert');
 
@@ -109,6 +109,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private subscriptionOpenWidgetPanel: Subscription;
   testitOutFirstClick: boolean = false;
   IS_OPEN_PANEL_WIDGET: boolean = false;
+  // Variabile osservabile
+  // private _isOpenPanelWidget = new BehaviorSubject<boolean>(false);
+  // public isOpenPanelWidget$ = this._isOpenPanelWidget.asObservable();
+       
 
   /** panel widget loaded */
   private subscriptionWidgetLoaded: Subscription;
@@ -137,6 +141,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   startDraggingPosition: any = null;
+  mesage_request_id: string;
 
   chatbotSubtype: string;
 
@@ -154,8 +159,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly route: ActivatedRoute, 
     public appStorageService: AppStorageService,
+    public logService: LogService,
     public webhookService: WebhookService,
-    public logService: LogService
+    
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -492,12 +498,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     });    
 
     /** SUBSCRIBE TO THE LOADED WIDGET */
-    this.subscriptionWidgetLoaded = this.logService.BSWidgetLoaded.subscribe((event: any) => {
-      this.logger.log("[CDS-CANVAS] logService loaded ", event);
-      if(event){
-        this.IS_OPEN_WIDGET_LOG = true;
-      }
-    });    
+    // this.subscriptionWidgetLoaded = this.logService.BSWidgetLoaded.subscribe((event: any) => {
+    //   this.logger.log("[CDS-CANVAS] logService loaded ", event);
+    //   if(event){
+    //     //this.IS_OPEN_WIDGET_LOG = true;
+    //   }
+    // });    
   }
 
    /** initialize */
@@ -519,6 +525,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log('[CDS-CANVAS] totElementsOnTheStage ::', this.stageService.loaded, numIntents, numConnectors);
       // scaleAndcenterStageOnCenterPosition(this.listOfIntents)
     }
+
     this.subscriptionOpenWidgetPanel = this.intentService.BStestiTout.pipe(skip(1)).subscribe((event) => this.onTestItOut(event));
 
     // ---------------------------------------
@@ -540,7 +547,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** closeAllPanels */
   private closeAllPanels(){
     this.IS_OPEN_PANEL_WIDGET = false;
-    this.IS_OPEN_WIDGET_LOG = false;
+    // this._isOpenPanelWidget.next(false);
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
@@ -548,6 +555,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_CONTEXT_MENU = false;
     this.IS_OPEN_COLOR_MENU = false;
     // // this.intentService.inactiveIntent();
+  }
+
+  onClosePanelLog(){
+    this.IS_OPEN_WIDGET_LOG = false;
   }
 
   private closeExtraPanels(){
@@ -1341,9 +1352,17 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.closeExtraPanels();
     }
 
-    setTimeout(() => {
-      this.IS_OPEN_PANEL_WIDGET = true;
-    }, 500);
+    if(this.dashboardService.selectedChatbot.subtype !== 'webhook'){
+      setTimeout(() => {
+        this.IS_OPEN_PANEL_WIDGET = true;
+        // this._isOpenPanelWidget.next(true);
+      }, 500);
+    } else {
+      this.logService.initialize(null); 
+      this.IS_OPEN_WIDGET_LOG = true;
+      this.IS_OPEN_PANEL_WIDGET = false;
+    }
+   
   }
 
   /** onActionDeleted */
@@ -1523,25 +1542,29 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   public onShowContextMenu(event: MouseEvent): void {
-      event.preventDefault();
-      this.logger.log('[CDS-CANVAS] onShowContextMenu:: ', event);
-      // this.showCustomMenu(x, y);
-
-      // Recupera l'elemento che ha scatenato l'evento
-      const targetElement = event.target as HTMLElement;
-      const customAttributeValue = targetElement.getAttribute('custom-attribute');
-
-      if(customAttributeValue === 'tds_container'){
-        // sto incollando sullo stage
-        this.positionContextMenu.x = event.clientX;
-        this.positionContextMenu.y = event.offsetY;
-        this.IS_OPEN_CONTEXT_MENU = true;
-        this.logger.log('Attributi dell\'elemento premuto:', customAttributeValue);
-      }
+    event.preventDefault();
+    this.logger.log('[CDS-CANVAS] onShowContextMenu:: ', event);
+    const targetElement = event.target as HTMLElement;
+    const customAttributeValue = targetElement.getAttribute('custom-attribute');
+    if(customAttributeValue === 'tds_container'){
+      this.positionContextMenu.x = event.clientX;
+      this.positionContextMenu.y = event.offsetY;
+      this.IS_OPEN_CONTEXT_MENU = true;
+    }
   }
 
   public onHideContextMenu(){
     this.IS_OPEN_CONTEXT_MENU = false;
+  }
+
+
+  public onNewConversation(request_id){
+    this.logger.log('[CDS-CANVAS] onNewConversation:: ', this.logService.request_id, request_id);
+    if(this.logService.request_id !== request_id){
+      this.logService.initialize(request_id); 
+      this.IS_OPEN_WIDGET_LOG = true;
+      this.mesage_request_id = request_id;
+    } 
   }
 
 }

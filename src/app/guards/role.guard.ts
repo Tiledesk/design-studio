@@ -30,7 +30,7 @@ export class RoleGuard implements CanActivate {
   ) { }
 
   async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
-
+    //console.log('[ROLE-GUARD] --->  canActivate')
     const url = state.url;
     const _url = route['_routerState'].url
 
@@ -56,17 +56,20 @@ export class RoleGuard implements CanActivate {
     // const userIsInProject = await this.getProjectUserInProject(projectId, user.uid)
     // console.log('[ROLE-GUARD] userIsInProject:', userIsInProject)
     const projectUser = await this.getProjects(projectId)
-   
+    //console.log('[ROLE-GUARD] --->  projectUser', projectUser)
 
     if (projectUser) {
       const project = projectUser.id_project
+      // console.log('[ROLE-GUARD] --->  project', project)
       // console.log('[ROLE-GUARD] --->  project:', project)
       if (project) {
         const projectCreationDate = new Date(project.createdAt);
-        if (projectCreationDate >= freePlanLimitDate) {
-          // console.log('[ROLE-GUARD] --->  projectCreationDate > freePlanLimitDate ')
-          // console.log('[ROLE-GUARD] --->  project.profile.type ', project.profile.type)
-          // console.log('[ROLE-GUARD] --->  project.trialExpired  ', project.trialExpired)
+        // console.log('[ROLE-GUARD] --->  projectCreationDate > ', projectCreationDate)
+        // console.log('[ROLE-GUARD] --->  freePlanLimitDate > ', freePlanLimitDate)
+        //if (projectCreationDate >= freePlanLimitDate) {
+          //console.log('[ROLE-GUARD] --->  projectCreationDate > freePlanLimitDate ')
+          //console.log('[ROLE-GUARD] --->  project.profile.type ', project.profile.type)
+          //console.log('[ROLE-GUARD] --->  project.trialExpired  ', project.trialExpired)
           if (project.profile.type === 'free' && project.trialExpired === true) {
             // let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ projectId + '/unauthorized-to-upgrade'
             let dashbordBaseUrl = ''
@@ -81,9 +84,9 @@ export class RoleGuard implements CanActivate {
             }
             window.open(dashbordBaseUrl, '_self').focus();
           }
-        } else {
+        //} else {
           // console.log('[ROLE-GUARD] --->  projectCreationDate < freePlanLimitDate ')
-        }
+        //}
       }
     }
 
