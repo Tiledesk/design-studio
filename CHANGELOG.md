@@ -7,9 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.31.2-rc2
+- **bug-fixed**: changed freePlanLimitDate
 
 # 1.31.2-rc1
-- **bug-fixed**: changed freePlanLimitDate
+- **bug-fixed**: test freePlanLimitDate
 
 
 # 1.31.1
