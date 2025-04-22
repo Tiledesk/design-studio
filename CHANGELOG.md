@@ -7,7 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.31.2
+
+# 1.31.2-rc1
+- **bug-fixed**: changed freePlanLimitDate
+
 
 # 1.31.1
 - **bug-fixed**: disabled widget log 
