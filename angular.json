@@ -59,7 +59,7 @@
               { "input": "node_modules/bootstrap/dist/js/bootstrap.js", "inject": true, "bundleName": "bootstrap" },
               { "input": "node_modules/bootstrap-notify/bootstrap-notify.js", "inject": true, "bundleName": "bootstrap-notify" },
               { "input": "node_modules/moment/moment.js", "inject": true, "bundleName": "moment" },
-              { "input": "src/assets/js/mqtt/4.1.0/mqtt.min.js", "inject": false, "bundleName": "mqtt.min" }
+              { "input": "src/assets/js/mqtt/4.1.0/mqtt.min.js", "inject": true, "bundleName": "mqtt.min" }
             ]
           },
           "configurations": {

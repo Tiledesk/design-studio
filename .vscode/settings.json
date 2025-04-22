@@ -1,0 +1,6 @@
+{
+    "workbench.editorAssociations": {
+        "*.json": "default",
+        "*.svg": "default"
+    }
+}

@@ -196,6 +196,7 @@ cds-textarea#url ::ng-deep {
         border-radius: 0px var(--input-border-radius-base) var(--input-border-radius-base) 0px;
         min-height: 27px;
     }
+    }
 }
 
 cds-textarea#body.jsonError ::ng-deep,
@@ -231,4 +232,14 @@ mat-button-toggle{
     &::ng-deep .mat-button-toggle-label-content {
         line-height: 36px;
     }
+}
+
+
+.action-row-left {
+    width: auto;
+    justify-content: flex-start;
+}
+.action-row-left {
+    width: auto;
+    justify-content: flex-start;
 }
