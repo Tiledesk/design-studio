@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.31.2-rc4
+- **bug-fixed**: changed labels for add_kb_content action
+
 # 1.31.2-rc3
 - **added**: new action add_kb_content
 
