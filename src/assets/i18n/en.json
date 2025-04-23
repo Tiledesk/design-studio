@@ -524,7 +524,7 @@
         "VisibilityConnectors":"Visibility of connectors",
         "ChangeAlphaConnectors":"Change alpha of the connectors color",
         "nameKB": "Name",
-        "ContentKB": "Content",
+        "ContentKB": "Text",
         "EnterTheKbName": "Content Name",
         "PlaceholderKBContent": "Content text"
     },
