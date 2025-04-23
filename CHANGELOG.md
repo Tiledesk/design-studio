@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.31.2-rc3
+- **added**: new action add_kb_content
+
 # 1.31.2-rc2
 - **bug-fixed**: changed freePlanLimitDate
 
