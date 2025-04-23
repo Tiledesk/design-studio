@@ -298,6 +298,13 @@
                         [action]="action">
                     </cds-action-whatsapp-static>
     
+                    <cds-action-add-kb-content *ngSwitchCase="TYPE_ACTION.KB_CONTENT"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-add-kb-content>
+
                     <cds-action-askgpt *ngSwitchCase="TYPE_ACTION.ASKGPT" 
                         class="panel-response" 
                         [intentSelected]="intent" 

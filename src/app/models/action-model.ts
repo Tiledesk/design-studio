@@ -407,6 +407,19 @@ export class ActionAskGPT extends Action {
     }
 }
 
+export class ActionKBContent extends Action {
+    name: string;
+    content: string;
+    type: string;
+    namespace: string;
+    namespaceAsName: boolean;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.KB_CONTENT;
+        this.type = "text";
+    }
+}
+
 export class ActionAskGPTV2 extends Action {
     question: string;
     model: string;

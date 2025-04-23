@@ -222,7 +222,16 @@
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-whatsapp-static>
-                    
+
+                    <cds-action-add-kb-content *ngSwitchCase="TYPE_ACTION.KB_CONTENT"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-add-kb-content>
+
                     <cds-action-askgpt *ngSwitchCase="TYPE_ACTION.ASKGPT"
                         class="panel-response"
                         [intentSelected]="intentSelected"
