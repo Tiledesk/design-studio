@@ -60,6 +60,7 @@ export class CdsHeaderComponent implements OnInit {
   BRAND_BASE_INFO = BRAND_BASE_INFO
   PLAY_MENU_ITEMS = PLAY_MENU_ITEMS;
   translationsMap: Map<string, string> = new Map();
+  isPlaying:boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -105,6 +106,8 @@ export class CdsHeaderComponent implements OnInit {
     this.projectID = this.dashboardService.projectID;
     this.defaultDepartmentId = this.dashboardService.defaultDepartment._id;
     this.selectedChatbot = this.dashboardService.selectedChatbot;
+    this.logger.log('[CdsHeaderComponent] selectedChatbot::: ', this.selectedChatbot);
+    
 
     this.getOSCODE();
     this.getTranslations()
@@ -152,15 +155,17 @@ export class CdsHeaderComponent implements OnInit {
         }  
     }) 
 
+    if(this.dashboardService.selectedChatbot.subtype === 'webhook'){
+      this.TRY_ON_WA = false;
+    }
+
   }
 
 
   getTranslations() {
-
     let keys = [
       'CDSHeader.LinkCopiedToClipboard',
     ]
-
     this.translate.get(keys).subscribe((text)=>{
       this.translationsMap.set('CDSHeader.LinkCopiedToClipboard', text['CDSHeader.LinkCopiedToClipboard'])
     })
@@ -315,7 +320,8 @@ export class CdsHeaderComponent implements OnInit {
     // let params = `toolbar=no,menubar=no,width=815,height=727,left=100,top=100`;
     // window.open(url, '_blank', params);
     let intentStart = this.intentService.listOfIntents.find(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START));
-    this.intentService.openTestItOut(intentStart)
+    this.intentService.openTestItOut(intentStart);
+    this.isPlaying = true;
   }
 
 

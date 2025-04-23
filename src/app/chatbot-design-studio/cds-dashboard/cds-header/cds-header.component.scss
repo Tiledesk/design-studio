@@ -169,14 +169,15 @@
     // outline-offset: -1px;
     color: var(--blu-02);
     border-radius: 50%;
-
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 6px 6px;
     width: 33px;
     height: 33px;
-
+    &.button-stop {
+        padding: 0px 0px 0 0;
+    }
 }
 
 ::ng-deep .mat-menu-panel.menuElement {
@@ -220,5 +221,25 @@
         padding: 0 !important;
     }
 }
+
+.box-url {
+    display: flex;
+    position: absolute;
+    background: transparent;
+    justify-content: flex-end;
+    flex-direction: row;
+    float: right;
+    align-items: center;
+    width: 100%;
+    margin-top: 60px;
+    font-size: 12px;
+    height: 30px;
+    .button-url {
+        line-height: normal;
+        background: #fff;
+    }
+}
+
+
 
 

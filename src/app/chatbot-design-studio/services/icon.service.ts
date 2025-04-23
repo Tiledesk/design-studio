@@ -412,6 +412,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/play.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'stop',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/stop.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'redo',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/redo.svg')
     );
