@@ -2,10 +2,10 @@
     [class.cds-intent-active]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive" 
     [class.isStart]="isStart" 
     [id]="'intent-content-'+ intent?.intent_id"
-    [ngStyle]="{'background-color': 'rgba('+intentColor+', 0.35)'}">
+    [ngStyle]="{'background-color': 'rgba('+intentColor+', 0.35)'}"
+    (click)="$event.stopPropagation();openWebhookIntentPanel(intent)">
 
     <!-- 
-    (click)="$event.stopPropagation();openWebhookIntentPanel(intent)"
     (click)="onSelectActionIfWebhook(startAction, 0, startAction?._tdActionId)" 
     -->
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
@@ -32,7 +32,8 @@
         <cds-panel-intent-header class="pic-title-text tds_draggable" 
             [class.isStart]="isStart"
             [intentColor]="intentColor"
-            [intent]="intent">
+            [intent]="intent"
+            (click)="onOptionClicked($event)">
         </cds-panel-intent-header>
 
         <div *ngIf="showIntentOptions" class="cds-intent-options">
@@ -468,6 +469,13 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-record>
+
+                    <cds-action-flow-log *ngSwitchCase="TYPE_ACTION.FLOW_LOG"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-flow-log>
 
                 </div>
             </span>

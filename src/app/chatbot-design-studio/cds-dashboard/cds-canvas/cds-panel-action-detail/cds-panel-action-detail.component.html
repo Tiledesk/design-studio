@@ -443,6 +443,13 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-record>
 
+                    <cds-action-flow-log *ngSwitchCase="TYPE_ACTION.FLOW_LOG"
+                        class="panel-response"   
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-flow-log>
+
                     <!-- <cds-action-assign-function *ngSwitchCase="TYPE_ACTION.ASSIGN_FUNCTION"
                         [action]="elementSelected">
                     </cds-action-assign-function> -->

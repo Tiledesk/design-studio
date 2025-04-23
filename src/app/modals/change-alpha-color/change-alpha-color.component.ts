@@ -24,7 +24,7 @@ export class ChangeAlphaColorComponent implements OnInit {
     const span: any = document.querySelector('.slider-value');
     if (slider && span) {
         const value = slider.value;
-        console.log("updateAlphaConnectors: ",slider);
+        // console.log("updateAlphaConnectors: ",slider);
         let width = slider.clientWidth-20;
         let left = value*width/100;
         span.style.left = left+'px';

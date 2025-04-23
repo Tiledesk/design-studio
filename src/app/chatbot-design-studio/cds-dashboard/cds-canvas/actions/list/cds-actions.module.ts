@@ -84,6 +84,7 @@ import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attrib
 import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-action-web-response.component';
 import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
+import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow-log.component';
 
 @NgModule({
   declarations: [
@@ -183,6 +184,7 @@ import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-
     VariableCssClassPipe,
     CdsActionReplyJsonbuttonsComponent,
     CdsActionAddKbContentComponent,
+    CdsActionFlowLogComponent
     
   ],
   imports: [
@@ -285,7 +287,8 @@ import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-
     FilterPipe,
     GetVariableNamePipe,
     VariableCssClassPipe,
-    CdsActionAddKbContentComponent
+    CdsActionAddKbContentComponent,
+    CdsActionFlowLogComponent
   ]
 })
 export class CdsActionsModule { }

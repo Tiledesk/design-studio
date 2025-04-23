@@ -9,8 +9,10 @@
       [matTooltip]="displayConnector?('CDSCanvas.HideConnector' | translate):('CDSCanvas.ShowConnector' | translate)"
       matTooltipHideDelay="100"
       (click)="onAddActionFromConnectorMenu(typeOfmenu.SHOW_HIDE)">
-      <img *ngIf="displayConnector === true" src="assets/images/icons/visibility.svg" alt="hide connector" />
-      <img *ngIf="displayConnector === false" src="assets/images/icons/visibility_off.svg" alt="show connector" />
+      <mat-icon *ngIf="displayConnector" class="icon" svgIcon="visibility" aria-hidden="true"></mat-icon>
+      <mat-icon *ngIf="!displayConnector" class="icon" svgIcon="visibility_off" aria-hidden="true"></mat-icon>
+      <!-- <img *ngIf="displayConnector === true" src="assets/images/icons/visibility.svg" alt="hide connector" />
+      <img *ngIf="displayConnector === false" src="assets/images/icons/visibility_off.svg" alt="show connector" /> -->
     </div>
 
     <!-- ---------------------------------- -->

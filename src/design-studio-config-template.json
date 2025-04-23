@@ -24,5 +24,10 @@
     "messagingSenderId": "${FIREBASE_MESSAGINGSENDERID}",
     "appId": "${FIREBASE_APP_ID}",
     "vapidKey": "${FIREBASE_VAPID}"
+  },
+  "chat21Config": {
+    "appId": "${MQTT_APPID}",
+    "MQTTendpoint": "${MQTT_ENDPOINT}",
+    "APIendpoint": "${MQTT_APIENDPOINT}"
   }
 }
