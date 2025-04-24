@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.31.2-rc3
+- **added**: added webhook in header
+
 # 1.31.2-rc2
 - **bug-fixed**: changed freePlanLimitDate
 

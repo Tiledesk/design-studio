@@ -1358,11 +1358,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         // this._isOpenPanelWidget.next(true);
       }, 500);
     } else {
+      // // webhook!!
+      this.IS_OPEN_PANEL_WIDGET = false;
       this.logService.initialize(null); 
       this.IS_OPEN_WIDGET_LOG = true;
-      this.IS_OPEN_PANEL_WIDGET = false;
     }
-   
   }
 
   /** onActionDeleted */

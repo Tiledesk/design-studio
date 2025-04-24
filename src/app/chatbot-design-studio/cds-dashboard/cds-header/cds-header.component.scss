@@ -223,20 +223,61 @@
 }
 
 .box-url {
-    display: flex;
-    position: absolute;
+    /* display: flex
+; */
+    /* position: absolute; */
     background: transparent;
     justify-content: flex-end;
     flex-direction: row;
-    float: right;
+    /* float: right; */
     align-items: center;
     width: 100%;
-    margin-top: 60px;
+    /* margin-top: 60px; */
     font-size: 12px;
     height: 30px;
+    z-index: 3;
+
     .button-url {
-        line-height: normal;
-        background: #fff;
+        position: absolute;
+        top: 0;
+        margin: 0px;
+        // display: flex;
+        // flex-direction: column;
+        // align-items: center;
+        max-width: 300px;
+        .span-url {
+            border: 1px solid var(--gray-02);
+            border-radius: 6px;
+            padding: 6px;
+            cursor: pointer;
+            background: #fff;
+            line-height: normal;
+            top: 0;
+            display: block;
+            overflow: hidden;
+        }
+        .webhook-message {
+            position: relative;
+            top: 4px;
+            float: right;
+            border: 1px solid var(--gray-02);
+            border-radius: 6px;
+            height: 30px;
+            background-color: #fff;
+            padding: 4px 6px;
+            font-weight: 500;
+            line-height: 22px;
+            width: -moz-fit-content;
+        }
+    }
+}
+
+.btn-play-webhook {
+    pointer-events: initial;
+    opacity: 1;
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
     }
 }
 
