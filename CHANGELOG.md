@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.31.2-rc5
+- **added**: added webhook play and stop to header canvas
+
 # 1.31.2-rc4
 - **bug-fixed**: changed labels for add_kb_content action
 
