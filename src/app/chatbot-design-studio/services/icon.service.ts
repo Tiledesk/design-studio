@@ -451,6 +451,10 @@ export class IconService {
       'youtube',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/youtube.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'terminal',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/terminal.svg')
+    );
 
    
   }

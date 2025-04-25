@@ -197,7 +197,7 @@ export class CdsWidgetLogsComponent implements OnInit {
     if (this.logContainer && this.startHeight !== undefined && this.startY !== undefined) {
       const newHeight = this.startHeight - (event.clientY - this.startY);
       if (newHeight < 30) {
-        this.isClosed = true;
+        //this.isClosed = true;
       } else { 
         this.isClosed = false;
         this.renderer.setStyle(this.logContainer, 'height', `${newHeight}px`);
@@ -272,10 +272,14 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   onCloseLog(){
-    this.closeLog();
-    this.closePanelLog.emit();
+    this.isClosed = true;
+    //this.closeLog();
+    //this.closePanelLog.emit();
   }
 
+  onOpenLog(){
+    this.isClosed = false;
+  }
 
   isButtonEnabled(index: number): boolean {
     const blockTextId = "row-log-text_"+index;

@@ -1,5 +1,5 @@
 
-<div id="cds_widget_log" class="cds-widget-log-container" [class.closed]="isClosed">
+<div *ngIf="!isClosed" id="cds_widget_log" class="cds-widget-log-container" [class.closed]="isClosed">
     <div class="resize-handle" (mousedown)="initResize($event)"> 
         <div class="dropdown-container">
             <!-- <label for="logLevel">{{ 'CDSCanvas.LogLevels' | translate }}:</label> -->
@@ -11,10 +11,10 @@
             </select>
         </div>
 
-        <div *ngIf="isOpenPanelWidget" class="button-toggle" (click)="onToggleLog()">
+        <!-- <div class="button-toggle" (click)="onToggleLog()">
             <img class="active-icon" [ngClass]="isClosed ? 'arrow-down' : 'arrow-up'" src="assets/images/icons/keyboard_arrow_down.svg" alt="button toggle">
-        </div>
-        <div *ngIf="!isOpenPanelWidget" class="button-toggle" (click)="onCloseLog()">
+        </div> -->
+        <div class="button-toggle" (click)="onCloseLog()">
             <img class="active-icon" src="assets/images/icons/close.svg" alt="button close">
         </div>
     </div>
@@ -28,3 +28,15 @@
     </div> 
 </div>
 
+
+<div  *ngIf="isClosed" class="button-log-panel">
+    <div class="cds-element" (click)="onOpenLog()" #divEvent>
+        <div class="cds-button-element">
+            <div class="cds-box-button">
+                <span class="box-img">
+                    <mat-icon class="icon" svgIcon="terminal" aria-hidden="true"></mat-icon>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

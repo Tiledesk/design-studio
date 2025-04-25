@@ -30,9 +30,7 @@ export class LogService {
   
   constructor(
     public appConfigService: AppConfigService
-  ) {
-    
-   }
+  ) {}
 
 
   public initialize(request_id: string){
@@ -40,9 +38,7 @@ export class LogService {
       this.closeLog();
     }
     this.request_id = request_id;
-
     this.logger.log("[LOG-SERV] getConfig : ", this.appConfigService.getConfig());
-
     const appId = this.appConfigService.getConfig().chat21Config.appId;
     const MQTTendpoint = this.appConfigService.getConfig().chat21Config.MQTTendpoint;
     const log = this.appConfigService.getConfig().chat21Config.log;
@@ -51,98 +47,7 @@ export class LogService {
       MQTTendpoint: MQTTendpoint,
       log: log
     })
-    
-    // this.mqtt_client = new MqttClient({
-    //   appId: MQTT_CLIENT.appId,
-    //   MQTTendpoint: MQTT_CLIENT.MQTTendpoint, 
-    //   log: MQTT_CLIENT.log
-    // })
-
-
   }
-
-
-
-  // async initializeChatbot(request_id: string){
-  //   if(!request_id){
-  //     // is webhook
-  //     const webhook_id = await this.getWebhook();
-  //     this.logger.log("[LOG-SERV] webhook_id : ", webhook_id);
-  //     request_id = await this.getNewRequestId(webhook_id);
-  //     this.logger.log("[LOG-SERV] request_id : ", request_id);
-  //   }
-
-
-  //   let resp = await this.getToken(request_id);
-  //   this.starterLog(resp);
-  //   this.logger.log('[LOG-SERV] initializeChatbot', this.LOG_URL);
-  //   this.logs = '';
-  //   this.BSWidgetLoaded.next(true);
-
-  // }
-
-
-
-  // async getWebhook(): Promise<any | null> {
-  //   const chatbot_id = this.dashboardService.id_faq_kb;
-  //   try {
-  //     const resp = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
-  //     this.logger.log("[LOG-SERV] getWebhook : ", resp);
-  //     return resp.webhook_id;
-  //   } catch (error) {
-  //     this.logger.error("[LOG-SERV] error getWebhook: ", error);
-  //     return null;
-  //   } finally {
-  //     this.logger.log("[LOG-SERV] getWebhook completed.");
-  //   }
-  // }
-
-
-  // async getNewRequestId(webhook_id): Promise<any|null> {
-  //   const tiledeskToken = localStorage.getItem('tiledesk_token');
-  //   const project_id = this.dashboardService.projectID;
-  //   try {
-  //     const resp = await this.tiledeskAuthService.createNewRequestId(
-  //       tiledeskToken,
-  //       project_id, 
-  //       webhook_id
-  //     );
-  //     this.logger.log('[CdsWidgetLogsComponent] >>> createNewRequestId ok ', resp);
-  //     if(resp['request_id']){
-  //       return resp['request_id'];
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error: any) {
-  //     this.logger.error('[CdsWidgetLogsComponent] createNewRequestId error::', error);
-  //     if (error.status && error.status === 401) {
-  //       // gestione errore
-  //     }
-  //     return null;
-  //   }
-  // }
-
-  // async getToken(request_id): Promise<any|null> {
-  //   const tiledeskToken = localStorage.getItem('tiledesk_token');
-  //   const project_id = this.dashboardService.projectID;
-  //   // const request_id = this.request_id;
-  //   try {
-  //     const resp = await this.tiledeskAuthService.createCustomTokenByRequestId(
-  //       tiledeskToken,
-  //       project_id,
-  //       request_id
-  //     );
-  //     this.logger.log('[CdsWidgetLogsComponent] >>> getToken ok ', resp);
-  //     return resp;
-  //   } catch (error: any) {
-  //     this.logger.error('[CdsWidgetLogsComponent] getToken error::', error);
-  //     if (error.status && error.status === 401) {
-  //       // gestione errore
-  //     }
-  //     return null;
-  //   }
-  // }
-
 
   async starterLog(mqtt_token, request_id){
     this.logger.log('[CdsWidgetLogsComponent] >>> starterLog ', this.mqtt_client);
@@ -163,6 +68,5 @@ export class LogService {
   public resetLogService(){
     this.logs = null;
   }
-
 
 }

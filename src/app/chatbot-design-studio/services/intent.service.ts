@@ -31,7 +31,7 @@ export class IntentService {
   behaviorIntent = new BehaviorSubject <Intent>(null);
   liveActiveIntent = new BehaviorSubject<Intent>(null);
   testIntent = new BehaviorSubject<Intent>(null);
-  BStestiTout = new BehaviorSubject<Intent>(null);
+  BSTestItOut = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
   behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
 
@@ -1661,7 +1661,11 @@ export class IntentService {
     }
 
     public openTestItOut(intent: Intent){
-      this.BStestiTout.next(intent)
+      this.BSTestItOut.next(intent);
+    }
+
+    public closeTestItOut(){
+      this.BSTestItOut.next(null);
     }
 
 
