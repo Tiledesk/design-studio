@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 
+# 1.31.2-rc6
+- **bug-fixed**: change attributes in web-request json body textarea to {{ attribute|json }}
+- **bug-fixed**: fixed css textarea, bug "added attributes". 
+
 # 1.31.2-rc5
 - **added**: added webhook play and stop to header canvas
 
