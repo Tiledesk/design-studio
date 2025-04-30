@@ -39,6 +39,7 @@
     
     .auto-suggest-group {
         display: flex;
+        justify-content: space-between;
         // max-width: 400px;
         // width: 100%;
     }
@@ -129,12 +130,14 @@
         width: 50%;
     }
 
-    cds-textarea#value.value ::ng-deep{
+    cds-textarea#value.txt-value ::ng-deep{
         display: flex;
         width: calc(50% - 2px);
         textarea {
-            // padding: 0 0 0 10px !important;
-            // border-radius: 0 var(--base-radius) var(--base-radius) 0;
+            padding: 0 0 0 10px !important;
+            border-radius: 0 var(--base-radius) var(--base-radius) 0;
+            margin: 3px 0px;
+            min-height: 26px!important;
         }
     }
 
@@ -156,7 +159,7 @@
             gap: 5px;
             position: absolute;
             bottom: -8px;
-            right: 4px;
+            right: 20px;//4px;
             z-index: 1;
         }
         textarea {
