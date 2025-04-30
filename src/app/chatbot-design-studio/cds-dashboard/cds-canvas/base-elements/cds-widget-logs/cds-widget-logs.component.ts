@@ -8,6 +8,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-widget-logs',
@@ -53,7 +54,8 @@ export class CdsWidgetLogsComponent implements OnInit {
     private readonly logService: LogService,
     private readonly dashboardService: DashboardService,
     private readonly webhookService: WebhookService,
-    private readonly tiledeskAuthService: TiledeskAuthService
+    private readonly tiledeskAuthService: TiledeskAuthService,
+    private intentService: IntentService
   ) {}
 
   ngOnInit(): void {
@@ -174,6 +176,7 @@ export class CdsWidgetLogsComponent implements OnInit {
       this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
       if(message){
         this.listOfLogs.push(message);
+        this.goToIntentByMessage(message);
         this.scrollToBottom();
       }
       this.filterLogMessage();
@@ -256,9 +259,29 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
 
+  goToIntentByMessage(message){
+    const intentId = message?.intent_id;
+    let animation = true;
+    const subtype = this.dashboardService.selectedChatbot.subtype;
+    if( subtype === TYPE_CHATBOT.WEBHOOK ||  subtype === TYPE_CHATBOT.COPILOT ){
+      animation = false;
+    }
+    this.intentService.setLiveActiveIntentByIntentId(intentId, animation);
+  }
 
   onToggleLog() {
     this.isClosed = !this.isClosed;
+  }
+
+  onClearLog(){
+    this.listOfLogs = [];
+    this.filteredLogs = [];
+  }
+
+  onGotoIntent(i){
+    const message = this.filteredLogs[i];
+    this.logger.log('[CDS-WIDGET-LOG] onGotoIntent:', message);
+    this.goToIntentByMessage(message);
   }
 
   onToggleRowLog(i) {

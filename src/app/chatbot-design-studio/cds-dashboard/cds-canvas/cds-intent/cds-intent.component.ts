@@ -152,13 +152,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtionKey = 'intentLiveActive';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
-      subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
-        if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
-          this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
-          const stageElement = document.getElementById(intent.intent_id);
-          this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
-          this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
-        }
+      subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+          if (data) {
+            const intent = data.intent;
+            const animation = data.animation;
+            if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
+              this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
+              const stageElement = document.getElementById(intent.intent_id);
+              if(animation){
+                this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
+              }
+              this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
+            }
+          }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);

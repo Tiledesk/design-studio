@@ -34,9 +34,9 @@ export class LogService {
 
 
   public initialize(request_id: string){
-    if(this.mqtt_client){
-      this.closeLog();
-    }
+    // if(this.mqtt_client){
+    //   this.closeLog();
+    // }
     this.request_id = request_id;
     this.logger.log("[LOG-SERV] getConfig : ", this.appConfigService.getConfig());
     const appId = this.appConfigService.getConfig().chat21Config.appId;
