@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.31.2-rc8
+- **changed**: change web log active 
+
 # 1.31.2-rc7
 - **changed**: change the web log animation of the selected intent
 
