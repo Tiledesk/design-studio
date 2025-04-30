@@ -372,6 +372,7 @@ export class CdsHeaderComponent implements OnInit {
 
   onOpenTestItOut(){
     if(this.isWebhook){
+      const intentId = this.intentService.intentSelected?.intent_id;
       this.logService.initialize(null); 
       if(!this.webhookUrl){
         this.createWebhook();

@@ -1581,12 +1581,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   public onNewConversation(request_id){
-    this.logger.log('[CDS-CANVAS] onNewConversation:: ', this.logService.request_id, request_id);
+    this.logger.log('[CDS-CANVAS] onNewConversation:: ',this.elementIntentSelected, this.logService.request_id, request_id);
     if(this.logService.request_id !== request_id){
       this.logService.initialize(request_id); 
       this.IS_OPEN_WIDGET_LOG = true;
       this.mesage_request_id = request_id;
     } 
+    
   }
+
+
 
 }
