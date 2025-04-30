@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.31.2-rc7
+- **changed**: change the web log animation of the selected intent
 
 # 1.31.2-rc6
 - **bug-fixed**: change attributes in web-request json body textarea to {{ attribute|json }}
