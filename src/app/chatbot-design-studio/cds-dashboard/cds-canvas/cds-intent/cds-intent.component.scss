@@ -143,15 +143,27 @@
   //         animation: blink-2 0.9s infinite both;
   // }
 
-  &.live-active-intent {
-    // margin: 100px;
-    // display: block;s
-    // background: #cca92c;
+  &.live-active-intent-pulse {
     cursor: pointer;
     box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
     animation: pulse 1s 2 forwards;
-    // position: relative;
   }
+
+  &.live-active-intent {
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
+    outline: 3px solid var(--blu);
+    outline-offset: 9px;
+  }
+
+  &.live-start-intent {
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
+    min-height: 44px;
+    border-radius: 20px;
+    animation: pulse 1s infinite;
+  }
+  
 
   // .live-active-intent::before {
   //   // content: '';
