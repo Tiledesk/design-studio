@@ -42,6 +42,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   WIDGET_BASE_URL: string = '';
   widgetTestSiteUrl: SafeResourceUrl = null;
+  private messageListener: (event: Event) => void;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -120,38 +121,61 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
      *  - set live active intent and start animation
      */
 
-    window.addEventListener('message', (event_data)=> {
-      if(event_data && event_data?.data?.source?.includes('widget') &&  event_data?.data?.event === 'onNewConversation'){
-        this.logger.log('[CDS-PANEL-WIDGET] OPEN NEW CONVERSATION ', event_data);
-        const conversation_id = event_data?.data?.data?.conversation_id;
+    this.messageListener = (event: Event) => {
+      const eventData = (event as MessageEvent).data;
+      // this.logger.log('[CDS-PANEL-WIDGET] messageListener ', eventData);
+      if(eventData?.source?.includes('widget') && eventData.event === 'onNewConversation'){
+        this.logger.log('[CDS-PANEL-WIDGET] OPEN NEW CONVERSATION ', eventData);
+        const conversation_id = eventData?.data?.conversation_id;
         this.newConversation.emit(conversation_id);
       }
-
-      else if(event_data && event_data?.data?.source?.includes('widget') ){
-        let message = event_data?.data?.data?.message;
+      else if(eventData?.source?.includes('widget')){
+        let message = eventData?.data?.message;
         this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message);
-        // const request_id = message?.recipient;
-        // this.newConversation.emit(request_id);
-
         if(message.status>0){
-          //publish ACTIVE INTENT only if widget-panel is visible
           if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
             let intentName = message.attributes.intentName;
-            this.intentService.setLiveActiveIntent(intentName);
+            //this.intentService.setLiveActiveIntent(intentName);
           }else{
-            this.intentService.setLiveActiveIntent(null);
+            //this.intentService.setLiveActiveIntent(null);
           }
         }
       }
-    })
+    };
+    window.addEventListener('message', this.messageListener);
+
+    // window.addEventListener('message', (event_data)=> {
+    //   if(event_data && event_data?.data?.source?.includes('widget') &&  event_data?.data?.event === 'onNewConversation'){
+    //     this.logger.log('[CDS-PANEL-WIDGET] OPEN NEW CONVERSATION ', event_data);
+    //     const conversation_id = event_data?.data?.data?.conversation_id;
+    //     this.newConversation.emit(conversation_id);
+    //   }
+
+    //   else if(event_data && event_data?.data?.source?.includes('widget') ){
+    //     let message = event_data?.data?.data?.message;
+    //     this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message);
+    //     // const request_id = message?.recipient;
+    //     // this.newConversation.emit(request_id);
+
+    //     if(message.status>0){
+    //       //publish ACTIVE INTENT only if widget-panel is visible
+    //       if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
+    //         let intentName = message.attributes.intentName;
+    //         this.intentService.setLiveActiveIntent(intentName);
+    //       }else{
+    //         this.intentService.setLiveActiveIntent(null);
+    //       }
+    //     }
+    //   }
+    // })
   }
 
   startTest(){
     this.iframeVisibility = !this.iframeVisibility
   }
 
-
-  ngOnDestroy(): void {
+  ngOnDestroy() {
+    window.removeEventListener('message', this.messageListener);
   }
 
   resetLogService(){

@@ -41,7 +41,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   @Output() actionDeleted = new EventEmitter();
   @Output() showPanelActions = new EventEmitter(); // nk
-  @Output() testItOut = new EventEmitter<Intent>();
+  // @Output() testItOut = new EventEmitter<Intent>();
   @Output() deleteIntent = new EventEmitter();
   @Output() openIntent = new EventEmitter<Intent>();
   @Output() changeColorIntent = new EventEmitter();
@@ -152,13 +152,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtionKey = 'intentLiveActive';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
-      subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
-        if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
-          this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
-          const stageElement = document.getElementById(intent.intent_id);
-          this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
-          this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
-        }
+      subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+          if (data) {
+            const intent = data.intent;
+            const animation = data.animation;
+            if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
+              this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
+              const stageElement = document.getElementById(intent.intent_id);
+              if(animation){
+                this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
+              }
+              this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
+            }
+          }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -876,7 +882,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.onDeleteIntent(this.intent)
         break;
       case 'test':
-        this.openTestSiteInPopupWindow()
+        this.onOpenTestItOut();
         break;
       case 'copy':
         this.copyIntent();
@@ -902,9 +908,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.appStorageService.setItem(data.key, data.data)
   }
 
-  openTestSiteInPopupWindow() {
-    this.testItOut.emit(this.intent)
+  // openTestSiteInPopupWindow() {
+  //   this.testItOut.emit(this.intent)
+  // }
+
+
+  onOpenTestItOut(){
+    this.intentService.openTestItOut(this.intent);
   }
+
 
   toggleIntentWebhook(intent) {
     this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent ', intent)

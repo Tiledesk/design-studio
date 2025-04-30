@@ -29,9 +29,9 @@ export class IntentService {
   idBot: string;
   behaviorIntents = new BehaviorSubject <Intent[]>([]);
   behaviorIntent = new BehaviorSubject <Intent>(null);
-  liveActiveIntent = new BehaviorSubject<Intent>(null);
+  liveActiveIntent = new BehaviorSubject<{ intent: Intent; animation: boolean }>(null);
   testIntent = new BehaviorSubject<Intent>(null);
-  BStestiTout = new BehaviorSubject<Intent>(null);
+  BSTestItOut = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
   behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
 
@@ -230,7 +230,12 @@ export class IntentService {
   
   public setLiveActiveIntent(intentName: string){
     let intent = this.listOfIntents.find((intent) => intent.intent_display_name === intentName);
-    this.liveActiveIntent.next(intent)
+    this.liveActiveIntent.next({intent: intent, animation: true})
+  }
+
+  public setLiveActiveIntentByIntentId(intentId: string, animation: boolean){
+    let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
+    this.liveActiveIntent.next({intent: intent, animation: animation});
   }
 
   /** 
@@ -1661,7 +1666,11 @@ export class IntentService {
     }
 
     public openTestItOut(intent: Intent){
-      this.BStestiTout.next(intent)
+      this.BSTestItOut.next(intent);
+    }
+
+    public closeTestItOut(){
+      this.BSTestItOut.next(null);
     }
 
 

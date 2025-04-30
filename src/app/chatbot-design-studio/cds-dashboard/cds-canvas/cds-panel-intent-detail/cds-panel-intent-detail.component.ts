@@ -153,7 +153,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   async copyText(dev): Promise<void> {
     let url = this.webhookUrl;
     if(dev === true){
-      url = this.webhookUrl +'?dev=true';
+      url = this.webhookUrl +'/dev';
     }
     if (navigator?.clipboard) {
       try {
