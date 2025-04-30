@@ -175,13 +175,21 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage .subscribe((message: any) => {
       this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
       if(message){
+        //stopAnimation();
         this.listOfLogs.push(message);
-        this.goToIntentByMessage(message);
+        //this.goToIntentByMessage(message);
         this.scrollToBottom();
+      } else {
+        //this.goToIntentByMessage(message);
+        // const intentId = this.intentService.intentSelectedID;
+        // this.logger.log("[CDS-WIDGET-LOG] ANIMATE BLOCK: #intent-content-"+(intentId));
+        // this.addCssAnimationClass('live-start-intent', '#intent-content-' + (intentId), 6);
       }
+      this.goToIntentByMessage(message);
       this.filterLogMessage();
     });  
   }
+
 
 
   initResize(event?: MouseEvent) {
@@ -260,6 +268,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   goToIntentByMessage(message){
+    this.logger.log('[CDS-WIDGET-LOG] goToIntentByMessage:', message);
     const intentId = message?.intent_id;
     let animation = true;
     const subtype = this.dashboardService.selectedChatbot.subtype;
@@ -322,5 +331,7 @@ export class CdsWidgetLogsComponent implements OnInit {
     }
   }
 
+
+  
 
 }
