@@ -389,6 +389,7 @@ export class CdsHeaderComponent implements OnInit {
     }
     this.intentService.closeTestItOut();
     this.isPlaying = false;
+    this.intentService.resetLiveActiveIntent();
     this.logService.closeLog();
   }
 

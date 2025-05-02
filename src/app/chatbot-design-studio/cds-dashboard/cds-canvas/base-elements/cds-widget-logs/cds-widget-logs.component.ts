@@ -249,6 +249,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   closeLog(){
     this.logger.log('[CDS-WIDGET-LOG] >>> closeLog ');
+    this.intentService.resetLiveActiveIntent();
     this.logService.closeLog();
   }
 
