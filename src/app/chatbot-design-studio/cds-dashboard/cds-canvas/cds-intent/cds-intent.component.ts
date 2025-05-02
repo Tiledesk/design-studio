@@ -153,7 +153,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-        this.logger.log("[CDS-INTENT] intentLiveActive: ",data, " con : ");
+        // this.logger.log("[CDS-INTENT] intentLiveActive: ", data, this.intent.intent_display_name);
           if (data) {
             const intent = data.intent;
             const animation = data.animation;

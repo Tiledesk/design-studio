@@ -8,6 +8,12 @@
 *Tiledesk SRL*
 
 
+# 1.31.2-rc8
+- **changed**: change web log active 
+
+# 1.31.2-rc7
+- **changed**: change the web log animation of the selected intent
+
 # 1.31.2-rc6
 - **bug-fixed**: change attributes in web-request json body textarea to {{ attribute|json }}
 - **bug-fixed**: fixed css textarea, bug "added attributes". 
