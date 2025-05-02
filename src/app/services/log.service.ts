@@ -51,7 +51,7 @@ export class LogService {
     if(this.mqtt_client && mqtt_token && request_id){
       this.mqtt_client.connect(request_id, mqtt_token, (message: any)=>{
         this.logger.log("[CdsWidgetLogsComponent] message: ", message);
-        const msg = message.payload?message.payload:null;
+        const msg = message?.payload?message?.payload:null;
         this.BSWidgetLoadedNewMessage.next(msg);
       });
     }
