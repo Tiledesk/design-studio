@@ -157,14 +157,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           if (data) {
             const intent = data.intent;
             const animation = data.animation;
-            if(!intent && this.intent.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+            if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
               this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
-            } else if(intent && this.intent.intent_display_name === TYPE_CHATBOT.WEBHOOK ) {
+            } else if(intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK ) {
               this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + (this.intent.intent_id));
             }
-            if (!intent || intent.intent_id !== this.intent.intent_id) {
+            if (!intent || intent.intent_id !== this.intent?.intent_id) {
               this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent.intent_id));
-            } else if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
+            } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
               // this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
               const stageElement = document.getElementById(intent.intent_id);
               if(animation){
@@ -174,7 +174,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
               this.addCssClassIntentActive('live-active-intent', '#intent-content-' + (intent.intent_id));
             } 
           } else {
-            this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent.intent_id));
+            this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent?.intent_id));
           }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
