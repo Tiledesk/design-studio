@@ -275,9 +275,12 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     const fromId = this.button.__idConnector;
 
     let toId = this.button.action;
-    if (this.button.action.includes('#') && this.button.action.includes('{')) {
-      toId = this.button.action.split('#')[1].split('{')[0];
-    }
+    if (this.button.action.includes('#')) {
+      toId = this.button.action.split('#')[1];
+      if(this.button.action.includes('{')) {
+        toId = this.button.action.split('#')[1].split('{')[0];
+      }
+    } 
     this.button.__idConnection = fromId+"/"+toId;
     this.logger.log('__idConnection: ', fromId+"/"+toId);
     // let toId = '';
