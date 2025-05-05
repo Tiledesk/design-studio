@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.31.2-rc9
+- **changed**: bug fix and change animation block intent selected on testit
+
 # 1.31.2-rc8
 - **changed**: change web log active 
 
