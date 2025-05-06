@@ -27,6 +27,9 @@ export class ControllerService {
   private addActionMenu = new Subject<any>();
   public isOpenAddActionMenu$ = this.addActionMenu.asObservable();
 
+  private publishPanelStatusSubject = new Subject<any>();
+  public isOpenPublishPanel$ = this.publishPanelStatusSubject.asObservable();
+
   constructor() {
   }
 
@@ -63,6 +66,9 @@ export class ControllerService {
     this.addActionMenu.next(null);
   }
 
+  public openPublishPanel(){
+    this.publishPanelStatusSubject.next(true);  
+  }
 
   public closeAllPanels(){
     this.intentSource.next(null);

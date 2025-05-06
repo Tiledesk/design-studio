@@ -24,6 +24,7 @@ import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
 import { every, filter } from 'rxjs';
+import { ControllerService } from '../../services/controller.service';
 
 const swal = require('sweetalert');
 
@@ -61,6 +62,8 @@ export class CdsHeaderComponent implements OnInit {
   PLAY_MENU_ITEMS = PLAY_MENU_ITEMS;
   translationsMap: Map<string, string> = new Map();
 
+  publishPaneltoggleState: boolean = false;
+  is0penDropDown: boolean = false
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -74,7 +77,8 @@ export class CdsHeaderComponent implements OnInit {
     private intentService: IntentService,
     private tiledeskAuthService: TiledeskAuthService,
     private notify: NotifyService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private controllerService: ControllerService
   ) { 
     this.manageRouteChanges();
   }
@@ -177,19 +181,15 @@ export class CdsHeaderComponent implements OnInit {
   }
 
 
+  isOpenDropdown(_is0penDropDown) {
+    this.is0penDropDown = _is0penDropDown
+    // this.logger.log('[WS-REQUESTS-MSGS] this.is0penDropDown ',this.is0penDropDown)  
+  }
+
   onClickPublish(){
-    this.logger.log('[CDS DSBRD] click on PUBLISH --> open  - CdsPublishOnCommunityModalComponent ', this.selectedChatbot)
-    const dialogRef = this.dialog.open(CdsModalActivateBotComponent, {
-      data: {
-        chatbot: this.selectedChatbot,
-        departments: this.dashboardService.departments,
-        project_id: this.projectID
-      },
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      this.logger.log(`Dialog result: ${result}`);
-      this.segmentChatbotPublished()
-    });
+    // this.publishPaneltoggleState = !this.publishPaneltoggleState
+    this.logger.log('[CDS DSBRD] click on PUBLISH --> open ', this.publishPaneltoggleState)
+    this.controllerService.openPublishPanel()
   }
 
 

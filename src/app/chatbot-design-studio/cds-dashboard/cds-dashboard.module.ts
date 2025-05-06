@@ -47,6 +47,11 @@ const routes: Routes = [
         loadChildren: () => import('../cds-globals/cds-globals.module').then( m => m.CdsGlobalsModule),
       },
       {
+        path: 'publish-history',
+        title: 'Design studio - Publish history',
+        loadChildren: () => import('../cds-publish-history/cds-publish-history.module').then( m => m.CdsPublishHistoryModule),
+      },
+      {
         path: 'settings',
         title: 'Design studio - Detail',
         loadChildren: () => import('../cds-chatbot-details/cds-chatbot-details.module').then( m => m.CdsChatbotDetailsModule),

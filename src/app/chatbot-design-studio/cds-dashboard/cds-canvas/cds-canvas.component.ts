@@ -28,6 +28,7 @@ import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storag
 import { storage } from 'firebase';
 import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
+import { Chatbot } from 'src/app/models/faq_kb-model';
 
 // const swal = require('sweetalert');
 
@@ -138,7 +139,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   startDraggingPosition: any = null;
 
+  // ---------------------------------------------------
+  // @ Toggle Publish Panel 
+  // ---------------------------------------------------
+  private subscriptionTogglePublishPanelState: Subscription;
+  IS_OPEN_PUBLISH_PANEL: boolean = false;
+
+
   chatbotSubtype: string;
+  selectedChatbot: Chatbot;
+  projectID: string;
 
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
@@ -198,6 +208,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (this.subscriptionUndoRedo) {
       this.subscriptionUndoRedo.unsubscribe();
     }
+
+    if (this.subscriptionTogglePublishPanelState) {
+      this.subscriptionTogglePublishPanelState.unsubscribe();
+    }
+
+
+    
     document.removeEventListener("connector-drawn", this.listnerConnectorDrawn, false);
     document.removeEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
     document.removeEventListener("start-dragging", this.listnerStartDragging, false);
@@ -498,10 +515,39 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         //this.IS_OPEN_WIDGET_LOG = true;
       }
     });    
+
+    this.subscriptionTogglePublishPanelState = this.controllerService.isOpenPublishPanel$.subscribe((event: any) => {
+      this.logger.log("[CDS-CANVAS] has opened Publish panel ", event);
+      // this.IS_OPEN_PUBLISH_PANEL = event
+      this.logger.log("[CDS-CANVAS] has opened Publish IS_OPEN_PUBLISH_PANEL ", this.IS_OPEN_PUBLISH_PANEL);
+      // isOpenButtonPanel
+      // if (event) {
+      //   this.closeAllPanels();
+      //   this.closeActionDetailPanel()
+      // } else {
+      //   this.IS_OPEN_ADD_ACTIONS_MENU = false;
+      // }
+
+      if (event) {
+        this.closeAllPanels();
+        this.closeActionDetailPanel();
+        // this.IS_OPEN_PANEL_WIDGET = false;
+        this.removeConnectorDraftAndCloseFloatMenu();
+        setTimeout(() => {
+          this.IS_OPEN_PUBLISH_PANEL = true;
+        }, 0);
+      } else {
+        this.IS_OPEN_PUBLISH_PANEL = false;
+      }
+    });    
   }
 
    /** initialize */
    private async initialize(){
+    this.selectedChatbot = this.dashboardService.selectedChatbot;
+    this.projectID = this.dashboardService.projectID;
+    // console.log('[CDS-CANVAS] selectedChatbot ::', this.selectedChatbot);
+    // console.log('[CDS-CANVAS] projectID ::', this.projectID);
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
     let getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
@@ -547,6 +593,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
     this.IS_OPEN_COLOR_MENU = false;
+    this.IS_OPEN_PANEL_WIDGET = false;
+    this.IS_OPEN_PUBLISH_PANEL = false;
     // // this.intentService.inactiveIntent();
   }
 

@@ -88,14 +88,9 @@
         [stateUndoRedo]="stateUndoRedo"
         (onOptionClicked)="onOptionClicked($event)">
     </cds-options>
-
 </div>
 
-
-<cds-widget-logs *ngIf="IS_OPEN_WIDGET_LOG"
-></cds-widget-logs>
-
-
+<cds-widget-logs *ngIf="IS_OPEN_WIDGET_LOG"></cds-widget-logs>
 
 <cds-add-action-menu class="menu--context--add" 
     [style.top.px]="15" 
@@ -123,6 +118,14 @@
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-intent-detail>
 
+<cds-panel-publish *ngIf="IS_OPEN_PUBLISH_PANEL"
+    id="publish-panel" 
+    [intent]="elementIntentSelected"
+    class="cds-generic-panel"
+    (closePanel)="closeAllPanels()"
+    [selectedChatbot]= "selectedChatbot"
+    [projectID]= "projectID">
+</cds-panel-publish>
 
 <cds-panel-action-detail *ngIf="IS_OPEN_PANEL_ACTION_DETAIL"
     id="action-detail" 
