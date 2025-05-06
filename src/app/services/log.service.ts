@@ -1,9 +1,16 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+import { BehaviorSubject, Observable, lastValueFrom } from 'rxjs';
+
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { MqttClient } from 'src/assets/js/MqttClient.js';
+import { AppConfigService } from './app-config';
+
+export enum MQTT_CLIENT {
+  appId           = 'tilechat',
+  MQTTendpoint    = 'ws://35.246.144.116:15675/ws',
+  log             = 'true'
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,65 +18,55 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 
 export class LogService {
   BSWidgetLoaded = new BehaviorSubject<boolean>(null);
+  BSWidgetLoadedNewMessage = new BehaviorSubject<any>(null);
 
+  mqtt_client: any;
   SERVER_BASE_PATH: string;
   LOG_URL: any;
   logs: any = null;
-  
-  private tiledeskToken: string;
+  request_id: string;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
-    public appStorageService: AppStorageService,
-    private readonly _httpClient: HttpClient
-  ) { }
+    public appConfigService: AppConfigService
+  ) {}
 
-  async initialize(serverBaseUrl: string, projectId: string, support_group_id: string){
-    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
-    // // support_group_id = "support-group-62c3f10152dc7400352bab0d-bbbc598e4759420f9541f46a3df0fd16";
-    this.LOG_URL = serverBaseUrl + projectId + '/logs/flows/' + support_group_id;
-    this.logger.log('[LOG-SERV] initialize', serverBaseUrl, this.LOG_URL);
-    this.logs = '';
-    this.BSWidgetLoaded.next(true);
+
+  public initialize(request_id: string){
+    if(this.mqtt_client){
+      this.closeLog();
+    }
+    this.request_id = request_id;
+    this.logger.log("[LOG-SERV] getConfig : ", this.appConfigService.getConfig());
+    const appId = this.appConfigService.getConfig().chat21Config.appId;
+    const MQTTendpoint = this.appConfigService.getConfig().chat21Config.MQTTendpoint;
+    const log = this.appConfigService.getConfig().chat21Config.log;
+    this.mqtt_client = new MqttClient({
+      appId: appId,
+      MQTTendpoint: MQTTendpoint,
+      log: log
+    })
   }
 
+  async starterLog(mqtt_token, request_id){
+    this.logger.log('[CdsWidgetLogsComponent] >>> starterLog ', this.mqtt_client);
+    this.logger.log('[CdsWidgetLogsComponent] >>> mqtt_token ok ', mqtt_token, request_id);
+    if(this.mqtt_client && mqtt_token && request_id){
+      this.mqtt_client.connect(request_id, mqtt_token, (message: any)=>{
+        this.logger.log("[CdsWidgetLogsComponent] message: ", message);
+        this.BSWidgetLoadedNewMessage.next(message.payload);
+      });
+    }
+  }
+
+  public closeLog(){
+    this.logger.log('[CdsWidgetLogsComponent] >>> closeLog ');
+    this.mqtt_client?.close();
+  }
 
   public resetLogService(){
     this.logs = null;
   }
-
-  
-  public initLogService(resp: any){
-    this.logs = resp;
-    // this.BSWidgetLoaded.next(resp);
-  }
-
-
-
-  public getLastLogs(logLevel?): Observable<any> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-    let url = this.LOG_URL+'?logLevel='+logLevel;
-    this.logger.log('[LOG-SERV] - GET LOG - URL', url);
-    return this._httpClient.get<any>(url, httpOptions)
-  }
-
-  public getOtherLogs(timestamp: string, direction: "prev"|"next", logLevel?): Observable<any> {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-    let url = this.LOG_URL + '?timestamp=' + timestamp + "&direction=" + direction +'&logLevel='+logLevel;
-    this.logger.log('[LOG-SERV] - GET LOG - URL', url);
-    return this._httpClient.get<any>(url, httpOptions)
-  }
-
 
 }

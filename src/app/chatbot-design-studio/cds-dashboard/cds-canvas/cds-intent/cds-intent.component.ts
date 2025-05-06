@@ -41,7 +41,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   @Output() actionDeleted = new EventEmitter();
   @Output() showPanelActions = new EventEmitter(); // nk
-  @Output() testItOut = new EventEmitter<Intent>();
+  // @Output() testItOut = new EventEmitter<Intent>();
   @Output() deleteIntent = new EventEmitter();
   @Output() openIntent = new EventEmitter<Intent>();
   @Output() changeColorIntent = new EventEmitter();
@@ -876,7 +876,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.onDeleteIntent(this.intent)
         break;
       case 'test':
-        this.openTestSiteInPopupWindow()
+        this.onOpenTestItOut();
         break;
       case 'copy':
         this.copyIntent();
@@ -902,9 +902,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.appStorageService.setItem(data.key, data.data)
   }
 
-  openTestSiteInPopupWindow() {
-    this.testItOut.emit(this.intent)
+  // openTestSiteInPopupWindow() {
+  //   this.testItOut.emit(this.intent)
+  // }
+
+
+  onOpenTestItOut(){
+    this.intentService.openTestItOut(this.intent);
   }
+
 
   toggleIntentWebhook(intent) {
     this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent ', intent)

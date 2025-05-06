@@ -139,6 +139,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/ai-prompt.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/add_kb_content.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/add_kb_content.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'assets/images/actions/ask_to_kb.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/ask_to_kb.svg')
     );
@@ -269,6 +273,10 @@ export class IconService {
     this.matIconRegistry.addSvgIcon(
       'assets/images/actions/whatsapp.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/whatsapp.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/flow_log.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/flow_log.svg')
     );
 
 
@@ -404,6 +412,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/play.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'stop',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/stop.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'redo',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/redo.svg')
     );
@@ -438,6 +450,10 @@ export class IconService {
     this.matIconRegistry.addSvgIcon(
       'youtube',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/youtube.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'terminal',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/terminal.svg')
     );
 
    

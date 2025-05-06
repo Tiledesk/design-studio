@@ -192,4 +192,18 @@ cds-textarea.text-editable-div ::ng-deep{
         width: calc(100% - 1.5em) !important;
     }
 }
-  
+
+
+::ng-deep .cds-attributes .box-textarea {
+    textarea {
+        border-radius: var(--base-radius) 0 0 var(--base-radius)!important;
+        background: #f2f2f2!important;
+        margin: 3px 0!important;
+        padding: 0 10px 0 10px!important;
+    }
+} 
+
+
+
+
+

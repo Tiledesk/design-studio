@@ -75,6 +75,7 @@
             <div class="webhook-buttons">
                 <button *ngIf="webhookUrl" type="button" class="btn btn-primary cds-blue-button" (click)="newWebhook()">{{'Regenerate' | translate}}</button>
                 <button *ngIf="!webhookUrl" type="button" class="btn btn-primary cds-blue-button" (click)="newWebhook()">{{'Create' | translate}}</button>
+                <button type="button" class="btn btn-primary cds-blue-button" (click)="copyText(true)">dev url</button>
                 <button type="button" class="btn btn-primary cds-blue-button" (click)="copyText()">{{'Copy' | translate}}</button>
             </div>
             

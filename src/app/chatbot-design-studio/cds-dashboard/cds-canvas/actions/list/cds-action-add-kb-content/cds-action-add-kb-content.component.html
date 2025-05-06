@@ -1,0 +1,90 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+    <div class="action-row">
+        <div class="action-row-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
+            </svg>
+        </div>
+        <div *ngIf="action?.name" class="action-row-right">
+            {{action?.name}}
+        </div>
+        <div *ngIf="!action?.name" class="action-row-right empty">
+            {{'CDSCanvas.EnterTheKbName' | translate}}
+        </div>
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+    
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.nameKB' | translate}}</label>
+        <cds-textarea 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="false" 
+            [minRow]="1"[maxRow]="1" 
+            [text]="action?.name" 
+            [placeholder]="'CDSCanvas.EnterTheKbName' | translate"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'name')">
+        </cds-textarea>
+        <br>
+        <label class="title-label">{{'CDSCanvas.ContentKB' | translate}}</label>
+        <cds-textarea  
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [minRow]="4"[maxRow]="25" 
+            [text]="action?.content" 
+            [placeholder]="'CDSCanvas.PlaceholderKBContent' | translate"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'content')">
+        </cds-textarea>
+    </div>
+
+
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.ChooseKB' | translate}}</label>
+        <cds-select *ngIf="!action?.namespaceAsName" id="text-condition" 
+            [items]="listOfNamespaces" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action.namespace" 
+            [placeholder]="'CDSCanvas.SelectNamespace' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'namespace')"
+            (onReset)="onResetBlockSelect($event, 'namespace')">
+        </cds-select>
+        <cds-text *ngIf="action?.namespaceAsName" id="text"
+            class="sx-input" 
+            [text]="action.namespace"
+            [placeholder]="'CDSCanvas.SelectNamespace' | translate"
+            [autocompleteOptions]="autocompleteOptions"
+            (blur)="onBlur($event)"
+            (onChange)="onChangeTextarea($event, 'namespace')">
+        </cds-text>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.namespaceAsName"
+                (change)="onChangeCheckbox($event,'namespaceAsName')">
+                {{ 'CDSCanvas.UseKnwoledgeBaseName' | translate }}
+            </mat-checkbox>
+            <label class="field-description">{{ "CDSCanvas.UseKBNameDescription" | translate }}
+                <!-- <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.namespace_as_name.link" [target]="DOCS_LINK.namespace_as_name.target">{{ 'LearnMore' | translate }}</a> -->
+            </label>
+        </section>
+    </div>
+
+
+    <div class="link-container">
+        <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
+    </div>
+
+
+
+</div>
+

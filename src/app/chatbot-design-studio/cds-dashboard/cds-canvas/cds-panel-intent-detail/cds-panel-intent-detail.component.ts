@@ -150,10 +150,14 @@ export class CdsPanelIntentDetailComponent implements OnInit {
 
 
 
-  async copyText(): Promise<void> {
+  async copyText(dev): Promise<void> {
+    let url = this.webhookUrl;
+    if(dev === true){
+      url = this.webhookUrl +'/dev';
+    }
     if (navigator?.clipboard) {
       try {
-        await navigator.clipboard.writeText(this.webhookUrl);
+        await navigator.clipboard.writeText(url);
         this.logger.log('Text copied successfully!');
         let translatedString = this.translate.instant('CDSCanvas.TextCopied');
         this.showMessage(translatedString);
