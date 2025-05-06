@@ -7,6 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+
+# 1.31.4
+- **bug-fixed**: bug fixed textarea
+- **bug-fixed**: hide connector icon
+- **bug-fixed**: set attributes and select block in panel button reply  
+
+
 # 1.31.2-rc3
 - **added**: added webhook in header
 
