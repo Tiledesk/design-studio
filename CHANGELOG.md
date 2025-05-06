@@ -13,12 +13,16 @@
 # 1.31.2-rc2
 - **bug-fixed**: changed freePlanLimitDate
 
+# 1.31.3
+
+
 # 1.31.2-rc1
 - **bug-fixed**: test freePlanLimitDate
 
 
 # 1.31.1
 - **bug-fixed**: disabled widget log 
+
 
 # 1.31.0
 
