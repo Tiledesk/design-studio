@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.31.2-rc10
+- **added**: Adds the ability to roll a chatbot back to a previous version
 
 # 1.31.2-rc9
 - **changed**: bug fix and change animation block intent selected on testit
