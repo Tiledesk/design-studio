@@ -20,7 +20,10 @@
 
         <div *ngIf="!isFilePendingToUpload">
             <!-- <label class="inputUploadImage" [for]="'uploadImage_'+ uuid"> -->
-                <div class="image"><img class="base-icon-color" src="assets/images/icons/add_image.svg"></div>
+                <div class="image">
+                    <mat-icon class="base-icon-color" svgIcon="add_image" aria-hidden="true"></mat-icon>
+                    <!-- <img class="base-icon-color" src="assets/images/icons/add_image.svg"> -->
+                </div>
                 <input #imageInput style="display:none" type="file" [id]="'uploadImage_'+ uuid" [accept]="fileUploadAccept" (change)="detectFiles($event)" />
             <!-- </label> -->
         

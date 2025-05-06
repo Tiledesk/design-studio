@@ -29,8 +29,17 @@ export class ControllerService {
 
   private publishPanelStatusSubject = new Subject<any>();
   public isOpenPublishPanel$ = this.publishPanelStatusSubject.asObservable();
+  private testItOutPlaying = new Subject<any>();
+  public isTestItOutPlaying$ = this.testItOutPlaying.asObservable();
 
   constructor() {
+  }
+
+  public playTestItOut(){
+    this.testItOutPlaying.next(true);
+  }
+  public stopTestItOut(){
+    this.testItOutPlaying.next(false);
   }
 
 

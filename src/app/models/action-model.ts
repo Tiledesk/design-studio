@@ -407,6 +407,19 @@ export class ActionAskGPT extends Action {
     }
 }
 
+export class ActionKBContent extends Action {
+    name: string;
+    content: string;
+    type: string;
+    namespace: string;
+    namespaceAsName: boolean;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.KB_CONTENT;
+        this.type = "text";
+    }
+}
+
 export class ActionAskGPTV2 extends Action {
     question: string;
     model: string;
@@ -490,6 +503,18 @@ export class ActionCaptureUserReply extends Action {
         this._tdActionType = TYPE_ACTION.CAPTURE_USER_REPLY
     }   
 }
+
+export class ActionFlowLog extends Action {
+    level: string;
+    log: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.FLOW_LOG;
+        this.level = "info";
+        this.log = "log";
+    }
+}
+
 
 export class ActionCode extends Action {
     source: string

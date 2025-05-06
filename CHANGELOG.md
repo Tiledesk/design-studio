@@ -8,8 +8,33 @@
 *Tiledesk SRL*
 
 
-# 1.31.2-rc1
+# 1.31.2-rc9
+- **changed**: bug fix and change animation block intent selected on testit
+
+# 1.31.2-rc8
+- **changed**: change web log active 
+
+# 1.31.2-rc7
+- **changed**: change the web log animation of the selected intent
+
+# 1.31.2-rc6
+- **bug-fixed**: change attributes in web-request json body textarea to {{ attribute|json }}
+- **bug-fixed**: fixed css textarea, bug "added attributes". 
+
+# 1.31.2-rc5
+- **added**: added webhook play and stop to header canvas
+
+# 1.31.2-rc4
+- **bug-fixed**: changed labels for add_kb_content action
+
+# 1.31.2-rc3
+- **added**: new action add_kb_content
+
+# 1.31.2-rc2
 - **bug-fixed**: changed freePlanLimitDate
+
+# 1.31.2-rc1
+- **bug-fixed**: test freePlanLimitDate
 
 
 # 1.31.1
