@@ -6,7 +6,7 @@
             [intent]="intent">
         </cds-panel-intent-header>
         
-        <div class="header-options-wrp icon-action" (click)="maximize = !maximize">
+        <div class="header-options-wrp icon-action" (click)="onChangeMaximize()">
             <img *ngIf="!maximize" src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" alt="">
             <img *ngIf="maximize" src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" alt="">
         </div>

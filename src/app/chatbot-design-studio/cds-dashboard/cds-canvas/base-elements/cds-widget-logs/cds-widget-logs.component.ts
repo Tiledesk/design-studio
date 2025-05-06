@@ -78,7 +78,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   async initializeChatbot(){
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
-    this.closeLog();
+    //this.closeLog();
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
     if(chatbotSubtype === 'webhook'){
       const webhook_id = await this.getWebhook();

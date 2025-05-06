@@ -157,22 +157,35 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           if (data) {
             const intent = data.intent;
             const animation = data.animation;
+
+
             if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
               this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
-            } else if(intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK ) {
-              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + (this.intent.intent_id));
-            }
-            if (!intent || intent.intent_id !== this.intent?.intent_id) {
+            } else if (!intent || intent.intent_id !== this.intent?.intent_id) {
               this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent.intent_id));
             } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
-              // this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
               const stageElement = document.getElementById(intent.intent_id);
               if(animation){
                 this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
               }
-              // this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
               this.addCssClassIntentActive('live-active-intent', '#intent-content-' + (intent.intent_id));
-            } 
+            }
+            // if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+            //   this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+            // } else if(intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK ) {
+            //   this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + (this.intent.intent_id));
+            // }
+            // if (!intent || intent.intent_id !== this.intent?.intent_id) {
+            //   this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent.intent_id));
+            // } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
+            //   // this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
+            //   const stageElement = document.getElementById(intent.intent_id);
+            //   if(animation){
+            //     this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
+            //   }
+            //   // this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
+            //   this.addCssClassIntentActive('live-active-intent', '#intent-content-' + (intent.intent_id));
+            // } 
           } else {
             this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent?.intent_id));
           }

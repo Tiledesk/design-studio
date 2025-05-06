@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
-import { RESERVED_INTENT_NAMES } from 'src/app/chatbot-design-studio/utils';
+import { RESERVED_INTENT_NAMES, STAGE_SETTINGS } from 'src/app/chatbot-design-studio/utils';
 import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { Intent } from 'src/app/models/intent-model';
 import { Project } from 'src/app/models/project-model';
@@ -21,7 +22,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   @Output() closePanel = new EventEmitter();
   @Output() updateAndSaveAction = new EventEmitter();
   
-  maximize: boolean = false;
+  maximize: boolean = true;
 
   isStart: boolean = false;
   isWebhook: boolean = false;
@@ -42,11 +43,13 @@ export class CdsPanelIntentDetailComponent implements OnInit {
     private readonly webhookService: WebhookService,
     private readonly appConfigService: AppConfigService,
     private readonly dashboardService: DashboardService,
-    private readonly translate: TranslateService
+    private readonly translate: TranslateService,
+    private stageService: StageService
   ) { 
   }
 
   ngOnInit(): void {
+    this.maximize = this.stageService.getMaximize();
     if(this.intent.intent_display_name === RESERVED_INTENT_NAMES.START) {
       this.initializeStart();
     } else if(this.intent.intent_display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
@@ -159,7 +162,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
       try {
         await navigator.clipboard.writeText(url);
         this.logger.log('Text copied successfully!');
-        let translatedString = this.translate.instant('CDSCanvas.TextCopied');
+        let translatedString = this.translate.instant('CDSCanvas.DevUrlCopied');
         this.showMessage(translatedString);
         
       } catch (err) {
@@ -180,5 +183,11 @@ export class CdsPanelIntentDetailComponent implements OnInit {
       this.messageText = '';
     }, 5000);
   }
+  
+    onChangeMaximize(){
+      this.maximize = !this.maximize;
+      const id_faq_kb = this.dashboardService.id_faq_kb;
+      this.stageService.saveSettings(id_faq_kb, STAGE_SETTINGS.Maximize, this.maximize);
+    }
   
 }

@@ -43,7 +43,7 @@ export class MqttClient {
   connect(request_id, token, callback) {
     this.request_id = request_id;
     this.jwt = token;
-
+    
     if (this.client) {
       this.client.end();
     }
@@ -57,23 +57,25 @@ export class MqttClient {
       rejectUnauthorized: false
     };
 
+    
     this.client = mqtt.connect(this.endpoint, options);
-
     this.client.on('connect', () => {
+      console.log("---------------------> CONNESSO ::: ",this.connected);
       if (!this.connected) {
         this.connected = true;
         this.start(callback);
       }
     });
-
     this.client.on('error', (error) => {
       console.error("MQTTClient error:", error);
     });
   }
 
   start(onMessageCallback) {
+    //console.log("---------------------> START ::: ");
     this.subscribeToLogs(() => {
       this.on_message_handler = this.client.on('message', (topic, message) => {
+        console.log("---------------------> start message::: ",message);
         let message_string = message.toString();
         try {
           const message_json = JSON.parse(message_string);
@@ -104,6 +106,8 @@ export class MqttClient {
     if (this.topic_inbox) {
       this.client.unsubscribe(this.topic_inbox, (err) => {
         // console.log("close ", err);
+        this.client.off('message', this.on_message_handler);
+
         this.client.end(() => {
           this.connected = false;
           this.on_message_handler = null;
@@ -112,6 +116,7 @@ export class MqttClient {
             callback();
           }
         });
+        
       });
     }
   }

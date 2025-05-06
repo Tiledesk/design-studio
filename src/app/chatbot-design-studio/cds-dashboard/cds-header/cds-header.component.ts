@@ -27,6 +27,7 @@ import { every, filter, Subscription } from 'rxjs';
 import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
+import { TYPE_CHATBOT } from '../../utils-actions';
 
 const swal = require('sweetalert');
 
@@ -68,7 +69,7 @@ export class CdsHeaderComponent implements OnInit {
 
   // webhook //
   isWebhook: boolean = false;
-  webhookUrl: string;
+  webhookUrl: string = null;
   messageWebhookUrl: string = '';
   chatbot_id: string;
   serverBaseURL: string;
@@ -459,10 +460,10 @@ export class CdsHeaderComponent implements OnInit {
 
   createWebhook(){
     this.logger.log("[cds-header] createWebhook: ");
-    let intentStart = this.intentService.listOfIntents.find(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.WEBHOOK));
+    let intentStart = this.intentService.listOfIntents.find(obj => (obj.intent_display_name.trim() === TYPE_INTENT_NAME.WEBHOOK));
     this.logger.log("[cds-header] createWebhook: ", this.chatbot_id, intentStart.intent_id);
     let copilot = false;
-    if(this.dashboardService.selectedChatbot.subtype === 'copilot'){
+    if(this.dashboardService.selectedChatbot.subtype === TYPE_CHATBOT.COPILOT){
       copilot = true;
     }
     this.webhookService.createWebhook(this.chatbot_id, intentStart.intent_id, true, copilot).subscribe({ next: (resp: any)=> {
@@ -528,7 +529,7 @@ export class CdsHeaderComponent implements OnInit {
       try {
         await navigator.clipboard.writeText(url);
         this.logger.log('Text copied successfully!');
-        let translatedString = this.translate.instant('CDSCanvas.TextCopied');
+        let translatedString = this.translate.instant('CDSCanvas.DevUrlCopied');
         this.showMessage(translatedString);
       } catch (err) {
         this.logger.error('Error copying text:', err);

@@ -520,6 +520,7 @@
         "TextCopied":"Text copied successfully!",
         "TextErrorCopied":"Error copying text",
         "ApiNotSupported":"Clipboard API not supported by your browser.",
+        "DevUrlCopied":"Dev url copied successfully!",
         "LogLevels": "Log levels",
         "LoadingAfter": "loading ... after",
         "LoadingBefore": "loading ... before",
