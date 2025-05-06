@@ -123,13 +123,15 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
     this.messageListener = (event: Event) => {
       const eventData = (event as MessageEvent).data;
+      // this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', eventData);
       if(eventData?.source?.includes('widget') && eventData.event === 'onNewConversation'){
         this.logger.log('[CDS-PANEL-WIDGET] OPEN NEW CONVERSATION ', eventData);
         const conversation_id = eventData?.data?.conversation_id;
         this.newConversation.emit(conversation_id);
       }
-      else if( eventData.data?.source?.includes('widget') ){
-        let message = eventData?.data?.message;
+      //else if(eventData?.source?.includes('widget')){
+      else if(eventData?.message) {
+        let message = eventData?.message;
         this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message);
         if(message.status>0){
           if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
