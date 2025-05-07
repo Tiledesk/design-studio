@@ -1,0 +1,82 @@
+name: Publish Tiledesk Design Studio ECR
+
+env:
+  REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}/tiledesk
+  IMAGE_NAME: design-studio
+
+on:
+  push:	 
+    branches: [ dev ]
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to ECR
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v4
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: linux/amd64,linux/arm64
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    
+    - name: Extract version from package.json
+      id: extract_version
+      run: |
+        VERSION=$(jq -r '.version' package.json)
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+    - name: Get short commit ID
+      id: get_commit_id
+      run: echo "COMMIT_ID=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+    - name: Build and push to Amazon ECR
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}-${{ env.COMMIT_ID }}
+  
+  # update_helm_chart:
+  #   name: Update Helm Chart
+  #   runs-on: ubuntu-latest
+  #   needs: push_to_registry
+
+  #   steps:
+  #   - name: Check out the Helm Chart repository
+  #     uses: actions/checkout@v4
+  #     with:
+  #       repository: ${{ secrets.GITHUB_ORG }}/${{ secrets.GITHUB_REPO }}
+  #       token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+  #       path: ${{ secrets.GITHUB_REPO }}
+
+  #   - name: Update values.yaml
+  #     run: |
+  #       cd ${{ secrets.GITHUB_REPO }}
+  #       yq eval ".cds.image.repository = \"${REGISTRY}/${IMAGE_NAME}\"" -i values.yaml
+  #       yq eval ".cds.image.tag = \"${VERSION}-${COMMIT_ID}\"" -i values.yaml
+  #   - name: Commit and push changes
+  #     run: |
+  #       cd helm-chart
+  #       git config user.name "GitHub Actions"
+  #       git config user.email "actions@github.com"
+  #       git add values.yaml
+  #       git commit -m "Update image tag to ${VERSION}-${COMMIT_ID}"
+  #       git push
