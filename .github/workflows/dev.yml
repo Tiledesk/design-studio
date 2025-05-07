@@ -77,8 +77,8 @@ jobs:
     - name: Update values.yaml
       run: |
         cd ${{ secrets.GIT_REPO }}/helm
-        yq eval '.cds.image.tag = ${{ env.VERSION }}-${{ env.COMMIT_ID }}' -i values.yaml
-        yq eval '.cds.image.repository = ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' -i values.yaml
+        yq -i '.cds.image.tag = ${{ env.VERSION }}-${{ env.COMMIT_ID }}' values.yaml
+        yq -i '.cds.image.repository = ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' values.yaml
         
     - name: Commit and push changes
       run: |
