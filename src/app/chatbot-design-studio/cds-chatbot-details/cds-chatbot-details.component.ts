@@ -1,3 +1,4 @@
+import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { TranslateService } from '@ngx-translate/core';
@@ -26,6 +27,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
   
   SETTINGS_SECTION = SETTINGS_SECTION
+  TYPE_CHATBOT = TYPE_CHATBOT;
   BRAND_BASE_INFO = BRAND_BASE_INFO
   isVisibleDEP: boolean;
 
@@ -33,6 +35,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
 
   translationsMap: Map<string, string> = new Map();
+  translationsVoiceSettingsMap: Map<string, string> = new Map();
 
   private subscriptionOpenWidgetPanel: Subscription;
 
@@ -111,6 +114,28 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
                           .set('CDSSetting.ThereHasBeenAnErrorProcessing', text['CDSSetting.AnErrorOccurredUpdatingProfile'])
                           .set('CDSSetting.ThereHasBeenAnErrorProcessing', text['CDSSetting.UserProfileUpdated'])
                           .set('CDSSetting.SlugAlreadyExists', text['CDSSetting.SlugAlreadyExists'])
+
+    })
+
+
+
+    let keys_VoiceSettings = [
+      'CDSSetting.VoiceProvider',
+      'CDSSetting.VoiceName',
+      'CDSSetting.TextToSpeechModel',
+      'CDSSetting.SpeechToTextModel',
+      'CDSSetting.SelectProvider',
+      'CDSSetting.SelectAnOption',
+    ]
+
+
+    this.translate.get(keys_VoiceSettings).subscribe((text)=>{
+      this.translationsVoiceSettingsMap.set('CDSSetting.VoiceProvider', text['CDSSetting.VoiceProvider'])
+                                      .set('CDSSetting.VoiceName', text['CDSSetting.VoiceName'])
+                                      .set('CDSSetting.TextToSpeechModel', text['CDSSetting.TextToSpeechModel'])
+                                      .set('CDSSetting.SpeechToTextModel', text['CDSSetting.SpeechToTextModel'])
+                                      .set('CDSSetting.SelectProvider', text['CDSSetting.SelectProvider'])
+                                      .set('CDSSetting.SelectAnOption', text['CDSSetting.SelectAnOption'])
 
     })
 

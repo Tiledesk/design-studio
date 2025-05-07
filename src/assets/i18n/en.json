@@ -222,7 +222,13 @@
         "UpdateYourProfile":"Update your profile",
         "Processing": "Processing...",
         "SearchABlock":"search a block...",
-        "SlugAlreadyExists":"An error occurred: slug already exists"
+        "SlugAlreadyExists":"An error occurred: slug already exists",
+        "VoiceProvider":"Voice provider",
+        "VoiceName" :"Voice",
+        "TextToSpeechModel":"Text-To-Speech model",
+        "SpeechToTextModel":"Speech-To-Text model",
+        "SelectProvider":"Select provider",
+        "SelectAnOption":"Select an option"
     },
     "BotDetails": "Bot details",
     "Developer": "Developer",

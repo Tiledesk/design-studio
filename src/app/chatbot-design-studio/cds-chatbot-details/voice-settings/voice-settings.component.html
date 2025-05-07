@@ -1,0 +1,91 @@
+<div class="chatbot-voice-settings-wpr">
+    <div class="row">
+
+        <!--STEP 1: choose TWILIO / OpenAi provider -->
+        <div class="col-sm-10 col-md-10" style="margin-bottom: 16px;">
+            <label class="cds-custom-label">
+                {{ 'CDSSetting.VoiceProvider' | translate }}
+            </label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <cds-select id="voiceProvider" 
+                    [items]="voiceProviderList" 
+                    [bindLabelSelect]="'label'"
+                    [bindValueSelect]="'key'" 
+                    [itemSelected]="voiceProvider" 
+                    [placeholder]="'CDSSetting.SelectProvider' | translate"
+                    [clearable]="true" 
+                    (onSelected)="onSelect($event, 'VOICE_PROVIDER')">
+                </cds-select>
+            </div>
+        </div>
+
+          <!--STEP 2: choose TWILIO / OpenAi voice -->
+        <div class="col-sm-10 col-md-10" style="margin-bottom: 16px;">
+            <label class="cds-custom-label">
+            {{ 'CDSSetting.VoiceName' | translate }}
+            </label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <cds-select id="voiceName" #voiceName
+                    [items]="voice_name_list" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'voiceId'" 
+                    [optionalBindAdditionalText]="'description'"
+                    [itemSelected]="voice_name" 
+                    [placeholder]="'CDSSetting.SelectAnOption' | translate"
+                    [clearable]="true" 
+                    (onSelected)="onSelect($event, 'TTS_VOICE_NAME')">
+                </cds-select>
+                <!-- <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                    {{'BotsAddEditPage.SlugAlert' | translate}}
+                    <a [href]="DOCS_LINK.chatbot_slug.link" [target]="DOCS_LINK.chatbot_slug.target">{{ 'LearnMore' | translate }}</a>
+                </span> -->
+            </div>
+        </div>
+
+        <!--STEP 3: choose OpenAi TTS_MODEL -->
+        <div *ngIf="voiceProvider === 'openai'" class="col-sm-10 col-md-10" style="margin-bottom: 16px;">
+            <label class="cds-custom-label">
+            {{ 'CDSSetting.TextToSpeechModel' | translate }}
+            </label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <cds-select id="text-condition" 
+                    [items]="tts_model_list" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'model'"
+                    [itemSelected]="tts_model" 
+                    [placeholder]="'CDSSetting.SelectAnOption' | translate"
+                    [clearable]="true" 
+                    (onSelected)="onSelect($event, 'TTS_MODEL')">
+                </cds-select>
+                <!-- <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                    {{'BotsAddEditPage.SlugAlert' | translate}}
+                    <a [href]="DOCS_LINK.chatbot_slug.link" [target]="DOCS_LINK.chatbot_slug.target">{{ 'LearnMore' | translate }}</a>
+                </span> -->
+            </div>
+        </div>
+
+        <!--STEP 4: choose OpenAi STT_MODEL -->
+        <div *ngIf="voiceProvider === 'openai'" class="col-sm-10 col-md-10" style="margin-bottom: 16px;">
+            <label class="cds-custom-label">
+            {{ 'CDSSetting.SpeechToTextModel' | translate }}
+            </label>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <cds-select id="text-condition" 
+                    [items]="stt_model_list" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'model'"
+                    [itemSelected]="stt_model" 
+                    [placeholder]="'CDSSetting.SelectAnOption' | translate"
+                    [clearable]="true" 
+                    (onSelected)="onSelect($event, 'STT_MODEL')">
+                </cds-select>
+                <!-- <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                    {{'BotsAddEditPage.SlugAlert' | translate}}
+                    <a [href]="DOCS_LINK.chatbot_slug.link" [target]="DOCS_LINK.chatbot_slug.target">{{ 'LearnMore' | translate }}</a>
+                </span> -->
+            </div>
+        </div>
+
+    </div>
+
+</div>

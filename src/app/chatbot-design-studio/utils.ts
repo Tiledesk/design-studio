@@ -68,6 +68,7 @@ export enum SIDEBAR_PAGES {
 
 export enum SETTINGS_SECTION {
     DETAIL          = 'bot_detail',
+    VOICE_SETTINGS  = 'voice_settings',
     IMPORT_EXPORT   = 'export',
     COMMUNITY       = 'community',
     DEVELOPER       = 'developer',

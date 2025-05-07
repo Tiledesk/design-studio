@@ -14,6 +14,7 @@ import { CDSDetailCommunityComponent } from './community/community.component';
 import { CDSDetailDeveloperComponent } from './developer/developer.component';
 import { CDSAdvancedComponent } from './advanced/advanced.component';
 import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/change-bot-lang.component';
+import { CDSVoiceSettingsComponent } from './voice-settings/voice-settings.component';
 
 const routes: Routes = [
   {
@@ -54,6 +55,7 @@ const routes: Routes = [
 
     //MODALS
     ChangeBotLangModalComponent,
+    CDSVoiceSettingsComponent,
   ],
   imports: [
     CommonModule,
