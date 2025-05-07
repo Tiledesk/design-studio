@@ -1,17 +1,14 @@
 <div class="panel-intent-detail" [class.minimize]="!maximize" [class.maximize]="maximize">
     <div class="header-panel">
-
         <cds-panel-intent-header class="pic-title-text tds_draggable" 
             [class.isStart]="false"
             [intent]="intent">
         </cds-panel-intent-header>
-        
         <div class="header-options-wrp icon-action" (click)="onChangeMaximize()">
             <img *ngIf="!maximize" src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" alt="">
             <img *ngIf="maximize" src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" alt="">
         </div>
     </div>
-
     <div id="content-panel" class="content-panel">
         
         <!-- ---------------------------------------------------------- -->
@@ -63,20 +60,48 @@
                 </div>
             </div> 
             -->
-            
-
-            <div class="webhook-block">
-                <div class="webhook-icon">
-                    <img src="assets/images/icons/webhook.svg" alt="webhook">
+    
+            <div>
+                <div>Webhook Url</div>
+                <div class="webhook-block">
+                    <div class="webhook-icon" *ngIf="!webhookUrl">
+                        <img src="assets/images/icons/webhook.svg" alt="webhook">
+                    </div>
+                    <input #copyInput class="webhook-link" [class.start]="!webhookUrl" type="text" [value]="webhookUrl">
+                    <div *ngIf="webhookUrl" class="webhook-icon end" (click)="onCopyToClipboard(copyInput.value)"
+                        matTooltip="{{'Copied' | translate}}!"
+                        #tooltip="matTooltip" 
+                        matTooltipClass="cds-mat-tooltip" 
+                        [matTooltipDisabled]="true"
+                        matTooltipPosition="above">
+                        <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+                    </div>
                 </div>
-                <input class="webhook-link" type="text" [value]="webhookUrl">
+            </div>
+
+
+            <div *ngIf="webhookUrlDev">
+                <div>Webhook Url Dev</div>
+                <div class="webhook-block">
+                    <input #copyInput class="webhook-link" type="text" [value]="webhookUrlDev">
+                    <div class="webhook-icon end" (click)="onCopyToClipboard(copyInput.value)"
+                        matTooltip="{{'Copied' | translate}}!"
+                        #tooltip="matTooltip" 
+                        matTooltipClass="cds-mat-tooltip" 
+                        [matTooltipDisabled]="true"
+                        matTooltipPosition="above">
+                        <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+                    </div>
+                </div>
             </div>
             
             <div class="webhook-buttons">
-                <button *ngIf="webhookUrl" type="button" class="btn btn-primary cds-blue-button" (click)="newWebhook()">{{'Regenerate' | translate}}</button>
+                <button *ngIf="webhookUrl" type="button" class="btn btn-primary cds-blue-button" (click)="onRegenerateWebhook()">{{'Regenerate' | translate}}</button>
                 <button *ngIf="!webhookUrl" type="button" class="btn btn-primary cds-blue-button" (click)="newWebhook()">{{'Create' | translate}}</button>
+                <!-- 
                 <button type="button" class="btn btn-primary cds-blue-button" (click)="copyText(true)">dev url</button>
-                <button type="button" class="btn btn-primary cds-blue-button" (click)="copyText()">{{'Copy' | translate}}</button>
+                <button type="button" class="btn btn-primary cds-blue-button" (click)="copyText()">{{'Copy' | translate}}</button> 
+                -->
             </div>
             
             <p *ngIf="messageText" class="webhook-message fade-in-out">

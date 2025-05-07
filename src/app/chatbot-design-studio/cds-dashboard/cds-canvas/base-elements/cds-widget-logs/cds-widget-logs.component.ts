@@ -172,7 +172,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   subscriptions(){
-    this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage .subscribe((message: any) => {
+    this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage.subscribe((message: any) => {
       this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
       if(message){
         //stopAnimation();

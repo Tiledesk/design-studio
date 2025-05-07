@@ -103,7 +103,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   initSubscriptions() {
     let subscribtion: any;
     let subscribtionKey: string;
-
     /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
     subscribtionKey = 'behaviorIntent';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
@@ -157,37 +156,24 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           if (data) {
             const intent = data.intent;
             const animation = data.animation;
-
-
-            if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+            if(intent && intent.intent_id !== this.intent?.intent_id && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+            } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
               this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
             } else if (!intent || intent.intent_id !== this.intent?.intent_id) {
-              this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent.intent_id));
+              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
             } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
               const stageElement = document.getElementById(intent.intent_id);
               if(animation){
                 this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
               }
-              this.addCssClassIntentActive('live-active-intent', '#intent-content-' + (intent.intent_id));
+              this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));
             }
-            // if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
-            //   this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
-            // } else if(intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK ) {
-            //   this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + (this.intent.intent_id));
-            // }
-            // if (!intent || intent.intent_id !== this.intent?.intent_id) {
-            //   this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent.intent_id));
-            // } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
-            //   // this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
-            //   const stageElement = document.getElementById(intent.intent_id);
-            //   if(animation){
-            //     this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
-            //   }
-            //   // this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
-            //   this.addCssClassIntentActive('live-active-intent', '#intent-content-' + (intent.intent_id));
-            // } 
           } else {
-            this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent?.intent_id));
+            if(this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+            }
+            this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
           }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };

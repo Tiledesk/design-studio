@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { MatTooltip } from '@angular/material/tooltip';
 import { TranslateService } from '@ngx-translate/core';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -11,12 +12,15 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
+const swal = require('sweetalert');
+
 @Component({
   selector: 'cds-panel-intent-detail',
   templateUrl: './cds-panel-intent-detail.component.html',
   styleUrls: ['./cds-panel-intent-detail.component.scss']
 })
 export class CdsPanelIntentDetailComponent implements OnInit {
+  @ViewChild('tooltip') tooltip: MatTooltip;
   @Input() intent: Intent;
   @Output() savePanelIntentDetail = new EventEmitter();
   @Output() closePanel = new EventEmitter();
@@ -33,6 +37,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   project: Project;
   chatbot_id: string;
   webhookUrl: string;
+  webhookUrlDev: string;
   messageText: string = '';
   action: any = {};
   chatbotSubtype: string;
@@ -71,6 +76,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
 
   initializeWebhook(){
     this.webhookUrl = '';
+    this.webhookUrlDev = '';
     this.isWebhook = true;
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.chatbot_id = this.dashboardService.id_faq_kb;
@@ -94,6 +100,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
     this.webhookService.getWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {
       this.logger.log("[CdsPanelIntentDetailComponent] getWebhook : ", resp);
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
+      this.webhookUrlDev = this.webhookUrl+"/dev";
     }, error: (error)=> {
       this.logger.error("[CdsPanelIntentDetailComponent] error getWebhook: ", error);
       // // this.createWebhook();
@@ -117,6 +124,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
     this.webhookService.createWebhook(this.chatbot_id, this.intent.intent_id, true, copilot).subscribe({ next: (resp: any)=> {
       this.logger.log("[CdsPanelIntentDetailComponent] createWebhook : ", resp);
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
+      this.webhookUrlDev = this.webhookUrl+"/dev";
     }, error: (error)=> {
       this.logger.error("[CdsPanelIntentDetailComponent] error createWebhook: ", error);
     }, complete: () => {
@@ -125,10 +133,29 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   }
 
 
+  onRegenerateWebhook(){
+    swal({
+      title: "Are you sure",
+      text: 'if you regenerate the webhook url, the previous url will no longer be available',
+      icon: "warning",
+      buttons: ["Cancel", 'Regenerate'],
+      dangerMode: false,
+    })
+    .then((resp: boolean) => {
+      if (resp) {
+        this.logger.log('[CDS DSBRD] Regenerate swal: ', resp);
+        this.regenerateWebhook();
+      } else {
+        this.logger.log('[CDS DSBRD] Regenerate swal: ', resp);
+      }
+    });
+  }
+
   regenerateWebhook(){
     this.webhookService.regenerateWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {
       this.logger.log("[CdsPanelIntentDetailComponent] regenerateWebhook : ", resp);
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
+      this.webhookUrlDev = this.webhookUrl+"/dev";
     }, error: (error)=> {
       this.showMessage('error regenerating webhook '+JSON.stringify(error));
       this.logger.error("[CdsPanelIntentDetailComponent] error regenerateWebhook: ", error);
@@ -190,4 +217,14 @@ export class CdsPanelIntentDetailComponent implements OnInit {
       this.stageService.saveSettings(id_faq_kb, STAGE_SETTINGS.Maximize, this.maximize);
     }
   
+    onCopyToClipboard(value: string): void {
+      navigator.clipboard.writeText(value).then(() => {
+        this.tooltip.disabled = false;
+        this.tooltip.show();
+        setTimeout(() => {
+          this.tooltip.hide();
+          this.tooltip.disabled = true;
+        }, 1000);
+      });
+    }
 }

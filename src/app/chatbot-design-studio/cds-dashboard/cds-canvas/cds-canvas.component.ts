@@ -506,6 +506,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // });    
 
     this.subscriptionOpenWidgetPanel = this.intentService.BSTestItOut.pipe(skip(1)).subscribe((intent) => {
+      this.logger.log("[CDS-CANVAS] BSTestItOut ", intent);
       if(intent){
         this.onTestItOut(intent);
         this.IS_OPEN_WIDGET_LOG = true;
@@ -1377,9 +1378,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.intentService.setIntentSelected(intent.intent_id);
       this.closeExtraPanels();
     }
-
-
-    if(this.dashboardService.selectedChatbot.subtype !== 'webhook'){
+    const subtype = this.dashboardService.selectedChatbot.subtype;
+    if(subtype !== TYPE_CHATBOT.WEBHOOK && subtype != TYPE_CHATBOT.COPILOT){
       setTimeout(() => {
         this.controllerService.playTestItOut();
         this.IS_OPEN_PANEL_WIDGET = true;
