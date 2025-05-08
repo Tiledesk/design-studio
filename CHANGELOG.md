@@ -7,7 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.32.0-rc5
+- **bug-fixed**: show all log messages
+- **bug-fixed**: added border on intent selected when log is active
+- **bug-fixed**: fixed cssbugs in panel log
+
 # 1.32.0-rc4
+
 # 1.32.0-rc3
 - **bug-fixed**: minor fix on chatbot types
 
