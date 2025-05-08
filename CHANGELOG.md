@@ -7,6 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.32.0-rc4
 # 1.32.0-rc3
 - **bug-fixed**: minor fix on chatbot types
 
