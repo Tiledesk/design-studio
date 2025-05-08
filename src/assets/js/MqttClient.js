@@ -60,7 +60,7 @@ export class MqttClient {
     
     this.client = mqtt.connect(this.endpoint, options);
     this.client.on('connect', () => {
-      console.log("---------------------> CONNESSO ::: ",this.connected);
+      // console.log("---------------------> CONNESSO ::: ",this.connected);
       if (!this.connected) {
         this.connected = true;
         this.start(callback);
@@ -72,10 +72,10 @@ export class MqttClient {
   }
 
   start(onMessageCallback) {
-    //console.log("---------------------> START ::: ");
+    // console.log("---------------------> START ::: ");
     this.subscribeToLogs(() => {
       this.on_message_handler = this.client.on('message', (topic, message) => {
-        console.log("---------------------> start message::: ",message);
+        // console.log("---------------------> start message::: ",message);
         let message_string = message.toString();
         try {
           const message_json = JSON.parse(message_string);
@@ -106,8 +106,6 @@ export class MqttClient {
     if (this.topic_inbox) {
       this.client.unsubscribe(this.topic_inbox, (err) => {
         // console.log("close ", err);
-        this.client.off('message', this.on_message_handler);
-
         this.client.end(() => {
           this.connected = false;
           this.on_message_handler = null;

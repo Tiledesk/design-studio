@@ -19,6 +19,7 @@ import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 
 export class CdsWidgetLogsComponent implements OnInit {
   private subscriptionWidgetLoadedNewMessage: Subscription;
+  private subscriptionLoadedWidget: Subscription;
   @Input() 
   set IS_OPEN_PANEL_WIDGET(value: boolean) {
     this.isOpenPanelWidget = value;
@@ -40,6 +41,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   selectedLogLevel = LOG_LEVELS.DEBUG;
   isOpenPanelWidget: boolean;
   mqtt_token: string;
+  highestTimestamp: string;
   // request_id: string;
 
   private startY: number;
@@ -76,6 +78,49 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
 
+
+  getStaticLastLogs(){
+    this.logService.getStaticLastLogs(this.selectedLogLevel).subscribe({ next: (resp)=> {
+      this.logger.log("[CDS-WIDGET-LOG] getStaticLastLogs", resp);
+      this.appendFirstMessagesToHeadArray(resp);
+    }, error: (error)=> {
+      this.logger.error("[LOG-SERV] initLogService error: ", error);
+    }, complete: () => {
+      this.logger.log("[LOG-SERV] initLogService completed.");
+      if(this.subscriptionLoadedWidget) {
+        this.subscriptionLoadedWidget.unsubscribe();
+      }
+    }})
+  }
+
+
+
+  private appendFirstMessagesToHeadArray(dataArray) {
+      const transformedArray = dataArray.map(item => ({
+          dev: false,
+          id_project: item.id_project,
+          level: item.rows.level,
+          nlevel: item.rows.nlevel,
+          request_id: item.request_id,
+          text: item.rows.text,
+          timestamp: item.rows.timestamp
+      }));
+
+      this.highestTimestamp = transformedArray.reduce((max, item) => {
+        return new Date(item.timestamp) > new Date(max) ? item.timestamp : max;
+      }, transformedArray[0]?.timestamp);
+
+      
+      //const uniqueIds = new Set(this.listOfLogs.map(msg => msg._id));
+      //const filteredArray = transformedArray.filter(item => !uniqueIds.has(item._id));
+      this.listOfLogs.unshift(...transformedArray);
+      this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.highestTimestamp, this.listOfLogs);
+  }
+
+  
+  
+
+
   async initializeChatbot(){
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
     //this.closeLog();
@@ -88,7 +133,6 @@ export class CdsWidgetLogsComponent implements OnInit {
     } else {
       this.request_id = this.logService.request_id;
     }
-
     if(this.request_id){
       let resp = await this.getToken(this.request_id);
       if(resp){
@@ -168,15 +212,22 @@ export class CdsWidgetLogsComponent implements OnInit {
     if (this.subscriptionWidgetLoadedNewMessage) {
       this.subscriptionWidgetLoadedNewMessage.unsubscribe();
     }
+    if(this.subscriptionLoadedWidget) {
+      this.subscriptionLoadedWidget.unsubscribe();
+    }
   }
 
 
   subscriptions(){
+     /** get dynamic logs */
     this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage.subscribe((message: any) => {
       this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
       if(message){
         //stopAnimation();
-        this.listOfLogs.push(message);
+        if(message.timestamp > this.highestTimestamp || !this.highestTimestamp){
+          this.listOfLogs.push(message);
+        }
+        
         //this.goToIntentByMessage(message);
         this.scrollToBottom();
       } else {
@@ -188,6 +239,16 @@ export class CdsWidgetLogsComponent implements OnInit {
       this.goToIntentByMessage(message);
       this.filterLogMessage();
     });  
+
+
+    /** get the static logs the first time */
+    this.subscriptionLoadedWidget = this.logService.BSWidgetLoaded.subscribe((resp: boolean) => {
+      this.logger.log("[CDS-WIDGET-LOG] loaded ", resp);
+      if(resp){
+        this.getStaticLastLogs();
+      };
+    });  
+    
   }
 
 

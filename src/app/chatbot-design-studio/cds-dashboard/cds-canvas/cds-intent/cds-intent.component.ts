@@ -1,6 +1,6 @@
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, timeInterval } from 'rxjs/operators';
 import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, CdkDropListGroup, CdkDropList, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
@@ -152,7 +152,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-        this.logger.log("[CDS-INTENT] intentLiveActive: ",data, " con : ");
+          this.logger.log("[CDS-INTENT] intentLiveActive: ",data, " con : ");
           if (data) {
             const intent = data.intent;
             const animation = data.animation;
@@ -161,13 +161,18 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
               this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
             } else if (!intent || intent.intent_id !== this.intent?.intent_id) {
-              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
+              setTimeout(() => {
+                this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
+              }, 500);
             } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
               const stageElement = document.getElementById(intent.intent_id);
               if(animation){
                 this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
               }
-              this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));
+              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
+              setTimeout(() => {
+                this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));
+              }, 500);
             }
           } else {
             if(this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
@@ -185,7 +190,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.stageService.alphaConnectors$.subscribe(value => {
-        this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
+        // this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
         this.alphaConnectors = value;
         this.getAllConnectorsIn();
       });
