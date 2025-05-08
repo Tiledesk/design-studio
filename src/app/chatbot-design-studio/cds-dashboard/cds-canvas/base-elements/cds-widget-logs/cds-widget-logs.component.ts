@@ -42,7 +42,6 @@ export class CdsWidgetLogsComponent implements OnInit {
   isOpenPanelWidget: boolean;
   mqtt_token: string;
   highestTimestamp: string;
-  // request_id: string;
 
   private startY: number;
   private startHeight: number;
@@ -87,34 +86,35 @@ export class CdsWidgetLogsComponent implements OnInit {
       this.logger.error("[LOG-SERV] initLogService error: ", error);
     }, complete: () => {
       this.logger.log("[LOG-SERV] initLogService completed.");
-      if(this.subscriptionLoadedWidget) {
-        this.subscriptionLoadedWidget.unsubscribe();
-      }
     }})
   }
 
 
 
   private appendFirstMessagesToHeadArray(dataArray) {
-      const transformedArray = dataArray.map(item => ({
+      let transformedArray = dataArray.map(item => ({
           dev: false,
           id_project: item.id_project,
+          intent_id: item.rows.intent_id,
           level: item.rows.level,
           nlevel: item.rows.nlevel,
           request_id: item.request_id,
           text: item.rows.text,
           timestamp: item.rows.timestamp
       }));
-
-      this.highestTimestamp = transformedArray.reduce((max, item) => {
-        return new Date(item.timestamp) > new Date(max) ? item.timestamp : max;
-      }, transformedArray[0]?.timestamp);
-
-      
-      //const uniqueIds = new Set(this.listOfLogs.map(msg => msg._id));
-      //const filteredArray = transformedArray.filter(item => !uniqueIds.has(item._id));
+      if(this.listOfLogs.length > 0){
+        const cutoffTimestamp = new Date(this.listOfLogs[0].timestamp);
+        transformedArray = transformedArray.filter(item => new Date(item.timestamp) < cutoffTimestamp);
+      } else {
+        this.highestTimestamp = transformedArray[transformedArray.length-1].timestamp;
+      }
+      // this.highestTimestamp = transformedArray.reduce((max, item) => {
+      //   return new Date(item.timestamp) > new Date(max) ? item.timestamp : max;
+      // }, transformedArray[0]?.timestamp);
+      // const uniqueIds = new Set(this.listOfLogs.map(msg => msg._id));
+      // const filteredArray = transformedArray.filter(item => !uniqueIds.has(item._id));
       this.listOfLogs.unshift(...transformedArray);
-      this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.highestTimestamp, this.listOfLogs);
+      this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.listOfLogs);
   }
 
   
@@ -122,6 +122,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   async initializeChatbot(){
+    this.listOfLogs = [];
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
     //this.closeLog();
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
@@ -221,13 +222,12 @@ export class CdsWidgetLogsComponent implements OnInit {
   subscriptions(){
      /** get dynamic logs */
     this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage.subscribe((message: any) => {
-      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
+      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message, this.highestTimestamp);
       if(message){
         //stopAnimation();
-        if(message.timestamp > this.highestTimestamp || !this.highestTimestamp){
+        if (new Date(message.timestamp) > new Date(this.highestTimestamp) || !this.highestTimestamp){
           this.listOfLogs.push(message);
-        }
-        
+        } 
         //this.goToIntentByMessage(message);
         this.scrollToBottom();
       } else {
