@@ -77,6 +77,7 @@
 
 .row-log {
   padding: 0 10px 0 4px;
+  padding: 0 10px 0 4px;
   display: flex;
   height: auto;
   min-height: 24px;
@@ -146,6 +147,7 @@
   cursor: pointer;
   .mat-icon{
     display: none;
+    display: none;
     width: 18px;
     height: 18px;
     fill:var(--blu);
@@ -154,6 +156,9 @@
 
 .row-log:hover {
   .row-log-goto {
+    .mat-icon {
+      display: flex;
+    }
     .mat-icon {
       display: flex;
     }

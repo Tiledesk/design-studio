@@ -9,7 +9,7 @@
             <a href="javascript:;" role="button">{{ "BotDetails" | translate }}</a>
           </li>
 
-          <li *ngIf="selectedChatbot?.subtype === TYPE_CHATBOT.VOICE" (click)="toggleTab(SETTINGS_SECTION.VOICE_SETTINGS)" class="btn-with-border-effect" [ngClass]="
+          <li *ngIf="selectedChatbot?.subtype?.startsWith(TYPE_CHATBOT.VOICE)" (click)="toggleTab(SETTINGS_SECTION.VOICE_SETTINGS)" class="btn-with-border-effect" [ngClass]="
                     { 'border-from-center' :  activeSection !== SETTINGS_SECTION.VOICE_SETTINGS, 
                       'li-active' :           activeSection === SETTINGS_SECTION.VOICE_SETTINGS
                     }">
@@ -53,7 +53,7 @@
       [translationsMap]="translationsMap">
     </cds-detail-botdetail>
 
-    <cds-voice-settings *ngIf="activeSection===SETTINGS_SECTION.VOICE_SETTINGS && selectedChatbot?.subtype === TYPE_CHATBOT.VOICE"
+    <cds-voice-settings *ngIf="activeSection===SETTINGS_SECTION.VOICE_SETTINGS && selectedChatbot?.subtype?.startsWith(TYPE_CHATBOT.VOICE)"
       class="scrollMePage"
       [selectedChatbot]="selectedChatbot"
       [project]="project">

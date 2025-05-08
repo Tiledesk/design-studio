@@ -102,7 +102,6 @@ export class CdsWidgetLogsComponent implements OnInit {
           text: item.rows.text,
           timestamp: item.rows.timestamp
       }));
-
       // this.highestTimestamp = transformedArray.reduce((max, item) => {
       //   return new Date(item.timestamp) > new Date(max) ? item.timestamp : max;
       // }, transformedArray[0]?.timestamp);
@@ -113,7 +112,7 @@ export class CdsWidgetLogsComponent implements OnInit {
         this.highestTimestamp = transformedArray[transformedArray.length-1].timestamp;
       }
       this.listOfLogs.unshift(...transformedArray);
-      this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.highestTimestamp, this.listOfLogs);
+      this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.listOfLogs);
   }
 
   
@@ -121,6 +120,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   async initializeChatbot(){
+    this.listOfLogs = [];
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
     this.listOfLogs = [];
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
@@ -220,7 +220,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   subscriptions(){
      /** get dynamic logs */
     this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage.subscribe((message: any) => {
-      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
+      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message, this.highestTimestamp);
       if(message){
         if (new Date(message.timestamp) > new Date(this.highestTimestamp) || !this.highestTimestamp){
           this.listOfLogs.push(message);

@@ -132,6 +132,7 @@
 
   &.live-active-intent-pulse {
     cursor: pointer;
+    outline: 2px solid var(--action-selected-color);
     animation: pulse-blu 1s 5 forwards;
     outline: 2px solid var(--action-selected-color);
   }
