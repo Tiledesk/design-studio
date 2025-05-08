@@ -59,7 +59,6 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // this.initTiledesk();
-    this.support_group_id = null;
     if(!this.intentService.intentSelected){
       this.intentService.setDefaultIntentSelected();
     }
@@ -114,6 +113,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   }
 
   onLoaded(event){
+    this.support_group_id = null;
     this.loading= false;
     this.logger.log('[CDS-PANEL-WIDGET] onLoaded!! ', event);
     /** enable the live stage navigation when widget iframe receive a new message from the chatbot
