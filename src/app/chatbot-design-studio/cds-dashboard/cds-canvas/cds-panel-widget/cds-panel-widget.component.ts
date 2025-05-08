@@ -36,6 +36,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   projectID: string;
   selectedChatbot: Chatbot;
   defaultDepartmentId: string;
+  support_group_id: string;
 
   public iframeVisibility: boolean = false;
   public loading:boolean = true;
@@ -58,7 +59,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // this.initTiledesk();
-    
+    this.support_group_id = null;
     if(!this.intentService.intentSelected){
       this.intentService.setDefaultIntentSelected();
     }
@@ -72,8 +73,8 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
      */
     this.intentService.testIntent.subscribe((intent: Intent) => {
       if(intent && intent.intent_display_name){
-        this.intentName = intent.intent_display_name
-        this.widgetIframe.nativeElement.contentWindow.postMessage(
+        this.intentName = intent.intent_display_name;
+        this.widgetIframe.nativeElement.contentWindow?.postMessage(
           {action: 'restart', intentName: this.intentName}, "*");
       }
     })
@@ -123,21 +124,17 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
     this.messageListener = (event: Event) => {
       const eventData = (event as MessageEvent).data;
-      // this.logger.log('[CDS-PANEL-WIDGET] messageListener ', eventData);
+      this.logger.log('[CDS-PANEL-WIDGET] messageListener ', event);
       if(eventData?.source?.includes('widget') && eventData.event === 'onNewConversation'){
         this.logger.log('[CDS-PANEL-WIDGET] OPEN NEW CONVERSATION ', eventData);
         const conversation_id = eventData?.data?.conversation_id;
         this.newConversation.emit(conversation_id);
-      }
-      else if(eventData?.source?.includes('widget')){
+      } else if(eventData?.source?.includes('widget')){
         let message = eventData?.data?.message;
         this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message);
-        if(message.status>0){
-          if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
-            let intentName = message.attributes.intentName;
-            //this.intentService.setLiveActiveIntent(intentName);
-          }else{
-            //this.intentService.setLiveActiveIntent(null);
+        if(message && message.status>0){
+          if(!this.support_group_id){
+            this.initLogStaticServices(message);
           }
         }
       }
@@ -168,6 +165,15 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     //     }
     //   }
     // })
+  }
+
+
+  initLogStaticServices(message){
+    this.support_group_id = message.recipient?message.recipient:null;
+    const projectId = message.attributes?.projectId?message.attributes?.projectId:null;
+    this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', this.support_group_id, projectId);
+    let serverBaseURL = this.appConfigService.getConfig().apiUrl;
+    this.logService.initStaticServices(serverBaseURL, projectId, this.support_group_id); 
   }
 
   startTest(){

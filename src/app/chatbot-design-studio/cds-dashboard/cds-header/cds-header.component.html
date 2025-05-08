@@ -34,12 +34,12 @@
         <span class="material-icons" [matMenuTriggerFor]="menuShare">ios_share</span>
     </div>
     <div class="right-opts">
-        <!-- && !webhookUrl -->
-        <div *ngIf="isBlockSectionActive " class="btn-group" id="cds-publish-btn-wrp" [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
+
+        <div *ngIf="isBlockSectionActive" class="btn-group" id="cds-publish-btn-wrp" [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
             <button *ngIf="!isPlaying" id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="onClickPublish()">
-                <!-- <span class="material-icons">
+                <span class="material-icons">
                     cached
-                </span>  -->
+                </span>
                 {{ 'Publish' | translate}}
             </button>
 
@@ -87,14 +87,18 @@
             </ul> -->
         </div>
 
-        <div *ngIf="TRY_ON_WA === true && isBlockSectionActive && !isPlaying" class="btn-group">
+        <div *ngIf="TRY_ON_WA === true && isBlockSectionActive && !isWebhook && !isPlaying" class="btn-group">
             <button id="cds-test-it-wab-out-btn" class="btn btn-primary cds-blue-button" type="button" (click)="openWhatsappPage()">
                 <img width="18px" height="18px" src="assets/images/channel_icons/whatsapp-logo_green.svg">
                 {{ 'TryOnWhatsapp' | translate}}
             </button>
         </div>
 
-        <div *ngIf="webhookUrl" class="btn-group box-url" (click)="copyText(true)">
+        <div *ngIf="webhookUrl && isPlaying && isWebhook" class="btn-group box-url" 
+                matTooltipClass="cds-mat-tooltip"
+                matTooltip="{{ 'Copy Dev url' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100"
+                (click)="copyText(true)">
             <div class="button-url">
                 <span class="span-url ellips">{{webhookUrl}}</span>
                 <div *ngIf="messageWebhookUrl !== ''" class="webhook-message fade-in-out">

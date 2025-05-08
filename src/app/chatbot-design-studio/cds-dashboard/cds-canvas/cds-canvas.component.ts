@@ -513,16 +513,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.IS_OPEN_ADD_ACTIONS_MENU = false;
       }
     });    
-
-    /** SUBSCRIBE TO THE LOADED WIDGET */
-    // this.subscriptionWidgetLoaded = this.logService.BSWidgetLoaded.subscribe((event: any) => {
-    //   this.logger.log("[CDS-CANVAS] logService loaded ", event);
-    //   if(event){
-    //     //this.IS_OPEN_WIDGET_LOG = true;
-    //   }
-    // });    
+  
 
     this.subscriptionOpenWidgetPanel = this.intentService.BSTestItOut.pipe(skip(1)).subscribe((intent) => {
+      this.logger.log("[CDS-CANVAS] BSTestItOut ", intent);
       if(intent){
         this.onTestItOut(intent);
         this.IS_OPEN_WIDGET_LOG = true;
@@ -1425,9 +1419,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.intentService.setIntentSelected(intent.intent_id);
       this.closeExtraPanels();
     }
-
-
-    if(this.dashboardService.selectedChatbot.subtype !== 'webhook'){
+    const subtype = this.dashboardService.selectedChatbot.subtype;
+    if(subtype !== TYPE_CHATBOT.WEBHOOK && subtype != TYPE_CHATBOT.COPILOT){
       setTimeout(() => {
         this.controllerService.playTestItOut();
         this.IS_OPEN_PANEL_WIDGET = true;
@@ -1631,6 +1624,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   public onNewConversation(request_id){
     this.logger.log('[CDS-CANVAS] onNewConversation:: ',this.elementIntentSelected, this.logService.request_id, request_id);
     if(this.logService.request_id !== request_id){
+
+    // const support_group_id = message.recipient?message.recipient:null;
+    // const projectId = message.attributes?.projectId?message.attributes?.projectId:null;
+    // this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', support_group_id, projectId);
+
       this.logService.initialize(request_id); 
       this.IS_OPEN_WIDGET_LOG = true;
       this.mesage_request_id = request_id;
