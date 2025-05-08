@@ -225,10 +225,13 @@
         "SlugAlreadyExists":"An error occurred: slug already exists",
         "VoiceProvider":"Voice provider",
         "VoiceName" :"Voice",
+        "VoiceLanguage":"Voice language",
         "TextToSpeechModel":"Text-To-Speech model",
         "SpeechToTextModel":"Speech-To-Text model",
         "SelectProvider":"Select provider",
-        "SelectAnOption":"Select an option"
+        "SelectAnOption":"Select an option",
+        "TextToSpeechModelDescription": "Generates audio from the input text.",
+        "SpeechToTextModelDescription":"Transcribes audio into the input language."
     },
     "BotDetails": "Bot details",
     "Developer": "Developer",

@@ -21,6 +21,12 @@ export const DOCS_LINK = {
     },
     JSON_BUTTONS: {
         more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
+    },
+    VOICE_SETTINGS: {
+        tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
+        stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
+        voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
+        voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
     }
 }
 

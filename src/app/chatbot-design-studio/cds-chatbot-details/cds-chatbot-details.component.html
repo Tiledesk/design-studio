@@ -56,8 +56,7 @@
     <cds-voice-settings *ngIf="activeSection===SETTINGS_SECTION.VOICE_SETTINGS && selectedChatbot?.subtype === TYPE_CHATBOT.VOICE"
       class="scrollMePage"
       [selectedChatbot]="selectedChatbot"
-      [project]="project"
-      [translationsMap]="translationsVoiceSettingsMap">
+      [project]="project">
     </cds-voice-settings>
 
     <cds-detail-import-export *ngIf="activeSection===SETTINGS_SECTION.IMPORT_EXPORT"

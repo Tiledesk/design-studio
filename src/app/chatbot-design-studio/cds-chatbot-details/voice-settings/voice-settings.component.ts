@@ -7,6 +7,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { variableList } from '../../utils-variables';
 import { SelectComponent } from '../../cds-base-element/select/select.component';
+import { DOCS_LINK } from '../../utils';
 
 @Component({
   selector: 'cds-voice-settings',
@@ -16,20 +17,26 @@ import { SelectComponent } from '../../cds-base-element/select/select.component'
 export class CDSVoiceSettingsComponent implements OnInit {
 
   @ViewChild('voiceName') voiceNameSelect!: SelectComponent;
+  @ViewChild('voiceLanguage') voiceLanguageSelect!: SelectComponent;
   
   @Input() selectedChatbot: Chatbot;
   @Input() project: Project;
-  @Input() translationsMap: Map<string, string> = new Map();
 
+  //const
   voiceProviderList = voiceProviderList;
+  DOCS_LINK = DOCS_LINK;
+
   tts_model_list = [];
   stt_model_list = [];
   voice_name_list = [];
+  voice_language_list = [];
   voiceProvider: string
   tts_model: string;
   stt_model: string;
   voice_name: string;
+  voice_language: string
 
+  
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private faqKbService: FaqKbService,
@@ -48,12 +55,14 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.tts_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_MODEL')?.value
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value
     this.voice_name = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_VOICE_NAME')?.value
-    this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type === 'neural' ? ' - neural' : ''} (${el.language_code})` }))
-    
+    this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
+    this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''} (${el.language_code})` }))
+    this.voice_language = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code
+
     if(this.voiceProvider === 'openai'){
-      this.tts_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, description: `${el.type === 'neural' ? ' - neural' : ''}` }))
-      this.stt_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, description: `${el.type === 'neural' ? ' - neural' : ''}` }))
-      this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type === 'neural' ? ' - neural' : ''}` }))
+      this.tts_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+      this.stt_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
+      this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
     }
   }
 
@@ -64,13 +73,21 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.findAndUpdateProperty("VOICE_PROVIDER", event.key)
         this.findAndUpdateProperty("TTS_VOICE_NAME", null)
         this.voiceNameSelect.onResetValue(null)
+        // this.voiceLanguageSelect.onResetValue(null)
         this.voiceProvider = event.key
-        this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type === 'neural' ? ' - neural' : ''} (${el.language_code})` }))
+        this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
+        
+        // this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''} (${el.language_code})` }))
         if(event && event.key === 'openai'){
-          this.tts_model_list = voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, description: `${el.type === 'neural' ? ' - neural' : ''}` }))
-          this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, description: `${el.type === 'neural' ? ' - neural' : ''}` }))
-          this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type === 'neural' ? ' - neural' : ''}` }))
+          this.tts_model_list = voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+          this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+          this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
         }
+        break;
+      };
+      case 'TTS_VOICE_LANGUAGE':{
+        this.voice_language = event.language_code;
+        this.voice_name_list = this.voiceProvider === 'twilio'? voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code) : voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice
         break;
       };
       case 'TTS_VOICE_NAME':{
@@ -94,7 +111,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
     const existingKey = this.selectedChatbot.attributes.globals.find(
       (item: any) => item.key === key
     );
-    
+
     if (existingKey) {
       // Se esiste, aggiorna il valore
       existingKey.value = value;

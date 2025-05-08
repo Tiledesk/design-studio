@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VoiceSettingsComponent } from './voice-settings.component';
+import { CDSVoiceSettingsComponent } from './voice-settings.component';
 
 describe('VoiceSettingsComponent', () => {
-  let component: VoiceSettingsComponent;
-  let fixture: ComponentFixture<VoiceSettingsComponent>;
+  let component: CDSVoiceSettingsComponent;
+  let fixture: ComponentFixture<CDSVoiceSettingsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ VoiceSettingsComponent ]
+      declarations: [ CDSVoiceSettingsComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(VoiceSettingsComponent);
+    fixture = TestBed.createComponent(CDSVoiceSettingsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

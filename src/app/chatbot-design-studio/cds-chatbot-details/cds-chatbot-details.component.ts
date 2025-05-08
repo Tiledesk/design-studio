@@ -117,28 +117,6 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
     })
 
-
-
-    let keys_VoiceSettings = [
-      'CDSSetting.VoiceProvider',
-      'CDSSetting.VoiceName',
-      'CDSSetting.TextToSpeechModel',
-      'CDSSetting.SpeechToTextModel',
-      'CDSSetting.SelectProvider',
-      'CDSSetting.SelectAnOption',
-    ]
-
-
-    this.translate.get(keys_VoiceSettings).subscribe((text)=>{
-      this.translationsVoiceSettingsMap.set('CDSSetting.VoiceProvider', text['CDSSetting.VoiceProvider'])
-                                      .set('CDSSetting.VoiceName', text['CDSSetting.VoiceName'])
-                                      .set('CDSSetting.TextToSpeechModel', text['CDSSetting.TextToSpeechModel'])
-                                      .set('CDSSetting.SpeechToTextModel', text['CDSSetting.SpeechToTextModel'])
-                                      .set('CDSSetting.SelectProvider', text['CDSSetting.SelectProvider'])
-                                      .set('CDSSetting.SelectAnOption', text['CDSSetting.SelectAnOption'])
-
-    })
-
   }
 
   getOSCODE() {
