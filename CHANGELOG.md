@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.32.0-rc4
+# 1.32.0-rc3
+- **bug-fixed**: minor fix on chatbot types
 
 # 1.32.0-rc2
 - **bug-fixed**: Check last repeated log in webhooks. To replicate, start a webhook, call it, then stop and play again. Last log of web response reappears.
