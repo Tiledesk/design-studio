@@ -73,6 +73,8 @@ export class CdsHeaderComponent implements OnInit {
   chatbot_id: string;
   serverBaseURL: string;
 
+  publishPaneltoggleState: boolean = false;
+  is0penDropDown: boolean = false
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -217,19 +219,15 @@ export class CdsHeaderComponent implements OnInit {
   }
 
 
+  isOpenDropdown(_is0penDropDown) {
+    this.is0penDropDown = _is0penDropDown
+    // this.logger.log('[WS-REQUESTS-MSGS] this.is0penDropDown ',this.is0penDropDown)  
+  }
+
   onClickPublish(){
-    this.logger.log('[CDS DSBRD] click on PUBLISH --> open  - CdsPublishOnCommunityModalComponent ', this.selectedChatbot)
-    const dialogRef = this.dialog.open(CdsModalActivateBotComponent, {
-      data: {
-        chatbot: this.selectedChatbot,
-        departments: this.dashboardService.departments,
-        project_id: this.projectID
-      },
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      this.logger.log(`Dialog result: ${result}`);
-      this.segmentChatbotPublished()
-    });
+    // this.publishPaneltoggleState = !this.publishPaneltoggleState
+    this.logger.log('[CDS DSBRD] click on PUBLISH --> open ', this.publishPaneltoggleState)
+    this.controllerService.openPublishPanel()
   }
 
 
@@ -372,6 +370,7 @@ export class CdsHeaderComponent implements OnInit {
 
   onOpenTestItOut(){
     if(this.isWebhook){
+      const intentId = this.intentService.intentSelected?.intent_id;
       this.logService.initialize(null); 
       if(!this.webhookUrl){
         this.createWebhook();
@@ -388,6 +387,7 @@ export class CdsHeaderComponent implements OnInit {
     }
     this.intentService.closeTestItOut();
     this.isPlaying = false;
+    this.intentService.resetLiveActiveIntent();
     this.logService.closeLog();
   }
 

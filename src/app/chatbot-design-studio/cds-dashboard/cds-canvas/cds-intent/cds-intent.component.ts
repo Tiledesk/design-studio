@@ -152,13 +152,30 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtionKey = 'intentLiveActive';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
-      subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
-        if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
-          this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
-          const stageElement = document.getElementById(intent.intent_id);
-          this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
-          this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
-        }
+      subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+        // this.logger.log("[CDS-INTENT] intentLiveActive: ", data, this.intent.intent_display_name);
+          if (data) {
+            const intent = data.intent;
+            const animation = data.animation;
+            if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+              this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+            } else if(intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK ) {
+              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + (this.intent.intent_id));
+            }
+            if (!intent || intent.intent_id !== this.intent?.intent_id) {
+              this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent.intent_id));
+            } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
+              // this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
+              const stageElement = document.getElementById(intent.intent_id);
+              if(animation){
+                this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
+              }
+              // this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
+              this.addCssClassIntentActive('live-active-intent', '#intent-content-' + (intent.intent_id));
+            } 
+          } else {
+            this.removeCssClassIntentActive('live-active-intent', '#intent-content-' + (this.intent?.intent_id));
+          }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -186,7 +203,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             this.changeIntentColor(resp.color);
           }
         }
-        
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -443,7 +459,24 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  /** addCssClassAndRemoveAfterTime */
+  /** addCssClassIntentActive */
+  private addCssClassIntentActive(className: string, componentID: string) {
+    this.logger.log("[CDS-INTENT] addCssClassIntentActive: ", className, componentID);
+    let element = this.elemenRef.nativeElement.querySelector(componentID)
+    if (element) {
+      element.classList.add(className);
+    }
+  }
+
+  private removeCssClassIntentActive(className: string, componentID: string) {
+    let element = this.elemenRef.nativeElement.querySelector(componentID);
+    this.logger.log('[CDS-INTENT] removeCssClassIntentActive: ', className, componentID);
+    if (element && element.classList.contains(className)) {
+      element.classList.remove(className);
+    }
+  }
+
+
   private addCssClassAndRemoveAfterTime(className: string, componentID: string, delay: number) {
     let element = this.elemenRef.nativeElement.querySelector(componentID)
     if (element) {
@@ -453,6 +486,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }, delay * 1000)
     }
   }
+
 
   /** setIntentAttribute */
   private setIntentAttributes(){

@@ -455,7 +455,11 @@ export class IconService {
       'terminal',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/terminal.svg')
     );
-
+    this.matIconRegistry.addSvgIcon(
+      'jump_to_element',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/jump_to_element.svg')
+    );
+    
    
   }
 }
