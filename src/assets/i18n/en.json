@@ -233,6 +233,7 @@
         "TextToSpeechModelDescription": "Generates audio from the input text.",
         "SpeechToTextModelDescription":"Transcribes audio into the input language."
     },
+    "VoiceSettings":"Voice settings",
     "BotDetails": "Bot details",
     "Developer": "Developer",
     "Done": "Done!",
