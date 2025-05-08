@@ -10,6 +10,9 @@ export const DOCS_LINK = {
         advanced_prompt: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#advanced-context', target: '_blank' }, 
         citations: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#get-contents-sources', target: '_blank' }
     }, 
+    ADD_TO_KB: {
+        namespace_as_name: { link: 'https://gethelp.tiledesk.com/articles/add-to-knowledge-base-action/', target: '_blank'},
+    },
     GPT_TASK : {
         json_mode: { link: 'https://platform.openai.com/docs/guides/structured-outputs/json-mode', target: '_blank' }
     },
@@ -64,12 +67,13 @@ export enum INTENT_COLORS {
   }
 
 export enum SIDEBAR_PAGES {
-    INTENTS     = 'cds-sb-intents',
-    SETTINGS    = 'cds-sb-settings',
-    // FULFILLMENT = 'cds-sb-fulfillment',
-    RULES       = 'cds-sb-rules',
-    GLOBALS     = 'cds-sb-globals',
-    SUPPORT     = 'cds-sb-support'
+    INTENTS         = 'cds-sb-intents',
+    SETTINGS        = 'cds-sb-settings',
+    // FULFILLMENT  = 'cds-sb-fulfillment',
+    PUBLISH_HISTORY = 'cds-sb-publish-history',
+    RULES           = 'cds-sb-rules',
+    GLOBALS         = 'cds-sb-globals',
+    SUPPORT         = 'cds-sb-support'
 }
 
 export enum SETTINGS_SECTION {
@@ -88,11 +92,11 @@ export enum EXTERNAL_URL {
 }
 
 export enum TYPE_INTENT_NAME {
-    TOPIC_INTERNAL                  = "internal",
+    TOPIC_INTERNAL     = "internal",
     START              = "start",
     DEFAULT_FALLBACK   = "defaultFallback",
-    WEBHOOK                         = 'webhook',
-    CLOSE                           = "close"
+    WEBHOOK            = 'webhook',
+    CLOSE              = "close"
 }
 
 export enum TYPE_MATH_OPERATOR {

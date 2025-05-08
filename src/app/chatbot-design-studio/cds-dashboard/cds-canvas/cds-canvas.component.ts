@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { Observable, Subscription, skip, timeout } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, skip, timeout } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -26,8 +26,9 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { TYPE_ACTION, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { storage } from 'firebase';
-import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
+import { Chatbot } from 'src/app/models/faq_kb-model';
+import { WebhookService } from '../../services/webhook-service.service';
 
 // const swal = require('sweetalert');
 
@@ -41,7 +42,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   @ViewChild('receiver_elements_dropped_on_stage', { static: false }) receiverElementsDroppedOnStage: ElementRef;
   @ViewChild('drawer_of_items_to_zoom_and_drag', { static: false }) drawerOfItemsToZoomAndDrag: ElementRef;
 
-  @Output() testItOut = new EventEmitter();
+  // @Output() testItOut = new EventEmitter();
   @Input() onHeaderTestItOut: Observable<Intent>
 
   /** listners */
@@ -109,6 +110,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private subscriptionOpenWidgetPanel: Subscription;
   testitOutFirstClick: boolean = false;
   IS_OPEN_PANEL_WIDGET: boolean = false;
+  // Variabile osservabile
+  // private _isOpenPanelWidget = new BehaviorSubject<boolean>(false);
+  // public isOpenPanelWidget$ = this._isOpenPanelWidget.asObservable();
+       
 
   /** panel widget loaded */
   private subscriptionWidgetLoaded: Subscription;
@@ -137,8 +142,18 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   startDraggingPosition: any = null;
+  mesage_request_id: string;
+
+  // ---------------------------------------------------
+  // @ Toggle Publish Panel 
+  // ---------------------------------------------------
+  private subscriptionTogglePublishPanelState: Subscription;
+  IS_OPEN_PUBLISH_PANEL: boolean = false;
+
 
   chatbotSubtype: string;
+  selectedChatbot: Chatbot;
+  projectID: string;
 
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
@@ -154,8 +169,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly route: ActivatedRoute, 
     public appStorageService: AppStorageService,
+    public logService: LogService,
     public webhookService: WebhookService,
-    public logService: LogService
+    
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -198,6 +214,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (this.subscriptionUndoRedo) {
       this.subscriptionUndoRedo.unsubscribe();
     }
+
+    if (this.subscriptionTogglePublishPanelState) {
+      this.subscriptionTogglePublishPanelState.unsubscribe();
+    }
+
+
+    
     document.removeEventListener("connector-drawn", this.listnerConnectorDrawn, false);
     document.removeEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
     document.removeEventListener("start-dragging", this.listnerStartDragging, false);
@@ -413,24 +436,24 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
       if(intents.length>0){
         this.listOfIntents = intents;
-        const chatbot_id = this.dashboardService.id_faq_kb;
-        const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
-        const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
-        if (updateWebhookObs) {
-          updateWebhookObs.subscribe({
-            next: (resp: any) => {
-              this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
-            },
-            error: (error) => {
-              this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
-            },
-            complete: () => {
-              this.logger.log("[cds-action-webhook] updateWebhook completed.");
-            }
-          });
-        } else {
-          this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
-        }
+        // const chatbot_id = this.dashboardService.id_faq_kb;
+        // const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
+        // const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
+        // if (updateWebhookObs) {
+        //   updateWebhookObs.subscribe({
+        //     next: (resp: any) => {
+        //       this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
+        //     },
+        //     error: (error) => {
+        //       this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
+        //     },
+        //     complete: () => {
+        //       this.logger.log("[cds-action-webhook] updateWebhook completed.");
+        //     }
+        //   });
+        // } else {
+        //   this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
+        // }
       }
     })
 
@@ -492,16 +515,67 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     });    
 
     /** SUBSCRIBE TO THE LOADED WIDGET */
-    this.subscriptionWidgetLoaded = this.logService.BSWidgetLoaded.subscribe((event: any) => {
-      this.logger.log("[CDS-CANVAS] logService loaded ", event);
-      if(event){
-        //this.IS_OPEN_WIDGET_LOG = true;
+    // this.subscriptionWidgetLoaded = this.logService.BSWidgetLoaded.subscribe((event: any) => {
+    //   this.logger.log("[CDS-CANVAS] logService loaded ", event);
+    //   if(event){
+    //     //this.IS_OPEN_WIDGET_LOG = true;
+    //   }
+    // });    
+
+    this.subscriptionOpenWidgetPanel = this.intentService.BSTestItOut.pipe(skip(1)).subscribe((intent) => {
+      if(intent){
+        this.onTestItOut(intent);
+        this.IS_OPEN_WIDGET_LOG = true;
+        // this.controllerService.onPlayTestItOut();
+        // this.logger.log('[CDS-CANVAS] OPEN TEST IT OUT');
+        // if(this.dashboardService.selectedChatbot.subtype !== 'webhook'){
+        //   // devo aprire il widget nel pannello
+        //   
+        // } else {
+        //   // devo aprire il pannello del log 
+        //   this.IS_OPEN_PANEL_WIDGET = false;
+        //   this.IS_OPEN_WIDGET_LOG = true;
+        // }
+      } else {
+        //this.controllerService.onStopTestItOut();
+        this.logger.log('[CDS-CANVAS] CLOSE TEST IT OUT');
+        this.IS_OPEN_PANEL_WIDGET = false;
+        this.IS_OPEN_WIDGET_LOG = false;
+      }
+    });    
+
+    this.subscriptionTogglePublishPanelState = this.controllerService.isOpenPublishPanel$.subscribe((event: any) => {
+      this.logger.log("[CDS-CANVAS] has opened Publish panel ", event);
+      // this.IS_OPEN_PUBLISH_PANEL = event
+      this.logger.log("[CDS-CANVAS] has opened Publish IS_OPEN_PUBLISH_PANEL ", this.IS_OPEN_PUBLISH_PANEL);
+      // isOpenButtonPanel
+      // if (event) {
+      //   this.closeAllPanels();
+      //   this.closeActionDetailPanel()
+      // } else {
+      //   this.IS_OPEN_ADD_ACTIONS_MENU = false;
+      // }
+
+      if (event) {
+        this.closeAllPanels();
+        this.closeActionDetailPanel();
+        // this.IS_OPEN_PANEL_WIDGET = false;
+        this.removeConnectorDraftAndCloseFloatMenu();
+        setTimeout(() => {
+          this.IS_OPEN_PUBLISH_PANEL = true;
+        }, 0);
+      } else {
+        this.IS_OPEN_PUBLISH_PANEL = false;
       }
     });    
   }
 
    /** initialize */
    private async initialize(){
+    this.selectedChatbot = this.dashboardService.selectedChatbot;
+    this.projectID = this.dashboardService.projectID;
+    // console.log('[CDS-CANVAS] selectedChatbot ::', this.selectedChatbot);
+    // console.log('[CDS-CANVAS] projectID ::', this.projectID);
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
     let getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
@@ -519,8 +593,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log('[CDS-CANVAS] totElementsOnTheStage ::', this.stageService.loaded, numIntents, numConnectors);
       // scaleAndcenterStageOnCenterPosition(this.listOfIntents)
     }
-    this.subscriptionOpenWidgetPanel = this.intentService.BStestiTout.pipe(skip(1)).subscribe((event) => this.onTestItOut(event));
-
     // ---------------------------------------
     // load localstorage
     // ---------------------------------------
@@ -539,15 +611,28 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** closeAllPanels */
   private closeAllPanels(){
-    this.IS_OPEN_PANEL_WIDGET = false;
-    this.IS_OPEN_WIDGET_LOG = false;
+    if(this.IS_OPEN_PANEL_WIDGET){
+      this.closePanelWidget();
+    }
+    // this._isOpenPanelWidget.next(false);
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
     this.IS_OPEN_COLOR_MENU = false;
+    this.IS_OPEN_PANEL_WIDGET = false;
+    this.IS_OPEN_PUBLISH_PANEL = false;
     // // this.intentService.inactiveIntent();
+  }
+
+  closePanelWidget(){
+    this.IS_OPEN_PANEL_WIDGET = false;
+    this.controllerService.stopTestItOut();
+  }
+
+  onClosePanelLog(){
+    this.IS_OPEN_WIDGET_LOG = false;
   }
 
   private closeExtraPanels(){
@@ -1324,26 +1409,30 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // - button configuration panel  
   // -------------------------------------------------------
   onTestItOut(intent: Intent) {
-    // // this.testItOut.emit(true);
-    this.closeAllPanels();
-    this.testitOutFirstClick = true;
-    this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
-    this.intentService.startTestWithIntent(intent);
-    this.controllerService.closeActionDetailPanel();
-    this.controllerService.closeButtonPanel();
-    // // this.intentService.setLiveActiveIntent(null);
-    this.controllerService.closeAddActionMenu();
-    this.connectorService.removeConnectorDraft();
     if(intent){
+      // // this.testItOut.emit(true);
+      this.closeAllPanels();
+      this.testitOutFirstClick = true;
+      this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
+      this.intentService.startTestWithIntent(intent);
+      this.controllerService.closeActionDetailPanel();
+      this.controllerService.closeButtonPanel();
+      // // this.intentService.setLiveActiveIntent(null);
+      this.controllerService.closeAddActionMenu();
+      this.connectorService.removeConnectorDraft();
       // // this.intentSelected = intent;
       this.intentService.setIntentSelectedById(intent.intent_id);
       this.intentService.setIntentSelected(intent.intent_id);
       this.closeExtraPanels();
     }
 
-    setTimeout(() => {
-      this.IS_OPEN_PANEL_WIDGET = true;
-    }, 500);
+
+    if(this.dashboardService.selectedChatbot.subtype !== 'webhook'){
+      setTimeout(() => {
+        this.controllerService.playTestItOut();
+        this.IS_OPEN_PANEL_WIDGET = true;
+      }, 100);
+    } 
   }
 
   /** onActionDeleted */
@@ -1523,25 +1612,32 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   public onShowContextMenu(event: MouseEvent): void {
-      event.preventDefault();
-      this.logger.log('[CDS-CANVAS] onShowContextMenu:: ', event);
-      // this.showCustomMenu(x, y);
-
-      // Recupera l'elemento che ha scatenato l'evento
-      const targetElement = event.target as HTMLElement;
-      const customAttributeValue = targetElement.getAttribute('custom-attribute');
-
-      if(customAttributeValue === 'tds_container'){
-        // sto incollando sullo stage
-        this.positionContextMenu.x = event.clientX;
-        this.positionContextMenu.y = event.offsetY;
-        this.IS_OPEN_CONTEXT_MENU = true;
-        this.logger.log('Attributi dell\'elemento premuto:', customAttributeValue);
-      }
+    event.preventDefault();
+    this.logger.log('[CDS-CANVAS] onShowContextMenu:: ', event);
+    const targetElement = event.target as HTMLElement;
+    const customAttributeValue = targetElement.getAttribute('custom-attribute');
+    if(customAttributeValue === 'tds_container'){
+      this.positionContextMenu.x = event.clientX;
+      this.positionContextMenu.y = event.offsetY;
+      this.IS_OPEN_CONTEXT_MENU = true;
+    }
   }
 
   public onHideContextMenu(){
     this.IS_OPEN_CONTEXT_MENU = false;
   }
+
+
+  public onNewConversation(request_id){
+    this.logger.log('[CDS-CANVAS] onNewConversation:: ',this.elementIntentSelected, this.logService.request_id, request_id);
+    if(this.logService.request_id !== request_id){
+      this.logService.initialize(request_id); 
+      this.IS_OPEN_WIDGET_LOG = true;
+      this.mesage_request_id = request_id;
+    } 
+    
+  }
+
+
 
 }

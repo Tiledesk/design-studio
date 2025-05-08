@@ -179,5 +179,4 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     this.logger.log("[PANEL-INTENT-HEADER] SALVO!!!");
     this.intentService.changeIntentName(this.intent);
   }
-
 }
