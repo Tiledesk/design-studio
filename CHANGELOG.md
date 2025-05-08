@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.32.0-rc1
+- **added**: voice settings tab into settings section to configure provider, voice, tts model and stt model (only for voice chatbot)
+
 # 1.31.2-rc10
 - **added**: Adds the ability to roll a chatbot back to a previous version
 
