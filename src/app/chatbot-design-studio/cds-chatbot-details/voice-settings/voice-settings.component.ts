@@ -58,7 +58,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value
     this.voice_name = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_VOICE_NAME')?.value
     this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
-    this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''} (${el.language_code})` }))
+    this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
     this.voice_language = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code
 
     if(this.voiceProvider === 'openai'){
@@ -93,7 +93,8 @@ export class CDSVoiceSettingsComponent implements OnInit {
       };
       case 'TTS_VOICE_LANGUAGE':{
         this.voice_language = event.language_code;
-        this.voice_name_list = this.voiceProvider === 'twilio'? voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code) : voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice
+        this.voice_name_list = this.voiceProvider === 'twilio'? voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code).map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` })) : voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice
+        
         break;
       };
       case 'TTS_VOICE_NAME':{
@@ -116,7 +117,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
   private findAndUpdateProperty(key: string, value: string){
     const existingKey = this.list.findIndex( (item: any) => item.key === key );
     if (existingKey > -1 ) {
-      this.list[existingKey] = value
+      this.list[existingKey].value = value
     } else {
       this.list.push({ key: key, value: value });
     }
