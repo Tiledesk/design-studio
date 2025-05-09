@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.32.0-rc6
+- **bug-fixed**: cannot able to save voice settings if globals not exist yes
+
 # 1.32.0-rc5
 - **bug-fixed**: show all log messages
 - **bug-fixed**: added border on intent selected when log is active
