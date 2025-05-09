@@ -26,6 +26,8 @@ export class CDSVoiceSettingsComponent implements OnInit {
   voiceProviderList = voiceProviderList;
   DOCS_LINK = DOCS_LINK;
 
+  list = [];
+
   tts_model_list = [];
   stt_model_list = [];
   voice_name_list = [];
@@ -63,6 +65,10 @@ export class CDSVoiceSettingsComponent implements OnInit {
       this.tts_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
       this.stt_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
       this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
+    }
+
+    if(this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals){
+      this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));
     }
   }
 
@@ -108,25 +114,17 @@ export class CDSVoiceSettingsComponent implements OnInit {
   
 
   private findAndUpdateProperty(key: string, value: string){
-    const existingKey = this.selectedChatbot.attributes.globals.find(
-      (item: any) => item.key === key
-    );
-
-    if (existingKey) {
-      // Se esiste, aggiorna il valore
-      existingKey.value = value;
+    const existingKey = this.list.findIndex( (item: any) => item.key === key );
+    if (existingKey > -1 ) {
+      this.list[existingKey] = value
     } else {
-      // Altrimenti, aggiungila
-      this.selectedChatbot.attributes.globals.push({
-        key: key,
-        value: value
-      });
+      this.list.push({ key: key, value: value });
     }
   }
 
   private saveAttributes() {
       
-    let data = this.selectedChatbot.attributes.globals.map(({ visible, ...keepAttrs }) => keepAttrs);
+    let data = this.list.map(({ visible, ...keepAttrs }) => keepAttrs);
     this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] saving globals ', data)
 
     this.faqKbService.addNodeToChatbotAttributes(this.selectedChatbot._id, 'globals', data).subscribe((resp) => {
