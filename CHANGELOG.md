@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # 1.32.0-rc6
+- **added**: ability to reset voice settings select options
 - **bug-fixed**: cannot able to save voice settings if globals not exist yes
 
 # 1.32.0-rc5
