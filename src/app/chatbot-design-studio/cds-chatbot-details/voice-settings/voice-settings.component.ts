@@ -79,15 +79,19 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.findAndUpdateProperty("VOICE_PROVIDER", event.key)
         this.findAndUpdateProperty("TTS_VOICE_NAME", null)
         this.voiceNameSelect.onResetValue(null)
-        // this.voiceLanguageSelect.onResetValue(null)
-        this.voiceProvider = event.key
-        this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
         
+        this.voiceProvider = event.key
+        // this.voiceLanguageSelect.onResetValue(null)
+        this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
+        this.voice_name_list = [];
         // this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''} (${el.language_code})` }))
         if(event && event.key === 'openai'){
           this.tts_model_list = voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
           this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
           this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+
+          this.voiceLanguageSelect.onResetValue(null)
+          this.voice_language = null;
         }
         break;
       };
@@ -107,6 +111,50 @@ export class CDSVoiceSettingsComponent implements OnInit {
       };
       case 'STT_MODEL':{
         this.findAndUpdateProperty("STT_MODEL", event.model)
+        break;
+      }
+    }
+    this.saveAttributes();
+  }
+
+
+  onResetSelect(event: any, key: string){
+    this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] onResetSelect ', event, key)
+    switch(key){
+      case 'VOICE_PROVIDER':{
+        this.findAndUpdateProperty("VOICE_PROVIDER", null)
+        this.findAndUpdateProperty("TTS_VOICE_NAME", null)
+        this.voice_name = null;
+        this.voice_language = null
+        if(this.voiceProvider === 'openai'){
+          this.findAndUpdateProperty("TTS_MODEL", null)
+          this.findAndUpdateProperty("STT_MODEL", null)
+          this.tts_model = null;
+          this.stt_model = null;
+        }
+        this.voiceProvider = null;
+        break;
+      };
+      case 'TTS_VOICE_LANGUAGE':{
+        this.findAndUpdateProperty("TTS_VOICE_NAME", null)
+        this.voice_name = null;
+        this.voice_language = null
+        break;
+      };
+      case 'TTS_VOICE_NAME':{
+        this.findAndUpdateProperty("TTS_VOICE_NAME", null)
+        this.voice_name = null;
+        this.voice_language = null
+        break;
+      };
+      case 'TTS_MODEL':{
+        this.findAndUpdateProperty("TTS_MODEL", null)
+        this.tts_model = null;
+        break;
+      };
+      case 'STT_MODEL':{
+        this.findAndUpdateProperty("STT_MODEL", null)
+        this.stt_model = null;
         break;
       }
     }
