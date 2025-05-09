@@ -1,10 +1,12 @@
 import { ElementRef, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, lastValueFrom } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { MqttClient } from 'src/assets/js/MqttClient.js';
 import { AppConfigService } from './app-config';
 import { TYPE_CHATBOT } from '../chatbot-design-studio/utils-actions';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 
 
 @Injectable({
@@ -12,8 +14,8 @@ import { TYPE_CHATBOT } from '../chatbot-design-studio/utils-actions';
 })
 
 export class LogService {
-  BSWidgetLoaded = new BehaviorSubject<boolean>(null);
-  BSWidgetLoadedNewMessage = new BehaviorSubject<any>(null);
+  BSWidgetLoaded = new Subject<boolean>();
+  BSWidgetLoadedNewMessage = new Subject<any>();
 
   mqtt_client: any;
   SERVER_BASE_PATH: string;
@@ -25,14 +27,36 @@ export class LogService {
   
   constructor(
     public readonly appConfigService: AppConfigService,
+    public appStorageService: AppStorageService,
+    private readonly _httpClient: HttpClient
   ) {}
 
 
+  public getStaticLastLogs(logLevel?): Observable<any> {
+    const tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': tiledeskToken
+      })
+    };
+    let url = this.LOG_URL+'?logLevel='+logLevel;
+    this.logger.log('[LOG-SERV] - GET LOG - URL', url);
+    return this._httpClient.get<any>(url, httpOptions)
+  }
+
+
+
+  async initStaticServices(serverBaseUrl: string, projectId: string, support_group_id: string){
+    const tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    this.LOG_URL = serverBaseUrl + projectId + '/logs/flows/' + support_group_id;
+    this.logger.log('[LOG-SERV] initialize', serverBaseUrl, this.LOG_URL);
+    this.logs = '';
+    this.BSWidgetLoaded.next(true);
+  }
+
 
   public initialize(request_id: string){
-    // if(this.mqtt_client){
-    //   this.closeLog();
-    // }
     this.request_id = request_id;
     this.logger.log("[LOG-SERV] getConfig : ", this.appConfigService.getConfig());
     const appId = this.appConfigService.getConfig().chat21Config.appId;

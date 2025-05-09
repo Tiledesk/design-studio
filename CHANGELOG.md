@@ -7,6 +7,29 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.32.0-rc6
+- **added**: ability to reset voice settings select options
+- **bug-fixed**: cannot able to save voice settings if globals not exist yes
+
+# 1.32.0-rc5
+- **bug-fixed**: show all log messages
+- **bug-fixed**: added border on intent selected when log is active
+- **bug-fixed**: fixed cssbugs in panel log
+
+# 1.32.0-rc4
+
+# 1.32.0-rc3
+- **bug-fixed**: minor fix on chatbot types
+
+# 1.32.0-rc2
+- **bug-fixed**: Check last repeated log in webhooks. To replicate, start a webhook, call it, then stop and play again. Last log of web response reappears.
+- **bug-fixed**: Check first log in ai agents. The first log is “action reply terminated”, it seems that the first log is lost. Question of queue subscription timing?
+- **bug-fixed**: Publish button disappeared in webhooks: you always see the dev url that should be visible only after pressing play and should disappear when you press stop.
+- **bug-fixed**: Put separate production and dev urls in the webhook detail
+- **bug-fixed**: If you press play on the webhook and then stop without calling it, the webhook block continues to flash
+- **bug-fixed**: In the webhook detail use the default setting “wide” so that the entire url is visible
+- **bug-fixed**: Widen the div of the dev url next to the start/stop and add a tooltip that says “Copy dev url” and after copying it replace “Text copied successfully” with “Dev url copied successfully”
+- **bug-fixed**: Regenerate button must show alert that says “Warning, regenerating the webhook url the previous url will no longer be available”.
 
 # 1.32.0-rc1
 - **added**: voice settings tab into settings section to configure provider, voice, tts model and stt model (only for voice chatbot)

@@ -19,6 +19,7 @@ import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 
 export class CdsWidgetLogsComponent implements OnInit {
   private subscriptionWidgetLoadedNewMessage: Subscription;
+  private subscriptionLoadedWidget: Subscription;
   @Input() 
   set IS_OPEN_PANEL_WIDGET(value: boolean) {
     this.isOpenPanelWidget = value;
@@ -40,7 +41,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   selectedLogLevel = LOG_LEVELS.DEBUG;
   isOpenPanelWidget: boolean;
   mqtt_token: string;
-  // request_id: string;
+  highestTimestamp: string;
 
   private startY: number;
   private startHeight: number;
@@ -76,9 +77,52 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
 
+
+  getStaticLastLogs(){
+    this.logService.getStaticLastLogs(this.selectedLogLevel).subscribe({ next: (resp)=> {
+      this.logger.log("[CDS-WIDGET-LOG] getStaticLastLogs", resp);
+      this.appendFirstMessagesToHeadArray(resp);
+    }, error: (error)=> {
+      this.logger.error("[LOG-SERV] initLogService error: ", error);
+    }, complete: () => {
+      this.logger.log("[LOG-SERV] initLogService completed.");
+    }})
+  }
+
+
+
+  private appendFirstMessagesToHeadArray(dataArray) {
+      let transformedArray = dataArray.map(item => ({
+          dev: false,
+          id_project: item.id_project,
+          intent_id: item.rows.intent_id,
+          level: item.rows.level,
+          nlevel: item.rows.nlevel,
+          request_id: item.request_id,
+          text: item.rows.text,
+          timestamp: item.rows.timestamp
+      }));
+      // this.highestTimestamp = transformedArray.reduce((max, item) => {
+      //   return new Date(item.timestamp) > new Date(max) ? item.timestamp : max;
+      // }, transformedArray[0]?.timestamp);
+      if(this.listOfLogs.length > 0){
+        const cutoffTimestamp = new Date(this.listOfLogs[0].timestamp);
+        transformedArray = transformedArray.filter(item => new Date(item.timestamp) < cutoffTimestamp);
+      } else {
+        this.highestTimestamp = transformedArray[transformedArray.length-1].timestamp;
+      }
+      this.listOfLogs.unshift(...transformedArray);
+      this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.listOfLogs);
+  }
+
+  
+  
+
+
   async initializeChatbot(){
+    this.listOfLogs = [];
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
-    this.closeLog();
+    this.listOfLogs = [];
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
     if(chatbotSubtype === 'webhook'){
       const webhook_id = await this.getWebhook();
@@ -88,7 +132,6 @@ export class CdsWidgetLogsComponent implements OnInit {
     } else {
       this.request_id = this.logService.request_id;
     }
-
     if(this.request_id){
       let resp = await this.getToken(this.request_id);
       if(resp){
@@ -168,15 +211,20 @@ export class CdsWidgetLogsComponent implements OnInit {
     if (this.subscriptionWidgetLoadedNewMessage) {
       this.subscriptionWidgetLoadedNewMessage.unsubscribe();
     }
+    if(this.subscriptionLoadedWidget) {
+      this.subscriptionLoadedWidget.unsubscribe();
+    }
   }
 
 
   subscriptions(){
-    this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage .subscribe((message: any) => {
-      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
+     /** get dynamic logs */
+    this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage.subscribe((message: any) => {
+      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message, this.highestTimestamp);
       if(message){
-        //stopAnimation();
-        this.listOfLogs.push(message);
+        if (new Date(message.timestamp) > new Date(this.highestTimestamp) || !this.highestTimestamp){
+          this.listOfLogs.push(message);
+        }
         //this.goToIntentByMessage(message);
         this.scrollToBottom();
       } else {
@@ -188,6 +236,16 @@ export class CdsWidgetLogsComponent implements OnInit {
       this.goToIntentByMessage(message);
       this.filterLogMessage();
     });  
+
+
+    /** get the static logs the first time */
+    this.subscriptionLoadedWidget = this.logService.BSWidgetLoaded.subscribe((resp: boolean) => {
+      this.logger.log("[CDS-WIDGET-LOG] loaded ", resp);
+      if(resp){
+        this.getStaticLastLogs();
+      };
+    });  
+    
   }
 
 

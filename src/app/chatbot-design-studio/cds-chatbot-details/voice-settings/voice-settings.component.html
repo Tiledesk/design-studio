@@ -14,7 +14,8 @@
                     [itemSelected]="voiceProvider" 
                     [placeholder]="'CDSSetting.SelectProvider' | translate"
                     [clearable]="true" 
-                    (onSelected)="onSelect($event, 'VOICE_PROVIDER')">
+                    (onSelected)="onSelect($event, 'VOICE_PROVIDER')"
+                    (onReset)="onResetSelect($event, 'VOICE_PROVIDER')">
                 </cds-select>
             </div>
         </div>
@@ -35,7 +36,9 @@
                         [itemSelected]="voice_language" 
                         [placeholder]="'CDSSetting.SelectAnOption' | translate"
                         [clearable]="true" 
-                        (onSelected)="onSelect($event, 'TTS_VOICE_LANGUAGE')">
+                        [searchable]="true"
+                        (onSelected)="onSelect($event, 'TTS_VOICE_LANGUAGE')"
+                        (onReset)="onResetSelect($event, 'TTS_VOICE_LANGUAGE')">
                     </cds-select>
                 </div>
             </div>
@@ -52,7 +55,9 @@
                         [itemSelected]="voice_name" 
                         [placeholder]="'CDSSetting.SelectAnOption' | translate"
                         [clearable]="true" 
-                        (onSelected)="onSelect($event, 'TTS_VOICE_NAME')">
+                        [searchable]="true"
+                        (onSelected)="onSelect($event, 'TTS_VOICE_NAME')"
+                        (onReset)="onResetSelect($event, 'TTS_VOICE_NAME')">
                     </cds-select>
                     <!-- <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
                         {{'BotsAddEditPage.SlugAlert' | translate}}
@@ -75,7 +80,8 @@
                     [itemSelected]="tts_model" 
                     [placeholder]="'CDSSetting.SelectAnOption' | translate"
                     [clearable]="true" 
-                    (onSelected)="onSelect($event, 'TTS_MODEL')">
+                    (onSelected)="onSelect($event, 'TTS_MODEL')"
+                    (onReset)="onResetSelect($event, 'TTS_MODEL')">
                 </cds-select>
                 <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
                     {{'CDSSetting.TextToSpeechModelDescription' | translate}}
@@ -97,7 +103,8 @@
                     [itemSelected]="stt_model" 
                     [placeholder]="'CDSSetting.SelectAnOption' | translate"
                     [clearable]="true" 
-                    (onSelected)="onSelect($event, 'STT_MODEL')">
+                    (onSelected)="onSelect($event, 'STT_MODEL')"
+                    (onReset)="onResetSelect($event, 'STT_MODEL')">
                 </cds-select>
                 <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
                     {{'CDSSetting.SpeechToTextModelDescription' | translate}}
