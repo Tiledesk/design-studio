@@ -276,12 +276,26 @@
   }
 }
 
-::ng-deep  .swal-restore > .swal-title{
+::ng-deep .swal-restore>.swal-title {
   font-size: 16px;
   font-weight: 400;
 }
 
-::ng-deep  .swal-restore > .swal-text{
+::ng-deep .swal-restore>.swal-text {
   font-weight: 600;
   text-align: center;
+}
+
+
+.no-release-container{
+  display: flex;
+  justify-content: center;
+  height: 100px;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.no-release-title {
+  font-weight: 400;
 }
