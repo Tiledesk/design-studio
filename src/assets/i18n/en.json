@@ -1238,5 +1238,7 @@
     "NowThatYouHavePublishedWhCp": "Now that you've published your {{sub_type}}, use the following URL to trigger it",
     "AreYouSureYouWantToRestore":"Are you sure you want to restore the Flow {{release_name}} to {{release_date}} version?",
     "ThisOperationWillReplaceTheCurrentlyPublishedFlow":"This operation will replace the currently published Flow",
-    "Copied":"Copied"
+    "Copied":"Copied",
+    "NoReleaseHistoryAvailable": "No release history available",
+    "PublishYourFlowToSeeTheReleaseHistoryAppearHere": "Publish your Flow to see the release history appear here"
 }
