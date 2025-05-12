@@ -1,5 +1,4 @@
 <div class="cds-attributes">
-   
     <div *ngIf="method == typeMethodAttribute.INPUT">
         <div *ngFor="let attribute of newAttributes; let i = index;">
             <div class="auto-suggest-group">
@@ -23,7 +22,7 @@
 
                 <!-- VALUE -->
                 <cds-textarea id="value"
-                    class="value"
+                    class="txt-value"
                     [text]="attribute.value"
                     [textLimitBtn]="false"
                     [emojiPikerBtn]="false"

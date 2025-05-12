@@ -1,0 +1,14 @@
+.field-description {
+    display: block;
+}
+.link-container {
+    margin-bottom: 20px;
+    a.link {
+        font-size: 14px;
+        font-weight: 400;
+    }
+    a.link:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+}

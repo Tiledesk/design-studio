@@ -92,12 +92,14 @@ ng-select {
     }    
 }
 
-::ng-deep .ng-select .ng-select-container {
-    border-radius: var(--input-border-radius-base);
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border: 1px solid var(--blu-light-02);
-}
+ng-select#depSelect ::ng-deep{
+    .ng-select-container {
+        border-radius: var(--input-border-radius-base);
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border: 1px solid var(--blu-light-02);
+    }
+} 
 
 .cds-bot_avatar_label {
     height: 36px;

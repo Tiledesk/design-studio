@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { IntentService } from '../../../services/intent.service';
 import { LogService } from 'src/app/services/log.service';
@@ -23,6 +23,8 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   @ViewChild('widgetIframe', {static:true}) widgetIframe:ElementRef;
   @Input() isPanelVisible: boolean = false;
+  @Output() newConversation = new EventEmitter();
+
   // @Input() intent: Intent;
   // @Input() projectID: string;
   // @Input() id_faq_kb: string;
@@ -34,12 +36,14 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   projectID: string;
   selectedChatbot: Chatbot;
   defaultDepartmentId: string;
+  support_group_id: string;
 
   public iframeVisibility: boolean = false;
   public loading:boolean = true;
 
   WIDGET_BASE_URL: string = '';
   widgetTestSiteUrl: SafeResourceUrl = null;
+  private messageListener: (event: Event) => void;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -55,7 +59,6 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // this.initTiledesk();
-    
     if(!this.intentService.intentSelected){
       this.intentService.setDefaultIntentSelected();
     }
@@ -69,8 +72,8 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
      */
     this.intentService.testIntent.subscribe((intent: Intent) => {
       if(intent && intent.intent_display_name){
-        this.intentName = intent.intent_display_name
-        this.widgetIframe.nativeElement.contentWindow.postMessage(
+        this.intentName = intent.intent_display_name;
+        this.widgetIframe.nativeElement.contentWindow?.postMessage(
           {action: 'restart', intentName: this.intentName}, "*");
       }
     })
@@ -80,6 +83,16 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     this.defaultDepartmentId = this.dashboardService.defaultDepartment._id;
     this.logger.log('[CDS-PANEL-WIDGET] ngOnInit  ');
     this.setIframeUrl()
+  }
+
+
+  ngAfterViewInit() {
+    const iframe = document.querySelector('iframe');
+    if (iframe) {
+      iframe.addEventListener('load', (event) => {
+        this.onLoaded(event);
+      });
+    }
   }
 
   setIframeUrl(){
@@ -100,57 +113,79 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   }
 
   onLoaded(event){
-    this.loading= false
+    this.support_group_id = null;
+    this.loading= false;
     this.logger.log('[CDS-PANEL-WIDGET] onLoaded!! ', event);
     /** enable the live stage navigation when widget iframe receive a new message from the chatbot
      *  - get message from widget page
      *  - get intent name from message attributes
      *  - set live active intent and start animation
      */
-    window.addEventListener('message', (event_data)=> {
-      if(event_data && event_data.origin.includes('widget')){
-        let message = event_data.data.message
-        //publish ACTIVE INTENT only if widget-panel is visible
-        if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
-          if(this.logService?.logs === null){
-            this.logger.log('[CDS-PANEL-WIDGET] message  INIZIALIZZO!! ', this.logService?.logs);
-            this.initLogService(message);
+
+    this.messageListener = (event: Event) => {
+      const eventData = (event as MessageEvent).data;
+      this.logger.log('[CDS-PANEL-WIDGET] messageListener ', event);
+      if(eventData?.source?.includes('widget') && eventData.event === 'onNewConversation'){
+        this.logger.log('[CDS-PANEL-WIDGET] OPEN NEW CONVERSATION ', eventData);
+        const conversation_id = eventData?.data?.conversation_id;
+        this.newConversation.emit(conversation_id);
+      } else if(eventData?.source?.includes('widget')){
+        let message = eventData?.data?.message;
+        this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message, this.support_group_id);
+        if(message && message.status>0){
+          if(!this.support_group_id){
+            this.initLogStaticServices(message);
           }
-          let intentName = message.attributes.intentName
-          this.intentService.setLiveActiveIntent(intentName)
-        }else{
-          this.intentService.setLiveActiveIntent(null)
         }
       }
-    })
+    };
+    window.addEventListener('message', this.messageListener);
+
+    // window.addEventListener('message', (event_data)=> {
+    //   if(event_data && event_data?.data?.source?.includes('widget') &&  event_data?.data?.event === 'onNewConversation'){
+    //     this.logger.log('[CDS-PANEL-WIDGET] OPEN NEW CONVERSATION ', event_data);
+    //     const conversation_id = event_data?.data?.data?.conversation_id;
+    //     this.newConversation.emit(conversation_id);
+    //   }
+
+    //   else if(event_data && event_data?.data?.source?.includes('widget') ){
+    //     let message = event_data?.data?.data?.message;
+    //     this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message);
+    //     // const request_id = message?.recipient;
+    //     // this.newConversation.emit(request_id);
+
+    //     if(message.status>0){
+    //       //publish ACTIVE INTENT only if widget-panel is visible
+    //       if(message && message.attributes && message.attributes.intentName && this.isPanelVisible){
+    //         let intentName = message.attributes.intentName;
+    //         this.intentService.setLiveActiveIntent(intentName);
+    //       }else{
+    //         this.intentService.setLiveActiveIntent(null);
+    //       }
+    //     }
+    //   }
+    // })
+  }
+
+
+  initLogStaticServices(message){
+    this.support_group_id = message.recipient?message.recipient:null;
+    const projectId = message.attributes?.projectId?message.attributes?.projectId:null;
+    this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', this.support_group_id, projectId);
+    let serverBaseURL = this.appConfigService.getConfig().apiUrl;
+    this.logService.initStaticServices(serverBaseURL, projectId, this.support_group_id); 
   }
 
   startTest(){
     this.iframeVisibility = !this.iframeVisibility
   }
 
-
-  ngOnDestroy(): void {
+  ngOnDestroy() {
+    window.removeEventListener('message', this.messageListener);
   }
 
   resetLogService(){
     this.logService.resetLogService();
   }
-
-  initLogService(message){
-    const support_group_id = message.recipient?message.recipient:null;
-    const projectId = message.attributes?.projectId?message.attributes?.projectId:null;
-    this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', support_group_id, projectId);
-    let serverBaseURL = this.appConfigService.getConfig().apiUrl;
-    this.logService.initialize(serverBaseURL, projectId, support_group_id); 
-    // this.logService.getLastLogs().subscribe({ next: (resp)=> {
-    //   this.logService.initLogService(resp);
-    // }, error: (error)=> {
-    //   this.logger.error("[LOG-SERV] initLogService error: ", error);
-    // }, complete: () => {
-    //   this.logger.log("[LOG-SERV] initLogService completed.");
-    // }})
-  }
-
 
 }

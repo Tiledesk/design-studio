@@ -1,20 +1,10 @@
 <div class="text-editor-wrapper" >
-    
-    <div *ngIf="!readonly" class="div-textarea" [class.hidden]="!showTextPreview" (click)="onClickDivTextArea();"><span class="label-text">{{labelDivTextArea}}</span></div>
- 
-
-
     <div [class.focus-in]="expand" [class.focus-out]="!expand">
-        <div class="text-editor" [class.hidden]="showTextPreview">
+        <div class="text-editor">
             <!-- [readonly]="readonly" -->
-             <!-- 
-                (blur)="onBlur($event); expand = false;"
-                (focus)="onFocus($event); expand = false;  
-            -->
             <mat-form-field class="box-textarea" appearance="fill">
                 <textarea matInput
-                    id="text-area"
-                    #textAreaRef
+                    #textAreaElement
                     #autosize="cdkTextareaAutosize"
                     [class.invalid]="control.invalid"
                     [maxlength]="limitCharsText"
@@ -24,24 +14,24 @@
                     cdkAutosizeMinRows="{{minRow}}"
                     cdkAutosizeMaxRows="{{maxRow}}"
                     [(ngModel)]="text"
-                    (ngModelChange)="onChangeTextArea($event)"
                     (click)="onClickTextareaOpenSetAttributePopover();"
                     (keydown)="openAttributesList($event)"
                     (blur)="onBlur($event); expand = false;"
-                    (focus)="onFocus($event); expand = false;" >
+                    (focus)="onFocus($event); expand = true;"
+                    (ngModelChange)="onChangeTextArea($event)">
                 </textarea>
             </mat-form-field>
     
             <div *ngIf="showUtils === true" unselectable="on" tabIndex="-1" class="editor-utils">
     
-                <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="onOpenAddVariable()">
+                <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="addVariable.toggle(); openSetAttributePopover();">
                     <span class="material-icons" style="font-size: 16px;">
                         data_object
                     </span>
                 </div>
         
                 <div *ngIf="emojiPikerBtn" class="emoji-picker">
-                    <div class="emoji-picker-button" aria-expanded="false" [satPopoverAnchor]="emojiPicker" (click)="onOpenAddEmoji();">
+                    <div class="emoji-picker-button" aria-expanded="false" [satPopoverAnchor]="emojiPicker" (click)="emojiPicker.toggle();">
                         <span class="material-icons-outlined" style="font-size: 16px;">
                             emoji_emotions
                         </span>
