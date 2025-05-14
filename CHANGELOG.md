@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.32.0-rc8
+- **changed**: replaced 'voice-twilio' with 'voice_twilio'
+
 # 1.32.0-rc7
 - **added**: Display a message on the Release History page when there are no versions
 
