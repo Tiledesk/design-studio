@@ -155,7 +155,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           this.logger.log("[CDS-INTENT] intentLiveActive: ",data, " con : ");
           if (data) {
             const intent = data.intent;
-            const animation = data.animation;
+            const logAnimationType = data.logAnimationType;
             if(intent && intent.intent_id !== this.intent?.intent_id && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
               this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
             } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
@@ -166,9 +166,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
               }, 500);
             } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
               const stageElement = document.getElementById(intent.intent_id);
-              if(animation){
-                this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
-              }
+              this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, logAnimationType);
               this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
               setTimeout(() => {
                 this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));

@@ -6,6 +6,7 @@ import { DEFAULT_ALPHA_CONNECTORS, CDS_ADD_ACTION_MENU_WIDTH, CDS_SIDEBAR_WIDTH,
 import { BehaviorSubject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { ConnectorService } from './connector.service';
+import { TYPE_LOG_ANIMATION } from '../utils-actions';
 
 
 export interface Settings {
@@ -113,12 +114,14 @@ export class StageService {
    * @param id_faq_kb 
    * @param stageElement 
    */
-  centerStageOnTopPosition(id_faq_kb, stageElement){
+  centerStageOnTopPosition(id_faq_kb, stageElement, logAnimationType){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnTopPosition ••••");
     let intervalId = setInterval(async () => {
       let scale = 1;
+      if(logAnimationType === TYPE_LOG_ANIMATION.NONE){
+        scale = this.tiledeskStage.scale;
+      }
       const result = await this.tiledeskStage.centerStageOnTopPosition(stageElement, scale);
-      // // const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
       if (result === true) {
         clearInterval(intervalId);
         this.savePositionAndScale(id_faq_kb);
