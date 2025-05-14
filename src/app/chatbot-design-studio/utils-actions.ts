@@ -77,7 +77,7 @@ export enum TYPE_ACTION_CATEGORY {
     SPECIAL         = 'Special',
     NEW             = 'New',
     VOICE           = 'Voice',
-    "VOICE-TWILIO"  = 'Voice Twilio'
+    VOICE_TWILIO    = 'Voice Twilio'
 }
 
 export enum STARTING_NAMES {
@@ -90,7 +90,7 @@ export enum STARTING_NAMES {
 export enum TYPE_CHATBOT {
     CHATBOT       = 'chatbot',
     VOICE         = 'voice',
-    VOICE_TWILIO  = 'voice-twilio',
+    VOICE_TWILIO  = 'voice_twilio',
     WEBHOOK       = 'webhook',
     COPILOT       = 'copilot',
 }
@@ -102,7 +102,7 @@ export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY['VOICE-TWILIO'], TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.VoiceTwilio',  src: 'assets/images/actions_category/twilio-voice.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE_TWILIO, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.VoiceTwilio',  src: 'assets/images/actions_category/twilio-voice.svg'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
 ]
 
@@ -183,10 +183,10 @@ export const ACTIONS_LIST: {
     SPEECH_FORM:            { name: 'CDSActionList.NAME.SpeechForm',            chatbot_types: [TYPE_CHATBOT.VOICE ],                                                                                                   category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
     AUDIO_RECORD:           { name: 'CDSActionList.NAME.AudioRecord',           chatbot_types: [TYPE_CHATBOT.VOICE ],                                                                                                   category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.AUDIO_RECORD,    src:"assets/images/actions-voice/audio_record.svg",     status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
 
-    DFTM_FORM_TWILIO:       { name: 'CDSActionList.NAME.DTMFForm',              chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
-    DTMF_MENU_TWILIO:       { name: 'CDSActionList.NAME.DTMFMenu',              chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
-    BLIND_TRANSFER_TWILIO:  { name: 'CDSActionList.NAME.BlindTransfer',         chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
-    PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
-    SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY['VOICE-TWILIO'],     type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
+    DFTM_FORM_TWILIO:       { name: 'CDSActionList.NAME.DTMFForm',              chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,     type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
+    DTMF_MENU_TWILIO:       { name: 'CDSActionList.NAME.DTMFMenu',              chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,     type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
+    BLIND_TRANSFER_TWILIO:  { name: 'CDSActionList.NAME.BlindTransfer',         chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,     type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
+    PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,     type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
+    SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                            category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,     type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
 
 }
