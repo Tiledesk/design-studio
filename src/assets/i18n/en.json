@@ -526,6 +526,8 @@
         "InfoAvailableToAgents":"A block with this option is visible to agents for the purpose to be put back in the conversation",
         "Create":"Create",
         "Regenerate":"Regenerate",
+        "ProductionUrl":"Production Url",
+        "DevelopmentUrl":"Development Url",
         "Copy":"Copy",
         "TextCopied":"Text copied successfully!",
         "TextErrorCopied":"Error copying text",
@@ -667,6 +669,7 @@
             "SetAttribute":"Set attribute",
             "DeleteAttribute":"Delete attribute",
             "ReplaceBot":"Replace bot",
+            "ReplaceAIAgent":"Replace AI Agent",
             "Wait":"Wait",
             "WebRequest":"Web request",
             "WebResponse":"Web response",
@@ -795,6 +798,13 @@
                 "IMAGE": "assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL": "",
                 "DOC_URL": "https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
+            },
+            "ReplaceAIAgent":{
+                "TITLE":"Replace the current bot with another one",
+                "DESCRIPTION":"Replaces the current chatbot with the specied one",
+                "IMAGE":"assets/images/doc/REPLACE_BOT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
             },
             "Wait": {
                 "TITLE": "Wait before next action",

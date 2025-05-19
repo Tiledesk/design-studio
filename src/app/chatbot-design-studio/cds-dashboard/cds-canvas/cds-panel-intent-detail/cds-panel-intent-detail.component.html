@@ -62,7 +62,7 @@
             -->
     
             <div>
-                <div>Webhook Url</div>
+                <div> {{'ProductionUrl' | translate}} </div>
                 <div class="webhook-block">
                     <div class="webhook-icon" *ngIf="!webhookUrl">
                         <img src="assets/images/icons/webhook.svg" alt="webhook">
@@ -81,7 +81,7 @@
 
 
             <div *ngIf="webhookUrlDev">
-                <div>Webhook Url Dev</div>
+                <div>{{'DevelopmentUrl' | translate}}</div>
                 <div class="webhook-block">
                     <input #copyInput class="webhook-link" type="text" [value]="webhookUrlDev">
                     <div class="webhook-icon end" (click)="onCopyToClipboard(copyInput.value)"

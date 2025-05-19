@@ -113,12 +113,10 @@ export class StageService {
    * @param id_faq_kb 
    * @param stageElement 
    */
-  centerStageOnTopPosition(id_faq_kb, stageElement){
+  centerStageOnTopPosition(id_faq_kb, stageElement, scale){
     this.logger.log("[CDS-STAGE]  •••• centerStageOnTopPosition ••••");
     let intervalId = setInterval(async () => {
-      let scale = 1;
       const result = await this.tiledeskStage.centerStageOnTopPosition(stageElement, scale);
-      // // const result = await this.tiledeskStage.centerStageOnHorizontalPosition(pos);
       if (result === true) {
         clearInterval(intervalId);
         this.savePositionAndScale(id_faq_kb);
