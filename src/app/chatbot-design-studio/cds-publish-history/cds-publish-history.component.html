@@ -5,6 +5,19 @@
     </div>
 </div>
 <div class="publish-history-page-main-content">
+
+
+    <div class="no-release-container" *ngIf="releases?.length === 0">
+
+        <div class="no-release-title">
+            {{'NoReleaseHistoryAvailable' | translate}}
+        </div>
+
+        <div class="no-release-subtitle">
+            {{'PublishYourFlowToSeeTheReleaseHistoryAppearHere' | translate}}
+        </div>
+    </div>
+
     <div class="publish-history-page-container">
 
         <div class="vfui_1ss6mi9c vfui_1ss6mi9k vfui_1ss6mi9l vfui_1ss6mi928 publish-history-list">

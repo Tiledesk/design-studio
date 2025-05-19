@@ -7,7 +7,23 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.32.0-rc8
+- **changed**: replaced 'voice-twilio' with 'voice_twilio'
+
+# 1.32.0-rc7
+- **added**: Display a message on the Release History page when there are no versions
+
+# 1.32.0-rc6
+- **added**: ability to reset voice settings select options
+- **bug-fixed**: cannot able to save voice settings if globals not exist yes
+
+# 1.32.0-rc5
+- **bug-fixed**: show all log messages
+- **bug-fixed**: added border on intent selected when log is active
+- **bug-fixed**: fixed cssbugs in panel log
+
 # 1.32.0-rc4
+
 # 1.32.0-rc3
 - **bug-fixed**: minor fix on chatbot types
 
