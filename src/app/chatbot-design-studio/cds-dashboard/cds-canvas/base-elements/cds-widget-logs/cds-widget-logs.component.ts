@@ -8,7 +8,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
-import { TYPE_CHATBOT, TYPE_LOG_ANIMATION } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-widget-logs',

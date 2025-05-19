@@ -6,7 +6,6 @@ import { DEFAULT_ALPHA_CONNECTORS, CDS_ADD_ACTION_MENU_WIDTH, CDS_SIDEBAR_WIDTH,
 import { BehaviorSubject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { ConnectorService } from './connector.service';
-import { TYPE_LOG_ANIMATION } from '../utils-actions';
 
 
 export interface Settings {

@@ -93,11 +93,6 @@ export enum TYPE_CHATBOT {
     COPILOT       = 'copilot',
 }
 
-export enum TYPE_LOG_ANIMATION {
-    NONE       = 'none',
-    MOVE       = 'move',
-    ZOOM       = 'zoom',
-}
 
 export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.MOST_USED, TYPE_ACTION_CATEGORY),    name: 'CDSActionCategory.MostUsed',     src: 'assets/images/actions_category/most_used.svg'},
