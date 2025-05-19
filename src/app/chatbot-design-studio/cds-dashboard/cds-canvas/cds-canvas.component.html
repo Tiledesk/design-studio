@@ -90,7 +90,14 @@
     </cds-options>
 </div>
 
-<cds-widget-logs *ngIf="IS_OPEN_WIDGET_LOG"></cds-widget-logs>
+<cds-widget-logs *ngIf="IS_OPEN_WIDGET_LOG" 
+    [class.small]="IS_OPEN_PANEL_WIDGET"
+    [request_id]="mesage_request_id"
+    [IS_OPEN_PANEL_WIDGET]="IS_OPEN_PANEL_WIDGET"
+    (closePanelLog)="onClosePanelLog()"
+></cds-widget-logs>
+
+
 
 <cds-add-action-menu class="menu--context--add" 
     [style.top.px]="15" 
@@ -143,7 +150,8 @@
     [class.isVisible]="IS_OPEN_PANEL_WIDGET"
     [class.isHidden]="!IS_OPEN_PANEL_WIDGET"
     [isPanelVisible]="IS_OPEN_PANEL_WIDGET"
-    [intent]="intentSelected">
+    [intent]="intentSelected"
+    (newConversation)="onNewConversation($event)">
 </cds-panel-widget>
 
 <cds-context-menu *ngIf="IS_OPEN_CONTEXT_MENU"

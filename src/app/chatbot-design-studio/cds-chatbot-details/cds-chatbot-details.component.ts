@@ -1,3 +1,4 @@
+import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { TranslateService } from '@ngx-translate/core';
@@ -26,6 +27,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
   
   SETTINGS_SECTION = SETTINGS_SECTION
+  TYPE_CHATBOT = TYPE_CHATBOT;
   BRAND_BASE_INFO = BRAND_BASE_INFO
   isVisibleDEP: boolean;
 
@@ -33,6 +35,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
 
   translationsMap: Map<string, string> = new Map();
+  translationsVoiceSettingsMap: Map<string, string> = new Map();
 
   private subscriptionOpenWidgetPanel: Subscription;
 

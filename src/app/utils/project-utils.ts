@@ -28,7 +28,7 @@ export class ProjectPlanUtils {
         this.checkActionCanShowInFT('GPT', TYPE_ACTION.GPT_TASK)
         this.checkActionCanShowInFT('GPT', TYPE_ACTION.GPT_ASSISTANT)
         this.checkIfActionCategoryIsInProject(TYPE_ACTION_CATEGORY.VOICE);
-        this.checkIfActionCategoryIsInProject(TYPE_ACTION_CATEGORY['VOICE-TWILIO']);
+        this.checkIfActionCategoryIsInProject(TYPE_ACTION_CATEGORY.VOICE_TWILIO);
         this.checkActionCanShow(TYPE_ACTION.CONNECT_BLOCK)
     }
 

@@ -241,15 +241,18 @@
     position: relative;
     width: 100%;
     height: 30px;
-    border-radius: 0 6px 6px 0;
+    border-radius: 6px 0 0 6px;
     background: #f2f2f2;
     font-size: 12px;
-    margin: 0;
-    padding: 0 6px 0 6px;
+    margin: 0px;
+    padding: 0 10px 0 10px;
     color: var(--blu);
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    &.start{
+        border-radius: 0 6px 6px 0;
+    }
 }
 
 .webhook-icon {
@@ -258,6 +261,25 @@
     display: flex;
     background-color: var(--blu-light-03);
     border-radius: 6px 0 0 6px;
+    z-index: 1;
+    cursor: pointer;
+    &.end{
+        border-radius: 0px 6px 6px 0px;
+    }    
+    mat-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        fill: var(--blu);
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+        svg {
+            fill: var(--blu);
+        }
+    }
     img {
         width: 20px;
         height: 20px;
