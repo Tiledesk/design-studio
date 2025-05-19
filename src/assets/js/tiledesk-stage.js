@@ -339,10 +339,14 @@ export class TiledeskStage {
     }
     
 
-    centerStageOnTopPosition(stageElement, scale=1){
-        // //console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnTopPosition ••••");
+    centerStageOnTopPosition(stageElement, scale){
+        // //console.log("[TILEDESK-STAGE-JS]  •••• centerStageOnTopPosition ••••", stageElement, scale);
         if(stageElement){
-            this.scale = scale;
+            if(scale){
+                this.scale = scale;
+            } else {
+                scale = this.scale;
+            }
             const w = stageElement.offsetWidth*scale;
             const h = stageElement.offsetHeight*scale;
             const x = stageElement.offsetLeft*scale;

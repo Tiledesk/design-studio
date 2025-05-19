@@ -38,19 +38,33 @@
 }
 
 .resize-handle .buttons-header-right {
-  position: absolute;
-  right: 10px;
-  top: 5px;
   display: flex;
   cursor: pointer;
+  justify-content: flex-end;
+  align-items: center;
+  height: 28px;
   .button-img {
-    margin-left: 10px;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
   }
-  img {
-    height: 18px;
+
+  ::ng-deep mat-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-  img.clear{
+
+  ::ng-deep mat-icon.run svg{
     height: 15px;
+  }
+  ::ng-deep mat-icon.bin svg{
+    height: 16px;
+  }
+  ::ng-deep mat-icon.closeLog svg{
+    height: 20px;
   }
 }
 

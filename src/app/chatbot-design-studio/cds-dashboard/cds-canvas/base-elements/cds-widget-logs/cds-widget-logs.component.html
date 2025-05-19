@@ -17,13 +17,14 @@
             </div> 
             -->
             <div class="button-img" (click)="onSetAnimationLog()">
-                <img class="active-icon clear" src="assets/images/icons/bin.svg" alt="button clear">
+                <mat-icon *ngIf="animationLog" class="sprint" svgIcon="sprint" aria-hidden="true"></mat-icon>
+                <mat-icon *ngIf="!animationLog" class="sprint" svgIcon="pause" aria-hidden="true"></mat-icon>
             </div>
             <div class="button-img" (click)="onClearLog()">
-                <img class="active-icon clear" src="assets/images/icons/bin.svg" alt="button clear">
+                <mat-icon class="bin" svgIcon="bin" aria-hidden="true"></mat-icon>
             </div>
             <div class="button-img" (click)="onCloseLog()">
-                <img class="active-icon" src="assets/images/icons/close.svg" alt="button close">
+                <mat-icon class="closeLog" svgIcon="close" aria-hidden="true"></mat-icon>
             </div>
         </div>
         

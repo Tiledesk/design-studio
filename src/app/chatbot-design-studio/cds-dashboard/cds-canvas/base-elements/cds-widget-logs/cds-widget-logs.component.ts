@@ -39,7 +39,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   isOpenPanelWidget: boolean;
   mqtt_token: string;
   highestTimestamp: string;
-  animationLog = false;
+  animationLog: boolean = true;
 
   private startY: number;
   private startHeight: number;
@@ -117,6 +117,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   async initializeChatbot(){
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
     this.listOfLogs = [];
+    this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
     if(chatbotSubtype === TYPE_CHATBOT.WEBHOOK || chatbotSubtype === TYPE_CHATBOT.COPILOT){
       const webhook_id = await this.getWebhook();
@@ -323,12 +324,15 @@ export class CdsWidgetLogsComponent implements OnInit {
   goToIntentByMessage(message){
     this.logger.log('[CDS-WIDGET-LOG] goToIntentByMessage:', message);
     const intentId = message?.intent_id;
-    let logAnimationType = localStorage.getItem('log_animation_type')?localStorage.getItem('log_animation_type'):TYPE_LOG_ANIMATION.NONE;
-    const subtype = this.dashboardService.selectedChatbot.subtype;
-    if( subtype !== TYPE_CHATBOT.WEBHOOK &&  subtype !== TYPE_CHATBOT.COPILOT ){
-      logAnimationType = TYPE_LOG_ANIMATION.ZOOM;
+    localStorage.setItem("isLoggedIn", JSON.stringify(true));
+    this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
+
+    let scale = null;
+    const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
+    if(chatbotSubtype === TYPE_CHATBOT.CHATBOT){
+      scale = 1;
     }
-    this.intentService.setLiveActiveIntentByIntentId(intentId, logAnimationType);
+    this.intentService.setLiveActiveIntentByIntentId(intentId, this.animationLog, scale);
   }
 
   onToggleLog() {
@@ -368,14 +372,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   onSetAnimationLog(){
     this.animationLog = !this.animationLog;
-    const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
-    if(this.animationLog === false){
-      localStorage.setItem('log_animation_type', TYPE_LOG_ANIMATION.NONE);
-    } else if(this.animationLog === true && (chatbotSubtype === TYPE_CHATBOT.WEBHOOK || chatbotSubtype === TYPE_CHATBOT.COPILOT)){
-      localStorage.setItem('log_animation_type', TYPE_LOG_ANIMATION.MOVE);
-    } else {
-      localStorage.setItem('log_animation_type', TYPE_LOG_ANIMATION.ZOOM);
-    }
+    localStorage.setItem("log_animation_type", JSON.stringify(this.animationLog));
   }
 
   isButtonEnabled(index: number): boolean {
