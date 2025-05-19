@@ -118,7 +118,9 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.listOfLogs = [];
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
     this.listOfLogs = [];
-    this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
+    if(localStorage.getItem("log_animation_type") != null){
+      this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
+    };
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
     if(chatbotSubtype === TYPE_CHATBOT.WEBHOOK || chatbotSubtype === TYPE_CHATBOT.COPILOT){
       const webhook_id = await this.getWebhook();
@@ -326,8 +328,9 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.logger.log('[CDS-WIDGET-LOG] goToIntentByMessage:', message);
     const intentId = message?.intent_id;
     localStorage.setItem("isLoggedIn", JSON.stringify(true));
-    this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
-
+    if(localStorage.getItem("log_animation_type") != null){
+      this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
+    };
     let scale = null;
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
     if(chatbotSubtype === TYPE_CHATBOT.CHATBOT){

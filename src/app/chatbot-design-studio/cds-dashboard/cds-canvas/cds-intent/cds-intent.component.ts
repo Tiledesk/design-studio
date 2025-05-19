@@ -166,15 +166,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
                 this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
               }, 500);
             } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
-              const stageElement = document.getElementById(intent.intent_id);
-              
-
-              if(logAnimationType) {
-                this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
-              }
-              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
+              // this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
               setTimeout(() => {
                 this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));
+                const stageElement = document.getElementById(intent.intent_id);
+                if(logAnimationType) {
+                  this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
+                }
               }, 500);
             }
           } else {
