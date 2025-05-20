@@ -359,7 +359,8 @@ export class TiledeskStage {
             const originRec = this.container.getBoundingClientRect();
             // // let newX = (originRec.width/2)-(x+w/2);
             let newX = (originRec.width/2)-posX;
-            let newY = -y+20;
+            //let newY = -y+20;
+            let newY = -y+20+(originRec.height*0.3);
             let tcmd = `translate(${newX}px, ${newY}px)`;
             let scmd = `scale(${scale})`;
             const cmd = tcmd + " " + scmd;
