@@ -7,7 +7,7 @@
             </svg>
         </div>
         <div *ngIf="action.status" class="action-row-right">
-            <b>{{'CDSCanvas.Status' | translate }}: </b> <span [ngClass]="action?.status | variableCssClass"> {{action?.status | getVariableName }} </span>
+            <b>{{'CDSCanvas.Status' | translate }}: </b> <span [ngClass]="action?.status | variableCssClass"> {{action?.status}} </span>
         </div>
 
         <div *ngIf="!action.status" class="action-row-right">

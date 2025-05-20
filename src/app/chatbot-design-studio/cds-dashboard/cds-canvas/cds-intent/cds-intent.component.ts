@@ -167,6 +167,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
               }, 500);
             } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
               // this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
+              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
               setTimeout(() => {
                 this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));
                 const stageElement = document.getElementById(intent.intent_id);
