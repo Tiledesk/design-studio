@@ -7,6 +7,17 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.32.0-rc10
+- **bug-fixed**: changed padding-left in publish-history
+
+# 1.32.0-rc9
+- **added**: added animation log message
+- **bug-fixed**: fixed z-index on "message url copied"
+- **bug-fixed**: changed webhook labels
+- **bug-fixed**: Removed "change department"
+- **bug-fixed**: changed "Replace bot" to "Replace AI Agent”
+
 # 1.32.0-rc8
 - **changed**: replaced 'voice-twilio' with 'voice_twilio'
 
