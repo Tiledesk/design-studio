@@ -7,6 +7,18 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.32.0-rc11
+- **bug-fixed**: Status 200 not displayed with newly created webhook
+- **bug-fixed**: Labels ProductionURL/Development URL
+- **changed**: Open Webhook detail in Large Mode
+- **bug-fixed**: “Development webhook is currently turned off”: the first time you press start it doesn’t work
+- **bug-fixed**: Fix margins on hover in History
+- **bug-fixed**: Remove action Replace Bot from Webhook
+- **bug-fixed**: Remove action Lead update from Webhook
+- **bug-fixed**: Remove action Change Department from Webhook
+- **bug-fixed**: Rename action Replace Bot to Replace AI Agent
+- **bug-fixed**: Log highlight must flash even if you click on a log of the same block
+- **bug-fixed**: On the webhook play you must also center the “start” of the webhook like other blocks (vertically)
 
 # 1.32.0-rc10
 - **bug-fixed**: changed padding-left in publish-history
