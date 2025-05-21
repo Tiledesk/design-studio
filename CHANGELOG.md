@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 
+# 1.32.0
+
 
 # 1.31.4
 - **bug-fixed**: bug fixed textarea
