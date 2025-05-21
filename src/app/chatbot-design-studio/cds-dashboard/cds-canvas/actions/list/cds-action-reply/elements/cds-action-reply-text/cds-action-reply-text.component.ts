@@ -173,15 +173,16 @@ export class CdsActionReplyTextComponent implements OnInit {
 
   /** changeJsonButtons */
   onChangeJsonButtons(json:any){
-    this.logger.log('[ACTION REPLY TEXT] onChangeJsonButtons', json);
-    this.jsonBody = json;
+    // this.logger.log('[ACTION REPLY TEXT] onChangeJsonButtons', json);
     if(json && json.trim() !== ''){
+      this.jsonBody = json;
       this.showJsonBody = true;
-      this.response.attributes.attachment.json_buttons = json; //JSON.stringify(json);
+      this.response.attributes.attachment.json_buttons = json;
     } else {
       this.showJsonBody = false;
       this.response.attributes.attachment.json_buttons = '';
     }
+    this.logger.log('[ACTION REPLY TEXT] onChangeJsonButtons', this.showJsonBody);
     this.changeJsonButtons.emit(this.response);
   }
 

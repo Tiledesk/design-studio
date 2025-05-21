@@ -47,7 +47,7 @@
 </div> 
 
 
-<div  *ngIf="!previewMode" class="text-editor-wrapper">
+<div *ngIf="!previewMode" class="text-editor-wrapper">
     <cds-textarea 
         class="text-editable-div"
         [activeFocus]="activeFocus"
@@ -67,7 +67,12 @@
 
 
 
-<div class="buttons-response button-replies" [class.previewMode]="previewMode" [class.disabled]="showJsonBody" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
+<div class="buttons-response button-replies" 
+[class.previewMode]="previewMode"
+[ngClass]="{'disabled': showJsonBody}" 
+[class.disabled]="showJsonBody==true" 
+cdkDropListOrientation="vertical" 
+cdkDropList (cdkDropListDropped)="dropButtons($event)" >
     
     <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element"  cdkDragBoundary=".button-replies" cdkDrag > 
         
