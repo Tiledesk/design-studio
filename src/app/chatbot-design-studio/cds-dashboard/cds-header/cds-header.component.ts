@@ -372,6 +372,7 @@ export class CdsHeaderComponent implements OnInit {
 
   onOpenTestItOut(){
     if(this.isWebhook){
+      const intentId = this.intentService.intentSelected?.intent_id;
       this.logService.initialize(null); 
       if(!this.webhookUrl){
         this.createWebhook();
@@ -388,6 +389,7 @@ export class CdsHeaderComponent implements OnInit {
     }
     this.intentService.closeTestItOut();
     this.isPlaying = false;
+    this.intentService.resetLiveActiveIntent();
     this.logService.closeLog();
   }
 

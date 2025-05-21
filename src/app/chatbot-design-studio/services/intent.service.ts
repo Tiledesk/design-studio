@@ -29,7 +29,7 @@ export class IntentService {
   idBot: string;
   behaviorIntents = new BehaviorSubject <Intent[]>([]);
   behaviorIntent = new BehaviorSubject <Intent>(null);
-  liveActiveIntent = new BehaviorSubject<Intent>(null);
+  liveActiveIntent = new BehaviorSubject<{ intent: Intent; animation: boolean }>(null);
   testIntent = new BehaviorSubject<Intent>(null);
   BSTestItOut = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
@@ -200,7 +200,7 @@ export class IntentService {
       const intentID = intent.intent_id;
       this.mapOfIntents[intentID] = {'shown': false };
     });
-    this.logger.log('[CDS-CANVAS-3] mapOfIntents: ', this.mapOfIntents);
+    this.logger.log('[CDS-CANVAS] mapOfIntents: ', this.mapOfIntents);
     return this.mapOfIntents;
   }
 
@@ -230,7 +230,17 @@ export class IntentService {
   
   public setLiveActiveIntent(intentName: string){
     let intent = this.listOfIntents.find((intent) => intent.intent_display_name === intentName);
-    this.liveActiveIntent.next(intent)
+    this.liveActiveIntent.next({intent: intent, animation: true})
+  }
+
+  public setLiveActiveIntentByIntentId(intentId: string, animation: boolean){
+    let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
+    this.liveActiveIntent.next({intent: intent, animation: animation});
+  }
+
+  public resetLiveActiveIntent(){
+    this.logger.log('[INTENT SERVICE] ::: ');
+    this.liveActiveIntent.next(null);
   }
 
   /** 

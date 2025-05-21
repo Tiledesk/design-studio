@@ -44,7 +44,7 @@
   margin: 0px;
   padding: var(--base-padding-preview);
   border-radius: var(--base-border-radius-preview);
-  outline: 1px solid var(--intent-border-color);
+  // outline: 1px solid var(--intent-border-color);
   &::before {
     display: block;
     border-radius: 10px;
@@ -143,15 +143,27 @@
   //         animation: blink-2 0.9s infinite both;
   // }
 
-  &.live-active-intent {
-    // margin: 100px;
-    // display: block;s
-    // background: #cca92c;
+  &.live-active-intent-pulse {
     cursor: pointer;
     box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
     animation: pulse 1s 2 forwards;
-    // position: relative;
   }
+
+  &.live-active-intent2 {
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
+    outline: 3px solid var(--blu);
+    outline-offset: 9px;
+  }
+
+  &.live-start-intent {
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
+    min-height: 44px;
+    border-radius: 20px;
+    animation: pulse 1s infinite;
+  }
+  
 
   // .live-active-intent::before {
   //   // content: '';
@@ -706,3 +718,41 @@ cds-panel-intent-header.isStart ::ng-deep{
 .add--action-placeholder:hover>.add-action-from-placeholder-btn-wpr {
   opacity: 1;
 }
+
+
+/** INTENT BORDER ANIMATION **/
+.live-active-intent {
+  position: relative;
+}
+.live-active-intent::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 13px;
+  z-index: -1;
+  padding: 10px;
+  background: conic-gradient(
+    from var(--outline-angle),
+    var(--blu) 60%,
+    rgba(255, 255, 255, 0.5) 90%,  /* Riflesso più intenso e rapido */
+    transparent 10%,                /* Transizione più veloce */
+    var(--blu) 80%   
+  );
+  // background: conic-gradient(from var(--outline-angle), 
+  //   var(--blu) 10%, 
+  //   transparent 50%, 
+  //   rgba(255, 255, 255, 0.3) 90%);
+  animation: outline-spin 3s linear infinite;
+  //animation: reflective-glow 4s linear infinite;
+}
+@property --outline-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@keyframes outline-spin {
+  to {
+    --outline-angle: -1turn;
+  }
+}
+

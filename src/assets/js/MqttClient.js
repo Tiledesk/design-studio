@@ -60,7 +60,6 @@ export class MqttClient {
     this.client = mqtt.connect(this.endpoint, options);
 
     this.client.on('connect', () => {
-    //   console.log("Client connected. Request: " + request_id);
       if (!this.connected) {
         this.connected = true;
         this.start(callback);
@@ -85,6 +84,7 @@ export class MqttClient {
         }
       });
     });
+    onMessageCallback();
   }
 
   subscribeToLogs(subscribedCallback) {

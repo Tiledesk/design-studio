@@ -1,16 +1,11 @@
-import { Injectable } from '@angular/core';
+import { ElementRef, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, lastValueFrom } from 'rxjs';
-
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { MqttClient } from 'src/assets/js/MqttClient.js';
 import { AppConfigService } from './app-config';
+import { TYPE_CHATBOT } from '../chatbot-design-studio/utils-actions';
 
-export enum MQTT_CLIENT {
-  appId           = 'tilechat',
-  MQTTendpoint    = 'ws://35.246.144.116:15675/ws',
-  log             = 'true'
-}
 
 @Injectable({
   providedIn: 'root'
@@ -29,14 +24,15 @@ export class LogService {
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
-    public appConfigService: AppConfigService
+    public readonly appConfigService: AppConfigService,
   ) {}
 
 
+
   public initialize(request_id: string){
-    if(this.mqtt_client){
-      this.closeLog();
-    }
+    // if(this.mqtt_client){
+    //   this.closeLog();
+    // }
     this.request_id = request_id;
     this.logger.log("[LOG-SERV] getConfig : ", this.appConfigService.getConfig());
     const appId = this.appConfigService.getConfig().chat21Config.appId;
@@ -46,7 +42,7 @@ export class LogService {
       appId: appId,
       MQTTendpoint: MQTTendpoint,
       log: log
-    })
+    });
   }
 
   async starterLog(mqtt_token, request_id){
@@ -55,7 +51,8 @@ export class LogService {
     if(this.mqtt_client && mqtt_token && request_id){
       this.mqtt_client.connect(request_id, mqtt_token, (message: any)=>{
         this.logger.log("[CdsWidgetLogsComponent] message: ", message);
-        this.BSWidgetLoadedNewMessage.next(message.payload);
+        const msg = message?.payload?message?.payload:null;
+        this.BSWidgetLoadedNewMessage.next(msg);
       });
     }
   }
@@ -68,5 +65,6 @@ export class LogService {
   public resetLogService(){
     this.logs = null;
   }
+
 
 }
