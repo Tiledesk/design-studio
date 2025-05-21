@@ -16,14 +16,23 @@
                 <img class="active-icon" [ngClass]="isClosed ? 'arrow-down' : 'arrow-up'" src="assets/images/icons/keyboard_arrow_down.svg" alt="button toggle">
             </div> 
             -->
-            <div class="button-img" (click)="onSetAnimationLog()">
+            <div class="button-img" (click)="onSetAnimationLog()"
+                matTooltipClass="cds-mat-tooltip"
+                matTooltip="{{ 'FollowLog' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100">
                 <mat-icon *ngIf="animationLog" class="sprint" svgIcon="sprint" aria-hidden="true"></mat-icon>
                 <mat-icon *ngIf="!animationLog" class="sprint" svgIcon="pause" aria-hidden="true"></mat-icon>
             </div>
-            <div class="button-img" (click)="onClearLog()">
+            <div class="button-img" (click)="onClearLog()"
+                matTooltipClass="cds-mat-tooltip"
+                matTooltip="{{ 'DeleteLog' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100">
                 <mat-icon class="bin" svgIcon="bin" aria-hidden="true"></mat-icon>
             </div>
-            <div class="button-img" (click)="onCloseLog()">
+            <div class="button-img" (click)="onCloseLog()"
+                matTooltipClass="cds-mat-tooltip"
+                matTooltip="{{ 'Close' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100">
                 <mat-icon class="closeLog" svgIcon="close" aria-hidden="true"></mat-icon>
             </div>
         </div>

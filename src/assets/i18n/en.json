@@ -1276,5 +1276,7 @@
     "ThisOperationWillReplaceTheCurrentlyPublishedFlow":"This operation will replace the currently published Flow",
     "Copied":"Copied",
     "NoReleaseHistoryAvailable": "No release history available",
-    "PublishYourFlowToSeeTheReleaseHistoryAppearHere": "Publish your Flow to see the release history appear here"
+    "PublishYourFlowToSeeTheReleaseHistoryAppearHere": "Publish your Flow to see the release history appear here",
+    "FollowLog": "Follow log",
+    "DeleteLog": "Delete log"
 }
