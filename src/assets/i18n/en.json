@@ -529,9 +529,9 @@
         "VisibilityConnectors": "Visibility of connectors",
         "ChangeAlphaConnectors": "Change alpha of the connectors color",
         "nameKB": "Name",
-        "ContentKB": "Content",
-        "EnterTheKbName": "Enter Knowledge Base Name",
-        "PlaceholderKBContent": "Enter Knowledge Base Content"
+        "ContentKB": "Text",
+        "EnterTheKbName": "Content Name",
+        "PlaceholderKBContent": "Content text"
     },
     "Alert": {
         "ErrorMaxOptions": "Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -667,7 +667,7 @@
             "WhatsAppStatic": "WhatsApp static",
             "WhatsAppByAttribute": "WhatsApp by attribute",
             "WhatsAppBySegment": "WhatsApp by segment",
-            "AddKBContent":"Add knowledge base",
+            "AddKBContent":"Add to knowledge base",
             "AskTheKnowledgeBase": "Ask knowledge base",
             "AskTheKnowledgeBaseV2": "Ask knowledge base V2",
             "GPTTask": "ChatGPT task",

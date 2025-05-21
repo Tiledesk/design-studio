@@ -7,6 +7,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { OpenaiService } from 'src/app/services/openai.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 
 @Component({
   selector: 'cds-action-add-kb-content',
@@ -24,6 +25,10 @@ export class CdsActionAddKbContentComponent implements OnInit {
   listOfNamespaces: Array<{name: string, value: string, icon?:string}>;
   autocompleteOptions: Array<{label: string, value: string}> = [];
   
+
+  BRAND_BASE_INFO = BRAND_BASE_INFO;
+  DOCS_LINK = DOCS_LINK.ADD_TO_KB;
+
   private logger: LoggerService = LoggerInstance.getInstance();
     
   constructor(
