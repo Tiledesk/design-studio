@@ -519,7 +519,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log("[CDS-CANVAS] BSTestItOut ", intent);
       if(intent){
         this.onTestItOut(intent);
-        //this.IS_OPEN_WIDGET_LOG = true;
+        this.IS_OPEN_WIDGET_LOG = true;
         // this.controllerService.onPlayTestItOut();
         // this.logger.log('[CDS-CANVAS] OPEN TEST IT OUT');
         // if(this.dashboardService.selectedChatbot.subtype !== 'webhook'){
