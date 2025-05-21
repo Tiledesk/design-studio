@@ -67,7 +67,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
     "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
-    "top_k": { name: "top_k", min: 1, max: 10, step: 1 }
+    "top_k": { name: "top_k", min: 1, max: 40, step: 1 }
   }
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
