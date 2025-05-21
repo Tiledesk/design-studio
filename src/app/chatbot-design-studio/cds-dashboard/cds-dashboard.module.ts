@@ -7,9 +7,6 @@ import { CdsDashboardComponent } from './cds-dashboard.component';
 import { CdsSidebarComponent } from './cds-sidebar/cds-sidebar.component';
 import { CdsHeaderComponent } from './cds-header/cds-header.component';
 
-
-
-
 import { MaterialModule } from 'src/app/shared/material.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
@@ -19,7 +16,6 @@ import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-
 import { CdsPublishOnCommunityModalComponent } from 'src/app/modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
 import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service';
 import { FilterPipe } from 'src/app/pipe/filter.pipe';
-
 
 const routes: Routes = [
   { path: '', 
@@ -45,6 +41,11 @@ const routes: Routes = [
         path: 'globals',
         title: 'Design studio - Globals',
         loadChildren: () => import('../cds-globals/cds-globals.module').then( m => m.CdsGlobalsModule),
+      },
+      {
+        path: 'publish-history',
+        title: 'Design studio - Publish history',
+        loadChildren: () => import('../cds-publish-history/cds-publish-history.module').then( m => m.CdsPublishHistoryModule),
       },
       {
         path: 'settings',

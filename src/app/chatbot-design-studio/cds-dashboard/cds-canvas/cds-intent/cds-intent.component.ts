@@ -1,6 +1,6 @@
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, timeInterval } from 'rxjs/operators';
 import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, CdkDropListGroup, CdkDropList, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
@@ -41,7 +41,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   @Output() actionDeleted = new EventEmitter();
   @Output() showPanelActions = new EventEmitter(); // nk
-  @Output() testItOut = new EventEmitter<Intent>();
+  // @Output() testItOut = new EventEmitter<Intent>();
   @Output() deleteIntent = new EventEmitter();
   @Output() openIntent = new EventEmitter<Intent>();
   @Output() changeColorIntent = new EventEmitter();
@@ -103,7 +103,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   initSubscriptions() {
     let subscribtion: any;
     let subscribtionKey: string;
-
     /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
     subscribtionKey = 'behaviorIntent';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
@@ -152,13 +151,40 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtionKey = 'intentLiveActive';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
-      subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
-        if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
-          this.logger.log("[CDS-INTENT] intentLiveActive: ", this.intent, " con : ");
-          const stageElement = document.getElementById(intent.intent_id);
-          this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
-          this.addCssClassAndRemoveAfterTime('live-active-intent', '#intent-content-' + (intent.intent_id), 6);
-        }
+      subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+          this.logger.log("[CDS-INTENT] intentLiveActive: ",data, " con : ");
+          if (data) {
+            const intent = data.intent;
+            const logAnimationType = data.logAnimationType;
+            const scale = data.scale;
+  
+            if(intent && intent.intent_id !== this.intent?.intent_id && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+            } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+              const stageElement = document.getElementById(this.intent.intent_id);
+              this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+              this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
+            } else if (!intent || intent.intent_id !== this.intent?.intent_id) {
+              setTimeout(() => {
+                this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
+              }, 500);
+            } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
+              // this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
+              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
+              setTimeout(() => {
+                this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));
+                const stageElement = document.getElementById(intent.intent_id);
+                if(logAnimationType) {
+                  this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
+                }
+              }, 500);
+            }
+          } else {
+            if(this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+            }
+            this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
+          }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -169,7 +195,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.stageService.alphaConnectors$.subscribe(value => {
-        this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
+        // this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
         this.alphaConnectors = value;
         this.getAllConnectorsIn();
       });
@@ -186,7 +212,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             this.changeIntentColor(resp.color);
           }
         }
-        
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -443,7 +468,24 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  /** addCssClassAndRemoveAfterTime */
+  /** addCssClassIntentActive */
+  private addCssClassIntentActive(className: string, componentID: string) {
+    this.logger.log("[CDS-INTENT] addCssClassIntentActive: ", className, componentID);
+    let element = this.elemenRef.nativeElement.querySelector(componentID)
+    if (element) {
+      element.classList.add(className);
+    }
+  }
+
+  private removeCssClassIntentActive(className: string, componentID: string) {
+    let element = this.elemenRef.nativeElement.querySelector(componentID);
+    this.logger.log('[CDS-INTENT] removeCssClassIntentActive: ', className, componentID);
+    if (element && element.classList.contains(className)) {
+      element.classList.remove(className);
+    }
+  }
+
+
   private addCssClassAndRemoveAfterTime(className: string, componentID: string, delay: number) {
     let element = this.elemenRef.nativeElement.querySelector(componentID)
     if (element) {
@@ -453,6 +495,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }, delay * 1000)
     }
   }
+
 
   /** setIntentAttribute */
   private setIntentAttributes(){
@@ -876,7 +919,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.onDeleteIntent(this.intent)
         break;
       case 'test':
-        this.openTestSiteInPopupWindow()
+        this.onOpenTestItOut();
         break;
       case 'copy':
         this.copyIntent();
@@ -902,9 +945,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.appStorageService.setItem(data.key, data.data)
   }
 
-  openTestSiteInPopupWindow() {
-    this.testItOut.emit(this.intent)
+  // openTestSiteInPopupWindow() {
+  //   this.testItOut.emit(this.intent)
+  // }
+
+
+  onOpenTestItOut(){
+    this.intentService.openTestItOut(this.intent);
   }
+
 
   toggleIntentWebhook(intent) {
     this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent ', intent)

@@ -27,7 +27,20 @@ export class ControllerService {
   private addActionMenu = new Subject<any>();
   public isOpenAddActionMenu$ = this.addActionMenu.asObservable();
 
+  private testItOutPlaying = new Subject<any>();
+  public isTestItOutPlaying$ = this.testItOutPlaying.asObservable();
+
+  private publishPanelStatusSubject = new Subject<any>();
+  public isOpenPublishPanel$ = this.publishPanelStatusSubject.asObservable();
+
   constructor() {
+  }
+
+  public playTestItOut(){
+    this.testItOutPlaying.next(true);
+  }
+  public stopTestItOut(){
+    this.testItOutPlaying.next(false);
   }
 
 
@@ -63,6 +76,9 @@ export class ControllerService {
     this.addActionMenu.next(null);
   }
 
+  public openPublishPanel(){
+    this.publishPanelStatusSubject.next(true);  
+  }
 
   public closeAllPanels(){
     this.intentSource.next(null);

@@ -119,6 +119,8 @@ export class FaqKbService {
     this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB BY ID - URL', url);
     return this._httpClient.get<FaqKb>(url, httpOptions)
   }
+
+
  
   /**
    * UPDATE (PUT)
@@ -224,7 +226,10 @@ export class FaqKbService {
   }
   // http://localhost:3000/63ea8812b48b3e22c9372f05/faq_kb/63ea8820b48b3e22c9372f83/publish
 
-  public publish(chatbot: Chatbot) {
+  public publish(chatbot: Chatbot, releaseid: string , release_note:string) {
+    this.logger.log(' publish BOT chatbot id ' , chatbot._id)
+    this.logger.log(' publish BOT releaseid ' , releaseid)
+    this.logger.log(' publish BOT release_note ' , release_note)
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -233,12 +238,32 @@ export class FaqKbService {
       })
     }
 
-    let url = this.FAQKB_URL + chatbot._id + "/publish";
+    let url = this.FAQKB_URL + chatbot._id + "/publish"; // id chatbot originale
     this.logger.log('publish BOT - URL ', url);
-
-
-    return this._httpClient.put(url, null, httpOptions)
+    // let body = { 'release_note': release_note }
+    let body = { }
+    if (release_note !== null && releaseid === null) {
+      body['release_note'] = release_note
+    } else  if (release_note === null && releaseid !== null){
+      body['restore_from'] = releaseid
+    }
+    this.logger.log('publish BOT - URL ', body);
+    return this._httpClient.put(url, body, httpOptions)
   }
+
+  public getBotReleaseHistory(botid: string): Observable<FaqKb> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    let url = this.FAQKB_URL + botid + '/published';
+    this.logger.log('[FAQ-KB.SERV] - GET FAQ-KB RELEASE HISTORY - URL', url);
+    return this._httpClient.get<FaqKb>(url, httpOptions)
+  }
+
+
 
   addNodeToChatbotAttributes(idBot: string, key:string,  json:any) {
     this.logger.log('[FAQ-KB.SERV] - addNodeToAttributesChatbot idBot ', idBot)

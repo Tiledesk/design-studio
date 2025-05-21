@@ -401,6 +401,38 @@
   }
 }
 
+/**
+ * ----------------------------------------
+ * animation pulse pulse blu
+ * ----------------------------------------
+ */
+ @-webkit-keyframes pulse-blu {
+  0% {
+     -webkit-box-shadow: 0 0 0 0 rgba(91, 114, 167, 0.6);
+  }
+  70% {
+     -webkit-box-shadow: 0 0 0 10px rgba(91, 114, 167, 0);
+  }
+  100% {
+     -webkit-box-shadow: 0 0 0 0 rgba(891, 114, 167, 0);
+     background: var(--intent-preview-background);
+  }
+}
+@keyframes pulse-blu {
+  0% {
+     -moz-box-shadow: 0 0 0 0 rgba(91, 114, 167, 0.6);
+     box-shadow: 0 0 0 0 rgba(91, 114, 167, 0.6);
+  }
+  70% {
+     -moz-box-shadow: 0 0 0 10px rgba(91, 114, 167, 0);
+     box-shadow: 0 0 0 40px rgba(91, 114, 167, 0);
+  }
+  100% {
+     -moz-box-shadow: 0 0 0 0 rgba(91, 114, 167, 0);
+     box-shadow: 0 0 0 0 rgba(91, 114, 167, 0);
+     background: var(--intent-preview-background);
+  }
+}
 
 /**
  * ----------------------------------------

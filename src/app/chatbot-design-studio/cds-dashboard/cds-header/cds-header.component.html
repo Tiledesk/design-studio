@@ -36,12 +36,20 @@
     <div class="right-opts">
 
         <div *ngIf="isBlockSectionActive" class="btn-group" id="cds-publish-btn-wrp" [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
-            <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="onClickPublish()">
-                <span class="material-icons">
+            <button *ngIf="(!isPlaying && isWebhook) || !isWebhook" id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="onClickPublish()">
+                <!-- <span class="material-icons">
                     cached
-                </span>
+                </span> -->
                 {{ 'Publish' | translate}}
             </button>
+
+            <!-- <button mat-icon-button [matMenuTriggerFor]="releasehistory"  class="custom-mat-icon-btn">
+                <mat-icon> arrow_drop_down </mat-icon>
+            </button> -->
+              
+           
+
+
             <!-- (click)="isOpenDropdown(isOpen = !isOpen)"  [ngClass]="{'caret-rotate-0': is0penDropDown === true, 'caret-rotate-180': is0penDropDown === false}" -->
             <!-- <button id="cds-publish-btn-option" type="button" class="btn btn-primary dropdown-toggle"
                 data-toggle="dropdown">
@@ -78,35 +86,60 @@
                 </li>
             </ul> -->
         </div>
-        <div *ngIf="TRY_ON_WA === true && isBlockSectionActive" class="btn-group">
+
+        <div *ngIf="TRY_ON_WA === true && isBlockSectionActive && !isWebhook" class="btn-group">
             <button id="cds-test-it-wab-out-btn" class="btn btn-primary cds-blue-button" type="button" (click)="openWhatsappPage()">
                 <img width="18px" height="18px" src="assets/images/channel_icons/whatsapp-logo_green.svg">
                 {{ 'TryOnWhatsapp' | translate}}
             </button>
         </div>
+
+        <div *ngIf="webhookUrl && isPlaying && isWebhook" class="btn-group box-url" 
+                matTooltipClass="cds-mat-tooltip"
+                matTooltip="{{ 'Copy Dev url' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100"
+                (click)="copyText(true)">
+            <div class="button-url">
+                <span class="span-url ellips">{{webhookUrl}}</span>
+                <div *ngIf="messageWebhookUrl !== ''" class="webhook-message fade-in-out">
+                    <span>{{ messageWebhookUrl }}</span>
+                </div>
+            </div>
+        </div>
+
         <div *ngIf="isBlockSectionActive" class="btn-group"
                 matTooltipClass="cds-mat-tooltip"
                 matTooltip="{{ 'TestIt' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
                 matTooltipHideDelay="100">
-                <!-- *ngIf="!TRY_ON_WA" -->
-            <button  id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" (click)="openTestSiteInPopupWindow()">
-                <img class="active-icon" width="18px" height="18px" src="assets/images/icons/play.svg">
+            <button *ngIf="!isPlaying" id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" (click)="onOpenTestItOut()">
+                <mat-icon class="toggle-setting-sidebar-icon2" svgIcon="play" aria-hidden="true"></mat-icon>
             </button>
-            <!-- <button *ngIf="TRY_ON_WA" id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" [matMenuTriggerFor]="menuPlay">
-                <img class="active-icon" width="18px" height="18px" src="assets/images/icons/play.svg">
-            </button> -->
+            <button *ngIf="isPlaying" id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button button-stop" type="button" (click)="onCloseTestItOut()">
+                <mat-icon class="" svgIcon="stop" aria-hidden="true"></mat-icon>
+            </button>
         </div>
-        <!-- <div class="cds-close-btn-wpr">
 
-            <button class="btn pull-right cds-close-btn" (click)="goToBack()">
-                <span class="material-icons cds-close-btn-icon">
-                    clear
-                </span>
+
+
+        <!-- [class.disabled]="!webhookUrl" -->
+        <!-- <div *ngIf="isBlockSectionActive && isWebhook" class="btn-group btn-play-webhook"
+                matTooltipClass="cds-mat-tooltip"
+                matTooltip="{{ 'TestIt' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100">
+            <button *ngIf="!isPlaying" id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button" type="button" (click)="openWebhookLog()">
+                <mat-icon class="toggle-setting-sidebar-icon2" svgIcon="play" aria-hidden="true"></mat-icon>
             </button>
-
+            <button *ngIf="isPlaying" id="cds-test-it-out-btn" class="btn btn-primary pull-right cds-blue-button button-stop" type="button" (click)="closeWebhookLog()">
+                <mat-icon class="" svgIcon="stop" aria-hidden="true"></mat-icon>
+            </button>
         </div> -->
+
+        
+
     </div>
 </div>
+
+
 
 
 
@@ -121,7 +154,7 @@
     </ng-template>
 </mat-menu>
 
-<!-- SHARE MENU OPTIONS-->
+<!-- SHARE MENU OPTIONS -->
 <mat-menu #menuShare="matMenu" class="menuElement shareMenu" xPosition="after" yPosition="below">
     <ng-template matMenuContent>
         <cds-menu
@@ -132,6 +165,14 @@
         </cds-menu>
     </ng-template>
 </mat-menu>
+
+<!-- RELEASE HISTORY OPTIONS -->
+<!-- <mat-menu #releasehistory="matMenu">
+    <button mat-menu-item>
+      <mat-icon>history</mat-icon>
+      <span>Release history</span>
+    </button>
+</mat-menu> -->
 
 <!-- PLAY MENU OPTIONS-->
 <mat-menu #menuPlay="matMenu" class="menuElement playMenu" xPosition="after" yPosition="below">

@@ -44,7 +44,7 @@
   margin: 0px;
   padding: var(--base-padding-preview);
   border-radius: var(--base-border-radius-preview);
-  outline: 1px solid var(--intent-border-color);
+  // outline: 1px solid var(--intent-border-color);
   &::before {
     display: block;
     border-radius: 10px;
@@ -130,46 +130,26 @@
   }
 
 
-
-
-
-  // .placeholder-block-header {
-  //   border: 1px solid rgb(255, 255, 255);
-  // }
-
-  // .live-active-intent {
-  //   // border: 3px solid red;
-  //   -webkit-animation: blink-2 0.9s infinite both;
-  //         animation: blink-2 0.9s infinite both;
-  // }
-
-  &.live-active-intent {
-    // margin: 100px;
-    // display: block;s
-    // background: #cca92c;
+  &.live-active-intent-pulse {
     cursor: pointer;
-    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
-    animation: pulse 1s 2 forwards;
-    // position: relative;
+    animation: pulse-blu 1s 2 forwards;
+    outline: 2px solid var(--action-selected-color);
   }
 
-  // .live-active-intent::before {
-  //   // content: '';
-  //   box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
-  //   animation: pulse 1s 2 forwards;
-  //   animation-delay: 0.5s;
-  //   // display: block;
-  //   // position: absolute;
-  //   // left: 0;
-  //   // right: 0;
-  //   // top: 0;
-  //   // bottom: 0;
-  //   // margin: auto;
-  // }
+  &.live-active-intent2 {
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
+    outline: 3px solid var(--blu);
+    outline-offset: 9px;
+  }
 
-  // .live-active-intent:hover {
-  //   animation: none;
-  // }
+  &.live-start-intent {
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
+    min-height: 44px;
+    border-radius: 20px;
+    animation: pulse 1s infinite;
+  }
 
 
   .cds-start {
@@ -706,3 +686,36 @@ cds-panel-intent-header.isStart ::ng-deep{
 .add--action-placeholder:hover>.add-action-from-placeholder-btn-wpr {
   opacity: 1;
 }
+
+
+/** INTENT BORDER ANIMATION **/
+.live-active-intent {
+  position: relative;
+}
+.live-active-intent::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 13px;
+  z-index: -1;
+  padding: 10px;
+  background: conic-gradient(
+    from var(--outline-angle),
+    var(--blu) 60%,
+    rgba(255, 255, 255, 0.5) 90%,
+    transparent 10%,               
+    var(--blu) 80%   
+  );
+  animation: outline-spin 3s linear infinite;
+}
+@property --outline-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@keyframes outline-spin {
+  to {
+    --outline-angle: -1turn;
+  }
+}
+

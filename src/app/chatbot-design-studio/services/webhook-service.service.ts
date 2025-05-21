@@ -105,7 +105,7 @@ export class WebhookService {
         'Authorization': this.tiledeskToken
       })
     };
-    let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
+    let url = this.WEBHOOK_URL + '/webhooks/preload/' + chatbot_id;
     this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
     return this._httpClient.delete<any>(url, httpOptions);
   }

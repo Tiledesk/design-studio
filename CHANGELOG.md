@@ -8,11 +8,24 @@
 *Tiledesk SRL*
 
 
+
+# 1.31.4
+- **bug-fixed**: bug fixed textarea
+- **bug-fixed**: hide connector icon
+- **bug-fixed**: set attributes and select block in panel button reply  
+
+
+# 1.31.2-rc3
+- **added**: added webhook in header
+
+# 1.31.2-rc2
+- **bug-fixed**: changed freePlanLimitDate
+
 # 1.31.3
 
 
 # 1.31.2-rc1
-- **bug-fixed**: changed freePlanLimitDate
+- **bug-fixed**: test freePlanLimitDate
 
 
 # 1.31.1

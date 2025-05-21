@@ -188,6 +188,8 @@
             </p>
         </div>
 
+     
+
         <div id="cds-sb-globals" name="globals" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'Globals' | translate}}"
@@ -201,6 +203,22 @@
             </i>
             <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
                 {{'Globals' | translate}}
+            </p>
+        </div>
+
+        <div id="cds-sb-globals" name="globals" class="section"
+            matTooltipClass="cds-mat-tooltip" 
+            matTooltip="{{'ReleaseHistory' | translate}}"
+            #tooltip="matTooltip" 
+            matTooltipPosition='right' 
+            matTooltipHideDelay="100"
+            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
+            [routerLink]="['publish-history']" routerLinkActive="is_active" >
+            <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons-outlined item-icon">
+                <span class="material-icons">history</span>
+            </i>
+            <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
+                {{'ReleaseHistory' | translate}}
             </p>
         </div>
 
