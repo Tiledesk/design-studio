@@ -23,10 +23,12 @@ import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
-import { every, filter, Subscription } from 'rxjs';
+import { firstValueFrom, every, filter, Subscription } from 'rxjs';
 import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
+import { TYPE_CHATBOT } from '../../utils-actions';
+
 
 const swal = require('sweetalert');
 
@@ -68,7 +70,7 @@ export class CdsHeaderComponent implements OnInit {
 
   // webhook //
   isWebhook: boolean = false;
-  webhookUrl: string;
+  webhookUrl: string = null;
   messageWebhookUrl: string = '';
   chatbot_id: string;
   serverBaseURL: string;
@@ -370,12 +372,13 @@ export class CdsHeaderComponent implements OnInit {
 
 
 
-  onOpenTestItOut(){
+  async onOpenTestItOut(){
     if(this.isWebhook){
       const intentId = this.intentService.intentSelected?.intent_id;
       this.logService.initialize(null); 
       if(!this.webhookUrl){
-        this.createWebhook();
+        this.webhookUrl = await this.createWebhook();
+        console.log("[cds-header] Webhook URL:", this.webhookUrl);
       }
     } 
     this.openTestSiteInPopupWindow();
@@ -450,62 +453,44 @@ export class CdsHeaderComponent implements OnInit {
 
 
   // webhook //
-  initializeWebhook(){
+  async initializeWebhook(){
     this.webhookUrl = null;
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.chatbot_id = this.dashboardService.id_faq_kb;
-    this.getWebhook();
+    this.webhookUrl = await this.getWebhook();
   }
 
-  createWebhook(){
-    this.logger.log("[cds-header] createWebhook: ");
-    let intentStart = this.intentService.listOfIntents.find(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.WEBHOOK));
-    this.logger.log("[cds-header] createWebhook: ", this.chatbot_id, intentStart.intent_id);
-    let copilot = false;
-    if(this.dashboardService.selectedChatbot.subtype === 'copilot'){
-      copilot = true;
+  async createWebhook(): Promise<string | null> {
+    this.logger.log("[cds-header] createWebhook 1: ", this.intentService.listOfIntents);
+    const intentStart = this.intentService.listOfIntents.find(obj => obj.intent_display_name.trim() === TYPE_INTENT_NAME.WEBHOOK);
+    if (!intentStart) {
+      this.logger.log("[cds-header] Errore: intentStart non trovato.");
+      return null;
     }
-    this.webhookService.createWebhook(this.chatbot_id, intentStart.intent_id, true, copilot).subscribe({ next: (resp: any)=> {
+    this.logger.log("[cds-header] createWebhook 2: ", this.chatbot_id, intentStart.intent_id);
+    const copilot = this.dashboardService.selectedChatbot.subtype === TYPE_CHATBOT.COPILOT;
+    try {
+      const resp: any = await firstValueFrom(this.webhookService.createWebhook(this.chatbot_id, intentStart.intent_id, true, copilot));
       this.logger.log("[cds-header] createWebhook : ", resp);
-      this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
-    }, error: (error)=> {
+      return resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
+    } catch (error) {
       this.logger.log("[cds-header] error createWebhook: ", error);
-    }, complete: () => {
-      this.logger.log("[cds-header] createWebhook completed.");
-    }});
+      return null;
+    }
   }
 
-  // async createWebhook2(): Promise<string> {
-  //   try {
-  //     this.logger.log("[cds-header] createWebhook: ");
-  //     const intentStart = this.intentService.listOfIntents.find(obj => obj.intent_display_name.trim() === TYPE_INTENT_NAME.WEBHOOK);
-  //     if (!intentStart) {
-  //       throw new Error("Intent not found");
-  //     }
-  //     this.logger.log("[cds-header] createWebhook: ", this.chatbot_id, intentStart.intent_id);
-  //     const copilot = this.dashboardService.selectedChatbot.subtype === 'copilot';
-  //     const resp: any = await this.webhookService.createWebhook(this.chatbot_id, intentStart.intent_id, true, copilot).toPromise();
-  //     this.logger.log("[cds-header] createWebhook: ", resp);
-  //     return `${this.serverBaseURL}webhook/${resp.webhook_id}`;
-  //     //this.webhookUrl = `${this.serverBaseURL}webhook/${resp.webhook_id}`;
-  //     //this.logger.log("[cds-header] createWebhook completed.");
-  //   } catch (error) {
-  //     this.logger.log("[cds-header] error createWebhook: ", error);
-  //     return;
-  //   }
-  // }
-  
-
-  getWebhook(){
-    this.webhookService.getWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {
+  async getWebhook(): Promise<string | null> {
+    try {
+      const resp: any = await firstValueFrom(this.webhookService.getWebhook(this.chatbot_id));
       this.logger.log("[cds-header] getWebhook : ", resp);
-      this.webhookUrl = this.serverBaseURL+'webhook/'+resp?.webhook_id?this.serverBaseURL+'webhook/'+resp?.webhook_id: null;
-    }, error: (error)=> {
+      const webhookUrl = resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
+      return webhookUrl;
+    } catch (error) {
       this.logger.log("[cds-header] error getWebhook: ", error);
-    }, complete: () => {
-      this.logger.log("[cds-header] getWebhook completed.", this.webhookUrl);
-    }});
+      return null;
+    }
   }
+
 
   stopWebhook(){
     this.webhookService.deleteWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {
@@ -528,7 +513,7 @@ export class CdsHeaderComponent implements OnInit {
       try {
         await navigator.clipboard.writeText(url);
         this.logger.log('Text copied successfully!');
-        let translatedString = this.translate.instant('CDSCanvas.TextCopied');
+        let translatedString = this.translate.instant('CDSCanvas.DevUrlCopied');
         this.showMessage(translatedString);
       } catch (err) {
         this.logger.error('Error copying text:', err);

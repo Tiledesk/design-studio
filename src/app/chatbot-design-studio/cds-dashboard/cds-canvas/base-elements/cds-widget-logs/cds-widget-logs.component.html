@@ -16,24 +16,37 @@
                 <img class="active-icon" [ngClass]="isClosed ? 'arrow-down' : 'arrow-up'" src="assets/images/icons/keyboard_arrow_down.svg" alt="button toggle">
             </div> 
             -->
-            <div class="button-img" (click)="onClearLog()">
-                <img class="active-icon clear" src="assets/images/icons/bin.svg" alt="button clear">
+            <div class="button-img" (click)="onSetAnimationLog()"
+                matTooltipClass="cds-mat-tooltip"
+                matTooltip="{{ 'FollowLog' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100">
+                <mat-icon *ngIf="animationLog" class="sprint" svgIcon="sprint" aria-hidden="true"></mat-icon>
+                <mat-icon *ngIf="!animationLog" class="sprint" svgIcon="pause" aria-hidden="true"></mat-icon>
             </div>
-            <div class="button-img" (click)="onCloseLog()">
-                <img class="active-icon" src="assets/images/icons/close.svg" alt="button close">
+            <div class="button-img" (click)="onClearLog()"
+                matTooltipClass="cds-mat-tooltip"
+                matTooltip="{{ 'DeleteLog' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100">
+                <mat-icon class="bin" svgIcon="bin" aria-hidden="true"></mat-icon>
+            </div>
+            <div class="button-img" (click)="onCloseLog()"
+                matTooltipClass="cds-mat-tooltip"
+                matTooltip="{{ 'Close' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
+                matTooltipHideDelay="100">
+                <mat-icon class="closeLog" svgIcon="close" aria-hidden="true"></mat-icon>
             </div>
         </div>
         
     </div>
     <div id="content-scroll-log" class="content-log">
         <div *ngFor="let log of filteredLogs; let i = index;" class="row-log" [class.closed]="!log?.open">
+            <span [id]="'row-log-goto_'+i" class="row-log-goto" (click)="onGotoIntent(i)">
+                <mat-icon class="icon" svgIcon="jump_to_element" aria-hidden="true"></mat-icon>
+            </span>
             <span [id]="'row-log-button_'+i" class="row-log-button material-icons-outlined" [class.open]="log?.open" (click)="onToggleRowLog(i)">chevron_right</span>
             <span class="row-log-time" (click)="onToggleRowLog(i)">{{log?.timestamp | date: 'dd/MM/yyyy HH:mm:ss'}} </span>
             <span class="row-log-level" [ngClass]="log?.level" (click)="onToggleRowLog(i)">{{log?.level}}</span>
             <span [id]="'row-log-text_'+i" class="row-log-text" (click)="onToggleRowLog(i)">{{log?.text}}</span>
-            <span [id]="'row-log-goto_'+i" class="row-log-goto" (click)="onGotoIntent(i)">
-                <mat-icon class="icon" svgIcon="jump_to_element" aria-hidden="true"></mat-icon>
-            </span>
         </div>
     </div> 
 </div>
