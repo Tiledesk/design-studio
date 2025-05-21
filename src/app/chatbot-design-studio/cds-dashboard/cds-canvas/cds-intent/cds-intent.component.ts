@@ -157,10 +157,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             const intent = data.intent;
             const logAnimationType = data.logAnimationType;
             const scale = data.scale;
+  
             if(intent && intent.intent_id !== this.intent?.intent_id && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
               this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
             } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+              const stageElement = document.getElementById(this.intent.intent_id);
               this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+              this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
             } else if (!intent || intent.intent_id !== this.intent?.intent_id) {
               setTimeout(() => {
                 this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
