@@ -22,7 +22,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { A11yModule } from '@angular/cdk/a11y';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 @NgModule({
@@ -49,7 +49,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatExpansionModule,
     MatTabsModule,
     MatMenuModule,
-
+    MatSnackBarModule,
     //CDK
     TextFieldModule,
     DragDropModule,
@@ -76,7 +76,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatExpansionModule,
     MatTabsModule,
     MatMenuModule,
-
+    MatSnackBarModule,
     //CDK
     TextFieldModule,
     DragDropModule,
