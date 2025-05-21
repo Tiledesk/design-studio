@@ -8,6 +8,11 @@
 *Tiledesk SRL*
 
 
+# 1.32.0-rc13
+- **changed**: limit chunk to 40
+- **added**: move position on start on "intent webhook"
+
+
 # 1.32.0-rc12
 - **bug-fixed**: restored VOICE_TWILIO in utils-actions
 - **added**: added tooltip in log panel
