@@ -1141,8 +1141,8 @@
     "Options": "Options",
     "CDSHeader": {
         "LinkCopiedToClipboard":"Link copied to clipboard"
-    }
-    
-
+    }, 
+    "FollowLog": "Follow log",
+    "DeleteLog": "Delete log"
     
 }
