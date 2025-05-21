@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.32.0-rc12
+- **bug-fixed**: restored VOICE_TWILIO in utils-actions
+- **added**: added tooltip in log panel
+
 # 1.32.0-rc11
 - **bug-fixed**: Status 200 not displayed with newly created webhook
 - **bug-fixed**: Labels ProductionURL/Development URL
