@@ -104,7 +104,7 @@ export class CdsWidgetLogsComponent implements OnInit {
         const cutoffTimestamp = new Date(this.listOfLogs[0].timestamp);
         transformedArray = transformedArray.filter(item => new Date(item.timestamp) < cutoffTimestamp);
       } else {
-        this.highestTimestamp = transformedArray[transformedArray.length-1].timestamp;
+        this.highestTimestamp = transformedArray[transformedArray.length-1]?.timestamp;
       }
       this.listOfLogs.unshift(...transformedArray);
       this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.highestTimestamp, this.listOfLogs);
