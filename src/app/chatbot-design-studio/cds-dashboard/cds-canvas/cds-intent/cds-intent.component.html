@@ -1,12 +1,17 @@
 
 <div #resizeElement class="panel-intent-content tds_draggable"
-    [class.cds-intent-active]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive" 
     [class.isStart]="isStart" 
     [id]="'intent-content-'+ intent?.intent_id"
-    [ngStyle]="{'background-color': 'rgba('+intentColor+', 0.35)'}"
+
+    [ngStyle]="{
+        'background-color': 'rgba('+intent.attributes.color+', 0.35)',
+        'outline': intentService.intentSelectedID === intent.intent_id && intentService.intentActive ? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
+      }"
+
     (click)="$event.stopPropagation();openWebhookIntentPanel(intent)">
 
     <!-- 
+    [class.cds-intent-active]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive" 
     (click)="onSelectActionIfWebhook(startAction, 0, startAction?._tdActionId)" 
     -->
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
