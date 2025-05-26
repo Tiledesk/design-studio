@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# 1.33.0-rc2
+# 1.33.0-rc3
 - **added**: TTS_VOICE_LANGUAGE to voice settings section
 
 # 1.33.0-rc1
