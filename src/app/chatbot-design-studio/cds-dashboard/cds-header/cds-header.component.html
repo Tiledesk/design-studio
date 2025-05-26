@@ -87,7 +87,7 @@
             </ul> -->
         </div>
 
-        <div *ngIf="TRY_ON_WA === true && isBlockSectionActive && !isWebhook" class="btn-group">
+        <div *ngIf="TRY_ON_WA === true && isBlockSectionActive && !isWebhook && !isPlaying" class="btn-group">
             <button id="cds-test-it-wab-out-btn" class="btn btn-primary cds-blue-button" type="button" (click)="openWhatsappPage()">
                 <img width="18px" height="18px" src="assets/images/channel_icons/whatsapp-logo_green.svg">
                 {{ 'TryOnWhatsapp' | translate}}
