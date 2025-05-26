@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.34.0-rc2
+- **changed**: set default val "kb_chunks"
+
 # 1.34.0-rc1
 - **added**: "Chunks only" in action "ask knowledge base"
 
