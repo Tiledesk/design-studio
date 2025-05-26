@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.33.0-rc2
+- **added**: set default chunks value
 
 # 1.33.0-rc1
 - **added**: added "Assign KB Chunks to" in action "ask knowledge base"
