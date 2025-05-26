@@ -12,6 +12,12 @@
 - **added**: set default chunks value
 - **added**: "Assign KB Chunks to" in action "ask knowledge base"
 
+# 1.33.0-rc3
+- **added**: TTS_VOICE_LANGUAGE to voice settings section
+
+# 1.33.0-rc2
+- **added**: set default chunks value
+
 # 1.33.0-rc1
 - **added**: added "Assign KB Chunks to" in action "ask knowledge base"
 
