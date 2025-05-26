@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.33.1
+- **changed**: set default val "kb_chunks"
+
 # 1.33.0
 - **added**: "TTS_VOICE_LANGUAGE to voice settings section
 - **added**: set default chunks value
