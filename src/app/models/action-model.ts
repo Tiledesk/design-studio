@@ -425,6 +425,7 @@ export class ActionAskGPTV2 extends Action {
     model: string;
     assignReplyTo: string;
     assignSourceTo: string;
+    assignChunksTo: string;
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
