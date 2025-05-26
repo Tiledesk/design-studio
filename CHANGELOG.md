@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 
+# 1.33.0-rc1
+- **added**: added "Assign KB Chunks to" in action "ask knowledge base"
+
+
 # 1.32.2
 - **changed**: limit chunk to 40
 - **added**: move position on start on "intent webhook"
