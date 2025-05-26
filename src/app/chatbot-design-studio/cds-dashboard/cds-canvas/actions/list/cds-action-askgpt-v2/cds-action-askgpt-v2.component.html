@@ -302,7 +302,7 @@
                 </div>
 
                 <!-- // advanced prompt -->                     
-                <div class="field-box">
+                <div class="field-box" [class.disabled]="action?.chanksOnly">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.advancedPrompt"
@@ -316,7 +316,9 @@
                 </div>
 
                 <!-- // citations -->    
-                <div class="field-box" *ngIf="action.hasOwnProperty('citations')">
+                <div *ngIf="action.hasOwnProperty('citations')"
+                    class="field-box" 
+                    [class.disabled]="action?.chanksOnly">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.citations"
@@ -327,6 +329,20 @@
                     <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
                     </label>
+                </div>
+
+
+                <div class="field-box">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.chanksOnly"
+                            (change)="onChangeCheckbox($event, 'chanksOnly')">
+                            {{"CDSCanvas.ChanksOnly" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <!-- <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
+                    </label> -->
                 </div>
             
 
@@ -362,7 +378,7 @@
     
     <!-- <hr class="custom-divider"> -->
 
-    <div class="field-box">
+    <div class="field-box" [class.disabled]="action?.chanksOnly">
         
         <label class="title-label">{{'CDSCanvas.KBReply' | translate}}</label>
         <cds-textarea id="assignTo" 
@@ -377,7 +393,7 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box">
+    <div class="field-box" [class.disabled]="action?.chanksOnly">
         <label class="title-label">{{'CDSCanvas.KBSource' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false"

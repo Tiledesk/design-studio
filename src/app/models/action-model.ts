@@ -439,7 +439,8 @@ export class ActionAskGPTV2 extends Action {
     history: boolean;
     advancedPrompt?: boolean;
     namespaceAsName: boolean;
-    citations: boolean
+    citations: boolean;
+    chanksOnly: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2

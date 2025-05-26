@@ -295,4 +295,12 @@ mat-checkbox ::ng-deep {
     }
 }
 
+
+.field-box {
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+}
+
 // PREVIEW SECTION --- start **************** //
