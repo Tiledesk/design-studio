@@ -205,6 +205,9 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_source')) {
       new_attributes.push({ name: "kb_source", value: "kb_source" });
     }
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_chunks')) {
+      new_attributes.push({ name: "kb_chunks", value: "kb_chunks" });
+    }
     variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
     this.logger.debug("[ACTION-ASKGPTV2] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }

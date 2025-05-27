@@ -1,10 +1,7 @@
 <div *ngIf="previewMode" class="cds-action-content cds-action-preview" style="position: relative;">
     <div class="action-row">
         <div class="action-row-left">
-            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
-                <path d="M0 0h24v24H0V0z" fill="none" />
-                <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
-            </svg>
+            <mat-icon class="icon" svgIcon="subject" aria-hidden="true"></mat-icon>
         </div>
         <div *ngIf="action?.question" class="action-row-right">
             {{action?.question}}
@@ -302,7 +299,7 @@
                 </div>
 
                 <!-- // advanced prompt -->                     
-                <div class="field-box">
+                <div class="field-box" [class.disabled]="action?.chanksOnly">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.advancedPrompt"
@@ -316,7 +313,9 @@
                 </div>
 
                 <!-- // citations -->    
-                <div class="field-box" *ngIf="action.hasOwnProperty('citations')">
+                <div *ngIf="action.hasOwnProperty('citations')"
+                    class="field-box" 
+                    [class.disabled]="action?.chanksOnly">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.citations"
@@ -328,6 +327,20 @@
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
                     </label>
                 </div>
+
+
+                <!-- <div class="field-box">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.chanksOnly"
+                            (change)="onChangeCheckbox($event, 'chanksOnly')">
+                            {{"CDSCanvas.ChanksOnly" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <!- <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
+                    </label> ->
+                </div> -->
             
 
             </div>
@@ -362,7 +375,8 @@
     
     <!-- <hr class="custom-divider"> -->
 
-    <div class="field-box">
+    <div class="field-box" [class.disabled]="action?.chanksOnly">
+        
         <label class="title-label">{{'CDSCanvas.KBReply' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
@@ -376,7 +390,7 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box">
+    <div class="field-box" [class.disabled]="action?.chanksOnly">
         <label class="title-label">{{'CDSCanvas.KBSource' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false"
@@ -387,6 +401,20 @@
             [text]="action.assignSourceTo"
             (selectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.KBChunks' | translate}}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true"
+            [text]="action.assignChunksTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignChunksTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignChunksTo')">
         </cds-textarea>
     </div>
 

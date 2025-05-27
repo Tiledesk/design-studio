@@ -1046,6 +1046,7 @@ export class IntentService {
       action.question = '{{lastUserText}}'
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
+      action.assignChunksTo = 'kb_chunks';
       action.max_tokens = 256;
       action.temperature = 0.7;
       action.top_k = 5;

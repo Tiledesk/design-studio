@@ -1,45 +1,45 @@
 {
-    "Required":"Required",
+    "Required": "Required",
     "Title": "Title",
-    "Description":"Description",
-    "YourDescription":"Your description",
-    "ShortDescription":"Short Description",
+    "Description": "Description",
+    "YourDescription": "Your description",
+    "ShortDescription": "Short Description",
     "MarkdownSupported": "Markdown supported - use the Markdown language to enrich your text",
-    "Tags":"Tags",
-    "TagPlaceholder":"Type to create a tag and press enter",
-    "CreateNew":"Create New",
+    "Tags": "Tags",
+    "TagPlaceholder": "Type to create a tag and press enter",
+    "CreateNew": "Create New",
     "Loading": "Loading",
     "Language": "Language",
     "Change": "Change",
-    "Cancel":"Cancel",
+    "Cancel": "Cancel",
     "Continue": "Continue",
-    "Add":"Add",
-    "Edit":"Edit",
-    "Update":"Update",
+    "Add": "Add",
+    "Edit": "Edit",
+    "Update": "Update",
     "Close": "Close",
     "Upload": "Upload",
-    "Delete":"Delete",
-    "Error":"Error",
-    "Search":"Search",
+    "Delete": "Delete",
+    "Error": "Error",
+    "Search": "Search",
     "Warning": "Attention!",
-    "Back":"Back",
-    "GoBack":"Go back",
-    "GoToDashboard":"Go to dashboard",
+    "Back": "Back",
+    "GoBack": "Go back",
+    "GoToDashboard": "Go to dashboard",
     "LogOut": "Logout",
-    "Export":"Export",
-    "HelpCenter":"Help Center",
+    "Export": "Export",
+    "HelpCenter": "Help Center",
     "RoadMap": "Roadmap",
-    "SystemStatus":"System Status",
-    "Feedback":"Feedback",
-    "Support":"Support",
-    "Help":"Help",
-    "SendUsEmail":"Send us an email",
-    "ChatUs":"Chat with us",
-    "StartConversation":"Start a conversation with us",
-    "DiscordChannel":"Discord channel",
-    "JoinDiscordChannel":"Join us on discord Channel",
-    "SelfService":"Self Service",
-    "ContactUs":"Contact us",
+    "SystemStatus": "System Status",
+    "Feedback": "Feedback",
+    "Support": "Support",
+    "Help": "Help",
+    "SendUsEmail": "Send us an email",
+    "ChatUs": "Chat with us",
+    "StartConversation": "Start a conversation with us",
+    "DiscordChannel": "Discord channel",
+    "JoinDiscordChannel": "Join us on discord Channel",
+    "SelfService": "Self Service",
+    "ContactUs": "Contact us",
     "Departments": "Departments",
     "ActivateFor": "Activate for",
     "ActivateForBot": "Activate bot for",
@@ -51,18 +51,18 @@
     "SelectDepartment": "Select department",
     "RelatedKnowledgeBase": "Related Knowledge Base",
     "ChooseALanguage": "Choose a language",
-    "Maximize":"Maximize",
-    "Minimize":"Minimize",
-    "Advanced":"Advanced",
-    "WatchVideo":"Watch video",
-    "LearnMore":"Learn more",
+    "Maximize": "Maximize",
+    "Minimize": "Minimize",
+    "Advanced": "Advanced",
+    "WatchVideo": "Watch video",
+    "LearnMore": "Learn more",
     "BotsAddEditPage": {
         "AddBot": "Add Bot",
         "EditBot": "Edit Bot",
         "BotName": "Name",
-        "Slug":"Slug",
-        "AddSlagToYourChatbot":"Add a slug to your chatbot",
-        "SlugAlert":"Be careful in modifying the slug name. It is used to reference chatbots in the flow",
+        "Slug": "Slug",
+        "AddSlagToYourChatbot": "Add a slug to your chatbot",
+        "SlugAlert": "Be careful in modifying the slug name. It is used to reference chatbots in the flow",
         "CreateBot": "Create Bot",
         "UpdateBot": "Update Bot",
         "UpdateBotName": "Update Bot",
@@ -82,13 +82,13 @@
         "Type": "Type",
         "Messages": "Messages",
         "ResolutionBotLanguage": "The language of the chatbot",
-        "ChangeChatbotLanguage":"Change chatbot language",
-        "BeAwereToTranslate":"Be aware that you must translate your training phrases to match the new language to get the maximum in terms of \n Machine Learning performance.",
-        "TheChatbotTrainingWillRestart":"The chatbot training will restarted. "
+        "ChangeChatbotLanguage": "Change chatbot language",
+        "BeAwereToTranslate": "Be aware that you must translate your training phrases to match the new language to get the maximum in terms of \n Machine Learning performance.",
+        "TheChatbotTrainingWillRestart": "The chatbot training will restarted. "
     },
     "UserProfile": {
         "Profile": "Profile",
-        "Avatar":"Avatar",
+        "Avatar": "Avatar",
         "UploadImage": "Upload image",
         "Name": "Name",
         "Lastname": "Lastname",
@@ -113,77 +113,77 @@
         "PreferredSize": "Preferred image size 128x128 px - Image format: .jpeg or .png"
     },
     "CDSDeveloper": {
-        "GetToken":"Get token",
-        "ClickToGetToken":" Click the 'Get Token' button to generate the chatbot token"
+        "GetToken": "Get token",
+        "ClickToGetToken": " Click the 'Get Token' button to generate the chatbot token"
     },
-    "CDSSplashScreen":{
-        "YouHaveNoRules":"You have no rules set for this Chatbot <br><br> Rules allow your Chatbot to proactively write to your visitor based on specific events (i.e. visitor lands on a specific page)",
-        "LearnAboutAI":"Learn about AI rules and how to apply them here"
+    "CDSSplashScreen": {
+        "YouHaveNoRules": "You have no rules set for this Chatbot <br><br> Rules allow your Chatbot to proactively write to your visitor based on specific events (i.e. visitor lands on a specific page)",
+        "LearnAboutAI": "Learn about AI rules and how to apply them here"
     },
-    "CDSModalActivateBot":{
+    "CDSModalActivateBot": {
         "HookTheBot": "Activate this bot",
-        "ActivateBot": "Activate bot",
-        "DoYouWantToActivateBotForOneOfTheFollowingDepts": "Do you want to activate bot <span class='bot_name_bold'>{{name}}</span> for one of the following departments?",
-        "BotSuccessfullyActivated": "Successfully activated for department <span class='bot_name_bold'>{{name}}</span>",
-        "BotSuccessFullyPublished":"Bot successfully published",
-        "AnErroOccurredWhileActivatingTheBot": "An error occurred while activating the bot",
-        "AnErroOccurredWhilePublishingTheBot": "An error occurred while publishing the bot",
-        "Installation":"Installation",
-        "AddTheInstallationCodeToYourWebsite":"Add the installation code to your website",
-        "CopyTheFollowingScript":"Copy the following script and insert it into the HTML source between the <code><em>&lt;head&gt;</em></code> tags.",
-        "WellDonePublishingChatbot":"Well done! You are about to publish your Chatbot 🚀",
-        "FollowTheseSimpleInstructions":"Follow these simple instructions to activate it on your website"
+        "ActivateBot": "Activate",
+        "DoYouWantToActivateBotForOneOfTheFollowingDepts": "Do you want to activate the AI Agent <b>{{name}}</b> for one of the following departments?",
+        "BotSuccessfullyActivated": "Successfully activated for department <b> {{name}}</b>",
+        "BotSuccessFullyPublished": "Flow successfully published",
+        "AnErroOccurredWhileActivatingTheBot": "An error occurred while activating the Flow",
+        "AnErroOccurredWhilePublishingTheBot": "An error occurred while publishing the Flow",
+        "Installation": "Installation",
+        "AddTheInstallationCodeToYourWebsite": "Add the installation code to your website",
+        "CopyTheFollowingScript": "Copy the following script and insert it into the HTML source between the <code><em>&lt;head&gt;</em></code> tags.",
+        "WellDonePublishingChatbot": "Well done! You are about to publish your Flow 🚀",
+        "FollowTheseSimpleInstructions": "Follow these simple instructions to activate it on your website"
     },
-    "CDSModalMouseTrackPad":{
-        "HowToMove":"How to move",
-        "ClickWhellDragToMove" :"Click wheel button & drag \n to move around",
-        "ScrollMouseWheel":"Scroll mouse wheel \n to move up/down",
-        "CtrlButtonWheelToZoom":"CRTL + Mouse wheel button \n to zoom in/out",
-        "PinchToZoom":"Pinch to zoom",
-        "SlideToMove":"Slide two fingers \n to move around",
-        "TrackpadMode":"Trackpad mode",
-        "MouseMode":"Mouse mode"
+    "CDSModalMouseTrackPad": {
+        "HowToMove": "How to move",
+        "ClickWhellDragToMove": "Click wheel button & drag \n to move around",
+        "ScrollMouseWheel": "Scroll mouse wheel \n to move up/down",
+        "CtrlButtonWheelToZoom": "CRTL + Mouse wheel button \n to zoom in/out",
+        "PinchToZoom": "Pinch to zoom",
+        "SlideToMove": "Slide two fingers \n to move around",
+        "TrackpadMode": "Trackpad mode",
+        "MouseMode": "Mouse mode"
     },
     "Ignore": "Ignore",
-    "Publish":"Publish",
-    "TestIt":"Test it",
-    "TryOnWhatsapp":"Try on Whatsapp",
-    "WebWidget":"Web widget",
-    "Blocks":"Blocks",
-    "Fulfillment":"Fulfillment",
-    "Rules":"Rules",
-    "General":"General",
-    "Settings":"Settings",
-    "TestYourChatbot":"Test your Chatbot",
-    "StartTryingYourChatbot":"Start trying your chatbot and interact with it",
-    "CDSPanelButtons":{
-        "Button":"Button",
-        "ButtonTitle":"Button title",
-        "ButtonTypingAlias":"Button typing alias",
-        "ButtonTypingAliasPlaceholder":"text1, text2, text3",
-        "ButtonTypingAliasDescription":"Please set a comma separated list of button alias that the user can type to trigger the button",
-        "Type":"Type",
-        "OpenIn":"Open in",
-        "GoToBlock":"Go to block"
+    "Publish": "Publish",
+    "TestIt": "Test it",
+    "TryOnWhatsapp": "Try on Whatsapp",
+    "WebWidget": "Web widget",
+    "Blocks": "Blocks",
+    "Fulfillment": "Fulfillment",
+    "Rules": "Rules",
+    "General": "General",
+    "Settings": "Settings",
+    "TestYourChatbot": "Test your Chatbot",
+    "StartTryingYourChatbot": "Start trying your chatbot and interact with it",
+    "CDSPanelButtons": {
+        "Button": "Button",
+        "ButtonTitle": "Button title",
+        "ButtonTypingAlias": "Button typing alias",
+        "ButtonTypingAliasPlaceholder": "text1, text2, text3",
+        "ButtonTypingAliasDescription": "Please set a comma separated list of button alias that the user can type to trigger the button",
+        "Type": "Type",
+        "OpenIn": "Open in",
+        "GoToBlock": "Go to block"
     },
     "CDSModalPublishOnCommunity": {
-        "PublishYouChatbotToCommunity":"Publish your chatbot on the {{BRAND_NAME}} community",
-        "Publishing":"Publishing",
-        "PublishChatbotCommunityDescription":"Publish your chatbot on the {{BRAND_NAME}} community. Allow other users to clone and customize your chatbot. Collect accolades and become part of the world's largest conversation designer community.",
-        "BeHeardBeKnow":"Be Heard, Be Known: complete the form available in the Personal info before publishing!",
-        "DeployToCommunity":"Deploy to community"
+        "PublishYouChatbotToCommunity": "Publish your chatbot on the {{BRAND_NAME}} community",
+        "Publishing": "Publishing",
+        "PublishChatbotCommunityDescription": "Publish your chatbot on the {{BRAND_NAME}} community. Allow other users to clone and customize your chatbot. Collect accolades and become part of the world's largest conversation designer community.",
+        "BeHeardBeKnow": "Be Heard, Be Known: complete the form available in the Personal info before publishing!",
+        "DeployToCommunity": "Deploy to community"
     },
-    "CDSSetting":{
-        "ChatbotInfo":"Chatbot info",
-        "PersonalInfo":"Personal Info",
-        "GoLiveOnCommunity":"Go live on Community",
-        "RemoveFromCommunity":"Remove from community",
-        "ChatbotCommunityInfo":"Chatbot community info",
-        "AddsTheBelowInformations":"Adds the below informations to describe to the community what your chatbot does",
-        "MainCategory":"Main Category",
-        "SelectCategory":"Select a category and press enter",
-        "YourCommunityProfile":" Your community profile",
-        "EnterYourInformation":"Enter your information which will be shown to the community for all chatbots you post live",
+    "CDSSetting": {
+        "ChatbotInfo": "Chatbot info",
+        "PersonalInfo": "Personal Info",
+        "GoLiveOnCommunity": "Go live on Community",
+        "RemoveFromCommunity": "Remove from community",
+        "ChatbotCommunityInfo": "Chatbot community info",
+        "AddsTheBelowInformations": "Adds the below informations to describe to the community what your chatbot does",
+        "MainCategory": "Main Category",
+        "SelectCategory": "Select a category and press enter",
+        "YourCommunityProfile": " Your community profile",
+        "EnterYourInformation": "Enter your information which will be shown to the community for all chatbots you post live",
         "ExportAndImport": "Export and Import",
         "ExportAsJSON": "Export as JSON",
         "ImportFromJSON": "Import from JSON",
@@ -192,42 +192,52 @@
         "download": "download",
         "examplecsv": "example.csv",
         "ColumnsSeparatedWith": "Columns separated with:",
-        "FrequentlyAskedQuestions":"Frequently Asked Questions",
+        "FrequentlyAskedQuestions": "Frequently Asked Questions",
         "Question": "Question",
         "Answer": "Answer",
-        "Form":"Form",
+        "Form": "Form",
         "DelimiterOptionMustBe": "Delimiter option must be one character long",
         "ChooseFile": "CHOOSE FILE",
         "UploadCsv": "Upload CSV",
         "Completed": "Completed",
-        "UploadAndOverwrite":"Upload and overwrite",
-        "YouCanImportBlocks":"You can import Blocks by overwriting or keeping existing Blocks",
+        "UploadAndOverwrite": "Upload and overwrite",
+        "YouCanImportBlocks": "You can import Blocks by overwriting or keeping existing Blocks",
         "FaqsSuccessfullyUploaded": "FAQs successfully uploaded",
         "AnErrorOccurredDuringTheUpload": "An error occurred during the upload",
         "InTheCSVFileToBeUploadedTheColumnsAreSeparatedBy": "In the CSV file to be uploaded, the columns are separated by",
         "UpdateBotError": "An error occurred while updating the bot",
-        "UserProfileUpdated":"User profile updated successfully",
-        "AnErrorOccurredUpdatingProfile":"An error occurred while updating your user profile",
+        "UserProfileUpdated": "User profile updated successfully",
+        "AnErrorOccurredUpdatingProfile": "An error occurred while updating your user profile",
         "Not a valid JSON file.": "Not a valid JSON file",
         "UpdateBotSuccess": " bot successfully updated",
         "AnErrorOccurredWhilDeletingTheAnswer": "An error occurred while deleting the Answer",
         "AnswerSuccessfullyDeleted": "Answer successfully deleted",
         "ThereHasBeenAnErrorProcessing": "There has been an error processing your request",
-        "FileUploadedSuccessfully":"File was uploaded succesfully",
-        "SuccessfullyDeployed":"Successfully deployed",
-        "Website":"Website",
-        "YourWebSite":"Your Website",
-        "PublicEmail":"Public email",
-        "YourPublicEmail":"Your public email",
-        "UpdateYourProfile":"Update your profile",
+        "FileUploadedSuccessfully": "File was uploaded succesfully",
+        "SuccessfullyDeployed": "Successfully deployed",
+        "Website": "Website",
+        "YourWebSite": "Your Website",
+        "PublicEmail": "Public email",
+        "YourPublicEmail": "Your public email",
+        "UpdateYourProfile": "Update your profile",
         "Processing": "Processing...",
-        "SearchABlock":"search a block...",
-        "SlugAlreadyExists":"An error occurred: slug already exists"
+        "SearchABlock": "search a block...",
+        "SlugAlreadyExists": "An error occurred: slug already exists",
+        "VoiceProvider":"Voice provider",
+        "VoiceName" :"Voice",
+        "VoiceLanguage":"Voice language",
+        "TextToSpeechModel":"Text-To-Speech model",
+        "SpeechToTextModel":"Speech-To-Text model",
+        "SelectProvider":"Select provider",
+        "SelectAnOption":"Select an option",
+        "TextToSpeechModelDescription": "Generates audio from the input text.",
+        "SpeechToTextModelDescription":"Transcribes audio into the input language."
     },
+    "VoiceSettings":"Voice settings",
     "BotDetails": "Bot details",
     "Developer": "Developer",
     "Done": "Done!",
-    "RememberToClickThePublishButton":"Remember to click the Publish button when you finish your work. Otherwise, your changes won’t be visible to users.",
+    "RememberToClickThePublishButton": "Remember to click the Publish button when you finish your work. Otherwise, your changes won’t be visible to users.",
     "UnauthorizedPage": {
         "UnauthorizedAccess": "Unauthorized  access!",
         "OopsYouDontHave": "Oops! You don't have permission to access this page.",
@@ -240,334 +250,336 @@
     "YourWebServiceWillReceivePostRequestFrom": "Your web service will receive a POST request from {{BRAND_NAME}} in the form of the response to a user query matched by intents with webhook enabled.",
     "BeSureThatYourWebServiceMeetsAllTheWebhookRequirements": "Be sure that your web service meets all the webhook requirements specific to the API version enabled in this agent.",
     "LearnMoreAboutWebhookRequirements": "Learn more about webhook requirements",
-    "WebhookURL":"Webhook URL",
+    "WebhookURL": "Webhook URL",
     "ThisUrlWilReceiveAPostRequestFrom": "This url will receive a POST request from {{BRAND_NAME}} every time the webhook is triggered by an intent.",
     "EnterWebhookURL": "Enter Webhook URL",
     "WebhookmentUrlMustBeAHttpsUrl": "The webhook URL must be an https or http URL",
     "WebhookmentUrlMustBeAValidUrl": "The webhook URL must be a valid URL",
-    "CDSCanvas":{
+    "CDSCanvas": {
         "EnterIntentName": "Enter block name",
-        "ErrorBlockName":"The block name must be unique",
-        "ErrorBlockCharacter":"The block name cannot contain special characters",
-        "DragAnImageOrClick":"drag an image here or click to select them",
-        "ImageDragging":"image dragging",
-        "AddPath":"Add path",
-        "LoadFrame":"load frame",
-        "AddAudioURL":"Add audio File",
-        "DragAudioOrClick":"drag audio file here or click to select them",
-        "AudioDragging":"audio dragging",
-        "Value":"Value",
-        "Attributes":"Attributes",
-        "Key":"Key",
-        "AddCustomAttributes":"Add a custom attribute",
-        "AddAttribute":"Add attribute",
-        "TheAttributesNameMustBe":" The attribute’s name can only contain alphanumeric <br> characters which are letters A-Z, numbers 0-9 and <br> underscore.",
-        "TheGlobalKeyMustBe":" The key's name can only contain alphanumeric <br> characters which are letters A-Z, numbers 0-9 and <br> underscore.",
-        "AttributeName":"Attribute name",
-        "TypeAttributeName":"Type attribute name",
-        "Filter":"Filter",
-        "AddFilter":"Add filter",
-        "StopOnConditionMet":"Stop on condition met",
-        "TreatAsAttributeName":"Treat as attribute name",
+        "ErrorBlockName": "The block name must be unique",
+        "ErrorBlockCharacter": "The block name cannot contain special characters",
+        "DragAnImageOrClick": "drag an image here or click to select them",
+        "ImageDragging": "image dragging",
+        "AddPath": "Add path",
+        "LoadFrame": "load frame",
+        "AddAudioURL": "Add audio File",
+        "DragAudioOrClick": "drag audio file here or click to select them",
+        "AudioDragging": "audio dragging",
+        "Value": "Value",
+        "Attributes": "Attributes",
+        "Key": "Key",
+        "AddCustomAttributes": "Add a custom attribute",
+        "AddAttribute": "Add attribute",
+        "TheAttributesNameMustBe": " The attribute’s name can only contain alphanumeric <br> characters which are letters A-Z, numbers 0-9 and <br> underscore.",
+        "TheGlobalKeyMustBe": " The key's name can only contain alphanumeric <br> characters which are letters A-Z, numbers 0-9 and <br> underscore.",
+        "AttributeName": "Attribute name",
+        "TypeAttributeName": "Type attribute name",
+        "Filter": "Filter",
+        "AddFilter": "Add filter",
+        "StopOnConditionMet": "Stop on condition met",
+        "TreatAsAttributeName": "Treat as attribute name",
         "TreatAsAttributeNameTips": "Treat the contents of the above field as the name of an attribute. \n Useful if you want to assign to this attribute the value of another one.",
-        "FeatureAvailableFromPlan":"Feature available from <b>{{ plan }}</b> plan",
-        "UpgradeNow":"Upgrade now!",
-        "ContactSales":"Contact Sales",
-        "Drag":"Drag",
-        "DeleteConnector":"Delete connector",
-        "HideConnector":"hide connector",
-        "ShowConnector":"show connector",
-        "LineText":"Line text",
+        "FeatureAvailableFromPlan": "Feature available from <b>{{ plan }}</b> plan",
+        "UpgradeNow": "Upgrade now!",
+        "ContactSales": "Contact Sales",
+        "Drag": "Drag",
+        "DeleteConnector": "Delete connector",
+        "HideConnector": "hide connector",
+        "ShowConnector": "show connector",
+        "LineText": "Line text",
         "IntentPanel": "Settings panel",
-        "ColorBlock":"Block color",
-        "DeleteBlock":"Delete block",
-        "CopyBlock":"Copy block",
-        "Paste":"Paste",
-        "StartTest":"Start test from here",
-        "DeleteAction":"Delete action",
-        "CopyAction":"Copy action",
-        "EditAction":"Edit action",
-        "AddAction" :"Add action",
-        "AddAnActionToBlock":"Add an action to this block",
-        "AddAnActionToBlockDescription":"Actions are executed in sequence starting from the top block action",
-        "delay":"delay",
-        "DelayTime":"Delay Time",
-        "timeout":"timeout",
-        "QuestionDescription":" When a user says something similar to a training phrase, {{BRAND_NAME}} matches it to the block",
-        "QuestionPlaceholderNew":"Add user expression and press enter or click ADD",
-        "Success":"Success",
-        "Else":"else",
-        "Prompt":"Prompt",
-        "UserQuestion":"User question",
-        "EnterPrompt":"Enter prompt",
-        "UseChatHistoryInPrompt":"Use the chat history in the prompt",
-        "FormatType":"Response as JSON format",
-        "FormatTypeDescription":"When JSON mode is turned on, the model's output is ensured to be valid JSON, except for in some edge cases that you should detect and handle appropriately.",
-        "Citations":"Get contents sources",
-        "CitationsDescription":"Use this option to get accurate sources of documents used to generate the reply.",
-        "EnterTheQuestion":"Enter the question",
-        "ChooseTheAIModel":"Choose the AI model",
-        "SelectNamespace":"Select namespace",
-        "UseKnwoledgeBaseName":"Use Knwoledge Base name",
-        "SelectKnowledgeBase":"Select Knowledge Base",
-        "SelectABlock":"Select a block",
-        "ChooseKB":"Choose Knowledge Base",
-        "LLM":"LLM",
+        "ColorBlock": "Block color",
+        "DeleteBlock": "Delete block",
+        "CopyBlock": "Copy block",
+        "Paste": "Paste",
+        "StartTest": "Start test from here",
+        "DeleteAction": "Delete action",
+        "CopyAction": "Copy action",
+        "EditAction": "Edit action",
+        "AddAction": "Add action",
+        "AddAnActionToBlock": "Add an action to this block",
+        "AddAnActionToBlockDescription": "Actions are executed in sequence starting from the top block action",
+        "delay": "delay",
+        "DelayTime": "Delay Time",
+        "timeout": "timeout",
+        "QuestionDescription": " When a user says something similar to a training phrase, {{BRAND_NAME}} matches it to the block",
+        "QuestionPlaceholderNew": "Add user expression and press enter or click ADD",
+        "Success": "Success",
+        "Else": "else",
+        "Prompt": "Prompt",
+        "UserQuestion": "User question",
+        "EnterPrompt": "Enter prompt",
+        "UseChatHistoryInPrompt": "Use the chat history in the prompt",
+        "FormatType": "Response as JSON format",
+        "FormatTypeDescription": "When JSON mode is turned on, the model's output is ensured to be valid JSON, except for in some edge cases that you should detect and handle appropriately.",
+        "Citations": "Get contents sources",
+        "CitationsDescription": "Use this option to get accurate sources of documents used to generate the reply.",
+        "EnterTheQuestion": "Enter the question",
+        "ChooseTheAIModel": "Choose the AI model",
+        "SelectNamespace": "Select namespace",
+        "UseKnwoledgeBaseName": "Use Knwoledge Base name",
+        "SelectKnowledgeBase": "Select Knowledge Base",
+        "SelectABlock": "Select a block",
+        "ChooseKB": "Choose Knowledge Base",
+        "LLM": "LLM",
         "Model": "Model",
-        "SelectKnowledgeBaseModel":"Select AI Model",
-        "SelectLL":"Select LLM ",
-        "SelectLLMModel":"Select an LLM model",
-        "QuestionToSubmit":"Question to submit",
-        "KnowledgeBaseID":"Knowledge Base ID",
-        "ManageKnowledgeBases":"Manage Knowledge Bases",
+        "SelectKnowledgeBaseModel": "Select AI Model",
+        "SelectLL": "Select LLM ",
+        "SelectLLMModel": "Select an LLM model",
+        "QuestionToSubmit": "Question to submit",
+        "KnowledgeBaseID": "Knowledge Base ID",
+        "ManageKnowledgeBases": "Manage Knowledge Bases",
         "UseKBName": "Use Knowledge Base name",
         "UseKBNameDescription": "Check this option if you want to use this chatbot across different projects.",
-        "ManageIntegration":"Manage integration",
-        "Howitwork":"How it works?",
-        "GPTReply":"Assign GPT Reply to",
-        "GPTSource":"Assign GPT Source to",
-        "GPTAssistant":"Assign GPT Assistant",
-        "GPTThread":"Assign GPT Thread",
-        "GPTResult":"Assign GPT Result to",
-        "GPTError":"Assign GPT Error to",
-        "KBReply":"Assign KB Reply to",
-        "KBSource":"Assign KB Source to",
-        "ErrorAutomaticAssign":"Errors will be automatically assigned to variable:",
-        "ApplyAFunctionToValue":"Apply a function to the value",
-        "InsertConstantValueOrChoise":"Insert a constant value or choose an attribute",
-        "Function":"Function",
-        "Operations":"Operations",
-        "NewOperation":"New operation",
-        "AssignTo":"Assign to",
-        "SelectAttribute":"Select attribute",
-        "SelectOperator":"Select a operator",
-        "TransferToAHuman":"Transfer to a human",
-        "CaptureUserReplyTo":"Capture user reply to",
-        "AssignUserReplyTo":"Assign user reply to",
-        "AssignUserReplyDescription":"Awaits for the user reply and automatically assign it to the selected attribute. If no attribute is selected the reply is automatically assigned to lastUserText",
+        "ManageIntegration": "Manage integration",
+        "Howitwork": "How it works?",
+        "GPTReply": "Assign GPT Reply to",
+        "GPTSource": "Assign GPT Source to",
+        "GPTAssistant": "Assign GPT Assistant",
+        "GPTThread": "Assign GPT Thread",
+        "GPTResult": "Assign GPT Result to",
+        "GPTError": "Assign GPT Error to",
+        "KBReply": "Assign KB Reply to",
+        "KBSource": "Assign KB Source to",
+        "KBChunks": "Assign KB Chunks to",
+        "ChanksOnly": "Chunks only",
+        "ErrorAutomaticAssign": "Errors will be automatically assigned to variable:",
+        "ApplyAFunctionToValue": "Apply a function to the value",
+        "InsertConstantValueOrChoise": "Insert a constant value or choose an attribute",
+        "Function": "Function",
+        "Operations": "Operations",
+        "NewOperation": "New operation",
+        "AssignTo": "Assign to",
+        "SelectAttribute": "Select attribute",
+        "SelectOperator": "Select a operator",
+        "TransferToAHuman": "Transfer to a human",
+        "CaptureUserReplyTo": "Capture user reply to",
+        "AssignUserReplyTo": "Assign user reply to",
+        "AssignUserReplyDescription": "Awaits for the user reply and automatically assign it to the selected attribute. If no attribute is selected the reply is automatically assigned to lastUserText",
         "Optional": "(Optional)",
-        "ThenGoToBlock":"Then go to block",
-        "SelectADepartment":"Select a department",
-        "ChooseADepartment":"Choose a department",
-        "END":"END",
-        "CLEAR_TRANSCRIPT":"CLEAR TRANSCRIPT",
-        "MOVE_TO_UNASSIGNED":"MOVE TO UNASSIGNED",
-        "ClickToAddCodeSource":"Click to add code source ...",
-        "Code":"Code",
-        "EnterYourCode":"Enter your code",
-        "SetVariableToDelete":"Set variable to delete",
-        "VariableName":"Variable name",
-        "AISettings":"AI Settings",
-        "MaxTokens":"Max Tokens",
-        "Temperature":"Temperature",
-        "ChunkLimit":"Chunk limit",
-        "SystemContext":"System context",
-        "AdvancedContext":"Advanced context",
-        "AdvancedContextDesctiption":"Here you have the most control. Be careful, the native prompt is completely overwritten.",
-        "YouAreAwesomeAssistant":"You are an awesome assistant",
-        "Preview":"Preview",
-        "AnswerPreview":"Answer preview",
-        "GeneratingAnswer":"Generating answer",
-        "GeneratedWith":"generated with ",
+        "ThenGoToBlock": "Then go to block",
+        "SelectADepartment": "Select a department",
+        "ChooseADepartment": "Choose a department",
+        "END": "END",
+        "CLEAR_TRANSCRIPT": "CLEAR TRANSCRIPT",
+        "MOVE_TO_UNASSIGNED": "MOVE TO UNASSIGNED",
+        "ClickToAddCodeSource": "Click to add code source ...",
+        "Code": "Code",
+        "EnterYourCode": "Enter your code",
+        "SetVariableToDelete": "Set variable to delete",
+        "VariableName": "Variable name",
+        "AISettings": "AI Settings",
+        "MaxTokens": "Max Tokens",
+        "Temperature": "Temperature",
+        "ChunkLimit": "Chunk limit",
+        "SystemContext": "System context",
+        "AdvancedContext": "Advanced context",
+        "AdvancedContextDesctiption": "Here you have the most control. Be careful, the native prompt is completely overwritten.",
+        "YouAreAwesomeAssistant": "You are an awesome assistant",
+        "Preview": "Preview",
+        "AnswerPreview": "Answer preview",
+        "GeneratingAnswer": "Generating answer",
+        "GeneratedWith": "generated with ",
         "AiError": "Oops! Something went wrong. Please retry in a few moment.",
-        "AiQuotaExceeded":"Oops! Token quota exceeed. Please upgrade your project",
-        "AiNoAnswer":"Unable to find a relevant answer",
-        "TokensUsage":"Tokens usage",
-        "MaxTokensForAnswer":"Max tokens for the answer",
-        "Total":"Total",
-        "ManageGPTKey":"Manage GPT Key",
-        "ManageIntegrationKey":"Manage integration key",
-        "SetHiddenMessage":"Set the hidden message",
-        "HiddenMessage":"Hidden message",
-        "HiddenMessageDescription":"Hidden messages are designed to be a useful tool to debug conversations. They are automatically disabled when your chatbot goes public.",
-        "EnterAccessToken":"Enter the Access Token",
-        "EnterParameters":"Enter parameters",
-        "HubspotAccessToken":"Hubspot access token",
-        "EnterHubspotAccessToken":"Enter Hubspot Access Token",
-        "BodyParameters":"Body parameters",
-        "Advanced":"Advanced",
-        "AssignResultTo":"Assign result to",
-        "AssignStatusTo":"Assign status to",
-        "AssignErrorTo":"Assign error to",
-        "GoTo":"go to",
-        "GoToBlock":"Go to block",
-        "CustomAttribute":"Custom Attribute",
-        "Action":"Action",
-        "Condition":"Condition",
-        "ApplyCondition":"Apply condition",
-        "AddNewCondition":"Add new condition",
-        "TypeSearchValue":"Type search value",
-        "NoVariableFound":"Nothing found. Please consider changing your search query",
-        "AddConditionsGroup":"Add conditions group",
-        "ClickAddCondition":"Click to add a condition",
-        "EnterRequestURL":"Enter request URL",
-        "MakeWebhookUrl":"Make webhook url",
-        "N8nWebhookUrl":"N8N webhook url",
-        "EnterMakeWebhookURL":"Enter Make Webhook URL",
-        "EnterN8nWebhookURL":"Enter N8N Webhook URL",
-        "EnterTrackingNumber":"Enter the tracking number",
-        "TrackingNumber":"Tracking Number",
-        "TrackingNumberToSearch":"Tracking number to search",
-        "QaplaApiKey":"Qapla Api Key",
-        "YourApiKey":"Your Api Key",
-        "Status":"Status",
-        "Result":"Result",
-        "Error":"Error",
-        "ChooseBot":"Choose a bot",
-        "UseChatbotSlug":"Use Chatbot slag",
-        "ChooseBlock":"Choose a block",
-        "ChooseBlockDescription":"Automatically execute this block when this chatbot joins the conversation",
-        "ExecuteBlock":"Execute block",
-        "ThisRequestNoBody":"This request does not have a body",
-        "Location":"Location",
-        "PhoneNumber":"Phone number",
-        "HeaderParameters":"Header parameters",
-        "TheHeaderContainsMedia":"The header contains a Media to customize",
-        "InsertValidURLOrUpdateFile":"Insert a valid URL or update a file",
-        "LocationHeadersNotSupported":"Location headers not yet supported",
-        "NoParameters":"No parameters",
-        "ButtonsParameters":"Buttons parameters",
-        "InsertValidURL":"Insert a valid URL",
-        "ContactSelected":"contact selected",
-        "ContactsSelected":"contacts selected",
-        "AddContacts":"Add contacts",
+        "AiQuotaExceeded": "Oops! Token quota exceeed. Please upgrade your project",
+        "AiNoAnswer": "Unable to find a relevant answer",
+        "TokensUsage": "Tokens usage",
+        "MaxTokensForAnswer": "Max tokens for the answer",
+        "Total": "Total",
+        "ManageGPTKey": "Manage GPT Key",
+        "ManageIntegrationKey": "Manage integration key",
+        "SetHiddenMessage": "Set the hidden message",
+        "HiddenMessage": "Hidden message",
+        "HiddenMessageDescription": "Hidden messages are designed to be a useful tool to debug conversations. They are automatically disabled when your chatbot goes public.",
+        "EnterAccessToken": "Enter the Access Token",
+        "EnterParameters": "Enter parameters",
+        "HubspotAccessToken": "Hubspot access token",
+        "EnterHubspotAccessToken": "Enter Hubspot Access Token",
+        "BodyParameters": "Body parameters",
+        "Advanced": "Advanced",
+        "AssignResultTo": "Assign result to",
+        "AssignStatusTo": "Assign status to",
+        "AssignErrorTo": "Assign error to",
+        "GoTo": "go to",
+        "GoToBlock": "Go to block",
+        "CustomAttribute": "Custom Attribute",
+        "Action": "Action",
+        "Condition": "Condition",
+        "ApplyCondition": "Apply condition",
+        "AddNewCondition": "Add new condition",
+        "TypeSearchValue": "Type search value",
+        "NoVariableFound": "Nothing found. Please consider changing your search query",
+        "AddConditionsGroup": "Add conditions group",
+        "ClickAddCondition": "Click to add a condition",
+        "EnterRequestURL": "Enter request URL",
+        "MakeWebhookUrl": "Make webhook url",
+        "N8nWebhookUrl": "N8N webhook url",
+        "EnterMakeWebhookURL": "Enter Make Webhook URL",
+        "EnterN8nWebhookURL": "Enter N8N Webhook URL",
+        "EnterTrackingNumber": "Enter the tracking number",
+        "TrackingNumber": "Tracking Number",
+        "TrackingNumberToSearch": "Tracking number to search",
+        "QaplaApiKey": "Qapla Api Key",
+        "YourApiKey": "Your Api Key",
+        "Status": "Status",
+        "Result": "Result",
+        "Error": "Error",
+        "ChooseBot": "Choose a bot",
+        "UseChatbotSlug": "Use Chatbot slag",
+        "ChooseBlock": "Choose a block",
+        "ChooseBlockDescription": "Automatically execute this block when this chatbot joins the conversation",
+        "ExecuteBlock": "Execute block",
+        "ThisRequestNoBody": "This request does not have a body",
+        "Location": "Location",
+        "PhoneNumber": "Phone number",
+        "HeaderParameters": "Header parameters",
+        "TheHeaderContainsMedia": "The header contains a Media to customize",
+        "InsertValidURLOrUpdateFile": "Insert a valid URL or update a file",
+        "LocationHeadersNotSupported": "Location headers not yet supported",
+        "NoParameters": "No parameters",
+        "ButtonsParameters": "Buttons parameters",
+        "InsertValidURL": "Insert a valid URL",
+        "ContactSelected": "contact selected",
+        "ContactsSelected": "contacts selected",
+        "AddContacts": "Add contacts",
         "PhoneNumberId": "Phone number id",
-        "ChooseTemplate":"Choose a template",
-        "LoadingTemplates":"Loading templates",
-        "NoTemplate":"Oops, looks like there is no template.",
-        "CreateOneNow":"Create one now!",
-        "AddReceiver":"Add receiver",
-        "AddContentsToReply":"Add contents to this Reply",
-        "ClickToAddFrame":"Click to add frame",
-        "ClickToAddImage":"Click to add image",
-        "ClickToAddUrl":"Click to add url ...",
-        "ClickToAddText":"Click to add text ...",
-        "ClickToAddAudioURL":"Click to add audio file ...",
-        "AddButton":"Add button",
-        "JsonButtons":"Json buttons",
-        "AddOption":"Add option",
-        "SelectOption":"Select an option",
-        "AddCard":"Add card",
-        "TypeTitle":"Type Title",
-        "TypeDescription":"Type Description",
-        "EnterEmailRecipient":"Enter email recipient",
-        "EnterEmailSubject":"Enter email subject",
-        "EnterEmailBody":"Enter email body",
-        "To":"To",
-        "Subject":"Subject",
-        "ReplyTo":"Reply to",
-        "EmailBody":"Email body",
-        "CustomerioFormId":"Customer.io Form Id",
-        "EntercustomerioFormId":"Enter Customer.io Form Id",
+        "ChooseTemplate": "Choose a template",
+        "LoadingTemplates": "Loading templates",
+        "NoTemplate": "Oops, looks like there is no template.",
+        "CreateOneNow": "Create one now!",
+        "AddReceiver": "Add receiver",
+        "AddContentsToReply": "Add contents to this Reply",
+        "ClickToAddFrame": "Click to add frame",
+        "ClickToAddImage": "Click to add image",
+        "ClickToAddUrl": "Click to add url ...",
+        "ClickToAddText": "Click to add text ...",
+        "ClickToAddAudioURL": "Click to add audio file ...",
+        "AddButton": "Add button",
+        "JsonButtons": "Json buttons",
+        "AddOption": "Add option",
+        "SelectOption": "Select an option",
+        "AddCard": "Add card",
+        "TypeTitle": "Type Title",
+        "TypeDescription": "Type Description",
+        "EnterEmailRecipient": "Enter email recipient",
+        "EnterEmailSubject": "Enter email subject",
+        "EnterEmailBody": "Enter email body",
+        "To": "To",
+        "Subject": "Subject",
+        "ReplyTo": "Reply to",
+        "EmailBody": "Email body",
+        "CustomerioFormId": "Customer.io Form Id",
+        "EntercustomerioFormId": "Enter Customer.io Form Id",
         "MinDigits": "Min digits",
         "MaxDigits": "Max digits",
-        "Terminator":"Terminator",
+        "Terminator": "Terminator",
         "Timeout": "Timeout",
         "TransferTo": "Transfer to",
-        "TransferType":"Transfer type",
-        "BargeIn":"Barge-in",
-        "NoMatch":"No match",
-        "NoInput":"No input",
-        "IncompleteSpeechTimeout":"Incomplete Speech Timeout",
-        "MaxTime":"Max time",
-        "FinalSilence":"Final silence",
-        "TerminateOnDigit":"Terminate on digit",
-        "PlayBeep":"Play a beep",
-        "RequestTimeout":"Request timeout",
-        "RequestTimeoutInfo":"Set how long a request should wait for a response before timing out. Admitted values range: 1-300k ms",
-        "AudioFileAllowed":"You can only upload *.wav audio format with mono, 8 KHz, with PCM 8bit, PCM 16bit, Alaw or uLaw coding",
+        "TransferType": "Transfer type",
+        "BargeIn": "Barge-in",
+        "NoMatch": "No match",
+        "NoInput": "No input",
+        "IncompleteSpeechTimeout": "Incomplete Speech Timeout",
+        "MaxTime": "Max time",
+        "FinalSilence": "Final silence",
+        "TerminateOnDigit": "Terminate on digit",
+        "PlayBeep": "Play a beep",
+        "RequestTimeout": "Request timeout",
+        "RequestTimeoutInfo": "Set how long a request should wait for a response before timing out. Admitted values range: 1-300k ms",
+        "AudioFileAllowed": "You can only upload *.wav audio format with mono, 8 KHz, with PCM 8bit, PCM 16bit, Alaw or uLaw coding",
         "ProjectWide": "Project wide",
         "CurrentDepartment": "Current department",
         "SelectedDepartment": "Selected Department",
-        "CheckAgentsAvailability":"Check agents availability",
-        "Target":"Target",
-        "Conversation":"Conversation",
-        "Contact":"Contact",
-        "TagsTypingAliasPlaceholder":"tag1, tag2, tag3",
-        "TagsTypingAliasDescription":"Please set a comma separated list of tags that the user can type to tag a conversation or a contact ",
-        "UpdateProperty":"Update property",
-        "SelectProperty":"Select property",
-        "CheckOperatingHours":"Check operating hours",
-        "General":"General",
-        "SelectedTimeSlot":"Selected time slot",
-        "SelectTimeSlot":"Select time slot",
-        "IgnoreOperatingHours":"Ignore General operating hours",
+        "CheckAgentsAvailability": "Check agents availability",
+        "Target": "Target",
+        "Conversation": "Conversation",
+        "Contact": "Contact",
+        "TagsTypingAliasPlaceholder": "tag1, tag2, tag3",
+        "TagsTypingAliasDescription": "Please set a comma separated list of tags that the user can type to tag a conversation or a contact ",
+        "UpdateProperty": "Update property",
+        "SelectProperty": "Select property",
+        "CheckOperatingHours": "Check operating hours",
+        "General": "General",
+        "SelectedTimeSlot": "Selected time slot",
+        "SelectTimeSlot": "Select time slot",
+        "IgnoreOperatingHours": "Ignore General operating hours",
         "IgnoreOperatingHoursDescription": "Check this option if you want to only check agents availability ignoring the General Operating hours settings. <br> This option is also useful if you want to demand opening and closing hours checking to the If Operating Hours Action, specifing a specific time slot",
         "intentsProgress": "Loading intents in progress",
         "intentsComplete": "Intents loading completed",
         "connectorsProgress": "Loading connectors in progress",
         "connectorsComplete": "Connectors loading completed",
-        "loadingCompleteWithErrors":"Loading completed with errors",
-        "PushTagsToList":"Push to tags List",
-        "PushTagsToListDescription":"Check this option if you want to add tags to global list.",
-        "ViewList":"View list",
-        "UseBotSlug":"Use bot slug",
-        "ChooseBotBySlug":"Choose bot by slug",
-        "CopilotEnabled":"Copilot enabled",
-        "CopilotDisabled":"Copilot disabled",
-        "ResponseStatus":"Response status",
-        "StatusNotSelected":"Status not selected",
-        "More":"More ",
-        "JSONButtons":" JSON buttons.",
+        "loadingCompleteWithErrors": "Loading completed with errors",
+        "PushTagsToList": "Push to tags List",
+        "PushTagsToListDescription": "Check this option if you want to add tags to global list.",
+        "ViewList": "View list",
+        "UseBotSlug": "Use bot slug",
+        "ChooseBotBySlug": "Choose bot by slug",
+        "CopilotEnabled": "Copilot enabled",
+        "CopilotDisabled": "Copilot disabled",
+        "ResponseStatus": "Response status",
+        "StatusNotSelected": "Status not selected",
+        "More": "More ",
+        "JSONButtons": " JSON buttons.",
         "Examples": "Examples",
         "FlowLog": "Log",
         "SetFlowLog":"Set the log",
-        "AvailableToAgents":"Available to agents",
-        "InfoAvailableToAgents":"A block with this option is visible to agents for the purpose to be put back in the conversation",
-        "Create":"Create",
-        "Regenerate":"Regenerate",
+        "AvailableToAgents": "Available to agents",
+        "InfoAvailableToAgents": "A block with this option is visible to agents for the purpose to be put back in the conversation",
+        "Create": "Create",
+        "Regenerate": "Regenerate",
         "ProductionUrl":"Production Url",
         "DevelopmentUrl":"Development Url",
-        "Copy":"Copy",
-        "TextCopied":"Text copied successfully!",
-        "TextErrorCopied":"Error copying text",
-        "ApiNotSupported":"Clipboard API not supported by your browser.",
+        "Copy": "Copy",
+        "TextCopied": "Text copied successfully!",
+        "TextErrorCopied": "Error copying text",
+        "ApiNotSupported": "Clipboard API not supported by your browser.",
         "DevUrlCopied":"Dev url copied successfully!",
         "LogLevels": "Log levels",
         "LoadingAfter": "loading ... after",
         "LoadingBefore": "loading ... before",
-        "VisibilityConnectors":"Visibility of connectors",
-        "ChangeAlphaConnectors":"Change alpha of the connectors color",
+        "VisibilityConnectors": "Visibility of connectors",
+        "ChangeAlphaConnectors": "Change alpha of the connectors color",
         "nameKB": "Name",
-        "ContentKB": "Content",
-        "EnterTheKbName": "Enter Knowledge Base Name",
-        "PlaceholderKBContent": "Enter Knowledge Base Content"
+        "ContentKB": "Text",
+        "EnterTheKbName": "Content Name",
+        "PlaceholderKBContent": "Content text"
     },
     "Alert": {
-        "ErrorMaxOptions":"Cannot add another option. Max available options achived ( 0..9, *, # )",
-        "ErrorSingleDigit":"Invalid option. Allowed options are 0..9 single digit, *, #",
-        "ErrorAllowedOption":"Invalid option. Allowed options are 0..9 single digit, *, #",
-        "ErrorDuplicateDigit":"Invalid option. Provided option already exist. Please check and try again"
+        "ErrorMaxOptions": "Cannot add another option. Max available options achived ( 0..9, *, # )",
+        "ErrorSingleDigit": "Invalid option. Allowed options are 0..9 single digit, *, #",
+        "ErrorAllowedOption": "Invalid option. Allowed options are 0..9 single digit, *, #",
+        "ErrorDuplicateDigit": "Invalid option. Provided option already exist. Please check and try again"
     },
-    "Name":"Name",
+    "Name": "Name",
     "Label": "Label",
     "Actions": "Actions",
-    "DisableUserInput":"Disable user input",
-    "url":"url",
-    "OpenIn":"Open in",
-    "SameWidgetWindow":"Same widget window",
+    "DisableUserInput": "Disable user input",
+    "url": "url",
+    "OpenIn": "Open in",
+    "SameWidgetWindow": "Same widget window",
     "NewTabWindow": "New Tab window",
     "Text": "Text",
     "Image": "Image",
     "Frame": "Frame",
     "Gallery": "Gallery",
     "Redirect": "Redirect",
-    "AudioUrl":"Audio File Url",
-    "Message":"Message",
-    "Every":"Every",
-    "CDSForm":{
-        "FormDescription":"The Forms block allows you to ask more than one question within a single message, making it easier for the customer to provide all the relevant information.",
-        "AddAFormToAsk":"Add a Form to ask user data",
+    "AudioUrl": "Audio File Url",
+    "Message": "Message",
+    "Every": "Every",
+    "CDSForm": {
+        "FormDescription": "The Forms block allows you to ask more than one question within a single message, making it easier for the customer to provide all the relevant information.",
+        "AddAFormToAsk": "Add a Form to ask user data",
         "AddForm": "Add form",
         "SelectTemplateForm": "Select a type of form among those suggested, or create a new one",
-        "SelectAForm":"Select a form",
+        "SelectAForm": "Select a form",
         "CreateForm": "Create form",
         "AddField": "Add field",
         "ParameterName": "Parameter name",
-        "ChooseAnAttribute":"Choose an attribute",
+        "ChooseAnAttribute": "Choose an attribute",
         "Label": "Label",
-        "ValidationField":"Validation field",
-        "SelectFieldType":"Select field type",
+        "ValidationField": "Validation field",
+        "SelectFieldType": "Select field type",
         "AddCustomRegex": "Add a custom regex",
         "ErrorMessage": "Error message",
         "DeleteField": "Delete field",
@@ -575,7 +587,7 @@
         "ConfirmDeleteField": "Are you sure you want to delete the field?",
         "DeleteForm": "Delete form",
         "ConfirmDeleteForm": "Are you sure you want to delete the form?",
-        "AreYouSureDeleteField":"Are you sure you want to delete the field?",
+        "AreYouSureDeleteField": "Are you sure you want to delete the field?",
         "MarkbotLabel": "You can use <a href='https://gethelp.tiledesk.com/articles/sending-images-videos-quick-replies-and-more/' target='_blank'>Markbot</a> to format your labels.",
         "InfoMessages": {
             "field_name": "Give a name to the Form field (ex: name _ User). The name can contain only letters numbers and _",
@@ -585,209 +597,209 @@
             "field_error": "Write an error message if the data entered by the user is not correct"
         }
     },
-    "CDSRules":{
-        "RuleName":"Rule name",
-        "AddRule":"Add Rule",
-        "DeleteRule":"Delete Rule",
-        "UpdateRule":"Update Rule"
+    "CDSRules": {
+        "RuleName": "Rule name",
+        "AddRule": "Add Rule",
+        "DeleteRule": "Delete Rule",
+        "UpdateRule": "Update Rule"
     },
-    "CDSButtonTypes":{
-        "text":"text",
-        "url":"url",
-        "goToBlock":"go to block"
+    "CDSButtonTypes": {
+        "text": "text",
+        "url": "url",
+        "goToBlock": "go to block"
     },
-    "CDSActionCategory":{
-        "MostUsed":"Most used",
-        "AI":"AI",
-        "Flow":"Flow",
-        "Integrations":"Integrations",
-        "Special":"Special",
-        "Voice":"Voice",
-        "VoiceTwilio":"Voice Twilio"
+    "CDSActionCategory": {
+        "MostUsed": "Most used",
+        "AI": "AI",
+        "Flow": "Flow",
+        "Integrations": "Integrations",
+        "Special": "Special",
+        "Voice": "Voice",
+        "VoiceTwilio": "Voice Twilio"
     },
-    "CDSOperatorList":{
-        "equalAsNumbers":"equal As Numbers",
-        "equalAsStrings":"equal As Text",
-        "notEqualAsNumbers":"not Equal As Numbers",
-        "notEqualAsStrings":"not Equal As Text",
-        "greaterThan":"greater Than",
-        "greaterThanOrEqual":"greater Than Or Equal",
-        "lessThan":"less Than",
-        "lessThanOrEqual":"less Than Or Equal",
-        "startsWith":"starts With",
-        "notStartsWith":"not starts With",
-        "startsWithIgnoreCase":"starts With Ignore Case",
-        "endsWith":"ends With",
-        "contains":"contains",
-        "containsIgnoreCase":"contains Ignore Case",
-        "isEmpty":"is Empty",
-        "isNull":"is Null",
-        "isUndefined":"is Undefined",
-        "matches":"matches"
+    "CDSOperatorList": {
+        "equalAsNumbers": "equal As Numbers",
+        "equalAsStrings": "equal As Text",
+        "notEqualAsNumbers": "not Equal As Numbers",
+        "notEqualAsStrings": "not Equal As Text",
+        "greaterThan": "greater Than",
+        "greaterThanOrEqual": "greater Than Or Equal",
+        "lessThan": "less Than",
+        "lessThanOrEqual": "less Than Or Equal",
+        "startsWith": "starts With",
+        "notStartsWith": "not starts With",
+        "startsWithIgnoreCase": "starts With Ignore Case",
+        "endsWith": "ends With",
+        "contains": "contains",
+        "containsIgnoreCase": "contains Ignore Case",
+        "isEmpty": "is Empty",
+        "isNull": "is Null",
+        "isUndefined": "is Undefined",
+        "matches": "matches"
     },
-    "CDSMathOperatorList":{
-        "addAsNumbers":"Add as numbers",
-        "addAsStrings":"Add as text",
-        "substractAsNumbers":"Substract",
-        "multiplyAsNumbers":"Multiply",
-        "divideAsNumbers":"Divide"
+    "CDSMathOperatorList": {
+        "addAsNumbers": "Add as numbers",
+        "addAsStrings": "Add as text",
+        "substractAsNumbers": "Substract",
+        "multiplyAsNumbers": "Multiply",
+        "divideAsNumbers": "Divide"
     },
-    "CDSFunctionListForVariable":{
-        "upperCaseAsStrings":"Upper case",
-        "lowerCaseAsStrings":"Lower case",
-        "capitalizeAsStrings":"Capitalize",
-        "absAsNumbers":"Absolute value",
-        "roundAsNumbers":"Round",
-        "floorAsNumbers":"Floor",
-        "ceilAsNumbers":"Ceil",
-        "convertToNumber":"Convert to number",
-        "JSONparse":"Convert to JSON Object",
-        "JSONstringify":"Stringify a JSON Object"
+    "CDSFunctionListForVariable": {
+        "upperCaseAsStrings": "Upper case",
+        "lowerCaseAsStrings": "Lower case",
+        "capitalizeAsStrings": "Capitalize",
+        "absAsNumbers": "Absolute value",
+        "roundAsNumbers": "Round",
+        "floorAsNumbers": "Floor",
+        "ceilAsNumbers": "Ceil",
+        "convertToNumber": "Convert to number",
+        "JSONparse": "Convert to JSON Object",
+        "JSONstringify": "Stringify a JSON Object"
     },
     "CDSActionList": {
         "NAME": {
-            "Reply":"Reply",
-            "ReplyV2":"Advanced reply",
-            "RandomReply":"Random reply",
-            "AgentHandoff":"Transfer to a human",
-            "Close":"Close",
-            "IfOperatingHours":"If operating hours",
-            "IfOnlineAgent":"If online agents",
-            "Condition":"Condition",
-            "ConditionElse":"Condition w/ else",
-            "ConnectBlock":"Connect block",
-            "SetAttribute":"Set attribute",
-            "DeleteAttribute":"Delete attribute",
-            "ReplaceBot":"Replace bot",
+            "Reply": "Reply",
+            "ReplyV2": "Advanced reply",
+            "RandomReply": "Random reply",
+            "AgentHandoff": "Transfer to a human",
+            "Close": "Close",
+            "IfOperatingHours": "If operating hours",
+            "IfOnlineAgent": "If online agents",
+            "Condition": "Condition",
+            "ConditionElse": "Condition w/ else",
+            "ConnectBlock": "Connect block",
+            "SetAttribute": "Set attribute",
+            "DeleteAttribute": "Delete attribute",
+            "ReplaceBot": "Replace bot",
             "ReplaceAIAgent":"Replace AI Agent",
-            "Wait":"Wait",
-            "WebRequest":"Web request",
-            "WebResponse":"Web response",
-            "SendEmail":"Send email",
-            "WhatsAppStatic":"WhatsApp static",
-            "WhatsAppByAttribute":"WhatsApp by attribute",
-            "WhatsAppBySegment":"WhatsApp by segment",
-            "AddKBContent":"Add knowledge base",
-            "AskTheKnowledgeBase":"Ask knowledge base",
-            "AskTheKnowledgeBaseV2":"Ask knowledge base V2",
-            "GPTTask":"ChatGPT task",
-            "GPTAssistant":"ChatGPT assistant",
-            "AiPrompt":"AI Prompt",
-            "HiddenMessage":"Hidden message",
-            "ChangeDept":"Change department",
-            "Code":"Code",
-            "SetFunction":"Set function",
-            "CaptureUserReply":"Capture user reply",
-            "LeadUpdate":"Lead update",
-            "ClearTranscript":"Clear transcript",
-            "MoveToUnassigned":"Move to unassigned",
-            "Qapla":"Qapla'",
-            "Make":"Make",
-            "Hubspot":"Hubspot",
-            "Customerio":"Customer.io",
-            "Brevo":"Brevo",
-            "N8n":"n8n",
-            "AddTag":"Add tag",
+            "Wait": "Wait",
+            "WebRequest": "Web request",
+            "WebResponse": "Web response",
+            "SendEmail": "Send email",
+            "WhatsAppStatic": "WhatsApp static",
+            "WhatsAppByAttribute": "WhatsApp by attribute",
+            "WhatsAppBySegment": "WhatsApp by segment",
+            "AddKBContent":"Add to knowledge base",
+            "AskTheKnowledgeBase": "Ask knowledge base",
+            "AskTheKnowledgeBaseV2": "Ask knowledge base V2",
+            "GPTTask": "ChatGPT task",
+            "GPTAssistant": "ChatGPT assistant",
+            "AiPrompt": "AI Prompt",
+            "HiddenMessage": "Hidden message",
+            "ChangeDept": "Change department",
+            "Code": "Code",
+            "SetFunction": "Set function",
+            "CaptureUserReply": "Capture user reply",
+            "LeadUpdate": "Lead update",
+            "ClearTranscript": "Clear transcript",
+            "MoveToUnassigned": "Move to unassigned",
+            "Qapla": "Qapla'",
+            "Make": "Make",
+            "Hubspot": "Hubspot",
+            "Customerio": "Customer.io",
+            "Brevo": "Brevo",
+            "N8n": "n8n",
+            "AddTag": "Add tag",
             "FlowLog":"Flow log",
-            "DTMFForm":"DTMF form",
-            "DTMFMenu":"DTMF menu",
+            "DTMFForm": "DTMF form",
+            "DTMFMenu": "DTMF menu",
             "BlindTransfer": "Blind transfer",
-            "PlayPrompt":"Play prompt",
-            "SpeechForm":"Speech form",
-            "AudioRecord":"Audio record",
-            "SendWhatsapp":"Send Whatsapp"
+            "PlayPrompt": "Play prompt",
+            "SpeechForm": "Speech form",
+            "AudioRecord": "Audio record",
+            "SendWhatsapp": "Send Whatsapp"
         },
         "DOC": {
-            "Reply":{
-                "TITLE":"Send a message back to the user",
-                "DESCRIPTION":"This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc",
-                "IMAGE":"assets/images/doc/REPLY.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/reply-action/"
+            "Reply": {
+                "TITLE": "Send a message back to the user",
+                "DESCRIPTION": "This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc",
+                "IMAGE": "assets/images/doc/REPLY.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/reply-action/"
             },
-            "ReplyV2":{
-                "TITLE":"Advanced reply management with input timeout and no-match",
-                "DESCRIPTION":"This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc.",
-                "IMAGE":"assets/images/doc/REPLY.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/reply-action/"
+            "ReplyV2": {
+                "TITLE": "Advanced reply management with input timeout and no-match",
+                "DESCRIPTION": "This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc.",
+                "IMAGE": "assets/images/doc/REPLY.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/reply-action/"
             },
-            "RandomReply":{
-                "TITLE":"Random messages in a set",
-                "DESCRIPTION":"This action sends back randomly selected messages choosen from a static set",
-                "IMAGE":"assets/images/doc/RANDOM_REPLY.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "RandomReply": {
+                "TITLE": "Random messages in a set",
+                "DESCRIPTION": "This action sends back randomly selected messages choosen from a static set",
+                "IMAGE": "assets/images/doc/RANDOM_REPLY.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "AgentHandoff":{
-                "TITLE":"Transfer to a human",
-                "DESCRIPTION":"This action removes the chatbot from the conversation and moves the flow to a human",
-                "IMAGE":"assets/images/doc/AGENT.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/agent-handoff-action/"
+            "AgentHandoff": {
+                "TITLE": "Transfer to a human",
+                "DESCRIPTION": "This action removes the chatbot from the conversation and moves the flow to a human",
+                "IMAGE": "assets/images/doc/AGENT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/agent-handoff-action/"
             },
-            "Close":{
-                "TITLE":"Close the conversation",
-                "DESCRIPTION":"This action closes the current conversation",
-                "IMAGE":"assets/images/doc/CLOSE.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "Close": {
+                "TITLE": "Close the conversation",
+                "DESCRIPTION": "This action closes the current conversation",
+                "IMAGE": "assets/images/doc/CLOSE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "IfOperatingHours":{
-                "TITLE":"Check opening hours",
-                "DESCRIPTION":"This action checks if the current time is included in some operating hours slot",
-                "IMAGE":"assets/images/doc/OPEN_HOURS.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "IfOperatingHours": {
+                "TITLE": "Check opening hours",
+                "DESCRIPTION": "This action checks if the current time is included in some operating hours slot",
+                "IMAGE": "assets/images/doc/OPEN_HOURS.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "IfOnlineAgent":{
-                "TITLE":"Check online agents",
-                "DESCRIPTION":"This action checks if there is an available agent in the current department",
-                "IMAGE":"assets/images/doc/ONLINE_AGENTS.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/the-if-online-agent-action-and-its-role-in-conversation-design/"
+            "IfOnlineAgent": {
+                "TITLE": "Check online agents",
+                "DESCRIPTION": "This action checks if there is an available agent in the current department",
+                "IMAGE": "assets/images/doc/ONLINE_AGENTS.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/the-if-online-agent-action-and-its-role-in-conversation-design/"
             },
-            "Condition":{
-                "TITLE":"Condition based branching",
-                "DESCRIPTION":"This action allows branching based on the specified condition",
-                "IMAGE":"assets/images/doc/CONDITION.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "Condition": {
+                "TITLE": "Condition based branching",
+                "DESCRIPTION": "This action allows branching based on the specified condition",
+                "IMAGE": "assets/images/doc/CONDITION.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "ConditionElse":{
-                "TITLE":"Condition with else branch",
-                "DESCRIPTION":"This action allows branching based on the specified condition with true/false branches",
-                "IMAGE":"assets/images/doc/JSON_CONDITION.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "ConditionElse": {
+                "TITLE": "Condition with else branch",
+                "DESCRIPTION": "This action allows branching based on the specified condition with true/false branches",
+                "IMAGE": "assets/images/doc/JSON_CONDITION.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "ConnectBlock":{
-                "TITLE":"",
-                "DESCRIPTION":"This action moves the flow to the specified block.<br> Keep in mind that if there are other actions in the current block actions-pipeline they will be executed too, generating a parallel-execution of all the branches affering to each block triggered through this Connect-block action",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "ConnectBlock": {
+                "TITLE": "",
+                "DESCRIPTION": "This action moves the flow to the specified block.<br> Keep in mind that if there are other actions in the current block actions-pipeline they will be executed too, generating a parallel-execution of all the branches affering to each block triggered through this Connect-block action",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "SetAttribute":{
-                "TITLE":"Create or modify a flow attribute",
-                "DESCRIPTION":"With this action you can set the value of a flow attribute or change his type",
-                "IMAGE":"assets/images/doc/ASSIGN_VARIABLE.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "SetAttribute": {
+                "TITLE": "Create or modify a flow attribute",
+                "DESCRIPTION": "With this action you can set the value of a flow attribute or change his type",
+                "IMAGE": "assets/images/doc/ASSIGN_VARIABLE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "DeleteAttribute":{
-                "TITLE":"Delete a flow attribute",
-                "DESCRIPTION":"With this action you can remove the specified attribute",
-                "IMAGE":"assets/images/doc/DELETE_VARIABLE.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "DeleteAttribute": {
+                "TITLE": "Delete a flow attribute",
+                "DESCRIPTION": "With this action you can remove the specified attribute",
+                "IMAGE": "assets/images/doc/DELETE_VARIABLE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "ReplaceBot":{
-                "TITLE":"Replace the current bot with another one",
-                "DESCRIPTION":"Replaces the current chatbot with the specied one",
-                "IMAGE":"assets/images/doc/REPLACE_BOT.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
+            "ReplaceBot": {
+                "TITLE": "Replace the current bot with another one",
+                "DESCRIPTION": "Replaces the current chatbot with the specied one",
+                "IMAGE": "assets/images/doc/REPLACE_BOT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
             },
             "ReplaceAIAgent":{
                 "TITLE":"Replace the current bot with another one",
@@ -796,152 +808,159 @@
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
             },
-            "Wait":{
-                "TITLE":"Wait before next action",
-                "DESCRIPTION":"Wait the specified amount of time before moving to the next action",
-                "IMAGE":"assets/images/doc/WAIT.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "Wait": {
+                "TITLE": "Wait before next action",
+                "DESCRIPTION": "Wait the specified amount of time before moving to the next action",
+                "IMAGE": "assets/images/doc/WAIT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "WebRequest":{
-                "TITLE":"Invoke HTTP services",
-                "DESCRIPTION":"Configure and invoke a remote REST API",
-                "IMAGE":"assets/images/doc/WEB_REQUESTV2.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/web-request-action/"
+            "WebRequest": {
+                "TITLE": "Invoke HTTP services",
+                "DESCRIPTION": "Configure and invoke a remote REST API",
+                "IMAGE": "assets/images/doc/WEB_REQUESTV2.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/web-request-action/"
             },
-            "WebResponse":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "WebResponse": {
+                "TITLE": "",
+                "DESCRIPTION": "",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "SendEmail":{
-                "TITLE":"Send email",
-                "DESCRIPTION":"Sends an email with the specified fields",
-                "IMAGE":"assets/images/doc/EMAIL.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/how-the-send-email-action-works/"
+            "SendEmail": {
+                "TITLE": "Send email",
+                "DESCRIPTION": "Sends an email with the specified fields",
+                "IMAGE": "assets/images/doc/EMAIL.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/how-the-send-email-action-works/"
             },
-            "WhatsAppStatic":{
-                "TITLE":"Send whatsapp message",
-                "DESCRIPTION":"Used to configure a Whatsapp message using a template and use the JSON to send massive Whatsapp messages",
-                "IMAGE":"assets/images/doc/WHATSAPP_STATIC.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/#use-the-fast-prototyping-trick-to-generate-the-request-payload"
+            "WhatsAppStatic": {
+                "TITLE": "Send whatsapp message",
+                "DESCRIPTION": "Used to configure a Whatsapp message using a template and use the JSON to send massive Whatsapp messages",
+                "IMAGE": "assets/images/doc/WHATSAPP_STATIC.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/#use-the-fast-prototyping-trick-to-generate-the-request-payload"
             },
-            "WhatsAppByAttribute":{
-                "TITLE":"Used to send multi Whatsapp messages",
-                "DESCRIPTION":"Used to send massive whatsapp messages using a flow",
-                "IMAGE":"assets/images/doc/WHATSAPP_ATTRIBUTE.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/"
+            "WhatsAppByAttribute": {
+                "TITLE": "Used to send multi Whatsapp messages",
+                "DESCRIPTION": "Used to send massive whatsapp messages using a flow",
+                "IMAGE": "assets/images/doc/WHATSAPP_ATTRIBUTE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/"
             },
-            "WhatsAppBySegment":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "WhatsAppBySegment": {
+                "TITLE": "",
+                "DESCRIPTION": "",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "SendWhatsapp":{
-                "TITLE":"Send Whatsapp",
-                "DESCRIPTION":"Send a Whatsapp message using the specified template",
-                "IMAGE":"assets/images/doc/WHATSAPP.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/send-whatsapp-message/"
+            "SendWhatsapp": {
+                "TITLE": "Send Whatsapp",
+                "DESCRIPTION": "Send a Whatsapp message using the specified template",
+                "IMAGE": "assets/images/doc/WHATSAPP.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/send-whatsapp-message/"
             },
-            "AskTheKnowledgeBase":{
-                "TITLE":"Prompt the KB",
-                "DESCRIPTION":"This action prompts the selected knowledge base to find the best suitable answer from the uploaded contents",
-                "IMAGE":"assets/images/doc/ASKGPT.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/"
+            "AskTheKnowledgeBase": {
+                "TITLE": "Prompt the KB",
+                "DESCRIPTION": "This action prompts the selected knowledge base to find the best suitable answer from the uploaded contents",
+                "IMAGE": "assets/images/doc/ASKGPT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/"
             },
-            "GPTTask":{
-                "TITLE":"ChatGPT Prompt",
-                "DESCRIPTION":"This action prompts chatGPT",
-                "IMAGE":"assets/images/doc/GPT_TASK.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "AddKBContent": {
+                "TITLE": "Add Content to the KB",
+                "DESCRIPTION": "Use this action to populare the Knowledge Base using an automation flow",
+                "IMAGE": "assets/images/doc/ADD_KB_CONTENT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/add-to-knowledge-base-action/"
             },
-            "GPTAssistant":{
-                "TITLE":"Prompt OpenAI Assistants",
-                "DESCRIPTION":"This action allows you to prompt the connected OpenAI Assistant",
-                "IMAGE":"assets/images/doc/GPT_ASSISTANT.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/chatgpt-assistant-action-beta/"
+            "GPTTask": {
+                "TITLE": "ChatGPT Prompt",
+                "DESCRIPTION": "This action prompts chatGPT",
+                "IMAGE": "assets/images/doc/GPT_TASK.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "AiPrompt":{
-                "TITLE":"AI Prompt multiple LLM",
-                "DESCRIPTION":"The AI Prompt Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
-                "IMAGE":"assets/images/doc/AI_PROMPT.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
+            "GPTAssistant": {
+                "TITLE": "Prompt OpenAI Assistants",
+                "DESCRIPTION": "This action allows you to prompt the connected OpenAI Assistant",
+                "IMAGE": "assets/images/doc/GPT_ASSISTANT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/chatgpt-assistant-action-beta/"
             },
-            "HiddenMessage":{
-                "TITLE":"Send an hidden message (for the end user)",
-                "DESCRIPTION":"Send a hidden message in the current conversation",
-                "IMAGE":"assets/images/doc/HIDE_MESSAGE.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "AiPrompt": {
+                "TITLE": "AI Prompt multiple LLM",
+                "DESCRIPTION": "The AI Prompt Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
+                "IMAGE": "assets/images/doc/AI_PROMPT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
             },
-            "ChangeDept":{
-                "TITLE":"Chage the department",
-                "DESCRIPTION":"Change the current conversation department",
-                "IMAGE":"assets/images/doc/CHANGE_DEPARTMENT.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "HiddenMessage": {
+                "TITLE": "Send an hidden message (for the end user)",
+                "DESCRIPTION": "Send a hidden message in the current conversation",
+                "IMAGE": "assets/images/doc/HIDE_MESSAGE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "Code":{
-                "TITLE":"Execute a code snippet",
-                "DESCRIPTION":"Execute this code snippet (Nodejs)",
-                "IMAGE":"assets/images/doc/CODE.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/code-action/"
+            "ChangeDept": {
+                "TITLE": "Chage the department",
+                "DESCRIPTION": "Change the current conversation department",
+                "IMAGE": "assets/images/doc/CHANGE_DEPARTMENT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "SetFunction":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "Code": {
+                "TITLE": "Execute a code snippet",
+                "DESCRIPTION": "Execute this code snippet (Nodejs)",
+                "IMAGE": "assets/images/doc/CODE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/code-action/"
             },
-            "CaptureUserReply":{
-                "TITLE":"Capture the user reply",
-                "DESCRIPTION":"Wait until user replies, then capture and save the user reply in the specified attribute",
-                "IMAGE":"assets/images/doc/CAPTURE_USER_REPLY.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/capture-user-reply-action/"
+            "SetFunction": {
+                "TITLE": "",
+                "DESCRIPTION": "",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "LeadUpdate":{
-                "TITLE":"Update lead data",
-                "DESCRIPTION":"Update the current lead (the end-user) in the conversation with the specified values",
-                "IMAGE":"assets/images/doc/LEAD_UPDATE.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "CaptureUserReply": {
+                "TITLE": "Capture the user reply",
+                "DESCRIPTION": "Wait until user replies, then capture and save the user reply in the specified attribute",
+                "IMAGE": "assets/images/doc/CAPTURE_USER_REPLY.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/capture-user-reply-action/"
             },
-            "ClearTranscript":{
-                "TITLE":"Clear the chat transcript",
-                "DESCRIPTION":"",
-                "IMAGE":"assets/images/doc/CLEAR_TRANSCRIPT.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/reset-transcript-action/"
+            "LeadUpdate": {
+                "TITLE": "Update lead data",
+                "DESCRIPTION": "Update the current lead (the end-user) in the conversation with the specified values",
+                "IMAGE": "assets/images/doc/LEAD_UPDATE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "MoveToUnassigned":{
-                "TITLE":"Move chat to unassigned",
-                "DESCRIPTION":"",
-                "IMAGE":"assets/images/doc/MOVE_TO_UNASSIGNED.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/move-to-unassigned-action/"
+            "ClearTranscript": {
+                "TITLE": "Clear the chat transcript",
+                "DESCRIPTION": "",
+                "IMAGE": "assets/images/doc/CLEAR_TRANSCRIPT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/reset-transcript-action/"
+            },
+            "MoveToUnassigned": {
+                "TITLE": "Move chat to unassigned",
+                "DESCRIPTION": "",
+                "IMAGE": "assets/images/doc/MOVE_TO_UNASSIGNED.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/move-to-unassigned-action/"
             },
             "AddTag": {
-                "TITLE":"Add a new tag",
-                "DESCRIPTION":"This action allow chatbot to automatically tags a conversation or a contact during the conversation flow",
-                "IMAGE":"assets/images/doc/ADD_TAGS.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/tag-action/"
+                "TITLE": "Add a new tag",
+                "DESCRIPTION": "This action allow chatbot to automatically tags a conversation or a contact during the conversation flow",
+                "IMAGE": "assets/images/doc/ADD_TAGS.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/tag-action/"
             },
             "FlowLog": {
                 "TITLE":"Add a log",
@@ -950,199 +969,323 @@
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/action-log"
             },
-            "Qapla":{
-                "TITLE":"Ask an order status to Qapla'",
-                "DESCRIPTION":"Query the remove Qapla' service",
-                "IMAGE":"assets/images/doc/QAPLA.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/qapla-integration/"
+            "Qapla": {
+                "TITLE": "Ask an order status to Qapla'",
+                "DESCRIPTION": "Query the remove Qapla' service",
+                "IMAGE": "assets/images/doc/QAPLA.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/qapla-integration/"
             },
-            "Make":{
-                "TITLE":"Invoke Make.com webhook",
-                "DESCRIPTION":"Invoke the wemote Make webhook",
-                "IMAGE":"assets/images/doc/MAKE.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/makecom-action/"
+            "Make": {
+                "TITLE": "Invoke Make.com webhook",
+                "DESCRIPTION": "Invoke the wemote Make webhook",
+                "IMAGE": "assets/images/doc/MAKE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/makecom-action/"
             },
-            "Hubspot":{
-                "TITLE":"Hubspot CRM",
-                "DESCRIPTION":"Send lead data to Hubspot",
-                "IMAGE":"assets/images/doc/HUBSPOT.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/hubspot-action/"
+            "Hubspot": {
+                "TITLE": "Hubspot CRM",
+                "DESCRIPTION": "Send lead data to Hubspot",
+                "IMAGE": "assets/images/doc/HUBSPOT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/hubspot-action/"
             },
-            "Customerio":{
-                "TITLE":"Customer.io CRM",
-                "DESCRIPTION":"Send lead data to Customer.io",
-                "IMAGE":"assets/images/doc/CUSTOMERIO.png",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "Customerio": {
+                "TITLE": "Customer.io CRM",
+                "DESCRIPTION": "Send lead data to Customer.io",
+                "IMAGE": "assets/images/doc/CUSTOMERIO.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "Brevo":{
-                "TITLE":"Brevo CRM",
-                "DESCRIPTION":"Send lead data to Brevo",
-                "IMAGE":"assets/images/doc/BREVO.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/brevo-action/"
+            "Brevo": {
+                "TITLE": "Brevo CRM",
+                "DESCRIPTION": "Send lead data to Brevo",
+                "IMAGE": "assets/images/doc/BREVO.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/brevo-action/"
             },
-            "N8n":{
-                "TITLE":"Invoke n8n webhook",
-                "DESCRIPTION":"Invoke the wemote n8n webhook",
-                "IMAGE":"assets/images/doc/N8N.png",
-                "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/n8nio-action/"
+            "N8n": {
+                "TITLE": "Invoke n8n webhook",
+                "DESCRIPTION": "Invoke the wemote n8n webhook",
+                "IMAGE": "assets/images/doc/N8N.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/n8nio-action/"
             },
-            "DTMFForm":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "DTMFForm": {
+                "TITLE": "",
+                "DESCRIPTION": "",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "DTMFMenu":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "DTMFMenu": {
+                "TITLE": "",
+                "DESCRIPTION": "",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
             "BlindTransfer": {
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+                "TITLE": "",
+                "DESCRIPTION": "",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "PlayPrompt":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "PlayPrompt": {
+                "TITLE": "",
+                "DESCRIPTION": "",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "SpeechForm":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "SpeechForm": {
+                "TITLE": "",
+                "DESCRIPTION": "",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
-            "AudioRecord":{
-                "TITLE":"",
-                "DESCRIPTION":"",
-                "IMAGE":"",
-                "VIDEO_URL":"",
-                "DOC_URL":""
+            "AudioRecord": {
+                "TITLE": "",
+                "DESCRIPTION": "",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             }
-
         }
     },
     "CDSvariablesList": {
-        "userDefined":"User defined",
-        "globals":"Globals",
-        "mostUsed":"Most used",
-        "systemDefined":"System defined",
-        "uploadedDocument":"Uploaded document",
-        "uploadedImage":"Uploaded image",
-        "leadAttributes":"Lead attributes",
-        "dynamicAttributes":"Dynamic attributes",
-        "voiceFlow":"Voice flow",
-        "mostUsedELements":{
-            "last_user_text":{ "description":"The last text the user typed. This is overwritten on each user reply" },
-            "user_country":{ "description":"The user Country as decoded by {{BRAND_NAME}}" },
-            "user_city":{ "description":"The user City as decoded by {{BRAND_NAME}}" },
-            "user_language":{ "description":"The user language decoded on channel" },
-            "transcript":{ "description":"All the conversation messages exchanged with this chatbot during the chat" }
+        "userDefined": "User defined",
+        "globals": "Globals",
+        "mostUsed": "Most used",
+        "systemDefined": "System defined",
+        "uploadedDocument": "Uploaded document",
+        "uploadedImage": "Uploaded image",
+        "leadAttributes": "Lead attributes",
+        "dynamicAttributes": "Dynamic attributes",
+        "voiceFlow": "Voice flow",
+        "mostUsedELements": {
+            "last_user_text": {
+                "description": "The last text the user typed. This is overwritten on each user reply"
+            },
+            "user_country": {
+                "description": "The user Country as decoded by {{BRAND_NAME}}"
+            },
+            "user_city": {
+                "description": "The user City as decoded by {{BRAND_NAME}}"
+            },
+            "user_language": {
+                "description": "The user language decoded on channel"
+            },
+            "transcript": {
+                "description": "All the conversation messages exchanged with this chatbot during the chat"
+            }
         },
-        "systemDefinedElements":{
-            "department_id":{ "description":"The ID of the department where this chatbot is activated" },
-            "department_name":{ "description":"'The name of the department where this chatbot is activated" },
-            "project_id":{ "description":"The name of the project where this chatbot belongs to" },
-            "last_message_id":{ "description":"The unique ID of the last message sent" },
-            "conversation_id":{ "description":"This conversation unique ID" },
-            "chatbot_id":{ "description":"This chatbot id" },
-            "chatbot_name":{ "description":"This chatbot name" },
-            "chatbotToken": { "description":"" },
-            "user_id":{ "description":"The user unique ID inside {{BRAND_NAME}} database" },
-            "user_agent":{ "description":"The web user agent where this conversation initiated" },
-            "chatChannel":{ "description":"The channel where this conversation belongs to. Ex. 'web', 'whatsapp', 'facebook', 'telegram'" },
-            "user_source_page":{ "description":"The page where this conversations is runinng. Only available on channel 'web'" },
-            "chat_url":{ "description":"The url of the Chat to send to a colleague to chat with this user. Use 'Invite human' action to invite the human to this chat" },
-            "user_ip_address":{ "description":"The user IP address, when available" },
-            "ticketId":{ "description":"The current conversation ticket ID"},
-            "flowError":{ "description":"The last error generated in the flow"}
+        "systemDefinedElements": {
+            "department_id": {
+                "description": "The ID of the department where this chatbot is activated"
+            },
+            "department_name": {
+                "description": "'The name of the department where this chatbot is activated"
+            },
+            "project_id": {
+                "description": "The name of the project where this chatbot belongs to"
+            },
+            "last_message_id": {
+                "description": "The unique ID of the last message sent"
+            },
+            "conversation_id": {
+                "description": "This conversation unique ID"
+            },
+            "chatbot_id": {
+                "description": "This chatbot id"
+            },
+            "chatbot_name": {
+                "description": "This chatbot name"
+            },
+            "chatbotToken": {
+                "description": ""
+            },
+            "user_id": {
+                "description": "The user unique ID inside {{BRAND_NAME}} database"
+            },
+            "user_agent": {
+                "description": "The web user agent where this conversation initiated"
+            },
+            "chatChannel": {
+                "description": "The channel where this conversation belongs to. Ex. 'web', 'whatsapp', 'facebook', 'telegram'"
+            },
+            "user_source_page": {
+                "description": "The page where this conversations is runinng. Only available on channel 'web'"
+            },
+            "chat_url": {
+                "description": "The url of the Chat to send to a colleague to chat with this user. Use 'Invite human' action to invite the human to this chat"
+            },
+            "user_ip_address": {
+                "description": "The user IP address, when available"
+            },
+            "ticketId": {
+                "description": "The current conversation ticket ID"
+            },
+            "flowError": {
+                "description": "The last error generated in the flow"
+            }
         },
-        "uploadedDocumentElements":{
-            "lastUserDocumentAsAttachmentURL":{ "description":"Useful if you want to have an URL of the uploaded document that can be displayed in chat and you will always download on click" },
-            "lastUserDocumentAsInlineURL":{ "description":"Document as 'view inline' on click. Useful if you want to use this link in a WebRequest or externar API invocation to get the document content" },
-            "lastUserDocumentName":{ "description":"The name of the document uploaded by the user. It's empy if no document is uploaded" },
-            "lastUserDocumentType":{ "description":"The type of the document uploaded by the user. It's empy if no document is uploaded" }
+        "uploadedDocumentElements": {
+            "lastUserDocumentAsAttachmentURL": {
+                "description": "Useful if you want to have an URL of the uploaded document that can be displayed in chat and you will always download on click"
+            },
+            "lastUserDocumentAsInlineURL": {
+                "description": "Document as 'view inline' on click. Useful if you want to use this link in a WebRequest or externar API invocation to get the document content"
+            },
+            "lastUserDocumentName": {
+                "description": "The name of the document uploaded by the user. It's empy if no document is uploaded"
+            },
+            "lastUserDocumentType": {
+                "description": "The type of the document uploaded by the user. It's empy if no document is uploaded"
+            }
         },
-        "uploadedImageElements":{
-            "lastUserImageURL":{ "description":"The public URL to access the image uploaded by the user. It's empy if no image is uploaded" },
-            "lastUserImageName":{ "description":"The name of the image uploaded by the user. It's empy if no image is uploaded" },
-            "lastUserImageType":{ "description":"The type of the image uploaded by the user. It's empy if no image is uploaded" },
-            "lastUserImageWidth":{ "description":"The height in pixel of the image uploaded by the user. It's empy if no image is uploaded" },
-            "lastUserImageHeight":{ "description":"The wdth in pixel of the image uploaded by the user. It's empy if no image is uploaded" }
+        "uploadedImageElements": {
+            "lastUserImageURL": {
+                "description": "The public URL to access the image uploaded by the user. It's empy if no image is uploaded"
+            },
+            "lastUserImageName": {
+                "description": "The name of the image uploaded by the user. It's empy if no image is uploaded"
+            },
+            "lastUserImageType": {
+                "description": "The type of the image uploaded by the user. It's empy if no image is uploaded"
+            },
+            "lastUserImageWidth": {
+                "description": "The height in pixel of the image uploaded by the user. It's empy if no image is uploaded"
+            },
+            "lastUserImageHeight": {
+                "description": "The wdth in pixel of the image uploaded by the user. It's empy if no image is uploaded"
+            }
         },
-        "leadAttributesElements":{
-            "userEmail":{ "description":"The user email in {{BRAND_NAME}} Contacts" },
-            "userFullname":{ "description":"The user Fullname in {{BRAND_NAME}} Contacts" },
-            "userPhone":{ "description":"The user phone in {{BRAND_NAME}} Contacts" },
-            "userLeadId":{ "description":"The user contact Id in {{BRAND_NAME}} Contacts" },
-            "userCompany":{ "description":"The user Company name in {{BRAND_NAME}} Contacts" },
-            "currentPhoneNumber":{ "description":"The user phone used in the current conversation (i.e. coming from Whatsapp / SMS channels)" },
-            "decodedCustomJWT":{ "description":"When the end-user (lead) is strong authenticated this JSON object contains certified info from the authentication provider. To get certified email use {{decodedCustomJWT.email}}. In the same way you can get firstname {{decodedCustomJWT.firstname}}, lastname {{decodedCustomJWT.laastname}} or custom attributes, i.e. {{decodedCustomJWT.attributes.SSN}}" },
-            "strongAuthenticated":{ "description":"Indicates that the current user logged in the chat session with 'strong authentication'" }
+        "leadAttributesElements": {
+            "userEmail": {
+                "description": "The user email in {{BRAND_NAME}} Contacts"
+            },
+            "userFullname": {
+                "description": "The user Fullname in {{BRAND_NAME}} Contacts"
+            },
+            "userPhone": {
+                "description": "The user phone in {{BRAND_NAME}} Contacts"
+            },
+            "userLeadId": {
+                "description": "The user contact Id in {{BRAND_NAME}} Contacts"
+            },
+            "userCompany": {
+                "description": "The user Company name in {{BRAND_NAME}} Contacts"
+            },
+            "currentPhoneNumber": {
+                "description": "The user phone used in the current conversation (i.e. coming from Whatsapp / SMS channels)"
+            },
+            "decodedCustomJWT": {
+                "description": "When the end-user (lead) is strong authenticated this JSON object contains certified info from the authentication provider. To get certified email use {{decodedCustomJWT.email}}. In the same way you can get firstname {{decodedCustomJWT.firstname}}, lastname {{decodedCustomJWT.laastname}} or custom attributes, i.e. {{decodedCustomJWT.attributes.SSN}}"
+            },
+            "strongAuthenticated": {
+                "description": "Indicates that the current user logged in the chat session with 'strong authentication'"
+            }
         },
-        "dynamicAttributesElements":{
-            "timestamp":{ "description":"The current timestamp in millis (Number format)" },
-            "now":{ "description":"The current date in the ISODate format. Ex. 2024-09-25T10:14:41.638Z (String format)" },
-            "UUID":{ "description":"A dynamic generated UUID obtained from a UUIDv4 removing the dashes" },
-            "UUIDv4":{ "description":"A dynamic standard UUIDv4" }
+        "dynamicAttributesElements": {
+            "timestamp": {
+                "description": "The current timestamp in millis (Number format)"
+            },
+            "now": {
+                "description": "The current date in the ISODate format. Ex. 2024-09-25T10:14:41.638Z (String format)"
+            },
+            "UUID": {
+                "description": "A dynamic generated UUID obtained from a UUIDv4 removing the dashes"
+            },
+            "UUIDv4": {
+                "description": "A dynamic standard UUIDv4"
+            }
         },
-        "voiceFlowElements":{
-            "voiceLanguage":{ "description":"Define the main language for the voice system interpreter" },
-            "voiceName":{ "description":"Define the name of the voice chatbot" },
-            "event":{ "description":"Every handled event during current call flow" },
-            "lastBlock":{ "description":"The last triggered block heard by the caller" },
-            "lastRecordedUrl": { "description": "The url of the latest recorded audio"}
+        "voiceFlowElements": {
+            "voiceLanguage": {
+                "description": "Define the main language for the voice system interpreter"
+            },
+            "voiceName": {
+                "description": "Define the name of the voice chatbot"
+            },
+            "event": {
+                "description": "Every handled event during current call flow"
+            },
+            "lastBlock": {
+                "description": "The last triggered block heard by the caller"
+            },
+            "lastRecordedUrl": {
+                "description": "The url of the latest recorded audio"
+            }
         }
     },
     "TYPE_GPT_MODEL": {
-        "text-davinci-003": { "description": ""},
-        "gpt-3.5-turbo": { "description": ""},
-        "gpt-4": { "description": ""},
-        "gpt-4-turbo-preview": { "description": ""},
-        "gpt-4o": { "description": ""},
-        "gpt-4o-mini": { "description": ""},
-        "o1-mini": { "description": ""},
-        "o1-preview": { "description": ""}
+        "text-davinci-003": {
+            "description": ""
+        },
+        "gpt-3.5-turbo": {
+            "description": ""
+        },
+        "gpt-4": {
+            "description": ""
+        },
+        "gpt-4-turbo-preview": {
+            "description": ""
+        },
+        "gpt-4o": {
+            "description": ""
+        },
+        "gpt-4o-mini": {
+            "description": ""
+        },
+        "o1-mini": {
+            "description": ""
+        },
+        "o1-preview": {
+            "description": ""
+        }
     },
-    "New":"New",
-    "Event":"Event",
+    "New": "New",
+    "Event": "Event",
     "WhatsNew": "What's new ?",
-    "Changelog":"Changelog",
-    "GitHubRepo":"GitHub repository",
+    "Changelog": "Changelog",
+    "GitHubRepo": "GitHub repository",
     "ReadMore": "Read more",
-    "SharePrototype":"Share prototype with testers",
-    "CopyLink":"Copy share link",
-    "OpenLinkInNewTab":"Open share link",
+    "SharePrototype": "Share prototype with testers",
+    "CopyLink": "Copy share link",
+    "OpenLinkInNewTab": "Open share link",
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
-    "CDSGlobals":{
-        "Globals":"Globals",
-        "NoGlobalVariables":"No global variables <br><br>Global variables are a set of variables that are always available in your flows",
-        "GLOBAL_KEY" :"GLOBAL_KEY",
-        "value":"value",
-        "InfoTitle":"Use variables to reuse values and protect sensitive data",
-        "InfoDescription":"Store sensitive data in variables type secret to keep its values masked on the screen. <br> Work with the current value of a variable to prevent sharing sensitive values with your team",
-        "ManageGlobal":"Manage global variable"
+    "CDSGlobals": {
+        "Globals": "Globals",
+        "NoGlobalVariables": "No global variables <br><br>Global variables are a set of variables that are always available in your flows",
+        "GLOBAL_KEY": "GLOBAL_KEY",
+        "value": "value",
+        "InfoTitle": "Use variables to reuse values and protect sensitive data",
+        "InfoDescription": "Store sensitive data in variables type secret to keep its values masked on the screen. <br> Work with the current value of a variable to prevent sharing sensitive values with your team",
+        "ManageGlobal": "Manage global variable"
     },
     "Options": "Options",
     "CDSHeader": {
-        "LinkCopiedToClipboard":"Link copied to clipboard"
-    }, 
+        "LinkCopiedToClipboard": "Link copied to clipboard"
+    },
+    "ReleaseHistory": "Release History",
+    "ReleaseNotes": "Release notes",
+    "EnterNotes": "Enter notes",
+    "PreparingToPublish": "Preparing to publish",
+    "NowThatYouHavePublished": "Now that you’ve published your AI Agent, make it visible to users.",
+    "InstallWidget": "Install widget",
+    "DoNotShowThisAgain": "Don’t show this again",
+    "Restore": "Restore",
+    "Less": "less",
+    "More": "more",
+    "NowThatYouHavePublishedWhCp": "Now that you've published your {{sub_type}}, use the following URL to trigger it",
+    "AreYouSureYouWantToRestore":"Are you sure you want to restore the Flow {{release_name}} to {{release_date}} version?",
+    "ThisOperationWillReplaceTheCurrentlyPublishedFlow":"This operation will replace the currently published Flow",
+    "Copied":"Copied",
+    "NoReleaseHistoryAvailable": "No release history available",
+    "PublishYourFlowToSeeTheReleaseHistoryAppearHere": "Publish your Flow to see the release history appear here",
     "FollowLog": "Follow log",
     "DeleteLog": "Delete log"
-    
 }

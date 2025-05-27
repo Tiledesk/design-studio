@@ -1,5 +1,5 @@
 
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
@@ -51,15 +51,14 @@ export class CdsActionReplyTextComponent implements OnInit {
   TYPE_BUTTON = TYPE_BUTTON;
   buttons: Array<any>;
   activeFocus: boolean = true;
-
-  showJsonBody: boolean =  false;
   jsonBody: string;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     private readonly connectorService: ConnectorService,
-    private readonly intentService: IntentService
+    private readonly intentService: IntentService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   // SYSTEM FUNCTIONS //
@@ -83,7 +82,6 @@ export class CdsActionReplyTextComponent implements OnInit {
     this.jsonBody = '';
     if(this.response?.attributes?.attachment?.json_buttons){
       this.jsonBody = this.response?.attributes?.attachment?.json_buttons;
-      this.showJsonBody = true;
     }
     if(this.index == 1 && (this.wait?.time == 500 || this.wait?.time == 0)) {
        this.delayTime = 0
@@ -146,7 +144,7 @@ export class CdsActionReplyTextComponent implements OnInit {
           buttonChanged.__isConnected = false;
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.__idConnection = null;
-          buttonChanged.action = '';
+          //buttonChanged.action = '';
           buttonChanged.type = TYPE_BUTTON.TEXT;
           if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
         } else {
@@ -176,11 +174,9 @@ export class CdsActionReplyTextComponent implements OnInit {
     this.logger.log('[ACTION REPLY TEXT] onChangeJsonButtons', json);
     this.jsonBody = json;
     if(json && json.trim() !== ''){
-      this.showJsonBody = true;
-      this.response.attributes.attachment.json_buttons = json; //JSON.stringify(json);
+      this.response.attributes.attachment.json_buttons = json;
     } else {
-      this.showJsonBody = false;
-      this.response.attributes.attachment.json_buttons = '';
+      this.response.attributes.attachment.json_buttons = null;
     }
     this.changeJsonButtons.emit(this.response);
   }
