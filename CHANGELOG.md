@@ -7,13 +7,19 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.34.0-rc4
+- **bug-fixed**: in deleteWebhook changed the parameter passed in the call from chatbot_id to webhook_id
+- **changed**: changed cursor icon in the header log panel
+- **added**: added background color animation on log lines
+- **changed**: changed follow log icons
+- **bug-fixed**: when I press stop test the log does not close
 
 # 1.34.0-rc3
 - **bug-fixed**: fixed translation of AvailableToAgents
 - **bug-fixed**: enabled resize on json buttons box
 - **bug-fixed**: added "on" in: More on JSON buttons
 - **bug-fixed**: fixed json buttons in preview action reply
-- **badded**: added summary to action add content to kb
+- **added**: added summary to action add content to kb
 - **changed**: intent title and highlighted border must be the same, without opacity
 - **changed**: changed icon in action log
 
