@@ -500,44 +500,26 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
     if(this.intent.attributes.color && this.intent.attributes.color !== undefined){
       const nwColor = this.intent.attributes.color;
-      // document.documentElement.style.setProperty('--intent-color', `rgb(${nwColor})`);
       this.intentColor = nwColor;
     } else {
       this.intentColor = INTENT_COLORS.COLOR1;
       this.intent.attributes.color = INTENT_COLORS.COLOR1;
     }
-    // const element = document.getElementById('intent-content-'+ this.intent?.intent_id);
-    // if(element){
-    //   element.style.setProperty('background-color', `rgba(${this.intentColor}, 0.35)`);
-    // }
-    // document.documentElement.style.setProperty('--intent-color', `rgba(${this.intentColor}, 1)`);
   }
 
   private setIntentSelected() {
     this.listOfActions = null;
     this.formSize = 0;
     this.questionCount = 0;
-    // const element = document.getElementById('intent-content-'+ this.intent?.intent_id);
-    // if(element){
-    //   element.style.setProperty('border-color', `rgba(${this.intentColor}, 1)`);
-    // }
     try {
       if (this.intent) {
         // document.documentElement.style.setProperty('--intent-color', `rgba(${this.intentColor}, 1)`);
         /** // this.patchAllActionsId(); */
         this.patchAttributesPosition();
-        /** // this.listOfActions = this.intent.actions.filter(function(obj) {
-        //   return obj._tdActionType !== TYPE_ACTION.INTENT;
-        // }); */
         this.listOfActions = this.intent.actions;
-        /** // this.logger.log("[CDS-INTENT] listOfActions: ", this.listOfActions);
-        // this.form = this.intent.form;
-        // this.actions = this.intent.actions;
-        // this.answer = this.intent.answer; */
         if (this.intent.question) {
           const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
           this.questionCount = question_segment.length;
-          /** // this.question = this.intent.question; */
         }
       }
       if (this.intent?.form && (this.intent.form !== null)) {
