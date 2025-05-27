@@ -70,6 +70,7 @@ export class CdsHeaderComponent implements OnInit {
   // webhook //
   isWebhook: boolean = false;
   webhookUrl: string = null;
+  webhookId: string = null;
   messageWebhookUrl: string = '';
   chatbot_id: string;
   serverBaseURL: string;
@@ -477,6 +478,7 @@ export class CdsHeaderComponent implements OnInit {
       const resp: any = await firstValueFrom(this.webhookService.getWebhook(this.chatbot_id));
       this.logger.log("[cds-header] getWebhook : ", resp);
       const webhookUrl = resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
+      this.webhookId = resp?.webhook_id;
       return webhookUrl;
     } catch (error) {
       this.logger.log("[cds-header] error getWebhook: ", error);
@@ -486,7 +488,7 @@ export class CdsHeaderComponent implements OnInit {
 
 
   stopWebhook(){
-    this.webhookService.deleteWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {
+    this.webhookService.deleteWebhook(this.webhookId).subscribe({ next: (resp: any)=> {
       this.logger.log("[cds-header] deleteWebhook : ", resp);
       //this.webhookUrl = null; //this.serverBaseURL+'webhook/'+resp.webhook_id;
     }, error: (error)=> {

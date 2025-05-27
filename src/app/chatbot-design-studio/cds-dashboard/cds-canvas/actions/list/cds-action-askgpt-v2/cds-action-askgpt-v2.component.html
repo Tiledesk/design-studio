@@ -299,7 +299,7 @@
                 </div>
 
                 <!-- // advanced prompt -->                     
-                <div class="field-box">
+                <div class="field-box" [class.disabled]="action?.chanksOnly">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.advancedPrompt"
@@ -313,7 +313,9 @@
                 </div>
 
                 <!-- // citations -->    
-                <div class="field-box" *ngIf="action.hasOwnProperty('citations')">
+                <div *ngIf="action.hasOwnProperty('citations')"
+                    class="field-box" 
+                    [class.disabled]="action?.chanksOnly">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.citations"
@@ -325,6 +327,20 @@
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
                     </label>
                 </div>
+
+
+                <!-- <div class="field-box">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.chanksOnly"
+                            (change)="onChangeCheckbox($event, 'chanksOnly')">
+                            {{"CDSCanvas.ChanksOnly" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <!- <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
+                    </label> ->
+                </div> -->
             
 
             </div>
@@ -359,7 +375,8 @@
     
     <!-- <hr class="custom-divider"> -->
 
-    <div class="field-box">
+    <div class="field-box" [class.disabled]="action?.chanksOnly">
+        
         <label class="title-label">{{'CDSCanvas.KBReply' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false" 
@@ -373,7 +390,7 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box">
+    <div class="field-box" [class.disabled]="action?.chanksOnly">
         <label class="title-label">{{'CDSCanvas.KBSource' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false"
@@ -384,6 +401,20 @@
             [text]="action.assignSourceTo"
             (selectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.KBChunks' | translate}}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true"
+            [text]="action.assignChunksTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignChunksTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignChunksTo')">
         </cds-textarea>
     </div>
 

@@ -78,6 +78,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
       case 'VOICE_PROVIDER':{
         this.findAndUpdateProperty("VOICE_PROVIDER", event.key)
         this.findAndUpdateProperty("TTS_VOICE_NAME", null)
+        this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
         this.voiceNameSelect.onResetValue(null)
         
         this.voiceProvider = event.key
@@ -90,12 +91,14 @@ export class CDSVoiceSettingsComponent implements OnInit {
           this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
           this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
 
+          this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
           this.voiceLanguageSelect.onResetValue(null)
           this.voice_language = null;
         }
         break;
       };
       case 'TTS_VOICE_LANGUAGE':{
+        this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", event.language_code)
         this.voice_language = event.language_code;
         this.voice_name_list = this.voiceProvider === 'twilio'? voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code).map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` })) : voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice
         
@@ -124,6 +127,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
       case 'VOICE_PROVIDER':{
         this.findAndUpdateProperty("VOICE_PROVIDER", null)
         this.findAndUpdateProperty("TTS_VOICE_NAME", null)
+        this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
         this.voice_name = null;
         this.voice_language = null
         if(this.voiceProvider === 'openai'){
@@ -136,6 +140,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
         break;
       };
       case 'TTS_VOICE_LANGUAGE':{
+        this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
         this.findAndUpdateProperty("TTS_VOICE_NAME", null)
         this.voice_name = null;
         this.voice_language = null

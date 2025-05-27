@@ -119,7 +119,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
         this.newConversation.emit(conversation_id);
       } else if(eventData?.source?.includes('widget')){
         let message = eventData?.data?.message;
-        this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message);
+        this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message, this.support_group_id);
         if(message && message.status>0){
           if(!this.support_group_id){
             this.initLogStaticServices(message);
