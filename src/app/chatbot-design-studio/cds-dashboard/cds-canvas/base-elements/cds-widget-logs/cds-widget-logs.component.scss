@@ -39,7 +39,7 @@
 
 .resize-handle .buttons-header-right {
   display: flex;
-  cursor: pointer;
+  cursor: ns-resize;
   justify-content: flex-end;
   align-items: center;
   height: 28px;
@@ -49,6 +49,7 @@
     align-items: center;
     justify-content: flex-end;
     height: 100%;
+    cursor: pointer;
   }
 
   ::ng-deep mat-icon {
@@ -57,8 +58,8 @@
     align-items: center;
   }
 
-  ::ng-deep mat-icon.run svg{
-    height: 15px;
+  ::ng-deep mat-icon.sprint svg{
+    height: 22px;
   }
   ::ng-deep mat-icon.bin svg{
     height: 16px;
@@ -99,6 +100,7 @@
   max-height: 1000px;
   border-bottom: 1px solid var(--gray-light-02);
   transition: max-height 0.3s ease, padding 0.3s ease;
+  animation: fadeBackground 2.5s forwards;
   .row-log-button {
     display: inline-block;
     cursor: pointer;
@@ -305,4 +307,10 @@
   .cds-box-button:focus {
       background-color: var(--gray-02);
   }
+}
+
+@keyframes fadeBackground {
+  0% { background-color: var(--gray-light-02); }
+  20% { background-color: var(--gray-light-02); }
+  100% { background-color: #ffffff; }
 }
