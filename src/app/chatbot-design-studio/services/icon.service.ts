@@ -460,8 +460,12 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/jump_to_element.svg')
     );
     this.matIconRegistry.addSvgIcon(
-      'sprint',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/sprint.svg')
+      'sprint_off',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/sprint_off.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'sprint_on',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/sprint_on.svg')
     );
     this.matIconRegistry.addSvgIcon(
       'pause',

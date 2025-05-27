@@ -517,7 +517,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         //this.controllerService.onStopTestItOut();
         this.logger.log('[CDS-CANVAS] CLOSE TEST IT OUT');
         this.IS_OPEN_PANEL_WIDGET = false;
-        this.IS_OPEN_WIDGET_LOG = false;
+        //this.IS_OPEN_WIDGET_LOG = false;
       }
     });
   }
