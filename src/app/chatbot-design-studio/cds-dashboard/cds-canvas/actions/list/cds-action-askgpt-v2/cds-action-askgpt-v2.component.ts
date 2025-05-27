@@ -67,7 +67,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
     "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
-    "top_k": { name: "top_k", min: 1, max: 10, step: 1 }
+    "top_k": { name: "top_k", min: 1, max: 40, step: 1 }
   }
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
@@ -204,6 +204,9 @@ export class CdsActionAskgptV2Component implements OnInit {
     }
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_source')) {
       new_attributes.push({ name: "kb_source", value: "kb_source" });
+    }
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_chunks')) {
+      new_attributes.push({ name: "kb_chunks", value: "kb_chunks" });
     }
     variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
     this.logger.debug("[ACTION-ASKGPTV2] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));

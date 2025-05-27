@@ -1,14 +1,12 @@
 
 <div #resizeElement class="panel-intent-content tds_draggable"
-    [class.cds-intent-active]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive" 
     [class.isStart]="isStart" 
     [id]="'intent-content-'+ intent?.intent_id"
-    [ngStyle]="{'background-color': 'rgba('+intentColor+', 0.35)'}"
+    [ngStyle]="{
+        'background-color': 'rgba('+intent.attributes.color+', 0.35)',
+        'outline': intentService.intentSelectedID === intent.intent_id && intentService.intentActive ? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
+      }"
     (click)="$event.stopPropagation();openWebhookIntentPanel(intent)">
-
-    <!-- 
-    (click)="onSelectActionIfWebhook(startAction, 0, startAction?._tdActionId)" 
-    -->
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
 
@@ -26,7 +24,7 @@
         (optionClicked)="onOptionClicked($event)">
     </cds-panel-intent-controls>
 
-    <div  [id]="'block-header-'+ intent?.intent_id"
+    <div [id]="'block-header-'+ intent?.intent_id"
         class="pic-header" 
         [ngClass]="{'cds-start': isStart}">
 
@@ -106,10 +104,12 @@
             class="box-action" 
             tabindex=-1
             [ngClass]="{
-            'cds-action-active': intentService.actionSelectedID === action._tdActionId, 
-            'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
-            'cds-last-action': last
+                'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
+                'cds-last-action': last
             }" 
+            [ngStyle]="{
+                'outline': intentService.actionSelectedID === action._tdActionId? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
+            }"
             (keydown)="onKeydown($event)" 
             (click)="onSelectAction(action, i, action._tdActionId)">
             <!-- [class.isFirst]="first" -->

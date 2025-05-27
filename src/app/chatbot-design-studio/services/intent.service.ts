@@ -29,7 +29,7 @@ export class IntentService {
   idBot: string;
   behaviorIntents = new BehaviorSubject <Intent[]>([]);
   behaviorIntent = new BehaviorSubject <Intent>(null);
-  liveActiveIntent = new BehaviorSubject<{ intent: Intent; animation: boolean }>(null);
+  liveActiveIntent = new BehaviorSubject<{ intent: Intent; logAnimationType: boolean; scale: number|null }>(null);
   testIntent = new BehaviorSubject<Intent>(null);
   BSTestItOut = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
@@ -230,12 +230,12 @@ export class IntentService {
   
   public setLiveActiveIntent(intentName: string){
     let intent = this.listOfIntents.find((intent) => intent.intent_display_name === intentName);
-    this.liveActiveIntent.next({intent: intent, animation: true})
+    this.liveActiveIntent.next({intent: intent, logAnimationType: true, scale: null})
   }
 
-  public setLiveActiveIntentByIntentId(intentId: string, animation: boolean){
+  public setLiveActiveIntentByIntentId(intentId: string, animation: boolean, scale:number|null){
     let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
-    this.liveActiveIntent.next({intent: intent, animation: animation});
+    this.liveActiveIntent.next({intent: intent, logAnimationType: animation, scale: scale});
   }
 
   public resetLiveActiveIntent(){
@@ -1046,6 +1046,7 @@ export class IntentService {
       action.question = '{{lastUserText}}'
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
+      action.assignChunksTo = 'kb_chunks';
       action.max_tokens = 256;
       action.temperature = 0.7;
       action.top_k = 5;

@@ -459,7 +459,18 @@ export class IconService {
       'jump_to_element',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/jump_to_element.svg')
     );
-    
+    this.matIconRegistry.addSvgIcon(
+      'sprint',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/sprint.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'pause',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/pause.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'subject',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/subject.svg')
+    );
    
   }
 }

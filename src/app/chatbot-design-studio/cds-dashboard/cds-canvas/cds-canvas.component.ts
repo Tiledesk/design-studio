@@ -27,8 +27,8 @@ import { TYPE_ACTION, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-a
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
-import { Chatbot } from 'src/app/models/faq_kb-model';
 import { WebhookService } from '../../services/webhook-service.service';
+import { Chatbot } from 'src/app/models/faq_kb-model';
 
 // const swal = require('sweetalert');
 
@@ -516,20 +516,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   
 
     this.subscriptionOpenWidgetPanel = this.intentService.BSTestItOut.pipe(skip(1)).subscribe((intent) => {
-      this.logger.log("[CDS-CANVAS] BSTestItOut ", intent);
+      this.logger.log("[CDS-CANVAS] ******* BSTestItOut ", intent);
       if(intent){
         this.onTestItOut(intent);
-        //this.IS_OPEN_WIDGET_LOG = true;
-        // this.controllerService.onPlayTestItOut();
-        // this.logger.log('[CDS-CANVAS] OPEN TEST IT OUT');
-        // if(this.dashboardService.selectedChatbot.subtype !== 'webhook'){
-        //   // devo aprire il widget nel pannello
-        //   
-        // } else {
-        //   // devo aprire il pannello del log 
-        //   this.IS_OPEN_PANEL_WIDGET = false;
-        //   this.IS_OPEN_WIDGET_LOG = true;
-        // }
+        this.IS_OPEN_WIDGET_LOG = true;
       } else {
         //this.controllerService.onStopTestItOut();
         this.logger.log('[CDS-CANVAS] CLOSE TEST IT OUT');
@@ -662,7 +652,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     const intent = this.intentService.getIntentFromId(idIntentFrom);
     const color = intent?.attributes?.color ?? INTENT_COLORS.COLOR1;
     const opacity = this.stageService.getAlpha()/100;
-    this.logger.log('[CDS-CANVAS] setConnectorColor ', connector, opacity);
+    //this.logger.log('[CDS-CANVAS] setConnectorColor ', connector, opacity);
     this.connectorService.setConnectorColor(intent.intent_id, color, opacity);
   }
 
@@ -1404,10 +1394,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // -------------------------------------------------------
   onTestItOut(intent: Intent) {
     if(intent){
-      // // this.testItOut.emit(true);
       this.closeAllPanels();
       this.testitOutFirstClick = true;
-      this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
       this.intentService.startTestWithIntent(intent);
       this.controllerService.closeActionDetailPanel();
       this.controllerService.closeButtonPanel();
@@ -1418,6 +1406,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.intentService.setIntentSelectedById(intent.intent_id);
       this.intentService.setIntentSelected(intent.intent_id);
       this.closeExtraPanels();
+      this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
     }
     const subtype = this.dashboardService.selectedChatbot.subtype;
     if(subtype !== TYPE_CHATBOT.WEBHOOK && subtype != TYPE_CHATBOT.COPILOT){

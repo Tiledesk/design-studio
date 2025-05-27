@@ -77,6 +77,7 @@
 
 .vfui_1ss6mi9k {
   flex-direction: column;
+  padding: 6px 0 4px 6px;
 }
 
 .vfui_1ss6mi9r {
@@ -284,4 +285,17 @@
 ::ng-deep  .swal-restore > .swal-text{
   font-weight: 600;
   text-align: center;
+}
+
+.no-release-container{
+  display: flex;
+  justify-content: center;
+  height: 100px;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.no-release-title {
+  font-weight: 400;
 }

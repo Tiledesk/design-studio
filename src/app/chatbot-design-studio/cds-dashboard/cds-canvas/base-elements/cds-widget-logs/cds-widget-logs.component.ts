@@ -27,9 +27,6 @@ export class CdsWidgetLogsComponent implements OnInit {
       this.closeLog();
     }
   }
-
-  
-
   @Input() request_id: string;
   @Output() closePanelLog = new EventEmitter();
 
@@ -42,6 +39,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   isOpenPanelWidget: boolean;
   mqtt_token: string;
   highestTimestamp: string;
+  animationLog: boolean = true;
 
   private startY: number;
   private startHeight: number;
@@ -102,14 +100,11 @@ export class CdsWidgetLogsComponent implements OnInit {
           text: item.rows.text,
           timestamp: item.rows.timestamp
       }));
-      // this.highestTimestamp = transformedArray.reduce((max, item) => {
-      //   return new Date(item.timestamp) > new Date(max) ? item.timestamp : max;
-      // }, transformedArray[0]?.timestamp);
       if(this.listOfLogs.length > 0){
         const cutoffTimestamp = new Date(this.listOfLogs[0].timestamp);
         transformedArray = transformedArray.filter(item => new Date(item.timestamp) < cutoffTimestamp);
       } else {
-        this.highestTimestamp = transformedArray[transformedArray.length-1].timestamp;
+        this.highestTimestamp = transformedArray[transformedArray.length-1]?.timestamp;
       }
       this.listOfLogs.unshift(...transformedArray);
       this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.listOfLogs);
@@ -123,8 +118,11 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.listOfLogs = [];
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
     this.listOfLogs = [];
+    if(localStorage.getItem("log_animation_type") != null){
+      this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
+    };
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
-    if(chatbotSubtype === 'webhook'){
+    if(chatbotSubtype === TYPE_CHATBOT.WEBHOOK || chatbotSubtype === TYPE_CHATBOT.COPILOT){
       const webhook_id = await this.getWebhook();
       this.logger.log("[CDS-WIDGET-LOG] webhook_id : ", webhook_id);
       this.request_id = await this.getNewRequestId(webhook_id);
@@ -329,12 +327,16 @@ export class CdsWidgetLogsComponent implements OnInit {
   goToIntentByMessage(message){
     this.logger.log('[CDS-WIDGET-LOG] goToIntentByMessage:', message);
     const intentId = message?.intent_id;
-    let animation = true;
-    const subtype = this.dashboardService.selectedChatbot.subtype;
-    if( subtype === TYPE_CHATBOT.WEBHOOK ||  subtype === TYPE_CHATBOT.COPILOT ){
-      animation = false;
+    localStorage.setItem("isLoggedIn", JSON.stringify(true));
+    if(localStorage.getItem("log_animation_type") != null){
+      this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
+    };
+    let scale = null;
+    const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
+    if(chatbotSubtype === TYPE_CHATBOT.CHATBOT){
+      scale = 1;
     }
-    this.intentService.setLiveActiveIntentByIntentId(intentId, animation);
+    this.intentService.setLiveActiveIntentByIntentId(intentId, this.animationLog, scale);
   }
 
   onToggleLog() {
@@ -370,6 +372,11 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   onOpenLog(){
     this.isClosed = false;
+  }
+
+  onSetAnimationLog(){
+    this.animationLog = !this.animationLog;
+    localStorage.setItem("log_animation_type", JSON.stringify(this.animationLog));
   }
 
   isButtonEnabled(index: number): boolean {

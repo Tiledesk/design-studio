@@ -155,23 +155,28 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         // this.logger.log("[CDS-INTENT] intentLiveActive: ", data, this.intent.intent_display_name);
           if (data) {
             const intent = data.intent;
-            const animation = data.animation;
+            const logAnimationType = data.logAnimationType;
+            const scale = data.scale;
+  
             if(intent && intent.intent_id !== this.intent?.intent_id && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
               this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
             } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+              const stageElement = document.getElementById(this.intent.intent_id);
               this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+              this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
             } else if (!intent || intent.intent_id !== this.intent?.intent_id) {
               setTimeout(() => {
                 this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
               }, 500);
             } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
-              const stageElement = document.getElementById(intent.intent_id);
-              if(animation){
-                this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement);
-              }
-              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
+              // this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
+              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
               setTimeout(() => {
                 this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));
+                const stageElement = document.getElementById(intent.intent_id);
+                if(logAnimationType) {
+                  this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
+                }
               }, 500);
             }
           } else {
@@ -217,7 +222,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit(): void {
     //setTimeout(() => {
-      this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
+      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
       if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
         this.showIntentOptions = false;
       }
@@ -234,13 +239,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         }
         this.showIntentOptions = false;
         this.startAction = this.intent.actions[0];
-      }
-      else {
+      } else {
         this.setIntentSelected();
       }
-
-      
-
       // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.START) {
       //   this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
       //   this.startAction = this.intent.actions[0];
@@ -260,7 +261,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.addEventListener();
-      this.setIntentAttributes();
+      //this.setIntentAttributes();
     //}, 10000);
   }
 
@@ -351,6 +352,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     setTimeout(() => {
       this.componentRendered.emit(this.intent.intent_id);
     }, 0);
+    this.setIntentAttributes();
   }
 
 
@@ -371,7 +373,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   // Event listener
   // ---------------------------------------------------------
   addEventListener() {
-
     document.addEventListener(
       "connector-release-on-intent", (e: CustomEvent) => {
         // //this.logger.log('[CDS-INTENT] connector-release-on-intent e ', e)
@@ -498,15 +499,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.intent['attributes'] = {};
     }
     if(this.intent.attributes.color && this.intent.attributes.color !== undefined){
-      const nwColor = this.intent.attributes.color;// INTENT_COLORS[this.intent.attributes.color];
-      document.documentElement.style.setProperty('--intent-color', `${nwColor}`);
-      // // const coloreValue = INTENT_COLORS[this.intent.attributes.color as keyof typeof INTENT_COLORS];
+      const nwColor = this.intent.attributes.color;
       this.intentColor = nwColor;
-    } 
-    // else {
-    //   this.intentColor = INTENT_COLORS.COLOR1;
-    // }
-
+    } else {
+      this.intentColor = INTENT_COLORS.COLOR1;
+      this.intent.attributes.color = INTENT_COLORS.COLOR1;
+    }
   }
 
   private setIntentSelected() {
@@ -515,20 +513,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.questionCount = 0;
     try {
       if (this.intent) {
+        // document.documentElement.style.setProperty('--intent-color', `rgba(${this.intentColor}, 1)`);
         /** // this.patchAllActionsId(); */
         this.patchAttributesPosition();
-        /** // this.listOfActions = this.intent.actions.filter(function(obj) {
-        //   return obj._tdActionType !== TYPE_ACTION.INTENT;
-        // }); */
         this.listOfActions = this.intent.actions;
-        /** // this.logger.log("[CDS-INTENT] listOfActions: ", this.listOfActions);
-        // this.form = this.intent.form;
-        // this.actions = this.intent.actions;
-        // this.answer = this.intent.answer; */
         if (this.intent.question) {
           const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
           this.questionCount = question_segment.length;
-          /** // this.question = this.intent.question; */
         }
       }
       if (this.intent?.form && (this.intent.form !== null)) {
@@ -994,14 +985,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   changeIntentColor(color){
-    // const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
-    this.intentColor = color;
-    this.intent.attributes.color = color;
     if(color){
-      document.documentElement.style.setProperty('--intent-color', `${color}`);
+      // const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
+      this.intentColor = color;
+      this.intent.attributes.color = color;
+      // document.documentElement.style.setProperty('--intent-color', `rgba(${this.intentColor}, 1)`);
+      // const element = document.getElementById('intent-content-'+ this.intent?.intent_id);
+      // if(element){
+      //   element.style.setProperty('background-color', `rgba(${this.intentColor}, 0.35)`);
+      // }
       this.setConnectorColor(color);
       this.intentService.updateIntent(this.intent); 
     }
+   
   }
   /** ******************************
    * intent controls options: END 

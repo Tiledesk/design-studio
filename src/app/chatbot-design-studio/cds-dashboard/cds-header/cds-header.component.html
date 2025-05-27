@@ -36,10 +36,10 @@
     <div class="right-opts">
 
         <div *ngIf="isBlockSectionActive" class="btn-group" id="cds-publish-btn-wrp" [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
-            <button *ngIf="!isPlaying" id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="onClickPublish()">
-                <span class="material-icons">
+            <button *ngIf="(!isPlaying && isWebhook) || !isWebhook" id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="onClickPublish()">
+                <!-- <span class="material-icons">
                     cached
-                </span>
+                </span> -->
                 {{ 'Publish' | translate}}
             </button>
 

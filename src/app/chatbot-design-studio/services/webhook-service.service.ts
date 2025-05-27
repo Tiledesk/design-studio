@@ -94,7 +94,7 @@ export class WebhookService {
     return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
   }
 
-  deleteWebhook(chatbot_id: string){
+  deleteWebhook(webhook_id: string){
     this.thereIsWebhook = false;
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] deleteWebhook');
@@ -105,7 +105,7 @@ export class WebhookService {
         'Authorization': this.tiledeskToken
       })
     };
-    let url = this.WEBHOOK_URL + '/webhooks/preload/' + chatbot_id;
+    let url = this.WEBHOOK_URL + '/webhooks/preload/' + webhook_id;
     this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
     return this._httpClient.delete<any>(url, httpOptions);
   }

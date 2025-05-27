@@ -75,6 +75,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   }
 
   initializeWebhook(){
+    this.maximize = true;
     this.webhookUrl = '';
     this.webhookUrlDev = '';
     this.isWebhook = true;
