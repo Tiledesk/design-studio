@@ -7,6 +7,16 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.34.0-rc3
+- **bug-fixed**: fixed translation of AvailableToAgents
+- **bug-fixed**: enabled resize on json buttons box
+- **bug-fixed**: added "on" in: More on JSON buttons
+- **bug-fixed**: fixed json buttons in preview action reply
+- **badded**: added summary to action add content to kb
+- **changed**: intent title and highlighted border must be the same, without opacity
+- **changed**: changed icon in action log
+
 # 1.34.0-rc2
 - **changed**: set default val "kb_chunks"
 
