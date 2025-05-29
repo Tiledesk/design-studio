@@ -303,4 +303,15 @@ mat-checkbox ::ng-deep {
     }
 }
 
+.slider-description {
+    width: calc(100% - 70px);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--blu);
+    font-weight: 400;
+    font-size: 12px;
+}
+
 // PREVIEW SECTION --- start **************** //

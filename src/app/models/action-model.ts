@@ -435,6 +435,7 @@ export class ActionAskGPTV2 extends Action {
     max_tokens: number;
     temperature: number;
     top_k: number;
+    alpha: number;
     context: string;
     history: boolean;
     advancedPrompt?: boolean;
