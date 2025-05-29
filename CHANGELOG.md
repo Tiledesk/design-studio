@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.34.0-rc5
+- **added**: Added alpha parameter on CDS in AI settings of ask kb
+- **changed**: preview text in action set attribute truncated to 8 lines
+- **added**: in each textarea with attributes button enabled, added 3 liquid buttons
+
 # 1.34.0-rc4
 - **bug-fixed**: in deleteWebhook changed the parameter passed in the call from chatbot_id to webhook_id
 - **changed**: changed cursor icon in the header log panel
