@@ -30,6 +30,11 @@ export const DOCS_LINK = {
         stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
         voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
         voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+    },
+    LIQUIDJS: {
+        home: { link: 'https://liquidjs.com/', target: '_blank'},
+        tags: { link: 'https://liquidjs.com/tags/overview.html', target: '_blank'},
+        filters: { link: 'https://liquidjs.com/filters/overview.html', target: '_blank'},
     }
 }
 

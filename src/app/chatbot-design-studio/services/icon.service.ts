@@ -475,7 +475,10 @@ export class IconService {
       'subject',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/subject.svg')
     );
-   
+    this.matIconRegistry.addSvgIcon(
+      'liquidjs',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/liquidjs.svg')
+    );
   }
 }
 
