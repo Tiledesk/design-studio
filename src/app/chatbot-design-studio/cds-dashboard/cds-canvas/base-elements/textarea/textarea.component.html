@@ -1,4 +1,12 @@
-<div class="text-editor-wrapper" >
+<div class="text-editor-wrapper">
+    <div *ngIf="setAttributeBtn && !readonly" class="liquidjs-menu">
+        <a matTooltipClass="cds-mat-tooltip"
+        matTooltip="{{ 'LiquidJS syntax supported' | translate}}" 
+        #tooltip="matTooltip" matTooltipPosition='below'
+        matTooltipHideDelay="50" class="liquidjs-button" [href]="DOCS_LINK.home.link" [target]='DOCS_LINK.home.target'><mat-icon svgIcon="liquidjs" aria-hidden="true"></mat-icon></a>
+        <!-- <a class="liquidjs-button" [href]="DOCS_LINK.tags.link" [target]='DOCS_LINK.tags.target'>{{ 'tags' | translate }}</a>
+        <a class="liquidjs-button" [href]="DOCS_LINK.filters.link" [target]='DOCS_LINK.filters.target'>{{ 'filters' | translate }}</a> -->
+    </div>
     <div [class.focus-in]="expand" [class.focus-out]="!expand">
         <div class="text-editor">
             <!-- [readonly]="readonly" -->
@@ -46,15 +54,6 @@
             <div class="tag" *ngIf="textTag">
                 <span class="material-icons close" (click)="onClearSelectedAttribute()">close</span>
                 <div class="tag-content ellips"><span class="tag-text">{{textTag}}</span></div>
-            </div>
-
-            <div *ngIf="setAttributeBtn" class="liquidjs-menu">
-                <a matTooltipClass="cds-mat-tooltip"
-                matTooltip="{{ 'LiquidJS syntax supported' | translate}}" 
-                #tooltip="matTooltip" matTooltipPosition='below'
-                matTooltipHideDelay="50" class="liquidjs-button" [href]="DOCS_LINK.home.link" [target]='DOCS_LINK.home.target'><mat-icon svgIcon="liquidjs" aria-hidden="true"></mat-icon></a>
-                <a class="liquidjs-button" [href]="DOCS_LINK.tags.link" [target]='DOCS_LINK.tags.target'>{{ 'tags' | translate }}</a>
-                <a class="liquidjs-button" [href]="DOCS_LINK.filters.link" [target]='DOCS_LINK.filters.target'>{{ 'filters' | translate }}</a>
             </div>
     
         </div>
