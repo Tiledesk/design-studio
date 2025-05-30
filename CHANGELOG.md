@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.34.0
+
+
 # 1.34.0-rc4
 - **bug-fixed**: in deleteWebhook changed the parameter passed in the call from chatbot_id to webhook_id
 - **changed**: changed cursor icon in the header log panel
