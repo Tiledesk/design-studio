@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.33.2
+- **added**: Claude Sonnet 4 e Opus 4 models
+
 # 1.33.1
 - **changed**: set default val "kb_chunks"
 
