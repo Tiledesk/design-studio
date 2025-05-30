@@ -85,13 +85,19 @@
       z-index: -1;
   }
 
+  .header-draggable {
+    position: absolute;
+    background-color: transparent;
+    width: calc(100% - 20px);
+    height: 40px;
+  }
   .pic-header {
     display: flex;
     justify-content: space-between;
     min-height: 30px;
     width: auto;
     margin: 0px;
-    position: relative;
+    // position: relative;
     padding: 0 0px 10px 0px;
     background-color: var(--intent-header-background);
     overflow: hidden;

@@ -32,7 +32,7 @@ export const DOCS_LINK = {
         voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
     },
     LIQUIDJS: {
-        home: { link: 'https://liquidjs.com/', target: '_blank'},
+        home: { link: 'https://liquidjs.com/tutorials/intro-to-liquid.html', target: '_blank'},
         tags: { link: 'https://liquidjs.com/tags/overview.html', target: '_blank'},
         filters: { link: 'https://liquidjs.com/filters/overview.html', target: '_blank'},
     }
