@@ -249,9 +249,12 @@ mat-button-toggle{
 }
 
 .cds-attributes ::ng-deep{
-    .liquidjs-menu .liquidjs-button {
-        margin-top: 16px!important;
-        margin-right: -10px!important;
-        z-index: 1;
+    .liquidjs-menu {
+        width: calc(100% - 15px);
+        .liquidjs-button {
+            margin-top: 16px!important;
+            margin-right: -25px !important;
+            z-index: 1;
+        }
     }
 }
