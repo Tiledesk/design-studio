@@ -247,3 +247,11 @@ mat-button-toggle{
 .action-row-right {
     display: block;
 }
+
+.cds-attributes ::ng-deep{
+    .liquidjs-menu .liquidjs-button {
+        margin-top: 16px!important;
+        margin-right: -10px!important;
+        z-index: 1;
+    }
+}
