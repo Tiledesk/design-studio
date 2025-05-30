@@ -20,8 +20,8 @@
                 matTooltipClass="cds-mat-tooltip"
                 matTooltip="{{ 'FollowLog' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
                 matTooltipHideDelay="100">
-                <mat-icon *ngIf="animationLog" class="sprint" svgIcon="sprint" aria-hidden="true"></mat-icon>
-                <mat-icon *ngIf="!animationLog" class="sprint" svgIcon="pause" aria-hidden="true"></mat-icon>
+                <mat-icon *ngIf="animationLog" class="sprint" svgIcon="sprint_on" aria-hidden="true"></mat-icon>
+                <mat-icon *ngIf="!animationLog" class="sprint" svgIcon="sprint_off" aria-hidden="true"></mat-icon>
             </div>
             <div class="button-img" (click)="onClearLog()"
                 matTooltipClass="cds-mat-tooltip"

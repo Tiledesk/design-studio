@@ -1,7 +1,7 @@
 import { FormControl } from '@angular/forms';
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef, HostListener, SimpleChanges, SimpleChange } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { calculatingRemainingCharacters, TEXT_CHARS_LIMIT } from '../../../../utils';
+import { calculatingRemainingCharacters, DOCS_LINK, TEXT_CHARS_LIMIT } from '../../../../utils';
 import { SatPopover } from '@ncstate/sat-popover';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -63,7 +63,7 @@ export class CDSTextareaComponent implements OnInit {
   emojiPerLine: number = 8;
   emojiColor: string ="#506493";
   emojiiCategories = [ 'recent', 'people', 'nature', 'activity', 'flags'];
-
+  DOCS_LINK = DOCS_LINK.LIQUIDJS;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   

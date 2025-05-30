@@ -4,7 +4,7 @@
     font-size: var(--font-size-base);
     width: 100%;
     height: auto;
-    margin: 0;
+    margin: 0 0 16px 0;
     padding: 0;
     .text-editor {
         position: relative;
@@ -215,5 +215,26 @@ mat-form-field.box-textarea ::ng-deep {
                 background: var(--blu-light-03);
             }
         }
+    }
+}
+
+
+.liquidjs-menu {
+    display: flex;
+    color: var(--blu);
+    cursor: pointer;
+    font-size: 0.8em;
+    font-weight: 400;
+    white-space: nowrap;
+    justify-content: flex-end;
+    margin-bottom: 4px;
+    .liquidjs-button {
+        margin: auto 0;
+        display: inline-flex;
+    }
+    .mat-icon {
+        width: 16px;
+        height: 16px;
+        fill:initial;
     }
 }

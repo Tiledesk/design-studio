@@ -197,12 +197,12 @@ emoji-mart {
 /* Intent Controls
 /* ------------------------ */
 .panel-intent-content:hover cds-panel-intent-controls>.intent-header-actions-container-on-start {
-    top: -28px !important;
+    top: -30px !important;
     right: 12px !important;
 }
 
 .panel-intent-content:hover cds-panel-intent-controls>.intent-header-actions-container {
-    top: -28px;
+    top: -30px;
     opacity: 1;
     transform: translate3d(0, 0, 0);
 }

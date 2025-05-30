@@ -229,6 +229,7 @@
                         <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens}}" disabled>
                         <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
                     </div>
+                    <div class="slider-description"></div>
                 </div>
 
                 <!-- // temperature slider -->
@@ -253,34 +254,59 @@
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
                             <input type="text" class="slider-input gpt-setting-input" value="{{action.temperature}}" disabled>
                         </div>
+                        <div class="slider-description"><span>{{'CDSCanvas.Deterministic' | translate }}</span><span>{{'CDSCanvas.Random' | translate }}</span></div>
                     </div>
                 </div>
 
                 <!-- // chunk limit slider -->
                 <div class="text-editor-wrapper">
                     <div class="field-box">
-                        <!-- <label class="title-label">{{'CDSCanvas.Temperature' | translate }}</label> -->
                         <label class="title-label">{{'CDSCanvas.ChunkLimit' | translate }}</label>
                         <div class="action-wait-content">
-
                             <div class="action-wait-slider">
-                                <div class="action-wait-range">{{ai_setting['temperature'].min}}</div>
+                                <div class="action-wait-range">{{ai_setting['chunk_limit'].min}}</div>
                                 <mat-slider 
                                     class="wait-slider" 
                                     thumbLabel 
                                     [displayWith]="formatLabel" 
-                                    [step]="ai_setting['top_k'].step"  
-                                    [min]="ai_setting['top_k'].min"
-                                    [max]="ai_setting['top_k'].max" 
+                                    [step]="ai_setting['chunk_limit'].step"  
+                                    [min]="ai_setting['chunk_limit'].min"
+                                    [max]="ai_setting['chunk_limit'].max" 
                                     [(ngModel)]="action.top_k"
-                                    (change)="updateSliderValue($event.value, 'top_k')" aria-label="units">
+                                    (change)="updateSliderValue($event.value, 'chunk_limit')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">{{ai_setting['top_k'].max}}</div>
+                                <div class="action-wait-range">{{ai_setting['chunk_limit'].max}}</div>
                             </div>
                             <!-- // doesn't work propely -->
-                            <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
                             <input type="text" class="slider-input gpt-setting-input" value="{{action.top_k}}" disabled>
                         </div>
+                        <div class="slider-description"></div>
+                    </div>
+                </div>
+
+                <!-- // alpha limit slider -->
+                <div class="text-editor-wrapper">
+                    <div class="field-box">
+                        <label class="title-label">{{'CDSCanvas.SearchTypeLimit' | translate }}</label>
+                        <div class="action-wait-content">
+                            <div class="action-wait-slider">
+                                <div class="action-wait-range">{{ai_setting['search_type'].min}}</div>
+                                <mat-slider 
+                                    class="wait-slider" 
+                                    thumbLabel 
+                                    [displayWith]="formatLabel" 
+                                    [step]="ai_setting['search_type'].step"  
+                                    [min]="ai_setting['search_type'].min"
+                                    [max]="ai_setting['search_type'].max" 
+                                    [(ngModel)]="action.alpha"
+                                    (change)="updateSliderValue($event.value, 'alpha')" aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">{{ai_setting['search_type'].max}}</div>
+                            </div>
+                            <!-- // doesn't work propely -->
+                            <input type="text" class="slider-input gpt-setting-input" value="{{action.alpha}}" disabled>
+                        </div>
+                        <div class="slider-description"><span>{{'CDSCanvas.FullText' | translate }}</span><span>{{'CDSCanvas.Semantic' | translate }}</span></div>
                     </div>
                 </div>
 
@@ -417,6 +443,7 @@
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assignChunksTo')">
         </cds-textarea>
     </div>
+    
 
     <div class="field-box">
         <label class="subtitle-label">{{'CDSCanvas.ErrorAutomaticAssign' | translate }}
