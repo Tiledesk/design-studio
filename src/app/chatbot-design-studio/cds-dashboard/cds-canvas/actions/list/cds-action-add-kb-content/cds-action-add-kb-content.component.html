@@ -1,10 +1,7 @@
 <div *ngIf="previewMode" class="cds-action-preview">
     <div class="action-row">
         <div class="action-row-left">
-            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
-                <path d="M0 0h24v24H0V0z" fill="none" />
-                <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
-            </svg>
+            <mat-icon class="icon" svgIcon="subject" aria-hidden="true"></mat-icon>
         </div>
         <div *ngIf="action?.name" class="action-row-right">
             {{action?.name}}

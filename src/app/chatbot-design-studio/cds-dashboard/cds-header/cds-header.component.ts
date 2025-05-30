@@ -374,8 +374,6 @@ export class CdsHeaderComponent implements OnInit {
     if(!this.webhookUrl){
       this.webhookUrl = await this.createWebhook();
     }
-    // console.log("[cds-header] Webhook URL:", this.webhookUrl);
-    // const intentId = this.intentService.intentSelected?.intent_id;
     this.logService.initialize(null); 
     this.openTestSiteInPopupWindow();
     this.isPlaying = true;

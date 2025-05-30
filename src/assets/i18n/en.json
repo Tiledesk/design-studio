@@ -871,6 +871,13 @@
                 "VIDEO_URL": "",
                 "DOC_URL": "https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/"
             },
+            "AddKBContent": {
+                "TITLE": "Add Content to the KB",
+                "DESCRIPTION": "Use this action to populare the Knowledge Base using an automation flow",
+                "IMAGE": "assets/images/doc/ADD_KB_CONTENT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/add-to-knowledge-base-action/"
+            },
             "GPTTask": {
                 "TITLE": "ChatGPT Prompt",
                 "DESCRIPTION": "This action prompts chatGPT",
