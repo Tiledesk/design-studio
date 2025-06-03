@@ -237,6 +237,7 @@ export class IntentService {
     let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
     this.liveActiveIntent.next({intent: intent, logAnimationType: animation, scale: scale});
   }
+  
 
   public resetLiveActiveIntent(){
     this.logger.log('[INTENT SERVICE] ::: ');

@@ -1,5 +1,5 @@
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
-import { Subject, Subscription } from 'rxjs';
+import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { takeUntil, timeInterval } from 'rxjs/operators';
 import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, CdkDropListGroup, CdkDropList, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Form, Intent } from 'src/app/models/intent-model';
@@ -13,6 +13,9 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID } from 'src/app/chatbot-design-studio/utils';
+import { AppConfigService } from 'src/app/services/app-config';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 
 export enum HAS_SELECTED_TYPE {
   ANSWER = "HAS_SELECTED_ANSWER",
@@ -81,6 +84,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isActionIntent: boolean = false;
   isAgentsAvailable: boolean = false;
   showIntentOptions: boolean = true;
+  webhookUrl: string;
+  serverBaseURL: any;
+  chatbot_id: string;
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -89,12 +95,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   constructor(
     public intentService: IntentService,
+    public appConfigService: AppConfigService,
     private readonly connectorService: ConnectorService,
     private readonly stageService: StageService,
     private readonly controllerService: ControllerService,
     private readonly elemenRef: ElementRef,
     private readonly renderer: Renderer2,
-    private readonly appStorageService: AppStorageService
+    private readonly appStorageService: AppStorageService,
+    private readonly dashboardService: DashboardService,
+    private readonly webhookService: WebhookService,
   ) {
     this.initSubscriptions();
   }
@@ -157,7 +166,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             const intent = data.intent;
             const logAnimationType = data.logAnimationType;
             const scale = data.scale;
-  
             if(intent && intent.intent_id !== this.intent?.intent_id && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
               this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
             } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
@@ -220,13 +228,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     //setTimeout(() => {
       this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
       if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
         this.showIntentOptions = false;
       }
-
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
@@ -239,6 +246,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         }
         this.showIntentOptions = false;
         this.startAction = this.intent.actions[0];
+
+        this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
+        this.chatbot_id = this.dashboardService.id_faq_kb;
+        this.webhookUrl = await this.getWebhook();
+        if(!this.webhookUrl){
+          this.webhookUrl = await this.createWebhook(this.intent);
+        }
       }
       else {
         this.setIntentSelected();
@@ -268,6 +282,35 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.setIntentAttributes();
     //}, 10000);
   }
+
+
+
+  async getWebhook(): Promise<string | null> {
+    try {
+      const resp: any = await firstValueFrom(this.webhookService.getWebhook(this.chatbot_id));
+      this.logger.log("[cds-header] getWebhook : ", resp);
+      const webhookUrl = resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
+      return webhookUrl;
+    } catch (error) {
+      this.logger.log("[cds-header] error getWebhook: ", error);
+      return null;
+    }
+  }
+
+  async createWebhook(intent): Promise<string | null> {
+    this.logger.log("[cds-intent] createWebhook : ", this.chatbot_id, intent.intent_id);
+    const copilot = this.chatbotSubtype === TYPE_CHATBOT.COPILOT;
+    try {
+      const resp: any = await firstValueFrom(this.webhookService.createWebhook(this.chatbot_id, intent.intent_id, true, copilot));
+      this.logger.log("[cds-intent] createWebhook : ", resp);
+      return resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
+    } catch (error) {
+      this.logger.log("[cds-intent] error createWebhook: ", error);
+      return null;
+    }
+  }
+
+
 
   private getAllConnectorsIn(){
     if(this.intent){

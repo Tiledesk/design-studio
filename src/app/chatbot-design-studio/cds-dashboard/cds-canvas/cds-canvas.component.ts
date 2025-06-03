@@ -1377,7 +1377,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.controllerService.playTestItOut();
         this.IS_OPEN_PANEL_WIDGET = true;
       }, 100);
-    } 
+    }
   }
 
   /** onActionDeleted */
