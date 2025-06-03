@@ -8,6 +8,13 @@
 *Tiledesk SRL*
 
 
+# 1.35.0-rc1
+- **added**: added webhook creation in intent component when webhook/copilot block is displayed
+- **bug-fixed**: fixed bug on webhook stop/play to make it restart from first block to play
+
+
+# 1.35.0
+
 # 1.34.0-rc6
 - **bug-fixed**: Drag and drop on intent header not working
 - **changed**: Fix CDS interface for Liquid on textarea
