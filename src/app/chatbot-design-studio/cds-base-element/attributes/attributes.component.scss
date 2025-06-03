@@ -39,7 +39,8 @@
     
     .auto-suggest-group {
         display: flex;
-        justify-content: space-between;
+        gap: 2px;
+        // justify-content: space-between;
         // max-width: 400px;
         // width: 100%;
     }
