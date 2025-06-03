@@ -4,7 +4,7 @@
     font-size: var(--font-size-base);
     width: 100%;
     height: auto;
-    margin: 0 0 16px 0;
+    margin: 0;
     padding: 0;
     .text-editor {
         position: relative;
@@ -180,9 +180,8 @@ mat-form-field.box-textarea ::ng-deep {
     }
     .tag {
         position: absolute;
-        top: 3px;
-        bottom: 3px;
-        left: 5px;
+        top: 2px;
+        left: 2px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -220,21 +219,24 @@ mat-form-field.box-textarea ::ng-deep {
 
 
 .liquidjs-menu {
+    position: absolute;
     display: flex;
     color: var(--blu);
     cursor: pointer;
     font-size: 0.8em;
     font-weight: 400;
     white-space: nowrap;
+    margin-top: -15px;
     justify-content: flex-end;
-    margin-bottom: 4px;
+    width: 100%;
     .liquidjs-button {
         margin: auto 0;
         display: inline-flex;
     }
     .mat-icon {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
         fill:initial;
+        display: flex;
     }
 }
