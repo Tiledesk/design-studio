@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.34.0-rc6
+- **bug-fixed**: Drag and drop on intent header not working
+- **changed**: Fix CDS interface for Liquid on textarea
+- **changed**: Highlighted log line needs to be lighter color
+
 # 1.34.0-rc5
 - **added**: Added alpha parameter on CDS in AI settings of ask kb
 - **changed**: preview text in action set attribute truncated to 8 lines
