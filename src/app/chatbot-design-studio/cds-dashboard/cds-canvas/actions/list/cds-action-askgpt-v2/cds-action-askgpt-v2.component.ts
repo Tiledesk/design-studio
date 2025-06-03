@@ -67,7 +67,8 @@ export class CdsActionAskgptV2Component implements OnInit {
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
     "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
-    "top_k": { name: "top_k", min: 1, max: 40, step: 1 }
+    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1 },
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05 }
   }
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
@@ -109,7 +110,7 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.action.preview = []; // per retrocompatibilità
     }
     this.getListNamespaces();
-    this.patchActionsKey();
+    // this.patchActionsKey();
   }
 
   ngOnDestroy() {
@@ -205,6 +206,9 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_source')) {
       new_attributes.push({ name: "kb_source", value: "kb_source" });
     }
+    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_chunks')) {
+      new_attributes.push({ name: "kb_chunks", value: "kb_chunks" });
+    }
     variableList.find(el => el.key ==='userDefined').elements = [ ...variableList.find(el => el.key ==='userDefined').elements, ...new_attributes];
     this.logger.debug("[ACTION-ASKGPTV2] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
@@ -233,17 +237,17 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   /** TO BE REMOVED: patch undefined action keys */
-  private patchActionsKey(){
-    if(!this.action.hasOwnProperty('top_k')){
-      this.action.top_k = 5;
-    }
-    if(!this.action.hasOwnProperty('max_tokens')){
-      this.action.max_tokens = 256;
-    }
-    if(!this.action.hasOwnProperty('temperature')){
-      this.action.temperature = 0.7;
-    }
-  }
+  // private patchActionsKey(){
+  //   if(!this.action.hasOwnProperty('top_k')){
+  //     this.action.top_k = 5;
+  //   }
+  //   if(!this.action.hasOwnProperty('max_tokens')){
+  //     this.action.max_tokens = 256;
+  //   }
+  //   if(!this.action.hasOwnProperty('temperature')){
+  //     this.action.temperature = 0.7;
+  //   }
+  // }
 
   onChangeTextarea($event: string, property: string) {
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", $event)

@@ -107,7 +107,7 @@ export class CdsWidgetLogsComponent implements OnInit {
         this.highestTimestamp = transformedArray[transformedArray.length-1]?.timestamp;
       }
       this.listOfLogs.unshift(...transformedArray);
-      this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.highestTimestamp, this.listOfLogs);
+      this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.listOfLogs);
   }
 
   
@@ -115,6 +115,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   async initializeChatbot(){
+    this.listOfLogs = [];
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
     this.listOfLogs = [];
     if(localStorage.getItem("log_animation_type") != null){
@@ -217,7 +218,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   subscriptions(){
      /** get dynamic logs */
     this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage.subscribe((message: any) => {
-      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message);
+      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message, this.highestTimestamp);
       if(message){
         if (new Date(message.timestamp) > new Date(this.highestTimestamp) || !this.highestTimestamp){
           this.listOfLogs.push(message);

@@ -425,6 +425,7 @@ export class ActionAskGPTV2 extends Action {
     model: string;
     assignReplyTo: string;
     assignSourceTo: string;
+    assignChunksTo: string;
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
@@ -434,11 +435,13 @@ export class ActionAskGPTV2 extends Action {
     max_tokens: number;
     temperature: number;
     top_k: number;
+    alpha: number;
     context: string;
     history: boolean;
     advancedPrompt?: boolean;
     namespaceAsName: boolean;
-    citations: boolean
+    citations: boolean;
+    chanksOnly: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2

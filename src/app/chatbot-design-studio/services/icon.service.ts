@@ -471,8 +471,14 @@ export class IconService {
       'pause',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/pause.svg')
     );
-    
-   
+    this.matIconRegistry.addSvgIcon(
+      'subject',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/subject.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'liquidjs',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/liquidjs.svg')
+    );
   }
 }
 

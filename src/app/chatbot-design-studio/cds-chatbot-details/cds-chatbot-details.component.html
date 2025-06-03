@@ -9,6 +9,13 @@
             <a href="javascript:;" role="button">{{ "BotDetails" | translate }}</a>
           </li>
 
+          <li *ngIf="selectedChatbot?.subtype === TYPE_CHATBOT.VOICE_TWILIO" (click)="toggleTab(SETTINGS_SECTION.VOICE_SETTINGS)" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== SETTINGS_SECTION.VOICE_SETTINGS, 
+                      'li-active' :           activeSection === SETTINGS_SECTION.VOICE_SETTINGS
+                    }">
+            <a href="javascript:;" role="button"> {{ "VoiceSettings" | translate }} </a>
+          </li>
+
           <li (click)="toggleTab(SETTINGS_SECTION.IMPORT_EXPORT)" class="btn-with-border-effect" [ngClass]="
                     { 'border-from-center' :  activeSection !== SETTINGS_SECTION.IMPORT_EXPORT, 
                       'li-active' :           activeSection === SETTINGS_SECTION.IMPORT_EXPORT
@@ -45,6 +52,12 @@
       [isVisibleDEP]="isVisibleDEP"
       [translationsMap]="translationsMap">
     </cds-detail-botdetail>
+
+    <cds-voice-settings *ngIf="activeSection===SETTINGS_SECTION.VOICE_SETTINGS && selectedChatbot?.subtype === TYPE_CHATBOT.VOICE_TWILIO"
+      class="scrollMePage"
+      [selectedChatbot]="selectedChatbot"
+      [project]="project">
+    </cds-voice-settings>
 
     <cds-detail-import-export *ngIf="activeSection===SETTINGS_SECTION.IMPORT_EXPORT"
       [id_faq_kb]="selectedChatbot?._id"

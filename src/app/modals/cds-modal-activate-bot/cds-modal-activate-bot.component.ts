@@ -25,7 +25,7 @@ export class CdsModalActivateBotComponent implements OnInit {
 
   defaultDepartmentId: string;
   // DISPLAY_SELECT_DEPTS_WITHOUT_BOT: boolean;
-  DISPLAY_INSTALL_SCRIPT: boolean = false;
+  DISPLAY_INSTALL_SCRIPT: boolean = true;
   // PRESENTS_MODAL_ATTACH_BOT_TO_DEPT: boolean = false;
   depts_without_bot_array = [];
 
@@ -63,7 +63,7 @@ export class CdsModalActivateBotComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.checkDepartmentsForProjectIdHasBot();
+    // this.checkDepartmentsForProjectIdHasBot();
     const config = this.appConfigService.getConfig()
     this.translateparamBotName = { bot_name: this.selectedChatbot.name }
     this.webScript = getWidgetWebInstallationScript(this.project_id, config.widgetBaseUrl)
@@ -144,19 +144,19 @@ export class CdsModalActivateBotComponent implements OnInit {
     });
   }
 
-  publish() {
-    this.faqKbService.publish(this.selectedChatbot).subscribe((data) => {
-      this.logger.log('[CDS DSBRD] publish  - RES ', data)
-    }, (error) => {
-      this.HAS_COMPLETED_PUBLISH = true
-      this.HAS_COMPLETED_PUBLISH_ERROR = true
-      this.logger.error('[CDS DSBRD] publish ERROR ', error);
-    }, () => {
-      this.HAS_COMPLETED_PUBLISH = true
-      this.HAS_COMPLETED_PUBLISH_SUCCESS = true
-      this.logger.log('[CDS DSBRD] publish * COMPLETE *');
-    });
-  }
+  // publish() {
+  //   this.faqKbService.publish(this.selectedChatbot).subscribe((data) => {
+  //     console.log('[CDS DSBRD] publish  - RES ', data)
+  //   }, (error) => {
+  //     this.HAS_COMPLETED_PUBLISH = true
+  //     this.HAS_COMPLETED_PUBLISH_ERROR = true
+  //     this.logger.error('[CDS DSBRD] publish ERROR ', error);
+  //   }, () => {
+  //     this.HAS_COMPLETED_PUBLISH = true
+  //     this.HAS_COMPLETED_PUBLISH_SUCCESS = true
+  //     this.logger.log('[CDS DSBRD] publish * COMPLETE *');
+  //   });
+  // }
 
 
   onCopyScript(){

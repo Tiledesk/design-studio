@@ -47,8 +47,6 @@ export class CdsActionReplyImageComponent implements OnInit {
   // Buttons //
   buttons: Array<any>;
   TYPE_BUTTON = TYPE_BUTTON;
-
-  showJsonBody: boolean =  false;
   jsonBody: string;
 
   
@@ -83,7 +81,6 @@ export class CdsActionReplyImageComponent implements OnInit {
     this.jsonBody = '';
     if(this.response?.attributes?.attachment?.json_buttons){
       this.jsonBody = this.response?.attributes?.attachment?.json_buttons;
-      this.showJsonBody = true;
     }
     this.delayTime = (this.wait && this.wait.time  || this.wait.time === 0)? (this.wait.time/1000) : 500/1000;
     this.checkButtons();
@@ -148,12 +145,11 @@ export class CdsActionReplyImageComponent implements OnInit {
   onChangeJsonButtons(json:any){
     this.logger.log('[ACTION REPLY TEXT] onChangeJsonButtons', json);
     if(json && json.trim() !== ''){
-      this.showJsonBody = true;
+      this.response.attributes.attachment.json_buttons = json;
     } else {
-      this.showJsonBody = false;
+      this.response.attributes.attachment.json_buttons = null;
     }
     this.jsonBody = json;
-    this.response.attributes.attachment.json_buttons =  json; //JSON.stringify(json);
     this.changeJsonButtons.emit( this.response);
   }
 

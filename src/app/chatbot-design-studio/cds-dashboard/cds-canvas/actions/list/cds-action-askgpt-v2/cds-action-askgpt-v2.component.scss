@@ -295,4 +295,23 @@ mat-checkbox ::ng-deep {
     }
 }
 
+
+.field-box {
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+}
+
+.slider-description {
+    width: calc(100% - 70px);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--blu);
+    font-weight: 400;
+    font-size: 12px;
+}
+
 // PREVIEW SECTION --- start **************** //

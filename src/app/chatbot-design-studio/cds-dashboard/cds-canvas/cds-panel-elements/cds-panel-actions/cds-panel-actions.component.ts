@@ -135,6 +135,8 @@ export class CdsPanelActionsComponent implements OnInit {
 
 
   openInfo(e, element) {
+    this.logger.log('[CDS-PANEL-ACTIONS] openInfo!', element);
+
     if(!BRAND_BASE_INFO['DOCS']){
       return;
     }

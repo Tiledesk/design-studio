@@ -1047,9 +1047,11 @@ export class IntentService {
       action.question = '{{lastUserText}}'
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
+      action.assignChunksTo = 'kb_chunks';
       action.max_tokens = 256;
       action.temperature = 0.7;
       action.top_k = 5;
+      action.alpha = 0.5;
       action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
       action.preview = [];
       action.history = false;
