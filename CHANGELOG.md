@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 
+# 1.34.1
+- **bug-fixed**: in AI prompt action, model must match value, now it matches label
+- **changed**: hidden alpha limit slider in the ask gpt v2 action
+
 # 1.34.0
 
 
