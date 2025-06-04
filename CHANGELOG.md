@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.34.0
+
+
 # 1.34.0-rc4
 - **bug-fixed**: in deleteWebhook changed the parameter passed in the call from chatbot_id to webhook_id
 - **changed**: changed cursor icon in the header log panel
@@ -28,6 +32,23 @@
 
 # 1.34.0-rc1
 - **added**: "Chunks only" in action "ask knowledge base"
+
+# 1.33.0-rc3
+- **added**: TTS_VOICE_LANGUAGE to voice settings section
+
+# 1.33.0-rc2
+- **added**: set default chunks value
+
+# 1.33.2
+- **added**: Claude Sonnet 4 e Opus 4 models
+
+# 1.33.1
+- **changed**: set default val "kb_chunks"
+
+# 1.33.0
+- **added**: "TTS_VOICE_LANGUAGE to voice settings section
+- **added**: set default chunks value
+- **added**: "Assign KB Chunks to" in action "ask knowledge base"
 
 # 1.33.0-rc3
 - **added**: TTS_VOICE_LANGUAGE to voice settings section
