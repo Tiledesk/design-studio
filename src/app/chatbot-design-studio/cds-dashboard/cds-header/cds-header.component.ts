@@ -371,8 +371,10 @@ export class CdsHeaderComponent implements OnInit {
 
 
   async onOpenTestItOut(){
+    this.webhookUrl = await this.getWebhook();
+    // this.logger.log('[cds-header] ----> onOpenTestItOut', this.webhookUrl);
     if(!this.webhookUrl){
-      this.webhookUrl = await this.createWebhook();
+     this.webhookUrl = await this.createWebhook();
     }
     this.logService.initialize(null); 
     this.openTestSiteInPopupWindow();
@@ -399,6 +401,7 @@ export class CdsHeaderComponent implements OnInit {
     }
     let intentStart = this.intentService.listOfIntents.find(obj => ( obj.intent_display_name.trim() === intentName));
     this.intentService.openTestItOut(intentStart);
+    this.intentService.setLiveActiveIntentByIntentId(null, true, null);
   }
 
 
@@ -451,7 +454,7 @@ export class CdsHeaderComponent implements OnInit {
     this.webhookUrl = null;
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.chatbot_id = this.dashboardService.id_faq_kb;
-    this.webhookUrl = await this.getWebhook();
+    //this.webhookUrl = await this.getWebhook();
   }
 
   async createWebhook(): Promise<string | null> {
