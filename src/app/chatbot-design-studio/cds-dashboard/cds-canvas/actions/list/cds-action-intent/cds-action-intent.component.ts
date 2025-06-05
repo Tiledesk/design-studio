@@ -95,6 +95,7 @@ export class CdsActionIntentComponent implements OnInit {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnector = this.idIntentSelected+'/'+this.action._tdActionId;
     this.intents = this.intentService.getListOfIntents();
+    this.intents.sort((a, b) => a.name.localeCompare(b.name));
     this.element = Object.values(ACTIONS_LIST).find(el => el.type === this.action._tdActionType);
     this.checkConnectionStatus();
     this.logger.log('[CDS-ACTION-INTENT] - initialize - idIntentSelected ', this.idIntentSelected);

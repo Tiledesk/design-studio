@@ -8,6 +8,12 @@
 *Tiledesk SRL*
 
 
+# 1.35.0-rc3
+- **added**: added "search only" parameter and filter on parameter in kb
+- **changed**: in connector selection the connectable blocks are in alphabetical order (in go to block)
+- **changed**: in replace AI agent the slug in brackets is added if it exists
+
+
 # 1.35.0-rc2
 - **changed**: New log level supported (native)
 - **added**: Added to Flow Logs action the log level

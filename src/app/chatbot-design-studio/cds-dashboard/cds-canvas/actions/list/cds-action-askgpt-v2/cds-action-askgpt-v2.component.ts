@@ -38,7 +38,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  listOfNamespaces: Array<{name: string, value: string, icon?:string}>;
+  listOfNamespaces: Array<{name: string, value: string, icon?:string, type:string}>;
 
   project_id: string;
   selectedNamespace: string;
@@ -70,6 +70,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1 },
     "search_type": { name: "search_type", min: 0, max: 1, step: 0.05 }
   }
+  IS_VISIBLE_ALPHA_SLIDER = false;
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.ASKGPTV2;
@@ -217,7 +218,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
+      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, type: el.engine?.type} })
       namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
@@ -233,6 +234,17 @@ export class CdsActionAskgptV2Component implements OnInit {
       if (!this.action.namespace) {
         this.action.namespace = await this.idToName(this.project_id);
       }
+    }
+    this.selectKB(this.action.namespace);
+  }
+
+  selectKB(namespace){
+    const result = this.listOfNamespaces.find(el => el.value === namespace);
+    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result)
+    if (result.type === "serverless") {
+      this.IS_VISIBLE_ALPHA_SLIDER = true;
+    } else {
+      this.IS_VISIBLE_ALPHA_SLIDER = false;
     }
   }
 
@@ -280,12 +292,14 @@ export class CdsActionAskgptV2Component implements OnInit {
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent' | 'namespace') {
     if(event){
       if (type === 'namespace') {
+        this.logger.log("[ACTION-ASKGPTV2] onChangeBlockSelect ",event );
         if (!this.action.namespaceAsName) {
           this.action[type]=event.value
         } else {
           this.action[type] = this.listOfNamespaces.find(n => n.value === event.value).name;
         }
         this.selectedNamespace = event.value;
+        this.selectKB(this.selectedNamespace);
       } else {
         this.action[type]=event.value
       }
@@ -337,7 +351,7 @@ export class CdsActionAskgptV2Component implements OnInit {
           } else {
             this.action.namespace = await this.nameToId(this.action.namespace);
           }
-        }else if(target === 'citations'){
+        } else if(target === 'citations'){
           if (this.action[target]) {
             this.ai_setting['max_tokens'].min=1024;
             this.action.max_tokens = 1024
@@ -435,10 +449,8 @@ export class CdsActionAskgptV2Component implements OnInit {
 
           if (attr && attr.value) {
             this.temp_variables.push({ name: name, value: attr.value });
-
           } else if (attr && !attr.value) {
             this.temp_variables.push({ name: name, value: null });
-
           } else {
             this.temp_variables.push({ name: name, value: null });
             this.action.preview.push({ name: name, value: null });
@@ -459,8 +471,12 @@ export class CdsActionAskgptV2Component implements OnInit {
       max_tokens: this.action.max_tokens,
       temperature: this.action.temperature,
       top_k: this.action.top_k,
+      aplpha: this.action.alpha,
       namespace: namespace,
-      advancedPrompt: this.action.advancedPrompt
+      advancedPrompt: this.action.advancedPrompt,
+    }
+    if(this.action?.chanksOnly && this.action?.chanksOnly === true){
+      data['search_type'] = 'chunks';
     }
 
     if(this.action.namespaceAsName){
