@@ -74,6 +74,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
 
   private initialize(){
     this.listOfIntents = this.intentService.getListOfIntents();
+    this.listOfIntents.sort((a, b) => a.name.localeCompare(b.name));
     // this.logger.log('CdsPanelButtonConfigurationComponent: ', this.button);
     if(this.button){
       // this.buttonLabelResult = true;
