@@ -277,11 +277,10 @@ export class CdsActionAiPromptComponent implements OnInit {
   onChangeTextarea(event: string, labelModel: string, property: string) {
     this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, property);
     // this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
-    this.action[property] = event;
+    //this.action[property] = event;
     if(property === 'model'){
       this.action['labelModel'] = labelModel;
     }
-
     // this.checkVariables();
     // this.updateAndSaveAction.emit();
     // this.updateAndSaveAction.emit();

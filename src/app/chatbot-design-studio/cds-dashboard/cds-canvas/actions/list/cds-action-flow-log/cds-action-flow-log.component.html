@@ -1,6 +1,14 @@
 <div *ngIf="previewMode" class="cds-action-preview">
     <div class="action-row">
         <div class="action-row-left">
+            <mat-icon class="icon" svgIcon="stacks" aria-hidden="true"></mat-icon>
+        </div>
+        <div *ngIf="action?.level" class="action-row-right">
+            {{action?.level}}
+        </div>
+    </div>
+    <div class="action-row">
+        <div class="action-row-left">
             <mat-icon class="icon" svgIcon="subject" aria-hidden="true"></mat-icon>
         </div>
         <div *ngIf="action?.log" class="action-row-right">
@@ -14,6 +22,21 @@
 
 
 <div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+   
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.LogLevels' | translate }}:</label>
+        <cds-select id="text-condition" 
+            [items]="logLevelsArray" 
+            [bindLabelSelect]="'value'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="selectedLogLevel" 
+            [clearable]="false"  
+            [searchable]="false"
+            (onSelected)="onLogLevelChange($event, 'bugsLevel')">
+        </cds-select>
+    </div>
+
+
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.FlowLog' | translate }}:</label>
         <cds-textarea 
@@ -27,5 +50,6 @@
         </cds-textarea>
         <!-- <label class="field-description"> {{ 'CDSCanvas.FlowLogDescription' | translate}} </label> -->
     </div>
+
 
 </div>

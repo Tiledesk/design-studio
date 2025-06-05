@@ -39,6 +39,7 @@ export const DOCS_LINK = {
 }
 
 export enum LOG_LEVELS {
+    NATIVE        = 'native',
     DEBUG         = 'debug',
     INFO          = 'info',
     WARN          = 'warn',
