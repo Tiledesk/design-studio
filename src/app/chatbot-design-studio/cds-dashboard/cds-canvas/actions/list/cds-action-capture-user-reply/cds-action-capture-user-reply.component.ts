@@ -63,6 +63,7 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnector = this.idIntentSelected+'/'+this.action._tdActionId;
     this.listOfIntents = this.intentService.getListOfIntents();
+    this.listOfIntents.sort((a, b) => a.name.localeCompare(b.name));
     this.checkConnectionStatus();
   }
 
