@@ -8,6 +8,12 @@
 *Tiledesk SRL*
 
 
+# 1.35.0-rc2
+- **changed**: New log level supported (native)
+- **added**: Added to Flow Logs action the log level
+- **added**: added to local storage the log panel status
+- **bug-fixed**: the "start" color, changed back to white
+
 # 1.35.0-rc1
 - **added**: added webhook creation in intent component when webhook/copilot block is displayed
 - **bug-fixed**: fixed bug on webhook stop/play to make it restart from first block to play
