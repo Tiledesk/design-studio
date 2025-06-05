@@ -136,6 +136,12 @@
   font-weight: 500;
   display: inline-block;
   width: 55px;
+  &.native{
+    color: var(--grey);
+  }
+  &.debug{
+    color: var(--blu);
+  }
   &.info{
     color: #1b6ef3;
   }

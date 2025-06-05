@@ -1,15 +1,13 @@
 
 <div *ngIf="!isClosed" id="cds_widget_log" class="cds-widget-log-container" [class.closed]="isClosed">
     <div class="resize-handle" (mousedown)="initResize($event)"> 
+
         <div class="dropdown-container">
-            <!-- <label for="logLevel">{{ 'CDSCanvas.LogLevels' | translate }}:</label> -->
             <select id="logLevel" [(ngModel)]="selectedLogLevel" (change)="onLogLevelChange($event)">
-                <option [value]="LOG_LEVELS.DEBUG">{{LOG_LEVELS.DEBUG}}</option>
-                <option [value]="LOG_LEVELS.INFO">{{LOG_LEVELS.INFO}}</option>
-                <option [value]="LOG_LEVELS.WARN">{{LOG_LEVELS.WARN}}</option>
-                <option [value]="LOG_LEVELS.ERROR">{{LOG_LEVELS.ERROR}}</option>
+                <option *ngFor="let level of logLevelsArray" [value]="level.value">{{level.value}}</option>
             </select>
         </div>
+
         <div class="buttons-header-right">
             <!-- 
             <div class="button-toggle" (click)="onToggleLog()">
@@ -52,7 +50,7 @@
 </div>
 
 
-<div  *ngIf="isClosed" class="button-log-panel">
+<div *ngIf="isClosed" class="button-log-panel">
     <div class="cds-element" (click)="onOpenLog()" #divEvent>
         <div class="cds-button-element">
             <div class="cds-box-button">
