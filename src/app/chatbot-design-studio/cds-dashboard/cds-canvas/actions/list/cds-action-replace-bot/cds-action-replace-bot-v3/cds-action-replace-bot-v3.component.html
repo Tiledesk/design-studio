@@ -41,12 +41,11 @@
 </div>
 
 <div *ngIf="!previewMode" class="content-panel-intent-detail">
-
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.ChooseBot' | translate }}</label>
         <cds-select *ngIf="!action?.useSlug" id="text-condition" 
             [items]="chatbots_name_list" 
-            [bindLabelSelect]="'name'"
+            [bindLabelSelect]="'name2'"
             [bindValueSelect]="'id'"
             [searchable]=true
             [clearable]=true
