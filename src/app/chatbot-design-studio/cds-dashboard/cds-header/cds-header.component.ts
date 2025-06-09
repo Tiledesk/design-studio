@@ -371,10 +371,11 @@ export class CdsHeaderComponent implements OnInit {
 
 
   async onOpenTestItOut(){
-    this.webhookUrl = await this.getWebhook();
-    // this.logger.log('[cds-header] ----> onOpenTestItOut', this.webhookUrl);
-    if(!this.webhookUrl){
-     this.webhookUrl = await this.createWebhook();
+    if(this.isWebhook){
+      this.webhookUrl = await this.getWebhook();
+      if(!this.webhookUrl){
+      this.webhookUrl = await this.createWebhook();
+      }
     }
     this.logService.initialize(null); 
     this.openTestSiteInPopupWindow();

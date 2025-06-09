@@ -475,7 +475,7 @@ export class CdsActionAskgptV2Component implements OnInit {
       namespace: namespace,
       advancedPrompt: this.action.advancedPrompt,
     }
-    if(this.action?.chanksOnly && this.action?.chanksOnly === true){
+    if(this.action?.chunks_only && this.action?.chunks_only === true){
       data['search_type'] = 'chunks';
     }
 
