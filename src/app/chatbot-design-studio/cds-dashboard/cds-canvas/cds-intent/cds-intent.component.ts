@@ -233,6 +233,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
       if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
         this.showIntentOptions = false;
+      } else {
+        this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
+        this.chatbot_id = this.dashboardService.id_faq_kb;
+        this.webhookUrl = await this.getWebhook();
+        if(!this.webhookUrl){
+          this.webhookUrl = await this.createWebhook(this.intent);
+        }
       }
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
@@ -246,13 +253,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         }
         this.showIntentOptions = false;
         this.startAction = this.intent.actions[0];
-
-        this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
-        this.chatbot_id = this.dashboardService.id_faq_kb;
-        this.webhookUrl = await this.getWebhook();
-        if(!this.webhookUrl){
-          this.webhookUrl = await this.createWebhook(this.intent);
-        }
       }
       else {
         this.setIntentSelected();
