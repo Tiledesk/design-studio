@@ -324,7 +324,7 @@
                 </div>
 
                 <!-- // advanced prompt -->                     
-                <div class="field-box" [class.disabled]="action?.chanksOnly">
+                <div class="field-box" [class.disabled]="action?.chunks_only">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.advancedPrompt"
@@ -340,7 +340,7 @@
                 <!-- // citations -->    
                 <div *ngIf="action.hasOwnProperty('citations')"
                     class="field-box" 
-                    [class.disabled]="action?.chanksOnly">
+                    [class.disabled]="action?.chunks_only">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.citations"
@@ -357,9 +357,9 @@
                 <div class="field-box">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
-                            [checked]="action?.chanksOnly"
-                            (change)="onChangeCheckbox($event, 'chanksOnly')">
-                            {{"CDSCanvas.ChanksOnly" | translate}}
+                            [checked]="action?.chunks_only"
+                            (change)="onChangeCheckbox($event, 'chunks_only')">
+                            {{"CDSCanvas.ChunksOnly" | translate}}
                         </mat-checkbox>
                     </section>
                     <!-- 
@@ -402,7 +402,7 @@
     
     <!-- <hr class="custom-divider"> -->
 
-    <div class="field-box" [class.disabled]="action?.chanksOnly">
+    <div class="field-box" [class.disabled]="action?.chunks_only">
         
         <label class="title-label">{{'CDSCanvas.KBReply' | translate}}</label>
         <cds-textarea id="assignTo" 
@@ -417,7 +417,7 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box" [class.disabled]="action?.chanksOnly">
+    <div class="field-box" [class.disabled]="action?.chunks_only">
         <label class="title-label">{{'CDSCanvas.KBSource' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false"

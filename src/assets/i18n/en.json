@@ -343,7 +343,7 @@
         "KBReply": "Assign KB Reply to",
         "KBSource": "Assign KB Source to",
         "KBChunks": "Assign KB Chunks to",
-        "ChanksOnly": "Chunks only",
+        "ChunksOnly": "Chunks only",
         "ErrorAutomaticAssign": "Errors will be automatically assigned to variable:",
         "ApplyAFunctionToValue": "Apply a function to the value",
         "InsertConstantValueOrChoise": "Insert a constant value or choose an attribute",
