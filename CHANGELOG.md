@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.35.0-rc6
+- **added**: Show used chunks in ActionAskGPTV2
 
 # 1.35.0-rc5
 - **bug-fixed**: Changed action param "aplpha" to "alpha" in ActionAskGPTV2

@@ -57,8 +57,10 @@ export class CdsActionAskgptV2Component implements OnInit {
   showPreview: boolean = false;
   showAiError: boolean = false;
   searching: boolean = false;
-  ai_response: string = "";
+  // ai_response: string = "";
   ai_error: string = "";
+  preview_response: any;
+  chunks: Array<any> = [];
 
   temp_variables = [];
   autocompleteOptions: Array<{label: string, value: string}> = [];
@@ -383,10 +385,12 @@ export class CdsActionAskgptV2Component implements OnInit {
     //this.scrollToBottom();
     this.temp_variables = [];
     let resp = await this.checkVariables();
+    this.logger.log("[ACTION-ASKGPTV2] execPreview: ", resp);
+
     let respNamespace = await this.checkNamespaceVariables()
     if (resp && respNamespace){
       this.getResponse(this.action.question, this.action.namespace);
-    }else{
+    } else{
       this.openAttributesDialog();
     }
   }
@@ -396,27 +400,20 @@ export class CdsActionAskgptV2Component implements OnInit {
       let regex: RegExp = /{{[^{}]*}}/g;
       let string = this.action.question;
       let matches = string.match(regex);
-
       if (!matches || matches.length == 0) {
         resolve(true);
-
       } else {
-
         matches.forEach((m) => {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
-
           const index = this.temp_variables.findIndex((e) => e.name === name);
           if(index> -1 ){ //key already exist: do not add it again
             return;
           }
-
           if (attr && attr.value) {
             this.temp_variables.push({ name: name, value: attr.value });
-
           } else if (attr && !attr.value) {
             this.temp_variables.push({ name: name, value: null });
-
           } else {
             this.temp_variables.push({ name: name, value: null });
             this.action.preview.push({ name: name, value: null });
@@ -492,18 +489,31 @@ export class CdsActionAskgptV2Component implements OnInit {
       element.classList.remove('preview-container-extended')
     }, 200)
 
-    this.openaiService.previewAskPrompt(data).subscribe({ next: (ai_response: any)=> {
+    this.openaiService.previewAskPrompt(data).subscribe({ next: (preview_response: any)=> {
       this.searching = false;
       setTimeout(() => {
         let element = document.getElementById("preview-container");
         element.classList.add('preview-container-extended')
       }, 200)
-      if(!ai_response.answer){
+
+      this.logger.log("[ACTION GPT-TASK] previewPrompt ai_response: ", preview_response, preview_response.chunks);
+
+      this.preview_response = preview_response;
+
+      if(!preview_response.answer){
         this.showAiError = true;
         this.ai_error = this.translate.instant('CDSCanvas.AiNoAnswer')
-        return;
+        // return;
       }
-      this.ai_response = ai_response;
+      
+      if(preview_response.chunks){
+        this.chunks = preview_response.chunks;
+      } else if(preview_response.content_chunks){
+        this.chunks = preview_response.content_chunks;
+      }
+      
+      //this.ai_response = preview_response.answer;
+
     }, error: (err)=> {
       this.searching = false;
       this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", err);
