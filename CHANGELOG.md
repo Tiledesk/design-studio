@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.35.0-rc5
+- **bug-fixed**: Changed action param "aplpha" to "alpha" in ActionAskGPTV2
+
 # 1.35.0-rc4
 - **bug-fixed**: Changed chunksOnly to chunks_only in ActionAskGPTV2
 - **bug-fixed**: Create webhooks only when chatbotSubtype !== chatbot on startup.
