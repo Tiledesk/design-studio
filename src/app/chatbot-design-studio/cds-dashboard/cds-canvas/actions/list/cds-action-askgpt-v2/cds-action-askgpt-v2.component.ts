@@ -471,7 +471,7 @@ export class CdsActionAskgptV2Component implements OnInit {
       max_tokens: this.action.max_tokens,
       temperature: this.action.temperature,
       top_k: this.action.top_k,
-      aplpha: this.action.alpha,
+      alpha: this.action.alpha,
       namespace: namespace,
       advancedPrompt: this.action.advancedPrompt,
     }
