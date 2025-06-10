@@ -314,4 +314,32 @@ mat-checkbox ::ng-deep {
     font-size: 12px;
 }
 
+
+
 // PREVIEW SECTION --- start **************** //
+.chunk--wpr {
+    max-height: 300px;
+    overflow-y: auto;
+    .chunk {
+        border: 1px solid #ccc;
+        cursor: not-allowed;
+        color: #787f86;
+        padding: 8px 15px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 11px;
+        margin-bottom: 3px;
+    }
+}
+mat-expansion-panel ::ng-deep {
+    background-color: transparent;
+    box-shadow: none;
+    font-family: var(--header-font-family) !important;
+    .mat-expansion-panel-header {
+        padding: 0;
+
+        &:hover {
+            background-color: transparent !important;
+        }
+    }
+}
