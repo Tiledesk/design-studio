@@ -102,43 +102,64 @@
     </div>
 
     <div class="answer-preview" *ngIf="showPreview">
-        <div class="header-answer-preview">
-            <div class="label-and-button-container">
-                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (model_list | filter:{key: 'value', value: action?.model }).name }} )</span>
-                </label>
-                <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
-                    (click)="showHideVariablesSection()">Set variables
-                    <span class="material-icons-round">
-                        chevron_right
-                    </span>
-                </button> -->
+
+        <div *ngIf="!action?.chunks_only">
+            <div class="header-answer-preview">
+                <div class="label-and-button-container">
+                    <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
+                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} )</span>
+                    </label>
+                </div>
             </div>
+    
+            <div id="preview-container" class="preview-container">
+                <div class="placeholder-container" *ngIf="searching">
+                    <loading-spinner class="custom-spinner"></loading-spinner>
+                    <span style="margin-left: 8px;">{{'CDSCanvas.GeneratingAnswer' | translate}} ...</span>
+                </div>
+                <div *ngIf="!searching && !showAiError && preview_response">
+                    {{ preview_response?.answer }}
+                </div>
+                <div *ngIf="showAiError">
+                    {{ ai_error }}
+                </div>
+            </div>
+    
+            <div class="usage-container" *ngIf="!searching && !showAiError ">
+                <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
+                <!-- <span style="font-size: 13px;">{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span> -->
+                <!-- <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span> -->
+                <span style="font-weight: 500;">{{'CDSCanvas.Total' | translate }}: {{ preview_response?.prompt_token_size }}</span>
+            </div>
+    
+        </div>
+        
+
+        <!-- ----------------------------- -->
+        <!-- Chunks Accordion -->
+        <!-- ----------------------------- -->
+        <div class="mat-accordion--wpr" style="margin-top: 3px;">
+            <mat-accordion>
+                <div class="placeholder-container" *ngIf="searching && action?.chunks_only">
+                    <loading-spinner class="custom-spinner"></loading-spinner>
+                    <!-- <span style="margin-left: 8px;">loading ...</span> -->
+                </div>
+                <mat-expansion-panel *ngIf="!searching" class="custom-expansion-panel" [expanded]="action?.chunks_only || panelOpenState" (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <span *ngIf="!action?.chunks_only">Chunks used for the answer ({{chunks?.length}})</span>
+                            <span *ngIf="action?.chunks_only">Chunks returned ({{chunks?.length}})</span>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="chunk--wpr" *ngFor="let chunk of chunks">
+                        <article class="chunk">
+                            {{chunk}}
+                        </article>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
         </div>
 
-        <div id="preview-container" class="preview-container">
-
-            <div class="placeholder-container" *ngIf="searching">
-                <loading-spinner class="custom-spinner"></loading-spinner>
-                <span style="margin-left: 8px;">{{'CDSCanvas.GeneratingAnswer' | translate}} ...</span>
-            </div>
-
-            <div *ngIf="!searching && !showAiError && ai_response">
-                {{ ai_response?.answer }}
-            </div>
-
-            <div *ngIf="showAiError">
-                {{ ai_error }}
-            </div>
-
-        </div>
-
-        <div class="usage-container" *ngIf="!searching && !showAiError ">
-            <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <!-- <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span> -->
-            <!-- <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span> -->
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.prompt_token_size }}</span>
-        </div>
 
     </div>
     <!-- PREVIEW - END -->
