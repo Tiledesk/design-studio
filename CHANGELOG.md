@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.35.0-rc10
+- **bug-fixed**: create a webhook when chatbot starts only if chatbot automation
+
 # 1.35.0-rc9
 - **bug-fixed**: enabled chunks_only check and pass chunks_only var in ActionAskGPTV2
 
