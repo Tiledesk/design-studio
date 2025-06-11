@@ -151,11 +151,14 @@
                             <span *ngIf="action?.chunks_only">Chunks returned ({{chunks?.length}})</span>
                         </mat-panel-title>
                     </mat-expansion-panel-header>
-                    <div class="chunk--wpr" *ngFor="let chunk of chunks">
-                        <article class="chunk">
-                            {{chunk}}
-                        </article>
+                    <div class="content-chunks">
+                        <div class="chunk--wpr" *ngFor="let chunk of chunks">
+                            <article class="chunk">
+                                {{chunk}}
+                            </article>
+                        </div>
                     </div>
+                    
                 </mat-expansion-panel>
             </mat-accordion>
         </div>
