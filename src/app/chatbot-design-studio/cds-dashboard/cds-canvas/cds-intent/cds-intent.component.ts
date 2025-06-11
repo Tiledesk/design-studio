@@ -233,7 +233,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
       if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
         this.showIntentOptions = false;
-      } else {
+      } 
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
         this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
         this.chatbot_id = this.dashboardService.id_faq_kb;
         this.webhookUrl = await this.getWebhook();
@@ -241,7 +242,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           this.webhookUrl = await this.createWebhook(this.intent);
         }
       }
-
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
@@ -286,11 +286,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   async getWebhook(): Promise<string | null> {
     try {
       const resp: any = await firstValueFrom(this.webhookService.getWebhook(this.chatbot_id));
-      this.logger.log("[cds-header] getWebhook : ", resp);
+      this.logger.log("[cds-intent] getWebhook : ", resp);
       const webhookUrl = resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
       return webhookUrl;
     } catch (error) {
-      this.logger.log("[cds-header] error getWebhook: ", error);
+      this.logger.log("[cds-intent] error getWebhook: ", error);
       return null;
     }
   }
