@@ -471,22 +471,21 @@ export class CdsActionAskgptV2Component implements OnInit {
       alpha: this.action.alpha,
       namespace: namespace,
       advancedPrompt: this.action.advancedPrompt,
+      chunks_only: this.action?.chunks_only
     }
-    if(this.action?.chunks_only && this.action?.chunks_only === true){
-      data['search_type'] = 'chunks';
-    }
-
+    // if(this.action?.chunks_only && this.action?.chunks_only === true){
+    //   data['search_type'] = 'chunks';
+    // }
     if(this.action.namespaceAsName){
       data.namespace = await this.nameToId(namespace)
     }
-
     this.showAiError = false;
     this.searching = true;
     this.showPreview = true;
 
     setTimeout(() => {
       let element = document.getElementById("preview-container");
-      element.classList.remove('preview-container-extended')
+      element?.classList.remove('preview-container-extended')
     }, 200)
 
     this.openaiService.previewAskPrompt(data).subscribe({ next: (preview_response: any)=> {
@@ -519,7 +518,7 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", err);
       setTimeout(() => {
         let element = document.getElementById("preview-container");
-        element.classList.add('preview-container-extended')
+        element?.classList.add('preview-container-extended')
       }, 200)
       this.showAiError = true;
       this.ai_error = this.translate.instant('CDSCanvas.AiError')
