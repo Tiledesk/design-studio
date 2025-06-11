@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.35.0-rc7
+- **bug-fixed**: css chunks list in ActionAskGPTV2
+
 # 1.35.0-rc6
 - **added**: Show used chunks in ActionAskGPTV2
 

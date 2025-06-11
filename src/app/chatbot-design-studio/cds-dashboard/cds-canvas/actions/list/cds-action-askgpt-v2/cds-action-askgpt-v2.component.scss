@@ -317,9 +317,11 @@ mat-checkbox ::ng-deep {
 
 
 // PREVIEW SECTION --- start **************** //
-.chunk--wpr {
+.content-chunks {
     max-height: 300px;
     overflow-y: auto;
+}
+.chunk--wpr {
     .chunk {
         border: 1px solid #ccc;
         cursor: not-allowed;
@@ -337,7 +339,6 @@ mat-expansion-panel ::ng-deep {
     font-family: var(--header-font-family) !important;
     .mat-expansion-panel-header {
         padding: 0;
-
         &:hover {
             background-color: transparent !important;
         }
