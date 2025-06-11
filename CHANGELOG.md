@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.35.0-rc8
+- **bug-fixed**: enabled chunks_only check and pass chunks_only var in ActionAskGPTV2
+- **added**: added findAndUpdateProperty TTS_MODEL and STT_MODEL in voice-settings
+
 # 1.35.0-rc7
 - **bug-fixed**: css chunks list in ActionAskGPTV2
 
