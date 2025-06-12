@@ -371,6 +371,7 @@ export class CdsHeaderComponent implements OnInit {
 
 
   async onOpenTestItOut(){
+     this.logService.initialize(null); 
     if(this.isWebhook){
       this.logger.log("[cds-header] onOpenTestItOut: isWebhook");
       this.webhookUrl = await this.getWebhook();
@@ -383,7 +384,6 @@ export class CdsHeaderComponent implements OnInit {
         this.logger.log("[cds-header] LOAD webhook: ", this.webhookUrl);
       }
     }
-    this.logService.initialize(null); 
     this.openTestSiteInPopupWindow();
     this.isPlaying = true;
   }
