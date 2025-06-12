@@ -37,7 +37,9 @@ export class CdsWidgetLogsComponent implements OnInit {
   logContainer: any;
   LOG_LEVELS = LOG_LEVELS;
   selectedLogLevel = LOG_LEVELS.NATIVE;
+  nLevels = { error: 0, warn: 1, info: 2, debug: 3, native: 4 };
   logLevelsArray = Object.entries(LOG_LEVELS).map(([key, value]) => ({ key, value }));
+
   isOpenPanelWidget: boolean;
   mqtt_token: string;
   highestTimestamp: string;
@@ -322,12 +324,9 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   private filterLogMessage() {
-    if(this.selectedLogLevel === LOG_LEVELS.NATIVE){
-      this.filteredLogs = this.listOfLogs;
-    } else {
-      this.filteredLogs = this.listOfLogs.filter(log => log.level === this.selectedLogLevel);
-    }
-    this.logger.log('[CDS-WIDGET-LOG] filterLogMessage:', this.filteredLogs);
+    const levLog = this.nLevels[this.selectedLogLevel] ?? 4; 
+    this.filteredLogs = this.listOfLogs.filter(log => log.nlevel <= levLog);
+    this.logger.log('[CDS-WIDGET-LOG] filterLogMessage:', levLog, this.filteredLogs);
   }
 
 

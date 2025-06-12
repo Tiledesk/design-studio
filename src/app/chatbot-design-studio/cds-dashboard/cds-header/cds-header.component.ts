@@ -371,12 +371,19 @@ export class CdsHeaderComponent implements OnInit {
 
 
   async onOpenTestItOut(){
-    this.webhookUrl = await this.getWebhook();
-    // this.logger.log('[cds-header] ----> onOpenTestItOut', this.webhookUrl);
-    if(!this.webhookUrl){
-     this.webhookUrl = await this.createWebhook();
+     this.logService.initialize(null); 
+    if(this.isWebhook){
+      this.logger.log("[cds-header] onOpenTestItOut: isWebhook");
+      this.webhookUrl = await this.getWebhook();
+      this.logger.log("[cds-header] webhookUrl: ", this.webhookUrl);
+      if(!this.webhookUrl){
+        this.webhookUrl = await this.createWebhook();
+        this.logger.log("[cds-header] NEW webhook: ", this.webhookUrl);
+      } else {
+        this.preloadWebhook();
+        this.logger.log("[cds-header] LOAD webhook: ", this.webhookUrl);
+      }
     }
-    this.logService.initialize(null); 
     this.openTestSiteInPopupWindow();
     this.isPlaying = true;
   }
@@ -489,6 +496,16 @@ export class CdsHeaderComponent implements OnInit {
     }
   }
 
+  preloadWebhook(){
+    this.webhookService.preloadWebhook(this.webhookId).subscribe({ next: (resp: any)=> {
+      this.logger.log("[cds-header] preloadWebhook : ", resp);
+    }, error: (error)=> {
+      this.logger.error("[cds-header] error preloadWebhook: ", error);
+    }, complete: () => {
+      this.logger.log("[cds-header] preloadWebhook completed.");
+    }});
+  }
+
 
   stopWebhook(){
     this.webhookService.deleteWebhook(this.webhookId).subscribe({ next: (resp: any)=> {
@@ -501,6 +518,7 @@ export class CdsHeaderComponent implements OnInit {
     }});
   }
   
+
 
   async copyText(dev): Promise<void> {
     let url = this.webhookUrl;
