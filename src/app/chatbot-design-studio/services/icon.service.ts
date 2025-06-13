@@ -479,6 +479,10 @@ export class IconService {
       'liquidjs',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/liquidjs.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'stacks',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/stacks.svg')
+    );
   }
 }
 

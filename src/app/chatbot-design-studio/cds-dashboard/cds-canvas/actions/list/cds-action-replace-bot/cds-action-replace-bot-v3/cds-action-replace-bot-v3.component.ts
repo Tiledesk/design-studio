@@ -21,7 +21,7 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
   @Output() updateAndSaveAction = new EventEmitter();
 
   //bots: Chatbot[] = [];
-  chatbots_name_list: Array<{name: string, value: string, id: string, slug: string, icon?:string}> = [];
+  chatbots_name_list: Array<{name: string, value: string, id: string, slug: string, name2: string, icon?:string}> = [];
   bot_selected: Chatbot;
 
   autocompleteOptions: Array<{label: string, value: string}> = [];
@@ -61,7 +61,12 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
         this.logger.log("[ACTION REPLACE BOT] chatbots: ", chatbots, this.autocompleteOptions);
         //this.bots = bots;
         this.autocompleteOptions = [];
-        this.chatbots_name_list = chatbots.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a._id, icon: 'smart_toy'}));
+        this.chatbots_name_list = chatbots.map(a => {
+          let name2 = a.name;
+          if(a.slug) {name2 = name2 + ' (' + a.slug + ')';}
+          return { name: a.name, value: a.name, slug: a.slug, id: a._id, name2: name2, icon: 'smart_toy' };
+        });
+        
         chatbots.forEach(el => {
           if(el.slug)
             this.autocompleteOptions.push({label: el.name + ' (' + el.slug + ')', value: el.slug})
@@ -156,7 +161,12 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
 
   onChangeCheckbox(event: MatCheckbox, target){
     this.action[target] = !this.action[target];
-    this.chatbots_name_list = this.chatbots_name_list.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a.id, icon: 'smart_toy'}));
+    this.chatbots_name_list = this.chatbots_name_list.map(a => {
+      let name2 = a.name;
+      if(a.slug) {name2 = name2 + ' (' + a.slug + ')';}
+      return { name: a.name, value: a.name, slug: a.slug, id: a.id, name2: name2, icon: 'smart_toy' };
+    });
+    // this.chatbots_name_list = this.chatbots_name_list.map(a => ({ name: a.name, value: a.name, slug: a.slug, id: a.id, name2: a.name+' ('+a.slug+')', icon: 'smart_toy'}));
     if (target === "useSlg") {
       if (this.action[target]) {
         if (this.action.botId) {

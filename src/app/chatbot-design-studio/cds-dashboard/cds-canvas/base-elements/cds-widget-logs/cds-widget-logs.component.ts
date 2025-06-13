@@ -29,13 +29,17 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
   @Input() request_id: string;
   @Output() closePanelLog = new EventEmitter();
+  
 
   listOfLogs: Array<any> = [];
   filteredLogs: Array<any> = [];
   isClosed = false;
   logContainer: any;
   LOG_LEVELS = LOG_LEVELS;
-  selectedLogLevel = LOG_LEVELS.DEBUG;
+  selectedLogLevel = LOG_LEVELS.NATIVE;
+  nLevels = { error: 0, warn: 1, info: 2, debug: 3, native: 4 };
+  logLevelsArray = Object.entries(LOG_LEVELS).map(([key, value]) => ({ key, value }));
+
   isOpenPanelWidget: boolean;
   mqtt_token: string;
   highestTimestamp: string;
@@ -72,6 +76,11 @@ export class CdsWidgetLogsComponent implements OnInit {
   ngAfterViewInit() {
     this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit selectedChatbot ", this.dashboardService.selectedChatbot);
     //this.initializeChatbot();
+    if(localStorage.getItem("default_closed_log_panel") != null){
+      this.isClosed = JSON.parse(localStorage.getItem("default_closed_log_panel"));
+    };
+
+    this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit selectedChatbot ", this.dashboardService.selectedChatbot);
   }
 
 
@@ -315,12 +324,9 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   private filterLogMessage() {
-    if(this.selectedLogLevel === LOG_LEVELS.DEBUG){
-      this.filteredLogs = this.listOfLogs;
-    } else {
-      this.filteredLogs = this.listOfLogs.filter(log => log.level === this.selectedLogLevel);
-    }
-    this.logger.log('[CDS-WIDGET-LOG] filterLogMessage:', this.filteredLogs);
+    const levLog = this.nLevels[this.selectedLogLevel] ?? 4; 
+    this.filteredLogs = this.listOfLogs.filter(log => log.nlevel <= levLog);
+    this.logger.log('[CDS-WIDGET-LOG] filterLogMessage:', levLog, this.filteredLogs);
   }
 
 
@@ -366,12 +372,14 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   onCloseLog(){
     this.isClosed = true;
+    localStorage.setItem('default_closed_log_panel', JSON.stringify(this.isClosed));
     //this.closeLog();
     //this.closePanelLog.emit();
   }
 
   onOpenLog(){
     this.isClosed = false;
+    localStorage.setItem('default_closed_log_panel', JSON.stringify(this.isClosed));
   }
 
   onSetAnimationLog(){
