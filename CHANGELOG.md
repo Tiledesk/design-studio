@@ -8,12 +8,33 @@
 *Tiledesk SRL*
 
 
+# 1.35.0-rc2
+- **changed**: New log level supported (native)
+- **added**: Added to Flow Logs action the log level
+- **added**: added to local storage the log panel status
+- **bug-fixed**: the "start" color, changed back to white
+
+# 1.35.0-rc1
+- **added**: added webhook creation in intent component when webhook/copilot block is displayed
+- **bug-fixed**: fixed bug on webhook stop/play to make it restart from first block to play
+
+
+# 1.35.0
+
+
 # 1.34.1
 - **bug-fixed**: in AI prompt action, model must match value, now it matches label
 - **changed**: hidden alpha limit slider in the ask gpt v2 action
 
-# 1.34.0
+# 1.34.0-rc6
+- **bug-fixed**: Drag and drop on intent header not working
+- **changed**: Fix CDS interface for Liquid on textarea
+- **changed**: Highlighted log line needs to be lighter color
 
+# 1.34.0-rc5
+- **added**: Added alpha parameter on CDS in AI settings of ask kb
+- **changed**: preview text in action set attribute truncated to 8 lines
+- **added**: in each textarea with attributes button enabled, added 3 liquid buttons
 
 # 1.34.0-rc4
 - **bug-fixed**: in deleteWebhook changed the parameter passed in the call from chatbot_id to webhook_id
@@ -37,22 +58,7 @@
 # 1.34.0-rc1
 - **added**: "Chunks only" in action "ask knowledge base"
 
-# 1.33.0-rc3
-- **added**: TTS_VOICE_LANGUAGE to voice settings section
-
-# 1.33.0-rc2
-- **added**: set default chunks value
-
-# 1.33.2
-- **added**: Claude Sonnet 4 e Opus 4 models
-
-# 1.33.1
-- **changed**: set default val "kb_chunks"
-
-# 1.33.0
-- **added**: "TTS_VOICE_LANGUAGE to voice settings section
-- **added**: set default chunks value
-- **added**: "Assign KB Chunks to" in action "ask knowledge base"
+# 1.34.0
 
 # 1.33.0-rc3
 - **added**: TTS_VOICE_LANGUAGE to voice settings section
@@ -115,7 +121,6 @@
 - **changed**: limit chunk to 40
 - **added**: move position on start on "intent webhook"
 
-
 # 1.32.0-rc12
 - **bug-fixed**: restored VOICE_TWILIO in utils-actions
 - **added**: added tooltip in log panel
@@ -175,6 +180,11 @@
 
 # 1.32.0-rc1
 - **added**: voice settings tab into settings section to configure provider, voice, tts model and stt model (only for voice chatbot)
+
+# 1.31.4
+- **bug-fixed**: bug fixed textarea
+- **bug-fixed**: hide connector icon
+- **bug-fixed**: set attributes and select block in panel button reply  
 
 # 1.31.2-rc10
 - **added**: Adds the ability to roll a chatbot back to a previous version

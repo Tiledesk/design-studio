@@ -79,8 +79,9 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.findAndUpdateProperty("VOICE_PROVIDER", event.key)
         this.findAndUpdateProperty("TTS_VOICE_NAME", null)
         this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
+        this.findAndUpdateProperty("TTS_MODEL", null)
+        this.findAndUpdateProperty("STT_MODEL", null)
         this.voiceNameSelect.onResetValue(null)
-        
         this.voiceProvider = event.key
         // this.voiceLanguageSelect.onResetValue(null)
         this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );

@@ -102,43 +102,67 @@
     </div>
 
     <div class="answer-preview" *ngIf="showPreview">
-        <div class="header-answer-preview">
-            <div class="label-and-button-container">
-                <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (model_list | filter:{key: 'value', value: action?.model }).name }} )</span>
-                </label>
-                <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
-                    (click)="showHideVariablesSection()">Set variables
-                    <span class="material-icons-round">
-                        chevron_right
-                    </span>
-                </button> -->
+
+        <div *ngIf="!action?.chunks_only">
+            <div class="header-answer-preview">
+                <div class="label-and-button-container">
+                    <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
+                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} )</span>
+                    </label>
+                </div>
             </div>
+    
+            <div id="preview-container" class="preview-container">
+                <div class="placeholder-container" *ngIf="searching">
+                    <loading-spinner class="custom-spinner"></loading-spinner>
+                    <span style="margin-left: 8px;">{{'CDSCanvas.GeneratingAnswer' | translate}} ...</span>
+                </div>
+                <div *ngIf="!searching && !showAiError && preview_response">
+                    {{ preview_response?.answer }}
+                </div>
+                <div *ngIf="showAiError">
+                    {{ ai_error }}
+                </div>
+            </div>
+    
+            <div class="usage-container" *ngIf="!searching && !showAiError ">
+                <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
+                <!-- <span style="font-size: 13px;">{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span> -->
+                <!-- <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span> -->
+                <span style="font-weight: 500;">{{'CDSCanvas.Total' | translate }}: {{ preview_response?.prompt_token_size }}</span>
+            </div>
+    
+        </div>
+        
+
+        <!-- ----------------------------- -->
+        <!-- Chunks Accordion -->
+        <!-- ----------------------------- -->
+        <div class="mat-accordion--wpr" style="margin-top: 3px;">
+            <mat-accordion>
+                <div class="placeholder-container" *ngIf="searching && action?.chunks_only">
+                    <loading-spinner class="custom-spinner"></loading-spinner>
+                    <!-- <span style="margin-left: 8px;">loading ...</span> -->
+                </div>
+                <mat-expansion-panel *ngIf="!searching" class="custom-expansion-panel" [expanded]="action?.chunks_only || panelOpenState" (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <span *ngIf="!action?.chunks_only">Chunks used for the answer ({{chunks?.length}})</span>
+                            <span *ngIf="action?.chunks_only">Chunks returned ({{chunks?.length}})</span>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="content-chunks">
+                        <div class="chunk--wpr" *ngFor="let chunk of chunks">
+                            <article class="chunk">
+                                {{chunk}}
+                            </article>
+                        </div>
+                    </div>
+                    
+                </mat-expansion-panel>
+            </mat-accordion>
         </div>
 
-        <div id="preview-container" class="preview-container">
-
-            <div class="placeholder-container" *ngIf="searching">
-                <loading-spinner class="custom-spinner"></loading-spinner>
-                <span style="margin-left: 8px;">{{'CDSCanvas.GeneratingAnswer' | translate}} ...</span>
-            </div>
-
-            <div *ngIf="!searching && !showAiError && ai_response">
-                {{ ai_response?.answer }}
-            </div>
-
-            <div *ngIf="showAiError">
-                {{ ai_error }}
-            </div>
-
-        </div>
-
-        <div class="usage-container" *ngIf="!searching && !showAiError ">
-            <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <!-- <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span> -->
-            <!-- <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span> -->
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.prompt_token_size }}</span>
-        </div>
 
     </div>
     <!-- PREVIEW - END -->
@@ -285,7 +309,7 @@
                 </div>
 
                 <!-- // alpha limit slider -->
-                <div class="text-editor-wrapper">
+                <div *ngIf="IS_VISIBLE_ALPHA_SLIDER" class="text-editor-wrapper">
                     <div class="field-box">
                         <label class="title-label">{{'CDSCanvas.SearchTypeLimit' | translate }}</label>
                         <div class="action-wait-content">
@@ -324,7 +348,7 @@
                 </div>
 
                 <!-- // advanced prompt -->                     
-                <div class="field-box" [class.disabled]="action?.chanksOnly">
+                <div class="field-box" [class.disabled]="action?.chunks_only">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.advancedPrompt"
@@ -340,7 +364,7 @@
                 <!-- // citations -->    
                 <div *ngIf="action.hasOwnProperty('citations')"
                     class="field-box" 
-                    [class.disabled]="action?.chanksOnly">
+                    [class.disabled]="action?.chunks_only">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.citations"
@@ -354,18 +378,20 @@
                 </div>
 
 
-                <!-- <div class="field-box">
+                <div class="field-box">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
-                            [checked]="action?.chanksOnly"
-                            (change)="onChangeCheckbox($event, 'chanksOnly')">
-                            {{"CDSCanvas.ChanksOnly" | translate}}
+                            [checked]="action?.chunks_only"
+                            (change)="onChangeCheckbox($event, 'chunks_only')">
+                            {{"CDSCanvas.ChunksOnly" | translate}}
                         </mat-checkbox>
                     </section>
-                    <!- <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                    <!-- 
+                    <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
-                    </label> ->
-                </div> -->
+                    </label> 
+                    -->
+                </div>
             
 
             </div>
@@ -400,7 +426,7 @@
     
     <!-- <hr class="custom-divider"> -->
 
-    <div class="field-box" [class.disabled]="action?.chanksOnly">
+    <div class="field-box" [class.disabled]="action?.chunks_only">
         
         <label class="title-label">{{'CDSCanvas.KBReply' | translate}}</label>
         <cds-textarea id="assignTo" 
@@ -415,7 +441,7 @@
         </cds-textarea>
     </div>
 
-    <div class="field-box" [class.disabled]="action?.chanksOnly">
+    <div class="field-box" [class.disabled]="action?.chunks_only">
         <label class="title-label">{{'CDSCanvas.KBSource' | translate}}</label>
         <cds-textarea id="assignTo" 
             [textLimitBtn]="false"
