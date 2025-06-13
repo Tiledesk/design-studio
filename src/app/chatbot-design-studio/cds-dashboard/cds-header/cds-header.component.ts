@@ -150,11 +150,6 @@ export class CdsHeaderComponent implements OnInit {
       this.subscriptionTestItOutPlayed = this.controllerService.isTestItOutPlaying$.subscribe((state) => {
         this.logger.log('[CdsHeaderComponent]  isTestItOutPlaying ', state);
         this.isPlaying = state;
-        // if(state) {
-        //   this.openWebhookLog();
-        // } else {
-        //   this.closeWebhookLog();
-        // }
       });
   }
 
@@ -379,7 +374,7 @@ export class CdsHeaderComponent implements OnInit {
     } else {
       request_id = this.logService.request_id;
     }
-    
+
     const tokenResp = await this.getToken(request_id);
     if (!tokenResp) {
       this.logger.warn("[CDS-header] Token non ottenuto");
