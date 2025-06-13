@@ -37,7 +37,9 @@ export class CdsWidgetLogsComponent implements OnInit {
   logContainer: any;
   LOG_LEVELS = LOG_LEVELS;
   selectedLogLevel = LOG_LEVELS.NATIVE;
+  nLevels = { error: 0, warn: 1, info: 2, debug: 3, native: 4 };
   logLevelsArray = Object.entries(LOG_LEVELS).map(([key, value]) => ({ key, value }));
+
   isOpenPanelWidget: boolean;
   mqtt_token: string;
   highestTimestamp: string;
@@ -65,6 +67,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.logger.log("[CDS-WIDGET-LOG] ngOnChanges selectedChatbot");
     if (changes['request_id']) { // && !changes['request_id'].isFirstChange()
       // this.request_id = changes['request_id'].currentValue;
       this.initializeChatbot();
@@ -128,11 +131,12 @@ export class CdsWidgetLogsComponent implements OnInit {
     if(localStorage.getItem("log_animation_type") != null){
       this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
     };
+    
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
     if(chatbotSubtype === TYPE_CHATBOT.WEBHOOK || chatbotSubtype === TYPE_CHATBOT.COPILOT){
       const webhook_id = await this.getWebhook();
       this.logger.log("[CDS-WIDGET-LOG] webhook_id : ", webhook_id);
-      this.request_id = await this.getNewRequestId(webhook_id);
+      // this.request_id = await this.getNewRequestId(webhook_id);
       this.logger.log("[CDS-WIDGET-LOG] request_id : ", this.request_id);
     } else {
       this.request_id = this.logService.request_id;
@@ -164,29 +168,29 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
 
-  async getNewRequestId(webhook_id): Promise<any|null> {
-    const tiledeskToken = localStorage.getItem('tiledesk_token');
-    const project_id = this.dashboardService.projectID;
-    try {
-      const resp = await this.tiledeskAuthService.createNewRequestId(
-        tiledeskToken,
-        project_id, 
-        webhook_id
-      );
-      this.logger.log('[CDS-WIDGET-LOG] >>> createNewRequestId ok ', resp);
-      if(resp['request_id']){
-        return resp['request_id'];
-      } else {
-        return null;
-      }
-    } catch (error: any) {
-      this.logger.error('[CDS-WIDGET-LOG] createNewRequestId error::', error);
-      if (error.status && error.status === 401) {
-        // error
-      }
-      return null;
-    }
-  }
+  // async getNewRequestId(webhook_id): Promise<any|null> {
+  //   const tiledeskToken = localStorage.getItem('tiledesk_token');
+  //   const project_id = this.dashboardService.projectID;
+  //   try {
+  //     const resp = await this.tiledeskAuthService.createNewRequestId(
+  //       tiledeskToken,
+  //       project_id, 
+  //       webhook_id
+  //     );
+  //     this.logger.log('[CDS-WIDGET-LOG] >>> createNewRequestId ok ', resp);
+  //     if(resp['request_id']){
+  //       return resp['request_id'];
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (error: any) {
+  //     this.logger.error('[CDS-WIDGET-LOG] createNewRequestId error::', error);
+  //     if (error.status && error.status === 401) {
+  //       // error
+  //     }
+  //     return null;
+  //   }
+  // }
 
 
   async getToken(request_id): Promise<any|null> {
@@ -322,12 +326,9 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   private filterLogMessage() {
-    if(this.selectedLogLevel === LOG_LEVELS.NATIVE){
-      this.filteredLogs = this.listOfLogs;
-    } else {
-      this.filteredLogs = this.listOfLogs.filter(log => log.level === this.selectedLogLevel);
-    }
-    this.logger.log('[CDS-WIDGET-LOG] filterLogMessage:', this.filteredLogs);
+    const levLog = this.nLevels[this.selectedLogLevel] ?? 4; 
+    this.filteredLogs = this.listOfLogs.filter(log => log.nlevel <= levLog);
+    this.logger.log('[CDS-WIDGET-LOG] filterLogMessage:', levLog, this.filteredLogs);
   }
 
 
