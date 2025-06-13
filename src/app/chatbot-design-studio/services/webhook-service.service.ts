@@ -110,22 +110,7 @@ export class WebhookService {
     return this._httpClient.delete<any>(url, httpOptions);
   }
 
-  preloadWebhook(webhook_id: string){
-    this.thereIsWebhook = false;
-    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
-    this.logger.log('[WEBHOOK_URL.SERV] playWebhook');
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
-      })
-    };
-    let body = { };
-    let url = this.WEBHOOK_URL + '/webhooks/preload/' + webhook_id;
-    this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
-    return this._httpClient.post<any>(url, JSON.stringify(body), httpOptions);
-  }
+
 
 
   checkIfThereIsWebResponse(){
@@ -215,7 +200,6 @@ export class WebhookService {
     this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
     return this._httpClient.post<any>(url, JSON.stringify(body), httpOptions);
   }
-
 
 
 }
