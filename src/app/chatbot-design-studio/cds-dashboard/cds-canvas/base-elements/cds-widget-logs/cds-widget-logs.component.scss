@@ -92,6 +92,7 @@
 
 .row-log {
   padding: 0 10px 0 4px;
+  padding: 0 10px 0 4px;
   display: flex;
   height: auto;
   min-height: 24px;
@@ -135,6 +136,12 @@
   font-weight: 500;
   display: inline-block;
   width: 55px;
+  &.native{
+    color: var(--grey);
+  }
+  &.debug{
+    color: var(--blu);
+  }
   &.info{
     color: #1b6ef3;
   }
@@ -162,6 +169,7 @@
   cursor: pointer;
   .mat-icon{
     display: none;
+    display: none;
     width: 18px;
     height: 18px;
     fill:var(--blu);
@@ -170,6 +178,9 @@
 
 .row-log:hover {
   .row-log-goto {
+    .mat-icon {
+      display: flex;
+    }
     .mat-icon {
       display: flex;
     }
@@ -305,7 +316,7 @@
 }
 
 @keyframes fadeBackground {
-  0% { background-color: var(--gray-light-02); }
-  20% { background-color: var(--gray-light-02); }
+  0% { background-color: var(--blu-light-01); }
+  20% { background-color: var(--blu-light-01); }
   100% { background-color: #ffffff; }
 }

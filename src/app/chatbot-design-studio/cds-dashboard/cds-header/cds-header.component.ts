@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-
+import { lastValueFrom, firstValueFrom, every, filter, Subscription } from 'rxjs';
 
 import { MultichannelService } from 'src/app/services/multichannel.service';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -23,7 +23,7 @@ import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
-import { firstValueFrom, every, filter, Subscription } from 'rxjs';
+
 import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
@@ -149,11 +149,6 @@ export class CdsHeaderComponent implements OnInit {
       this.subscriptionTestItOutPlayed = this.controllerService.isTestItOutPlaying$.subscribe((state) => {
         this.logger.log('[CdsHeaderComponent]  isTestItOutPlaying ', state);
         this.isPlaying = state;
-        // if(state) {
-        //   this.openWebhookLog();
-        // } else {
-        //   this.closeWebhookLog();
-        // }
       });
   }
 
@@ -374,16 +369,26 @@ export class CdsHeaderComponent implements OnInit {
 
 
   async onOpenTestItOut(){
-    if(this.isWebhook){
-      this.webhookUrl = await this.getWebhook();
-      if(!this.webhookUrl){
-      this.webhookUrl = await this.createWebhook();
-      }
-    }
+    let request_id: string | Promise<void>;
     this.logService.initialize(null); 
+    if(this.isWebhook){
+      this.logger.log("[cds-header] onOpenTestItOut: isWebhook");
+      request_id = await this.webhookStarterLog();
+    } else {
+      request_id = this.logService.request_id;
+    }
+    const tokenResp = await this.getToken(request_id);
+    if (!tokenResp) {
+      this.logger.warn("[CDS-header] Token non ottenuto");
+      return;
+    }
+    const mqtt_token = tokenResp.token || null;
+    request_id = tokenResp.request_id || null;
+    this.logService.starterLog(mqtt_token, request_id);
     this.openTestSiteInPopupWindow();
     this.isPlaying = true;
   }
+
 
 
   onCloseTestItOut(){
@@ -458,41 +463,56 @@ export class CdsHeaderComponent implements OnInit {
     this.webhookUrl = null;
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.chatbot_id = this.dashboardService.id_faq_kb;
-    //this.webhookUrl = await this.getWebhook();
   }
 
-  async createWebhook(): Promise<string | null> {
-    this.logger.log("[cds-header] createWebhook 1: ", this.intentService.listOfIntents);
-    const intentStart = this.intentService.listOfIntents.find(obj => obj.intent_display_name.trim() === TYPE_INTENT_NAME.WEBHOOK);
-    if (!intentStart) {
-      this.logger.log("[cds-header] Errore: intentStart non trovato.");
-      return null;
-    }
-    this.logger.log("[cds-header] createWebhook 2: ", this.chatbot_id, intentStart.intent_id);
-    const copilot = this.dashboardService.selectedChatbot.subtype === TYPE_CHATBOT.COPILOT;
+
+  async webhookStarterLog() {
     try {
-      const resp: any = await firstValueFrom(this.webhookService.createWebhook(this.chatbot_id, intentStart.intent_id, true, copilot));
-      this.logger.log("[cds-header] createWebhook : ", resp);
-      return resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
+      const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
+      if (chatbotSubtype !== TYPE_CHATBOT.WEBHOOK && chatbotSubtype !== TYPE_CHATBOT.COPILOT) {
+        return;
+      }
+      const chatbot_id = this.dashboardService.id_faq_kb;
+      const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
+      this.webhookId = webhook?.webhook_id;
+      if (webhook?.webhook_id) {
+        this.webhookUrl = webhook?.webhook_id ? `${this.serverBaseURL}webhook/${webhook.webhook_id}` : null;
+      } else {
+        this.logger.warn("[CDS-header] Webhook non trovato per chatbot_id:", chatbot_id);
+        return;
+      }
+      this.logger.log("[CDS-header] chatbot_id:", chatbot_id, webhook);
+      const resp = await lastValueFrom(this.webhookService.preloadWebhook(this.webhookId));
+      if (!resp?.request_id) {
+        this.logger.warn("[CDS-header] request_id non trovato");
+        return;
+      }
+      return resp.request_id;
     } catch (error) {
-      this.logger.log("[cds-header] error createWebhook: ", error);
-      return null;
+      this.logger.error("[CDS-header] Errore in starterLog:", error);
     }
   }
 
-  async getWebhook(): Promise<string | null> {
+
+  async getToken(request_id): Promise<any|null> {
+    const tiledeskToken = localStorage.getItem('tiledesk_token');
+    const project_id = this.dashboardService.projectID;
     try {
-      const resp: any = await firstValueFrom(this.webhookService.getWebhook(this.chatbot_id));
-      this.logger.log("[cds-header] getWebhook : ", resp);
-      const webhookUrl = resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
-      this.webhookId = resp?.webhook_id;
-      return webhookUrl;
-    } catch (error) {
-      this.logger.log("[cds-header] error getWebhook: ", error);
+      const resp = await this.tiledeskAuthService.createCustomTokenByRequestId(
+        tiledeskToken,
+        project_id,
+        request_id
+      );
+      this.logger.log('[CDS-header] >>> getToken ok ', resp);
+      return resp;
+    } catch (error: any) {
+      this.logger.error('[CDS-header] getToken error::', error);
+      if (error.status && error.status === 401) {
+      // error
+      }
       return null;
     }
   }
-
 
   stopWebhook(){
     this.webhookService.deleteWebhook(this.webhookId).subscribe({ next: (resp: any)=> {
