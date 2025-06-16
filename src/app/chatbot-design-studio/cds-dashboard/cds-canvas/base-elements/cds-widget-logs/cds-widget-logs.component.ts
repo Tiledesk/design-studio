@@ -62,13 +62,13 @@ export class CdsWidgetLogsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    //empty
+    this.listOfLogs = [];
     this.subscriptions();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.logger.log("[CDS-WIDGET-LOG] ngOnChanges selectedChatbot");
     if (changes['request_id']) { // && !changes['request_id'].isFirstChange()
+       this.logger.log("[CDS-WIDGET-LOG] ngOnChanges selectedChatbot ", changes);
       // this.request_id = changes['request_id'].currentValue;
       this.initializeChatbot();
     }
@@ -80,7 +80,6 @@ export class CdsWidgetLogsComponent implements OnInit {
     if(localStorage.getItem("default_closed_log_panel") != null){
       this.isClosed = JSON.parse(localStorage.getItem("default_closed_log_panel"));
     };
-
     this.logger.log("[CDS-WIDGET-LOG] ngAfterViewInit selectedChatbot ", this.dashboardService.selectedChatbot);
   }
 
@@ -88,12 +87,12 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   getStaticLastLogs(){
     this.logService.getStaticLastLogs(this.selectedLogLevel).subscribe({ next: (resp)=> {
-      this.logger.log("[CDS-WIDGET-LOG] getStaticLastLogs", resp);
+      this.logger.log("[CDS-WIDGET-LOG-A] getStaticLastLogs", resp);
       this.appendFirstMessagesToHeadArray(resp);
     }, error: (error)=> {
-      this.logger.error("[LOG-SERV] initLogService error: ", error);
+      this.logger.error("[CDS-WIDGET-LOG-A] getStaticLastLogs error: ", error);
     }, complete: () => {
-      this.logger.log("[LOG-SERV] initLogService completed.");
+      this.logger.log("[CDS-WIDGET-LOG-A] getStaticLastLogs completed.");
     }})
   }
 
@@ -110,14 +109,18 @@ export class CdsWidgetLogsComponent implements OnInit {
           text: item.rows.text,
           timestamp: item.rows.timestamp
       }));
+      
       if(this.listOfLogs.length > 0){
-        const cutoffTimestamp = new Date(this.listOfLogs[0].timestamp);
-        transformedArray = transformedArray.filter(item => new Date(item.timestamp) < cutoffTimestamp);
+        const cutOffTimestamp = new Date(this.listOfLogs[0].timestamp);
+        transformedArray = transformedArray.filter(item => new Date(item.timestamp) < cutOffTimestamp);
+        this.listOfLogs = [...transformedArray, ...this.listOfLogs];
       } else {
-        this.highestTimestamp = transformedArray[transformedArray.length-1]?.timestamp;
+        this.listOfLogs = transformedArray;
       }
-      this.listOfLogs.unshift(...transformedArray);
-      this.logger.log("[CDS-WIDGET-LOG] transformedArray", transformedArray, this.listOfLogs);
+      //this.listOfLogs.unshift(...transformedArray);
+      this.highestTimestamp = this.listOfLogs[this.listOfLogs.length-1]?.timestamp;
+      this.filterLogMessage();
+      this.logger.log("[CDS-WIDGET-LOG-A] appendFirstMessagesToHeadArray", transformedArray, this.listOfLogs);
   }
 
   
@@ -125,19 +128,16 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   async initializeChatbot(){
-    this.listOfLogs = [];
     this.logger.log("[CDS-WIDGET-LOG] initializeChatbot ");
-    this.listOfLogs = [];
     if(localStorage.getItem("log_animation_type") != null){
       this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
     };
-    
     const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
     if(chatbotSubtype === TYPE_CHATBOT.WEBHOOK || chatbotSubtype === TYPE_CHATBOT.COPILOT){
       const webhook_id = await this.getWebhook();
-      this.logger.log("[CDS-WIDGET-LOG] webhook_id : ", webhook_id);
+      this.logger.log("[CDS-WIDGET-LOG] initializeChatbot webhook_id : ", webhook_id);
       // this.request_id = await this.getNewRequestId(webhook_id);
-      this.logger.log("[CDS-WIDGET-LOG] request_id : ", this.request_id);
+      this.logger.log("[CDS-WIDGET-LOG] initializeChatbot request_id : ", this.request_id);
     } else {
       this.request_id = this.logService.request_id;
     }
@@ -229,10 +229,11 @@ export class CdsWidgetLogsComponent implements OnInit {
   subscriptions(){
      /** get dynamic logs */
     this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage.subscribe((message: any) => {
-      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message, this.highestTimestamp);
+      // this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message, this.highestTimestamp);
       if(message){
         if (new Date(message.timestamp) > new Date(this.highestTimestamp) || !this.highestTimestamp){
           this.listOfLogs.push(message);
+          this.highestTimestamp = this.listOfLogs[this.listOfLogs.length-1]?.timestamp;
         }
         //this.goToIntentByMessage(message);
         this.scrollToBottom();
@@ -242,6 +243,7 @@ export class CdsWidgetLogsComponent implements OnInit {
         // this.logger.log("[CDS-WIDGET-LOG] ANIMATE BLOCK: #intent-content-"+(intentId));
         // this.addCssAnimationClass('live-start-intent', '#intent-content-' + (intentId), 6);
       }
+      this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message, this.listOfLogs);
       this.goToIntentByMessage(message);
       this.filterLogMessage();
     });  
@@ -249,7 +251,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
     /** get the static logs the first time */
     this.subscriptionLoadedWidget = this.logService.BSWidgetLoaded.subscribe((resp: boolean) => {
-      this.logger.log("[CDS-WIDGET-LOG] loaded ", resp);
+      this.logger.log("[CDS-WIDGET-LOG-A] loaded ", resp);
       if(resp){
         this.getStaticLastLogs();
       };
@@ -310,12 +312,13 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   starterLog(){
-    this.logger.log('[CDS-WIDGET-LOG] >>> starterLog ');
+    this.listOfLogs = [];
+    this.logger.log('[CDS-WIDGET-LOG-A] >>> starterLog ');
     this.logService.starterLog(this.mqtt_token, this.request_id);
   }
 
   closeLog(){
-    this.logger.log('[CDS-WIDGET-LOG] >>> closeLog ');
+    this.logger.log('[CDS-WIDGET-LOG-A] >>> closeLog ');
     this.intentService.resetLiveActiveIntent();
     this.logService.closeLog();
   }
@@ -406,5 +409,8 @@ export class CdsWidgetLogsComponent implements OnInit {
       return false;
     }
   }
+
+
+  
 
 }
