@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.35.0-rc12
+- **bug-fixed**: show first log message via static service call
+
 # 1.35.0-rc11
 - **bug-fixed**: Start log of a chatbot or webhook
 - **bug-fixed**: Stop and restart log on webhook regeneration
