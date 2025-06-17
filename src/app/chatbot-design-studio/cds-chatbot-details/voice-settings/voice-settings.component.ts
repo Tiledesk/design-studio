@@ -8,6 +8,7 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { variableList } from '../../utils-variables';
 import { SelectComponent } from '../../cds-base-element/select/select.component';
 import { DOCS_LINK } from '../../utils';
+import { AiService } from 'src/app/services/ai.service';
 
 @Component({
   selector: 'cds-voice-settings',
@@ -42,6 +43,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private faqKbService: FaqKbService,
+    private aiService: AiService
   ) { }
 
   ngOnInit(): void {
