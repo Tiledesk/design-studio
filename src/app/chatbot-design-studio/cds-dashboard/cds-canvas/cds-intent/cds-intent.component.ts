@@ -227,24 +227,20 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-
-  async ngOnInit(): Promise<void> {
+async ngOnInit(): Promise<void> {
     //setTimeout(() => {
-      this.logger.log('CdsPanelIntentComponent ngOnInit-->', this.intent);
+      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
       if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
         this.showIntentOptions = false;
-      } else {
+      } 
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
         this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
         this.chatbot_id = this.dashboardService.id_faq_kb;
-      }
-
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
         this.webhookUrl = await this.getWebhook();
         if(!this.webhookUrl){
           this.webhookUrl = await this.createWebhook(this.intent);
         }
       }
-
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
@@ -261,32 +257,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       else {
         this.setIntentSelected();
       }
-
-      
-
-      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.START) {
-      //   this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
-      //   this.startAction = this.intent.actions[0];
-      //   this.isStart = true;
-      //   //** set 'start' intent as default selected one */
-      //   // this.intentService.setDefaultIntentSelected();
-
-      //   // //** center stage on 'start' intent */
-      //   // /let startElement = document.getElementById(this.intent.intent_id)
-      //   // /this.stageService.centerStageOnHorizontalPosition(startElement)
-      // } else {
-      //   this.setIntentSelected();
-      // }
-      // il setTimeout evita l'effetto che crea un connettore e poi lo sposta nel undo
       setTimeout(() => {
         this.setActionIntent();
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.addEventListener();
       this.setIntentAttributes();
-    //}, 10000);
   }
-
 
 
   async getWebhook(): Promise<string | null> {
