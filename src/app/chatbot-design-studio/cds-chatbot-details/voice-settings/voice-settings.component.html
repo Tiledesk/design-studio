@@ -68,9 +68,9 @@
         </div>
 
         <!--STEP 3: choose OpenAi TTS_MODEL -->
-        <div *ngIf="voiceProvider === 'openai'" style="margin-bottom: 16px;">
+        <div *ngIf="voiceProvider === 'openai' || voiceProvider === 'elevenlabs'" style="margin-bottom: 16px;">
             <label class="cds-custom-label">
-            {{ 'CDSSetting.TextToSpeechModel' | translate }}
+                {{ 'CDSSetting.TextToSpeechModel' | translate }}
             </label>
             <div style="width: 40%;">
                 <cds-select id="text-condition" 
@@ -85,15 +85,15 @@
                 </cds-select>
                 <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
                     {{'CDSSetting.TextToSpeechModelDescription' | translate}}
-                    <a [href]="DOCS_LINK.VOICE_SETTINGS.tts_model.link" [target]="DOCS_LINK.VOICE_SETTINGS.tts_model.target">{{ 'LearnMore' | translate }}</a>
+                    <a [href]="DOCS_LINK.VOICE_SETTINGS[voiceProvider].tts_model.link" [target]="DOCS_LINK.VOICE_SETTINGS[voiceProvider].tts_model.target">{{ 'LearnMore' | translate }}</a>
                 </span>
             </div>
         </div>
 
         <!--STEP 4: choose OpenAi STT_MODEL -->
-        <div *ngIf="voiceProvider === 'openai'" style="margin-bottom: 16px;">
+        <div *ngIf="voiceProvider === 'openai' || voiceProvider === 'elevenlabs'" style="margin-bottom: 16px;">
             <label class="cds-custom-label">
-            {{ 'CDSSetting.SpeechToTextModel' | translate }}
+                {{ 'CDSSetting.SpeechToTextModel' | translate }}
             </label>
             <div style="width: 40%;">
                 <cds-select id="text-condition" 
@@ -108,7 +108,7 @@
                 </cds-select>
                 <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
                     {{'CDSSetting.SpeechToTextModelDescription' | translate}}
-                    <a [href]="DOCS_LINK.VOICE_SETTINGS.stt_model.link" [target]="DOCS_LINK.VOICE_SETTINGS.stt_model.target">{{ 'LearnMore' | translate }}</a>
+                    <a [href]="DOCS_LINK.VOICE_SETTINGS[voiceProvider].stt_model.link" [target]="DOCS_LINK.VOICE_SETTINGS[voiceProvider].stt_model.target">{{ 'LearnMore' | translate }}</a>
                 </span>
             </div>
         </div>

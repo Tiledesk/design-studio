@@ -234,16 +234,17 @@ export var voiceProviderList: Array<{key: string, label: string, elements?: Arra
         ]
     },
     {
-        key: 'eleven_labs',
+        key: 'elevenlabs',
         label: "ElevenLabs",
         tts_voice: [
             //GET VOICES FROM ELEVENLABS API
         ],
         tts_model: [
-            { model: 'eleven_multilingual_v2',       name: 'eleven_multilingual_v2',      status: 'active' },
+            //GET MODELS FROM ELEVENLABS API
         ],
         stt_model: [
-            { model: 'eleven_multilingual_v2',       name: 'eleven_multilingual_v2',      status: 'active' },
+            { model: 'scribe_v1',                   name: 'scribe_v1',          status: 'active' },
+            { model: 'scribe_v1_experimental',      name: 'scribe_v1_experimental',     status: 'active' },
         ]
     }
 ]

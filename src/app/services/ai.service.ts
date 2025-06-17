@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map, firstValueFrom } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -20,7 +20,6 @@ export class AiService {
   // private
   private URL_TILEDESK_OPENAI: string;
   private tiledeskToken: string;
-  private GPT_API_URL: string;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -33,25 +32,25 @@ export class AiService {
   initialize(serverBaseUrl: string, project_id: string): void {
     this.logger.log('[OPENAI.SERVICE] - initialize serverBaseUrl', serverBaseUrl);
     this.project_id = project_id;
-    this.SERVER_BASE_URL = serverBaseUrl;
+    this.SERVER_BASE_URL = serverBaseUrl + this.project_id;
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')
   }
 
-  getElevenLabsVoices(): Observable<any[]> {
+  getElevenLabsVoices(): Promise<any[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken
+        'Authorization': this.tiledeskToken,
       })
     }
 
-    const url = this.SERVER_BASE_URL + "/voice/list_voices";
+    const url = this.SERVER_BASE_URL + "/voice/voices";
     this.logger.debug('[OPENAI.SERVICE] - preview prompt URL: ', url);
 
-    return this.httpClient.get<any[]>(url, httpOptions);
+    return firstValueFrom(this.httpClient.get<any[]>(url, httpOptions));
   }
 
-  getElevenLabsModels(): Observable<any[]> {
+  getElevenLabsModels(): Promise<any[]> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -59,10 +58,10 @@ export class AiService {
       })
     } 
 
-    const url = this.SERVER_BASE_URL + "/voice/list_models";
+    const url = this.SERVER_BASE_URL + "/voice/models";
     this.logger.debug('[OPENAI.SERVICE] - preview prompt URL: ', url);
 
-    return this.httpClient.get<any[]>(url, httpOptions);
+    return firstValueFrom(this.httpClient.get<any[]>(url, httpOptions));
   }
 
 
