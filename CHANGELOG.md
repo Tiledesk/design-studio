@@ -10,6 +10,8 @@
 
 # 1.36.0
 
+# 1.35.1
+
 # 1.35.0-rc13
 - **bug-fixed**: getWebhook only if block is "webhook"
 
