@@ -10,6 +10,11 @@
 
 # 1.36.0
 
+# 1.35.0-rc13
+- **bug-fixed**: getWebhook only if block is "webhook"
+
+# 1.35.0-rc12
+- **bug-fixed**: show first log message via static service call
 
 # 1.35.0-rc11
 - **bug-fixed**: Start log of a chatbot or webhook
