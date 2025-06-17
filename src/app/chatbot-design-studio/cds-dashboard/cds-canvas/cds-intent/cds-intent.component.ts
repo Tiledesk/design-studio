@@ -236,6 +236,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       } else {
         this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
         this.chatbot_id = this.dashboardService.id_faq_kb;
+      }
+
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
         this.webhookUrl = await this.getWebhook();
         if(!this.webhookUrl){
           this.webhookUrl = await this.createWebhook(this.intent);
