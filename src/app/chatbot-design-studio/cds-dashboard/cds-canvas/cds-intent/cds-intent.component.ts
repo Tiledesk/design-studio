@@ -242,6 +242,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           this.webhookUrl = await this.createWebhook(this.intent);
         }
       }
+
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }

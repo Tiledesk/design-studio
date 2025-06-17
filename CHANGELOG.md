@@ -11,6 +11,8 @@
 # 1.35.0-rc12
 - **bug-fixed**: show first log message via static service call
 
+# 1.36.0
+
 # 1.35.0-rc11
 - **bug-fixed**: Start log of a chatbot or webhook
 - **bug-fixed**: Stop and restart log on webhook regeneration
@@ -56,6 +58,11 @@
 
 # 1.35.0
 
+
+# 1.34.1
+- **bug-fixed**: in AI prompt action, model must match value, now it matches label
+- **changed**: hidden alpha limit slider in the ask gpt v2 action
+
 # 1.34.0-rc6
 - **bug-fixed**: Drag and drop on intent header not working
 - **changed**: Fix CDS interface for Liquid on textarea
@@ -88,6 +95,8 @@
 # 1.34.0-rc1
 - **added**: "Chunks only" in action "ask knowledge base"
 
+# 1.34.0
+
 # 1.33.0-rc3
 - **added**: TTS_VOICE_LANGUAGE to voice settings section
 
@@ -98,6 +107,52 @@
 - **added**: added "Assign KB Chunks to" in action "ask knowledge base"
 
 # 1.32.2
+- **changed**: limit chunk to 40
+- **added**: move position on start on "intent webhook"
+- **bug-fixed**: restored VOICE_TWILIO in utils-actions
+- **added**: added tooltip in log panel
+- **bug-fixed**: Status 200 not displayed with newly created webhook
+- **bug-fixed**: Labels ProductionURL/Development URL
+- **changed**: Open Webhook detail in Large Mode
+- **bug-fixed**: “Development webhook is currently turned off”: the first time you press start it doesn’t work
+- **bug-fixed**: Fix margins on hover in History
+- **bug-fixed**: Remove action Replace Bot from Webhook
+- **bug-fixed**: Remove action Lead update from Webhook
+- **bug-fixed**: Remove action Change Department from Webhook
+- **bug-fixed**: Rename action Replace Bot to Replace AI Agent
+- **bug-fixed**: Log highlight must flash even if you click on a log of the same block
+- **bug-fixed**: On the webhook play you must also center the “start” of the webhook like other blocks (vertically)
+- **bug-fixed**: changed padding-left in publish-history
+- **added**: added animation log message
+- **bug-fixed**: fixed z-index on "message url copied"
+- **bug-fixed**: changed webhook labels
+- **bug-fixed**: Removed "change department"
+- **bug-fixed**: changed "Replace bot" to "Replace AI Agent”
+- **changed**: replaced 'voice-twilio' with 'voice_twilio'
+- **added**: Display a message on the Release History page when there are no versions
+- **added**: ability to reset voice settings select options
+- **bug-fixed**: cannot able to save voice settings if globals not exist yes
+- **bug-fixed**: show all log messages
+- **bug-fixed**: added border on intent selected when log is active
+- **bug-fixed**: fixed cssbugs in panel log
+- **bug-fixed**: minor fix on chatbot types
+- **bug-fixed**: Check last repeated log in webhooks. To replicate, start a webhook, call it, then stop and play again. Last log of web response reappears.
+- **bug-fixed**: Check first log in ai agents. The first log is “action reply terminated”, it seems that the first log is lost. Question of queue subscription timing?
+- **bug-fixed**: Publish button disappeared in webhooks: you always see the dev url that should be visible only after pressing play and should disappear when you press stop.
+- **bug-fixed**: Put separate production and dev urls in the webhook detail
+- **bug-fixed**: If you press play on the webhook and then stop without calling it, the webhook block continues to flash
+- **bug-fixed**: In the webhook detail use the default setting “wide” so that the entire url is visible
+- **bug-fixed**: Widen the div of the dev url next to the start/stop and add a tooltip that says “Copy dev url” and after copying it replace “Text copied successfully” with “Dev url copied successfully”
+- **bug-fixed**: Regenerate button must show alert that says “Warning, regenerating the webhook url the previous url will no longer be available”.
+- **added**: voice settings tab into settings section to configure provider, voice, tts model and stt model (only for voice chatbot)
+
+
+# 1.31.4
+- **bug-fixed**: bug fixed textarea
+- **bug-fixed**: hide connector icon
+- **bug-fixed**: set attributes and select block in panel button reply  
+
+
 
 # 1.32.0-rc13
 - **changed**: limit chunk to 40

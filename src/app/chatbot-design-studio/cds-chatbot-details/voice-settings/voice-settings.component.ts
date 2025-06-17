@@ -8,6 +8,7 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { variableList } from '../../utils-variables';
 import { SelectComponent } from '../../cds-base-element/select/select.component';
 import { DOCS_LINK } from '../../utils';
+import { AiService } from 'src/app/services/ai.service';
 
 @Component({
   selector: 'cds-voice-settings',
@@ -42,6 +43,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private faqKbService: FaqKbService,
+    private aiService: AiService
   ) { }
 
   ngOnInit(): void {
@@ -52,7 +54,11 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.initialize()
   }
 
-  private initialize(){
+  private async initialize(){
+
+    await this.getElevenLabsVoices(); //get voices from elevenlabs
+    await this.getElevenLabsModels(); //get models from elevenlabs
+
     this.voiceProvider = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'VOICE_PROVIDER')?.value
     this.tts_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_MODEL')?.value
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value
@@ -61,7 +67,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
     this.voice_language = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code
 
-    if(this.voiceProvider === 'openai'){
+    if(this.voiceProvider === 'openai' || this.voiceProvider === 'elevenlabs'){
       this.tts_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
       this.stt_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
       this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
@@ -70,6 +76,36 @@ export class CDSVoiceSettingsComponent implements OnInit {
     if(this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals){
       this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));
     }
+
+    
+   
+  }
+
+
+  async getElevenLabsVoices(){
+    const resp = await this.aiService.getElevenLabsVoices();
+    this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsVoices ', resp)
+    resp.forEach(voice => {
+      voiceProviderList.find(el => el.key === 'elevenlabs').tts_voice.push({
+        voiceId: voice.voice_id,
+        name: voice.name, 
+        type: 'standard',
+        status: 'active'
+      });
+    });
+  }
+
+  async getElevenLabsModels(){
+    const resp = await this.aiService.getElevenLabsModels();
+    this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsModels ', resp)
+    resp.forEach(model => {
+        voiceProviderList.find(el => el.key === 'elevenlabs').tts_model.push({
+          model: model.model_id,
+          name: model.name,
+          status: 'active'
+        });
+    });
+    
   }
 
   onSelect(event, key){
@@ -87,7 +123,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
         this.voice_name_list = [];
         // this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''} (${el.language_code})` }))
-        if(event && event.key === 'openai'){
+        if(event && (event.key === 'openai' || event.key === 'elevenlabs')){
           this.tts_model_list = voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
           this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
           this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))

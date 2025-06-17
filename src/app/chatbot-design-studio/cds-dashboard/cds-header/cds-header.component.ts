@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-
+import { lastValueFrom, firstValueFrom, every, filter, Subscription } from 'rxjs';
 
 import { MultichannelService } from 'src/app/services/multichannel.service';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -23,7 +23,7 @@ import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
-import { lastValueFrom, firstValueFrom, every, filter, Subscription } from 'rxjs';
+
 import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
@@ -374,7 +374,6 @@ export class CdsHeaderComponent implements OnInit {
     } else {
       request_id = this.logService.request_id;
     }
-
     const tokenResp = await this.getToken(request_id);
     if (!tokenResp) {
       this.logger.warn("[CDS-header] Token non ottenuto");
@@ -386,6 +385,7 @@ export class CdsHeaderComponent implements OnInit {
     this.openTestSiteInPopupWindow();
     this.isPlaying = true;
   }
+
 
 
   onCloseTestItOut(){
@@ -462,24 +462,33 @@ export class CdsHeaderComponent implements OnInit {
     this.chatbot_id = this.dashboardService.id_faq_kb;
   }
 
-  // async createWebhook(): Promise<string | null> {
-  //   this.logger.log("[cds-header] createWebhook 1: ", this.intentService.listOfIntents);
-  //   const intentStart = this.intentService.listOfIntents.find(obj => obj.intent_display_name.trim() === TYPE_INTENT_NAME.WEBHOOK);
-  //   if (!intentStart) {
-  //     this.logger.log("[cds-header] Errore: intentStart non trovato.");
-  //     return null;
-  //   }
-  //   this.logger.log("[cds-header] createWebhook 2: ", this.chatbot_id, intentStart.intent_id);
-  //   const copilot = this.dashboardService.selectedChatbot.subtype === TYPE_CHATBOT.COPILOT;
-  //   try {
-  //     const resp: any = await firstValueFrom(this.webhookService.createWebhook(this.chatbot_id, intentStart.intent_id, true, copilot));
-  //     this.logger.log("[cds-header] createWebhook : ", resp);
-  //     return resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
-  //   } catch (error) {
-  //     this.logger.log("[cds-header] error createWebhook: ", error);
-  //     return null;
-  //   }
-  // }
+
+  async webhookStarterLog() {
+    try {
+      const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
+      if (chatbotSubtype !== TYPE_CHATBOT.WEBHOOK && chatbotSubtype !== TYPE_CHATBOT.COPILOT) {
+        return;
+      }
+      const chatbot_id = this.dashboardService.id_faq_kb;
+      const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
+      this.webhookId = webhook?.webhook_id;
+      if (webhook?.webhook_id) {
+        this.webhookUrl = webhook?.webhook_id ? `${this.serverBaseURL}webhook/${webhook.webhook_id}` : null;
+      } else {
+        this.logger.warn("[CDS-header] Webhook non trovato per chatbot_id:", chatbot_id);
+        return;
+      }
+      this.logger.log("[CDS-header] chatbot_id:", chatbot_id, webhook);
+      const resp = await lastValueFrom(this.webhookService.preloadWebhook(this.webhookId));
+      if (!resp?.request_id) {
+        this.logger.warn("[CDS-header] request_id non trovato");
+        return;
+      }
+      return resp.request_id;
+    } catch (error) {
+      this.logger.error("[CDS-header] Errore in starterLog:", error);
+    }
+  }
 
 
   async getToken(request_id): Promise<any|null> {
@@ -496,51 +505,11 @@ export class CdsHeaderComponent implements OnInit {
     } catch (error: any) {
       this.logger.error('[CDS-header] getToken error::', error);
       if (error.status && error.status === 401) {
-        // error
+      // error
       }
       return null;
     }
   }
-
-
-  async webhookStarterLog() {
-    try {
-        const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
-        if (chatbotSubtype !== TYPE_CHATBOT.WEBHOOK && chatbotSubtype !== TYPE_CHATBOT.COPILOT) {
-          return;
-        }
-        const chatbot_id = this.dashboardService.id_faq_kb;
-        const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
-        this.webhookId = webhook?.webhook_id;
-        if (webhook?.webhook_id) {
-          this.webhookUrl = webhook?.webhook_id ? `${this.serverBaseURL}webhook/${webhook.webhook_id}` : null;
-        } else {
-          this.logger.warn("[CDS-header] Webhook non trovato per chatbot_id:", chatbot_id);
-          return;
-        }
-
-        this.logger.log("[CDS-header] chatbot_id:", chatbot_id, webhook);
-        const resp = await lastValueFrom(this.webhookService.preloadWebhook(this.webhookId));
-        if (!resp?.request_id) {
-          this.logger.warn("[CDS-header] request_id non trovato");
-          return;
-        }
-
-        return resp.request_id;
-        // this.logger.log("[CDS-header] request_id:", resp);
-        // const tokenResp = await this.getToken(resp.request_id);
-        // if (!tokenResp) {
-        //   this.logger.warn("[CDS-header] Token non ottenuto");
-        //   return;
-        // }
-        // const mqtt_token = tokenResp.token || null;
-        // const request_id = tokenResp.request_id || null;
-        // this.logService.starterLog(mqtt_token, request_id);
-    } catch (error) {
-        this.logger.error("[CDS-header] Errore in starterLog:", error);
-    }
-  }
-
 
   stopWebhook(){
     this.webhookService.deleteWebhook(this.webhookId).subscribe({ next: (resp: any)=> {
