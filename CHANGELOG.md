@@ -8,6 +8,41 @@
 *Tiledesk SRL*
 
 
+# 1.36.0
+
+
+# 1.35.0-rc11
+- **bug-fixed**: Start log of a chatbot or webhook
+- **bug-fixed**: Stop and restart log on webhook regeneration
+
+# 1.35.0-rc10
+- **bug-fixed**: create a webhook when chatbot starts only if chatbot automation
+
+# 1.35.0-rc9
+- **bug-fixed**: enabled chunks_only check and pass chunks_only var in ActionAskGPTV2
+
+# 1.35.0-rc8
+- **bug-fixed**: enabled chunks_only check and pass chunks_only var in ActionAskGPTV2
+- **added**: added findAndUpdateProperty TTS_MODEL and STT_MODEL in voice-settings
+
+# 1.35.0-rc7
+- **bug-fixed**: css chunks list in ActionAskGPTV2
+
+# 1.35.0-rc6
+- **added**: Show used chunks in ActionAskGPTV2
+
+# 1.35.0-rc5
+- **bug-fixed**: Changed action param "aplpha" to "alpha" in ActionAskGPTV2
+
+# 1.35.0-rc4
+- **bug-fixed**: Changed chunksOnly to chunks_only in ActionAskGPTV2
+- **bug-fixed**: Create webhooks only when chatbotSubtype !== chatbot on startup.
+
+# 1.35.0-rc3
+- **added**: added "search only" parameter and filter on parameter in kb
+- **changed**: in connector selection the connectable blocks are in alphabetical order (in go to block)
+- **changed**: in replace AI agent the slug in brackets is added if it exists
+
 # 1.35.0-rc2
 - **changed**: New log level supported (native)
 - **added**: Added to Flow Logs action the log level
