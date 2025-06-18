@@ -342,7 +342,7 @@
 .footer-intent:hover>.csd-open-action-menu-btn-wpr,
 .add--action-placeholder:hover .csd-open-action-menu-btn-wpr {
   opacity: 1;
-  transform: translate3d(0, 00px, 0);
+  transform: translate3d(0, 0px, 0);
   transition: 0.25s all ease-in-out;
 }
 
@@ -648,7 +648,8 @@ cds-panel-intent-header.isStart ::ng-deep{
   padding: 12px 6px;
   border-style: dashed;
   // background: rgba(62, 169, 245, 0.1);
-  background: rgba(221, 228, 234, .8);
+  // background: rgba(221, 228, 234, .8);
+  background: rgb(255, 255, 255);
 }
 
 .add--action-placeholder-add-icon span {

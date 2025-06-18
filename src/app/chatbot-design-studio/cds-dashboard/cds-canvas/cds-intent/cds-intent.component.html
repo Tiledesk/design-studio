@@ -6,7 +6,7 @@
         'background-color': 'rgba('+intent.attributes.color+', 0.35)',
         'outline': intentService.intentSelectedID === intent.intent_id && intentService.intentActive ? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
       }"
-    (click)="$event.stopPropagation();openWebhookIntentPanel(intent)">
+    (click)="$event.stopPropagation();onOpenWebhookIntentPanel(intent)">
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
     <cds-connector-in *ngIf="!isStart && alphaConnectors < 1 && connectorsIn?.length>0"
@@ -63,7 +63,7 @@
         cdkDropList
         [cdkDropListData]="listOfActions"
         (cdkDropListDropped)="onDropAction($event)"
-        [cdkDropListEnterPredicate]="canEnterDropList(intent)">
+        [cdkDropListEnterPredicate]="onCanEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
@@ -83,7 +83,7 @@
             </div>
 
             <div class="csd-open-action-menu-btn-wpr">
-                <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+                <div #openActionMenuBtn (click)="$event.stopPropagation();onOpenActionMenu(intent, 'add-action-btn')"
                     class="cds-add-action-btn">    
                     + {{ 'CDSCanvas.AddAction' | translate}}
                 </div>
@@ -510,7 +510,7 @@
 
     <div class="footer-intent">
         <div *ngIf="!isStart && listOfActions?.length > 0" class="csd-open-action-menu-btn-wpr">
-            <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
+            <div #openActionMenuBtn (click)="$event.stopPropagation();onOpenActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">    
                 + {{ 'CDSCanvas.AddAction' | translate}}
             </div>
