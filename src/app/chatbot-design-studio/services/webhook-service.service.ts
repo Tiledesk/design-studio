@@ -111,6 +111,8 @@ export class WebhookService {
   }
 
 
+
+
   checkIfThereIsWebResponse(){
     const listOfIntents = this.intentService.listOfIntents;
     let thereIsWebResponse = false;
@@ -198,46 +200,6 @@ export class WebhookService {
     this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
     return this._httpClient.post<any>(url, JSON.stringify(body), httpOptions);
   }
-
-
-
-    preloadWebhook(webhook_id: string){
-      this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
-      this.logger.log('[WEBHOOK_URL.SERV] preloadWebhook');
-      const httpOptions = {
-        headers: new HttpHeaders({
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': this.tiledeskToken
-        })
-      };
-      let body = { };
-      let url = this.WEBHOOK_URL + '/webhooks/preload/' + webhook_id;
-      this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
-      return this._httpClient.post<any>(url, JSON.stringify(body), httpOptions);
-  }
-
-    // preloadWebhook(tiledeskToken: string, id_project: string, webhook_id: string) {
-    //   const headers = new HttpHeaders({
-    //     'Content-type': 'application/json',
-    //     Authorization: tiledeskToken
-    //   });
-    //   const requestOptions = { headers: headers };
-    //   const postData = {};
-    //   this.logger.log('[TILEDESK-AUTH-SERV] - createNewRequestId webhook_id: ', webhook_id);
-    //   const that = this;
-    //   let URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID = this.SERVER_BASE_URL + id_project+ '/webhooks/preload/'+webhook_id;
-    //   this.logger.log('[TILEDESK-AUTH-SERV] - URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID2: ', URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID);
-    //   return new Promise((resolve, reject) => {
-    //     this.http.post(URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID, postData, requestOptions).subscribe({next: (data)=>{
-    //       if (data) {
-    //         resolve(data);
-    //       }
-    //     }, error: (error)=>{
-    //       reject(error)
-    //     }})
-    //   });
-    // }
 
 
 }
