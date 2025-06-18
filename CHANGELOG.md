@@ -8,8 +8,8 @@
 *Tiledesk SRL*
 
 
-# 1.35.0-rc12
-- **bug-fixed**: show first log message via static service call
+# 1.36.0-rc1
+- **added**: support for elevenLabs voices for voice_twilio chatbot 
 
 # 1.36.0
 
