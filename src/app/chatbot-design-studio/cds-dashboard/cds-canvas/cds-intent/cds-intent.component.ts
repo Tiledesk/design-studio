@@ -65,13 +65,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Evento emesso quando il componente è stato renderizzato */
   @Output() componentRendered = new EventEmitter<string>();
   /** Evento emesso quando viene selezionata una domanda (deprecato) */
-  @Output() questionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
-  /** Evento emesso quando viene selezionata una risposta (deprecato) */
-  @Output() answerSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
+  @Output() questionSelected = new EventEmitter();
   /** Evento emesso quando viene selezionato un form (deprecato) */
-  @Output() formSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
+  @Output() formSelected = new EventEmitter();
   /** Evento emesso quando viene selezionata un'azione (deprecato) */
-  @Output() actionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
+  @Output() actionSelected = new EventEmitter();
 
   /** Evento emesso quando viene eliminata un'azione */
   @Output() actionDeleted = new EventEmitter();
@@ -782,7 +780,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Inizializza gli attributi se non esistono e imposta il colore di default se non specificato.
    */
   private setIntentAttributes(): void {
-    this.intentService.setIntentAttributes(this.intent);
+    this.intentColor = this.intentService.setIntentAttributes(this.intent);
   }
 
   /**
@@ -827,7 +825,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Configura le azioni dell'intent.
    */
   private configureIntentActions(): void {
-    this.listOfActions = this.intent.actions;
+        this.listOfActions = this.intent.actions;
     this.logger.debug("[CDS-INTENT] Azioni configurate:", this.listOfActions?.length || 0);
   }
 
@@ -894,10 +892,81 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   // =============================
-  // EVENT HANDLERS - FUNZIONI CHIAMATE DAL FILE HTML
+  // TEMPLATE HELPER METHODS
   // =============================
-  // Queste funzioni gestiscono gli eventi provenienti dal template HTML
-  // e rappresentano l'interfaccia tra la vista e la logica del componente
+
+  /**
+   * Genera gli stili dinamici per l'intent
+   * Ottimizza le performance evitando calcoli inline nel template
+   * 
+   * @returns Oggetto con gli stili CSS per l'intent
+   */
+  getIntentStyles(): { [key: string]: string } {
+    if (!this.intent?.attributes?.color) {
+      return {};
+    }
+
+    const color = this.intent.attributes.color;
+    const isSelected = this.intentService.intentSelectedID === this.intent.intent_id && this.intentService.intentActive;
+    
+    return {
+      'background-color': `rgba(${color}, 0.35)`,
+      'outline': isSelected ? `2px solid rgba(${color}, 1)` : 'none'
+    };
+  }
+
+  /**
+   * Genera gli stili dinamici per l'azione
+   * Ottimizza le performance evitando calcoli inline nel template
+   * 
+   * @param action - L'azione per cui generare gli stili
+   * @returns Oggetto con gli stili CSS per l'azione
+   */
+  getActionStyles(action: Action): { [key: string]: string } {
+    if (!this.intent?.attributes?.color || !action?._tdActionId) {
+      return {};
+    }
+
+    const color = this.intent.attributes.color;
+    const isSelected = this.intentService.actionSelectedID === action._tdActionId;
+    
+    return {
+      'outline': isSelected ? `2px solid rgba(${color}, 1)` : 'none'
+    };
+  }
+
+  /**
+   * Funzione trackBy per ottimizzare il rendering della lista azioni
+   * Evita re-rendering non necessari durante il drag & drop
+   * 
+   * @param index - Indice dell'elemento
+   * @param action - L'azione corrente
+   * @returns ID univoco dell'azione
+   */
+  trackByActionId(index: number, action: Action): string {
+    return action?._tdActionId || `action-${index}`;
+  }
+
+  /**
+   * Verifica se un'azione è considerata "featured" (principale)
+   * Semplifica la logica condizionale nel template
+   * 
+   * @param action - L'azione da verificare
+   * @returns true se l'azione è featured, false altrimenti
+   */
+  isFeaturedAction(action: Action): boolean {
+    if (!action?._tdActionType) {
+      return false;
+    }
+
+    return action._tdActionType === TYPE_ACTION.REPLY || 
+           action._tdActionType === TYPE_ACTION_VXML.DTMF_FORM || 
+           action._tdActionType === TYPE_ACTION_VXML.BLIND_TRANSFER;
+  }
+
+  // =============================
+  // EVENT HANDLERS - CALLED FROM HTML TEMPLATE
+  // =============================
 
   /**
    * Gestisce la selezione di un'azione nell'intent
@@ -905,8 +974,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * @param index - L'indice dell'azione nella lista
    * @param idAction - Il tipo di selezione (HAS_SELECTED_TYPE)
    */
-  onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE): void {
-    this.logger.log('[CDS-INTENT] onSelectAction - action:', action, 'index:', index, 'idAction:', idAction);
+  onActionSelect(action: any, index: number, idAction: HAS_SELECTED_TYPE): void {
+    this.logger.log('[CDS-INTENT] onActionSelect - action:', action, 'index:', index, 'idAction:', idAction);
     
     // Imposta il tipo di elemento selezionato
     this.elementTypeSelected = idAction;
@@ -926,8 +995,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Gestisce la selezione della domanda dell'intent
    * @param elementSelected - Il tipo di elemento selezionato (HAS_SELECTED_TYPE.QUESTION)
    */
-  onSelectQuestion(elementSelected: HAS_SELECTED_TYPE): void {
-    this.logger.log('[CDS-INTENT] onSelectQuestion - elementSelected:', elementSelected, 'question:', this.intent.question);
+  onQuestionSelect(elementSelected: HAS_SELECTED_TYPE): void {
+    this.logger.log('[CDS-INTENT] onQuestionSelect - elementSelected:', elementSelected, 'question:', this.intent.question);
     
     // Imposta il tipo di elemento selezionato
     this.elementTypeSelected = elementSelected;
@@ -943,8 +1012,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Gestisce la selezione del form dell'intent
    * @param elementSelected - Il tipo di elemento selezionato (HAS_SELECTED_TYPE.FORM)
    */
-  onSelectForm(elementSelected: HAS_SELECTED_TYPE): void {
-    this.logger.log('[CDS-INTENT] onSelectForm - elementSelected:', elementSelected);
+  onFormSelect(elementSelected: HAS_SELECTED_TYPE): void {
+    this.logger.log('[CDS-INTENT] onFormSelect - elementSelected:', elementSelected);
     
     // Imposta il tipo di elemento selezionato
     this.elementTypeSelected = elementSelected;
@@ -955,7 +1024,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // Crea un nuovo form se non esiste
     if (this.intent && !this.intent.form) {
       this.intent.form = new Form();
-      this.logger.log('[CDS-INTENT] onSelectForm - Creato nuovo form per intent:', this.intent.intent_id);
+      this.logger.log('[CDS-INTENT] onFormSelect - Creato nuovo form per intent:', this.intent.intent_id);
     }
     
     // Emette l'evento con il form dell'intent
@@ -968,13 +1037,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * @param action - L'azione su cui eseguire il controllo
    * @param index - L'indice dell'azione nella lista
    */
-  onClickControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number): void {
-    this.logger.log('[CDS-INTENT] onClickControl - event:', event, 'action:', action);
+  onActionControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number): void {
+    this.logger.log('[CDS-INTENT] onActionControl - event:', event, 'action:', action);
     
     switch (event) {
       case 'edit':
         // Seleziona l'azione per la modifica
-        this.onSelectAction(action, index, action._tdActionId);
+        this.onActionSelect(action, index, action._tdActionId);
         break;
         
       case 'delete':
@@ -995,7 +1064,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         break;
         
       default:
-        this.logger.warn('[CDS-INTENT] onClickControl - Evento non gestito:', event);
+        this.logger.warn('[CDS-INTENT] onActionControl - Evento non gestito:', event);
         break;
     }
   }
@@ -1004,125 +1073,145 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Gestisce gli eventi di tastiera per le azioni
    * @param event - L'evento di tastiera
    */
-  onKeydown(event: KeyboardEvent): void {
-    this.logger.log('[CDS-INTENT] onKeydown - key:', event.key);
+  onKeyPress(event: KeyboardEvent): void {
+    this.logger.log('[CDS-INTENT] onKeyPress - key:', event.key);
     
     // Chiavi che attivano l'eliminazione dell'azione selezionata
     const deleteKeys = ['Backspace', 'Escape', 'Canc'];
     
     if (deleteKeys.includes(event.key)) {
-      this.logger.log('[CDS-INTENT] onKeydown - Eliminazione azione selezionata tramite tasto:', event.key);
+      this.logger.log('[CDS-INTENT] onKeyPress - Eliminazione azione selezionata tramite tasto:', event.key);
       this.intentService.deleteSelectedAction();
     }
   }
 
-  public onDragMove(event: CdkDragMove): void {
+  /**
+   * Gestisce il movimento del drag preview durante il drag & drop
+   * @param event - L'evento di movimento del drag
+   */
+  public onDragPreviewMove(event: CdkDragMove): void {
     const element = document.getElementById('customDragPreview');
     if (element) {
+      // Calcola la posizione del preview con offset per centrarlo
       const xPos = event.pointerPosition.x - 122;
       const yPos = event.pointerPosition.y - 20;
       element.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
     }
 }
 
-  onDragStarted(event, previousIntentId, index) {
+  /**
+   * Gestisce l'inizio del drag & drop di un'azione
+   * @param event - L'evento di drag
+   * @param previousIntentId - ID dell'intent precedente
+   * @param index - Indice dell'azione
+   */
+  onDragStart(event: any, previousIntentId: string, index: number): void {
+    this.logger.log('[CDS-INTENT] onDragStart - event:', event, 'previousIntentId:', previousIntentId, 'index:', index);
+    
+    // Chiude il pannello dei dettagli dell'azione
     this.controllerService.closeActionDetailPanel();
-    this.logger.log('[CDS-INTENT] onDragStarted event ', event, 'previousIntentId ', previousIntentId);
-    this.logger.log('[CDS-INTENT] onDragStarted index ', index);
+    
+    // Imposta l'ID dell'intent precedente e lo stato di dragging
     this.intentService.setPreviousIntentId(previousIntentId);
     this.isDragging = true;
-    this.logger.log('[CDS-INTENT] isDragging - onDragStarted', this.isDragging)
+    this.logger.log('[CDS-INTENT] onDragStart - isDragging:', this.isDragging);
     
+    // Ottiene i riferimenti agli elementi del placeholder
     const actionDragPlaceholder = document.querySelector('.action-drag-placeholder');
     const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
 
-    this.logger.log('[CDS-INTENT] onDragStarted actionDragPlaceholder', actionDragPlaceholder)
-    this.logger.log('[CDS-INTENT] onDragStarted addActionPlaceholderEl ', addActionPlaceholderEl)
-    const myObserver = new ResizeObserver(entries => {
+    this.logger.log('[CDS-INTENT] onDragStart - actionDragPlaceholder:', actionDragPlaceholder);
+    this.logger.log('[CDS-INTENT] onDragStart - addActionPlaceholderEl:', addActionPlaceholderEl);
+    
+    // Crea un observer per monitorare il ridimensionamento del placeholder
+    const resizeObserver = new ResizeObserver(entries => {
       entries.forEach(entry => {
-        this.actionDragPlaceholderWidth = entry.contentRect.width
-        this.logger.log('[CDS-INTENT] width actionDragPlaceholderWidth', this.actionDragPlaceholderWidth);
-        if (this.actionDragPlaceholderWidth <= 270) {
-          this.hideActionDragPlaceholder = false;
-          this.logger.log('[CDS-INTENT] Hide action drag placeholder', this.hideActionDragPlaceholder);
-          if (actionDragPlaceholder instanceof HTMLElement) {
-            actionDragPlaceholder.style.opacity = '1';
-          }
-          if (addActionPlaceholderEl instanceof HTMLElement) {
-            addActionPlaceholderEl.style.opacity = '0';
-          }
-          this.logger.log('[CDS-INTENT] HERE 1 !!!! ');
-        } else {
-          this.hideActionDragPlaceholder = true;
-          this.logger.log('[CDS-INTENT] Hide action drag placeholder', this.hideActionDragPlaceholder);
-          if (actionDragPlaceholder instanceof HTMLElement) {
-            actionDragPlaceholder.style.opacity = '0';
-          }
-          if (addActionPlaceholderEl instanceof HTMLElement) {
-            addActionPlaceholderEl.style.opacity = '1';
-          }
-          this.logger.log('[CDS-INTENT] HERE 2 !!!! ');
-        }
+        this.actionDragPlaceholderWidth = entry.contentRect.width;
+        this.logger.log('[CDS-INTENT] onDragStart - placeholder width:', this.actionDragPlaceholderWidth);
+        
+        // Gestisce la visibilità dei placeholder in base alla larghezza
+        this.handlePlaceholderVisibility(actionDragPlaceholder, addActionPlaceholderEl);
       });
     });
-    myObserver.observe(actionDragPlaceholder);
+    
+    // Inizia a osservare il placeholder
+    if (actionDragPlaceholder) {
+      resizeObserver.observe(actionDragPlaceholder);
+    }
   }
 
-  onDragEnded(event, index) {
-    this.logger.log('[CDS-INTENT] onDragEnded: ', event, this.intent.intent_id);
+  /**
+   * Gestisce la fine del drag & drop di un'azione
+   * @param event - L'evento di drag
+   * @param index - Indice dell'azione
+   */
+  onDragEnd(event: any, index: number): void {
+    this.logger.log('[CDS-INTENT] onDragEnd - event:', event, 'intentId:', this.intent.intent_id, 'index:', index);
+    
+    // Resetta lo stato di dragging
     this.isDragging = false;
+    
+    // Aggiorna i connettori dell'intent
     this.connectorService.updateConnector(this.intent.intent_id);
   }
 
-  async onDropAction(event: CdkDragDrop<string[]>) {
-    this.logger.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
+  /**
+   * Gestisce il drop di un'azione nell'intent
+   * @param event - L'evento di drop
+   */
+  async onActionDrop(event: CdkDragDrop<string[]>): Promise<void> {
+    this.logger.log('[CDS-INTENT] onActionDrop - event:', event, 'actions:', this.intent.actions);
+    
+    // Chiude tutti i pannelli e seleziona l'intent
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
+    
     if (event.previousContainer === event.container) {
-      moveItemInArray(this.intent.actions, event.previousIndex, event.currentIndex);
-      this.intentService.updateIntent(this.intent, null);
+      // Spostamento all'interno dello stesso container
+      this.handleInternalDrop(event);
     } else {
-      try {
-        let action: any = event.previousContainer.data[event.previousIndex];
-        if (event.previousContainer.data.length > 0) {
-          if (action._tdActionType) {
-            this.logger.log("[CDS-INTENT] onDropAction sposto la action tra 2 intent differenti");
-            this.intentService.moveActionBetweenDifferentIntents(event, action, this.intent.intent_id);
-            this.intentService.updateIntent(this.intent, null);
-            this.connectorService.updateConnectorsOfBlock(this.intent.intent_id)
-          } else if (action.value?.type) {
-            this.logger.log("[CDS-INTENT] onDropAction aggiungo una nuova action all'intent da panel elements - action ", this.newActionCreated);
-            this.intentService.moveNewActionIntoIntent(event.currentIndex, action, this.intent.intent_id);
-          }
-        }
-      } catch (error) {
-        console.error(error);
-      }
+      // Spostamento tra container diversi
+      await this.handleExternalDrop(event);
     }
   }
 
-  public async onUpdateAndSaveAction(object) {
-    let connector = null;
-    if(object?._tdActionId){
+  /**
+   * Gestisce l'aggiornamento e il salvataggio di un'azione
+   * @param object - L'oggetto azione da aggiornare
+   */
+  public async onActionUpdate(object: any): Promise<void> {
+    this.logger.log('[CDS-INTENT] onActionUpdate - object:', object);
+    
+    // Aggiorna l'azione nella lista se ha un ID
+    if (object?._tdActionId) {
       this.intent.actions = replaceItemInArrayForKey('_tdActionId', this.intent.actions, object);
+      this.logger.log('[CDS-INTENT] onActionUpdate - Azione aggiornata nella lista');
     }
-    this.logger.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
+    
+    // Salva l'intent aggiornato
     this.intentService.updateIntent(this.intent);
+    this.logger.log('[CDS-INTENT] onActionUpdate - Intent salvato');
   }
 
-  onOptionClicked(event: 'webhook' | 'color' | 'delete' | 'test' | 'copy' | 'open'){
-    switch(event){
+  /**
+   * Gestisce i click sulle opzioni dell'intent (webhook, color, delete, test, copy, open)
+   * @param event - Il tipo di evento selezionato
+   */
+  onIntentOptionClick(event: 'webhook' | 'color' | 'delete' | 'test' | 'copy' | 'open'): void {
+    this.logger.log('[CDS-INTENT] onIntentOptionClick - event:', event);
+    
+    switch (event) {
       case 'webhook':
         this.toggleIntentWebhook(this.intent);
         break;
       case 'color':
-        this.onColorIntent(this.intent)
+        this.onIntentColorChange(this.intent);
         break;
       case 'delete':
-        this.onDeleteIntent(this.intent)
+        this.onIntentDelete(this.intent);
         break;
       case 'test':
-        this.onOpenTestItOut();
+        this.onIntentTest();
         break;
       case 'copy':
         this.copyIntent();
@@ -1130,18 +1219,37 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       case 'open':
         this.openIntentPanel(this.intent);
         break;
+      default:
+        this.logger.warn('[CDS-INTENT] onIntentOptionClick - Evento non gestito:', event);
+        break;
     }
   }
 
-  onOpenTestItOut(){
+  /**
+   * Apre la modalità di test per l'intent
+   */
+  onIntentTest(): void {
+    this.logger.log('[CDS-INTENT] onIntentTest - Apertura test per intent:', this.intent.intent_id);
     this.intentService.openTestItOut(this.intent);
   }
 
-  onDeleteIntent(intent: Intent) {
+  /**
+   * Gestisce l'eliminazione di un intent
+   * @param intent - L'intent da eliminare
+   */
+  onIntentDelete(intent: Intent): void {
+    this.logger.log('[CDS-INTENT] onIntentDelete - Eliminazione intent:', intent.intent_id);
     this.deleteIntent.emit(intent);
   }
 
-  onColorIntent(intent: Intent) {
+  /**
+   * Gestisce il cambio colore di un intent
+   * @param intent - L'intent per cui cambiare il colore
+   */
+  onIntentColorChange(intent: Intent): void {
+    this.logger.log('[CDS-INTENT] onIntentColorChange - Cambio colore per intent:', intent.intent_id);
+    
+    // Seleziona l'intent e emette l'evento di cambio colore
     this.intentService.setIntentSelected(this.intent.intent_id);
     this.changeColorIntent.emit(intent);
   }
@@ -1150,9 +1258,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Gestisce l'evento di click per aprire il pannello webhook dell'intent
    * @param intent - L'intent per cui aprire il pannello webhook
    */
-  onOpenWebhookIntentPanel(intent: Intent) {
-    const webhookIntent = this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK ? true : false;
+  onWebhookPanelOpen(intent: Intent): void {
+    const webhookIntent = this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK;
     if (webhookIntent) {
+      this.logger.log('[CDS-INTENT] onWebhookPanelOpen - Apertura pannello webhook per intent:', intent.intent_id);
       this.openIntentPanel(intent);
     }
   }
@@ -1162,19 +1271,32 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * @param intent - L'intent per cui aprire il menu
    * @param calleBy - Identificatore del chiamante per posizionamento
    */
-  onOpenActionMenu(intent: any, calleBy: string) {
-    this.logger.log('[CDS-INTENT] onOpenActionMenu > intent ', intent)
-    this.logger.log('[CDS-INTENT] onOpenActionMenu > calleBy ', calleBy)
-    const openActionMenuElm = this.openActionMenuBtnRef.nativeElement.getBoundingClientRect()
-    let xOffSet = openActionMenuElm.width + 10
+  onActionMenuOpen(intent: any, calleBy: string): void {
+    this.logger.log('[CDS-INTENT] onActionMenuOpen - intent:', intent, 'calleBy:', calleBy);
+    
+    // Calcola la posizione del menu
+    const openActionMenuElm = this.openActionMenuBtnRef.nativeElement.getBoundingClientRect();
+    let xOffSet = openActionMenuElm.width + 10;
+    
+    // Aggiusta l'offset per il placeholder di aggiunta azione
     if (calleBy === 'add-action-placeholder') {
-      xOffSet = 277
+      xOffSet = 277;
     }
-    let buttonXposition = openActionMenuElm.x + xOffSet
-    let buttonYposition = openActionMenuElm.y
-    this.logger.log('[CDS-INTENT] onOpenActionMenu > openActionMenuBtnRef ', openActionMenuElm)
-    this.logger.log('[CDS-INTENT] onOpenActionMenu > buttonXposition ', buttonXposition)
-    const data = { 'x': buttonXposition, 'y': buttonYposition, 'intent': intent, 'addAction': true };
+    
+    const buttonXposition = openActionMenuElm.x + xOffSet;
+    const buttonYposition = openActionMenuElm.y;
+    
+    this.logger.log('[CDS-INTENT] onActionMenuOpen - Posizione calcolata:', { x: buttonXposition, y: buttonYposition });
+    
+    // Prepara i dati per l'emissione dell'evento
+    const data = { 
+      'x': buttonXposition, 
+      'y': buttonYposition, 
+      'intent': intent, 
+      'addAction': true 
+    };
+    
+    // Seleziona l'intent e mostra il pannello delle azioni
     this.intentService.setIntentSelected(this.intent.intent_id);
     this.showPanelActions.emit(data);
   }
@@ -1184,9 +1306,104 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * @param action - L'azione per cui verificare la possibilità di inserimento
    * @returns Funzione che restituisce sempre true (tutti gli elementi possono essere inseriti)
    */
-  onCanEnterDropList(action: any) {
-    return (item: CdkDrag<any>) => {
-      return true
+  onDropListEnterCheck(action: any): (item: CdkDrag<any>) => boolean {
+    return (item: CdkDrag<any>): boolean => {
+      return true;
+    };
+  }
+
+  /**
+   * Gestisce l'evento di visualizzazione dei connettori in entrata
+   */
+  onConnectorsInShow(): void {
+    this.logger.log('[CDS-INTENT] onConnectorsInShow - Mostrando connettori in entrata');
+    // Implementazione per mostrare i connettori in entrata
+  }
+
+  /**
+   * Gestisce l'evento di nascondimento dei connettori in entrata
+   */
+  onConnectorsInHide(): void {
+    this.logger.log('[CDS-INTENT] onConnectorsInHide - Nascondendo connettori in entrata');
+    // Implementazione per nascondere i connettori in entrata
+  }
+
+  /**
+   * Gestisce la visibilità dei placeholder durante il drag & drop
+   * @param actionDragPlaceholder - Elemento placeholder per il drag
+   * @param addActionPlaceholderEl - Elemento placeholder per aggiungere azioni
+   */
+  private handlePlaceholderVisibility(actionDragPlaceholder: Element | null, addActionPlaceholderEl: Element | null): void {
+    const threshold = 270;
+    
+    if (this.actionDragPlaceholderWidth <= threshold) {
+      // Mostra il placeholder del drag e nasconde quello di aggiunta
+      this.hideActionDragPlaceholder = false;
+      this.updatePlaceholderOpacity(actionDragPlaceholder, addActionPlaceholderEl, '1', '0');
+      this.logger.log('[CDS-INTENT] handlePlaceholderVisibility - Mostrando placeholder drag');
+    } else {
+      // Nasconde il placeholder del drag e mostra quello di aggiunta
+      this.hideActionDragPlaceholder = true;
+      this.updatePlaceholderOpacity(actionDragPlaceholder, addActionPlaceholderEl, '0', '1');
+      this.logger.log('[CDS-INTENT] handlePlaceholderVisibility - Nascondendo placeholder drag');
+    }
+  }
+
+  /**
+   * Aggiorna l'opacità degli elementi placeholder
+   * @param actionDragPlaceholder - Elemento placeholder per il drag
+   * @param addActionPlaceholderEl - Elemento placeholder per aggiungere azioni
+   * @param dragOpacity - Opacità per il placeholder del drag
+   * @param addOpacity - Opacità per il placeholder di aggiunta
+   */
+  private updatePlaceholderOpacity(
+    actionDragPlaceholder: Element | null, 
+    addActionPlaceholderEl: Element | null, 
+    dragOpacity: string, 
+    addOpacity: string
+  ): void {
+    if (actionDragPlaceholder instanceof HTMLElement) {
+      actionDragPlaceholder.style.opacity = dragOpacity;
+    }
+    if (addActionPlaceholderEl instanceof HTMLElement) {
+      addActionPlaceholderEl.style.opacity = addOpacity;
+    }
+  }
+
+  /**
+   * Gestisce il drop interno (stesso container)
+   * @param event - L'evento di drop
+   */
+  private handleInternalDrop(event: CdkDragDrop<string[]>): void {
+    this.logger.log('[CDS-INTENT] handleInternalDrop - Spostamento interno');
+    moveItemInArray(this.intent.actions, event.previousIndex, event.currentIndex);
+    this.intentService.updateIntent(this.intent, null);
+  }
+
+  /**
+   * Gestisce il drop esterno (container diverso)
+   * @param event - L'evento di drop
+   */
+  private async handleExternalDrop(event: CdkDragDrop<string[]>): Promise<void> {
+    try {
+      const action: any = event.previousContainer.data[event.previousIndex];
+      
+      if (event.previousContainer.data.length > 0) {
+        if (action._tdActionType) {
+          // Spostamento di un'azione esistente tra intent diversi
+          this.logger.log('[CDS-INTENT] handleExternalDrop - Spostamento azione tra intent diversi');
+          this.intentService.moveActionBetweenDifferentIntents(event, action, this.intent.intent_id);
+          this.intentService.updateIntent(this.intent, null);
+          this.connectorService.updateConnectorsOfBlock(this.intent.intent_id);
+        } else if (action.value?.type) {
+          // Aggiunta di una nuova azione dall'elenco elementi
+          this.logger.log('[CDS-INTENT] handleExternalDrop - Aggiunta nuova azione da panel elements');
+          this.intentService.moveNewActionIntoIntent(event.currentIndex, action, this.intent.intent_id);
+        }
+      }
+    } catch (error) {
+      this.logger.error('[CDS-INTENT] handleExternalDrop - Errore durante il drop esterno:', error);
+      console.error(error);
     }
   }
 

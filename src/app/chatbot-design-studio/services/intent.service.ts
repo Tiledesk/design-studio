@@ -1901,17 +1901,17 @@ export class IntentService {
    * Inizializza gli attributi se non esistono e imposta il colore di default se non specificato.
    * 
    * @param intent - L'intent da configurare
+   * @returns Il colore dell'intent configurato
    */
-  public setIntentAttributes(intent: Intent): void {
+  public setIntentAttributes(intent: Intent): string {
     try {
       // Inizializza gli attributi se non esistono
       this.initializeIntentAttributes(intent);
-      
       // Configura il colore dell'intent
-      this.configureIntentColor(intent);
-      
+      return this.configureIntentColor(intent);
     } catch (error) {
       this.logger.error("[INTENT SERVICE] Errore nella configurazione degli attributi intent:", error);
+      return null;
     }
   }
 
@@ -1932,14 +1932,15 @@ export class IntentService {
    * Usa il colore esistente se presente, altrimenti imposta il colore di default.
    * 
    * @param intent - L'intent da configurare
+   * @returns Il colore dell'intent configurato
    */
-  private configureIntentColor(intent: Intent): void {
+  private configureIntentColor(intent: Intent): string {
     const existingColor = intent.attributes.color;
-    
     if (this.isValidColor(existingColor)) {
       this.logger.debug("[INTENT SERVICE] Colore intent configurato:", existingColor);
+      return existingColor;
     } else {
-      this.setDefaultIntentColor(intent);
+      return this.setDefaultIntentColor(intent);
     }
   }
 
@@ -1957,11 +1958,13 @@ export class IntentService {
    * Imposta il colore di default per l'intent.
    * 
    * @param intent - L'intent per cui impostare il colore di default
+   * @returns Il colore di default impostato
    */
-  private setDefaultIntentColor(intent: Intent): void {
+  private setDefaultIntentColor(intent: Intent): string {
     const defaultColor = '156,163,205'; // INTENT_COLORS.COLOR1
     intent.attributes.color = defaultColor;
     this.logger.debug("[INTENT SERVICE] Colore di default impostato:", defaultColor);
+    return defaultColor;
   }
 
   /**
