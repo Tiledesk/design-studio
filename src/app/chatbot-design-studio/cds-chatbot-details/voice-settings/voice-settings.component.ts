@@ -39,6 +39,10 @@ export class CDSVoiceSettingsComponent implements OnInit {
   voice_name: string;
   voice_language: string
 
+
+  //PLAYER audio (elevenlabs)
+  isPlaying: boolean = false;
+  private audio: HTMLAudioElement | null = null;
   
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
@@ -76,8 +80,6 @@ export class CDSVoiceSettingsComponent implements OnInit {
     if(this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals){
       this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));
     }
-
-    
    
   }
 
@@ -88,6 +90,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
     resp.forEach(voice => {
       voiceProviderList.find(el => el.key === 'elevenlabs').tts_voice.push({
         voiceId: voice.voice_id,
+        preview_url: voice.preview_url,
         name: voice.name, 
         type: 'standard',
         status: 'active'
@@ -143,6 +146,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
       };
       case 'TTS_VOICE_NAME':{
         this.findAndUpdateProperty("TTS_VOICE_NAME", event.voiceId)
+        this.voice_name = event.voiceId;
         break;
       };
       case 'TTS_MODEL':{
@@ -240,6 +244,32 @@ export class CDSVoiceSettingsComponent implements OnInit {
     }, () => {
       this.logger.debug("[CDS-CHATBOT-VOICE-SETTINGS]  saveAttributes *COMPLETE*");
     })
+  }
+
+
+  get selectedPreviewUrl(): string | null {
+    const selectedVoice = this.voice_name_list.find(voice => voice.voiceId === this.voice_name);
+    return selectedVoice ? selectedVoice.preview_url : null;
+  }
+
+  togglePlay(): void {
+    if (!this.audio) {
+      this.audio = new Audio(this.selectedPreviewUrl);
+
+      this.audio.addEventListener('ended', () => {
+        this.isPlaying = false;
+        this.audio = null;
+      });
+    }
+
+    if (this.isPlaying) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.isPlaying = false;
+    } else {
+      this.audio.play();
+      this.isPlaying = true;
+    }
   }
 
 
