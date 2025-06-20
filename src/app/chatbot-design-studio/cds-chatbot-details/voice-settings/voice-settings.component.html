@@ -46,7 +46,7 @@
                 <label class="cds-custom-label">
                 {{ 'CDSSetting.VoiceName' | translate }}
                 </label>
-                <div>
+                <div class="name-container">
                     <cds-select id="voiceName" #voiceName
                         [items]="voice_name_list" 
                         [bindLabelSelect]="'name'"
@@ -63,6 +63,11 @@
                         {{'BotsAddEditPage.SlugAlert' | translate}}
                         <a [href]="DOCS_LINK.chatbot_slug.link" [target]="DOCS_LINK.chatbot_slug.target">{{ 'LearnMore' | translate }}</a>
                     </span> -->
+                    <div *ngIf="selectedPreviewUrl" class="audio-player-circle d-flex justify-content-center align-items-center" (click)="togglePlay()">
+                        <span class="material-icons">
+                          {{ isPlaying ? 'pause_circle' : 'play_circle' }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
