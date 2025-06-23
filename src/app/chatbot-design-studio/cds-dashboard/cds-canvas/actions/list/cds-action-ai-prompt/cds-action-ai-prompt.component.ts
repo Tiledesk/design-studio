@@ -280,6 +280,10 @@ export class CdsActionAiPromptComponent implements OnInit {
     //this.action[property] = event;
     if(property === 'model'){
       this.action['labelModel'] = labelModel;
+    } else if (property === 'question'){
+      this.action['question'] = event;
+    } else if (property === 'context'){
+      this.action['context'] = event;
     }
     // this.checkVariables();
     // this.updateAndSaveAction.emit();

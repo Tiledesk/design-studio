@@ -227,9 +227,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-
   async ngOnInit(): Promise<void> {
-    //setTimeout(() => {
       this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
       if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
         this.showIntentOptions = false;
@@ -258,29 +256,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       else {
         this.setIntentSelected();
       }
-      // if (this.intent.actions && this.intent.actions.length === 1 && this.intent.actions[0]._tdActionType === TYPE_ACTION.INTENT && this.intent.intent_display_name === TYPE_INTENT_NAME.START) {
-      //   this.logger.log('CdsPanelIntentComponent START-->',this.intent.actions[0]); 
-      //   this.startAction = this.intent.actions[0];
-      //   this.isStart = true;
-      //   //** set 'start' intent as default selected one */
-      //   // this.intentService.setDefaultIntentSelected();
-
-      //   // //** center stage on 'start' intent */
-      //   // /let startElement = document.getElementById(this.intent.intent_id)
-      //   // /this.stageService.centerStageOnHorizontalPosition(startElement)
-      // } else {
-      //   this.setIntentSelected();
-      // }
-      // il setTimeout evita l'effetto che crea un connettore e poi lo sposta nel undo
       setTimeout(() => {
         this.setActionIntent();
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.addEventListener();
-      //this.setIntentAttributes();
-    //}, 10000);
+      this.setIntentAttributes();
   }
-
 
 
   async getWebhook(): Promise<string | null> {
