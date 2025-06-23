@@ -596,6 +596,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** closeAllPanels */
   private closeAllPanels(){
     this.controllerService.stopTestItOut();
+    
     if(this.IS_OPEN_PANEL_WIDGET){
       this.closePanelWidget();
     }
