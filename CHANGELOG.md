@@ -7,9 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.36.0-rc3
+- **bug-fixed**: updated textarea value in action AI prompt
+
 # 1.36.0-rc2
 - **added**: voice preview player for elevenlabs voices for voice_twilio chatbot type
-
 
 # 1.36.0-rc1
 - **added**: support for elevenLabs voices for voice_twilio chatbot 
