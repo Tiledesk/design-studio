@@ -10,6 +10,9 @@
 
 # 1.36.0
 
+# 1.35.2
+- **bug-fixed**: updated textarea value in action AI prompt
+
 # 1.35.1
 
 # 1.35.0-rc13
