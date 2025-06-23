@@ -268,11 +268,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   async getWebhook(): Promise<string | null> {
     try {
       const resp: any = await firstValueFrom(this.webhookService.getWebhook(this.chatbot_id));
-      this.logger.log("[cds-header] getWebhook : ", resp);
+      this.logger.log("[cds-intent] getWebhook : ", resp);
       const webhookUrl = resp?.webhook_id ? `${this.serverBaseURL}webhook/${resp.webhook_id}` : null;
       return webhookUrl;
     } catch (error) {
-      this.logger.log("[cds-header] error getWebhook: ", error);
+      this.logger.log("[cds-intent] error getWebhook: ", error);
       return null;
     }
   }
