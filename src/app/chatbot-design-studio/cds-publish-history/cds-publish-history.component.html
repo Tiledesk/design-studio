@@ -1,0 +1,149 @@
+
+<div class="publish-history-header-content">
+    <div class="publish-history-header">
+       {{'ReleaseHistory' | translate}}
+    </div>
+</div>
+<div class="publish-history-page-main-content">
+
+
+    <div class="no-release-container" *ngIf="releases?.length === 0">
+
+        <div class="no-release-title">
+            {{'NoReleaseHistoryAvailable' | translate}}
+        </div>
+
+        <div class="no-release-subtitle">
+            {{'PublishYourFlowToSeeTheReleaseHistoryAppearHere' | translate}}
+        </div>
+    </div>
+
+    <div class="publish-history-page-container">
+
+        <div class="vfui_1ss6mi9c vfui_1ss6mi9k vfui_1ss6mi9l vfui_1ss6mi928 publish-history-list">
+            <div class="vfui_1ss6mi9c vfui_1ss6mi9j vfui_1ss6mi9r vfui_1ss6mi9l vfui_1ss6mi928" style="gap: 12px;"
+                *ngFor="let release of releases; let last = last;  let i = index">
+
+                <div class="_149y0hi2 " [ngClass]="{ '_149y0hi3': !last }">
+                    <div class="vfui_176drylj vfui_176drylb vfui_176dryle vfui_176drylh"
+                        data-testid="publish-release-history-page__item__avatar">
+                        <div class="vfui_176dryl0" data-testid="publish-release-history-page__item__avatar__letter">
+                            
+                            <!-- Skeleton Avatar (loading) -->
+                            <div *ngIf="release.publishedBy?.loadingImage"
+                                class="avatar-skeleton">
+                            </div>
+
+                            <!-- Show profile image if available -->
+                            <img *ngIf="!release.publishedBy?.loadingImage && release.publishedBy?.hasImage" [src]="getUserImageUrl(release.publishedBy)"
+                                class="user-profile-photo" />
+
+                            <div *ngIf="!release.publishedBy?.loadingImage && !release.publishedBy?.hasImage" class="avatar-no-profile-photo"
+                                [ngStyle]="{'background': release.publishedBy.fillColour}">
+                                <div class="initials">
+                                    {{ release.publishedBy.fullname_initial }}
+                                </div>
+                            </div>
+                            <!-- <span class="vfui_176dryl2">
+                                {{ release.publishedBy.firstname.charAt(0) }}
+                            </span> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="release-item-wpr">
+                    <div class="vfui_1ss6mi9c vfui_1ss6mi9k vfui_1ss6mi9l vfui_1ss6mi928 release-item">
+                        <p class="vfui_ad6d3e0 vfui_ad6d3e5 vfui_ad6d3eh _149y0hi0"
+                            data-testid="publish-release-history-page__item__name">
+                            {{ release.formattedDate }}
+                        </p>
+                        <div class="vfui_ad6d3e0 vfui_ad6d3e7 _149y0hi1"
+                            data-testid="publish-release-history-page__item__description">
+                           
+
+                            <div class="clamped-wrapper" [ngClass]="{ 'expanded': expandedIndexes[i] }">
+                                <span #textRef class="clamped-text">
+                                    {{ release.release_note }}
+                                </span>
+                            </div>
+                           
+                            <a *ngIf="lineCounts[i] > 3" (click)="toggleExpand(i);  $event.stopPropagation()">
+                                <!-- {{ expandedIndexes[i] ? 'less' : 'more' }} -->
+                                <span *ngIf="expandedIndexes[i] ===  false"> 
+                                    {{ 'More' | translate}}
+                                </span>
+                                <span *ngIf="expandedIndexes[i] ===  true"> 
+                                    {{ 'Less' | translate}}
+                                </span>
+                            </a>
+
+                            <!-- Hidden clone to measure line count -->
+                            <div class="hidden-clone" #cloneRef>
+                                {{ release.release_note }}
+                            </div>
+                        </div>
+                        <div class="vfui_1ss6mi9c vfui_1ss6mi9j vfui_1ss6mi9l vfui_1ss6mi928 vfui_1ss6mi910">
+                            <div class="vfui_ad6d3e0 vfui_ad6d3e7 vfui_ad6d3ef"
+                                data-testid="publish-release-history-page__item__bullet-list__item"
+                                style="color: rgb(120, 127, 134);">
+                                {{ release.publishedBy.firstname }} 
+                                <span *ngIf="release.publishedBy.lastname && release.publishedBy.lastname !== ' '">
+                                    {{ release.publishedBy.lastname }} 
+                                </span>
+                            </div>
+                            <div class="vfui_1ss6mi9c vfui_1ss6mi9j vfui_1ss6mi9o vfui_1ss6mi9l vfui_1ss6mi928"
+                                style="padding: 0px 9px 0px 9px;">
+                                <span class="vfui_m8apfq0 vfui_m8apfq1"> </span>
+                            </div>
+                            <div class="vfui_ad6d3e0 vfui_ad6d3e7 vfui_ad6d3ef"
+                                data-testid="publish-release-history-page__item__bullet-list__item"
+                                style="color: rgb(120, 127, 134);">
+                                {{ release._id }}
+                                <!-- {{ release.publishedAt | amTimeAgo }} -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="restore-release" style="padding-left: 12px; padding-right: 6px;">
+                        <div class="restore-btn-wpr">
+                            <button type="button" class="restore-btn" (click)="restoreRelease(release)">
+                                {{'Restore' | translate}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="vfui_1ss6mi9c vfui_1ss6mi9j vfui_1ss6mi9r vfui_1ss6mi9l vfui_1ss6mi928" style="gap: 12px;">
+                <div class="_149y0hi2">
+                    <div class="vfui_176drylj vfui_176drylb vfui_176dryle vfui_176drylh"
+                        data-testid="publish-release-history-page__item__avatar">
+                        <div class="vfui_176dryl0" data-testid="publish-release-history-page__item__avatar__letter">
+                            <span class="vfui_176dryl2">N</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="vfui_1ss6mi9c vfui_1ss6mi9k vfui_1ss6mi9l vfui_1ss6mi928"
+                    style="width: 100%; padding: 4px 0px 0px 0px;">
+                    <p class="vfui_ad6d3e0 vfui_ad6d3e5 vfui_ad6d3eh _149y0hi0"
+                        data-testid="publish-release-history-page__item__name">
+                        V1
+                    </p>
+                    <div class="vfui_1ss6mi9c vfui_1ss6mi9j vfui_1ss6mi9l vfui_1ss6mi928 vfui_1ss6mi910">
+                        <div class="vfui_ad6d3e0 vfui_ad6d3e7 vfui_ad6d3ef"
+                            data-testid="publish-release-history-page__item__bullet-list__item"
+                            style="color: rgb(120, 127, 134);">
+                            Nicola Lanzilotto
+                        </div>
+                        <div class="vfui_1ss6mi9c vfui_1ss6mi9j vfui_1ss6mi9o vfui_1ss6mi9l vfui_1ss6mi928"
+                            style="padding: 0px 9px 0px 9px;">
+                            <span class="vfui_m8apfq0 vfui_m8apfq1"></span>
+                        </div>
+                        <div class="vfui_ad6d3e0 vfui_ad6d3e7 vfui_ad6d3ef"
+                            data-testid="publish-release-history-page__item__bullet-list__item"
+                            style="color: rgb(120, 127, 134);">Just now</div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+        <!-- ------------------------------------------------------- -->
+    </div>
+</div>

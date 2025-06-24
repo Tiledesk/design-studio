@@ -3,6 +3,9 @@ export class Namespace {
     id_project: string;
     default: boolean
     name: string;
+    engine: {
+        type: string;
+    }
     preview_settings: {
         model: string,
         max_tokens: number,

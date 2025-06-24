@@ -5,14 +5,16 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
 ]
 
 export const GOOGLE_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
-    { name: "Gemini-pro",         value: "gemini-pro",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
-    { name: "Gemini 1.5 Flash",   value: "gemini-1.5-flash",       description: "TYPE_GPT_MODEL.text-davinci-003.description",   status: "active" },
-    { name: "Gemini 2.0 Flash",   value: "gemini-2.0-flash",       description: "TYPE_GPT_MODEL.text-davinci-003.description",   status: "active" },
+    { name: "Gemini-pro",         value: "gemini-pro",              description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Gemini 1.5 Flash",   value: "gemini-1.5-flash",        description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Gemini 2.0 Flash",   value: "gemini-2.0-flash",        description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
 ]
 
 export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
-    { name: "Claude-3.5 Sonnet",                value: "claude-3-5-sonnet-20240620",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
-    { name: "Claude-3.7 Sonnet",                value: "claude-3-7-sonnet-20250219",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Claude-3.5 Sonnet",                value: "claude-3-5-sonnet-20240620",        description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Claude-3.7 Sonnet",                value: "claude-3-7-sonnet-20250219",        description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Claude Sonnet 4",                  value: "claude-sonnet-4-20250514",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Claude Opus 4",                    value: "claude-opus-4-20250514",            description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
 ]
 
 export const GROQ_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [

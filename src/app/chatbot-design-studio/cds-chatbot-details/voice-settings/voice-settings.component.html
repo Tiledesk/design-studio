@@ -1,0 +1,123 @@
+<div class="chatbot-voice-settings-wpr">
+    <div class="row">
+
+        <!--STEP 1: choose TWILIO / OpenAi provider -->
+        <div style="margin-bottom: 16px;">
+            <label class="cds-custom-label">
+                {{ 'CDSSetting.VoiceProvider' | translate }}
+            </label>
+            <div style="width: 40%;">
+                <cds-select id="voiceProvider" 
+                    [items]="voiceProviderList" 
+                    [bindLabelSelect]="'label'"
+                    [bindValueSelect]="'key'" 
+                    [itemSelected]="voiceProvider" 
+                    [placeholder]="'CDSSetting.SelectProvider' | translate"
+                    [clearable]="true" 
+                    (onSelected)="onSelect($event, 'VOICE_PROVIDER')"
+                    (onReset)="onResetSelect($event, 'VOICE_PROVIDER')">
+                </cds-select>
+            </div>
+        </div>
+
+        <!--STEP 2: choose TWILIO / OpenAi voice -->
+        <div class="voice-wrp" style="margin-bottom: 16px; width: 40%;">
+             <!-- show language list only for Twilio provider -->
+            <div *ngIf="voiceProvider === 'twilio'" class="voice-setting">
+                <label class="cds-custom-label">
+                {{ 'CDSSetting.VoiceLanguage' | translate }}
+                </label>
+                <div>
+                    <cds-select id="voiceLanguage" #voiceLanguage
+                        [items]="voice_language_list" 
+                        [bindLabelSelect]="'language'"
+                        [bindValueSelect]="'language_code'" 
+                        [optionalBindAdditionalText]="'description'"
+                        [itemSelected]="voice_language" 
+                        [placeholder]="'CDSSetting.SelectAnOption' | translate"
+                        [clearable]="true" 
+                        [searchable]="true"
+                        (onSelected)="onSelect($event, 'TTS_VOICE_LANGUAGE')"
+                        (onReset)="onResetSelect($event, 'TTS_VOICE_LANGUAGE')">
+                    </cds-select>
+                </div>
+            </div>
+            <div class="voice-setting">
+                <label class="cds-custom-label">
+                {{ 'CDSSetting.VoiceName' | translate }}
+                </label>
+                <div class="name-container">
+                    <cds-select id="voiceName" #voiceName
+                        [items]="voice_name_list" 
+                        [bindLabelSelect]="'name'"
+                        [bindValueSelect]="'voiceId'" 
+                        [optionalBindAdditionalText]="'description'"
+                        [itemSelected]="voice_name" 
+                        [placeholder]="'CDSSetting.SelectAnOption' | translate"
+                        [clearable]="true" 
+                        [searchable]="true"
+                        (onSelected)="onSelect($event, 'TTS_VOICE_NAME')"
+                        (onReset)="onResetSelect($event, 'TTS_VOICE_NAME')">
+                    </cds-select>
+                    <!-- <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                        {{'BotsAddEditPage.SlugAlert' | translate}}
+                        <a [href]="DOCS_LINK.chatbot_slug.link" [target]="DOCS_LINK.chatbot_slug.target">{{ 'LearnMore' | translate }}</a>
+                    </span> -->
+                    <div *ngIf="selectedPreviewUrl" class="audio-player-circle d-flex justify-content-center align-items-center" (click)="togglePlay()">
+                        <span class="material-icons">
+                          {{ isPlaying ? 'pause_circle' : 'play_circle' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--STEP 3: choose OpenAi TTS_MODEL -->
+        <div *ngIf="voiceProvider === 'openai' || voiceProvider === 'elevenlabs'" style="margin-bottom: 16px;">
+            <label class="cds-custom-label">
+                {{ 'CDSSetting.TextToSpeechModel' | translate }}
+            </label>
+            <div style="width: 40%;">
+                <cds-select id="text-condition" 
+                    [items]="tts_model_list" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'model'"
+                    [itemSelected]="tts_model" 
+                    [placeholder]="'CDSSetting.SelectAnOption' | translate"
+                    [clearable]="true" 
+                    (onSelected)="onSelect($event, 'TTS_MODEL')"
+                    (onReset)="onResetSelect($event, 'TTS_MODEL')">
+                </cds-select>
+                <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                    {{'CDSSetting.TextToSpeechModelDescription' | translate}}
+                    <a [href]="DOCS_LINK.VOICE_SETTINGS[voiceProvider].tts_model.link" [target]="DOCS_LINK.VOICE_SETTINGS[voiceProvider].tts_model.target">{{ 'LearnMore' | translate }}</a>
+                </span>
+            </div>
+        </div>
+
+        <!--STEP 4: choose OpenAi STT_MODEL -->
+        <div *ngIf="voiceProvider === 'openai' || voiceProvider === 'elevenlabs'" style="margin-bottom: 16px;">
+            <label class="cds-custom-label">
+                {{ 'CDSSetting.SpeechToTextModel' | translate }}
+            </label>
+            <div style="width: 40%;">
+                <cds-select id="text-condition" 
+                    [items]="stt_model_list" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'model'"
+                    [itemSelected]="stt_model" 
+                    [placeholder]="'CDSSetting.SelectAnOption' | translate"
+                    [clearable]="true" 
+                    (onSelected)="onSelect($event, 'STT_MODEL')"
+                    (onReset)="onResetSelect($event, 'STT_MODEL')">
+                </cds-select>
+                <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                    {{'CDSSetting.SpeechToTextModelDescription' | translate}}
+                    <a [href]="DOCS_LINK.VOICE_SETTINGS[voiceProvider].stt_model.link" [target]="DOCS_LINK.VOICE_SETTINGS[voiceProvider].stt_model.target">{{ 'LearnMore' | translate }}</a>
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+</div>

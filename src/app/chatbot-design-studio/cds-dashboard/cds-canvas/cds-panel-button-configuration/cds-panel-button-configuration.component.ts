@@ -74,6 +74,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
 
   private initialize(){
     this.listOfIntents = this.intentService.getListOfIntents();
+    this.listOfIntents.sort((a, b) => a.name.localeCompare(b.name));
     // this.logger.log('CdsPanelButtonConfigurationComponent: ', this.button);
     if(this.button){
       // this.buttonLabelResult = true;
@@ -164,6 +165,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   }
 
   private checkTypeButton() {
+    this.logger.log('[cds-panel-button-configuration] checkTypeButton', this.button);
     if (this.button.type === this.typeOfButton.TEXT) {
       this.deleteConnector();
       return true;
@@ -199,6 +201,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   }
 
   private checkAndSaveButton(){
+    this.logger.log('[cds-panel-button-configuration] checkAndSaveButton');
     let checkLabel = this.checkButtonLabel();
     let checkType = this.checkTypeButton();
     if (checkLabel && checkType) {
@@ -225,6 +228,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
 
   /** */
   onChangeTypeButton(typeOfButton: { label: string, value: TYPE_BUTTON }) {
+    this.logger.log('[cds-panel-button-configuration]: onChangeTypeButton', typeOfButton);
     this.buttonType = this.button.type = typeOfButton.value;
     this.buttonAction = null;
     if(this.button.__idConnector){
@@ -265,6 +269,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   onChangeGoToBlock(event: {name: string, value: string}){
     this.logger.log('onChangeGoToBlock: ', event);
     this.buttonAction = event.value;
+
     if(this.buttonAttributes && this.buttonAttributes !== '{}'){
       this.button.action = this.buttonAction + JSON.stringify(this.buttonAttributes);
     } else {
@@ -272,12 +277,15 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     }
     this.button.__isConnected = true;
     const fromId = this.button.__idConnector;
-    let toId = '';
-    const posId = this.button.action.indexOf("#");
-    if (posId !== -1) {
-      toId = this.button.action.slice(posId+1);
-      this.button.__idConnection = fromId+"/"+toId;
-    }
+    let toId = this.button.action;
+    if (this.button.action.includes('#')) {
+      toId = this.button.action.split('#')[1];
+      if(this.button.action.includes('{')) {
+        toId = this.button.action.split('#')[1].split('{')[0];
+      }
+    } 
+    this.button.__idConnection = fromId+"/"+toId;
+    this.logger.log('__idConnection: ', fromId+"/"+toId);
     this.logger.log('onChangeGoToBlock: ', this.button);
     // IMPORTANT! non salvare la modifica dei connettori ma solo la modifica della action!
     this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false);
@@ -286,7 +294,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   }
 
   private deleteConnector(){
-    this.logger.log('deleteConnector: ', this.button);
+    this.logger.log('[cds-panel-button-configuration] deleteConnector: ', this.button);
     const fromId = this.button.__idConnector;
     this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false);
     this.button.__isConnected = false;
