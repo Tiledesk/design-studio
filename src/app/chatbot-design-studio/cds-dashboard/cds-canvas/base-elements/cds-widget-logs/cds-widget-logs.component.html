@@ -44,7 +44,7 @@
             <span [id]="'row-log-button_'+i" class="row-log-button material-icons-outlined" [class.open]="log?.open" (click)="onToggleRowLog(i)">chevron_right</span>
             <span class="row-log-time" (click)="onToggleRowLog(i)">{{log?.timestamp | date: 'dd/MM/yyyy HH:mm:ss'}} </span>
             <span class="row-log-level" [ngClass]="log?.level" (click)="onToggleRowLog(i)">{{log?.level}}</span>
-            <span [id]="'row-log-text_'+i" class="row-log-text" (click)="onToggleRowLog(i)">{{log?.text}}</span>
+            <span [id]="'row-log-text_'+i" class="row-log-tex ellips" (click)="onToggleRowLog(i)">{{log?.text}}</span>
         </div>
     </div> 
 </div>

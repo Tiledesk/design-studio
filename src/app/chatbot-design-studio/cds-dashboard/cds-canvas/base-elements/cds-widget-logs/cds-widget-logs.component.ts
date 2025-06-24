@@ -366,14 +366,37 @@ export class CdsWidgetLogsComponent implements OnInit {
   }
 
   onToggleRowLog(i) {
-    if(this.isButtonEnabled(i)){
-      if(this.listOfLogs[i]['open']){
-        this.listOfLogs[i]['open'] = !this.listOfLogs[i]['open'];
-      } else {
-        this.listOfLogs[i]['open'] = true;
+    this.logger.log('[CDS-WIDGET-LOG] onToggleRowLog: ', i);
+    //if(this.isButtonEnabled(i)){
+      this.logger.log('[CDS-WIDGET-LOG] onToggleRowLog: ', this.listOfLogs[i]['open']);
+      const blockTextId = "row-log-text_"+i;
+      const elementText = document.getElementById(blockTextId);
+      this.logger.log('[CDS-WIDGET-LOG] onToggleRowLog: ', elementText);
+      if (elementText) {
+        if(this.listOfLogs[i]['open']){
+          this.listOfLogs[i]['open'] = false;
+          this.renderer.addClass(elementText, 'ellips');
+        } else {
+          this.listOfLogs[i]['open'] = true;
+          this.renderer.removeClass(elementText, 'ellips');
+        }
       }
-    }
+    //}
   }
+
+  // if(this.isButtonEnabled(i)){
+  //   const isOpen = !!this.listOfLogs[i]['open'];
+  //   this.listOfLogs[i]['open'] = !isOpen;
+  //   const blockTextId = "row-log-text_"+i;
+  //   const elementText = document.getElementById(blockTextId);
+  //   if (elementText) {
+  //     if (this.listOfLogs[i]['open']) {
+  //       this.renderer.removeClass(elementText, 'ellips');
+  //     } else {
+  //       this.renderer.addClass(elementText, 'ellips');
+  //     }
+  //   }
+  // }
 
   onCloseLog(){
     this.isClosed = true;
