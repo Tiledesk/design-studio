@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.36.0-rc5
+- **changed**: added ellips in log lines in ds-widget-logs.component
+
 # 1.36.0-rc4
 - **bug-fixed**: all actions that contain block selection on true/false do not display connector on stage when create via action detail panel
 - **bug-fixed**: about corrupted connectors with full dot but no connector on the stage
