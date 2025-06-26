@@ -7,7 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.37.0
+# 1.37.1
+
+# 1.37.0-rc2
+- **bug-fixed**: widget-log: disabled collapse row; stop webhook log when click on the stage
 
 # 1.37.0-rc1
 - **changed**: Ask Kb type from 'text' to 'faq'
