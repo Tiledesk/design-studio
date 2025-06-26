@@ -147,8 +147,11 @@ export class CdsHeaderComponent implements OnInit {
   private setSubscriptions(){
       /** SUBSCRIBE TO THE STATE TEST IT OUT */
       this.subscriptionTestItOutPlayed = this.controllerService.isTestItOutPlaying$.subscribe((state) => {
-        this.logger.log('[CdsHeaderComponent]  isTestItOutPlaying ', state);
+        this.logger.log('[CdsHeaderComponent]  isTestItOutPlaying DDD ', state);
         this.isPlaying = state;
+        if(!state){
+          this.onCloseTestItOut()
+        }
       });
   }
 
