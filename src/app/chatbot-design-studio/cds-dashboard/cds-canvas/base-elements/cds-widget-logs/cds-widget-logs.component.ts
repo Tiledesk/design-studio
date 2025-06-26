@@ -39,7 +39,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   selectedLogLevel = LOG_LEVELS.NATIVE;
   nLevels = { error: 0, warn: 1, info: 2, debug: 3, native: 4 };
   logLevelsArray = Object.entries(LOG_LEVELS).map(([key, value]) => ({ key, value }));
-
+  expandedLogs = new Set<number>();
   isOpenPanelWidget: boolean;
   mqtt_token: string;
   highestTimestamp: string;
@@ -354,6 +354,7 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.isClosed = !this.isClosed;
   }
 
+
   onClearLog(){
     this.listOfLogs = [];
     this.filteredLogs = [];
@@ -365,22 +366,30 @@ export class CdsWidgetLogsComponent implements OnInit {
     this.goToIntentByMessage(message);
   }
 
-  onToggleRowLog(i) {
-    this.logger.log('[CDS-WIDGET-LOG] onToggleRowLog: ', i);
-    //if(this.isButtonEnabled(i)){
-      this.logger.log('[CDS-WIDGET-LOG] onToggleRowLog: ', this.listOfLogs[i]['open']);
-      const blockTextId = "row-log-text_"+i;
-      const elementText = document.getElementById(blockTextId);
-      this.logger.log('[CDS-WIDGET-LOG] onToggleRowLog: ', elementText);
-      if (elementText) {
-        if(this.listOfLogs[i]['open']){
-          this.listOfLogs[i]['open'] = false;
-          this.renderer.addClass(elementText, 'ellips');
-        } else {
-          this.listOfLogs[i]['open'] = true;
-          this.renderer.removeClass(elementText, 'ellips');
-        }
-      }
+  
+  onToggleRowLog(index: number) {
+
+    if (this.expandedLogs.has(index)) {
+      this.expandedLogs.delete(index); // collapse
+    } else {
+      this.expandedLogs.add(index); // expand
+    }
+
+    // this.logger.log('[CDS-WIDGET-LOG] onToggleRowLog: ', i);
+    // //if(this.isButtonEnabled(i)){
+    //   this.logger.log('[CDS-WIDGET-LOG] onToggleRowLog: ', this.listOfLogs[i]['open']);
+    //   const blockTextId = "row-log-text_"+i;
+    //   const elementText = document.getElementById(blockTextId);
+    //   this.logger.log('[CDS-WIDGET-LOG] onToggleRowLog: ', elementText);
+    //   if (elementText) {
+    //     if(this.listOfLogs[i]['open']){
+    //       this.listOfLogs[i]['open'] = false;
+    //       this.renderer.addClass(elementText, 'ellips');
+    //     } else {
+    //       this.listOfLogs[i]['open'] = true;
+    //       this.renderer.removeClass(elementText, 'ellips');
+    //     }
+    //   }
     //}
   }
 
