@@ -131,7 +131,11 @@ export class CdsActionAddKbContentComponent implements OnInit {
   }
 
 
-  onBlur(event){
+  onBlur(event, property){
+    if(property == 'source'){
+      this.action.content = this.action.name?  this.action.name + '\n'+this.action[property] : this.action[property];
+    }
+
     this.updateAndSaveAction.emit()
   }
  

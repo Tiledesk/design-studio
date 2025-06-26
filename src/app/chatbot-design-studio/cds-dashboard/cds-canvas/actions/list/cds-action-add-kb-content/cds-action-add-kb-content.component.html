@@ -7,7 +7,7 @@
             {{action?.name}}
         </div>
         <div *ngIf="!action?.name" class="action-row-right empty">
-            {{'CDSCanvas.EnterTheKbName' | translate}}
+            {{'CDSCanvas.EnterQuestion' | translate}}
         </div>
     </div>
 
@@ -16,28 +16,30 @@
 <div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
     
     <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.nameKB' | translate}}</label>
+        <label class="title-label">{{'CDSCanvas.QuestionKB' | translate}}</label>
         <cds-textarea 
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
             [minRow]="1"[maxRow]="1" 
             [text]="action?.name" 
-            [placeholder]="'CDSCanvas.EnterTheKbName' | translate"
+            [placeholder]="'CDSCanvas.EnterQuestion' | translate"
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'name')">
         </cds-textarea>
-        <br>
-        <label class="title-label">{{'CDSCanvas.ContentKB' | translate}}</label>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.AnswerKB' | translate}}</label>
         <cds-textarea  
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
             [minRow]="4"[maxRow]="25" 
-            [text]="action?.content" 
-            [placeholder]="'CDSCanvas.PlaceholderKBContent' | translate"
-            (blur)="onBlur($event)"
-            (changeTextarea)="onChangeTextarea($event, 'content')">
+            [text]="action?.source" 
+            [placeholder]="'CDSCanvas.EnterAnswer' | translate"
+            (blur)="onBlur($event, 'source')"
+            (changeTextarea)="onChangeTextarea($event, 'source')">
         </cds-textarea>
     </div>
 
