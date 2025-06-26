@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.36.0-rc7
+- **bug-fixed**: css bug fixed in widget-log 
+
 # 1.36.0-rc6
 - **bug-fixed**: added width and height to previewModel images in action reply gallery
 - **bug-fixed**: in widget-log added ellips on the row, row opening, fixed display for very long texts, added selectable text, graphic adjustments
