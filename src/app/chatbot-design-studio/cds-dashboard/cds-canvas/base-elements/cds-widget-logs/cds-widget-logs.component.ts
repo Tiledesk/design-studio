@@ -370,7 +370,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   onToggleRowLog(index: number) {
 
     if (this.expandedLogs.has(index)) {
-      this.expandedLogs.delete(index); // collapse
+      //this.expandedLogs.delete(index); // collapse
     } else {
       this.expandedLogs.add(index); // expand
     }
