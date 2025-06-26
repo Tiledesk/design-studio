@@ -2,9 +2,10 @@
 @import "./src/assets/sass/md/_variables.scss";
 /** GENERIC **/
 
-body{
+body {
     font-family: var(--font-family-poppins);
 }
+
 /*
 Ellips text
 */
@@ -15,7 +16,7 @@ Ellips text
     overflow: hidden !important;
 }
 
-#scrollMe{
+#scrollMe {
     scroll-behavior: smooth;
     // margin-bottom: 30px;
     padding-bottom: 40px;
@@ -30,44 +31,47 @@ Ellips text
 
 img,
 svg {
-  vertical-align: unset;
+    vertical-align: unset;
 }
 
-.btn-group{
+.btn-group {
     margin: 0;
 }
-.input-group{
+
+.input-group {
     position: relative;
     display: flex;
     border-collapse: separate;
 }
 
-.input-group {  // may be in or outside of form-group
+.input-group {
+
+    // may be in or outside of form-group
     .input-group-btn {
-      padding: 0 12px; // match addon spacing
+        padding: 0 12px; // match addon spacing
 
-      position: relative;
-      font-size: 0;
-      white-space: nowrap;
+        position: relative;
+        font-size: 0;
+        white-space: nowrap;
 
-      display: table-cell;
-      vertical-align: middle;
+        display: table-cell;
+        vertical-align: middle;
     }
-  
+
     .input-group-addon {
-      border: 0;
-      background: transparent;
-      padding: 6px 15px 0px;
+        border: 0;
+        background: transparent;
+        padding: 6px 15px 0px;
     }
 }
 
 //notification close icon
-button.close{
+button.close {
     background-color: transparent;
     border-color: transparent;
 }
 
-.modal-content .modal-footer button + button{
+.modal-content .modal-footer button+button {
     margin-bottom: unset;
 }
 
@@ -115,41 +119,48 @@ button.close{
     // overflow: auto; // nk
     // max-height: calc(100vh - 200px); // nk
 }
-.no-footer{
+
+.no-footer {
     bottom: 0px
 }
 
-.title-label{
+.title-label {
     color: var(--blu);
     font-size: 14px;
 }
-.subtitle-label{
+
+.subtitle-label {
     color: var(--blu);
     font-size: 11px;
     font-style: italic;
 }
+
 .condition-text {
     font-size: 14px;
     font-weight: 600;
     color: var(--blu);
 }
+
 .condition-container {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 5px;
 }
+
 .field-box {
     display: flex;
     flex-direction: column;
     gap: 5px;
     margin-bottom: 20px;
 }
-.field-description{
+
+.field-description {
     font-size: 10px;
     font-style: italic;
     margin-top: 5px;
 }
+
 .icon-action {
     transition: opacity .15s ease 0s;
     opacity: .85;
@@ -157,16 +168,18 @@ button.close{
     display: flex;
     align-items: center;
     justify-content: center;
+
     img {
         height: 20px;
     }
-} 
+}
 
 
 emoji-mart {
     border: 0;
     margin-top: 12px;
     float: right;
+
     ::ng-deep section.emoji-mart {
         border: 0;
     }
@@ -183,19 +196,20 @@ emoji-mart {
 
 /* Intent Controls
 /* ------------------------ */
-.panel-intent-content:hover cds-panel-intent-controls > .intent-header-actions-container-on-start {
-    top: -28px!important;
+.panel-intent-content:hover cds-panel-intent-controls>.intent-header-actions-container-on-start {
+    top: -30px !important;
     right: 12px !important;
 }
-.panel-intent-content:hover cds-panel-intent-controls > .intent-header-actions-container {
-    top: -28px;
+
+.panel-intent-content:hover cds-panel-intent-controls>.intent-header-actions-container {
+    top: -30px;
     opacity: 1;
     transform: translate3d(0, 0, 0);
 }
 
 /* Action Controls
 /* ------------------------ */
-.body-action > cds-action-controls > .action-controls {
+.body-action>cds-action-controls>.action-controls {
     opacity: 0;
     pointer-events: none;
     position: absolute;
@@ -208,7 +222,8 @@ emoji-mart {
     z-index: 1;
     display: inline-flex;
 }
-.body-action:hover > cds-action-controls > .action-controls {
+
+.body-action:hover>cds-action-controls>.action-controls {
     opacity: 1;
     pointer-events: auto;
     -webkit-transform: translateX(-10px);
@@ -247,16 +262,18 @@ emoji-mart {
     0% {
         box-shadow: 0 0 0 0 #a09e9e44, 0 0 0 0 #a09e9e44;
     }
+
     80% {
         box-shadow: 0 0 0 20px #fff0, 0 0 0 40px #fff0;
     }
+
     100% {
         box-shadow: 0 0 0 0 #fff0, 0 0 0 0 #fff0;
     }
 }
 
 ::ng-deep .mat-expansion-indicator::after {
-color: white;
+    color: white;
 }
 
 /** CONNECTOR TRUE/FALSE: end **/
@@ -285,17 +302,23 @@ color: white;
     padding: 6px 12px;
     margin: 0;
     border-radius: var(--button-border-radius-base);
+
     &:hover {
         opacity: 0.8;
-    //   background: rgba(var(--blu-02), 0.8);
+        //   background: rgba(var(--blu-02), 0.8);
     }
+}
+
+.btn.btn-primary.cds-blue-button.xl {
+    padding: 12px 24px;
+    border-radius: 9999px;
 }
 
 appdashboard-cds-dashboard a {
     text-decoration: none;
 }
 
-.cds-title{
+.cds-title {
     font-size: 18px;
     position: relative;
     color: var(--blu);
@@ -319,11 +342,11 @@ img.active-icon {
     filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
 }
 
-img.base-icon-color{
+img.base-icon-color {
     filter: brightness(0) saturate(100%) invert(83%) sepia(87%) saturate(3891%) hue-rotate(177deg) brightness(92%) contrast(89%);
 }
 
-img.hover-icon{
+img.hover-icon {
     filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%);
 }
 
@@ -339,7 +362,7 @@ img.hover-icon{
     cursor: grab;
 }
 
-.cds-reply-button-element{
+.cds-reply-button-element {
     position: relative;
 }
 
@@ -348,3 +371,59 @@ img.hover-icon{
     display: flex;
     justify-content: center;
 }
+
+
+/* Snackbar 
+/* *********************** */
+
+.custom-error-snackbar {
+    // animation: slide-in 0.4s ease-out;
+    background: #D06079 !important;
+    color: #fff !important;
+    font-weight: 400;
+    min-width: fit-content !important;
+}
+
+.custom-error-snackbar::before {
+    font-family: "FontAwesome";
+    content: "\f071";
+    position: absolute;
+    color: #b03450;
+    top: 12px;
+}
+
+.custom-error-snackbar>div>div>simple-snack-bar>span {
+    margin-left: 22px;
+}
+
+.custom-error-snackbar>div>div>simple-snack-bar>div>button {
+    color: #000 !important;
+    font-weight: 400;
+}
+
+
+.custom-success-snackbar {
+    // animation: slide-in 0.4s ease-out;
+    background: #73AF55 !important;
+    color: #fff !important;
+    font-weight: 400;
+    min-width: fit-content !important;
+}
+
+.custom-success-snackbar::before {
+    font-family: "FontAwesome";
+    content: "\f00c";
+    position: absolute;
+    color: #507A3B;
+    top: 12px;
+}
+
+.custom-success-snackbar>div>div>simple-snack-bar>span {
+    margin-left: 22px;
+}
+
+.custom-success-snackbar>div>div>simple-snack-bar>div>button {
+    color: #000 !important;
+    font-weight: 400;
+}
+

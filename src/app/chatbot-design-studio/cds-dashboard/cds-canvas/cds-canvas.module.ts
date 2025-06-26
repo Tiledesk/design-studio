@@ -37,13 +37,14 @@ import { CdsColorMenuComponent } from './base-elements/cds-color-menu/cds-color-
 import { CdsConnectorInComponent } from './base-elements/cds-connector-in/cds-connector-in.component';
 import { CdsWidgetLogsComponent } from './base-elements/cds-widget-logs/cds-widget-logs.component';
 import { ChangeAlphaColorComponent } from 'src/app/modals/change-alpha-color/change-alpha-color.component';
+import { CdsPanelPublishComponent } from './cds-panel-publish/cds-panel-publish.component';
 
 
 const routes: Routes = [
   {
     path: '',
     component: CdsCanvasComponent,
-    resolve: { images: ImagePreloaderResolver}
+    resolve: { images: ImagePreloaderResolver }
   }
 ];
 
@@ -55,7 +56,7 @@ const routes: Routes = [
     CdsIntentComponent,
     PanelIntentHeaderComponent,
     PanelIntentControlsComponent,
-    
+
     //CDS PANEL INTENT LIST
     CdsPanelIntentListComponent,
 
@@ -74,22 +75,20 @@ const routes: Routes = [
 
     //CDS PANEL BUTTON CONFIGURATION
     CdsPanelButtonConfigurationComponent,
-    
+
     //CDS PANEL CONNECTOR MENU
     CdsPanelConnectorMenuComponent,
-    
+    CdsPanelPublishComponent,
+
     //CDS OPTIONS
     CdsOptionsComponent,
-   
-
     ContextMenuComponent,
 
     //ACTIONS
-      //SHARED
-      CdsActionControlsComponent,
-      CdsActionArrowComponent,
-      CdsAddActionMenuComponent,
-
+    //SHARED
+    CdsActionControlsComponent,
+    CdsActionArrowComponent,
+    CdsAddActionMenuComponent,
 
     //MODALS
     MouseTipsComponent,
@@ -102,7 +101,7 @@ const routes: Routes = [
     PreloadBarComponent,
     CdsColorMenuComponent,
     CdsConnectorInComponent,
-     CdsWidgetLogsComponent,
+    CdsWidgetLogsComponent,
   ],
   imports: [
     CommonModule,

@@ -1,7 +1,7 @@
 import { FormControl } from '@angular/forms';
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef, HostListener, SimpleChanges, SimpleChange } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { calculatingRemainingCharacters, TEXT_CHARS_LIMIT } from '../../../../utils';
+import { calculatingRemainingCharacters, DOCS_LINK, TEXT_CHARS_LIMIT } from '../../../../utils';
 import { SatPopover } from '@ncstate/sat-popover';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -12,7 +12,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
   styleUrls: ['./textarea.component.scss']
 })
 export class CDSTextareaComponent implements OnInit {
-  @ViewChild('textAreaRef') textAreaRef!: ElementRef;
+
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   @ViewChild("addVariable") addVariable: SatPopover;
   @ViewChild("emojiPicker") emojiPicker: SatPopover;
@@ -32,8 +32,7 @@ export class CDSTextareaComponent implements OnInit {
   @Input() readonly: boolean = false;
   @Input() autoResize: boolean = false;
   @Input() popoverVerticalAlign: string = 'below';
-  @Input() showTextPreview: boolean = false;
-
+  @Input() isJsonAttribute: boolean = false;
 
   @Output() changeTextarea = new EventEmitter();
   @Output() selectedAttribute = new EventEmitter();
@@ -53,7 +52,6 @@ export class CDSTextareaComponent implements OnInit {
   isSelected: boolean = false;
   textIsChanged: boolean = false;
   startText: string;
-  comeFrom: string;
   // strPlaceholder: string;
 
   // Wrapper management // 
@@ -65,11 +63,7 @@ export class CDSTextareaComponent implements OnInit {
   emojiPerLine: number = 8;
   emojiColor: string ="#506493";
   emojiiCategories = [ 'recent', 'people', 'nature', 'activity', 'flags'];
-
-  minRowOrigin: number = 1;
-  maxRowOrigin: number = 1;
-  labelDivTextArea: String;
-  showTextPreviewOrigin: boolean;
+  DOCS_LINK = DOCS_LINK.LIQUIDJS;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   
@@ -101,10 +95,6 @@ export class CDSTextareaComponent implements OnInit {
 
 
   initialize(){
-    this.showTextPreviewOrigin = this.showTextPreview;
-    this.labelDivTextArea = this.text;
-    this.maxRowOrigin = this.maxRow;
-    this.minRowOrigin = this.minRow;
     this.startText = this.text;
     this.textIsChanged = false;
     if (this.text) {
@@ -127,7 +117,7 @@ export class CDSTextareaComponent implements OnInit {
 
   /** */
   onClickTextareaOpenSetAttributePopover(){
-    this.logger.log('[CDS-TEXAREA] - onClickTextareaOpenSetAttributePopover', this.readonly, this.setAttributeBtn);
+    this.logger.log('onClickTextareaOpenSetAttributePopover', this.readonly, this.setAttributeBtn);
     if(this.readonly === true  && this.setAttributeBtn === true){
       this.addVariable.toggle();
       this.openSetAttributePopover();
@@ -135,7 +125,6 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   onChangeTextArea(event) {
-    this.logger.log('[CDS-TEXAREA] - onChangeTextArea ');
     // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
     this.calculatingleftCharsText();
     if(this.readonly && event){
@@ -146,48 +135,31 @@ export class CDSTextareaComponent implements OnInit {
       if(this.startText !== event){
         this.textIsChanged = true;
         this.text = event;
-        this.labelDivTextArea = event;
         // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', this.text, this.textIsChanged);
       }
     }
     if(!this.isSelected || !this.readonly){
       this.changeTextarea.emit(event.toString().trim());
     }
-
-    //this.vengoDa = "onChangeTextArea";
   }
 
-
-
-
   onBlur(event){
-    if (this.comeFrom === "addVariable" || this.comeFrom === "emojiPicker"){
-      this.comeFrom = '';
-      return;
+    if(this.autoResize) this.maxRow = 1;
+    this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen());
+    if(!this.addVariable.isOpen() && !this.emojiPicker.isOpen() && this.textIsChanged){
+      this.textIsChanged = false;
+      this.startText = this.text;
+      this.blur.emit(event);
     }
-    setTimeout(() => {
-      this.logger.log('[CDS-TEXAREA] - onBlur - isOpen textIsChanged', this.textIsChanged, this.addVariable.isOpen(), this.comeFrom);
-      if(!this.addVariable.isOpen() && !this.emojiPicker.isOpen()){ //&& this.textIsChanged
-        this.showTextPreview = this.showTextPreviewOrigin;
-        //this.maxRow = this.minRowOrigin;
-        this.textIsChanged = false;
-        this.startText = this.text;
-        this.blur.emit(event);
-     }
-    }, 0);
   }
 
   onFocus(event){
-    this.maxRow = this.maxRowOrigin;
-    this.logger.log('[CDS-TEXAREA] - onFocus - isOpen textIsChanged', event);
-    // if(this.autoResize) this.maxRow = 5
+    this.logger.log('[CDS-TEXAREA] - onFocus - isOpen textIsChanged');
+    if(this.autoResize) this.maxRow = 5
     this.focus.emit(event)
   }
 
-
-
   onVariableSelected(variableSelected: { name: string, value: string }) {
-    this.logger.log('[CDS-TEXAREA] - onVariableSelected ');
     this.isSelected = true;
     let valueTextArea = {name: '', value: ''};
     if (this.elTextarea) {
@@ -203,7 +175,7 @@ export class CDSTextareaComponent implements OnInit {
     } else {
       // this.onChangeTextArea(valueTextArea.name);
     }
-    this.onCloseAddVariable();
+    this.addVariable.close();
     this.selectedAttribute.emit(variableSelected);
   }
 
@@ -216,6 +188,7 @@ export class CDSTextareaComponent implements OnInit {
 
   openSetAttributePopover() {
     // this.emojiPicker.toggle()
+    this.logger.log('[CDS-TEXAREA] - openSetAttributePopover ');
     this.elTextarea = this.autosize['_textareaElement'] as HTMLInputElement;
     this.elTextarea.focus()
   }
@@ -232,19 +205,33 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   private insertAtCursorPos(elem: HTMLInputElement, attribute) {
-    this.logger.log('[CDS-TEXAREA] - insertAtCursorPos ');
     let cursor_pos = elem.selectionStart;
     var textarea_txt = elem.value;
+    this.logger.log('[CDS-TEXAREA] - insertAtCursorPos ', this.isJsonAttribute, attribute);
+    if(this.isJsonAttribute){
+      attribute =this.checkAndSetJsonBody(attribute);
+    }
     var txt_to_add = attribute;
-    
     //clear '{' or '{{' cursor_pos -1/-2 chars
     if( textarea_txt.substring(cursor_pos -1, cursor_pos) === '{')  textarea_txt = textarea_txt.substring(0, cursor_pos-1)
     if( textarea_txt.substring(cursor_pos -2, cursor_pos) === '{{')  textarea_txt = textarea_txt.substring(0, cursor_pos-2)
-
     elem.value = textarea_txt.substring(0, cursor_pos) + txt_to_add + textarea_txt.substring(cursor_pos);
     elem.focus();
     elem.selectionEnd = cursor_pos + txt_to_add.length;
+    this.logger.log('[CDS-TEXAREA] - insertAtCursorPos ', txt_to_add);
     this.text = elem.value;
+  }
+
+
+  checkAndSetJsonBody(jsonBody){
+    this.logger.log('[CDS-TEXAREA] jsonBody:: ', jsonBody);
+    return jsonBody.replace(/{{(.*?)}}/g, (match, content) => {
+      if (match.includes('| json') || match.includes('|json')) {
+        return match;
+      } else {
+        return `{{ ${content.trim()} | json }}`;
+      }
+    });
   }
 
   onAddEmoji(event){
@@ -254,7 +241,7 @@ export class CDSTextareaComponent implements OnInit {
     } else {
       this.text = `${event.emoji.native}`;
     }
-    this.onCloseAddEmoji();
+    this.emojiPicker.close();
     this.selectedEmoji.emit(event)
   }
   
@@ -268,49 +255,11 @@ export class CDSTextareaComponent implements OnInit {
   }
 
   openAttributesList(event) {
-    const keyCode = event.which || event.keyCode;
-    const key = event.key;
-    if (keyCode === 219 && key === "{") { // '{' keyboard code
-      this.addVariable.toggle();
-    }
+    // const keyCode = event.which || event.keyCode;
+    // const key = event.key;
+    // if (keyCode === 219 && key === "{") { // '{' keyboard code
+    //   this.addVariable.toggle();;
+    // }
   }
 
-  onClickDivTextArea(){
-    this.logger.log('[CDS-TEXAREA] - onClickDivTextArea ');
-    const textarea = this.textAreaRef.nativeElement;
-    this.maxRow = this.maxRowOrigin;
-    this.showTextPreview = false;
-    setTimeout(() => {
-      textarea.focus();
-    }, 0);
-  }
-
-
-
-  onOpenAddVariable(){
-    this.logger.log('[CDS-TEXAREA] - onOpenAddVariable ');
-    this.addVariable.open(); 
-    this.openSetAttributePopover();
-  }
-
-
-  onCloseAddVariable(){
-    this.logger.log('[CDS-TEXAREA] - onCloseAddVariable ');
-    this.comeFrom = "addVariable";
-    this.addVariable.close();
-  }
-
-
-  onOpenAddEmoji(){
-    this.logger.log('[CDS-TEXAREA] - onOpenAddEmoji ');
-    this.emojiPicker.open(); 
-    this.openSetAttributePopover();
-  }
-
-
-  onCloseAddEmoji(){
-    this.logger.log('[CDS-TEXAREA] - onCloseAddEmoji ');
-    this.comeFrom = "emojiPicker";
-    this.emojiPicker.close();
-  }
 }

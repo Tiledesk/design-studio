@@ -74,6 +74,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
 
   private initialize(){
     this.listOfIntents = this.intentService.getListOfIntents();
+    this.listOfIntents.sort((a, b) => a.name.localeCompare(b.name));
     // this.logger.log('CdsPanelButtonConfigurationComponent: ', this.button);
     if(this.button){
       // this.buttonLabelResult = true;
@@ -265,6 +266,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
   onChangeGoToBlock(event: {name: string, value: string}){
     this.logger.log('onChangeGoToBlock: ', event);
     this.buttonAction = event.value;
+
     if(this.buttonAttributes && this.buttonAttributes !== '{}'){
       this.button.action = this.buttonAction + JSON.stringify(this.buttonAttributes);
     } else {
@@ -272,12 +274,22 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     }
     this.button.__isConnected = true;
     const fromId = this.button.__idConnector;
-    let toId = '';
-    const posId = this.button.action.indexOf("#");
-    if (posId !== -1) {
-      toId = this.button.action.slice(posId+1);
-      this.button.__idConnection = fromId+"/"+toId;
-    }
+
+    let toId = this.button.action;
+    if (this.button.action.includes('#')) {
+      toId = this.button.action.split('#')[1];
+      if(this.button.action.includes('{')) {
+        toId = this.button.action.split('#')[1].split('{')[0];
+      }
+    } 
+    this.button.__idConnection = fromId+"/"+toId;
+    this.logger.log('__idConnection: ', fromId+"/"+toId);
+    // let toId = '';
+    // const posId = this.button.action.indexOf("#");
+    // if (posId !== -1) {
+    //   toId = this.button.action.slice(posId+1);
+    //   this.button.__idConnection = fromId+"/"+toId;
+    // }
     this.logger.log('onChangeGoToBlock: ', this.button);
     // IMPORTANT! non salvare la modifica dei connettori ma solo la modifica della action!
     this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false);
@@ -291,7 +303,7 @@ export class CdsPanelButtonConfigurationComponent implements OnInit {
     this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, false);
     this.button.__isConnected = false;
     this.button.__idConnection = null;
-    this.button.action = '';
+    //this.button.action = '';
   }
 
   onChangeOpenIn(event: {name: string, value: string}){

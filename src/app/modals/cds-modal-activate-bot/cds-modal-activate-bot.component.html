@@ -2,7 +2,7 @@
 <!-- Hook chatbot to a dept modal  -->
 <!-- ---------------------------------------------- -->
 <div class="cds-modal-content">
-    <div class="cds-modal-header">
+    <!-- <div class="cds-modal-header">
         <div class="header-title">{{ "CDSModalActivateBot.HookTheBot" | translate }}</div>
         <mat-dialog-actions>
             <button mat-dialog-close>
@@ -10,12 +10,12 @@
                     close
                 </span>
             </button>
-            <!-- <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Install</button> -->
+   
         </mat-dialog-actions>
     </div>
 
-    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
-    <!-- padding-top: 0px; padding-bottom: 0px; padding-right: 34px; padding-left: 34px;  -->
+    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px"> -->
+
     <ng-container *ngIf="DEPTS_HAS_NOT_A_BOT" [ngTemplateOutlet]="deptsChoise"></ng-container>
     <ng-container *ngIf="!DEPTS_HAS_NOT_A_BOT" [ngTemplateOutlet]="publishStep"></ng-container>
      
@@ -169,9 +169,13 @@
 
     <div class="cds-modal-footer" id="publishStep">
 
-        <button *ngIf="DISPLAY_INSTALL_SCRIPT"
+        <button *ngIf="DISPLAY_INSTALL_SCRIPT" class="btn btn-primary cds-blue-button" mat-dialog-close>
+            <span> {{ "Close" | translate }} </span>
+        </button>
+
+        <!-- <button *ngIf="DISPLAY_INSTALL_SCRIPT"
             class="btn btn-primary cds-blue-button" (click)="DISPLAY_INSTALL_SCRIPT = !DISPLAY_INSTALL_SCRIPT">
-            <span> < {{ "Back" | translate }} </span>
+        <span> < {{ "Back" | translate }} </span>
         </button>
 
         <button *ngIf="!HAS_COMPLETED_PUBLISH && !DISPLAY_INSTALL_SCRIPT" (click)="publish()"
@@ -182,7 +186,7 @@
         <button *ngIf="HAS_COMPLETED_PUBLISH_SUCCESS"
             class="btn btn-primary cds-blue-button" mat-dialog-close>
             <span> {{ "Close" | translate }} </span>
-        </button>
+        </button> -->
 
     </div> <!-- /.modal-footer -->
 </ng-template>

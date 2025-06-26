@@ -21,9 +21,11 @@ mat-form-field.mat-focused ::ng-deep {
             .mat-form-field-infix {
                 textarea {
                     border: 1px solid var(--blu) ;
+                    // outline: 0px solid var(--blu);
                     transition: border 0.3s;
                     &.invalid{
                         border: 1px solid red !important;
+                        // outline: 0px solid red !important;
                         transition: border 0.3s;
                     }
                 }
@@ -37,6 +39,7 @@ mat-form-field.box-textarea ::ng-deep {
         .mat-form-field-flex {
             border-radius: 4px 4px 0 0;
             padding: 0px;
+            // padding: 0 0.75em 0 0.75em;
             margin: 0;
             background-color: transparent !important;
         }
@@ -55,6 +58,7 @@ mat-form-field.box-textarea ::ng-deep {
 /** box-textarea **/
 .box-textarea {
     width: 100%;
+    // margin-left: 20px;
     textarea {
         border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
@@ -65,16 +69,18 @@ mat-form-field.box-textarea ::ng-deep {
         font-size: 1.15em;
         line-height: 25px;
         resize: vertical;
+
+        // width: calc(100% - 2.5em);
         padding: 10px;
         padding-top: 4px;
         padding-bottom: 4px;
         margin: 0px;
+        // resize: none;
         height: 26px;
         min-height: 26px;
+
     }
 }
-
-
 
 /** editor-utils **/
 .editor-utils {
@@ -90,7 +96,6 @@ mat-form-field.box-textarea ::ng-deep {
     .tpl-text-limit {
         pointer-events: none;
         transition: background-color 0.3s, color 0.3s;
-        min-width: 45px;
         .num-chars {
             background: var(--blu-light-01);
             flex-shrink: 0;
@@ -175,9 +180,8 @@ mat-form-field.box-textarea ::ng-deep {
     }
     .tag {
         position: absolute;
-        top: 3px;
-        bottom: 3px;
-        left: 5px;
+        top: 2px;
+        left: 2px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -213,43 +217,26 @@ mat-form-field.box-textarea ::ng-deep {
     }
 }
 
-.div-textarea {
-    &.hidden {
-        display: none;
-    }
-}
 
-.text-editor {
-    &.hidden {
-        display: none;
-    }
-}
-
-
-.div-textarea {
-    width: 100%;
-    height: 100%;
-    padding: 0 10px;
+.liquidjs-menu {
+    position: absolute;
     display: flex;
-    background: var(--color-white-hex);
-    border: 1px solid var(--blu-light-02);
-    border-radius: 0 var(--base-radius) var(--base-radius) 0;
-    border-radius: 0 var(--input-border-radius-base) var(--input-border-radius-base) 0;
-
-    margin: 0px;
-    opacity: 1;
-    &.hidden {
-        opacity: 0;
-        height: 0;
-        border: none;
-    }
-    .label-text {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-        height: 26px;
-        display: inline-block;
+    color: var(--blu);
+    cursor: pointer;
+    font-size: 0.8em;
+    font-weight: 400;
+    white-space: nowrap;
+    margin-top: -15px;
+    justify-content: flex-end;
+    width: 100%;
+    .liquidjs-button {
         margin: auto 0;
+        display: inline-flex;
     }
-  }
+    .mat-icon {
+        width: 14px;
+        height: 14px;
+        fill:initial;
+        display: flex;
+    }
+}

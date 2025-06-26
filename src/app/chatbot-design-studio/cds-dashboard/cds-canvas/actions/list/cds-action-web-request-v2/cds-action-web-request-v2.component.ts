@@ -15,6 +15,7 @@ import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { HEADER_TYPE, TYPE_METHOD_REQUEST } from 'src/app/chatbot-design-studio/utils-request';
+// import { CDSTextareaComponent } from '../../../base-elements/textarea/textarea.component';
 
 @Component({
   selector: 'cds-action-web-request-v2',
@@ -22,6 +23,7 @@ import { HEADER_TYPE, TYPE_METHOD_REQUEST } from 'src/app/chatbot-design-studio/
   styleUrls: ['./cds-action-web-request-v2.component.scss']
 })
 export class CdsActionWebRequestV2Component implements OnInit {
+  // @ViewChild('cdsTextareaBody', { static: false }) cdsTextareaBody!: CDSTextareaComponent;
 
   @Input() intentSelected: Intent;
   @Input() action: ActionWebRequestV2;
@@ -151,11 +153,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.bodyOptions.forEach(el => { el.value ===this.action.bodyType? el.checked= true: el.checked = false })
     // this.jsonIsValid = this.isValidJson(this.action.jsonBody);
 
-
-
     if(this.action.jsonBody){ 
-      this.body = this.checkAndSetJsonBody(this.action.jsonBody);
-      // // this.body = this.action.jsonBody;
+      //this.body = this.checkAndSetJsonBody(this.action.jsonBody);
+      this.body = this.action.jsonBody;
       this.body = this.formatJSON(this.body, "\t");
     }
     this.jsonSettings = { timeout: 20000}
@@ -235,9 +235,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
         break;
       case 'json':
         this.bodyType = 'json';
-        // // this.body = this.action.jsonBody;
+        this.body = this.action.jsonBody;
         this.jsonHeader['Content-Type'] = 'application/json';
-        this.body = this.checkAndSetJsonBody(this.action.jsonBody);
+        // this.body = this.checkAndSetJsonBody(this.action.jsonBody);
         break;
       case 'form-data':
         this.bodyType = 'form-data';
@@ -248,22 +248,6 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.action.headersString = this.jsonHeader
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
-
-
-
-  checkAndSetJsonBody(jsonBody){
-    this.logger.log('[ACTION-WEB-REQUEST-v2] jsonBody:: ', jsonBody);
-    return jsonBody.replace(/{{(.*?)}}/g, (match, content) => {
-      if (match.includes('| json') || match.includes('|json')) {
-        return match;
-      } else {
-        return `{{ ${content.trim()} | json }}`;
-      }
-    });
-  }
-
-
-
 
   onChangeTextarea(e, type: 'url' | 'body' | 'setting'){
     switch(type){
@@ -294,10 +278,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
   }
 
   onBlur(event){
-    this.action.jsonBody = this.checkAndSetJsonBody(this.body);
-    this.body = this.action.jsonBody;
-    this.action.jsonBody = this.checkAndSetJsonBody(this.body);
-    this.body = this.action.jsonBody;
+    // this.action.jsonBody = this.checkAndSetJsonBody(this.body);
+    // this.body = this.action.jsonBody;
+    this.action.jsonBody = this.body;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -334,6 +317,49 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.action[property] = event.value;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
+
+  // onSelectedAttribute2(event, property) {
+  //   if (this.cdsTextareaBody) {
+  //     // const cursorPosition = this.cdsTextareaBody.getCursorPosition();
+  //     this.logger.log("[ACTION-WEB-REQUEST-v2] onSelectedAttribute2 textarea",event);
+  //     const textarea: HTMLTextAreaElement = this.cdsTextareaBody.textAreaElement.nativeElement;
+    
+  //     const cursorPosition = textarea.selectionStart;
+  //     this.logger.log("[ACTION-WEB-REQUEST-v2] onSelectedAttribute2 cursorPosition", textarea);
+  //     const textBeforeCursor = this.body.slice(0, cursorPosition); // Testo fino al cursore
+  //     this.logger.log("[ACTION-WEB-REQUEST-v2] onSelectedAttribute2 textBeforeCursor", textBeforeCursor);
+  //     // Regex per individuare solo l'ultima istanza di {{...}} immediatamente prima del cursore
+  //     const regex = new RegExp(`{{\\s*${event.value}\\s*}}`, 'g'); // Cerca tutte le istanze
+  //     const matches = textBeforeCursor.match(regex);
+  //     const match = matches?matches[matches.length - 1] : null;
+  //     //const match = textBeforeCursor.match(regex);
+  //     this.logger.log("[ACTION-WEB-REQUEST-v2] onSelectedAttribute2", match);
+
+  //     if (match) {
+  //         const extractedText = match;//[0];
+  //         this.logger.log("[ACTION-WEB-REQUEST-v2] extractedText", extractedText);
+  //         // Modifica il testo estratto (ad esempio, aggiunge '-modificato')
+  //         const modifiedText = this.checkAndSetJsonBody(extractedText);
+  //         // Sostituisce solo il testo trovato immediatamente prima del cursore
+  //         const updatedTextBeforeCursor = textBeforeCursor.replace(extractedText, modifiedText);
+  //         this.body = updatedTextBeforeCursor + this.body.slice(cursorPosition); // Combina il testo aggiornato con il resto
+  //         // Aggiorna la textarea con il nuovo contenuto
+  //         textarea.value = this.body;
+  //     }
+  //   }
+  // }
+
+  // checkAndSetJsonBody(jsonBody){
+  //   this.logger.log('[ACTION-WEB-REQUEST-v2] jsonBody:: ', jsonBody);
+  //   return jsonBody.replace(/{{(.*?)}}/g, (match, content) => {
+  //     if (match.includes('| json') || match.includes('|json')) {
+  //       return match;
+  //     } else {
+  //       return `{{ ${content.trim()} | json }}`;
+  //     }
+  //   });
+  // }
+
 
   onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
     if(event){

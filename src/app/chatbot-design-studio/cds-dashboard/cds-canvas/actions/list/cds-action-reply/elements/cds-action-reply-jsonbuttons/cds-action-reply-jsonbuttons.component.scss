@@ -8,8 +8,9 @@ cds-textarea.text-editable-div {
 
 ::ng-deep .box-textarea {
     textarea {
-        line-height: 20px!important;
+        // line-height: 20px!important;
         font-size: 0.9em!important;
+        max-height: none!important;
     }
 } 
 
@@ -19,6 +20,10 @@ cds-textarea.text-editable-div {
 .json-text {
     position: relative;
     padding: 0;
+    margin-top: 20px;
+    .button-controls {
+        top:20px;
+    }
 }
 
 .field-description {
@@ -34,13 +39,15 @@ cds-textarea.text-editable-div {
     position: relative;
     width: 100%;
     height: 36px;
-    margin-bottom: -1px;
-
+    margin-bottom: -20px;
+    &.json-shown {
+        width:fit-content;
+        z-index: 1;
+    }
     .text-condition {
         position: relative;
         display: flex;
-        justify-content: flex-end;
-
+        // justify-content: flex-end;
         ::ng-deep .select-bot-box {
             min-width: 160px;
         }
@@ -50,12 +57,12 @@ cds-textarea.text-editable-div {
             color: var(--blu);
         }
         ::ng-deep .ng-select .ng-select-container .ng-value-container {
-            justify-content: flex-end;
+            // justify-content: flex-end;
             margin-right: 10px;
             font-weight: 500;
         }
         ::ng-deep .ng-select .ng-select-container {
-            justify-content: flex-end;
+            // justify-content: flex-end;
             border: 0px solid var(--blu-light-02);
             box-shadow: none;
         }

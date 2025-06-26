@@ -7,7 +7,7 @@
 
     </div>
 
-    <div *ngIf="action.url" class="action-row-right">
+    <div *ngIf="action.url" class="action-row-right ellips">
         {{action.url}}
     </div>
     <div *ngIf="!action.url" class="action-row-right empty">
@@ -108,7 +108,7 @@
             (changeButtonSelect)="onChangeButtonSelect($event)">
         </cds-radio-buttons>
 
-        <cds-textarea id="body" *ngSwitchCase="'json'"
+        <cds-textarea *ngSwitchCase="'json'"
             [ngClass]="{'jsonError': !jsonIsValid}"
             class = "text-editable-div"
             [text]="body"
@@ -117,6 +117,7 @@
             [setAttributeBtn]="true"
             [minRow]="10" [maxRow]="10"
             [readonly]="false"
+            [isJsonAttribute]="true"
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'body')">
         </cds-textarea>

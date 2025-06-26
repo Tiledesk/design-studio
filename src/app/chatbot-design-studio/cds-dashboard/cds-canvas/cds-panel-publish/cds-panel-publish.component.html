@@ -1,0 +1,266 @@
+<div class="panel-intent-detail" *ngIf="!HAS_COMPLETED_PUBLISH_SUCCESS">
+
+  <div class="panel-header-title">
+    {{ 'CDSModalActivateBot.WellDonePublishingChatbot' | translate }}
+  </div>
+
+  <div id="content-panel" class="content-panel">
+
+    <div class="field-box" style="margin-bottom: 10px;">
+      <label class="title-label">
+        {{'ReleaseNotes' | translate}}
+      </label>
+      <cds-textarea id="release-notes" 
+        [textLimitBtn]="false" 
+        [emojiPikerBtn]="false" 
+        [setAttributeBtn]="false"
+        [minRow]="2" [maxRow]="4" 
+        placeholder="{{'EnterNotes' | translate}}" 
+        (changeTextarea)="changeTextarea($event)">
+      </cds-textarea>
+    </div>
+  </div>
+
+  <div class="publish-btn-wpr">
+    <button id="cds-publish-btn" type="button" class="btn btn-primary cds-blue-button" (click)="onClickPublish()">
+      <span>
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff"
+          style="vertical-align: middle;">
+          <path
+            d="M260-160q-91 0-155.5-63T40-377q0-78 47-139t123-78q25-92 100-149t170-57q117 0 198.5 81.5T760-520q69 8 114.5 59.5T920-340q0 75-52.5 127.5T740-160H520q-33 0-56.5-23.5T440-240v-206l-64 62-56-56 160-160 160 160-56 56-64-62v206h220q42 0 71-29t29-71q0-42-29-71t-71-29h-60v-80q0-83-58.5-141.5T480-720q-83 0-141.5 58.5T280-520h-20q-58 0-99 41t-41 99q0 58 41 99t99 41h100v80H260Zm220-280Z" />
+        </svg>
+      </span>
+      {{ 'Publish' | translate}}
+    </button>
+  </div>
+
+
+  <!-- Hook flow to a department -->
+  <div class="hook-bot-to-dept-wpr"
+    *ngIf="DEPTS_HAS_NOT_A_BOT && (!selectedChatbot?.subtype || selectedChatbot?.subtype === 'chatbot')">
+    <mat-accordion>
+      <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
+        class="custom--expansion-panel">
+        <mat-expansion-panel-header class="disable_ripple">
+          <mat-panel-title>
+            {{'Advanced' | translate }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div>
+
+          <label class="title-label"
+            [innerHTML]="'CDSModalActivateBot.DoYouWantToActivateBotForOneOfTheFollowingDepts' | translate: selectedChatbot ">
+          </label>
+          <div class="cds--input-group">
+            <!-- <cds-select id="departments" 
+                [items]="depts_without_bot_array" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'id'" 
+                placeholder="{{'SelectDepartment'|translate}}" 
+                [itemSelected]="deptSelected"
+                [clearable]="true" 
+                (onSelected)="onSelectDept($event)" 
+                [disabled]="HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS">
+              </cds-select> -->
+
+            <ng-select class="departments" 
+              [items]="depts_without_bot_array" 
+              bindLabel="name" bindValue="id"
+              placeholder="{{'SelectDepartment'|translate}}" 
+              (change)="onSelectDept($event)" 
+              appendTo="body">
+            </ng-select>
+
+
+            <button [disabled]="!deptSelected || HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS === true"
+              class="btn btn-primary cds-blue-button" (click)="hookBotToDept()">
+              <i *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+                class="fa fa-spinner fa-spin"></i>
+              <span> {{ 'CDSModalActivateBot.ActivateBot' | translate}}</span>
+            </button>
+          </div>
+
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+
+    <!-- <div class="hook-bot-to-dept-wpr" *ngIf="DEPTS_HAS_NOT_A_BOT">
+      <label class="title-label"
+        [innerHTML]="'CDSModalActivateBot.DoYouWantToActivateBotForOneOfTheFollowingDepts' | translate: selectedChatbot ">
+      </label>
+      <div class="cds--input-group">
+
+        <ng-select class="departments"
+          [items]="depts_without_bot_array"
+          bindLabel="name"
+          bindValue="id"
+          (change)="onSelectDept($event)" >
+        </ng-select>
+
+
+        <button [disabled]="!deptSelected || HAS_COMPLETED_HOOK_BOOT_TO_DEPT_SUCCESS === true"
+          class="btn btn-primary cds-blue-button" (click)="hookBotToDept()">
+          <i *ngIf="HAS_CLICKED_HOOK_BOOT_TO_DEPT === true && HAS_COMPLETED_HOOK_BOOT_TO_DEPT === false"
+            class="fa fa-spinner fa-spin"></i>
+          <span> {{ 'CDSModalActivateBot.ActivateBot' | translate}}</span>
+        </button>
+      </div>
+    </div> -->
+  </div>
+
+
+</div>
+
+<div class="panel-intent-detail">
+
+  <!-- ---------------------------------------------------------- -->
+  <!--  This works better 135 x 135 -->
+  <!-- ---------------------------------------------------------- -->
+  <div class="publish-result-wpr">
+
+    <!-- <svg width="135" height="135" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+
+      <rect width="200" height="200" fill="white" />
+
+     
+      <clipPath id="circleClip">
+        <circle cx="100" cy="100" r="90" />
+      </clipPath>
+
+   
+      <g id="stars" clip-path="url(#circleClip)" [style.animation-delay]="rocketExitDelay + 's'"
+        [ngClass]="{'stars-fade': status === 'success' || status === 'error', 'stars-move':  status === 'pending'}">
+        <circle class="star" cx="20" cy="30" r="1" fill="gray" />
+        <circle class="star" cx="70" cy="80" r="1" fill="gray" />
+        <circle class="star" cx="150" cy="50" r="1" fill="gray" />
+        <circle class="star" cx="120" cy="140" r="1" fill="gray" />
+        <circle class="star" cx="50" cy="150" r="1" fill="gray" />
+        <circle class="star" cx="170" cy="170" r="1" fill="gray" />
+        <circle class="star" cx="30" cy="120" r="1" fill="gray" />
+        <circle class="star" cx="90" cy="30" r="1" fill="gray" />
+        <circle class="star" cx="140" cy="100" r="1" fill="gray" />
+        <circle class="star" cx="100" cy="170" r="1" fill="gray" />
+      </g>
+
+    
+      <circle cx="100" cy="100" r="90" stroke="#eee" stroke-width="8" fill="none" [ngClass]="{
+      'progress-success': status === 'success',
+      'progress-error': status === 'error'}" />
+
+  
+      <circle id="progress" cx="100" cy="100" r="90" stroke-width="8" fill="none" stroke-linecap="round"
+        stroke-dasharray="565.48" stroke-dashoffset="565.48"
+        style="transform: rotate(-90deg); transform-origin: center;" [ngClass]="{
+        'progress-success': status === 'success',
+        'progress-error': status === 'error',
+        'progress-pending': status === 'pending'
+      }" [style.animation-delay]="animationDuration + 's'">
+      </circle>
+
+      <g id="rocket-wrapper" [style.animation-delay]="rocketExitDelay + 's'"
+        [ngClass]="{'rocket-exit': true, 'rocket-shake': isRocketShaking}">
+        <g id="rocket" transform="translate(100, 100) scale(0.1) translate(-480, 480)">
+          <path
+            d="m226-559 78 33q14-28 29-54t33-52l-56-11-84 84Zm142 83 114 113q42-16 90-49t90-75q70-70 109.5-155.5T806-800q-72-5-158 34.5T492-656q-42 42-75 90t-49 90Zm178-65q-23-23-23-56.5t23-56.5q23-23 57-23t57 23q23 23 23 56.5T660-541q-23 23-57 23t-57-23Zm19 321 84-84-11-56q-26 18-52 32.5T532-299l33 79Zm313-653q19 121-23.5 235.5T708-419l20 99q4 20-2 39t-20 33L538-80l-84-197-171-171-197-84 167-168q14-14 33.5-20t39.5-2l99 20q104-104 218-147t235-24ZM157-321q35-35 85.5-35.5T328-322q35 35 34.5 85.5T327-151q-25 25-83.5 43T82-76q14-103 32-161.5t43-83.5Zm57 56q-10 10-20 36.5T180-175q27-4 53.5-13.5T270-208q12-12 13-29t-11-29q-12-12-29-11.5T214-265Z"
+            fill="grey" />
+        </g>
+      </g>
+
+  
+      <g id="checkmark" [ngClass]="{'show-check': status === 'success'}" style="opacity: 0;"
+        transform="translate(100, 100) scale(2) translate(-25, -25)" [style.animation-delay]="showResultDelay + 's'">
+        <path d="M10 25 L20 35 L40 15" stroke="#00C853" stroke-width="4" fill="none" stroke-linecap="round" />
+      </g>
+   
+      <g id="cross" [ngClass]="{'show-cross': status === 'error'}"
+        transform="translate(100, 100) scale(2) translate(-25, -25)" style="opacity: 0;"
+        [style.animation-delay]="showResultDelay + 's'">
+        <line x1="10" y1="10" x2="40" y2="40" stroke="#D32F2F" stroke-width="4" stroke-linecap="round" />
+        <line x1="40" y1="10" x2="10" y2="40" stroke="#D32F2F" stroke-width="4" stroke-linecap="round" />
+      </g>
+    </svg> -->
+
+    <svg *ngIf="status === 'success'" style="width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 130.2 130.2">
+      <circle class="path circle" fill="none" stroke="#73AF55" stroke-width="6" stroke-miterlimit="10" cx="65.1"
+        cy="65.1" r="62.1" />
+      <polyline class="path check" fill="none" stroke="#73AF55" stroke-width="6" stroke-linecap="round"
+        stroke-miterlimit="10" points="100.2,40.2 51.5,88.8 29.8,67.5 " />
+    </svg>
+    <h5 *ngIf="status === 'success'" style="color:#73AF55;" class="custom-h5 success">
+      {{ 'CDSModalActivateBot.BotSuccessFullyPublished' | translate }}
+    </h5>
+
+
+    <svg *ngIf="status === 'error'" style=" width: 55px;" version="1.1" xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 130.2 130.2">
+      <circle class="path circle" fill="none" stroke="#D06079" stroke-width="6" stroke-miterlimit="10" cx="65.1"
+        cy="65.1" r="62.1" />
+      <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
+        stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+      <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round"
+        stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+    </svg>
+    <h5 *ngIf="status === 'error'" style="color:#D06079;" class="custom-h5 error">
+      {{ 'CDSModalActivateBot.AnErroOccurredWhilePublishingTheBot' | translate }}
+    </h5>
+
+    <div class="publish-result">
+      <div *ngIf="status === 'pending'">
+        <div class="loading-text">
+          {{ 'PreparingToPublish' | translate }}<span class="dot">.</span><span class="dot">.</span><span
+            class="dot">.</span>
+        </div>
+      </div>
+    </div>
+
+
+    <ng-container *ngIf="!selectedChatbot?.subtype || selectedChatbot?.subtype === 'chatbot'">
+      <div *ngIf="status === 'success' && hideInstallButton === false" class="publish-success">
+        <div class="publish-success-content chatbot">
+
+
+          <div> {{ 'NowThatYouHavePublished' | translate }}</div>
+
+          <button id="cds-present-install-btn" type="button" class="btn btn-primary cds-blue-button"
+            (click)="presentInstallModal()">
+            {{ 'InstallWidget' | translate }}
+          </button>
+
+          <div>
+            <mat-checkbox (change)="onChangeCheckbox($event)">
+              {{ 'DoNotShowThisAgain' | translate }}
+            </mat-checkbox>
+          </div>
+
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container
+      *ngIf="selectedChatbot?.subtype && (selectedChatbot?.subtype === 'copilot' || selectedChatbot?.subtype === 'webhook')">
+      <div *ngIf="status === 'success'" class="publish-success">
+        <div class="publish-success-content webhook">
+
+          <div> {{ 'NowThatYouHavePublishedWhCp' | translate : { sub_type: selectedChatbot?.subtype } }}</div>
+
+          <div class="webhook-url-wpr">
+            <input #copyInput type="text" class="webhook-input" [value]="webhookUrl" readonly>
+
+            <div class="webhook-copy-icon-wpr" (click)="copyToClipboard(copyInput.value)"
+              matTooltip="{{'Copied' | translate}}!"
+              #tooltip="matTooltip" 
+              matTooltipClass="cds-mat-tooltip" 
+              [matTooltipDisabled]="true"
+              matTooltipPosition="above">
+              <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+            
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

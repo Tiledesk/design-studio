@@ -10,6 +10,9 @@ export const DOCS_LINK = {
         advanced_prompt: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#advanced-context', target: '_blank' }, 
         citations: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#get-contents-sources', target: '_blank' }
     }, 
+    ADD_TO_KB: {
+        namespace_as_name: { link: 'https://gethelp.tiledesk.com/articles/add-to-knowledge-base-action/', target: '_blank'},
+    },
     GPT_TASK : {
         json_mode: { link: 'https://platform.openai.com/docs/guides/structured-outputs/json-mode', target: '_blank' }
     },
@@ -21,6 +24,17 @@ export const DOCS_LINK = {
     },
     JSON_BUTTONS: {
         more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
+    },
+    VOICE_SETTINGS: {
+        tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
+        stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
+        voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
+        voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+    },
+    LIQUIDJS: {
+        home: { link: 'https://liquidjs.com/tutorials/intro-to-liquid.html', target: '_blank'},
+        tags: { link: 'https://liquidjs.com/tags/overview.html', target: '_blank'},
+        filters: { link: 'https://liquidjs.com/filters/overview.html', target: '_blank'},
     }
 }
 
@@ -59,16 +73,18 @@ export enum INTENT_COLORS {
   }
 
 export enum SIDEBAR_PAGES {
-    INTENTS     = 'cds-sb-intents',
-    SETTINGS    = 'cds-sb-settings',
-    // FULFILLMENT = 'cds-sb-fulfillment',
-    RULES       = 'cds-sb-rules',
-    GLOBALS     = 'cds-sb-globals',
-    SUPPORT     = 'cds-sb-support'
+    INTENTS         = 'cds-sb-intents',
+    SETTINGS        = 'cds-sb-settings',
+    // FULFILLMENT  = 'cds-sb-fulfillment',
+    PUBLISH_HISTORY = 'cds-sb-publish-history',
+    RULES           = 'cds-sb-rules',
+    GLOBALS         = 'cds-sb-globals',
+    SUPPORT         = 'cds-sb-support'
 }
 
 export enum SETTINGS_SECTION {
     DETAIL          = 'bot_detail',
+    VOICE_SETTINGS  = 'voice_settings',
     IMPORT_EXPORT   = 'export',
     COMMUNITY       = 'community',
     DEVELOPER       = 'developer',
@@ -82,11 +98,11 @@ export enum EXTERNAL_URL {
 }
 
 export enum TYPE_INTENT_NAME {
-    TOPIC_INTERNAL                  = "internal",
+    TOPIC_INTERNAL     = "internal",
     START              = "start",
     DEFAULT_FALLBACK   = "defaultFallback",
-    WEBHOOK                         = 'webhook',
-    CLOSE                           = "close"
+    WEBHOOK            = 'webhook',
+    CLOSE              = "close"
 }
 
 export enum TYPE_MATH_OPERATOR {
