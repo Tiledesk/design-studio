@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.36.1
+- **bug-fixed**: css bug fixed in widget-log 
 
 # 1.36.0
 - **bug-fixed**: added width and height to previewModel images in action reply gallery
