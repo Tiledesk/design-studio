@@ -105,7 +105,7 @@
     display: inline-block;
     cursor: pointer;
     width: 0px;
-    height: 24px;
+    height: auto;
     font-size: 20px;
     margin-top: 3px;
     transition: transform 0.3s ease;
@@ -129,6 +129,7 @@
   color: var(--gray);
   display: inline-block;
   width: 120px;
+  min-width: 120px;
 }
 
 .row-log-level {
@@ -136,6 +137,7 @@
   font-weight: 500;
   display: inline-block;
   width: 55px;
+  min-width: 55px;
   &.native{
     color: var(--grey);
   }
