@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.37.0
+
+# 1.37.0-rc1
+- **changed**: Ask Kb type from 'text' to 'faq'
+
 # 1.36.1
 - **bug-fixed**: css bug fixed in widget-log 
 
