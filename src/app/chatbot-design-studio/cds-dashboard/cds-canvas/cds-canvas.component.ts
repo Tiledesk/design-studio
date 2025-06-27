@@ -559,7 +559,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** closeAllPanels */
   private closeAllPanels(){
-    this.controllerService.stopTestItOut();
     if(this.IS_OPEN_PANEL_WIDGET){
       this.closePanelWidget();
     }
@@ -845,8 +844,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log('[CDS CANVAS] DOCUMENT CLICK event: ', event.target.id, event);
     if (event.target.id.startsWith("cdk-drop-list-") && !event.target.className.includes('button-replies')) {
       this.removeConnectorDraftAndCloseFloatMenu();
-      // this.controllerService.closeActionDetailPanel();
-      // this.controllerService.closeButtonPanel();
+      this.controllerService.stopTestItOut();
       this.closeAllPanels();
       this.closeActionDetailPanel();
     }
