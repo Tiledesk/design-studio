@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.37.0-rc3
+- **bug-fixed**: delete webhook only when it is stopped
 
 # 1.37.0-rc2
 - **bug-fixed**: widget-log: disabled collapse row; stop webhook log when click on the stage
