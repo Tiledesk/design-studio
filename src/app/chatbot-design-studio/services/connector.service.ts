@@ -1028,6 +1028,7 @@ export class ConnectorService {
       delete intent.attributes.connectors[idConnector];
     }
     this.hideContractConnector(idConnection);
+    this.logger.log('[CONNECTOR-SERV] deleteConnector::  intent ', intent);
     this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 

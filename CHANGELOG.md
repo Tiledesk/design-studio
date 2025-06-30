@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.37.1-rc1
+- **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
+
+# 1.37.1
+
 # 1.37.0-rc3
 - **bug-fixed**: delete webhook only when it is stopped
 
