@@ -327,7 +327,7 @@ export class CdsActionReplyV2Component implements OnInit {
 
   /** onConnectorChangeReply */
   onConnectorChangeReply(event){
-    this.logger.log('onConnectorChangeReply ************', event, this.action);
+    this.logger.log('[cds-action-reply] onConnectorChangeReply ************', event, this.action);
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     this.onConnectorChange.emit(event)
   }

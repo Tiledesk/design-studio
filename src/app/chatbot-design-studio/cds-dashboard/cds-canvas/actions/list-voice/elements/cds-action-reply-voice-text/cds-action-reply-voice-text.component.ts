@@ -148,7 +148,7 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
           buttonChanged.__isConnected = false;
           buttonChanged.__idConnector = this.connector.fromId;
           buttonChanged.__idConnection = null;
-          //buttonChanged.action = '';
+          buttonChanged.action = '';
           buttonChanged.type = TYPE_BUTTON.TEXT;
           if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
         } else {

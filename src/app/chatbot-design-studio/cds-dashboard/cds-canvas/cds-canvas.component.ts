@@ -1572,6 +1572,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       if(intent && !intent.attributes?.connectors){
         intent.attributes['connectors'] = {};
       } 
+
+      this.logger.log('[CDS-CANVAS] onAddActionFromConnectorMenu intent:: ', intent);
+
       if(event.type === "show-hide" && event.connector){
         this.logger.log('[CDS-CANVAS] show-hide:: ', event.connector);
         this.connectorService.hideDefaultConnector(event.connector.id);
