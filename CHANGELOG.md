@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.38.0-rc2
+- **changed**: refactoring intent component
+
 # 1.38.0-rc1
 - **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
 
