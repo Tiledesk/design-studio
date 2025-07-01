@@ -410,13 +410,14 @@ export class ActionAskGPT extends Action {
 export class ActionKBContent extends Action {
     name: string;
     content: string;
+    source: string;
     type: string;
     namespace: string;
     namespaceAsName: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.KB_CONTENT;
-        this.type = "text";
+        this.type = "faq";
     }
 }
 
@@ -425,6 +426,7 @@ export class ActionAskGPTV2 extends Action {
     model: string;
     assignReplyTo: string;
     assignSourceTo: string;
+    assignChunksTo: string;
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
@@ -434,11 +436,13 @@ export class ActionAskGPTV2 extends Action {
     max_tokens: number;
     temperature: number;
     top_k: number;
+    alpha: number;
     context: string;
     history: boolean;
     advancedPrompt?: boolean;
     namespaceAsName: boolean;
-    citations: boolean
+    citations: boolean;
+    chunks_only: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2

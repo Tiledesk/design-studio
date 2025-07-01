@@ -247,15 +247,20 @@ export class CdsActionDetailPanelComponent implements OnInit, OnChanges {
    * IMPORTANTE: questa funzione deve SOLO aggiornare i connettori e NON deve salvare e NON deve aggiungere UNDO.
    */
   onConnectorChange(type: 'create' | 'delete', idConnector: string, toIntentId: string){
+    this.logger.log('[cds-panel-action-detail] onConnectorChange', type, idConnector, toIntentId);
     const fromId = idConnector;
     let toId = '';
     this.connectorService.updateConnectorAttributes(idConnector, null);
     switch(type){
       case 'create':
-        const posId = toIntentId.indexOf("#");
-        if (posId !== -1) {
-          toId = toIntentId.slice(posId+1);
-        }
+        let toId = toIntentId;
+        if (toIntentId.includes('#')) {
+          toId = toIntentId.split('#')[1];
+          if(toIntentId.includes('{')) {
+            toId = toIntentId.split('#')[1].split('{')[0];
+          }
+        } 
+        this.logger.log('[cds-panel-action-detail] onConnectorChange create', fromId, toId);
         this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, true);
         this.connectorService.createNewConnector(fromId, toId);
         break;

@@ -111,6 +111,8 @@ export class WebhookService {
   }
 
 
+
+
   checkIfThereIsWebResponse(){
     const listOfIntents = this.intentService.listOfIntents;
     let thereIsWebResponse = false;
@@ -198,7 +200,6 @@ export class WebhookService {
     this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
     return this._httpClient.post<any>(url, JSON.stringify(body), httpOptions);
   }
-
 
 
 }

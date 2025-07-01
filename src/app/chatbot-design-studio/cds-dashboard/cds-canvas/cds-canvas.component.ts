@@ -16,7 +16,7 @@ import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
 
 // UTILS //
-import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS } from '../../utils';
+import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
 import { LOGOS_ITEMS } from './../../utils-resources';
 
 
@@ -28,6 +28,7 @@ import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storag
 import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
 import { WebhookService } from '../../services/webhook-service.service';
+import { Chatbot } from 'src/app/models/faq_kb-model';
 
 // const swal = require('sweetalert');
 
@@ -63,6 +64,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   id_faq_kb: string;
   TYPE_OF_MENU = TYPE_OF_MENU;
+  TYPE_INTENT_NAME = TYPE_INTENT_NAME;
 
   private subscriptionListOfIntents: Subscription;
   listOfIntents: Array<Intent> = [];
@@ -143,7 +145,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   startDraggingPosition: any = null;
   mesage_request_id: string;
 
+  // ---------------------------------------------------
+  // @ Toggle Publish Panel 
+  // ---------------------------------------------------
+  private subscriptionTogglePublishPanelState: Subscription;
+  IS_OPEN_PUBLISH_PANEL: boolean = false;
+
+
   chatbotSubtype: string;
+  selectedChatbot: Chatbot;
+  projectID: string;
 
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
@@ -204,6 +215,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (this.subscriptionUndoRedo) {
       this.subscriptionUndoRedo.unsubscribe();
     }
+
+    if (this.subscriptionTogglePublishPanelState) {
+      this.subscriptionTogglePublishPanelState.unsubscribe();
+    }
+
+
+    
     document.removeEventListener("connector-drawn", this.listnerConnectorDrawn, false);
     document.removeEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
     document.removeEventListener("start-dragging", this.listnerStartDragging, false);
@@ -499,31 +517,50 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   
 
     this.subscriptionOpenWidgetPanel = this.intentService.BSTestItOut.pipe(skip(1)).subscribe((intent) => {
-      this.logger.log("[CDS-CANVAS] BSTestItOut ", intent);
+      this.logger.log("[CDS-CANVAS] ******* BSTestItOut ", intent);
       if(intent){
         this.onTestItOut(intent);
         this.IS_OPEN_WIDGET_LOG = true;
-        // this.controllerService.onPlayTestItOut();
-        // this.logger.log('[CDS-CANVAS] OPEN TEST IT OUT');
-        // if(this.dashboardService.selectedChatbot.subtype !== 'webhook'){
-        //   // devo aprire il widget nel pannello
-        //   
-        // } else {
-        //   // devo aprire il pannello del log 
-        //   this.IS_OPEN_PANEL_WIDGET = false;
-        //   this.IS_OPEN_WIDGET_LOG = true;
-        // }
       } else {
         //this.controllerService.onStopTestItOut();
         this.logger.log('[CDS-CANVAS] CLOSE TEST IT OUT');
         this.IS_OPEN_PANEL_WIDGET = false;
         //this.IS_OPEN_WIDGET_LOG = false;
       }
-    });
+    });    
+
+    this.subscriptionTogglePublishPanelState = this.controllerService.isOpenPublishPanel$.subscribe((event: any) => {
+      this.logger.log("[CDS-CANVAS] has opened Publish panel ", event);
+      // this.IS_OPEN_PUBLISH_PANEL = event
+      this.logger.log("[CDS-CANVAS] has opened Publish IS_OPEN_PUBLISH_PANEL ", this.IS_OPEN_PUBLISH_PANEL);
+      // isOpenButtonPanel
+      // if (event) {
+      //   this.closeAllPanels();
+      //   this.closeActionDetailPanel()
+      // } else {
+      //   this.IS_OPEN_ADD_ACTIONS_MENU = false;
+      // }
+
+      if (event) {
+        this.closeAllPanels();
+        this.closeActionDetailPanel();
+        // this.IS_OPEN_PANEL_WIDGET = false;
+        this.removeConnectorDraftAndCloseFloatMenu();
+        setTimeout(() => {
+          this.IS_OPEN_PUBLISH_PANEL = true;
+        }, 0);
+      } else {
+        this.IS_OPEN_PUBLISH_PANEL = false;
+      }
+    });    
   }
 
    /** initialize */
    private async initialize(){
+    this.selectedChatbot = this.dashboardService.selectedChatbot;
+    this.projectID = this.dashboardService.projectID;
+    // console.log('[CDS-CANVAS] selectedChatbot ::', this.selectedChatbot);
+    // console.log('[CDS-CANVAS] projectID ::', this.projectID);
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
     let getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
@@ -569,6 +606,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
     this.IS_OPEN_COLOR_MENU = false;
+    this.IS_OPEN_PANEL_WIDGET = false;
+    this.IS_OPEN_PUBLISH_PANEL = false;
     // // this.intentService.inactiveIntent();
   }
 
@@ -613,7 +652,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     const intent = this.intentService.getIntentFromId(idIntentFrom);
     const color = intent?.attributes?.color ?? INTENT_COLORS.COLOR1;
     const opacity = this.stageService.getAlpha()/100;
-    this.logger.log('[CDS-CANVAS] setConnectorColor ', connector, opacity);
+    //this.logger.log('[CDS-CANVAS] setConnectorColor ', connector, opacity);
     this.connectorService.setConnectorColor(intent.intent_id, color, opacity);
   }
 
@@ -688,12 +727,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       // // el.style.zIndex = 1;
       this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected.attributes.position);
       this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
-      // //let position = this.intentService.intentSelected.attributes.position;
-      // //if(this.startDraggingPosition.x === position.x && this.startDraggingPosition.y === position.y){
-      // //this.onIntentSelected(this.intentService.intentSelected);
-      // //}
+      // Verifica se la posizione è cambiata (drag effettivo)
+      const pos = this.intentService.intentSelected.attributes.position;
+      const dragged = !this.startDraggingPosition ||
+        (pos && (pos.x !== this.startDraggingPosition.x || pos.y !== this.startDraggingPosition.y));
       this.closeAllPanels();
       this.intentService.updateIntentSelected();
+      if (!dragged) {
+        this.openWebhookIntentPanel(this.intentService.intentSelected);
+      }
     };
     document.addEventListener("end-dragging", this.listnerEndDragging, false);
 
@@ -1354,10 +1396,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // -------------------------------------------------------
   onTestItOut(intent: Intent) {
     if(intent){
-      // // this.testItOut.emit(true);
       this.closeAllPanels();
       this.testitOutFirstClick = true;
-      this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
       this.intentService.startTestWithIntent(intent);
       this.controllerService.closeActionDetailPanel();
       this.controllerService.closeButtonPanel();
@@ -1368,6 +1408,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.intentService.setIntentSelectedById(intent.intent_id);
       this.intentService.setIntentSelected(intent.intent_id);
       this.closeExtraPanels();
+      this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
     }
     const subtype = this.dashboardService.selectedChatbot.subtype;
     if(subtype !== TYPE_CHATBOT.WEBHOOK && subtype != TYPE_CHATBOT.COPILOT){
@@ -1554,6 +1595,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // --------------------------------------------------------- //
 
 
+  openWebhookIntentPanel(intent: Intent){
+    const webhookIntent = intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK ? true:false;
+    if(webhookIntent){
+      this.onOpenIntent(intent);
+    }
+  }
+
   public onShowContextMenu(event: MouseEvent): void {
     event.preventDefault();
     this.logger.log('[CDS-CANVAS] onShowContextMenu:: ', event);
@@ -1574,11 +1622,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   public onNewConversation(request_id){
     this.logger.log('[CDS-CANVAS] onNewConversation:: ',this.elementIntentSelected, this.logService.request_id, request_id);
     if(this.logService.request_id !== request_id){
-
-    // const support_group_id = message.recipient?message.recipient:null;
-    // const projectId = message.attributes?.projectId?message.attributes?.projectId:null;
-    // this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', support_group_id, projectId);
-
+      // const support_group_id = message.recipient?message.recipient:null;
+      // const projectId = message.attributes?.projectId?message.attributes?.projectId:null;
+      // this.logger.log('[CDS-PANEL-WIDGET] initLogService  ', support_group_id, projectId);
       this.logService.initialize(request_id); 
       this.IS_OPEN_WIDGET_LOG = true;
       this.mesage_request_id = request_id;

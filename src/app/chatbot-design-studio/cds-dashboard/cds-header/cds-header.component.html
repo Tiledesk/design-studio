@@ -37,11 +37,19 @@
 
         <div *ngIf="isBlockSectionActive" class="btn-group" id="cds-publish-btn-wrp" [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
             <button *ngIf="(!isPlaying && isWebhook) || !isWebhook" id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="onClickPublish()">
-                <span class="material-icons">
+                <!-- <span class="material-icons">
                     cached
-                </span>
+                </span> -->
                 {{ 'Publish' | translate}}
             </button>
+
+            <!-- <button mat-icon-button [matMenuTriggerFor]="releasehistory"  class="custom-mat-icon-btn">
+                <mat-icon> arrow_drop_down </mat-icon>
+            </button> -->
+              
+           
+
+
             <!-- (click)="isOpenDropdown(isOpen = !isOpen)"  [ngClass]="{'caret-rotate-0': is0penDropDown === true, 'caret-rotate-180': is0penDropDown === false}" -->
             <!-- <button id="cds-publish-btn-option" type="button" class="btn btn-primary dropdown-toggle"
                 data-toggle="dropdown">
@@ -79,7 +87,7 @@
             </ul> -->
         </div>
 
-        <div *ngIf="TRY_ON_WA === true && isBlockSectionActive && !isWebhook" class="btn-group">
+        <div *ngIf="TRY_ON_WA === true && isBlockSectionActive && !isWebhook && !isPlaying" class="btn-group">
             <button id="cds-test-it-wab-out-btn" class="btn btn-primary cds-blue-button" type="button" (click)="openWhatsappPage()">
                 <img width="18px" height="18px" src="assets/images/channel_icons/whatsapp-logo_green.svg">
                 {{ 'TryOnWhatsapp' | translate}}
@@ -146,7 +154,7 @@
     </ng-template>
 </mat-menu>
 
-<!-- SHARE MENU OPTIONS-->
+<!-- SHARE MENU OPTIONS -->
 <mat-menu #menuShare="matMenu" class="menuElement shareMenu" xPosition="after" yPosition="below">
     <ng-template matMenuContent>
         <cds-menu
@@ -157,6 +165,14 @@
         </cds-menu>
     </ng-template>
 </mat-menu>
+
+<!-- RELEASE HISTORY OPTIONS -->
+<!-- <mat-menu #releasehistory="matMenu">
+    <button mat-menu-item>
+      <mat-icon>history</mat-icon>
+      <span>Release history</span>
+    </button>
+</mat-menu> -->
 
 <!-- PLAY MENU OPTIONS-->
 <mat-menu #menuPlay="matMenu" class="menuElement playMenu" xPosition="after" yPosition="below">

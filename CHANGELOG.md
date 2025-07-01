@@ -7,11 +7,276 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.37.1
+
+# 1.37.0-rc2
+- **bug-fixed**: widget-log: disabled collapse row; stop webhook log when click on the stage
+
+# 1.37.0-rc1
+- **changed**: Ask Kb type from 'text' to 'faq'
+
+# 1.36.1
+- **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0
+- **bug-fixed**: added width and height to previewModel images in action reply gallery
+- **bug-fixed**: in widget-log added ellips on the row, row opening, fixed display for very long texts, added selectable text, graphic adjustments
+- **changed**: added ellips in log lines in ds-widget-logs.component
+- **bug-fixed**: all actions that contain block selection on true/false do not display connector on stage when create via action detail panel
+- **bug-fixed**: about corrupted connectors with full dot but no connector on the stage
+- **bug-fixed**: the webhook opens the detail also on drag, it should open it only on click
+
+# 1.35.2
+- **bug-fixed**: updated textarea value in action AI prompt
+
+# 1.35.1
+
+# 1.35.0-rc13
+- **bug-fixed**: getWebhook only if block is "webhook"
+
+# 1.35.0-rc12
+- **bug-fixed**: show first log message via static service call
+
+# 1.35.0-rc11
+- **bug-fixed**: Start log of a chatbot or webhook
+- **bug-fixed**: Stop and restart log on webhook regeneration
+
+# 1.35.0-rc10
+- **bug-fixed**: create a webhook when chatbot starts only if chatbot automation
+
+# 1.35.0-rc9
+- **bug-fixed**: enabled chunks_only check and pass chunks_only var in ActionAskGPTV2
+
+# 1.35.0-rc8
+- **bug-fixed**: enabled chunks_only check and pass chunks_only var in ActionAskGPTV2
+- **added**: added findAndUpdateProperty TTS_MODEL and STT_MODEL in voice-settings
+
+# 1.35.0-rc7
+- **bug-fixed**: css chunks list in ActionAskGPTV2
+
+# 1.35.0-rc6
+- **added**: Show used chunks in ActionAskGPTV2
+
+# 1.35.0-rc5
+- **bug-fixed**: Changed action param "aplpha" to "alpha" in ActionAskGPTV2
+
+# 1.35.0-rc4
+- **bug-fixed**: Changed chunksOnly to chunks_only in ActionAskGPTV2
+- **bug-fixed**: Create webhooks only when chatbotSubtype !== chatbot on startup.
+
+# 1.35.0-rc3
+- **added**: added "search only" parameter and filter on parameter in kb
+- **changed**: in connector selection the connectable blocks are in alphabetical order (in go to block)
+- **changed**: in replace AI agent the slug in brackets is added if it exists
+
+# 1.35.0-rc2
+- **changed**: New log level supported (native)
+- **added**: Added to Flow Logs action the log level
+- **added**: added to local storage the log panel status
+- **bug-fixed**: the "start" color, changed back to white
+
+# 1.35.0-rc1
+- **added**: added webhook creation in intent component when webhook/copilot block is displayed
+- **bug-fixed**: fixed bug on webhook stop/play to make it restart from first block to play
+
+
+# 1.35.0
+
+
+# 1.34.1
+- **bug-fixed**: in AI prompt action, model must match value, now it matches label
+- **changed**: hidden alpha limit slider in the ask gpt v2 action
+
+# 1.34.0-rc6
+- **bug-fixed**: Drag and drop on intent header not working
+- **changed**: Fix CDS interface for Liquid on textarea
+- **changed**: Highlighted log line needs to be lighter color
+
+# 1.34.0-rc5
+- **added**: Added alpha parameter on CDS in AI settings of ask kb
+- **changed**: preview text in action set attribute truncated to 8 lines
+- **added**: in each textarea with attributes button enabled, added 3 liquid buttons
+
+# 1.34.0-rc4
+- **bug-fixed**: in deleteWebhook changed the parameter passed in the call from chatbot_id to webhook_id
+- **changed**: changed cursor icon in the header log panel
+- **added**: added background color animation on log lines
+- **changed**: changed follow log icons
+- **bug-fixed**: when I press stop test the log does not close
+
+# 1.34.0-rc3
+- **bug-fixed**: fixed translation of AvailableToAgents
+- **bug-fixed**: enabled resize on json buttons box
+- **bug-fixed**: added "on" in: More on JSON buttons
+- **bug-fixed**: fixed json buttons in preview action reply
+- **added**: added summary to action add content to kb
+- **changed**: intent title and highlighted border must be the same, without opacity
+- **changed**: changed icon in action log
+
+# 1.34.0-rc2
+- **changed**: set default val "kb_chunks"
+
+# 1.34.0-rc1
+- **added**: "Chunks only" in action "ask knowledge base"
+
+# 1.34.0
+
+# 1.33.0-rc3
+- **added**: TTS_VOICE_LANGUAGE to voice settings section
+
+# 1.33.0-rc2
+- **added**: set default chunks value
+
+# 1.33.0-rc1
+- **added**: added "Assign KB Chunks to" in action "ask knowledge base"
+
+# 1.32.2
+- **changed**: limit chunk to 40
+- **added**: move position on start on "intent webhook"
+- **bug-fixed**: restored VOICE_TWILIO in utils-actions
+- **added**: added tooltip in log panel
+- **bug-fixed**: Status 200 not displayed with newly created webhook
+- **bug-fixed**: Labels ProductionURL/Development URL
+- **changed**: Open Webhook detail in Large Mode
+- **bug-fixed**: “Development webhook is currently turned off”: the first time you press start it doesn’t work
+- **bug-fixed**: Fix margins on hover in History
+- **bug-fixed**: Remove action Replace Bot from Webhook
+- **bug-fixed**: Remove action Lead update from Webhook
+- **bug-fixed**: Remove action Change Department from Webhook
+- **bug-fixed**: Rename action Replace Bot to Replace AI Agent
+- **bug-fixed**: Log highlight must flash even if you click on a log of the same block
+- **bug-fixed**: On the webhook play you must also center the “start” of the webhook like other blocks (vertically)
+- **bug-fixed**: changed padding-left in publish-history
+- **added**: added animation log message
+- **bug-fixed**: fixed z-index on "message url copied"
+- **bug-fixed**: changed webhook labels
+- **bug-fixed**: Removed "change department"
+- **bug-fixed**: changed "Replace bot" to "Replace AI Agent”
+- **changed**: replaced 'voice-twilio' with 'voice_twilio'
+- **added**: Display a message on the Release History page when there are no versions
+- **added**: ability to reset voice settings select options
+- **bug-fixed**: cannot able to save voice settings if globals not exist yes
+- **bug-fixed**: show all log messages
+- **bug-fixed**: added border on intent selected when log is active
+- **bug-fixed**: fixed cssbugs in panel log
+- **bug-fixed**: minor fix on chatbot types
+- **bug-fixed**: Check last repeated log in webhooks. To replicate, start a webhook, call it, then stop and play again. Last log of web response reappears.
+- **bug-fixed**: Check first log in ai agents. The first log is “action reply terminated”, it seems that the first log is lost. Question of queue subscription timing?
+- **bug-fixed**: Publish button disappeared in webhooks: you always see the dev url that should be visible only after pressing play and should disappear when you press stop.
+- **bug-fixed**: Put separate production and dev urls in the webhook detail
+- **bug-fixed**: If you press play on the webhook and then stop without calling it, the webhook block continues to flash
+- **bug-fixed**: In the webhook detail use the default setting “wide” so that the entire url is visible
+- **bug-fixed**: Widen the div of the dev url next to the start/stop and add a tooltip that says “Copy dev url” and after copying it replace “Text copied successfully” with “Dev url copied successfully”
+- **bug-fixed**: Regenerate button must show alert that says “Warning, regenerating the webhook url the previous url will no longer be available”.
+- **added**: voice settings tab into settings section to configure provider, voice, tts model and stt model (only for voice chatbot)
+
+
+# 1.31.4
+- **bug-fixed**: bug fixed textarea
+- **bug-fixed**: hide connector icon
+- **bug-fixed**: set attributes and select block in panel button reply  
+
+
+
+# 1.32.0-rc13
+- **changed**: limit chunk to 40
+- **added**: move position on start on "intent webhook"
+
+# 1.32.0-rc12
+- **bug-fixed**: restored VOICE_TWILIO in utils-actions
+- **added**: added tooltip in log panel
+
+# 1.32.0-rc11
+- **bug-fixed**: Status 200 not displayed with newly created webhook
+- **bug-fixed**: Labels ProductionURL/Development URL
+- **changed**: Open Webhook detail in Large Mode
+- **bug-fixed**: “Development webhook is currently turned off”: the first time you press start it doesn’t work
+- **bug-fixed**: Fix margins on hover in History
+- **bug-fixed**: Remove action Replace Bot from Webhook
+- **bug-fixed**: Remove action Lead update from Webhook
+- **bug-fixed**: Remove action Change Department from Webhook
+- **bug-fixed**: Rename action Replace Bot to Replace AI Agent
+- **bug-fixed**: Log highlight must flash even if you click on a log of the same block
+- **bug-fixed**: On the webhook play you must also center the “start” of the webhook like other blocks (vertically)
+
+# 1.32.0-rc10
+- **bug-fixed**: changed padding-left in publish-history
+
+# 1.32.0-rc9
+- **added**: added animation log message
+- **bug-fixed**: fixed z-index on "message url copied"
+- **bug-fixed**: changed webhook labels
+- **bug-fixed**: Removed "change department"
+- **bug-fixed**: changed "Replace bot" to "Replace AI Agent”
+
+# 1.32.0-rc8
+- **changed**: replaced 'voice-twilio' with 'voice_twilio'
+
+# 1.32.0-rc7
+- **added**: Display a message on the Release History page when there are no versions
+
+# 1.32.0-rc6
+- **added**: ability to reset voice settings select options
+- **bug-fixed**: cannot able to save voice settings if globals not exist yes
+
+# 1.32.0-rc5
+- **bug-fixed**: show all log messages
+- **bug-fixed**: added border on intent selected when log is active
+- **bug-fixed**: fixed cssbugs in panel log
+
+# 1.32.0-rc4
+
+# 1.32.0-rc3
+- **bug-fixed**: minor fix on chatbot types
+
+# 1.32.0-rc2
+- **bug-fixed**: Check last repeated log in webhooks. To replicate, start a webhook, call it, then stop and play again. Last log of web response reappears.
+- **bug-fixed**: Check first log in ai agents. The first log is “action reply terminated”, it seems that the first log is lost. Question of queue subscription timing?
+- **bug-fixed**: Publish button disappeared in webhooks: you always see the dev url that should be visible only after pressing play and should disappear when you press stop.
+- **bug-fixed**: Put separate production and dev urls in the webhook detail
+- **bug-fixed**: If you press play on the webhook and then stop without calling it, the webhook block continues to flash
+- **bug-fixed**: In the webhook detail use the default setting “wide” so that the entire url is visible
+- **bug-fixed**: Widen the div of the dev url next to the start/stop and add a tooltip that says “Copy dev url” and after copying it replace “Text copied successfully” with “Dev url copied successfully”
+- **bug-fixed**: Regenerate button must show alert that says “Warning, regenerating the webhook url the previous url will no longer be available”.
+
+# 1.32.0-rc1
+- **added**: voice settings tab into settings section to configure provider, voice, tts model and stt model (only for voice chatbot)
+
+# 1.31.4
+- **bug-fixed**: bug fixed textarea
+- **bug-fixed**: hide connector icon
+- **bug-fixed**: set attributes and select block in panel button reply  
+
+# 1.31.2-rc10
+- **added**: Adds the ability to roll a chatbot back to a previous version
+
+# 1.31.2-rc9
+- **changed**: bug fix and change animation block intent selected on testit
+
+# 1.31.2-rc8
+- **changed**: change web log active 
+
+# 1.31.2-rc7
+- **changed**: change the web log animation of the selected intent
+
+# 1.31.2-rc6
+- **bug-fixed**: change attributes in web-request json body textarea to {{ attribute|json }}
+- **bug-fixed**: fixed css textarea, bug "added attributes". 
+
+# 1.31.2-rc5
+- **added**: added webhook play and stop to header canvas
+
+# 1.31.2-rc4
+- **bug-fixed**: changed labels for add_kb_content action
+
 # 1.31.2-rc3
-- **added**: added webhook in header
+- **added**: new action add_kb_content
 
 # 1.31.2-rc2
 - **bug-fixed**: changed freePlanLimitDate
+
+# 1.31.3
+
 
 # 1.31.2-rc1
 - **bug-fixed**: test freePlanLimitDate
@@ -19,6 +284,7 @@
 
 # 1.31.1
 - **bug-fixed**: disabled widget log 
+
 
 # 1.31.0
 

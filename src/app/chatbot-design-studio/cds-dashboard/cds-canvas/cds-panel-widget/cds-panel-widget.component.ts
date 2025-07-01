@@ -24,27 +24,16 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   @ViewChild('widgetIframe', {static:true}) widgetIframe:ElementRef;
   @Input() isPanelVisible: boolean = false;
   @Output() newConversation = new EventEmitter();
-
-  // @Input() intent: Intent;
-  // @Input() projectID: string;
-  // @Input() id_faq_kb: string;
-  // @Input() defaultDepartmentId: string;
-  // @Input() intentName: string;
-
   intentName: string;
-  
   projectID: string;
   selectedChatbot: Chatbot;
   defaultDepartmentId: string;
   support_group_id: string;
-
   public iframeVisibility: boolean = false;
   public loading:boolean = true;
-
   WIDGET_BASE_URL: string = '';
   widgetTestSiteUrl: SafeResourceUrl = null;
   private messageListener: (event: Event) => void;
-
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor( 
@@ -58,12 +47,10 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // this.initTiledesk();
     if(!this.intentService.intentSelected){
       this.intentService.setDefaultIntentSelected();
     }
     this.intentName = this.intentService.intentSelected.intent_display_name;
-    
     this.resetLogService();
     /** allow to start a new converation if intent change and user has select 'play' icon from intent heaader
      *  (skip only the first time --> setIframeUrl() make the first iteration calling widget url)
@@ -90,6 +77,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     const iframe = document.querySelector('iframe');
     if (iframe) {
       iframe.addEventListener('load', (event) => {
+        this.logger.log('[CDS-PANEL-WIDGET] onLoaded  ');
         this.onLoaded(event);
       });
     }
@@ -109,7 +97,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     if(this.intentName && this.intentName !== '') 
       url += '&tiledesk_hiddenMessage=' + this.intentName            
     this.widgetTestSiteUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    // this.logger.log('[CDS-PANEL-WIDGET] setIframeUrl ----------------- DA QUI ---------------  ');
+    this.logger.log('[CDS-PANEL-WIDGET] setIframeUrl ----------------- DA QUI ---------------  ');
   }
 
   onLoaded(event){
@@ -131,7 +119,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
         this.newConversation.emit(conversation_id);
       } else if(eventData?.source?.includes('widget')){
         let message = eventData?.data?.message;
-        this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message);
+        this.logger.log('[CDS-PANEL-WIDGET] NEW MESSAGE ', message, this.support_group_id);
         if(message && message.status>0){
           if(!this.support_group_id){
             this.initLogStaticServices(message);
