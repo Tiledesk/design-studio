@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.37.2
+- **bug-fixed**: delete webhook only when it is stopped
+
 # 1.37.1
 
 # 1.37.0-rc2
