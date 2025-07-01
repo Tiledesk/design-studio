@@ -422,8 +422,8 @@ cds-image-upload ::ng-deep {
         img{
             height: 100% !important;
             width: 100% !important;
-            -o-object-fit: cover;
-            object-fit: cover;
+            -o-object-fit: contain;
+            object-fit: contain;
         }
 
         &:hover{
@@ -684,6 +684,20 @@ cds-textarea#description.noButtons ::ng-deep{
         }
         
     }
+}
+
+.text-editable-div {
+    display: block;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.action-reply-gallery .buttons-json-response {
+    padding: 20px var(--input-base-margin);
+}
+
+.json-text {
+    padding-top: 40px;
 }
 /** TEXT AREA: end **/
 ////////////////////////////

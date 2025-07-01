@@ -8,11 +8,18 @@
 *Tiledesk SRL*
 
 
+# 1.38.0-rc3
+- **added**: json gallery in action reply gallery
+
 # 1.38.0-rc2
 - **changed**: refactoring intent component
 
 # 1.38.0-rc1
 - **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
+
+
+# 1.37.2
+- **bug-fixed**: delete webhook only when it is stopped
 
 # 1.37.1
 
