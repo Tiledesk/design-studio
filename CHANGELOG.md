@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.38.0-rc3
+- **added**: json gallery in action reply gallery
+
 # 1.38.0-rc2
 - **changed**: refactoring intent component
 
