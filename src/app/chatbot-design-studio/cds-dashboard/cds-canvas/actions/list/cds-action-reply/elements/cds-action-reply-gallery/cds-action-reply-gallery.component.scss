@@ -696,7 +696,11 @@ cds-textarea#description.noButtons ::ng-deep{
     padding: 20px var(--input-base-margin);
 }
 
-.json-text {
+.json-text .text-editable-div{
+    padding-top: 40px;
+}
+
+.json-text .button-controls{
     padding-top: 40px;
 }
 /** TEXT AREA: end **/
