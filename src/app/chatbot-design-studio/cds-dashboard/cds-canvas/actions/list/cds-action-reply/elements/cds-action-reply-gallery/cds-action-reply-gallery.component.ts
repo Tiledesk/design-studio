@@ -3,7 +3,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 import { DomSanitizer } from '@angular/platform-browser';
 import { ConnectorService } from '../../../../../../../services/connector.service';
 import { IntentService } from '../../../../../../../services/intent.service';
-import { TYPE_BUTTON, TYPE_URL, generateShortUID } from '../../../../../../../utils';
+import { TEXT_CHARS_LIMIT, TYPE_BUTTON, TYPE_URL, generateShortUID } from '../../../../../../../utils';
 import { Button, Expression, GalleryElement, Message, Wait, Metadata, MessageAttributes } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -30,6 +30,7 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   @Input() wait: Wait;
   @Input() index: number;
   @Input() previewMode: boolean = true;
+  @Input() limitCharsText: number = TEXT_CHARS_LIMIT;
   
   // Connector //
   idIntent: string;
@@ -48,6 +49,10 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   // Buttons //
   buttons: Array<Button>;
   TYPE_BUTTON = TYPE_BUTTON;
+  showJsonButton: boolean =  false;
+  showJsonBody: boolean =  false;
+  json_gallery: string;
+  jsonPlaceholder: string;
   
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -88,8 +93,20 @@ export class CdsActionReplyGalleryComponent implements OnInit {
       if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
         this.filterConditionExist = true
       }
+      if(this.response.attributes.attachment.json_gallery){
+        this.json_gallery = this.response.attributes.attachment.json_gallery;
+      }
     } catch (error) {
       this.logger.log('onAddNewResponse ERROR', error);
+    }
+
+    if(this.json_gallery && this.json_gallery.trim() !== ''){
+      this.showJsonBody = true;
+      this.showJsonButton = true;
+    } else {
+      this.json_gallery = '';
+      this.showJsonBody = false;
+      this.showJsonButton = false;
     }
   }
 
@@ -286,12 +303,12 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
 
   /** onChangeTextarea */
-  // onChangeTextarea(text:string) {
-  //   if(!this.previewMode){
-  //     this.response.text = text;
-  //     this.changeActionReply.emit();
-  //   }
-  // }
+  onChangeTextarea(text:string) {
+    if(!this.previewMode){
+      this.response.text = text;
+      this.changeActionReply.emit();
+    }
+  }
 
   onChangeText(text: string, element: 'title' | 'description', index: number) {
     this.gallery[index][element] = text;
@@ -433,6 +450,46 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
 
 
+
+  /** onClickJsonButtons */
+  onClickJsonButtons(){
+    if(!this.showJsonBody){
+      this.showJsonBody = true;
+      this.showJsonButton = true;
+    }
+  }
+
+  /** onDeleteJsonButtons */
+  onDeleteJsonButtons(){
+    this.json_gallery = '';
+    this.showJsonBody = false;
+    this.showJsonButton = false;
+    this.response.attributes.attachment.json_gallery = "";
+    // this.changeJsonButtons.emit();
+    this.changeActionReply.emit();
+  }
+
+
+  /** onChangeJsonTextarea */
+  onChangeJsonTextarea(text:string) {
+    if(!text || text.trim() === ''){
+      this.showJsonButton = true;
+    } else {
+      this.json_gallery = text;
+      this.response.attributes.attachment.json_gallery = text;
+      this.showJsonButton = false;
+    }
+
+    // // this.changeJsonButtons.emit(text);
+  }
+
+  /** onBlurJsonTextarea */
+  onBlurJsonTextarea(event:any){
+    this.logger.log('[ACTION REPLY jsonbuttons] onBlurJsonTextarea ', event);
+    const json = event.target?.value;
+    this.changeActionReply.emit();
+    // this.changeJsonButtons.emit(json);
+  }
    // ----- BUTTONS INSIDE GALLERY ELEMENT: end
 
 }
