@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0-rc5
+- **added**: added image by url in action reply gallery
 
 # 1.38.0-rc4
 - **bug-fixed**: scss fix in action reply gallery
