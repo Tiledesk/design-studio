@@ -414,12 +414,12 @@ export class CDSImageUploadComponent implements OnInit {
   onDeletePathElement(event){
     this.logger.log('[IMAGE-UPLOAD] onDeletePathElement', event)
     this.uploadService.delete(this.user.uid, this.metadata.src).then((result)=>{
-      
       this.isFilePendingToUpload = false;
       this.onDeletedMetadata.emit();
     }).catch((error)=> {
       this.logger.error('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE (FAQ-COMP) deleteUserProfileImage ERORR:', error)
       this.isFilePendingToUpload = false;
+      this.onDeletedMetadata.emit();
     }) 
 
   }
