@@ -310,8 +310,12 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     }
   }
 
-  onChangeText(text: string, element: 'title' | 'description', index: number) {
-    this.gallery[index][element] = text;
+  onChangeText(text: string, element: 'title' | 'description' | 'imageUrl', index: number) {
+    if (element === 'imageUrl') {
+      this.gallery[index].preview.src = text;
+    } else {
+      this.gallery[index][element] = text;
+    }
     this.response.attributes.attachment.gallery = this.gallery;
     // this.changeActionReply.emit();
   }
@@ -363,8 +367,9 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
 
   onDeletedMetadata(metadata: Metadata, index: number){
+    this.logger.log('[ACTION REPLY] onDeletedMetadata ', index, this.response.attributes.attachment.gallery);
     this.gallery[index].preview = { src: '', downloadURL: ''};
-    this.response.attributes.attachment.gallery = this.gallery
+    this.response.attributes.attachment.gallery = this.gallery;
     this.changeActionReply.emit();
   }
 
@@ -489,6 +494,13 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     const json = event.target?.value;
     this.changeActionReply.emit();
     // this.changeJsonButtons.emit(json);
+  }
+
+  onBlurUrlTextarea(event: any, i: number) {
+    const value = event && event.target ? event.target.value : '';
+    this.logger.log('[ACTION REPLY] onBlurUrlTextarea ', value);
+    this.response.attributes.attachment.gallery[i].preview.src = value;
+    this.changeActionReply.emit();
   }
    // ----- BUTTONS INSIDE GALLERY ELEMENT: end
 
