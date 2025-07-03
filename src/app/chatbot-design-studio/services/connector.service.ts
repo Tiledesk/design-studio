@@ -1028,6 +1028,7 @@ export class ConnectorService {
       delete intent.attributes.connectors[idConnector];
     }
     this.hideContractConnector(idConnection);
+    this.logger.log('[CONNECTOR-SERV] deleteConnector::  intent ', intent);
     this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 
@@ -1215,7 +1216,7 @@ export class ConnectorService {
       return filteredMap;
     }, {});
     const arrayConnectors = Object.values(connectors);
-    this.logger.log('[CONNECTOR-SERV] -----> arrayConnectors::: ', arrayConnectors);
+    // this.logger.log('[CONNECTOR-SERV] -----> arrayConnectors::: ', arrayConnectors);
     return arrayConnectors;
   }
 

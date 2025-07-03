@@ -1,5 +1,5 @@
-<div  class="extensions-response" *ngIf="!previewMode">
-    
+<div class="extensions-response" *ngIf="!previewMode">
+   
     <div class="text-editor-drop">
         <em class="material-icons">drag_indicator</em>
     </div>
@@ -40,18 +40,82 @@
 </div>
 
 
+<div *ngIf="previewMode" class="text-editor-wrapper previewMode">
+    <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
+    <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate }}</div>
+</div> 
 <div *ngIf="previewMode" [class.previewMode]="previewMode">
     <ng-container *ngIf="gallery.length === 1 && gallery[0].preview && gallery[0].preview.src === ''" [ngTemplateOutlet]="placeholder"></ng-container>
     <ng-container *ngIf="(gallery.length === 1 && gallery[0].preview && gallery[0].preview.src !== '') ||  gallery.length > 1" [ngTemplateOutlet]="galleryElement"></ng-container>
 </div>
 
 
-<div *ngIf="!previewMode"
+<div *ngIf="!previewMode" class="action-reply-gallery text-editor-wrapper ">
+    <cds-textarea 
+        class="text-editable-div"
+        [activeFocus]="activeFocus"
+        [text]="response.text" 
+        [minRow]="1"
+        [limitCharsText]="limitCharsText"
+        popoverVerticalAlign="above"
+        (changeTextarea)="onChangeTextarea($event)"
+        (blur)="onBlur($event)"
+        (selectedAttribute)="onSelectedAttribute($event)">
+    </cds-textarea> 
+
+    <div *ngIf="!showJsonBody" class="buttons-json-response">
+        <div class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
+            + {{'CDSCanvas.JsonGallery' | translate }}
+        </div>
+    </div>
+    
+    <!-- <div *ngIf="showJsonButton" class="buttons-json-response json-shown">
+        <cds-select 
+            class="text-condition" 
+            [items]="listType" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [placeholder]="'CDSCanvas.Examples' | translate "
+            [deleteButton]="false"
+            [clearable]="false"
+            [searchable]="false"
+            (onSelected)="onChangeJsonButtonsType($event)"
+            (onReset)="onResetJsonButtonsType($event)"
+            [clearable]="true">
+        </cds-select>
+    </div> -->
+    
+    
+    <div *ngIf="showJsonBody" class="json-text">
+        <cds-textarea
+            class = "text-editable-div"
+            [text]="json_gallery"
+            [placeholder]="jsonPlaceholder"
+            [limitCharsText]="10000"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [minRow]="5" [maxRow]="10"
+            [readonly]="false"
+            (blur)="onBlurJsonTextarea($event)"
+            (changeTextarea)="onChangeJsonTextarea($event)">
+        </cds-textarea>
+        <div class="button-controls">
+            <div class="control-button delete" (click)="$event.stopPropagation(); onDeleteJsonButtons()">
+                <em class="material-icons">delete</em>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode && !showJsonBody"
     class="gallery-response gallery-replies" 
     #scrollMe id="scrollMe"         
     cdkDropListOrientation="horizontal" 
     cdkDropList (cdkDropListDropped)="drop($event)" >
-    
+
+
     <div *ngFor="let galleryEl of gallery; let i = index; let last= last" class="tpl-drop-down single-btn-reply" cdkDragBoundary=".gallery-replies" cdkDrag> 
         <div style="display: flex;">
             <div>
@@ -69,6 +133,28 @@
                                 <!-- <div *ngIf="galleryEl.preview.src" class="control-button delete" (click)="onDeleteImage(i)">
                                     <em class="material-icons">clear</em>
                                 </div> -->
+                                <div *ngIf="!galleryEl.preview.src" class="image-load-or">OR</div>
+                                <div *ngIf="!galleryEl.preview.scr" class="image-from-url">
+                                    <cds-textarea
+                                        id="image-url"
+                                        [textLimitBtn]="false"
+                                        [setAttributeBtn]="true"
+                                        [emojiPikerBtn]="false"
+                                        [isJsonAttribute]="false"
+                                        [limitCharsText]="300"
+                                        [minRow]="1"
+                                        [maxRow]="1"
+                                        [text]="galleryEl.preview.src"
+                                        [placeholder]="'CDSCanvas.AddImageUrl' | translate"
+                                        class="image-url-textarea"
+                                        (blur)="onBlurUrlTextarea($event, i)">
+                                    </cds-textarea>
+
+                                    <!-- (changeTextarea)="onChangeText($event, 'imageUrl', i)"
+                                    (selectedAttribute)="onSelectedAttribute($event, 'imageUrl', i)"
+                                    (clearSelectedAttribute)="onClearSelectedAttribute()"
+                                     -->
+                                </div>
                             </div>
                         </div>
                         <div class="gallery-title" (click)="initElement();activateEL[i].title=true"> 
