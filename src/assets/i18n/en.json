@@ -1088,6 +1088,9 @@
             }
         },
         "systemDefinedElements": {
+            "payload": {
+                "description": "The Payload inside the webhook"
+            },
             "department_id": {
                 "description": "The ID of the department where this chatbot is activated"
             },
