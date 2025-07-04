@@ -705,6 +705,8 @@ cds-textarea#description.noButtons ::ng-deep{
 }
 
 .action-reply-gallery .buttons-json-response {
+    width: 100%;
+    margin-bottom: -24px;
     padding: 20px var(--input-base-margin);
 }
 
@@ -770,6 +772,58 @@ cds-textarea#description.noButtons ::ng-deep{
     line-height: 12px;
 }
 
+
+
+.buttons-json-response {
+    display: block;
+    position: relative;
+    width: max-content;
+    height: 36px;
+    margin-bottom: -20px;
+    &.json-shown {
+        width:fit-content;
+        z-index: 1;
+    }
+    .text-condition {
+        position: relative;
+        display: flex;
+        ::ng-deep .ng-select .ng-select-container .ng-value-container .ng-placeholder {
+            font-size: 12px;
+            display:block!important;
+            color: var(--blu);
+        }
+        ::ng-deep .ng-select .ng-select-container .ng-value-container {
+            // justify-content: flex-end;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        ::ng-deep .ng-select .ng-select-container {
+            // justify-content: flex-end;
+            border: 0px solid var(--blu-light-02);
+            box-shadow: none;
+        }
+        ::ng-deep .ng-select .ng-select-container:hover {
+            box-shadow: none;
+        }
+        ::ng-deep .ng-value .ng-star-inserted {
+            display:none!important;
+        }
+        ::ng-deep .ng-select .ng-select-container .ng-clear-wrapper {
+            display:none!important;
+        }
+        ::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option span.label-select {
+            font-size: 12px!important;
+        }
+        ::ng-deep .ng-dropdown-panel .form-control-select .ng-star-inserted .ng-select-bottom {
+            border: none;
+        }
+        ::ng-deep .ng-select.ng-select-single .ng-select-container .ng-value-container .ng-value {
+            display:none!important;
+        }
+    }
+}
+
+
 // .image-from-url ::ng-deep .mat-form-field-underline,
 // .image-from-url ::ng-deep .mat-form-field-wrapper,
 // .image-from-url ::ng-deep .mat-form-field-flex {
@@ -777,3 +831,11 @@ cds-textarea#description.noButtons ::ng-deep{
 // }
 /** TEXT AREA: end **/
 ////////////////////////////
+
+// Adatta la larghezza della select cds-select.text-condition al contenuto più largo
+:host ::ng-deep cds-select.text-condition,
+:host ::ng-deep cds-select.text-condition .ng-select-container {
+  min-width: max-content;
+  width: auto;
+  box-sizing: border-box;
+}

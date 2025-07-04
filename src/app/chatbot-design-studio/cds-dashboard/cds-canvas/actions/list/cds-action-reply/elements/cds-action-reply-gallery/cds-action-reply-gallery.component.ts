@@ -508,7 +508,8 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   /** onBlurJsonTextarea */
   onBlurJsonTextarea(event:any){
     this.logger.log('[ACTION REPLY jsonbuttons] onBlurJsonTextarea ', event);
-    const json = event.target?.value;
+    this.json_gallery= event.target?.value;
+    this.response.attributes.attachment.json_gallery = this.json_gallery;
     this.changeActionReply.emit();
   }
 
