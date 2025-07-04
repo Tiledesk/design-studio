@@ -7,6 +7,17 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0-rc6
+- **added**: added chatbot_type in utils variableList
+
+# 1.38.0-rc5
+- **added**: added image by url in action reply gallery
+
+# 1.38.0-rc4
+- **bug-fixed**: scss fix in action reply gallery
+
+# 1.38.0-rc3
+- **added**: json gallery in action reply gallery
 
 # 1.38.0-rc2
 - **changed**: refactoring intent component
