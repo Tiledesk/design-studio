@@ -9,6 +9,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
+import { LIST_JSON_MODEL_GALLERY } from 'src/app/chatbot-design-studio/utils-json-gallery';
 
 @Component({
   selector: 'cds-action-reply-gallery',
@@ -53,7 +54,7 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   showJsonBody: boolean =  false;
   json_gallery: string;
   jsonPlaceholder: string;
-  
+  listType: any = {};
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -76,15 +77,23 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     }
   }
 
+
   private initialize(){
+    this.listType = LIST_JSON_MODEL_GALLERY; 
+
     this.delayTime = (this.wait?.time && this.wait?.time !== 0)? (this.wait.time/1000) : 500/1000;
     this.gallery = [];
+
     try {
-      this.gallery = this.response.attributes.attachment.gallery;
+      if (this.response.attributes.attachment.json_gallery && this.response.attributes.attachment.json_gallery.trim() !== '') {
+        this.json_gallery = this.response.attributes.attachment.json_gallery;
+      } 
+      if (this.response.attributes.attachment.gallery) {
+        this.gallery = this.response.attributes.attachment.gallery;
+      }
       this.initElement();
       if(!this.previewMode) this.scrollToLeft();
       this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-        // // this.logger.log('CdsActionReplyGalleryComponent isChangedConnector-->', connector);
         this.connector = connector;
         this.updateConnector();
       });
@@ -92,9 +101,6 @@ export class CdsActionReplyGalleryComponent implements OnInit {
 
       if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
         this.filterConditionExist = true
-      }
-      if(this.response.attributes.attachment.json_gallery){
-        this.json_gallery = this.response.attributes.attachment.json_gallery;
       }
     } catch (error) {
       this.logger.log('onAddNewResponse ERROR', error);
@@ -109,6 +115,9 @@ export class CdsActionReplyGalleryComponent implements OnInit {
       this.showJsonButton = false;
     }
   }
+
+
+
 
   private initElement(){
     if(this.gallery && this.gallery.length > 0){
@@ -322,11 +331,9 @@ export class CdsActionReplyGalleryComponent implements OnInit {
 
 
   /** onOpenButtonPanel */
-  // onOpenButtonPanel(button){
-  //   this.openButtonPanel.emit(button);
-  // }
 
   onOpenButtonPanel(button){
+    this.logger.log('[ACTION REPLY GALLERY] onOpenButtonPanel ', button);
     this.openButtonPanel.emit(button);
   }
 
@@ -475,26 +482,7 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
 
 
-  /** onChangeJsonTextarea */
-  onChangeJsonTextarea(text:string) {
-    if(!text || text.trim() === ''){
-      this.showJsonButton = true;
-    } else {
-      this.json_gallery = text;
-      this.response.attributes.attachment.json_gallery = text;
-      this.showJsonButton = false;
-    }
 
-    // // this.changeJsonButtons.emit(text);
-  }
-
-  /** onBlurJsonTextarea */
-  onBlurJsonTextarea(event:any){
-    this.logger.log('[ACTION REPLY jsonbuttons] onBlurJsonTextarea ', event);
-    const json = event.target?.value;
-    this.changeActionReply.emit();
-    // this.changeJsonButtons.emit(json);
-  }
 
   onBlurUrlTextarea(event: any, i: number) {
     const value = event && event.target ? event.target.value : '';
@@ -504,5 +492,42 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
    // ----- BUTTONS INSIDE GALLERY ELEMENT: end
 
+
+
+  /** onChangeJsonTextarea */
+  onChangeJsonTextarea(text:string) {
+    if(!text || text.trim() === ''){
+      this.showJsonButton = true;
+    } else {
+      this.json_gallery = text;
+      this.response.attributes.attachment.json_gallery = text;
+      this.showJsonButton = false;
+    }
+  }
+
+  /** onBlurJsonTextarea */
+  onBlurJsonTextarea(event:any){
+    this.logger.log('[ACTION REPLY jsonbuttons] onBlurJsonTextarea ', event);
+    const json = event.target?.value;
+    this.changeActionReply.emit();
+  }
+
+  /** onDeleteJsonButtons */
+  onChangeJsonButtonsType(event){
+    this.json_gallery = event['value']?event['value']:'';
+    this.showJsonBody = true;
+    this.showJsonButton = false;
+    this.response.attributes.attachment.json_gallery = this.json_gallery;
+    this.changeActionReply.emit();
+  }
+
+  /** onDeleteJsonButtons */
+  onResetJsonButtonsType(event){
+    this.logger.log('[ACTION REPLY jsonbuttons] onResetJsonButtonsType ', this.json_gallery);
+    this.json_gallery = '';
+    this.response.attributes.attachment.json_gallery = this.json_gallery;
+    this.changeActionReply.emit();
+    // this.changeJsonButtons.emit(this.json_gallery);
+  }
 }
 
