@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0-rc7
+- **added**: added models in json-gallery
+- **bug-fixed**: bug fix edit button in action gallery
+
 # 1.38.0-rc6
 - **added**: added chatbot_type in utils variableList
 
