@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.38.0-rc8
+- **bug-fixed**: bug fixed: css gallery-json-select
+
 # 1.38.0-rc7
 - **added**: added models in json-gallery
 - **bug-fixed**: bug fix edit button in action gallery
