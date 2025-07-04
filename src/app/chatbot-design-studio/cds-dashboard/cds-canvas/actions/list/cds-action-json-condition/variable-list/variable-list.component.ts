@@ -63,9 +63,11 @@ export class VariableListComponent implements OnInit {
 
     this.idBot = this.dashboardService.id_faq_kb;
     this.variableListUserDefined = variableList.find(el => el.key === 'userDefined');
-    if (this.variableListUserDefined && this.variableListUserDefined.elements) {
-      this.variableListUserDefined.elements = this.variableListUserDefined.elements.filter(el => el.chatbot_types?.includes(this.type_chatbot));
-    }
+    
+    // if (this.variableListUserDefined && this.variableListUserDefined.elements) {
+    //   this.variableListUserDefined.elements = this.variableListUserDefined.elements.filter(el => el.chatbot_types?.includes(this.type_chatbot));
+    // }
+
     this.variableListGlobals = variableList.find(el => el.key === 'globals');
     if (this.variableListGlobals && this.variableListGlobals.elements) {
       this.variableListGlobals.elements = this.variableListGlobals.elements.filter(el => el.chatbot_types?.includes(this.type_chatbot));
