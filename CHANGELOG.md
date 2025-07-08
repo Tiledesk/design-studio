@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 
+# 1.38.0-rc9
+- **added**: added load image from url in ds-action-reply-image
+- **added**: fixed isLiquidjs in textarea
+
 # 1.38.0-rc8
 - **bug-fixed**: bug fixed: css gallery-json-select
 
