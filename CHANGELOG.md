@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0-rc10
+- **bug-fixed**: css ng-select-opened
+- **bug-fixed**: enabled variable list userDefined
+- **bug-fixed**: button is too far from the Examples in json buttons of action reply
 
 # 1.38.0-rc9
 - **added**: added load image from url in ds-action-reply-image
