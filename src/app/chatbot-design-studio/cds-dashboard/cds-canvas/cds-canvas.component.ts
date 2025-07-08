@@ -883,7 +883,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // -------------------------------------------------------
   @HostListener('document:click', ['$event'])
   documentClick(event: any): void {
-    this.logger.log('[CDS CANVAS] DOCUMENT CLICK event: ', event.target.id, event);
+    this.logger.log('[CDS CANVAS] DOCUMENT CLICK event: ', event.target, event);
     if (event.target.id.startsWith("cdk-drop-list-") && !event.target.className.includes('button-replies')) {
       this.removeConnectorDraftAndCloseFloatMenu();
       this.controllerService.stopTestItOut();
@@ -1570,6 +1570,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       if(intent && !intent.attributes?.connectors){
         intent.attributes['connectors'] = {};
       } 
+
+      this.logger.log('[CDS-CANVAS] onAddActionFromConnectorMenu intent:: ', intent);
+
       if(event.type === "show-hide" && event.connector){
         this.logger.log('[CDS-CANVAS] show-hide:: ', event.connector);
         this.connectorService.hideDefaultConnector(event.connector.id);
