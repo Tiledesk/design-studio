@@ -33,7 +33,8 @@ export class CDSTextareaComponent implements OnInit {
   @Input() autoResize: boolean = false;
   @Input() popoverVerticalAlign: string = 'below';
   @Input() isJsonAttribute: boolean = false;
-
+  @Input() isLiquidjs: boolean = true;
+ 
   @Output() changeTextarea = new EventEmitter();
   @Output() selectedAttribute = new EventEmitter();
   @Output() blur = new EventEmitter();
