@@ -7,6 +7,21 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.38.0-rc9
+- **added**: added load image from url in ds-action-reply-image
+- **added**: fixed isLiquidjs in textarea
+
+# 1.38.0-rc8
+- **bug-fixed**: bug fixed: css gallery-json-select
+
+# 1.38.0-rc7
+- **added**: added models in json-gallery
+- **bug-fixed**: bug fix edit button in action gallery
+
+# 1.38.0-rc6
+- **added**: added chatbot_type in utils variableList
+
 # 1.38.0-rc5
 - **added**: added image by url in action reply gallery
 
