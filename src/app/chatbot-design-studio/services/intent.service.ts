@@ -115,13 +115,13 @@ export class IntentService {
           buttons.forEach(button => {
             if (button && button.action) {
               if (button.type !== 'action') {
-                const actionId = button.action.startsWith('#') ? button.action.substring(1) : button.action;
-                const foundIntent = listOfIntents.find(i => i.intent_id === actionId);
-                if (foundIntent) {
-                  button.type = 'action';
-                } else {
-                  button.action = '';
-                }
+                // const actionId = button.action.startsWith('#') ? button.action.substring(1) : button.action;
+                // const foundIntent = listOfIntents.find(i => i.intent_id === actionId);
+                // if (foundIntent) {
+                //   button.type = 'action';
+                // } else {
+                //   button.action = '';
+                // }
                 corruptedButtons.push({
                   intentId: intent.intent_id,
                   intentName: intent.intent_display_name,
@@ -134,9 +134,9 @@ export class IntentService {
           });
         });
       }
-      if (intentModified) {
-        this.updateIntent(intent);
-      }
+      // if (intentModified) {
+      //   this.updateIntent(intent);
+      // }
     });
     return corruptedButtons;
   }
