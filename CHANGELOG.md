@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.38.0-rc12
+- **changed**: stand-by chatbot Patch that finds and fixes all broken buttons
+
 # 1.38.0-rc11
 - **added**: added chatbot Patch that finds and fixes all broken buttons
 
