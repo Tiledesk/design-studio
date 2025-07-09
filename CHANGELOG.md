@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.38.0-rc11
+- **added**: added chatbot Patch that finds and fixes all broken buttons
+
 # 1.38.0-rc10
 - **bug-fixed**: css ng-select-opened
 - **bug-fixed**: enabled variable list userDefined

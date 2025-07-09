@@ -19,6 +19,7 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -83,12 +84,62 @@ export class IntentService {
     private controllerService: ControllerService,
     private stageService: StageService,
     private dashboardService: DashboardService,
-    private tiledeskAuthService: TiledeskAuthService
+    private tiledeskAuthService: TiledeskAuthService,
+    private http: HttpClient
   ) { 
 
   }
 
 
+  public chatbotPatch(listOfIntents) {
+    let corruptedButtons = [];
+    corruptedButtons = this.findAndFixAllBrokenButtons(listOfIntents);
+    this.logger.log('[INTENT SERVICE] ::: chatbotPatch corruptedButtons:: ', corruptedButtons);
+    if (corruptedButtons.length > 0) {
+      //this.sendCorruptedButtonsEmail(corruptedButtons);
+    }
+    return corruptedButtons;
+  }
+
+
+
+
+  public findAndFixAllBrokenButtons(listOfIntents){
+    const corruptedButtons = [];
+    if (!Array.isArray(listOfIntents)) return corruptedButtons;
+    listOfIntents.forEach(intent => {
+      let intentModified = false;
+      if (intent.actions && Array.isArray(intent.actions)) {
+        intent.actions.forEach(action => {
+          const buttons = this.connectorService.findButtons(action);
+          buttons.forEach(button => {
+            if (button && button.action) {
+              if (button.type !== 'action') {
+                const actionId = button.action.startsWith('#') ? button.action.substring(1) : button.action;
+                const foundIntent = listOfIntents.find(i => i.intent_id === actionId);
+                if (foundIntent) {
+                  button.type = 'action';
+                } else {
+                  button.action = '';
+                }
+                corruptedButtons.push({
+                  intentId: intent.intent_id,
+                  intentName: intent.intent_display_name,
+                  actionId: action._tdActionId,
+                  button: { ...button }
+                });
+                intentModified = true;
+              }
+            }
+          });
+        });
+      }
+      if (intentModified) {
+        this.updateIntent(intent);
+      }
+    });
+    return corruptedButtons;
+  }
 
    public setIntentColor(color){
     const intentId = this.intentSelected.intent_id;
