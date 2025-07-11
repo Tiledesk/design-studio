@@ -1021,14 +1021,23 @@ export class ConnectorService {
    * 
    */
   public deleteConnector(intent, idConnection, save=false, notify=true) {
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
-    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
-    this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
-    if(idConnector && intent.attributes?.connectors[idConnector]){
-      delete intent.attributes.connectors[idConnector];
+    try {
+      this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
+      if (!intent || !idConnection) return;
+      if (!intent.attributes) intent.attributes = {};
+      if (!intent.attributes.connectors) intent.attributes.connectors = {};
+      const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+      this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
+      if(idConnector && intent.attributes.connectors[idConnector]){
+        delete intent.attributes.connectors[idConnector];
+      }
+      this.hideContractConnector(idConnection);
+      if (this.tiledeskConnectors && typeof this.tiledeskConnectors.deleteConnector === 'function') {
+        this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
+      }
+    } catch (err) {
+      this.logger.error('[CONNECTOR-SERV] deleteConnector error:', err);
     }
-    this.hideContractConnector(idConnection);
-    this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 
 
@@ -1065,7 +1074,7 @@ export class ConnectorService {
         return filteredMap;
       }, {});
       for (const [key, connector] of Object.entries(listOfConnectors)) {
-        this.logger.log('delete connector :: ', key );
+        this.logger.log('[CONNECTOR-SERV] delete connector :: ', key );
         const intentId = connectorID.split('/')[0];
         const intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
         this.deleteConnector(intent, key, save, notify);
@@ -1215,7 +1224,7 @@ export class ConnectorService {
       return filteredMap;
     }, {});
     const arrayConnectors = Object.values(connectors);
-    this.logger.log('[CONNECTOR-SERV] -----> arrayConnectors::: ', arrayConnectors);
+    // this.logger.log('[CONNECTOR-SERV] -----> arrayConnectors::: ', arrayConnectors);
     return arrayConnectors;
   }
 

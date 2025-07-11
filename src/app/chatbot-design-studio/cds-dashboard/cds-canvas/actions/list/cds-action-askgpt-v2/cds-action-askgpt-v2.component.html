@@ -347,6 +347,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="10000"
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 
@@ -395,12 +396,12 @@
                             {{"CDSCanvas.ChunksOnly" | translate}}
                         </mat-checkbox>
                     </section>
-                    <!-- 
+                    <!--
                     <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
                     </label> 
                     -->
-                </div>
+                </div> 
             
 
             </div>
@@ -442,6 +443,7 @@
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
+            [isLiquidjs]="false"
             [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignReplyTo"
@@ -456,6 +458,7 @@
             [textLimitBtn]="false"
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
+            [isLiquidjs]="false"
             [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignSourceTo"
@@ -470,6 +473,7 @@
             [textLimitBtn]="false"
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
+            [isLiquidjs]="false"
             [minRow]="1" [maxRow]="1" 
             [readonly]="true"
             [text]="action.assignChunksTo"
