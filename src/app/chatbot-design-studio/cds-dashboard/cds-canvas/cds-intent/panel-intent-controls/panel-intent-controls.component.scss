@@ -4,11 +4,12 @@
 /* ***************************** */
 .intent-header-actions-container {
     position: absolute;
-    top: 40px;
+    top: -10px;
     right: 0px;
-    height: 25px;
+    height: 30px;
     padding-left: 12px;
     opacity: 0;
+    cursor: default;
     transform: translate3d(0, 20px, 0);
     transition: 0.25s all ease-in-out;
   }
