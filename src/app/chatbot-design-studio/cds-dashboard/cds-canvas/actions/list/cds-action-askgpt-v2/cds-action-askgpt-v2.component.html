@@ -1,6 +1,15 @@
 <div *ngIf="previewMode" class="cds-action-content cds-action-preview" style="position: relative;">
     <div class="action-row">
-        <div class="action-row-left">
+        <div class="action-row-left empty">
+            <mat-icon class="icon" svgIcon="brain" aria-hidden="true"></mat-icon>
+        </div>
+        <div *ngIf="action?.question" class="action-row-right">
+            {{action?.namespace}}
+        </div>
+    </div>
+    
+    <div class="action-row">
+        <div class="action-row-left empty">
             <mat-icon class="icon" svgIcon="subject" aria-hidden="true"></mat-icon>
         </div>
         <div *ngIf="action?.question" class="action-row-right">
