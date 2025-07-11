@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0-rc13
+- **bug-fixed**: when i drag and drop an action from the menu, if i go back to the actions menu bar without releasing the action, the submenu disappears
+- **changed**: Insert the name of the selected KB as the first element in the "Ask KB" action.
+- **bug-fixed**: Dragging the "Start" intent doesn't work on edges. The action detail shouldn't open when I drag and drop, but only when I click.
 
 # 1.38.0-rc12
 - **changed**: stand-by chatbot Patch that finds and fixes all broken buttons
