@@ -115,7 +115,7 @@ export class TiledeskConnectors {
     notify = true,
     attributes = null
   ) {
-    // console.log("createConnector:::::  ", fromId, toId, fromPoint, toPoint);
+    // console.log("[JS] createConnector:::::  ", attributes, fromId, toId, fromPoint, toPoint);
     if (!fromPoint || !toPoint) return;
     const id = fromId + "/" + toId;
     let connector = {
@@ -145,7 +145,7 @@ export class TiledeskConnectors {
     inblock.inConnectors[connector.id] = connector.id;
     this.#drawConnector(id, fromPoint, toPoint, attributes);
     this.removeConnectorDraft();
-    // console.log("connector CREATED id, save, notify:", id, save, notify);
+    // console.log("connector CREATED id, save, notify:", id, save, attributes);
     connector["save"] = save;
     if (notify) {
       const event = new CustomEvent("connector-created", {
@@ -870,12 +870,61 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes = null) {
-    // // console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
     let label = null;
     if (attributes?.label) {
       label = attributes.label;
     }
     const display = attributes?.display === false ? "none" : "flex";
+
+    // control points (dichiarate una sola volta)
+    let controlFront = { x: 0, y: 0 };
+    let controlBack = { x: 0, y: 0 };
+    controlFront.x = frontPoint.x - 200;
+    controlFront.y = frontPoint.y;
+    controlBack.x = backPoint.x + 200;
+    controlBack.y = backPoint.y;
+    let d =
+      "M" +
+      (frontPoint.x - 10) +
+      " " +
+      frontPoint.y +
+      " " +
+      "C " +
+      controlFront.x +
+      " " +
+      controlFront.y +
+      " " +
+      controlBack.x +
+      " " +
+      controlBack.y +
+      " " +
+      backPoint.x +
+      " " +
+      backPoint.y;
+
+    // 1. Crea o aggiorna il path hitbox rosso sotto il principale
+    let hitbox = document.getElementById(id + "_hitbox");
+    if (!hitbox) {
+      hitbox = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      hitbox.setAttributeNS(null, "id", id + "_hitbox");
+      hitbox.setAttributeNS(null, "fill", "transparent");
+      hitbox.setAttributeNS(null, "stroke", "red");
+      hitbox.setAttributeNS(null, "stroke-width", "11");
+      hitbox.setAttributeNS(null, "pointer-events", "none");
+      // Inserisci il path hitbox PRIMA del path principale (se esiste)
+      if (this.svgContainer) {
+        const mainPath = document.getElementById(id);
+        if (mainPath) {
+          this.svgContainer.insertBefore(hitbox, mainPath);
+        } else {
+          this.svgContainer.appendChild(hitbox);
+        }
+      }
+    }
+    hitbox.setAttributeNS(null, "d", d);
+    hitbox.setAttributeNS(null, "display", display);
+    
 
     let connector = document.getElementById(id);
     if (!connector) {
@@ -1020,31 +1069,6 @@ export class TiledeskConnectors {
       this.svgContainer.appendChild(group);
     }
 
-    // control points
-    let controlFront = { x: 0, y: 0 };
-    let controlBack = { x: 0, y: 0 };
-    controlFront.x = frontPoint.x - 200;
-    controlFront.y = frontPoint.y;
-    controlBack.x = backPoint.x + 200;
-    controlBack.y = backPoint.y;
-    let d =
-      "M" +
-      (frontPoint.x - 10) +
-      " " +
-      frontPoint.y +
-      " " +
-      "C " +
-      controlFront.x +
-      " " +
-      controlFront.y +
-      " " +
-      controlBack.x +
-      " " +
-      controlBack.y +
-      " " +
-      backPoint.x +
-      " " +
-      backPoint.y;
     connector.setAttributeNS(null, "d", d);
     connector.setAttributeNS(
       null,

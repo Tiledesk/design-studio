@@ -93,6 +93,7 @@ export class CdsConnectorComponent implements OnInit {
           this.connector = connectors[this.idConnector];
           this.idContractConnector = 'contract_' + this.idConnector;
           display = this.connector.display;
+          if(display)this.connectorService.hideDefaultConnector(this.idConnection);
           // // this.connectorService.showHideConnectorByIdConnector(this.idConnection, this.connector.display);
         }
         // // const displayConnector = display ? 'none' : 'flex';
