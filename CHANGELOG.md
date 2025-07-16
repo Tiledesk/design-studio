@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.37.4
+- **bug-fixed**: added models in json-gallery
+
 # 1.37.3
 - **changed**: enable/disable alpha slider in askkb-v2 action
 
