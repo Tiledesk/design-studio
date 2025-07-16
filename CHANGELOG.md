@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.37.3
+- **changed**: enable/disable alpha slider in askkb-v2 action
 
 # 1.37.2
 - **bug-fixed**: delete webhook only when it is stopped
