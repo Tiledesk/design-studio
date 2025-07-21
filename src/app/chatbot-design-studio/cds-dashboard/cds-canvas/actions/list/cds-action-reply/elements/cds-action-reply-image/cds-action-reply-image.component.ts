@@ -49,6 +49,7 @@ export class CdsActionReplyImageComponent implements OnInit {
   TYPE_BUTTON = TYPE_BUTTON;
   jsonBody: string;
 
+  imageType: 'upload' | 'link' = 'upload';
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -65,6 +66,7 @@ export class CdsActionReplyImageComponent implements OnInit {
       this.updateConnector();
     });
     this.initialize();
+    this.setInitialImageType();
   }
 
 
@@ -296,6 +298,29 @@ export class CdsActionReplyImageComponent implements OnInit {
     var element = buttons[fromIndex];
     buttons.splice(fromIndex, 1);
     buttons.splice(toIndex, 0, element);
+  }
+
+  setInitialImageType() {
+    if (this.response?.metadata?.src) {
+      // Semplice check: se inizia con http o https o contiene {{...}} consideriamo link
+      if (this.response.metadata.src.startsWith('http') || this.response.metadata.src.match(/\{\{.*\}\}/)) {
+        this.imageType = 'link';
+      } else {
+        this.imageType = 'upload';
+      }
+    } else {
+      this.imageType = 'upload';
+    }
+  }
+
+  onSelectImageType(type: 'upload' | 'link') {
+    this.imageType = type;
+    // Se cambio tipo, resetto i dati dell'immagine
+    if (type === 'upload') {
+      //this.response.metadata = { name: '', src: '', downloadURL: '' };
+    } else if (type === 'link') {
+      //this.response.metadata = { name: '', src: '', downloadURL: '' };
+    }
   }
 }
 

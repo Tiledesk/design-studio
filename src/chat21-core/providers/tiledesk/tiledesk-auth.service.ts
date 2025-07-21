@@ -70,27 +70,27 @@ export class TiledeskAuthService {
 
   
 
-  createNewRequestId(tiledeskToken: string, id_project: string, webhook_id: string) {
-    const headers = new HttpHeaders({
-      'Content-type': 'application/json',
-      Authorization: tiledeskToken
-    });
-    const requestOptions = { headers: headers };
-    const postData = {};
-    this.logger.log('[TILEDESK-AUTH-SERV] - createNewRequestId tiledeskToken: ', tiledeskToken);
-    const that = this;
-    let URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID = this.SERVER_BASE_URL + id_project+ '/webhooks/preload/'+webhook_id;
-    return new Promise((resolve, reject) => {
-      this.http.post(URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID, postData, requestOptions).subscribe({next: (data)=>{
-        this.logger.log('[TILEDESK-AUTH-SERV] - createNewRequestId: ', data);
-        if (data) {
-          resolve(data);
-        }
-      }, error: (error)=>{
-        reject(error)
-      }})
-    });
-  }
+  // preloadWebhook(tiledeskToken: string, id_project: string, webhook_id: string) {
+  //   const headers = new HttpHeaders({
+  //     'Content-type': 'application/json',
+  //     Authorization: tiledeskToken
+  //   });
+  //   const requestOptions = { headers: headers };
+  //   const postData = {};
+  //   this.logger.log('[TILEDESK-AUTH-SERV] - createNewRequestId webhook_id: ', webhook_id);
+  //   const that = this;
+  //   let URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID = this.SERVER_BASE_URL + id_project+ '/webhooks/preload/'+webhook_id;
+  //   this.logger.log('[TILEDESK-AUTH-SERV] - URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID2: ', URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID);
+  //   return new Promise((resolve, reject) => {
+  //     this.http.post(URL_TILEDESK_CREATE_TOKEN_BY_REQUEST_ID, postData, requestOptions).subscribe({next: (data)=>{
+  //       if (data) {
+  //         resolve(data);
+  //       }
+  //     }, error: (error)=>{
+  //       reject(error)
+  //     }})
+  //   });
+  // }
 
 
   /**

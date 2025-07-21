@@ -47,10 +47,6 @@ cds-textarea.text-editable-div {
     .text-condition {
         position: relative;
         display: flex;
-        // justify-content: flex-end;
-        ::ng-deep .select-bot-box {
-            min-width: 160px;
-        }
         ::ng-deep .ng-select .ng-select-container .ng-value-container .ng-placeholder {
             font-size: 12px;
             display:block!important;
