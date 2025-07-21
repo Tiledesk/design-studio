@@ -19,8 +19,9 @@ export class TiledeskConnectors {
       connector_draft: "tds_connector_draft",
     };
     this.colors = {
-      black: "#b1b1b7",
+      black: "#000000",//"#b1b1b7",
       gray: "gray",
+      lightGray: "#fcfafa",
       blue: "#3ea9f5",
     };
 
@@ -69,12 +70,12 @@ export class TiledeskConnectors {
       },
       {
         id: this.ids["arrow_draft"],
-        fill: this.colors["gray"],
+        fill: this.colors["black"],
         class: this.classes["connector_draft"],
       },
       {
         id: this.ids["arrow_over"],
-        fill: this.colors["gray"],
+        fill: this.colors["blue"],
         class: this.classes["connector_over"],
       },
       {
@@ -115,7 +116,7 @@ export class TiledeskConnectors {
     notify = true,
     attributes = null
   ) {
-    // console.log("createConnector:::::  ", fromId, toId, fromPoint, toPoint);
+    // console.log("[JS] createConnector:::::  ", attributes, fromId, toId, fromPoint, toPoint);
     if (!fromPoint || !toPoint) return;
     const id = fromId + "/" + toId;
     let connector = {
@@ -145,7 +146,7 @@ export class TiledeskConnectors {
     inblock.inConnectors[connector.id] = connector.id;
     this.#drawConnector(id, fromPoint, toPoint, attributes);
     this.removeConnectorDraft();
-    // console.log("connector CREATED id, save, notify:", id, save, notify);
+    // console.log("connector CREATED id, save, notify:", id, save, attributes);
     connector["save"] = save;
     if (notify) {
       const event = new CustomEvent("connector-created", {
@@ -555,7 +556,7 @@ export class TiledeskConnectors {
     gElement.id = this.svgConnectorsId;
     gElement.setAttribute("fill", "white");
     gElement.setAttribute("stroke", this.colors["black"]);
-    gElement.setAttribute("stroke-width", "3");
+    gElement.setAttribute("stroke-width", "1");
     svgContainer.appendChild(gElement);
     // Add the `<g>` come figlio di <svg>
     drawer.appendChild(svgContainer);
@@ -870,157 +871,14 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes = null) {
-    // // console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    // console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
     let label = null;
     if (attributes?.label) {
       label = attributes.label;
     }
     const display = attributes?.display === false ? "none" : "flex";
 
-    let connector = document.getElementById(id);
-    if (!connector) {
-      connector = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "path"
-      );
-      connector.setAttributeNS(null, "fill", "transparent");
-      connector.setAttributeNS(null, "id", id);
-      connector.setAttributeNS(null, "class", "connector");
-      connector.setAttributeNS(null, "pointer-events", "stroke");
-      connector.setAttributeNS(null, "display", display);
-      // Quando il connettore perde il focus (blur), deselezionalo
-      connector.addEventListener("blur", () => {
-        const deselectEvent = new CustomEvent("connector-deselected");
-        document.dispatchEvent(deselectEvent);
-      });
-
-      connector.addEventListener("mouseover", (e) => {
-        if (this.selectedConnector !== null) {
-          if (this.selectedConnector.id !== e.currentTarget.id) {
-            e.currentTarget.setAttributeNS(
-              null,
-              "class",
-              this.classes["connector_over"]
-            );
-            connector.setAttributeNS(
-              null,
-              "marker-start",
-              "url(#" + this.ids["arrow_over"] + ")"
-            );
-          }
-        } else {
-          e.currentTarget.setAttributeNS(
-            null,
-            "class",
-            this.classes["connector_over"]
-          );
-          connector.setAttributeNS(
-            null,
-            "marker-start",
-            "url(#" + this.ids["arrow_over"] + ")"
-          );
-        }
-      });
-      connector.addEventListener("mouseleave", (e) => {
-        // // console.log("mouseleave e", e.currentTarget);
-        if (
-          !e.currentTarget.classList.contains(
-            this.classes["connector_selected"]
-          )
-        ) {
-          e.currentTarget.setAttributeNS(
-            null,
-            "class",
-            this.classes["connector"]
-          );
-          const markerId = `marker_${e.currentTarget.id}`;
-          connector.setAttributeNS(
-            null,
-            "marker-start",
-            "url(#" + markerId + ")"
-          );
-        }
-      });
-      connector.addEventListener("click", (e) => {
-        let pos_x_phis = e.clientX;
-        let pos_y_phis = e.clientY;
-        let mouse_pos_logic = this.logicPoint({ x: pos_x_phis, y: pos_y_phis });
-        // // let toPointPhis = { x: pos_x_phis, y: pos_y_phis };
-        // // console.log("clicked e", e, toPointPhis, mouse_pos_logic);
-        // // console.log("clicked e", e.currentTarget);
-        if (this.selectedConnector) {
-          this.selectedConnector.setAttributeNS(
-            null,
-            "class",
-            this.classes["connector"]
-          );
-          this.selectedConnector.setAttributeNS(
-            null,
-            "marker-start",
-            "url(#" + this.ids["arrow"] + ")"
-          );
-        }
-        this.selectedConnector = e.currentTarget;
-        this.selectedConnector.setAttributeNS(
-          null,
-          "class",
-          this.classes["connector_selected"]
-        );
-        this.selectedConnector.setAttributeNS(
-          null,
-          "marker-start",
-          "url(#" + this.ids["arrow_selected"] + ")"
-        );
-        const event = new CustomEvent("connector-selected", {
-          detail: { connector: connector, mouse_pos: mouse_pos_logic },
-        });
-        document.dispatchEvent(event);
-      });
-      this.svgContainer.appendChild(connector);
-
-      // add lineText to connector
-      const x = (frontPoint.x + backPoint.x) / 2;
-      const y = (frontPoint.y + backPoint.y) / 2;
-      let group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      group.setAttributeNS(null, "class", `line-text-connector`);
-      let lineText = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "text"
-      );
-      lineText.setAttributeNS(null, "id", "label_" + id);
-      lineText.setAttributeNS(null, "x", String(x));
-      lineText.setAttributeNS(null, "y", String(y));
-      lineText.setAttributeNS(null, "text-anchor", "middle");
-      lineText.setAttributeNS(null, "dominant-baseline", "middle");
-      lineText.setAttributeNS(null, "stroke", "none");
-      lineText.setAttributeNS(null, "fill", "#b1b1b7");
-      lineText.setAttributeNS(null, "style", `font-size: 12px;`);
-      lineText.setAttributeNS(null, "display", display);
-      lineText.textContent = label;
-      group.appendChild(lineText);
-
-      const bbox = lineText.getBBox();
-      group.removeChild(lineText);
-      const rectWidth = bbox.width ? bbox.width + 10 : 0;
-      const rectHeight = bbox.height ? bbox.height + 10 : 0;
-      let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      rect.setAttributeNS(null, "id", "rect_" + id);
-      rect.setAttributeNS(null, "x", String(x - rectWidth / 2));
-      rect.setAttributeNS(null, "y", String(y - rectHeight / 2));
-      rect.setAttributeNS(null, "width", String(rectWidth));
-      rect.setAttributeNS(null, "height", String(rectHeight));
-      rect.setAttributeNS(null, "fill", "#fcfafa");
-      rect.setAttributeNS(null, "stroke", "none");
-      rect.setAttributeNS(null, "rx", "8");
-      rect.setAttributeNS(null, "display", display);
-      // //rect.setAttributeNS(null, "style", `left:${x}; top:${y};`);
-      group.appendChild(rect);
-      group.appendChild(lineText);
-
-      this.svgContainer.appendChild(group);
-    }
-
-    // control points
+    // control points (dichiarate una sola volta)
     let controlFront = { x: 0, y: 0 };
     let controlBack = { x: 0, y: 0 };
     controlFront.x = frontPoint.x - 200;
@@ -1045,6 +903,185 @@ export class TiledeskConnectors {
       backPoint.x +
       " " +
       backPoint.y;
+
+    // 1. Crea o aggiorna il path hitbox rosso sotto il principale
+    let hitbox = document.getElementById(id + "_hitbox");
+    if (!hitbox) {
+      hitbox = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      hitbox.setAttributeNS(null, "id", id + "_hitbox");
+      hitbox.setAttributeNS(null, "fill", "transparent");
+      hitbox.setAttributeNS(null, "stroke", "transparent"); //"red"
+      hitbox.setAttributeNS(null, "stroke-width", "11");
+      hitbox.setAttributeNS(null, "pointer-events", "stroke"); //era "none"
+      // Inserisci il path hitbox PRIMA del path principale (se esiste)
+      if (this.svgContainer) {
+        const mainPath = document.getElementById(id);
+        if (mainPath) {
+          this.svgContainer.insertBefore(hitbox, mainPath);
+        } else {
+          this.svgContainer.appendChild(hitbox);
+        }
+      }
+    }
+    hitbox.setAttributeNS(null, "d", d);
+    hitbox.setAttributeNS(null, "display", display);
+
+
+    let connector = document.getElementById(id);
+    if (!connector) {
+      connector = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path"
+      );
+      // connector.setAttributeNS(null, "fill", "transparent");
+      connector.setAttributeNS(null, "id", id);
+      connector.setAttributeNS(null, "class", "connector");
+      connector.setAttributeNS(null, "pointer-events", "stroke");
+      connector.setAttributeNS(null, "display", display);
+      connector.setAttributeNS(null, "stroke", this.colors['black']);
+      connector.setAttributeNS(null, "fill", "transparent");
+      // Definisci le funzioni di gestione degli eventi
+      const handleMouseOver = (e) => {
+        if (this.selectedConnector !== null) {
+          if (this.selectedConnector.id !== connector.id) {
+            connector.setAttributeNS(
+              null,
+              "class",
+              this.classes["connector_over"]
+            );
+            connector.setAttributeNS(
+              null,
+              "marker-start",
+              "url(#" + this.ids["arrow_over"] + ")"
+            );
+          }
+        } else {
+          connector.setAttributeNS(
+            null,
+            "class",
+            this.classes["connector_over"]
+          );
+          connector.setAttributeNS(
+            null,
+            "marker-start",
+            "url(#" + this.ids["arrow_over"] + ")"
+          );
+        }
+      };
+
+      const handleMouseLeave = (e) => {
+        if (
+          !connector.classList.contains(
+            this.classes["connector_selected"]
+          )
+        ) {
+          connector.setAttributeNS(
+            null,
+            "class",
+            this.classes["connector"]
+          );
+          const markerId = `marker_${connector.id}`;
+          connector.setAttributeNS(
+            null,
+            "marker-start",
+            "url(#" + markerId + ")"
+          );
+        }
+      };
+
+      const handleClick = (e) => {
+        let pos_x_phis = e.clientX;
+        let pos_y_phis = e.clientY;
+        let mouse_pos_logic = this.logicPoint({ x: pos_x_phis, y: pos_y_phis });
+        if (this.selectedConnector) {
+          this.selectedConnector.setAttributeNS(
+            null,
+            "class",
+            this.classes["connector"]
+          );
+          this.selectedConnector.setAttributeNS(
+            null,
+            "marker-start",
+            "url(#" + this.ids["arrow"] + ")"
+          );
+        }
+        this.selectedConnector = connector;
+        this.selectedConnector.setAttributeNS(
+          null,
+          "class",
+          this.classes["connector_selected"]
+        );
+        this.selectedConnector.setAttributeNS(
+          null,
+          "marker-start",
+          "url(#" + this.ids["arrow_selected"] + ")"
+        );
+        const event = new CustomEvent("connector-selected", {
+          detail: { connector: connector, mouse_pos: mouse_pos_logic },
+        });
+        document.dispatchEvent(event);
+      };
+
+      // Quando il connettore perde il focus (blur), deselezionalo
+      connector.addEventListener("blur", () => {
+        const deselectEvent = new CustomEvent("connector-deselected");
+        document.dispatchEvent(deselectEvent);
+      });
+
+      // Aggiungi gli event listener a entrambi gli elementi
+      connector.addEventListener("mouseover", handleMouseOver);
+      hitbox.addEventListener("mouseover", handleMouseOver);
+
+      connector.addEventListener("mouseleave", handleMouseLeave);
+      hitbox.addEventListener("mouseleave", handleMouseLeave);
+
+      connector.addEventListener("click", handleClick);
+      hitbox.addEventListener("click", handleClick);
+
+      this.svgContainer.appendChild(connector);
+
+      // add lineText to connector
+      const x = (frontPoint.x + backPoint.x) / 2;
+      const y = (frontPoint.y + backPoint.y) / 2;
+      let group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      group.setAttributeNS(null, "class", `line-text-connector`);
+      let lineText = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+      );
+      lineText.setAttributeNS(null, "id", "label_" + id);
+      lineText.setAttributeNS(null, "x", String(x));
+      lineText.setAttributeNS(null, "y", String(y));
+      lineText.setAttributeNS(null, "text-anchor", "middle");
+      lineText.setAttributeNS(null, "dominant-baseline", "middle");
+      lineText.setAttributeNS(null, "stroke", "none");
+      lineText.setAttributeNS(null, "fill", this.colors['gray']);
+      lineText.setAttributeNS(null, "style", `font-size: 12px;`);
+      lineText.setAttributeNS(null, "display", display);
+      lineText.textContent = label;
+      group.appendChild(lineText);
+
+      const bbox = lineText.getBBox();
+      group.removeChild(lineText);
+      const rectWidth = bbox.width ? bbox.width + 10 : 0;
+      const rectHeight = bbox.height ? bbox.height + 10 : 0;
+      let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttributeNS(null, "id", "rect_" + id);
+      rect.setAttributeNS(null, "x", String(x - rectWidth / 2));
+      rect.setAttributeNS(null, "y", String(y - rectHeight / 2));
+      rect.setAttributeNS(null, "width", String(rectWidth));
+      rect.setAttributeNS(null, "height", String(rectHeight));
+      rect.setAttributeNS(null, "fill",  this.colors['lightGray']);
+      rect.setAttributeNS(null, "stroke", "none");
+      rect.setAttributeNS(null, "rx", "8");
+      rect.setAttributeNS(null, "display", display);
+      // //rect.setAttributeNS(null, "style", `left:${x}; top:${y};`);
+      group.appendChild(rect);
+      group.appendChild(lineText);
+
+      this.svgContainer.appendChild(group);
+    }
+
     connector.setAttributeNS(null, "d", d);
     connector.setAttributeNS(
       null,

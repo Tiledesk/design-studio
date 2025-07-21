@@ -7,11 +7,18 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.37.4
-- **bug-fixed**: added models in json-gallery
+# 1.38.0-rc17
+- **bug-fixed**: Changed the connector stroke width and color;
 
-# 1.37.3
-- **changed**: enable/disable alpha slider in askkb-v2 action
+# 1.38.0-rc16
+- **changed**: Changed the connector stroke width and color;
+- **bug-fixed**: After the refresh, the label on the connectors is not displayed.
+- **bug-fixed**: If I hide the connector and refresh I see the extended connector and the contracted one.
+
+# 1.38.0-rc15
+- **changed**:: change textarea limitCharsText (from 10.000 to 100.000) in system context cds-action-ai-prompt, system context cds-action-askgpt-v2, prompt cds-action-gpt-assistant, prompt cds-action-gpt-task;
+- **changed**:: enabled hundreds separator for numeric characters in textarea.component
+
 
 # 1.38.0-rc14
 - **added**: Open KNB link in new tab in intent detail panel
@@ -61,6 +68,11 @@
 # 1.38.0-rc1
 - **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
 
+# 1.37.4
+- **bug-fixed**: added models in json-gallery
+
+# 1.37.3
+- **changed**: enable/disable alpha slider in askkb-v2 action
 
 # 1.37.2
 - **bug-fixed**: delete webhook only when it is stopped
