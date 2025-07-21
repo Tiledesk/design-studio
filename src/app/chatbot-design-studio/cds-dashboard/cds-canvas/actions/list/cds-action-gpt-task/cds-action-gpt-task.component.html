@@ -83,13 +83,12 @@
 
 <div id="scrollMe" #scrollMe *ngIf="!previewMode && !showVariablesSection" class="content-panel-intent-detail no-footer">
 
-
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.Prompt' | translate }}</label>
         <cds-textarea id="question" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
-            [limitCharsText]="10000"
+            [limitCharsText]="100000"
             [minRow]="4"[maxRow]="25" 
             [text]="action.question" 
             [placeholder]="'CDSCanvas.EnterPrompt' | translate"
@@ -266,7 +265,7 @@
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
                         [isLiquidjs]="false"
-                        [limitCharsText]="10000"
+                        [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
                         [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
