@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0-rc16
+- **changed**:: changed the connector stroke width and color;
 
 # 1.38.0-rc15
 - **changed**:: change textarea limitCharsText (from 10.000 to 100.000) in system context cds-action-ai-prompt, system context cds-action-askgpt-v2, prompt cds-action-gpt-assistant, prompt cds-action-gpt-task;
