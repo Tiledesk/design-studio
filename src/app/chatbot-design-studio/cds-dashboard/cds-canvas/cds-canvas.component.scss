@@ -72,18 +72,19 @@ $toogle-sidebar-width: 22px;
   .tds_connector {
     stroke: var(--connector-default-color);
     stroke-width: var(--connector-width);
+    filter: brightness(70%);
   }
   .tds_connector_over {
     stroke:var(--connector-over-color) !important;
-    stroke-width: var(--connector-width);
-    opacity: 1;
-    filter: none;
+    stroke-width: var(--connector-width)!important;
+    opacity: 1!important;
+    filter: none!important;
   }
   .tds_connector_selected {
     stroke: var(--connector-selected-color) !important;
-    stroke-width: var(--connector-width);
-    opacity: 1;
-    filter: none;
+    stroke-width: var(--connector-width)!important;
+    opacity: 1!important;
+    filter: none!important;
   }
 }
 

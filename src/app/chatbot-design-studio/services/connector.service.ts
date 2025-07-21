@@ -1354,6 +1354,7 @@ export class ConnectorService {
       let op: string = opacity.toString();
       if (element) {
         element.style.setProperty('stroke', rgba);
+        element.style.setProperty('filter', 'brightness(70%)');
         element.setAttributeNS(null, "opacity", op);
         this.addCustomMarker(connector.id, rgba);
       }
