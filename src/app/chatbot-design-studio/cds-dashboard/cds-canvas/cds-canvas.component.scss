@@ -8,6 +8,7 @@ $margin-top-card: 30px;
 $box-left-width: 230px;
 $box-left-width-closed: 0px;
 $toogle-sidebar-width: 22px;
+$connector-width: 1px;
 
 
 :host {
@@ -65,21 +66,21 @@ $toogle-sidebar-width: 22px;
   .tds_path {
     animation: dash 30s linear infinite;
     stroke-dasharray: 6;
-    stroke-width: 3px;
+    stroke-width: var(--$connector-width);
     stroke: var(--connector-default-color);
   }
   .tds_connector {
     stroke: var(--connector-default-color);
-    stroke-width: 3px;
+    stroke-width: var(--$connector-width);
   }
   .tds_connector_over {
     stroke:var(--connector-over-color) !important;
-    stroke-width: 3px;
+    stroke-width: var(--$connector-width);
     opacity: 1;
   }
   .tds_connector_selected {
     stroke: var(--connector-selected-color) !important;
-    stroke-width: 3px;
+    stroke-width: var(--$connector-width);
     opacity: 1;
   }
 }

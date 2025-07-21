@@ -555,7 +555,7 @@ export class TiledeskConnectors {
     gElement.id = this.svgConnectorsId;
     gElement.setAttribute("fill", "white");
     gElement.setAttribute("stroke", this.colors["black"]);
-    gElement.setAttribute("stroke-width", "3");
+    gElement.setAttribute("stroke-width", "1");
     svgContainer.appendChild(gElement);
     // Add the `<g>` come figlio di <svg>
     drawer.appendChild(svgContainer);
@@ -909,9 +909,9 @@ export class TiledeskConnectors {
       hitbox = document.createElementNS("http://www.w3.org/2000/svg", "path");
       hitbox.setAttributeNS(null, "id", id + "_hitbox");
       hitbox.setAttributeNS(null, "fill", "transparent");
-      hitbox.setAttributeNS(null, "stroke", "red");
+      hitbox.setAttributeNS(null, "stroke", "transparent"); //"red"
       hitbox.setAttributeNS(null, "stroke-width", "11");
-      hitbox.setAttributeNS(null, "pointer-events", "none");
+      hitbox.setAttributeNS(null, "pointer-events", "stroke"); //era "none"
       // Inserisci il path hitbox PRIMA del path principale (se esiste)
       if (this.svgContainer) {
         const mainPath = document.getElementById(id);
@@ -924,7 +924,7 @@ export class TiledeskConnectors {
     }
     hitbox.setAttributeNS(null, "d", d);
     hitbox.setAttributeNS(null, "display", display);
-    
+
 
     let connector = document.getElementById(id);
     if (!connector) {
@@ -937,16 +937,12 @@ export class TiledeskConnectors {
       connector.setAttributeNS(null, "class", "connector");
       connector.setAttributeNS(null, "pointer-events", "stroke");
       connector.setAttributeNS(null, "display", display);
-      // Quando il connettore perde il focus (blur), deselezionalo
-      connector.addEventListener("blur", () => {
-        const deselectEvent = new CustomEvent("connector-deselected");
-        document.dispatchEvent(deselectEvent);
-      });
 
-      connector.addEventListener("mouseover", (e) => {
+      // Definisci le funzioni di gestione degli eventi
+      const handleMouseOver = (e) => {
         if (this.selectedConnector !== null) {
-          if (this.selectedConnector.id !== e.currentTarget.id) {
-            e.currentTarget.setAttributeNS(
+          if (this.selectedConnector.id !== connector.id) {
+            connector.setAttributeNS(
               null,
               "class",
               this.classes["connector_over"]
@@ -958,7 +954,7 @@ export class TiledeskConnectors {
             );
           }
         } else {
-          e.currentTarget.setAttributeNS(
+          connector.setAttributeNS(
             null,
             "class",
             this.classes["connector_over"]
@@ -969,34 +965,32 @@ export class TiledeskConnectors {
             "url(#" + this.ids["arrow_over"] + ")"
           );
         }
-      });
-      connector.addEventListener("mouseleave", (e) => {
-        // // console.log("mouseleave e", e.currentTarget);
+      };
+
+      const handleMouseLeave = (e) => {
         if (
-          !e.currentTarget.classList.contains(
+          !connector.classList.contains(
             this.classes["connector_selected"]
           )
         ) {
-          e.currentTarget.setAttributeNS(
+          connector.setAttributeNS(
             null,
             "class",
             this.classes["connector"]
           );
-          const markerId = `marker_${e.currentTarget.id}`;
+          const markerId = `marker_${connector.id}`;
           connector.setAttributeNS(
             null,
             "marker-start",
             "url(#" + markerId + ")"
           );
         }
-      });
-      connector.addEventListener("click", (e) => {
+      };
+
+      const handleClick = (e) => {
         let pos_x_phis = e.clientX;
         let pos_y_phis = e.clientY;
         let mouse_pos_logic = this.logicPoint({ x: pos_x_phis, y: pos_y_phis });
-        // // let toPointPhis = { x: pos_x_phis, y: pos_y_phis };
-        // // console.log("clicked e", e, toPointPhis, mouse_pos_logic);
-        // // console.log("clicked e", e.currentTarget);
         if (this.selectedConnector) {
           this.selectedConnector.setAttributeNS(
             null,
@@ -1009,7 +1003,7 @@ export class TiledeskConnectors {
             "url(#" + this.ids["arrow"] + ")"
           );
         }
-        this.selectedConnector = e.currentTarget;
+        this.selectedConnector = connector;
         this.selectedConnector.setAttributeNS(
           null,
           "class",
@@ -1024,7 +1018,24 @@ export class TiledeskConnectors {
           detail: { connector: connector, mouse_pos: mouse_pos_logic },
         });
         document.dispatchEvent(event);
+      };
+
+      // Quando il connettore perde il focus (blur), deselezionalo
+      connector.addEventListener("blur", () => {
+        const deselectEvent = new CustomEvent("connector-deselected");
+        document.dispatchEvent(deselectEvent);
       });
+
+      // Aggiungi gli event listener a entrambi gli elementi
+      connector.addEventListener("mouseover", handleMouseOver);
+      hitbox.addEventListener("mouseover", handleMouseOver);
+
+      connector.addEventListener("mouseleave", handleMouseLeave);
+      hitbox.addEventListener("mouseleave", handleMouseLeave);
+
+      connector.addEventListener("click", handleClick);
+      hitbox.addEventListener("click", handleClick);
+
       this.svgContainer.appendChild(connector);
 
       // add lineText to connector
