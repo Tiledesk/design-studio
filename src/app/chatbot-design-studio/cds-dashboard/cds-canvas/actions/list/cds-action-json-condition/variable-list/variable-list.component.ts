@@ -7,7 +7,7 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 //UTILS
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
-import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+import { variableList, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
   selector: 'variable-list',
@@ -18,9 +18,11 @@ export class VariableListComponent implements OnInit {
   
   @Output() onSelected = new EventEmitter()
 
-  variableListUserDefined: { key: string, elements: Array<{name: string, value: string}>} // = variableList.userDefined 
-  variableListGlobals: { key: string, elements: Array<{name: string, value: string}>}
-  variableListSystemDefined: Array<{ key: string, elements: Array<{name: string, value: string, description: string, src?: string}>}> //= variableList.systemDefined
+  type_chatbot:TYPE_CHATBOT;
+
+  variableListUserDefined: { key: string, elements: Array<{name: string, chatbot_types: string, value: string}>} // = variableList.userDefined 
+  variableListGlobals: { key: string, elements: Array<{name: string, chatbot_types: string, value: string}>}
+  variableListSystemDefined: Array<{ key: string, elements: Array<{name: string, chatbot_types: string, value: string, description: string, src?: string}>}> //= variableList.systemDefined
 
   filteredVariableList: Array<{ key: string, elements: Array<{name: string, value: string}>}> //= []
   filteredGlobalsList: Array<{ key: string, elements: Array<{name: string, value: string}>}> //= []
@@ -46,11 +48,38 @@ export class VariableListComponent implements OnInit {
     //this.initialize();
   }
 
-  private initialize(){
-    this.idBot = this.dashboardService.id_faq_kb
+  private initialize() {
+    // Ensure subtype is a valid TYPE_CHATBOT value, otherwise fallback to TYPE_CHATBOT.CHATBOT
+    if (
+      this.dashboardService.selectedChatbot &&
+      Object.values(TYPE_CHATBOT).includes(this.dashboardService.selectedChatbot.subtype as TYPE_CHATBOT)
+    ) {
+      this.type_chatbot = this.dashboardService.selectedChatbot.subtype as TYPE_CHATBOT;
+    } else {
+      this.type_chatbot = TYPE_CHATBOT.CHATBOT;
+    }
+    
+
+
+    this.idBot = this.dashboardService.id_faq_kb;
     this.variableListUserDefined = variableList.find(el => el.key === 'userDefined');
+    
+    // if (this.variableListUserDefined && this.variableListUserDefined.elements) {
+    //   this.variableListUserDefined.elements = this.variableListUserDefined.elements.filter(el => el.chatbot_types?.includes(this.type_chatbot));
+    // }
+
     this.variableListGlobals = variableList.find(el => el.key === 'globals');
-    this.variableListSystemDefined = variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals'));
+    if (this.variableListGlobals && this.variableListGlobals.elements) {
+      this.variableListGlobals.elements = this.variableListGlobals.elements.filter(el => el.chatbot_types?.includes(this.type_chatbot));
+    }
+
+    this.variableListSystemDefined = variableList
+      .filter(el => (el.key !== 'userDefined' && el.key !== 'globals'))
+      .map(el => ({
+        ...el,
+        elements: el.elements.filter(elem => elem.chatbot_types?.includes(this.type_chatbot))
+      }));
+
     this.filteredVariableList = []
     this.filteredGlobalsList = []
     this.filteredIntentVariableList = [];
@@ -77,7 +106,7 @@ export class VariableListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       // this.logger.log(`Dialog result: ${result}`);
       if(result && result !== undefined && result !== false){
-        let variable = {name: result, value: result};
+        let variable = {name: result, chatbot_types:this.type_chatbot, value: result};
         that.variableListUserDefined.elements.push(variable);
         this.saveVariables(this.variableListUserDefined.elements);
       }
