@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0-rc17
+- **bug-fixed**: Changed the connector stroke width and color;
+
 # 1.38.0-rc16
 - **changed**: Changed the connector stroke width and color;
 - **bug-fixed**: After the refresh, the label on the connectors is not displayed.
