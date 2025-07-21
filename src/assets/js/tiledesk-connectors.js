@@ -19,8 +19,9 @@ export class TiledeskConnectors {
       connector_draft: "tds_connector_draft",
     };
     this.colors = {
-      black: "#b1b1b7",
+      black: "#000000",//"#b1b1b7",
       gray: "gray",
+      lightGray: "#fcfafa",
       blue: "#3ea9f5",
     };
 
@@ -69,12 +70,12 @@ export class TiledeskConnectors {
       },
       {
         id: this.ids["arrow_draft"],
-        fill: this.colors["gray"],
+        fill: this.colors["black"],
         class: this.classes["connector_draft"],
       },
       {
         id: this.ids["arrow_over"],
-        fill: this.colors["gray"],
+        fill: this.colors["blue"],
         class: this.classes["connector_over"],
       },
       {
@@ -870,7 +871,7 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes = null) {
-    console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
+    // console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
     let label = null;
     if (attributes?.label) {
       label = attributes.label;
@@ -932,12 +933,13 @@ export class TiledeskConnectors {
         "http://www.w3.org/2000/svg",
         "path"
       );
-      connector.setAttributeNS(null, "fill", "transparent");
+      // connector.setAttributeNS(null, "fill", "transparent");
       connector.setAttributeNS(null, "id", id);
       connector.setAttributeNS(null, "class", "connector");
       connector.setAttributeNS(null, "pointer-events", "stroke");
       connector.setAttributeNS(null, "display", display);
-
+      connector.setAttributeNS(null, "stroke", this.colors['black']);
+      connector.setAttributeNS(null, "fill", "transparent");
       // Definisci le funzioni di gestione degli eventi
       const handleMouseOver = (e) => {
         if (this.selectedConnector !== null) {
@@ -1053,7 +1055,7 @@ export class TiledeskConnectors {
       lineText.setAttributeNS(null, "text-anchor", "middle");
       lineText.setAttributeNS(null, "dominant-baseline", "middle");
       lineText.setAttributeNS(null, "stroke", "none");
-      lineText.setAttributeNS(null, "fill", "#b1b1b7");
+      lineText.setAttributeNS(null, "fill", this.colors['gray']);
       lineText.setAttributeNS(null, "style", `font-size: 12px;`);
       lineText.setAttributeNS(null, "display", display);
       lineText.textContent = label;
@@ -1069,7 +1071,7 @@ export class TiledeskConnectors {
       rect.setAttributeNS(null, "y", String(y - rectHeight / 2));
       rect.setAttributeNS(null, "width", String(rectWidth));
       rect.setAttributeNS(null, "height", String(rectHeight));
-      rect.setAttributeNS(null, "fill", "#fcfafa");
+      rect.setAttributeNS(null, "fill",  this.colors['lightGray']);
       rect.setAttributeNS(null, "stroke", "none");
       rect.setAttributeNS(null, "rx", "8");
       rect.setAttributeNS(null, "display", display);
