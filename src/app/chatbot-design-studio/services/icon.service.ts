@@ -483,6 +483,10 @@ export class IconService {
       'stacks',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/stacks.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'brain',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/brain.svg')
+    );
   }
 }
 

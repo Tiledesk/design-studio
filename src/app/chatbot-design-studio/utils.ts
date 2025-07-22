@@ -26,10 +26,19 @@ export const DOCS_LINK = {
         more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
     },
     VOICE_SETTINGS: {
-        tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
-        stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
-        voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
-        voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+        'twilio': {
+            voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
+        },
+        'openai': {
+            tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
+            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},    
+            voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+        },
+        'elevenlabs': {
+            tts_model: { link: 'https://elevenlabs.io/docs/api-reference/text-to-speech/convert', target: '_blank'},
+            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},    
+            voice_openai: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
+        },
     },
     LIQUIDJS: {
         home: { link: 'https://liquidjs.com/tutorials/intro-to-liquid.html', target: '_blank'},
@@ -69,7 +78,7 @@ export enum INTENT_COLORS {
     COLOR3 = '86,179,101',
     COLOR4 = '204,68,75',
     COLOR5 = '210,130,40',
-    COLOR6 = '182,139,206',
+    COLOR6 = '182,139,206'
   }
 
 export enum SIDEBAR_PAGES {
@@ -602,3 +611,158 @@ export function getColorFromRgba(rgba) {
     }
     return null;
   }
+
+// =============================
+// INTENT UTILITY FUNCTIONS
+// =============================
+
+/**
+ * Verifica se il colore fornito è valido.
+ * 
+ * @param color - Colore da validare
+ * @returns true se il colore è valido, false altrimenti
+ */
+export function isValidColor(color: any): boolean {
+  return color && color !== undefined && color !== null && color !== '';
+}
+
+/**
+ * Verifica se gli ID sono validi per la creazione di un connettore.
+ * 
+ * @param fromId - ID di origine
+ * @param toId - ID di destinazione
+ * @returns true se gli ID sono validi, false altrimenti
+ */
+export function areValidIds(fromId: string | null, toId: string | null): boolean {
+  return fromId !== null && toId !== null && fromId !== '' && toId !== '';
+}
+
+/**
+ * Trova la chiave dell'enum corrispondente al tipo di azione.
+ * 
+ * @param actionType - Il tipo di azione da cercare
+ * @param TYPE_ACTION - L'enum dei tipi di azione
+ * @returns La chiave dell'enum o null se non trovata
+ */
+export function findActionKey(actionType: string, TYPE_ACTION: any): string | null {
+  const enumKeys = Object.keys(TYPE_ACTION);
+  
+  for (const key of enumKeys) {
+    if (TYPE_ACTION[key] === actionType) {
+      return key;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Aggiunge una classe CSS a un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da aggiungere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function addCssClassToElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log("[UTILS] Aggiunta classe CSS:", className, "a elemento:", componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element) {
+      element.classList.add(className);
+      if (logger) {
+        logger.log("[UTILS] Classe aggiunta con successo");
+      }
+    } else {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nell'aggiunta della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Rimuove una classe CSS da un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da rimuovere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function removeCssClassFromElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log('[UTILS] Rimozione classe CSS:', className, 'da elemento:', componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element && element.classList.contains(className)) {
+      element.classList.remove(className);
+      if (logger) {
+        logger.log("[UTILS] Classe rimossa con successo");
+      }
+    } else if (!element) {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    } else {
+      if (logger) {
+        logger.debug("[UTILS] Classe non presente sull'elemento:", className);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nella rimozione della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Calcola il numero di domande da una stringa di testo.
+ * 
+ * @param questionText - Testo contenente le domande
+ * @returns Numero di domande calcolato
+ */
+export function calculateQuestionCount(questionText: string): number {
+  if (!questionText) {
+    return 0;
+  }
+  
+  const questionSegments = questionText
+    .split(/\r?\n/)
+    .filter(segment => segment.trim() !== '');
+  
+  return questionSegments.length;
+}
+
+/**
+ * Calcola la dimensione di un form.
+ * 
+ * @param form - Oggetto form da analizzare
+ * @returns Dimensione del form (numero di campi)
+ */
+export function calculateFormSize(form: any): number {
+  if (form && form !== null) {
+    return Object.keys(form).length;
+  }
+  return 0;
+}

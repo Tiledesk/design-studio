@@ -6,6 +6,7 @@
         (ngModelChange)="onChangeSearch($event)">
 </div>
 <div id="variable-list-scrollMe">
+
     <div id="data" *ngIf="filteredVariableList && filteredVariableList[0].elements.length > 0">
         <mat-expansion-panel [expanded]="true" id="userDefined">
             <mat-expansion-panel-header class="specific-class">
@@ -20,6 +21,7 @@
             </div>
         </mat-expansion-panel>
     </div>
+
     <div id="data" *ngFor="let item of filteredIntentVariableList; let index= index">
         <mat-expansion-panel [expanded]="(index===0 || isSearching)? true: false" *ngIf="item && item.elements.length > 0">
             <mat-expansion-panel-header class="specific-class">
@@ -49,6 +51,7 @@
             </div>
         </mat-expansion-panel>
     </div>
+
     <div id="data" *ngIf="filteredGlobalsList && filteredGlobalsList[0].elements.length > 0">
         <mat-expansion-panel expanded="false" id="globals">
             <mat-expansion-panel-header class="specific-class">
@@ -62,6 +65,7 @@
             </div>
         </mat-expansion-panel>
     </div>
+    
     <div id="no-data" *ngIf="isEmpty">
        <div class="no-result">
             <span class="material-icons">search</span>

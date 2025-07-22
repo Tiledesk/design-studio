@@ -924,17 +924,18 @@ export class ConnectorService {
   }
 
   private createConnector(intent, idConnectorFrom, idConnectorTo){
-    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent, idConnectorFrom, idConnectorTo);
-      const connectorsAttributes = intent.attributes.connectors;
-      if(idConnectorFrom && idConnectorTo){
-        const connectorID = idConnectorFrom+'/'+idConnectorTo;
-        let attributes = null;
-        if(connectorsAttributes?.connectorID){
-          attributes = connectorsAttributes[connectorID]
-        }
-        this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
+    const connectorsAttributes = intent.attributes.connectors;
+    this.logger.log('[DEBUG] - createConnector ->', intent, connectorsAttributes, idConnectorFrom, idConnectorTo);
+    if(idConnectorFrom && idConnectorTo){
+      //const connectorID =  idConnectorFrom + '/' + idConnectorTo; 
+      let attributes = {};
+      if(connectorsAttributes && connectorsAttributes[idConnectorFrom]){
+        attributes = connectorsAttributes[idConnectorFrom];
+      }
+      this.logger.log('[DEBUG] - createConnector attributes ->', idConnectorFrom, connectorsAttributes, attributes);
+      this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
     } else {
-      this.logger.log('[CONNECTOR-SERV] - il connettore è rotto non esiste intent ->', idConnectorTo);
+      this.logger.log('[DEBUG] - il connettore è rotto non esiste intent ->', idConnectorTo);
     }
   }
   /*************************************************/
@@ -1021,14 +1022,23 @@ export class ConnectorService {
    * 
    */
   public deleteConnector(intent, idConnection, save=false, notify=true) {
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
-    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
-    this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
-    if(idConnector && intent.attributes?.connectors[idConnector]){
-      delete intent.attributes.connectors[idConnector];
+    try {
+      this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
+      if (!intent || !idConnection) return;
+      if (!intent.attributes) intent.attributes = {};
+      if (!intent.attributes.connectors) intent.attributes.connectors = {};
+      const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+      this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
+      if(idConnector && intent.attributes.connectors[idConnector]){
+        delete intent.attributes.connectors[idConnector];
+      }
+      this.hideContractConnector(idConnection);
+      if (this.tiledeskConnectors && typeof this.tiledeskConnectors.deleteConnector === 'function') {
+        this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
+      }
+    } catch (err) {
+      this.logger.error('[CONNECTOR-SERV] deleteConnector error:', err);
     }
-    this.hideContractConnector(idConnection);
-    this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 
 
@@ -1065,7 +1075,7 @@ export class ConnectorService {
         return filteredMap;
       }, {});
       for (const [key, connector] of Object.entries(listOfConnectors)) {
-        this.logger.log('delete connector :: ', key );
+        this.logger.log('[CONNECTOR-SERV] delete connector :: ', key );
         const intentId = connectorID.split('/')[0];
         const intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
         this.deleteConnector(intent, key, save, notify);
@@ -1344,7 +1354,7 @@ export class ConnectorService {
       let op: string = opacity.toString();
       if (element) {
         element.style.setProperty('stroke', rgba);
-        // element.style.setProperty('opacity', op);
+        element.style.setProperty('filter', 'brightness(70%)');
         element.setAttributeNS(null, "opacity", op);
         this.addCustomMarker(connector.id, rgba);
       }

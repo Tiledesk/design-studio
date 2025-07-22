@@ -7,6 +7,70 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0-rc18
+- **bug-fixed**: in setattribute update the size of the "value" field to 100,000
+
+# 1.38.0-rc17
+- **bug-fixed**: Changed the connector stroke width and color;
+
+# 1.38.0-rc16
+- **changed**: Changed the connector stroke width and color;
+- **bug-fixed**: After the refresh, the label on the connectors is not displayed.
+- **bug-fixed**: If I hide the connector and refresh I see the extended connector and the contracted one.
+
+# 1.38.0-rc15
+- **changed**:: change textarea limitCharsText (from 10.000 to 100.000) in system context cds-action-ai-prompt, system context cds-action-askgpt-v2, prompt cds-action-gpt-assistant, prompt cds-action-gpt-task;
+- **changed**:: enabled hundreds separator for numeric characters in textarea.component
+
+
+# 1.38.0-rc14
+- **added**: Open KNB link in new tab in intent detail panel
+
+# 1.38.0-rc13
+- **bug-fixed**: when i drag and drop an action from the menu, if i go back to the actions menu bar without releasing the action, the submenu disappears
+- **changed**: Insert the name of the selected KB as the first element in the "Ask KB" action.
+- **bug-fixed**: Dragging the "Start" intent doesn't work on edges. The action detail shouldn't open when I drag and drop, but only when I click.
+
+# 1.38.0-rc12
+- **changed**: stand-by chatbot Patch that finds and fixes all broken buttons
+
+# 1.38.0-rc11
+- **added**: added chatbot Patch that finds and fixes all broken buttons
+
+# 1.38.0-rc10
+- **bug-fixed**: css ng-select-opened
+- **bug-fixed**: enabled variable list userDefined
+- **bug-fixed**: button is too far from the Examples in json buttons of action reply
+
+# 1.38.0-rc9
+- **added**: added load image from url in ds-action-reply-image
+- **added**: fixed isLiquidjs in textarea
+
+# 1.38.0-rc8
+- **bug-fixed**: bug fixed: css gallery-json-select
+
+# 1.38.0-rc7
+- **added**: added models in json-gallery
+- **bug-fixed**: bug fix edit button in action gallery
+
+# 1.38.0-rc6
+- **added**: added chatbot_type in utils variableList
+
+# 1.38.0-rc5
+- **added**: added image by url in action reply gallery
+
+# 1.38.0-rc4
+- **bug-fixed**: scss fix in action reply gallery
+
+# 1.38.0-rc3
+- **added**: json gallery in action reply gallery
+
+# 1.38.0-rc2
+- **changed**: refactoring intent component
+
+# 1.38.0-rc1
+- **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
+
 # 1.37.4
 - **bug-fixed**: added models in json-gallery
 
@@ -18,6 +82,9 @@
 
 # 1.37.1
 
+# 1.37.0-rc3
+- **bug-fixed**: delete webhook only when it is stopped
+
 # 1.37.0-rc2
 - **bug-fixed**: widget-log: disabled collapse row; stop webhook log when click on the stage
 
@@ -26,6 +93,30 @@
 
 # 1.36.1
 - **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc7
+- **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc6
+- **bug-fixed**: added width and height to previewModel images in action reply gallery
+- **bug-fixed**: in widget-log added ellips on the row, row opening, fixed display for very long texts, added selectable text, graphic adjustments
+
+# 1.36.0-rc5
+- **changed**: added ellips in log lines in ds-widget-logs.component
+
+# 1.36.0-rc4
+- **bug-fixed**: all actions that contain block selection on true/false do not display connector on stage when create via action detail panel
+- **bug-fixed**: about corrupted connectors with full dot but no connector on the stage
+- **bug-fixed**: the webhook opens the detail also on drag, it should open it only on click
+
+# 1.36.0-rc3
+- **bug-fixed**: updated textarea value in action AI prompt
+
+# 1.36.0-rc2
+- **added**: voice preview player for elevenlabs voices for voice_twilio chatbot type
+
+# 1.36.0-rc1
+- **added**: support for elevenLabs voices for voice_twilio chatbot 
 
 # 1.36.0
 - **bug-fixed**: added width and height to previewModel images in action reply gallery

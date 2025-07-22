@@ -5,6 +5,7 @@ import { calculatingRemainingCharacters, DOCS_LINK, TEXT_CHARS_LIMIT } from '../
 import { SatPopover } from '@ncstate/sat-popover';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'cds-textarea',
@@ -33,7 +34,8 @@ export class CDSTextareaComponent implements OnInit {
   @Input() autoResize: boolean = false;
   @Input() popoverVerticalAlign: string = 'below';
   @Input() isJsonAttribute: boolean = false;
-
+  @Input() isLiquidjs: boolean = true;
+ 
   @Output() changeTextarea = new EventEmitter();
   @Output() selectedAttribute = new EventEmitter();
   @Output() blur = new EventEmitter();
@@ -65,9 +67,15 @@ export class CDSTextareaComponent implements OnInit {
   emojiiCategories = [ 'recent', 'people', 'nature', 'activity', 'flags'];
   DOCS_LINK = DOCS_LINK.LIQUIDJS;
 
+  public browserLang: string = 'it';
+
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   
-  constructor() { }
+  constructor(
+    private translate: TranslateService
+  ) {
+    this.browserLang = this.translate.getBrowserLang();
+  }
 
   ngOnInit(): void {
     this.initialize();
