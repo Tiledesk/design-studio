@@ -120,9 +120,12 @@ export class CdsPanelElementsComponent implements OnInit {
 
   createActionListByCategory(){
     ACTION_CATEGORY.forEach(category => {
-      const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
-      this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', subtype);
-      this.projectPlanUtils.checkIfActionIsInChatbotType(subtype as TYPE_CHATBOT);
+      const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:null;
+      //subtype = null;
+      this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', ACTIONS_LIST, subtype);
+      if(subtype){
+        this.projectPlanUtils.checkIfActionIsInChatbotType(subtype as TYPE_CHATBOT);
+      }
       let menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[category.type] && el.status !== 'inactive')).map(element => {
         return {
           type: TYPE_OF_MENU.ACTION,
