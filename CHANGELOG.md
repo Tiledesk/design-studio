@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0-rc19
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
+
 # 1.38.0-rc18
 - **bug-fixed**: in setattribute update the size of the "value" field to 100,000
 
