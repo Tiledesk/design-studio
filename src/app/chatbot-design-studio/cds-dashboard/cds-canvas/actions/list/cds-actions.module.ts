@@ -85,6 +85,7 @@ import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-act
 import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
 import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow-log.component';
+import { FindPipe } from 'src/app/pipe/find.pipe';
 
 @NgModule({
   declarations: [
@@ -180,6 +181,7 @@ import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow
 
     //PIPES
     FilterPipe,
+    FindPipe,
     GetVariableNamePipe,
     VariableCssClassPipe,
     CdsActionReplyJsonbuttonsComponent,

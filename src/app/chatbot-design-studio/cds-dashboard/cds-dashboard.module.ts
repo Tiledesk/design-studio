@@ -82,6 +82,9 @@ const routes: Routes = [
     CdsModalActivateBotComponent,
     CdsPublishOnCommunityModalComponent,
 
+    //PIPIS
+    FilterPipe
+
   ],
   imports: [
     CommonModule,

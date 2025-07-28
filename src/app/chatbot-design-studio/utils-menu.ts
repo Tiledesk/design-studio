@@ -15,10 +15,10 @@ export var INFO_MENU_ITEMS: Array<{ key: string, label: string, icon: string, ty
     // { key: 'GITHUB', label: 'GitHubRepo', icon: 'assets/images/github-mark.svg', type: TYPE_URL.BLANK, status: "active", src: 'https://github.com/Tiledesk'}
 ]
 
-export var SHARE_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string}> = [
-    { key: 'COPY_LINK',     label: 'CopyLink',          icon: 'copy',               type: TYPE_URL.SELF},
-    { key: 'OPEN_NEW_PAGE', label: 'OpenLinkInNewTab',  icon: 'open_in_browser',    type: TYPE_URL.BLANK},
-    { key: 'EXPORT',        label: 'Export',            icon: 'file_download',      type: TYPE_URL.SELF},
+export var SHARE_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, src?: string, status:"active" | "inactive"}> = [
+    { key: 'COPY_LINK',     label: 'CopyLink',          icon: 'copy',               type: TYPE_URL.SELF,    status: "active"},
+    { key: 'OPEN_NEW_PAGE', label: 'OpenLinkInNewTab',  icon: 'open_in_browser',    type: TYPE_URL.BLANK,   status: "active"},
+    { key: 'EXPORT',        label: 'Export',            icon: 'file_download',      type: TYPE_URL.SELF,    status: "active"},
 ]
 
 export var CONTEXT_MENU_ITEMS: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive" , src?: string}> = [
