@@ -34,7 +34,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LocalSessionStorage } from 'src/chat21-core/providers/localSessionStorage';
 import { DepartmentService } from './services/department.service';
 import { WebSocketJs } from './services/websocket/websocket-js';
-import { DatePipe, HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { DatePipe, HashLocationStrategy, LocationStrategy, registerLocaleData } from '@angular/common';
 import { NotifyService } from './services/notify.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -65,6 +65,10 @@ import { NetworkService } from './services/network.service';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
 import { BrandResources } from './chatbot-design-studio/BrandResources';
+import { AiService } from './services/ai.service';
+
+import localeIt from '@angular/common/locales/it';
+registerLocaleData(localeIt, 'it');
 
 
 // FACTORIES
@@ -202,6 +206,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     UsersService,
     KnowledgeBaseService,
     OpenaiService,
+    AiService,
     WhatsappService,
     BrandService,
     MultichannelService,

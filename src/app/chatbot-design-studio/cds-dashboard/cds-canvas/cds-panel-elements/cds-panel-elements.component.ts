@@ -56,6 +56,7 @@ export class CdsPanelElementsComponent implements OnInit {
   }
 
   onDraggingMenuElement(event) {
+    this.isDraggingMenuElement = event;
     if (event === true) {
       this.isOpen = false;
     }
