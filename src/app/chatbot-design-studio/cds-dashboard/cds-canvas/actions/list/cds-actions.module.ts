@@ -70,7 +70,6 @@ import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-da
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
-import { FilterPipe } from 'src/app/pipe/filter.pipe';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
 import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript/cds-action-clear-transcript.component';
@@ -180,8 +179,6 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionWebResponseComponent,
 
     //PIPES
-    FilterPipe,
-    FindPipe,
     GetVariableNamePipe,
     VariableCssClassPipe,
     CdsActionReplyJsonbuttonsComponent,
@@ -286,7 +283,6 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionWebResponseComponent,
     
     //PIPES
-    FilterPipe,
     GetVariableNamePipe,
     VariableCssClassPipe,
     CdsActionAddKbContentComponent,
