@@ -30,7 +30,7 @@
         <span class="cds-text title"> {{BRAND_BASE_INFO['META_TITLE']}}</span>    
     </div>
     <div class="header-title ellips">
-        {{ selectedChatbot?.name }} - {{SHARE_MENU_ITEMS.length}}
+        {{ selectedChatbot?.name }}
         <span class="material-icons" *ngIf="(SHARE_MENU_ITEMS | filter:{key: 'status', value: 'active' }).length > 0" [matMenuTriggerFor]="menuShare">ios_share</span>
     </div>
     <div class="right-opts">
