@@ -14,6 +14,8 @@ import { CDSToogleComponent } from '../chatbot-design-studio/cds-base-element/to
 import { TextEditableDivComponent } from '../chatbot-design-studio/cds-base-element/text-editable-div/text-editable-div.component';
 import { BaseElementModule } from './base-element.module';
 import { BaseConditionRowComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/actions/list/cds-action-json-condition/base-condition-row/base-condition-row.component';
+import { FilterPipe } from '../pipe/filter.pipe';
+import { FindPipe } from '../pipe/find.pipe';
 
 
 
@@ -29,6 +31,10 @@ import { BaseConditionRowComponent } from '../chatbot-design-studio/cds-dashboar
     CDSToogleComponent,
     SelectComponent,
     TextEditableDivComponent,
+
+    //PIPES
+    FilterPipe,
+    FindPipe
   ],
   imports: [
     CommonModule,
@@ -48,6 +54,10 @@ import { BaseConditionRowComponent } from '../chatbot-design-studio/cds-dashboar
     CDSToogleComponent,
     SelectComponent,
     TextEditableDivComponent,
+
+    //PIPES
+    FilterPipe,
+    FindPipe
   ],
 })
 export class CdsBaseElementModule { }

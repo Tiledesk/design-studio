@@ -13,5 +13,6 @@ export class Namespace {
         top_k: number,
         context: string
     };
+    hybrid: boolean;
 
 }
