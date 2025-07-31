@@ -924,17 +924,18 @@ export class ConnectorService {
   }
 
   private createConnector(intent, idConnectorFrom, idConnectorTo){
-    this.logger.log('[CONNECTOR-SERV] - createConnector ->', intent, idConnectorFrom, idConnectorTo);
-      const connectorsAttributes = intent.attributes.connectors;
-      if(idConnectorFrom && idConnectorTo){
-        const connectorID = idConnectorFrom+'/'+idConnectorTo;
-        let attributes = null;
-        if(connectorsAttributes?.connectorID){
-          attributes = connectorsAttributes[connectorID]
-        }
-        this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
+    const connectorsAttributes = intent.attributes.connectors;
+    this.logger.log('[DEBUG] - createConnector ->', intent, connectorsAttributes, idConnectorFrom, idConnectorTo);
+    if(idConnectorFrom && idConnectorTo){
+      //const connectorID =  idConnectorFrom + '/' + idConnectorTo; 
+      let attributes = {};
+      if(connectorsAttributes && connectorsAttributes[idConnectorFrom]){
+        attributes = connectorsAttributes[idConnectorFrom];
+      }
+      this.logger.log('[DEBUG] - createConnector attributes ->', idConnectorFrom, connectorsAttributes, attributes);
+      this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
     } else {
-      this.logger.log('[CONNECTOR-SERV] - il connettore è rotto non esiste intent ->', idConnectorTo);
+      this.logger.log('[DEBUG] - il connettore è rotto non esiste intent ->', idConnectorTo);
     }
   }
   /*************************************************/
@@ -1344,7 +1345,7 @@ export class ConnectorService {
       let op: string = opacity.toString();
       if (element) {
         element.style.setProperty('stroke', rgba);
-        // element.style.setProperty('opacity', op);
+        element.style.setProperty('filter', 'brightness(70%)');
         element.setAttributeNS(null, "opacity", op);
         this.addCustomMarker(connector.id, rgba);
       }
