@@ -7,6 +7,77 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.0
+
+# 1.38.0-rc20
+- **added**: ability to manage Share_Items from BrandSrc
+
+# 1.38.0-rc19
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
+
+# 1.38.0-rc18
+- **bug-fixed**: in setattribute update the size of the "value" field to 100,000
+
+# 1.38.0-rc17
+- **bug-fixed**: Changed the connector stroke width and color;
+
+# 1.38.0-rc16
+- **changed**: Changed the connector stroke width and color;
+- **bug-fixed**: After the refresh, the label on the connectors is not displayed.
+- **bug-fixed**: If I hide the connector and refresh I see the extended connector and the contracted one.
+
+# 1.38.0-rc15
+- **changed**:: change textarea limitCharsText (from 10.000 to 100.000) in system context cds-action-ai-prompt, system context cds-action-askgpt-v2, prompt cds-action-gpt-assistant, prompt cds-action-gpt-task;
+- **changed**:: enabled hundreds separator for numeric characters in textarea.component
+
+# 1.38.0-rc14
+- **added**: Open KNB link in new tab in intent detail panel
+
+# 1.38.0-rc13
+- **bug-fixed**: when i drag and drop an action from the menu, if i go back to the actions menu bar without releasing the action, the submenu disappears
+- **changed**: Insert the name of the selected KB as the first element in the "Ask KB" action.
+- **bug-fixed**: Dragging the "Start" intent doesn't work on edges. The action detail shouldn't open when I drag and drop, but only when I click.
+
+# 1.38.0-rc12
+- **changed**: stand-by chatbot Patch that finds and fixes all broken buttons
+
+# 1.38.0-rc11
+- **added**: added chatbot Patch that finds and fixes all broken buttons
+
+# 1.38.0-rc10
+- **bug-fixed**: css ng-select-opened
+- **bug-fixed**: enabled variable list userDefined
+- **bug-fixed**: button is too far from the Examples in json buttons of action reply
+
+# 1.38.0-rc9
+- **added**: added load image from url in ds-action-reply-image
+- **added**: fixed isLiquidjs in textarea
+
+# 1.38.0-rc8
+- **bug-fixed**: bug fixed: css gallery-json-select
+
+# 1.38.0-rc7
+- **added**: added models in json-gallery
+- **bug-fixed**: bug fix edit button in action gallery
+
+# 1.38.0-rc6
+- **added**: added chatbot_type in utils variableList
+
+# 1.38.0-rc5
+- **added**: added image by url in action reply gallery
+
+# 1.38.0-rc4
+- **bug-fixed**: scss fix in action reply gallery
+
+# 1.38.0-rc3
+- **added**: json gallery in action reply gallery
+
+# 1.38.0-rc2
+- **changed**: refactoring intent component
+
+# 1.38.0-rc1
+- **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
+
 # 1.37.6
 - **added**: ability to manage Share_Items from BrandSrc
 
