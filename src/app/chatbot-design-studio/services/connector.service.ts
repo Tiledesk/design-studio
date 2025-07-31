@@ -1215,7 +1215,7 @@ export class ConnectorService {
       return filteredMap;
     }, {});
     const arrayConnectors = Object.values(connectors);
-    this.logger.log('[CONNECTOR-SERV] -----> arrayConnectors::: ', arrayConnectors);
+    // this.logger.log('[CONNECTOR-SERV] -----> arrayConnectors::: ', arrayConnectors);
     return arrayConnectors;
   }
 
