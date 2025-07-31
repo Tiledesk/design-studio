@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.37.6
+- **added**: ability to manage Share_Items from BrandSrc
+
+# 1.37.5
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
+
 # 1.37.4
 - **bug-fixed**: added models in json-gallery
 

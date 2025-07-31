@@ -120,7 +120,7 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (model_list | filter:{key: 'value', value: action?.model }).name }} )</span>
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (model_list | find:{key: 'value', value: action?.model }).name }} )</span>
                 </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
