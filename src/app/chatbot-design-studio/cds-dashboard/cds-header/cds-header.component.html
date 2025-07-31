@@ -31,7 +31,7 @@
     </div>
     <div class="header-title ellips">
         {{ selectedChatbot?.name }}
-        <span class="material-icons" [matMenuTriggerFor]="menuShare">ios_share</span>
+        <span class="material-icons" *ngIf="(SHARE_MENU_ITEMS | filter:{key: 'status', value: 'active' }).length > 0" [matMenuTriggerFor]="menuShare">ios_share</span>
     </div>
     <div class="right-opts">
 

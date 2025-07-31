@@ -434,7 +434,7 @@ export class CdsActionReplyV2Component implements OnInit {
 
   /** appdashboard-button-configuration-panel: onOpenButtonPanel */
   onOpenButtonPanel(buttonSelected) {
-    this.logger.log('onOpenButtonPanel 2 :: ', buttonSelected);
+    this.logger.log('[cds-action-reply] onOpenButtonPanel 2 :: ', buttonSelected);
     // this.intentService.setIntentSelected(this.intentSelected.intent_id);
     this.intentService.selectAction(this.intentSelected.intent_id, this.action._tdActionId);
     this.controllerService.openButtonPanel(buttonSelected);
