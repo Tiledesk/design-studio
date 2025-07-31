@@ -63,6 +63,8 @@
     border-radius: var(--base-border-radius-preview);
   }
   &.isStart{
+    position: absolute;
+    height: 100%;
     background-color: unset!important;
     padding: 0;
     border-radius: unset;
@@ -72,6 +74,17 @@
     .intent-background-overlay {
       background-color: transparent!important;
       outline: unset!important;
+    }
+    .header-draggable {
+      height: 100%;
+      width: 100%;
+    }
+    .pic-header {
+      height: 100%;
+      display: block;
+      position: absolute;
+      margin: 0;
+      padding: 0;
     }
   }
 
@@ -203,7 +216,7 @@
     border-radius: 5px;
     font-size: 15px;
     font-weight: 600;
-    // cursor: text;
+    cursor: grab;
     box-sizing: border-box;
     max-width: 100%;
     width: 100%;
@@ -212,6 +225,14 @@
     white-space: pre-wrap;
     overflow-wrap: break-word;
     pointer-events: auto;
+    &.isStart{
+      height: 100%;
+      display:flex;
+      align-items: center;
+    }
+    .header {
+      padding:0px!important;
+    }
   }
 
 }

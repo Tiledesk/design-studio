@@ -1,4 +1,3 @@
-import { Namespace } from './../../../../../../models/namespace-model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MatDialog } from '@angular/material/dialog';
@@ -38,7 +37,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  listOfNamespaces: Array<{name: string, value: string, icon?:string, type:string}>;
+  listOfNamespaces: Array<{name: string, value: string, icon?:string, hybrid:boolean}>;
 
   project_id: string;
   selectedNamespace: string;
@@ -220,7 +219,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, type: el.engine?.type} })
+      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, hybrid: el.hybrid? el.hybrid:false } })
       namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
@@ -243,11 +242,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   selectKB(namespace){
     const result = this.listOfNamespaces.find(el => el.value === namespace);
     this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result)
-    if (result.type === "serverless") {
-      this.IS_VISIBLE_ALPHA_SLIDER = true;
-    } else {
-      this.IS_VISIBLE_ALPHA_SLIDER = false;
-    }
+    this.IS_VISIBLE_ALPHA_SLIDER = result.hybrid
   }
 
   /** TO BE REMOVED: patch undefined action keys */

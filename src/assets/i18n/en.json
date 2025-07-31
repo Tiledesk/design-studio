@@ -462,6 +462,7 @@
         "ClickToAddAudioURL": "Click to add audio file ...",
         "AddButton": "Add button",
         "JsonButtons": "Json buttons",
+        "JsonGallery": "Json gallery",
         "AddOption": "Add option",
         "SelectOption": "Select an option",
         "AddCard": "Add card",
@@ -470,6 +471,7 @@
         "EnterEmailRecipient": "Enter email recipient",
         "EnterEmailSubject": "Enter email subject",
         "EnterEmailBody": "Enter email body",
+        "AddImageUrl": "add image url",
         "To": "To",
         "Subject": "Subject",
         "ReplyTo": "Reply to",
@@ -1088,6 +1090,9 @@
             }
         },
         "systemDefinedElements": {
+            "payload": {
+                "description": "The Payload inside the webhook"
+            },
             "department_id": {
                 "description": "The ID of the department where this chatbot is activated"
             },

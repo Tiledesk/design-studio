@@ -56,6 +56,7 @@ export class CdsPanelElementsComponent implements OnInit {
   }
 
   onDraggingMenuElement(event) {
+    this.isDraggingMenuElement = event;
     if (event === true) {
       this.isOpen = false;
     }
@@ -120,7 +121,7 @@ export class CdsPanelElementsComponent implements OnInit {
   createActionListByCategory(){
     ACTION_CATEGORY.forEach(category => {
       const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
-      this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', subtype);
+      this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', ACTIONS_LIST, subtype);
       this.projectPlanUtils.checkIfActionIsInChatbotType(subtype as TYPE_CHATBOT);
       let menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[category.type] && el.status !== 'inactive')).map(element => {
         return {

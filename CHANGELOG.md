@@ -7,6 +7,21 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.37.6
+- **added**: ability to manage Share_Items from BrandSrc
+
+# 1.37.5
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
+
+# 1.37.4
+- **bug-fixed**: added models in json-gallery
+
+# 1.37.3
+- **changed**: enable/disable alpha slider in askkb-v2 action
+
+# 1.37.2
+- **bug-fixed**: delete webhook only when it is stopped
+
 # 1.37.1
 
 # 1.37.0-rc2

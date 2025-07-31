@@ -24,12 +24,12 @@
             <mat-icon *ngIf="!action?.llm" svgIcon="add_ai_model" aria-hidden="true"></mat-icon>
             <!-- <img *ngIf="!action?.llm" src="assets/images/icons/add_ai_model.svg" alt="ai model"> -->
             <!-- <mat-icon *ngIf="action?.llm" [svgIcon]="getLlmIcon(action?.llm)" aria-hidden="true"></mat-icon> -->
-            <img *ngIf="action?.llm" src="{{ (llm_models | filter:{key: 'value', value: action?.llm }).src }}" alt="">
+            <img *ngIf="action?.llm" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
         </div>
 
         <div class="action-row-right">
             <div *ngIf="action?.llm" class="action-row-right">
-                {{ (llm_models | filter:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">({{action?.model}})</span>
+                {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">({{action?.model}})</span>
             </div>
             <div *ngIf="!action?.llm" class="action-row-right empty">
                 {{'CDSCanvas.ChooseTheAIModel' | translate }}
@@ -91,7 +91,7 @@
         <cds-textarea id="question" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
-            [limitCharsText]="10000"
+            [limitCharsText]="100000"
             [minRow]="4"[maxRow]="25" 
             [text]="action.question" 
             [placeholder]="'CDSCanvas.EnterPrompt' | translate"
@@ -123,7 +123,7 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | filter:{key: 'value', value: action?.llm }).name }} )</span>
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} )</span>
                 </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
@@ -297,7 +297,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
-                        [limitCharsText]="10000"
+                        [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
                         [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
@@ -323,6 +323,7 @@
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
+            [isLiquidjs]="false"
             [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignReplyTo"

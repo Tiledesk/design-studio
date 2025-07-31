@@ -69,7 +69,7 @@ export enum INTENT_COLORS {
     COLOR3 = '86,179,101',
     COLOR4 = '204,68,75',
     COLOR5 = '210,130,40',
-    COLOR6 = '182,139,206',
+    COLOR6 = '182,139,206'
   }
 
 export enum SIDEBAR_PAGES {

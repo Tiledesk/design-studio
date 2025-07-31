@@ -35,6 +35,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   /* webhook params */
   serverBaseURL: string;
   project: Project;
+  project_id: string;
   chatbot_id: string;
   webhookUrl: string;
   webhookUrlDev: string;
@@ -75,6 +76,7 @@ export class CdsPanelIntentDetailComponent implements OnInit {
   }
 
   initializeWebhook(){
+    this.project_id = this.dashboardService.projectID;
     this.maximize = true;
     this.webhookUrl = '';
     this.webhookUrlDev = '';
@@ -227,5 +229,10 @@ export class CdsPanelIntentDetailComponent implements OnInit {
           this.tooltip.disabled = true;
         }, 1000);
       });
+    }
+
+    goToKNB(){
+      let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name='
+      window.open(url, '_blank');
     }
 }
