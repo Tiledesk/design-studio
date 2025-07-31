@@ -107,6 +107,10 @@
             <p *ngIf="messageText" class="webhook-message fade-in-out">
                 {{ messageText }}
             </p>
+
+            <div class="link-container">
+                <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
+            </div>
         </div>
 
     </div>
