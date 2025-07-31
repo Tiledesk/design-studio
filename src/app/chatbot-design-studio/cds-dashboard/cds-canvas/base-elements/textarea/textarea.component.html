@@ -1,5 +1,5 @@
 <div class="text-editor-wrapper">
-    <div *ngIf="setAttributeBtn && !readonly" class="liquidjs-menu">
+    <div *ngIf="(setAttributeBtn && !readonly) || isLiquidjs" class="liquidjs-menu">
         <a matTooltipClass="cds-mat-tooltip"
         matTooltip="{{ 'LiquidJS syntax supported' | translate}}" 
         #tooltip="matTooltip" matTooltipPosition='below'
