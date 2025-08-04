@@ -556,7 +556,7 @@ export class TiledeskConnectors {
     gElement.id = this.svgConnectorsId;
     gElement.setAttribute("fill", "white");
     gElement.setAttribute("stroke", this.colors["black"]);
-    gElement.setAttribute("stroke-width", "1");
+    gElement.setAttribute("stroke-width", "2");
     svgContainer.appendChild(gElement);
     // Add the `<g>` come figlio di <svg>
     drawer.appendChild(svgContainer);
