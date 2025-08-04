@@ -1,5 +1,5 @@
 <div class="text-editor-wrapper">
-    <div *ngIf="setAttributeBtn && !readonly" class="liquidjs-menu">
+    <div *ngIf="(setAttributeBtn && !readonly) || isLiquidjs" class="liquidjs-menu">
         <a matTooltipClass="cds-mat-tooltip"
         matTooltip="{{ 'LiquidJS syntax supported' | translate}}" 
         #tooltip="matTooltip" matTooltipPosition='below'
@@ -31,7 +31,6 @@
             </mat-form-field>
     
             <div *ngIf="showUtils === true" unselectable="on" tabIndex="-1" class="editor-utils">
-    
                 <div *ngIf="setAttributeBtn" class="text-editor-insert-attribute" [satPopoverAnchor]="addVariable" (click)="addVariable.toggle(); openSetAttributePopover();">
                     <span class="material-icons" style="font-size: 16px;">
                         data_object
@@ -47,7 +46,7 @@
                 </div>
         
                 <div *ngIf="textLimitBtn" data-status="default" class="tpl-text-limit">
-                    <div class="num-chars" [ngClass]="{'error' : alertCharsText}">{{leftCharsText}}</div>
+                    <div class="num-chars" [ngClass]="{'error' : alertCharsText}">{{leftCharsText | number:'': browserLang}}</div>
                 </div>
             </div>
     
