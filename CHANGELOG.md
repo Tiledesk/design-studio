@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc2
+- **changed**: anyComponentStyle maximum error limit
 
 # 1.39.0-rc1
 - **changed**: added scroll button left and right on image gallery
