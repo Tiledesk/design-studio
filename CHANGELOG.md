@@ -7,6 +7,25 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.0-rc1
+- **changed**: added scroll button left and right on image gallery
+
+# 1.38.2
+- **changed**: ai models upgraded
+
+# 1.38.1
+- **changed**: Changed connector-width in 2px
+
+# 1.38.0
+
+
+# 1.38.0-rc20
+- **added**: ability to manage Share_Items from BrandSrc
+
+# 1.37.5
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
+
 # 1.38.0-rc19
 - **bug-fixed**: Voice menu compatibility patch if there is no subtype
 

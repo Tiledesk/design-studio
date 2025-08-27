@@ -7,7 +7,7 @@
         </div>
         <div class="action-row-right">
             <div class="set-option-value">
-                {{ (radioOptions | filter:{key: 'value', value: action?.target }).name | translate }}
+                {{ (radioOptions | find:{key: 'value', value: action?.target }).name | translate }}
             </div>
         </div>
     </div>

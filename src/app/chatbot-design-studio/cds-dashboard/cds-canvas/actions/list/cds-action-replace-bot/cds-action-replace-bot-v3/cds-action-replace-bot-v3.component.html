@@ -17,7 +17,7 @@
         </div>
 
         <div *ngIf="action?.botId || action?.botSlug" class="action-row-right"> 
-            {{ (chatbots_name_list | filter:{key: 'id', value: action?.botId })?.name }} <div class="slug" [ngClass]="action?.botSlug | variableCssClass"  *ngIf="action?.botSlug">{{ formatBotSlug(action?.botSlug) }}</div>
+            {{ (chatbots_name_list | find:{key: 'id', value: action?.botId })?.name }} <div class="slug" [ngClass]="action?.botSlug | variableCssClass"  *ngIf="action?.botSlug">{{ formatBotSlug(action?.botSlug) }}</div>
         </div>
         <div *ngIf="!action?.botId && !action?.botSlug" class="action-row-right empty"> 
             {{'CDSCanvas.ChooseBot' | translate }}
