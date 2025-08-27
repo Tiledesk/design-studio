@@ -8,9 +8,11 @@
 *Tiledesk SRL*
 
 
-# 1.38.1-rc1
+# 1.39.0-rc1
 - **changed**: added scroll button left and right on image gallery
 
+# 1.38.2
+- **changed**: ai models upgraded
 
 # 1.38.1
 - **changed**: Changed connector-width in 2px
