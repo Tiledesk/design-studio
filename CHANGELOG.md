@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.38.2
+- **changed**: ai models upgraded
+
 # 1.38.1
 - **changed**: Changed connector-width in 2px
 
