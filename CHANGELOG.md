@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc3
+- **changed**: set text charts limit to 10000
+- **changed**: changed the name of JSON buttons to (JSON Buttons and JSON Carousel) and always show it
+
 # 1.39.0-rc2
 - **changed**: anyComponentStyle maximum error limit
 
