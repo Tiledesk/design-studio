@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.3
+- **changed**: set text charts limit to 10000
+- **changed**: changed the name of JSON buttons to (JSON Buttons and JSON Carousel) and always show it
 
 # 1.38.2
 - **changed**: ai models upgraded
