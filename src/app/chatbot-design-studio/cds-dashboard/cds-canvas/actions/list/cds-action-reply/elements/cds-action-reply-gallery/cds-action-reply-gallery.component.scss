@@ -136,12 +136,113 @@
 /** BUTTONS **/
 .gallery-response {
     display: flex;
-    overflow: scroll;
+    overflow-y: visible;
     gap: 10px;
     margin: 0;
     width: 100%;
     font-size: var(--font-size-base);
     padding: 0 32px 32px 32px;
+}
+
+/* Contenitore principale con frecce fisse */
+.gallery-container {
+    position: relative;
+    width: 100%;
+    padding: 0 50px; /* Spazio per le frecce laterali */
+}
+
+/* Contenuto scrollabile interno */
+.gallery-replies {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    
+    /* Abilita lo scrolling orizzontale con trackpad e touch */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    
+    /* Proprietà per il touch scrolling orizzontale */
+    touch-action: pan-x;
+    
+    /* Stili per Webkit browsers (Chrome, Safari, Edge) */
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+        
+        &:hover {
+            background: var(--base-color);
+        }
+    }
+    
+    /* Assicura che gli elementi figli non si restringano */
+    > * {
+        flex-shrink: 0;
+    }
+}
+
+/* Frecce di navigazione fisse */
+.gallery-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    // background: rgba(255, 255, 255, 0.9);
+    background: var(--base-color);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0;
+    transition: all 0.3s ease;
+    // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    &:hover {
+        background: var(--base-color);
+        color: white;
+        border-color: var(--base-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .material-icons {
+        font-size: 20px;
+        color: var(--border-color);
+        transition: color 0.3s ease;
+    }
+    
+    &:hover .material-icons {
+        color: white;
+    }
+}
+
+.gallery-nav-left {
+    left: 0;
+}
+
+.gallery-nav-right {
+    right: 0;
+}
+
+/* Mostra le frecce al passaggio del mouse sul container */
+.gallery-container:hover .gallery-nav-arrow {
+    opacity: 1;
 }
 
 .button-reply {

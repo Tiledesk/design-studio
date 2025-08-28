@@ -1,5 +1,5 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ConnectorService } from '../../../../../../../services/connector.service';
 import { IntentService } from '../../../../../../../services/intent.service';
@@ -16,8 +16,8 @@ import { LIST_JSON_MODEL_GALLERY } from 'src/app/chatbot-design-studio/utils-jso
   templateUrl: './cds-action-reply-gallery.component.html',
   styleUrls: ['./cds-action-reply-gallery.component.scss']
 })
-export class CdsActionReplyGalleryComponent implements OnInit {
-  @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
+export class CdsActionReplyGalleryComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('galleryContainer', { static: false }) scrollContainer: ElementRef;
   
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
@@ -55,6 +55,10 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   json_gallery: string;
   jsonPlaceholder: string;
   listType: any = {};
+  
+  // Navigation arrows visibility
+  showLeftArrow: boolean = false;
+  showRightArrow: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -68,6 +72,13 @@ export class CdsActionReplyGalleryComponent implements OnInit {
 
   ngOnInit(): void {
     this.initialize();
+  }
+
+  ngAfterViewInit(): void {
+    // Controlla la visibilità delle frecce dopo che la vista è stata inizializzata
+    setTimeout(() => {
+      this.checkArrowsVisibility();
+    }, 100);
   }
 
   /** */
@@ -93,6 +104,12 @@ export class CdsActionReplyGalleryComponent implements OnInit {
       }
       this.initElement();
       if(!this.previewMode) this.scrollToLeft();
+      
+      // Controlla la visibilità delle frecce dopo l'inizializzazione
+      setTimeout(() => {
+        this.checkArrowsVisibility();
+      }, 200);
+      
       this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
         this.connector = connector;
         this.updateConnector();
@@ -208,6 +225,9 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     this.gallery.push( this.newGalleryElement() )
     this.initElement()
     this.scrollToLeft()
+    setTimeout(() => {
+      this.checkArrowsVisibility();
+    }, 100);
   }
 
   newGalleryElement(){
@@ -438,6 +458,9 @@ export class CdsActionReplyGalleryComponent implements OnInit {
 
   onDeleteGallery(index){
     this.gallery.splice(index, 1);
+    setTimeout(() => {
+      this.checkArrowsVisibility();
+    }, 100);
     // if(this.buttons.length === 0){
     //   delete this.response.attributes.attachment
     // } 
@@ -530,5 +553,99 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     this.changeActionReply.emit();
     // this.changeJsonButtons.emit(this.json_gallery);
   }
+
+  // ----- NAVIGATION ARROWS FUNCTIONS: start
+  /**
+   * Controlla se le frecce devono essere visibili
+   */
+  checkArrowsVisibility(): void {
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      const container = this.scrollContainer.nativeElement;
+      if((container.scrollWidth - container.clientWidth)>0){
+        this.showLeftArrow = true;
+        this.showRightArrow = true;
+      } else {
+        this.showLeftArrow = false;
+        this.showRightArrow = false;
+      }
+    }
+  }
+
+  /**
+   * Scorre a sinistra di un blocco alla volta
+   */
+  scrollLeft(): void {
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      const container = this.scrollContainer.nativeElement;
+      const cardWidth = 220; // Larghezza della card (--cardWidth)
+      const gap = 10; // Gap tra le card
+      const scrollAmount = cardWidth + gap;
+      
+      container.scrollTo({
+        left: container.scrollLeft - scrollAmount,
+        behavior: 'smooth'
+      });
+      
+      // Aggiorna la visibilità delle frecce dopo lo scrolling
+      setTimeout(() => {
+        this.checkArrowsVisibility();
+      }, 300);
+    }
+  }
+
+  /**
+   * Scorre a destra di un blocco alla volta
+   */
+  scrollRight(): void {
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      const container = this.scrollContainer.nativeElement;
+      const cardWidth = 220; // Larghezza della card (--cardWidth)
+      const gap = 10; // Gap tra le card
+      const scrollAmount = cardWidth + gap;
+      
+      container.scrollTo({
+        left: container.scrollLeft + scrollAmount,
+        behavior: 'smooth'
+      });
+      
+      // Aggiorna la visibilità delle frecce dopo lo scrolling
+      setTimeout(() => {
+        this.checkArrowsVisibility();
+      }, 300);
+    }
+  }
+
+  /**
+   * Controlla se è possibile scorrere a sinistra
+   */
+  canScrollLeft(): boolean {
+    return this.showLeftArrow;
+  }
+
+  /**
+   * Controlla se è possibile scorrere a destra
+   */
+  canScrollRight(): boolean {
+    return this.showRightArrow;
+  }
+
+  /**
+   * Listener per il resize della finestra
+   */
+  @HostListener('window:resize')
+  onResize(): void {
+    setTimeout(() => {
+      this.checkArrowsVisibility();
+    }, 100);
+  }
+
+  /**
+   * Listener per lo scroll del contenitore
+   */
+  @HostListener('scroll', ['$event'])
+  onScroll(event: Event): void {
+    this.checkArrowsVisibility();
+  }
+  // ----- NAVIGATION ARROWS FUNCTIONS: end
 }
 
