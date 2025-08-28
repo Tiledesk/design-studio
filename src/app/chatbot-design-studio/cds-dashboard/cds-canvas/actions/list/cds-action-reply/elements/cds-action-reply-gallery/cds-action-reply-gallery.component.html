@@ -63,8 +63,12 @@
         (selectedAttribute)="onSelectedAttribute($event)">
     </cds-textarea> 
 
-    <div *ngIf="!showJsonBody" class="buttons-json-response">
-        <div class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
+    <!-- *ngIf="!showJsonBody" -->
+    <div class="buttons-json-response">
+        <div class="button-reply-add button-json single-btn-reply" 
+             [class.disabled]="showJsonBody"
+             [disabled]="showJsonBody"
+             (click)="!showJsonBody && $event.stopPropagation();onClickJsonButtons()">
             + {{'CDSCanvas.JsonGallery' | translate }}
         </div>
     </div>
