@@ -82,6 +82,16 @@ cds-textarea.text-editable-div {
         }
     }
 
+    .button-reply-add.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+        
+        &:hover {
+            background: var(--color-white-hex);
+            border-color: var(--border-color);
+        }
+    }
     // ::ng-deep .select-item-wrp {
     //     justify-content: flex-end;
     // }

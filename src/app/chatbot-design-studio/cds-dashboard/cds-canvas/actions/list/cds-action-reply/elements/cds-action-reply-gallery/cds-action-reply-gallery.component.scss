@@ -160,6 +160,7 @@
     line-height: var(--button-height-base);
     text-align: center;
     transition: all .3s;
+    
     &.custom-placeholder {
         margin: 10px 5px;
         background: #dfdfdf;
@@ -819,6 +820,16 @@ cds-textarea#description.noButtons ::ng-deep{
         }
         ::ng-deep .ng-select.ng-select-single .ng-select-container .ng-value-container .ng-value {
             display:none!important;
+        }
+    }
+    .button-reply-add.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+        
+        &:hover {
+            background: var(--color-white-hex);
+            border-color: var(--border-color);
         }
     }
 }

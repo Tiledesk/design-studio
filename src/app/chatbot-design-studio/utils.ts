@@ -254,7 +254,7 @@ export const INTENT_TEMP_ID         = '';
 export const MESSAGE_METADTA_WIDTH  = '100%';
 export const MESSAGE_METADTA_HEIGHT = 230;
 export const TIME_WAIT_DEFAULT      = 500;
-export const TEXT_CHARS_LIMIT       = 1024;
+export const TEXT_CHARS_LIMIT       = 10000;//1024;
 export const classCardButtonNoClose = 'card-buttons-no-close';
 
 export const CDS_SIDEBAR_WIDTH = 60;
