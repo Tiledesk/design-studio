@@ -92,8 +92,7 @@ export class BrandResources {
             SHARE_MENU_ITEMS.find(a => a.key === el.key).status = el.status
             SHARE_MENU_ITEMS.find(a => a.key === el.key).icon = el.icon
         })
-        console.log('shareeeee', SHARE_MENU_ITEMS, this.brand['SHARE_MENU_ITEMS'])
-
+        
         /** MEDIA */
         Object.keys(MEDIA).forEach(key => { 
             if(this.brand['MEDIA'][key].src) MEDIA[key].src = this.brand['MEDIA'][key].src

@@ -1,8 +1,12 @@
-<div *ngIf="!showJsonBody" class="buttons-json-response">
-    <div class="button-reply-add button-json single-btn-reply" (click)="$event.stopPropagation();onClickJsonButtons()">
+<!-- *ngIf="!showJsonButton" -->
+<div class="buttons-json-response">
+    <div class="button-reply-add button-json single-btn-reply" 
+    [class.disabled]="showJsonButton"
+    (click)="!showJsonButton && $event.stopPropagation();onClickJsonButtons()">
         + {{'CDSCanvas.JsonButtons' | translate }}
     </div>
 </div>
+
 
 <div *ngIf="showJsonButton" class="buttons-json-response json-shown">
     <cds-select 

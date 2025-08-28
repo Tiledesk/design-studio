@@ -178,14 +178,14 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.actionLabelModel =  '';
     this.actionLabelModel =  '';
     if(this.action.llm){
-      const filteredModels = this.getModelsByName(this.action.llm);
+      const filteredModels = this.getModelsByName(this.action.llm).filter(el => el.status === 'active');
       filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
       this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
     }
     // this.actionLabelModel = this.action['labelModel'];
   }
 
-  getModelsByName(value: string): any[] {
+  getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> {
     const model = this.llm_model.find((model) => model.value === value);
     return model.models;
   }
