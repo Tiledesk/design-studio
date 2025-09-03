@@ -84,6 +84,9 @@ import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-act
 import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
 import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow-log.component';
+import { CdsActionAiConditionComponent } from './cds-action-ai-condition/cds-action-ai-condition.component';
+import { AttributesDialogAiConditionComponent } from './cds-action-ai-condition/attributes-dialog/attributes-dialog.component';
+import { AiConditionComponent } from './cds-action-ai-condition/ai-condition/ai-condition.component';
 import { FindPipe } from 'src/app/pipe/find.pipe';
 
 @NgModule({
@@ -173,8 +176,10 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionConnectBlockComponent,
     CdsActionSendWhatsappComponent,
     CdsActionAiPromptComponent,
-    // action Ai Prompt elements: start //
     AttributesDialogAiPromptComponent,
+    CdsActionAiConditionComponent,
+    AttributesDialogAiConditionComponent,
+    AiConditionComponent,
     // action Ai Prompt elements: end //
     CdsActionWebResponseComponent,
 
@@ -277,8 +282,10 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionConnectBlockComponent,
     CdsActionSendWhatsappComponent,
     CdsActionAiPromptComponent,
-    // action Ai Prompt elements: start //
     AttributesDialogAiPromptComponent,
+    CdsActionAiConditionComponent,
+    AttributesDialogAiConditionComponent,
+    AiConditionComponent,
     // action Ai Prompt elements: end //
     CdsActionWebResponseComponent,
     
