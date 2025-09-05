@@ -10,16 +10,18 @@ export class AiConditionComponent implements OnInit {
     @Input() index: number;
     @Input() listOfIntents: Array<{name: string, value: string, icon?:string}>;
     @Output() updateAndSaveAction = new EventEmitter;
+    @Output() updateAndSaveConnectors = new EventEmitter;
+    
     label: string;
     propmt: string;
-    intentId: string;
+    conditionIntentId: string;
     placeholder: string = "Go down this path if";
   constructor() { }
 
   ngOnInit(): void {
     this.label = this.intent.label;
     this.propmt = this.intent.prompt;
-    this.intentId = this.intent.intentId;
+    this.conditionIntentId = this.intent.conditionIntentId;
   }
 
   onBlur(event: any) {
@@ -34,17 +36,18 @@ export class AiConditionComponent implements OnInit {
   }
 
   onChangeBlockSelect(event: any) {
-    this.intent.intentId = event.value;
-    this.updateAndSaveAction.emit({
-      value: event
+    this.intent.conditionIntentId = event.value;
+    this.updateAndSaveConnectors.emit({
+      value: event,
+      type: 'create'
     });
   }
 
   onResetBlockSelect(event: any) {
-    this.intent.intentId = '';
-    this.updateAndSaveAction.emit({
-      value: event
+    this.intent.conditionIntentId = null;   
+    this.updateAndSaveConnectors.emit({
+      value: event,
+      type: 'delete'
     });
   }
-
 }

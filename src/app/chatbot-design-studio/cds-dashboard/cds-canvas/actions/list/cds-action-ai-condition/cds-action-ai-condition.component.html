@@ -34,11 +34,11 @@
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
-            <label class="title-preview-label">{{'CDSCanvas.Success' | translate }} </label>
+            <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
             <cds-connector class="connector-true"
-                [idConnector] = "listOfConnectors[intent.label].idConnector"    
-                [idConnection] = "listOfConnectors[intent.label].idConnection"
-                [isConnected] = "listOfConnectors[intent.label].isConnected">
+                 [idConnector]   = "listOfConnectors[intent.label]?.idConnector"    
+                 [idConnection]  = "listOfConnectors[intent.label]?.idConnection"
+                 [isConnected]   = "listOfConnectors[intent.label]?.isConnected">
             </cds-connector>
         </div>
 
@@ -50,9 +50,20 @@
     <div class="previewContent">
        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
-            [idConnector]   = "idConnectorFalse"
-            [idConnection]  = "idConnectionFalse"
-            [isConnected]   = "isConnectedFalse">
+            [idConnector]   = "idConnectorFallback"
+            [idConnection]  = "idConnectionFallback"
+            [isConnected]   = "isConnectedFallback">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+       <label class="title-preview-label">{{'CDSCanvas.Error' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector]   = "idConnectorError"
+            [idConnection]  = "idConnectionError"
+            [isConnected]   = "isConnectedError">
         </cds-connector>
     </div>
 
@@ -69,7 +80,8 @@
                 [index]="i" 
                 [intent]="intent"
                 [listOfIntents]="listOfIntents"
-                (updateAndSaveAction)="onUpdateAndSaveAction(i, intent)">
+                (updateAndSaveConnectors)="onUpdateAndSaveConnectors(intent, $event.type)"
+                (updateAndSaveAction)="onUpdateAndSaveAction(intent)">
              </app-ai-condition>
          </div>
 
@@ -325,11 +337,29 @@
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
-            [itemSelected]="action?.falseIntent" 
+            [itemSelected]="action?.fallbackIntent" 
             [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
-            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
-            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+            (onSelected)="onChangeBlockSelect($event, 'fallbackIntent')"
+            (onReset)="onResetBlockSelect($event, 'fallbackIntent')">
+        </cds-select>
+    </div>
+
+    <hr class="custom-divider">
+
+    <div class="field-box">
+        <div class="condition-container">
+            <label class="condition-text">{{'CDSCanvas.Error' | translate | titlecase}}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.errorIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'errorIntent')"
+            (onReset)="onResetBlockSelect($event, 'errorIntent')">
         </cds-select>
     </div>
 

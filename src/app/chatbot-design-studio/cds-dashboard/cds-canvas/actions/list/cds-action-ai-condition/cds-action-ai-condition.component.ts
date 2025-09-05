@@ -25,7 +25,7 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
-import { checkGenericConnectionStatusOfAction, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
 
 @Component({
@@ -43,7 +43,6 @@ export class CdsActionAiConditionComponent implements OnInit {
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter;
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
-  
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
@@ -75,9 +74,12 @@ export class CdsActionAiConditionComponent implements OnInit {
 //   idConnectionTrue: Array<string> = [];
 //   isConnectedTrue: Array<boolean> = [];
 
-  idConnectorFalse: string;
-  idConnectionFalse: string;
-  isConnectedFalse: boolean = false;
+  idConnectorFallback: string;
+  idConnectorError: string;
+  idConnectionFallback: string;
+  idConnectionError: string;
+  isConnectedFallback: boolean = false;
+  isConnectedError: boolean = false;
 
   connector: any;
   private subscriptionChangedConnector: Subscription;
@@ -147,9 +149,22 @@ export class CdsActionAiConditionComponent implements OnInit {
       this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
       this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
     }
-    this.checkConnectionStatus();
+    //this.checkConnectionStatus();
   }
 
+//   private checkConnectionStatus(){
+//     const resp = checkConnectionStatusByConnector(this.action.falseIntent, this.idConnectorFalse);
+//     this.isConnectedFalse   = resp.isConnected;
+//     this.idConnectionFalse  = resp.idConnection;
+//     this.logger.log('[ACTION AI_CONDITION] - FALSE checkConnectionStatusByConnector:', resp);
+
+//     this.action.intents.forEach(element => {
+//       const resp = checkConnectionStatusByConnector(element.intentId, element.idConnector);
+//       this.listOfConnectors[element.label].isConnected = resp.isConnected;
+//       this.listOfConnectors[element.label].idConnection = resp.idConnection;
+//       this.logger.log('[ACTION AI_CONDITION] - TRUE checkConnectionStatusByConnector:', resp);
+//     });
+//   }
 
   async getOllamaModels(){
     this.llm_model.forEach(async (model) => {
@@ -199,9 +214,9 @@ export class CdsActionAiConditionComponent implements OnInit {
   }
 
 
-  initializeConnector() {
+    initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
-    this.listOfConnectors = {};
+    //this.listOfConnectors = {};
     this.action.intents.forEach((element, index) => {
         this.logger.log("[ACTION AI_CONDITION] initializeConnector element: ", index, element);
         let idConnector = '';
@@ -210,9 +225,9 @@ export class CdsActionAiConditionComponent implements OnInit {
         if(element.label){
             idConnector = this.idIntentSelected + "/" + this.action._tdActionId + "/" + element.label + "/true";
         }
-        if(element.intentId){
+        if(element.conditionIntentId){
             isConnected = true;
-            let toIntentId = element.intentId.replace('#', '');
+            let toIntentId = element.conditionIntentId.replace('#', '');
             idConnection = idConnector+"/"+toIntentId;
         }
         this.listOfConnectors[element.label] = {
@@ -221,51 +236,20 @@ export class CdsActionAiConditionComponent implements OnInit {
             isConnected: isConnected
         }
     });
-
-    this.idConnectorFalse = this.idIntentSelected + "/" + this.action._tdActionId + "/false/";
-    if (this.action.falseIntent) {
-      this.isConnectedFalse = true;
-      this.idConnectionFalse = this.action.falseIntent;
+    this.idConnectorFallback = this.idIntentSelected + "/" + this.action._tdActionId + "/fallback";
+    if (this.action.fallbackIntent) {
+      this.isConnectedFallback = true;
+      this.idConnectionFallback = "/" + this.action.fallbackIntent.replace('#', '');
+    }
+    this.idConnectorError = this.idIntentSelected + "/" + this.action._tdActionId + "/error";
+    if (this.action.errorIntent) {
+      this.isConnectedError = true;
+      this.idConnectionError = "/" + this.action.errorIntent.replace('#', '');
     }
     this.listOfIntents = this.intentService.getListOfIntents();
-
-
     //this.checkConnectionStatus();
   }
   
-  
-
-  private checkConnectionStatus(){
-    this.logger.log("[ACTION AI_CONDITION] checkConnectionStatus: ");
-    this.isConnectedFalse = false;
-    this.idConnectionFalse = null;
-    this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
-    if(this.action.falseIntent){
-        this.isConnectedFalse = true;
-        this.idConnectionFalse = this.idConnectorFalse + "/" + this.action.falseIntent.replace('#', '');
-    }
-
-    this.action.intents.forEach((element, index) => {
-        const found = this.action.intents.find(item => item.label === element.label);
-        if(found){
-            // this.isConnectedTrue[index] = found.isConnected;
-            // this.idConnectionTrue[index] = found.idConnection;
-        }
-    });
-  }
-
-    private resetFalseIntent(){
-        this.isConnectedFalse = false;
-        this.idConnectionFalse = null;
-        this.action.falseIntent = '';
-        this.logger.log('[ACTION AI_CONDITION] resetFalseIntent:', this.isConnectedFalse, this.action.falseIntent);
-    }
-    private setFalseIntent(idConnectionFalse, toId){
-        this.isConnectedFalse = true;
-        this.idConnectionFalse = idConnectionFalse;
-        this.action.falseIntent = '#'+toId;
-    }
-
 
   private updateConnectionTrue(){
     this.logger.log('[ACTION AI_CONDITION] updateConnectionTrue:', this.connector);
@@ -275,11 +259,11 @@ export class CdsActionAiConditionComponent implements OnInit {
         const found = this.action.intents.find(item => item.label === idCondition);
         if (this.connector.deleted) {
             if(this.listOfConnectors[idCondition]){
-                this.listOfConnectors[idCondition].idConnection =  '';
+                this.listOfConnectors[idCondition].idConnection =  null;
                 this.listOfConnectors[idCondition].isConnected  =  false;
             }
             if(found){
-                found.intentId = '';
+                found.conditionIntentId = null;
             }
         } else {
             if(this.listOfConnectors[idCondition]){
@@ -287,87 +271,49 @@ export class CdsActionAiConditionComponent implements OnInit {
                 this.listOfConnectors[idCondition].isConnected  =  true;
             }
             if(found){
-                found.intentId = '#'+this.connector.toId;
+                found.conditionIntentId = '#'+this.connector.toId;
             }
         }
-        this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+
+        //if (resp.emit) {
+            this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
+        //} 
+        //this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     } catch (error) {
         this.logger.log('error: ', error);
     }
   }
 
+
   private updateConnectionFalse(){
-    this.logger.log('[ACTION AI_CONDITION] updateConnector:', this.connector);
-    if (this.connector.id === this.idConnectionFalse) {
+    this.logger.log('[ACTION AI_CONDITION] updateConnectorFalse:', this.connector, this.connector.id, this.idConnectionFallback);
+    if (this.connector.fromId === this.idConnectorFallback) {
         if (this.connector.deleted) {
-            this.resetFalseIntent();
+            this.isConnectedFallback = false;
+            this.idConnectionFallback = null;
+            this.action.fallbackIntent = null;
+            this.logger.log('[ACTION AI_CONDITION] deleted:');
         } else {
-            this.setFalseIntent(this.connector.id, this.connector.toId);
+            this.isConnectedFallback = true;
+            this.idConnectionFallback = this.connector.id;
+            this.action.fallbackIntent = '#'+this.connector.toId;
+            this.logger.log('[ACTION AI_CONDITION] added:');
+        }
+        this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    } else if (this.connector.fromId === this.idConnectorError) {
+        if (this.connector.deleted) {
+            this.isConnectedError = false;
+            this.idConnectionError = null;
+            this.action.errorIntent = null;
+            this.logger.log('[ACTION AI_CONDITION] deleted:');
+        } else {
+            this.isConnectedError = true;
+            this.idConnectionError = this.connector.id;
+            this.action.errorIntent = '#'+this.connector.toId;
+            this.logger.log('[ACTION AI_CONDITION] added:');
         }
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
-  }
-
-  private updateConnector2() {
-    // this.connector.forEach((element: any, index: number) => {});
-
-    // this.listOfConnectors.forEach((element: any, index: number) => {
-    //   if (element.idConnector === this.connector.fromId) {
-    //     this.logger.log('[ACTION AI_CONDITION] updateConnector: idConnectorTrue', element);
-    //     if (this.connector.deleted) {
-    //       this.logger.log('[ACTION AI_CONDITION] updateConnector: deleted', element);
-    //       this.isConnectedTrue[index] = false;
-    //       this.idConnectionTrue[index] = null;
-    //     }
-    //   }
-    // });
-    // controllo se il connettore appartiene a uno dei miei idConnectorTrue oppure è idConnectorFalse
-    // this.idConnectorTrue.forEach((element: string, index: number) => {
-    //   if (element === this.connector.fromId) {
-    //     this.logger.log('[ACTION AI_CONDITION] updateConnector: idConnectorTrue', element);
-    //     if (this.connector.deleted) {
-    //             this.logger.log('[ACTION AI_CONDITION] updateConnector: deleted', element);
-    //             this.isConnectedTrue[index] = false;
-    //             this.idConnectionTrue[index] = null;
-    //     } else {
-    //         this.logger.log('[ACTION AI_CONDITION] updateConnector: not deleted', element);
-    //         this.isConnectedTrue[index] = false;
-    //         this.idConnectionTrue[index] = null;
-    //     }
-    // } 
-    // });
-    // try {
-        // const array = this.connector.fromId.split("/");
-        // this.logger.log('[ACTION AI_CONDITION] updateConnector: array', array);
-        // const idCondition = array[array.length - 2];
-        // this.logger.log('[ACTION AI_CONDITION] updateConnector: idCondition', idCondition);
-        // const idConnector = +this.action._tdActionId+'/'+idCondition;
-        // const buttonChanged = this.action.intents.find(obj => obj.label === idCondition);
-      
-        // if(idConnector === this.connector.fromId && buttonChanged){
-        //     this.logger.log('updateConnector [CdsActionReplyTextComponent]:: buttonChanged: ', this.connector, buttonChanged, this.buttons, idButton);
-        //     if(this.connector.deleted){
-        //         buttonChanged.__isConnected = false;
-        //         buttonChanged.__idConnector = this.connector.fromId;
-        //         buttonChanged.__idConnection = null;
-        //         buttonChanged.action = '';
-        //         buttonChanged.type = TYPE_BUTTON.TEXT;
-        //     if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-        //     } else {
-        //     // ADD / EDIT
-        //     buttonChanged.__idConnector = this.connector.fromId;
-        //     buttonChanged.action = buttonChanged.action? buttonChanged.action : '#' + this.connector.toId;
-        //     buttonChanged.type = TYPE_BUTTON.ACTION;
-        //     if(!buttonChanged.__isConnected){
-        //         buttonChanged.__isConnected = true;
-        //         buttonChanged.__idConnection = this.connector.fromId+"/"+this.connector.toId;
-        //         if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-        //     } 
-        //     }
-        // }
-    // } catch (error) {
-    //   this.logger.error('error: ', error);
-    // }
   }
 
 
@@ -393,10 +339,34 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
   }
 
-  onUpdateAndSaveAction(index: number, intent: any) {
-    this.logger.log("[ACTION AI_CONDITION] onUpdateAndSaveAction event: ", index, intent);
-    this.action.intents[index] = intent;
-    this.updateAndSaveAction.emit();
+  onUpdateAndSaveConnectors(intent: any, type: 'create' | 'delete') {
+    this.logger.log("[ACTION AI_CONDITION] onUpdateAndSaveConnectors event: ", intent, type);
+    let toId: string;
+    let fromId: string;
+    try {
+        //if(intent.conditionIntentId && intent.conditionIntentId !== null){
+            if(type === 'delete'){
+                this.listOfConnectors[intent.label].idConnection =  null;
+                this.listOfConnectors[intent.label].isConnected  =  false;
+                toId = null;
+                fromId = this.listOfConnectors[intent.label].idConnector;
+            } else if(intent.conditionIntentId && intent.conditionIntentId !== null) {
+                this.listOfConnectors[intent.label].idConnection =  this.listOfConnectors[intent.label].idConnector+"/"+intent.conditionIntentId.replace('#', '');
+                this.listOfConnectors[intent.label].isConnected  =  true;
+                toId = intent.conditionIntentId.replace('#', '');
+                fromId = this.listOfConnectors[intent.label].idConnector;
+            }
+        //}
+        let found = this.action.intents.find(item => item.label === intent.label);
+        if(found){
+            found = intent;
+        } 
+        this.logger.log("[ACTION AI_CONDITION] onUpdateAndSaveConnectors this.action: ", this.action);
+        this.onConnectorChange.emit({ type: type, fromId: fromId, toId: toId });
+        this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    } catch (error) {
+        this.logger.log("[ACTION AI_CONDITION] onUpdateAndSaveConnectors error: ", error);
+    }
   }
 
   onOptionSelected(event: any, property: string){
@@ -446,29 +416,30 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
   }
 
-  onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent' | string) {
+  onChangeBlockSelect(event:{name: string, value: string}, type: 'errorIntent' | 'fallbackIntent' | string) {
     this.logger.log("[ACTION AI_CONDITION] onChangeBlockSelect", event, type);
+    this.action[type]=event.value;
     if(event){
         switch(type){
-          case 'trueIntent':
+          case 'errorIntent':
+            this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorError, toId: this.action.errorIntent});
             break;
-          case 'falseIntent':
-            this.action[type]=event.value;
-            this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent});
+          case 'fallbackIntent':
+            this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFallback, toId: this.action.fallbackIntent});
             break;
         }
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   }
 
-  onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
+  onResetBlockSelect(event:{name: string, value: string}, type: 'errorIntent' | 'fallbackIntent') {
+    this.action[type]=null;
     switch(type){
-      case 'trueIntent':
-        //this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.action.trueIntent});
+      case 'errorIntent':
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorError, toId: this.action.errorIntent});
         break;
-      case 'falseIntent':
-        this.action[type]=null;
-        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorFalse, toId: this.action.falseIntent});
+      case 'fallbackIntent':
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorFallback, toId: this.action.fallbackIntent});
         break;
     }
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
@@ -588,125 +559,6 @@ export class CdsActionAiConditionComponent implements OnInit {
   }
 
 
-  // getResponsePreview() {
-
-  //   this.showPreview = true;
-  //   this.showAiError = false;
-
-  //   this.checkVariables().then((resp) => {
-
-  //     if (resp === false) {
-  //       this.missingVariables = true;
-
-  //     } else {
-  //       let temp_question = this.action.question;
-  //       this.temp_variables.forEach((tv) => {
-  //         let old_value = "{{" + tv.name + "}}";
-  //         temp_question = temp_question.replace(old_value, tv.value);
-  //       })
-
-  //       this.searching = true;
-  //       this.missingVariables = false;
-
-  //       setTimeout(() => {
-  //         let element = document.getElementById("preview-container");
-  //         element.classList.remove('preview-container-extended')
-  //       }, 200)
-
-  //       let data = {
-  //         question: temp_question,
-  //         context: this.action.context,
-  //         model: this.action.model,
-  //         max_tokens: this.action.max_tokens,
-  //         temperature: this.action.temperature
-  //       }
-
-  //       this.openaiService.previewPrompt(data).subscribe((ai_response: any) => {
-  //         this.searching = false;
-  //         setTimeout(() => {
-  //           let element = document.getElementById("preview-container");
-  //           element.classList.add('preview-container-extended')
-  //         }, 200)
-  //         this.ai_response = ai_response;
-  //       }, (error) => {
-  //         this.logger.error("[ACTION GPT-TASK] previewPrompt error: ", error);
-  //         setTimeout(() => {
-  //           let element = document.getElementById("preview-container");
-  //           element.classList.add('preview-container-extended')
-  //         }, 200)
-  //         this.showAiError = true;
-  //         this.searching = false;
-  //       }, () => {
-  //         this.logger.error("[ACTION GPT-TASK] preview prompt *COMPLETE*: ");
-  //         this.searching = false;
-  //       })
-  //     }
-  //   })
-  // }
-
-  // _checkVariables() {
-  //   return new Promise((resolve, reject) => {
-  //     let regex: RegExp = /{{[^{}]*}}/g;
-  //     let string = this.action.question;
-  //     let matches = string.match(regex);
-  //     let response: boolean = true;
-
-  //     if (!matches || matches.length == 0) {
-  //       this.showVariablesBtn = false;
-  //       resolve(response);
-  //     }
-
-  //     if (matches.length > 0) {
-  //       if (!this.action.preview) {
-  //         this.action.preview = [];
-  //       }
-  //       this.showVariablesBtn = true;
-  //       this.temp_variables = [];
-
-  //       matches.forEach((m) => {
-  //         let name = m.slice(2, m.length - 2);
-  //         let attr = this.action.preview.find(v => v.name === name);
-  //         if (attr && attr.value) {
-  //           this.temp_variables.push({ name: name, value: attr.value });
-  //         } else if (attr && !attr.value) {
-  //           response = false;
-  //           this.temp_variables.push({ name: name, value: null });
-  //         } else {
-  //           response = false;
-  //           this.temp_variables.push({ name: name, value: null });
-  //           this.action.preview.push({ name: name, value: null });
-  //         }
-  //       })
-  //       this.logger.log("temp_variables: ", this.temp_variables)
-  //       resolve(response);
-  //     }
-
-  //   })
-  // }
-
-  // showHideVariablesSection() {
-  //   this.showVariablesSection = !this.showVariablesSection;
-  //   if (this.showVariablesSection == false) {
-  //     this.getResponsePreview();
-  //   }
-  // }
-
-  // onChangeVar(event, name) {
-  //   let index = this.action.preview.findIndex(v => v.name === name);
-  //   if (index != -1) {
-  //     this.action.preview[index].value = event;
-  //   }
-  //   this.updateAndSaveAction.emit();
-  // }
-
-  // closePreview() {
-  //   let element = document.getElementById("preview-container");
-  //   element.classList.remove('preview-container-extended')
-
-  //   this.showPreview = false;
-  //   this.searching = false;
-  // }
-
   openAttributesDialog() {
     this.logger.log("temp_variables: ", this.temp_variables);
     const dialogRef = this.dialog.open(AttributesDialogAiConditionComponent, {
@@ -745,17 +597,23 @@ export class CdsActionAiConditionComponent implements OnInit {
    * Adds a new intent to the intents array
    */
   addNewIntent() {
-    this.logger.log("[ACTION AI_CONDITION] addNewIntent");
+    this.logger.log("[ACTION AI_CONDITION] addNewIntent", this.action.intents);
     if (!this.action.intents) {
       this.action.intents = [];
     }
     // Add a new intent with default values
     const idCondition = generateShortUID();
     this.action.intents.push({
-      "label": idCondition, //`condition_${this.action.intents.length + 1}`,
+      "label": idCondition,
       "prompt": "",
-      "intentId": ""
+      "conditionIntentId": ""
     });
+    this.listOfConnectors[idCondition] = {
+      idConnector: this.idIntentSelected + "/" + this.action._tdActionId + "/" + idCondition + "/true",
+      idConnection: null,
+      isConnected: false
+    };
+    this.logger.log("[ACTION AI_CONDITION] addNewIntent", this.listOfConnectors);
     this.updateAndSaveAction.emit();
   }
 

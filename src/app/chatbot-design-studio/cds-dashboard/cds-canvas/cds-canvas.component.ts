@@ -312,14 +312,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   checkAllConnectors(connector){
-    // this.logger.log("[CDS-CANVAS]  •••• checkAllConnectors ••••", connector.id);
+    this.logger.log("[CDS-CANVAS]  •••• checkAllConnectors ••••", connector, this.mapOfConnectors);
     if(this.stageService.loaded === false && this.renderedAllElements === false){
       this.labelInfoLoading = 'CDSCanvas.connectorsProgress';
       if(this.mapOfConnectors[connector.id] && this.mapOfConnectors[connector.id].shown !== 'true') {
         this.mapOfConnectors[connector.id].shown = 'true';
         this.countRenderedElements++;
         this.loadingProgress += (this.countRenderedElements/this.totElementsOnTheStage)*100;
-        this.logger.log("[CDS-CANVAS]  •••• E' stato creato un nuovo connettore verifico ••••", connector.id, this.countRenderedElements);
+        this.logger.log("[CDS-CANVAS]  •••• E' stato creato un nuovo connettore verifico ••••", this.mapOfConnectors[connector.id], connector.id, this.countRenderedElements);
       }
     }
     this.checkAndShowStage();
@@ -328,7 +328,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private checkAndShowStage(){
     if(this.stageService.loaded === false){
       const allShownTrue = Object.values(this.mapOfConnectors).every(connector => connector.shown !== 'false');
-      // this.logger.log("[CDS-CANVAS]  •••• checkAndshowStage", this.mapOfConnectors, allShownTrue);
+      this.logger.log("[CDS-CANVAS]  •••• checkAndshowStage", this.mapOfConnectors, allShownTrue);
       if(allShownTrue){ 
         this.stageService.loaded = true;
         this.loadingProgress = 100;

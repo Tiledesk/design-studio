@@ -508,7 +508,7 @@ export class ActionAiCondition extends Action {
     max_tokens: number;
     temperature: number;
     preview?: Array<any>;
-    falseIntent: string;
+    fallbackIntent: string;
     errorIntent: string;
     constructor() {
         super();

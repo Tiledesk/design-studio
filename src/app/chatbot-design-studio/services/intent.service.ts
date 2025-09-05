@@ -1089,15 +1089,15 @@ export class IntentService {
       action.max_tokens = 256;
       action.temperature = 0.7;
       action.model = LLM_MODEL.find(el => el.value === 'cohere').value
-      action.assignReplyTo = 'ai_condition';
+      action.assignReplyTo = TYPE_ACTION.AI_CONDITION;
       const idCondition = generateShortUID();
       action.intents.push({
         "label": idCondition,
         "prompt": "",
-        "intentId": ""
+        "conditionIntentId": ""
       });
-      
-      action.falseIntent = "#"+this.getDefaultFallbackIntent().intent_id;
+      action.fallbackIntent = "#"+this.getDefaultFallbackIntent().intent_id;
+      action.errorIntent = "#"+this.getDefaultFallbackIntent().intent_id;
     }
 
     if(typeAction === TYPE_ACTION.CAPTURE_USER_REPLY) {

@@ -25,7 +25,7 @@
         [items]="listOfIntents" 
         [bindLabelSelect]="'name'"
         [bindValueSelect]="'value'" 
-        [itemSelected]="intent?.intentId" 
+        [itemSelected]="intent?.conditionIntentId" 
         [placeholder]="'CDSCanvas.SelectABlock' | translate"
         [clearable]="true" 
         (onSelected)="onChangeBlockSelect($event)"
