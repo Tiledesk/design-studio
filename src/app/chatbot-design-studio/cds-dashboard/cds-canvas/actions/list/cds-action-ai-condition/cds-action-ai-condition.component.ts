@@ -617,6 +617,24 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.updateAndSaveAction.emit();
   }
 
-  
+  onDeleteCondition(index: number) {
+    this.logger.log("[ACTION AI_CONDITION] onDeleteCondition", index);
+    if (this.action.intents && this.action.intents[index]) {
+      const intentToDelete = this.action.intents[index];
+      
+      // Remove from intents array
+      this.action.intents.splice(index, 1);
+      
+      // Remove from connectors map
+      if (intentToDelete.label && this.listOfConnectors[intentToDelete.label]) {
+        delete this.listOfConnectors[intentToDelete.label];
+      }
+      
+      this.logger.log("[ACTION AI_CONDITION] onDeleteCondition - remaining intents:", this.action.intents);
+      this.logger.log("[ACTION AI_CONDITION] onDeleteCondition - remaining connectors:", this.listOfConnectors);
+      
+      this.updateAndSaveAction.emit();
+    }
+  }
 
 }

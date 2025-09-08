@@ -1,6 +1,12 @@
 <div class="ai-condition-container">
     <div class="condition-header">
         <label class="condition-number">Condition {{index+1}}</label>
+        <button class="delete-condition-btn" 
+                type="button" 
+                (click)="onDeleteCondition()"
+                [title]="'Delete Condition'">
+            <span class="material-icons">delete</span>
+        </button>
     </div>
     <cds-textarea id="question" 
         [emojiPikerBtn]="false" 

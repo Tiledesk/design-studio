@@ -81,7 +81,8 @@
                 [intent]="intent"
                 [listOfIntents]="listOfIntents"
                 (updateAndSaveConnectors)="onUpdateAndSaveConnectors(intent, $event.type)"
-                (updateAndSaveAction)="onUpdateAndSaveAction(intent)">
+                (updateAndSaveAction)="onUpdateAndSaveAction(intent)"
+                (deleteCondition)="onDeleteCondition($event)">
              </app-ai-condition>
          </div>
 
@@ -92,7 +93,7 @@
                  type="button" 
                  (click)="addNewIntent()">
              <span class="material-icons">add</span>
-             Add new prompt
+             Add Condition
          </button>
      </div>
 

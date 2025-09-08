@@ -11,6 +11,7 @@ export class AiConditionComponent implements OnInit {
     @Input() listOfIntents: Array<{name: string, value: string, icon?:string}>;
     @Output() updateAndSaveAction = new EventEmitter;
     @Output() updateAndSaveConnectors = new EventEmitter;
+    @Output() deleteCondition = new EventEmitter;
     
     label: string;
     propmt: string;
@@ -48,6 +49,12 @@ export class AiConditionComponent implements OnInit {
     this.updateAndSaveConnectors.emit({
       value: event,
       type: 'delete'
+    });
+  }
+
+  onDeleteCondition() {
+    this.deleteCondition.emit({
+      value: this.intent
     });
   }
 }

@@ -440,23 +440,44 @@ loading-spinner.custom-spinner ::ng-deep {
 }
 
 .add-intent-btn {
-    background-color: #f8f9fa;
-    border: 2px dashed #dee2e6;
-    color: #6c757d;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease;
+    // background-color: #f8f9fa;
+    // border: 2px dashed #dee2e6;
+    // color: #6c757d;
+    // padding: 12px 20px;
+    // border-radius: 8px;
+    // font-size: 14px;
+    // font-weight: 500;
+    // display: flex;
+    // align-items: center;
+    // gap: 8px;
+    // transition: all 0.2s ease;
+    // cursor: pointer;
+
+    float: right;
+    -webkit-user-select: none;
+    user-select: none;
+    box-sizing: border-box;
+    outline: none;
+    border: 1px dashed var(--blu-light-02);
+    border-radius: var(--button-border-radius-base);
+    color: var(--blu-light-02);
     cursor: pointer;
+    font-size: 0.7em;
+    font-weight: 400;
+    line-height: var(--button-height-base);
+    order: 1;
+    padding: 0 10px;
+    transition: all 0.3s;
+    min-width: 100px;
+    text-align: center;
+    width: fit-content;
+    background-color: #ffffff;
+
 
     &:hover {
-        background-color: #e9ecef;
-        border-color: #adb5bd;
-        color: #495057;
+        border-color: var(--blu-light-02);
+        color: var(--color-white-hex);
+        background-color: var(--blu);
     }
 
     .material-icons {
