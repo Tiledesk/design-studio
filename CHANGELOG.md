@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc4
+- **added**: gpt-5 models in AI Prompt action
 
 # 1.39.0-rc3
 - **changed**: set text charts limit to 10000
