@@ -321,6 +321,9 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
       this.action.model= null;
       this.initLLMModels();
+      if(event.value === 'openai'){
+        this.action.temperature = 1
+      }
     }
     this.updateAndSaveAction.emit();
   }

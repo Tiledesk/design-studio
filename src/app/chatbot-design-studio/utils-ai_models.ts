@@ -60,6 +60,12 @@ export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:st
     { name: "Deepseek-chat",                value: "deepseek-chat",                    description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active" },
 ]
 
+export const OPENAI_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
+    { name: "Gpt-5",                value: "gpt-5",                    description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active" },
+    { name: "Gpt-5-mini",           value: "gpt-5-mini",               description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active" },
+    { name: "Gpt-5-nano",           value: "gpt-5-nano",               description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active" },
+]
+
 export const OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
 ]
 
@@ -70,5 +76,6 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
     { name: "Groq",           value: "groq",              description: "",      src:"assets/images/icons/ai_prompt/groq.svg",        status: "active",   models: GROQ_MODEL          },
     { name: "Deepseek",       value: "deepseek",          description: "",      src:"assets/images/icons/ai_prompt/deepseek.svg",    status: "active",   models: DEEPSEEK_MODEL      },
     { name: "Ollama",         value: "ollama",            description: "",      src:"assets/images/icons/ai_prompt/ollama.svg",      status: "active",   models: OLLAMA_MODEL        },
+    { name: "Openai",         value: "openai",            description: "",      src:"assets/images/icons/ai_prompt/openai.svg",      status: "active",   models: OPENAI_MODEL        },
 ]
 /************             AI PROMPT MODEL: END        ************************/
