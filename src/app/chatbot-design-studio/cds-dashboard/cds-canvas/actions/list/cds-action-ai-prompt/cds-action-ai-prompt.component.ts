@@ -155,7 +155,6 @@ export class CdsActionAiPromptComponent implements OnInit {
         }
       }
     });
-    console.log('ellllllll', this.llm_model)
   }
 
   async getIntegrationByName(){
@@ -337,7 +336,6 @@ export class CdsActionAiPromptComponent implements OnInit {
         this.action.temperature = 1
       }
     }
-    console.log('llmmmmmmm',this.llm_options_models)
     this.updateAndSaveAction.emit();
   }
 
