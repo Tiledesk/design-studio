@@ -66,11 +66,11 @@ export class CdsActionAskgptV2Component implements OnInit {
   autocompleteOptions: Array<{label: string, value: string}> = [];
 
   model_list: Array<{ name: string, value: string, additionalText?: string}>;
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
-    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1 },
-    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05 }
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
+    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
   }
   IS_VISIBLE_ALPHA_SLIDER = false;
 
@@ -289,8 +289,15 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
     } else {
-      this.logger.log("event: ", event);
+      this.logger.log("[ACTION-ASKGPTV2] onChangeSelect event: ", event);
       this.action.model = event.value;
+      /** MANAGE GPT-5 MODELS */
+      if(event.value.startsWith('gpt-5')){
+        this.action.temperature = 1
+        this.ai_setting['temperature'].disabled= true
+      }else{
+        this.ai_setting['temperature'].disabled= false
+      }
       
       this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});

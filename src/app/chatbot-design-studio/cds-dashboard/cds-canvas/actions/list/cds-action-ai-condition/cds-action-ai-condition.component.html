@@ -19,6 +19,7 @@
 
 
     <div *ngFor="let intent of action.intents; let i = index">
+        
         <div class="action-row">
             <div class="intent-preview-info">
                 <div class="intent-prompt-preview" *ngIf="intent.prompt">
@@ -45,7 +46,18 @@
         <hr class="preview-divider">
     </div>
 
-    <!-- <hr class="preview-divider"> -->
+
+    <div class="add-intent-container">
+         <button class="btn btn-secondary add-intent-btn" 
+                 type="button" 
+                 (click)="$event.stopPropagation();addNewIntent()">
+             <span class="material-icons">add</span>
+             Add Condition
+         </button>
+     </div>
+     
+    <hr class="preview-divider">
+
 
     <div class="previewContent">
         <!-- {{'CDSCanvas.Fallback' | translate }} -->
@@ -88,31 +100,35 @@
          </div>
 
     </div>
-         <!-- Add New Intent Button -->
-     <div class="add-intent-container">
+    
+    <!-- Add New Intent Button -->
+    <div class="add-intent-container">
          <button class="btn btn-secondary add-intent-btn" 
                  type="button" 
-                 (click)="addNewIntent()">
+                 (click)="$event.stopPropagation();addNewIntent()">
              <span class="material-icons">add</span>
              Add Condition
          </button>
-     </div>
-
-
-     <div class="condition-header">
-        <label class="condition-number">Instructions</label>
     </div>
-     <cds-textarea id="instructions" 
-        [emojiPikerBtn]="false" 
-        [setAttributeBtn]="true" 
-        [limitCharsText]="100000"
-        [minRow]="4"[maxRow]="25" 
-        [text]="action.instructions" 
-        [placeholder]="placeholder"
-        (blur)="onBlur($event)"
-        (changeTextarea)="onChangeTextarea($event, '', 'instructions')">
-    </cds-textarea>
-    <hr class="custom-divider">
+
+    <div class="ai-condition-instructions">
+        <div class="condition-header">
+            <label class="condition-number">Instructions</label>
+        </div>
+        <cds-textarea id="instructions" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [limitCharsText]="100000"
+            [minRow]="4"[maxRow]="25" 
+            [text]="action.instructions" 
+            [placeholder]="placeholder"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, '', 'instructions')">
+        </cds-textarea>
+    </div>
+
+    
+
     <!-- <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
         <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
             [disabled]="!action.question" (click)="execPreview()">

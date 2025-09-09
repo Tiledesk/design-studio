@@ -608,7 +608,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.action.intents.push({
       "label": idCondition,
       "prompt": "",
-      "conditionIntentId": ""
+      "conditionIntentId": null
     });
     this.listOfConnectors[idCondition] = {
       idConnector: this.idIntentSelected + "/" + this.action._tdActionId + "/" + idCondition + "/true",
@@ -616,7 +616,7 @@ export class CdsActionAiConditionComponent implements OnInit {
       isConnected: false
     };
     this.logger.log("[ACTION AI_CONDITION] addNewIntent", this.listOfConnectors);
-    this.updateAndSaveAction.emit();
+    //this.updateAndSaveAction.emit();
   }
 
   onDeleteCondition(intent: any) {
