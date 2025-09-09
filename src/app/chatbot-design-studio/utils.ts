@@ -235,21 +235,6 @@ export enum OPTIONS {
     ALPHA       = 'alpha'
 }
 
-export const TYPE_GPT_MODEL: Array<{name: string, value: string, description: string, status: "active" | "inactive"}> = [
-    { name: "GPT-4.1",                          value: "gpt-4.1",               description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 mini",                     value: "gpt-4.1-mini",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 nano",                     value: "gpt-4.1-nano",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4o",                           value: "gpt-4o",                description: "TYPE_GPT_MODEL.gpt-4o.description",                   status: "active"    },
-    { name: "GPT-4o mini",                      value: "gpt-4o-mini",           description: "TYPE_GPT_MODEL.gpt-4o-mini.description",              status: "active"    },
-    { name: "GPT-4 (Legacy)",                   value: "gpt-4",                 description: "TYPE_GPT_MODEL.gpt-4.description",                    status: "active"    },
-    { name: "GPT-4 Turbo Preview",              value: "gpt-4-turbo-preview",   description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active"    },
-    { name: "GPT-3 (DaVinci)",                  value: "text-davinci-003",      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-3.5 Turbo",                    value: "gpt-3.5-turbo",         description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",            status: "active"    },
-    { name: "OpenAI o1-mini",                   value: "o1-mini",               description: "TYPE_GPT_MODEL.o1-mini.description",                  status: "active"    },
-    { name: "OpenAI o1-preview",                value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",               status: "active"    }
-]
-
-
 export const INTENT_TEMP_ID         = '';
 export const MESSAGE_METADTA_WIDTH  = '100%';
 export const MESSAGE_METADTA_HEIGHT = 230;
