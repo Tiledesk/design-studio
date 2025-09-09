@@ -155,6 +155,7 @@ export class CdsActionAiPromptComponent implements OnInit {
         }
       }
     });
+    console.log('ellllllll', this.llm_model)
   }
 
   async getIntegrationByName(){
