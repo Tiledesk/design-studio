@@ -48,9 +48,9 @@ export class CdsActionAiPromptComponent implements OnInit {
   panelOpenState = false;
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive",  additionalText?: string }> = [];
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false}
   }
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
@@ -291,11 +291,17 @@ export class CdsActionAiPromptComponent implements OnInit {
     //this.action[property] = event;
     if(property === 'model'){
       this.action['labelModel'] = labelModel;
+      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
+        this.action.temperature = 1
+        this.ai_setting['temperature'].disabled= true
+      }else{
+        this.ai_setting['temperature'].disabled= false
+      }
     } else if (property === 'question'){
       this.action['question'] = event;
     } else if (property === 'context'){
       this.action['context'] = event;
-    }
+    } 
     // this.checkVariables();
     // this.updateAndSaveAction.emit();
     // this.updateAndSaveAction.emit();
@@ -332,9 +338,6 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
       this.action.model= null;
       this.initLLMModels();
-      if(event.value === 'openai'){
-        this.action.temperature = 1
-      }
     }
     this.updateAndSaveAction.emit();
   }
