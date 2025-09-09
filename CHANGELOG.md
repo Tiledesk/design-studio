@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc6
+- **added**: added action ai-condition
+
 # 1.39.0-rc5
 - **added**: additionalText input property in cds-text component
 - **added**: managed openai and ollama models for AiPrompt action

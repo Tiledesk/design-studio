@@ -1,4 +1,23 @@
 
+export function checkGenericConnectionStatusOfAction(connectedTo:string, idConnector: string): any {
+    const result = {
+        isConnected: false,
+        idConnection: null
+    };
+    if(connectedTo){
+        result.isConnected = true;
+        const posId = connectedTo.indexOf("#");
+        if (posId !== -1) {
+            const toId = connectedTo.slice(posId+1);
+            result.idConnection = idConnector+"/"+toId;
+        }
+    } else {
+        result.isConnected = false;
+        result.idConnection = null;
+    }
+    return result;
+}
+
 export function checkConnectionStatusOfAction(action: any, idConnectorTrue: string, idConnectorFalse: string): any {
     const result = {
         isConnectedTrue: false,
