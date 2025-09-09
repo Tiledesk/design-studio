@@ -203,8 +203,7 @@
                         [itemSelected]="action.model"
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"
-                        [optionalBindAdditionalText]="'multiplier'"
-                        [optionalBindDescription]="'description'"
+                        [optionalBindAdditionalText]="'additionalText'"
                         (onSelected)="onChangeSelect($event, 'model')">
                     </cds-select>
                 </div>
@@ -264,6 +263,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 

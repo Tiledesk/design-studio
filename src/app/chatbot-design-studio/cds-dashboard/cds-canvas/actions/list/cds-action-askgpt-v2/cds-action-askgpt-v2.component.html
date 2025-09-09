@@ -4,7 +4,7 @@
             <mat-icon class="icon" svgIcon="brain" aria-hidden="true"></mat-icon>
         </div>
         <div *ngIf="action?.question" class="action-row-right">
-            {{action?.namespace}}
+            {{ (listOfNamespaces | filter:{key: 'value', value: action?.namespace })[0].name }}
         </div>
     </div>
     
@@ -234,8 +234,7 @@
                         [itemSelected]="action.model"
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"
-                        [optionalBindAdditionalText]="'multiplier'" 
-                        [optionalBindDescription]="'description'" 
+                        [optionalBindAdditionalText]="'additionalText'"
                         (onSelected)="onChangeSelect($event, 'model')">
                     </cds-select>
                 </div>
@@ -347,6 +346,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 
@@ -395,12 +395,12 @@
                             {{"CDSCanvas.ChunksOnly" | translate}}
                         </mat-checkbox>
                     </section>
-                    <!-- 
+                    <!--
                     <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
                     </label> 
                     -->
-                </div>
+                </div> 
             
 
             </div>
