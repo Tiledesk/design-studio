@@ -59,3 +59,15 @@
         font-size: 16px;
     }
 }
+
+.ai-condition-select{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    .condition-text {
+        font-weight: unset;
+    }
+    cds-select {
+        width: 50%;
+    }
+}
