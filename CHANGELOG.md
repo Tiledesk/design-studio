@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc5
+- **added**: additionalText input property in cds-text component
+- **added**: managed openai and ollama models for AiPrompt action
+- **added**: name of selected namespace in AskKbv2 action
+- **changed**: disabled action gpt_task
+- **removed**: TYPE_GPT_MODEL in favour of OPENAI_MODEL
+
 # 1.39.0-rc4
 - **added**: gpt-5 models in AI Prompt action
 

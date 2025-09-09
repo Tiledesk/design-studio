@@ -155,7 +155,6 @@ export class CdsActionAiPromptComponent implements OnInit {
         }
       }
     });
-    console.log('ellllllll', this.llm_model)
   }
 
   async getIntegrationByName(){
@@ -340,7 +339,6 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.action.model= null;
       this.initLLMModels();
     }
-
     this.updateAndSaveAction.emit();
   }
 
