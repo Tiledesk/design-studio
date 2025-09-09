@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc8
+- **bug-fix**: fixed bugs in action ai-condition
+
 # 1.39.0-rc7
 - **added**: disabled property for mat-slider in ai-settings section
 
