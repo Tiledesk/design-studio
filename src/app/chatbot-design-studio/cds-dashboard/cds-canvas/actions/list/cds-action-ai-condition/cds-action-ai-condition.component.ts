@@ -336,6 +336,8 @@ export class CdsActionAiConditionComponent implements OnInit {
       this.action['question'] = event;
     } else if (property === 'context'){
       this.action['context'] = event;
+    } else if (property === 'instructions'){
+        this.action['instructions'] = event;
     }
   }
 
@@ -617,22 +619,24 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.updateAndSaveAction.emit();
   }
 
-  onDeleteCondition(index: number) {
-    this.logger.log("[ACTION AI_CONDITION] onDeleteCondition", index);
-    if (this.action.intents && this.action.intents[index]) {
-      const intentToDelete = this.action.intents[index];
+  onDeleteCondition(intent: any) {
+    this.logger.log("[ACTION AI_CONDITION] onDeleteCondition", intent);
+
+    const label = intent.value.label;
+    const foundIndex = this.action.intents.findIndex(item => item.label === label);
+    
+    if (foundIndex !== -1) {
+      const intentToDelete = this.action.intents[foundIndex];
       
       // Remove from intents array
-      this.action.intents.splice(index, 1);
+      this.action.intents.splice(foundIndex, 1);
       
       // Remove from connectors map
       if (intentToDelete.label && this.listOfConnectors[intentToDelete.label]) {
         delete this.listOfConnectors[intentToDelete.label];
       }
-      
       this.logger.log("[ACTION AI_CONDITION] onDeleteCondition - remaining intents:", this.action.intents);
       this.logger.log("[ACTION AI_CONDITION] onDeleteCondition - remaining connectors:", this.listOfConnectors);
-      
       this.updateAndSaveAction.emit();
     }
   }

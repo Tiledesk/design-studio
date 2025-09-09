@@ -48,7 +48,8 @@
     <!-- <hr class="preview-divider"> -->
 
     <div class="previewContent">
-       <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+        <!-- {{'CDSCanvas.Fallback' | translate }} -->
+       <label class="title-preview-label">Fallback</label>
         <cds-connector class="connector-false"
             [idConnector]   = "idConnectorFallback"
             [idConnection]  = "idConnectionFallback"
@@ -97,9 +98,21 @@
          </button>
      </div>
 
-  
 
-
+     <div class="condition-header">
+        <label class="condition-number">Instructions</label>
+    </div>
+     <cds-textarea id="instructions" 
+        [emojiPikerBtn]="false" 
+        [setAttributeBtn]="true" 
+        [limitCharsText]="100000"
+        [minRow]="4"[maxRow]="25" 
+        [text]="action.instructions" 
+        [placeholder]="placeholder"
+        (blur)="onBlur($event)"
+        (changeTextarea)="onChangeTextarea($event, '', 'instructions')">
+    </cds-textarea>
+    <hr class="custom-divider">
     <!-- <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
         <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
             [disabled]="!action.question" (click)="execPreview()">
@@ -332,7 +345,8 @@
 
     <div class="field-box">
         <div class="condition-container">
-            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
+            <!-- {{'CDSCanvas.Fallback' | translate | titlecase}} -->
+            <label class="condition-text">Fallback</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 

@@ -1096,8 +1096,8 @@ export class IntentService {
         "prompt": "",
         "conditionIntentId": ""
       });
-      action.fallbackIntent = "#"+this.getDefaultFallbackIntent().intent_id;
-      action.errorIntent = "#"+this.getDefaultFallbackIntent().intent_id;
+      action.fallbackIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
+      action.errorIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
     }
 
     if(typeAction === TYPE_ACTION.CAPTURE_USER_REPLY) {

@@ -422,16 +422,23 @@ loading-spinner.custom-spinner ::ng-deep {
     margin-bottom: 8px;
 }
 
+
 .condition-number {
-    background-color: var(--blu);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--blu);
 }
+
+// .condition-number2 {
+//     background-color: var(--blu);
+//     color: white;
+//     padding: 4px 12px;
+//     border-radius: 16px;
+//     font-size: 12px;
+//     font-weight: 500;
+//     text-transform: uppercase;
+//     letter-spacing: 0.5px;
+// }
 
 .add-intent-container {
     display: flex;
@@ -472,8 +479,6 @@ loading-spinner.custom-spinner ::ng-deep {
     text-align: center;
     width: fit-content;
     background-color: #ffffff;
-
-
     &:hover {
         border-color: var(--blu-light-02);
         color: var(--color-white-hex);
