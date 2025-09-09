@@ -906,6 +906,13 @@
                 "VIDEO_URL": "",
                 "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
             },
+            "AiCondition": {
+                "TITLE": "AI Condition",
+                "DESCRIPTION": "The AI Condition Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
+                "IMAGE": "assets/images/doc/AI_CONDITION.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
+            },
             "HiddenMessage": {
                 "TITLE": "Send an hidden message (for the end user)",
                 "DESCRIPTION": "Send a hidden message in the current conversation",

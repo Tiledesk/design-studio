@@ -7,6 +7,19 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc6
+- **added**: added action ai-condition
+
+# 1.39.0-rc5
+- **added**: additionalText input property in cds-text component
+- **added**: managed openai and ollama models for AiPrompt action
+- **added**: name of selected namespace in AskKbv2 action
+- **changed**: disabled action gpt_task
+- **removed**: TYPE_GPT_MODEL in favour of OPENAI_MODEL
+
+# 1.39.0-rc4
+- **added**: gpt-5 models in AI Prompt action
+
 # 1.39.0-rc3
 - **changed**: set text charts limit to 10000
 - **changed**: changed the name of JSON buttons to (JSON Buttons and JSON Carousel) and always show it
@@ -16,6 +29,13 @@
 
 # 1.39.0-rc1
 - **changed**: added scroll button left and right on image gallery
+
+# 1.38.4
+- **changed**: added left and right scroll button in image gallery
+
+# 1.38.3
+- **changed**: set text charts limit to 10000
+- **changed**: changed the name of JSON buttons to (JSON Buttons and JSON Carousel) and always show it
 
 # 1.38.2
 - **changed**: ai models upgraded

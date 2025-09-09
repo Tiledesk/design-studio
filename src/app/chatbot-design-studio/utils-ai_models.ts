@@ -60,7 +60,25 @@ export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:st
     { name: "Deepseek-chat",                value: "deepseek-chat",                    description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active" },
 ]
 
-export const OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
+export var OPENAI_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", additionalText?: string}> = [
+    { name: "Gpt-5",                value: "gpt-5",                 description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active"    },
+    { name: "Gpt-5-mini",           value: "gpt-5-mini",            description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active"    },
+    { name: "Gpt-5-nano",           value: "gpt-5-nano",            description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active"    },
+    { name: "GPT-4.1",              value: "gpt-4.1",               description: "TYPE_GPT_MODEL.text-davinci-003.description",      status: "inactive"  },
+    { name: "GPT-4.1 mini",         value: "gpt-4.1-mini",          description: "TYPE_GPT_MODEL.text-davinci-003.description",      status: "inactive"  },
+    { name: "GPT-4.1 nano",         value: "gpt-4.1-nano",          description: "TYPE_GPT_MODEL.text-davinci-003.description",      status: "inactive"  },
+    { name: "GPT-4o",               value: "gpt-4o",                description: "TYPE_GPT_MODEL.gpt-4o.description",                status: "active"    },
+    { name: "GPT-4o mini",          value: "gpt-4o-mini",           description: "TYPE_GPT_MODEL.gpt-4o-mini.description",           status: "active"    },
+    { name: "GPT-4 (Legacy)",       value: "gpt-4",                 description: "TYPE_GPT_MODEL.gpt-4.description",                 status: "active"    },
+    { name: "GPT-4 Turbo Preview",  value: "gpt-4-turbo-preview",   description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",   status: "active"    },
+    { name: "GPT-3 (DaVinci)",      value: "text-davinci-003",      description: "TYPE_GPT_MODEL.text-davinci-003.description",      status: "inactive"  },
+    { name: "GPT-3.5 Turbo",        value: "gpt-3.5-turbo",         description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",         status: "active"    },
+    { name: "OpenAI o1-mini",       value: "o1-mini",               description: "TYPE_GPT_MODEL.o1-mini.description",               status: "active"    },
+    { name: "OpenAI o1-preview",    value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",            status: "active"    }
+
+]
+
+export var OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
 ]
 
 export const LLM_MODEL: Array<{name: string, value: string, description: string, src: string, status: "active" | "inactive", models: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> }> = [
@@ -70,5 +88,6 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
     { name: "Groq",           value: "groq",              description: "",      src:"assets/images/icons/ai_prompt/groq.svg",        status: "active",   models: GROQ_MODEL          },
     { name: "Deepseek",       value: "deepseek",          description: "",      src:"assets/images/icons/ai_prompt/deepseek.svg",    status: "active",   models: DEEPSEEK_MODEL      },
     { name: "Ollama",         value: "ollama",            description: "",      src:"assets/images/icons/ai_prompt/ollama.svg",      status: "active",   models: OLLAMA_MODEL        },
+    { name: "Openai",         value: "openai",            description: "",      src:"assets/images/icons/ai_prompt/openai.svg",      status: "active",   models: OPENAI_MODEL        },
 ]
 /************             AI PROMPT MODEL: END        ************************/

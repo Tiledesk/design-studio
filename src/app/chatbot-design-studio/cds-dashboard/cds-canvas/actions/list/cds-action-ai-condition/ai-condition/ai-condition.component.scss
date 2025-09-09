@@ -1,0 +1,61 @@
+.ai-condition-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    // padding: 16px;
+    margin-bottom: 20px;
+    // border: 1px solid #e9ecef;
+    // border-radius: 8px;
+    // background-color: #ffffff;
+    transition: all 0.2s ease;
+
+    &:hover {
+        // border-color: #dee2e6;
+        // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        .delete-condition-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+}
+
+.condition-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.condition-number {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--blu);
+}
+
+.delete-condition-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    position: absolute;
+    top: 30px;
+    left: -24px;
+    &:hover {
+        background-color: #c82333;
+        transform: scale(1.1);
+    }
+    .material-icons {
+        font-size: 16px;
+    }
+}

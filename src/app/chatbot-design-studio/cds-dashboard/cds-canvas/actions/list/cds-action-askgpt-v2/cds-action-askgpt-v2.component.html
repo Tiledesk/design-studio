@@ -4,7 +4,7 @@
             <mat-icon class="icon" svgIcon="brain" aria-hidden="true"></mat-icon>
         </div>
         <div *ngIf="action?.question" class="action-row-right">
-            {{action?.namespace}}
+            {{ (listOfNamespaces | filter:{key: 'value', value: action?.namespace })[0].name }}
         </div>
     </div>
     
@@ -234,8 +234,7 @@
                         [itemSelected]="action.model"
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"
-                        [optionalBindAdditionalText]="'multiplier'" 
-                        [optionalBindDescription]="'description'" 
+                        [optionalBindAdditionalText]="'additionalText'"
                         (onSelected)="onChangeSelect($event, 'model')">
                     </cds-select>
                 </div>
