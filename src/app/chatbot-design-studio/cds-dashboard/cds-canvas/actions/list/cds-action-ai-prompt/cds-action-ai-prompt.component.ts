@@ -23,7 +23,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
 
@@ -47,7 +47,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   panelOpenState = false;
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
-  llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
+  llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive",  additionalText?: string }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
     "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
@@ -83,7 +83,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   DOCS_LINK = DOCS_LINK.GPT_TASK;
   llm_model = LLM_MODEL;
 
-  autocompleteOptions: Array<{label: string, value: string}> = [];
+  autocompleteOptions: Array<{label: string, value: string,  additionalText?: string}> = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -149,11 +149,9 @@ export class CdsActionAiPromptComponent implements OnInit {
         const NEW_MODELS = await this.getIntegrationByName();
         if(NEW_MODELS?.value?.models){
           this.logger.log('[ACTION AI_PROMPT] - NEW_MODELS:', NEW_MODELS.value.models);
-          const models = NEW_MODELS?.value?.models.map(item => ({
-            name: item,
-            value: item
-          }));
-          model.models = models;
+          (NEW_MODELS?.value?.models as Array<string>).forEach(item => {
+            OLLAMA_MODEL.push({ name: item, value: item, description: null, status: 'active' });
+          });
         }
       }
     });
@@ -177,15 +175,28 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
     this.actionLabelModel =  '';
     this.actionLabelModel =  '';
+
+    /** SET GPT MODELS */
+    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
+    OPENAI_MODEL.forEach(el => {
+      if (ai_models[el.value]) {
+        el.additionalText = `${ai_models[el.value]} x tokens`;
+        el.status = 'active';
+      } else {
+        el.additionalText = null;
+        el.status = 'inactive';
+      }
+    });
+
     if(this.action.llm){
       const filteredModels = this.getModelsByName(this.action.llm).filter(el => el.status === 'active');
-      filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
+      filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value, additionalText: el.additionalText? el.additionalText: null}));
       this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
     }
     // this.actionLabelModel = this.action['labelModel'];
   }
 
-  getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> {
+  getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive", additionalText?: string}> {
     const model = this.llm_model.find((model) => model.value === value);
     return model.models;
   }
@@ -325,6 +336,7 @@ export class CdsActionAiPromptComponent implements OnInit {
         this.action.temperature = 1
       }
     }
+    console.log('llmmmmmmm',this.llm_options_models)
     this.updateAndSaveAction.emit();
   }
 
