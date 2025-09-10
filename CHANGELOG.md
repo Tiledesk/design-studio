@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc9
+- **bug-fix**: fixed bug new connector in action ai-condition 
+
 # 1.39.0-rc8
 - **bug-fix**: fixed bugs in action ai-condition
 
