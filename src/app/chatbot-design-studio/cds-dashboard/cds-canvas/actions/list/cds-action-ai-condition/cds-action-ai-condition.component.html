@@ -19,7 +19,6 @@
 
 
     <div *ngFor="let intent of action.intents; let i = index">
-        
         <div class="action-row">
             <div class="intent-preview-info">
                 <div class="intent-prompt-preview" *ngIf="intent.prompt">
@@ -30,7 +29,6 @@
                 </div>
             </div>
         </div>
-
         <div *ngIf="intent.label" class="previewContent">
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
@@ -42,7 +40,6 @@
                  [isConnected]   = "listOfConnectors[intent.label]?.isConnected">
             </cds-connector>
         </div>
-
         <hr class="preview-divider">
     </div>
 
@@ -50,7 +47,7 @@
     <div class="add-intent-container">
          <button class="btn btn-secondary add-intent-btn" 
                  type="button" 
-                 (click)="$event.stopPropagation();addNewIntent()">
+                 (click)="$event.stopPropagation();addNewCondition()">
              <span class="material-icons">add</span>
              Add Condition
          </button>
@@ -105,7 +102,7 @@
     <div class="add-intent-container">
          <button class="btn btn-secondary add-intent-btn" 
                  type="button" 
-                 (click)="$event.stopPropagation();addNewIntent()">
+                 (click)="$event.stopPropagation();addNewCondition()">
              <span class="material-icons">add</span>
              Add Condition
          </button>
@@ -127,28 +124,12 @@
         </cds-textarea>
     </div>
 
-    
-
-    <!-- <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
-        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
-            [disabled]="!action.question" (click)="execPreview()">
-            <span class="material-icons">preview</span>
-            {{'CDSCanvas.Preview' | translate }}
-        </button>
-    </div> -->
-
     <div class="answer-preview" *ngIf="showPreview">
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
                     <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} )</span>
                 </label>
-                <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
-                    (click)="showHideVariablesSection()">Set variables
-                    <span class="material-icons-round">
-                        chevron_right
-                    </span>
-                </button> -->
             </div>
         </div>
 
