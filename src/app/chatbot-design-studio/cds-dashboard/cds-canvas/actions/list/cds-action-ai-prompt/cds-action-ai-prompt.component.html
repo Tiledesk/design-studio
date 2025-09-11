@@ -254,6 +254,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -279,7 +280,8 @@
                                     class="wait-slider" thumbLabel
                                     [step]="ai_setting['temperature'].step"  
                                     [min]="ai_setting['temperature'].min"
-                                    [max]="ai_setting['temperature'].max" 
+                                    [max]="ai_setting['temperature'].max"
+                                    [disabled]="ai_setting['temperature'].disabled" 
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>
@@ -297,6 +299,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
