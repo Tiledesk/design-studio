@@ -137,7 +137,6 @@ export class CdsActionAiPromptComponent implements OnInit {
     if(this.action.llm){
       this.initLLMModels();
       this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
-      this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
       this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
     }
   }
@@ -175,7 +174,6 @@ export class CdsActionAiPromptComponent implements OnInit {
   initLLMModels(){
     this.autocompleteOptions = [];
     this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
-    this.actionLabelModel =  '';
     this.actionLabelModel =  '';
     if(this.action.llm){
       const filteredModels = this.getModelsByName(this.action.llm).filter(el => el.status === 'active');
@@ -285,9 +283,9 @@ export class CdsActionAiPromptComponent implements OnInit {
     } else if (property === 'context'){
       this.action['context'] = event;
     }
+    // this.logger.log("[ACTION AI_PROMPT] changeTextarea labelModel: ", this.action['labelModel'], property);
     // this.checkVariables();
-    // this.updateAndSaveAction.emit();
-    // this.updateAndSaveAction.emit();
+    //this.updateAndSaveAction.emit();
   }
 
 
@@ -296,13 +294,17 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   onOptionSelected(event: any, property: string){
     this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
-    this.actionLabelModel = event.label;
+    this.actionLabelModel = event.value;
     this.action[property] = event.value;
-    this.updateAndSaveAction.emit();
+    // this.updateAndSaveAction.emit();
   }
 
-  onBlur(event: string){
-    this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action);
+  onBlur(event: any, property?: string){
+    if(property === 'model'){
+      this.action[property] = event;
+      this.action['labelModel'] = event;
+    }
+    this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action, property);
     this.updateAndSaveAction.emit();
   }
 

@@ -233,7 +233,7 @@
                         [placeholder]="'CDSCanvas.Model' | translate"
                         [autocompleteOptions]="autocompleteOptions"
                         (onOptionSelected)="onOptionSelected($event, 'model')"
-                        (blur)="onBlur($event)"
+                        (blur)="onBlur($event, 'model')"
                         (onChange)="onChangeTextarea($event, actionLabelModel, 'model')">
                     </cds-text>
                 </div>

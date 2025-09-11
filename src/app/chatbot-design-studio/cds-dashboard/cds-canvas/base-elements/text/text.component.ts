@@ -75,7 +75,8 @@ export class CDSTextComponent implements OnInit {
   }
 
   onBlur(event){
-    this.blur.emit(event);
+    //this.blur.emit(event);
+    this.blur.emit(this.text);
   }
 
   onOpenClose(event: 'open' | 'close'){
