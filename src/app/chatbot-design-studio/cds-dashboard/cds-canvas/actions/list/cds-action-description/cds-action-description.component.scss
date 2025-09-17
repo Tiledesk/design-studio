@@ -90,11 +90,13 @@
 
 .deprecation-message {
     position: absolute;
-    bottom: -21px;
-    left: 10px;
+    bottom: -22px;
+    left: 0px;
+    right: 0px;
     font-size: 10px;
     font-weight: 400;
     color: #cf2b2b;
+    text-align: center;
 }
 
 .edit-mode-header-buttons {
