@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc11
+- **added**: deprecation message and badge status. GPT Task action set as deprecated
+
 # 1.39.0-rc10
 - **bug-fix**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
 
