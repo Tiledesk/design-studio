@@ -7,6 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc10
+- **bug-fix**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
+
+# 1.39.0-rc9
+- **bug-fix**: fixed bug new connector in action ai-condition 
+
+# 1.39.0-rc8
+- **bug-fix**: fixed bugs in action ai-condition
+
 # 1.39.0-rc7
 - **added**: disabled property for mat-slider in ai-settings section
 

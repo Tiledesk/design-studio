@@ -693,6 +693,7 @@
             "GPTTask": "ChatGPT task",
             "GPTAssistant": "ChatGPT assistant",
             "AiPrompt": "AI Prompt",
+            "AiCondition": "AI Condition",
             "HiddenMessage": "Hidden message",
             "ChangeDept": "Change department",
             "Code": "Code",

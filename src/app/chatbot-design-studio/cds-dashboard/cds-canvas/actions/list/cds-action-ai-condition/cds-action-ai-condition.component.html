@@ -29,7 +29,6 @@
                 </div>
             </div>
         </div>
-
         <div *ngIf="intent.label" class="previewContent">
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
@@ -41,11 +40,21 @@
                  [isConnected]   = "listOfConnectors[intent.label]?.isConnected">
             </cds-connector>
         </div>
-
         <hr class="preview-divider">
     </div>
 
-    <!-- <hr class="preview-divider"> -->
+
+    <div class="add-intent-container">
+         <button class="btn btn-secondary add-intent-btn" 
+                 type="button" 
+                 (click)="$event.stopPropagation();addNewCondition()">
+             <span class="material-icons">add</span>
+             Add Condition
+         </button>
+     </div>
+     
+    <hr class="preview-divider">
+
 
     <div class="previewContent">
         <!-- {{'CDSCanvas.Fallback' | translate }} -->
@@ -88,38 +97,32 @@
          </div>
 
     </div>
-         <!-- Add New Intent Button -->
-     <div class="add-intent-container">
+    
+    <!-- Add New Intent Button -->
+    <div class="add-intent-container">
          <button class="btn btn-secondary add-intent-btn" 
                  type="button" 
-                 (click)="addNewIntent()">
+                 (click)="$event.stopPropagation();addNewCondition()">
              <span class="material-icons">add</span>
              Add Condition
          </button>
-     </div>
-
-
-     <div class="condition-header">
-        <label class="condition-number">Instructions</label>
     </div>
-     <cds-textarea id="instructions" 
-        [emojiPikerBtn]="false" 
-        [setAttributeBtn]="true" 
-        [limitCharsText]="100000"
-        [minRow]="4"[maxRow]="25" 
-        [text]="action.instructions" 
-        [placeholder]="placeholder"
-        (blur)="onBlur($event)"
-        (changeTextarea)="onChangeTextarea($event, '', 'instructions')">
-    </cds-textarea>
-    <hr class="custom-divider">
-    <!-- <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
-        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
-            [disabled]="!action.question" (click)="execPreview()">
-            <span class="material-icons">preview</span>
-            {{'CDSCanvas.Preview' | translate }}
-        </button>
-    </div> -->
+
+    <div class="ai-condition-instructions">
+        <div class="condition-header">
+            <label class="condition-number">Instructions</label>
+        </div>
+        <cds-textarea id="instructions" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [limitCharsText]="100000"
+            [minRow]="4"[maxRow]="25" 
+            [text]="action.instructions" 
+            [placeholder]="placeholder"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, '', 'instructions')">
+        </cds-textarea>
+    </div>
 
     <div class="answer-preview" *ngIf="showPreview">
         <div class="header-answer-preview">
@@ -127,12 +130,6 @@
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
                     <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} )</span>
                 </label>
-                <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
-                    (click)="showHideVariablesSection()">Set variables
-                    <span class="material-icons-round">
-                        chevron_right
-                    </span>
-                </button> -->
             </div>
         </div>
 

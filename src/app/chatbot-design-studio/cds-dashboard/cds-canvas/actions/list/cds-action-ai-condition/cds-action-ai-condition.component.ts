@@ -108,17 +108,21 @@ export class CdsActionAiConditionComponent implements OnInit {
   ngOnInit(): void {
     this.logger.log("[ACTION AI_CONDITION] ngOnInit action: ", this.action);
     this.getOllamaModels();
-    this.logger.log("[ACTION AI_CONDITION] HO AGGIORNATO  llm_model: ", this.llm_model);
+    //this.logger.log("[ACTION AI_CONDITION] HO AGGIORNATO  llm_model: ", this.llm_model);
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-        this.logger.log('[ACTION AI_CONDITION] isChangedConnector -->', connector);
+        //this.logger.log('[ACTION AI_CONDITION] isChangedConnector -->', connector);
         let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-        this.logger.log('[ACTION AI_CONDITION] connectorId -->', connectorId);
         if(connector.fromId.startsWith(connectorId)){
+            this.logger.log('[ACTION AI_CONDITION] connectorId -->', connectorId);
             this.connector = connector;
-            this.updateConnectionFalse();
-            this.updateConnectionTrue();
+            if(connector.idCondition){
+                this.refreshConnector(connector.fromId, connector.idCondition); 
+            } else {
+              this.updateConnectionFalse();
+              this.updateConnectionTrue();
+            }
         }
     });
     if(this.intentSelected){
@@ -214,7 +218,16 @@ export class CdsActionAiConditionComponent implements OnInit {
   }
 
 
-    initializeConnector() {
+  refreshConnector(idConnector, idCondition) {
+     this.listOfConnectors[idCondition] = {
+      idConnector: idConnector,
+      idConnection: null,
+      isConnected: false
+    };
+  }
+
+
+  initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
     //this.listOfConnectors = {};
     this.action.intents.forEach((element, index) => {
@@ -595,28 +608,33 @@ export class CdsActionAiConditionComponent implements OnInit {
   }
 
   /**
-   * addNewIntent
-   * Adds a new intent to the intents array
+   * addNewCondition
+   * Adds a new condition to the intents array
    */
-  addNewIntent() {
-    this.logger.log("[ACTION AI_CONDITION] addNewIntent", this.action.intents);
+  addNewCondition() {
+    this.logger.log("[ACTION AI_CONDITION] addNewCondition", this.action.intents);
+
     if (!this.action.intents) {
       this.action.intents = [];
     }
-    // Add a new intent with default values
     const idCondition = generateShortUID();
     this.action.intents.push({
       "label": idCondition,
       "prompt": "",
-      "conditionIntentId": ""
+      "conditionIntentId": ''
     });
+
+    let idConnector = `${this.idIntentSelected}/${this.action._tdActionId}/${idCondition}/true`;
     this.listOfConnectors[idCondition] = {
-      idConnector: this.idIntentSelected + "/" + this.action._tdActionId + "/" + idCondition + "/true",
+      idConnector: idConnector,
       idConnection: null,
       isConnected: false
     };
-    this.logger.log("[ACTION AI_CONDITION] addNewIntent", this.listOfConnectors);
-    this.updateAndSaveAction.emit();
+    //this.onConnectorChange.emit({ type: 'delete', fromId: idConnector, toId: ''});
+    this.intentService.onChangedConnector({fromId: idConnector, idCondition: idCondition});
+   
+    this.logger.log("[ACTION AI_CONDITION] addNewCondition", this.listOfConnectors);
+    // this.updateAndSaveAction.emit();
   }
 
   onDeleteCondition(intent: any) {
