@@ -1091,6 +1091,7 @@ export class IntentService {
       action.model = LLM_MODEL.find(el => el.value === 'cohere').value
       action.assignReplyTo = TYPE_ACTION.AI_CONDITION;
       const idCondition = generateShortUID();
+      action.instructions = "User said: {{lastUserText}}";
       action.intents.push({
         "label": idCondition,
         "prompt": "",
