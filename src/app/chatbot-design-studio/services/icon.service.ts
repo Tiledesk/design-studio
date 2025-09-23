@@ -139,6 +139,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/ai-prompt.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/ai-condition.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/ai-condition.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'assets/images/actions/add_kb_content.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/add_kb_content.svg')
     );

@@ -121,13 +121,13 @@ export class ConnectorService {
 
 
   public async createMapOfConnectors(intents){
-    // // this.logger.log('[CONNECTOR-SERV] -----> createConnectors::: ', intents);
+    this.logger.log('[CONNECTOR-SERV] -----> createMapOfConnectors 1::: ', intents);
     this.existingIntentIds = new Set(intents.map((item) => item.intent_id));
     this.listOfIntents = intents;
     intents.forEach(async intent => {
       this.createListOfConnectorsByIntent2(intent);  
     });
-    this.logger.log('[CONNECTOR-SERV] -----> createMapOfConnectors::: ', this.mapOfConnectors);
+    this.logger.log('[CONNECTOR-SERV] -----> createMapOfConnectors 2::: ', this.mapOfConnectors);
     return this.mapOfConnectors;
   }
 
@@ -617,6 +617,44 @@ export class ConnectorService {
           }
         }
 
+        if(action._tdActionType === TYPE_ACTION.AI_CONDITION){
+          action.intents.forEach(element => {
+            if(element.conditionIntentId && element.conditionIntentId !== ''){
+              idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/'+element.label + '/true';
+              idConnectorTo = element.conditionIntentId.replace("#", "");
+              if(!this.intentExists(idConnectorTo)){
+                element.conditionIntentId = '';
+                idConnectorTo = null;
+              }
+              this.logger.log('[CONNECTOR-SERV] - AI-CONDITION ACTION -> idConnectorFrom', idConnectorFrom);
+              this.logger.log('[CONNECTOR-SERV] - AI-CONDITION ACTION -> idConnectorTo', idConnectorTo);
+              this.createConnector(intent, idConnectorFrom, idConnectorTo);
+            }
+          });
+          if(action.fallbackIntent && action.fallbackIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/fallback';
+            idConnectorTo = action.fallbackIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.fallbackIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - AI-CONDITION ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - AI-CONDITION ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(action.errorIntent && action.errorIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/error';
+            idConnectorTo = action.errorIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.errorIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - AI-CONDITION ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - AI-CONDITION ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
         /** WEB-REQUEST-V2 */
         if(action._tdActionType === TYPE_ACTION.WEB_REQUESTV2){
           if(action.trueIntent && action.trueIntent !== ''){
@@ -1022,15 +1060,23 @@ export class ConnectorService {
    * 
    */
   public deleteConnector(intent, idConnection, save=false, notify=true) {
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
-    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
-    this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
-    if(idConnector && intent.attributes?.connectors[idConnector]){
-      delete intent.attributes.connectors[idConnector];
+    try {
+      this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
+      if (!intent || !idConnection) return;
+      if (!intent.attributes) intent.attributes = {};
+      if (!intent.attributes.connectors) intent.attributes.connectors = {};
+      const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+      this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
+      if(idConnector && intent.attributes.connectors[idConnector]){
+        delete intent.attributes.connectors[idConnector];
+      }
+      this.hideContractConnector(idConnection);
+      if (this.tiledeskConnectors && typeof this.tiledeskConnectors.deleteConnector === 'function') {
+        this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
+      }
+    } catch (err) {
+      this.logger.error('[CONNECTOR-SERV] deleteConnector error:', err);
     }
-    this.hideContractConnector(idConnection);
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  intent ', intent);
-    this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 
 
@@ -1067,7 +1113,7 @@ export class ConnectorService {
         return filteredMap;
       }, {});
       for (const [key, connector] of Object.entries(listOfConnectors)) {
-        this.logger.log('delete connector :: ', key );
+        this.logger.log('[CONNECTOR-SERV] delete connector :: ', key );
         const intentId = connectorID.split('/')[0];
         const intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
         this.deleteConnector(intent, key, save, notify);
@@ -1291,16 +1337,23 @@ export class ConnectorService {
             if(key === 'intentName'){
               connectorID = intent_id+'/'+tdActionId+'/'+idConnectorTo;
             } else if(key === 'trueIntent'){
-              connectorID = intent_id+'/'+tdActionId+'/true'+'/'+idConnectorTo;
+              connectorID = intent_id+'/'+tdActionId+'/true/'+idConnectorTo;
             } else if(key === 'falseIntent'){
-              connectorID = intent_id+'/'+tdActionId+'/false'+'/'+idConnectorTo;
+              connectorID = intent_id+'/'+tdActionId+'/false/'+idConnectorTo;
             } else if(key === 'noInputIntent'){
-              connectorID = intent_id+'/'+tdActionId+'/noInput'+'/'+idConnectorTo;
+              connectorID = intent_id+'/'+tdActionId+'/noInput/'+idConnectorTo;
             } else if(key === 'noMatchIntent'){
-              connectorID = intent_id+'/'+tdActionId+'/noMatch'+'/'+idConnectorTo;
+              connectorID = intent_id+'/'+tdActionId+'/noMatch/'+idConnectorTo;
             } else if(obj.uid && obj.type === 'action'){
               connectorID = intent_id+"/"+tdActionId+"/"+obj.uid+'/'+idConnectorTo;
+            } else if(key === 'conditionIntentId' && obj.label){ 
+              connectorID = intent_id+"/"+tdActionId+"/"+obj.label+'/true/'+idConnectorTo;
+            } else if(key === 'fallbackIntent'){ 
+              connectorID = intent_id+"/"+tdActionId+'/fallback/'+idConnectorTo;
+            } else if(key === 'errorIntent'){ 
+              connectorID = intent_id+"/"+tdActionId+'/error/'+idConnectorTo;
             } 
+
             let shown = 'false';
             const objectExists = this.existingIntentIds.has(idConnectorTo);
             if(!objectExists) {

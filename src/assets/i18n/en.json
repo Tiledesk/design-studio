@@ -551,6 +551,7 @@
         "AnswerKB": "Answer",
         "EnterQuestion": "Your question",
         "EnterAnswer": "Your answer",
+        "DeprecationMessage": "🚫 This action is deprecated and will no longer be supported",
         "ConfigureModel": "Configure"
     },
     "Alert": {
@@ -693,6 +694,7 @@
             "GPTTask": "ChatGPT task",
             "GPTAssistant": "ChatGPT assistant",
             "AiPrompt": "AI Prompt",
+            "AiCondition": "AI Condition",
             "HiddenMessage": "Hidden message",
             "ChangeDept": "Change department",
             "Code": "Code",
@@ -904,6 +906,13 @@
                 "TITLE": "AI Prompt multiple LLM",
                 "DESCRIPTION": "The AI Prompt Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
                 "IMAGE": "assets/images/doc/AI_PROMPT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
+            },
+            "AiCondition": {
+                "TITLE": "AI Condition",
+                "DESCRIPTION": "The AI Condition Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
+                "IMAGE": "assets/images/doc/AI_CONDITION.png",
                 "VIDEO_URL": "",
                 "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
             },

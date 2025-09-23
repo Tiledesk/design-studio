@@ -110,6 +110,10 @@ $base-padding: 6px;
     align-items: center;
 }
 
+.deprecation-badge{
+    background: linear-gradient(45deg, #e23131, #640b0b)
+}
+
 .action-btn-icon img{
     filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
 }
