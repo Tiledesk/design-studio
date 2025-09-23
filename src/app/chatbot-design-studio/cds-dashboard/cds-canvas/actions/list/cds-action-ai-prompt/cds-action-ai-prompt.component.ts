@@ -65,6 +65,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   temp_variables = [];
   actionLabelModel: string = "";
   selectedModelConfigured: boolean = true;
+  labelModel: string = "";
 
 
   // Connectors
@@ -86,7 +87,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   autocompleteOptions: Array<{label: string, value: string}> = [];
 
   llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean }> = [];
-
+  autocompleteOptions_2: Array<{label: string, value: string}> = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -142,14 +143,14 @@ export class CdsActionAiPromptComponent implements OnInit {
     if(this.action.llm){
       this.initLLMModels();
       this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
-      this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
+      this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
       this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
-      
       // Update selectedModelConfigured for the current selection
       if(this.actionLabelModel) {
         const selectedModel = this.llm_models_2.find(m => m.labelModel === this.actionLabelModel);
         this.selectedModelConfigured = selectedModel ? selectedModel.configured : true;
       }
+      
     }
   }
 
@@ -214,12 +215,14 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.autocompleteOptions = [];
     this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
     this.actionLabelModel =  '';
-    this.actionLabelModel =  '';
     if(this.action.llm){
       const filteredModels = this.getModelsByName(this.action.llm).filter(el => el.status === 'active');
       filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
       this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
     }
+
+    this.autocompleteOptions_2 = [];
+    this.llm_models_2.forEach(el => this.autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
     // this.actionLabelModel = this.action['labelModel'];
   }
 
@@ -322,6 +325,8 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.action['question'] = event;
     } else if (property === 'context'){
       this.action['context'] = event;
+    } else if (property === 'llm_model'){
+      this.action['labelModel'] = labelModel;
     }
     // this.checkVariables();
     // this.updateAndSaveAction.emit();
@@ -330,12 +335,24 @@ export class CdsActionAiPromptComponent implements OnInit {
 
 
 
-  
+
 
   onOptionSelected(event: any, property: string){
     this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
-    this.actionLabelModel = event.label;
-    this.action[property] = event.value;
+    if(property === 'llm_model'){
+      this.actionLabelModel = event.label;
+      const model = this.llm_models_2.find(m => m.labelModel === event.label);
+      if(model){
+        this.selectedModelConfigured = model ? model.configured : true;
+        this.action.llm = model.llm;
+        this.action.model = model.model;
+        this.action.labelModel = model.labelModel;
+        this.labelModel = model.labelModel;
+      }
+    } else if (property === 'model'){
+      this.actionLabelModel = event.label;
+      this.action[property] = event.value;
+    }
     this.updateAndSaveAction.emit();
   }
 
@@ -365,7 +382,7 @@ export class CdsActionAiPromptComponent implements OnInit {
       let model = event.model;
       this.action.llm = llm;
       this.action.model = model;
-      this.actionLabelModel = event.labelModel;
+      this.action.labelModel = event.labelModel;
       
       // Update selectedModelConfigured based on the selected model
       const selectedModel = this.llm_models_2.find(m => m.labelModel === event.labelModel);
