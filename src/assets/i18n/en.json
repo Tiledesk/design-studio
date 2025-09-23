@@ -550,7 +550,8 @@
         "QuestionKB": "Question",
         "AnswerKB": "Answer",
         "EnterQuestion": "Your question",
-        "EnterAnswer": "Your answer"
+        "EnterAnswer": "Your answer",
+        "ConfigureModel": "Configure"
     },
     "Alert": {
         "ErrorMaxOptions": "Cannot add another option. Max available options achived ( 0..9, *, # )",
