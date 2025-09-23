@@ -90,4 +90,40 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
     { name: "Ollama",         value: "ollama",            description: "",      src:"assets/images/icons/ai_prompt/ollama.svg",      status: "active",   models: OLLAMA_MODEL        },
     { name: "Openai",         value: "openai",            description: "",      src:"assets/images/icons/ai_prompt/openai.svg",      status: "active",   models: OPENAI_MODEL        },
 ]
+
+/**
+ * Generates llm_models_2 array by transforming all models from utils-ai_models
+ * Changes name format to "Provider - ModelName" and value format to "provider-modelname"
+ * Adds description and src for each record
+ */
+export function generateLlmModels2(): Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> {
+  const llm_models_2: Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> = [];
+  
+  // Process each provider's models
+  LLM_MODEL.forEach(provider => {
+    provider.models.forEach(model => {
+      // Transform name: "Command R" -> "Cohere - Command R"
+      const transformedName = `${provider.name} - ${model.name}`;
+      
+      // Transform value: "command-r" -> "cohere-command-r"
+      //const transformedValue = `${provider.value}-${model.value}`;
+      
+      // Add to the new array
+      llm_models_2.push({
+        labelModel:transformedName,
+        llm:provider.value,
+        model:model.value,
+        description: model.description,
+        src: provider.src,
+        status: model.status,
+        configured: false
+      });
+    });
+  });
+  return llm_models_2;
+}
+
+// Generate the array
+export const LLM_MODELS_2 = generateLlmModels2();
+
 /************             AI PROMPT MODEL: END        ************************/
