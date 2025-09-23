@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.0-rc12
+- **changed**: added default intructions value "User said: {{lastUserText}}"
+
 # 1.39.0-rc11
 - **added**: deprecation message and badge status. GPT Task action set as deprecated
 
