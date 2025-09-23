@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc13
+- **changed**: changed the selection of LLM and model to only one select
 
 # 1.39.0-rc12
 - **changed**: added default intructions value "User said: {{lastUserText}}"
