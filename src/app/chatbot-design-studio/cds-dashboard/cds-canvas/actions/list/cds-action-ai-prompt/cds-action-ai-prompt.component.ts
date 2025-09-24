@@ -342,6 +342,7 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, labelModel, property, this.isInitializing[property]);
     // Ignora le chiamate durante l'inizializzazione per questa proprietà specifica
     if (this.isInitializing[property]) {
+      this.isInitializing[property] = false;
       return;
     }
     // se event non corrisponde a nessun valore di autocompleteOptions_2 ed è diverso da '' o null allora non fare nulla
@@ -361,7 +362,7 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.action['question'] = event;
     } else if (property === 'context'){
       this.action['context'] = event;
-    } else if (property === 'llm_model' && event){
+    } else if (property === 'llm_model'){
       this.action['labelModel'] = event;
       this.labelModel = event;
       this.actionLabelModel = event;
@@ -408,6 +409,12 @@ setModel(labelModel: string){
     this.action.labelModel = model.labelModel;
     this.labelModel = model.labelModel;
     this.logger.log("[ACTION AI_PROMPT] 2 action: ", this.action);
+  }
+  else {
+    this.action.llm = '';
+    this.action.model = '';
+    this.action.labelModel = '';
+    this.labelModel = '';
   }
 }
 
