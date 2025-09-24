@@ -65,6 +65,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   temp_variables = [];
   actionLabelModel: string = "";
   selectedModelConfigured: boolean = true;
+  labelModel: string = "";
 
 
   // Connectors
@@ -86,7 +87,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   autocompleteOptions: Array<{label: string, value: string,  additionalText?: string}> = [];
 
   llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean }> = [];
-
+  autocompleteOptions_2: Array<{label: string, value: string}> = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -142,13 +143,14 @@ export class CdsActionAiPromptComponent implements OnInit {
     if(this.action.llm){
       this.initLLMModels();
       this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
+      this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
       this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
-      
       // Update selectedModelConfigured for the current selection
       if(this.actionLabelModel) {
         const selectedModel = this.llm_models_2.find(m => m.labelModel === this.actionLabelModel);
         this.selectedModelConfigured = selectedModel ? selectedModel.configured : true;
       }
+      
     }
   }
 
@@ -227,6 +229,9 @@ export class CdsActionAiPromptComponent implements OnInit {
       filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value, additionalText: el.additionalText? el.additionalText: null}));
       this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
     }
+
+    this.autocompleteOptions_2 = [];
+    this.llm_models_2.forEach(el => this.autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
     // this.actionLabelModel = this.action['labelModel'];
   }
 
@@ -320,29 +325,35 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
   onChangeTextarea(event: string, labelModel: string, property: string) {
-    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, property);
+    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, labelModel, property);
     // this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
     //this.action[property] = event;
     if(property === 'model'){
-      this.action['labelModel'] = labelModel;
+      this.action['labelModel'] = event;
       if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
         this.action.temperature = 1
         this.ai_setting['temperature'].disabled= true
-      }else{
+      } else {
         this.ai_setting['temperature'].disabled= false
       }
+      this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;
     } else if (property === 'context'){
       this.action['context'] = event;
+    } else if (property === 'llm_model'){
+      this.action['labelModel'] = event;
+      this.labelModel = event;
+      this.actionLabelModel = event;
     }
+    this.setModel(event);
     // this.checkVariables();
-    //this.updateAndSaveAction.emit();
+    // this.updateAndSaveAction.emit();
   }
 
 
 
-  
+
 
   onOptionSelected(event: any, property: string){
     this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
@@ -351,12 +362,36 @@ export class CdsActionAiPromptComponent implements OnInit {
     // this.updateAndSaveAction.emit();
   }
 
-  onBlur(event: any, property?: string){
-    if(property === 'model'){
-      this.action[property] = event;
-      this.action['labelModel'] = event;
-    }
-    this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action, property);
+  // onBlur(event: any, property?: string){
+  //   if(property === 'model'){
+  //     this.action[property] = event;
+  //     this.action['labelModel'] = event;
+  //   }
+  //   this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action, property);
+  //   this.actionLabelModel = event.label;
+  //   this.labelModel = event.label;
+  //   if(property === 'llm_model'){
+  //     this.setModel(event.label);
+  //   } else if (property === 'model'){
+  //     // this.actionLabelModel = event.label;
+  //     this.action[property] = event.value;
+  //   }
+  //   this.updateAndSaveAction.emit();
+  // }
+
+setModel(labelModel: string){
+  const model = this.llm_models_2.find(m => m.labelModel === labelModel);
+  if(model){
+    this.selectedModelConfigured = model ? model.configured : true;
+    this.action.llm = model.llm;
+    this.action.model = model.model;
+    this.action.labelModel = model.labelModel;
+    this.labelModel = model.labelModel;
+  }
+}
+
+  onBlur(event: string){
+    this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action);
     this.updateAndSaveAction.emit();
   }
 
@@ -381,7 +416,7 @@ export class CdsActionAiPromptComponent implements OnInit {
       let model = event.model;
       this.action.llm = llm;
       this.action.model = model;
-      this.actionLabelModel = event.labelModel;
+      this.action.labelModel = event.labelModel;
       
       // Update selectedModelConfigured based on the selected model
       const selectedModel = this.llm_models_2.find(m => m.labelModel === event.labelModel);
