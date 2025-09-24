@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc15
+- **added**: Added text area with autocomplete in LLM model selection
+
 # 1.39.0-rc14
 - **changed**: changed the selection of LLM and model to only one select
 
