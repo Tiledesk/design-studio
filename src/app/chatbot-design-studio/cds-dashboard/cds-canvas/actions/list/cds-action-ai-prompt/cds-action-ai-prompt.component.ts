@@ -316,20 +316,22 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
   onChangeTextarea(event: string, labelModel: string, property: string) {
-    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, property);
+    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, labelModel, property);
     // this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
     //this.action[property] = event;
     if(property === 'model'){
-      this.action['labelModel'] = labelModel;
+      this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;
     } else if (property === 'context'){
       this.action['context'] = event;
     } else if (property === 'llm_model'){
-      this.action['labelModel'] = labelModel;
+      this.action['labelModel'] = event;
+      this.labelModel = event;
+      this.actionLabelModel = event;
     }
+    this.setModel(event);
     // this.checkVariables();
-    // this.updateAndSaveAction.emit();
     // this.updateAndSaveAction.emit();
   }
 
@@ -339,22 +341,27 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   onOptionSelected(event: any, property: string){
     this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
+    this.actionLabelModel = event.label;
+    this.labelModel = event.label;
     if(property === 'llm_model'){
-      this.actionLabelModel = event.label;
-      const model = this.llm_models_2.find(m => m.labelModel === event.label);
-      if(model){
-        this.selectedModelConfigured = model ? model.configured : true;
-        this.action.llm = model.llm;
-        this.action.model = model.model;
-        this.action.labelModel = model.labelModel;
-        this.labelModel = model.labelModel;
-      }
+      this.setModel(event.label);
     } else if (property === 'model'){
-      this.actionLabelModel = event.label;
+      // this.actionLabelModel = event.label;
       this.action[property] = event.value;
     }
     this.updateAndSaveAction.emit();
   }
+
+setModel(labelModel: string){
+  const model = this.llm_models_2.find(m => m.labelModel === labelModel);
+  if(model){
+    this.selectedModelConfigured = model ? model.configured : true;
+    this.action.llm = model.llm;
+    this.action.model = model.model;
+    this.action.labelModel = model.labelModel;
+    this.labelModel = model.labelModel;
+  }
+}
 
   onBlur(event: string){
     this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action);
