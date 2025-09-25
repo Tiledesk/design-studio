@@ -219,9 +219,9 @@
                         </cds-select>
                     </div> 
                     -->
-
+                    
                     <div class="select-container" [class.not-configured]="!selectedModelConfigured">
-                        <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
+                        <!-- <div class="status-indicator" *ngIf="!selectedModelConfigured"></div> -->
                         <cds-text id="text-label-model"
                             class="sx-input" 
                             [class]="!selectedModelConfigured ? 'not-configured' : ''"

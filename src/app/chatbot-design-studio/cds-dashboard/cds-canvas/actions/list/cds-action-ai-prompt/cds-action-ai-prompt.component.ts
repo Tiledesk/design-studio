@@ -15,7 +15,7 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 
 //UTILS
 import { AttributesDialogAiPromptComponent } from './attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
@@ -91,7 +91,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   llm_model = LLM_MODEL;
   autocompleteOptions: Array<{label: string, value: string}> = [];
 
-  llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean }> = [];
+  llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
   autocompleteOptions_2: Array<{label: string, value: string}> = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
@@ -109,9 +109,32 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.logger.log("[ACTION AI_PROMPT] ngOnInit action: ", this.action);
+
+    this.project_id = this.dashboardService.projectID;
+    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
+    
+
+
+    
+
+
+
     this.getOllamaModels();
-    this.logger.log("[ACTION AI_PROMPT] HO AGGIORNATO  llm_model: ", this.llm_model);
     this.llm_models_2 = generateLlmModels2();
+
+    // this.llm_models_2 = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
+    //   if(ai_models[el.value])
+    //     return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
+    //   else
+    //     return { ...el, multiplier: null }
+    // })
+    // aggiungi a llm_models_2 il campo multiplier popolandolo con il valore di ai_models.multiplier dove il campo labelModel corrisponde a ai_models.name
+    this.llm_models_2 = this.llm_models_2.map((el) => {
+      const model = Object.values(ai_models).find((m: any) => (m as any)?.name === el.labelModel);
+      return { ...el, multiplier: model && (model as any).multiplier !== undefined ? (model as any).multiplier : null };
+    });
+
+    this.logger.log("[ACTION AI_PROMPT] HO AGGIORNATO  model_list: ", this.llm_models_2);
 
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name
@@ -218,7 +241,7 @@ export class CdsActionAiPromptComponent implements OnInit {
         this.logger.log('[ACTION AI_PROMPT] 1 - integration:', el.name, el.value.apikey);
         if(el.name && el.value?.apikey){
           this.llm_models_2.forEach(model => {
-            if(model.llm === el.name) {
+            if(model.llm === el.name || model.llm.toLowerCase() === 'openai') {
               model.configured = true;
             }
           });
@@ -236,6 +259,8 @@ export class CdsActionAiPromptComponent implements OnInit {
     }
     this.autocompleteOptions_2 = [];
     this.llm_models_2.forEach(el => this.autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
+    this.autocompleteOptions_2.sort((a, b) => a.label.localeCompare(b.label));
+
     // this.actionLabelModel = this.action['labelModel'];
     this.logger.log('[ACTION AI_PROMPT] autocompleteOptions_2',this.autocompleteOptions_2);
   }

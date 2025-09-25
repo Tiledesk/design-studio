@@ -439,7 +439,9 @@ loading-spinner.custom-spinner ::ng-deep {
         }
         ::ng-deep .text-editor-wrapper .text-editor .box-input input {
             color: var(--empty-value-text-color)!important;
+            border: 1px solid var(--empty-value-text-color)!important;
         }
+
     }
 
 
