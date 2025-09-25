@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc17
+- **bug-fix**: added catch (error) in getElevenLabsVoices and getElevenLabsModels
 
 # 1.39.0-rc16
 - **bug-fix**: Fixed save prompt error
