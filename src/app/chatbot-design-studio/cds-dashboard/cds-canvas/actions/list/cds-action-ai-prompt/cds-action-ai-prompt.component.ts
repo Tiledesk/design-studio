@@ -345,10 +345,6 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.isInitializing[property] = false;
       return;
     }
-    // se event non corrisponde a nessun valore di autocompleteOptions_2 ed è diverso da '' o null allora non fare nulla
-    if(!this.autocompleteOptions_2.find(el => el.value === event) && event !== '' && event !== null) {
-      return;
-    }
     if(property === 'model'){
       this.action['labelModel'] = event;
       if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
@@ -363,6 +359,10 @@ export class CdsActionAiPromptComponent implements OnInit {
     } else if (property === 'context'){
       this.action['context'] = event;
     } else if (property === 'llm_model'){
+       // se event non corrisponde a nessun valore di autocompleteOptions_2 ed è diverso da '' o null allora non fare nulla
+      if(!this.autocompleteOptions_2.find(el => el.value === event) && event !== '' && event !== null) {
+        return;
+      }
       this.action['labelModel'] = event;
       this.labelModel = event;
       this.actionLabelModel = event;

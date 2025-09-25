@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.0-rc16
+- **bug-fix**: Fixed save prompt error
+
 # 1.39.0-rc15
 - **added**: Added text area with autocomplete in LLM model selection
 
