@@ -443,7 +443,7 @@ loading-spinner.custom-spinner ::ng-deep {
 .add-intent-container {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 .add-intent-btn {
@@ -485,6 +485,7 @@ loading-spinner.custom-spinner ::ng-deep {
     flex-direction: column;
     gap: 4px;
     flex: 1;
+    padding-top: 10px;
 }
 
 .intent-prompt-preview {
@@ -506,7 +507,7 @@ loading-spinner.custom-spinner ::ng-deep {
         color: #333;
         line-height: 1.3;
         word-wrap: break-word;
-        max-width: 200px;
+        // max-width: 200px;
     }
     
     &.empty {
@@ -523,4 +524,17 @@ loading-spinner.custom-spinner ::ng-deep {
 
 .ai-condition-instructions {
     padding-bottom: 40px;
+}
+
+
+// Prompt text truncation
+.prompt-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    max-height: 2.8em; /* 2 righe * 1.4 line-height */
 }

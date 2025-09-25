@@ -138,7 +138,8 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.initLLMModels();
       this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
       this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
-      this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
+      const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
+      this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
     }
   }
 
@@ -187,7 +188,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> {
     const model = this.llm_model.find((model) => model.value === value);
-    return model.models;
+    return model?.models || [];
   }
 
 
@@ -318,7 +319,8 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.log("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
     if(target === 'llm'){
-      this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
+      const foundLLM = this.llm_models.find(el => el.value === event.value);
+      this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
       this.action.model= null;
       this.initLLMModels();
     }

@@ -151,7 +151,10 @@ export class CdsActionAiConditionComponent implements OnInit {
       this.initLLMModels();
       this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
       this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
-      this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
+      //this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
+      const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
+      this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
+
     }
     //this.checkConnectionStatus();
   }
@@ -214,7 +217,7 @@ export class CdsActionAiConditionComponent implements OnInit {
 
   getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> {
     const model = this.llm_model.find((model) => model.value === value);
-    return model.models;
+    return model?.models || [];
   }
 
 
