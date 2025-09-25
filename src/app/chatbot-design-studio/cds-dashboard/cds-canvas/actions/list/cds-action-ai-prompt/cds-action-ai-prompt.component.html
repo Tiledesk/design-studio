@@ -237,7 +237,7 @@
                     </div>
                     <!-- Container per i due elementi sulla stessa riga -->
                     <div class="bottom-row">
-                        <div class="multiplier-container" *ngIf="multiplier">{{multiplier}} x tokens</div>
+                        <div class="multiplier-container"><span *ngIf="multiplier">{{multiplier}} x tokens</span></div>
                         <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
                     </div>
                 </div>

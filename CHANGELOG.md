@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc18
+- **bug-fix**: new order, openai and ollama never red
+
 # 1.39.0-rc17
 - **bug-fix**: added catch (error) in getElevenLabsVoices and getElevenLabsModels
 
