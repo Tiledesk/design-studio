@@ -226,9 +226,10 @@ mat-form-field.box-textarea ::ng-deep {
     font-size: 0.8em;
     font-weight: 400;
     white-space: nowrap;
-    margin-top: -15px;
+    margin-top: -11px;
     justify-content: flex-end;
     width: 100%;
+    z-index: 2;
     .liquidjs-button {
         margin: auto 0;
         display: inline-flex;

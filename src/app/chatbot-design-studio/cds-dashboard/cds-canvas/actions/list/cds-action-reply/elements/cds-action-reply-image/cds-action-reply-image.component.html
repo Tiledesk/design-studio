@@ -65,17 +65,44 @@
 
 </div>
     
+<div class="image-type-toggle cds-toggle-group" *ngIf="!previewMode">
+    <button type="button"
+            value="upload"
+            data-testid="image-editor__image__tab__upload"
+            class="cds-toggle-btn"
+            [class.selected]="imageType === 'upload'"
+            (click)="onSelectImageType('upload')">
+        <span class="cds-toggle-label">Upload</span>
+    </button>
+    <button type="button"
+            value="link"
+            data-testid="image-editor__image__tab__link"
+            class="cds-toggle-btn"
+            [class.selected]="imageType === 'link'"
+            (click)="onSelectImageType('link')">
+        <span class="cds-toggle-label">Link</span>
+    </button>
+</div>
+
 <div class="image-editor-wrapper" *ngIf="!previewMode">
         
         <div class="image-editor">
     
             <div class="response-image-uploader-wrapper">
                 <cds-image-upload 
+                    *ngIf="imageType === 'upload'"
                     class="image-upload"
                     [metadata] = response.metadata
                     (onChangeMetadata)="onChangeMetadata($event)"
                     (onDeletedMetadata)="onDeletedMetadata($event)">
                 </cds-image-upload>
+                <cds-image-url 
+                    *ngIf="imageType === 'link'"
+                    class="image-upload"
+                    [metadata] = response.metadata
+                    (onChangeMetadata)="onChangeMetadata($event)"
+                    (onDeletedMetadata)="onDeletedMetadata($event)">
+                </cds-image-url>
             </div>
 
             <cds-textarea 

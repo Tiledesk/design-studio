@@ -1,4 +1,3 @@
-import { Namespace } from './../../../../../../models/namespace-model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,13 +15,14 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { OPENAI_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -38,7 +38,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  listOfNamespaces: Array<{name: string, value: string, icon?:string, type:string}>;
+  listOfNamespaces: Array<{name: string, value: string, icon?:string, hybrid:boolean}>;
 
   project_id: string;
   selectedNamespace: string;
@@ -65,12 +65,12 @@ export class CdsActionAskgptV2Component implements OnInit {
   temp_variables = [];
   autocompleteOptions: Array<{label: string, value: string}> = [];
 
-  model_list: Array<{ name: string, value: string, multiplier: string}>;
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
-    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1 },
-    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05 }
+  model_list: Array<{ name: string, value: string, additionalText?: string}>;
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
+    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
   }
   IS_VISIBLE_ALPHA_SLIDER = false;
 
@@ -94,12 +94,22 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("[ACTION-ASKGPTV2] action detail: ", this.action);
     this.project_id = this.dashboardService.projectID
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
-      if(ai_models[el.value])
-        return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
-      else
-        return { ...el, multiplier: null }
-    })
+    OPENAI_MODEL.forEach(el => {
+      if (ai_models[el.value]) {
+        el.additionalText = `${ai_models[el.value]} x tokens`;
+        el.status = 'active';
+      } else {
+        el.additionalText = null;
+        el.status = 'inactive';
+      }
+    });
+    this.model_list = OPENAI_MODEL.filter(el => el.status === 'active')
+    // this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
+    //   if(ai_models[el.value])
+    //     return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
+    //   else
+    //     return { ...el, multiplier: null }
+    // })
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
       this.connector = connector;
@@ -220,7 +230,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, type: el.engine?.type} })
+      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, hybrid: el.hybrid? el.hybrid:false } })
       namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
@@ -243,11 +253,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   selectKB(namespace){
     const result = this.listOfNamespaces.find(el => el.value === namespace);
     this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result)
-    if (result.type === "serverless") {
-      this.IS_VISIBLE_ALPHA_SLIDER = true;
-    } else {
-      this.IS_VISIBLE_ALPHA_SLIDER = false;
-    }
+    this.IS_VISIBLE_ALPHA_SLIDER = result.hybrid
   }
 
   /** TO BE REMOVED: patch undefined action keys */
@@ -283,8 +289,15 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
     } else {
-      this.logger.log("event: ", event);
+      this.logger.log("[ACTION-ASKGPTV2] onChangeSelect event: ", event);
       this.action.model = event.value;
+      /** MANAGE GPT-5 MODELS */
+      if(event.value.startsWith('gpt-5')){
+        this.action.temperature = 1
+        this.ai_setting['temperature'].disabled= true
+      }else{
+        this.ai_setting['temperature'].disabled= false
+      }
       
       this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});

@@ -83,6 +83,16 @@ export class BrandResources {
             SUPPORT_OPTIONS['CONTACT_US'].find(a => a.key === el.key).icon = el.icon
         })
 
+        /** SHARE_MENU_ITEMS */
+        let share_items: Array<{ key: string, label: string, icon: string, type: TYPE_URL, status: "active" | "inactive", src?: string}> = Array.from([...SHARE_MENU_ITEMS, ...this.brand['SHARE_MENU_ITEMS']].reduce((m, o) => m.set(o.key, o), new Map).values());
+        share_items.forEach(el => {
+            if(!SHARE_MENU_ITEMS.find(a => a.key === el.key)) return;
+            SHARE_MENU_ITEMS.find(a => a.key === el.key).icon = el.icon
+            SHARE_MENU_ITEMS.find(a => a.key === el.key).src = el.src
+            SHARE_MENU_ITEMS.find(a => a.key === el.key).status = el.status
+            SHARE_MENU_ITEMS.find(a => a.key === el.key).icon = el.icon
+        })
+        
         /** MEDIA */
         Object.keys(MEDIA).forEach(key => { 
             if(this.brand['MEDIA'][key].src) MEDIA[key].src = this.brand['MEDIA'][key].src

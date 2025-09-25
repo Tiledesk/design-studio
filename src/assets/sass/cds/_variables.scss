@@ -163,9 +163,11 @@
     /* INTEN DEFAULT COLORS */
     --intent-color: 80, 100, 147;
  
+
     /* CONNECTOR COLORS */
-    --connector-default-color: rgb(177, 177, 183);
-    --connector-over-color: rgb(128, 128, 128);
+    --connector-width: 2px;
+    --connector-default-color: rgb(0, 0, 0);// rgb(177, 177, 183);
+    --connector-over-color:rgb(62, 169, 245); //rgb(128, 128, 128);
     --connector-selected-color: rgb(62, 169, 245);
 
 }

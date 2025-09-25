@@ -1,22 +1,23 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ConnectorService } from '../../../../../../../services/connector.service';
 import { IntentService } from '../../../../../../../services/intent.service';
-import { TYPE_BUTTON, TYPE_URL, generateShortUID } from '../../../../../../../utils';
+import { TEXT_CHARS_LIMIT, TYPE_BUTTON, TYPE_URL, generateShortUID } from '../../../../../../../utils';
 import { Button, Expression, GalleryElement, Message, Wait, Metadata, MessageAttributes } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
+import { LIST_JSON_MODEL_GALLERY } from 'src/app/chatbot-design-studio/utils-json-gallery';
 
 @Component({
   selector: 'cds-action-reply-gallery',
   templateUrl: './cds-action-reply-gallery.component.html',
   styleUrls: ['./cds-action-reply-gallery.component.scss']
 })
-export class CdsActionReplyGalleryComponent implements OnInit {
-  @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
+export class CdsActionReplyGalleryComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('galleryContainer', { static: false }) scrollContainer: ElementRef;
   
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
@@ -30,6 +31,7 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   @Input() wait: Wait;
   @Input() index: number;
   @Input() previewMode: boolean = true;
+  @Input() limitCharsText: number = TEXT_CHARS_LIMIT;
   
   // Connector //
   idIntent: string;
@@ -48,7 +50,15 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   // Buttons //
   buttons: Array<Button>;
   TYPE_BUTTON = TYPE_BUTTON;
+  showJsonButton: boolean =  false;
+  showJsonBody: boolean =  false;
+  json_gallery: string;
+  jsonPlaceholder: string;
+  listType: any = {};
   
+  // Navigation arrows visibility
+  showLeftArrow: boolean = false;
+  showRightArrow: boolean = false;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -64,6 +74,13 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     this.initialize();
   }
 
+  ngAfterViewInit(): void {
+    // Controlla la visibilità delle frecce dopo che la vista è stata inizializzata
+    setTimeout(() => {
+      this.checkArrowsVisibility();
+    }, 100);
+  }
+
   /** */
   ngOnDestroy() {
     if (this.subscriptionChangedConnector) {
@@ -71,15 +88,29 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     }
   }
 
+
   private initialize(){
+    this.listType = LIST_JSON_MODEL_GALLERY; 
+
     this.delayTime = (this.wait?.time && this.wait?.time !== 0)? (this.wait.time/1000) : 500/1000;
     this.gallery = [];
+
     try {
-      this.gallery = this.response.attributes.attachment.gallery;
+      if (this.response.attributes.attachment.json_gallery && this.response.attributes.attachment.json_gallery.trim() !== '') {
+        this.json_gallery = this.response.attributes.attachment.json_gallery;
+      } 
+      if (this.response.attributes.attachment.gallery) {
+        this.gallery = this.response.attributes.attachment.gallery;
+      }
       this.initElement();
       if(!this.previewMode) this.scrollToLeft();
+      
+      // Controlla la visibilità delle frecce dopo l'inizializzazione
+      setTimeout(() => {
+        this.checkArrowsVisibility();
+      }, 200);
+      
       this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-        // // this.logger.log('CdsActionReplyGalleryComponent isChangedConnector-->', connector);
         this.connector = connector;
         this.updateConnector();
       });
@@ -91,7 +122,19 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     } catch (error) {
       this.logger.log('onAddNewResponse ERROR', error);
     }
+
+    if(this.json_gallery && this.json_gallery.trim() !== ''){
+      this.showJsonBody = true;
+      this.showJsonButton = true;
+    } else {
+      this.json_gallery = '';
+      this.showJsonBody = false;
+      this.showJsonButton = false;
+    }
   }
+
+
+
 
   private initElement(){
     if(this.gallery && this.gallery.length > 0){
@@ -182,6 +225,9 @@ export class CdsActionReplyGalleryComponent implements OnInit {
     this.gallery.push( this.newGalleryElement() )
     this.initElement()
     this.scrollToLeft()
+    setTimeout(() => {
+      this.checkArrowsVisibility();
+    }, 100);
   }
 
   newGalleryElement(){
@@ -286,26 +332,28 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
 
   /** onChangeTextarea */
-  // onChangeTextarea(text:string) {
-  //   if(!this.previewMode){
-  //     this.response.text = text;
-  //     this.changeActionReply.emit();
-  //   }
-  // }
+  onChangeTextarea(text:string) {
+    if(!this.previewMode){
+      this.response.text = text;
+      this.changeActionReply.emit();
+    }
+  }
 
-  onChangeText(text: string, element: 'title' | 'description', index: number) {
-    this.gallery[index][element] = text;
+  onChangeText(text: string, element: 'title' | 'description' | 'imageUrl', index: number) {
+    if (element === 'imageUrl') {
+      this.gallery[index].preview.src = text;
+    } else {
+      this.gallery[index][element] = text;
+    }
     this.response.attributes.attachment.gallery = this.gallery;
     // this.changeActionReply.emit();
   }
 
 
   /** onOpenButtonPanel */
-  // onOpenButtonPanel(button){
-  //   this.openButtonPanel.emit(button);
-  // }
 
   onOpenButtonPanel(button){
+    this.logger.log('[ACTION REPLY GALLERY] onOpenButtonPanel ', button);
     this.openButtonPanel.emit(button);
   }
 
@@ -346,8 +394,9 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
 
   onDeletedMetadata(metadata: Metadata, index: number){
+    this.logger.log('[ACTION REPLY] onDeletedMetadata ', index, this.response.attributes.attachment.gallery);
     this.gallery[index].preview = { src: '', downloadURL: ''};
-    this.response.attributes.attachment.gallery = this.gallery
+    this.response.attributes.attachment.gallery = this.gallery;
     this.changeActionReply.emit();
   }
 
@@ -409,6 +458,9 @@ export class CdsActionReplyGalleryComponent implements OnInit {
 
   onDeleteGallery(index){
     this.gallery.splice(index, 1);
+    setTimeout(() => {
+      this.checkArrowsVisibility();
+    }, 100);
     // if(this.buttons.length === 0){
     //   delete this.response.attributes.attachment
     // } 
@@ -433,7 +485,167 @@ export class CdsActionReplyGalleryComponent implements OnInit {
   }
 
 
+
+  /** onClickJsonButtons */
+  onClickJsonButtons(){
+    if(!this.showJsonBody){
+      this.showJsonBody = true;
+      this.showJsonButton = true;
+    }
+  }
+
+  /** onDeleteJsonButtons */
+  onDeleteJsonButtons(){
+    this.json_gallery = '';
+    this.showJsonBody = false;
+    this.showJsonButton = false;
+    this.response.attributes.attachment.json_gallery = "";
+    // this.changeJsonButtons.emit();
+    this.changeActionReply.emit();
+  }
+
+
+
+
+  onBlurUrlTextarea(event: any, i: number) {
+    const value = event && event.target ? event.target.value : '';
+    this.logger.log('[ACTION REPLY] onBlurUrlTextarea ', value);
+    this.response.attributes.attachment.gallery[i].preview.src = value;
+    this.changeActionReply.emit();
+  }
    // ----- BUTTONS INSIDE GALLERY ELEMENT: end
 
+
+
+  /** onChangeJsonTextarea */
+  onChangeJsonTextarea(text:string) {
+    if(!text || text.trim() === ''){
+      this.showJsonButton = true;
+    } else {
+      this.json_gallery = text;
+      this.response.attributes.attachment.json_gallery = text;
+      this.showJsonButton = false;
+    }
+  }
+
+  /** onBlurJsonTextarea */
+  onBlurJsonTextarea(event:any){
+    this.logger.log('[ACTION REPLY jsonbuttons] onBlurJsonTextarea ', event);
+    this.json_gallery= event.target?.value;
+    this.response.attributes.attachment.json_gallery = this.json_gallery;
+    this.changeActionReply.emit();
+  }
+
+  /** onDeleteJsonButtons */
+  onChangeJsonButtonsType(event){
+    this.json_gallery = event['value']?event['value']:'';
+    this.showJsonBody = true;
+    this.showJsonButton = false;
+    this.response.attributes.attachment.json_gallery = this.json_gallery;
+    this.changeActionReply.emit();
+  }
+
+  /** onDeleteJsonButtons */
+  onResetJsonButtonsType(event){
+    this.logger.log('[ACTION REPLY jsonbuttons] onResetJsonButtonsType ', this.json_gallery);
+    this.json_gallery = '';
+    this.response.attributes.attachment.json_gallery = this.json_gallery;
+    this.changeActionReply.emit();
+    // this.changeJsonButtons.emit(this.json_gallery);
+  }
+
+  // ----- NAVIGATION ARROWS FUNCTIONS: start
+  /**
+   * Controlla se le frecce devono essere visibili
+   */
+  checkArrowsVisibility(): void {
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      const container = this.scrollContainer.nativeElement;
+      if((container.scrollWidth - container.clientWidth)>0){
+        this.showLeftArrow = true;
+        this.showRightArrow = true;
+      } else {
+        this.showLeftArrow = false;
+        this.showRightArrow = false;
+      }
+    }
+  }
+
+  /**
+   * Scorre a sinistra di un blocco alla volta
+   */
+  scrollLeft(): void {
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      const container = this.scrollContainer.nativeElement;
+      const cardWidth = 220; // Larghezza della card (--cardWidth)
+      const gap = 10; // Gap tra le card
+      const scrollAmount = cardWidth + gap;
+      
+      container.scrollTo({
+        left: container.scrollLeft - scrollAmount,
+        behavior: 'smooth'
+      });
+      
+      // Aggiorna la visibilità delle frecce dopo lo scrolling
+      setTimeout(() => {
+        this.checkArrowsVisibility();
+      }, 300);
+    }
+  }
+
+  /**
+   * Scorre a destra di un blocco alla volta
+   */
+  scrollRight(): void {
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      const container = this.scrollContainer.nativeElement;
+      const cardWidth = 220; // Larghezza della card (--cardWidth)
+      const gap = 10; // Gap tra le card
+      const scrollAmount = cardWidth + gap;
+      
+      container.scrollTo({
+        left: container.scrollLeft + scrollAmount,
+        behavior: 'smooth'
+      });
+      
+      // Aggiorna la visibilità delle frecce dopo lo scrolling
+      setTimeout(() => {
+        this.checkArrowsVisibility();
+      }, 300);
+    }
+  }
+
+  /**
+   * Controlla se è possibile scorrere a sinistra
+   */
+  canScrollLeft(): boolean {
+    return this.showLeftArrow;
+  }
+
+  /**
+   * Controlla se è possibile scorrere a destra
+   */
+  canScrollRight(): boolean {
+    return this.showRightArrow;
+  }
+
+  /**
+   * Listener per il resize della finestra
+   */
+  @HostListener('window:resize')
+  onResize(): void {
+    setTimeout(() => {
+      this.checkArrowsVisibility();
+    }, 100);
+  }
+
+  /**
+   * Listener per lo scroll del contenitore
+   */
+  @HostListener('scroll', ['$event'])
+  onScroll(event: Event): void {
+    this.checkArrowsVisibility();
+  }
+  // ----- NAVIGATION ARROWS FUNCTIONS: end
 }
 

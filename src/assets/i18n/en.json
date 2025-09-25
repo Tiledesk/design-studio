@@ -461,7 +461,8 @@
         "ClickToAddText": "Click to add text ...",
         "ClickToAddAudioURL": "Click to add audio file ...",
         "AddButton": "Add button",
-        "JsonButtons": "Json buttons",
+        "JsonButtons": "JSON Buttons",
+        "JsonGallery": "JSON Carousel",
         "AddOption": "Add option",
         "SelectOption": "Select an option",
         "AddCard": "Add card",
@@ -470,6 +471,7 @@
         "EnterEmailRecipient": "Enter email recipient",
         "EnterEmailSubject": "Enter email subject",
         "EnterEmailBody": "Enter email body",
+        "AddImageUrl": "add image url",
         "To": "To",
         "Subject": "Subject",
         "ReplyTo": "Reply to",
@@ -545,10 +547,12 @@
         "LoadingBefore": "loading ... before",
         "VisibilityConnectors": "Visibility of connectors",
         "ChangeAlphaConnectors": "Change alpha of the connectors color",
-        "nameKB": "Name",
-        "ContentKB": "Text",
-        "EnterTheKbName": "Content Name",
-        "PlaceholderKBContent": "Content text"
+        "QuestionKB": "Question",
+        "AnswerKB": "Answer",
+        "EnterQuestion": "Your question",
+        "EnterAnswer": "Your answer",
+        "DeprecationMessage": "🚫 This action is deprecated and will no longer be supported",
+        "ConfigureModel": "Configure"
     },
     "Alert": {
         "ErrorMaxOptions": "Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -690,6 +694,7 @@
             "GPTTask": "ChatGPT task",
             "GPTAssistant": "ChatGPT assistant",
             "AiPrompt": "AI Prompt",
+            "AiCondition": "AI Condition",
             "HiddenMessage": "Hidden message",
             "ChangeDept": "Change department",
             "Code": "Code",
@@ -904,6 +909,13 @@
                 "VIDEO_URL": "",
                 "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
             },
+            "AiCondition": {
+                "TITLE": "AI Condition",
+                "DESCRIPTION": "The AI Condition Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
+                "IMAGE": "assets/images/doc/AI_CONDITION.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
+            },
             "HiddenMessage": {
                 "TITLE": "Send an hidden message (for the end user)",
                 "DESCRIPTION": "Send a hidden message in the current conversation",
@@ -1088,6 +1100,9 @@
             }
         },
         "systemDefinedElements": {
+            "payload": {
+                "description": "The Payload inside the webhook"
+            },
             "department_id": {
                 "description": "The ID of the department where this chatbot is activated"
             },

@@ -8,8 +8,213 @@
 *Tiledesk SRL*
 
 
-# 1.36.0
+# 1.39.0-rc16
+- **bug-fix**: Fixed save prompt error
 
+# 1.39.0-rc15
+- **added**: Added text area with autocomplete in LLM model selection
+
+# 1.39.0-rc14
+- **changed**: changed the selection of LLM and model to only one select
+
+# 1.39.0-rc12
+- **changed**: added default intructions value "User said: {{lastUserText}}"
+
+# 1.39.0-rc11
+- **added**: deprecation message and badge status. GPT Task action set as deprecated
+
+# 1.39.0-rc10
+- **bug-fix**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
+
+# 1.39.0-rc9
+- **bug-fix**: fixed bug new connector in action ai-condition 
+
+# 1.39.0-rc8
+- **bug-fix**: fixed bugs in action ai-condition
+
+# 1.39.0-rc7
+- **added**: disabled property for mat-slider in ai-settings section
+
+# 1.39.0-rc6
+- **added**: added action ai-condition
+
+# 1.39.0-rc5
+- **added**: additionalText input property in cds-text component
+- **added**: managed openai and ollama models for AiPrompt action
+- **added**: name of selected namespace in AskKbv2 action
+- **changed**: disabled action gpt_task
+- **removed**: TYPE_GPT_MODEL in favour of OPENAI_MODEL
+
+# 1.39.0-rc4
+- **added**: gpt-5 models in AI Prompt action
+
+# 1.39.0-rc3
+- **changed**: set text charts limit to 10000
+- **changed**: changed the name of JSON buttons to (JSON Buttons and JSON Carousel) and always show it
+
+# 1.39.0-rc2
+- **changed**: anyComponentStyle maximum error limit
+
+# 1.39.0-rc1
+- **changed**: added scroll button left and right on image gallery
+
+# 1.38.4
+- **changed**: added left and right scroll button in image gallery
+
+# 1.38.3
+- **changed**: set text charts limit to 10000
+- **changed**: changed the name of JSON buttons to (JSON Buttons and JSON Carousel) and always show it
+
+# 1.38.2
+- **changed**: ai models upgraded
+
+# 1.38.2
+- **changed**: ai models upgraded
+
+# 1.38.1
+- **changed**: Changed connector-width in 2px
+
+# 1.38.0
+
+
+# 1.38.0-rc20
+- **added**: ability to manage Share_Items from BrandSrc
+
+# 1.37.5
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
+
+# 1.38.0-rc19
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
+
+# 1.38.0-rc18
+- **bug-fixed**: in setattribute update the size of the "value" field to 100,000
+
+# 1.38.0-rc17
+- **bug-fixed**: Changed the connector stroke width and color;
+
+# 1.38.0-rc16
+- **changed**: Changed the connector stroke width and color;
+- **bug-fixed**: After the refresh, the label on the connectors is not displayed.
+- **bug-fixed**: If I hide the connector and refresh I see the extended connector and the contracted one.
+
+# 1.38.0-rc15
+- **changed**:: change textarea limitCharsText (from 10.000 to 100.000) in system context cds-action-ai-prompt, system context cds-action-askgpt-v2, prompt cds-action-gpt-assistant, prompt cds-action-gpt-task;
+- **changed**:: enabled hundreds separator for numeric characters in textarea.component
+
+
+# 1.38.0-rc14
+- **added**: Open KNB link in new tab in intent detail panel
+
+# 1.38.0-rc13
+- **bug-fixed**: when i drag and drop an action from the menu, if i go back to the actions menu bar without releasing the action, the submenu disappears
+- **changed**: Insert the name of the selected KB as the first element in the "Ask KB" action.
+- **bug-fixed**: Dragging the "Start" intent doesn't work on edges. The action detail shouldn't open when I drag and drop, but only when I click.
+
+# 1.38.0-rc12
+- **changed**: stand-by chatbot Patch that finds and fixes all broken buttons
+
+# 1.38.0-rc11
+- **added**: added chatbot Patch that finds and fixes all broken buttons
+
+# 1.38.0-rc10
+- **bug-fixed**: css ng-select-opened
+- **bug-fixed**: enabled variable list userDefined
+- **bug-fixed**: button is too far from the Examples in json buttons of action reply
+
+# 1.38.0-rc9
+- **added**: added load image from url in ds-action-reply-image
+- **added**: fixed isLiquidjs in textarea
+
+# 1.38.0-rc8
+- **bug-fixed**: bug fixed: css gallery-json-select
+
+# 1.38.0-rc7
+- **added**: added models in json-gallery
+- **bug-fixed**: bug fix edit button in action gallery
+
+# 1.38.0-rc6
+- **added**: added chatbot_type in utils variableList
+
+# 1.38.0-rc5
+- **added**: added image by url in action reply gallery
+
+# 1.38.0-rc4
+- **bug-fixed**: scss fix in action reply gallery
+
+# 1.38.0-rc3
+- **added**: json gallery in action reply gallery
+
+# 1.38.0-rc2
+- **changed**: refactoring intent component
+
+# 1.38.0-rc1
+- **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
+
+# 1.37.4
+- **bug-fixed**: added models in json-gallery
+
+# 1.37.3
+- **changed**: enable/disable alpha slider in askkb-v2 action
+
+# 1.37.2
+- **bug-fixed**: delete webhook only when it is stopped
+
+# 1.37.1
+
+# 1.37.0-rc3
+- **bug-fixed**: delete webhook only when it is stopped
+
+# 1.37.0-rc2
+- **bug-fixed**: widget-log: disabled collapse row; stop webhook log when click on the stage
+
+# 1.37.0-rc1
+- **changed**: Ask Kb type from 'text' to 'faq'
+
+# 1.36.1
+- **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc7
+- **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc6
+- **bug-fixed**: added width and height to previewModel images in action reply gallery
+- **bug-fixed**: in widget-log added ellips on the row, row opening, fixed display for very long texts, added selectable text, graphic adjustments
+
+# 1.36.0-rc5
+- **changed**: added ellips in log lines in ds-widget-logs.component
+
+# 1.36.0-rc4
+- **bug-fixed**: all actions that contain block selection on true/false do not display connector on stage when create via action detail panel
+- **bug-fixed**: about corrupted connectors with full dot but no connector on the stage
+- **bug-fixed**: the webhook opens the detail also on drag, it should open it only on click
+
+# 1.36.0-rc3
+- **bug-fixed**: updated textarea value in action AI prompt
+
+# 1.36.0-rc2
+- **added**: voice preview player for elevenlabs voices for voice_twilio chatbot type
+
+# 1.36.0-rc1
+- **added**: support for elevenLabs voices for voice_twilio chatbot 
+
+# 1.36.0
+- **bug-fixed**: added width and height to previewModel images in action reply gallery
+- **bug-fixed**: in widget-log added ellips on the row, row opening, fixed display for very long texts, added selectable text, graphic adjustments
+- **changed**: added ellips in log lines in ds-widget-logs.component
+- **bug-fixed**: all actions that contain block selection on true/false do not display connector on stage when create via action detail panel
+- **bug-fixed**: about corrupted connectors with full dot but no connector on the stage
+- **bug-fixed**: the webhook opens the detail also on drag, it should open it only on click
+
+# 1.35.2
+- **bug-fixed**: updated textarea value in action AI prompt
+
+# 1.35.1
+
+# 1.35.0-rc13
+- **bug-fixed**: getWebhook only if block is "webhook"
+
+# 1.35.0-rc12
+- **bug-fixed**: show first log message via static service call
 
 # 1.35.0-rc11
 - **bug-fixed**: Start log of a chatbot or webhook

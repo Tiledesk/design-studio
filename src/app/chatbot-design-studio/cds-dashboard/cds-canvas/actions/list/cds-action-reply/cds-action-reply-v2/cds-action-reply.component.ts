@@ -327,7 +327,7 @@ export class CdsActionReplyV2Component implements OnInit {
 
   /** onConnectorChangeReply */
   onConnectorChangeReply(event){
-    this.logger.log('onConnectorChangeReply ************', event, this.action);
+    this.logger.log('[cds-action-reply] onConnectorChangeReply ************', event, this.action);
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     this.onConnectorChange.emit(event)
   }
@@ -434,7 +434,7 @@ export class CdsActionReplyV2Component implements OnInit {
 
   /** appdashboard-button-configuration-panel: onOpenButtonPanel */
   onOpenButtonPanel(buttonSelected) {
-    this.logger.log('onOpenButtonPanel 2 :: ', buttonSelected);
+    this.logger.log('[cds-action-reply] onOpenButtonPanel 2 :: ', buttonSelected);
     // this.intentService.setIntentSelected(this.intentSelected.intent_id);
     this.intentService.selectAction(this.intentSelected.intent_id, this.action._tdActionId);
     this.controllerService.openButtonPanel(buttonSelected);

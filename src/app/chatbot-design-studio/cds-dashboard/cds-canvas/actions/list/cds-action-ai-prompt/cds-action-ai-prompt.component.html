@@ -24,12 +24,12 @@
             <mat-icon *ngIf="!action?.llm" svgIcon="add_ai_model" aria-hidden="true"></mat-icon>
             <!-- <img *ngIf="!action?.llm" src="assets/images/icons/add_ai_model.svg" alt="ai model"> -->
             <!-- <mat-icon *ngIf="action?.llm" [svgIcon]="getLlmIcon(action?.llm)" aria-hidden="true"></mat-icon> -->
-            <img *ngIf="action?.llm" src="{{ (llm_models | filter:{key: 'value', value: action?.llm }).src }}" alt="">
+            <img *ngIf="action?.llm" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
         </div>
 
         <div class="action-row-right">
             <div *ngIf="action?.llm" class="action-row-right">
-                {{ (llm_models | filter:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">({{action?.model}})</span>
+                {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">({{action?.model}})</span>
             </div>
             <div *ngIf="!action?.llm" class="action-row-right empty">
                 {{'CDSCanvas.ChooseTheAIModel' | translate }}
@@ -91,7 +91,7 @@
         <cds-textarea id="question" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
-            [limitCharsText]="10000"
+            [limitCharsText]="100000"
             [minRow]="4"[maxRow]="25" 
             [text]="action.question" 
             [placeholder]="'CDSCanvas.EnterPrompt' | translate"
@@ -123,7 +123,7 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | filter:{key: 'value', value: action?.llm }).name }} )</span>
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} )</span>
                 </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
@@ -199,8 +199,50 @@
             </mat-expansion-panel-header>
             <div>
 
+
+
+                 <!-- // llm select -->
+                 <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
+                    
+                    <!-- 
+                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
+                        <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
+                        <cds-select id="model-condition"
+                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
+                            [items]="llm_models_2" 
+                            [itemSelected]="labelModel"
+                            [bindLabelSelect]="'labelModel'" 
+                            [bindValueSelect]="'value'"
+                            [placeholder]="'CDSCanvas.SelectLL' | translate"
+                            (onSelected)="onChangeSelect($event, 'llm2')">
+                        </cds-select>
+                    </div> 
+                    -->
+
+                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
+                        <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
+                        <cds-text id="text-label-model"
+                            class="sx-input" 
+                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
+                            [text]="labelModel"
+                            [autocompleteOptions]="autocompleteOptions_2"
+                            [placeholder]="'CDSCanvas.Model' | translate"
+                            [setAttributeBtn]="false"
+                            (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"
+                            (blur)="onBlur($event)"
+                            >
+                            <!--   
+                                (onOptionSelected)="onOptionSelected($event, 'llm_model')" 
+                            -->
+                        </cds-text>
+                    </div>
+             
+                    <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                </div>
+                
                 <!-- // llm select -->
-                <div class="field-box">
+                <!-- <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }}</label>
                     <cds-select id="model-condition"
                         [items]="llm_models" 
@@ -212,19 +254,6 @@
                     </cds-select>
                 </div>
 
-                <!-- // llm model select -->
-                <!-- <div class="field-box">
-                    <label class="title-label">{{'CDSCanvas.Model' | translate }}</label>
-                    <cds-select id="model-condition"
-                        [items]="llm_options_models" 
-                        [itemSelected]="action.model"
-                        [bindLabelSelect]="'name'" 
-                        [bindValueSelect]="'value'"
-                        [placeholder]="'CDSCanvas.SelectLLMModel' | translate"
-                        (onSelected)="onChangeSelect($event, 'model')">
-                    </cds-select>
-                </div> -->
-
                 <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.Model' | translate }}</label>
                     <cds-text id="text"
@@ -233,10 +262,10 @@
                         [placeholder]="'CDSCanvas.Model' | translate"
                         [autocompleteOptions]="autocompleteOptions"
                         (onOptionSelected)="onOptionSelected($event, 'model')"
-                        (blur)="onBlur($event)"
+                        (blur)="onBlur($event, 'model')"
                         (onChange)="onChangeTextarea($event, actionLabelModel, 'model')">
                     </cds-text>
-                </div>
+                </div> -->
 
 
 
@@ -254,6 +283,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -279,7 +309,8 @@
                                     class="wait-slider" thumbLabel
                                     [step]="ai_setting['temperature'].step"  
                                     [min]="ai_setting['temperature'].min"
-                                    [max]="ai_setting['temperature'].max" 
+                                    [max]="ai_setting['temperature'].max"
+                                    [disabled]="ai_setting['temperature'].disabled" 
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>
@@ -297,7 +328,8 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
-                        [limitCharsText]="10000"
+                        [isLiquidjs]="false"
+                        [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
                         [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
@@ -323,6 +355,7 @@
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
+            [isLiquidjs]="false"
             [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignReplyTo"

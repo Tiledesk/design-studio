@@ -410,13 +410,14 @@ export class ActionAskGPT extends Action {
 export class ActionKBContent extends Action {
     name: string;
     content: string;
+    source: string;
     type: string;
     namespace: string;
     namespaceAsName: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.KB_CONTENT;
-        this.type = "text";
+        this.type = "faq";
     }
 }
 
@@ -487,6 +488,7 @@ export class ActionAiPrompt extends Action {
     history: boolean;
     max_tokens: number;
     temperature: number;
+    labelModel: string;
     llm: string;
     model: string;
     preview?: Array<any>;
@@ -495,6 +497,24 @@ export class ActionAiPrompt extends Action {
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AI_PROMPT
+    }
+}
+
+export class ActionAiCondition extends Action {
+    question: string;
+    intents: Array<any>;
+    instructions: string;
+    llm: string;
+    model: string;
+    max_tokens: number;
+    temperature: number;
+    preview?: Array<any>;
+    fallbackIntent: string;
+    errorIntent: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.AI_CONDITION,
+        this.intents = [];
     }
 }
 
@@ -633,12 +653,14 @@ export class Metadata {
 export class Attachment {
     type: string;
     json_buttons?: string;
+    json_gallery?: string;
     buttons?: Button[];
     gallery?: GalleryElement[];
     constructor() {
         this.type = TYPE_ATTACHMENT.TEMPLATE;
         this.buttons = [];
         this.json_buttons = '';
+        this.json_gallery = '';
     }
 }
 
