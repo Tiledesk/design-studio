@@ -155,7 +155,8 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
     this.logger.log("[ACTION AI_PROMPT] 0 initialize llm_options_models: ", this.action, this.labelModel);
     this.setModel(this.labelModel);
-    this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active');
+    const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
+    this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
     // if(this.action.llm){
     //   this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
     //   this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
@@ -408,7 +409,8 @@ setModel(labelModel: string){
     this.logger.log("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
     if(target === 'llm'){
-      this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
+      const foundLLM = this.llm_models.find(el => el.value === event.value);
+      this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
       this.action.model= null;
       // this.initLLMModels();
     }
