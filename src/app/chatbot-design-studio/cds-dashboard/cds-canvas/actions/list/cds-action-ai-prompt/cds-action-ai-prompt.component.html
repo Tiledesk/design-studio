@@ -219,9 +219,9 @@
                         </cds-select>
                     </div> 
                     -->
-
+                    
                     <div class="select-container" [class.not-configured]="!selectedModelConfigured">
-                        <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
+                        <!-- <div class="status-indicator" *ngIf="!selectedModelConfigured"></div> -->
                         <cds-text id="text-label-model"
                             class="sx-input" 
                             [class]="!selectedModelConfigured ? 'not-configured' : ''"
@@ -237,8 +237,11 @@
                             -->
                         </cds-text>
                     </div>
-             
-                    <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                    <!-- Container per i due elementi sulla stessa riga -->
+                    <div class="bottom-row">
+                        <div class="multiplier-container" *ngIf="multiplier">{{multiplier}} x tokens</div>
+                        <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                    </div>
                 </div>
                 
                 <!-- // llm select -->
