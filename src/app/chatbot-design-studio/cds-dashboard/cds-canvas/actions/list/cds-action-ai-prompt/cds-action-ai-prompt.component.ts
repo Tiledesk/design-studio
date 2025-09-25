@@ -168,16 +168,6 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.setModel(this.labelModel);
     const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
     this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
-    // if(this.action.llm){
-    //   this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
-    //   this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
-    //   this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
-    //   // Update selectedModelConfigured for the current selection
-    //   if(this.actionLabelModel) {
-    //     const selectedModel = this.llm_models_2.find(m => m.labelModel === this.actionLabelModel);
-    //     this.selectedModelConfigured = selectedModel ? selectedModel.configured : true;
-    //   }
-    // }
   }
 
 
@@ -227,7 +217,7 @@ export class CdsActionAiPromptComponent implements OnInit {
         this.logger.log('[ACTION AI_PROMPT] 1 - integration:', el.name, el.value.apikey);
         if(el.name && el.value?.apikey){
           this.llm_models_2.forEach(model => {
-            if(model.llm === el.name || model.llm.toLowerCase() === 'openai') {
+            if(model.llm === el.name || model.llm.toLowerCase() === 'openai' || model.llm.toLowerCase() === 'ollama') {
               model.configured = true;
             }
           });
@@ -264,8 +254,7 @@ export class CdsActionAiPromptComponent implements OnInit {
     }
     this.autocompleteOptions_2 = [];
     this.llm_models_2.forEach(el => this.autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
-    this.autocompleteOptions_2.sort((a, b) => a.label.localeCompare(b.label));
-
+    this.sortAutocompleteOptions2();
     // this.actionLabelModel = this.action['labelModel'];
     this.logger.log('[ACTION AI_PROMPT] autocompleteOptions_2',this.autocompleteOptions_2);
   }
@@ -273,6 +262,28 @@ export class CdsActionAiPromptComponent implements OnInit {
   getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive", additionalText?: string}> {
     const model = this.llm_model.find((model) => model.value === value);
     return model.models;
+  }
+
+  sortAutocompleteOptions2(): void {
+    this.autocompleteOptions_2.sort((a, b) => {
+      // Trova il modello corrispondente in llm_models_2 per entrambi gli elementi
+      const modelA = this.llm_models_2.find(el => el.labelModel === a.value);
+      const modelB = this.llm_models_2.find(el => el.labelModel === b.value);
+      // Se entrambi sono OpenAI, ordina alfabeticamente
+      if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
+        return a.label.localeCompare(b.label);
+      }
+      // Se solo A è OpenAI, A viene prima
+      if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() !== 'openai') {
+        return -1;
+      }
+      // Se solo B è OpenAI, B viene prima
+      if (modelA?.llm?.toLowerCase() !== 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
+        return 1;
+      }
+      // Se nessuno dei due è OpenAI, ordina alfabeticamente
+      return a.label.localeCompare(b.label);
+    });
   }
 
 
