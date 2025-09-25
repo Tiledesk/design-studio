@@ -385,7 +385,9 @@ loading-spinner.custom-spinner ::ng-deep {
         }
         ::ng-deep .text-editor-wrapper .text-editor .box-input input {
             color: var(--empty-value-text-color)!important;
+            border: 1px solid var(--empty-value-text-color)!important;
         }
+
     }
 
 
@@ -402,5 +404,31 @@ loading-spinner.custom-spinner ::ng-deep {
 
 }
 
+// Multiplier and Configure Button Row
+.bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0px;
+    padding-left: 10px;
+}
+
+.multiplier-container {
+    color: var(--gray);
+    font-size: 12px;
+    display: inline-block;
+}
+
+.configure-model-button {
+    cursor: pointer;
+    color: #007bff;
+    font-size: 12px;
+    text-decoration: underline;
+    display: inline-block;
+    
+    &:hover {
+        opacity: 0.7;
+    }
+}
 
 // PREVIEW SECTION --- start **************** //
