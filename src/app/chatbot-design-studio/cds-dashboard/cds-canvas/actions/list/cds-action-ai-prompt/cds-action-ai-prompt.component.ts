@@ -23,7 +23,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
 
@@ -47,10 +47,10 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   panelOpenState = false;
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
-  llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+  llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive",  additionalText?: string }> = [];
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false}
   }
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
@@ -64,6 +64,13 @@ export class CdsActionAiPromptComponent implements OnInit {
   searching: boolean = false;
   temp_variables = [];
   actionLabelModel: string = "";
+  selectedModelConfigured: boolean = true;
+  private isInitializing = {
+    'llm_model': true,
+    'context': true,
+    'question': true
+  };
+  labelModel: string = "";
 
 
   // Connectors
@@ -82,10 +89,13 @@ export class CdsActionAiPromptComponent implements OnInit {
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.GPT_TASK;
   llm_model = LLM_MODEL;
+  autocompleteOptions: Array<{label: string, value: string,  additionalText?: string}> = [];
 
-  autocompleteOptions: Array<{label: string, value: string}> = [];
+  llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
+  autocompleteOptions_2: Array<{label: string, value: string}> = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+  multiplier: string;
 
   constructor(
     private readonly dialog: MatDialog,
@@ -98,10 +108,21 @@ export class CdsActionAiPromptComponent implements OnInit {
   ) { }
 
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.logger.log("[ACTION AI_PROMPT] ngOnInit action: ", this.action);
+
+    this.project_id = this.dashboardService.projectID;
+    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
     this.getOllamaModels();
-    this.logger.log("[ACTION AI_PROMPT] HO AGGIORNATO  llm_model: ", this.llm_model);
+    this.llm_models_2 = generateLlmModels2();
+    // Assegna i moltiplicatori ai modelli
+    this.llm_models_2.forEach(model => {
+      if (ai_models[model.model]) {
+        model.multiplier = ai_models[model.model].toString();
+      }
+    });
+    this.logger.log("[ACTION AI_PROMPT] HO AGGIORNATO  model_list: ", this.llm_models_2, ai_models);
+
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
@@ -119,7 +140,13 @@ export class CdsActionAiPromptComponent implements OnInit {
     if (!this.action.preview) {
       this.action.preview = [];
     }
-    this.initialize();
+    await this.initialize();
+    // Fine dell'inizializzazione - reset di tutti i flag
+    this.isInitializing = {
+      'llm_model': false,
+      'context': false,
+      'question': false
+    };
   }
 
 
@@ -133,13 +160,14 @@ export class CdsActionAiPromptComponent implements OnInit {
     }
   }
 
-  private initialize(){
-    if(this.action.llm){
-      this.initLLMModels();
-      this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
-      this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
-      this.llm_options_models = this.llm_models.find(el => el.value === this.action.llm).models.filter(el => el.status === 'active')
-    }
+  private async initialize(){
+    await this.initLLMModels();
+    this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
+    this.multiplier = this.llm_models_2.find(el => el.labelModel === this.labelModel)?.multiplier;
+    this.logger.log("[ACTION AI_PROMPT] 0 initialize multiplier: ", this.action, this.multiplier);
+    this.setModel(this.labelModel);
+    const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
+    this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
   }
 
 
@@ -149,11 +177,9 @@ export class CdsActionAiPromptComponent implements OnInit {
         const NEW_MODELS = await this.getIntegrationByName();
         if(NEW_MODELS?.value?.models){
           this.logger.log('[ACTION AI_PROMPT] - NEW_MODELS:', NEW_MODELS.value.models);
-          const models = NEW_MODELS?.value?.models.map(item => ({
-            name: item,
-            value: item
-          }));
-          model.models = models;
+          (NEW_MODELS?.value?.models as Array<string>).forEach(item => {
+            OLLAMA_MODEL.push({ name: item, value: item, description: null, status: 'active' });
+          });
         }
       }
     });
@@ -172,22 +198,92 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
 
-  initLLMModels(){
+  async getIntegrations(){
+    const projectID = this.dashboardService.projectID;
+    try {
+        const response = await firstValueFrom(this.projectService.getIntegrations(projectID));
+        this.logger.log('[ACTION AI_PROMPT] - integrations response:', response.value);
+        return response;
+    } catch (error) {
+      this.logger.log('[ACTION AI_PROMPT] getIntegrations ERROR:', error);
+    }
+  }
+
+  async initLLMModels(){
+    const INTEGRATIONS = await this.getIntegrations();
+    this.logger.log('[ACTION AI_PROMPT] 1 - integrations:', INTEGRATIONS);
+    if(INTEGRATIONS){
+      INTEGRATIONS.forEach((el: any) => {
+        this.logger.log('[ACTION AI_PROMPT] 1 - integration:', el.name, el.value.apikey);
+        if(el.name && el.value?.apikey){
+          this.llm_models_2.forEach(model => {
+            if(model.llm === el.name || model.llm.toLowerCase() === 'openai' || model.llm.toLowerCase() === 'ollama') {
+              model.configured = true;
+            }
+          });
+        }
+      });
+    }
+    this.logger.log('[ACTION AI_PROMPT] - this.llm_models_2:', this.llm_models_2);
     this.autocompleteOptions = [];
     this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
     this.actionLabelModel =  '';
-    this.actionLabelModel =  '';
+    this.multiplier = null;
+    /** SET GPT MODELS */
+    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
+    OPENAI_MODEL.forEach(el => {
+      if (ai_models[el.value]) {
+        el.additionalText = `${ai_models[el.value]} x tokens`;
+        el.status = 'active';
+      } else {
+        el.additionalText = null;
+        el.status = 'inactive';
+      }
+    });
+
+    // Assegna i moltiplicatori ai modelli in llm_models_2
+    this.llm_models_2.forEach(model => {
+      if (ai_models[model.model]) {
+        model.multiplier = ai_models[model.model].toString();
+      }
+    });
     if(this.action.llm){
       const filteredModels = this.getModelsByName(this.action.llm).filter(el => el.status === 'active');
-      filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
+      filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value, additionalText: el.additionalText? el.additionalText: null}));
       this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
     }
+    this.autocompleteOptions_2 = [];
+    this.llm_models_2.forEach(el => this.autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
+    this.sortAutocompleteOptions2();
     // this.actionLabelModel = this.action['labelModel'];
+    this.logger.log('[ACTION AI_PROMPT] autocompleteOptions_2',this.autocompleteOptions_2);
   }
 
-  getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> {
+  getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive", additionalText?: string}> {
     const model = this.llm_model.find((model) => model.value === value);
     return model.models;
+  }
+
+  sortAutocompleteOptions2(): void {
+    this.autocompleteOptions_2.sort((a, b) => {
+      // Trova il modello corrispondente in llm_models_2 per entrambi gli elementi
+      const modelA = this.llm_models_2.find(el => el.labelModel === a.value);
+      const modelB = this.llm_models_2.find(el => el.labelModel === b.value);
+      // Se entrambi sono OpenAI, ordina alfabeticamente
+      if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
+        return a.label.localeCompare(b.label);
+      }
+      // Se solo A è OpenAI, A viene prima
+      if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() !== 'openai') {
+        return -1;
+      }
+      // Se solo B è OpenAI, B viene prima
+      if (modelA?.llm?.toLowerCase() !== 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
+        return 1;
+      }
+      // Se nessuno dei due è OpenAI, ordina alfabeticamente
+      return a.label.localeCompare(b.label);
+    });
   }
 
 
@@ -274,32 +370,88 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.debug("[ACTION AI_PROMPT] Initialized variableList.userDefined: ", variableList.find(el => el.key ==='userDefined'));
   }
 
+
   onChangeTextarea(event: string, labelModel: string, property: string) {
-    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, property);
-    // this.logger.debug("[ACTION AI_PROMPT] changeTextarea propery: ", property);
-    //this.action[property] = event;
+    this.logger.log("[ACTION AI_PROMPT] changeTextarea event: ", event, labelModel, property, this.isInitializing[property]);
+    // Ignora le chiamate durante l'inizializzazione per questa proprietà specifica
+    if (this.isInitializing[property]) {
+      this.isInitializing[property] = false;
+      return;
+    }
     if(property === 'model'){
-      this.action['labelModel'] = labelModel;
+      this.action['labelModel'] = event;
+      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
+        this.action.temperature = 1
+        this.ai_setting['temperature'].disabled= true
+      } else {
+        this.ai_setting['temperature'].disabled= false
+      }
+      this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;
     } else if (property === 'context'){
       this.action['context'] = event;
+    } else if (property === 'llm_model'){
+       // se event non corrisponde a nessun valore di autocompleteOptions_2 ed è diverso da '' o null allora non fare nulla
+      if(!this.autocompleteOptions_2.find(el => el.value === event) && event !== '' && event !== null) {
+        return;
+      }
+      this.action['labelModel'] = event;
+      this.labelModel = event;
+      this.actionLabelModel = event;
+      this.setModel(event);
     }
-    // this.checkVariables();
-    // this.updateAndSaveAction.emit();
-    // this.updateAndSaveAction.emit();
   }
 
 
 
-  
+
 
   onOptionSelected(event: any, property: string){
     this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
-    this.actionLabelModel = event.label;
+    this.actionLabelModel = event.value;
     this.action[property] = event.value;
-    this.updateAndSaveAction.emit();
+    // this.updateAndSaveAction.emit();
   }
+
+  // onBlur(event: any, property?: string){
+  //   if(property === 'model'){
+  //     this.action[property] = event;
+  //     this.action['labelModel'] = event;
+  //   }
+  //   this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action, property);
+  //   this.actionLabelModel = event.label;
+  //   this.labelModel = event.label;
+  //   if(property === 'llm_model'){
+  //     this.setModel(event.label);
+  //   } else if (property === 'model'){
+  //     // this.actionLabelModel = event.label;
+  //     this.action[property] = event.value;
+  //   }
+  //   this.updateAndSaveAction.emit();
+  // }
+
+setModel(labelModel: string){
+  this.logger.log("[ACTION AI_PROMPT] 2 setModel labelModel: ", labelModel);
+  const model = this.llm_models_2.find(m => m.labelModel === labelModel);
+  this.logger.log("[ACTION AI_PROMPT] 2 setModel model: ", model);
+  if(model){
+    this.selectedModelConfigured = model.configured;
+    this.action.llm = model.llm;
+    this.action.model = model.model;
+    this.action.labelModel = model.labelModel;
+    this.labelModel = model.labelModel;
+    this.multiplier = model.multiplier;
+    this.logger.log("[ACTION AI_PROMPT] 2 action multiplier ", this.action, this.multiplier);
+  }
+  else {
+    this.action.llm = '';
+    this.action.model = '';
+    this.action.labelModel = '';
+    this.labelModel = '';
+    this.multiplier = null;
+  }
+}
 
   onBlur(event: string){
     this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action);
@@ -314,13 +466,24 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
   onChangeSelect(event, target) {
-    this.logger.log("[ACTION AI_PROMPT] onChangeSelect event: ", event.value)
+    this.logger.log("[ACTION AI_PROMPT] onChangeSelect event: ", event)
     this.logger.log("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
     if(target === 'llm'){
-      this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
+      const foundLLM = this.llm_models.find(el => el.value === event.value);
+      this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
       this.action.model= null;
-      this.initLLMModels();
+      // this.initLLMModels();
+    }
+    else if(target === 'llm2'){
+      let llm = event.llm;
+      let model = event.model;
+      this.action.llm = llm;
+      this.action.model = model;
+      this.action.labelModel = event.labelModel;
+      // Update selectedModelConfigured based on the selected model
+      const selectedModel = this.llm_models_2.find(m => m.labelModel === event.labelModel);
+      this.selectedModelConfigured = selectedModel ? selectedModel.configured : true;
     }
     this.updateAndSaveAction.emit();
   }

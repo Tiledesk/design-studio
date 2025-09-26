@@ -488,6 +488,7 @@ export class ActionAiPrompt extends Action {
     history: boolean;
     max_tokens: number;
     temperature: number;
+    labelModel: string;
     llm: string;
     model: string;
     preview?: Array<any>;
@@ -496,6 +497,24 @@ export class ActionAiPrompt extends Action {
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AI_PROMPT
+    }
+}
+
+export class ActionAiCondition extends Action {
+    question: string;
+    intents: Array<any>;
+    instructions: string;
+    llm: string;
+    model: string;
+    max_tokens: number;
+    temperature: number;
+    preview?: Array<any>;
+    fallbackIntent: string;
+    errorIntent: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.AI_CONDITION,
+        this.intents = [];
     }
 }
 

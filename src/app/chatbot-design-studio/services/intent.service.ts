@@ -1,14 +1,14 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
-import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
+import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey } from '../utils';
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from '../utils-actions';
-import { LLM_MODEL } from '../utils-ai_models';
+import { LLM_MODEL, OPENAI_MODEL } from '../utils-ai_models';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -19,6 +19,8 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { FirebaseUploadService } from 'src/chat21-core/providers/firebase/firebase-upload.service';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -83,12 +85,62 @@ export class IntentService {
     private controllerService: ControllerService,
     private stageService: StageService,
     private dashboardService: DashboardService,
-    private tiledeskAuthService: TiledeskAuthService
+    private tiledeskAuthService: TiledeskAuthService,
+    private http: HttpClient
   ) { 
 
   }
 
 
+  public chatbotPatch(listOfIntents) {
+    let corruptedButtons = [];
+    corruptedButtons = this.findAndFixAllBrokenButtons(listOfIntents);
+    this.logger.log('[INTENT SERVICE] ::: chatbotPatch corruptedButtons:: ', corruptedButtons);
+    if (corruptedButtons.length > 0) {
+      //this.sendCorruptedButtonsEmail(corruptedButtons);
+    }
+    return corruptedButtons;
+  }
+
+
+
+
+  public findAndFixAllBrokenButtons(listOfIntents){
+    const corruptedButtons = [];
+    if (!Array.isArray(listOfIntents)) return corruptedButtons;
+    listOfIntents.forEach(intent => {
+      let intentModified = false;
+      if (intent.actions && Array.isArray(intent.actions)) {
+        intent.actions.forEach(action => {
+          const buttons = this.connectorService.findButtons(action);
+          buttons.forEach(button => {
+            if (button && button.action) {
+              if (button.type !== 'action') {
+                // const actionId = button.action.startsWith('#') ? button.action.substring(1) : button.action;
+                // const foundIntent = listOfIntents.find(i => i.intent_id === actionId);
+                // if (foundIntent) {
+                //   button.type = 'action';
+                // } else {
+                //   button.action = '';
+                // }
+                corruptedButtons.push({
+                  intentId: intent.intent_id,
+                  intentName: intent.intent_display_name,
+                  actionId: action._tdActionId,
+                  button: { ...button }
+                });
+                intentModified = true;
+              }
+            }
+          });
+        });
+      }
+      // if (intentModified) {
+      //   this.updateIntent(intent);
+      // }
+    });
+    return corruptedButtons;
+  }
 
    public setIntentColor(color){
     const intentId = this.intentSelected.intent_id;
@@ -1052,7 +1104,7 @@ export class IntentService {
       action.temperature = 0.7;
       action.top_k = 5;
       action.alpha = 0.5;
-      action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
+      action.model = OPENAI_MODEL.find(el => el.value === 'gpt-4o').value
       action.preview = [];
       action.history = false;
       action.citations = false;
@@ -1061,7 +1113,7 @@ export class IntentService {
       action = new ActionGPTTask();
       action.max_tokens = 256;
       action.temperature = 0.7;
-      action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
+      action.model = OPENAI_MODEL.find(el => el.value === 'gpt-4o').value
       action.assignReplyTo = 'gpt_reply';
       action.preview = [];
       action.formatType = 'none'
@@ -1082,6 +1134,24 @@ export class IntentService {
       action.preview = [];
       action.formatType = 'none'
     }
+
+    if(typeAction === TYPE_ACTION.AI_CONDITION){
+      action = new ActionAiCondition();
+      action.max_tokens = 256;
+      action.temperature = 0.7;
+      action.model = LLM_MODEL.find(el => el.value === 'cohere').value
+      action.assignReplyTo = TYPE_ACTION.AI_CONDITION;
+      const idCondition = generateShortUID();
+      action.instructions = "User said: {{lastUserText}}";
+      action.intents.push({
+        "label": idCondition,
+        "prompt": "",
+        "conditionIntentId": ""
+      });
+      action.fallbackIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
+      action.errorIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
+    }
+
     if(typeAction === TYPE_ACTION.CAPTURE_USER_REPLY) {
       action = new ActionCaptureUserReply();
     }
@@ -1890,6 +1960,258 @@ export class IntentService {
       this.updateIntent(intent);
       this.logger.log('[INTENT SERVICE] -> updateIntentAttributeConnectors, ', intent);
     }
+  }
+
+  // =============================
+  // INTENT ATTRIBUTES MANAGEMENT
+  // =============================
+
+  /**
+   * Configura gli attributi dell'intent, in particolare il colore.
+   * Inizializza gli attributi se non esistono e imposta il colore di default se non specificato.
+   * 
+   * @param intent - L'intent da configurare
+   * @returns Il colore dell'intent configurato
+   */
+  public setIntentAttributes(intent: Intent): string {
+    try {
+      // Inizializza gli attributi se non esistono
+      this.initializeIntentAttributes(intent);
+      // Configura il colore dell'intent
+      return this.configureIntentColor(intent);
+    } catch (error) {
+      this.logger.error("[INTENT SERVICE] Errore nella configurazione degli attributi intent:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Inizializza l'oggetto attributes dell'intent se non esiste.
+   * 
+   * @param intent - L'intent da inizializzare
+   */
+  private initializeIntentAttributes(intent: Intent): void {
+    if (!intent?.attributes) {
+      intent['attributes'] = {};
+      this.logger.debug("[INTENT SERVICE] Attributi intent inizializzati");
+    }
+  }
+
+  /**
+   * Configura il colore dell'intent.
+   * Usa il colore esistente se presente, altrimenti imposta il colore di default.
+   * 
+   * @param intent - L'intent da configurare
+   * @returns Il colore dell'intent configurato
+   */
+  private configureIntentColor(intent: Intent): string {
+    const existingColor = intent.attributes.color;
+    if (this.isValidColor(existingColor)) {
+      this.logger.debug("[INTENT SERVICE] Colore intent configurato:", existingColor);
+      return existingColor;
+    } else {
+      return this.setDefaultIntentColor(intent);
+    }
+  }
+
+  /**
+   * Verifica se il colore fornito è valido.
+   * 
+   * @param color - Colore da validare
+   * @returns true se il colore è valido, false altrimenti
+   */
+  private isValidColor(color: any): boolean {
+    return color && color !== undefined && color !== null && color !== '';
+  }
+
+  /**
+   * Imposta il colore di default per l'intent.
+   * 
+   * @param intent - L'intent per cui impostare il colore di default
+   * @returns Il colore di default impostato
+   */
+  private setDefaultIntentColor(intent: Intent): string {
+    const defaultColor = '156,163,205'; // INTENT_COLORS.COLOR1
+    intent.attributes.color = defaultColor;
+    this.logger.debug("[INTENT SERVICE] Colore di default impostato:", defaultColor);
+    return defaultColor;
+  }
+
+  /**
+   * Assicura che l'intent abbia gli attributi di posizione configurati.
+   * Crea gli attributi se non esistono e imposta la posizione di default.
+   * 
+   * @param intent - L'intent da configurare
+   */
+  public patchAttributesPosition(intent: Intent): void {
+    try {
+      // Inizializza gli attributi se non esistono
+      this.initializeIntentAttributes(intent);
+      
+      // Assicura che la posizione sia configurata
+      this.ensurePositionAttribute(intent);
+      
+    } catch (error) {
+      this.logger.error("[INTENT SERVICE] Errore nella configurazione della posizione:", error);
+    }
+  }
+
+  /**
+   * Assicura che l'attributo position sia presente e configurato.
+   * 
+   * @param intent - L'intent da configurare
+   */
+  private ensurePositionAttribute(intent: Intent): void {
+    if (!intent.attributes.position) {
+      intent.attributes['position'] = { 'x': 0, 'y': 0 };
+      this.logger.debug("[INTENT SERVICE] Posizione di default impostata");
+    }
+  }
+
+  // =============================
+  // INTENT METRICS CALCULATION
+  // =============================
+
+  /**
+   * Configura lo stato dell'intent quando viene selezionato.
+   * Inizializza le proprietà dell'intent e calcola le metriche (azioni, domande, form).
+   * 
+   * @param intent - L'intent da configurare
+   * @returns Oggetto con le metriche calcolate
+   */
+  public setIntentSelectedWithMetrics(intent: Intent): {
+    questionCount: number;
+    formSize: number;
+    actionsCount: number;
+  } {
+    try {
+      const metrics = {
+        questionCount: 0,
+        formSize: 0,
+        actionsCount: 0
+      };
+
+      if (intent) {
+        // Configura la posizione degli attributi
+        this.patchAttributesPosition(intent);
+        
+        // Calcola le metriche
+        metrics.questionCount = this.calculateQuestionCount(intent.question);
+        metrics.formSize = this.calculateFormSize(intent.form);
+        metrics.actionsCount = intent.actions?.length || 0;
+      }
+      
+      this.logger.debug("[INTENT SERVICE] Intent selezionato configurato:", intent?.intent_id, metrics);
+      return metrics;
+      
+    } catch (error) {
+      this.logger.error("[INTENT SERVICE] Errore nella configurazione dell'intent selezionato:", error);
+      return { questionCount: 0, formSize: 0, actionsCount: 0 };
+    }
+  }
+
+  /**
+   * Calcola il numero di domande nell'intent.
+   * 
+   * @param questionText - Testo delle domande
+   * @returns Numero di domande calcolato
+   */
+  private calculateQuestionCount(questionText: string): number {
+    if (!questionText) {
+      return 0;
+    }
+    
+    const questionSegments = questionText
+      .split(/\r?\n/)
+      .filter(segment => segment.trim() !== '');
+    
+    const count = questionSegments.length;
+    this.logger.debug("[INTENT SERVICE] Numero domande calcolato:", count);
+    return count;
+  }
+
+  /**
+   * Calcola la dimensione del form dell'intent.
+   * 
+   * @param form - Oggetto form da analizzare
+   * @returns Dimensione del form (numero di campi)
+   */
+  private calculateFormSize(form: any): number {
+    if (form && form !== null) {
+      const size = Object.keys(form).length;
+      this.logger.debug("[INTENT SERVICE] Dimensione form calcolata:", size);
+      return size;
+    }
+    return 0;
+  }
+
+  // =============================
+  // ACTION PARAMETERS MANAGEMENT
+  // =============================
+
+  /**
+   * Ottiene i parametri di configurazione per un'azione specifica.
+   * Cerca l'azione nell'enum TYPE_ACTION e restituisce la configurazione corrispondente.
+   * 
+   * @param action - L'azione per cui ottenere i parametri
+   * @param TYPE_ACTION - L'enum dei tipi di azione
+   * @param ACTIONS_LIST - La lista delle configurazioni delle azioni
+   * @returns La configurazione dell'azione o undefined se non trovata
+   */
+  public getActionParams(action: any, TYPE_ACTION: any, ACTIONS_LIST: any): any {
+    try {
+      if (!action || !action._tdActionType) {
+        this.logger.warn("[INTENT SERVICE] Azione non valida per getActionParams:", action);
+        return undefined;
+      }
+
+      const actionKey = this.findActionKey(action._tdActionType, TYPE_ACTION);
+      
+      if (actionKey) {
+        const actionConfig = ACTIONS_LIST[actionKey];
+        this.logger.debug("[INTENT SERVICE] Parametri azione trovati:", actionKey);
+        return actionConfig;
+      } else {
+        this.logger.warn("[INTENT SERVICE] Tipo azione non trovato:", action._tdActionType);
+        return undefined;
+      }
+      
+    } catch (error) {
+      this.logger.error("[INTENT SERVICE] Errore nell'ottenimento dei parametri azione:", error);
+      return undefined;
+    }
+  }
+
+  /**
+   * Trova la chiave dell'enum corrispondente al tipo di azione.
+   * 
+   * @param actionType - Il tipo di azione da cercare
+   * @param TYPE_ACTION - L'enum dei tipi di azione
+   * @returns La chiave dell'enum o null se non trovata
+   */
+  private findActionKey(actionType: string, TYPE_ACTION: any): string | null {
+    const enumKeys = Object.keys(TYPE_ACTION);
+    
+    for (const key of enumKeys) {
+      if (TYPE_ACTION[key] === actionType) {
+        return key;
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * getDefaultFallbackIntent
+   * @returns the defaultFallback intent if it exists
+   */
+  private getDefaultFallbackIntent(): Intent | null {
+    if (this.listOfIntents && this.listOfIntents.length > 0) {
+      return this.listOfIntents.find(intent => 
+        intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK
+      ) || null;
+    }
+    return null;
   }
 
 
