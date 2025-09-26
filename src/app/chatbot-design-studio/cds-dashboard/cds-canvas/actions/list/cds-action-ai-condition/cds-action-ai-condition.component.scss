@@ -432,7 +432,7 @@ loading-spinner.custom-spinner ::ng-deep {
 .add-intent-container {
     display: flex;
     justify-content: center;
-    margin: 8px 0 0 0;
+    margin: 6px 0 0 0;
 }
 
 .add-intent-btn {
@@ -586,4 +586,7 @@ loading-spinner.custom-spinner ::ng-deep {
     }
 }
 
+.previewContent {
+    margin: 0;
+}
 // PREVIEW SECTION --- start **************** //
