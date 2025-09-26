@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.0-rc23
+
 # 1.39.0-rc22
 - **changed**: disabled badge "NEW" on "replaceAIAgent", "AddKBContent", "FlowLog"
 
