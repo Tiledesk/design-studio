@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc22
+- **changed**: disabled badge "NEW" on "replaceAIAgent", "AddKBContent", "FlowLog"
 
 # 1.39.0-rc21
 - **added**: changed the selection of LLM and model to only one select in ai-condition
