@@ -1226,7 +1226,7 @@ export class IntentService {
       commandWait2.time = 0
       action.attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { minDigits: null, maxDigits: null, terminators: '#', noInputIntent: null, noInputTimeout: 5000, bargein: true}
+      command_form.settings = { minDigits: null, maxDigits: null, terminators: '#', noInputIntent: null, noMatchIntent: null, noInputTimeout: 5000, bargein: true}
       command_form.subType = TYPE_ACTION_VXML.DTMF_FORM
       action.attributes.commands.push(command_form);
     }

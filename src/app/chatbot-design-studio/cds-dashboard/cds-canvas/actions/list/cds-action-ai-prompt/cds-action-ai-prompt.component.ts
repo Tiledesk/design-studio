@@ -261,7 +261,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive", additionalText?: string}> {
     const model = this.llm_model.find((model) => model.value === value);
-    return model.models;
+    return model?.models || [];
   }
 
   sortAutocompleteOptions2(): void {

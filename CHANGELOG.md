@@ -7,6 +7,19 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc22
+- **changed**: disabled badge "NEW" on "replaceAIAgent", "AddKBContent", "FlowLog"
+
+# 1.39.0-rc21
+- **added**: changed the selection of LLM and model to only one select in ai-condition
+- **bug-fix**: fixed prompt saving error in "ai-condoition"
+- **changed**: graphical changes in the "ai-condition" action preview
+
+# 1.39.0-rc20
+
+# 1.39.0-rc19
+- **added**: noMatch for action DTMF_Form for voice bot
+
 # 1.39.0-rc18
 - **bug-fix**: new order, openai and ollama never red
 

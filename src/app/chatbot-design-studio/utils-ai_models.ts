@@ -81,6 +81,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
 export var OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
 ]
 
+
 export const LLM_MODEL: Array<{name: string, value: string, description: string, src: string, status: "active" | "inactive", models: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> }> = [
     { name: "Cohere",         value: "cohere",            description: "",      src:"assets/images/icons/ai_prompt/cohere.svg",      status: "active",   models: COHERE_MODEL        },
     { name: "Google",         value: "google",            description: "",      src:"assets/images/icons/ai_prompt/google.svg",      status: "active",   models: GOOGLE_MODEL        },
@@ -98,16 +99,10 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
  */
 export function generateLlmModels2(): Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> {
   const llm_models_2: Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> = [];
-  
   // Process each provider's models
   LLM_MODEL.forEach(provider => {
     provider.models.forEach(model => {
-      // Transform name: "Command R" -> "Cohere - Command R"
       const transformedName = `${provider.name} - ${model.name}`;
-      
-      // Transform value: "command-r" -> "cohere-command-r"
-      //const transformedValue = `${provider.value}-${model.value}`;
-      
       // Add to the new array
       llm_models_2.push({
         labelModel:transformedName,
