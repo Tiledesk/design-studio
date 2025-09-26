@@ -507,6 +507,7 @@ export class ActionAiCondition extends Action {
     model: string;
     max_tokens: number;
     temperature: number;
+    labelModel: string;
     preview?: Array<any>;
     fallbackIntent: string;
     errorIntent: string;

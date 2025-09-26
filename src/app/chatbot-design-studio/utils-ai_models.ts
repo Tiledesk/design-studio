@@ -63,6 +63,23 @@ export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:st
 export const OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
 ]
 
+export var OPENAI_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", additionalText?: string}> = [
+  { name: "Gpt-5",                value: "gpt-5",                 description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active"    },
+  { name: "Gpt-5-mini",           value: "gpt-5-mini",            description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active"    },
+  { name: "Gpt-5-nano",           value: "gpt-5-nano",            description: "TYPE_GPT_MODEL.deepseek-chat.description",         status: "active"    },
+  { name: "GPT-4.1",              value: "gpt-4.1",               description: "TYPE_GPT_MODEL.text-davinci-003.description",      status: "inactive"  },
+  { name: "GPT-4.1 mini",         value: "gpt-4.1-mini",          description: "TYPE_GPT_MODEL.text-davinci-003.description",      status: "inactive"  },
+  { name: "GPT-4.1 nano",         value: "gpt-4.1-nano",          description: "TYPE_GPT_MODEL.text-davinci-003.description",      status: "inactive"  },
+  { name: "GPT-4o",               value: "gpt-4o",                description: "TYPE_GPT_MODEL.gpt-4o.description",                status: "active"    },
+  { name: "GPT-4o mini",          value: "gpt-4o-mini",           description: "TYPE_GPT_MODEL.gpt-4o-mini.description",           status: "active"    },
+  { name: "GPT-4 (Legacy)",       value: "gpt-4",                 description: "TYPE_GPT_MODEL.gpt-4.description",                 status: "active"    },
+  { name: "GPT-4 Turbo Preview",  value: "gpt-4-turbo-preview",   description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",   status: "active"    },
+  { name: "GPT-3 (DaVinci)",      value: "text-davinci-003",      description: "TYPE_GPT_MODEL.text-davinci-003.description",      status: "inactive"  },
+  { name: "GPT-3.5 Turbo",        value: "gpt-3.5-turbo",         description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",         status: "active"    },
+  { name: "OpenAI o1-mini",       value: "o1-mini",               description: "TYPE_GPT_MODEL.o1-mini.description",               status: "active"    },
+  { name: "OpenAI o1-preview",    value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",            status: "active"    }
+]
+
 export const LLM_MODEL: Array<{name: string, value: string, description: string, src: string, status: "active" | "inactive", models: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> }> = [
     { name: "Cohere",         value: "cohere",            description: "",      src:"assets/images/icons/ai_prompt/cohere.svg",      status: "active",   models: COHERE_MODEL        },
     { name: "Google",         value: "google",            description: "",      src:"assets/images/icons/ai_prompt/google.svg",      status: "active",   models: GOOGLE_MODEL        },
@@ -71,4 +88,36 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
     { name: "Deepseek",       value: "deepseek",          description: "",      src:"assets/images/icons/ai_prompt/deepseek.svg",    status: "active",   models: DEEPSEEK_MODEL      },
     { name: "Ollama",         value: "ollama",            description: "",      src:"assets/images/icons/ai_prompt/ollama.svg",      status: "active",   models: OLLAMA_MODEL        },
 ]
+
+
+
+/**
+ * Generates llm_models_2 array by transforming all models from utils-ai_models
+ * Changes name format to "Provider - ModelName" and value format to "provider-modelname"
+ * Adds description and src for each record
+ */
+export function generateLlmModels2(): Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> {
+  const llm_models_2: Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> = [];
+  // Process each provider's models
+  LLM_MODEL.forEach(provider => {
+    provider.models.forEach(model => {
+      const transformedName = `${provider.name} - ${model.name}`;
+      // Add to the new array
+      llm_models_2.push({
+        labelModel:transformedName,
+        llm:provider.value,
+        model:model.value,
+        description: model.description,
+        src: provider.src,
+        status: model.status,
+        configured: false
+      });
+    });
+  });
+  return llm_models_2;
+}
+
+// Generate the array
+export const LLM_MODELS_2 = generateLlmModels2();
+
 /************             AI PROMPT MODEL: END        ************************/
