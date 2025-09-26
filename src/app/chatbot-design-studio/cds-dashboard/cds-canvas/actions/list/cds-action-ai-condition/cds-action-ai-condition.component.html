@@ -120,7 +120,9 @@
             [text]="action.instructions" 
             [placeholder]="placeholder"
             (blur)="onBlur($event)"
-            (changeTextarea)="onChangeTextarea($event, '', 'instructions')">
+            (changeTextarea)="onChangeTextarea($event, '', 'instructions')"
+            >
+            <!--  -->
         </cds-textarea>
     </div>
 
@@ -232,8 +234,9 @@
                         [placeholder]="'CDSCanvas.Model' | translate"
                         [autocompleteOptions]="autocompleteOptions"
                         (onOptionSelected)="onOptionSelected($event, 'model')"
-                        (blur)="onBlur($event)"
-                        (onChange)="onChangeTextarea($event, actionLabelModel, 'model')">
+                        (onChange)="onChangeTextarea($event, actionLabelModel, 'model')"
+                        >
+                        <!-- (blur)="onBlur($event)" -->
                     </cds-text>
                 </div>
 

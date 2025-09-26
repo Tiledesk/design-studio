@@ -357,6 +357,19 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
   }
 
+
+  onUpdateAndSaveAction(intent: any) {
+    this.logger.log("[ACTION AI_CONDITION] onUpdateAndSaveAction event: ", intent);
+    // cerca nell'array action.intents l'elemento con label === intent.label e sostituiscilo con intent se non lo trova aggiungilo all'array
+    const found = this.action.intents.find(item => item.label === intent?.label);
+    if(found){
+      this.action.intents[found.index] = intent;
+    } else {
+      this.action.intents.push(intent);
+    }
+    this.updateAndSaveAction.emit();
+  }
+
   onUpdateAndSaveConnectors(intent: any, type: 'create' | 'delete') {
     this.logger.log("[ACTION AI_CONDITION] onUpdateAndSaveConnectors event: ", intent, type);
     let toId: string;
