@@ -243,7 +243,6 @@ export class ProjectService {
     return this.http.get(url, httpOptions);
   }
 
-
   getIntegrations(project_id: string): Observable<any> {
     const url = this.SERVER_BASE_URL + project_id + '/integration';
     this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);

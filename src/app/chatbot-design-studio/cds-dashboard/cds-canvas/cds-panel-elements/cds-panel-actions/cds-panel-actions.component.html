@@ -40,7 +40,7 @@
                     </div>
                     <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name | translate}}</div>
                     <span *ngIf="!item.canLoad" class="trigger-beta-badge">PRO</span>
-                    <span *ngIf="item.value.badge" class="trigger-beta-badge">{{item.value.badge}}</span>
+                    <span *ngIf="item.value.badge" class="trigger-beta-badge" [class.deprecation-badge]="item.value.badge==='DEP'">{{item.value.badge}}</span>
 
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <button class="btn btn-tdblu-no-boxshadow drag-btn">
