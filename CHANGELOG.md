@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.38.5
+- **changed**: update ai models
+
 # 1.38.4
 - **changed**: added left and right scroll button in image gallery
 
