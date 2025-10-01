@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc25
+- **changed**: change css tag "new", "beta"
+- **bug-fix**: disable scroll on preview button in ai-prompt
+- **bug-fix**: css ai-condition
 
 # 1.39.0-rc24
 - **changed**: set isLiquidjs to false in web request from data
