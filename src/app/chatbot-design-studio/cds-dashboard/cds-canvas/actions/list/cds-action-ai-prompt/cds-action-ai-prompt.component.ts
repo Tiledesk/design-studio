@@ -520,7 +520,7 @@ setModel(labelModel: string){
   }
 
   execPreview() {
-    this.scrollToBottom();
+    // this.scrollToBottom();
     this.checkVariables().then((resp) => {
 
       if (resp === true) {
