@@ -30,10 +30,10 @@
             </div>
         </div>
         <div *ngIf="intent.label" class="previewContent">
-            <div class="icon-action">
+            <!-- <div class="icon-action">
                 <img class="active-icon" src="assets/images/icons/if_condition.svg">
             </div>
-            <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
+            <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label> -->
             <cds-connector class="connector-true"
                  [idConnector]   = "listOfConnectors[intent.label]?.idConnector"    
                  [idConnection]  = "listOfConnectors[intent.label]?.idConnection"
@@ -53,7 +53,7 @@
          </button>
      </div>
      
-    <hr class="preview-divider">
+    <!-- <hr class="preview-divider"> -->
 
 
     <div class="previewContent">
@@ -66,7 +66,7 @@
         </cds-connector>
     </div>
 
-    <hr class="preview-divider">
+    <!-- <hr class="preview-divider"> -->
 
     <div class="previewContent">
        <label class="title-preview-label">{{'CDSCanvas.Error' | translate }}</label>
@@ -120,7 +120,9 @@
             [text]="action.instructions" 
             [placeholder]="placeholder"
             (blur)="onBlur($event)"
-            (changeTextarea)="onChangeTextarea($event, '', 'instructions')">
+            (changeTextarea)="onChangeTextarea($event, '', 'instructions')"
+            >
+            <!--  -->
         </cds-textarea>
     </div>
 
@@ -150,42 +152,6 @@
 
         </div>
 
-        <!-- <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.answer">
-            <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
-        </div> -->
-
-        <!-- <div id="preview-container" class="preview-container">
-
-            <div class="placeholder-container" *ngIf="missingVariables">
-                <div style="display: flex; flex-direction: column; width: 100%;">
-                    <span style="margin-left: 8px;">Set all variables to get the preview</span>
-                </div>
-            </div>
-
-            <div class="placeholder-container" *ngIf="searching && !missingVariables">
-                <loading-spinner class="custom-spinner"></loading-spinner>
-                <span style="margin-left: 8px;">Generating answer...</span>
-            </div>
-
-            <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content">
-                {{ ai_response.choices[0].message.content }}
-            </div>
-
-            <div *ngIf="showAiError">
-                {{ ai_error }}
-            </div>
-        </div>
-
-        <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content"
-            style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 6px; padding: 0px 4px; color: #a6a6a6;  font-size: 11px; width: 100%;">
-            <span style="font-weight: 500;">Tokens usage</span>
-            <span>Prompt: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>Answer: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens }}</span>
-        </div> -->
     </div>
 
     <mat-accordion>
@@ -198,8 +164,35 @@
             </mat-expansion-panel-header>
             <div>
 
-                <!-- // llm select -->
                 <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
+                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
+                        <cds-text id="text-label-model"
+                            class="sx-input" 
+                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
+                            [text]="labelModel"
+                            [autocompleteOptions]="autocompleteOptions_2"
+                            [placeholder]="'CDSCanvas.Model' | translate"
+                            [setAttributeBtn]="false"
+                            (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"
+                            (blur)="onBlur($event)"
+                            >
+                            <!--   
+                                (onOptionSelected)="onOptionSelected($event, 'llm_model')" 
+                            -->
+                        </cds-text>
+                    </div>
+                    <!-- Container per i due elementi sulla stessa riga -->
+                    <div class="bottom-row">
+                        <div class="multiplier-container"><span *ngIf="multiplier">{{multiplier}} x tokens</span></div>
+                        <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                    </div>
+
+                </div>
+
+                
+                <!-- // llm select -->
+                <!-- <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }}</label>
                     <cds-select id="model-condition"
                         [items]="llm_models" 
@@ -209,22 +202,9 @@
                         [placeholder]="'CDSCanvas.SelectLL' | translate"
                         (onSelected)="onChangeSelect($event, 'llm')">
                     </cds-select>
-                </div>
-
-                <!-- // llm model select -->
-                <!-- <div class="field-box">
-                    <label class="title-label">{{'CDSCanvas.Model' | translate }}</label>
-                    <cds-select id="model-condition"
-                        [items]="llm_options_models" 
-                        [itemSelected]="action.model"
-                        [bindLabelSelect]="'name'" 
-                        [bindValueSelect]="'value'"
-                        [placeholder]="'CDSCanvas.SelectLLMModel' | translate"
-                        (onSelected)="onChangeSelect($event, 'model')">
-                    </cds-select>
                 </div> -->
 
-                <div class="field-box">
+                <!-- <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.Model' | translate }}</label>
                     <cds-text id="text"
                         class="sx-input" 
@@ -235,7 +215,7 @@
                         (blur)="onBlur($event)"
                         (onChange)="onChangeTextarea($event, actionLabelModel, 'model')">
                     </cds-text>
-                </div>
+                </div> -->
 
 
 

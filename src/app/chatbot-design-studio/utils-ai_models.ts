@@ -1,12 +1,12 @@
 /************             AI PROMPT MODEL: START        ************************/
 export const COHERE_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
-    { name: "Command R",                        value: "command-r",                    description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
-    { name: "Command R+",                       value: "command-r-plus",               description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Command R",                        value: "command-r",                    description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Command R+",                       value: "command-r-plus",               description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
     { name: "Command A (03-2025)",              value: "command-a-03-2025",            description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Command R7B (12-2024)",            value: "command-r7b-12-2024",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Command A Vision (07-2025)",       value: "command-a-vision-07-2025",     description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
-    { name: "Command R+ (04-2024)",             value: "command-r-plus-04-2024",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
-
+    { name: "Command R+ (04-2024)",             value: "command-r-plus-04-2024",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
+    { name: "Command R+ (08-2024)",             value: "command-r-plus-08-2024",       description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
 ]
 
 export const GOOGLE_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
@@ -47,7 +47,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     { name: "Llama 3.3 70B – Versatile",                        value: "llama-3.3-70b-versatile",                           description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Gemma 2 – 9B Instruct (Italian tuned)",            value: "gemma2-9b-it",                                      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Allam 2 – 7B",                                     value: "allam-2-7b",                                        description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
-    { name: "Llama 3 70B – 8K context",                         value: "llama3-70b-8192",                                   description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
+    { name: "Llama 3 70B – 8K context",                         value: "llama3-70b-8192",                                   description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive" },
     { name: "Llama Guard 4 – 12B Safety Model",                 value: "meta-llama/llama-guard-4-12b",                      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "DeepSeek R1 Distilled Llama 70B",                  value: "deepseek-r1-distill-llama-70b",                     description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
     { name: "Llama 4 Maverick – 17B (128 Experts, Instruct)",   value: "meta-llama/llama-4-maverick-17b-128e-instruct",     description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "active" },
@@ -81,6 +81,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
 export var OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
 ]
 
+
 export const LLM_MODEL: Array<{name: string, value: string, description: string, src: string, status: "active" | "inactive", models: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> }> = [
     { name: "Cohere",         value: "cohere",            description: "",      src:"assets/images/icons/ai_prompt/cohere.svg",      status: "active",   models: COHERE_MODEL        },
     { name: "Google",         value: "google",            description: "",      src:"assets/images/icons/ai_prompt/google.svg",      status: "active",   models: GOOGLE_MODEL        },
@@ -98,16 +99,10 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
  */
 export function generateLlmModels2(): Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> {
   const llm_models_2: Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> = [];
-  
   // Process each provider's models
   LLM_MODEL.forEach(provider => {
     provider.models.forEach(model => {
-      // Transform name: "Command R" -> "Cohere - Command R"
       const transformedName = `${provider.name} - ${model.name}`;
-      
-      // Transform value: "command-r" -> "cohere-command-r"
-      //const transformedValue = `${provider.value}-${model.value}`;
-      
       // Add to the new array
       llm_models_2.push({
         labelModel:transformedName,

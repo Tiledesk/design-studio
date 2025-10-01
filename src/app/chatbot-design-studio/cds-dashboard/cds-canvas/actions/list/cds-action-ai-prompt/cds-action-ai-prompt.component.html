@@ -27,7 +27,7 @@
 
         <div class="action-row-right">
             <div *ngIf="action?.llm" class="action-row-right">
-                {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">({{action?.model}})</span>
+                {{ (llm_models | find:{key: 'value', value: action?.llm })?.name }} <span *ngIf="action?.model">({{action?.model}})</span>
             </div>
             <div *ngIf="!action?.llm" class="action-row-right empty">
                 {{'CDSCanvas.ChooseTheAIModel' | translate }}
@@ -121,7 +121,7 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} )</span>
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm })?.name }} )</span>
                 </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
