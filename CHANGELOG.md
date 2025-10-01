@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.0-rc24
+- **changed**: set isLiquidjs to false in web request from data
+
+# 1.39.0-rc23
+
 # 1.39.0-rc22
 - **changed**: disabled badge "NEW" on "replaceAIAgent", "AddKBContent", "FlowLog"
 
