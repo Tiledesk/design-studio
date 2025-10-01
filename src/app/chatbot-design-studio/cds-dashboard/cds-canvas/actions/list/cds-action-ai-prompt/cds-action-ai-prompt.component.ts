@@ -544,16 +544,13 @@ setModel(labelModel: string){
   }
 
   execPreview() {
-    this.scrollToBottom();
+    // this.scrollToBottom();
     this.checkVariables().then((resp) => {
-
       if (resp === true) {
         this.getResponse(this.action.question);
-
       } else {
         this.openAttributesDialog();
       }
-
     })
   }
 
@@ -563,22 +560,17 @@ setModel(labelModel: string){
       let string = this.action.question;
       let matches = string.match(regex);
       let response: boolean = true;
-
       if (!matches || matches.length == 0) {
         resolve(true);
-
       } else {
-
         this.temp_variables = [];
         matches.forEach((m) => {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
-
           if (attr?.value) {
             this.temp_variables.push({ name: name, value: attr.value });
           } else if (attr && !attr.value) {
             this.temp_variables.push({ name: name, value: null });
-
           } else {
             this.temp_variables.push({ name: name, value: null });
             this.action.preview.push({ name: name, value: null });
