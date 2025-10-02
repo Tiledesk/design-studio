@@ -23,7 +23,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
 
@@ -93,7 +93,8 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
   autocompleteOptions_2: Array<{label: string, value: string}> = [];
-  
+  multiplier: string;
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -113,26 +114,19 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.project_id = this.dashboardService.projectID;
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
     
-
-
-    
-
-
-
     this.getOllamaModels();
-    this.llm_models_2 = generateLlmModels2();
 
-    // this.llm_models_2 = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
-    //   if(ai_models[el.value])
-    //     return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
-    //   else
-    //     return { ...el, multiplier: null }
-    // })
-    // aggiungi a llm_models_2 il campo multiplier popolandolo con il valore di ai_models.multiplier dove il campo labelModel corrisponde a ai_models.name
-    this.llm_models_2 = this.llm_models_2.map((el) => {
-      const model = Object.values(ai_models).find((m: any) => (m as any)?.name === el.labelModel);
-      return { ...el, multiplier: model && (model as any).multiplier !== undefined ? (model as any).multiplier : null };
+    this.llm_models_2 = generateLlmModels2();
+    this.llm_models_2.forEach(model => {
+      if (ai_models[model.model]) {
+        model.multiplier = ai_models[model.model].toString();
+      }
     });
+    this.logger.log("[ACTION AI_PROMPT] model_list: ", this.llm_models_2, ai_models);
+    // this.llm_models_2 = this.llm_models_2.map((el) => {
+    //   const model = Object.values(ai_models).find((m: any) => (m as any)?.name === el.labelModel);
+    //   return { ...el, multiplier: model && (model as any).multiplier !== undefined ? (model as any).multiplier : null };
+    // });
 
     this.logger.log("[ACTION AI_PROMPT] HO AGGIORNATO  model_list: ", this.llm_models_2);
 
@@ -175,6 +169,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   private async initialize(){
     await this.initLLMModels();
+    this.multiplier = this.llm_models_2.find(el => el.labelModel === this.labelModel)?.multiplier;
     this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
     this.logger.log("[ACTION AI_PROMPT] 0 initialize llm_options_models: ", this.action, this.labelModel);
     this.setModel(this.labelModel);
@@ -242,6 +237,25 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.autocompleteOptions = [];
     this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
     this.actionLabelModel =  '';
+    this.multiplier = null;
+    /** SET GPT MODELS */
+    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
+    OPENAI_MODEL.forEach(el => {
+      if (ai_models[el.value]) {
+        el.additionalText = `${ai_models[el.value]} x tokens`;
+        el.status = 'active';
+      } else {
+        el.additionalText = null;
+        el.status = 'inactive';
+      }
+    });
+
+    // Assegna i moltiplicatori ai modelli in llm_models_2
+    this.llm_models_2.forEach(model => {
+      if (ai_models[model.model]) {
+        model.multiplier = ai_models[model.model].toString();
+      }
+    });
     if(this.action.llm){
       const filteredModels = this.getModelsByName(this.action.llm).filter(el => el.status === 'active');
       filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
@@ -418,6 +432,7 @@ setModel(labelModel: string){
     this.action.model = model.model;
     this.action.labelModel = model.labelModel;
     this.labelModel = model.labelModel;
+    this.multiplier = model.multiplier;
     this.logger.log("[ACTION AI_PROMPT] 2 action: ", this.action);
   }
   else {
@@ -425,6 +440,7 @@ setModel(labelModel: string){
     this.action.model = '';
     this.action.labelModel = '';
     this.labelModel = '';
+    this.multiplier = null;
   }
 }
 
