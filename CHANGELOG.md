@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.0-rc27
+- **bug-fix**: bug fix ai-condition and ai-prompt
 
 # 1.39.0-rc26
 - **bug-fix**: css ai-condition fixed bug with long text in preview
