@@ -7,6 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.1
 
 # 1.39.0
 
