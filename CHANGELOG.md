@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.0-rc26
+- **bug-fix**: css ai-condition fixed bug with long text in preview
+
 # 1.39.0-rc25
 - **changed**: change css tag "new", "beta"
 - **bug-fix**: disable scroll on preview button in ai-prompt
