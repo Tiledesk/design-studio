@@ -26,6 +26,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-ai-prompt',
@@ -207,19 +208,9 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
 
-  async getIntegrations(){
-    const projectID = this.dashboardService.projectID;
-    try {
-        const response = await firstValueFrom(this.projectService.getIntegrations(projectID));
-        this.logger.log('[ACTION AI_PROMPT] - integrations response:', response.value);
-        return response;
-    } catch (error) {
-      this.logger.log('[ACTION AI_PROMPT] getIntegrations ERROR:', error);
-    }
-  }
 
   async initLLMModels(){
-    const INTEGRATIONS = await this.getIntegrations();
+    const INTEGRATIONS = await getIntegrations(this.projectService, this.dashboardService, this.logger);
     this.logger.log('[ACTION AI_PROMPT] 1 - integrations:', INTEGRATIONS);
     if(INTEGRATIONS){
       INTEGRATIONS.forEach((el: any) => {
@@ -257,43 +248,18 @@ export class CdsActionAiPromptComponent implements OnInit {
       }
     });
     if(this.action.llm){
-      const filteredModels = this.getModelsByName(this.action.llm).filter(el => el.status === 'active');
+      const filteredModels = getModelsByName(this.action.llm, this.llm_model).filter(el => el.status === 'active');
       filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value}));
       this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
     }
     this.autocompleteOptions_2 = [];
     this.llm_models_2.forEach(el => this.autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
-    this.sortAutocompleteOptions2();
+    this.autocompleteOptions_2 = sortAutocompleteOptions(this.autocompleteOptions_2, this.llm_models_2);
     // this.actionLabelModel = this.action['labelModel'];
     this.logger.log('[ACTION AI_PROMPT] autocompleteOptions_2',this.autocompleteOptions_2);
   }
 
-  getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> {
-    const model = this.llm_model.find((model) => model.value === value);
-    return model?.models || [];
-  }
 
-  sortAutocompleteOptions2(): void {
-    this.autocompleteOptions_2.sort((a, b) => {
-      // Trova il modello corrispondente in llm_models_2 per entrambi gli elementi
-      const modelA = this.llm_models_2.find(el => el.labelModel === a.value);
-      const modelB = this.llm_models_2.find(el => el.labelModel === b.value);
-      // Se entrambi sono OpenAI, ordina alfabeticamente
-      if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
-        return a.label.localeCompare(b.label);
-      }
-      // Se solo A è OpenAI, A viene prima
-      if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() !== 'openai') {
-        return -1;
-      }
-      // Se solo B è OpenAI, B viene prima
-      if (modelA?.llm?.toLowerCase() !== 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
-        return 1;
-      }
-      // Se nessuno dei due è OpenAI, ordina alfabeticamente
-      return a.label.localeCompare(b.label);
-    });
-  }
 
 
 
@@ -423,25 +389,14 @@ export class CdsActionAiPromptComponent implements OnInit {
   }
 
 setModel(labelModel: string){
-  this.logger.log("[ACTION AI_PROMPT] 2 setModel labelModel: ", labelModel);
-  const model = this.llm_models_2.find(m => m.labelModel === labelModel);
-  this.logger.log("[ACTION AI_PROMPT] 2 setModel model: ", model);
-  if(model){
-    this.selectedModelConfigured = model.configured;
-    this.action.llm = model.llm;
-    this.action.model = model.model;
-    this.action.labelModel = model.labelModel;
-    this.labelModel = model.labelModel;
-    this.multiplier = model.multiplier;
-    this.logger.log("[ACTION AI_PROMPT] 2 action: ", this.action);
-  }
-  else {
-    this.action.llm = '';
-    this.action.model = '';
-    this.action.labelModel = '';
-    this.labelModel = '';
-    this.multiplier = null;
-  }
+  const result = setModel(labelModel, this.llm_models_2, this.logger);
+  this.selectedModelConfigured = result.selectedModelConfigured;
+  this.action.llm = result.action.llm;
+  this.action.model = result.action.model;
+  this.action.labelModel = result.action.labelModel;
+  this.labelModel = result.labelModel;
+  this.multiplier = result.multiplier;
+  this.logger.log("[ACTION AI_PROMPT] 2 action: ", this.action);
 }
 
   onBlur(event: string){
