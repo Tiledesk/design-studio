@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.39.0-rc27
+# 1.39.2-rc2
 - **bug-fix**: bug fix ai-condition and ai-prompt
 
 # 1.39.0-rc26
