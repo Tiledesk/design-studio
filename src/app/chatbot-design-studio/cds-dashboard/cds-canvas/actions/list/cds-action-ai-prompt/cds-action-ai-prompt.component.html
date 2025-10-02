@@ -22,9 +22,7 @@
     <div class="action-row">
         <div id="gpt-icon" class="action-row-left icon-action">
             <mat-icon *ngIf="!action?.llm" svgIcon="add_ai_model" aria-hidden="true"></mat-icon>
-            <!-- <img *ngIf="!action?.llm" src="assets/images/icons/add_ai_model.svg" alt="ai model"> -->
-            <!-- <mat-icon *ngIf="action?.llm" [svgIcon]="getLlmIcon(action?.llm)" aria-hidden="true"></mat-icon> -->
-            <img *ngIf="action?.llm && (llm_models | find:{key: 'value', value: action?.llm })" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
+            <img *ngIf="action?.llm" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
         </div>
 
         <div class="action-row-right">
@@ -199,8 +197,50 @@
             </mat-expansion-panel-header>
             <div>
 
+
+
+                 <!-- // llm select -->
+                 <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
+                    
+                    <!-- 
+                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
+                        <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
+                        <cds-select id="model-condition"
+                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
+                            [items]="llm_models_2" 
+                            [itemSelected]="labelModel"
+                            [bindLabelSelect]="'labelModel'" 
+                            [bindValueSelect]="'value'"
+                            [placeholder]="'CDSCanvas.SelectLL' | translate"
+                            (onSelected)="onChangeSelect($event, 'llm2')">
+                        </cds-select>
+                    </div> 
+                    -->
+                    
+                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
+                        <!-- <div class="status-indicator" *ngIf="!selectedModelConfigured"></div> -->
+                        <cds-text id="text-label-model"
+                            class="sx-input" 
+                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
+                            [text]="labelModel"
+                            [autocompleteOptions]="autocompleteOptions_2"
+                            [placeholder]="'CDSCanvas.Model' | translate"
+                            [setAttributeBtn]="false"
+                            (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"
+                            (blur)="onBlur($event)"
+                            >
+                            <!--   
+                                (onOptionSelected)="onOptionSelected($event, 'llm_model')" 
+                            -->
+                        </cds-text>
+                    </div>
+             
+                    <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                </div>
+                
                 <!-- // llm select -->
-                <div class="field-box">
+                <!-- <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }}</label>
                     <cds-select id="model-condition"
                         [items]="llm_models" 
@@ -211,19 +251,6 @@
                         (onSelected)="onChangeSelect($event, 'llm')">
                     </cds-select>
                 </div>
-
-                <!-- // llm model select -->
-                <!-- <div class="field-box">
-                    <label class="title-label">{{'CDSCanvas.Model' | translate }}</label>
-                    <cds-select id="model-condition"
-                        [items]="llm_options_models" 
-                        [itemSelected]="action.model"
-                        [bindLabelSelect]="'name'" 
-                        [bindValueSelect]="'value'"
-                        [placeholder]="'CDSCanvas.SelectLLMModel' | translate"
-                        (onSelected)="onChangeSelect($event, 'model')">
-                    </cds-select>
-                </div> -->
 
                 <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.Model' | translate }}</label>
@@ -236,7 +263,7 @@
                         (blur)="onBlur($event)"
                         (onChange)="onChangeTextarea($event, actionLabelModel, 'model')">
                     </cds-text>
-                </div>
+                </div> -->
 
 
 

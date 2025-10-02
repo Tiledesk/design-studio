@@ -488,6 +488,7 @@ export class ActionAiPrompt extends Action {
     history: boolean;
     max_tokens: number;
     temperature: number;
+    labelModel: string;
     llm: string;
     model: string;
     preview?: Array<any>;
