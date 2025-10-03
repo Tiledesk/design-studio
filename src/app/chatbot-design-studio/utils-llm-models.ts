@@ -6,6 +6,9 @@ import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { AppConfigService } from 'src/app/services/app-config';
+import { loadTokenMultiplier } from 'src/app/utils/util';
+import { OPENAI_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
 
 export interface LlmModel {
   labelModel: string;
@@ -41,6 +44,24 @@ export interface SetModelResult {
   action: ActionModel;
   labelModel: string;
   multiplier: string | null;
+}
+
+export interface InitLLMModelsParams {
+  projectService: ProjectService;
+  dashboardService: DashboardService;
+  appConfigService: AppConfigService;
+  logger: LoggerService;
+  action: any;
+  llm_model: Array<{ value: string; models: ModelOption[] }>;
+  componentName: string;
+}
+
+export interface InitLLMModelsResult {
+  llm_models_2: LlmModel[];
+  autocompleteOptions: AutocompleteOption[];
+  autocompleteOptions_2: AutocompleteOption[];
+  multiplier: string | null;
+  actionLabelModel: string;
 }
 
 /**
@@ -154,4 +175,77 @@ export function setModel(
       multiplier: null
     };
   }
+}
+
+/**
+ * Initializes LLM models configuration
+ * @param params Parameters for initialization
+ * @returns Promise with initialization result
+ */
+export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLLMModelsResult> {
+  const { projectService, dashboardService, appConfigService, logger, action, llm_model, componentName } = params;
+  
+  const INTEGRATIONS = await getIntegrations(projectService, dashboardService, logger);
+  logger.log(`[${componentName}] 1 - integrations:`, INTEGRATIONS);
+  
+  // Generate LLM models
+  const llm_models_2 = generateLlmModels2();
+  
+  if(INTEGRATIONS){
+    INTEGRATIONS.forEach((el: any) => {
+      logger.log(`[${componentName}] 1 - integration:`, el.name, el.value?.apikey);
+      if(el.name && el.value?.apikey){
+        llm_models_2.forEach(model => {
+          if(model.llm === el.name || model.llm.toLowerCase() === 'openai' || model.llm.toLowerCase() === 'ollama') {
+            model.configured = true;
+          }
+        });
+      }
+    });
+  }
+  
+  logger.log(`[${componentName}] - this.llm_models_2:`, llm_models_2);
+  
+  const autocompleteOptions: AutocompleteOption[] = [];
+  logger.log(`[${componentName}] initLLMModels`, action.llm);
+  const actionLabelModel = '';
+  let multiplier: string | null = null;
+  
+  /** SET GPT MODELS */
+  const ai_models = loadTokenMultiplier(appConfigService.getConfig().aiModels);
+  OPENAI_MODEL.forEach(el => {
+    if (ai_models[el.value]) {
+      el.additionalText = `${ai_models[el.value]} x tokens`;
+      el.status = 'active';
+    } else {
+      el.additionalText = null;
+      el.status = 'inactive';
+    }
+  });
+
+  // Assegna i moltiplicatori ai modelli in llm_models_2
+  llm_models_2.forEach(model => {
+    if (ai_models[model.model]) {
+      (model as LlmModel).multiplier = ai_models[model.model].toString();
+    }
+  });
+  
+  if(action.llm){
+    const filteredModels = getModelsByName(action.llm, llm_model).filter(el => el.status === 'active');
+    filteredModels.forEach(el => autocompleteOptions.push({label: el.name, value: el.value}));
+    logger.log(`[${componentName}] filteredModels`, filteredModels);
+  }
+  
+  const autocompleteOptions_2: AutocompleteOption[] = [];
+  llm_models_2.forEach(el => autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
+  const sortedAutocompleteOptions_2 = sortAutocompleteOptions(autocompleteOptions_2, llm_models_2);
+  logger.log(`[${componentName}] autocompleteOptions_2`, sortedAutocompleteOptions_2);
+  
+  return {
+    llm_models_2,
+    autocompleteOptions,
+    autocompleteOptions_2: sortedAutocompleteOptions_2,
+    multiplier,
+    actionLabelModel
+  };
 }

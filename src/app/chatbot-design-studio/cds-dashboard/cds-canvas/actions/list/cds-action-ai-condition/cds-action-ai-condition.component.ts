@@ -27,7 +27,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-ai-condition',
@@ -225,52 +225,21 @@ export class CdsActionAiConditionComponent implements OnInit {
 
 
   async initLLMModels(){
-    const INTEGRATIONS = await getIntegrations(this.projectService, this.dashboardService, this.logger);
-    this.logger.log('[ACTION AI_PROMPT] 1 - integrations:', INTEGRATIONS);
-    if(INTEGRATIONS){
-      INTEGRATIONS.forEach((el: any) => {
-        this.logger.log('[ACTION AI_PROMPT] 1 - integration:', el.name, el.value.apikey);
-        if(el.name && el.value?.apikey){
-          this.llm_models_2.forEach(model => {
-            if(model.llm === el.name || model.llm.toLowerCase() === 'openai' || model.llm.toLowerCase() === 'ollama') {
-              model.configured = true;
-            }
-          });
-        }
-      });
-    }
-    this.logger.log('[ACTION AI_PROMPT] - this.llm_models_2:', this.llm_models_2);
-    this.autocompleteOptions = [];
-    this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
-    this.actionLabelModel =  '';
-    this.multiplier = null;
-    /** SET GPT MODELS */
-    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    OPENAI_MODEL.forEach(el => {
-      if (ai_models[el.value]) {
-        el.additionalText = `${ai_models[el.value]} x tokens`;
-        el.status = 'active';
-      } else {
-        el.additionalText = null;
-        el.status = 'inactive';
-      }
+    const result = await initLLMModels({
+      projectService: this.projectService,
+      dashboardService: this.dashboardService,
+      appConfigService: this.appConfigService,
+      logger: this.logger,
+      action: this.action,
+      llm_model: this.llm_model,
+      componentName: 'ACTION AI_CONDITION'
     });
-
-    // Assegna i moltiplicatori ai modelli in llm_models_2
-    this.llm_models_2.forEach(model => {
-      if (ai_models[model.model]) {
-        model.multiplier = ai_models[model.model].toString();
-      }
-    });
-    if(this.action.llm){
-      const filteredModels = getModelsByName(this.action.llm, this.llm_model).filter(el => el.status === 'active');
-      //filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value, additionalText: el.additionalText? el.additionalText: null}));
-      this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
-    }
-    this.autocompleteOptions_2 = [];
-    this.llm_models_2.forEach(el => this.autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
-    this.autocompleteOptions_2 = sortAutocompleteOptions(this.autocompleteOptions_2, this.llm_models_2);
-    this.logger.log('[ACTION AI_PROMPT] autocompleteOptions_2',this.autocompleteOptions_2);
+    
+    this.llm_models_2 = result.llm_models_2;
+    this.autocompleteOptions = result.autocompleteOptions;
+    this.autocompleteOptions_2 = result.autocompleteOptions_2;
+    this.multiplier = result.multiplier;
+    this.actionLabelModel = result.actionLabelModel;
   }
 
 
