@@ -1,5 +1,5 @@
 
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -104,65 +104,6 @@ cds-select#model-condition ::ng-deep{
     flex-direction: row;
     align-items: center;
     gap: 5px;
-}
-
-.action-wait-range {
-    color: var(--text-color);
-    font-size: 11px;
-    font-weight: 500;
-}
-
-.action-wait-slider {
-    align-items: center;
-    background: var(--slider-background-color);
-    border-radius: 13px;
-    display: inline-flex;
-    position: relative;
-    height: 26px;
-    padding: 0 9px 0 9px;
-    width: 100%;
-    text-align: center;
-    transition: width 0.3s ease-in;
-    font-size: 14px;
-}
-
-.action-wait-slider>mat-slider {
-    width: 100%;
-    margin-left: 6px;
-}
-
-.action-wait-slider ::ng-deep{
-    .mat-accent .mat-slider-track-fill {
-        background-color: var(--text-color) !important;
-    }
-    .mat-slider-thumb-label {
-        background-color: var(--text-color) !important;
-    }
-    .mat-slider-thumb-label-text{
-        color: var(--background-color) !important;
-    }
-    .mat-slider-thumb {
-        background-color: var(--text-color) !important;
-    }
-}
-
-.gpt-setting-input {
-    color: var(--text-color);
-    text-align: center;
-    width: 45px;
-    border: none;
-    height: 26px;
-    border-radius: 12px;
-    background-color: white;
-    border: 1px solid var(--text-color);
-}
-
-.slider-input ::ng-deep {
-    width: 60px;
-
-    input {
-        text-align: center;
-    }
 }
 
 // *********** AI SETTINGS --end *********** //
@@ -342,5 +283,58 @@ mat-expansion-panel ::ng-deep {
         &:hover {
             background-color: transparent !important;
         }
+    }
+}
+
+
+.select-container {
+    &.not-configured {
+        ::ng-deep .ng-select .ng-select-container {
+            .ng-value {
+                span.label-select {
+                    color: var(--empty-value-text-color);
+                }
+            }
+        }
+        ::ng-deep .text-editor-wrapper .text-editor .box-input input {
+            color: var(--empty-value-text-color)!important;
+            border: 1px solid var(--empty-value-text-color)!important;
+        }
+    }
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: var(--empty-value-text-color);
+        border-radius: 50%;
+        margin: 0px;
+        position: absolute;
+        left: 0px;
+        top: 96px;
+    }
+}
+
+// Bottom row styles for model selection
+.bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0px;
+    padding-left: 10px;
+}
+
+.multiplier-container {
+    color: var(--gray);
+    font-size: 12px;
+    display: inline-block;
+}
+
+.configure-model-button {
+    cursor: pointer;
+    color: #007bff;
+    font-size: 12px;
+    text-decoration: underline;
+    display: inline-block;
+    &:hover {
+        opacity: 0.7;
     }
 }

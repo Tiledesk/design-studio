@@ -233,4 +233,18 @@ export var voiceProviderList: Array<{key: string, label: string, elements?: Arra
             { model: 'whisper-1',                   name: 'whisper-1',                  status: 'active' },
         ]
     },
+    {
+        key: 'elevenlabs',
+        label: "ElevenLabs",
+        tts_voice: [
+            //GET VOICES FROM ELEVENLABS API
+        ],
+        tts_model: [
+            //GET MODELS FROM ELEVENLABS API
+        ],
+        stt_model: [
+            { model: 'scribe_v1',                   name: 'scribe_v1',          status: 'active' },
+            { model: 'scribe_v1_experimental',      name: 'scribe_v1_experimental',     status: 'active' },
+        ]
+    }
 ]

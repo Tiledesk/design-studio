@@ -15,13 +15,17 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { firstValueFrom } from 'rxjs';
+import { ProjectService } from 'src/app/services/projects.service';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -64,20 +68,33 @@ export class CdsActionAskgptV2Component implements OnInit {
   temp_variables = [];
   autocompleteOptions: Array<{label: string, value: string}> = [];
 
-  model_list: Array<{ name: string, value: string, multiplier: string}>;
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
-    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1 },
-    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05 }
+  model_list: Array<{ name: string, value: string, additionalText?: string}>;
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
+    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
   }
   IS_VISIBLE_ALPHA_SLIDER = false;
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.ASKGPTV2;
+
+
+  llm_model = LLM_MODEL;
+  llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
+  autocompleteOptions_2: Array<{label: string, value: string}> = [];
+  multiplier: string;
+  selectedModelConfigured: boolean = true;
+  labelModel: string = "";
+  private isInitializing = {
+    'llm_model': true,
+    'context': true,
+    'question': true
+  };
+
   
   private subscriptionChangedConnector: Subscription;
-
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -86,19 +103,34 @@ export class CdsActionAskgptV2Component implements OnInit {
     private dashboardService: DashboardService,
     private openaiService: OpenaiService,
     private translate: TranslateService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private readonly projectService: ProjectService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.logger.log("[ACTION-ASKGPTV2] action detail: ", this.action);
     this.project_id = this.dashboardService.projectID
-    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
-      if(ai_models[el.value])
-        return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
-      else
-        return { ...el, multiplier: null }
-    })
+    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
+
+    OPENAI_MODEL.forEach(el => {
+      if (ai_models[el.value]) {
+        el.additionalText = `${ai_models[el.value]} x tokens`;
+        el.status = 'active';
+      } else {
+        el.additionalText = null;
+        el.status = 'inactive';
+      }
+    });
+    this.model_list = OPENAI_MODEL.filter(el => el.status === 'active')
+
+    this.llm_models_2 = generateLlmModels2();
+    this.llm_models_2.forEach(model => {
+      if (ai_models[model.model]) {
+        model.multiplier = ai_models[model.model].toString();
+      }
+    });
+    this.logger.log("[ACTION-ASKGPTV2] model_list: ", this.llm_models_2, ai_models);
+
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
       this.connector = connector;
@@ -113,6 +145,8 @@ export class CdsActionAskgptV2Component implements OnInit {
     }
     this.getListNamespaces();
     // this.patchActionsKey();
+
+    await this.initialize();
   }
 
   ngOnDestroy() {
@@ -125,6 +159,48 @@ export class CdsActionAskgptV2Component implements OnInit {
   //   //this.getKnowledgeBaseSettings();
   //   this.initializeAttributes();
   // }
+
+  private async initialize(){
+    await this.initLLMModels();
+    this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
+    this.multiplier = this.llm_models_2.find(el => el.labelModel === this.labelModel)?.multiplier;
+    this.logger.log("[ACTION ASKGPTV2] 0 initialize llm_options_models: ", this.action, this.labelModel);
+    this.setModel(this.labelModel);
+  }
+
+
+  async initLLMModels(){
+    const result = await initLLMModels({
+      projectService: this.projectService,
+      dashboardService: this.dashboardService,
+      appConfigService: this.appConfigService,
+      logger: this.logger,
+      action: this.action,
+      llm_model: this.llm_model,
+      componentName: 'ACTION ASKGPTV2'
+    });
+    
+    this.llm_models_2 = result.llm_models_2;
+    this.autocompleteOptions = result.autocompleteOptions;
+    this.autocompleteOptions_2 = result.autocompleteOptions_2;
+    this.multiplier = result.multiplier;
+    // Note: askgpt-v2 uses labelModel instead of actionLabelModel
+  }
+
+
+
+
+  setModel(labelModel: string){
+    const result = setModel(labelModel, this.llm_models_2, this.logger);
+    this.selectedModelConfigured = result.selectedModelConfigured;
+    this.action.llm = result.action.llm;
+    this.action.model = result.action.model;
+    this.action.labelModel = result.action.labelModel;
+    this.labelModel = result.labelModel;
+    this.multiplier = result.multiplier;
+    this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
+  }
+
 
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
@@ -258,11 +334,24 @@ export class CdsActionAskgptV2Component implements OnInit {
   //   }
   // }
 
-  onChangeTextarea($event: string, property: string) {
-    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", $event)
+  onChangeTextarea(event: string, property: string) {
+    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event)
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property)
-    this.action[property] = $event
-    // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    if (this.isInitializing[property]) {
+      this.isInitializing[property] = false;
+      return;
+    }
+    if (property === 'llm_model'){
+       // se event non corrisponde a nessun valore di autocompleteOptions_2 ed è diverso da '' o null allora non fare nulla
+      if(!this.autocompleteOptions_2.find(el => el.value === event) && event !== '' && event !== null) {
+        return;
+      }
+      this.action['labelModel'] = event;
+      this.labelModel = event;
+      this.setModel(event);
+    } else {
+      this.action[property] = event;
+    }
   }
   
   onBlur(event){
@@ -278,8 +367,15 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
     } else {
-      this.logger.log("event: ", event);
+      this.logger.log("[ACTION-ASKGPTV2] onChangeSelect event: ", event);
       this.action.model = event.value;
+      /** MANAGE GPT-5 MODELS */
+      if(event.value.startsWith('gpt-5')){
+        this.action.temperature = 1
+        this.ai_setting['temperature'].disabled= true
+      }else{
+        this.ai_setting['temperature'].disabled= false
+      }
       
       this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
@@ -572,4 +668,8 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
 
+  goToIntegrations(){
+    let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations'
+    window.open(url, '_blank')
+  }
 }

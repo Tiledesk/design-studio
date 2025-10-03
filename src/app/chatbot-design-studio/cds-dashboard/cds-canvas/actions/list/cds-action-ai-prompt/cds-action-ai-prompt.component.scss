@@ -1,4 +1,4 @@
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -208,60 +208,6 @@ mat-checkbox ::ng-deep {
     font-size: 11px;
     font-weight: 500;
 }
-
-.action-wait-slider {
-    align-items: center;
-    background: var(--slider-background-color);
-    border-radius: 13px;
-    display: inline-flex;
-    position: relative;
-    height: 26px;
-    padding: 0 9px 0 9px;
-    width: 100%;
-    text-align: center;
-    transition: width 0.3s ease-in;
-    font-size: 14px;
-}
-
-.action-wait-slider>mat-slider {
-    width: 100%;
-    margin-left: 6px;
-}
-
-.action-wait-slider ::ng-deep{
-    .mat-accent .mat-slider-track-fill {
-        background-color: var(--text-color) !important;
-    }
-    .mat-slider-thumb-label {
-        background-color: var(--text-color) !important;
-    }
-    .mat-slider-thumb-label-text{
-        color: var(--background-color) !important;
-    }
-    .mat-slider-thumb {
-        background-color: var(--text-color) !important;
-    }
-}
-
-.gpt-setting-input {
-    color: var(--text-color);
-    text-align: center;
-    width: 45px;
-    border: none;
-    height: 26px;
-    border-radius: 12px;
-    background-color: white;
-    border: 1px solid var(--text-color);
-}
-
-.slider-input ::ng-deep {
-    width: 60px;
-
-    input {
-        text-align: center;
-    }
-}
-
 // *********** AI SETTINGS --end *********** //
 
 .header-answer-preview {

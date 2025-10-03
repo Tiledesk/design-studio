@@ -424,6 +424,8 @@ export class ActionKBContent extends Action {
 export class ActionAskGPTV2 extends Action {
     question: string;
     model: string;
+    llm: string;
+    labelModel: string;
     assignReplyTo: string;
     assignSourceTo: string;
     assignChunksTo: string;
@@ -443,6 +445,8 @@ export class ActionAskGPTV2 extends Action {
     namespaceAsName: boolean;
     citations: boolean;
     chunks_only: boolean;
+    skip_unanswered: boolean;
+    reranking: boolean;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2
