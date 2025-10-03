@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.2-rc2
+- **bug-fix**: bug fix ai-condition and ai-prompt
+
 # 1.39.2
 
 # 1.39.1
@@ -95,7 +99,6 @@
 # 1.39.0-rc1
 - **changed**: added scroll button left and right on image gallery
 
-
 # 1.38.5
 - **changed**: update ai models
 
@@ -109,13 +112,20 @@
 # 1.38.2
 - **changed**: ai models upgraded
 
+# 1.38.2
+- **changed**: ai models upgraded
+
 # 1.38.1
 - **changed**: Changed connector-width in 2px
 
 # 1.38.0
 
+
 # 1.38.0-rc20
 - **added**: ability to manage Share_Items from BrandSrc
+
+# 1.37.5
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
 
 # 1.38.0-rc19
 - **bug-fixed**: Voice menu compatibility patch if there is no subtype
@@ -134,6 +144,7 @@
 # 1.38.0-rc15
 - **changed**:: change textarea limitCharsText (from 10.000 to 100.000) in system context cds-action-ai-prompt, system context cds-action-askgpt-v2, prompt cds-action-gpt-assistant, prompt cds-action-gpt-task;
 - **changed**:: enabled hundreds separator for numeric characters in textarea.component
+
 
 # 1.38.0-rc14
 - **added**: Open KNB link in new tab in intent detail panel
@@ -183,12 +194,6 @@
 # 1.38.0-rc1
 - **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
 
-# 1.37.6
-- **added**: ability to manage Share_Items from BrandSrc
-
-# 1.37.5
-- **bug-fixed**: Voice menu compatibility patch if there is no subtype
-
 # 1.37.4
 - **bug-fixed**: added models in json-gallery
 
@@ -200,6 +205,9 @@
 
 # 1.37.1
 
+# 1.37.0-rc3
+- **bug-fixed**: delete webhook only when it is stopped
+
 # 1.37.0-rc2
 - **bug-fixed**: widget-log: disabled collapse row; stop webhook log when click on the stage
 
@@ -208,6 +216,30 @@
 
 # 1.36.1
 - **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc7
+- **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc6
+- **bug-fixed**: added width and height to previewModel images in action reply gallery
+- **bug-fixed**: in widget-log added ellips on the row, row opening, fixed display for very long texts, added selectable text, graphic adjustments
+
+# 1.36.0-rc5
+- **changed**: added ellips in log lines in ds-widget-logs.component
+
+# 1.36.0-rc4
+- **bug-fixed**: all actions that contain block selection on true/false do not display connector on stage when create via action detail panel
+- **bug-fixed**: about corrupted connectors with full dot but no connector on the stage
+- **bug-fixed**: the webhook opens the detail also on drag, it should open it only on click
+
+# 1.36.0-rc3
+- **bug-fixed**: updated textarea value in action AI prompt
+
+# 1.36.0-rc2
+- **added**: voice preview player for elevenlabs voices for voice_twilio chatbot type
+
+# 1.36.0-rc1
+- **added**: support for elevenLabs voices for voice_twilio chatbot 
 
 # 1.36.0
 - **bug-fixed**: added width and height to previewModel images in action reply gallery

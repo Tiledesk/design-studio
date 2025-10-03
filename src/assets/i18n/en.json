@@ -553,6 +553,7 @@
         "AnswerKB": "Answer",
         "EnterQuestion": "Your question",
         "EnterAnswer": "Your answer",
+        "DeprecationMessage": "🚫 This action is deprecated and will no longer be supported",
         "ConfigureModel": "Configure"
     },
     "Alert": {

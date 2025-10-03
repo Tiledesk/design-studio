@@ -15,7 +15,7 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 
 //UTILS
 import { AttributesDialogAiPromptComponent } from './attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
@@ -48,10 +48,10 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   panelOpenState = false;
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
-  llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+  llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive",  additionalText?: string }> = [];
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false}
   }
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
@@ -90,7 +90,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.GPT_TASK;
   llm_model = LLM_MODEL;
-  autocompleteOptions: Array<{label: string, value: string}> = [];
+  autocompleteOptions: Array<{label: string, value: string,  additionalText?: string}> = [];
 
   llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
   autocompleteOptions_2: Array<{label: string, value: string}> = [];
@@ -172,7 +172,8 @@ export class CdsActionAiPromptComponent implements OnInit {
     await this.initLLMModels();
     this.multiplier = this.llm_models_2.find(el => el.labelModel === this.labelModel)?.multiplier;
     this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
-    this.logger.log("[ACTION AI_PROMPT] 0 initialize llm_options_models: ", this.action, this.labelModel);
+    this.multiplier = this.llm_models_2.find(el => el.labelModel === this.labelModel)?.multiplier;
+    this.logger.log("[ACTION AI_PROMPT] 0 initialize multiplier: ", this.action, this.multiplier);
     this.setModel(this.labelModel);
     const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
     this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
@@ -185,11 +186,9 @@ export class CdsActionAiPromptComponent implements OnInit {
         const NEW_MODELS = await this.getIntegrationByName();
         if(NEW_MODELS?.value?.models){
           this.logger.log('[ACTION AI_PROMPT] - NEW_MODELS:', NEW_MODELS.value.models);
-          const models = NEW_MODELS?.value?.models.map(item => ({
-            name: item,
-            value: item
-          }));
-          model.models = models;
+          (NEW_MODELS?.value?.models as Array<string>).forEach(item => {
+            OLLAMA_MODEL.push({ name: item, value: item, description: null, status: 'active' });
+          });
         }
       }
     });
@@ -323,6 +322,13 @@ export class CdsActionAiPromptComponent implements OnInit {
     }
     if(property === 'model'){
       this.action['labelModel'] = event;
+      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
+        this.action.temperature = 1
+        this.ai_setting['temperature'].disabled= true
+      } else {
+        this.ai_setting['temperature'].disabled= false
+      }
+      this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;
     } else if (property === 'context'){
@@ -345,16 +351,27 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   onOptionSelected(event: any, property: string){
     this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
-    this.actionLabelModel = event.label;
-    this.labelModel = event.label;
-    if(property === 'llm_model'){
-      this.setModel(event.label);
-    } else if (property === 'model'){
-      // this.actionLabelModel = event.label;
-      this.action[property] = event.value;
-    }
-    this.updateAndSaveAction.emit();
+    this.actionLabelModel = event.value;
+    this.action[property] = event.value;
+    // this.updateAndSaveAction.emit();
   }
+
+  // onBlur(event: any, property?: string){
+  //   if(property === 'model'){
+  //     this.action[property] = event;
+  //     this.action['labelModel'] = event;
+  //   }
+  //   this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action, property);
+  //   this.actionLabelModel = event.label;
+  //   this.labelModel = event.label;
+  //   if(property === 'llm_model'){
+  //     this.setModel(event.label);
+  //   } else if (property === 'model'){
+  //     // this.actionLabelModel = event.label;
+  //     this.action[property] = event.value;
+  //   }
+  //   this.updateAndSaveAction.emit();
+  // }
 
 setModel(labelModel: string){
   const result = setModel(labelModel, this.llm_models_2, this.logger);
@@ -395,7 +412,6 @@ setModel(labelModel: string){
       this.action.llm = llm;
       this.action.model = model;
       this.action.labelModel = event.labelModel;
-      
       // Update selectedModelConfigured based on the selected model
       const selectedModel = this.llm_models_2.find(m => m.labelModel === event.labelModel);
       this.selectedModelConfigured = selectedModel ? selectedModel.configured : true;
@@ -461,14 +477,11 @@ setModel(labelModel: string){
   execPreview() {
     // this.scrollToBottom();
     this.checkVariables().then((resp) => {
-
       if (resp === true) {
         this.getResponse(this.action.question);
-
       } else {
         this.openAttributesDialog();
       }
-
     })
   }
 
@@ -478,22 +491,17 @@ setModel(labelModel: string){
       let string = this.action.question;
       let matches = string.match(regex);
       let response: boolean = true;
-
       if (!matches || matches.length == 0) {
         resolve(true);
-
       } else {
-
         this.temp_variables = [];
         matches.forEach((m) => {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
-
           if (attr?.value) {
             this.temp_variables.push({ name: name, value: attr.value });
           } else if (attr && !attr.value) {
             this.temp_variables.push({ name: name, value: null });
-
           } else {
             this.temp_variables.push({ name: name, value: null });
             this.action.preview.push({ name: name, value: null });
