@@ -102,17 +102,20 @@ const llm_models_2: Array<{labelModel: string, llm: string, model: string, descr
 // Process each provider's models
 LLM_MODEL.forEach(provider => {
   provider.models.forEach(model => {
-    const transformedName = `${provider.name} - ${model.name}`;
-    // Add to the new array
-    llm_models_2.push({
-      labelModel:transformedName,
-      llm:provider.value,
-      model:model.value,
-      description: model.description,
-      src: provider.src,
-      status: model.status,
-      configured: false
-    });
+    // Only add models with status "active"
+    if (model.status === "active") {
+      const transformedName = `${provider.name} - ${model.name}`;
+      // Add to the new array
+      llm_models_2.push({
+        labelModel:transformedName,
+        llm:provider.value,
+        model:model.value,
+        description: model.description,
+        src: provider.src,
+        status: model.status,
+        configured: false
+      });
+    }
   });
 });
 return llm_models_2;
