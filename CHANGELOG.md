@@ -7,6 +7,101 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.4
+
+# 1.39.3
+- **bug-fix**: added filter status "active" in generateLlmModels
+
+# 1.39.2
+
+# 1.39.1
+
+# 1.39.0
+
+# 1.39.0-rc26
+- **bug-fix**: css ai-condition fixed bug with long text in preview
+
+# 1.39.0-rc25
+- **changed**: change css tag "new", "beta"
+- **bug-fix**: disable scroll on preview button in ai-prompt
+- **bug-fix**: css ai-condition
+
+# 1.39.0-rc24
+- **changed**: set isLiquidjs to false in web request from data
+
+# 1.39.0-rc23
+
+# 1.39.0-rc22
+- **changed**: disabled badge "NEW" on "replaceAIAgent", "AddKBContent", "FlowLog"
+
+# 1.39.0-rc21
+- **added**: changed the selection of LLM and model to only one select in ai-condition
+- **bug-fix**: fixed prompt saving error in "ai-condoition"
+- **changed**: graphical changes in the "ai-condition" action preview
+
+# 1.39.0-rc20
+
+# 1.39.0-rc19
+- **added**: noMatch for action DTMF_Form for voice bot
+
+# 1.39.0-rc18
+- **bug-fix**: new order, openai and ollama never red
+
+# 1.39.0-rc17
+- **bug-fix**: added catch (error) in getElevenLabsVoices and getElevenLabsModels
+
+# 1.39.0-rc16
+- **bug-fix**: Fixed save prompt error
+
+# 1.39.0-rc15
+- **added**: Added text area with autocomplete in LLM model selection
+
+# 1.39.0-rc14
+- **changed**: changed the selection of LLM and model to only one select
+
+# 1.39.0-rc12
+- **changed**: added default intructions value "User said: {{lastUserText}}"
+
+# 1.39.0-rc11
+- **added**: deprecation message and badge status. GPT Task action set as deprecated
+
+# 1.39.0-rc10
+- **bug-fix**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
+
+# 1.39.0-rc9
+- **bug-fix**: fixed bug new connector in action ai-condition 
+
+# 1.39.0-rc8
+- **bug-fix**: fixed bugs in action ai-condition
+
+# 1.39.0-rc7
+- **added**: disabled property for mat-slider in ai-settings section
+
+# 1.39.0-rc6
+- **added**: added action ai-condition
+
+# 1.39.0-rc5
+- **added**: additionalText input property in cds-text component
+- **added**: managed openai and ollama models for AiPrompt action
+- **added**: name of selected namespace in AskKbv2 action
+- **changed**: disabled action gpt_task
+- **removed**: TYPE_GPT_MODEL in favour of OPENAI_MODEL
+
+# 1.39.0-rc4
+- **added**: gpt-5 models in AI Prompt action
+
+# 1.39.0-rc3
+- **changed**: set text charts limit to 10000
+- **changed**: changed the name of JSON buttons to (JSON Buttons and JSON Carousel) and always show it
+
+# 1.39.0-rc2
+- **changed**: anyComponentStyle maximum error limit
+
+# 1.39.0-rc1
+- **changed**: added scroll button left and right on image gallery
+
+
 # 1.38.5
 - **changed**: update ai models
 
