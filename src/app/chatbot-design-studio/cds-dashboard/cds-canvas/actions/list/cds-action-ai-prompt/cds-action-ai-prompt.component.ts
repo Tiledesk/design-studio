@@ -218,7 +218,7 @@ export class CdsActionAiPromptComponent implements OnInit {
       llm_model: this.llm_model,
       componentName: 'ACTION AI_PROMPT'
     });
-    
+  
     this.llm_models_2 = result.llm_models_2;
     this.autocompleteOptions = result.autocompleteOptions;
     this.autocompleteOptions_2 = result.autocompleteOptions_2;
