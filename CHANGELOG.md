@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.4
+
 # 1.39.3
 - **bug-fix**: added filter status "active" in generateLlmModels
 
