@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.2-rc3
+- **changed**: changed select llm model in askgpt-v2
+- **changed**: moved common functions between ai-prompt, ai-condition and askgpt-v2 actions in utils-llm-model
+- **added**: skip_unanswered and reranking in AskKbv2 
 
 # 1.39.2-rc2
 - **bug-fix**: bug fix ai-condition and ai-prompt
