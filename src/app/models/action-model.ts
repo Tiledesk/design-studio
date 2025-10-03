@@ -500,6 +500,25 @@ export class ActionAiPrompt extends Action {
     }
 }
 
+export class ActionAiCondition extends Action {
+    question: string;
+    intents: Array<any>;
+    instructions: string;
+    llm: string;
+    model: string;
+    max_tokens: number;
+    temperature: number;
+    labelModel: string;
+    preview?: Array<any>;
+    fallbackIntent: string;
+    errorIntent: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.AI_CONDITION,
+        this.intents = [];
+    }
+}
+
 export class ActionCaptureUserReply extends Action {
     assignResultTo: string;
     goToIntent: string;

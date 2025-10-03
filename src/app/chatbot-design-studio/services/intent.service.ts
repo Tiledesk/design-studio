@@ -1,7 +1,7 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { environment } from 'src/environments/environment';
@@ -19,6 +19,7 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { FirebaseUploadService } from 'src/chat21-core/providers/firebase/firebase-upload.service';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -1082,6 +1083,24 @@ export class IntentService {
       action.preview = [];
       action.formatType = 'none'
     }
+
+    if(typeAction === TYPE_ACTION.AI_CONDITION){
+      action = new ActionAiCondition();
+      action.max_tokens = 256;
+      action.temperature = 0.7;
+      action.model = LLM_MODEL.find(el => el.value === 'cohere').value
+      action.assignReplyTo = TYPE_ACTION.AI_CONDITION;
+      const idCondition = generateShortUID();
+      action.instructions = "User said: {{lastUserText}}";
+      action.intents.push({
+        "label": idCondition,
+        "prompt": "",
+        "conditionIntentId": ""
+      });
+      action.fallbackIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
+      action.errorIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
+    }
+
     if(typeAction === TYPE_ACTION.CAPTURE_USER_REPLY) {
       action = new ActionCaptureUserReply();
     }
@@ -1890,6 +1909,20 @@ export class IntentService {
       this.updateIntent(intent);
       this.logger.log('[INTENT SERVICE] -> updateIntentAttributeConnectors, ', intent);
     }
+  }
+
+
+  /**
+   * getDefaultFallbackIntent
+   * @returns the defaultFallback intent if it exists
+   */
+  private getDefaultFallbackIntent(): Intent | null {
+    if (this.listOfIntents && this.listOfIntents.length > 0) {
+      return this.listOfIntents.find(intent => 
+        intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK
+      ) || null;
+    }
+    return null;
   }
 
 

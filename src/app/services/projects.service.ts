@@ -241,7 +241,7 @@ export class ProjectService {
       })
     };
     return this.http.get(url, httpOptions);
-   }
+  }
 
 
    getIntegrations(project_id: string): Observable<any> {

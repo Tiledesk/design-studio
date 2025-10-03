@@ -341,6 +341,13 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-ai-prompt>
 
+                    <cds-action-ai-condition *ngSwitchCase="TYPE_ACTION.AI_CONDITION" 
+                        class="panel-response" 
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-ai-condition>
+
                     <cds-action-capture-user-reply *ngSwitchCase="TYPE_ACTION.CAPTURE_USER_REPLY" 
                         class="panel-response" 
                         [intentSelected]="intent"

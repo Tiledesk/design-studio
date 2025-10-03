@@ -89,7 +89,7 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
   { name: "Groq",           value: "groq",              description: "",      src:"assets/images/icons/ai_prompt/groq.svg",        status: "active",   models: GROQ_MODEL          },
   { name: "Deepseek",       value: "deepseek",          description: "",      src:"assets/images/icons/ai_prompt/deepseek.svg",    status: "active",   models: DEEPSEEK_MODEL      },
   { name: "Ollama",         value: "ollama",            description: "",      src:"assets/images/icons/ai_prompt/ollama.svg",      status: "active",   models: OLLAMA_MODEL        },
-  { name: "Openai",         value: "openai",            description: "",      src:"assets/images/icons/ai_prompt/openai.svg",      status: "active",   models: OPENAI_MODEL        },
+  { name: "OpenAI",         value: "openai",            description: "",      src:"assets/images/icons/ai_prompt/openai.svg",      status: "active",   models: OPENAI_MODEL        },
 ]
 
 /**
@@ -102,17 +102,20 @@ const llm_models_2: Array<{labelModel: string, llm: string, model: string, descr
 // Process each provider's models
 LLM_MODEL.forEach(provider => {
   provider.models.forEach(model => {
-    const transformedName = `${provider.name} - ${model.name}`;
-    // Add to the new array
-    llm_models_2.push({
-      labelModel:transformedName,
-      llm:provider.value,
-      model:model.value,
-      description: model.description,
-      src: provider.src,
-      status: model.status,
-      configured: false
-    });
+    // Only add models with status "active"
+    if (model.status === "active") {
+      const transformedName = `${provider.name} - ${model.name}`;
+      // Add to the new array
+      llm_models_2.push({
+        labelModel:transformedName,
+        llm:provider.value,
+        model:model.value,
+        description: model.description,
+        src: provider.src,
+        status: model.status,
+        configured: false
+      });
+    }
   });
 });
 return llm_models_2;

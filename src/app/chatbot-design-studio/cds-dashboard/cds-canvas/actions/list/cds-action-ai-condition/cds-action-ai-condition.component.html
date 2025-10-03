@@ -1,33 +1,14 @@
 <div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
 
-    <div class="action-row">
-        <div class="action-row-left">
-            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
-                <path d="M0 0h24v24H0V0z" fill="none" />
-                <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
-            </svg>
-        </div>
-
-        <div class="action-row-right">
-            <div *ngIf="action?.question" class="action-row-right">
-                {{action?.question}}
-            </div>
-            <div *ngIf="!action?.question" class="action-row-right empty">
-                {{'CDSCanvas.EnterPrompt' | translate }}
-            </div>
-        </div>
-
-    </div>
 
     <div class="action-row">
         <div id="gpt-icon" class="action-row-left icon-action">
             <mat-icon *ngIf="!action?.llm" svgIcon="add_ai_model" aria-hidden="true"></mat-icon>
             <img *ngIf="action?.llm" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
         </div>
-
         <div class="action-row-right">
             <div *ngIf="action?.llm" class="action-row-right">
-                {{ (llm_models | find:{key: 'value', value: action?.llm })?.name }} <span *ngIf="action?.model">({{action?.model}})</span>
+                {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">({{action?.model}})</span>
             </div>
             <div *ngIf="!action?.llm" class="action-row-right empty">
                 {{'CDSCanvas.ChooseTheAIModel' | translate }}
@@ -35,100 +16,122 @@
         </div>
     </div>
 
-    <div class="previewContent">
-        
-        <div class="icon-action">
-            <img class="active-icon" src="assets/images/icons/if_condition.svg">
-        </div>
 
-        <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
-        
-        <cds-connector class="connector-true"
-            [idConnector] = "idConnectorTrue"
-            [idConnection] = "idConnectionTrue"
-            [isConnected] = "isConnectedTrue">
+
+    <div *ngFor="let intent of action.intents; let i = index">
+        <div class="action-row">
+            <div class="intent-preview-info">
+                <div class="intent-prompt-preview" *ngIf="intent.prompt">
+                    <span class="prompt-text">{{intent.prompt}}</span>
+                </div>
+                <div class="intent-prompt-preview empty" *ngIf="!intent.prompt">
+                    <span class="prompt-text">No prompt defined</span>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="intent.label" class="previewContent">
+            <!-- <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label> -->
+            <cds-connector class="connector-true"
+                 [idConnector]   = "listOfConnectors[intent.label]?.idConnector"    
+                 [idConnection]  = "listOfConnectors[intent.label]?.idConnection"
+                 [isConnected]   = "listOfConnectors[intent.label]?.isConnected">
+            </cds-connector>
+        </div>
+        <hr class="preview-divider">
+    </div>
+
+
+    <div class="add-intent-container">
+         <button class="btn btn-secondary add-intent-btn" 
+                 type="button" 
+                 (click)="$event.stopPropagation();addNewCondition()">
+             <span class="material-icons">add</span>
+             Add Condition
+         </button>
+     </div>
+     
+    <!-- <hr class="preview-divider"> -->
+
+
+    <div class="previewContent">
+        <!-- {{'CDSCanvas.Fallback' | translate }} -->
+       <label class="title-preview-label">Fallback</label>
+        <cds-connector class="connector-false"
+            [idConnector]   = "idConnectorFallback"
+            [idConnection]  = "idConnectionFallback"
+            [isConnected]   = "isConnectedFallback">
         </cds-connector>
     </div>
 
-    <hr class="preview-divider">
+    <!-- <hr class="preview-divider"> -->
 
     <div class="previewContent">
-       <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+       <label class="title-preview-label">{{'CDSCanvas.Error' | translate }}</label>
         <cds-connector class="connector-false"
-            [idConnector] = "idConnectorFalse"
-            [idConnection] = "idConnectionFalse"
-            [isConnected] = "isConnectedFalse">
+            [idConnector]   = "idConnectorError"
+            [idConnection]  = "idConnectionError"
+            [isConnected]   = "isConnectedError">
         </cds-connector>
     </div>
 
 </div>
 
-<!-- <div id="variables" class="content" *ngIf="!previewMode && showVariablesSection"
-    [ngClass]="{active: showVariablesSection === true}">
-
-    <div class="variables-content-header">
-        <span class="material-icons-round back-button" (click)="showHideVariablesSection()">undo</span>
-        <label class="title-label">Set variables</label>
-    </div>
-
-    <div class="variables-container">
-
-        <div *ngFor="let variable of temp_variables" class="single-variable">
-            <div class="variable-name">{{ variable.name }}</div>
-            <cds-text [text]="variable.value" (onChange)="onChangeVar($event, variable.name)"></cds-text>
-
-        </div>
-    </div>
-</div> -->
 
 <div id="scrollMe" #scrollMe *ngIf="!previewMode && !showVariablesSection" class="content-panel-intent-detail no-footer">
 
 
+    <!-- AI Condition Component -->
     <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.Prompt' | translate }}</label>
-        <cds-textarea id="question" 
+        <div *ngFor="let intent of action.intents; let i = index">
+             <app-ai-condition 
+                [index]="i" 
+                [intent]="intent"
+                [listOfIntents]="listOfIntents"
+                (updateAndSaveConnectors)="onUpdateAndSaveConnectors(intent, $event.type)"
+                (updateAndSaveAction)="onUpdateAndSaveAction(intent)"
+                (deleteCondition)="onDeleteCondition($event)">
+             </app-ai-condition>
+         </div>
+
+    </div>
+    
+    <!-- Add New Intent Button -->
+    <div class="add-intent-container">
+         <button class="btn btn-secondary add-intent-btn" 
+                 type="button" 
+                 (click)="$event.stopPropagation();addNewCondition()">
+             <span class="material-icons">add</span>
+             Add Condition
+         </button>
+    </div>
+
+    <div class="ai-condition-instructions">
+        <div class="condition-header">
+            <label class="condition-number">Instructions</label>
+        </div>
+        <cds-textarea id="instructions" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true" 
             [limitCharsText]="100000"
             [minRow]="4"[maxRow]="25" 
-            [text]="action.question" 
-            [placeholder]="'CDSCanvas.EnterPrompt' | translate"
+            [text]="action.instructions" 
+            [placeholder]="placeholder"
             (blur)="onBlur($event)"
-            (changeTextarea)="onChangeTextarea($event, $event, 'question')">
+            (changeTextarea)="onChangeTextarea($event, '', 'instructions')"
+            >
+            <!--  -->
         </cds-textarea>
-    </div>
-
-
-    <div class="field-box">
-        <section class="disable-input-message-section">
-            <mat-checkbox 
-                [checked]="action?.history"
-                (change)="onChangeCheckbox($event, 'history')">
-                {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
-            </mat-checkbox>
-        </section>
-    </div>
-
-    <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
-        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
-            [disabled]="!action.question" (click)="execPreview()">
-            <span class="material-icons">preview</span>
-            {{'CDSCanvas.Preview' | translate }}
-        </button>
     </div>
 
     <div class="answer-preview" *ngIf="showPreview">
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm })?.name }} )</span>
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} )</span>
                 </label>
-                <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
-                    (click)="showHideVariablesSection()">Set variables
-                    <span class="material-icons-round">
-                        chevron_right
-                    </span>
-                </button> -->
             </div>
         </div>
 
@@ -149,42 +152,6 @@
 
         </div>
 
-        <!-- <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.answer">
-            <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
-        </div> -->
-
-        <!-- <div id="preview-container" class="preview-container">
-
-            <div class="placeholder-container" *ngIf="missingVariables">
-                <div style="display: flex; flex-direction: column; width: 100%;">
-                    <span style="margin-left: 8px;">Set all variables to get the preview</span>
-                </div>
-            </div>
-
-            <div class="placeholder-container" *ngIf="searching && !missingVariables">
-                <loading-spinner class="custom-spinner"></loading-spinner>
-                <span style="margin-left: 8px;">Generating answer...</span>
-            </div>
-
-            <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content">
-                {{ ai_response.choices[0].message.content }}
-            </div>
-
-            <div *ngIf="showAiError">
-                {{ ai_error }}
-            </div>
-        </div>
-
-        <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content"
-            style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 6px; padding: 0px 4px; color: #a6a6a6;  font-size: 11px; width: 100%;">
-            <span style="font-weight: 500;">Tokens usage</span>
-            <span>Prompt: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>Answer: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens }}</span>
-        </div> -->
     </div>
 
     <mat-accordion>
@@ -197,29 +164,9 @@
             </mat-expansion-panel-header>
             <div>
 
-
-
-                 <!-- // llm select -->
-                 <div class="field-box">
+                <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
-                    
-                    <!-- 
                     <div class="select-container" [class.not-configured]="!selectedModelConfigured">
-                        <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
-                        <cds-select id="model-condition"
-                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
-                            [items]="llm_models_2" 
-                            [itemSelected]="labelModel"
-                            [bindLabelSelect]="'labelModel'" 
-                            [bindValueSelect]="'value'"
-                            [placeholder]="'CDSCanvas.SelectLL' | translate"
-                            (onSelected)="onChangeSelect($event, 'llm2')">
-                        </cds-select>
-                    </div> 
-                    -->
-                    
-                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
-                        <!-- <div class="status-indicator" *ngIf="!selectedModelConfigured"></div> -->
                         <cds-text id="text-label-model"
                             class="sx-input" 
                             [class]="!selectedModelConfigured ? 'not-configured' : ''"
@@ -235,13 +182,14 @@
                             -->
                         </cds-text>
                     </div>
-             
                     <!-- Container per i due elementi sulla stessa riga -->
                     <div class="bottom-row">
                         <div class="multiplier-container"><span *ngIf="multiplier">{{multiplier}} x tokens</span></div>
                         <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
                     </div>
+
                 </div>
+
                 
                 <!-- // llm select -->
                 <!-- <div class="field-box">
@@ -254,9 +202,9 @@
                         [placeholder]="'CDSCanvas.SelectLL' | translate"
                         (onSelected)="onChangeSelect($event, 'llm')">
                     </cds-select>
-                </div>
+                </div> -->
 
-                <div class="field-box">
+                <!-- <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.Model' | translate }}</label>
                     <cds-text id="text"
                         class="sx-input" 
@@ -281,7 +229,7 @@
                         <div class="action-wait-slider ">
                             <div class="action-wait-range">{{ai_setting['max_tokens'].min}}</div>
                             <mat-slider 
-                                class="wait-slider"  thumbLabel 
+                                class="wait-slider" thumbLabel 
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
@@ -311,7 +259,6 @@
                                     [step]="ai_setting['temperature'].step"  
                                     [min]="ai_setting['temperature'].min"
                                     [max]="ai_setting['temperature'].max" 
-                                    [disabled]="ai_setting['temperature'].disabled"
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>
@@ -367,61 +314,45 @@
     <div class="field-box">
         <label class="subtitle-label">{{'CDSCanvas.ErrorAutomaticAssign' | translate }}
             <b>flowError</b>
-            <!-- <span class="tag-container">
-                <span class="tag-label">flowError</span>
-            </span> -->
         </label> 
     </div>
 
     
     <hr class="custom-divider">
-    
 
     <div class="field-box">
         <div class="condition-container">
-            <div class="icon-action">
-                <img class="active-icon" src="assets/images/icons/if_condition.svg">
-            </div>
-            <label class="condition-text">{{'CDSCanvas.Success' | translate }}</label>
+            <!-- {{'CDSCanvas.Fallback' | translate | titlecase}} -->
+            <label class="condition-text">Fallback</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
-            [itemSelected]="action?.trueIntent" 
+            [itemSelected]="action?.fallbackIntent" 
             [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
-            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
-            (onReset)="onResetBlockSelect($event, 'trueIntent')">
+            (onSelected)="onChangeBlockSelect($event, 'fallbackIntent')"
+            (onReset)="onResetBlockSelect($event, 'fallbackIntent')">
         </cds-select>
-        <!-- <cds-attributes 
-            class="cds-attributes" 
-            [attributes]="trueIntentAttributes"
-            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
-        </cds-attributes> -->
     </div>
+
+    <hr class="custom-divider">
 
     <div class="field-box">
         <div class="condition-container">
-            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
+            <label class="condition-text">{{'CDSCanvas.Error' | translate | titlecase}}</label>
         </div>
         <cds-select id="text-condition" 
             [items]="listOfIntents" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
-            [itemSelected]="action?.falseIntent" 
+            [itemSelected]="action?.errorIntent" 
             [placeholder]="'CDSCanvas.SelectABlock' | translate"
             [clearable]="true" 
-            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
-            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+            (onSelected)="onChangeBlockSelect($event, 'errorIntent')"
+            (onReset)="onResetBlockSelect($event, 'errorIntent')">
         </cds-select>
-        <!-- <cds-attributes 
-            class="cds-attributes" 
-            [attributes]="action.falseIntentAttributes"
-            (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
-        </cds-attributes> -->
     </div>
-
-
 
 </div>
