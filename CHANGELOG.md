@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.3-rc1
+- **bug-fix**: added filter status "active" in generateLlmModels
+
 # 1.39.2-rc3
 - **changed**: changed select llm model in askgpt-v2
 - **changed**: moved common functions between ai-prompt, ai-condition and askgpt-v2 actions in utils-llm-model
