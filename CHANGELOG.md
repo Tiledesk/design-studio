@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.5
+- **bug-fix**: added gpt-5 in aiModels env
+- **added**: added a temperature filter if the model is gpt-5
 
 # 1.39.4
 
