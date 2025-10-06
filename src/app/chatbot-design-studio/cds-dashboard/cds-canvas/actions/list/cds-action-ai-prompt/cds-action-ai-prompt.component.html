@@ -208,7 +208,7 @@
                         <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
                         <cds-select id="model-condition"
                             [class]="!selectedModelConfigured ? 'not-configured' : ''"
-                            [items]="llm_models_2" 
+                            [items]="llm_models_flat" 
                             [itemSelected]="labelModel"
                             [bindLabelSelect]="'labelModel'" 
                             [bindValueSelect]="'value'"
@@ -224,7 +224,7 @@
                             class="sx-input" 
                             [class]="!selectedModelConfigured ? 'not-configured' : ''"
                             [text]="labelModel"
-                            [autocompleteOptions]="autocompleteOptions_2"
+                            [autocompleteOptions]="autocompleteOptionsFlat"
                             [placeholder]="'CDSCanvas.Model' | translate"
                             [setAttributeBtn]="false"
                             (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"

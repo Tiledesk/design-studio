@@ -22,7 +22,7 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
-import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
 import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels } from 'src/app/chatbot-design-studio/utils-llm-models';
@@ -83,8 +83,8 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
   llm_model = LLM_MODEL;
-  llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
-  autocompleteOptions_2: Array<{label: string, value: string}> = [];
+  llm_models_flat: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
+  autocompleteOptionsFlat: Array<{label: string, value: string}> = [];
   multiplier: string;
   selectedModelConfigured: boolean = true;
   labelModel: string = "";
@@ -119,13 +119,13 @@ export class CdsActionAskgptV2Component implements OnInit {
         return { ...el, multiplier: null }
     })
 
-    this.llm_models_2 = generateLlmModels2();
-    this.llm_models_2.forEach(model => {
+    this.llm_models_flat = generateLlmModelsFlat();
+    this.llm_models_flat.forEach(model => {
       if (ai_models[model.model]) {
         model.multiplier = ai_models[model.model].toString();
       }
     });
-    this.logger.log("[ACTION-ASKGPTV2] model_list: ", this.llm_models_2, ai_models);
+    this.logger.log("[ACTION-ASKGPTV2] model_list: ", this.llm_models_flat, ai_models);
 
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
@@ -141,7 +141,6 @@ export class CdsActionAskgptV2Component implements OnInit {
     }
     this.getListNamespaces();
     // this.patchActionsKey();
-
     await this.initialize();
   }
 
@@ -159,7 +158,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   private async initialize(){
     await this.initLLMModels();
     this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
-    this.multiplier = this.llm_models_2.find(el => el.labelModel === this.labelModel)?.multiplier;
+    this.multiplier = this.llm_models_flat.find(el => el.labelModel === this.labelModel)?.multiplier;
     this.logger.log("[ACTION ASKGPTV2] 0 initialize llm_options_models: ", this.action, this.labelModel);
     this.setModel(this.labelModel);
   }
@@ -176,9 +175,9 @@ export class CdsActionAskgptV2Component implements OnInit {
       componentName: 'ACTION ASKGPTV2'
     });
     
-    this.llm_models_2 = result.llm_models_2;
+    this.llm_models_flat = result.llm_models_flat;
     this.autocompleteOptions = result.autocompleteOptions;
-    this.autocompleteOptions_2 = result.autocompleteOptions_2;
+    this.autocompleteOptionsFlat = result.autocompleteOptionsFlat;
     this.multiplier = result.multiplier;
     // Note: askgpt-v2 uses labelModel instead of actionLabelModel
   }
@@ -187,7 +186,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
   setModel(labelModel: string){
-    const result = setModel(labelModel, this.llm_models_2, this.logger);
+    const result = setModel(labelModel, this.llm_models_flat, this.logger);
     this.selectedModelConfigured = result.selectedModelConfigured;
     this.action.llm = result.action.llm;
     this.action.model = result.action.model;
@@ -338,8 +337,8 @@ export class CdsActionAskgptV2Component implements OnInit {
       return;
     }
     if (property === 'llm_model'){
-       // se event non corrisponde a nessun valore di autocompleteOptions_2 ed è diverso da '' o null allora non fare nulla
-      if(!this.autocompleteOptions_2.find(el => el.value === event) && event !== '' && event !== null) {
+       // se event non corrisponde a nessun valore di autocompleteOptionsFlat ed è diverso da '' o null allora non fare nulla
+      if(!this.autocompleteOptionsFlat.find(el => el.value === event) && event !== '' && event !== null) {
         return;
       }
       this.action['labelModel'] = event;
