@@ -171,7 +171,7 @@
                             class="sx-input" 
                             [class]="!selectedModelConfigured ? 'not-configured' : ''"
                             [text]="labelModel"
-                            [autocompleteOptions]="autocompleteOptions_2"
+                            [autocompleteOptions]="autocompleteOptionsFlat"
                             [placeholder]="'CDSCanvas.Model' | translate"
                             [setAttributeBtn]="false"
                             (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"
