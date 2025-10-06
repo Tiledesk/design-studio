@@ -93,18 +93,18 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
 ]
 
 /**
-* Generates llm_models_2 array by transforming all models from utils-ai_models
+* Generates llm_models_flat array by transforming all models from utils-ai_models
 * Changes name format to "Provider - ModelName" and value format to "provider-modelname"
 * Adds description and src for each record
 */
-export function generateLlmModels2(): Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> {
-const llm_models_2: Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> = [];
+export function generateLlmModelsFlat(): Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> {
+const llm_models_flat: Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> = [];
 // Process each provider's models
 LLM_MODEL.forEach(provider => {
   provider.models.forEach(model => {
     const transformedName = `${provider.name} - ${model.name}`;
     // Add to the new array
-    llm_models_2.push({
+    llm_models_flat.push({
       labelModel:transformedName,
       llm:provider.value,
       model:model.value,
@@ -115,10 +115,10 @@ LLM_MODEL.forEach(provider => {
     });
   });
 });
-return llm_models_2;
+return llm_models_flat;
 }
 
 // Generate the array
-export const LLM_MODELS_2 = generateLlmModels2();
+export const LLM_MODELS_FLAT = generateLlmModelsFlat();
 
 /************             AI PROMPT MODEL: END        ************************/

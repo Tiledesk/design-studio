@@ -8,7 +8,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { loadTokenMultiplier } from 'src/app/utils/util';
-import { OPENAI_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 
 export interface LlmModel {
   labelModel: string;
@@ -57,9 +57,9 @@ export interface InitLLMModelsParams {
 }
 
 export interface InitLLMModelsResult {
-  llm_models_2: LlmModel[];
+  llm_models_flat: LlmModel[];
   autocompleteOptions: AutocompleteOption[];
-  autocompleteOptions_2: AutocompleteOption[];
+  autocompleteOptionsFlat: AutocompleteOption[];
   multiplier: string | null;
   actionLabelModel: string;
 }
@@ -189,13 +189,13 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLL
   logger.log(`[${componentName}] 1 - integrations:`, INTEGRATIONS);
   
   // Generate LLM models
-  const llm_models_2 = generateLlmModels2();
+  const llm_models_flat = generateLlmModelsFlat();
   
   if(INTEGRATIONS){
     INTEGRATIONS.forEach((el: any) => {
       logger.log(`[${componentName}] 1 - integration:`, el.name, el.value?.apikey);
       if(el.name && el.value?.apikey){
-        llm_models_2.forEach(model => {
+        llm_models_flat.forEach(model => {
           if(model.llm === el.name || model.llm.toLowerCase() === 'openai' || model.llm.toLowerCase() === 'ollama') {
             model.configured = true;
           }
@@ -204,7 +204,7 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLL
     });
   }
   
-  logger.log(`[${componentName}] - this.llm_models_2:`, llm_models_2);
+  logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
   
   const autocompleteOptions: AutocompleteOption[] = [];
   logger.log(`[${componentName}] initLLMModels`, action.llm);
@@ -223,8 +223,8 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLL
     }
   });
 
-  // Assegna i moltiplicatori ai modelli in llm_models_2
-  llm_models_2.forEach(model => {
+  // Assegna i moltiplicatori ai modelli in llm_models_flat
+  llm_models_flat.forEach(model => {
     if (ai_models[model.model]) {
       (model as LlmModel).multiplier = ai_models[model.model].toString();
     }
@@ -236,15 +236,15 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLL
     logger.log(`[${componentName}] filteredModels`, filteredModels);
   }
   
-  const autocompleteOptions_2: AutocompleteOption[] = [];
-  llm_models_2.forEach(el => autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
-  const sortedAutocompleteOptions_2 = sortAutocompleteOptions(autocompleteOptions_2, llm_models_2);
-  logger.log(`[${componentName}] autocompleteOptions_2`, sortedAutocompleteOptions_2);
+  const autocompleteOptionsFlat: AutocompleteOption[] = [];
+  llm_models_flat.forEach(el => autocompleteOptionsFlat.push({label: el.labelModel, value: el.labelModel}));
+  const sortedAutocompleteOptionsFlat = sortAutocompleteOptions(autocompleteOptionsFlat, llm_models_flat);
+  logger.log(`[${componentName}] autocompleteOptionsFlat`, sortedAutocompleteOptionsFlat);
   
   return {
-    llm_models_2,
+    llm_models_flat,
     autocompleteOptions,
-    autocompleteOptions_2: sortedAutocompleteOptions_2,
+    autocompleteOptionsFlat: sortedAutocompleteOptionsFlat,
     multiplier,
     actionLabelModel
   };
