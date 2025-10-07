@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.8
+
 # 1.39.7
 - **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
 - **added**: added css for temperature disabled when gpt-5 is the selected model 
