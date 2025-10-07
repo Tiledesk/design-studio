@@ -49,7 +49,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
   }
   ai_response: string = "";
@@ -440,14 +440,14 @@ setModel(labelModel: string){
     /** MANAGE GPT-5 MODELS */
     if(model.model.startsWith('gpt-5')){
       this.action.temperature = 1;
-      this.ai_setting['temperature'].disabled= true
-      this.ai_setting['max_tokens'].max = 100000;
+      // this.ai_setting['temperature'].disabled= true
+      // this.ai_setting['max_tokens'].max = 100000;
     }else{
       this.ai_setting['temperature'].disabled= false
-      this.ai_setting['max_tokens'].max = 8192;
-      if(this.action.max_tokens > 8192){
-        this.action.max_tokens = 8192;
-      }
+      // this.ai_setting['max_tokens'].max = 8192;
+      // if(this.action.max_tokens > 8192){
+      //   this.action.max_tokens = 8192;
+      // }
     }
   }
   else {
