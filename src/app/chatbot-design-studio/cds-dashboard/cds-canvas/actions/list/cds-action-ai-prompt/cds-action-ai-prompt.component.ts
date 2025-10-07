@@ -445,6 +445,9 @@ setModel(labelModel: string){
     }else{
       this.ai_setting['temperature'].disabled= false
       this.ai_setting['max_tokens'].max = 8192;
+      if(this.action.max_tokens > 8192){
+        this.action.max_tokens = 8192;
+      }
     }
   }
   else {
