@@ -66,7 +66,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   model_list: Array<{ name: string, value: string, multiplier: string}>;
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
     "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1 },
     "search_type": { name: "search_type", min: 0, max: 1, step: 0.05 }
