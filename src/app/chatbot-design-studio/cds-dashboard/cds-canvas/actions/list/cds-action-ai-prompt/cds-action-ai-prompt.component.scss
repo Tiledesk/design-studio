@@ -1,4 +1,4 @@
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -261,7 +261,6 @@ mat-checkbox ::ng-deep {
 
 .slider-input ::ng-deep {
     width: 60px;
-
     input {
         text-align: center;
     }

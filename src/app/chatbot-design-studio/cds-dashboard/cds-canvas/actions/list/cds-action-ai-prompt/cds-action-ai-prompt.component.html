@@ -208,7 +208,7 @@
                         <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
                         <cds-select id="model-condition"
                             [class]="!selectedModelConfigured ? 'not-configured' : ''"
-                            [items]="llm_models_2" 
+                            [items]="llm_models_flat" 
                             [itemSelected]="labelModel"
                             [bindLabelSelect]="'labelModel'" 
                             [bindValueSelect]="'value'"
@@ -224,7 +224,7 @@
                             class="sx-input" 
                             [class]="!selectedModelConfigured ? 'not-configured' : ''"
                             [text]="labelModel"
-                            [autocompleteOptions]="autocompleteOptions_2"
+                            [autocompleteOptions]="autocompleteOptionsFlat"
                             [placeholder]="'CDSCanvas.Model' | translate"
                             [setAttributeBtn]="false"
                             (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"
@@ -264,7 +264,7 @@
                         [placeholder]="'CDSCanvas.Model' | translate"
                         [autocompleteOptions]="autocompleteOptions"
                         (onOptionSelected)="onOptionSelected($event, 'model')"
-                        (blur)="onBlur($event)"
+                        (blur)="onBlur($event, 'model')"
                         (onChange)="onChangeTextarea($event, actionLabelModel, 'model')">
                     </cds-text>
                 </div> -->
@@ -285,6 +285,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -329,6 +330,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
