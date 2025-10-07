@@ -96,6 +96,7 @@ export class CdsActionAiPromptComponent implements OnInit {
   multiplier: string;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+  browserLang: string = 'it';
 
   constructor(
     private readonly dialog: MatDialog,
@@ -105,7 +106,9 @@ export class CdsActionAiPromptComponent implements OnInit {
     private readonly translate: TranslateService,
     private readonly dashboardService: DashboardService,
     private readonly projectService: ProjectService
-  ) { }
+  ) { 
+    this.browserLang = this.translate.getBrowserLang();
+  }
 
 
   async ngOnInit(): Promise<void> {

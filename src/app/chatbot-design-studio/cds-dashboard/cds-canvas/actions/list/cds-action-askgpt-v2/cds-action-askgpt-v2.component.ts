@@ -79,6 +79,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   private subscriptionChangedConnector: Subscription;
 
   private logger: LoggerService = LoggerInstance.getInstance();
+  browserLang: string = 'it';
 
   constructor(
     private intentService: IntentService,
@@ -87,7 +88,9 @@ export class CdsActionAskgptV2Component implements OnInit {
     private openaiService: OpenaiService,
     private translate: TranslateService,
     private dialog: MatDialog
-  ) { }
+  ) { 
+    this.browserLang = this.translate.getBrowserLang();
+  }
 
   ngOnInit(): void {
     this.logger.log("[ACTION-ASKGPTV2] action detail: ", this.action);

@@ -102,6 +102,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     'context': true,
     'question': true
   };
+  browserLang: string = 'it';
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -113,7 +114,9 @@ export class CdsActionAiConditionComponent implements OnInit {
     private readonly translate: TranslateService,
     private readonly dashboardService: DashboardService,
     private readonly projectService: ProjectService
-  ) { }
+  ) {
+    this.browserLang = this.translate.getBrowserLang();
+   }
 
 
   async ngOnInit(): Promise<void> {
