@@ -221,6 +221,9 @@ mat-checkbox ::ng-deep {
     text-align: center;
     transition: width 0.3s ease-in;
     font-size: 14px;
+    &.disabled {
+        opacity: 0.5;
+    }
 }
 
 .action-wait-slider>mat-slider {
@@ -242,6 +245,7 @@ mat-checkbox ::ng-deep {
     .mat-slider-thumb {
         background-color: var(--text-color) !important;
     }
+   
 }
 
 .gpt-setting-input {
