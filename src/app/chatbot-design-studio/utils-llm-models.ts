@@ -288,15 +288,20 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLL
   if(INTEGRATIONS){
     INTEGRATIONS.forEach((el: any) => {
       logger.log(`[${componentName}] 1 - integration:`, el.name, el.value?.apikey);
-      if(el.name && el.value?.apikey){
+      if(el.name){
         llm_models_flat.forEach(model => {
-          if(model.llm === el.name || model.llm.toLowerCase() === 'openai' || model.llm.toLowerCase() === 'ollama') {
+          if(model.llm === el.name && el.value?.apikey) {
             model.configured = true;
+          } else if(model.llm.toLowerCase() === 'openai' || model.llm.toLowerCase() === 'ollama' || model.llm.toLowerCase() === 'vllm'){
+            model.configured = true;
+          } else {
+            model.configured = false;
           }
         });
       }
     });
   }
+
   
   logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
   
