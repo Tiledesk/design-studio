@@ -15,7 +15,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
@@ -25,8 +25,7 @@ import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels } from 'src/app/chatbot-design-studio/utils-llm-models';
-
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, manageGpt5ModelSettings } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-askgpt-v2',
@@ -69,12 +68,12 @@ export class CdsActionAskgptV2Component implements OnInit {
   temp_variables = [];
   autocompleteOptions: Array<{label: string, value: string}> = [];
 
-  model_list: Array<{ name: string, value: string, multiplier: string}>;
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
-    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1 },
-    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05 }
+  model_list: Array<{ name: string, value: string, additionalText?: string}>;
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
+    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
   }
   IS_VISIBLE_ALPHA_SLIDER = false;
 
@@ -97,6 +96,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   
   private subscriptionChangedConnector: Subscription;
   private logger: LoggerService = LoggerInstance.getInstance();
+  browserLang: string = 'it';
 
   constructor(
     private intentService: IntentService,
@@ -106,7 +106,9 @@ export class CdsActionAskgptV2Component implements OnInit {
     private translate: TranslateService,
     private dialog: MatDialog,
     private readonly projectService: ProjectService
-  ) { }
+  ) { 
+    this.browserLang = this.translate.getBrowserLang();
+  }
 
   async ngOnInit(): Promise<void> {
     this.logger.log("[ACTION-ASKGPTV2] action detail: ", this.action);
@@ -114,13 +116,17 @@ export class CdsActionAskgptV2Component implements OnInit {
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
-    
-    this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
-      if(ai_models[el.value])
-        return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
-      else
-        return { ...el, multiplier: null }
-    })
+
+    OPENAI_MODEL.forEach(el => {
+      if (ai_models[el.value]) {
+        el.additionalText = `${ai_models[el.value]} x tokens`;
+        el.status = 'active';
+      } else {
+        el.additionalText = null;
+        el.status = 'inactive';
+      }
+    });
+    this.model_list = OPENAI_MODEL.filter(el => el.status === 'active')
 
     this.llm_models_flat = generateLlmModelsFlat();
     this.llm_models_flat.forEach(model => {
@@ -164,6 +170,8 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.multiplier = this.llm_models_flat.find(el => el.labelModel === this.labelModel)?.multiplier;
     this.logger.log("[ACTION ASKGPTV2] 0 initialize llm_options_models: ", this.action, this.labelModel);
     this.setModel(this.labelModel);
+    /** MANAGE GPT-5 MODELS */
+    manageGpt5ModelSettings(this.action, this.ai_setting);
   }
 
 
@@ -189,7 +197,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
   setModel(labelModel: string){
-    const result = setModel(labelModel, this.llm_models_flat, this.logger);
+    const result = setModel(labelModel, this.llm_models_flat, this.ai_setting, this.logger);
     this.selectedModelConfigured = result.selectedModelConfigured;
     this.action.llm = result.action.llm;
     this.action.model = result.action.model;
@@ -346,6 +354,8 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.action['labelModel'] = event;
       this.labelModel = event;
       this.setModel(event);
+      /** MANAGE GPT-5 MODELS */
+      manageGpt5ModelSettings(this.action, this.ai_setting);
     } else {
       this.action[property] = event;
     }
@@ -364,9 +374,10 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
     } else {
-      this.logger.log("event: ", event);
+      this.logger.log("[ACTION-ASKGPTV2] onChangeSelect event: ", event);
       this.action.model = event.value;
-      
+      /** MANAGE GPT-5 MODELS */
+      manageGpt5ModelSettings(this.action, this.ai_setting);
       this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }

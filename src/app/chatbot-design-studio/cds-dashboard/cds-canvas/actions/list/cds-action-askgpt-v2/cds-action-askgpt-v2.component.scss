@@ -1,5 +1,5 @@
 
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -140,6 +140,7 @@ cds-select#model-condition ::ng-deep{
     }
     .mat-slider-thumb-label-text{
         color: var(--background-color) !important;
+        font-size: 8px!important;
     }
     .mat-slider-thumb {
         background-color: var(--text-color) !important;

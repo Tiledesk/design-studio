@@ -194,6 +194,40 @@ export async function getIntegrationModels(
   }
 }
 
+/** 
+ * Manages GPT-5 model specific settings
+ * @param modelName The model name to check
+ * @param action The action object to update
+ * @param ai_setting The AI settings object to update
+ */
+export function manageGpt5ModelSettings(
+  action: any,
+  ai_setting: any
+): void {
+  let modelName = action?.model;
+  if (!modelName || !action || !ai_setting) {
+    return;
+  }
+
+  const isGpt5 = modelName.toLowerCase().startsWith('gpt-5');
+  
+  if (isGpt5) {
+    action.temperature = 1;
+    ai_setting['temperature'].disabled = true;
+    // if (ai_setting['max_tokens']) {
+    //   ai_setting['max_tokens'].max = 100000;
+    // }
+  } else {
+    ai_setting['temperature'].disabled = false;
+    // if (ai_setting['max_tokens']) {
+    //   ai_setting['max_tokens'].max = 8192;
+    //   if (action.max_tokens > 8192) {
+    //     action.max_tokens = 8192;
+    //   }
+    // }
+  }
+}
+
 /**
  * Sets the selected model and updates related properties
  * @param labelModel The label of the model to set
@@ -204,7 +238,9 @@ export async function getIntegrationModels(
 export function setModel(
   labelModel: string,
   llmModels: LlmModel[],
-  logger: LoggerService
+  ai_setting: any,
+  logger: LoggerService,
+
 ): SetModelResult {
   logger.log("[LLM-UTILS] setModel labelModel: ", labelModel);
   const model = llmModels.find(m => m.labelModel === labelModel);

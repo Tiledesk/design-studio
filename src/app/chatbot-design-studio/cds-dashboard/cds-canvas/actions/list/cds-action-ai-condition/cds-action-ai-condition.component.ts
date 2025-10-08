@@ -27,7 +27,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, manageGpt5ModelSettings } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-ai-condition',
@@ -50,9 +50,10 @@ export class CdsActionAiConditionComponent implements OnInit {
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false}
+    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
   }
+
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
 
@@ -102,6 +103,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     'context': true,
     'question': true
   };
+  browserLang: string = 'it';
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -113,7 +115,9 @@ export class CdsActionAiConditionComponent implements OnInit {
     private readonly translate: TranslateService,
     private readonly dashboardService: DashboardService,
     private readonly projectService: ProjectService
-  ) { }
+  ) {
+    this.browserLang = this.translate.getBrowserLang();
+   }
 
 
   async ngOnInit(): Promise<void> {
@@ -193,6 +197,8 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.multiplier = this.llm_models_flat.find(el => el.labelModel === this.labelModel)?.multiplier;
     this.logger.log("[ACTION AI_PROMPT] 0 initialize multiplier: ", this.action, this.multiplier);
     this.setModel(this.labelModel);
+    /** MANAGE GPT-5 MODELS */
+    manageGpt5ModelSettings(this.action, this.ai_setting);
     const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
     this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
   }
@@ -345,7 +351,7 @@ export class CdsActionAiConditionComponent implements OnInit {
   }
 
   setModel(labelModel: string){
-    const result = setModel(labelModel, this.llm_models_flat, this.logger);
+    const result = setModel(labelModel, this.llm_models_flat, this.ai_setting, this.logger);
     this.selectedModelConfigured = result.selectedModelConfigured;
     this.action.llm = result.action.llm;
     this.action.model = result.action.model;
@@ -374,13 +380,6 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
     if(property === 'model'){
       this.action['labelModel'] = event;
-      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
-        this.action.temperature = 1
-        this.ai_setting['temperature'].disabled= true
-      } else {
-        this.ai_setting['temperature'].disabled= false
-      }
-      this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;
     } else if (property === 'context'){
@@ -394,6 +393,8 @@ export class CdsActionAiConditionComponent implements OnInit {
       this.labelModel = event;
       this.actionLabelModel = event;
       this.setModel(event);
+      /** MANAGE GPT-5 MODELS */
+      manageGpt5ModelSettings(this.action, this.ai_setting);
     } else if (property === 'instructions'){
       this.action['instructions'] = event;
     }

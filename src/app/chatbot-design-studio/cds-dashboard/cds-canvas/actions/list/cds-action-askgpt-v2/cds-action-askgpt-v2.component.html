@@ -3,8 +3,8 @@
         <div class="action-row-left empty">
             <mat-icon class="icon" svgIcon="brain" aria-hidden="true"></mat-icon>
         </div>
-        <div *ngIf="action?.question" class="action-row-right">
-            {{action?.namespace}}
+        <div *ngIf="action?.namespace" class="action-row-right">
+            {{ (listOfNamespaces | find:{key: 'value', value: action?.namespace })?.name }}
         </div>
     </div>
     
@@ -116,7 +116,7 @@
             <div class="header-answer-preview">
                 <div class="label-and-button-container">
                     <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} )</span>
+                        <span class="subtitle-label"><span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (model_list | find:{key: 'value', value: action?.model }).name }} )</span></span>
                     </label>
                 </div>
             </div>
@@ -260,8 +260,7 @@
                         [itemSelected]="action.model"
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"
-                        [optionalBindAdditionalText]="'multiplier'" 
-                        [optionalBindDescription]="'description'" 
+                        [optionalBindAdditionalText]="'additionalText'"
                         (onSelected)="onChangeSelect($event, 'model')">
                     </cds-select>
                 </div> -->
@@ -277,15 +276,16 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
                             </mat-slider>
-                            <div class="action-wait-range">{{ai_setting['max_tokens'].max}}</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].max | number:'': browserLang}}</div>
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
-                        <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens}}" disabled>
+                        <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens | number:'': browserLang}}" disabled>
                         <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
                     </div>
                     <div class="slider-description"></div>
@@ -303,15 +303,16 @@
                                     class="wait-slider" thumbLabel
                                     [step]="ai_setting['temperature'].step"  
                                     [min]="ai_setting['temperature'].min"
-                                    [max]="ai_setting['temperature'].max" 
+                                    [max]="ai_setting['temperature'].max"
+                                    [disabled]="ai_setting['temperature'].disabled" 
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">{{ai_setting['temperature'].max}}</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].max | number:'': browserLang}}</div>
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
-                            <input type="text" class="slider-input gpt-setting-input" value="{{action.temperature}}" disabled>
+                            <input type="text" class="slider-input gpt-setting-input" value="{{action.temperature | number:'': browserLang}}" disabled>
                         </div>
                         <div class="slider-description"><span>{{'CDSCanvas.Deterministic' | translate }}</span><span>{{'CDSCanvas.Random' | translate }}</span></div>
                     </div>
@@ -330,7 +331,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['chunk_limit'].step"  
                                     [min]="ai_setting['chunk_limit'].min"
-                                    [max]="ai_setting['chunk_limit'].max" 
+                                    [max]="ai_setting['chunk_limit'].max"
+                                    [disabled]="ai_setting['chunk_limit'].disabled" 
                                     [(ngModel)]="action.top_k"
                                     (change)="updateSliderValue($event.value, 'chunk_limit')" aria-label="units">
                                 </mat-slider>
@@ -356,7 +358,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['search_type'].step"  
                                     [min]="ai_setting['search_type'].min"
-                                    [max]="ai_setting['search_type'].max" 
+                                    [max]="ai_setting['search_type'].max"
+                                    [disabled]="ai_setting['max_tokens'].disabled" 
                                     [(ngModel)]="action.alpha"
                                     (change)="updateSliderValue($event.value, 'alpha')" aria-label="units">
                                 </mat-slider>
@@ -373,6 +376,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 
@@ -421,7 +425,7 @@
                             {{"CDSCanvas.ChunksOnly" | translate}}
                         </mat-checkbox>
                     </section>
-                    <!-- 
+                    <!--
                     <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
                     </label> 

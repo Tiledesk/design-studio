@@ -1,4 +1,4 @@
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -221,6 +221,9 @@ mat-checkbox ::ng-deep {
     text-align: center;
     transition: width 0.3s ease-in;
     font-size: 14px;
+    &.disabled {
+        opacity: 0.5;
+    }
 }
 
 .action-wait-slider>mat-slider {
@@ -237,10 +240,12 @@ mat-checkbox ::ng-deep {
     }
     .mat-slider-thumb-label-text{
         color: var(--background-color) !important;
+        font-size: 8px!important;
     }
     .mat-slider-thumb {
         background-color: var(--text-color) !important;
     }
+   
 }
 
 .gpt-setting-input {
@@ -256,7 +261,6 @@ mat-checkbox ::ng-deep {
 
 .slider-input ::ng-deep {
     width: 60px;
-
     input {
         text-align: center;
     }

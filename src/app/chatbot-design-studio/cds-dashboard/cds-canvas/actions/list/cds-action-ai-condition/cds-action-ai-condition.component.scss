@@ -221,6 +221,9 @@ mat-checkbox ::ng-deep {
     text-align: center;
     transition: width 0.3s ease-in;
     font-size: 14px;
+    &.disabled {
+        opacity: 0.5;
+    }
 }
 
 .action-wait-slider>mat-slider {
@@ -237,6 +240,7 @@ mat-checkbox ::ng-deep {
     }
     .mat-slider-thumb-label-text{
         color: var(--background-color) !important;
+        font-size: 8px!important;
     }
     .mat-slider-thumb {
         background-color: var(--text-color) !important;
@@ -429,17 +433,6 @@ loading-spinner.custom-spinner ::ng-deep {
     color: var(--blu);
 }
 
-// .condition-number2 {
-//     background-color: var(--blu);
-//     color: white;
-//     padding: 4px 12px;
-//     border-radius: 16px;
-//     font-size: 12px;
-//     font-weight: 500;
-//     text-transform: uppercase;
-//     letter-spacing: 0.5px;
-// }
-
 .add-intent-container {
     display: flex;
     justify-content: center;
@@ -493,7 +486,7 @@ loading-spinner.custom-spinner ::ng-deep {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 4px 0;
+    padding: 4px 0 0 0;
     
     .prompt-label {
         font-size: 11px;
