@@ -25,7 +25,7 @@ import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 
 @Component({
@@ -112,6 +112,9 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("[ACTION-ASKGPTV2] action detail: ", this.action);
     this.project_id = this.dashboardService.projectID
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
+    
     this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
       if(ai_models[el.value])
         return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
@@ -269,7 +272,6 @@ export class CdsActionAskgptV2Component implements OnInit {
   //     this.logger.error('[ACTION-ASKGPTV2] updateConnector error: ', error);
   //   }
   // }
-
 
   private initializeAttributes() {
     let new_attributes = [];

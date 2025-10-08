@@ -26,7 +26,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-ai-prompt',
@@ -114,7 +114,8 @@ export class CdsActionAiPromptComponent implements OnInit {
 
     this.project_id = this.dashboardService.projectID;
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
-    this.getOllamaModels();
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
 
     this.llm_models_flat = generateLlmModelsFlat();
     this.llm_models_flat.forEach(model => {
@@ -176,36 +177,6 @@ export class CdsActionAiPromptComponent implements OnInit {
     const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
     this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
   }
-
-
-  async getOllamaModels(){
-    this.llm_model.forEach(async (model) => {
-      if (model.value === "ollama") {
-        const NEW_MODELS = await this.getIntegrationByName();
-        if(NEW_MODELS?.value?.models){
-          this.logger.log('[ACTION AI_PROMPT] - NEW_MODELS:', NEW_MODELS.value.models);
-          const models = NEW_MODELS?.value?.models.map(item => ({
-            name: item,
-            value: item
-          }));
-          model.models = models;
-        }
-      }
-    });
-  }
-
-  async getIntegrationByName(){
-    const projectID = this.dashboardService.projectID;
-    const integrationName = 'ollama';
-    try {
-        const response = await firstValueFrom(this.projectService.getIntegrationByName(projectID, integrationName));
-        this.logger.log('[ACTION AI_PROMPT] - integration response:', response.value);
-        return response;
-    } catch (error) {
-      this.logger.log('[ACTION AI_PROMPT] getIntegrationByName ERROR:', error);
-    }
-  }
-
 
 
   async initLLMModels(){

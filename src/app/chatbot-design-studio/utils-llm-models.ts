@@ -137,6 +137,64 @@ export async function getIntegrations(
 }
 
 /**
+ * Retrieves a specific integration by name
+ * @param projectService ProjectService instance
+ * @param dashboardService DashboardService instance
+ * @param logger LoggerService instance
+ * @param integrationName Name of the integration to retrieve
+ * @returns Promise with integration data
+ */
+export async function getIntegrationByName(
+  projectService: ProjectService,
+  dashboardService: DashboardService,
+  logger: LoggerService,
+  integrationName: string
+): Promise<any> {
+  const projectID = dashboardService.projectID;
+  try {
+    const response = await firstValueFrom(projectService.getIntegrationByName(projectID, integrationName));
+    logger.log('[LLM-UTILS] - integration response:', response.value);
+    return response;
+  } catch (error) {
+    logger.log('[LLM-UTILS] getIntegrationByName ERROR:', error);
+    return null;
+  }
+}
+
+/**
+ * Retrieves and updates models from integration
+ * @param projectService ProjectService instance
+ * @param dashboardService DashboardService instance
+ * @param logger LoggerService instance
+ * @param llmModelList Array of LLM model configurations
+ * @param modelName Name of the model/integration to retrieve (e.g., 'ollama', 'groq', etc.)
+ * @returns Promise that resolves when models are updated
+ */
+export async function getIntegrationModels(
+  projectService: ProjectService,
+  dashboardService: DashboardService,
+  logger: LoggerService,
+  llmModelList: Array<{ value: string; models: ModelOption[] }>,
+  modelName: string
+): Promise<void> {
+  for (const model of llmModelList) {
+    if (model.value === modelName) {
+      const NEW_MODELS = await getIntegrationByName(projectService, dashboardService, logger, modelName);
+      if (NEW_MODELS?.value?.models) {
+        logger.log(`[LLM-UTILS] - NEW_MODELS for ${modelName}:`, NEW_MODELS.value.models);
+        const models = NEW_MODELS.value.models.map(item => ({
+          name: item,
+          value: item,
+          description: '',
+          status: 'active' as const
+        }));
+        model.models = models;
+      }
+    }
+  }
+}
+
+/**
  * Sets the selected model and updates related properties
  * @param labelModel The label of the model to set
  * @param llmModels Array of available LLM models
