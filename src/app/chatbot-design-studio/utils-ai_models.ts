@@ -110,7 +110,7 @@ LLM_MODEL.forEach(provider => {
     const transformedName = `${provider.name} - ${model.name}`;
     // Add to the new array
     llm_models_flat.push({
-      labelModel:transformedName,
+      labelModel:model.name,
       llm:provider.value,
       model:model.value,
       description: model.description,

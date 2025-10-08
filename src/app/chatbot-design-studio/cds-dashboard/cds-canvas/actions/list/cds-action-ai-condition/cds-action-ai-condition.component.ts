@@ -216,16 +216,9 @@ export class CdsActionAiConditionComponent implements OnInit {
       dashboardService: this.dashboardService,
       appConfigService: this.appConfigService,
       logger: this.logger,
-      action: this.action,
-      llm_model: this.llm_model,
       componentName: 'ACTION AI_CONDITION'
     });
-    
     this.llm_models_flat = result.llm_models_flat;
-    this.autocompleteOptions = result.autocompleteOptions;
-    this.autocompleteOptionsFlat = result.autocompleteOptionsFlat;
-    this.multiplier = result.multiplier;
-    this.actionLabelModel = result.actionLabelModel;
   }
 
 

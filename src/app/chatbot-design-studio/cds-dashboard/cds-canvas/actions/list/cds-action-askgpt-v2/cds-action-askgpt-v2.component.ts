@@ -67,9 +67,10 @@ export class CdsActionAskgptV2Component implements OnInit {
   chunks: Array<any> = [];
 
   temp_variables = [];
-  autocompleteOptions: Array<{label: string, value: string}> = [];
+  // autocompleteOptions: Array<{label: string, value: string}> = [];
+  
 
-  model_list: Array<{ name: string, value: string, multiplier: string}>;
+  // model_list: Array<{ name: string, value: string, multiplier: string}>;
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
     "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
@@ -81,7 +82,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.ASKGPTV2;
 
-
+  actionLabelModel: string = "";
   llm_model = LLM_MODEL;
   llm_models_flat: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
   autocompleteOptionsFlat: Array<{label: string, value: string}> = [];
@@ -111,24 +112,24 @@ export class CdsActionAskgptV2Component implements OnInit {
   async ngOnInit(): Promise<void> {
     this.logger.log("[ACTION-ASKGPTV2] action detail: ", this.action);
     this.project_id = this.dashboardService.projectID
-    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
+    // const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
     
-    this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
-      if(ai_models[el.value])
-        return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
-      else
-        return { ...el, multiplier: null }
-    })
+    // this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
+    //   if(ai_models[el.value])
+    //     return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
+    //   else
+    //     return { ...el, multiplier: null }
+    // })
 
-    this.llm_models_flat = generateLlmModelsFlat();
-    this.llm_models_flat.forEach(model => {
-      if (ai_models[model.model]) {
-        model.multiplier = ai_models[model.model].toString();
-      }
-    });
-    this.logger.log("[ACTION-ASKGPTV2] model_list: ", this.llm_models_flat, ai_models);
+    // this.llm_models_flat = generateLlmModelsFlat();
+    // this.llm_models_flat.forEach(model => {
+    //   if (ai_models[model.model]) {
+    //     model.multiplier = ai_models[model.model].toString();
+    //   }
+    // });
+    // this.logger.log("[ACTION-ASKGPTV2] model_list: ", this.llm_models_flat, ai_models);
 
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
@@ -173,16 +174,9 @@ export class CdsActionAskgptV2Component implements OnInit {
       dashboardService: this.dashboardService,
       appConfigService: this.appConfigService,
       logger: this.logger,
-      action: this.action,
-      llm_model: this.llm_model,
       componentName: 'ACTION ASKGPTV2'
     });
-    
     this.llm_models_flat = result.llm_models_flat;
-    this.autocompleteOptions = result.autocompleteOptions;
-    this.autocompleteOptionsFlat = result.autocompleteOptionsFlat;
-    this.multiplier = result.multiplier;
-    // Note: askgpt-v2 uses labelModel instead of actionLabelModel
   }
 
 
@@ -293,7 +287,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
       this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, hybrid: el.hybrid? el.hybrid:false } })
-      namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
+      // namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
   }

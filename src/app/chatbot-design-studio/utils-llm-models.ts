@@ -51,8 +51,6 @@ export interface InitLLMModelsParams {
   dashboardService: DashboardService;
   appConfigService: AppConfigService;
   logger: LoggerService;
-  action: any;
-  llm_model: Array<{ value: string; models: ModelOption[] }>;
   componentName: string;
 }
 
@@ -208,7 +206,6 @@ export function setModel(
 ): SetModelResult {
   logger.log("[LLM-UTILS] setModel labelModel: ", labelModel);
   const model = llmModels.find(m => m.labelModel === labelModel);
-  
   if (model) {
     logger.log("[LLM-UTILS] model: ", model);
     return {
@@ -240,18 +237,21 @@ export function setModel(
  * @param params Parameters for initialization
  * @returns Promise with initialization result
  */
-export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLLMModelsResult> {
-  const { projectService, dashboardService, appConfigService, logger, action, llm_model, componentName } = params;
+export async function initLLMModels(params: InitLLMModelsParams): Promise<any> {
+  const { projectService, dashboardService, appConfigService, logger, componentName } = params;
   
   const INTEGRATIONS = await getIntegrations(projectService, dashboardService, logger);
-  logger.log(`[${componentName}] 1 - integrations:`, INTEGRATIONS);
-  
+  // logger.log(`[${componentName}] 1 - integrations:`, INTEGRATIONS);
+
   // Generate LLM models
-  const llm_models_flat = generateLlmModelsFlat();
-  
+  let llm_models_flat = generateLlmModelsFlat();
+
+  // Filter only active models
+  llm_models_flat = llm_models_flat.filter(model => model.status === 'active');
+
+  // Set configured status for llm_models_flat
   if(INTEGRATIONS){
     INTEGRATIONS.forEach((el: any) => {
-      logger.log(`[${componentName}] 1 - integration:`, el.name, el.value?.apikey);
       if(el.name){
         llm_models_flat.forEach(model => {
           if(model.llm === el.name && el.value?.apikey) {
@@ -265,49 +265,26 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLL
       }
     });
   }
-  
-  logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
-  
-  const autocompleteOptions: AutocompleteOption[] = [];
-  logger.log(`[${componentName}] initLLMModels`, action.llm);
-  const actionLabelModel = '';
-  let multiplier: string | null = null;
-  
-  /** SET GPT MODELS */
+  // logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
+
+  // Set token multiplier for each model
   const ai_models = loadTokenMultiplier(appConfigService.getConfig().aiModels);
-  OPENAI_MODEL.forEach(el => {
-    if (ai_models[el.value]) {
-      el.additionalText = `${ai_models[el.value]} x tokens`;
-      el.status = 'active';
-    } else {
-      el.additionalText = null;
-      el.status = 'inactive';
+  llm_models_flat.forEach(model => {
+    if (ai_models[model.model]) {
+      (model as LlmModel).multiplier = ai_models[model.model].toString() + ' x tokens';
     }
   });
 
-  // Assegna i moltiplicatori ai modelli in llm_models_flat
-  llm_models_flat.forEach(model => {
-    if (ai_models[model.model]) {
-      (model as LlmModel).multiplier = ai_models[model.model].toString();
+  // sort llm_models_flat by llm, placing "openai" first and continuing the sort in ascending alphabetical order
+  // as the second criterion, model, again in ascending alphabetical order
+  llm_models_flat.sort((a, b) => {
+    if (a.llm === 'openai' && b.llm !== 'openai') {
+      return -1;
     }
+    return a.model.localeCompare(b.model);
   });
-  
-  if(action.llm){
-    const filteredModels = getModelsByName(action.llm, llm_model).filter(el => el.status === 'active');
-    filteredModels.forEach(el => autocompleteOptions.push({label: el.name, value: el.value}));
-    logger.log(`[${componentName}] filteredModels`, filteredModels);
-  }
-  
-  const autocompleteOptionsFlat: AutocompleteOption[] = [];
-  llm_models_flat.forEach(el => autocompleteOptionsFlat.push({label: el.labelModel, value: el.labelModel}));
-  const sortedAutocompleteOptionsFlat = sortAutocompleteOptions(autocompleteOptionsFlat, llm_models_flat);
-  logger.log(`[${componentName}] autocompleteOptionsFlat`, sortedAutocompleteOptionsFlat);
-  
+  logger.log(`[${componentName}] llm_models_flat`, llm_models_flat);
   return {
-    llm_models_flat,
-    autocompleteOptions,
-    autocompleteOptionsFlat: sortedAutocompleteOptionsFlat,
-    multiplier,
-    actionLabelModel
+    llm_models_flat
   };
 }
