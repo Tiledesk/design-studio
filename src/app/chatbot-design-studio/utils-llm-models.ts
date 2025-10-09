@@ -11,7 +11,7 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 
 export interface LlmModel {
-  labelModel: string;
+  modelName: string;
   llm: string;
   model: string;
   description: string;
@@ -39,12 +39,12 @@ export interface ActionModel {
   labelModel: string;
 }
 
-export interface SetModelResult {
-  selectedModelConfigured: boolean;
-  action: ActionModel;
-  labelModel: string;
-  multiplier: string | null;
-}
+// export interface SetModelResult {
+//   selectedModelConfigured: boolean;
+//   action: ActionModel;
+//   labelModel: string;
+//   multiplier: string | null;
+// }
 
 export interface InitLLMModelsParams {
   projectService: ProjectService;
@@ -74,8 +74,8 @@ export function sortAutocompleteOptions(
 ): AutocompleteOption[] {
   return autocompleteOptions.sort((a, b) => {
     // Find corresponding models in llmModels for both elements
-    const modelA = llmModels.find(el => el.labelModel === a.value);
-    const modelB = llmModels.find(el => el.labelModel === b.value);
+    const modelA = llmModels.find(el => el.modelName === a.value);
+    const modelB = llmModels.find(el => el.modelName === b.value);
     
     // If both are OpenAI, sort alphabetically
     if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
@@ -194,42 +194,43 @@ export async function getIntegrationModels(
 
 /**
  * Sets the selected model and updates related properties
- * @param labelModel The label of the model to set
+ * @param modelName The label of the model to set
  * @param llmModels Array of available LLM models
  * @param logger LoggerService instance
  * @returns SetModelResult with updated model information
  */
 export function setModel(
-  labelModel: string,
+  modelName: string,
   llmModels: LlmModel[],
   logger: LoggerService
-): SetModelResult {
-  logger.log("[LLM-UTILS] setModel labelModel: ", labelModel);
-  const model = llmModels.find(m => m.labelModel === labelModel);
-  if (model) {
-    logger.log("[LLM-UTILS] model: ", model);
-    return {
-      selectedModelConfigured: model.configured,
-      action: {
-        llm: model.llm,
-        model: model.model,
-        labelModel: model.labelModel
-      },
-      labelModel: model.labelModel,
-      multiplier: model.multiplier || null
-    };
-  } else {
-    return {
-      selectedModelConfigured: true,
-      action: {
-        llm: '',
-        model: '',
-        labelModel: ''
-      },
-      labelModel: '',
-      multiplier: null
-    };
-  }
+): LlmModel {
+  logger.log("[LLM-UTILS] setModel modelName: ", modelName);
+  const model = llmModels.find(m => m.modelName === modelName);
+  return model;
+  // if (model) {
+  //   logger.log("[LLM-UTILS] model: ", model);
+  //   return {
+  //     selectedModelConfigured: model.configured,
+  //     action: {
+  //       llm: model.llm,
+  //       model: model.model,
+  //       modelName: model.modelName
+  //     },
+  //     modelName: model.modelName,
+  //     multiplier: model.multiplier || null
+  //   };
+  // } else {
+  //   return {
+  //     selectedModelConfigured: true,
+  //     action: {
+  //       llm: '',
+  //       model: '',
+  //       modelName: ''
+  //     },
+  //     modelName: '',
+  //     multiplier: null
+  //   };
+  // }
 }
 
 /**
@@ -237,7 +238,7 @@ export function setModel(
  * @param params Parameters for initialization
  * @returns Promise with initialization result
  */
-export async function initLLMModels(params: InitLLMModelsParams): Promise<any> {
+export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmModel[]> {
   const { projectService, dashboardService, appConfigService, logger, componentName } = params;
   
   const INTEGRATIONS = await getIntegrations(projectService, dashboardService, logger);
@@ -284,7 +285,5 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<any> {
     return a.model.localeCompare(b.model);
   });
   logger.log(`[${componentName}] llm_models_flat`, llm_models_flat);
-  return {
-    llm_models_flat
-  };
+  return llm_models_flat;
 }

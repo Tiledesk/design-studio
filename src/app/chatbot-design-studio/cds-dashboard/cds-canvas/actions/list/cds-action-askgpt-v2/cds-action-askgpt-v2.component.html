@@ -227,40 +227,14 @@
             </mat-expansion-panel-header>
             <div>
 
-
-                <!-- // model select -->
-                <!-- <div class="field-box">
-                    <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
-                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
-                        <cds-text id="text-label-model"
-                            class="sx-input" 
-                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
-                            [text]="labelModel"
-                            [autocompleteOptions]="autocompleteOptionsFlat"
-                            [placeholder]="'CDSCanvas.Model' | translate"
-                            [setAttributeBtn]="false"
-                            (onChange)="onChangeTextarea($event, 'llm_model')"
-                            (blur)="onBlur($event)"
-                            >
-                        </cds-text>
-                    </div>
-                    <div class="bottom-row">
-                        <div class="multiplier-container"><span *ngIf="multiplier">{{multiplier}} x tokens</span></div>
-                        <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
-                    </div>
-                </div> -->
-
-
-
-
-                <!-- // model select -->
+                <!-- // model select  -->
                 <div class="field-box">
                     <cds-select id="model-condition"
-                        [class]="!selectedModelConfigured ? 'not-configured' : ''"
+                        [class]="!llm_model_selected.configured ? 'not-configured' : ''"
                         [items]="llm_models_flat" 
-                        [itemSelected]="action.model"
-                        [bindLabelSelect]="'model'" 
-                        [bindValueSelect]="'value'"
+                        [itemSelected]="llm_model_selected.model"
+                        [bindLabelSelect]="'modelName'" 
+                        [bindValueSelect]="'model'"
                         [groupByKey]="'llm'"
                         [clearable]="false" 
                         [searchable]="true"

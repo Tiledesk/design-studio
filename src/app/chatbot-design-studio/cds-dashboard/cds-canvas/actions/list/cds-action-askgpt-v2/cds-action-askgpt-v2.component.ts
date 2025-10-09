@@ -22,10 +22,10 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
-import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 
 @Component({
@@ -82,13 +82,12 @@ export class CdsActionAskgptV2Component implements OnInit {
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.ASKGPTV2;
 
-  actionLabelModel: string = "";
+
+  default_model = DEFAULT_MODEL;
   llm_model = LLM_MODEL;
-  llm_models_flat: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
-  autocompleteOptionsFlat: Array<{label: string, value: string}> = [];
-  multiplier: string;
-  selectedModelConfigured: boolean = true;
-  labelModel: string = "";
+  llm_models_flat: Array<LlmModel>;
+  llm_model_selected: LlmModel = {} as LlmModel;
+
   private isInitializing = {
     'llm_model': true,
     'context': true,
@@ -110,27 +109,12 @@ export class CdsActionAskgptV2Component implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
-    this.logger.log("[ACTION-ASKGPTV2] action detail: ", this.action);
     this.project_id = this.dashboardService.projectID
-    // const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
+    this.logger.log("[ACTION-ASKGPTV2] action detail action: ", this.action);
+    // aggiorno llm_model con i modelli dell'integration
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
     
-    // this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
-    //   if(ai_models[el.value])
-    //     return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
-    //   else
-    //     return { ...el, multiplier: null }
-    // })
-
-    // this.llm_models_flat = generateLlmModelsFlat();
-    // this.llm_models_flat.forEach(model => {
-    //   if (ai_models[model.model]) {
-    //     model.multiplier = ai_models[model.model].toString();
-    //   }
-    // });
-    // this.logger.log("[ACTION-ASKGPTV2] model_list: ", this.llm_models_flat, ai_models);
-
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
       this.connector = connector;
@@ -154,17 +138,10 @@ export class CdsActionAskgptV2Component implements OnInit {
     }
   }
 
-  // onDetailModeLoad() {
-  //   //this.getKnowledgeBaseSettings();
-  //   this.initializeAttributes();
-  // }
-
   private async initialize(){
     await this.initLLMModels();
-    this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
-    this.multiplier = this.llm_models_flat.find(el => el.labelModel === this.labelModel)?.multiplier;
-    this.logger.log("[ACTION ASKGPTV2] 0 initialize llm_options_models: ", this.action, this.labelModel);
-    this.setModel(this.labelModel);
+    this.logger.log("[ACTION ASKGPTV2] 0 initialize llm_options_models: ", this.action);
+    this.setModel(this.action.modelName?this.action.modelName:this.default_model.name);
   }
 
 
@@ -176,20 +153,19 @@ export class CdsActionAskgptV2Component implements OnInit {
       logger: this.logger,
       componentName: 'ACTION ASKGPTV2'
     });
-    this.llm_models_flat = result.llm_models_flat;
+    this.llm_models_flat = result;
   }
 
 
 
 
-  setModel(labelModel: string){
-    const result = setModel(labelModel, this.llm_models_flat, this.logger);
-    this.selectedModelConfigured = result.selectedModelConfigured;
-    this.action.llm = result.action.llm;
-    this.action.model = result.action.model;
-    this.action.labelModel = result.action.labelModel;
-    this.labelModel = result.labelModel;
-    this.multiplier = result.multiplier;
+  setModel(modelName: string){
+    const result = setModel(modelName, this.llm_models_flat, this.logger);
+    this.llm_model_selected = result;
+    this.logger.log("[ACTION ASKGPTV2] llm_model_selected: ", this.llm_model_selected);
+    this.action.llm = result?.llm?result.llm:'';
+    this.action.model = result?.model?result.model:'';
+    this.action.modelName = result?.modelName?result.modelName:'';
     this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
   }
 
@@ -225,47 +201,6 @@ export class CdsActionAskgptV2Component implements OnInit {
       } 
     }
   }
-
-  // private updateConnector(){
-  //   try {
-  //     const array = this.connector.fromId.split("/");
-  //     const idAction= array[1];
-  //     if(idAction === this.action._tdActionId){
-  //       if(this.connector.deleted){
-  //         if(array[array.length -1] === 'true'){
-  //           this.action.trueIntent = null;
-  //           this.isConnectedTrue = false;
-  //           this.idConnectionTrue = null;
-  //         }        
-  //         if(array[array.length -1] === 'false'){
-  //           this.action.falseIntent = null;
-  //           this.isConnectedFalse = false;
-  //           this.idConnectionFalse = null;
-  //         }
-  //         if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-  //       } else { 
-  //         // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
-  //         this.logger.debug('[ACTION-ASKGPTV2] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-  //         if(array[array.length -1] === 'true'){
-  //           // this.action.trueIntent = '#'+this.connector.toId;
-  //           this.isConnectedTrue = true;
-  //           this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
-  //           this.action.trueIntent = '#'+this.connector.toId;
-  //           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-  //         }        
-  //         if(array[array.length -1] === 'false'){
-  //           // this.action.falseIntent = '#'+this.connector.toId;
-  //           this.isConnectedFalse = true;
-  //           this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
-  //           this.action.falseIntent = '#'+this.connector.toId;
-  //           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-  //         }
-  //       }
-  //     }
-  //   } catch (error) {
-  //     this.logger.error('[ACTION-ASKGPTV2] updateConnector error: ', error);
-  //   }
-  // }
 
   private initializeAttributes() {
     let new_attributes = [];
@@ -312,37 +247,16 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.IS_VISIBLE_ALPHA_SLIDER = result.hybrid
   }
 
-  /** TO BE REMOVED: patch undefined action keys */
-  // private patchActionsKey(){
-  //   if(!this.action.hasOwnProperty('top_k')){
-  //     this.action.top_k = 5;
-  //   }
-  //   if(!this.action.hasOwnProperty('max_tokens')){
-  //     this.action.max_tokens = 256;
-  //   }
-  //   if(!this.action.hasOwnProperty('temperature')){
-  //     this.action.temperature = 0.7;
-  //   }
-  // }
 
   onChangeTextarea(event: string, property: string) {
-    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event)
-    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property)
+    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event);
+    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property);
     if (this.isInitializing[property]) {
       this.isInitializing[property] = false;
       return;
     }
-    if (property === 'llm_model'){
-       // se event non corrisponde a nessun valore di autocompleteOptionsFlat ed è diverso da '' o null allora non fare nulla
-      if(!this.autocompleteOptionsFlat.find(el => el.value === event) && event !== '' && event !== null) {
-        return;
-      }
-      this.action['labelModel'] = event;
-      this.labelModel = event;
-      this.setModel(event);
-    } else {
-      this.action[property] = event;
-    }
+    this.action[property] = event;
+    this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
   }
   
   onBlur(event){
@@ -355,13 +269,15 @@ export class CdsActionAskgptV2Component implements OnInit {
 }
   
   onChangeSelect(event, target) {
+    this.logger.log("[ACTION-ASKGPTV2] onChangeSelect event", event);
+    if (target === 'llm_model'){
+      this.setModel(event.modelName);
+    } 
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
     } else {
-      this.logger.log("event: ", event);
-      this.action.model = event.value;
-      
-      this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
+      //this.action.model = event.value;
+      //this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   }
@@ -431,10 +347,11 @@ export class CdsActionAskgptV2Component implements OnInit {
         } else if(target === 'citations'){
           if (this.action[target]) {
             this.ai_setting['max_tokens'].min=1024;
-            this.action.max_tokens = 1024
+            if(this.action.max_tokens<1024){
+              this.action.max_tokens = 1024;
+            }
           }else{
             this.ai_setting['max_tokens'].min=10;
-            this.action.max_tokens = 256
           }
         }
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
@@ -445,8 +362,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   updateSliderValue(event, target) {
-    this.logger.debug("[ACTION-ASKGPTV2] updateSliderValue event: ", event)
-    this.logger.debug("[ACTION-ASKGPTV2] updateSliderValue target: ", target)
+    this.logger.debug("[ACTION-ASKGPTV2] updateSliderValue event: ", event, target)
     this.action[target] = event;
     this.updateAndSaveAction.emit();
   }
@@ -539,6 +455,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     let data = {
       question: question,
       system_context: this.action.context,
+      llm: this.action.llm,
       model: this.action.model,
       max_tokens: this.action.max_tokens,
       temperature: this.action.temperature,

@@ -26,7 +26,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-ai-prompt',
@@ -91,8 +91,8 @@ export class CdsActionAiPromptComponent implements OnInit {
   DOCS_LINK = DOCS_LINK.GPT_TASK;
   llm_model = LLM_MODEL;
   autocompleteOptions: Array<{label: string, value: string}> = [];
-
-  llm_models_flat: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
+  llm_models_flat: Array<LlmModel>;
+  // llm_models_flat: Array<{ modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
   autocompleteOptionsFlat: Array<{label: string, value: string}> = [];
   multiplier: string;
 
@@ -170,7 +170,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
   private async initialize(){
     await this.initLLMModels();
-    this.multiplier = this.llm_models_flat.find(el => el.labelModel === this.labelModel)?.multiplier;
+    this.multiplier = this.llm_models_flat.find(el => el.modelName === this.labelModel)?.multiplier;
     this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
     this.logger.log("[ACTION AI_PROMPT] 0 initialize llm_options_models: ", this.action, this.labelModel);
     this.setModel(this.labelModel);
@@ -187,7 +187,7 @@ export class CdsActionAiPromptComponent implements OnInit {
       logger: this.logger,
       componentName: 'ACTION AI_PROMPT'
     });
-    this.llm_models_flat = result.llm_models_flat;
+    this.llm_models_flat = result;
   }
 
 
@@ -319,13 +319,13 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.updateAndSaveAction.emit();
   }
 
-setModel(labelModel: string){
-  const result = setModel(labelModel, this.llm_models_flat, this.logger);
-  this.selectedModelConfigured = result.selectedModelConfigured;
-  this.action.llm = result.action.llm;
-  this.action.model = result.action.model;
-  this.action.labelModel = result.action.labelModel;
-  this.labelModel = result.labelModel;
+setModel(modelName: string){
+  const result = setModel(modelName, this.llm_models_flat, this.logger);
+  // this.selectedModelConfigured = result.selectedModelConfigured;
+  // this.action.llm = result.action.llm;
+  // this.action.model = result.action.model;
+  // // this.action.labelModel = result.action.labelModel;
+  this.labelModel = result.modelName;
   this.multiplier = result.multiplier;
   this.logger.log("[ACTION AI_PROMPT] 2 action: ", this.action);
 }
@@ -357,10 +357,10 @@ setModel(labelModel: string){
       let model = event.model;
       this.action.llm = llm;
       this.action.model = model;
-      this.action.labelModel = event.labelModel;
+      // this.action.labelModel = event.labelModel;
       
       // Update selectedModelConfigured based on the selected model
-      const selectedModel = this.llm_models_flat.find(m => m.labelModel === event.labelModel);
+      const selectedModel = this.llm_models_flat.find(m => m.modelName === event.labelModel);
       this.selectedModelConfigured = selectedModel ? selectedModel.configured : true;
     }
     this.updateAndSaveAction.emit();

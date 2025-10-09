@@ -27,7 +27,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-ai-condition',
@@ -47,6 +47,7 @@ export class CdsActionAiConditionComponent implements OnInit {
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
+
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
@@ -94,9 +95,11 @@ export class CdsActionAiConditionComponent implements OnInit {
   selectedModelConfigured: boolean = true;
   labelModel: string = "";
   autocompleteOptions: Array<{label: string, value: string,  additionalText?: string}> = [];
-  llm_models_flat: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
+  // llm_models_flat: Array<{ modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
   autocompleteOptionsFlat: Array<{label: string, value: string}> = [];
   multiplier: string;
+  llm_models_flat: Array<LlmModel>;
+
   private isInitializing = {
     'llm_model': true,
     'context': true,
@@ -190,7 +193,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     await this.initLLMModels();
     this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
     this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
-    this.multiplier = this.llm_models_flat.find(el => el.labelModel === this.labelModel)?.multiplier;
+    this.multiplier = this.llm_models_flat.find(el => el.modelName === this.labelModel)?.multiplier;
     this.logger.log("[ACTION AI_PROMPT] 0 initialize multiplier: ", this.action, this.multiplier);
     this.setModel(this.labelModel);
     const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
@@ -218,7 +221,7 @@ export class CdsActionAiConditionComponent implements OnInit {
       logger: this.logger,
       componentName: 'ACTION AI_CONDITION'
     });
-    this.llm_models_flat = result.llm_models_flat;
+    this.llm_models_flat = result;
   }
 
 
@@ -339,11 +342,11 @@ export class CdsActionAiConditionComponent implements OnInit {
 
   setModel(labelModel: string){
     const result = setModel(labelModel, this.llm_models_flat, this.logger);
-    this.selectedModelConfigured = result.selectedModelConfigured;
-    this.action.llm = result.action.llm;
-    this.action.model = result.action.model;
-    this.action.labelModel = result.action.labelModel;
-    this.labelModel = result.labelModel;
+    // this.selectedModelConfigured = result.selectedModelConfigured;
+    // this.action.llm = result.action.llm;
+    // this.action.model = result.action.model;
+    // this.action.labelModel = result.action.labelModel;
+    this.labelModel = result.modelName;
     this.multiplier = result.multiplier;
     this.logger.log("[ACTION AI_PROMPT] 2 action multiplier ", this.action, this.multiplier);
   }

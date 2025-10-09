@@ -380,6 +380,18 @@ mat-expansion-panel ::ng-deep {
 }
 
 
+
+
+cds-select#model-condition.not-configured ::ng-deep {
+    .ng-select .ng-select-container {
+        border: 1px solid var(--empty-value-text-color);
+    }
+    .ng-select .ng-select-container .ng-value span.label-select{
+        color: var(--empty-value-text-color);
+    }
+}
+
+
 .select-container {
     &.not-configured {
         ::ng-deep .ng-select .ng-select-container {

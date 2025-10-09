@@ -97,20 +97,23 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
   { name: "vLLM",           value: "vllm",              description: "",      src:"assets/images/icons/ai_prompt/vllm.svg",        status: "active",   models: VLLM_MODEL        },
 ]
 
+export const DEFAULT_MODEL: { name: string, value: string, description:string, status: "active" | "inactive"} = 
+  { name: "GPT-4o", value: "gpt-4o", description: "TYPE_GPT_MODEL.gpt-4o.description", status: "active" };
+
 /**
 * Generates llm_models_flat array by transforming all models from utils-ai_models
 * Changes name format to "Provider - ModelName" and value format to "provider-modelname"
 * Adds description and src for each record
 */
-export function generateLlmModelsFlat(): Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> {
-const llm_models_flat: Array<{labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> = [];
+export function generateLlmModelsFlat(): Array<{modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> {
+const llm_models_flat: Array<{modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean}> = [];
 // Process each provider's models
 LLM_MODEL.forEach(provider => {
   provider.models.forEach(model => {
-    const transformedName = `${provider.name} - ${model.name}`;
+    // const transformedName = `${provider.name} - ${model.name}`;
     // Add to the new array
     llm_models_flat.push({
-      labelModel:model.name,
+      modelName:model.name,
       llm:provider.value,
       model:model.value,
       description: model.description,
