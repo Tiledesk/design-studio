@@ -26,6 +26,7 @@ import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MO
 import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
 import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 
 @Component({
@@ -105,7 +106,8 @@ export class CdsActionAskgptV2Component implements OnInit {
     private openaiService: OpenaiService,
     private translate: TranslateService,
     private dialog: MatDialog,
-    private readonly projectService: ProjectService
+    private readonly projectService: ProjectService,
+    private readonly formatNumberPipe: FormatNumberPipe
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -373,8 +375,17 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   updateSliderValue(event, target) {
-    this.logger.debug("[ACTION-ASKGPTV2] updateSliderValue event: ", event, target)
+    this.logger.debug("[ACTION-ASKGPTV2] updateSliderValue event: ", event, target);
     this.action[target] = event;
+    if(target === 'max_tokens'){
+      if(event < this.ai_setting['max_tokens'].min){
+        this.action.max_tokens = this.ai_setting['max_tokens'].min;
+      } else if(event > this.ai_setting['max_tokens'].max){
+        this.action.max_tokens = this.ai_setting['max_tokens'].max;
+      } else {
+        this.action.max_tokens = event;
+      }
+    }
     this.updateAndSaveAction.emit();
   }
 
@@ -583,5 +594,22 @@ export class CdsActionAskgptV2Component implements OnInit {
   goToIntegrations(){
     let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations'
     window.open(url, '_blank')
+  }
+
+  /**
+   * Formats the slider thumb label value with "k" notation for values > 999
+   * Uses the FormatNumberPipe for consistent formatting across the app
+   * @param value - The numeric value to format
+   * @returns Formatted string with "k" for values > 999 (rounded to integers)
+   */
+  formatSliderLabel = (value: number): string => {
+    return this.formatNumberPipe.transform(value);
+  }
+
+  /**
+   * Alias for formatSliderLabel to maintain compatibility with existing templates
+   */
+  formatLabel = (value: number): string => {
+    return value?.toString() || '';
   }
 }

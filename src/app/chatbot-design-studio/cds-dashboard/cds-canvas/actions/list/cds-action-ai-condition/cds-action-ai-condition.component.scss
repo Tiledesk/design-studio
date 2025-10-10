@@ -240,6 +240,7 @@ mat-checkbox ::ng-deep {
     }
     .mat-slider-thumb-label-text{
         color: var(--background-color) !important;
+        font-size: 10px !important;
     }
     .mat-slider-thumb {
         background-color: var(--text-color) !important;
@@ -255,6 +256,20 @@ mat-checkbox ::ng-deep {
     border-radius: 12px;
     background-color: white;
     border: 1px solid var(--text-color);
+
+    // Hide number input spinner arrows
+    /* Chrome, Safari, Edge, Opera */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    &[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
 }
 
 .slider-input ::ng-deep {
