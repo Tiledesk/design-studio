@@ -164,7 +164,28 @@
             </mat-expansion-panel-header>
             <div>
 
-                <div class="field-box">
+
+                 <!-- // llm select -->
+                 <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
+                    <cds-select id="model-condition"
+                        [class]="!llm_model_selected.configured ? 'not-configured' : ''"
+                        [items]="llm_models_flat" 
+                        [itemSelected]="llm_model_selected.model"
+                        [bindLabelSelect]="'modelName'" 
+                        [bindValueSelect]="'model'"
+                        [groupByKey]="'llm'"
+                        [clearable]="false" 
+                        [searchable]="true"
+                        [optionalBindAdditionalText]="'multiplier'" 
+                        (onSelected)="onChangeSelect($event, 'llm_model')">
+                    </cds-select>
+                    <div class="bottom-row">
+                        <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                    </div>
+                </div>
+
+                <!-- <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
                     <div class="select-container" [class.not-configured]="!selectedModelConfigured">
                         <cds-text id="text-label-model"
@@ -177,18 +198,13 @@
                             (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"
                             (blur)="onBlur($event)"
                             >
-                            <!--   
-                                (onOptionSelected)="onOptionSelected($event, 'llm_model')" 
-                            -->
                         </cds-text>
                     </div>
-                    <!-- Container per i due elementi sulla stessa riga -->
                     <div class="bottom-row">
                         <div class="multiplier-container"><span *ngIf="multiplier">{{multiplier}} x tokens</span></div>
                         <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
                     </div>
-
-                </div>
+                </div> -->
 
                 
                 <!-- // llm select -->

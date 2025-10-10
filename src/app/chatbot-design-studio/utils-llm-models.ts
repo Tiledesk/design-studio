@@ -11,7 +11,7 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 
 export interface LlmModel {
-  labelModel: string;
+  modelName: string;
   llm: string;
   model: string;
   description: string;
@@ -39,20 +39,12 @@ export interface ActionModel {
   labelModel: string;
 }
 
-export interface SetModelResult {
-  selectedModelConfigured: boolean;
-  action: ActionModel;
-  labelModel: string;
-  multiplier: string | null;
-}
 
 export interface InitLLMModelsParams {
   projectService: ProjectService;
   dashboardService: DashboardService;
   appConfigService: AppConfigService;
   logger: LoggerService;
-  action: any;
-  llm_model: Array<{ value: string; models: ModelOption[] }>;
   componentName: string;
 }
 
@@ -76,8 +68,8 @@ export function sortAutocompleteOptions(
 ): AutocompleteOption[] {
   return autocompleteOptions.sort((a, b) => {
     // Find corresponding models in llmModels for both elements
-    const modelA = llmModels.find(el => el.labelModel === a.value);
-    const modelB = llmModels.find(el => el.labelModel === b.value);
+    const modelA = llmModels.find(el => el.modelName === a.value);
+    const modelB = llmModels.find(el => el.modelName === b.value);
     
     // If both are OpenAI, sort alphabetically
     if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
@@ -230,45 +222,19 @@ export function manageGpt5ModelSettings(
 
 /**
  * Sets the selected model and updates related properties
- * @param labelModel The label of the model to set
+ * @param modelName The label of the model to set
  * @param llmModels Array of available LLM models
  * @param logger LoggerService instance
  * @returns SetModelResult with updated model information
  */
 export function setModel(
-  labelModel: string,
+  modelName: string,
   llmModels: LlmModel[],
-  ai_setting: any,
-  logger: LoggerService,
-
-): SetModelResult {
-  logger.log("[LLM-UTILS] setModel labelModel: ", labelModel);
-  const model = llmModels.find(m => m.labelModel === labelModel);
-  
-  if (model) {
-    logger.log("[LLM-UTILS] model: ", model);
-    return {
-      selectedModelConfigured: model.configured,
-      action: {
-        llm: model.llm,
-        model: model.model,
-        labelModel: model.labelModel
-      },
-      labelModel: model.labelModel,
-      multiplier: model.multiplier || null
-    };
-  } else {
-    return {
-      selectedModelConfigured: true,
-      action: {
-        llm: '',
-        model: '',
-        labelModel: ''
-      },
-      labelModel: '',
-      multiplier: null
-    };
-  }
+  logger: LoggerService
+): LlmModel {
+  logger.log("[LLM-UTILS] setModel modelName: ", modelName);
+  const model = llmModels.find(m => m.modelName === modelName);
+  return model;
 }
 
 /**
@@ -276,18 +242,21 @@ export function setModel(
  * @param params Parameters for initialization
  * @returns Promise with initialization result
  */
-export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLLMModelsResult> {
-  const { projectService, dashboardService, appConfigService, logger, action, llm_model, componentName } = params;
+export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmModel[]> {
+  const { projectService, dashboardService, appConfigService, logger, componentName } = params;
   
   const INTEGRATIONS = await getIntegrations(projectService, dashboardService, logger);
-  logger.log(`[${componentName}] 1 - integrations:`, INTEGRATIONS);
-  
+  // logger.log(`[${componentName}] 1 - integrations:`, INTEGRATIONS);
+
   // Generate LLM models
-  const llm_models_flat = generateLlmModelsFlat();
-  
+  let llm_models_flat = generateLlmModelsFlat();
+
+  // Filter only active models
+  llm_models_flat = llm_models_flat.filter(model => model.status === 'active');
+
+  // Set configured status for llm_models_flat
   if(INTEGRATIONS){
     INTEGRATIONS.forEach((el: any) => {
-      logger.log(`[${componentName}] 1 - integration:`, el.name, el.value?.apikey);
       if(el.name){
         llm_models_flat.forEach(model => {
           if(model.llm === el.name && el.value?.apikey) {
@@ -301,50 +270,24 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<InitLL
       }
     });
   }
+  // logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
 
-  
-  logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
-  
-  const autocompleteOptions: AutocompleteOption[] = [];
-  logger.log(`[${componentName}] initLLMModels`, action.llm);
-  const actionLabelModel = '';
-  let multiplier: string | null = null;
-  
-  /** SET GPT MODELS */
+  // Set token multiplier for each model
   const ai_models = loadTokenMultiplier(appConfigService.getConfig().aiModels);
-  OPENAI_MODEL.forEach(el => {
-    if (ai_models[el.value]) {
-      el.additionalText = `${ai_models[el.value]} x tokens`;
-      el.status = 'active';
-    } else {
-      el.additionalText = null;
-      el.status = 'inactive';
-    }
-  });
-
-  // Assegna i moltiplicatori ai modelli in llm_models_flat
   llm_models_flat.forEach(model => {
     if (ai_models[model.model]) {
-      (model as LlmModel).multiplier = ai_models[model.model].toString();
+      (model as LlmModel).multiplier = ai_models[model.model].toString() + ' x tokens';
     }
   });
-  
-  if(action.llm){
-    const filteredModels = getModelsByName(action.llm, llm_model).filter(el => el.status === 'active');
-    filteredModels.forEach(el => autocompleteOptions.push({label: el.name, value: el.value}));
-    logger.log(`[${componentName}] filteredModels`, filteredModels);
-  }
-  
-  const autocompleteOptionsFlat: AutocompleteOption[] = [];
-  llm_models_flat.forEach(el => autocompleteOptionsFlat.push({label: el.labelModel, value: el.labelModel}));
-  const sortedAutocompleteOptionsFlat = sortAutocompleteOptions(autocompleteOptionsFlat, llm_models_flat);
-  logger.log(`[${componentName}] autocompleteOptionsFlat`, sortedAutocompleteOptionsFlat);
-  
-  return {
-    llm_models_flat,
-    autocompleteOptions,
-    autocompleteOptionsFlat: sortedAutocompleteOptionsFlat,
-    multiplier,
-    actionLabelModel
-  };
+
+  // sort llm_models_flat by llm, placing "openai" first and continuing the sort in ascending alphabetical order
+  // as the second criterion, model, again in ascending alphabetical order
+  llm_models_flat.sort((a, b) => {
+    if (a.llm === 'openai' && b.llm !== 'openai') {
+      return -1;
+    }
+    return a.model.localeCompare(b.model);
+  });
+  logger.log(`[${componentName}] llm_models_flat`, llm_models_flat);
+  return llm_models_flat;
 }

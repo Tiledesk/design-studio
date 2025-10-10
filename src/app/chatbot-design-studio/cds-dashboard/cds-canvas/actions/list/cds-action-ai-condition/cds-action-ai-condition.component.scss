@@ -534,6 +534,17 @@ loading-spinner.custom-spinner ::ng-deep {
 }
 
 
+
+cds-select#model-condition.not-configured ::ng-deep {
+    .ng-select .ng-select-container {
+        border: 1px solid var(--empty-value-text-color);
+    }
+    .ng-select .ng-select-container .ng-value span.label-select{
+        color: var(--empty-value-text-color);
+    }
+}
+
+
 .select-container {
     &.not-configured {
         ::ng-deep .ng-select .ng-select-container {
@@ -547,10 +558,7 @@ loading-spinner.custom-spinner ::ng-deep {
             color: var(--empty-value-text-color)!important;
             border: 1px solid var(--empty-value-text-color)!important;
         }
-
     }
-
-
     .status-indicator {
         width: 8px;
         height: 8px;
@@ -561,16 +569,15 @@ loading-spinner.custom-spinner ::ng-deep {
         left: 0px;
         top: 96px;
     }
-
 }
 
-// Multiplier and Configure Button Row
+// Bottom row styles for model selection
 .bottom-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-top: 0px;
-    padding-left: 10px;
+    padding-left: 0px;
+    flex-direction: row-reverse;
 }
 
 .multiplier-container {
@@ -585,7 +592,6 @@ loading-spinner.custom-spinner ::ng-deep {
     font-size: 12px;
     text-decoration: underline;
     display: inline-block;
-    
     &:hover {
         opacity: 0.7;
     }
