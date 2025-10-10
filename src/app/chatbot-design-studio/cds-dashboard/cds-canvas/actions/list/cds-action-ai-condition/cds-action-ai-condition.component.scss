@@ -227,6 +227,9 @@ mat-checkbox ::ng-deep {
     width: 100%;
     margin-left: 6px;
 }
+.action-wait-slider.disabled {
+    opacity: 0.4;
+}
 
 .action-wait-slider ::ng-deep{
     .mat-accent .mat-slider-track-fill {

@@ -71,11 +71,11 @@ export class CdsActionAskgptV2Component implements OnInit {
   
 
   // model_list: Array<{ name: string, value: string, multiplier: string}>;
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05},
-    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1 },
-    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05 }
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
+    "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
   }
   IS_VISIBLE_ALPHA_SLIDER = false;
 
@@ -142,6 +142,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     await this.initLLMModels();
     this.logger.log("[ACTION ASKGPTV2] 0 initialize llm_options_models: ", this.action);
     this.setModel(this.action.modelName?this.action.modelName:this.default_model.name);
+    
   }
 
 
@@ -167,6 +168,17 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.action.model = result?.model?result.model:'';
     this.action.modelName = result?.modelName?result.modelName:'';
     this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
+    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_tokens_context;
+    this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
+    if(this.action.max_tokens > this.llm_model_selected.max_tokens_context){
+      this.action.max_tokens = this.llm_model_selected.max_tokens_context;
+    }
+    if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
+      this.action.temperature = 1
+      this.ai_setting['temperature'].disabled= true
+    } else {
+      this.ai_setting['temperature'].disabled= false
+    }
   }
 
 
@@ -268,6 +280,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.updateAndSaveAction.emit()
 }
   
+
   onChangeSelect(event, target) {
     this.logger.log("[ACTION-ASKGPTV2] onChangeSelect event", event);
     if (target === 'llm_model'){
@@ -276,8 +289,6 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
     } else {
-      //this.action.model = event.value;
-      //this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   }

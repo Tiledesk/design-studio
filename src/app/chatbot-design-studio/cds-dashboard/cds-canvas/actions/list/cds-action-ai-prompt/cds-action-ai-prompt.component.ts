@@ -49,10 +49,12 @@ export class CdsActionAiPromptComponent implements OnInit {
   panelOpenState = false;
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
   }
+
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
   // ai_error: string = "Oops! Something went wrong."
@@ -243,6 +245,17 @@ setModel(modelName: string){
   this.action.model = result?.model?result.model:'';
   this.action.modelName = result?.modelName?result.modelName:'';
   this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
+  this.ai_setting['max_tokens'].max = this.llm_model_selected.max_tokens_context;
+  this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
+  if(this.action.max_tokens > this.llm_model_selected.max_tokens_context){
+    this.action.max_tokens = this.llm_model_selected.max_tokens_context;
+  }
+  if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
+    this.action.temperature = 1
+    this.ai_setting['temperature'].disabled= true
+  } else {
+    this.ai_setting['temperature'].disabled= false
+  }
 }
 
 
@@ -262,28 +275,9 @@ setModel(modelName: string){
     this.logger.log("[ACTION AI_PROMPT] onChangeSelect event: ", event)
     this.logger.log("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
-    // if(target === 'llm'){
-    //   const foundLLM = this.llm_models.find(el => el.value === event.value);
-    //   this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
-    //   this.action.model= null;
-    //   // this.initLLMModels();
-    // }
-    // else if(target === 'llm2'){
-    //   let llm = event.llm;
-    //   let model = event.model;
-    //   this.action.llm = llm;
-    //   this.action.model = model;
-    //   // this.action.labelModel = event.labelModel;
-      
-    //   // Update selectedModelConfigured based on the selected model
-    //   const selectedModel = this.llm_models_flat.find(m => m.modelName === event.labelModel);
-    //   this.selectedModelConfigured = selectedModel ? selectedModel.configured : true;
-    // }
-
     if (target === 'llm_model'){
       this.setModel(event.modelName);
     } 
-
     this.updateAndSaveAction.emit();
   }
 

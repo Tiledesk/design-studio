@@ -268,13 +268,14 @@
                         <label class="title-label">{{'CDSCanvas.Temperature' | translate }}</label>
                         <div class="action-wait-content">
 
-                            <div class="action-wait-slider">
+                            <div class="action-wait-slider" [class.disabled]="ai_setting['temperature'].disabled">
                                 <div class="action-wait-range">{{ai_setting['temperature'].min}}</div>
                                 <mat-slider 
                                     class="wait-slider" thumbLabel
                                     [step]="ai_setting['temperature'].step"  
                                     [min]="ai_setting['temperature'].min"
                                     [max]="ai_setting['temperature'].max" 
+                                    [disabled]="ai_setting['temperature'].disabled"
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>

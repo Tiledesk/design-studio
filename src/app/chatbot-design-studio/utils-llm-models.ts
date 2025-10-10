@@ -19,6 +19,8 @@ export interface LlmModel {
   status: "active" | "inactive";
   configured: boolean;
   multiplier?: string;
+  min_tokens?: number;
+  max_tokens_context?: number;
 }
 
 export interface AutocompleteOption {

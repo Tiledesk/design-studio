@@ -165,6 +165,10 @@ cds-select#model-condition ::ng-deep{
     margin-left: 6px;
 }
 
+.action-wait-slider.disabled {
+    opacity: 0.4;
+}
+
 .action-wait-slider ::ng-deep{
     .mat-accent .mat-slider-track-fill {
         background-color: var(--text-color) !important;
@@ -179,6 +183,8 @@ cds-select#model-condition ::ng-deep{
         background-color: var(--text-color) !important;
     }
 }
+
+
 
 .gpt-setting-input {
     color: var(--text-color);
