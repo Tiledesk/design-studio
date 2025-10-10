@@ -495,6 +495,7 @@ export class ActionAiPrompt extends Action {
     temperature: number;
     labelModel: string;
     llm: string;
+    modelName: string;
     model: string;
     preview?: Array<any>;
     trueIntent: string;
@@ -510,6 +511,7 @@ export class ActionAiCondition extends Action {
     intents: Array<any>;
     instructions: string;
     llm: string;
+    modelName: string;
     model: string;
     max_tokens: number;
     temperature: number;

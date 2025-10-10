@@ -39,12 +39,6 @@ export interface ActionModel {
   labelModel: string;
 }
 
-// export interface SetModelResult {
-//   selectedModelConfigured: boolean;
-//   action: ActionModel;
-//   labelModel: string;
-//   multiplier: string | null;
-// }
 
 export interface InitLLMModelsParams {
   projectService: ProjectService;
@@ -207,30 +201,6 @@ export function setModel(
   logger.log("[LLM-UTILS] setModel modelName: ", modelName);
   const model = llmModels.find(m => m.modelName === modelName);
   return model;
-  // if (model) {
-  //   logger.log("[LLM-UTILS] model: ", model);
-  //   return {
-  //     selectedModelConfigured: model.configured,
-  //     action: {
-  //       llm: model.llm,
-  //       model: model.model,
-  //       modelName: model.modelName
-  //     },
-  //     modelName: model.modelName,
-  //     multiplier: model.multiplier || null
-  //   };
-  // } else {
-  //   return {
-  //     selectedModelConfigured: true,
-  //     action: {
-  //       llm: '',
-  //       model: '',
-  //       modelName: ''
-  //     },
-  //     modelName: '',
-  //     multiplier: null
-  //   };
-  // }
 }
 
 /**
