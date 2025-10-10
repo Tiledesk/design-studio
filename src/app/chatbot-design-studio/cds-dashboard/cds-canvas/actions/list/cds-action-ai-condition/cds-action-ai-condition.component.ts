@@ -28,6 +28,7 @@ import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MO
 import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
 import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 @Component({
   selector: 'cds-action-ai-condition',
@@ -51,7 +52,7 @@ export class CdsActionAiConditionComponent implements OnInit {
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
   }
 
@@ -113,10 +114,9 @@ export class CdsActionAiConditionComponent implements OnInit {
     private readonly appConfigService: AppConfigService,
     private readonly translate: TranslateService,
     private readonly dashboardService: DashboardService,
-    private readonly projectService: ProjectService
-  ) {
-    this.browserLang = this.translate.getBrowserLang();
-   }
+    private readonly projectService: ProjectService,
+    private readonly formatNumberPipe: FormatNumberPipe
+  ) { }
 
 
   async ngOnInit(): Promise<void> {
@@ -195,6 +195,17 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.action.model = result?.model?result.model:'';
     this.action.modelName = result?.modelName?result.modelName:'';
     this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
+    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_tokens_context;
+    this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
+    if(this.action.max_tokens > this.llm_model_selected.max_tokens_context){
+      this.action.max_tokens = this.llm_model_selected.max_tokens_context;
+    }
+    if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
+      this.action.temperature = 1
+      this.ai_setting['temperature'].disabled= true
+    } else {
+      this.ai_setting['temperature'].disabled= false
+    }
   }
 
   async getIntegrationByName(){
@@ -409,11 +420,9 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.logger.log("[ACTION AI_CONDITION] onChangeSelect event: ", event.value)
     this.logger.log("[ACTION AI_CONDITION] onChangeSelect target: ", target)
     this.action[target] = event.value;
-    if(target === 'llm'){
-      this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
-      this.action.model= null;
-      this.initLLMModels();
-    }
+    if (target === 'llm_model'){
+      this.setModel(event.modelName);
+    } 
     this.updateAndSaveAction.emit();
   }
 
@@ -421,6 +430,15 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.logger.log("[ACTION AI_CONDITION] updateSliderValue event: ", event)
     this.logger.log("[ACTION AI_CONDITION] updateSliderValue target: ", target)
     this.action[target] = event;
+    if(target === 'max_tokens'){
+      if(event < this.ai_setting['max_tokens'].min){
+        this.action.max_tokens = this.ai_setting['max_tokens'].min;
+      } else if(event > this.ai_setting['max_tokens'].max){
+        this.action.max_tokens = this.ai_setting['max_tokens'].max;
+      } else {
+        this.action.max_tokens = event;
+      }
+    }
     this.updateAndSaveAction.emit();
   }
 
@@ -641,6 +659,16 @@ export class CdsActionAiConditionComponent implements OnInit {
       this.logger.log("[ACTION AI_CONDITION] onDeleteCondition - remaining connectors:", this.listOfConnectors);
       this.updateAndSaveAction.emit();
     }
+  }
+
+  /**
+   * Formats the slider thumb label value with "k" notation for values > 999
+   * Uses the FormatNumberPipe for consistent formatting across the app
+   * @param value - The numeric value to format
+   * @returns Formatted string with "k" for values > 999 (rounded to integers)
+   */
+  formatSliderLabel = (value: number): string => {
+    return this.formatNumberPipe.transform(value);
   }
 
 }

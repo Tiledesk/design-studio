@@ -26,6 +26,7 @@ import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MO
 import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
 import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 
 @Component({
@@ -70,9 +71,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   // autocompleteOptions: Array<{label: string, value: string}> = [];
   
 
-  // model_list: Array<{ name: string, value: string, additionalText?: string}>;
+  // model_list: Array<{ name: string, value: string, multiplier: string}>;
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
     "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
     "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
@@ -106,10 +107,9 @@ export class CdsActionAskgptV2Component implements OnInit {
     private openaiService: OpenaiService,
     private translate: TranslateService,
     private dialog: MatDialog,
-    private readonly projectService: ProjectService
-  ) { 
-    this.browserLang = this.translate.getBrowserLang();
-  }
+    private readonly projectService: ProjectService,
+    private readonly formatNumberPipe: FormatNumberPipe
+  ) { }
 
   async ngOnInit(): Promise<void> {
     this.project_id = this.dashboardService.projectID
@@ -145,6 +145,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     await this.initLLMModels();
     this.logger.log("[ACTION ASKGPTV2] 0 initialize llm_options_models: ", this.action);
     this.setModel(this.action.modelName?this.action.modelName:this.default_model.name);
+    
   }
 
 
@@ -170,6 +171,17 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.action.model = result?.model?result.model:'';
     this.action.modelName = result?.modelName?result.modelName:'';
     this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
+    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_tokens_context;
+    this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
+    if(this.action.max_tokens > this.llm_model_selected.max_tokens_context){
+      this.action.max_tokens = this.llm_model_selected.max_tokens_context;
+    }
+    if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
+      this.action.temperature = 1
+      this.ai_setting['temperature'].disabled= true
+    } else {
+      this.ai_setting['temperature'].disabled= false
+    }
   }
 
 
@@ -271,6 +283,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.updateAndSaveAction.emit()
 }
   
+
   onChangeSelect(event, target) {
     this.logger.log("[ACTION-ASKGPTV2] onChangeSelect event", event);
     if (target === 'llm_model'){
@@ -279,8 +292,6 @@ export class CdsActionAskgptV2Component implements OnInit {
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
     } else {
-      //this.action.model = event.value;
-      //this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   }
@@ -365,8 +376,17 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   updateSliderValue(event, target) {
-    this.logger.debug("[ACTION-ASKGPTV2] updateSliderValue event: ", event, target)
+    this.logger.debug("[ACTION-ASKGPTV2] updateSliderValue event: ", event, target);
     this.action[target] = event;
+    if(target === 'max_tokens'){
+      if(event < this.ai_setting['max_tokens'].min){
+        this.action.max_tokens = this.ai_setting['max_tokens'].min;
+      } else if(event > this.ai_setting['max_tokens'].max){
+        this.action.max_tokens = this.ai_setting['max_tokens'].max;
+      } else {
+        this.action.max_tokens = event;
+      }
+    }
     this.updateAndSaveAction.emit();
   }
 
@@ -575,5 +595,22 @@ export class CdsActionAskgptV2Component implements OnInit {
   goToIntegrations(){
     let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations'
     window.open(url, '_blank')
+  }
+
+  /**
+   * Formats the slider thumb label value with "k" notation for values > 999
+   * Uses the FormatNumberPipe for consistent formatting across the app
+   * @param value - The numeric value to format
+   * @returns Formatted string with "k" for values > 999 (rounded to integers)
+   */
+  formatSliderLabel = (value: number): string => {
+    return this.formatNumberPipe.transform(value);
+  }
+
+  /**
+   * Alias for formatSliderLabel to maintain compatibility with existing templates
+   */
+  formatLabel = (value: number): string => {
+    return value?.toString() || '';
   }
 }
