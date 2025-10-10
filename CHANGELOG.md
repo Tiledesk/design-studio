@@ -8,6 +8,14 @@
 *Tiledesk SRL*
 
 
+# 1.39.9-rc2:
+- **added**: set default model
+- **changed**: replaced the textarea with a select in the model selection
+- **changed**: changed token display by adding k for thousands
+- **changed**: editable max token field
+- **added**: added max_token and min_token parameters for each model
+
+
 # 1.39.9-rc1:
 - **added**: added vLLM model integration
 
