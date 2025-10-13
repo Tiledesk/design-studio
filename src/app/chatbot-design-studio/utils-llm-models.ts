@@ -20,7 +20,7 @@ export interface LlmModel {
   configured: boolean;
   multiplier?: string;
   min_tokens?: number;
-  max_tokens_context?: number;
+  max_output_tokens?: number;
 }
 
 export interface AutocompleteOption {
