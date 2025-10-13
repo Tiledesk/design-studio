@@ -7,6 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.9-rc3:
+- **bug-fix**: set result.hybrid on undefined
+- **bug-fix**: bug fix overflow preview-container-extended
+- **bug-fix**: set generate with llm_model_selected.modelName
+- **bug-fix**: undefined.url
+- **bug-fix**: on preview ask kb
+- **bug-fix**: max-height text area
+- **changed**: changed max_tokens_context in max_output_tokens and update openai values
+
 
 # 1.39.9-rc2:
 - **added**: set default model
