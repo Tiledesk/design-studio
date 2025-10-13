@@ -23,10 +23,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, manageGpt5ModelSettings } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 @Component({
   selector: 'cds-action-ai-prompt',
@@ -49,10 +50,12 @@ export class CdsActionAiPromptComponent implements OnInit {
   panelOpenState = false;
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
+
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
   }
+
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
   // ai_error: string = "Oops! Something went wrong."
@@ -66,12 +69,18 @@ export class CdsActionAiPromptComponent implements OnInit {
   temp_variables = [];
   actionLabelModel: string = "";
   selectedModelConfigured: boolean = true;
+
+
+  default_model = DEFAULT_MODEL;
+  llm_model = LLM_MODEL;
+  llm_models_flat: Array<LlmModel>;
+  llm_model_selected: LlmModel = {} as LlmModel;
+
   private isInitializing = {
     'llm_model': true,
     'context': true,
     'question': true
   };
-  labelModel: string = "";
 
 
   // Connectors
@@ -85,17 +94,10 @@ export class CdsActionAiPromptComponent implements OnInit {
   connector: any;
   private subscriptionChangedConnector: Subscription;
 
-  projectPlan: PLAN_NAME
-  PLAN_NAME = PLAN_NAME
+  projectPlan: PLAN_NAME;
+  PLAN_NAME = PLAN_NAME;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.GPT_TASK;
-  llm_model = LLM_MODEL;
-  autocompleteOptions: Array<{label: string, value: string,  additionalText?: string}> = [];
-
-  llm_models_flat: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
-  autocompleteOptionsFlat: Array<{label: string, value: string}> = [];
-  multiplier: string;
-
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   browserLang: string = 'it';
 
@@ -106,32 +108,18 @@ export class CdsActionAiPromptComponent implements OnInit {
     private readonly appConfigService: AppConfigService,
     private readonly translate: TranslateService,
     private readonly dashboardService: DashboardService,
-    private readonly projectService: ProjectService
-  ) { 
-    this.browserLang = this.translate.getBrowserLang();
-  }
+    private readonly projectService: ProjectService,
+    private readonly formatNumberPipe: FormatNumberPipe
+  ) { }
 
 
   async ngOnInit(): Promise<void> {
     this.logger.log("[ACTION AI_PROMPT] ngOnInit action: ", this.action);
 
     this.project_id = this.dashboardService.projectID;
-    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
-    this.getOllamaModels();
-
-    this.llm_models_flat = generateLlmModelsFlat();
-    this.llm_models_flat.forEach(model => {
-      if (ai_models[model.model]) {
-        model.multiplier = ai_models[model.model].toString();
-      }
-    });
-    this.logger.log("[ACTION AI_PROMPT] model_list: ", this.llm_models_flat, ai_models);
-    // this.llm_models_flat = this.llm_models_flat.map((el) => {
-    //   const model = Object.values(ai_models).find((m: any) => (m as any)?.name === el.labelModel);
-    //   return { ...el, multiplier: model && (model as any).multiplier !== undefined ? (model as any).multiplier : null };
-    // });
-
-    this.logger.log("[ACTION AI_PROMPT] HO AGGIORNATO  model_list: ", this.llm_models_flat);
+    // const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
 
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name
@@ -151,6 +139,7 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.action.preview = [];
     }
     await this.initialize();
+    
     // Fine dell'inizializzazione - reset di tutti i flag
     this.isInitializing = {
       'llm_model': false,
@@ -158,7 +147,6 @@ export class CdsActionAiPromptComponent implements OnInit {
       'question': false
     };
   }
-
 
   ngOnChanges(changes: SimpleChanges) {
     // // empty
@@ -170,31 +158,11 @@ export class CdsActionAiPromptComponent implements OnInit {
     }
   }
 
+
   private async initialize(){
     await this.initLLMModels();
-    this.multiplier = this.llm_models_flat.find(el => el.labelModel === this.labelModel)?.multiplier;
-    this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
-    this.logger.log("[ACTION AI_PROMPT] 0 initialize multiplier: ", this.action, this.multiplier);
-    this.setModel(this.labelModel);
-    /** MANAGE GPT-5 MODELS */
-    manageGpt5ModelSettings(this.action, this.ai_setting);
-    const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
-    this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
-  }
-
-
-  async getOllamaModels(){
-    this.llm_model.forEach(async (model) => {
-      if (model.value === "ollama") {
-        const NEW_MODELS = await this.getIntegrationByName();
-        if(NEW_MODELS?.value?.models){
-          this.logger.log('[ACTION AI_PROMPT] - NEW_MODELS:', NEW_MODELS.value.models);
-          (NEW_MODELS?.value?.models as Array<string>).forEach(item => {
-            OLLAMA_MODEL.push({ name: item, value: item, description: null, status: 'active' });
-          });
-        }
-      }
-    });
+    this.setModel(this.action.modelName?this.action.modelName:this.default_model.name);
+    this.logger.log("[ACTION AI_PROMPT] initialize llm_options_models: ", this.action);
   }
 
   async getIntegrationByName(){
@@ -217,16 +185,9 @@ export class CdsActionAiPromptComponent implements OnInit {
       dashboardService: this.dashboardService,
       appConfigService: this.appConfigService,
       logger: this.logger,
-      action: this.action,
-      llm_model: this.llm_model,
       componentName: 'ACTION AI_PROMPT'
     });
-    
-    this.llm_models_flat = result.llm_models_flat;
-    this.autocompleteOptions = result.autocompleteOptions;
-    this.autocompleteOptionsFlat = result.autocompleteOptionsFlat;
-    this.multiplier = result.multiplier;
-    this.actionLabelModel = result.actionLabelModel;
+    this.llm_models_flat = result;
   }
 
 
@@ -264,47 +225,6 @@ export class CdsActionAiPromptComponent implements OnInit {
     }
   }
 
-  // private updateConnector2(){
-  //   try {
-  //     const array = this.connector.fromId.split("/");
-  //     const idAction= array[1];
-  //     if(idAction === this.action._tdActionId){
-  //       if(this.connector.deleted){
-  //         if(array[array.length -1] === 'true'){
-  //           this.action.trueIntent = null;
-  //           this.isConnectedTrue = false;
-  //           this.idConnectionTrue = null;
-  //         }        
-  //         if(array[array.length -1] === 'false'){
-  //           this.action.falseIntent = null;
-  //           this.isConnectedFalse = false;
-  //           this.idConnectionFalse = null;
-  //         }
-  //         if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-  //       } else { 
-  //         // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
-  //         this.logger.debug('[ACTION AI_PROMPT] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-  //         if(array[array.length -1] === 'true'){
-  //           // this.action.trueIntent = '#'+this.connector.toId;
-  //           this.isConnectedTrue = true;
-  //           this.idConnectionTrue = this.connector.fromId+"/"+this.connector.toId;
-  //           this.action.trueIntent = '#'+this.connector.toId;
-  //           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-  //         }        
-  //         if(array[array.length -1] === 'false'){
-  //           // this.action.falseIntent = '#'+this.connector.toId;
-  //           this.isConnectedFalse = true;
-  //           this.idConnectionFalse = this.connector.fromId+"/"+this.connector.toId;
-  //           this.action.falseIntent = '#'+this.connector.toId;
-  //           if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-  //         }
-  //       }
-  //     }
-  //   } catch (error) {
-  //     this.logger.error('[ACTION AI_PROMPT] updateConnector error: ', error);
-  //   }
-  // }
-
 
   private initializeAttributes() {
     let new_attributes = [];
@@ -329,58 +249,31 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.action['question'] = event;
     } else if (property === 'context'){
       this.action['context'] = event;
-    } else if (property === 'llm_model'){
-       // se event non corrisponde a nessun valore di autocompleteOptionsFlat ed è diverso da '' o null allora non fare nulla
-      if(!this.autocompleteOptionsFlat.find(el => el.value === event) && event !== '' && event !== null) {
-        return;
-      }
-      this.action['labelModel'] = event;
-      this.labelModel = event;
-      this.actionLabelModel = event;
-      this.setModel(event);
-      /** MANAGE GPT-5 MODELS */
-      manageGpt5ModelSettings(this.action, this.ai_setting);
-    }
+    } 
   }
 
 
-
-
-
-  onOptionSelected(event: any, property: string){
-    this.logger.log("[ACTION AI_PROMPT] onOptionSelected event: ", event, this.action);
-    this.actionLabelModel = event.value;
-    this.action[property] = event.value;
-    // this.updateAndSaveAction.emit();
+setModel(modelName: string){
+  const result = setModel(modelName, this.llm_models_flat, this.logger);
+  this.llm_model_selected = result;
+  this.logger.log("[ACTION AI_PROMPT] llm_model_selected: ", this.llm_model_selected);
+  this.action.llm = result?.llm?result.llm:'';
+  this.action.model = result?.model?result.model:'';
+  this.action.modelName = result?.modelName?result.modelName:'';
+  this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
+  this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
+  this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
+  if(this.action.max_tokens > this.llm_model_selected.max_output_tokens){
+    this.action.max_tokens = this.llm_model_selected.max_output_tokens;
   }
-
-  // onBlur(event: any, property?: string){
-  //   if(property === 'model'){
-  //     this.action[property] = event;
-  //     this.action['labelModel'] = event;
-  //   }
-  //   this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action, property);
-  //   this.actionLabelModel = event.label;
-  //   this.labelModel = event.label;
-  //   if(property === 'llm_model'){
-  //     this.setModel(event.label);
-  //   } else if (property === 'model'){
-  //     // this.actionLabelModel = event.label;
-  //     this.action[property] = event.value;
-  //   }
-  //   this.updateAndSaveAction.emit();
-  // }
-
-setModel(labelModel: string){
-  const result = setModel(labelModel, this.llm_models_flat, this.ai_setting, this.logger);
-  this.selectedModelConfigured = result.selectedModelConfigured;
-  this.action.llm = result.action.llm;
-  this.action.model = result.action.model;
-  this.action.labelModel = result.action.labelModel;
-  this.labelModel = result.labelModel;
-  this.multiplier = result.multiplier;
-  this.logger.log("[ACTION AI_PROMPT] 2 action: ", this.action);
+  if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
+    this.action.temperature = 1
+    this.ai_setting['temperature'].disabled= true
+  } else {
+    this.ai_setting['temperature'].disabled= false
+  }
 }
+
 
   onBlur(event: string){
     this.logger.log("[ACTION AI_PROMPT] onBlur event: ", event, this.action);
@@ -398,22 +291,9 @@ setModel(labelModel: string){
     this.logger.log("[ACTION AI_PROMPT] onChangeSelect event: ", event)
     this.logger.log("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
-    if(target === 'llm'){
-      const foundLLM = this.llm_models.find(el => el.value === event.value);
-      this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
-      this.action.model= null;
-      // this.initLLMModels();
-    }
-    else if(target === 'llm2'){
-      let llm = event.llm;
-      let model = event.model;
-      this.action.llm = llm;
-      this.action.model = model;
-      this.action.labelModel = event.labelModel;
-      // Update selectedModelConfigured based on the selected model
-      const selectedModel = this.llm_models_flat.find(m => m.labelModel === event.labelModel);
-      this.selectedModelConfigured = selectedModel ? selectedModel.configured : true;
-    }
+    if (target === 'llm_model'){
+      this.setModel(event.modelName);
+    } 
     this.updateAndSaveAction.emit();
   }
 
@@ -421,6 +301,15 @@ setModel(labelModel: string){
     this.logger.log("[ACTION AI_PROMPT] updateSliderValue event: ", event)
     this.logger.log("[ACTION AI_PROMPT] updateSliderValue target: ", target)
     this.action[target] = event;
+    if(target === 'max_tokens'){
+      if(event < this.ai_setting['max_tokens'].min){
+        this.action.max_tokens = this.ai_setting['max_tokens'].min;
+      } else if(event > this.ai_setting['max_tokens'].max){
+        this.action.max_tokens = this.ai_setting['max_tokens'].max;
+      } else {
+        this.action.max_tokens = event;
+      }
+    }
     this.updateAndSaveAction.emit();
   }
 
@@ -717,6 +606,16 @@ setModel(labelModel: string){
   goToIntegrations(){
     let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations'
     window.open(url, '_blank')
+  }
+
+  /**
+   * Formats the slider thumb label value with "k" notation for values > 999
+   * Uses the FormatNumberPipe for consistent formatting across the app
+   * @param value - The numeric value to format
+   * @returns Formatted string with "k" for values > 999 (rounded to integers)
+   */
+  formatSliderLabel = (value: number): string => {
+    return this.formatNumberPipe.transform(value);
   }
 
 }

@@ -224,7 +224,7 @@
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
                             </mat-slider>
-                            <div class="action-wait-range">{{ai_setting['max_tokens'].max}}</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].max | formatNumber}}</div>
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->

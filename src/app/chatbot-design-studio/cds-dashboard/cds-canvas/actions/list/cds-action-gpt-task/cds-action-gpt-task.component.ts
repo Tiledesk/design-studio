@@ -100,10 +100,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
     OPENAI_MODEL.forEach(el => {
       if (ai_models[el.value]) {
-        el.additionalText = `${ai_models[el.value]} x tokens`;
+        // el.additionalText = `${ai_models[el.value]} x tokens`;
         el.status = 'active';
       } else {
-        el.additionalText = null;
+        // el.additionalText = null;
         el.status = 'inactive';
       }
     });

@@ -202,45 +202,21 @@
                  <!-- // llm select -->
                  <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
-                    
-                    <!-- 
-                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
-                        <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
                         <cds-select id="model-condition"
-                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
+                            [class]="!llm_model_selected.configured ? 'not-configured' : ''"
                             [items]="llm_models_flat" 
-                            [itemSelected]="labelModel"
-                            [bindLabelSelect]="'labelModel'" 
-                            [bindValueSelect]="'value'"
-                            [placeholder]="'CDSCanvas.SelectLL' | translate"
-                            (onSelected)="onChangeSelect($event, 'llm2')">
+                            [itemSelected]="llm_model_selected.model"
+                            [bindLabelSelect]="'modelName'" 
+                            [bindValueSelect]="'model'"
+                            [groupByKey]="'llm'"
+                            [clearable]="false" 
+                            [searchable]="true"
+                            [optionalBindAdditionalText]="'multiplier'" 
+                            (onSelected)="onChangeSelect($event, 'llm_model')">
                         </cds-select>
-                    </div> 
-                    -->
-                    
-                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
-                        <!-- <div class="status-indicator" *ngIf="!selectedModelConfigured"></div> -->
-                        <cds-text id="text-label-model"
-                            class="sx-input" 
-                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
-                            [text]="labelModel"
-                            [autocompleteOptions]="autocompleteOptionsFlat"
-                            [placeholder]="'CDSCanvas.Model' | translate"
-                            [setAttributeBtn]="false"
-                            (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"
-                            (blur)="onBlur($event)"
-                            >
-                            <!--   
-                                (onOptionSelected)="onOptionSelected($event, 'llm_model')" 
-                            -->
-                        </cds-text>
-                    </div>
-             
-                    <!-- Container per i due elementi sulla stessa riga -->
-                    <div class="bottom-row">
-                        <div class="multiplier-container"><span *ngIf="multiplier">{{multiplier}} x tokens</span></div>
-                        <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
-                    </div>
+                        <div class="bottom-row">
+                            <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                        </div>
                 </div>
                 
                 <!-- // llm select -->
@@ -282,6 +258,7 @@
                             <div class="action-wait-range">{{ai_setting['max_tokens'].min}}</div>
                             <mat-slider 
                                 class="wait-slider"  thumbLabel 
+                                [displayWith]="formatSliderLabel"
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
@@ -290,11 +267,16 @@
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
                             </mat-slider>
-                            <div class="action-wait-range">{{ai_setting['max_tokens'].max | number:'': browserLang}}</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].max | formatNumber}}</div>
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
-                        <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens | number:'': browserLang}}" disabled>
+                        <input type="number" 
+                               class="slider-input gpt-setting-input" 
+                               [(ngModel)]="action.max_tokens"
+                               [min]="ai_setting['max_tokens'].min"
+                               [max]="ai_setting['max_tokens'].max"
+                               (change)="updateSliderValue(action.max_tokens, 'max_tokens')">
                         <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
                     </div>
                 </div>
@@ -320,7 +302,7 @@
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
-                            <input type="text" class="slider-input gpt-setting-input" value="{{action.temperature | number:'': browserLang}}" disabled>
+                            <input type="number" class="slider-input gpt-setting-input" value="{{action.temperature}}" disabled>
                         </div>
                     </div>
                 </div>

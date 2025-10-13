@@ -111,7 +111,11 @@ mat-slider {
     }
     .mat-slider-thumb-label-text{
         color: $background-color !important;
-        font-size: 8px!important;
+        max-width: 4ch;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
     }
     .mat-slider-thumb {
         background-color: $text-color !important;
