@@ -4,13 +4,15 @@
     <div class="action-row">
         <div id="gpt-icon" class="action-row-left icon-action">
             <mat-icon *ngIf="!action?.llm" svgIcon="add_ai_model" aria-hidden="true"></mat-icon>
-            <img *ngIf="action?.llm" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
+            <img *ngIf="action?.llm && (llm_models | find:{key: 'value', value: action?.llm})" 
+                 src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" 
+                 alt="">
         </div>
         <div class="action-row-right">
-            <div *ngIf="action?.llm" class="action-row-right">
+            <div *ngIf="action?.llm && (llm_models | find:{key: 'value', value: action?.llm})" class="action-row-right">
                 {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">({{action?.model}})</span>
             </div>
-            <div *ngIf="!action?.llm" class="action-row-right empty">
+            <div *ngIf="!action?.llm || !(llm_models | find:{key: 'value', value: action?.llm})" class="action-row-right empty">
                 {{'CDSCanvas.ChooseTheAIModel' | translate }}
             </div>
         </div>
@@ -130,7 +132,9 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} )</span>
+                    <span class="subtitle-label" *ngIf="llm_models | find:{key: 'value', value: action?.llm}">
+                        ( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} )
+                    </span>
                 </label>
             </div>
         </div>
