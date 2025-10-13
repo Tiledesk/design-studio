@@ -221,11 +221,17 @@ mat-checkbox ::ng-deep {
     text-align: center;
     transition: width 0.3s ease-in;
     font-size: 14px;
+    &.disabled {
+        opacity: 0.5;
+    }
 }
 
 .action-wait-slider>mat-slider {
     width: 100%;
     margin-left: 6px;
+}
+.action-wait-slider.disabled {
+    opacity: 0.4;
 }
 
 .action-wait-slider ::ng-deep{
@@ -237,6 +243,7 @@ mat-checkbox ::ng-deep {
     }
     .mat-slider-thumb-label-text{
         color: var(--background-color) !important;
+        font-size: 10px !important;
     }
     .mat-slider-thumb {
         background-color: var(--text-color) !important;
@@ -252,6 +259,20 @@ mat-checkbox ::ng-deep {
     border-radius: 12px;
     background-color: white;
     border: 1px solid var(--text-color);
+
+    // Hide number input spinner arrows
+    /* Chrome, Safari, Edge, Opera */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    &[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
 }
 
 .slider-input ::ng-deep {
@@ -314,7 +335,7 @@ mat-checkbox ::ng-deep {
 
 .preview-container-extended {
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .placeholder-container {
@@ -475,6 +496,7 @@ loading-spinner.custom-spinner ::ng-deep {
     gap: 4px;
     flex: 1;
     padding-top: 10px;
+    width: 100%;
 }
 
 .intent-prompt-preview {
@@ -529,6 +551,17 @@ loading-spinner.custom-spinner ::ng-deep {
 }
 
 
+
+cds-select#model-condition.not-configured ::ng-deep {
+    .ng-select .ng-select-container {
+        border: 1px solid var(--empty-value-text-color);
+    }
+    .ng-select .ng-select-container .ng-value span.label-select{
+        color: var(--empty-value-text-color);
+    }
+}
+
+
 .select-container {
     &.not-configured {
         ::ng-deep .ng-select .ng-select-container {
@@ -542,10 +575,7 @@ loading-spinner.custom-spinner ::ng-deep {
             color: var(--empty-value-text-color)!important;
             border: 1px solid var(--empty-value-text-color)!important;
         }
-
     }
-
-
     .status-indicator {
         width: 8px;
         height: 8px;
@@ -556,16 +586,15 @@ loading-spinner.custom-spinner ::ng-deep {
         left: 0px;
         top: 96px;
     }
-
 }
 
-// Multiplier and Configure Button Row
+// Bottom row styles for model selection
 .bottom-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-top: 0px;
-    padding-left: 10px;
+    padding-left: 0px;
+    flex-direction: row-reverse;
 }
 
 .multiplier-container {
@@ -580,10 +609,8 @@ loading-spinner.custom-spinner ::ng-deep {
     font-size: 12px;
     text-decoration: underline;
     display: inline-block;
-    
     &:hover {
         opacity: 0.7;
     }
 }
-
 // PREVIEW SECTION --- start **************** //

@@ -25,6 +25,7 @@ import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { OPENAI_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { manageGpt5ModelSettings } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -45,9 +46,14 @@ export class CdsActionGPTTaskComponent implements OnInit {
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
+  // model_list: Array<{ name: string, value: string }>;
+  // ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
+  //   "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1},
+  //   "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+  
   model_list: Array<{ name: string, value: string, additionalText?: string }>;
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false}
   }
   ai_response: string = "";
@@ -94,10 +100,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
     OPENAI_MODEL.forEach(el => {
       if (ai_models[el.value]) {
-        el.additionalText = `${ai_models[el.value]} x tokens`;
+        // el.additionalText = `${ai_models[el.value]} x tokens`;
         el.status = 'active';
       } else {
-        el.additionalText = null;
+        // el.additionalText = null;
         el.status = 'inactive';
       }
     });
@@ -238,12 +244,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.action[target] = event.value;
 
     /** MANAGE GPT-5 MODELS */
-    if(event.value.startsWith('gpt-5')){
-      this.action.temperature = 1
-      this.ai_setting['temperature'].disabled= true
-    }else{
-      this.ai_setting['temperature'].disabled= false
-    }
+    manageGpt5ModelSettings(this.action, this.ai_setting);
 
     this.updateAndSaveAction.emit();
   }

@@ -7,6 +7,73 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.9-rc3:
+- **bug-fix**: set result.hybrid on undefined
+- **bug-fix**: bug fix overflow preview-container-extended
+- **bug-fix**: set generate with llm_model_selected.modelName
+- **bug-fix**: undefined.url
+- **bug-fix**: on preview ask kb
+- **bug-fix**: max-height text area
+- **changed**: changed max_tokens_context in max_output_tokens and update openai values
+
+
+# 1.39.9-rc2:
+- **added**: set default model
+- **changed**: replaced the textarea with a select in the model selection
+- **changed**: changed token display by adding k for thousands
+- **changed**: editable max token field
+- **added**: added max_token and min_token parameters for each model
+
+
+# 1.39.9-rc1:
+- **added**: added vLLM model integration
+
+
+# 1.39.8-rc1:
+- **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
+- **added**: added css for temperature disabled when gpt-5 is the selected model 
+- **added**: set max_token when change model
+
+
+# 1.39.6
+- **changed**: set max_tokens from 8192 to 100000
+
+# 1.39.6
+- **changed**: set max_tokens from 8192 to 100000
+
+# 1.39.5
+- **bug-fix**: added gpt-5 in aiModels env
+- **added**: added a temperature filter if the model is gpt-5
+
+# 1.39.4
+
+# 1.39.3
+- **bug-fix**: added filter status "active" in generateLlmModels
+
+# 1.39.3-rc1
+- **bug-fix**: added filter status "active" in generateLlmModels
+
+# 1.39.2-rc3
+- **changed**: changed select llm model in askgpt-v2
+- **changed**: moved common functions between ai-prompt, ai-condition and askgpt-v2 actions in utils-llm-model
+- **added**: skip_unanswered and reranking in AskKbv2 
+
+# 1.39.2-rc2
+- **bug-fix**: bug fix ai-condition and ai-prompt
+
+# 1.39.2
+
+# 1.39.1
+
+# 1.39.0
+
+# 1.39.0-rc26
+- **bug-fix**: css ai-condition fixed bug with long text in preview
+
+# 1.39.0-rc25
+- **changed**: change css tag "new", "beta"
+- **bug-fix**: disable scroll on preview button in ai-prompt
+- **bug-fix**: css ai-condition
 
 # 1.39.0-rc24
 - **changed**: set isLiquidjs to false in web request from data
@@ -81,6 +148,9 @@
 
 # 1.39.0-rc1
 - **changed**: added scroll button left and right on image gallery
+
+# 1.38.5
+- **changed**: update ai models
 
 # 1.38.4
 - **changed**: added left and right scroll button in image gallery
