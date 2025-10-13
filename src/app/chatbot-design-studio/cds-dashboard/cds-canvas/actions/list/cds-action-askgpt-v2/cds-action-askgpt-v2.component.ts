@@ -257,8 +257,10 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   selectKB(namespace){
     const result = this.listOfNamespaces.find(el => el.value === namespace);
-    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result)
-    this.IS_VISIBLE_ALPHA_SLIDER = result.hybrid
+    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result);
+    if(result){
+      this.IS_VISIBLE_ALPHA_SLIDER = result.hybrid;
+    }
   }
 
 
