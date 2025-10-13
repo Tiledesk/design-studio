@@ -332,7 +332,7 @@ mat-checkbox ::ng-deep {
 
 .preview-container-extended {
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .placeholder-container {
