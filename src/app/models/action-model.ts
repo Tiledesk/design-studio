@@ -528,6 +528,18 @@ export class ActionCaptureUserReply extends Action {
     }   
 }
 
+export class ActionIteration extends Action {
+    iterable: any;
+    assignOutputTo: string;
+    goToIntent: string;
+    fallbackIntent: string;
+    delay: number;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.ITERATION
+    }   
+}
+
 export class ActionFlowLog extends Action {
     level: string;
     log: string;

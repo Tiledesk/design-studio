@@ -282,6 +282,10 @@ export class IconService {
       'assets/images/actions/flow_log.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/flow_log.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/autorenew.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/autorenew.svg')
+    );
 
 
 

@@ -354,6 +354,13 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-capture-user-reply>
+
+                    <cds-action-iteration *ngSwitchCase="TYPE_ACTION.ITERATION" 
+                        class="panel-response" 
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-iteration>
                     
                     <cds-action-qapla *ngSwitchCase="TYPE_ACTION.QAPLA" 
                         class="panel-response"
