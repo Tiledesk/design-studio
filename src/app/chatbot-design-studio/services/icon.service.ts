@@ -495,6 +495,10 @@ export class IconService {
       'brain',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/brain.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'change_circle',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/change_circle.svg')
+    );
   }
 }
 

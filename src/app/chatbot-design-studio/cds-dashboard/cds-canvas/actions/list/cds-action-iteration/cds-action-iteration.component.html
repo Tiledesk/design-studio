@@ -23,9 +23,10 @@
 
     <div class="previewContent">
         <div class="icon-action">
-            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            <!-- <img class="active-icon" src="assets/images/icons/if_condition.svg"> -->
+            <mat-icon svgIcon="change_circle" aria-hidden="true"></mat-icon>
         </div>
-        <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
+        <label class="title-preview-label">{{'CDSCanvas.GoToBlock' | translate }}</label>
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorGoTo"
             [idConnection] = "idConnectionGoTo"
@@ -90,9 +91,10 @@
     <div class="field-box">
         <div class="condition-container">
             <div class="icon-action">
-                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+                <!-- <img class="active-icon" src="assets/images/icons/if_condition.svg"> -->
+                <mat-icon svgIcon="change_circle" aria-hidden="true"></mat-icon>
             </div>
-            <span class="condition-text">{{'CDSCanvas.Success' | translate }}</span>
+            <span class="condition-text">{{'CDSCanvas.GoToBlock' | translate }}</span>
         </div>
         <cds-select id="text-condition-goto" 
             [items]="listOfIntents" 
