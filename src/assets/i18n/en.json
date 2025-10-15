@@ -553,8 +553,11 @@
         "AnswerKB": "Answer",
         "EnterQuestion": "Your question",
         "EnterAnswer": "Your answer",
-        "DeprecationMessage": "🚫 This action is deprecated and will no longer be supported",
-        "ConfigureModel": "Configure"
+        "ConfigureModel": "Configure",
+        "IterableAttribute": "Iterable attribute",
+        "IteratableAttributeDescription": "The attribute that will be used to iterate over the data",
+        "AssignOutputTo": "Assign output to",
+        "AssignOutputToDescription": "The attribute that will be used to assign the output"
     },
     "Alert": {
         "ErrorMaxOptions": "Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -719,7 +722,8 @@
             "PlayPrompt": "Play prompt",
             "SpeechForm": "Speech form",
             "AudioRecord": "Audio record",
-            "SendWhatsapp": "Send Whatsapp"
+            "SendWhatsapp": "Send Whatsapp", 
+            "Iteration": "Iteration"
         },
         "DOC": {
             "Reply": {

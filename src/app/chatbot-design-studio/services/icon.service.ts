@@ -283,8 +283,8 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/flow_log.svg')
     );
     this.matIconRegistry.addSvgIcon(
-      'assets/images/actions/autorenew.svg',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/autorenew.svg')
+      'assets/images/actions/repeat.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/repeat.svg')
     );
 
 
@@ -494,6 +494,10 @@ export class IconService {
     this.matIconRegistry.addSvgIcon(
       'brain',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/brain.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'change_circle',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/change_circle.svg')
     );
   }
 }
