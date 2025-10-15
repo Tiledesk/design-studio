@@ -8,6 +8,7 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { variableList } from '../../utils-variables';
 import { SelectComponent } from '../../cds-base-element/select/select.component';
 import { DOCS_LINK } from '../../utils';
+import { AiService } from 'src/app/services/ai.service';
 
 @Component({
   selector: 'cds-voice-settings',
@@ -38,10 +39,15 @@ export class CDSVoiceSettingsComponent implements OnInit {
   voice_name: string;
   voice_language: string
 
+
+  //PLAYER audio (elevenlabs)
+  isPlaying: boolean = false;
+  private audio: HTMLAudioElement | null = null;
   
   private logger: LoggerService = LoggerInstance.getInstance()
   constructor(
     private faqKbService: FaqKbService,
+    private aiService: AiService
   ) { }
 
   ngOnInit(): void {
@@ -52,7 +58,11 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.initialize()
   }
 
-  private initialize(){
+  private async initialize(){
+
+    await this.getElevenLabsVoices(); //get voices from elevenlabs
+    await this.getElevenLabsModels(); //get models from elevenlabs
+
     this.voiceProvider = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'VOICE_PROVIDER')?.value
     this.tts_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_MODEL')?.value
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value
@@ -61,7 +71,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
     this.voice_language = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code
 
-    if(this.voiceProvider === 'openai'){
+    if(this.voiceProvider === 'openai' || this.voiceProvider === 'elevenlabs'){
       this.tts_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
       this.stt_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
       this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
@@ -69,6 +79,52 @@ export class CDSVoiceSettingsComponent implements OnInit {
 
     if(this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals){
       this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));
+    }
+   
+  }
+
+
+  async getElevenLabsVoices(){
+    try {
+      const resp = await this.aiService.getElevenLabsVoices();
+      this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsVoices ', resp)
+      if (resp && Array.isArray(resp)) {
+        resp.forEach(voice => {
+          const elevenLabsProvider = voiceProviderList.find(el => el.key === 'elevenlabs');
+          if (elevenLabsProvider && elevenLabsProvider.tts_voice) {
+            elevenLabsProvider.tts_voice.push({
+              voiceId: voice.voice_id,
+              preview_url: voice.preview_url,
+              name: voice.name, 
+              type: 'standard',
+              status: 'active'
+            });
+          }
+        });
+      }
+    } catch (error) {
+      this.logger.error('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsVoices error: ', error);
+    }
+  }
+
+  async getElevenLabsModels(){
+    try {
+      const resp = await this.aiService.getElevenLabsModels();
+      this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsModels ', resp)
+      if (resp && Array.isArray(resp)) {
+        resp.forEach(model => {
+          const elevenLabsProvider = voiceProviderList.find(el => el.key === 'elevenlabs');
+          if (elevenLabsProvider && elevenLabsProvider.tts_model) {
+            elevenLabsProvider.tts_model.push({
+              model: model.model_id,
+              name: model.name,
+              status: 'active'
+            });
+          }
+        });
+      }
+    } catch (error) {
+      this.logger.error('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsModels error: ', error);
     }
   }
 
@@ -81,19 +137,19 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
         this.findAndUpdateProperty("TTS_MODEL", null)
         this.findAndUpdateProperty("STT_MODEL", null)
-        this.voiceNameSelect.onResetValue(null)
+        this.voiceNameSelect?.onResetValue(null)
         this.voiceProvider = event.key
         // this.voiceLanguageSelect.onResetValue(null)
         this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
         this.voice_name_list = [];
         // this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''} (${el.language_code})` }))
-        if(event && event.key === 'openai'){
+        if(event && (event.key === 'openai' || event.key === 'elevenlabs')){
           this.tts_model_list = voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
           this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
           this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
 
           this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
-          this.voiceLanguageSelect.onResetValue(null)
+          this.voiceLanguageSelect?.onResetValue(null)
           this.voice_language = null;
         }
         break;
@@ -107,6 +163,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
       };
       case 'TTS_VOICE_NAME':{
         this.findAndUpdateProperty("TTS_VOICE_NAME", event.voiceId)
+        this.voice_name = event.voiceId;
         break;
       };
       case 'TTS_MODEL':{
@@ -204,6 +261,32 @@ export class CDSVoiceSettingsComponent implements OnInit {
     }, () => {
       this.logger.debug("[CDS-CHATBOT-VOICE-SETTINGS]  saveAttributes *COMPLETE*");
     })
+  }
+
+
+  get selectedPreviewUrl(): string | null {
+    const selectedVoice = this.voice_name_list.find(voice => voice.voiceId === this.voice_name);
+    return selectedVoice ? selectedVoice.preview_url : null;
+  }
+
+  togglePlay(): void {
+    if (!this.audio) {
+      this.audio = new Audio(this.selectedPreviewUrl);
+
+      this.audio.addEventListener('ended', () => {
+        this.isPlaying = false;
+        this.audio = null;
+      });
+    }
+
+    if (this.isPlaying) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.isPlaying = false;
+    } else {
+      this.audio.play();
+      this.isPlaying = true;
+    }
   }
 
 

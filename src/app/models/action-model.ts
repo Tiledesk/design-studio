@@ -424,6 +424,8 @@ export class ActionKBContent extends Action {
 export class ActionAskGPTV2 extends Action {
     question: string;
     model: string;
+    llm: string;
+    modelName: string;
     assignReplyTo: string;
     assignSourceTo: string;
     assignChunksTo: string;
@@ -443,6 +445,9 @@ export class ActionAskGPTV2 extends Action {
     namespaceAsName: boolean;
     citations: boolean;
     chunks_only: boolean;
+    skip_unanswered: boolean;
+    reranking: boolean;
+  value: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2
@@ -490,6 +495,7 @@ export class ActionAiPrompt extends Action {
     temperature: number;
     labelModel: string;
     llm: string;
+    modelName: string;
     model: string;
     preview?: Array<any>;
     trueIntent: string;
@@ -505,6 +511,7 @@ export class ActionAiCondition extends Action {
     intents: Array<any>;
     instructions: string;
     llm: string;
+    modelName: string;
     model: string;
     max_tokens: number;
     temperature: number;
