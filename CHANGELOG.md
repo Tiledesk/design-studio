@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # 1.39.9-rc6:
+- **bug-fix**: bug fix changed name attributes assignOutputTo
 - **bug-fix**: bug fix css on block-connector and start-content
 
 # 1.39.9-rc5:
