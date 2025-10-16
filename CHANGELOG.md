@@ -8,9 +8,12 @@
 *Tiledesk SRL*
 
 
+# 1.39.9-rc5:
+- **changed**: added "item" attribute
+- **bug-fix**: css bug fixed
+
 # 1.39.9-rc4:
 - **added**: added interation action
-
 
 # 1.39.9-rc3:
 - **bug-fix**: set result.hybrid on undefined
