@@ -15,8 +15,8 @@
         </div>
         <div class="action-row">
             <label class="title-preview-label">{{'CDSCanvas.AssignOutputTo' | translate }}:
-                <span *ngIf="!action?.item" class="empty">...</span>
-                <span *ngIf="action?.item">{{ action.item }}</span>
+                <span *ngIf="!action?.assignOutputTo" class="empty">...</span>
+                <span *ngIf="action?.assignOutputTo">{{ action.assignOutputTo }}</span>
             </label>
         </div>
     <!-- </div> -->
@@ -77,11 +77,11 @@
             [setAttributeBtn]="true"
             [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
-            [text]="action.item"
+            [text]="action.assignOutputTo"
             [placeholder]="''"
             [isLiquidjs]="false"
-            (selectedAttribute)="onSelectedAttribute($event, 'item')"
-            (clearSelectedAttribute)="onSelectedAttribute($event, 'item')">
+            (selectedAttribute)="onSelectedAttribute($event, 'assignOutputTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignOutputTo')">
         </cds-textarea>
         <label class="field-description"> {{ 'CDSCanvas.AssignOutputToDescription' | translate}} </label>
     </div>

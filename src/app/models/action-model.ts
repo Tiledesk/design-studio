@@ -537,7 +537,7 @@ export class ActionCaptureUserReply extends Action {
 
 export class ActionIteration extends Action {
     iterable: any;
-    item: string;
+    assignOutputTo: string;
     goToIntent: string;
     fallbackIntent: string;
     delay: number;
