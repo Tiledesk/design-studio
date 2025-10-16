@@ -370,6 +370,12 @@
                             (updateAndSaveAction)="onActionUpdate($event)">
                         </cds-action-ai-prompt>
 
+                        <cds-action-iteration *ngSwitchCase="TYPE_ACTION.ITERATION" 
+                            class="panel-response" 
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-iteration>
 
                         <cds-action-ai-condition *ngSwitchCase="TYPE_ACTION.AI_CONDITION" 
                             class="panel-response" 

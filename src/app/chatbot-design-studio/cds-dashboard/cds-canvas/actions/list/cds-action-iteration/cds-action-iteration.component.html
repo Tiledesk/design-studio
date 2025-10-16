@@ -1,0 +1,131 @@
+<div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
+
+
+    <!-- <div id="gpt-icon" class="action-row-left icon-action">
+        <mat-icon *ngIf="!action?.llm" svgIcon="add_ai_model" aria-hidden="true"></mat-icon>
+        <img *ngIf="action?.llm" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
+    </div> -->
+
+    <!-- <div id="iterationAction"> -->
+        <div class="action-row">
+            <label class="title-preview-label">{{'CDSCanvas.IterableAttribute' | translate }}:
+                <span *ngIf="!action?.iterable" class="empty">...</span>
+                <span *ngIf="action?.iterable">{{ action.iterable }}</span>
+            </label>
+        </div>
+        <div class="action-row">
+            <label class="title-preview-label">{{'CDSCanvas.AssignOutputTo' | translate }}:
+                <span *ngIf="!action?.item" class="empty">...</span>
+                <span *ngIf="action?.item">{{ action.item }}</span>
+            </label>
+        </div>
+    <!-- </div> -->
+
+    <div class="previewContent">
+        <div class="icon-action">
+            <!-- <img class="active-icon" src="assets/images/icons/if_condition.svg"> -->
+            <mat-icon svgIcon="change_circle" aria-hidden="true"></mat-icon>
+        </div>
+        <label class="title-preview-label">{{'CDSCanvas.GoToBlock' | translate }}</label>
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorGoTo"
+            [idConnection] = "idConnectionGoTo"
+            [isConnected] = "isConnectedGoTo">
+        </cds-connector>
+    </div>
+
+    <!-- <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">{{'CDSCanvas.Fallback' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFallback"
+            [idConnection] = "idConnectionFallback"
+            [isConnected] = "isConnectedFallback">
+        </cds-connector>
+    </div> -->
+
+</div>
+
+
+<div id="content" *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.IterableAttribute' | translate }}:</label>
+        <cds-textarea 
+            id="iterableAttribute" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.iterable"
+            [placeholder]="''"
+            [isLiquidjs]="false"
+            (selectedAttribute)="onSelectedAttribute($event, 'iterable')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'iterable')">
+        </cds-textarea>
+        <label class="field-description"> {{ 'CDSCanvas.IterableAttributeDescription' | translate}} </label>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.AssignOutputTo' | translate }}:</label>
+        <cds-textarea 
+            id="assignOutputTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.item"
+            [placeholder]="''"
+            [isLiquidjs]="false"
+            (selectedAttribute)="onSelectedAttribute($event, 'item')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'item')">
+        </cds-textarea>
+        <label class="field-description"> {{ 'CDSCanvas.AssignOutputToDescription' | translate}} </label>
+    </div>
+
+    
+    <hr class="custom-divider">
+
+    <!-- goToIntent -->
+    <div class="field-box">
+        <div class="condition-container">
+            <div class="icon-action">
+                <!-- <img class="active-icon" src="assets/images/icons/if_condition.svg"> -->
+                <mat-icon svgIcon="change_circle" aria-hidden="true"></mat-icon>
+            </div>
+            <span class="condition-text">{{'CDSCanvas.GoToBlock' | translate }}</span>
+        </div>
+        <cds-select id="text-condition-goto" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.goToIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeSelect($event, 'goToIntent')"
+            (onReset)="onResetBlockSelect($event, 'goToIntent')">
+        </cds-select>
+    </div>
+
+    <!-- fallbackIntent -->
+    <!-- <div class="field-box">
+        <div class="condition-container">
+            <span class="condition-text">{{'CDSCanvas.Fallback' | translate | titlecase }}</span>
+        </div>
+        <cds-select id="text-condition-fallback" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.fallbackIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeSelect($event, 'fallbackIntent')"
+            (onReset)="onResetBlockSelect($event, 'fallbackIntent')">
+        </cds-select>
+    </div> -->
+    
+</div>
+

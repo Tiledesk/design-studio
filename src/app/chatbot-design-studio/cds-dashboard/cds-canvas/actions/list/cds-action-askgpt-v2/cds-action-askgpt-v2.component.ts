@@ -258,8 +258,10 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   selectKB(namespace){
     const result = this.listOfNamespaces.find(el => el.value === namespace);
-    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result)
-    this.IS_VISIBLE_ALPHA_SLIDER = result.hybrid
+    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result);
+    if(result){
+      this.IS_VISIBLE_ALPHA_SLIDER = result.hybrid;
+    }
   }
 
 
@@ -303,7 +305,8 @@ export class CdsActionAskgptV2Component implements OnInit {
         if (!this.action.namespaceAsName) {
           this.action[type]=event.value
         } else {
-          this.action[type] = this.listOfNamespaces.find(n => n.value === event.value).name;
+          const found = this.listOfNamespaces.find(n => n.value === event.value);
+          this.action[type] = found?.name || event.value;
         }
         this.selectedNamespace = event.value;
         this.selectKB(this.selectedNamespace);
@@ -576,18 +579,20 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   async idToName(id: string): Promise<any> {
     return new Promise((resolve) => {
-      let name = this.listOfNamespaces.find(n => n.value === id).name;
+      const found = this.listOfNamespaces?.find(n => n.value === id);
+      const name = found?.name || id;
       resolve(name)
     })
   }
 
   async nameToId(name: string): Promise<any> {
     return new Promise((resolve) => {
-      let selected = this.listOfNamespaces.find(n => n.name === name);
+      const selected = this.listOfNamespaces?.find(n => n.name === name);
       if(selected){
         resolve(selected.value)
+      } else {
+        resolve(this.project_id)
       }
-      resolve(this.project_id)
     })
   }
 

@@ -8,6 +8,22 @@
 *Tiledesk SRL*
 
 
+# 1.39.9-rc5:
+- **changed**: added "item" attribute
+- **bug-fix**: css bug fixed
+
+# 1.39.9-rc4:
+- **added**: added interation action
+
+# 1.39.9-rc3:
+- **bug-fix**: set result.hybrid on undefined
+- **bug-fix**: bug fix overflow preview-container-extended
+- **bug-fix**: set generate with llm_model_selected.modelName
+- **bug-fix**: undefined.url
+- **bug-fix**: on preview ask kb
+- **bug-fix**: max-height text area
+- **changed**: changed max_tokens_context in max_output_tokens and update openai values
+
 # 1.39.9-rc2:
 - **added**: set default model
 - **changed**: replaced the textarea with a select in the model selection
@@ -15,12 +31,19 @@
 - **changed**: editable max token field
 - **added**: added max_token and min_token parameters for each model
 
-
 # 1.39.9-rc1:
 - **added**: added vLLM model integration
 
+# 1.39.9 
+
+# 1.39.8
 
 # 1.39.8-rc1:
+- **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
+- **added**: added css for temperature disabled when gpt-5 is the selected model 
+- **added**: set max_token when change model
+
+# 1.39.7
 - **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
 - **added**: added css for temperature disabled when gpt-5 is the selected model 
 - **added**: set max_token when change model
