@@ -1106,7 +1106,7 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.ITERATION) {
       action = new ActionIteration();
-      action.item = 'item';
+      action.assignOutputTo = 'item';
     }
     if(typeAction === TYPE_ACTION.QAPLA) {
       action = new ActionQapla();
