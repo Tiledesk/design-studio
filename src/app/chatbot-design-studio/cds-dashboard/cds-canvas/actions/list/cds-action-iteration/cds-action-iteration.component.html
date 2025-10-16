@@ -9,13 +9,13 @@
     <!-- <div id="iterationAction"> -->
         <div class="action-row">
             <label class="title-preview-label">{{'CDSCanvas.IterableAttribute' | translate }}:
-                <span *ngIf="!action?.iterable" class="action-row-right empty">...</span>
+                <span *ngIf="!action?.iterable" class="empty">...</span>
                 <span *ngIf="action?.iterable">{{ action.iterable }}</span>
             </label>
         </div>
         <div class="action-row">
             <label class="title-preview-label">{{'CDSCanvas.AssignOutputTo' | translate }}:
-                <span *ngIf="!action?.item" class="action-row-right empty">...</span>
+                <span *ngIf="!action?.item" class="empty">...</span>
                 <span *ngIf="action?.item">{{ action.item }}</span>
             </label>
         </div>
