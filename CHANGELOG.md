@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 
+# 1.39.9-rc4:
+- **added**: added interation action
+
+
 # 1.39.9-rc3:
 - **bug-fix**: set result.hybrid on undefined
 - **bug-fix**: bug fix overflow preview-container-extended
