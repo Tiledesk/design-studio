@@ -1,12 +1,5 @@
-.previewContent#iterationAction {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 5px;
-    margin: 4px 0px;
-    flex-wrap: wrap;
+.action-row {
+    min-height: 24px;
 }
 
 .title-preview-label > span{
