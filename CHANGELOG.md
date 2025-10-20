@@ -7,10 +7,19 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.9-rc7:
+- **added**: added action iteration in webhook
+
+# 1.39.9-rc6:
+- **bug-fix**: bug fix changed name attributes assignOutputTo
+- **bug-fix**: bug fix css on block-connector and start-content
+
+# 1.39.9-rc5:
+- **changed**: added "item" attribute
+- **bug-fix**: css bug fixed
 
 # 1.39.9-rc4:
 - **added**: added interation action
-
 
 # 1.39.9-rc3:
 - **bug-fix**: set result.hybrid on undefined

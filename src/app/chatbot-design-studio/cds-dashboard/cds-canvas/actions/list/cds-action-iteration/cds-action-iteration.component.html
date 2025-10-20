@@ -6,20 +6,20 @@
         <img *ngIf="action?.llm" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
     </div> -->
 
-    <div id="iterationAction" class="previewContent">
+    <!-- <div id="iterationAction"> -->
         <div class="action-row">
             <label class="title-preview-label">{{'CDSCanvas.IterableAttribute' | translate }}:
-                <span *ngIf="!action?.iterable" class="action-row-right empty">...</span>
+                <span *ngIf="!action?.iterable" class="empty">...</span>
                 <span *ngIf="action?.iterable">{{ action.iterable }}</span>
             </label>
         </div>
         <div class="action-row">
             <label class="title-preview-label">{{'CDSCanvas.AssignOutputTo' | translate }}:
-                <span *ngIf="!action?.assignOutputTo" class="action-row-right empty">...</span>
+                <span *ngIf="!action?.assignOutputTo" class="empty">...</span>
                 <span *ngIf="action?.assignOutputTo">{{ action.assignOutputTo }}</span>
             </label>
         </div>
-    </div>
+    <!-- </div> -->
 
     <div class="previewContent">
         <div class="icon-action">
@@ -61,6 +61,7 @@
             [readonly]="true" 
             [text]="action.iterable"
             [placeholder]="''"
+            [isLiquidjs]="false"
             (selectedAttribute)="onSelectedAttribute($event, 'iterable')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'iterable')">
         </cds-textarea>
@@ -78,6 +79,7 @@
             [readonly]="true" 
             [text]="action.assignOutputTo"
             [placeholder]="''"
+            [isLiquidjs]="false"
             (selectedAttribute)="onSelectedAttribute($event, 'assignOutputTo')"
             (clearSelectedAttribute)="onSelectedAttribute($event, 'assignOutputTo')">
         </cds-textarea>

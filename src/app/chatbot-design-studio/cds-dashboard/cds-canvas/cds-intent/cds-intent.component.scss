@@ -186,14 +186,14 @@
   }
 
   .cds-start-content {
-    width: auto;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    position: absolute;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    align-content: center;
+    flex-direction: row;
+    height: 100%;
     right: 11px;
-    top: 11px;
-    
     .title-label {
       display: none;
     }
