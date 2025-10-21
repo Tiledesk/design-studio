@@ -772,7 +772,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * @param componentID - Selettore CSS per identificare l'elemento target
    */
   private removeCssClassIntentActive(className: string, componentID: string): void {
-    removeCssClassFromElement(this.elemenRef, className, componentID, this.logger);
+    this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
+    if(this.intent) {
+      removeCssClassFromElement(this.elemenRef, className, componentID, this.logger);
+    }
   }
 
   /**
