@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.9-rc8:
+- **bug-fix**: renamed function onUpdateAndSaveAction in onActionUpdate
+- **bug-fix**: added check on intent undefined
+
 # 1.39.9-rc7:
 - **added**: added action iteration in webhook
 
