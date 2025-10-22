@@ -187,6 +187,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** */
   ngOnDestroy() {
+    // Pulisci la coda di retry dei connettori
+    this.connectorService.clearRetryQueue();
 
     if (this.subscriptionChangedConnectorAttributes) {
       this.subscriptionChangedConnectorAttributes.unsubscribe();
@@ -307,8 +309,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   async onAllIntentsRendered() {
     this.labelInfoLoading = 'CDSCanvas.intentsComplete';
     this.logger.log("[CDS-CANVAS]  •••• Tutti i cds-intent sono stati renderizzati ••••", this.countRenderedElements);
-    this.connectorService.createConnectors(this.listOfIntents);
-    this.renderedAllIntents = true;
+    
+    // Aspetta che Angular completi il rendering delle actions e dei loro connettori
+    // Usa sia setTimeout che requestAnimationFrame per essere sicuri che il DOM sia pronto
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        this.logger.log("[CDS-CANVAS]  •••• Inizio disegno connettori dopo rendering completo ••••");
+        this.connectorService.createConnectors(this.listOfIntents);
+        this.renderedAllIntents = true;
+      });
+    }, 100);
   }
 
   checkAllConnectors(connector){
@@ -563,6 +573,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // console.log('[CDS-CANVAS] projectID ::', this.projectID);
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
+    
+    // Pulisci la coda di retry dei connettori prima di inizializzare un nuovo bot
+    this.connectorService.clearRetryQueue();
+    
     let getAllIntents = await this.intentService.getAllIntents(this.id_faq_kb);
     if (getAllIntents) {
       this.listOfIntents = this.intentService.listOfIntents;

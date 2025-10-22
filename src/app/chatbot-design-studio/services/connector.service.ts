@@ -33,6 +33,11 @@ export class ConnectorService {
   mapOfConnectors: any = {};
   scale: number = 1;
   existingIntentIds: any;
+  
+  // Coda per connettori che hanno fallito il rendering
+  private failedConnectorsQueue: Array<{intent: any, fromId: string, toId: string, attributes: any, retryCount: number}> = [];
+  private retryIntervalId: any = null;
+  private readonly MAX_RETRY_ATTEMPTS = 5;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
@@ -112,11 +117,14 @@ export class ConnectorService {
    * @param intents 
    * 
    */
-  public createConnectors(intents){
+  public async createConnectors(intents){
     this.listOfIntents = intents;
-    intents.forEach(intent => {
-      this.createConnectorsOfIntent(intent);
-    });
+    // Pulisci la coda di retry prima di iniziare
+    this.clearRetryQueue();
+    
+    for (const intent of intents) {
+      await this.createConnectorsOfIntent(intent);
+    }
   }
 
 
@@ -229,7 +237,7 @@ export class ConnectorService {
    * 
    * create connectors from Intent
    */
-  public createConnectorsOfIntent(intent:any){
+  public async createConnectorsOfIntent(intent:any){
     if(intent.attributes?.nextBlockAction){
       let idConnectorFrom = null;
       let idConnectorTo = null;
@@ -961,7 +969,7 @@ export class ConnectorService {
     }
   }
 
-  private createConnector(intent, idConnectorFrom, idConnectorTo){
+  private async createConnector(intent, idConnectorFrom, idConnectorTo){
     const connectorsAttributes = intent.attributes.connectors;
     this.logger.log('[DEBUG] - createConnector ->', intent, connectorsAttributes, idConnectorFrom, idConnectorTo);
     if(idConnectorFrom && idConnectorTo){
@@ -971,10 +979,96 @@ export class ConnectorService {
         attributes = connectorsAttributes[idConnectorFrom];
       }
       this.logger.log('[DEBUG] - createConnector attributes ->', idConnectorFrom, connectorsAttributes, attributes);
-      this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
+      const success = await this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
+      
+      // Se il connettore non è stato creato, aggiungilo alla coda per retry
+      if (!success) {
+        this.logger.log('[CONNECTOR-SERV] Connettore fallito, aggiunto alla coda retry:', idConnectorFrom, idConnectorTo);
+        this.addToRetryQueue(intent, idConnectorFrom, idConnectorTo, attributes);
+      }
     } else {
       this.logger.log('[DEBUG] - il connettore è rotto non esiste intent ->', idConnectorTo);
     }
+  }
+  
+  /**
+   * Aggiunge un connettore fallito alla coda per ritentare
+   */
+  private addToRetryQueue(intent: any, fromId: string, toId: string, attributes: any) {
+    this.failedConnectorsQueue.push({
+      intent,
+      fromId,
+      toId,
+      attributes,
+      retryCount: 0
+    });
+    
+    // Avvia il processo di retry se non è già attivo
+    if (!this.retryIntervalId) {
+      this.startRetryProcess();
+    }
+  }
+  
+  /**
+   * Avvia il processo di retry per i connettori falliti
+   */
+  private startRetryProcess() {
+    this.logger.log('[CONNECTOR-SERV] Avvio processo retry per connettori falliti');
+    
+    this.retryIntervalId = setInterval(async () => {
+      if (this.failedConnectorsQueue.length === 0) {
+        this.logger.log('[CONNECTOR-SERV] Coda retry vuota, termino processo');
+        this.stopRetryProcess();
+        return;
+      }
+      
+      this.logger.log('[CONNECTOR-SERV] Ritento creazione connettori, coda:', this.failedConnectorsQueue.length);
+      
+      // Processa tutti i connettori nella coda
+      const connectorsToRetry = [...this.failedConnectorsQueue];
+      this.failedConnectorsQueue = [];
+      
+      for (const connector of connectorsToRetry) {
+        connector.retryCount++;
+        
+        if (connector.retryCount > this.MAX_RETRY_ATTEMPTS) {
+          this.logger.error('[CONNECTOR-SERV] Connettore fallito definitivamente dopo', this.MAX_RETRY_ATTEMPTS, 'tentativi:', connector.fromId, connector.toId);
+          continue;
+        }
+        
+        const success = await this.createConnectorFromId(
+          connector.fromId, 
+          connector.toId, 
+          false, 
+          connector.attributes
+        );
+        
+        // Se ancora fallisce, rimettilo in coda
+        if (!success) {
+          this.failedConnectorsQueue.push(connector);
+        } else {
+          this.logger.log('[CONNECTOR-SERV] Connettore creato con successo al tentativo', connector.retryCount, ':', connector.fromId, connector.toId);
+        }
+      }
+    }, 500); // Ritenta ogni 500ms
+  }
+  
+  /**
+   * Ferma il processo di retry
+   */
+  private stopRetryProcess() {
+    if (this.retryIntervalId) {
+      clearInterval(this.retryIntervalId);
+      this.retryIntervalId = null;
+    }
+  }
+  
+  /**
+   * Pulisce la coda di retry (da chiamare quando si cambia bot o si resetta)
+   */
+  public clearRetryQueue() {
+    this.failedConnectorsQueue = [];
+    this.stopRetryProcess();
   }
   /*************************************************/
 
