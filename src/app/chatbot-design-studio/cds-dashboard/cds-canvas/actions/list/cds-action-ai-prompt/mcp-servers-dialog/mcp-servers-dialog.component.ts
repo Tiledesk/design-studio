@@ -55,8 +55,25 @@ export class McpServersDialogComponent implements OnInit {
 
   onAddMcpServer(): void {
     this.logger.log("[McpServersDialog] - onAddMcpServer clicked");
-    // TODO: Open a form to add a new MCP server
-    // For now, just log the action
+    
+    const dialogRef = this.dialog.open(McpServerEditDialogComponent, {
+      panelClass: 'custom-mcp-edit-dialog-container',
+      data: { 
+        isNew: true,
+        allServers: this.data.mcpServers 
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.logger.log("[McpServerEditDialog] new server result:", result);
+      if (result !== false && result) {
+        // Add the new server to the list
+        this.data.mcpServers.push(result);
+        // Automatically select the new server
+        this.selectedServers.push(result);
+        this.logger.log("[McpServersDialog] New server added:", result);
+      }
+    });
   }
 
   openEditServerDialog(server: { name: string, url: string, transport: string }, event: Event): void {
@@ -65,7 +82,10 @@ export class McpServersDialogComponent implements OnInit {
     
     const dialogRef = this.dialog.open(McpServerEditDialogComponent, {
       panelClass: 'custom-mcp-edit-dialog-container',
-      data: { server: server }
+      data: { 
+        server: server,
+        allServers: this.data.mcpServers 
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -88,7 +108,11 @@ export class McpServersDialogComponent implements OnInit {
 
   onConfirm(): void {
     this.logger.log("[McpServersDialog] - onConfirm return data: ", this.selectedServers);
-    this.dialogRef.close(this.selectedServers);
+    // Return both selected servers and updated server list
+    this.dialogRef.close({
+      selectedServers: this.selectedServers,
+      allServers: this.data.mcpServers
+    });
   }
 
 }

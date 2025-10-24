@@ -1,7 +1,7 @@
 <div class="tpl-modal-box">
     <div class="tpl-modal-header">
         <div class="tpl-modal-header-text">
-            <span>Modifica Server MCP</span>
+            <span>{{ isNewServer ? 'Aggiungi Server MCP' : 'Modifica Server MCP' }}</span>
         </div>
         <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
     </div>
@@ -30,26 +30,31 @@
                 </cds-text>
             </div>
 
-            <!-- Transport Type -->
+            <!-- Transport Type (Read-only) -->
             <div class="form-field">
                 <label class="field-label">Type</label>
-                <cds-text 
-                    [text]="editedServer.transport"
-                    [placeholder]="'Inserisci il tipo di transport'"
-                    (onChange)="onChangeField($event, 'transport')">
-                </cds-text>
+                <div class="readonly-field">
+                    {{ editedServer.transport }}
+                </div>
+                <span class="field-hint">Il campo Type non è modificabile</span>
             </div>
         </form>
     </div>
 
     <div class="tpl-modal-buttons">
-        <button id="cds-cancel-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">
+        <button id="cds-cancel-btn" class="btn btn-primary cds-blue-button" type="button" 
+            [mat-dialog-close]="false"
+            [disabled]="isSaving">
             Annulla
         </button>
         <button id="cds-save-btn" class="btn btn-primary cds-blue-button" type="button" 
-            [disabled]="!isFormValid()"
+            [disabled]="!isFormValid() || isSaving"
             (click)="onSave()">
-            Salva
+            <span *ngIf="!isSaving">Salva</span>
+            <span *ngIf="isSaving" style="display: flex; align-items: center; gap: 8px;">
+                <span class="spinner"></span>
+                Salvataggio...
+            </span>
         </button>
     </div>
 </div>

@@ -158,8 +158,8 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.action.preview = [];
     }
     // Initialize selected MCP servers from action
-    if (this.action['selectedMcpServers']) {
-      this.selectedMcpServers = this.action['selectedMcpServers'];
+    if (this.action['servers']) {
+      this.selectedMcpServers = this.action['servers'];
     }
     await this.initialize();
     // Fine dell'inizializzazione - reset di tutti i flag
@@ -803,7 +803,7 @@ setModel(labelModel: string){
 
   openMcpServersDialog() {
     this.logger.log("mcpServers: ", this.mcpServers);
-    this.logger.log("selectedMcpServers: ", this.selectedMcpServers);
+    this.logger.log("servers: ", this.selectedMcpServers);
     const dialogRef = this.dialog.open(McpServersDialogComponent, {
       panelClass: 'custom-mcp-dialog-container',
       data: { 
@@ -814,12 +814,22 @@ setModel(labelModel: string){
     dialogRef.afterClosed().subscribe(result => {
       this.logger.log("McpServersDialogComponent result: ", result);
       if (result !== false && result !== null && result !== undefined) {
-        // Replace the entire list with the new selection (including deselections)
-        this.selectedMcpServers = result.length > 0 ? [...result] : [];
-        // Save selected servers to action
-        this.action['selectedMcpServers'] = this.selectedMcpServers;
-        this.logger.log("Updated selected MCP servers: ", this.selectedMcpServers);
-        this.updateAndSaveAction.emit();
+        // Handle new response structure with selectedServers and allServers
+        if (result.selectedServers !== undefined) {
+          // Update the list of selected servers
+          this.selectedMcpServers = result.selectedServers.length > 0 ? [...result.selectedServers] : [];
+          
+          // Update the main server list with any modifications
+          if (result.allServers) {
+            this.mcpServers = [...result.allServers];
+          }
+          
+          // Save selected servers to action
+          this.action['servers'] = this.selectedMcpServers;
+          this.logger.log("Updated selected MCP servers: ", this.selectedMcpServers);
+          this.logger.log("Updated all MCP servers: ", this.mcpServers);
+          this.updateAndSaveAction.emit();
+        }
       }
     });
   }
@@ -830,7 +840,7 @@ setModel(labelModel: string){
     if (index > -1) {
       this.selectedMcpServers.splice(index, 1);
       // Update action
-      this.action['selectedMcpServers'] = this.selectedMcpServers;
+      this.action['servers'] = this.selectedMcpServers;
       this.logger.log("Removed server, updated list: ", this.selectedMcpServers);
       this.updateAndSaveAction.emit();
     }
