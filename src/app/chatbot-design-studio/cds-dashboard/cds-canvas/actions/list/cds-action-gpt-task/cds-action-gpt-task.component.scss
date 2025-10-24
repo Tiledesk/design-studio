@@ -1,5 +1,4 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 :host {
     --background-color: #{var(--blu-light-01)};
@@ -314,7 +313,7 @@ mat-checkbox ::ng-deep {
 
 .preview-container-extended {
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .placeholder-container {

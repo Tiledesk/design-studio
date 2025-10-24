@@ -24,9 +24,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModels2 } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
+import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 @Component({
   selector: 'cds-action-ai-condition',
@@ -46,10 +48,11 @@ export class CdsActionAiConditionComponent implements OnInit {
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
+
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
   }
 
@@ -89,14 +92,12 @@ export class CdsActionAiConditionComponent implements OnInit {
   PLAN_NAME = PLAN_NAME
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.GPT_TASK;
-  llm_model = LLM_MODEL;
 
-  selectedModelConfigured: boolean = true;
-  labelModel: string = "";
-  autocompleteOptions: Array<{label: string, value: string,  additionalText?: string}> = [];
-  llm_models_2: Array<{ labelModel: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, multiplier?: string }> = [];
-  autocompleteOptions_2: Array<{label: string, value: string}> = [];
-  multiplier: string;
+  default_model = DEFAULT_MODEL;
+  llm_model = LLM_MODEL;
+  llm_models_flat: Array<LlmModel>;
+  llm_model_selected: LlmModel = {} as LlmModel;
+
   private isInitializing = {
     'llm_model': true,
     'context': true,
@@ -113,25 +114,16 @@ export class CdsActionAiConditionComponent implements OnInit {
     private readonly appConfigService: AppConfigService,
     private readonly translate: TranslateService,
     private readonly dashboardService: DashboardService,
-    private readonly projectService: ProjectService
-  ) {
-    this.browserLang = this.translate.getBrowserLang();
-   }
+    private readonly projectService: ProjectService,
+    private readonly formatNumberPipe: FormatNumberPipe
+  ) { }
 
 
   async ngOnInit(): Promise<void> {
     this.logger.log("[ACTION AI_CONDITION] ngOnInit action: ", this.action);
     this.project_id = this.dashboardService.projectID;
-    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
-    this.getOllamaModels();
-
-    this.llm_models_2 = generateLlmModels2();
-    this.llm_models_2.forEach(model => {
-      if (ai_models[model.model]) {
-        model.multiplier = ai_models[model.model].toString();
-      }
-    });
-    this.logger.log("[ACTION AI_CONDITION] model_list: ", this.llm_models_2, ai_models);
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
 
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name;
@@ -167,7 +159,7 @@ export class CdsActionAiConditionComponent implements OnInit {
 
 
   ngOnChanges(changes: SimpleChanges) {
-    // // empty
+    // empty
   }
 
   ngOnDestroy() {
@@ -176,42 +168,44 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
   }
 
-  // private initialize(){
-  //   if(this.action.llm){
-  //     this.initLLMModels();
-  //     this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
-  //     const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
-  //     this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
-  //   }
-  // }
 
-
-  
   private async initialize(){
     await this.initLLMModels();
-    this.actionLabelModel = this.action['labelModel']?this.action['labelModel']:'';
-    this.labelModel = this.action['labelModel']?this.action['labelModel']:'';
-    this.multiplier = this.llm_models_2.find(el => el.labelModel === this.labelModel)?.multiplier;
-    this.logger.log("[ACTION AI_PROMPT] 0 initialize multiplier: ", this.action, this.multiplier);
-    this.setModel(this.labelModel);
-    const foundLLM = this.llm_models.find(el => el.value === this.action.llm);
-    this.llm_options_models = foundLLM ? foundLLM.models.filter(el => el.status === 'active') : [];
+    this.setModel(this.action.modelName?this.action.modelName:this.default_model.name);
+    this.logger.log("[ACTION AI_PROMPT] initialize llm_options_models: ", this.action);
   }
 
-  async getOllamaModels(){
-    this.llm_model.forEach(async (model) => {
-      if (model.value === "ollama") {
-        const NEW_MODELS = await this.getIntegrationByName();
-        if(NEW_MODELS?.value?.models){
-          this.logger.log('[ACTION AI_CONDITION] - NEW_MODELS:', NEW_MODELS.value.models);
-          const models = NEW_MODELS?.value?.models.map(item => ({
-            name: item,
-            value: item
-          }));
-          model.models = models;
-        }
-      }
+
+  async initLLMModels(){
+    const result = await initLLMModels({
+      projectService: this.projectService,
+      dashboardService: this.dashboardService,
+      appConfigService: this.appConfigService,
+      logger: this.logger,
+      componentName: 'ACTION AI_PROMPT'
     });
+    this.llm_models_flat = result;
+  }
+
+  setModel(modelName: string){
+    const result = setModel(modelName, this.llm_models_flat, this.logger);
+    this.llm_model_selected = result;
+    this.logger.log("[ACTION AI_PROMPT] llm_model_selected: ", this.llm_model_selected);
+    this.action.llm = result?.llm?result.llm:'';
+    this.action.model = result?.model?result.model:'';
+    this.action.modelName = result?.modelName?result.modelName:'';
+    this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
+    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
+    this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
+    if(this.action.max_tokens > this.llm_model_selected.max_output_tokens){
+      this.action.max_tokens = this.llm_model_selected.max_output_tokens;
+    }
+    if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
+      this.action.temperature = 1
+      this.ai_setting['temperature'].disabled= true
+    } else {
+      this.ai_setting['temperature'].disabled= false
+    }
   }
 
   async getIntegrationByName(){
@@ -226,96 +220,6 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
   }
 
-
-  async initLLMModels(){
-    const INTEGRATIONS = await this.getIntegrations();
-    this.logger.log('[ACTION AI_PROMPT] 1 - integrations:', INTEGRATIONS);
-    if(INTEGRATIONS){
-      INTEGRATIONS.forEach((el: any) => {
-        this.logger.log('[ACTION AI_PROMPT] 1 - integration:', el.name, el.value.apikey);
-        if(el.name && el.value?.apikey){
-          this.llm_models_2.forEach(model => {
-            if(model.llm === el.name || model.llm.toLowerCase() === 'openai' || model.llm.toLowerCase() === 'ollama') {
-              model.configured = true;
-            }
-          });
-        }
-      });
-    }
-    this.logger.log('[ACTION AI_PROMPT] - this.llm_models_2:', this.llm_models_2);
-    this.autocompleteOptions = [];
-    this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
-    this.actionLabelModel =  '';
-    this.multiplier = null;
-    /** SET GPT MODELS */
-    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    OPENAI_MODEL.forEach(el => {
-      if (ai_models[el.value]) {
-        el.additionalText = `${ai_models[el.value]} x tokens`;
-        el.status = 'active';
-      } else {
-        el.additionalText = null;
-        el.status = 'inactive';
-      }
-    });
-
-    // Assegna i moltiplicatori ai modelli in llm_models_2
-    this.llm_models_2.forEach(model => {
-      if (ai_models[model.model]) {
-        model.multiplier = ai_models[model.model].toString();
-      }
-    });
-    if(this.action.llm){
-      const filteredModels = this.getModelsByName(this.action.llm).filter(el => el.status === 'active');
-      //filteredModels.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.value, additionalText: el.additionalText? el.additionalText: null}));
-      this.logger.log('[ACTION AI_PROMPT] filteredModels',filteredModels);
-    }
-    this.autocompleteOptions_2 = [];
-    this.llm_models_2.forEach(el => this.autocompleteOptions_2.push({label: el.labelModel, value: el.labelModel}));
-    this.sortAutocompleteOptions2();
-    this.logger.log('[ACTION AI_PROMPT] autocompleteOptions_2',this.autocompleteOptions_2);
-  }
-
-
-  sortAutocompleteOptions2(): void {
-    this.autocompleteOptions_2.sort((a, b) => {
-      // Trova il modello corrispondente in llm_models_2 per entrambi gli elementi
-      const modelA = this.llm_models_2.find(el => el.labelModel === a.value);
-      const modelB = this.llm_models_2.find(el => el.labelModel === b.value);
-      // Se entrambi sono OpenAI, ordina alfabeticamente
-      if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
-        return a.label.localeCompare(b.label);
-      }
-      // Se solo A è OpenAI, A viene prima
-      if (modelA?.llm?.toLowerCase() === 'openai' && modelB?.llm?.toLowerCase() !== 'openai') {
-        return -1;
-      }
-      // Se solo B è OpenAI, B viene prima
-      if (modelA?.llm?.toLowerCase() !== 'openai' && modelB?.llm?.toLowerCase() === 'openai') {
-        return 1;
-      }
-      // Se nessuno dei due è OpenAI, ordina alfabeticamente
-      return a.label.localeCompare(b.label);
-    });
-  }
-
-  async getIntegrations(){
-    const projectID = this.dashboardService.projectID;
-    try {
-        const response = await firstValueFrom(this.projectService.getIntegrations(projectID));
-        this.logger.log('[ACTION AI_PROMPT] - integrations response:', response.value);
-        return response;
-    } catch (error) {
-      this.logger.log('[ACTION AI_PROMPT] getIntegrations ERROR:', error);
-    }
-  }
-
-  getModelsByName(value: string): Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> {
-    const model = this.llm_model.find((model) => model.value === value);
-    return model?.models || [];
-  }
-
-
   refreshConnector(idConnector, idCondition) {
      this.listOfConnectors[idCondition] = {
       idConnector: idConnector,
@@ -323,7 +227,6 @@ export class CdsActionAiConditionComponent implements OnInit {
       isConnected: false
     };
   }
-
 
   initializeConnector() {
     this.idIntentSelected = this.intentSelected.intent_id;
@@ -366,32 +269,29 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.logger.log('[ACTION AI_CONDITION] updateConnectionTrue:', this.connector);
     const parts = this.connector.fromId.split("/");
     try {
-        const idCondition = parts[parts.length - 2];
-        const found = this.action.intents.find(item => item.label === idCondition);
-        if (this.connector.deleted) {
-            if(this.listOfConnectors[idCondition]){
-                this.listOfConnectors[idCondition].idConnection =  null;
-                this.listOfConnectors[idCondition].isConnected  =  false;
-            }
-            if(found){
-                found.conditionIntentId = null;
-            }
-        } else {
-            if(this.listOfConnectors[idCondition]){
-                this.listOfConnectors[idCondition].idConnection =  this.connector.id;
-                this.listOfConnectors[idCondition].isConnected  =  true;
-            }
-            if(found){
-                found.conditionIntentId = '#'+this.connector.toId;
-            }
+      const idCondition = parts[parts.length - 2];
+      const found = this.action.intents.find(item => item.label === idCondition);
+      if (this.connector.deleted) {
+        if(this.listOfConnectors[idCondition]){
+          this.listOfConnectors[idCondition].idConnection =  null;
+          this.listOfConnectors[idCondition].isConnected  =  false;
         }
-
-        //if (resp.emit) {
-            this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-        //} 
-        //this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+        if(found){
+          found.conditionIntentId = null;
+        }
+      } else if (this.connector.created) {
+        if(this.listOfConnectors[idCondition]){
+          this.listOfConnectors[idCondition].idConnection =  this.connector.id;
+          this.listOfConnectors[idCondition].isConnected  =  true;
+        }
+        if(found){
+          found.conditionIntentId = '#'+this.connector.toId;
+        }
+      }
+      this.logger.log('[ACTION AI_CONDITION] updateConnectionTrue:', this.listOfConnectors, idCondition, found);
+      this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
     } catch (error) {
-        this.logger.log('error: ', error);
+      this.logger.log('error: ', error);
     }
   }
 
@@ -427,40 +327,6 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
   }
 
-  setModel(labelModel: string){
-    this.logger.log("[ACTION AI_PROMPT] 2 setModel labelModel: ", labelModel);
-    const model = this.llm_models_2.find(m => m.labelModel === labelModel);
-    this.logger.log("[ACTION AI_PROMPT] 2 setModel model: ", model);
-    if(model){
-      this.selectedModelConfigured = model.configured;
-      this.action.llm = model.llm;
-      this.action.model = model.model;
-      this.action.labelModel = model.labelModel;
-      this.labelModel = model.labelModel;
-      this.multiplier = model.multiplier;
-      /** MANAGE GPT-5 MODELS */
-      if(model.model.startsWith('gpt-5')){
-        this.action.temperature = 1;
-        this.ai_setting['temperature'].disabled= true;
-        // this.ai_setting['max_tokens'].max = 100000;
-      }else{
-        this.ai_setting['temperature'].disabled= false;
-        // this.ai_setting['max_tokens'].max = 8192;
-        // if(this.action.max_tokens > 8192){
-        //   this.action.max_tokens = 8192;
-        // }
-      }
-      this.logger.log("[ACTION AI_PROMPT] 2 action multiplier ", this.action, this.multiplier);
-    }
-    else {
-      this.action.llm = '';
-      this.action.model = '';
-      this.action.labelModel = '';
-      this.labelModel = '';
-      this.multiplier = null;
-    }
-  }
-
   private initializeAttributes() {
     let new_attributes = [];
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'ai_reply')) {
@@ -480,26 +346,10 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
     if(property === 'model'){
       this.action['labelModel'] = event;
-      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
-        this.action.temperature = 1
-        this.ai_setting['temperature'].disabled= true
-      } else {
-        this.ai_setting['temperature'].disabled= false
-      }
-      this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;
     } else if (property === 'context'){
       this.action['context'] = event;
-    } else if (property === 'llm_model'){
-      // se event non corrisponde a nessun valore di autocompleteOptions_2 ed è diverso da '' o null allora non fare nulla
-      if(!this.autocompleteOptions_2.find(el => el.value === event) && event !== '' && event !== null) {
-        return;
-      }
-      this.action['labelModel'] = event;
-      this.labelModel = event;
-      this.actionLabelModel = event;
-      this.setModel(event);
     } else if (property === 'instructions'){
       this.action['instructions'] = event;
     }
@@ -571,11 +421,9 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.logger.log("[ACTION AI_CONDITION] onChangeSelect event: ", event.value)
     this.logger.log("[ACTION AI_CONDITION] onChangeSelect target: ", target)
     this.action[target] = event.value;
-    if(target === 'llm'){
-      this.llm_options_models = this.llm_models.find(el => el.value === event.value).models.filter(el => el.status === 'active')
-      this.action.model= null;
-      this.initLLMModels();
-    }
+    if (target === 'llm_model'){
+      this.setModel(event.modelName);
+    } 
     this.updateAndSaveAction.emit();
   }
 
@@ -583,6 +431,15 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.logger.log("[ACTION AI_CONDITION] updateSliderValue event: ", event)
     this.logger.log("[ACTION AI_CONDITION] updateSliderValue target: ", target)
     this.action[target] = event;
+    if(target === 'max_tokens'){
+      if(event < this.ai_setting['max_tokens'].min){
+        this.action.max_tokens = this.ai_setting['max_tokens'].min;
+      } else if(event > this.ai_setting['max_tokens'].max){
+        this.action.max_tokens = this.ai_setting['max_tokens'].max;
+      } else {
+        this.action.max_tokens = event;
+      }
+    }
     this.updateAndSaveAction.emit();
   }
 
@@ -639,14 +496,11 @@ export class CdsActionAiConditionComponent implements OnInit {
   execPreview() {
     this.scrollToBottom();
     this.checkVariables().then((resp) => {
-
       if (resp === true) {
         this.getResponse(this.action.question);
-
       } else {
         this.openAttributesDialog();
       }
-
     })
   }
 
@@ -656,22 +510,17 @@ export class CdsActionAiConditionComponent implements OnInit {
       let string = this.action.question;
       let matches = string.match(regex);
       let response: boolean = true;
-
       if (!matches || matches.length == 0) {
         resolve(true);
-
       } else {
-
         this.temp_variables = [];
         matches.forEach((m) => {
           let name = m.slice(2, m.length - 2);
           let attr = this.action.preview.find(v => v.name === name);
-
           if (attr?.value) {
             this.temp_variables.push({ name: name, value: attr.value });
           } else if (attr && !attr.value) {
             this.temp_variables.push({ name: name, value: null });
-
           } else {
             this.temp_variables.push({ name: name, value: null });
             this.action.preview.push({ name: name, value: null });
@@ -684,7 +533,6 @@ export class CdsActionAiConditionComponent implements OnInit {
 
   getResponse(question) {
     this.logger.log("getResponse called...")
-
     let data = {
       question: question,
       llm: this.action.llm,
@@ -692,16 +540,13 @@ export class CdsActionAiConditionComponent implements OnInit {
       max_tokens: this.action.max_tokens,
       temperature: this.action.temperature,
     }
-
     this.showAiError = false;
     this.searching = true;
     this.showPreview = true;
-
     setTimeout(() => {
       let element = document.getElementById("preview-container");
       element.classList.remove('preview-container-extended')
     }, 200)
-
     this.openaiService.previewLLMPrompt(data).subscribe({ next: (ai_response: any) => {
       this.searching = false;
       setTimeout(() => {
@@ -787,7 +632,6 @@ export class CdsActionAiConditionComponent implements OnInit {
       "prompt": "",
       "conditionIntentId": ''
     });
-
     let idConnector = `${this.idIntentSelected}/${this.action._tdActionId}/${idCondition}/true`;
     this.listOfConnectors[idCondition] = {
       idConnector: idConnector,
@@ -796,23 +640,18 @@ export class CdsActionAiConditionComponent implements OnInit {
     };
     //this.onConnectorChange.emit({ type: 'delete', fromId: idConnector, toId: ''});
     this.intentService.onChangedConnector({fromId: idConnector, idCondition: idCondition});
-   
     this.logger.log("[ACTION AI_CONDITION] addNewCondition", this.listOfConnectors);
     // this.updateAndSaveAction.emit();
   }
 
   onDeleteCondition(intent: any) {
     this.logger.log("[ACTION AI_CONDITION] onDeleteCondition", intent);
-
     const label = intent.value.label;
     const foundIndex = this.action.intents.findIndex(item => item.label === label);
-    
     if (foundIndex !== -1) {
       const intentToDelete = this.action.intents[foundIndex];
-      
       // Remove from intents array
       this.action.intents.splice(foundIndex, 1);
-      
       // Remove from connectors map
       if (intentToDelete.label && this.listOfConnectors[intentToDelete.label]) {
         delete this.listOfConnectors[intentToDelete.label];
@@ -821,6 +660,16 @@ export class CdsActionAiConditionComponent implements OnInit {
       this.logger.log("[ACTION AI_CONDITION] onDeleteCondition - remaining connectors:", this.listOfConnectors);
       this.updateAndSaveAction.emit();
     }
+  }
+
+  /**
+   * Formats the slider thumb label value with "k" notation for values > 999
+   * Uses the FormatNumberPipe for consistent formatting across the app
+   * @param value - The numeric value to format
+   * @returns Formatted string with "k" for values > 999 (rounded to integers)
+   */
+  formatSliderLabel = (value: number): string => {
+    return this.formatNumberPipe.transform(value);
   }
 
 }

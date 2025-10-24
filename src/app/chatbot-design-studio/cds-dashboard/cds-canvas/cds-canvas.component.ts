@@ -581,6 +581,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (getAllIntents) {
       this.listOfIntents = this.intentService.listOfIntents;
       // // this.initListOfIntents();
+      this.intentService.chatbotPatch(this.listOfIntents);
+      
       this.refreshIntents();
       this.initLoadingStage();
       // // this.intentService.setStartIntent();

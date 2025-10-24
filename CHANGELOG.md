@@ -7,14 +7,61 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.9-rc8:
+- **bug-fix**: renamed function onUpdateAndSaveAction in onActionUpdate
+- **bug-fix**: added check on intent undefined
+
+# 1.39.9-rc7:
+- **added**: added action iteration in webhook
+
+# 1.39.9-rc6:
+- **bug-fix**: bug fix changed name attributes assignOutputTo
+- **bug-fix**: bug fix css on block-connector and start-content
+
+# 1.39.9-rc5:
+- **changed**: added "item" attribute
+- **bug-fix**: css bug fixed
+
+# 1.39.9-rc4:
+- **added**: added interation action
+
+# 1.39.9-rc3:
+- **bug-fix**: set result.hybrid on undefined
+- **bug-fix**: bug fix overflow preview-container-extended
+- **bug-fix**: set generate with llm_model_selected.modelName
+- **bug-fix**: undefined.url
+- **bug-fix**: on preview ask kb
+- **bug-fix**: max-height text area
+- **changed**: changed max_tokens_context in max_output_tokens and update openai values
+
+# 1.39.9-rc2:
+- **added**: set default model
+- **changed**: replaced the textarea with a select in the model selection
+- **changed**: changed token display by adding k for thousands
+- **changed**: editable max token field
+- **added**: added max_token and min_token parameters for each model
+
+# 1.39.9-rc1:
+- **added**: added vLLM model integration
+
 # 1.39.9 
 
 # 1.39.8
+
+# 1.39.8-rc1:
+- **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
+- **added**: added css for temperature disabled when gpt-5 is the selected model 
+- **added**: set max_token when change model
 
 # 1.39.7
 - **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
 - **added**: added css for temperature disabled when gpt-5 is the selected model 
 - **added**: set max_token when change model
+
+
+# 1.39.6
+- **changed**: set max_tokens from 8192 to 100000
 
 # 1.39.6
 - **changed**: set max_tokens from 8192 to 100000
@@ -27,6 +74,17 @@
 
 # 1.39.3
 - **bug-fix**: added filter status "active" in generateLlmModels
+
+# 1.39.3-rc1
+- **bug-fix**: added filter status "active" in generateLlmModels
+
+# 1.39.2-rc3
+- **changed**: changed select llm model in askgpt-v2
+- **changed**: moved common functions between ai-prompt, ai-condition and askgpt-v2 actions in utils-llm-model
+- **added**: skip_unanswered and reranking in AskKbv2 
+
+# 1.39.2-rc2
+- **bug-fix**: bug fix ai-condition and ai-prompt
 
 # 1.39.2
 
@@ -116,7 +174,6 @@
 # 1.39.0-rc1
 - **changed**: added scroll button left and right on image gallery
 
-
 # 1.38.5
 - **changed**: update ai models
 
@@ -130,13 +187,20 @@
 # 1.38.2
 - **changed**: ai models upgraded
 
+# 1.38.2
+- **changed**: ai models upgraded
+
 # 1.38.1
 - **changed**: Changed connector-width in 2px
 
 # 1.38.0
 
+
 # 1.38.0-rc20
 - **added**: ability to manage Share_Items from BrandSrc
+
+# 1.37.5
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
 
 # 1.38.0-rc19
 - **bug-fixed**: Voice menu compatibility patch if there is no subtype
@@ -155,6 +219,7 @@
 # 1.38.0-rc15
 - **changed**:: change textarea limitCharsText (from 10.000 to 100.000) in system context cds-action-ai-prompt, system context cds-action-askgpt-v2, prompt cds-action-gpt-assistant, prompt cds-action-gpt-task;
 - **changed**:: enabled hundreds separator for numeric characters in textarea.component
+
 
 # 1.38.0-rc14
 - **added**: Open KNB link in new tab in intent detail panel
@@ -204,12 +269,6 @@
 # 1.38.0-rc1
 - **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
 
-# 1.37.6
-- **added**: ability to manage Share_Items from BrandSrc
-
-# 1.37.5
-- **bug-fixed**: Voice menu compatibility patch if there is no subtype
-
 # 1.37.4
 - **bug-fixed**: added models in json-gallery
 
@@ -221,6 +280,9 @@
 
 # 1.37.1
 
+# 1.37.0-rc3
+- **bug-fixed**: delete webhook only when it is stopped
+
 # 1.37.0-rc2
 - **bug-fixed**: widget-log: disabled collapse row; stop webhook log when click on the stage
 
@@ -229,6 +291,30 @@
 
 # 1.36.1
 - **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc7
+- **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc6
+- **bug-fixed**: added width and height to previewModel images in action reply gallery
+- **bug-fixed**: in widget-log added ellips on the row, row opening, fixed display for very long texts, added selectable text, graphic adjustments
+
+# 1.36.0-rc5
+- **changed**: added ellips in log lines in ds-widget-logs.component
+
+# 1.36.0-rc4
+- **bug-fixed**: all actions that contain block selection on true/false do not display connector on stage when create via action detail panel
+- **bug-fixed**: about corrupted connectors with full dot but no connector on the stage
+- **bug-fixed**: the webhook opens the detail also on drag, it should open it only on click
+
+# 1.36.0-rc3
+- **bug-fixed**: updated textarea value in action AI prompt
+
+# 1.36.0-rc2
+- **added**: voice preview player for elevenlabs voices for voice_twilio chatbot type
+
+# 1.36.0-rc1
+- **added**: support for elevenLabs voices for voice_twilio chatbot 
 
 # 1.36.0
 - **bug-fixed**: added width and height to previewModel images in action reply gallery

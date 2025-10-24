@@ -59,7 +59,7 @@ export class McpServerEditDialogComponent implements OnInit {
       this.editedServer = {
         name: '',
         url: '',
-        transport: 'stdio' // Default value
+        transport: 'streamable_http' // Default value
       };
       this.originalServer = null;
     } else {
