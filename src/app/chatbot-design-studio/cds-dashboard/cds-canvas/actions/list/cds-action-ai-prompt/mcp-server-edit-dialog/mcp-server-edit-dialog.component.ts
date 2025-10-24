@@ -32,8 +32,11 @@ export class McpServerEditDialogComponent implements OnInit {
   originalServer: McpServer;
   project_id: string;
   isSaving: boolean = false;
+  showLoader: boolean = false;
   allMcpServers: McpServer[] = [];
   isNewServer: boolean = false;
+  errorMessage: string = '';
+  showError: boolean = false;
   
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -59,7 +62,7 @@ export class McpServerEditDialogComponent implements OnInit {
       this.editedServer = {
         name: '',
         url: '',
-        transport: 'stdio' // Default value
+        transport: 'streamable_http' // Default value
       };
       this.originalServer = null;
     } else {
@@ -100,17 +103,30 @@ export class McpServerEditDialogComponent implements OnInit {
       return; // Prevent double submission
     }
 
+    // Reset error state
+    this.showError = false;
+    this.errorMessage = '';
     this.isSaving = true;
+    this.showLoader = false;
     this.logger.log("[McpServerEditDialog] Saving server:", this.editedServer);
     
+    // Set a timer to show loader after 500ms if still saving
+    const loaderTimer = setTimeout(() => {
+      if (this.isSaving) {
+        this.showLoader = true;
+      }
+    }, 500);
+
     try {
       if (this.isNewServer) {
         // Check if server name already exists
         const nameExists = this.allMcpServers.some(s => s.name === this.editedServer.name);
         if (nameExists) {
           this.logger.warn("[McpServerEditDialog] Server name already exists");
-          // TODO: Show error message to user
+          this.errorMessage = "A server with this name already exists";
+          this.showError = true;
           this.isSaving = false;
+          clearTimeout(loaderTimer);
           return;
         }
         // Add new server to the array
@@ -141,14 +157,36 @@ export class McpServerEditDialogComponent implements OnInit {
       
       this.logger.log("[McpServerEditDialog] Integration saved successfully:", response);
       
+      // Clear the loader timer and hide states
+      clearTimeout(loaderTimer);
+      this.isSaving = false;
+      this.showLoader = false;
+      
       // Close with the edited data
       this.dialogRef.close(this.editedServer);
     } catch (error) {
       this.logger.error("[McpServerEditDialog] Error saving integration:", error);
+      clearTimeout(loaderTimer);
       this.isSaving = false;
-      // TODO: Show error message to user
-      // For now, we still close with the edited data for UI consistency
-      this.dialogRef.close(this.editedServer);
+      this.showLoader = false;
+      
+      // Show error message to user
+      this.showError = true;
+      
+      // Extract error message with different fallback strategies
+      if (error?.error?.message) {
+        this.errorMessage = error.error.message;
+      } else if (error?.message) {
+        this.errorMessage = error.message;
+      } else if (error?.error?.error) {
+        this.errorMessage = error.error.error;
+      } else if (typeof error === 'string') {
+        this.errorMessage = error;
+      } else {
+        this.errorMessage = "An error occurred while saving the server. Please try again.";
+      }
+      
+      this.logger.log("[McpServerEditDialog] Error message displayed:", this.errorMessage);
     }
   }
 

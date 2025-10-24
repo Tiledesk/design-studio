@@ -35,6 +35,16 @@
         </div>
     </div>
 
+    <!-- MCP Tools Preview -->
+    <div class="mcp-tools-preview-container" *ngIf="selectedMcpServers && selectedMcpServers.length > 0">
+        <div class="mcp-tools-header">{{'CDSCanvas.ToolsUsed' | translate}}</div>
+        <div class="mcp-tools-preview">
+            <span class="mcp-tool-tag" *ngFor="let server of selectedMcpServers">
+                {{ server.name }}
+            </span>
+        </div>
+    </div>
+
     <div class="previewContent">
         
         <div class="icon-action">
@@ -112,7 +122,7 @@
 
     <!-- MCP SERVERS SECTION -->
     <div class="field-box mcp-servers-section">
-        <label class="title-label">Utilizza i tools per completare l'operazione</label>
+        <label class="title-label">{{'CDSCanvas.UseToolsToCompleteOperation' | translate}}</label>
         <div class="mcp-servers-grid">
             <!-- Selected MCP Servers -->
             <button 
@@ -129,7 +139,7 @@
                 type="button"
                 (click)="openMcpServersDialog()">
                 <span class="material-icons" style="font-size: 18px; margin-right: 6px;">add</span>
-                {{ selectedMcpServers.length > 0 ? 'Aggiungi altri tools' : 'Seleziona MCP tools' }}
+                {{ selectedMcpServers.length > 0 ? ('CDSCanvas.AddMoreTools' | translate) : ('CDSCanvas.SelectMCPTools' | translate) }}
             </button>
         </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 //MODELS
@@ -112,7 +112,8 @@ export class CdsActionAiPromptComponent implements OnInit {
     private readonly appConfigService: AppConfigService,
     private readonly translate: TranslateService,
     private readonly dashboardService: DashboardService,
-    private readonly projectService: ProjectService
+    private readonly projectService: ProjectService,
+    private readonly cdr: ChangeDetectorRef
   ) { 
     this.browserLang = this.translate.getBrowserLang();
   }
@@ -158,8 +159,8 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.action.preview = [];
     }
     // Initialize selected MCP servers from action
-    if (this.action['servers']) {
-      this.selectedMcpServers = this.action['servers'];
+    if (this.action['selectedMcpServers']) {
+      this.selectedMcpServers = this.action['selectedMcpServers'];
     }
     await this.initialize();
     // Fine dell'inizializzazione - reset di tutti i flag
@@ -804,34 +805,43 @@ setModel(labelModel: string){
   openMcpServersDialog() {
     this.logger.log("mcpServers: ", this.mcpServers);
     this.logger.log("servers: ", this.selectedMcpServers);
+    
     const dialogRef = this.dialog.open(McpServersDialogComponent, {
       panelClass: 'custom-mcp-dialog-container',
       data: { 
         mcpServers: this.mcpServers,
-        selectedServers: this.selectedMcpServers 
-      }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      this.logger.log("McpServersDialogComponent result: ", result);
-      if (result !== false && result !== null && result !== undefined) {
-        // Handle new response structure with selectedServers and allServers
-        if (result.selectedServers !== undefined) {
-          // Update the list of selected servers
-          this.selectedMcpServers = result.selectedServers.length > 0 ? [...result.selectedServers] : [];
-          
-          // Update the main server list with any modifications
-          if (result.allServers) {
-            this.mcpServers = [...result.allServers];
-          }
-          
-          // Save selected servers to action
-          this.action['servers'] = this.selectedMcpServers;
-          this.logger.log("Updated selected MCP servers: ", this.selectedMcpServers);
-          this.logger.log("Updated all MCP servers: ", this.mcpServers);
-          this.updateAndSaveAction.emit();
+        selectedServers: this.selectedMcpServers,
+        onUpdate: (updateData: any) => {
+          this.handleMcpServersUpdate(updateData);
         }
       }
     });
+    // No need to handle afterClosed since updates are real-time via callback
+    dialogRef.afterClosed().subscribe(() => {
+      this.logger.log("McpServersDialogComponent closed");
+    });
+  }
+
+  handleMcpServersUpdate(updateData: any): void {
+    this.logger.log("[ACTION AI_PROMPT] Real-time update from dialog:", updateData);
+    
+    // Update the list of selected servers
+    this.selectedMcpServers = updateData.selectedServers.length > 0 ? [...updateData.selectedServers] : [];
+    
+    // Update the main server list with any modifications
+    if (updateData.allServers) {
+      this.mcpServers = [...updateData.allServers];
+    }
+    
+    // Save selected servers to action
+    this.action['selectedMcpServers'] = this.selectedMcpServers;
+    this.logger.log("[ACTION AI_PROMPT] Real-time updated selected MCP servers: ", this.selectedMcpServers);
+    this.logger.log("[ACTION AI_PROMPT] Real-time updated all MCP servers: ", this.mcpServers);
+    
+    // Force change detection to update the preview
+    this.cdr.detectChanges();
+    
+    this.updateAndSaveAction.emit();
   }
 
   removeSelectedServer(server: { name: string, url: string, transport: string }, event: Event) {
@@ -840,8 +850,12 @@ setModel(labelModel: string){
     if (index > -1) {
       this.selectedMcpServers.splice(index, 1);
       // Update action
-      this.action['servers'] = this.selectedMcpServers;
+      this.action['selectedMcpServers'] = this.selectedMcpServers;
       this.logger.log("Removed server, updated list: ", this.selectedMcpServers);
+      
+      // Force change detection to update the preview
+      this.cdr.detectChanges();
+      
       this.updateAndSaveAction.emit();
     }
   }
