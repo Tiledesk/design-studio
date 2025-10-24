@@ -80,6 +80,8 @@ import { VariableCssClassPipe } from 'src/app/pipe/variablecssClass.pipe';
 import { GetVariableNamePipe } from 'src/app/pipe/get-variable-name.pipe';
 import { CdsActionAiPromptComponent } from './cds-action-ai-prompt/cds-action-ai-prompt.component';
 import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attributes-dialog/attributes-dialog.component';
+import { McpServersDialogComponent } from './cds-action-ai-prompt/mcp-servers-dialog/mcp-servers-dialog.component';
+import { McpServerEditDialogComponent } from './cds-action-ai-prompt/mcp-server-edit-dialog/mcp-server-edit-dialog.component';
 import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-action-web-response.component';
 import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
@@ -177,6 +179,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionSendWhatsappComponent,
     CdsActionAiPromptComponent,
     AttributesDialogAiPromptComponent,
+    McpServersDialogComponent,
+    McpServerEditDialogComponent,
     CdsActionAiConditionComponent,
     AttributesDialogAiConditionComponent,
     AiConditionComponent,
@@ -283,6 +287,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionSendWhatsappComponent,
     CdsActionAiPromptComponent,
     AttributesDialogAiPromptComponent,
+    McpServersDialogComponent,
+    McpServerEditDialogComponent,
     CdsActionAiConditionComponent,
     AttributesDialogAiConditionComponent,
     AiConditionComponent,

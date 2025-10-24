@@ -109,6 +109,31 @@
         </section>
     </div>
 
+
+    <!-- MCP SERVERS SECTION -->
+    <div class="field-box mcp-servers-section">
+        <label class="title-label">Utilizza i tools per completare l'operazione</label>
+        <div class="mcp-servers-grid">
+            <!-- Selected MCP Servers -->
+            <button 
+                *ngFor="let server of selectedMcpServers"
+                class="mcp-server-button selected"
+                type="button">
+                {{ server.name }}
+                <span class="material-icons remove-icon" (click)="removeSelectedServer(server, $event)">close</span>
+            </button>
+            
+            <!-- Add/Select MCP tools button -->
+            <button 
+                class="mcp-server-button add-tool-button"
+                type="button"
+                (click)="openMcpServersDialog()">
+                <span class="material-icons" style="font-size: 18px; margin-right: 6px;">add</span>
+                {{ selectedMcpServers.length > 0 ? 'Aggiungi altri tools' : 'Seleziona MCP tools' }}
+            </button>
+        </div>
+    </div>
+
     <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
         <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
             [disabled]="!action.question" (click)="execPreview()">

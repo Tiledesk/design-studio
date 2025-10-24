@@ -1,0 +1,56 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>Modifica Server MCP</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+    
+    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+    
+    <div class="tpl-modal-content">
+        <form class="edit-form">
+            <!-- Nome -->
+            <div class="form-field">
+                <label class="field-label">Nome</label>
+                <cds-text 
+                    [text]="editedServer.name"
+                    [placeholder]="'Inserisci il nome del server'"
+                    (onChange)="onChangeField($event, 'name')">
+                </cds-text>
+            </div>
+
+            <!-- URL -->
+            <div class="form-field">
+                <label class="field-label">URL</label>
+                <cds-text 
+                    [text]="editedServer.url"
+                    [placeholder]="'Inserisci l\'URL del server'"
+                    (onChange)="onChangeField($event, 'url')">
+                </cds-text>
+            </div>
+
+            <!-- Transport Type -->
+            <div class="form-field">
+                <label class="field-label">Type</label>
+                <cds-text 
+                    [text]="editedServer.transport"
+                    [placeholder]="'Inserisci il tipo di transport'"
+                    (onChange)="onChangeField($event, 'transport')">
+                </cds-text>
+            </div>
+        </form>
+    </div>
+
+    <div class="tpl-modal-buttons">
+        <button id="cds-cancel-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">
+            Annulla
+        </button>
+        <button id="cds-save-btn" class="btn btn-primary cds-blue-button" type="button" 
+            [disabled]="!isFormValid()"
+            (click)="onSave()">
+            Salva
+        </button>
+    </div>
+</div>
+

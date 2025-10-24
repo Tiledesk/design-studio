@@ -1,0 +1,62 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>Scegli un tool tra quelli disponibili oppure inserisci un server MCP</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+    
+    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+    
+    <div class="tpl-modal-content">
+        <div class="mcp-servers-list">
+            <div *ngIf="!data.mcpServers || data.mcpServers.length === 0" class="empty-state">
+                <span class="material-icons empty-icon">cloud_off</span>
+                <p class="empty-message">Nessun server MCP configurato</p>
+            </div>
+            
+            <button 
+                *ngFor="let server of data.mcpServers" 
+                class="mcp-server-item"
+                [class.selected]="isServerSelected(server)"
+                type="button"
+                (click)="toggleServerSelection(server)">
+                <div class="server-info">
+                    <div class="server-name">{{ server.name }}</div>
+                    <div class="server-details">{{ server.transport }}</div>
+                </div>
+                <div class="server-actions">
+                    <button class="edit-button" 
+                        type="button"
+                        (click)="openEditServerDialog(server, $event)"
+                        title="Modifica server">
+                        <span class="material-icons">edit</span>
+                    </button>
+                    <div class="checkmark" *ngIf="isServerSelected(server)">
+                        <span class="material-icons">check_circle</span>
+                    </div>
+                </div>
+            </button>
+            
+            <button 
+                class="mcp-server-item add-server-button"
+                type="button"
+                (click)="onAddMcpServer()">
+                <div class="server-info">
+                    <div class="server-name">+ Add MCP server</div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <div class="tpl-modal-buttons">
+        <button id="cds-cancel-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">
+            Cancel
+        </button>
+        <button id="cds-confirm-btn" class="btn btn-primary cds-blue-button" type="button" 
+            (click)="onConfirm()">
+            Confirm
+        </button>
+    </div>
+</div>
+

@@ -15,6 +15,7 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 
 //UTILS
 import { AttributesDialogAiPromptComponent } from './attributes-dialog/attributes-dialog.component';
+import { McpServersDialogComponent } from './mcp-servers-dialog/mcp-servers-dialog.component';
 import { DOCS_LINK, TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -95,8 +96,14 @@ export class CdsActionAiPromptComponent implements OnInit {
   autocompleteOptions_2: Array<{label: string, value: string}> = [];
   multiplier: string;
 
+
+  mcpServers: Array<{ name: string, url: string, transport: string }> = [];
+  selectedMcpServers: Array<{ name: string, url: string, transport: string }> = [];
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   browserLang: string = 'it';
+
+
 
   constructor(
     private readonly dialog: MatDialog,
@@ -149,6 +156,10 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.initializeAttributes();
     if (!this.action.preview) {
       this.action.preview = [];
+    }
+    // Initialize selected MCP servers from action
+    if (this.action['selectedMcpServers']) {
+      this.selectedMcpServers = this.action['selectedMcpServers'];
     }
     await this.initialize();
     // Fine dell'inizializzazione - reset di tutti i flag
@@ -233,9 +244,12 @@ export class CdsActionAiPromptComponent implements OnInit {
               model.configured = true;
             }
           });
+        } else if(el.name && el.name === 'mcp'){
+          this.mcpServers = el.value.servers;
         }
       });
     }
+    this.logger.log('[ACTION AI_PROMPT] - mcpServers:', this.mcpServers);
     this.logger.log('[ACTION AI_PROMPT] - this.llm_models_2:', this.llm_models_2);
     this.autocompleteOptions = [];
     this.logger.log('[ACTION AI_PROMPT] initLLMModels',this.action.llm);
@@ -785,6 +799,41 @@ setModel(labelModel: string){
         this.saveAttributes(result.attributes);
       }
     });
+  }
+
+  openMcpServersDialog() {
+    this.logger.log("mcpServers: ", this.mcpServers);
+    this.logger.log("selectedMcpServers: ", this.selectedMcpServers);
+    const dialogRef = this.dialog.open(McpServersDialogComponent, {
+      panelClass: 'custom-mcp-dialog-container',
+      data: { 
+        mcpServers: this.mcpServers,
+        selectedServers: this.selectedMcpServers 
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.logger.log("McpServersDialogComponent result: ", result);
+      if (result !== false && result !== null && result !== undefined) {
+        // Replace the entire list with the new selection (including deselections)
+        this.selectedMcpServers = result.length > 0 ? [...result] : [];
+        // Save selected servers to action
+        this.action['selectedMcpServers'] = this.selectedMcpServers;
+        this.logger.log("Updated selected MCP servers: ", this.selectedMcpServers);
+        this.updateAndSaveAction.emit();
+      }
+    });
+  }
+
+  removeSelectedServer(server: { name: string, url: string, transport: string }, event: Event) {
+    event.stopPropagation();
+    const index = this.selectedMcpServers.findIndex(s => s.name === server.name);
+    if (index > -1) {
+      this.selectedMcpServers.splice(index, 1);
+      // Update action
+      this.action['selectedMcpServers'] = this.selectedMcpServers;
+      this.logger.log("Removed server, updated list: ", this.selectedMcpServers);
+      this.updateAndSaveAction.emit();
+    }
   }
 
   saveAttributes(attributes) {

@@ -1,0 +1,228 @@
+@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/styles.scss";
+
+::ng-deep .custom-mcp-dialog-container {
+    width: 40vw!important;
+    min-width: 500px;
+    max-width: 700px!important;
+    max-height: 80vh;
+
+    .tpl-modal-box {
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        background: rgb(255, 255, 255);
+        max-height: 80vh;
+    }
+
+    .tpl-modal-header {
+        align-items: flex-start;
+        align-items: center;
+        display: flex;
+        flex-shrink: 0;
+        justify-content: center;
+        width: 100%;
+        padding: 20px 20px 10px 20px;
+
+        i {
+            flex-shrink: 0;
+            font-size: 24px;
+            line-height: 23px;
+            margin-left: auto;
+            cursor: pointer;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.7;
+            }
+        }
+    }
+    
+    .tpl-modal-header-text {
+        flex-grow: 1;
+        text-align: center;
+        width: 0;
+
+        span {
+            word-wrap: break-word;
+            display: -webkit-box;
+            line-height: 23px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 69px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+    }
+    
+    .tpl-modal-content {
+        flex-grow: 1;
+        padding: 20px;
+        width: 100%;
+        overflow-y: auto;
+    }
+    
+    .tpl-modal-buttons {
+        display: flex;
+        flex-shrink: 0;
+        justify-content: flex-end;
+        padding: 15px 20px;
+        color: #333;
+        gap: 10px;
+        border-top: 1px solid #e5e5e5;
+    }
+}
+
+.mcp-servers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+    
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+    
+    .empty-message {
+        font-size: 14px;
+        margin: 0;
+    }
+}
+
+.mcp-server-item {
+    background-color: #ffffff;
+    border: 2px solid #d0d0d0;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 14px;
+    font-family: var(--font-family-poppins);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    &:hover {
+        background-color: #f8f8f8;
+        border-color: #b0b0b0;
+    }
+
+    &.selected {
+        background-color: #e8f4ff;
+        border-color: #006cff;
+        border-width: 2px;
+    }
+
+    .server-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &.add-server-button {
+        border-style: dashed;
+        border-width: 2px;
+        border-color: #d0d0d0;
+        background-color: #fafafa;
+        
+        .server-name {
+            color: #999;
+            font-weight: 400;
+        }
+
+        &:hover {
+            background-color: #f0f0f0;
+            border-color: #b0b0b0;
+            
+            .server-name {
+                color: #666;
+            }
+        }
+    }
+}
+
+.server-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.server-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+}
+
+.server-details {
+    font-size: 12px;
+    color: #999;
+}
+
+.checkmark {
+    display: flex;
+    align-items: center;
+    color: #006cff;
+    
+    .material-icons {
+        font-size: 24px;
+    }
+}
+
+.edit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    color: #666;
+
+    .material-icons {
+        font-size: 20px;
+    }
+
+    &:hover {
+        background-color: rgba(0, 108, 255, 0.1);
+        color: #006cff;
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+#cds-confirm-btn:hover:enabled {
+    opacity: .8 !important;
+}
+
+#cds-confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+#cds-cancel-btn {
+    background: #e5e5e5;
+    color: #4b5052;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+

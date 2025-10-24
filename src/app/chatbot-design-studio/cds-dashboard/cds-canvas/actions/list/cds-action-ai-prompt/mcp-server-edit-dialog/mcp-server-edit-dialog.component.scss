@@ -1,0 +1,112 @@
+@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/styles.scss";
+
+::ng-deep .custom-mcp-edit-dialog-container {
+    width: 35vw!important;
+    min-width: 450px;
+    max-width: 600px!important;
+    max-height: 80vh;
+
+    .tpl-modal-box {
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        background: rgb(255, 255, 255);
+        max-height: 80vh;
+    }
+
+    .tpl-modal-header {
+        align-items: flex-start;
+        align-items: center;
+        display: flex;
+        flex-shrink: 0;
+        justify-content: center;
+        width: 100%;
+        padding: 20px 20px 10px 20px;
+
+        i {
+            flex-shrink: 0;
+            font-size: 24px;
+            line-height: 23px;
+            margin-left: auto;
+            cursor: pointer;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.7;
+            }
+        }
+    }
+    
+    .tpl-modal-header-text {
+        flex-grow: 1;
+        text-align: center;
+        width: 0;
+
+        span {
+            word-wrap: break-word;
+            display: -webkit-box;
+            line-height: 23px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 69px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+    }
+    
+    .tpl-modal-content {
+        flex-grow: 1;
+        padding: 20px;
+        width: 100%;
+        overflow-y: auto;
+    }
+    
+    .tpl-modal-buttons {
+        display: flex;
+        flex-shrink: 0;
+        justify-content: flex-end;
+        padding: 15px 20px;
+        color: #333;
+        gap: 10px;
+        border-top: 1px solid #e5e5e5;
+    }
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+#cds-save-btn:hover:enabled {
+    opacity: .8 !important;
+}
+
+#cds-save-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+#cds-cancel-btn {
+    background: #e5e5e5;
+    color: #4b5052;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
