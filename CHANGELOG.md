@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.9-rc10:
+- **changed** updated mcd servers in action ai-prompt
+
 # 1.39.9-rc9:
 - **added**: added mcd servers in action ai-prompt
 - **added**: added Save/Update MCP Server in integration
