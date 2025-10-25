@@ -6,7 +6,7 @@ import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-serv
 
 
 @Component({
-  selector: 'appdashboard-mcp-servers-dialog',
+  selector: 'mcp-servers-dialog',
   templateUrl: './mcp-servers-dialog.component.html',
   styleUrls: ['./mcp-servers-dialog.component.scss']
 })

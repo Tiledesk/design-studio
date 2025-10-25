@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 //MODELS
@@ -112,8 +112,7 @@ export class CdsActionAiPromptComponent implements OnInit {
     private readonly appConfigService: AppConfigService,
     private readonly translate: TranslateService,
     private readonly dashboardService: DashboardService,
-    private readonly projectService: ProjectService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly projectService: ProjectService
   ) { 
     this.browserLang = this.translate.getBrowserLang();
   }
@@ -171,10 +170,6 @@ export class CdsActionAiPromptComponent implements OnInit {
     };
   }
 
-
-  ngOnChanges(changes: SimpleChanges) {
-    // // empty
-  }
 
   ngOnDestroy() {
     if (this.subscriptionChangedConnector) {
@@ -522,7 +517,7 @@ setModel(labelModel: string){
       this.action[target] = event.checked;
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     } catch (error) {
-      this.logger.log("Error: ", error);
+      this.logger.log("[ACTION AI_PROMPT] Error: ", error);
     }
   }
 
@@ -560,7 +555,7 @@ setModel(labelModel: string){
         this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
         this.scrollContainer.nativeElement.animate({ scrollTop: 0 }, '500');
       } catch (error) {
-        this.logger.log('scrollToBottom ERROR: ', error);
+        this.logger.log('[ACTION AI_PROMPT] scrollToBottom ERROR: ', error);
       }
     }, 300);
   }
@@ -612,7 +607,7 @@ setModel(labelModel: string){
   }
 
   getResponse(question) {
-    this.logger.log("getResponse called...")
+    this.logger.log("[ACTION AI_PROMPT] getResponse called...")
 
     let data = {
       question: question,
@@ -788,13 +783,13 @@ setModel(labelModel: string){
   // }
 
   openAttributesDialog() {
-    this.logger.log("temp_variables: ", this.temp_variables);
+    this.logger.log("[ACTION AI_PROMPT] temp_variables: ", this.temp_variables);
     const dialogRef = this.dialog.open(AttributesDialogAiPromptComponent, {
       panelClass: 'custom-setattribute-dialog-container',
       data: { attributes: this.temp_variables, question: this.action.question }
     });
     dialogRef.afterClosed().subscribe(result => {
-      this.logger.log("AttributesDialogComponent result: ", result);
+      this.logger.log("[ACTION AI_PROMPT] AttributesDialogComponent result: ", result);
       if (result !== false) {
         this.getResponse(result.question);
         this.saveAttributes(result.attributes);
@@ -803,8 +798,8 @@ setModel(labelModel: string){
   }
 
   openMcpServersDialog() {
-    this.logger.log("mcpServers: ", this.mcpServers);
-    this.logger.log("servers: ", this.selectedMcpServers);
+    this.logger.log("[ACTION AI_PROMPT] mcpServers: ", this.mcpServers);
+    this.logger.log("[ACTION AI_PROMPT] selectedMcpServers: ", this.selectedMcpServers);
     
     const dialogRef = this.dialog.open(McpServersDialogComponent, {
       panelClass: 'custom-mcp-dialog-container',
@@ -818,7 +813,7 @@ setModel(labelModel: string){
     });
     // No need to handle afterClosed since updates are real-time via callback
     dialogRef.afterClosed().subscribe(() => {
-      this.logger.log("McpServersDialogComponent closed");
+      this.logger.log("[ACTION AI_PROMPT] McpServersDialogComponent closed");
     });
   }
 
@@ -838,9 +833,6 @@ setModel(labelModel: string){
     this.logger.log("[ACTION AI_PROMPT] Real-time updated selected MCP servers: ", this.selectedMcpServers);
     this.logger.log("[ACTION AI_PROMPT] Real-time updated all MCP servers: ", this.mcpServers);
     
-    // Force change detection to update the preview
-    this.cdr.detectChanges();
-    
     this.updateAndSaveAction.emit();
   }
 
@@ -851,17 +843,14 @@ setModel(labelModel: string){
       this.selectedMcpServers.splice(index, 1);
       // Update action
       this.action['selectedMcpServers'] = this.selectedMcpServers;
-      this.logger.log("Removed server, updated list: ", this.selectedMcpServers);
-      
-      // Force change detection to update the preview
-      this.cdr.detectChanges();
+      this.logger.log("[ACTION AI_PROMPT] Removed server, updated list: ", this.selectedMcpServers);
       
       this.updateAndSaveAction.emit();
     }
   }
 
   saveAttributes(attributes) {
-    this.logger.log("attributes: ", attributes);
+    this.logger.log("[ACTION AI_PROMPT] attributes: ", attributes);
     attributes.forEach(a => {
       let index = this.action.preview.findIndex(v => v.name === a.name)
       if (index != -1) {
