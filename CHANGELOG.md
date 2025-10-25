@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.9-rc9:
+- **added**: added mcd servers in action ai-prompt
+- **added**: added Save/Update MCP Server in integration
+- **added**: retry system for rendering connectors with slow connections
+
 
 # 1.39.9-rc8:
 - **bug-fix**: renamed function onUpdateAndSaveAction in onActionUpdate
