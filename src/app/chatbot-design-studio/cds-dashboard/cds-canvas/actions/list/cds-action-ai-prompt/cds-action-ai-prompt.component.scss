@@ -504,7 +504,7 @@ cds-select#model-condition.not-configured ::ng-deep {
 
 .configure-model-button {
     cursor: pointer;
-    color: #007bff;
+    color: var(--blu-02);
     font-size: 12px;
     text-decoration: underline;
     display: inline-block;
@@ -512,6 +512,40 @@ cds-select#model-condition.not-configured ::ng-deep {
         opacity: 0.7;
     }
 }
+
+// MCP TOOLS PREVIEW --- start **************** //
+.mcp-tools-preview-container {
+    padding: 8px 0px;
+    margin-top: 8px;
+}
+
+.mcp-tools-header {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mcp-tools-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mcp-tool-tag {
+    background-color: #e8f4ff;
+    color: var(--blu-02);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-family-poppins);
+    white-space: nowrap;
+    display: inline-block;
+}
+// MCP TOOLS PREVIEW --- end **************** //
 
 // MCP SERVERS SECTION --- start **************** //
 .mcp-servers-section {
@@ -528,12 +562,12 @@ cds-select#model-condition.not-configured ::ng-deep {
 
 .mcp-server-button {
     background-color: #ffffff;
-    border: 2px solid #006cff;
+    border: 2px solid var(--blu-02);
     border-radius: 8px;
-    padding: 12px 16px;
+    padding: 4px 12px;
     font-size: 14px;
     font-family: var(--font-family-poppins);
-    color: #006cff;
+    color: var(--blu-02);
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -544,13 +578,13 @@ cds-select#model-condition.not-configured ::ng-deep {
     
     &:hover {
         background-color: #e8f4ff;
-        border-color: #0056cc;
-        color: #0056cc;
+        border-color: var(--blu);
+        color: var(--blu);
     }
 
     &.selected {
         background-color: #e8f4ff;
-        border-color: #006cff;
+        border-color: var(--blu-02);
         padding-right: 40px;
         justify-content: flex-start;
         
@@ -563,7 +597,6 @@ cds-select#model-condition.not-configured ::ng-deep {
             transition: all 0.2s ease;
             border-radius: 50%;
             padding: 2px;
-            
             &:hover {
                 background-color: rgba(255, 0, 0, 0.1);
                 color: #ff0000;

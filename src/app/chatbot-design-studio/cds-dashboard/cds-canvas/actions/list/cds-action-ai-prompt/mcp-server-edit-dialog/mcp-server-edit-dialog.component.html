@@ -1,21 +1,37 @@
 <div class="tpl-modal-box">
+    <!-- Loading overlay - shown only if saving takes more than 500ms -->
+    <div class="loading-overlay" *ngIf="showLoader">
+        <div class="loading-content">
+            <div class="spinner-large"></div>
+            <span class="loading-text">{{'CDSCanvas.Saving' | translate}}...</span>
+        </div>
+    </div>
+
     <div class="tpl-modal-header">
         <div class="tpl-modal-header-text">
-            <span>{{ isNewServer ? 'Aggiungi Server MCP' : 'Modifica Server MCP' }}</span>
+            <span>{{ isNewServer ? ('CDSCanvas.AddMCPServer' | translate) : ('CDSCanvas.EditMCPServer' | translate) }}</span>
         </div>
         <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
     </div>
     
-    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+    <!-- <  class="custom-hr" style="margin-top:3px; margin-bottom:3px"> -->
     
     <div class="tpl-modal-content">
+        <!-- Error message -->
+        <div class="error-alert" *ngIf="showError">
+            <span class="material-icons error-icon">error_outline</span>
+            <span class="error-text">{{ errorMessage }}</span>
+            <span class="material-icons close-error" (click)="showError = false">close</span>
+        </div>
+
         <form class="edit-form">
             <!-- Nome -->
             <div class="form-field">
-                <label class="field-label">Nome</label>
+                <label class="field-label">{{'CDSCanvas.Name' | translate}}</label>
                 <cds-text 
                     [text]="editedServer.name"
-                    [placeholder]="'Inserisci il nome del server'"
+                    [setAttributeBtn]="false"
+                    [placeholder]="'CDSCanvas.EnterServerName' | translate"
                     (onChange)="onChangeField($event, 'name')">
                 </cds-text>
             </div>
@@ -25,7 +41,8 @@
                 <label class="field-label">URL</label>
                 <cds-text 
                     [text]="editedServer.url"
-                    [placeholder]="'Inserisci l\'URL del server'"
+                    [setAttributeBtn]="false"
+                    [placeholder]="'CDSCanvas.EnterServerURL' | translate"
                     (onChange)="onChangeField($event, 'url')">
                 </cds-text>
             </div>
@@ -36,7 +53,7 @@
                 <div class="readonly-field">
                     {{ editedServer.transport }}
                 </div>
-                <span class="field-hint">Il campo Type non è modificabile</span>
+                <span class="field-hint">{{'CDSCanvas.OnlySupported' | translate}}</span>
             </div>
         </form>
     </div>
@@ -45,15 +62,15 @@
         <button id="cds-cancel-btn" class="btn btn-primary cds-blue-button" type="button" 
             [mat-dialog-close]="false"
             [disabled]="isSaving">
-            Annulla
+            {{'Cancel' | translate}}
         </button>
         <button id="cds-save-btn" class="btn btn-primary cds-blue-button" type="button" 
             [disabled]="!isFormValid() || isSaving"
             (click)="onSave()">
-            <span *ngIf="!isSaving">Salva</span>
+            <span *ngIf="!isSaving">{{'CDSCanvas.Save' | translate}}</span>
             <span *ngIf="isSaving" style="display: flex; align-items: center; gap: 8px;">
                 <span class="spinner"></span>
-                Salvataggio...
+                {{'CDSCanvas.Saving' | translate}}...
             </span>
         </button>
     </div>

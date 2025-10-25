@@ -6,13 +6,16 @@ import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-serv
 
 
 @Component({
-  selector: 'appdashboard-mcp-servers-dialog',
+  selector: 'mcp-servers-dialog',
   templateUrl: './mcp-servers-dialog.component.html',
   styleUrls: ['./mcp-servers-dialog.component.scss']
 })
 export class McpServersDialogComponent implements OnInit {
 
   selectedServers: Array<{ name: string, url: string, transport: string }> = [];
+  filteredServers: Array<{ name: string, url: string, transport: string }> = [];
+  searchFilter: string = '';
+  onUpdateCallback: (data: any) => void;
   
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -21,7 +24,8 @@ export class McpServersDialogComponent implements OnInit {
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: { 
       mcpServers: Array<{ name: string, url: string, transport: string }>,
-      selectedServers?: Array<{ name: string, url: string, transport: string }>
+      selectedServers?: Array<{ name: string, url: string, transport: string }>,
+      onUpdate?: (data: any) => void
     }
   ) { }
 
@@ -32,6 +36,12 @@ export class McpServersDialogComponent implements OnInit {
       this.selectedServers = [...this.data.selectedServers];
       this.logger.debug("[McpServersDialog] Pre-selected servers: ", this.selectedServers);
     }
+    // Store the update callback if provided
+    if (this.data.onUpdate) {
+      this.onUpdateCallback = this.data.onUpdate;
+    }
+    // Initialize filtered servers
+    this.filteredServers = [...this.data.mcpServers];
   }
 
   onCloseDialog(): void {
@@ -39,7 +49,10 @@ export class McpServersDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
-  toggleServerSelection(server: { name: string, url: string, transport: string }): void {
+  toggleServerSelection(server: { name: string, url: string, transport: string }, event?: Event): void {
+    if (event) {
+      event.stopPropagation(); // Prevent triggering the button click
+    }
     const index = this.selectedServers.findIndex(s => s.name === server.name);
     if (index > -1) {
       this.selectedServers.splice(index, 1);
@@ -47,6 +60,34 @@ export class McpServersDialogComponent implements OnInit {
       this.selectedServers.push(server);
     }
     this.logger.log("[McpServersDialog] selectedServers: ", this.selectedServers);
+    
+    // Notify parent component in real-time
+    this.notifyUpdate();
+  }
+
+  private notifyUpdate(): void {
+    if (this.onUpdateCallback) {
+      this.onUpdateCallback({
+        selectedServers: this.selectedServers,
+        allServers: this.data.mcpServers
+      });
+    }
+  }
+
+  onSearchChange(): void {
+    const filter = this.searchFilter.toLowerCase().trim();
+    
+    if (!filter) {
+      this.filteredServers = [...this.data.mcpServers];
+    } else {
+      this.filteredServers = this.data.mcpServers.filter(server => 
+        server.name.toLowerCase().includes(filter) ||
+        server.url.toLowerCase().includes(filter) ||
+        server.transport.toLowerCase().includes(filter)
+      );
+    }
+    
+    this.logger.log("[McpServersDialog] Filtered servers:", this.filteredServers.length);
   }
 
   isServerSelected(server: { name: string, url: string, transport: string }): boolean {
@@ -72,12 +113,20 @@ export class McpServersDialogComponent implements OnInit {
         // Automatically select the new server
         this.selectedServers.push(result);
         this.logger.log("[McpServersDialog] New server added:", result);
+        
+        // Update filtered list
+        this.onSearchChange();
+        
+        // Notify parent component in real-time
+        this.notifyUpdate();
       }
     });
   }
 
-  openEditServerDialog(server: { name: string, url: string, transport: string }, event: Event): void {
-    event.stopPropagation(); // Prevent toggling selection
+  openEditServerDialog(server: { name: string, url: string, transport: string }, event?: Event): void {
+    if (event) {
+      event.stopPropagation(); // Prevent any unwanted propagation
+    }
     this.logger.log("[McpServersDialog] - openEditServerDialog for:", server);
     
     const dialogRef = this.dialog.open(McpServerEditDialogComponent, {
@@ -101,17 +150,14 @@ export class McpServersDialogComponent implements OnInit {
             this.selectedServers[selectedIndex] = result;
           }
           this.logger.log("[McpServersDialog] Server updated:", result);
+          
+          // Update filtered list
+          this.onSearchChange();
+          
+          // Notify parent component in real-time
+          this.notifyUpdate();
         }
       }
-    });
-  }
-
-  onConfirm(): void {
-    this.logger.log("[McpServersDialog] - onConfirm return data: ", this.selectedServers);
-    // Return both selected servers and updated server list
-    this.dialogRef.close({
-      selectedServers: this.selectedServers,
-      allServers: this.data.mcpServers
     });
   }
 

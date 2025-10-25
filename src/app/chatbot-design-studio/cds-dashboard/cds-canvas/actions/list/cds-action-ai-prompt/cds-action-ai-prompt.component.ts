@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 //MODELS
@@ -143,8 +143,8 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.action.preview = [];
     }
     // Initialize selected MCP servers from action
-    if (this.action['servers']) {
-      this.selectedMcpServers = this.action['servers'];
+    if (this.action['selectedMcpServers']) {
+      this.selectedMcpServers = this.action['selectedMcpServers'];
     }
     await this.initialize();
     
@@ -156,9 +156,6 @@ export class CdsActionAiPromptComponent implements OnInit {
     };
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    // // empty
-  }
 
   ngOnDestroy() {
     if (this.subscriptionChangedConnector) {
@@ -349,7 +346,7 @@ setModel(modelName: string){
       this.action[target] = event.checked;
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     } catch (error) {
-      this.logger.log("Error: ", error);
+      this.logger.log("[ACTION AI_PROMPT] Error: ", error);
     }
   }
 
@@ -387,7 +384,7 @@ setModel(modelName: string){
         this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
         this.scrollContainer.nativeElement.animate({ scrollTop: 0 }, '500');
       } catch (error) {
-        this.logger.log('scrollToBottom ERROR: ', error);
+        this.logger.log('[ACTION AI_PROMPT] scrollToBottom ERROR: ', error);
       }
     }, 300);
   }
@@ -431,7 +428,7 @@ setModel(modelName: string){
   }
 
   getResponse(question) {
-    this.logger.log("getResponse called...")
+    this.logger.log("[ACTION AI_PROMPT] getResponse called...")
 
     let data = {
       question: question,
@@ -607,13 +604,13 @@ setModel(modelName: string){
   // }
 
   openAttributesDialog() {
-    this.logger.log("temp_variables: ", this.temp_variables);
+    this.logger.log("[ACTION AI_PROMPT] temp_variables: ", this.temp_variables);
     const dialogRef = this.dialog.open(AttributesDialogAiPromptComponent, {
       panelClass: 'custom-setattribute-dialog-container',
       data: { attributes: this.temp_variables, question: this.action.question }
     });
     dialogRef.afterClosed().subscribe(result => {
-      this.logger.log("AttributesDialogComponent result: ", result);
+      this.logger.log("[ACTION AI_PROMPT] AttributesDialogComponent result: ", result);
       if (result !== false) {
         this.getResponse(result.question);
         this.saveAttributes(result.attributes);
@@ -622,36 +619,42 @@ setModel(modelName: string){
   }
 
   openMcpServersDialog() {
-    this.logger.log("mcpServers: ", this.mcpServers);
-    this.logger.log("servers: ", this.selectedMcpServers);
+    this.logger.log("[ACTION AI_PROMPT] mcpServers: ", this.mcpServers);
+    this.logger.log("[ACTION AI_PROMPT] selectedMcpServers: ", this.selectedMcpServers);
+    
     const dialogRef = this.dialog.open(McpServersDialogComponent, {
       panelClass: 'custom-mcp-dialog-container',
       data: { 
         mcpServers: this.mcpServers,
-        selectedServers: this.selectedMcpServers 
-      }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      this.logger.log("McpServersDialogComponent result: ", result);
-      if (result !== false && result !== null && result !== undefined) {
-        // Handle new response structure with selectedServers and allServers
-        if (result.selectedServers !== undefined) {
-          // Update the list of selected servers
-          this.selectedMcpServers = result.selectedServers.length > 0 ? [...result.selectedServers] : [];
-          
-          // Update the main server list with any modifications
-          if (result.allServers) {
-            this.mcpServers = [...result.allServers];
-          }
-          
-          // Save selected servers to action
-          this.action['servers'] = this.selectedMcpServers;
-          this.logger.log("Updated selected MCP servers: ", this.selectedMcpServers);
-          this.logger.log("Updated all MCP servers: ", this.mcpServers);
-          this.updateAndSaveAction.emit();
+        selectedServers: this.selectedMcpServers,
+        onUpdate: (updateData: any) => {
+          this.handleMcpServersUpdate(updateData);
         }
       }
     });
+    // No need to handle afterClosed since updates are real-time via callback
+    dialogRef.afterClosed().subscribe(() => {
+      this.logger.log("[ACTION AI_PROMPT] McpServersDialogComponent closed");
+    });
+  }
+
+  handleMcpServersUpdate(updateData: any): void {
+    this.logger.log("[ACTION AI_PROMPT] Real-time update from dialog:", updateData);
+    
+    // Update the list of selected servers
+    this.selectedMcpServers = updateData.selectedServers.length > 0 ? [...updateData.selectedServers] : [];
+    
+    // Update the main server list with any modifications
+    if (updateData.allServers) {
+      this.mcpServers = [...updateData.allServers];
+    }
+    
+    // Save selected servers to action
+    this.action['selectedMcpServers'] = this.selectedMcpServers;
+    this.logger.log("[ACTION AI_PROMPT] Real-time updated selected MCP servers: ", this.selectedMcpServers);
+    this.logger.log("[ACTION AI_PROMPT] Real-time updated all MCP servers: ", this.mcpServers);
+    
+    this.updateAndSaveAction.emit();
   }
 
   removeSelectedServer(server: { name: string, url: string, transport: string }, event: Event) {
@@ -660,14 +663,15 @@ setModel(modelName: string){
     if (index > -1) {
       this.selectedMcpServers.splice(index, 1);
       // Update action
-      this.action['servers'] = this.selectedMcpServers;
-      this.logger.log("Removed server, updated list: ", this.selectedMcpServers);
+      this.action['selectedMcpServers'] = this.selectedMcpServers;
+      this.logger.log("[ACTION AI_PROMPT] Removed server, updated list: ", this.selectedMcpServers);
+      
       this.updateAndSaveAction.emit();
     }
   }
 
   saveAttributes(attributes) {
-    this.logger.log("attributes: ", attributes);
+    this.logger.log("[ACTION AI_PROMPT] attributes: ", attributes);
     attributes.forEach(a => {
       let index = this.action.preview.findIndex(v => v.name === a.name)
       if (index != -1) {
