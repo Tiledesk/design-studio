@@ -6,6 +6,10 @@
     min-width: 500px;
     max-width: 700px!important;
     max-height: 80vh;
+  
+    .mat-dialog-container {
+        padding: 0px 10px;
+    }
 
     .tpl-modal-box {
         border-radius: 6px;
@@ -13,6 +17,8 @@
         flex-direction: column;
         background: rgb(255, 255, 255);
         max-height: 80vh;
+        min-height: 335px;
+        height: 80vh;
     }
 
     .tpl-modal-header {
@@ -64,10 +70,10 @@
 
     .tpl-modal-content {
         flex-grow: 1;
-        padding: 20px;
+        padding: 0 20px 20px 20px;
         width: 100%;
         overflow-y: auto;
-        max-height: 350px;
+        height: calc(100% - 400px);
         border: none;
 
         // Custom scrollbar styles
@@ -93,7 +99,7 @@
     .tpl-modal-buttons {
         display: flex;
         flex-shrink: 0;
-        justify-content: flex-end;
+        justify-content: space-between;
         padding: 15px 20px;
         color: #333;
         gap: 10px;
@@ -150,14 +156,14 @@
 .mcp-servers-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
 }
 
 .mcp-server-item-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     width: 100%;
 }
 
@@ -184,7 +190,7 @@
 
 .mcp-server-item {
     background-color: #ffffff;
-    border: 2px solid #d0d0d0;
+    border: 2px solid var(--blu-light-01);
     border-radius: 8px;
     padding: 8px 12px;
     font-size: 14px;
@@ -195,12 +201,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     flex: 1;
     width: 100%;
     min-height: 50px;
+    max-width: calc(100% - 34px);
 
     &:hover {
-        background-color: #f8f8f8;
+        background-color: var(--blu-light-01);
         border-color: #b0b0b0;
     }
 
@@ -246,35 +254,37 @@
     line-height: normal;
 }
 
-.checkmark {
+.checkmark-icon {
+    color: var(--blu-02);
+    font-size: 24px !important;
+    flex-shrink: 0;
+}
+
+.edit-button {
     display: flex;
     align-items: center;
-    flex-shrink: 0;
-    width: 32px;
-    height: 32px;
     justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    background-color: #ffffff;
+    border: 0px solid #d0d0d0;
+    border-radius: 8px;
     cursor: pointer;
-    border-radius: 50%;
     transition: all 0.2s ease;
-    
+    padding: 0;
+    margin-top: 4px;
     .material-icons {
-        font-size: 24px;
+        font-size: 20px;
+        color: var(--blu);
     }
 
-    &.checked {
-        color: var(--blu-02);
+    &:hover {
+        background-color: var(--blu-light-01);
+        border-color: #b0b0b0;
         
-        &:hover {
-            background-color: rgba(0, 108, 255, 0.1);
-        }
-    }
-
-    &.unchecked {
-        color: #999;
-        
-        &:hover {
-            background-color: rgba(153, 153, 153, 0.1);
-            color: #666;
+        .material-icons {
+            color: #333;
         }
     }
 
@@ -293,7 +303,7 @@
     }
 }
 
-#cds-cancel-btn {
+#cds-ok-btn {
     background: #e5e5e5;
     color: #4b5052;
 

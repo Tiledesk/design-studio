@@ -554,7 +554,7 @@ cds-select#model-condition.not-configured ::ng-deep {
 }
 
 .mcp-servers-grid {
-    display: grid;
+    display: flex;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 12px;
     margin-top: 10px;
@@ -564,7 +564,7 @@ cds-select#model-condition.not-configured ::ng-deep {
     background-color: #ffffff;
     border: 2px solid var(--blu-02);
     border-radius: 8px;
-    padding: 4px 12px;
+    padding: 0px 10px;
     font-size: 14px;
     font-family: var(--font-family-poppins);
     color: var(--blu-02);
@@ -585,12 +585,12 @@ cds-select#model-condition.not-configured ::ng-deep {
     &.selected {
         background-color: #e8f4ff;
         border-color: var(--blu-02);
-        padding-right: 40px;
+        padding-right: 30px;
         justify-content: flex-start;
         
         .remove-icon {
             position: absolute;
-            right: 8px;
+            right: 4px;
             font-size: 18px;
             color: #666;
             cursor: pointer;
