@@ -8,11 +8,14 @@
 *Tiledesk SRL*
 
 
+# 1.39.9-rc11:
+- **changed** updated css mcp servers
+
 # 1.39.9-rc10:
-- **changed** updated mcd servers in action ai-prompt
+- **changed** updated mcp servers in action ai-prompt
 
 # 1.39.9-rc9:
-- **added**: added mcd servers in action ai-prompt
+- **added**: added mcp servers in action ai-prompt
 - **added**: added Save/Update MCP Server in integration
 - **added**: retry system for rendering connectors with slow connections
 
