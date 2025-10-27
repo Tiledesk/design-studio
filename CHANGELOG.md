@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.39.9-rc13:
+- **bug-fix**: bug-fix css in mcp-servers-grid 
+
 # 1.39.9-rc12:
 - **bug-fix**: renamed "selected Mcp Servers"
 
