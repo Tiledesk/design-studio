@@ -556,8 +556,9 @@ cds-select#model-condition.not-configured ::ng-deep {
 .mcp-servers-grid {
     display: flex;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
+    gap: 10px;
     margin-top: 10px;
+    flex-wrap: wrap;
 }
 
 .mcp-server-button {
