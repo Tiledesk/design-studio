@@ -158,8 +158,8 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.action.preview = [];
     }
     // Initialize selected MCP servers from action
-    if (this.action['selectedMcpServers']) {
-      this.selectedMcpServers = this.action['selectedMcpServers'];
+    if (this.action['servers']) {
+      this.selectedMcpServers = this.action['servers'];
     }
     await this.initialize();
     // Fine dell'inizializzazione - reset di tutti i flag
@@ -829,7 +829,7 @@ setModel(labelModel: string){
     }
     
     // Save selected servers to action
-    this.action['selectedMcpServers'] = this.selectedMcpServers;
+    this.action['servers'] = this.selectedMcpServers;
     this.logger.log("[ACTION AI_PROMPT] Real-time updated selected MCP servers: ", this.selectedMcpServers);
     this.logger.log("[ACTION AI_PROMPT] Real-time updated all MCP servers: ", this.mcpServers);
     
@@ -842,7 +842,7 @@ setModel(labelModel: string){
     if (index > -1) {
       this.selectedMcpServers.splice(index, 1);
       // Update action
-      this.action['selectedMcpServers'] = this.selectedMcpServers;
+      this.action['servers'] = this.selectedMcpServers;
       this.logger.log("[ACTION AI_PROMPT] Removed server, updated list: ", this.selectedMcpServers);
       
       this.updateAndSaveAction.emit();

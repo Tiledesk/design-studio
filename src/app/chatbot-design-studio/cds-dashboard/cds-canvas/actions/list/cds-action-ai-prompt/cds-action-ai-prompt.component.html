@@ -36,10 +36,10 @@
     </div>
 
     <!-- MCP Tools Preview -->
-    <div class="mcp-tools-preview-container" *ngIf="action?.selectedMcpServers && action.selectedMcpServers.length > 0">
+    <div class="mcp-tools-preview-container" *ngIf="action?.servers && action.servers.length > 0">
         <div class="mcp-tools-header">{{'CDSCanvas.ToolsUsed' | translate}}</div>
         <div class="mcp-tools-preview">
-            <span class="mcp-tool-tag" *ngFor="let server of action.selectedMcpServers">
+            <span class="mcp-tool-tag" *ngFor="let server of action.servers">
                 {{ server.name }}
             </span>
         </div>
