@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.9-rc14:
+- **bug-fix**: contract connector undefined and connector empty hidden on action ai prompt
+- **bug-fix**: drag on start intent
+- **bug-fix**: show namespace or id action if namespaceAsName is true or false
+- **bug-fix**: set focus on textarea when create new server MCP
 
 # 1.39.9-rc13:
 - **bug-fix**: bug-fix css in mcp-servers-grid 
