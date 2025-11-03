@@ -85,11 +85,11 @@ export class CdsActionAiPromptComponent implements OnInit {
 
 
   // Connectors
-  idIntentSelected: string;
-  idConnectorTrue: string;
-  idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
+  idIntentSelected: string = '';
+  idConnectorTrue: string = '';
+  idConnectorFalse: string = '';
+  idConnectionTrue: string = '';
+  idConnectionFalse: string = '';
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
@@ -227,19 +227,28 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
+    this.logger.log('[ACTION AI_PROMPT] listOfIntents:', this.listOfIntents);
+    this.logger.log('[ACTION AI_PROMPT] idIntentSelected:', this.idIntentSelected);
+    this.logger.log('[ACTION AI_PROMPT] idConnectorTrue:', this.idConnectorTrue);
+    this.logger.log('[ACTION AI_PROMPT] idConnectorFalse:', this.idConnectorFalse);
     this.checkConnectionStatus();
+    
+    // this.logger.log('[ACTION AI_PROMPT] isConnectedFalse:', this.isConnectedFalse);
+    // this.logger.log('[ACTION AI_PROMPT] idConnectionTrue:', this.idConnectionTrue);
+    // this.logger.log('[ACTION AI_PROMPT] idConnectionFalse:', this.idConnectionFalse);
   }
   
   private checkConnectionStatus(){
     const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.logger.log('[ACTION AI_PROMPT] checkConnectionStatusOfAction:',this.action, this.idConnectorTrue, this.idConnectorFalse);
     this.isConnectedTrue    = resp.isConnectedTrue;
     this.isConnectedFalse   = resp.isConnectedFalse;
     this.idConnectionTrue   = resp.idConnectionTrue;
     this.idConnectionFalse  = resp.idConnectionFalse;
+    this.logger.log('[ACTION AI_PROMPT] resp:',resp);
   }
 
   private updateConnector(){
-    this.logger.log('[ACTION AI_PROMPT] updateConnector:');
     const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
     if(resp){
       this.isConnectedTrue    = resp.isConnectedTrue;
