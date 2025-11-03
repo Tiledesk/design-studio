@@ -867,7 +867,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.listnerKeydown = (e) => {
       this.logger.log('[CDS-CANVAS]  keydown ', e);
       var focusedElement = document.activeElement;
-      if (focusedElement.tagName === 'TEXTAREA') {
+      // Consenti l'undo/redo nativo per TEXTAREA e INPUT
+      if (focusedElement.tagName === 'TEXTAREA' || focusedElement.tagName === 'INPUT') {
         return;
       }
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
