@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 
+- **bug-fix**: The contracted connector was not defined and the empty connector was not visible in the AI-prompt, ai-condition, askgpt-v2 action.
+- **bug-fix**: Dragging issue with the "start" intent.
+- **bug-fix**: The namespace or action ID is now displayed correctly based on the namespaceAsName flag (true/false).
+- **bug-fix**: Ctr-z is enabled in the text area when creating a new MCP server.
 
 # 1.39.9-rc13:
 - **bug-fix**: bug-fix css in mcp-servers-grid 
