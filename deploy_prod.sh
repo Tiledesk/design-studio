@@ -6,6 +6,9 @@ echo "version $version"
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 remote_name=$(git config --get branch.$current_branch.remote)
 
+##Install deps
+npm i
+
 ## Push commit to git
 git add .
 git commit -m "version added: ### $version"
