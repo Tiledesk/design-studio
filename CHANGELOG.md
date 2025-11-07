@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+# 1.39.9-rc16:
 - **bug-fix**: Updated MCP tools in the ai-prompt action when another ai-prompt action is selected
 
 # 1.39.9-rc15:
