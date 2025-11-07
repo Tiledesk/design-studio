@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 //MODELS
@@ -35,7 +35,7 @@ import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
   templateUrl: './cds-action-ai-prompt.component.html',
   styleUrls: ['./cds-action-ai-prompt.component.scss']
 })
-export class CdsActionAiPromptComponent implements OnInit {
+export class CdsActionAiPromptComponent implements OnInit, OnChanges {
   
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
   
@@ -156,6 +156,20 @@ export class CdsActionAiPromptComponent implements OnInit {
     };
   }
 
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Aggiorna selectedMcpServers quando cambia l'action (selezione di un blocco diverso)
+    if (changes['action'] && changes['action'].currentValue) {
+      const currentAction = changes['action'].currentValue as ActionAiPrompt;
+      if (currentAction['servers']) {
+        this.selectedMcpServers = currentAction['servers'];
+        this.logger.log("[ACTION AI_PROMPT] ngOnChanges - Updated selectedMcpServers from action: ", this.selectedMcpServers);
+      } else {
+        this.selectedMcpServers = [];
+        this.logger.log("[ACTION AI_PROMPT] ngOnChanges - Reset selectedMcpServers (no servers in action)");
+      }
+    }
+  }
 
   ngOnDestroy() {
     if (this.subscriptionChangedConnector) {
