@@ -286,7 +286,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     name: "Gemma 2 – 9B Instruct (Italian tuned)",
     value: "gemma2-9b-it",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
-    status: "active",
+    status: "inactive",
     min_tokens: 1,
     max_output_tokens: 8192
   },
@@ -310,7 +310,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     name: "DeepSeek R1 Distilled Llama 70B",
     value: "deepseek-r1-distill-llama-70b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
-    status: "active",
+    status: "inactive",
     min_tokens: 1,
     max_output_tokens: 32768
   },
@@ -345,7 +345,36 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     status: "active",
     min_tokens: 1,
     max_output_tokens: 32768
-  }
+  },
+  { name: "Groq Compound",
+    value: "groq/compound",
+    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 32768
+  },
+  { name: "Groq Compound Mini",
+    value: "groq/compound-mini",
+    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 32768
+  },
+  { name: "OpenAI GPT-OSS 120B",
+    value: "openai/gpt-oss-120b",
+    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 32768
+  },
+  { name: "OpenAI GPT-OSS 20B",
+    value: "openai/gpt-oss-20b",
+    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 32768
+  },
+
 ]
 
 export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number}> = [
