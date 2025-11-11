@@ -417,7 +417,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     name: "GPT-4.1",
     value: "gpt-4.1",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
-    status: "inactive",
+    status: "active",
     min_tokens: 1,
     max_output_tokens: 32768
   },
@@ -425,7 +425,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     name: "GPT-4.1 mini",
     value: "gpt-4.1-mini",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
-    status: "inactive",
+    status: "active",
     min_tokens: 1,
     max_output_tokens: 32768
   },
@@ -433,7 +433,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     name: "GPT-4.1 nano",
     value: "gpt-4.1-nano",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
-    status: "inactive",
+    status: "active",
     min_tokens: 1,
     max_output_tokens: 32768
   },
@@ -489,7 +489,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     name: "OpenAI o1-mini",
     value: "o1-mini",
     description: "TYPE_GPT_MODEL.o1-mini.description",
-    status: "active",
+    status: "inactive",
     min_tokens: 1,
     max_output_tokens: 65536
   },
@@ -497,7 +497,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     name: "OpenAI o1-preview",
     value: "o1-preview",
     description: "TYPE_GPT_MODEL.o1-preview.description",
-    status: "active",
+    status: "inactive",
     min_tokens: 1,
     max_output_tokens: 32768
   }
