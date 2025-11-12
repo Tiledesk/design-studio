@@ -344,6 +344,8 @@
         "KBSource": "Assign KB Source to",
         "KBChunks": "Assign KB Chunks to",
         "ChunksOnly": "Chunks only",
+        "Reranking": "Re-ranking",
+        "SkipUnanswered": "Do not update unanswered list",
         "ErrorAutomaticAssign": "Errors will be automatically assigned to variable:",
         "ApplyAFunctionToValue": "Apply a function to the value",
         "InsertConstantValueOrChoise": "Insert a constant value or choose an attribute",
