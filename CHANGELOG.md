@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.12
+- **added**: added MCP server in ai-prompt
+
 # 1.39.11
 
 # 1.39.10
