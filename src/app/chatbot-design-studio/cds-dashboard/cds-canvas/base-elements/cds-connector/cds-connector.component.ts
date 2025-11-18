@@ -42,10 +42,11 @@ export class CdsConnectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.initSubscriptions();
-    this.setIdContractConnector();
+    // this.setIdContractConnector();
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    this.setIdContractConnector();
     if (changes.isConnected?.currentValue === false) {
       this.displayConnector = 'none';
       const element = document.getElementById(this.idContractConnector);
