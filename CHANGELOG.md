@@ -10,6 +10,7 @@
 
 # this branch
 - **added**: implemented queue for connector rendering management
+- **bug-fix**: set Id Contract Connector
 
 # 1.39.9 
 
