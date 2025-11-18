@@ -11,6 +11,8 @@
 # this branch
 - **added**: implemented queue for connector rendering management
 - **bug-fix**: set Id Contract Connector
+- **bug-fix**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
+- **bug-fix**: Ctr-z is enabled in the text area when creating a new MCP server.
 
 # 1.39.9 
 
