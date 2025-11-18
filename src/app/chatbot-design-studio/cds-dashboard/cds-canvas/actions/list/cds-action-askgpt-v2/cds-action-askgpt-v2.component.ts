@@ -50,11 +50,12 @@ export class CdsActionAskgptV2Component implements OnInit {
   //selectedNamespace: any;
 
   // Connectors
-  idIntentSelected: string;
-  idConnectorTrue: string;
-  idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
+  idIntentSelected: string = '';
+  idConnectorTrue: string = '';
+  idConnectorFalse: string = '';
+  idConnectionTrue: string = '';
+  idConnectionFalse: string = '';
+
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
