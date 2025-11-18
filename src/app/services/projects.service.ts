@@ -257,6 +257,38 @@ export class ProjectService {
     return this.http.get(url, httpOptions);
    }
 
+   // ----------------------------------------------------------
+   // Save/Update MCP Server in integration
+   // ----------------------------------------------------------
+
+   saveIntegration(project_id: string, integration:any) {
+    this.logger.log('[TILEDESK-SERVICE] - UPDATE MCP SERVER', integration);
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    }
+    const url = this.SERVER_BASE_URL + project_id + "/integration/";
+    this.logger.debug('[TILEDESK-SERVICE] - save integration URL: ', url);
+    return this.http.post(url, integration, httpOptions);
+  }
+
+  //  updateMcpServer(project_id: string, mcpServer: { name: string, url: string, transport: string }): Observable<any> {
+  //   this.logger.log('[TILEDESK-SERVICE] - UPDATE MCP SERVER', mcpServer);
+  //   const httpOptions = {
+  //     headers: new HttpHeaders({
+  //       'Content-Type': 'application/json',
+  //       'Authorization': this.tiledeskToken
+  //     })
+  //   };
+
+  //   const url = this.SERVER_BASE_URL + project_id + "/integration";
+  //   this.logger.log('[TILEDESK-SERVICE] - UPDATE MCP SERVER - URL: ', url);
+
+  //   return this.http.put(url, mcpServer, httpOptions);
+  // }
+
    
 
 

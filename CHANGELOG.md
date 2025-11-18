@@ -10,6 +10,14 @@
 
 # this branch
 - **added**: implemented queue for connector rendering management
+- **bug-fix**: set Id Contract Connector
+
+# 1.39.12
+- **added**: added MCP server in ai-prompt
+
+# 1.39.11
+
+# 1.39.10
 
 # 1.39.9 
 
