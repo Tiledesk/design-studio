@@ -8,9 +8,10 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.39.13
 - **added**: implemented queue for connector rendering management
 - **bug-fix**: set Id Contract Connector
+- **changed**: changed label "Add MCP tools"
 
 # 1.39.12
 - **added**: added MCP server in ai-prompt
