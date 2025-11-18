@@ -253,12 +253,12 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.idConnectorFallback = this.idIntentSelected + "/" + this.action._tdActionId + "/fallback";
     if (this.action.fallbackIntent) {
       this.isConnectedFallback = true;
-      this.idConnectionFallback = "/" + this.action.fallbackIntent.replace('#', '');
+      this.idConnectionFallback =this.idConnectorFallback + "/" + this.action.fallbackIntent.replace('#', '');
     }
     this.idConnectorError = this.idIntentSelected + "/" + this.action._tdActionId + "/error";
     if (this.action.errorIntent) {
       this.isConnectedError = true;
-      this.idConnectionError = "/" + this.action.errorIntent.replace('#', '');
+      this.idConnectionError = this.idConnectorError + "/" + this.action.errorIntent.replace('#', '');
     }
     this.listOfIntents = this.intentService.getListOfIntents();
     //this.checkConnectionStatus();
