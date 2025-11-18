@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.10-rc1
+- **added**: implemented queue for connector rendering management
+
 # 1.39.10
 
 # 1.39.9 
