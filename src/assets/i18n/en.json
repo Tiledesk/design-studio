@@ -433,9 +433,10 @@
         "Result": "Result",
         "Error": "Error",
         "ChooseBot": "Choose a bot",
+        "ChooseAgent": "Choose an Agent",
         "UseChatbotSlug": "Use Chatbot slag",
         "ChooseBlock": "Choose a block",
-        "ChooseBlockDescription": "Automatically execute this block when this chatbot joins the conversation",
+        "ChooseBlockDescription": "Automatically execute this block when the Agent joins the conversation",
         "ExecuteBlock": "Execute block",
         "ThisRequestNoBody": "This request does not have a body",
         "Location": "Location",
@@ -831,8 +832,8 @@
                 "DOC_URL": "https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
             },
             "ReplaceAIAgent":{
-                "TITLE":"Replace the current bot with another one",
-                "DESCRIPTION":"Replaces the current chatbot with the specied one",
+                "TITLE":"Replaces the current Agent with the specied one",
+                "DESCRIPTION":"",
                 "IMAGE":"assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"

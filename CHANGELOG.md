@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **bug-fix**: Text correction on replace AI agent
+- **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management
