@@ -29,8 +29,18 @@ import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
 import { WebhookService } from '../../services/webhook-service.service';
 import { Chatbot } from 'src/app/models/faq_kb-model';
+import { v4 as uuidv4 } from 'uuid';
 
 // const swal = require('sweetalert');
+
+// Interface per le note
+export interface Note {
+  note_id: string;
+  x: number;
+  y: number;
+  text?: string;
+  createdAt: Date;
+}
 
 @Component({
   selector: 'cds-canvas',
@@ -41,6 +51,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   @ViewChild('receiver_elements_dropped_on_stage', { static: false }) receiverElementsDroppedOnStage: ElementRef;
   @ViewChild('drawer_of_items_to_zoom_and_drag', { static: false }) drawerOfItemsToZoomAndDrag: ElementRef;
+  @ViewChild('cdsOptions') cdsOptions: any;
 
   // @Output() testItOut = new EventEmitter();
   @Input() onHeaderTestItOut: Observable<Intent>
@@ -68,7 +79,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   private subscriptionListOfIntents: Subscription;
   listOfIntents: Array<Intent> = [];
-  listOfEvents: Array<Intent> = []
+  listOfEvents: Array<Intent> = [];
+  listOfNotes: Array<Note> = [];
   // intentSelected: Intent;
   intent_id: string;
   hasClickedAddAction: boolean = false;
@@ -140,6 +152,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** panel widget readonly readonly log */
   IS_OPEN_WIDGET_LOG: boolean = false;
   
+  /** note mode */
+  isNoteModeActive: boolean = false;
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   startDraggingPosition: any = null;
@@ -1481,7 +1495,67 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.stageService.setAlphaConnectors(this.id_faq_kb, alpha);
         break;
       }
+      case OPTIONS.NOTE: {
+        this.isNoteModeActive = resp.isActive !== undefined ? resp.isActive : !this.isNoteModeActive;
+        this.logger.log("[CDS-CANVAS] note mode active: ", this.isNoteModeActive);
+        break;
+      }
     }
+  }
+
+  /**
+   * Gestisce il click sullo stage quando la modalità note è attiva
+   */
+  onStageClick(event: MouseEvent): void {
+    if (this.isNoteModeActive) {
+      // Verifichiamo che il click non provenga dal pulsante note o da altri elementi che non devono essere intercettati
+      const target = event.target as HTMLElement;
+      if (target.closest('#cds-options-panel')) {
+        // Non intercettare i click sul pannello delle opzioni
+        return;
+      }
+      
+      // Preveniamo la propagazione per evitare che il click venga gestito da altri handler
+      event.stopPropagation();
+      event.preventDefault();
+      
+      // Calcoliamo le coordinate relative al container dello stage
+      const stageContainer = event.currentTarget as HTMLElement;
+      const rect = stageContainer.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      
+      // Creiamo una nuova nota
+      const newNote: Note = {
+        note_id: uuidv4(),
+        x: x,
+        y: y,
+        text: '',
+        createdAt: new Date()
+      };
+      
+      // Aggiungiamo la nota all'array
+      this.listOfNotes.push(newNote);
+      
+      this.logger.log("[CDS-CANVAS] Note created at position:", { x, y }, "Total notes:", this.listOfNotes.length);
+      
+      // Disattiviamo la modalità note
+      this.deactivateNoteMode();
+    }
+  }
+
+  /**
+   * Disattiva la modalità note e ripristina lo stato del pulsante
+   */
+  private deactivateNoteMode(): void {
+    this.isNoteModeActive = false;
+    
+    // Ripristiniamo lo stato del pulsante nel componente cds-options
+    if (this.cdsOptions) {
+      this.cdsOptions.isNoteModeActive = false;
+    }
+    
+    this.logger.log("[CDS-CANVAS] note mode deactivated");
   } 
 
 

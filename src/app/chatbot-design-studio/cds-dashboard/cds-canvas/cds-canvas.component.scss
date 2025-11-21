@@ -352,6 +352,10 @@ cds-fulfillment {
   background-image: radial-gradient(var(--container-background) 1.14286px, var(--container-points-color) 1.14286px);
   // background-image: radial-gradient(rgb(218, 226, 226) 1.14286px, rgb(244, 246, 246) 1.14286px);
   background-position: 593.4px -230.4px;
+
+  &.note-mode-active {
+    cursor: text;
+  }
 }
 
 .tds-drag-drawer {

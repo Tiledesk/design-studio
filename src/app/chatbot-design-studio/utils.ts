@@ -226,6 +226,7 @@ export enum TYPE_UPDATE_ACTION {
 }
 
 export enum OPTIONS {
+    NOTE        = 'note',
     ZOOM_IN     = 'zoom-in',
     ZOOM_OUT    = 'zoom-out',
     CENTER      = 'center',

@@ -25,7 +25,7 @@
 </div>
 
 
-<div id="tds_container" class="box-right tds-drag-container" cdkDropListGroup (contextmenu)="onShowContextMenu($event)">
+<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
 
     <cds-panel-elements class="cds-panel-elements" 
         [ngStyle]="{'left': IS_OPEN_INTENTS_LIST ? '230px' : '0px'}"
@@ -80,9 +80,15 @@
             (addActionFromConnectorMenu)="onAddActionFromConnectorMenu($event)">
         </cds-panel-connector-menu>
 
+        <cds-notes *ngFor="let note of listOfNotes"
+        class="panel-intent tds_input_block" 
+        [style.top.px]="note.y"
+        [style.left.px]="note.x">
+
+        </cds-notes>
     </div> 
 
-    <cds-options class="cds-panel-elements" 
+    <cds-options #cdsOptions class="cds-panel-elements" 
         id="cds-options-panel"
         [id_faq_kb] = "id_faq_kb"
         [stateUndoRedo]="stateUndoRedo"
