@@ -1,0 +1,27 @@
+.stage-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  
+  button {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    
+    &:hover {
+      background: #f0f0f0;
+    }
+  }
+}
+
+.stage-container {
+  width: 100%;
+  height: calc(100vh - 100px);
+  border: 1px solid #ddd;
+  background: #fafafa;
+}
+

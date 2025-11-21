@@ -170,6 +170,8 @@
     (hideColortMenu)="onHideColortMenu($event)">
 </cds-color-menu>
 
+
+
 <div id="masck-canv" [class.disabled]="renderedAllElements">
     <img class="logo" [src]="LOGOS_ITEMS['BASE_LOGO_NO_TEXT'].icon" alt="logo">
     <div class="loading"> 
@@ -177,3 +179,7 @@
         <cds-preload-bar class="progress-bar" [progress]="loadingProgress"></cds-preload-bar>
     </div>
 </div>
+
+<cds-stage-notes>
+    NOTES
+</cds-stage-notes>
