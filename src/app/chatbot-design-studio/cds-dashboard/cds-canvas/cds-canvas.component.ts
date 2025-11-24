@@ -1519,25 +1519,24 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       event.stopPropagation();
       event.preventDefault();
       
-      // Calcoliamo le coordinate relative al container dello stage
-      const stageContainer = event.currentTarget as HTMLElement;
-      const rect = stageContainer.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      // Calcoliamo la posizione usando la stessa logica di onDroppedElementToStage
+      let pos = this.connectorService.tiledeskConnectors.logicPoint({ x: event.clientX, y: event.clientY });
+      // pos.x = pos.x - 80;
+      // pos.y = pos.y - 20;
       
       // Creiamo una nuova nota
       const newNote: Note = {
         note_id: uuidv4(),
-        x: x,
-        y: y,
-        text: '',
+        x: pos.x,
+        y: pos.y,
+        text: 'Type something',
         createdAt: new Date()
       };
       
       // Aggiungiamo la nota all'array
       this.listOfNotes.push(newNote);
       
-      this.logger.log("[CDS-CANVAS] Note created at position:", { x, y }, "Total notes:", this.listOfNotes.length);
+      this.logger.log("[CDS-CANVAS] Note created at position:", pos, "Total notes:", this.listOfNotes.length);
       
       // Disattiviamo la modalità note
       this.deactivateNoteMode();

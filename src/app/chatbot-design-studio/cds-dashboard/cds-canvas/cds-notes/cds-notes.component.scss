@@ -1,9 +1,108 @@
 .container {
-    display: flex;
-    flex-direction: column;
+    position: relative;
 }
 
 .cds-notes-content {
-    padding: 16px;
+    width: max-content;
+    min-width: 50px;
+    min-height: 20px;
+    background-color: #00ffa6; // Giallo chiaro per le note
+    padding: 10px 8px;
+    position: relative;
+    box-sizing: border-box;
 }
 
+
+
+.note-input {
+    display: block;
+    border: none;
+    background: transparent;
+    outline: none;
+    resize: none;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    line-height: 1.4;
+    font-size: 14px;
+    font-family: inherit;
+    min-height: 1.4em; // Altezza minima per 1 riga (line-height * 1)
+    height: 100%;
+    width: 100%;
+    min-width: 50px; // Larghezza minima
+    box-sizing: border-box;
+    white-space: pre-wrap; // Mantiene gli spazi e permette il wrap
+    word-wrap: break-word; // Permette il wrap delle parole lunghe
+    z-index: 0;
+}
+
+.note-input-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background-color: transparent;
+    z-index: 1;
+}
+
+/* Handle invisibili di default */
+.cds-notes-content .resize-handle {
+    position: absolute;
+    border: 1px solid #007aff;
+    background: white;
+    display: none;
+    z-index: 10;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  /* Quando selezionata → mostra handle */
+  .cds-notes-content.selected .resize-handle {
+    display: block;
+  }
+  
+  /* Handle angoli (8x8px) */
+  .resize-tl, .resize-tr, .resize-bl, .resize-br {
+    width: 8px;
+    height: 8px;
+  }
+  
+  /* Posizioni degli angoli */
+  .resize-tl { 
+    top: -4px; 
+    left: -4px; 
+    cursor: nwse-resize;
+  }
+  .resize-tr { 
+    top: -4px; 
+    right: -4px; 
+    cursor: nesw-resize;
+  }
+  .resize-bl { 
+    bottom: -4px; 
+    left: -4px; 
+    cursor: nesw-resize;
+  }
+  .resize-br { 
+    bottom: -4px; 
+    right: -4px; 
+    cursor: nwse-resize;
+  }
+  
+  /* Handle laterali (larghezza 8px, altezza 20px) */
+  .resize-left, .resize-right {
+    width: 8px;
+    height: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+  }
+  
+  .resize-left {
+    left: -4px;
+  }
+  
+  .resize-right {
+    right: -4px;
+  }

@@ -272,6 +272,14 @@ cds-fulfillment {
       z-index: 2;
     }
 
+    .panel-note {
+      position: absolute;
+      margin: 0px;
+      padding: 0px;
+      z-index: 1;
+      user-select: none;
+    }
+
   }
 
 .panel--connector--menu{
