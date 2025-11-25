@@ -67,22 +67,23 @@ export class VariableListComponent implements OnInit {
 
     this.idBot = this.dashboardService.id_faq_kb;
     this.variableListUserDefined = variableList.find(el => el.key === 'userDefined');
-    // this.logger.log('[VARIABLE-LIST] initialize--> 1', this.type_chatbot, variableList);
+    this.logger.log('[VARIABLE-LIST] initialize--> 1', this.type_chatbot, variableList);
     // if (this.variableListUserDefined && this.variableListUserDefined.elements) {
     //   this.variableListUserDefined.elements = this.variableListUserDefined.elements.filter(el => el.chatbot_types?.includes(this.type_chatbot));
     // }
 
     this.variableListGlobals = variableList.find(el => el.key === 'globals');
-    if (this.variableListGlobals && this.variableListGlobals.elements) {
-      this.variableListGlobals.elements = this.variableListGlobals.elements.filter(el => el.chatbot_types?.includes(this.type_chatbot));
-    }
+    // if (this.variableListGlobals && this.variableListGlobals.elements) {
+    //   this.variableListGlobals.elements = this.variableListGlobals.elements.filter(el => el.chatbot_types?.includes(this.type_chatbot));
+    // }
 
     this.variableListSystemDefined = variableList
-      .filter(el => (el.key !== 'userDefined' && el.key !== 'globals'))
-      .map(el => ({
-        ...el,
-        elements: el.elements.filter(elem => elem.chatbot_types?.includes(this.type_chatbot))
-      }));
+    .filter(el => (el.key !== 'userDefined' && el.key !== 'globals'))
+    .map(el => ({
+      ...el,
+      elements: el.elements.filter(elem => elem.chatbot_types?.includes(this.type_chatbot))
+    }));
+
     // this.logger.log('[VARIABLE-LIST] initialize--> 2', this.variableListSystemDefined);
 
     this.filteredVariableList = []
@@ -97,6 +98,8 @@ export class VariableListComponent implements OnInit {
     variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals')).map(el => {
       this.filteredIntentVariableList.push( { key: el.key, elements: el.elements })
     })
+
+
     // if(this.variableListSystemDefined){
     //   this.filteredIntentVariableList = this.variableListSystemDefined
     // }

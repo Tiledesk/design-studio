@@ -35,6 +35,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() intent: Intent;
   @Input() hideActionPlaceholderOfActionPanel: boolean;
   @Input() chatbotSubtype: string;
+  @Input() IS_OPEN_PANEL_INTENT_DETAIL: boolean;
   
   @Output() componentRendered = new EventEmitter<string>();
   @Output() questionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
@@ -663,6 +664,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.formSelected.emit(this.intent.form);
   }
 
+
+
   onClickControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number) {
     this.logger.log('[CDS-INTENT] onClickControl', event, action);
     if (event === 'edit') {
@@ -917,6 +920,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.showPanelActions.emit(data);
   }
 
+  onOpenIntentPanel(){
+    if(this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL){
+      this.logger.log('[CDS-INTENT] onOpenIntentPanel > open intent panel', this.intent)
+      this.openIntentPanel(this.intent);
+    }
+  }
   /** ******************************
    * intent controls options: START
    * ****************************** */

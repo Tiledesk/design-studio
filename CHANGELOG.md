@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 # this branch
+- **bug-fix**: added the "globals" variables created in the DS to the variable list
+- **changed**: open the Intent panel details by clicking on "start intent"
+- **bug-fix**: drag intent "start action"
 - **added**: added ai-modules gpt-5.1, gemini-3-pro-preview, gemini-3-pro-image-preview
 - **bug-fix**: fixed an error when searching for parameters for "voice" chatbot_type
 - **bug-fix**: changed knwoledge to knowledge 
