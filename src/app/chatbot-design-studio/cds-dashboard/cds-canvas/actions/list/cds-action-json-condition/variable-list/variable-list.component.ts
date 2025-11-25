@@ -8,6 +8,8 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 //UTILS
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { variableList, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-variables';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'variable-list',
@@ -34,6 +36,8 @@ export class VariableListComponent implements OnInit {
   isSearching: boolean = false
 
   BRAND_BASE_INFO = BRAND_BASE_INFO
+
+  private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     public dialog: MatDialog,
     private faqkbService: FaqKbService,
@@ -63,7 +67,7 @@ export class VariableListComponent implements OnInit {
 
     this.idBot = this.dashboardService.id_faq_kb;
     this.variableListUserDefined = variableList.find(el => el.key === 'userDefined');
-    
+    // this.logger.log('[VARIABLE-LIST] initialize--> 1', this.type_chatbot, variableList);
     // if (this.variableListUserDefined && this.variableListUserDefined.elements) {
     //   this.variableListUserDefined.elements = this.variableListUserDefined.elements.filter(el => el.chatbot_types?.includes(this.type_chatbot));
     // }
@@ -79,6 +83,7 @@ export class VariableListComponent implements OnInit {
         ...el,
         elements: el.elements.filter(elem => elem.chatbot_types?.includes(this.type_chatbot))
       }));
+    // this.logger.log('[VARIABLE-LIST] initialize--> 2', this.variableListSystemDefined);
 
     this.filteredVariableList = []
     this.filteredGlobalsList = []
@@ -142,17 +147,20 @@ export class VariableListComponent implements OnInit {
   }
 
   onChangeSearch(event){
+    // this.logger.log('[VARIABLE-LIST] onChangeSearch-->', event, this.textVariable);
     if(event && event.target){
       this.textVariable = event.target.value
     }else {
       this.textVariable = event
     }
+    // this.logger.log('[VARIABLE-LIST] onChangeSearch--> 1', this.textVariable, this.variableListUserDefined, this.variableListGlobals, this.variableListSystemDefined);
     this.filteredVariableList = this._filter2(this.textVariable, [this.variableListUserDefined])
     this.filteredGlobalsList = this._filter2(this.textVariable, [this.variableListGlobals])
     this.filteredIntentVariableList = this._filter2(this.textVariable, this.variableListSystemDefined)
-
+    // this.logger.log('[VARIABLE-LIST] onChangeSearch--> 2', this.filteredVariableList, this.filteredGlobalsList, this.filteredIntentVariableList);
     this.isEmpty = (this.filteredIntentVariableList.every(el => el.elements.length === 0) && this.filteredVariableList[0].elements.length === 0 ) 
     this.isSearching = (this.textVariable !== '')
+    // this.logger.log('[VARIABLE-LIST] onChangeSearch--> 3', this.isEmpty, this.isSearching);
   }
 
   private _filter(value: string, array: Array<any>): Array<any> {

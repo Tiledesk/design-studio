@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 # this branch
+- **added**: added ai-modules gpt-5.1, gemini-3-pro-preview, gemini-3-pro-image-preview
+- **bug-fix**: fixed an error when searching for parameters for "voice" chatbot_type
+- **bug-fix**: changed knwoledge to knowledge 
+
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
 
