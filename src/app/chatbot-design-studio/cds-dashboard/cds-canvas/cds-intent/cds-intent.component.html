@@ -1,6 +1,8 @@
 
 <div #resizeElement class="panel-intent-content tds_draggable"
-    (click)="onOpenIntentPanel()"
+    (mousedown)="onIntentMouseDown($event)"
+    (mousemove)="onIntentMouseMove($event)"
+    (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     [class.isStart]="isStart" 
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{
