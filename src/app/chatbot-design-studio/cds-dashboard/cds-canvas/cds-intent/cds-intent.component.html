@@ -11,10 +11,12 @@
   - Controlli per modifica/eliminazione
 -->
 <div #resizeElement class="panel-intent-content tds_draggable"
-    [class.isStart]="isStart"
+    (mousedown)="onIntentMouseDown($event)"
+    (mousemove)="onIntentMouseMove($event)"
+    (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
+    [class.isStart]="isStart" 
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="getIntentStyles()"
-    (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     role="region"
     [attr.aria-label]="'Intent: ' + intent.intent_display_name">
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>

@@ -137,6 +137,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Se il connettore è sopra un intent */
   connectorIsOverAnIntent: boolean = false;
   /** Tooltip webhook */
+  private hasMouseMoved: boolean = false;
   webHookTooltipText: string;
   /** Se l'intent è interno */
   isInternalIntent: boolean = false;
@@ -1270,12 +1271,22 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  onOpenIntentPanel(intent: Intent): void {
-    if(this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL){
-      this.logger.log('[CDS-INTENT] onOpenIntentPanel > open intent panel', intent)
+  onOpenIntentPanel(intent: Intent){
+    this.logger.log('[CDS-INTENT] onOpenIntentPanel > intent', this.intent, " con : ", intent);
+    // Only open panel if there was no mouse movement (single click, not drag)
+    if(!this.hasMouseMoved && !intent['attributesChanged'] && this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL){
       this.openIntentPanel(intent);
     }
   }
+
+  onIntentMouseDown(event: MouseEvent): void {
+    this.hasMouseMoved = false;
+  }
+
+  onIntentMouseMove(event: MouseEvent): void {
+    this.hasMouseMoved = true;
+  }
+
   /**
    * Gestisce l'evento di click per aprire il menu delle azioni
    * @param intent - L'intent per cui aprire il menu
