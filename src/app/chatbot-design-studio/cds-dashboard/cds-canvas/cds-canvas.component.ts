@@ -14,6 +14,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
+import { Note } from 'src/app/models/note-model';
 
 // UTILS //
 import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
@@ -33,14 +34,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 // const swal = require('sweetalert');
 
-// Interface per le note
-export interface Note {
-  note_id: string;
-  x: number;
-  y: number;
-  text?: string;
-  createdAt: Date;
-}
 
 @Component({
   selector: 'cds-canvas',
@@ -1530,6 +1523,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         x: pos.x,
         y: pos.y,
         text: 'Type something',
+        width: 220,
+        height: 50,
         createdAt: new Date()
       };
       

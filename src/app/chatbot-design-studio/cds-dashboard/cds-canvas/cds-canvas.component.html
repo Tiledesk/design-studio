@@ -81,11 +81,10 @@
         </cds-panel-connector-menu>
 
         <cds-notes *ngFor="let note of listOfNotes"
-        class="panel-note tds_input_block2" 
-        [note]="note"
-        [style.top.px]="note.y"
-        [style.left.px]="note.x">
-
+            class="panel-note tds_input_block2" 
+            [note]="note"
+            [style.top.px]="note.y"
+            [style.left.px]="note.x">
         </cds-notes>
     </div> 
 

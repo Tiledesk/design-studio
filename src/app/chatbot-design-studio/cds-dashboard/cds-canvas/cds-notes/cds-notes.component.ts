@@ -1,12 +1,13 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
-import { Note } from '../cds-canvas.component';
+import { Component, OnInit, Input, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
+import { Note } from 'src/app/models/note-model';
+import { StageService } from '../../../services/stage.service';
 
 @Component({
   selector: 'cds-notes',
   templateUrl: './cds-notes.component.html',
   styleUrls: ['./cds-notes.component.scss']
 })
-export class CdsNotesComponent implements OnInit, AfterViewInit {
+export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() note: Note;
   @ViewChild('noteInput', { static: false }) noteInput: ElementRef<HTMLTextAreaElement>;
   @ViewChild('contentElement', { static: false }) contentElement: ElementRef<HTMLDivElement>;
@@ -18,6 +19,12 @@ export class CdsNotesComponent implements OnInit, AfterViewInit {
 
   selected = false;
   text_disabled: boolean = false;
+  textareaHasFocus = false;
+  
+  // Getter per determinare se il drag è abilitato
+  get isDraggable(): boolean {
+    return !this.selected && !this.textareaHasFocus;
+  }
   
   // Variabili per il ridimensionamento
   private isResizing = false;
@@ -26,35 +33,90 @@ export class CdsNotesComponent implements OnInit, AfterViewInit {
   private startY = 0;
   private startWidth = 0;
   private startHeight = 0;
-  private startLeft = 0;
-  private startTop = 0;
+  private startNoteX = 0;
+  private startNoteY = 0;
+  private justFinishedResizing = false;
+  private draggedListener: EventListener | null = null;
   
-  constructor() { }
+  constructor(private stageService: StageService) { }
 
   ngOnInit(): void {
-    
+    // Imposta i valori di default per width e height se non presenti
+    if (this.note) {
+      if (!this.note.width) {
+        this.note.width = 220;
+      }
+      if (!this.note.height) {
+        this.note.height = 50;
+      }
+    }
   }
 
   ngAfterViewInit(): void {
-
-
-    // Se la nota è appena stata creata, calcola anche la larghezza per correggere la posizione
-    // const isNewNote = !this.note?.text;
-    // if (isNewNote) {
-    //     // this.autoResizeWidth();
-    //     this.note.x = this.note.x - 80;
-    //     this.note.y = this.note.y - 20;
-    // }
+    // Imposta le dimensioni iniziali del blocco basandosi su note.width e note.height
+    if (this.contentElement && this.note) {
+      const width = this.note.width || 220;
+      const height = this.note.height || 50;
+      
+      this.contentElement.nativeElement.style.width = width + 'px';
+      this.contentElement.nativeElement.style.height = height + 'px';
+      
+      // Aggiorna anche la textarea
+      if (this.noteInput) {
+        this.noteInput.nativeElement.style.width = (width - 16) + 'px';
+        this.noteInput.nativeElement.style.height = (height - 20) + 'px';
+      }
+      
+      // Imposta l'ID per il drag
+      if (this.contentElement.nativeElement) {
+        this.contentElement.nativeElement.id = this.note.note_id;
+      }
+      
+      // Inizializza il drag per questo elemento
+      this.initializeDrag();
+      
+      // Aggiungi listener per gli eventi di drag
+      this.setupDragListeners();
+    }
 
     // Imposta il focus e auto-resize iniziale
     if (this.noteInput) {
       setTimeout(() => {
         this.noteInput.nativeElement.focus();
-        // if (!this.note?.text || this.note.text === 'Type something') {
-        //   this.noteInput.nativeElement.select();
-        // }
-        // this.autoResize();
+        // Il focus imposterà textareaHasFocus = true tramite onFocusTextarea
       }, 0);
+    }
+  }
+  
+  private initializeDrag(): void {
+    // Inizializza il drag usando StageService
+    if (this.note?.note_id) {
+      // Usa un timeout per assicurarsi che l'elemento sia nel DOM
+      setTimeout(() => {
+        this.stageService.setDragElement(this.note.note_id);
+      }, 100);
+    }
+  }
+  
+  private setupDragListeners(): void {
+    // Listener per l'evento "dragged" che aggiorna la posizione della nota
+    this.draggedListener = ((e: CustomEvent) => {
+      const el = e.detail.element;
+      // Verifica che l'elemento sia questa nota
+      if (el && el.id === this.note?.note_id && this.note) {
+        // Aggiorna la posizione della nota usando offsetLeft e offsetTop (come per gli intent)
+        this.note.x = el.offsetLeft;
+        this.note.y = el.offsetTop;
+      }
+    }) as EventListener;
+    
+    document.addEventListener("dragged", this.draggedListener, false);
+  }
+  
+  ngOnDestroy(): void {
+    // Rimuovi i listener quando il componente viene distrutto
+    if (this.draggedListener) {
+      document.removeEventListener("dragged", this.draggedListener, false);
     }
   }
 
@@ -80,17 +142,29 @@ export class CdsNotesComponent implements OnInit, AfterViewInit {
     }
   }
 
+  onFocusTextarea(event: FocusEvent): void {
+    this.textareaHasFocus = true;
+    // Disabilita il drag quando la textarea ha il focus
+    this.updateDragState();
+  }
+
   onBlurTextarea(event: FocusEvent): void {
     this.text_disabled = true;
+    this.textareaHasFocus = false;
     console.log('onBlurTextarea', event);
     this.selected = false;
+    // Riabilita il drag quando la textarea perde il focus (se non è selezionata)
+    this.updateDragState();
   }
 
   onSingleClick(event: MouseEvent): void {
     event.stopPropagation();
     console.log('onSingleClick');
     this.noteInput.nativeElement.blur();
+    this.textareaHasFocus = false;
     this.selected = true;
+    // Disabilita il drag quando le maniglie sono visibili
+    this.updateDragState();
   }
 
   onDoubleClick(event: MouseEvent): void {
@@ -98,8 +172,10 @@ export class CdsNotesComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
     console.log('onDoubleClick');
     this.text_disabled = false;
+    this.selected = false;
     setTimeout(() => {
         this.noteInput.nativeElement.focus();
+        // Il focus imposterà textareaHasFocus = true tramite onFocusTextarea
       }, 100);
   }
 
@@ -107,7 +183,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
     event.preventDefault();
     
-    if (!this.contentElement) return;
+    if (!this.contentElement || !this.note) return;
     
     this.isResizing = true;
     this.resizeHandle = handle;
@@ -115,121 +191,96 @@ export class CdsNotesComponent implements OnInit, AfterViewInit {
     const rect = this.contentElement.nativeElement.getBoundingClientRect();
     this.startX = event.clientX;
     this.startY = event.clientY;
-    this.startWidth = rect.width;
-    this.startHeight = rect.height;
-    
-    // Ottieni la posizione iniziale del container (nota)
-    const container = this.container;
-    if (container) {
-      // Usa le coordinate della nota invece di getBoundingClientRect per evitare problemi con lo scroll
-      this.startLeft = this.note?.x || 0;
-      this.startTop = this.note?.y || 0;
-    } else {
-      this.startLeft = rect.left;
-      this.startTop = rect.top;
-    }
-    
-    // Previeni la selezione del testo durante il drag
-    event.preventDefault();
+    this.startWidth = this.note.width || 220;
+    this.startHeight = this.note.height || 50;
+    this.startNoteX = this.note.x || 0;
+    this.startNoteY = this.note.y || 0;
   }
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
-    if (!this.isResizing || !this.contentElement) return;
+    if (!this.isResizing || !this.contentElement || !this.note) return;
     
     const deltaX = event.clientX - this.startX;
     const deltaY = event.clientY - this.startY;
     
+    const minWidth = 50;
+    const minHeight = 50;
+    
     let newWidth = this.startWidth;
     let newHeight = this.startHeight;
-    let newLeft = this.startLeft;
-    let newTop = this.startTop;
-    
-    const minWidth = 50;
-    const minHeight = 20;
-    const aspectRatio = this.startWidth / this.startHeight;
+    let newNoteX = this.startNoteX;
+    let newNoteY = this.startNoteY;
     
     switch (this.resizeHandle) {
-      case 'tl': // Top-left: ridimensionamento proporzionale
+      case 'br': // Bottom-right: top-left fisso (posizione x,y invariata)
         {
-          const scale = Math.min(
-            (this.startWidth - deltaX) / this.startWidth,
-            (this.startHeight - deltaY) / this.startHeight
-          );
-          newWidth = Math.max(minWidth, this.startWidth * scale);
-          newHeight = Math.max(minHeight, this.startHeight * scale);
-          newLeft = this.startLeft + (this.startWidth - newWidth);
-          newTop = this.startTop + (this.startHeight - newHeight);
+          // La nuova larghezza è determinata da deltaX
+          newWidth = Math.max(minWidth, this.startWidth + deltaX);
+          // La nuova altezza è determinata da deltaY
+          newHeight = Math.max(minHeight, this.startHeight + deltaY);
+          // Posizione invariata
+          newNoteX = this.startNoteX;
+          newNoteY = this.startNoteY;
         }
         break;
         
-      case 'tr': // Top-right: ridimensionamento proporzionale
+      case 'tr': // Top-right: bottom-left fisso (bl rimane invariato)
         {
-          const scale = Math.min(
-            (this.startWidth + deltaX) / this.startWidth,
-            (this.startHeight - deltaY) / this.startHeight
-          );
-          newWidth = Math.max(minWidth, this.startWidth * scale);
-          newHeight = Math.max(minHeight, this.startHeight * scale);
-          newTop = this.startTop + (this.startHeight - newHeight);
+          // La nuova larghezza è determinata da deltaX
+          newWidth = Math.max(minWidth, this.startWidth + deltaX);
+          // La nuova altezza è determinata da deltaY (negativo perché si muove verso l'alto)
+          newHeight = Math.max(minHeight, this.startHeight - deltaY);
+          // Per mantenere bl fisso:
+          // - bl.x = note.x (rimane uguale perché bl è all'angolo sinistro)
+          // - bl.y = note.y + note.height (deve rimanere uguale)
+          // Quindi: newY = startY - (newHeight - startHeight)
+          newNoteX = this.startNoteX; // x rimane uguale
+          newNoteY = this.startNoteY - (newHeight - this.startHeight); // y si sposta per mantenere bl.y fisso
         }
         break;
         
-      case 'bl': // Bottom-left: ridimensionamento proporzionale
+      case 'bl': // Bottom-left: top-right fisso (tr rimane invariato)
         {
-          const scale = Math.min(
-            (this.startWidth - deltaX) / this.startWidth,
-            (this.startHeight + deltaY) / this.startHeight
-          );
-          newWidth = Math.max(minWidth, this.startWidth * scale);
-          newHeight = Math.max(minHeight, this.startHeight * scale);
-          newLeft = this.startLeft + (this.startWidth - newWidth);
+          // La nuova larghezza è determinata da deltaX (negativo perché si muove verso sinistra)
+          newWidth = Math.max(minWidth, this.startWidth - deltaX);
+          // La nuova altezza è determinata da deltaY
+          newHeight = Math.max(minHeight, this.startHeight + deltaY);
+          // Per mantenere tr fisso:
+          // - tr.x = note.x + note.width (deve rimanere uguale)
+          // - tr.y = note.y (deve rimanere uguale)
+          // Quindi: newX = startX - (newWidth - startWidth)
+          newNoteX = this.startNoteX - (newWidth - this.startWidth); // x si sposta per mantenere tr.x fisso
+          newNoteY = this.startNoteY; // y rimane uguale
         }
         break;
         
-      case 'br': // Bottom-right: ridimensionamento proporzionale
+      case 'tl': // Top-left: bottom-right fisso (br rimane invariato)
         {
-          const scale = Math.min(
-            (this.startWidth + deltaX) / this.startWidth,
-            (this.startHeight + deltaY) / this.startHeight
-          );
-          newWidth = Math.max(minWidth, this.startWidth * scale);
-          newHeight = Math.max(minHeight, this.startHeight * scale);
+          // La nuova larghezza è determinata da deltaX (negativo perché si muove verso sinistra)
+          newWidth = Math.max(minWidth, this.startWidth - deltaX);
+          // La nuova altezza è determinata da deltaY (negativo perché si muove verso l'alto)
+          newHeight = Math.max(minHeight, this.startHeight - deltaY);
+          // Per mantenere br fisso:
+          // - br.x = note.x + note.width (deve rimanere uguale)
+          // - br.y = note.y + note.height (deve rimanere uguale)
+          // Quindi: newX = startX - (newWidth - startWidth)
+          //         newY = startY - (newHeight - startHeight)
+          newNoteX = this.startNoteX - (newWidth - this.startWidth); // x si sposta per mantenere br.x fisso
+          newNoteY = this.startNoteY - (newHeight - this.startHeight); // y si sposta per mantenere br.y fisso
         }
-        break;
-        
-      case 'left': // Lato sinistro: solo larghezza
-        newWidth = Math.max(minWidth, this.startWidth - deltaX);
-        newLeft = this.startLeft + (this.startWidth - newWidth);
-        break;
-        
-      case 'right': // Lato destro: solo larghezza
-        newWidth = Math.max(minWidth, this.startWidth + deltaX);
         break;
     }
     
-    // Applica le nuove dimensioni
+    // Aggiorna le dimensioni e la posizione della nota
+    this.note.width = newWidth;
+    this.note.height = newHeight;
+    this.note.x = newNoteX;
+    this.note.y = newNoteY;
+    
+    // Applica le nuove dimensioni al contentElement
     this.contentElement.nativeElement.style.width = newWidth + 'px';
     this.contentElement.nativeElement.style.height = newHeight + 'px';
-    
-    // Aggiorna la posizione del container se necessario
-    const container = this.container;
-    
-    if (container && this.note) {
-      // Calcola la differenza di posizione in pixel
-      const deltaLeft = newLeft - this.startLeft;
-      const deltaTop = newTop - this.startTop;
-      
-      // Aggiorna la posizione della nota se si ridimensiona da sinistra o dall'alto
-      if (this.resizeHandle.includes('l')) {
-        this.note.x = this.startLeft + deltaLeft;
-        container.style.left = this.note.x + 'px';
-      }
-      if (this.resizeHandle.includes('t')) {
-        this.note.y = this.startTop + deltaTop;
-        container.style.top = this.note.y + 'px';
-      }
-    }
     
     // Aggiorna le dimensioni della textarea (sottrai padding: 10px top/bottom, 8px left/right)
     if (this.noteInput) {
@@ -243,60 +294,51 @@ export class CdsNotesComponent implements OnInit, AfterViewInit {
     if (this.isResizing) {
       this.isResizing = false;
       this.resizeHandle = '';
+      // Mantieni la nota selezionata dopo il ridimensionamento
+      this.selected = true;
+      // Imposta un flag per prevenire la deselezione immediata
+      this.justFinishedResizing = true;
+      // Reset del flag dopo un breve delay per permettere all'evento click di essere ignorato
+      setTimeout(() => {
+        this.justFinishedResizing = false;
+      }, 100);
     }
   }
-//   private autoResizeWidth(): void {
-//     if (this.noteInput) {
-//       const textarea = this.noteInput.nativeElement;
-//       // Reset width per calcolare correttamente
-//       textarea.style.width = 'auto';
-      
-//       // Crea un elemento temporaneo per misurare la larghezza del testo
-//       const measureElement = document.createElement('span');
-//       const styles = window.getComputedStyle(textarea);
-      
-//       // Copia gli stili rilevanti per la misurazione
-//       measureElement.style.visibility = 'hidden';
-//       measureElement.style.position = 'absolute';
-//       measureElement.style.whiteSpace = 'pre-wrap';
-//       measureElement.style.wordWrap = 'break-word';
-//       measureElement.style.font = styles.font;
-//       measureElement.style.fontSize = styles.fontSize;
-//       measureElement.style.fontFamily = styles.fontFamily;
-//       measureElement.style.fontWeight = styles.fontWeight;
-//       measureElement.style.lineHeight = styles.lineHeight;
-//       measureElement.style.padding = styles.padding;
-//       measureElement.style.border = styles.border;
-//       measureElement.style.boxSizing = styles.boxSizing;
-      
-//       // Imposta il contenuto (considera anche il valore di default)
-//       const text = textarea.value || 'Type something';
-//       measureElement.textContent = text;
-      
-//       // Aggiungi al DOM temporaneamente
-//       document.body.appendChild(measureElement);
-      
-//       // Calcola la larghezza necessaria
-//       // Per una textarea, dobbiamo considerare la larghezza della riga più lunga
-//       const lines = text.split('\n');
-//       let maxWidth = 0;
-      
-//       lines.forEach(line => {
-//         measureElement.textContent = line || ' '; // Usa spazio se la riga è vuota
-//         const width = measureElement.offsetWidth;
-//         if (width > maxWidth) {
-//           maxWidth = width;
-//         }
-//       });
-      
-//       // Rimuovi l'elemento temporaneo
-//       document.body.removeChild(measureElement);
-      
-//       // Imposta la larghezza con un minimo di 50px
-//       const minWidth = 50;
-//       textarea.style.width = Math.max(maxWidth, minWidth) + 'px';
-//     }
-//   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Non deselezionare se si sta facendo il ridimensionamento o si è appena finito
+    if (this.isResizing || this.justFinishedResizing) {
+      return;
+    }
+    
+    // Se la nota è selezionata e si clicca fuori dal componente, deseleziona
+    if (this.selected && this.contentElement) {
+      const target = event.target as HTMLElement;
+      const clickedInside = this.contentElement.nativeElement.contains(target);
+      
+      // Non deselezionare se si clicca su una maniglia
+      const clickedOnHandle = target.classList.contains('resize-handle');
+      
+      if (!clickedInside && !clickedOnHandle) {
+        this.selected = false;
+        this.textareaHasFocus = false;
+        // Ri-inizializza il drag quando la selezione cambia (per riattivare il drag quando selected = false e textarea non ha focus)
+        this.updateDragState();
+      }
+    }
+  }
+  
+  private updateDragState(): void {
+    // Ri-inizializza il drag quando lo stato cambia
+    if (this.note?.note_id) {
+      setTimeout(() => {
+        // Abilita il drag solo se: !selected && !textareaHasFocus
+        if (this.isDraggable) {
+          this.stageService.setDragElement(this.note.note_id);
+        }
+      }, 50);
+    }
+  }
 }
 

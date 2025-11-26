@@ -1,36 +1,34 @@
-<div class="container">
-    <div class="cds-notes-content"
-        #contentElement
-        [class.selected]="selected">
-        <textarea 
-            #noteInput
-            class="note-input"
-            [value]="note?.text"
-            (input)="onInputChange($event)"
-            (blur)="onBlurTextarea($event)"
-            rows="1"></textarea>
 
-        <div
-            *ngIf="text_disabled"
-            class="note-input-button" 
-            (click)="onSingleClick($event)"
-            (dblclick)="onDoubleClick($event)">
-        </div>
+<div class="cds-notes-content"
+    #contentElement
+    [class.selected]="selected"
+    [class.tds_draggable]="isDraggable"
+    [id]="note?.note_id">
+    <textarea 
+        #noteInput
+        class="note-input"
+        [value]="note?.text"
+        (input)="onInputChange($event)"
+        (focus)="onFocusTextarea($event)"
+        (blur)="onBlurTextarea($event)"
+        rows="1"></textarea>
 
-        <!-- Handle angoli per ridimensionamento proporzionale -->
-        <div class="resize-handle resize-tl" 
-            (mousedown)="startResize($event, 'tl')"></div>
-        <div class="resize-handle resize-tr" 
-            (mousedown)="startResize($event, 'tr')"></div>
-        <div class="resize-handle resize-bl" 
-            (mousedown)="startResize($event, 'bl')"></div>
-        <div class="resize-handle resize-br" 
-            (mousedown)="startResize($event, 'br')"></div>
-        
-        <!-- Handle laterali per modificare solo la larghezza -->
-        <div class="resize-handle resize-left" 
-            (mousedown)="startResize($event, 'left')"></div>
-        <div class="resize-handle resize-right" 
-            (mousedown)="startResize($event, 'right')"></div>
+    <div
+        *ngIf="text_disabled"
+        class="note-resize" 
+        (click)="onSingleClick($event)"
+        (dblclick)="onDoubleClick($event)">
     </div>
+
+    <!-- Handle angoli per ridimensionamento -->
+    <div class="resize-handle resize-tl" 
+        (mousedown)="startResize($event, 'tl')"></div>
+    <div class="resize-handle resize-tr" 
+        (mousedown)="startResize($event, 'tr')"></div>
+    <div class="resize-handle resize-bl" 
+        (mousedown)="startResize($event, 'bl')"></div>
+    <div class="resize-handle resize-br" 
+        (mousedown)="startResize($event, 'br')"></div>
+
 </div>
+

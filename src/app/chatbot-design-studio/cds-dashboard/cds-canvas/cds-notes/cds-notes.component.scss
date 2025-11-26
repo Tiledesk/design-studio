@@ -1,15 +1,21 @@
-.container {
-    position: relative;
-}
 
 .cds-notes-content {
-    width: max-content;
     min-width: 50px;
-    min-height: 20px;
+    min-height: 50px;
     background-color: #00ffa6; // Giallo chiaro per le note
     padding: 10px 8px;
     position: relative;
     box-sizing: border-box;
+    
+    // Cursor pointer quando è draggable
+    &.tds_draggable {
+        cursor: move;
+        cursor: grab;
+        
+        &:active {
+            cursor: grabbing;
+        }
+    }
 }
 
 
@@ -36,7 +42,7 @@
     z-index: 0;
 }
 
-.note-input-button {
+.note-resize {
     position: absolute;
     right: 0;
     top: 0;
@@ -90,19 +96,3 @@
     cursor: nwse-resize;
   }
   
-  /* Handle laterali (larghezza 8px, altezza 20px) */
-  .resize-left, .resize-right {
-    width: 8px;
-    height: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: ew-resize;
-  }
-  
-  .resize-left {
-    left: -4px;
-  }
-  
-  .resize-right {
-    right: -4px;
-  }
