@@ -20,6 +20,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   selected = false;
   text_disabled: boolean = false;
   textareaHasFocus = false;
+  dragged = false;
   
   // Getter per determinare se il drag è abilitato
   get isDraggable(): boolean {
@@ -37,6 +38,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   private startNoteY = 0;
   private justFinishedResizing = false;
   private draggedListener: EventListener | null = null;
+  private draggingListener: EventListener | null = null;
   
   constructor(private stageService: StageService) { }
 
@@ -72,11 +74,9 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.contentElement.nativeElement.id = this.note.note_id;
       }
       
-      // Inizializza il drag per questo elemento
-      this.initializeDrag();
-      
       // Aggiungi listener per gli eventi di drag
-      this.setupDragListeners();
+      this.setupDragEndListener();
+      this.setupDraggingListener();
     }
 
     // Imposta il focus e auto-resize iniziale
@@ -88,35 +88,45 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
   
-  private initializeDrag(): void {
-    // Inizializza il drag usando StageService
-    if (this.note?.note_id) {
-      // Usa un timeout per assicurarsi che l'elemento sia nel DOM
-      setTimeout(() => {
-        this.stageService.setDragElement(this.note.note_id);
-      }, 100);
-    }
-  }
-  
-  private setupDragListeners(): void {
-    // Listener per l'evento "dragged" che aggiorna la posizione della nota
-    this.draggedListener = ((e: CustomEvent) => {
+  private setupDraggingListener(): void {
+    // Listener per l'evento "dragged" che intercetta il dragging
+    this.draggingListener = ((e: CustomEvent) => {
       const el = e.detail.element;
       // Verifica che l'elemento sia questa nota
-      if (el && el.id === this.note?.note_id && this.note) {
-        // Aggiorna la posizione della nota usando offsetLeft e offsetTop (come per gli intent)
-        this.note.x = el.offsetLeft;
-        this.note.y = el.offsetTop;
+      if (el && el.id === this.note?.note_id) {
+        this.dragged = true;
+        console.log('DRAGGING');
       }
     }) as EventListener;
     
-    document.addEventListener("dragged", this.draggedListener, false);
+    document.addEventListener("dragged", this.draggingListener, false);
+  }
+  
+  private setupDragEndListener(): void {
+    // Listener per l'evento "end-dragging" che intercetta la fine del drag
+    this.draggedListener = ((e: CustomEvent) => {
+      const el = e.detail.element;
+      // Verifica che l'elemento sia questa nota
+      if (el && el.id === this.note?.note_id) {
+        console.log('[CDS-NOTES] end-dragging - Note ID:', this.note.note_id);
+        console.log('[CDS-NOTES] end-dragging - Element:', el);
+        console.log('[CDS-NOTES] end-dragging - Position:', {
+          x: this.note.x,
+          y: this.note.y
+        });
+      }
+    }) as EventListener;
+    
+    document.addEventListener("end-dragging", this.draggedListener, false);
   }
   
   ngOnDestroy(): void {
     // Rimuovi i listener quando il componente viene distrutto
+    if (this.draggingListener) {
+      document.removeEventListener("dragged", this.draggingListener, false);
+    }
     if (this.draggedListener) {
-      document.removeEventListener("dragged", this.draggedListener, false);
+      document.removeEventListener("end-dragging", this.draggedListener, false);
     }
   }
 
@@ -162,7 +172,11 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('onSingleClick');
     this.noteInput.nativeElement.blur();
     this.textareaHasFocus = false;
+    // Al singolo click visualizza le maniglie
+    if(!this.dragged) {
     this.selected = true;
+    }
+    this.dragged = false;
     // Disabilita il drag quando le maniglie sono visibili
     this.updateDragState();
   }
@@ -171,8 +185,10 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Previeni la propagazione dell'evento per evitare conflitti
     event.stopPropagation();
     console.log('onDoubleClick');
+    // Al doppio click nascondo il div note-resize e metto il focus sulla textarea
     this.text_disabled = false;
     this.selected = false;
+    this.textareaHasFocus = false;
     setTimeout(() => {
         this.noteInput.nativeElement.focus();
         // Il focus imposterà textareaHasFocus = true tramite onFocusTextarea
@@ -335,9 +351,30 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       setTimeout(() => {
         // Abilita il drag solo se: !selected && !textareaHasFocus
         if (this.isDraggable) {
+          // Inizializza il drag sull'elemento principale
           this.stageService.setDragElement(this.note.note_id);
+          
+          // Inizializza anche l'overlay se presente
+          const overlay = this.contentElement?.nativeElement?.querySelector('.notes-background-overlay');
+          if (overlay) {
+            // L'overlay ha già la classe tds_draggable, ma dobbiamo assicurarci che il drag funzioni
+            // Il sistema JavaScript dovrebbe gestirlo automaticamente se l'elemento principale ha il drag inizializzato
+          }
         }
       }, 50);
+    }
+  }
+  
+  ngAfterViewChecked(): void {
+    // Ri-inizializza il drag quando la classe cambia (dopo che Angular ha aggiornato il DOM)
+    if (this.isDraggable && this.note?.note_id) {
+      // Usa un timeout per assicurarsi che il DOM sia aggiornato
+      setTimeout(() => {
+        const element = document.getElementById(this.note.note_id);
+        if (element && element.classList.contains('tds_draggable')) {
+          this.stageService.setDragElement(this.note.note_id);
+        }
+      }, 0);
     }
   }
 }

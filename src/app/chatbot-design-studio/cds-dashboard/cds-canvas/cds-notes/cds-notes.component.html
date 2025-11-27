@@ -1,12 +1,14 @@
 
-<div class="cds-notes-content"
+<div 
+class="panel-intent-content cds-notes-content"
     #contentElement
     [class.selected]="selected"
-    [class.tds_draggable]="isDraggable"
     [id]="note?.note_id">
+    
     <textarea 
         #noteInput
         class="note-input"
+        [class.tds_draggable]="isDraggable"
         [value]="note?.text"
         (input)="onInputChange($event)"
         (focus)="onFocusTextarea($event)"
@@ -16,6 +18,7 @@
     <div
         *ngIf="text_disabled"
         class="note-resize" 
+        [class.tds_draggable]="isDraggable"
         (click)="onSingleClick($event)"
         (dblclick)="onDoubleClick($event)">
     </div>

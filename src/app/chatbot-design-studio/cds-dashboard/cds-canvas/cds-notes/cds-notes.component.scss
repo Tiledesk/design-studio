@@ -1,21 +1,11 @@
 
 .cds-notes-content {
-    min-width: 50px;
-    min-height: 50px;
-    background-color: #00ffa6; // Giallo chiaro per le note
-    padding: 10px 8px;
-    position: relative;
-    box-sizing: border-box;
-    
-    // Cursor pointer quando è draggable
-    &.tds_draggable {
-        cursor: move;
-        cursor: grab;
-        
-        &:active {
-            cursor: grabbing;
-        }
-    }
+  min-width: 50px;
+  min-height: 50px;
+  background-color: #00ffa6; // Giallo chiaro per le note
+  padding: 10px 8px;
+  position: relative;
+  box-sizing: border-box;
 }
 
 
@@ -39,7 +29,16 @@
     box-sizing: border-box;
     white-space: pre-wrap; // Mantiene gli spazi e permette il wrap
     word-wrap: break-word; // Permette il wrap delle parole lunghe
-    z-index: 0;
+    z-index: 1;
+    position: relative;
+    // Cursor pointer quando è draggable
+    &.tds_draggable {
+      cursor: move;
+      cursor: grab;
+      &:active {
+          cursor: grabbing;
+      }
+  }
 }
 
 .note-resize {
@@ -49,7 +48,31 @@
     left: 0;
     bottom: 0;
     background-color: transparent;
+    z-index: 2;
+    // Cursor pointer quando è draggable
+    &.tds_draggable {
+      cursor: move;
+      cursor: grab;
+      &:active {
+          cursor: grabbing;
+      }
+  }
+}
+
+.notes-background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
     z-index: 1;
+    pointer-events: auto;
+    cursor: grab;
+    
+    &:active {
+        cursor: grabbing;
+    }
 }
 
 /* Handle invisibili di default */

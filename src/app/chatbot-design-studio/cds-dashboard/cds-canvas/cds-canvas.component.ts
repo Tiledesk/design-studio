@@ -745,18 +745,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.listnerEndDragging = (e: CustomEvent) => {
       const el = e.detail.element;
       this.logger.log('[CDS-CANVAS] end-dragging ', el);
-      // // el.style.zIndex = 1;
-      this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected.attributes.position);
+      this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected?.attributes?.position);
       this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
       // Verifica se la posizione è cambiata (drag effettivo)
-      const pos = this.intentService.intentSelected.attributes.position;
-      const dragged = !this.startDraggingPosition ||
-        (pos && (pos.x !== this.startDraggingPosition.x || pos.y !== this.startDraggingPosition.y));
-      this.closeAllPanels();
-      this.intentService.updateIntentSelected();
-      if (!dragged) {
-        this.openWebhookIntentPanel(this.intentService.intentSelected);
-      }
+      if(this.intentService.intentSelected){
+        const pos = this.intentService.intentSelected.attributes.position;
+        const dragged = !this.startDraggingPosition ||
+          (pos && (pos.x !== this.startDraggingPosition.x || pos.y !== this.startDraggingPosition.y));
+        this.closeAllPanels();
+        this.intentService.updateIntentSelected();
+        if (!dragged) {
+          this.openWebhookIntentPanel(this.intentService.intentSelected);
+        }
+      } 
     };
     document.addEventListener("end-dragging", this.listnerEndDragging, false);
 
