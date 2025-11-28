@@ -10,6 +10,7 @@ import { StageService } from '../../services/stage.service';
 import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { NoteService } from 'src/app/services/note.service';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
@@ -179,6 +180,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public appStorageService: AppStorageService,
     public logService: LogService,
     public webhookService: WebhookService,
+    private readonly noteService: NoteService,
     
   ) {
     this.setSubscriptions();
@@ -612,6 +614,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // set subtype chatbot
     // ---------------------------------------
     this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+
+
+    // ---------------------------------------
+    // set listOfNotes load from localStorage
+    // ---------------------------------------
+    this.listOfNotes = this.noteService.getNotes(this.id_faq_kb);
+    //this.logger.log("[CDS-CANVAS]  •••• listOfNotes ••••", this.listOfNotes);
   }
 
 
@@ -718,6 +727,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     /** start-dragging */
     this.listnerStartDragging = (e: CustomEvent) => {
       const el = e.detail.element;
+      // se nella classe list esiste 'cds-note' allora è una nota
+      if (el.classList.contains('cds-note')) {
+        // this.logger.log('[CDS-CANVAS] start-dragging nota ', el);
+        return;
+      }
       this.logger.log('[CDS-CANVAS] start-dragging ', el);
       this.removeConnectorDraftAndCloseFloatMenu();
       this.intentService.setIntentSelectedById(el.id);
@@ -734,6 +748,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     */
     this.listnerDragged = (e: CustomEvent) => {
       const el = e.detail.element;
+      if (el.classList.contains('cds-note')) {
+        // this.logger.log('[CDS-CANVAS] dragged nota ', el);
+        return;
+      }
       const x = e.detail.x;
       const y = e.detail.y;
       this.connectorService.moved(el, x, y);
@@ -744,6 +762,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     /** end-dragging */
     this.listnerEndDragging = (e: CustomEvent) => {
       const el = e.detail.element;
+      if (el.classList.contains('cds-note')) {
+        // this.logger.log('[CDS-CANVAS] end-dragging nota ', el);
+        return;
+      }
       this.logger.log('[CDS-CANVAS] end-dragging ', el);
       this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected?.attributes?.position);
       this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
@@ -1515,22 +1537,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       
       // Calcoliamo la posizione usando la stessa logica di onDroppedElementToStage
       let pos = this.connectorService.tiledeskConnectors.logicPoint({ x: event.clientX, y: event.clientY });
-      // pos.x = pos.x - 80;
-      // pos.y = pos.y - 20;
-      
+    
       // Creiamo una nuova nota
-      const newNote: Note = {
-        note_id: uuidv4(),
-        x: pos.x,
-        y: pos.y,
-        text: 'Type something',
-        width: 220,
-        height: 50,
-        createdAt: new Date()
-      };
+      const newNote = new Note(this.id_faq_kb, pos);
       
       // Aggiungiamo la nota all'array
       this.listOfNotes.push(newNote);
+      
+      // Salva la nota nel localStorage con chiave specifica per il chatbot
+      this.noteService.saveNote(newNote, this.id_faq_kb);
       
       this.logger.log("[CDS-CANVAS] Note created at position:", pos, "Total notes:", this.listOfNotes.length);
       

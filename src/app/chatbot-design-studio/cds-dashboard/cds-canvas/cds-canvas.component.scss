@@ -272,11 +272,11 @@ cds-fulfillment {
       z-index: 2;
     }
 
-    .panel-note {
+    .cds-note {
       position: absolute;
       margin: 0px;
       padding: 0px;
-      z-index: 1;
+      z-index: 0;
       user-select: none;
     }
 

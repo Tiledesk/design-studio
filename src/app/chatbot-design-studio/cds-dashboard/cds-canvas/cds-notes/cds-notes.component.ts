@@ -10,21 +10,26 @@ import { StageService } from '../../../services/stage.service';
 export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() note: Note;
   @ViewChild('noteInput', { static: false }) noteInput: ElementRef<HTMLTextAreaElement>;
-  @ViewChild('contentElement', { static: false }) contentElement: ElementRef<HTMLDivElement>;
-  
-  // Riferimento al container (ottenuto tramite parentElement)
-  private get container(): HTMLElement | null {
-    return this.contentElement?.nativeElement?.closest('.container') as HTMLElement || null;
-  }
+  @ViewChild('noteContentElement', { static: false }) contentElement: ElementRef<HTMLDivElement>;
+  @ViewChild('noteResize', { static: false }) noteResize: ElementRef<HTMLDivElement>;
 
-  selected = false;
+
+  // selected = false;
   text_disabled: boolean = false;
   textareaHasFocus = false;
-  dragged = false;
+  dragged = false;  
+
+  stateNote: 0|1|2|3 = 0; // 0: normal, 1: text focus, 2: resizing, 3: dropping
   
   // Getter per determinare se il drag è abilitato
   get isDraggable(): boolean {
-    return !this.selected && !this.textareaHasFocus;
+    return this.stateNote !== 1 && !this.textareaHasFocus;
+  }
+  
+  // Funzione per cambiare lo stato della nota
+  changeState(state: 0|1|2): void {
+    this.stateNote = state;
+    console.log('[CDS-NOTES] State changed to:', state);
   }
   
   // Variabili per il ridimensionamento
@@ -42,49 +47,20 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   
   constructor(private stageService: StageService) { }
 
-  ngOnInit(): void {
-    // Imposta i valori di default per width e height se non presenti
-    if (this.note) {
-      if (!this.note.width) {
-        this.note.width = 220;
-      }
-      if (!this.note.height) {
-        this.note.height = 50;
-      }
-    }
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     // Imposta le dimensioni iniziali del blocco basandosi su note.width e note.height
     if (this.contentElement && this.note) {
       const width = this.note.width || 220;
       const height = this.note.height || 50;
-      
       this.contentElement.nativeElement.style.width = width + 'px';
       this.contentElement.nativeElement.style.height = height + 'px';
-      
-      // Aggiorna anche la textarea
-      if (this.noteInput) {
-        this.noteInput.nativeElement.style.width = (width - 16) + 'px';
-        this.noteInput.nativeElement.style.height = (height - 20) + 'px';
-      }
-      
-      // Imposta l'ID per il drag
-      if (this.contentElement.nativeElement) {
-        this.contentElement.nativeElement.id = this.note.note_id;
-      }
-      
       // Aggiungi listener per gli eventi di drag
       this.setupDragEndListener();
       this.setupDraggingListener();
-    }
-
-    // Imposta il focus e auto-resize iniziale
-    if (this.noteInput) {
-      setTimeout(() => {
-        this.noteInput.nativeElement.focus();
-        // Il focus imposterà textareaHasFocus = true tramite onFocusTextarea
-      }, 0);
+      // Inizializza il drag dopo che la vista è stata inizializzata
+      this.updateDragState();
     }
   }
   
@@ -98,7 +74,6 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log('DRAGGING');
       }
     }) as EventListener;
-    
     document.addEventListener("dragged", this.draggingListener, false);
   }
   
@@ -110,14 +85,42 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       if (el && el.id === this.note?.note_id) {
         console.log('[CDS-NOTES] end-dragging - Note ID:', this.note.note_id);
         console.log('[CDS-NOTES] end-dragging - Element:', el);
-        console.log('[CDS-NOTES] end-dragging - Position:', {
-          x: this.note.x,
-          y: this.note.y
-        });
+        
+        // Ricalcola e sincronizza le dimensioni e le posizioni dopo il drag
+        this.recalculateNoteDimensionsAndPosition(el);
       }
     }) as EventListener;
-    
     document.addEventListener("end-dragging", this.draggedListener, false);
+  }
+  
+  /**
+   * Ricalcola le dimensioni e le posizioni della nota basandosi sulle posizioni CSS finali
+   * Questo è importante per le operazioni di resize successive
+   */
+  private recalculateNoteDimensionsAndPosition(element: HTMLElement): void {
+    if (!this.note || !this.contentElement) return;
+    
+    // Leggi le posizioni CSS finali dopo il drag
+    const computedStyle = window.getComputedStyle(element);
+    const left = parseFloat(computedStyle.left) || parseFloat(element.style.left) || element.offsetLeft || 0;
+    const top = parseFloat(computedStyle.top) || parseFloat(element.style.top) || element.offsetTop || 0;
+    
+    // Leggi le dimensioni CSS finali
+    const width = parseFloat(computedStyle.width) || parseFloat(element.style.width) || element.offsetWidth || this.note.width || 220;
+    const height = parseFloat(computedStyle.height) || parseFloat(element.style.height) || element.offsetHeight || this.note.height || 50;
+    
+    // Aggiorna il modello della nota con le posizioni e dimensioni correnti
+    this.note.x = left;
+    this.note.y = top;
+    this.note.width = width;
+    this.note.height = height;
+    
+    console.log('[CDS-NOTES] Recalculated note dimensions and position:', {
+      x: this.note.x,
+      y: this.note.y,
+      width: this.note.width,
+      height: this.note.height
+    });
   }
   
   ngOnDestroy(): void {
@@ -135,25 +138,12 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.note) {
       this.note.text = textarea.value;
     }
-    this.autoResize();
-  }
-
-  private autoResize(): void {
-    if (this.noteInput) {
-      const textarea = this.noteInput.nativeElement;
-      // Reset height per calcolare correttamente scrollHeight
-      textarea.style.height = 'auto';
-      // Imposta l'altezza basata sul contenuto, rispettando min e max
-      const scrollHeight = textarea.scrollHeight;
-      textarea.style.height = scrollHeight + 'px';
-      
-      // Auto-resize width
-      // this.autoResizeWidth();
-    }
   }
 
   onFocusTextarea(event: FocusEvent): void {
     this.textareaHasFocus = true;
+    // Cambia lo stato a 1 quando la textarea prende il focus
+    this.changeState(1);
     // Disabilita il drag quando la textarea ha il focus
     this.updateDragState();
   }
@@ -162,21 +152,35 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.text_disabled = true;
     this.textareaHasFocus = false;
     console.log('onBlurTextarea', event);
-    this.selected = false;
+    this.stateNote = 0;
     // Riabilita il drag quando la textarea perde il focus (se non è selezionata)
     this.updateDragState();
   }
 
+  onNoteResizeMouseDown(event: MouseEvent): void {
+    // Se il drag è abilitato, permettere all'evento di propagarsi al contenitore principale
+    // per permettere al sistema di drag di funzionare
+    if (this.isDraggable) {
+      // Non chiamare preventDefault o stopPropagation per permettere al drag di funzionare
+      // L'evento verrà gestito dal sistema di drag sul contenitore principale
+      return;
+    }
+    // Se il drag non è abilitato, prevenire il comportamento di default
+    event.preventDefault();
+  }
+
   onSingleClick(event: MouseEvent): void {
+    // Se si è fatto drag, non gestire il click
+    if (this.dragged) {
+      this.dragged = false;
+      return;
+    }
     event.stopPropagation();
     console.log('onSingleClick');
     this.noteInput.nativeElement.blur();
     this.textareaHasFocus = false;
     // Al singolo click visualizza le maniglie
-    if(!this.dragged) {
-    this.selected = true;
-    }
-    this.dragged = false;
+    this.stateNote = 1;
     // Disabilita il drag quando le maniglie sono visibili
     this.updateDragState();
   }
@@ -187,7 +191,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('onDoubleClick');
     // Al doppio click nascondo il div note-resize e metto il focus sulla textarea
     this.text_disabled = false;
-    this.selected = false;
+    this.stateNote = 1;
     this.textareaHasFocus = false;
     setTimeout(() => {
         this.noteInput.nativeElement.focus();
@@ -195,15 +199,16 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       }, 100);
   }
 
+
+
+  // mouse DOWN = start resize!!
   startResize(event: MouseEvent, handle: string): void {
+    console.log('-----> startResize', event, handle);
     event.stopPropagation();
     event.preventDefault();
-    
     if (!this.contentElement || !this.note) return;
-    
     this.isResizing = true;
     this.resizeHandle = handle;
-    
     const rect = this.contentElement.nativeElement.getBoundingClientRect();
     this.startX = event.clientX;
     this.startY = event.clientY;
@@ -211,23 +216,22 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.startHeight = this.note.height || 50;
     this.startNoteX = this.note.x || 0;
     this.startNoteY = this.note.y || 0;
+    this.changeState(2);
   }
 
+
+  // mouse MOVE = resize!!
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
     if (!this.isResizing || !this.contentElement || !this.note) return;
-    
     const deltaX = event.clientX - this.startX;
     const deltaY = event.clientY - this.startY;
-    
     const minWidth = 50;
     const minHeight = 50;
-    
     let newWidth = this.startWidth;
     let newHeight = this.startHeight;
     let newNoteX = this.startNoteX;
     let newNoteY = this.startNoteY;
-    
     switch (this.resizeHandle) {
       case 'br': // Bottom-right: top-left fisso (posizione x,y invariata)
         {
@@ -305,13 +309,14 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // mouse UP = end resize!!
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
     if (this.isResizing) {
       this.isResizing = false;
       this.resizeHandle = '';
       // Mantieni la nota selezionata dopo il ridimensionamento
-      this.selected = true;
+      this.stateNote = 0;
       // Imposta un flag per prevenire la deselezione immediata
       this.justFinishedResizing = true;
       // Reset del flag dopo un breve delay per permettere all'evento click di essere ignorato
@@ -321,6 +326,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // mouse CLICK = end select!!
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     // Non deselezionare se si sta facendo il ridimensionamento o si è appena finito
@@ -329,7 +335,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     
     // Se la nota è selezionata e si clicca fuori dal componente, deseleziona
-    if (this.selected && this.contentElement) {
+    if (this.stateNote === 1 && this.contentElement) {
       const target = event.target as HTMLElement;
       const clickedInside = this.contentElement.nativeElement.contains(target);
       
@@ -337,7 +343,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       const clickedOnHandle = target.classList.contains('resize-handle');
       
       if (!clickedInside && !clickedOnHandle) {
-        this.selected = false;
+        this.stateNote = 0;
         this.textareaHasFocus = false;
         // Ri-inizializza il drag quando la selezione cambia (per riattivare il drag quando selected = false e textarea non ha focus)
         this.updateDragState();
@@ -351,31 +357,14 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       setTimeout(() => {
         // Abilita il drag solo se: !selected && !textareaHasFocus
         if (this.isDraggable) {
-          // Inizializza il drag sull'elemento principale
+          // Inizializza il drag sull'elemento principale (contenitore)
+          // Il drag funzionerà anche quando si clicca sul div note-resize perché
+          // il sistema controlla se event.target ha la classe tds_draggable
           this.stageService.setDragElement(this.note.note_id);
-          
-          // Inizializza anche l'overlay se presente
-          const overlay = this.contentElement?.nativeElement?.querySelector('.notes-background-overlay');
-          if (overlay) {
-            // L'overlay ha già la classe tds_draggable, ma dobbiamo assicurarci che il drag funzioni
-            // Il sistema JavaScript dovrebbe gestirlo automaticamente se l'elemento principale ha il drag inizializzato
-          }
         }
       }, 50);
     }
   }
   
-  ngAfterViewChecked(): void {
-    // Ri-inizializza il drag quando la classe cambia (dopo che Angular ha aggiornato il DOM)
-    if (this.isDraggable && this.note?.note_id) {
-      // Usa un timeout per assicurarsi che il DOM sia aggiornato
-      setTimeout(() => {
-        const element = document.getElementById(this.note.note_id);
-        if (element && element.classList.contains('tds_draggable')) {
-          this.stageService.setDragElement(this.note.note_id);
-        }
-      }, 0);
-    }
-  }
 }
 

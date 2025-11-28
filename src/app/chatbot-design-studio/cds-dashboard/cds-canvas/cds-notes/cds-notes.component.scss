@@ -47,7 +47,7 @@
     top: 0;
     left: 0;
     bottom: 0;
-    background-color: transparent;
+    background-color: #ff000070;
     z-index: 2;
     // Cursor pointer quando è draggable
     &.tds_draggable {
@@ -81,8 +81,7 @@
     border: 1px solid #007aff;
     background: white;
     display: none;
-    z-index: 10;
-    cursor: pointer;
+    z-index: 10; 
     user-select: none;
   }
   

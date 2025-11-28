@@ -1,14 +1,12 @@
 
-<div 
-class="panel-intent-content cds-notes-content"
-    #contentElement
-    [class.selected]="selected"
+<div class="cds-notes-content"
+    #noteContentElement
+    [class.selected]="stateNote === 1 || stateNote === 2"
     [id]="note?.note_id">
     
     <textarea 
         #noteInput
         class="note-input"
-        [class.tds_draggable]="isDraggable"
         [value]="note?.text"
         (input)="onInputChange($event)"
         (focus)="onFocusTextarea($event)"
@@ -16,9 +14,11 @@ class="panel-intent-content cds-notes-content"
         rows="1"></textarea>
 
     <div
-        *ngIf="text_disabled"
+        #noteResize
         class="note-resize" 
+        [id]="note?.note_id + '-resize'"
         [class.tds_draggable]="isDraggable"
+        (mousedown)="onNoteResizeMouseDown($event)"
         (click)="onSingleClick($event)"
         (dblclick)="onDoubleClick($event)">
     </div>
