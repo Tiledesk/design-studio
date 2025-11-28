@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, skip, timeout } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -619,7 +619,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // ---------------------------------------
     // set listOfNotes load from localStorage
     // ---------------------------------------
-    this.listOfNotes = this.noteService.getNotes(this.id_faq_kb);
+    // this.listOfNotes = this.noteService.getNotes(this.id_faq_kb);
+    this.listOfNotes = this.dashboardService.selectedChatbot.attributes.notes || [];
     //this.logger.log("[CDS-CANVAS]  •••• listOfNotes ••••", this.listOfNotes);
   }
 
@@ -1541,16 +1542,41 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       // Creiamo una nuova nota
       const newNote = new Note(this.id_faq_kb, pos);
       
-      // Aggiungiamo la nota all'array
+      // Aggiungiamo la nota all'array locale
       this.listOfNotes.push(newNote);
       
-      // Salva la nota nel localStorage con chiave specifica per il chatbot
-      this.noteService.saveNote(newNote, this.id_faq_kb);
+      // Sincronizziamo listOfNotes con attributes.notes per assicurarci che siano allineati
+      // Questo è importante perché saveRemoteNote recupera le note da attributes.notes
+      if (!this.dashboardService.selectedChatbot.attributes) {
+        this.dashboardService.selectedChatbot.attributes = {};
+      }
+      this.dashboardService.selectedChatbot.attributes.notes = [...this.listOfNotes];
+      
+      // Salva la nota in remoto (saveRemoteNote aggiungerà la nota agli attributes se non presente)
+      // Usa firstValueFrom invece di subscribe per una gestione moderna e sicura
+      this.saveNoteRemotely(newNote);
       
       this.logger.log("[CDS-CANVAS] Note created at position:", pos, "Total notes:", this.listOfNotes.length);
       
       // Disattiviamo la modalità note
       this.deactivateNoteMode();
+    }
+  }
+
+  /**
+   * Salva una nota in remoto usando firstValueFrom invece di subscribe
+   * Gestione moderna e sicura delle Observable
+   */
+  private async saveNoteRemotely(note: Note): Promise<void> {
+    try {
+      const data = await firstValueFrom(this.noteService.saveRemoteNote(note, this.id_faq_kb));
+      this.logger.log("[CDS-CANVAS] Note saved remotely successfully:", note.note_id);
+      // Sincronizza listOfNotes con attributes.notes dopo il salvataggio per mantenere la coerenza
+      if (this.dashboardService.selectedChatbot.attributes?.notes) {
+        this.listOfNotes = [...this.dashboardService.selectedChatbot.attributes.notes];
+      }
+    } catch (error) {
+      this.logger.error("[CDS-CANVAS] Error saving note remotely:", error);
     }
   }
 

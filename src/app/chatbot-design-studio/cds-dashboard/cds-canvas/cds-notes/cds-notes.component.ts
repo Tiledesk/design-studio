@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 import { Note } from 'src/app/models/note-model';
 import { StageService } from '../../../services/stage.service';
+import { NoteService } from 'src/app/services/note.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'cds-notes',
@@ -52,7 +54,10 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   private draggedListener: EventListener | null = null;
   private draggingListener: EventListener | null = null;
   
-  constructor(private stageService: StageService) { }
+  constructor(
+    private stageService: StageService,
+    private noteService: NoteService
+  ) { }
 
   ngOnInit(): void {}
 
@@ -115,6 +120,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Listener per l'evento "end-dragging" emesso quando termina il drag
    * Viene chiamato quando l'utente rilascia il mouse dopo aver trascinato
    * Ricalcola e sincronizza le dimensioni e posizioni della nota con le posizioni CSS finali
+   * Salva la nota nel localStorage dopo il drag
    */
   private setupDragEndListener(): void {
     this.draggedListener = ((e: CustomEvent) => {
@@ -123,10 +129,14 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       if (el && el.id === this.note?.note_id) {
         console.log('DRAGGING END');
         console.log('[CDS-NOTES] end-dragging - Note ID:', this.note.note_id);
-        console.log('[CDS-NOTES] end-dragging - Element:', el);
-        
-        // Ricalcola e sincronizza le dimensioni e le posizioni dopo il drag
-        this.recalculateNoteDimensionsAndPosition(el);
+        console.log('[CDS-NOTES] end-dragging - position:', el.offsetLeft, el.offsetTop, this.note.x, this.note.y);
+        // Salva la nota nel localStorage dopo il drag
+        // se la posizione è cambiata, salva la nota
+        if (this.note.x !== el.offsetLeft || this.note.y !== el.offsetTop) {
+          this.updateNote();
+          // Ricalcola e sincronizza le dimensioni e le posizioni dopo il drag
+          this.recalculateNoteDimensionsAndPosition(el);
+        }
       } else {
         console.log('DRAGGING END - NOT THIS NOTE');
         this.changeState(0);
@@ -216,12 +226,15 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Quando la textarea perde il focus:
    * - Resetta lo stato a 0 (normal)
    * - Riabilita il drag se la nota non è selezionata
+   * - Salva la nota nel localStorage dopo la modifica del testo
    */
   onBlurTextarea(event: FocusEvent): void {
     console.log('onBlurTextarea', event);
     this.changeState(0);
     // Riabilita il drag quando la textarea perde il focus (se non è selezionata)
     this.updateDragState();
+    // Salva la nota nel localStorage dopo la modifica del testo
+    this.updateNote();
   }
 
   // ============================================================================
@@ -250,6 +263,12 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Al singolo click:
    * - Se non si è fatto drag, seleziona la nota (mostra le maniglie)
    * - Disabilita il drag quando le maniglie sono visibili
+   * 
+   * NOTA: Non chiama updateNote() perché il click singolo serve solo per selezionare la nota,
+   * non per salvare modifiche. Il salvataggio avviene solo quando:
+   * - Termina un drag (fine spostamento)
+   * - Termina il resize (fine ridimensionamento)
+   * - Termina la modifica del testo (perdita del focus sulla textarea)
    */
   onSingleClick(event: MouseEvent): void {
     // Se si è fatto drag, non gestire il click
@@ -258,12 +277,12 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     event.stopPropagation();
-    console.log('onSingleClick');
-    // this.noteInput.nativeElement.blur();
+    console.log('[CDS-NOTES] onSingleClick');
     // Al singolo click visualizza le maniglie
     this.changeState(2);
     // Disabilita il drag quando le maniglie sono visibili
     this.updateDragState();
+    // NON chiamare updateNote() qui - il click serve solo per selezionare
   }
 
   /**
@@ -271,6 +290,9 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Al doppio click:
    * - Mette il focus sulla textarea per permettere la modifica del testo
    * - Cambia lo stato a 1 (text focus)
+   * 
+   * NOTA: Non chiama updateNote() perché il doppio click serve solo per attivare la modifica,
+   * non per salvare. Il salvataggio avviene quando la textarea perde il focus (onBlurTextarea).
    */
   onDoubleClick(event: MouseEvent): void {
     // Previeni la propagazione dell'evento per evitare conflitti
@@ -278,6 +300,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('onDoubleClick');
     // Al doppio click nascondo il div note-resize e metto il focus sulla textarea
     this.changeState(1);
+    // NON chiamare updateNote() qui - il doppio click serve solo per attivare la modifica
   }
 
 
@@ -406,13 +429,14 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Listener globale per l'evento mouseup che termina il ridimensionamento
    * Viene chiamato quando l'utente rilascia il mouse dopo aver ridimensionato
    * Resetta lo stato di resize e imposta un flag per prevenire la deselezione immediata
+   * Salva la nota nel localStorage dopo il resize
    */
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
     if (this.isResizing) {
       this.isResizing = false;
       this.resizeHandle = '';
-      // Mantieni la nota selezionata dopo il ridimensionamento
+      console.log('[CDS-NOTES] onMouseUp');
       this.changeState(0);
       // Imposta un flag per prevenire la deselezione immediata
       this.justFinishedResizing = true;
@@ -420,6 +444,8 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       setTimeout(() => {
         this.justFinishedResizing = false;
       }, 100);
+      // Salva la nota nel localStorage dopo il resize
+      this.updateNote();
     }
   }
 
@@ -467,6 +493,37 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
           this.stageService.setDragElement(this.note.note_id);
         }
       }, 50);
+    }
+  }
+
+  // ============================================================================
+  // METODI DI PERSISTENZA
+  // ============================================================================
+  
+  /**
+   * Salva la nota in remoto chiamando il servizio NoteService
+   * Viene chiamato automaticamente quando:
+   * - Termina un drag (fine spostamento)
+   * - Termina il resize (fine ridimensionamento)
+   * - Termina la modifica del testo (perdita del focus sulla textarea)
+   * 
+   * Best practice: Il servizio gestisce tutto internamente:
+   * - Recupera tutte le note dal dashboardService
+   * - Aggiorna o aggiunge la nota specifica
+   * - Salva l'array completo aggiornato in remoto
+   * Usa firstValueFrom invece di subscribe per una gestione moderna e sicura
+   */
+  private async updateNote(): Promise<void> {
+    if (this.note && this.note.id_faq_kb) {
+      try {
+        // Il servizio gestisce tutto: recupera, aggiorna e salva l'array completo
+        await firstValueFrom(this.noteService.saveRemoteNote(this.note, this.note.id_faq_kb));
+        console.log('[CDS-NOTES] Note saved:', this.note.note_id);
+      } catch (error) {
+        console.error('[CDS-NOTES] Error saving note:', error);
+      }
+    } else {
+      console.warn('[CDS-NOTES] Cannot save note: missing note or id_faq_kb');
     }
   }
   
