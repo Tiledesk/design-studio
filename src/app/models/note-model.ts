@@ -12,6 +12,18 @@ export class Note {
   backgroundColor?: string;
   createdAt: Date;
   isNew?: boolean;
+  
+  // Text formatting properties
+  fontFamily?: string;
+  fontSize?: number;
+  textAlign?: 'left' | 'center' | 'right';
+  fontStyle?: 'normal' | 'italic';
+  textDecoration?: 'none' | 'underline';
+  textColor?: string;
+  textOpacity?: number;
+  backgroundOpacity?: number;
+  isLink?: boolean;
+  linkUrl?: string;
 
   constructor(id_faq_kb: string, pos: any) {
     this.id_faq_kb = id_faq_kb;
@@ -24,6 +36,18 @@ export class Note {
     this.createdAt = new Date();
     this.backgroundColor = INTENT_COLORS.COLOR1;
     this.isNew = true; // Indica che la nota è appena stata creata
+    
+    // Default formatting values
+    this.fontFamily = 'Open Sans';
+    this.fontSize = 14;
+    this.textAlign = 'left';
+    this.fontStyle = 'normal';
+    this.textDecoration = 'none';
+    this.textColor = '#000000';
+    this.textOpacity = 100;
+    this.backgroundOpacity = 100;
+    this.isLink = false;
+    this.linkUrl = '';
   }
 }
 

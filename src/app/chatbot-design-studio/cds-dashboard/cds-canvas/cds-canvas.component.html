@@ -84,8 +84,10 @@
             class="cds-note" 
             [id]="note.note_id"
             [note]="note"
+            [IS_OPEN_PANEL_NOTE_DETAIL]="IS_OPEN_PANEL_NOTE_DETAIL"
             [style.top.px]="note.y"
-            [style.left.px]="note.x">
+            [style.left.px]="note.x"
+            (noteSelected)="onNoteSelected($event)">
         </cds-notes>
     </div> 
 
@@ -131,6 +133,14 @@
     (closePanel)="closeAllPanels()"
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-intent-detail>
+
+<cds-panel-note-detail *ngIf="IS_OPEN_PANEL_NOTE_DETAIL"
+    id="note-detail" 
+    class="cds-generic-panel"
+    [note]="noteSelected"
+    (closePanel)="closeAllPanels()"
+    (savePanelNoteDetail)="onSavePanelNoteDetail($event)">
+</cds-panel-note-detail>
 
 <cds-panel-publish *ngIf="IS_OPEN_PUBLISH_PANEL"
     id="publish-panel" 

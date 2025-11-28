@@ -1,0 +1,193 @@
+<div class="panel-note-detail" [class.minimize]="!maximize" [class.maximize]="maximize">
+    <div class="header-panel">
+        <div class="pic-title-text">
+            <div class="note-icon">
+                <span class="material-icons">note</span>
+            </div>
+            <div class="title-text">
+                <h3>{{ 'CDSCanvas.NoteDetails' | translate }}</h3>
+            </div>
+        </div>
+        <div class="header-options-wrp icon-action" (click)="onChangeMaximize()">
+            <img *ngIf="!maximize" src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" alt="">
+            <img *ngIf="maximize" src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" alt="">
+        </div>
+        <div class="header-close-wrp icon-action" (click)="onClosePanel()">
+            <mat-icon class="active-icon" svgIcon="close" aria-hidden="true"></mat-icon>
+        </div>
+    </div>
+    <div id="content-panel" class="content-panel">
+        
+        <!-- ---------------------------------------------------------- -->
+        <!-- Markup Text Section -->
+        <!-- ---------------------------------------------------------- -->
+        <div class="row markup-section">
+            <div class="section-header">
+                <h4 class="section-title">Markup text</h4>
+                <mat-icon class="more-options-icon" svgIcon="more_vert" aria-hidden="true"></mat-icon>
+            </div>
+
+            <!-- Font Selection -->
+            <div class="font-selection">
+                <select class="font-select" [(ngModel)]="note.fontFamily" (change)="onFormatChange()">
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Roboto">Roboto</option>
+                </select>
+                <select class="font-size-select" [(ngModel)]="note.fontSize" (change)="onFormatChange()">
+                    <option [value]="10">10</option>
+                    <option [value]="12">12</option>
+                    <option [value]="14">14</option>
+                    <option [value]="16">16</option>
+                    <option [value]="18">18</option>
+                    <option [value]="20">20</option>
+                    <option [value]="24">24</option>
+                    <option [value]="28">28</option>
+                    <option [value]="32">32</option>
+                </select>
+            </div>
+
+            <!-- Formatting Toolbar -->
+            <div class="formatting-toolbar">
+                <!-- Alignment -->
+                <div class="toolbar-group">
+                    <button type="button" 
+                        class="toolbar-btn" 
+                        [class.active]="note.textAlign === 'left'"
+                        (click)="setTextAlign('left')"
+                        [title]="'Left align' | translate">
+                        <mat-icon svgIcon="format_align_left" aria-hidden="true"></mat-icon>
+                    </button>
+                    <button type="button" 
+                        class="toolbar-btn" 
+                        [class.active]="note.textAlign === 'center'"
+                        (click)="setTextAlign('center')"
+                        [title]="'Center align' | translate">
+                        <mat-icon svgIcon="format_align_center" aria-hidden="true"></mat-icon>
+                    </button>
+                    <button type="button" 
+                        class="toolbar-btn" 
+                        [class.active]="note.textAlign === 'right'"
+                        (click)="setTextAlign('right')"
+                        [title]="'Right align' | translate">
+                        <mat-icon svgIcon="format_align_right" aria-hidden="true"></mat-icon>
+                    </button>
+                </div>
+
+                <div class="toolbar-separator"></div>
+
+                <!-- Style -->
+                <div class="toolbar-group">
+                    <button type="button" 
+                        class="toolbar-btn" 
+                        [class.active]="note.fontStyle === 'italic'"
+                        (click)="toggleItalic()"
+                        [title]="'Italic' | translate">
+                        <span class="format-icon">I</span>
+                    </button>
+                    <button type="button" 
+                        class="toolbar-btn" 
+                        [class.active]="note.textDecoration === 'underline'"
+                        (click)="toggleUnderline()"
+                        [title]="'Underline' | translate">
+                        <span class="format-icon">U</span>
+                    </button>
+                </div>
+
+                <div class="toolbar-separator"></div>
+
+                <!-- Link -->
+                <div class="toolbar-group">
+                    <button type="button" 
+                        class="toolbar-btn" 
+                        [class.active]="note.isLink"
+                        (click)="toggleLink()"
+                        [title]="'Link' | translate">
+                        <mat-icon svgIcon="link" aria-hidden="true"></mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Link URL Input (shown when link is active) -->
+            <div class="link-input-group" *ngIf="note.isLink">
+                <input type="text" 
+                    class="form-control" 
+                    [(ngModel)]="note.linkUrl"
+                    placeholder="{{ 'CDSCanvas.EnterUrl' | translate }}"
+                    (change)="onFormatChange()">
+            </div>
+
+            <!-- Text Color -->
+            <div class="color-control-group">
+                <div class="color-swatch-wrapper">
+                    <input type="color" 
+                        class="color-swatch" 
+                        [(ngModel)]="note.textColor"
+                        (change)="onFormatChange()">
+                </div>
+                <div class="slider-wrapper">
+                    <input type="range" 
+                        class="opacity-slider" 
+                        min="0" 
+                        max="100" 
+                        [(ngModel)]="note.textOpacity"
+                        (input)="onFormatChange()">
+                </div>
+                <input type="text" 
+                    class="opacity-input" 
+                    [(ngModel)]="note.textOpacity"
+                    (change)="onFormatChange()"
+                    readonly>
+                <span class="opacity-percent">%</span>
+            </div>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <!-- Background Section -->
+        <!-- ---------------------------------------------------------- -->
+        <div class="row background-section">
+            <div class="section-header">
+                <h4 class="section-title">Background</h4>
+                <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
+            </div>
+
+            <div class="color-control-group">
+                <div class="color-swatch-wrapper">
+                    <input type="color" 
+                        class="color-swatch" 
+                        [(ngModel)]="note.backgroundColor"
+                        (change)="onFormatChange()">
+                </div>
+                <div class="slider-wrapper">
+                    <input type="range" 
+                        class="opacity-slider" 
+                        min="0" 
+                        max="100" 
+                        [(ngModel)]="note.backgroundOpacity"
+                        (input)="onFormatChange()">
+                </div>
+                <input type="text" 
+                    class="opacity-input" 
+                    [(ngModel)]="note.backgroundOpacity"
+                    (change)="onFormatChange()"
+                    readonly>
+                <span class="opacity-percent">%</span>
+            </div>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <!-- Save Button -->
+        <!-- ---------------------------------------------------------- -->
+        <div class="row">
+            <button type="button" class="btn btn-primary cds-blue-button" (click)="onSaveNote()">
+                {{ 'Save' | translate }}
+            </button>
+        </div>
+
+    </div>
+</div>

@@ -150,6 +150,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   isNoteModeActive: boolean = false;
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
+  IS_OPEN_PANEL_NOTE_DETAIL: boolean = false;
+  noteSelected: Note;
   startDraggingPosition: any = null;
   mesage_request_id: string;
 
@@ -633,6 +635,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // this._isOpenPanelWidget.next(false);
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
+    this.IS_OPEN_PANEL_NOTE_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
@@ -1363,6 +1366,21 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     }, 0);
   }
 
+  /**
+   * Gestisce la selezione di una nota e apre il panel dei dettagli
+   * Simile a onIntentSelected per gli intent
+   */
+  onNoteSelected(note: Note): void {
+    this.logger.log('[CDS-CANVAS] onNoteSelected ', note.note_id);
+    this.closeAllPanels();
+    this.removeConnectorDraftAndCloseFloatMenu();
+    this.closeActionDetailPanel();
+    setTimeout(() => {
+      this.noteSelected = note;
+      this.IS_OPEN_PANEL_NOTE_DETAIL = true;
+    }, 0);
+  }
+
   /** onActionSelected  **
    * @ Close WHEN AN ACTION IS SELECTED FROM AN INTENT
    * - actions context menu (static & float)
@@ -1632,6 +1650,34 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       // this.onOpenDialog();
     }
     
+  }
+
+  /** onSavePanelNoteDetail */
+  onSavePanelNoteDetail(note: Note) {
+    this.logger.log('[CDS-CANVAS] onSavePanelNoteDetail note ', note)
+    if (note && note != null) {
+      // Aggiorna la nota nell'array listOfNotes
+      const index = this.listOfNotes.findIndex(n => n.note_id === note.note_id);
+      if (index >= 0) {
+        this.listOfNotes[index] = note;
+      }
+      // Aggiorna anche negli attributes del dashboardService
+      if (this.dashboardService.selectedChatbot.attributes?.notes) {
+        const attrIndex = this.dashboardService.selectedChatbot.attributes.notes.findIndex(n => n.note_id === note.note_id);
+        if (attrIndex >= 0) {
+          this.dashboardService.selectedChatbot.attributes.notes[attrIndex] = note;
+        }
+      }
+      // Salva la nota in remoto
+      this.noteService.saveRemoteNote(note, this.id_faq_kb).subscribe({
+        next: (data) => {
+          this.logger.log('[CDS-CANVAS] Note saved successfully:', data);
+        },
+        error: (error) => {
+          this.logger.error('[CDS-CANVAS] Error saving note:', error);
+        }
+      });
+    }
   }
   // --------------------------------------------------------- //
 

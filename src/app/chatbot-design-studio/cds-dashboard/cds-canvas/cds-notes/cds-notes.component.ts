@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 import { Note } from 'src/app/models/note-model';
 import { StageService } from '../../../services/stage.service';
 import { NoteService } from 'src/app/services/note.service';
@@ -11,6 +11,8 @@ import { firstValueFrom } from 'rxjs';
 })
 export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() note: Note;
+  @Input() IS_OPEN_PANEL_NOTE_DETAIL: boolean = false;
+  @Output() noteSelected = new EventEmitter<Note>();
   @ViewChild('noteInput', { static: false }) noteInput: ElementRef<HTMLTextAreaElement>;
   @ViewChild('noteContentElement', { static: false }) contentElement: ElementRef<HTMLDivElement>;
   @ViewChild('noteResize', { static: false }) noteResize: ElementRef<HTMLDivElement>;
@@ -37,6 +39,9 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.textareaHasFocus = false;
       this.noteInput.nativeElement.blur();
+    }
+    if(state !== 0) {
+        this.noteSelected.emit(this.note);
     }
     console.log('[CDS-NOTES] State changed to:', state);
   }
@@ -282,6 +287,8 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.changeState(2);
     // Disabilita il drag quando le maniglie sono visibili
     this.updateDragState();
+    // Emetti l'evento per aprire il panel dei dettagli della nota
+    this.noteSelected.emit(this.note);
     // NON chiamare updateNote() qui - il click serve solo per selezionare
   }
 
@@ -421,7 +428,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Aggiorna le dimensioni della textarea (sottrai padding: 10px top/bottom, 8px left/right)
     if (this.noteInput) {
       this.noteInput.nativeElement.style.width = (newWidth - 16) + 'px';
-      this.noteInput.nativeElement.style.height = (newHeight - 20) + 'px';
+      //this.noteInput.nativeElement.style.height = (newHeight - 20) + 'px';
     }
   }
 
