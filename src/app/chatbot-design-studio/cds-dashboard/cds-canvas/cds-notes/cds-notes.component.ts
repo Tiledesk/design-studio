@@ -14,8 +14,6 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('noteResize', { static: false }) noteResize: ElementRef<HTMLDivElement>;
 
 
-  // selected = false;
-  text_disabled: boolean = false;
   textareaHasFocus = false;
   dragged = false;  
 
@@ -27,8 +25,17 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   
   // Funzione per cambiare lo stato della nota
-  changeState(state: 0|1|2): void {
+  changeState(state: 0|1|2|3): void {
     this.stateNote = state;
+    if(state === 1) {
+      this.textareaHasFocus = true;
+      setTimeout(() => {
+        this.noteInput.nativeElement.focus();
+      }, 100);
+    } else {
+      this.textareaHasFocus = false;
+      this.noteInput.nativeElement.blur();
+    }
     console.log('[CDS-NOTES] State changed to:', state);
   }
   
@@ -56,16 +63,43 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       const height = this.note.height || 50;
       this.contentElement.nativeElement.style.width = width + 'px';
       this.contentElement.nativeElement.style.height = height + 'px';
-      // Aggiungi listener per gli eventi di drag
-      this.setupDragEndListener();
-      this.setupDraggingListener();
+      // Inizializza tutti i listener per gli eventi
+      this.setupAllListeners();
       // Inizializza il drag dopo che la vista è stata inizializzata
       this.updateDragState();
     }
   }
+
+  // ============================================================================
+  // LISTENER SETUP - Configurazione di tutti i listener per gli eventi
+  // ============================================================================
   
+  /**
+   * Inizializza tutti i listener necessari per il componente
+   */
+  private setupAllListeners(): void {
+    this.setupDragListeners();
+  }
+
+  // ============================================================================
+  // LISTENER PER EVENTI DI DRAG (Custom Events dal sistema di drag)
+  // ============================================================================
+  
+  /**
+   * Configura i listener per gli eventi di drag personalizzati
+   * Questi eventi vengono emessi dal sistema di drag (tiledesk-stage.js)
+   */
+  private setupDragListeners(): void {
+    this.setupDraggingListener();
+    this.setupDragEndListener();
+  }
+
+  /**
+   * Listener per l'evento "dragged" emesso durante il trascinamento
+   * Viene chiamato continuamente mentre l'utente trascina la nota
+   * Imposta il flag dragged = true per distinguere un drag da un click
+   */
   private setupDraggingListener(): void {
-    // Listener per l'evento "dragged" che intercetta il dragging
     this.draggingListener = ((e: CustomEvent) => {
       const el = e.detail.element;
       // Verifica che l'elemento sia questa nota
@@ -77,17 +111,25 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     document.addEventListener("dragged", this.draggingListener, false);
   }
   
+  /**
+   * Listener per l'evento "end-dragging" emesso quando termina il drag
+   * Viene chiamato quando l'utente rilascia il mouse dopo aver trascinato
+   * Ricalcola e sincronizza le dimensioni e posizioni della nota con le posizioni CSS finali
+   */
   private setupDragEndListener(): void {
-    // Listener per l'evento "end-dragging" che intercetta la fine del drag
     this.draggedListener = ((e: CustomEvent) => {
       const el = e.detail.element;
       // Verifica che l'elemento sia questa nota
       if (el && el.id === this.note?.note_id) {
+        console.log('DRAGGING END');
         console.log('[CDS-NOTES] end-dragging - Note ID:', this.note.note_id);
         console.log('[CDS-NOTES] end-dragging - Element:', el);
         
         // Ricalcola e sincronizza le dimensioni e le posizioni dopo il drag
         this.recalculateNoteDimensionsAndPosition(el);
+      } else {
+        console.log('DRAGGING END - NOT THIS NOTE');
+        this.changeState(0);
       }
     }) as EventListener;
     document.addEventListener("end-dragging", this.draggedListener, false);
@@ -123,8 +165,16 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
   
+  // ============================================================================
+  // LIFECYCLE HOOKS
+  // ============================================================================
+  
+  /**
+   * Cleanup: rimuove tutti i listener quando il componente viene distrutto
+   * Previene memory leak rimuovendo gli event listener dal document
+   */
   ngOnDestroy(): void {
-    // Rimuovi i listener quando il componente viene distrutto
+    // Rimuovi i listener per gli eventi di drag
     if (this.draggingListener) {
       document.removeEventListener("dragged", this.draggingListener, false);
     }
@@ -133,6 +183,14 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // ============================================================================
+  // LISTENER PER EVENTI DELLA TEXTAREA
+  // ============================================================================
+  
+  /**
+   * Listener per l'evento input della textarea
+   * Aggiorna il testo della nota quando l'utente digita
+   */
   onInputChange(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     if (this.note) {
@@ -140,23 +198,41 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * Listener per l'evento focus della textarea
+   * Quando la textarea prende il focus:
+   * - Cambia lo stato a 1 (text focus)
+   * - Disabilita il drag per permettere la modifica del testo
+   */
   onFocusTextarea(event: FocusEvent): void {
-    this.textareaHasFocus = true;
     // Cambia lo stato a 1 quando la textarea prende il focus
     this.changeState(1);
     // Disabilita il drag quando la textarea ha il focus
     this.updateDragState();
   }
 
+  /**
+   * Listener per l'evento blur della textarea
+   * Quando la textarea perde il focus:
+   * - Resetta lo stato a 0 (normal)
+   * - Riabilita il drag se la nota non è selezionata
+   */
   onBlurTextarea(event: FocusEvent): void {
-    this.text_disabled = true;
-    this.textareaHasFocus = false;
     console.log('onBlurTextarea', event);
-    this.stateNote = 0;
+    this.changeState(0);
     // Riabilita il drag quando la textarea perde il focus (se non è selezionata)
     this.updateDragState();
   }
 
+  // ============================================================================
+  // LISTENER PER EVENTI DEL MOUSE SUL BLOCCO NOTE-RESIZE
+  // ============================================================================
+  
+  /**
+   * Listener per l'evento mousedown sul div note-resize
+   * Permette al sistema di drag di funzionare quando si clicca sul blocco
+   * Se il drag è abilitato, l'evento viene propagato al contenitore principale
+   */
   onNoteResizeMouseDown(event: MouseEvent): void {
     // Se il drag è abilitato, permettere all'evento di propagarsi al contenitore principale
     // per permettere al sistema di drag di funzionare
@@ -169,6 +245,12 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     event.preventDefault();
   }
 
+  /**
+   * Listener per l'evento click sul div note-resize
+   * Al singolo click:
+   * - Se non si è fatto drag, seleziona la nota (mostra le maniglie)
+   * - Disabilita il drag quando le maniglie sono visibili
+   */
   onSingleClick(event: MouseEvent): void {
     // Se si è fatto drag, non gestire il click
     if (this.dragged) {
@@ -177,31 +259,39 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     event.stopPropagation();
     console.log('onSingleClick');
-    this.noteInput.nativeElement.blur();
-    this.textareaHasFocus = false;
+    // this.noteInput.nativeElement.blur();
     // Al singolo click visualizza le maniglie
-    this.stateNote = 1;
+    this.changeState(2);
     // Disabilita il drag quando le maniglie sono visibili
     this.updateDragState();
   }
 
+  /**
+   * Listener per l'evento dblclick sul div note-resize
+   * Al doppio click:
+   * - Mette il focus sulla textarea per permettere la modifica del testo
+   * - Cambia lo stato a 1 (text focus)
+   */
   onDoubleClick(event: MouseEvent): void {
     // Previeni la propagazione dell'evento per evitare conflitti
     event.stopPropagation();
     console.log('onDoubleClick');
     // Al doppio click nascondo il div note-resize e metto il focus sulla textarea
-    this.text_disabled = false;
-    this.stateNote = 1;
-    this.textareaHasFocus = false;
-    setTimeout(() => {
-        this.noteInput.nativeElement.focus();
-        // Il focus imposterà textareaHasFocus = true tramite onFocusTextarea
-      }, 100);
+    this.changeState(1);
   }
 
 
 
-  // mouse DOWN = start resize!!
+  // ============================================================================
+  // LISTENER PER EVENTI DI RIDIMENSIONAMENTO (RESIZE)
+  // ============================================================================
+  
+  /**
+   * Listener per l'evento mousedown sulle maniglie di ridimensionamento
+   * Inizia l'operazione di resize quando l'utente clicca su una maniglia
+   * @param event - Evento mouse
+   * @param handle - Identificatore della maniglia ('tl', 'tr', 'bl', 'br')
+   */
   startResize(event: MouseEvent, handle: string): void {
     console.log('-----> startResize', event, handle);
     event.stopPropagation();
@@ -219,8 +309,11 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.changeState(2);
   }
 
-
-  // mouse MOVE = resize!!
+  /**
+   * Listener globale per l'evento mousemove durante il ridimensionamento
+   * Viene chiamato continuamente mentre l'utente trascina una maniglia
+   * Calcola le nuove dimensioni e posizioni basandosi sul punto di ancoraggio
+   */
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
     if (!this.isResizing || !this.contentElement || !this.note) return;
@@ -309,14 +402,18 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // mouse UP = end resize!!
+  /**
+   * Listener globale per l'evento mouseup che termina il ridimensionamento
+   * Viene chiamato quando l'utente rilascia il mouse dopo aver ridimensionato
+   * Resetta lo stato di resize e imposta un flag per prevenire la deselezione immediata
+   */
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
     if (this.isResizing) {
       this.isResizing = false;
       this.resizeHandle = '';
       // Mantieni la nota selezionata dopo il ridimensionamento
-      this.stateNote = 0;
+      this.changeState(0);
       // Imposta un flag per prevenire la deselezione immediata
       this.justFinishedResizing = true;
       // Reset del flag dopo un breve delay per permettere all'evento click di essere ignorato
@@ -326,7 +423,15 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // mouse CLICK = end select!!
+  // ============================================================================
+  // LISTENER PER EVENTI GLOBALI DEL DOCUMENTO
+  // ============================================================================
+  
+  /**
+   * Listener globale per l'evento click sul documento
+   * Deseleziona la nota quando si clicca fuori dal componente
+   * Ignora il click se si sta facendo resize o si è appena finito
+   */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     // Non deselezionare se si sta facendo il ridimensionamento o si è appena finito
@@ -343,8 +448,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       const clickedOnHandle = target.classList.contains('resize-handle');
       
       if (!clickedInside && !clickedOnHandle) {
-        this.stateNote = 0;
-        this.textareaHasFocus = false;
+        this.changeState(0);
         // Ri-inizializza il drag quando la selezione cambia (per riattivare il drag quando selected = false e textarea non ha focus)
         this.updateDragState();
       }
