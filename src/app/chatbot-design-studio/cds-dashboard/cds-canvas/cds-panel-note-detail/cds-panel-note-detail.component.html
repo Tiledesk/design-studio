@@ -103,7 +103,7 @@
             </div> -->
 
             <!-- Rich Text Editor Content -->
-            <div class="rich-text-editor-wrapper">
+            <!--  <div class="rich-text-editor-wrapper">
                 <div 
                     #richTextEditor
                     class="rich-text-editor"
@@ -115,8 +115,8 @@
                     [style.font-family]="note?.fontFamily || 'Open Sans'"
                     [style.font-size.px]="note?.fontSize || 14"
                     spellcheck="false">
-                </div>
-            </div>
+                </div> 
+            </div> -->
 
             <!-- Link URL Input Dialog (shown when inserting link) -->
             <!-- <div class="link-dialog" *ngIf="showLinkDialog">
@@ -131,6 +131,16 @@
                     <button type="button" class="btn-link" (click)="cancelLink()">{{ 'Cancel' | translate }}</button>
                 </div>
             </div> -->
+
+            <quill-editor 
+            #quillEditor
+            [(ngModel)]="note.text"
+            [modules]="quillModules"
+            (onContentChanged)="onQuillContentChanged($event)"
+            [styles]="{ height: '250px' }"
+            placeholder="Type something...">
+          </quill-editor>
+
         </div>
 
         <!-- ---------------------------------------------------------- -->

@@ -18,6 +18,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   @Output() deleteNote = new EventEmitter<Note>();
   @Output() duplicateNote = new EventEmitter<Note>();
   @ViewChild('richTextEditor', { static: false }) richTextEditor: ElementRef<HTMLDivElement>;
+  @ViewChild('quillEditor', { static: false }) quillEditor: any;
   
   maximize: boolean = true;
   showLinkDialog: boolean = false;
@@ -26,6 +27,10 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   private savedSelection: Range | null = null;
   private savedSelectedText: string = '';
   private saveTimer: any = null; // Timer per il debounce del salvataggio automatico
+
+
+  toolbarOptions: any;
+  quillModules: any;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
@@ -36,6 +41,19 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.maximize = this.stageService.getMaximize();
     this.initializeFormattingDefaults();
+
+    this.toolbarOptions = [
+      ['bold', 'italic', 'underline'],            // testo
+      [{ 'color': [] }, { 'background': [] }],    // colori
+      [{ 'align': [] }],                          // allineamento
+      ['link'],                                   // link
+      ['clean']                                   // rimuovi formattazione
+    ];
+
+    // Configurazione dei moduli Quill
+    this.quillModules = {
+      toolbar: this.toolbarOptions
+    };
   }
 
   ngOnDestroy(): void {
@@ -614,6 +632,35 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   onSaveNote(): void {
     this.logger.log('[CdsPanelNoteDetailComponent] onSaveNote:: ', this.note);
     this.savePanelNoteDetail.emit(this.note);
+  }
+
+  /**
+   * Gestisce il cambio di contenuto in Quill
+   * Converte il Delta in HTML e salva nel note.text
+   */
+  onQuillContentChanged(event: any): void {
+    if (!this.note || !event) return;
+
+    try {
+      // Quill restituisce il contenuto in formato Delta
+      // Convertiamo in HTML usando il metodo getContents() e poi convertiamo in HTML
+      const quillInstance = event.editor;
+      if (quillInstance) {
+        // Ottieni il contenuto HTML dall'editor Quill
+        const htmlContent = quillInstance.root.innerHTML;
+        
+        // Aggiorna il testo della nota con l'HTML
+        if (this.note.text !== htmlContent) {
+          this.note.text = htmlContent;
+          this.logger.log('[CdsPanelNoteDetailComponent] Quill content changed, HTML:', htmlContent);
+          
+          // Salvataggio automatico con debounce
+          this.autoSave();
+        }
+      }
+    } catch (error) {
+      this.logger.error('[CdsPanelNoteDetailComponent] Error handling Quill content change:', error);
+    }
   }
 
   /**
