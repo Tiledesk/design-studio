@@ -139,7 +139,9 @@
     class="cds-generic-panel"
     [note]="noteSelected"
     (closePanel)="closeAllPanels()"
-    (savePanelNoteDetail)="onSavePanelNoteDetail($event)">
+    (savePanelNoteDetail)="onSavePanelNoteDetail($event)"
+    (deleteNote)="onDeleteNote($event)"
+    (duplicateNote)="onDuplicateNote($event)">
 </cds-panel-note-detail>
 
 <cds-panel-publish *ngIf="IS_OPEN_PUBLISH_PANEL"

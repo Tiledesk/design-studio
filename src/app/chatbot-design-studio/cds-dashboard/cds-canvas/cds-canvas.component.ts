@@ -1679,6 +1679,42 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       });
     }
   }
+
+  /** onDeleteNote */
+  onDeleteNote(note: Note) {
+    this.logger.log('[CDS-CANVAS] onDeleteNote note ', note);
+    if (note && note != null) {
+      // Usa il servizio per eliminare la nota
+      this.noteService.deleteNote(note, this.id_faq_kb).subscribe({
+        next: (data) => {
+          // Sincronizza listOfNotes con l'array aggiornato dal servizio
+          this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+          this.logger.log('[CDS-CANVAS] Note deleted successfully, array updated:', data);
+        },
+        error: (error) => {
+          this.logger.error('[CDS-CANVAS] Error deleting note:', error);
+        }
+      });
+    }
+  }
+
+  /** onDuplicateNote */
+  onDuplicateNote(note: Note) {
+    this.logger.log('[CDS-CANVAS] onDuplicateNote note ', note);
+    if (note && note != null) {
+      // Usa il servizio per duplicare la nota
+      this.noteService.duplicateNote(note, this.id_faq_kb).subscribe({
+        next: (duplicatedNote) => {
+          // Sincronizza listOfNotes con l'array aggiornato dal servizio
+          this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+          this.logger.log('[CDS-CANVAS] Note duplicated successfully:', duplicatedNote.note_id);
+        },
+        error: (error) => {
+          this.logger.error('[CDS-CANVAS] Error duplicating note:', error);
+        }
+      });
+    }
+  }
   // --------------------------------------------------------- //
 
 

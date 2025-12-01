@@ -12,6 +12,9 @@
             <img *ngIf="!maximize" src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" alt="">
             <img *ngIf="maximize" src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" alt="">
         </div>
+        <div class="header-menu-wrp icon-action" [matMenuTriggerFor]="noteMenu">
+            <mat-icon class="active-icon" svgIcon="more_horiz" aria-hidden="true"></mat-icon>
+        </div>
         <div class="header-close-wrp icon-action" (click)="onClosePanel()">
             <mat-icon class="active-icon" svgIcon="close" aria-hidden="true"></mat-icon>
         </div>
@@ -19,61 +22,68 @@
     <div id="content-panel" class="content-panel">
         
         <!-- ---------------------------------------------------------- -->
-        <!-- Markup Text Section -->
+        <!-- Rich Text Editor Section -->
         <!-- ---------------------------------------------------------- -->
-        <div class="row markup-section">
+        <div class="row rich-text-editor-section">
             <div class="section-header">
                 <h4 class="section-title">Markup text</h4>
                 <mat-icon class="more-options-icon" svgIcon="more_vert" aria-hidden="true"></mat-icon>
             </div>
 
-            <!-- Font Selection -->
-            <div class="font-selection">
-                <select class="font-select" [(ngModel)]="note.fontFamily" (change)="onFormatChange()">
-                    <option value="Open Sans">Open Sans</option>
-                    <option value="Arial">Arial</option>
-                    <option value="Helvetica">Helvetica</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Courier New">Courier New</option>
-                    <option value="Georgia">Georgia</option>
-                    <option value="Verdana">Verdana</option>
-                    <option value="Roboto">Roboto</option>
-                </select>
-                <select class="font-size-select" [(ngModel)]="note.fontSize" (change)="onFormatChange()">
-                    <option [value]="10">10</option>
-                    <option [value]="12">12</option>
-                    <option [value]="14">14</option>
-                    <option [value]="16">16</option>
-                    <option [value]="18">18</option>
-                    <option [value]="20">20</option>
-                    <option [value]="24">24</option>
-                    <option [value]="28">28</option>
-                    <option [value]="32">32</option>
-                </select>
-            </div>
-
-            <!-- Formatting Toolbar -->
-            <div class="formatting-toolbar">
-                <!-- Alignment -->
-                <div class="toolbar-group">
+            <!-- Rich Text Editor Toolbar -->
+            <!-- <div class="rich-text-toolbar">
+                <Text Formatting -->
+                <!-- <div class="toolbar-group">
                     <button type="button" 
                         class="toolbar-btn" 
-                        [class.active]="note.textAlign === 'left'"
-                        (click)="setTextAlign('left')"
+                        (click)="formatText('bold')"
+                        [title]="'Bold' | translate">
+                        <span class="format-icon bold">B</span>
+                    </button>
+                    <button type="button" 
+                        class="toolbar-btn" 
+                        (click)="formatText('italic')"
+                        [title]="'Italic' | translate">
+                        <span class="format-icon italic">I</span>
+                    </button>
+                    <button type="button" 
+                        class="toolbar-btn" 
+                        (click)="formatText('underline')"
+                        [title]="'Underline' | translate">
+                        <span class="format-icon underline">U</span>
+                    </button>
+                </div>
+
+                <div class="toolbar-separator"></div>
+
+                <Text Color -->
+                <!-- <div class="toolbar-group">
+                    <input type="color" 
+                        class="toolbar-color-picker" 
+                        [value]="getCurrentTextColor()"
+                        (change)="formatTextColor($event)"
+                        [title]="'Text Color' | translate">
+                </div>
+
+                <div class="toolbar-separator"></div>
+
+                <Alignment -->
+                <!-- <div class="toolbar-group">
+                    <button type="button" 
+                        class="toolbar-btn" 
+                        (click)="formatText('justifyLeft')"
                         [title]="'Left align' | translate">
                         <mat-icon svgIcon="format_align_left" aria-hidden="true"></mat-icon>
                     </button>
                     <button type="button" 
                         class="toolbar-btn" 
-                        [class.active]="note.textAlign === 'center'"
-                        (click)="setTextAlign('center')"
+                        (click)="formatText('justifyCenter')"
                         [title]="'Center align' | translate">
                         <mat-icon svgIcon="format_align_center" aria-hidden="true"></mat-icon>
                     </button>
                     <button type="button" 
                         class="toolbar-btn" 
-                        [class.active]="note.textAlign === 'right'"
-                        (click)="setTextAlign('right')"
+                        (click)="formatText('justifyRight')"
                         [title]="'Right align' | translate">
                         <mat-icon svgIcon="format_align_right" aria-hidden="true"></mat-icon>
                     </button>
@@ -81,78 +91,54 @@
 
                 <div class="toolbar-separator"></div>
 
-                <!-- Style -->
-                <div class="toolbar-group">
+                <Link -->
+                <!-- <div class="toolbar-group">
                     <button type="button" 
                         class="toolbar-btn" 
-                        [class.active]="note.fontStyle === 'italic'"
-                        (click)="toggleItalic()"
-                        [title]="'Italic' | translate">
-                        <span class="format-icon">I</span>
-                    </button>
-                    <button type="button" 
-                        class="toolbar-btn" 
-                        [class.active]="note.textDecoration === 'underline'"
-                        (click)="toggleUnderline()"
-                        [title]="'Underline' | translate">
-                        <span class="format-icon">U</span>
-                    </button>
-                </div>
-
-                <div class="toolbar-separator"></div>
-
-                <!-- Link -->
-                <div class="toolbar-group">
-                    <button type="button" 
-                        class="toolbar-btn" 
-                        [class.active]="note.isLink"
-                        (click)="toggleLink()"
-                        [title]="'Link' | translate">
+                        (click)="insertLink()"
+                        [title]="'Insert Link' | translate">
                         <mat-icon svgIcon="link" aria-hidden="true"></mat-icon>
                     </button>
                 </div>
+            </div> -->
+
+            <!-- Rich Text Editor Content -->
+            <div class="rich-text-editor-wrapper">
+                <div 
+                    #richTextEditor
+                    class="rich-text-editor"
+                    contenteditable="true"
+                    [innerHTML]="note?.text || ''"
+                    (input)="onEditorInput($event)"
+                    (focus)="onEditorFocus()"
+                    (blur)="onEditorBlur()"
+                    [style.font-family]="note?.fontFamily || 'Open Sans'"
+                    [style.font-size.px]="note?.fontSize || 14"
+                    spellcheck="false">
+                </div>
             </div>
 
-            <!-- Link URL Input (shown when link is active) -->
-            <div class="link-input-group" *ngIf="note.isLink">
+            <!-- Link URL Input Dialog (shown when inserting link) -->
+            <!-- <div class="link-dialog" *ngIf="showLinkDialog">
                 <input type="text" 
                     class="form-control" 
-                    [(ngModel)]="note.linkUrl"
+                    [(ngModel)]="linkUrl"
                     placeholder="{{ 'CDSCanvas.EnterUrl' | translate }}"
-                    (change)="onFormatChange()">
-            </div>
-
-            <!-- Text Color -->
-            <div class="color-control-group">
-                <div class="color-swatch-wrapper">
-                    <input type="color" 
-                        class="color-swatch" 
-                        [(ngModel)]="note.textColor"
-                        (change)="onFormatChange()">
+                    (keyup.enter)="confirmLink()"
+                    (keyup.escape)="cancelLink()">
+                <div class="link-dialog-buttons">
+                    <button type="button" class="btn-link" (click)="confirmLink()">{{ 'OK' | translate }}</button>
+                    <button type="button" class="btn-link" (click)="cancelLink()">{{ 'Cancel' | translate }}</button>
                 </div>
-                <div class="slider-wrapper">
-                    <input type="range" 
-                        class="opacity-slider" 
-                        min="0" 
-                        max="100" 
-                        [(ngModel)]="note.textOpacity"
-                        (input)="onFormatChange()">
-                </div>
-                <input type="text" 
-                    class="opacity-input" 
-                    [(ngModel)]="note.textOpacity"
-                    (change)="onFormatChange()"
-                    readonly>
-                <span class="opacity-percent">%</span>
-            </div>
+            </div> -->
         </div>
 
         <!-- ---------------------------------------------------------- -->
-        <!-- Background Section -->
+        <!-- Background color Section -->
         <!-- ---------------------------------------------------------- -->
         <div class="row background-section">
             <div class="section-header">
-                <h4 class="section-title">Background</h4>
+                <h4 class="section-title">Background color</h4>
                 <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
             </div>
 
@@ -160,8 +146,8 @@
                 <div class="color-swatch-wrapper">
                     <input type="color" 
                         class="color-swatch" 
-                        [(ngModel)]="note.backgroundColor"
-                        (change)="onFormatChange()">
+                        [value]="getBaseColorForPicker('background')"
+                        (change)="onColorChange($event, 'background', note.backgroundOpacity)">
                 </div>
                 <div class="slider-wrapper">
                     <input type="range" 
@@ -173,21 +159,88 @@
                 </div>
                 <input type="text" 
                     class="opacity-input" 
-                    [(ngModel)]="note.backgroundOpacity"
-                    (change)="onFormatChange()"
-                    readonly>
+                    [ngModel]="note.backgroundOpacity"
+                    (ngModelChange)="onOpacityInputChange('background', $event)"
+                    (input)="onOpacityInput($event, 'background')"
+                    (blur)="onOpacityInputBlur('background')"
+                    pattern="[0-9]*"
+                    inputmode="numeric">
                 <span class="opacity-percent">%</span>
+            </div>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <!-- Border color Section -->
+        <!-- ---------------------------------------------------------- -->
+        <div class="row background-section">
+            <div class="section-header">
+                <h4 class="section-title">Border color</h4>
+                <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
+            </div>
+
+            <div class="color-control-group">
+                <div class="color-swatch-wrapper">
+                    <input type="color" 
+                        class="color-swatch" 
+                        [value]="getBaseColorForPicker('border')"
+                        (change)="onColorChange($event, 'border', note.borderOpacity)">
+                </div>
+                <div class="slider-wrapper">
+                    <input type="range" 
+                        class="opacity-slider" 
+                        min="0" 
+                        max="100" 
+                        [(ngModel)]="note.borderOpacity"
+                        (input)="onFormatChange()">
+                </div>
+                <input type="text" 
+                    class="opacity-input" 
+                    [ngModel]="note.borderOpacity"
+                    (ngModelChange)="onOpacityInputChange('border', $event)"
+                    (input)="onOpacityInput($event, 'border')"
+                    (blur)="onOpacityInputBlur('border')"
+                    pattern="[0-9]*"
+                    inputmode="numeric">
+                <span class="opacity-percent">%</span>
+            </div>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <!-- Box Shadow Section -->
+        <!-- ---------------------------------------------------------- -->
+        <div class="row background-section">
+            <div class="section-header">
+                <h4 class="section-title">Box parameters</h4>
+                <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
+            </div>
+
+            <div class="field-box">
+                <section class="disable-input-message-section">
+                    <mat-checkbox 
+                        [checked]="note.boxShadow"
+                        (change)="onBoxShadowChange($event)">
+                        Enable shadow
+                    </mat-checkbox>
+                </section>
             </div>
         </div>
 
         <!-- ---------------------------------------------------------- -->
         <!-- Save Button -->
         <!-- ---------------------------------------------------------- -->
-        <div class="row">
-            <button type="button" class="btn btn-primary cds-blue-button" (click)="onSaveNote()">
-                {{ 'Save' | translate }}
-            </button>
-        </div>
+        <!-- Pulsante Salva nascosto - salvataggio automatico con debounce -->
 
     </div>
 </div>
+
+<!-- Note Menu -->
+<mat-menu #noteMenu="matMenu" xPosition="before" yPosition="below">
+    <button mat-menu-item (click)="onDuplicateNote()">
+        <mat-icon svgIcon="copy" aria-hidden="true"></mat-icon>
+        <span>{{ 'Duplicate' | translate }}</span>
+    </button>
+    <button mat-menu-item (click)="onDeleteNote()">
+        <mat-icon svgIcon="bin" aria-hidden="true"></mat-icon>
+        <span>{{ 'Delete' | translate }}</span>
+    </button>
+</mat-menu>

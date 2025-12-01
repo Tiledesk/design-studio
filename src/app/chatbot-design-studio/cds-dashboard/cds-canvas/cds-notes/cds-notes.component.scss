@@ -2,7 +2,8 @@
 .cds-notes-content {
   min-width: 50px;
   min-height: 50px;
-  background-color: rgb(197, 231, 246); // Giallo chiaro per le note
+  // background-color viene applicato dinamicamente tramite [style.background-color]
+  // Default: rgb(197, 231, 246) se non specificato nella nota
   padding: 10px 8px;
   position: relative;
   box-sizing: border-box;
@@ -37,9 +38,10 @@
     word-wrap: break-word; // Permette il wrap delle parole lunghe
     z-index: 1;
     position: relative;
-    // Usa field-sizing per auto-ridimensionamento automatico (supporto moderno)
-    // Questa proprietà fa sì che la textarea si adatti automaticamente al contenuto
-    field-sizing: content;
+    // Contenteditable styling
+    -webkit-user-select: text;
+    user-select: text;
+    // Permette l'inserimento di HTML formattato
     // Cursor pointer quando è draggable
     &.tds_draggable {
       cursor: move;
@@ -47,7 +49,36 @@
       &:active {
           cursor: grabbing;
       }
-  }
+    }
+    
+    // Stili per elementi HTML all'interno del contenteditable
+    // Permette la formattazione inline
+    ::ng-deep strong,
+    ::ng-deep b {
+      font-weight: bold;
+    }
+    
+    ::ng-deep em,
+    ::ng-deep i {
+      font-style: italic;
+    }
+    
+    ::ng-deep u {
+      text-decoration: underline;
+    }
+    
+    ::ng-deep a {
+      color: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    
+    // Quando è vuoto, mostra un placeholder visivo
+    &:empty:before {
+      content: 'Type something';
+      color: #999;
+      pointer-events: none;
+    }
 }
 
 

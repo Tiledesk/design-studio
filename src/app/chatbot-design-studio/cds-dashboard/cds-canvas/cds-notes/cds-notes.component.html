@@ -2,16 +2,26 @@
 <div class="cds-notes-content"
     #noteContentElement
     [class.selected]="stateNote === 2"
-    [id]="note?.note_id">
-    
-    <textarea 
+    [id]="note?.note_id"
+    [style.box-shadow]="note?.boxShadow === false ? 'none' : null"
+    [style.border-color]="note?.borderColor || 'rgba(86, 179, 101, 1)'"
+    [style.background-color]="note?.backgroundColor || 'rgba(197, 231, 246, 1)'">
+    <!-- (input)="onInputChange($event)" -->
+    <div 
         #noteInput
         class="note-input"
-        [value]="note?.text"
-        (input)="onInputChange($event)"
+        contenteditable="true"
+        [innerHTML]="note?.text || ''"
         (focus)="onFocusTextarea($event)"
         (blur)="onBlurTextarea($event)"
-        rows="1"></textarea>
+        [style.font-family]="note?.fontFamily || 'Open Sans'"
+        [style.font-size.px]="note?.fontSize || 14"
+        [style.text-align]="note?.textAlign || 'left'"
+        [style.font-style]="note?.fontStyle || 'normal'"
+        [style.text-decoration]="note?.textDecoration || 'none'"
+        [style.color]="getTextColorWithOpacity()"
+        spellcheck="false">
+    </div>
 
     <div
         #noteResize

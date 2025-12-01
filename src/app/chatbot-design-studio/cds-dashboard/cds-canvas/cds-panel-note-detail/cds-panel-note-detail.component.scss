@@ -10,7 +10,8 @@
 }
 
 .panel-note-detail {
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: var(--panel-width);
     min-width: 400px;
     height: 100%;
@@ -65,6 +66,7 @@
 }
 
 .header-options-wrp,
+.header-menu-wrp,
 .header-close-wrp {
     display: flex;
     padding: 10px;
@@ -77,12 +79,37 @@
 }
 
 .content-panel {
-    overflow: hidden auto;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px;
+    min-height: 0; // Necessario per far funzionare il flex con overflow
+    
+    // Stile della scrollbar per coerenza con altri pannelli
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+    }
+    
+    // Per Firefox
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
-// Markup Text Section
-.markup-section {
+// Rich Text Editor Section
+.rich-text-editor-section {
     .section-header {
         display: flex;
         align-items: center;
@@ -105,43 +132,7 @@
         }
     }
     
-    .font-selection {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 15px;
-        
-        .font-select {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid var(--gray-light-02);
-            border-radius: 4px;
-            font-size: 14px;
-            background-color: white;
-            cursor: pointer;
-            
-            &:focus {
-                outline: none;
-                border-color: var(--blu);
-            }
-        }
-        
-        .font-size-select {
-            width: 80px;
-            padding: 8px 12px;
-            border: 1px solid var(--gray-light-02);
-            border-radius: 4px;
-            font-size: 14px;
-            background-color: white;
-            cursor: pointer;
-            
-            &:focus {
-                outline: none;
-                border-color: var(--blu);
-            }
-        }
-    }
-    
-    .formatting-toolbar {
+    .rich-text-toolbar {
         display: flex;
         align-items: center;
         gap: 0;
@@ -190,8 +181,35 @@
                 font-style: normal;
                 color: var(--gray-dark);
                 
+                &.bold {
+                    font-weight: 700;
+                }
+                
                 &.italic {
                     font-style: italic;
+                }
+                
+                &.underline {
+                    text-decoration: underline;
+                }
+            }
+            
+            .toolbar-color-picker {
+                width: 32px;
+                height: 32px;
+                border: 1px solid var(--gray-light-02);
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 0;
+                background: transparent;
+                
+                &::-webkit-color-swatch-wrapper {
+                    padding: 0;
+                }
+                
+                &::-webkit-color-swatch {
+                    border: none;
+                    border-radius: 3px;
                 }
             }
             
@@ -210,8 +228,65 @@
         }
     }
     
-    .link-input-group {
-        margin-bottom: 15px;
+    .rich-text-editor-wrapper {
+        margin-top: 15px;
+        border: 1px solid var(--gray-light-02);
+        border-radius: 4px;
+        background-color: white;
+        min-height: 200px;
+        
+        .rich-text-editor {
+            min-height: 200px;
+            padding: 12px;
+            outline: none;
+            overflow-y: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            
+            &:focus {
+                border-color: var(--blu);
+            }
+            
+            // Stili per elementi HTML formattati
+            ::ng-deep strong,
+            ::ng-deep b {
+                font-weight: bold;
+            }
+            
+            ::ng-deep em,
+            ::ng-deep i {
+                font-style: italic;
+            }
+            
+            ::ng-deep u {
+                text-decoration: underline;
+            }
+            
+            ::ng-deep a {
+                color: var(--blu);
+                text-decoration: underline;
+                cursor: pointer;
+                
+                &:hover {
+                    color: var(--blu-dark);
+                }
+            }
+            
+            // Quando è vuoto, mostra un placeholder
+            &:empty:before {
+                content: 'Type something...';
+                color: #999;
+                pointer-events: none;
+            }
+        }
+    }
+    
+    .link-dialog {
+        margin-top: 10px;
+        padding: 12px;
+        border: 1px solid var(--gray-light-02);
+        border-radius: 4px;
+        background-color: #f9f9f9;
         
         .form-control {
             width: 100%;
@@ -219,10 +294,31 @@
             border: 1px solid var(--gray-light-02);
             border-radius: 4px;
             font-size: 14px;
+            margin-bottom: 10px;
             
             &:focus {
                 outline: none;
                 border-color: var(--blu);
+            }
+        }
+        
+        .link-dialog-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            
+            .btn-link {
+                padding: 6px 16px;
+                border: 1px solid var(--gray-light-02);
+                border-radius: 4px;
+                background-color: white;
+                cursor: pointer;
+                font-size: 14px;
+                
+                &:hover {
+                    background-color: var(--blu-light-03);
+                    border-color: var(--blu);
+                }
             }
         }
     }
@@ -295,6 +391,17 @@
             font-size: 12px;
             text-align: center;
             background-color: #f9f9f9;
+            
+            // Nasconde le freccette per input type="number"
+            &[type="number"] {
+                -moz-appearance: textfield;
+                
+                &::-webkit-outer-spin-button,
+                &::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+            }
             
             &:focus {
                 outline: none;
@@ -401,6 +508,17 @@
             text-align: center;
             background-color: #f9f9f9;
             
+            // Nasconde le freccette per input type="number"
+            &[type="number"] {
+                -moz-appearance: textfield;
+                
+                &::-webkit-outer-spin-button,
+                &::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+            }
+            
             &:focus {
                 outline: none;
                 border-color: var(--blu);
@@ -410,6 +528,23 @@
         .opacity-percent {
             font-size: 12px;
             color: var(--gray-dark);
+        }
+        
+        .field-box {
+            margin-bottom: 15px;
+            
+            .disable-input-message-section {
+                display: flex;
+                align-items: center;
+                margin-bottom: 8px;
+                
+                ::ng-deep .mat-checkbox {
+                    .mat-checkbox-label {
+                        font-size: 14px;
+                        color: var(--gray-dark);
+                    }
+                }
+            }
         }
     }
 }

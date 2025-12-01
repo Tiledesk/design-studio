@@ -154,5 +154,119 @@ export class NoteService {
       throw error;
     }
   }
+
+  /**
+   * Elimina una nota dall'array e salva l'array aggiornato in remoto
+   * @param note - La nota da eliminare
+   * @param id_faq_kb - ID del chatbot a cui appartiene la nota
+   * @returns Observable che emette il risultato della chiamata
+   */
+  deleteNote(note: Note, id_faq_kb: string): Observable<any> {
+    try {
+      this.logger.log('[NOTE-SERVICE] deleteNote note:', note.note_id);
+      
+      if (!note || !note.note_id) {
+        throw new Error('Note is required for deletion');
+      }
+
+      // Assicurati che attributes esista
+      if (!this.dashboardService.selectedChatbot.attributes) {
+        this.dashboardService.selectedChatbot.attributes = {};
+      }
+      
+      // Recupera tutte le note dal dashboardService
+      const notes = this.dashboardService.selectedChatbot.attributes.notes || [];
+      
+      // Rimuove la nota dall'array
+      const filteredNotes = notes.filter(n => n.note_id !== note.note_id);
+      
+      // Aggiorna l'array nel dashboardService
+      this.dashboardService.selectedChatbot.attributes.notes = filteredNotes;
+      
+      this.logger.log('[NOTE-SERVICE] Note removed from array. Remaining notes:', filteredNotes.length);
+      
+      // Prepara gli attributi da inviare
+      const attributes = {
+        notes: filteredNotes
+      };
+      
+      // Chiama patchAttributes per salvare l'array aggiornato in remoto
+      return this.faqKbService.patchAttributes(id_faq_kb, attributes);
+    } catch (error) {
+      this.logger.error('[NOTE-SERVICE] Error deleting note:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Duplica una nota creando una copia con un nuovo ID e posizione leggermente spostata
+   * @param note - La nota da duplicare
+   * @param id_faq_kb - ID del chatbot a cui appartiene la nota
+   * @returns Observable che emette la nota duplicata e il risultato della chiamata
+   */
+  duplicateNote(note: Note, id_faq_kb: string): Observable<Note> {
+    try {
+      this.logger.log('[NOTE-SERVICE] duplicateNote note:', note.note_id);
+      
+      if (!note || !note.note_id) {
+        throw new Error('Note is required for duplication');
+      }
+
+      // Crea una copia della nota con un nuovo ID
+      // Sposta leggermente la posizione della nota duplicata
+      const duplicatedNote = new Note(id_faq_kb, {
+        x: note.x + 20,
+        y: note.y + 20
+      });
+      
+      // Copia tutte le proprietà dalla nota originale
+      duplicatedNote.text = note.text;
+      duplicatedNote.fontSize = note.fontSize;
+      duplicatedNote.fontFamily = note.fontFamily;
+      duplicatedNote.fontStyle = note.fontStyle;
+      duplicatedNote.textDecoration = note.textDecoration;
+      duplicatedNote.textAlign = note.textAlign;
+      duplicatedNote.textColor = note.textColor;
+      duplicatedNote.textOpacity = note.textOpacity;
+      duplicatedNote.backgroundColor = note.backgroundColor;
+      duplicatedNote.backgroundOpacity = note.backgroundOpacity;
+      duplicatedNote.borderColor = note.borderColor;
+      duplicatedNote.borderOpacity = note.borderOpacity;
+      duplicatedNote.boxShadow = note.boxShadow;
+      duplicatedNote.isLink = note.isLink;
+      duplicatedNote.linkUrl = note.linkUrl;
+      duplicatedNote.width = note.width;
+      duplicatedNote.height = note.height;
+      
+      // Assicurati che attributes esista
+      if (!this.dashboardService.selectedChatbot.attributes) {
+        this.dashboardService.selectedChatbot.attributes = {};
+      }
+      
+      // Recupera tutte le note dal dashboardService
+      const notes = this.dashboardService.selectedChatbot.attributes.notes || [];
+      
+      // Aggiunge la nota duplicata all'array
+      notes.push(duplicatedNote);
+      
+      // Aggiorna l'array nel dashboardService
+      this.dashboardService.selectedChatbot.attributes.notes = notes;
+      
+      this.logger.log('[NOTE-SERVICE] Note duplicated. New note ID:', duplicatedNote.note_id);
+      
+      // Prepara gli attributi da inviare
+      const attributes = {
+        notes: notes
+      };
+      
+      // Salva la nota duplicata in remoto e restituisce la nota duplicata
+      return this.faqKbService.patchAttributes(id_faq_kb, attributes).pipe(
+        map(() => duplicatedNote)
+      );
+    } catch (error) {
+      this.logger.error('[NOTE-SERVICE] Error duplicating note:', error);
+      throw error;
+    }
+  }
 }
 

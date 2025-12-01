@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { INTENT_COLORS } from 'src/app/chatbot-design-studio/utils';
+import { NOTE_COLORS } from 'src/app/chatbot-design-studio/utils';
 
 export class Note {
   id_faq_kb?: string;
@@ -10,6 +10,7 @@ export class Note {
   width?: number;
   height?: number;
   backgroundColor?: string;
+  borderColor?: string;
   createdAt: Date;
   isNew?: boolean;
   
@@ -22,6 +23,8 @@ export class Note {
   textColor?: string;
   textOpacity?: number;
   backgroundOpacity?: number;
+  borderOpacity?: number;
+  boxShadow?: boolean;
   isLink?: boolean;
   linkUrl?: string;
 
@@ -34,7 +37,8 @@ export class Note {
     this.width = 220;
     this.height = 50;
     this.createdAt = new Date();
-    this.backgroundColor = INTENT_COLORS.COLOR1;
+    this.backgroundColor = 'rgba('+NOTE_COLORS.BACKGROUND_COLOR+', 1)'; // Colore di default
+    this.borderColor = 'rgba('+NOTE_COLORS.BORDER_COLOR+', 1)'; // Colore di default
     this.isNew = true; // Indica che la nota è appena stata creata
     
     // Default formatting values
@@ -46,6 +50,7 @@ export class Note {
     this.textColor = '#000000';
     this.textOpacity = 100;
     this.backgroundOpacity = 100;
+    this.boxShadow = true; // Default: ombra attiva
     this.isLink = false;
     this.linkUrl = '';
   }

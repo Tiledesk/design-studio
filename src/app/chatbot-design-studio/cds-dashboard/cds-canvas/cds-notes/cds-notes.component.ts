@@ -13,7 +13,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() note: Note;
   @Input() IS_OPEN_PANEL_NOTE_DETAIL: boolean = false;
   @Output() noteSelected = new EventEmitter<Note>();
-  @ViewChild('noteInput', { static: false }) noteInput: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('noteInput', { static: false }) noteInput: ElementRef<HTMLDivElement>;
   @ViewChild('noteContentElement', { static: false }) contentElement: ElementRef<HTMLDivElement>;
   @ViewChild('noteResize', { static: false }) noteResize: ElementRef<HTMLDivElement>;
 
@@ -34,16 +34,34 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     if(state === 1) {
       this.textareaHasFocus = true;
       setTimeout(() => {
-        this.noteInput.nativeElement.focus();
+        if (this.noteInput) {
+          this.noteInput.nativeElement.focus();
+          // Posiziona il cursore alla fine del contenuto
+          // this.placeCaretAtEnd(this.noteInput.nativeElement);
+        }
       }, 100);
+      // Apri il panel dei dettagli quando si mette il focus sul testo
+      this.noteSelected.emit(this.note);
     } else {
       this.textareaHasFocus = false;
-      this.noteInput.nativeElement.blur();
+      if (this.noteInput) {
+        this.noteInput.nativeElement.blur();
+      }
     }
-    if(state !== 0) {
-        this.noteSelected.emit(this.note);
-    }
+    // NON aprire il panel quando lo stato è 2 (resizing) - solo al doppio click o focus sul testo
     console.log('[CDS-NOTES] State changed to:', state);
+  }
+
+  /**
+   * Posiziona il cursore alla fine del contenuto del div contenteditable
+   */
+  private placeCaretAtEnd(element: HTMLElement): void {
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.selectNodeContents(element);
+    range.collapse(false);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
   }
   
   // Variabili per il ridimensionamento
@@ -138,9 +156,10 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
         // Salva la nota nel localStorage dopo il drag
         // se la posizione è cambiata, salva la nota
         if (this.note.x !== el.offsetLeft || this.note.y !== el.offsetTop) {
-          this.updateNote();
+         
           // Ricalcola e sincronizza le dimensioni e le posizioni dopo il drag
           this.recalculateNoteDimensionsAndPosition(el);
+          this.updateNote();
         }
       } else {
         console.log('DRAGGING END - NOT THIS NOTE');
@@ -203,14 +222,39 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   // ============================================================================
   
   /**
-   * Listener per l'evento input della textarea
-   * Aggiorna il testo della nota quando l'utente digita
+   * Listener per l'evento input del div contenteditable
+   * Aggiorna il testo HTML formattato della nota quando l'utente digita
    */
-  onInputChange(event: Event): void {
-    const textarea = event.target as HTMLTextAreaElement;
-    if (this.note) {
-      this.note.text = textarea.value;
+  // onInputChange(event: Event): void {
+  //   const editableDiv = event.target as HTMLDivElement;
+  //   if (this.note) {
+  //     // Salva l'HTML formattato invece del testo semplice
+  //     this.note.text = editableDiv.innerHTML;
+  //   }
+  // }
+
+  /**
+   * Calcola il colore del testo con opacità
+   */
+  getTextColorWithOpacity(): string {
+    if (!this.note) return '#000000';
+    const color = this.note.textColor || '#000000';
+    const opacity = (this.note.textOpacity || 100) / 100;
+    
+    // Se il colore è in formato hex, convertilo in rgba
+    if (color.startsWith('#')) {
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
+    
+    // Se è già in formato rgba, modifica l'opacità
+    if (color.startsWith('rgba')) {
+      return color.replace(/[\d\.]+\)$/g, `${opacity})`);
+    }
+    
+    return color;
   }
 
   /**
@@ -287,8 +331,7 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.changeState(2);
     // Disabilita il drag quando le maniglie sono visibili
     this.updateDragState();
-    // Emetti l'evento per aprire il panel dei dettagli della nota
-    this.noteSelected.emit(this.note);
+    // NON aprire il panel al singolo click - solo al doppio click o quando si mette il focus sul testo
     // NON chiamare updateNote() qui - il click serve solo per selezionare
   }
 
@@ -307,6 +350,8 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('onDoubleClick');
     // Al doppio click nascondo il div note-resize e metto il focus sulla textarea
     this.changeState(1);
+    // Apri il panel dei dettagli della nota al doppio click
+    this.noteSelected.emit(this.note);
     // NON chiamare updateNote() qui - il doppio click serve solo per attivare la modifica
   }
 
@@ -425,10 +470,10 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.contentElement.nativeElement.style.width = newWidth + 'px';
     this.contentElement.nativeElement.style.height = newHeight + 'px';
     
-    // Aggiorna le dimensioni della textarea (sottrai padding: 10px top/bottom, 8px left/right)
+    // Aggiorna le dimensioni del div contenteditable (sottrai padding: 10px top/bottom, 8px left/right)
     if (this.noteInput) {
       this.noteInput.nativeElement.style.width = (newWidth - 16) + 'px';
-      //this.noteInput.nativeElement.style.height = (newHeight - 20) + 'px';
+      // L'altezza si adatta automaticamente al contenuto grazie al CSS
     }
   }
 
