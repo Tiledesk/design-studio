@@ -1,15 +1,19 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Note } from 'src/app/models/note-model';
 import { StageService } from '../../../services/stage.service';
 import { NoteService } from 'src/app/services/note.service';
-import { firstValueFrom } from 'rxjs';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { firstValueFrom, Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'cds-notes',
   templateUrl: './cds-notes.component.html',
   styleUrls: ['./cds-notes.component.scss']
 })
-export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() note: Note;
   @Input() IS_OPEN_PANEL_NOTE_DETAIL: boolean = false;
   @Output() noteSelected = new EventEmitter<Note>();
@@ -23,6 +27,14 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   stateNote: 0|1|2|3 = 0; // 0: normal, 1: text focus, 2: resizing, 3: dropping
   
+  // Timer per ritardare l'apertura del pannello e evitare aperture multiple
+  private openPanelTimer: any = null;
+  noteText: string;
+  sanitizedNoteHtml: SafeHtml;
+  
+  // Sottoscrizioni per i cambiamenti delle note
+  private noteUpdatedSubscription: Subscription;
+  
   // Getter per determinare se il drag è abilitato
   get isDraggable(): boolean {
     return this.stateNote !== 1 && !this.textareaHasFocus;
@@ -30,38 +42,99 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   
   // Funzione per cambiare lo stato della nota
   changeState(state: 0|1|2|3): void {
+    const previousState = this.stateNote;
     this.stateNote = state;
+    
     if(state === 1) {
+      // Stato: text focus - APRI il panel immediatamente (doppio click)
+      // Cancella eventuali timer pendenti per evitare aperture multiple
+      this.cancelOpenPanelTimer();
       this.textareaHasFocus = true;
+      // Apri il panel dei dettagli immediatamente quando si mette il focus sul testo
+      this.noteSelected.emit(this.note);
+      
+      // Posiziona il cursore alla fine del testo dopo che il focus è stato applicato
       setTimeout(() => {
         if (this.noteInput) {
           this.noteInput.nativeElement.focus();
           // Posiziona il cursore alla fine del contenuto
-          // this.placeCaretAtEnd(this.noteInput.nativeElement);
+          this.placeCaretAtEnd(this.noteInput.nativeElement);
         }
-      }, 100);
-      // Apri il panel dei dettagli quando si mette il focus sul testo
-      this.noteSelected.emit(this.note);
-    } else {
+      }, 150);
+    } else if(state === 2) {
+      // Stato: selected con maniglie visibili - APRI il panel con ritardo
       this.textareaHasFocus = false;
       if (this.noteInput) {
         this.noteInput.nativeElement.blur();
       }
+      // Apri il panel dei dettagli con un breve ritardo per evitare aperture multiple su doppio click
+      this.openPanelWithDelay();
+    } else if(state === 0 || state === 3) {
+      // Stato: normal (0) o dropping (3) - CHIUDI il panel
+      // Cancella eventuali timer pendenti
+      this.cancelOpenPanelTimer();
+      this.textareaHasFocus = false;
+      if (this.noteInput) {
+        this.noteInput.nativeElement.blur();
+      }
+      // Chiudi il panel quando lo stato è 0 o 3
+      // Emetti null solo se il panel era aperto (stato precedente era 1 o 2)
+      if (previousState === 1 || previousState === 2) {
+        this.noteSelected.emit(null);
+      }
     }
-    // NON aprire il panel quando lo stato è 2 (resizing) - solo al doppio click o focus sul testo
-    console.log('[CDS-NOTES] State changed to:', state);
+    
+    console.log('[CDS-NOTES] State changed from', previousState, 'to:', state);
+  }
+
+  /**
+   * Apre il pannello con un breve ritardo per evitare aperture multiple su doppio click
+   */
+  private openPanelWithDelay(): void {
+    // Cancella eventuali timer precedenti
+    this.cancelOpenPanelTimer();
+    
+    // Imposta un nuovo timer con ritardo di 200ms
+    this.openPanelTimer = setTimeout(() => {
+      this.noteSelected.emit(this.note);
+      this.openPanelTimer = null;
+    }, 200);
+  }
+
+  /**
+   * Cancella il timer di apertura del pannello se esiste
+   */
+  private cancelOpenPanelTimer(): void {
+    if (this.openPanelTimer) {
+      clearTimeout(this.openPanelTimer);
+      this.openPanelTimer = null;
+    }
   }
 
   /**
    * Posiziona il cursore alla fine del contenuto del div contenteditable
    */
   private placeCaretAtEnd(element: HTMLElement): void {
-    const range = document.createRange();
-    const selection = window.getSelection();
-    range.selectNodeContents(element);
-    range.collapse(false);
-    selection?.removeAllRanges();
-    selection?.addRange(range);
+    try {
+      const range = document.createRange();
+      const selection = window.getSelection();
+      
+      if (!selection) return;
+      
+      // Seleziona tutto il contenuto
+      range.selectNodeContents(element);
+      // Collassa il range alla fine (false = fine, true = inizio)
+      range.collapse(false);
+      
+      // Rimuovi tutte le selezioni esistenti e aggiungi il nuovo range
+      selection.removeAllRanges();
+      selection.addRange(range);
+      
+      // Assicurati che l'elemento abbia il focus
+      element.focus();
+    } catch (error) {
+      console.error('[CDS-NOTES] Error placing caret at end:', error);
+    }
   }
   
   // Variabili per il ridimensionamento
@@ -77,12 +150,101 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
   private draggedListener: EventListener | null = null;
   private draggingListener: EventListener | null = null;
   
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
+
   constructor(
     private stageService: StageService,
-    private noteService: NoteService
+    private noteService: NoteService,
+    private sanitizer: DomSanitizer
   ) { }
 
-  ngOnInit(): void {}
+  /**
+   * Aggiorna l'HTML sanitizzato usato per il binding [innerHTML]
+   * Usa DomSanitizer per preservare gli stili inline (es. color) generati da Quill
+   * senza che Angular li rimuova
+   */
+  private updateSanitizedHtml(): void {
+    // Non aggiornare mentre l'utente sta digitando per evitare che il cursore si sposti
+    if (this.textareaHasFocus) {
+      return;
+    }
+    const html = this.note?.text || '';
+    this.sanitizedNoteHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  ngOnInit(): void {
+    // Inizializza noteText con il valore corrente di note.text
+    if (this.note) {
+      this.noteText = this.note.text || '';
+      this.updateSanitizedHtml();
+    }
+    
+    // Sottoscrivi ai cambiamenti delle note per aggiornare il contenuto quando una nota viene modificata
+    this.noteUpdatedSubscription = this.noteService.noteUpdated$
+      .pipe(
+        filter(updatedNote => updatedNote && this.note && updatedNote.note_id === this.note.note_id)
+      )
+      .subscribe(updatedNote => {
+        // Aggiorna la nota locale con i dati aggiornati
+        if (updatedNote && this.note) {
+          // Aggiorna tutte le proprietà della nota
+          Object.assign(this.note, updatedNote);
+          
+          // Aggiorna noteText solo se la textarea non ha il focus
+          if (!this.textareaHasFocus) {
+            const newText = updatedNote.text || '';
+            if (this.noteText !== newText) {
+              this.noteText = newText;
+              // Aggiorna anche il DOM se la textarea esiste
+              if (this.noteInput && this.noteInput.nativeElement.innerHTML !== newText) {
+                this.noteInput.nativeElement.innerHTML = newText;
+              }
+              // Aggiorna anche l'HTML sanitizzato per la visualizzazione
+              this.updateSanitizedHtml();
+            }
+          }
+          
+          this.logger.log('[CDS-NOTES] Note updated from service:', updatedNote.note_id);
+        }
+      });
+  }
+
+  /**
+   * Rileva i cambiamenti all'input note e aggiorna noteText di conseguenza
+   * Best practice: usa ngOnChanges per sincronizzare lo stato locale con gli input
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('---------> ngOnChanges', changes['note']);
+    if (changes['note'] && this.note) {
+      const noteChange = changes['note'];
+      
+      // Se è la prima volta che note viene impostato, inizializza noteText
+      if (noteChange.isFirstChange()) {
+        this.noteText = this.note.text || '';
+        this.updateSanitizedHtml();
+      } else {
+        // Se note.text è cambiato, aggiorna noteText solo se diverso
+        // Questo evita aggiornamenti inutili quando l'utente sta digitando
+        const newText = this.note.text || '';
+        if (this.noteText !== newText) {
+          // Aggiorna noteText solo se la textarea non ha il focus
+          // per evitare conflitti durante la digitazione
+          if (!this.textareaHasFocus && this.noteInput) {
+            this.noteText = newText;
+            // Aggiorna anche il DOM se necessario
+            if (this.noteInput.nativeElement.innerHTML !== newText) {
+              this.noteInput.nativeElement.innerHTML = newText;
+            }
+            this.updateSanitizedHtml();
+          } else if (!this.textareaHasFocus) {
+            // Se la textarea non esiste ancora, aggiorna solo noteText
+            this.noteText = newText;
+            this.updateSanitizedHtml();
+          }
+        }
+      }
+    }
+  }
 
   ngAfterViewInit(): void {
     // Imposta le dimensioni iniziali del blocco basandosi su note.width e note.height
@@ -93,8 +255,8 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.contentElement.nativeElement.style.height = height + 'px';
       // Inizializza tutti i listener per gli eventi
       this.setupAllListeners();
-      // Inizializza il drag dopo che la vista è stata inizializzata
-      this.updateDragState();
+        // Inizializza il drag dopo che la vista è stata inizializzata
+        this.updateDragState();
     }
   }
 
@@ -215,6 +377,13 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.draggedListener) {
       document.removeEventListener("end-dragging", this.draggedListener, false);
     }
+    // Pulisci il timer di apertura del pannello
+    this.cancelOpenPanelTimer();
+    
+    // Rimuovi la sottoscrizione ai cambiamenti delle note
+    if (this.noteUpdatedSubscription) {
+      this.noteUpdatedSubscription.unsubscribe();
+    }
   }
 
   // ============================================================================
@@ -225,37 +394,15 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Listener per l'evento input del div contenteditable
    * Aggiorna il testo HTML formattato della nota quando l'utente digita
    */
-  // onInputChange(event: Event): void {
-  //   const editableDiv = event.target as HTMLDivElement;
-  //   if (this.note) {
-  //     // Salva l'HTML formattato invece del testo semplice
-  //     this.note.text = editableDiv.innerHTML;
-  //   }
-  // }
-
-  /**
-   * Calcola il colore del testo con opacità
-   */
-  getTextColorWithOpacity(): string {
-    if (!this.note) return '#000000';
-    const color = this.note.textColor || '#000000';
-    const opacity = (this.note.textOpacity || 100) / 100;
-    
-    // Se il colore è in formato hex, convertilo in rgba
-    if (color.startsWith('#')) {
-      const r = parseInt(color.slice(1, 3), 16);
-      const g = parseInt(color.slice(3, 5), 16);
-      const b = parseInt(color.slice(5, 7), 16);
-      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  onInputChange(event: Event): void {
+    const editableDiv = event.target as HTMLDivElement;
+    if (this.note) {
+      // Salva l'HTML formattato invece del testo semplice
+      this.note.text = editableDiv.innerHTML;
     }
-    
-    // Se è già in formato rgba, modifica l'opacità
-    if (color.startsWith('rgba')) {
-      return color.replace(/[\d\.]+\)$/g, `${opacity})`);
-    }
-    
-    return color;
+    console.log('onInputChange', this.note.text, editableDiv.innerHTML);
   }
+
 
   /**
    * Listener per l'evento focus della textarea
@@ -282,6 +429,8 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.changeState(0);
     // Riabilita il drag quando la textarea perde il focus (se non è selezionata)
     this.updateDragState();
+    // Aggiorna l'HTML sanitizzato dopo che l'utente ha finito di modificare il testo
+    this.updateSanitizedHtml();
     // Salva la nota nel localStorage dopo la modifica del testo
     this.updateNote();
   }
@@ -327,11 +476,11 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     event.stopPropagation();
     console.log('[CDS-NOTES] onSingleClick');
-    // Al singolo click visualizza le maniglie
+    // Al singolo click visualizza le maniglie (stateNote === 2)
+    // changeState(2) aprirà automaticamente il panel
     this.changeState(2);
     // Disabilita il drag quando le maniglie sono visibili
     this.updateDragState();
-    // NON aprire il panel al singolo click - solo al doppio click o quando si mette il focus sul testo
     // NON chiamare updateNote() qui - il click serve solo per selezionare
   }
 
@@ -517,15 +666,18 @@ export class CdsNotesComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     
-    // Se la nota è selezionata e si clicca fuori dal componente, deseleziona
-    if (this.stateNote === 1 && this.contentElement) {
+    // Se la nota è selezionata (stateNote === 1 o 2) e si clicca fuori dal componente, deseleziona
+    if ((this.stateNote === 1 || this.stateNote === 2) && this.contentElement) {
       const target = event.target as HTMLElement;
       const clickedInside = this.contentElement.nativeElement.contains(target);
       
       // Non deselezionare se si clicca su una maniglia
       const clickedOnHandle = target.classList.contains('resize-handle');
       
-      if (!clickedInside && !clickedOnHandle) {
+      // Non deselezionare se si clicca sul pannello di dettaglio
+      const clickedOnPanel = target.closest('.panel-note-detail') !== null;
+      
+      if (!clickedInside && !clickedOnHandle && !clickedOnPanel) {
         this.changeState(0);
         // Ri-inizializza il drag quando la selezione cambia (per riattivare il drag quando selected = false e textarea non ha focus)
         this.updateDragState();

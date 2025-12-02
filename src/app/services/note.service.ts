@@ -4,7 +4,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { FaqKbService } from './faq-kb.service';
 import { DashboardService } from './dashboard.service';
-import { Observable } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable({
@@ -12,11 +12,40 @@ import { map } from 'rxjs/operators';
 })
 export class NoteService {
   private logger: LoggerService = LoggerInstance.getInstance();
+  
+  // Subject per notificare i cambiamenti alle note
+  // Emette l'array completo di note quando viene modificato
+  private notesChangedSubject = new BehaviorSubject<Note[]>([]);
+  public notesChanged$ = this.notesChangedSubject.asObservable();
+  
+  // Subject per notificare i cambiamenti a una singola nota
+  // Emette la nota modificata
+  private noteUpdatedSubject = new Subject<Note>();
+  public noteUpdated$ = this.noteUpdatedSubject.asObservable();
 
   constructor(
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService
   ) { }
+  
+  /**
+   * Notifica i cambiamenti all'array di note
+   * Chiamato internamente quando l'array viene modificato
+   */
+  private notifyNotesChanged(): void {
+    const notes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+    this.notesChangedSubject.next([...notes]);
+    this.logger.log('[NOTE-SERVICE] Notes changed notification sent. Total notes:', notes.length);
+  }
+  
+  /**
+   * Notifica i cambiamenti a una singola nota
+   * @param note - La nota che è stata modificata
+   */
+  private notifyNoteUpdated(note: Note): void {
+    this.noteUpdatedSubject.next(note);
+    this.logger.log('[NOTE-SERVICE] Note updated notification sent:', note.note_id);
+  }
 
   /**
    * Ottiene la chiave del localStorage per un chatbot specifico
@@ -142,6 +171,10 @@ export class NoteService {
       
       this.logger.log('[NOTE-SERVICE] Saving notes remotely:', notes.length, 'notes for chatbot:', id_faq_kb);
       
+      // Notifica i cambiamenti
+      this.notifyNotesChanged();
+      this.notifyNoteUpdated(note);
+      
       // Prepara gli attributi da inviare
       const attributes = {
         notes: notes
@@ -185,6 +218,9 @@ export class NoteService {
       
       this.logger.log('[NOTE-SERVICE] Note removed from array. Remaining notes:', filteredNotes.length);
       
+      // Notifica i cambiamenti
+      this.notifyNotesChanged();
+      
       // Prepara gli attributi da inviare
       const attributes = {
         notes: filteredNotes
@@ -221,20 +257,11 @@ export class NoteService {
       
       // Copia tutte le proprietà dalla nota originale
       duplicatedNote.text = note.text;
-      duplicatedNote.fontSize = note.fontSize;
-      duplicatedNote.fontFamily = note.fontFamily;
-      duplicatedNote.fontStyle = note.fontStyle;
-      duplicatedNote.textDecoration = note.textDecoration;
-      duplicatedNote.textAlign = note.textAlign;
-      duplicatedNote.textColor = note.textColor;
-      duplicatedNote.textOpacity = note.textOpacity;
       duplicatedNote.backgroundColor = note.backgroundColor;
       duplicatedNote.backgroundOpacity = note.backgroundOpacity;
       duplicatedNote.borderColor = note.borderColor;
       duplicatedNote.borderOpacity = note.borderOpacity;
       duplicatedNote.boxShadow = note.boxShadow;
-      duplicatedNote.isLink = note.isLink;
-      duplicatedNote.linkUrl = note.linkUrl;
       duplicatedNote.width = note.width;
       duplicatedNote.height = note.height;
       
@@ -253,6 +280,10 @@ export class NoteService {
       this.dashboardService.selectedChatbot.attributes.notes = notes;
       
       this.logger.log('[NOTE-SERVICE] Note duplicated. New note ID:', duplicatedNote.note_id);
+      
+      // Notifica i cambiamenti
+      this.notifyNotesChanged();
+      this.notifyNoteUpdated(duplicatedNote);
       
       // Prepara gli attributi da inviare
       const attributes = {

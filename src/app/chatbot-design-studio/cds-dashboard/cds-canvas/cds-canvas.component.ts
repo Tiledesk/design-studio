@@ -624,6 +624,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // this.listOfNotes = this.noteService.getNotes(this.id_faq_kb);
     this.listOfNotes = this.dashboardService.selectedChatbot.attributes.notes || [];
     //this.logger.log("[CDS-CANVAS]  •••• listOfNotes ••••", this.listOfNotes);
+    
+    // NOTA: Non ci sottoscriviamo a notesChanged$ per mantenere il componente disaccoppiato.
+    // Il canvas aggiorna listOfNotes manualmente dopo ogni operazione (save, delete, duplicate).
+    // I componenti figli (cds-notes) si sottoscrivono a noteUpdated$ per aggiornare le singole note.
   }
 
 
@@ -1370,15 +1374,32 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * Gestisce la selezione di una nota e apre il panel dei dettagli
    * Simile a onIntentSelected per gli intent
    */
-  onNoteSelected(note: Note): void {
-    this.logger.log('[CDS-CANVAS] onNoteSelected ', note.note_id);
-    this.closeAllPanels();
-    this.removeConnectorDraftAndCloseFloatMenu();
-    this.closeActionDetailPanel();
-    setTimeout(() => {
-      this.noteSelected = note;
-      this.IS_OPEN_PANEL_NOTE_DETAIL = true;
-    }, 0);
+  onNoteSelected(note: Note | null): void {
+    if (note) {
+      // Verifica se il pannello è già aperto sulla stessa nota
+      if (this.IS_OPEN_PANEL_NOTE_DETAIL && 
+          this.noteSelected && 
+          this.noteSelected.note_id === note.note_id) {
+        // Il pannello è già aperto sulla stessa nota, non fare nulla
+        this.logger.log('[CDS-CANVAS] onNoteSelected - panel already open for note:', note.note_id);
+        return;
+      }
+      
+      // Apri il panel quando una nota viene selezionata (stateNote === 1 o 2)
+      this.logger.log('[CDS-CANVAS] onNoteSelected ', note.note_id);
+      this.closeAllPanels();
+      this.removeConnectorDraftAndCloseFloatMenu();
+      this.closeActionDetailPanel();
+      setTimeout(() => {
+        this.noteSelected = note;
+        this.IS_OPEN_PANEL_NOTE_DETAIL = true;
+      }, 0);
+    } else {
+      // Chiudi il panel quando note è null (stato cambiato a 0)
+      this.logger.log('[CDS-CANVAS] onNoteSelected - closing panel');
+      this.IS_OPEN_PANEL_NOTE_DETAIL = false;
+      this.noteSelected = null;
+    }
   }
 
   /** onActionSelected  **
@@ -1669,8 +1690,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         }
       }
       // Salva la nota in remoto
+      // Il servizio notificherà automaticamente i cambiamenti tramite Observable
       this.noteService.saveRemoteNote(note, this.id_faq_kb).subscribe({
         next: (data) => {
+          // Sincronizza listOfNotes con l'array aggiornato dal servizio
+          this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
           this.logger.log('[CDS-CANVAS] Note saved successfully:', data);
         },
         error: (error) => {
@@ -1692,7 +1716,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
           this.logger.log('[CDS-CANVAS] Note deleted successfully, array updated:', data);
         },
         error: (error) => {
-          this.logger.error('[CDS-CANVAS] Error deleting note:', error);
+          this.logger.error('[CDS-CANVAS] Note Error deleting note:', error);
         }
       });
     }
@@ -1710,7 +1734,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
           this.logger.log('[CDS-CANVAS] Note duplicated successfully:', duplicatedNote.note_id);
         },
         error: (error) => {
-          this.logger.error('[CDS-CANVAS] Error duplicating note:', error);
+          this.logger.error('[CDS-CANVAS] Note Error duplicating note:', error);
         }
       });
     }

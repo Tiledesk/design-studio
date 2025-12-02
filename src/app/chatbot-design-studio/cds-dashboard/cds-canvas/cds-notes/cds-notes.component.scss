@@ -53,6 +53,11 @@
     
     // Stili per elementi HTML all'interno del contenteditable
     // Permette la formattazione inline
+
+    ::ng-deep p {
+      margin: 0;
+    }
+    
     ::ng-deep strong,
     ::ng-deep b {
       font-weight: bold;

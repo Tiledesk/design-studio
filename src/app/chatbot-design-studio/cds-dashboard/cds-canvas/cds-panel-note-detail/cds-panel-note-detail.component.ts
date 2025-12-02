@@ -1,10 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, OnDestroy, Output, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnDestroy, Output, ViewChild } from '@angular/core';
 import { Note } from 'src/app/models/note-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
+import { NoteService } from 'src/app/services/note.service';
 import { STAGE_SETTINGS, ColorUtils, NOTE_COLORS } from 'src/app/chatbot-design-studio/utils';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'cds-panel-note-detail',
@@ -17,31 +20,26 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   @Output() savePanelNoteDetail = new EventEmitter<Note>();
   @Output() deleteNote = new EventEmitter<Note>();
   @Output() duplicateNote = new EventEmitter<Note>();
-  @ViewChild('richTextEditor', { static: false }) richTextEditor: ElementRef<HTMLDivElement>;
   @ViewChild('quillEditor', { static: false }) quillEditor: any;
   
   maximize: boolean = true;
-  showLinkDialog: boolean = false;
-  linkUrl: string = '';
-  selectedText: string = '';
-  private savedSelection: Range | null = null;
-  private savedSelectedText: string = '';
   private saveTimer: any = null; // Timer per il debounce del salvataggio automatico
-
 
   toolbarOptions: any;
   quillModules: any;
+  
+  // Sottoscrizioni per i cambiamenti delle note
+  private noteUpdatedSubscription: Subscription;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
-    private readonly stageService: StageService
+    private readonly stageService: StageService,
+    private readonly noteService: NoteService
   ) { }
 
   ngOnInit(): void {
     this.maximize = this.stageService.getMaximize();
-    this.initializeFormattingDefaults();
-
     this.toolbarOptions = [
       ['bold', 'italic', 'underline'],            // testo
       [{ 'color': [] }, { 'background': [] }],    // colori
@@ -54,6 +52,47 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     this.quillModules = {
       toolbar: this.toolbarOptions
     };
+    
+    // Sottoscrivi ai cambiamenti delle note per aggiornare il contenuto quando una nota viene modificata
+    this.noteUpdatedSubscription = this.noteService.noteUpdated$
+      .pipe(
+        filter(updatedNote => updatedNote && this.note && updatedNote.note_id === this.note.note_id)
+      )
+      .subscribe(updatedNote => {
+        // Aggiorna la nota locale con i dati aggiornati
+        if (updatedNote && this.note) {
+          // Aggiorna tutte le proprietà della nota
+          // Nota: non aggiorniamo il testo se l'utente sta modificando nel pannello
+          // perché potrebbe causare conflitti
+          const propertiesToUpdate = [
+            'backgroundColor', 'backgroundOpacity',
+            'borderColor', 'borderOpacity', 'boxShadow',
+            'width', 'height', 'x', 'y'
+          ];
+          
+          propertiesToUpdate.forEach(prop => {
+            if (updatedNote[prop] !== undefined) {
+              this.note[prop] = updatedNote[prop];
+            }
+          });
+          
+          // Aggiorna il testo solo se non è stato modificato localmente
+          // (il testo viene gestito separatamente per evitare conflitti con Quill)
+          if (updatedNote.text && updatedNote.text !== this.note.text) {
+            // Aggiorna solo se Quill non ha il focus
+            if (this.quillEditor && this.quillEditor.quillEditor) {
+              const quillInstance = this.quillEditor.quillEditor;
+              if (!quillInstance.hasFocus()) {
+                this.note.text = updatedNote.text;
+              }
+            } else {
+              this.note.text = updatedNote.text;
+            }
+          }
+          
+          this.logger.log('[CdsPanelNoteDetailComponent] Note updated from service:', updatedNote.note_id);
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -62,346 +101,13 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       clearTimeout(this.saveTimer);
       this.saveTimer = null;
     }
-  }
-
-  /**
-   * Inizializza i valori di default per la formattazione se non sono presenti
-   */
-  private initializeFormattingDefaults(): void {
-    if (!this.note) return;
     
-    if (!this.note.fontFamily) this.note.fontFamily = 'Open Sans';
-    if (!this.note.fontSize) this.note.fontSize = 14;
-    if (!this.note.textAlign) this.note.textAlign = 'left';
-    if (!this.note.fontStyle) this.note.fontStyle = 'normal';
-    if (!this.note.textDecoration) this.note.textDecoration = 'none';
-    if (!this.note.textColor) this.note.textColor = '#000000';
-    this.note.textOpacity = this.note.textOpacity ?? 100;
-    // Inizializza l'opacità di sfondo se non presente
-    this.note.backgroundOpacity = this.note.backgroundOpacity ?? 100;
-    
-    // Inizializza il colore di sfondo se non presente usando NOTE_COLORS.BACKGROUND_COLOR
-    // Il colore viene sempre salvato in formato rgba completo (con opacità)
-    if (!this.note.backgroundColor) {
-      const opacity = (this.note.backgroundOpacity || 100) / 100;
-      this.note.backgroundColor = `rgba(${NOTE_COLORS.BACKGROUND_COLOR}, ${opacity})`;
-    }
-    // Nota: non modifichiamo il colore esistente all'apertura per preservare i valori salvati
-    
-    // Inizializza l'opacità del bordo se non presente
-    this.note.borderOpacity = this.note.borderOpacity ?? 100;
-    
-    // Inizializza il colore del bordo se non presente usando NOTE_COLORS.BORDER_COLOR
-    if (!this.note.borderColor) {
-      const opacity = (this.note.borderOpacity || 100) / 100;
-      this.note.borderColor = `rgba(${NOTE_COLORS.BORDER_COLOR}, ${opacity})`;
-    }
-    // Nota: non modifichiamo il colore esistente all'apertura per preservare i valori salvati
-    
-    // Inizializza boxShadow se non presente (default: true)
-    if (this.note.boxShadow === undefined || this.note.boxShadow === null) {
-      this.note.boxShadow = true;
-    }
-    
-    if (this.note.isLink === undefined || this.note.isLink === null) this.note.isLink = false;
-    if (!this.note.linkUrl) this.note.linkUrl = '';
-  }
-
-  /**
-   * Applica formattazione al testo selezionato nell'editor
-   * Mantiene la selezione dopo l'applicazione dello stile
-   */
-  formatText(command: string): void {
-    // Salva la selezione corrente e il testo selezionato
-    this.saveSelection();
-    const selection = window.getSelection();
-    this.savedSelectedText = selection ? selection.toString() : '';
-    
-    // Applica il comando di formattazione
-    document.execCommand(command, false, undefined);
-    // Aggiorna il testo
-    this.updateNoteText();
-    // Ripristina la selezione per mantenere il testo evidenziato
-    setTimeout(() => {
-      this.restoreSelection();
-    }, 0);
-  }
-
-  /**
-   * Applica il colore al testo selezionato
-   * Mantiene la selezione dopo l'applicazione del colore
-   */
-  formatTextColor(event: Event): void {
-    // Salva la selezione corrente e il testo selezionato
-    this.saveSelection();
-    const selection = window.getSelection();
-    this.savedSelectedText = selection ? selection.toString() : '';
-    
-    const colorInput = event.target as HTMLInputElement;
-    const color = colorInput.value;
-    // Applica il colore
-    document.execCommand('foreColor', false, color);
-    // Aggiorna il testo
-    this.updateNoteText();
-    // Ripristina la selezione per mantenere il testo evidenziato
-    setTimeout(() => {
-      this.restoreSelection();
-    }, 0);
-  }
-
-  /**
-   * Ottiene il colore corrente del testo selezionato
-   */
-  getCurrentTextColor(): string {
-    return this.note?.textColor || '#000000';
-  }
-
-  /**
-   * Inserisce un link nel testo selezionato
-   */
-  insertLink(): void {
-    const selection = window.getSelection();
-    if (selection && selection.toString().length > 0) {
-      this.selectedText = selection.toString();
-      this.showLinkDialog = true;
-      setTimeout(() => {
-        const input = document.querySelector('.link-dialog input') as HTMLInputElement;
-        if (input) input.focus();
-      }, 0);
-    } else {
-      // Se non c'è testo selezionato, chiedi l'URL
-      this.selectedText = '';
-      this.showLinkDialog = true;
-      setTimeout(() => {
-        const input = document.querySelector('.link-dialog input') as HTMLInputElement;
-        if (input) input.focus();
-      }, 0);
+    // Rimuovi la sottoscrizione ai cambiamenti delle note
+    if (this.noteUpdatedSubscription) {
+      this.noteUpdatedSubscription.unsubscribe();
     }
   }
 
-  /**
-   * Conferma l'inserimento del link
-   */
-  confirmLink(): void {
-    if (this.linkUrl && this.linkUrl.trim() !== '') {
-      if (this.selectedText) {
-        // C'è testo selezionato, crea il link
-        document.execCommand('createLink', false, this.linkUrl);
-      } else {
-        // Non c'è testo selezionato, inserisci l'URL come link
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          const link = document.createElement('a');
-          link.href = this.linkUrl;
-          link.textContent = this.linkUrl;
-          range.insertNode(link);
-        }
-      }
-      this.updateNoteText();
-    }
-    this.cancelLink();
-  }
-
-  /**
-   * Annulla l'inserimento del link
-   */
-  cancelLink(): void {
-    this.showLinkDialog = false;
-    this.linkUrl = '';
-    this.selectedText = '';
-    // Ripristina il focus sull'editor
-    if (this.richTextEditor) {
-      this.richTextEditor.nativeElement.focus();
-    }
-  }
-
-  /**
-   * Gestisce l'input nell'editor
-   * Salva e ripristina la posizione del cursore per evitare che si sposti
-   */
-  onEditorInput(event: Event): void {
-    // Salva la posizione del cursore prima di aggiornare
-    //this.saveSelection();
-    // Aggiorna il testo
-    //this.updateNoteText();
-    // Ripristina la posizione del cursore dopo l'aggiornamento
-    //setTimeout(() => {
-      //this.restoreSelection();
-    //}, 0);
-  }
-
-  /**
-   * Gestisce il focus sull'editor
-   */
-  onEditorFocus(): void {
-    // Mantieni il focus per permettere la formattazione
-  }
-
-  /**
-   * Gestisce il blur dell'editor
-   */
-  onEditorBlur(): void {
-    this.updateNoteText();
-  }
-
-  /**
-   * Aggiorna il testo della nota con il contenuto HTML dell'editor
-   */
-  private updateNoteText(): void {
-    if (this.richTextEditor && this.note) {
-      // Non aggiornare l'innerHTML se è già aggiornato per evitare di perdere il cursore
-      const currentHtml = this.richTextEditor.nativeElement.innerHTML;
-      if (this.note.text !== currentHtml) {
-        this.note.text = currentHtml;
-        this.logger.log('[CdsPanelNoteDetailComponent] Text updated:', this.note.text);
-      }
-    }
-  }
-
-  /**
-   * Salva la posizione corrente del cursore/selezione
-   */
-  private saveSelection(): void {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      this.savedSelection = selection.getRangeAt(0).cloneRange();
-    } else {
-      this.savedSelection = null;
-    }
-  }
-
-  /**
-   * Ripristina la posizione del cursore/selezione salvata
-   * Aggiorna il range per riflettere eventuali modifiche al DOM dopo la formattazione
-   */
-  private restoreSelection(): void {
-    if (this.savedSelection && this.richTextEditor) {
-      const selection = window.getSelection();
-      if (selection) {
-        try {
-          // Crea un nuovo range basato sulle posizioni salvate
-          const startContainer = this.savedSelection.startContainer;
-          const endContainer = this.savedSelection.endContainer;
-          
-          // Verifica che i container siano ancora validi
-          if (this.richTextEditor.nativeElement.contains(startContainer) &&
-              this.richTextEditor.nativeElement.contains(endContainer)) {
-            
-            // Prova a ripristinare il range originale
-            try {
-              const range = document.createRange();
-              range.setStart(startContainer, this.savedSelection.startOffset);
-              range.setEnd(endContainer, this.savedSelection.endOffset);
-              selection.removeAllRanges();
-              selection.addRange(range);
-              return;
-            } catch (e) {
-              // Se il range originale non funziona, prova a selezionare il testo formattato
-            }
-          }
-          
-          // Se i container non sono più validi o il range non funziona,
-          // cerca di selezionare il testo che è stato appena formattato
-          this.selectFormattedText();
-        } catch (e) {
-          // Se c'è un errore, prova a selezionare il testo formattato
-          this.selectFormattedText();
-        }
-      }
-    }
-  }
-
-  /**
-   * Seleziona il testo che è stato appena formattato
-   * Cerca il testo salvato nel DOM e lo seleziona
-   */
-  private selectFormattedText(): void {
-    if (!this.richTextEditor || !this.savedSelectedText) return;
-    
-    const editor = this.richTextEditor.nativeElement;
-    const selection = window.getSelection();
-    
-    if (!selection) return;
-    
-    try {
-      // Cerca il testo salvato nel DOM
-      const textToFind = this.savedSelectedText.trim();
-      
-      if (textToFind.length === 0) {
-        this.placeCaretAtEnd(editor);
-        return;
-      }
-      
-      // Cerca tutti i nodi di testo nell'editor
-      const walker = document.createTreeWalker(
-        editor,
-        NodeFilter.SHOW_TEXT,
-        null
-      );
-      
-      let foundNode: Node | null = null;
-      let foundOffset = -1;
-      
-      while (walker.nextNode()) {
-        const node = walker.currentNode;
-        const nodeText = node.textContent || '';
-        
-        // Cerca il testo salvato nel nodo corrente
-        const index = nodeText.indexOf(textToFind);
-        if (index !== -1) {
-          foundNode = node;
-          foundOffset = index;
-          break;
-        }
-      }
-      
-      if (foundNode && foundOffset !== -1) {
-        // Seleziona il testo trovato
-        const range = document.createRange();
-        range.setStart(foundNode, foundOffset);
-        range.setEnd(foundNode, foundOffset + textToFind.length);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        return;
-      }
-      
-      // Se non trova il testo esatto, cerca elementi formattati che potrebbero contenere il testo
-      const formattedElements = editor.querySelectorAll('strong, em, u, span[style], a');
-      
-      for (let i = formattedElements.length - 1; i >= 0; i--) {
-        const element = formattedElements[i] as HTMLElement;
-        const elementText = element.textContent || '';
-        
-        // Se l'elemento contiene il testo cercato (o parte di esso)
-        if (elementText.includes(textToFind) || textToFind.includes(elementText)) {
-          const range = document.createRange();
-          range.selectNodeContents(element);
-          selection.removeAllRanges();
-          selection.addRange(range);
-          return;
-        }
-      }
-      
-      // Se tutto fallisce, posiziona il cursore alla fine
-      this.placeCaretAtEnd(editor);
-    } catch (e) {
-      // Se c'è un errore, posiziona il cursore alla fine
-      this.placeCaretAtEnd(editor);
-    }
-  }
-
-  /**
-   * Posiziona il cursore alla fine del contenuto
-   */
-  private placeCaretAtEnd(element: HTMLElement): void {
-    const range = document.createRange();
-    const selection = window.getSelection();
-    range.selectNodeContents(element);
-    range.collapse(false);
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-  }
 
   /**
    * Gestisce il cambio di formattazione (per la sezione Background)
@@ -417,11 +123,6 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       this.note.borderColor = this.calculateBorderColorWithOpacity();
     }
     
-    // Aggiorna immediatamente il testo se presente nell'editor
-    if (this.richTextEditor && this.note) {
-      this.updateNoteText();
-    }
-
     // Salvataggio automatico con debounce - accorpa le chiamate multiple ravvicinate
     this.autoSave();
   }
@@ -636,28 +337,18 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
 
   /**
    * Gestisce il cambio di contenuto in Quill
-   * Converte il Delta in HTML e salva nel note.text
+   * Il contenuto è già sincronizzato tramite [(ngModel)]="note.text"
+   * Chiama autoSave() per salvare automaticamente con debounce
    */
   onQuillContentChanged(event: any): void {
     if (!this.note || !event) return;
-
+    
     try {
-      // Quill restituisce il contenuto in formato Delta
-      // Convertiamo in HTML usando il metodo getContents() e poi convertiamo in HTML
-      const quillInstance = event.editor;
-      if (quillInstance) {
-        // Ottieni il contenuto HTML dall'editor Quill
-        const htmlContent = quillInstance.root.innerHTML;
-        
-        // Aggiorna il testo della nota con l'HTML
-        if (this.note.text !== htmlContent) {
-          this.note.text = htmlContent;
-          this.logger.log('[CdsPanelNoteDetailComponent] Quill content changed, HTML:', htmlContent);
-          
-          // Salvataggio automatico con debounce
-          this.autoSave();
-        }
-      }
+      // Il contenuto è già aggiornato in note.text tramite [(ngModel)]
+      // Non serve confrontare o aggiornare manualmente
+      // Chiama sempre autoSave() - il debounce gestisce le chiamate multiple
+      this.logger.log('[CdsPanelNoteDetailComponent] Quill content changed, triggering auto-save');
+      this.autoSave();
     } catch (error) {
       this.logger.error('[CdsPanelNoteDetailComponent] Error handling Quill content change:', error);
     }

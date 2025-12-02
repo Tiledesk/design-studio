@@ -8,10 +8,10 @@
                 <h3>{{ 'CDSCanvas.NoteDetails' | translate }}</h3>
             </div>
         </div>
-        <div class="header-options-wrp icon-action" (click)="onChangeMaximize()">
+        <!-- <div class="header-options-wrp icon-action" (click)="onChangeMaximize()">
             <img *ngIf="!maximize" src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" alt="">
             <img *ngIf="maximize" src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" alt="">
-        </div>
+        </div> -->
         <div class="header-menu-wrp icon-action" [matMenuTriggerFor]="noteMenu">
             <mat-icon class="active-icon" svgIcon="more_horiz" aria-hidden="true"></mat-icon>
         </div>
@@ -25,128 +25,26 @@
         <!-- Rich Text Editor Section -->
         <!-- ---------------------------------------------------------- -->
         <div class="row rich-text-editor-section">
-            <div class="section-header">
+            <!-- <div class="section-header">
                 <h4 class="section-title">Markup text</h4>
                 <mat-icon class="more-options-icon" svgIcon="more_vert" aria-hidden="true"></mat-icon>
-            </div>
-
-            <!-- Rich Text Editor Toolbar -->
-            <!-- <div class="rich-text-toolbar">
-                <Text Formatting -->
-                <!-- <div class="toolbar-group">
-                    <button type="button" 
-                        class="toolbar-btn" 
-                        (click)="formatText('bold')"
-                        [title]="'Bold' | translate">
-                        <span class="format-icon bold">B</span>
-                    </button>
-                    <button type="button" 
-                        class="toolbar-btn" 
-                        (click)="formatText('italic')"
-                        [title]="'Italic' | translate">
-                        <span class="format-icon italic">I</span>
-                    </button>
-                    <button type="button" 
-                        class="toolbar-btn" 
-                        (click)="formatText('underline')"
-                        [title]="'Underline' | translate">
-                        <span class="format-icon underline">U</span>
-                    </button>
-                </div>
-
-                <div class="toolbar-separator"></div>
-
-                <Text Color -->
-                <!-- <div class="toolbar-group">
-                    <input type="color" 
-                        class="toolbar-color-picker" 
-                        [value]="getCurrentTextColor()"
-                        (change)="formatTextColor($event)"
-                        [title]="'Text Color' | translate">
-                </div>
-
-                <div class="toolbar-separator"></div>
-
-                <Alignment -->
-                <!-- <div class="toolbar-group">
-                    <button type="button" 
-                        class="toolbar-btn" 
-                        (click)="formatText('justifyLeft')"
-                        [title]="'Left align' | translate">
-                        <mat-icon svgIcon="format_align_left" aria-hidden="true"></mat-icon>
-                    </button>
-                    <button type="button" 
-                        class="toolbar-btn" 
-                        (click)="formatText('justifyCenter')"
-                        [title]="'Center align' | translate">
-                        <mat-icon svgIcon="format_align_center" aria-hidden="true"></mat-icon>
-                    </button>
-                    <button type="button" 
-                        class="toolbar-btn" 
-                        (click)="formatText('justifyRight')"
-                        [title]="'Right align' | translate">
-                        <mat-icon svgIcon="format_align_right" aria-hidden="true"></mat-icon>
-                    </button>
-                </div>
-
-                <div class="toolbar-separator"></div>
-
-                <Link -->
-                <!-- <div class="toolbar-group">
-                    <button type="button" 
-                        class="toolbar-btn" 
-                        (click)="insertLink()"
-                        [title]="'Insert Link' | translate">
-                        <mat-icon svgIcon="link" aria-hidden="true"></mat-icon>
-                    </button>
-                </div>
             </div> -->
-
-            <!-- Rich Text Editor Content -->
-            <!--  <div class="rich-text-editor-wrapper">
-                <div 
-                    #richTextEditor
-                    class="rich-text-editor"
-                    contenteditable="true"
-                    [innerHTML]="note?.text || ''"
-                    (input)="onEditorInput($event)"
-                    (focus)="onEditorFocus()"
-                    (blur)="onEditorBlur()"
-                    [style.font-family]="note?.fontFamily || 'Open Sans'"
-                    [style.font-size.px]="note?.fontSize || 14"
-                    spellcheck="false">
-                </div> 
-            </div> -->
-
-            <!-- Link URL Input Dialog (shown when inserting link) -->
-            <!-- <div class="link-dialog" *ngIf="showLinkDialog">
-                <input type="text" 
-                    class="form-control" 
-                    [(ngModel)]="linkUrl"
-                    placeholder="{{ 'CDSCanvas.EnterUrl' | translate }}"
-                    (keyup.enter)="confirmLink()"
-                    (keyup.escape)="cancelLink()">
-                <div class="link-dialog-buttons">
-                    <button type="button" class="btn-link" (click)="confirmLink()">{{ 'OK' | translate }}</button>
-                    <button type="button" class="btn-link" (click)="cancelLink()">{{ 'Cancel' | translate }}</button>
-                </div>
-            </div> -->
-
             <quill-editor 
             #quillEditor
             [(ngModel)]="note.text"
             [modules]="quillModules"
             (onContentChanged)="onQuillContentChanged($event)"
-            [styles]="{ height: '250px' }"
-            placeholder="Type something...">
+            [styles]="{ height: '150px' }">
           </quill-editor>
 
         </div>
 
-        <!-- ---------------------------------------------------------- -->
-        <!-- Background color Section -->
-        <!-- ---------------------------------------------------------- -->
+
         <div class="row background-section">
+            <!-- ---------------------------------------------------------- -->
+            <!-- Background color Section -->
+            <!-- ---------------------------------------------------------- -->
+        
             <div class="section-header">
                 <h4 class="section-title">Background color</h4>
                 <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
@@ -177,12 +75,12 @@
                     inputmode="numeric">
                 <span class="opacity-percent">%</span>
             </div>
-        </div>
 
-        <!-- ---------------------------------------------------------- -->
-        <!-- Border color Section -->
-        <!-- ---------------------------------------------------------- -->
-        <div class="row background-section">
+
+            <!-- ---------------------------------------------------------- -->
+            <!-- Border color Section -->
+            <!-- ---------------------------------------------------------- -->
+    
             <div class="section-header">
                 <h4 class="section-title">Border color</h4>
                 <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
@@ -213,12 +111,12 @@
                     inputmode="numeric">
                 <span class="opacity-percent">%</span>
             </div>
-        </div>
+  
 
-        <!-- ---------------------------------------------------------- -->
-        <!-- Box Shadow Section -->
-        <!-- ---------------------------------------------------------- -->
-        <div class="row background-section">
+            <!-- ---------------------------------------------------------- -->
+            <!-- Box Shadow Section -->
+            <!-- ---------------------------------------------------------- -->
+
             <div class="section-header">
                 <h4 class="section-title">Box parameters</h4>
                 <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>

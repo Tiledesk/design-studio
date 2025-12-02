@@ -232,7 +232,8 @@
     ::ng-deep quill-editor {
         display: block;
         margin-top: 15px;
-        
+        margin: 0;
+        padding: 0;
         .ql-container {
             font-family: 'Open Sans', sans-serif;
             font-size: 14px;
@@ -245,6 +246,7 @@
             border-top-right-radius: 4px;
             border: 1px solid var(--gray-light-02);
             border-bottom: none;
+            background-color: var(--blu-light-03);
         }
         
         .ql-container {
@@ -253,8 +255,9 @@
         }
         
         .ql-editor {
-            min-height: 200px;
+            min-height: 100px;
             padding: 12px;
+            margin: 0;
         }
     }
 

@@ -11,15 +11,10 @@
         #noteInput
         class="note-input"
         contenteditable="true"
-        [innerHTML]="note?.text || ''"
+        [innerHTML]="sanitizedNoteHtml"
         (focus)="onFocusTextarea($event)"
+        (input)="onInputChange($event)"
         (blur)="onBlurTextarea($event)"
-        [style.font-family]="note?.fontFamily || 'Open Sans'"
-        [style.font-size.px]="note?.fontSize || 14"
-        [style.text-align]="note?.textAlign || 'left'"
-        [style.font-style]="note?.fontStyle || 'normal'"
-        [style.text-decoration]="note?.textDecoration || 'none'"
-        [style.color]="getTextColorWithOpacity()"
         spellcheck="false">
     </div>
 
