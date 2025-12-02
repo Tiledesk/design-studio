@@ -1,169 +1,159 @@
-
+// ============================================================================
+// CONTAINER PRINCIPALE
+// ============================================================================
 .cds-notes-content {
   min-width: 50px;
   min-height: 50px;
-  // background-color viene applicato dinamicamente tramite [style.background-color]
-  // Default: rgb(197, 231, 246) se non specificato nella nota
   padding: 10px 8px;
   position: relative;
   box-sizing: border-box;
-  min-height: fit-content;
-
   border-radius: 6px;
   border: 1px solid rgba(0, 0, 0, 0.04);
   box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 3px 0px;
-
-  // Il contenitore si adatterà automaticamente all'altezza della textarea
-  // grazie a display: inline-block e all'altezza auto della textarea
   
   // Permette la selezione del testo quando lo stato è 1 (text focus)
   -webkit-user-select: text;
   user-select: text;
+  cursor: grab;
+  // Background color viene applicato dinamicamente tramite [style.background-color]
+  // Border color viene applicato dinamicamente tramite [style.border-color]
+  // Box shadow viene applicato dinamicamente tramite [style.box-shadow]
 }
 
+// ============================================================================
+// INPUT NOTE (CONTENTEDITABLE)
+// ============================================================================
 .note-input {
-    display: block;
-    border: none;
-    background: transparent;
-    outline: none;
-    resize: none;
-    padding: 6px;
-    margin: 0;
-    overflow: hidden; // Rimuove la scrollbar - nessuna scrollbar visibile
-    line-height: 1.4;
-    font-size: 14px;
-    font-family: inherit;
-    min-height: 1.4em; // Altezza minima per 1 riga (line-height * 1)
-    height: min-content; // Auto-ridimensionamento in base al contenuto
-    width: 100%;
-    min-width: 50px; // Larghezza minima
-    box-sizing: border-box;
-    white-space: pre-wrap; // Mantiene gli spazi e permette il wrap
-    word-wrap: break-word; // Permette il wrap delle parole lunghe
-    z-index: 1;
-    position: relative;
-    // Contenteditable styling
-    -webkit-user-select: text;
-    user-select: text;
-    // Permette l'inserimento di HTML formattato
-    // Cursor pointer quando è draggable
-    &.tds_draggable {
-      cursor: grab;
-      &:active {
-          cursor: grabbing;
-      }
-    }
-    
-    // Stili per elementi HTML all'interno del contenteditable
-    // Permette la formattazione inline
-
-    ::ng-deep p {
-      margin: 0;
-    }
-
-    ::ng-deep strong,
-    ::ng-deep b {
-      font-weight: bold;
-    }
-    
-    ::ng-deep em,
-    ::ng-deep i {
-      font-style: italic;
-    }
-    
-    ::ng-deep u {
-      text-decoration: underline;
-    }
-    
-    ::ng-deep a {
-      color: inherit;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-    
-    // Quando è vuoto, mostra un placeholder visivo
-    &:empty:before {
-      content: 'Type something';
-      color: #999;
-      pointer-events: none;
-    }
-}
-
-
-.note-resize {
-    position: absolute;
-    right: 0;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    background-color: transparent;
-    z-index: 2;
-    // Cursor pointer quando è draggable
-    &.tds_draggable {
-      cursor: move;
-      cursor: grab;
-      &:active {
-          cursor: grabbing;
-      }
-  }
-}
-
-.notes-background-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: transparent;
-    z-index: 1;
-    pointer-events: auto;
+  display: block;
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: none;
+  padding: 6px;
+  margin: 0;
+  overflow: hidden;
+  line-height: 1.4;
+  font-size: 14px;
+  font-family: inherit;
+  min-height: 1.4em;
+  height: min-content;
+  width: 100%;
+  min-width: 50px;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  z-index: 1;
+  position: relative;
+  -webkit-user-select: text;
+  user-select: text;
+  
+  // Cursor quando è draggable
+  &.tds_draggable {
     cursor: grab;
     
     &:active {
-        cursor: grabbing;
+      cursor: grabbing;
     }
+    
+    // Tutti gli elementi figli ereditano il cursore grab
+    ::ng-deep * {
+      cursor: grab;
+      
+      &.tds_draggable {
+        cursor: grab;
+      }
+    }
+    
+    // I link devono sempre avere il cursore pointer, anche quando è draggable
+    ::ng-deep a {
+      cursor: pointer !important;
+      
+      &:hover {
+        cursor: pointer !important;
+      }
+    }
+  }
+  
+  // Stili per elementi HTML all'interno del contenteditable
+  ::ng-deep p {
+    margin: 0;
+  }
+
+  ::ng-deep strong,
+  ::ng-deep b {
+    font-weight: bold;
+  }
+  
+  ::ng-deep em,
+  ::ng-deep i {
+    font-style: italic;
+  }
+  
+  ::ng-deep u {
+    text-decoration: underline;
+  }
+  
+  ::ng-deep a {
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  
+  // Placeholder quando è vuoto
+  &:empty:before {
+    content: 'Type something';
+    color: #999;
+    pointer-events: none;
+  }
 }
 
-/* Handle invisibili di default */
-.cds-notes-content .resize-handle {
+// ============================================================================
+// RESIZE HANDLES
+// ============================================================================
+.cds-notes-content {
+  // Handle invisibili di default
+  .resize-handle {
     position: absolute;
     border: 1px solid #007aff;
     background: white;
     display: none;
-    z-index: 10; 
+    z-index: 10;
     user-select: none;
-  }
-  
-  /* Quando selezionata → mostra handle */
-  .cds-notes-content.selected .resize-handle {
-    display: block;
-  }
-  
-  /* Handle angoli (8x8px) */
-  .resize-tl, .resize-tr, .resize-bl, .resize-br {
     width: 8px;
     height: 8px;
   }
   
-  /* Posizioni degli angoli */
-  .resize-tl { 
-    top: -4px; 
-    left: -4px; 
-    cursor: nwse-resize;
+  // Quando selezionata → mostra handle
+  &.selected .resize-handle {
+    display: block;
   }
-  .resize-tr { 
-    top: -4px; 
-    right: -4px; 
-    cursor: nesw-resize;
-  }
-  .resize-bl { 
-    bottom: -4px; 
-    left: -4px; 
-    cursor: nesw-resize;
-  }
-  .resize-br { 
-    bottom: -4px; 
-    right: -4px; 
+  
+  // Posizioni degli angoli
+  .resize-tl {
+    top: -4px;
+    left: -4px;
     cursor: nwse-resize;
   }
   
+  .resize-tr {
+    top: -4px;
+    right: -4px;
+    cursor: nesw-resize;
+  }
+  
+  .resize-bl {
+    bottom: -4px;
+    left: -4px;
+    cursor: nesw-resize;
+  }
+  
+  .resize-br {
+    bottom: -4px;
+    right: -4px;
+    cursor: nwse-resize;
+  }
+}
