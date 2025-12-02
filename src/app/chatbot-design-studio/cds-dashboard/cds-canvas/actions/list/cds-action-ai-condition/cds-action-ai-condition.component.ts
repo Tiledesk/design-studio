@@ -253,12 +253,12 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.idConnectorFallback = this.idIntentSelected + "/" + this.action._tdActionId + "/fallback";
     if (this.action.fallbackIntent) {
       this.isConnectedFallback = true;
-      this.idConnectionFallback = "/" + this.action.fallbackIntent.replace('#', '');
+      this.idConnectionFallback =this.idConnectorFallback + "/" + this.action.fallbackIntent.replace('#', '');
     }
     this.idConnectorError = this.idIntentSelected + "/" + this.action._tdActionId + "/error";
     if (this.action.errorIntent) {
       this.isConnectedError = true;
-      this.idConnectionError = "/" + this.action.errorIntent.replace('#', '');
+      this.idConnectionError = this.idConnectorError + "/" + this.action.errorIntent.replace('#', '');
     }
     this.listOfIntents = this.intentService.getListOfIntents();
     //this.checkConnectionStatus();
@@ -279,7 +279,7 @@ export class CdsActionAiConditionComponent implements OnInit {
         if(found){
           found.conditionIntentId = null;
         }
-      } else {
+      } else if (this.connector.created) {
         if(this.listOfConnectors[idCondition]){
           this.listOfConnectors[idCondition].idConnection =  this.connector.id;
           this.listOfConnectors[idCondition].isConnected  =  true;
@@ -288,6 +288,7 @@ export class CdsActionAiConditionComponent implements OnInit {
           found.conditionIntentId = '#'+this.connector.toId;
         }
       }
+      this.logger.log('[ACTION AI_CONDITION] updateConnectionTrue:', this.listOfConnectors, idCondition, found);
       this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
     } catch (error) {
       this.logger.log('error: ', error);
@@ -344,13 +345,6 @@ export class CdsActionAiConditionComponent implements OnInit {
       return;
     }
     if(property === 'model'){
-      this.action['labelModel'] = event;
-      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
-        this.action.temperature = 1
-        this.ai_setting['temperature'].disabled= true
-      } else {
-        this.ai_setting['temperature'].disabled= false
-      }
       this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;

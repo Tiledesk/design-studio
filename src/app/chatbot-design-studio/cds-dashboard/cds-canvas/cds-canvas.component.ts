@@ -592,6 +592,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (getAllIntents) {
       this.listOfIntents = this.intentService.listOfIntents;
       // // this.initListOfIntents();
+      this.intentService.chatbotPatch(this.listOfIntents);
+      
       this.refreshIntents();
       this.initLoadingStage();
       // // this.intentService.setStartIntent();
@@ -903,7 +905,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.listnerKeydown = (e) => {
       this.logger.log('[CDS-CANVAS]  keydown ', e);
       var focusedElement = document.activeElement;
+      // Consenti l'undo/redo nativo per TEXTAREA e INPUT
       if (focusedElement.tagName === 'TEXTAREA' || focusedElement.tagName === 'INPUT') {
+        return;
+      }
+      // Prevent undo/redo if a detail panel is open (to allow native undo/redo in panel inputs)
+      if (this.IS_OPEN_PANEL_ACTION_DETAIL || this.IS_OPEN_PANEL_INTENT_DETAIL) {
+        this.logger.log('[CDS-CANVAS] Panel is open - skipping canvas undo/redo');
         return;
       }
       // Prevent undo/redo if a detail panel is open (to allow native undo/redo in panel inputs)
