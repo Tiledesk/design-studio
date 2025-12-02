@@ -17,6 +17,8 @@ export class Note {
   backgroundOpacity?: number;
   borderOpacity?: number;
   boxShadow?: boolean;
+  fontSize?: number; // Dimensione del font in pixel
+  fontFamily?: string; // Famiglia del font
 
   constructor(id_faq_kb: string, pos: any) {
     this.id_faq_kb = id_faq_kb;
@@ -32,6 +34,8 @@ export class Note {
     this.isNew = true; // Indica che la nota è appena stata creata
     this.backgroundOpacity = 100;
     this.boxShadow = true; // Default: ombra attiva
+    this.fontSize = 14; // Dimensione del font di default in pixel
+    this.fontFamily = 'Open Sans, sans-serif'; // Famiglia del font di default
   }
 }
 

@@ -73,9 +73,9 @@ export enum INTENT_COLORS {
   }
 
   export enum NOTE_COLORS {
-    BACKGROUND_COLOR = '156,163,205',
+    BACKGROUND_COLOR = '197, 231, 246',
     TEXT_COLOR = '0,0,0',
-    BORDER_COLOR = '156,163,205'
+    BORDER_COLOR = '191, 223, 237'
   }
 
 export enum SIDEBAR_PAGES {

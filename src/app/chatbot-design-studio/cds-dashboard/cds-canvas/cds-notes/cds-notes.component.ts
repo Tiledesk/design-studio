@@ -19,7 +19,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   @Output() noteSelected = new EventEmitter<Note>();
   @ViewChild('noteInput', { static: false }) noteInput: ElementRef<HTMLDivElement>;
   @ViewChild('noteContentElement', { static: false }) contentElement: ElementRef<HTMLDivElement>;
-  @ViewChild('noteResize', { static: false }) noteResize: ElementRef<HTMLDivElement>;
+  // @ViewChild('noteResize', { static: false }) noteResize: ElementRef<HTMLDivElement>;
 
 
   textareaHasFocus = false;
@@ -46,12 +46,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.stateNote = state;
     
     if(state === 1) {
-      // Stato: text focus - APRI il panel immediatamente (doppio click)
+      // Stato: text focus - NON aprire il panel (solo focus sul testo)
       // Cancella eventuali timer pendenti per evitare aperture multiple
       this.cancelOpenPanelTimer();
       this.textareaHasFocus = true;
-      // Apri il panel dei dettagli immediatamente quando si mette il focus sul testo
-      this.noteSelected.emit(this.note);
+      // Chiudi il panel se era aperto (stato precedente era 2)
+      if (previousState === 2) {
+        this.noteSelected.emit(null);
+      }
       
       // Posiziona il cursore alla fine del testo dopo che il focus è stato applicato
       setTimeout(() => {
@@ -78,25 +80,28 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         this.noteInput.nativeElement.blur();
       }
       // Chiudi il panel quando lo stato è 0 o 3
-      // Emetti null solo se il panel era aperto (stato precedente era 1 o 2)
-      if (previousState === 1 || previousState === 2) {
+      // Emetti null solo se il panel era aperto (stato precedente era 2)
+      if (previousState === 2) {
         this.noteSelected.emit(null);
       }
     }
-    
-    console.log('[CDS-NOTES] State changed from', previousState, 'to:', state);
   }
 
   /**
    * Apre il pannello con un breve ritardo per evitare aperture multiple su doppio click
+   * Viene chiamato solo quando lo stato è 2 (selected con maniglie visibili)
    */
   private openPanelWithDelay(): void {
     // Cancella eventuali timer precedenti
     this.cancelOpenPanelTimer();
     
+    // Verifica che lo stato sia ancora 2 prima di aprire il pannello
     // Imposta un nuovo timer con ritardo di 200ms
     this.openPanelTimer = setTimeout(() => {
-      this.noteSelected.emit(this.note);
+      // Apri il pannello solo se lo stato è ancora 2
+      if (this.stateNote === 2) {
+        this.noteSelected.emit(this.note);
+      }
       this.openPanelTimer = null;
     }, 200);
   }
@@ -116,15 +121,15 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    */
   private placeCaretAtEnd(element: HTMLElement): void {
     try {
-      const range = document.createRange();
-      const selection = window.getSelection();
+    const range = document.createRange();
+    const selection = window.getSelection();
       
       if (!selection) return;
       
       // Seleziona tutto il contenuto
-      range.selectNodeContents(element);
+    range.selectNodeContents(element);
       // Collassa il range alla fine (false = fine, true = inizio)
-      range.collapse(false);
+    range.collapse(false);
       
       // Rimuovi tutte le selezioni esistenti e aggiungi il nuovo range
       selection.removeAllRanges();
@@ -146,12 +151,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private startHeight = 0;
   private startNoteX = 0;
   private startNoteY = 0;
+  private startFontSize = 0; // Font size iniziale per calcolare il resize proporzionale
   private justFinishedResizing = false;
   private draggedListener: EventListener | null = null;
   private draggingListener: EventListener | null = null;
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
-
+  
   constructor(
     private stageService: StageService,
     private noteService: NoteService,
@@ -204,6 +210,16 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             }
           }
           
+          // Aggiorna fontSize e fontFamily se cambiati
+          if (this.noteInput) {
+            if (updatedNote.fontSize && this.note.fontSize !== updatedNote.fontSize) {
+              this.noteInput.nativeElement.style.fontSize = updatedNote.fontSize + 'px';
+            }
+            if (updatedNote.fontFamily && this.note.fontFamily !== updatedNote.fontFamily) {
+              this.noteInput.nativeElement.style.fontFamily = updatedNote.fontFamily;
+            }
+          }
+          
           this.logger.log('[CDS-NOTES] Note updated from service:', updatedNote.note_id);
         }
       });
@@ -214,7 +230,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    * Best practice: usa ngOnChanges per sincronizzare lo stato locale con gli input
    */
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('---------> ngOnChanges', changes['note']);
     if (changes['note'] && this.note) {
       const noteChange = changes['note'];
       
@@ -253,10 +268,25 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const height = this.note.height || 50;
       this.contentElement.nativeElement.style.width = width + 'px';
       this.contentElement.nativeElement.style.height = height + 'px';
+      
+      // Inizializza fontSize e fontFamily se non presenti
+      if (!this.note.fontSize) {
+        this.note.fontSize = 14;
+      }
+      if (!this.note.fontFamily) {
+        this.note.fontFamily = 'Open Sans, sans-serif';
+      }
+      
+      // Applica fontSize e fontFamily al div contenteditable
+      if (this.noteInput) {
+        this.noteInput.nativeElement.style.fontSize = this.note.fontSize + 'px';
+        this.noteInput.nativeElement.style.fontFamily = this.note.fontFamily;
+      }
+      
       // Inizializza tutti i listener per gli eventi
       this.setupAllListeners();
-        // Inizializza il drag dopo che la vista è stata inizializzata
-        this.updateDragState();
+      // Inizializza il drag dopo che la vista è stata inizializzata
+      this.updateDragState();
     }
   }
 
@@ -295,7 +325,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       // Verifica che l'elemento sia questa nota
       if (el && el.id === this.note?.note_id) {
         this.dragged = true;
-        console.log('DRAGGING');
       }
     }) as EventListener;
     document.addEventListener("dragged", this.draggingListener, false);
@@ -312,9 +341,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const el = e.detail.element;
       // Verifica che l'elemento sia questa nota
       if (el && el.id === this.note?.note_id) {
-        console.log('DRAGGING END');
-        console.log('[CDS-NOTES] end-dragging - Note ID:', this.note.note_id);
-        console.log('[CDS-NOTES] end-dragging - position:', el.offsetLeft, el.offsetTop, this.note.x, this.note.y);
         // Salva la nota nel localStorage dopo il drag
         // se la posizione è cambiata, salva la nota
         if (this.note.x !== el.offsetLeft || this.note.y !== el.offsetTop) {
@@ -324,7 +350,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
           this.updateNote();
         }
       } else {
-        console.log('DRAGGING END - NOT THIS NOTE');
         this.changeState(0);
       }
     }) as EventListener;
@@ -352,13 +377,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.note.y = top;
     this.note.width = width;
     this.note.height = height;
-    
-    console.log('[CDS-NOTES] Recalculated note dimensions and position:', {
-      x: this.note.x,
-      y: this.note.y,
-      width: this.note.width,
-      height: this.note.height
-    });
   }
   
   // ============================================================================
@@ -391,6 +409,76 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   
   /**
+   * Gestisce i click sul div note-input
+   * Blocca la propagazione per evitare che il click raggiunga il canvas,
+   * ma permette la selezione del testo e il funzionamento dei link
+   */
+  onNoteInputClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    
+    // Se il click è su un link, permettere al link di funzionare normalmente
+    // Verifica se il target è un link o è dentro un link
+    const isLink = target.tagName === 'A' || target.closest('a') !== null;
+    
+    if (isLink) {
+      const linkElement = target.tagName === 'A' ? target as HTMLAnchorElement : target.closest('a') as HTMLAnchorElement;
+      let linkUrl = linkElement?.getAttribute('href') || 'N/A';
+      
+      // Normalizza l'URL: se non inizia con http:// o https://, aggiungi http://
+      if ( linkUrl !== 'N/A' && !linkUrl.startsWith('http://') && !linkUrl.startsWith('https://')) {
+        linkUrl = 'http://' +  linkUrl;
+      }
+      
+      const linkText = linkElement?.textContent || linkElement?.innerText || 'N/A';
+      const targetAttr = linkElement?.getAttribute('target') || '_blank';
+      
+      
+      this.logger.log('[CDS-NOTES] 🔗 LINK CLICKED - URL:', linkUrl, 'Text:', linkText, 'Target:', targetAttr);
+      
+      // Apri il link esplicitamente
+      if (linkUrl && linkUrl !== 'N/A') {
+        // Se il link ha un target="_blank", apri in una nuova tab
+        if (targetAttr === '_blank' || linkElement?.target === '_blank') {
+          window.open(linkUrl, '_blank', 'noopener,noreferrer');
+        } else {
+          // Altrimenti apri nella stessa finestra
+          window.location.href = linkUrl;
+        }
+      }
+      
+      // Blocca la propagazione per evitare che il click raggiunga il canvas
+      // ma permettere al link di funzionare
+      event.stopPropagation();
+      return;
+    } else {
+      // Per altri elementi, blocca la propagazione per evitare che il click raggiunga il canvas
+      event.stopPropagation();
+    }
+    // Non interferire con la selezione del testo - il browser gestisce automaticamente
+  }
+
+  /**
+   * Gestisce i mousedown sul div note-input
+   * Permette la selezione del testo e il funzionamento dei link
+   */
+  onNoteInputMouseDown(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    
+    // Se il mousedown è su un link, permettere al link di funzionare normalmente
+    const isLink = target.tagName === 'A' || target.closest('a') !== null;
+    
+    if (isLink) {
+      // Per i link, non bloccare la propagazione - permettere al link di funzionare
+      return;
+    }
+    
+    // Per altri elementi, blocca la propagazione per evitare che il mousedown raggiunga il canvas
+    // ma NON interferire con la selezione del testo
+    event.stopPropagation();
+    // Il browser gestirà automaticamente la selezione del testo
+  }
+
+  /**
    * Listener per l'evento input del div contenteditable
    * Aggiorna il testo HTML formattato della nota quando l'utente digita
    */
@@ -400,7 +488,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       // Salva l'HTML formattato invece del testo semplice
       this.note.text = editableDiv.innerHTML;
     }
-    console.log('onInputChange', this.note.text, editableDiv.innerHTML);
   }
 
 
@@ -425,7 +512,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    * - Salva la nota nel localStorage dopo la modifica del testo
    */
   onBlurTextarea(event: FocusEvent): void {
-    console.log('onBlurTextarea', event);
     this.changeState(0);
     // Riabilita il drag quando la textarea perde il focus (se non è selezionata)
     this.updateDragState();
@@ -475,7 +561,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       return;
     }
     event.stopPropagation();
-    console.log('[CDS-NOTES] onSingleClick');
     // Al singolo click visualizza le maniglie (stateNote === 2)
     // changeState(2) aprirà automaticamente il panel
     this.changeState(2);
@@ -496,11 +581,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   onDoubleClick(event: MouseEvent): void {
     // Previeni la propagazione dell'evento per evitare conflitti
     event.stopPropagation();
-    console.log('onDoubleClick');
     // Al doppio click nascondo il div note-resize e metto il focus sulla textarea
     this.changeState(1);
-    // Apri il panel dei dettagli della nota al doppio click
-    this.noteSelected.emit(this.note);
+    // NON aprire il panel quando lo stato è 1 (text focus)
     // NON chiamare updateNote() qui - il doppio click serve solo per attivare la modifica
   }
 
@@ -517,7 +600,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    * @param handle - Identificatore della maniglia ('tl', 'tr', 'bl', 'br')
    */
   startResize(event: MouseEvent, handle: string): void {
-    console.log('-----> startResize', event, handle);
     event.stopPropagation();
     event.preventDefault();
     if (!this.contentElement || !this.note) return;
@@ -530,6 +612,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.startHeight = this.note.height || 50;
     this.startNoteX = this.note.x || 0;
     this.startNoteY = this.note.y || 0;
+    // Salva il font size iniziale per calcolare il resize proporzionale
+    this.startFontSize = this.note.fontSize || 14;
     this.changeState(2);
   }
 
@@ -544,7 +628,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const deltaX = event.clientX - this.startX;
     const deltaY = event.clientY - this.startY;
     const minWidth = 50;
-    const minHeight = 50;
+    //const minHeight = 50;
+    // ricalcola le dimensioni minime dell'altezza assegnando la altezza del div class note-input note-resize e la larghezza del div class note-input note-resize meno 16px (padding: 6px)
+    const noteInputElement = this.noteInput.nativeElement;
+    const minHeight = noteInputElement.offsetHeight;
     let newWidth = this.startWidth;
     let newHeight = this.startHeight;
     let newNoteX = this.startNoteX;
@@ -615,13 +702,24 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.note.x = newNoteX;
     this.note.y = newNoteY;
     
+    // Calcola il nuovo font size proporzionale alla larghezza
+    // Usa la larghezza come riferimento principale per mantenere la proporzione
+    const widthRatio = newWidth / this.startWidth;
+    const newFontSize = Math.max(8, Math.min(72, this.startFontSize * widthRatio)); // Limita tra 8px e 72px
+    this.note.fontSize = Math.round(newFontSize);
+    
     // Applica le nuove dimensioni al contentElement
     this.contentElement.nativeElement.style.width = newWidth + 'px';
     this.contentElement.nativeElement.style.height = newHeight + 'px';
     
-    // Aggiorna le dimensioni del div contenteditable (sottrai padding: 10px top/bottom, 8px left/right)
+    // Aggiorna le dimensioni e il font size del div contenteditable
     if (this.noteInput) {
       this.noteInput.nativeElement.style.width = (newWidth - 16) + 'px';
+      this.noteInput.nativeElement.style.fontSize = this.note.fontSize + 'px';
+      // Mantieni anche il fontFamily se presente
+      if (this.note.fontFamily) {
+        this.noteInput.nativeElement.style.fontFamily = this.note.fontFamily;
+      }
       // L'altezza si adatta automaticamente al contenuto grazie al CSS
     }
   }
@@ -637,7 +735,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     if (this.isResizing) {
       this.isResizing = false;
       this.resizeHandle = '';
-      console.log('[CDS-NOTES] onMouseUp');
       this.changeState(0);
       // Imposta un flag per prevenire la deselezione immediata
       this.justFinishedResizing = true;
@@ -722,7 +819,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       try {
         // Il servizio gestisce tutto: recupera, aggiorna e salva l'array completo
         await firstValueFrom(this.noteService.saveRemoteNote(this.note, this.note.id_faq_kb));
-        console.log('[CDS-NOTES] Note saved:', this.note.note_id);
       } catch (error) {
         console.error('[CDS-NOTES] Error saving note:', error);
       }

@@ -4,28 +4,36 @@
     [class.selected]="stateNote === 2"
     [id]="note?.note_id"
     [style.box-shadow]="note?.boxShadow === false ? 'none' : null"
-    [style.border-color]="note?.borderColor || 'rgba(86, 179, 101, 1)'"
-    [style.background-color]="note?.backgroundColor || 'rgba(197, 231, 246, 1)'">
+    [style.border-color]="note?.borderColor"
+    [style.background-color]="note?.backgroundColor">
     <!-- (input)="onInputChange($event)" -->
     <div 
         #noteInput
         class="note-input"
         contenteditable="true"
         [innerHTML]="sanitizedNoteHtml"
+        [style.font-size.px]="note?.fontSize"
+        [style.font-family]="note?.fontFamily"
         (focus)="onFocusTextarea($event)"
         (input)="onInputChange($event)"
         (blur)="onBlurTextarea($event)"
+
+        (click)="onNoteInputClick($event)"
+        (mousedown)="onNoteInputMouseDown($event)"
         spellcheck="false">
     </div>
 
     <div
+        *ngIf="stateNote !== 1"
         #noteResize
         class="note-resize" 
         [id]="note?.note_id + '-resize'"
         [class.tds_draggable]="isDraggable"
-        (mousedown)="onNoteResizeMouseDown($event)"
+        [style.pointer-events]="stateNote === 1 ? 'none' : 'auto'"
         (click)="onSingleClick($event)"
-        (dblclick)="onDoubleClick($event)">
+        (dblclick)="onDoubleClick($event)"
+        (mousedown)="onNoteResizeMouseDown($event)"
+        >
     </div>
 
     <!-- Handle angoli per ridimensionamento -->
