@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.14-rc3
+- **added**: added notes component
+
 # 1.39.14-rc2
 - **bug-fix**: added the "globals" variables created in the DS to the variable list
 - **changed**: open the Intent panel details by clicking on "start intent"
