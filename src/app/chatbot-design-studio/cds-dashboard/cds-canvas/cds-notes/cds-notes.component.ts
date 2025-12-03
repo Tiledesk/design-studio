@@ -51,7 +51,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private startHeight = 0;
   private startNoteX = 0;
   private startNoteY = 0;
-  private startFontSize = 0;
+  private startFontSizeEm = Note.DEFAULT_FONT_SIZE_EM; // font-size iniziale in em
   private justFinishedResizing = false;
 
   // ============================================================================
@@ -113,22 +113,16 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   ngAfterViewInit(): void {
     if (this.contentElement && this.note) {
       // Imposta dimensioni iniziali
-      const width = this.note.width || 220;
-      const height = this.note.height || 50;
+      const width = this.note.width || Note.DEFAULT_WIDTH;
+      const height = this.note.height || Note.DEFAULT_HEIGHT;
       this.contentElement.nativeElement.style.width = width + 'px';
       this.contentElement.nativeElement.style.height = height + 'px';
       
-      // Inizializza fontSize e fontFamily se non presenti
-      if (!this.note.fontSize) {
-        this.note.fontSize = 14;
-      }
-      if (!this.note.fontFamily) {
-        this.note.fontFamily = 'Open Sans, sans-serif';
-      }
+      
       
       // Applica fontSize e fontFamily
       if (this.noteInput) {
-        this.noteInput.nativeElement.style.fontSize = this.note.fontSize + 'px';
+        this.noteInput.nativeElement.style.fontSize = this.note.fontSize;
         this.noteInput.nativeElement.style.fontFamily = this.note.fontFamily;
       }
       
@@ -172,40 +166,57 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     if (!this.isResizing || !this.contentElement || !this.note) return;
     
     const deltaX = event.clientX - this.startX;
-    const deltaY = event.clientY - this.startY;
-    const minWidth = 50;
-    const minHeight = this.noteInput.nativeElement.offsetHeight;
-    
+    // Usa il valore di default della larghezza dal model come minWidth
+    const minWidth = Note.DEFAULT_WIDTH;
     let newWidth = this.startWidth;
-    let newHeight = this.startHeight;
     let newNoteX = this.startNoteX;
     let newNoteY = this.startNoteY;
     
+    // Calcola il rapporto di aspetto iniziale
+    const aspectRatio = this.startHeight / this.startWidth;
+    
+    // Modifica la larghezza basandosi sul movimento orizzontale
     switch (this.resizeHandle) {
       case 'br': // Bottom-right: top-left fisso
           newWidth = Math.max(minWidth, this.startWidth + deltaX);
-          newHeight = Math.max(minHeight, this.startHeight + deltaY);
           newNoteX = this.startNoteX;
-          newNoteY = this.startNoteY;
+          // Y rimane invariata (punto fisso top-left)
         break;
       case 'tr': // Top-right: bottom-left fisso
           newWidth = Math.max(minWidth, this.startWidth + deltaX);
-          newHeight = Math.max(minHeight, this.startHeight - deltaY);
-        newNoteX = this.startNoteX;
-        newNoteY = this.startNoteY - (newHeight - this.startHeight);
+          newNoteX = this.startNoteX;
+          // Y verrà calcolata dopo per mantenere il punto bottom-left fisso
         break;
       case 'bl': // Bottom-left: top-right fisso
           newWidth = Math.max(minWidth, this.startWidth - deltaX);
-          newHeight = Math.max(minHeight, this.startHeight + deltaY);
-        newNoteX = this.startNoteX - (newWidth - this.startWidth);
-        newNoteY = this.startNoteY;
+          newNoteX = this.startNoteX - (newWidth - this.startWidth);
+          // Y rimane invariata (punto fisso top-right)
         break;
       case 'tl': // Top-left: bottom-right fisso
           newWidth = Math.max(minWidth, this.startWidth - deltaX);
-          newHeight = Math.max(minHeight, this.startHeight - deltaY);
-        newNoteX = this.startNoteX - (newWidth - this.startWidth);
-        newNoteY = this.startNoteY - (newHeight - this.startHeight);
+          newNoteX = this.startNoteX - (newWidth - this.startWidth);
+          // Y verrà calcolata dopo per mantenere il punto bottom-right fisso
         break;
+    }
+    
+    // Calcola l'altezza proporzionale alla larghezza
+    let newHeight = newWidth * aspectRatio;
+    
+    // Calcola l'altezza minima del testo (se disponibile)
+    let minHeight = newHeight;
+    if (this.noteInput) {
+      const textScrollHeight = this.noteInput.nativeElement.scrollHeight;
+      const verticalPadding = 20; // 10px top + 10px bottom dal CSS
+      minHeight = textScrollHeight + verticalPadding;
+    }
+    
+    // Usa il massimo tra altezza proporzionale e altezza minima
+    newHeight = Math.max(newHeight, minHeight);
+    
+    // Per le maniglie superiori (tr, tl), aggiusta la posizione Y per mantenere il punto fisso
+    if (this.resizeHandle === 'tr' || this.resizeHandle === 'tl') {
+      const heightDelta = newHeight - this.startHeight;
+      newNoteY = this.startNoteY - heightDelta; // Sposta verso l'alto se l'altezza aumenta
     }
     
     // Aggiorna note
@@ -214,22 +225,19 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.note.x = newNoteX;
     this.note.y = newNoteY;
     
-    // Calcola font size proporzionale
-    const widthRatio = newWidth / this.startWidth;
-    const newFontSize = Math.max(8, Math.min(72, this.startFontSize * widthRatio));
-    this.note.fontSize = Math.round(newFontSize);
-    
     // Applica dimensioni al DOM
     this.contentElement.nativeElement.style.width = newWidth + 'px';
     this.contentElement.nativeElement.style.height = newHeight + 'px';
     
     if (this.noteInput) {
       this.noteInput.nativeElement.style.width = (newWidth - 16) + 'px';
-      this.noteInput.nativeElement.style.fontSize = this.note.fontSize + 'px';
       if (this.note.fontFamily) {
         this.noteInput.nativeElement.style.fontFamily = this.note.fontFamily;
       }
     }
+
+    // Aggiorna il font-size proporzionalmente alla larghezza
+    this.updateFontSizeOnResize(newWidth);
   }
 
   @HostListener('document:mouseup', ['$event'])
@@ -369,11 +377,15 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.resizeHandle = handle;
     this.startX = event.clientX;
     this.startY = event.clientY;
-    this.startWidth = this.note.width || 220;
-    this.startHeight = this.note.height || 50;
-    this.startNoteX = this.note.x || 0;
-    this.startNoteY = this.note.y || 0;
-    this.startFontSize = this.note.fontSize || 14;
+    this.startWidth = this.note.width;
+    this.startHeight = this.note.height;
+    this.startNoteX = this.note.x;
+    this.startNoteY = this.note.y;
+
+    // Legge il fontSize dal modello (es. "0.9em") e lo converte in number (em)
+    const fontSizeStr = this.note.fontSize || '0.9em';
+    this.startFontSizeEm = parseFloat(fontSizeStr.replace('em', '').replace('px', '')) || 0.9;
+
     this.changeState(2);
   }
 
@@ -456,15 +468,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             }
           }
           
-          if (this.noteInput) {
-            if (updatedNote.fontSize && this.note.fontSize !== updatedNote.fontSize) {
-              this.noteInput.nativeElement.style.fontSize = updatedNote.fontSize + 'px';
-            }
-            if (updatedNote.fontFamily && this.note.fontFamily !== updatedNote.fontFamily) {
-              this.noteInput.nativeElement.style.fontFamily = updatedNote.fontFamily;
-            }
-          }
-          
+          // if (this.noteInput) {
+          //   if (updatedNote.fontSize && this.note.fontSize !== updatedNote.fontSize) {
+          //     this.noteInput.nativeElement.style.fontSize = updatedNote.fontSize + 'px';
+          //   }
+          //   if (updatedNote.fontFamily && this.note.fontFamily !== updatedNote.fontFamily) {
+          //     this.noteInput.nativeElement.style.fontFamily = updatedNote.fontFamily;
+          //   }
+          // }
           this.logger.log('[CDS-NOTES] Note updated from service:', updatedNote.note_id);
         }
       });
@@ -525,6 +536,88 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   // METODI PRIVATI - Utility e helper
   // ============================================================================
+  /**
+   * Aggiorna il font-size proporzionalmente alla larghezza del contenitore.
+   * Mantiene una relazione lineare tra larghezza e font-size.
+   * Verifica e corregge l'altezza del contenitore per garantire che non sia mai
+   * inferiore all'altezza minima del testo (scrollHeight + padding).
+   */
+  private updateFontSizeOnResize(newWidth: number): void {
+    if (!this.note || !this.noteInput || !this.startWidth || !this.startFontSizeEm) {
+      return;
+    }
+    if(newWidth <= Note.DEFAULT_WIDTH) {
+      this.note.fontSize = Note.DEFAULT_FONT_SIZE_EM + 'em';
+      // Aggiorna il DOM
+      if (this.noteInput) {
+        this.noteInput.nativeElement.style.fontSize = this.note.fontSize;
+      }
+      // Verifica comunque l'altezza minima anche quando si riduce la larghezza
+      this.ensureMinimumHeight();
+      return;
+    }
+
+    // Rapporto tra nuova larghezza e larghezza iniziale
+    const ratio = (newWidth / this.startWidth)*1.05;
+
+    // Calcola il nuovo font-size in em
+    let newFontSizeEm = this.startFontSizeEm * ratio;
+
+    // Limiti ragionevoli
+    newFontSizeEm = Math.max(0.5, Math.min(4, newFontSizeEm)); // tra 0.5em e 4em
+
+    // Aggiorna il modello (per persistenza)
+    this.note.fontSize = newFontSizeEm.toFixed(2) + 'em';
+
+    // Aggiorna il DOM
+    this.noteInput.nativeElement.style.fontSize = this.note.fontSize;
+
+    // Verifica e corregge l'altezza minima dopo aver aggiornato il font-size
+    // (il font-size potrebbe essere cambiato, quindi anche l'altezza minima potrebbe essere cambiata)
+    this.ensureMinimumHeight();
+  }
+
+  /**
+   * Verifica che l'altezza del contenitore non sia inferiore all'altezza minima
+   * del testo (scrollHeight + padding verticale).
+   * Se l'altezza è inferiore al minimo, la corregge automaticamente.
+   * Se siamo in fase di resize e la maniglia è superiore (tr, tl), aggiorna anche la posizione Y.
+   */
+  private ensureMinimumHeight(): void {
+    if (!this.note || !this.noteInput || !this.contentElement) {
+      return;
+    }
+
+    // Calcola l'altezza minima: scrollHeight del testo + padding verticale (10px top + 10px bottom = 20px)
+    const textScrollHeight = this.noteInput.nativeElement.scrollHeight;
+    const verticalPadding = 20; // 10px top + 10px bottom dal CSS (.cds-notes-content padding: 10px 8px)
+    const minHeight = textScrollHeight + verticalPadding;
+
+    // Ottieni l'altezza corrente del contenitore
+    const currentHeight = this.note.height || this.contentElement.nativeElement.offsetHeight;
+
+    // Se l'altezza corrente è inferiore al minimo, correggila
+    if (currentHeight < minHeight) {
+      const newHeight = minHeight;
+      const heightDelta = newHeight - currentHeight;
+      
+      // Aggiorna il modello
+      this.note.height = newHeight;
+      
+      // Aggiorna il DOM
+      this.contentElement.nativeElement.style.height = newHeight + 'px';
+      
+      // Se siamo in fase di resize e la maniglia è superiore (tr, tl), aggiorna anche la posizione Y
+      // per mantenere il punto fisso (bottom-right per tl, bottom-left per tr)
+      if (this.isResizing && (this.resizeHandle === 'tr' || this.resizeHandle === 'tl')) {
+        this.note.y = this.note.y - heightDelta;
+        if (this.contentElement) {
+          this.contentElement.nativeElement.style.top = this.note.y + 'px';
+        }
+      }
+    }
+  }
+
   private purifyAndNormalizeText(html: string): string {
     if (!html) return '';
     
@@ -616,7 +709,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const top = parseFloat(computedStyle.top) || parseFloat(element.style.top) || element.offsetTop || 0;
     const width = parseFloat(computedStyle.width) || parseFloat(element.style.width) || element.offsetWidth || this.note.width || 220;
     const height = parseFloat(computedStyle.height) || parseFloat(element.style.height) || element.offsetHeight || this.note.height || 50;
-    
+     
     this.note.x = left;
     this.note.y = top;
     this.note.width = width;
