@@ -347,7 +347,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       // Il contenuto è già aggiornato in note.text tramite [(ngModel)]
       // Non serve confrontare o aggiornare manualmente
       // Chiama sempre autoSave() - il debounce gestisce le chiamate multiple
-      this.logger.log('[CdsPanelNoteDetailComponent] Quill content changed, triggering auto-save');
+      this.logger.log('[CdsPanelNoteDetailComponent] Quill content changed, triggering auto-save', event);
       this.autoSave();
     } catch (error) {
       this.logger.error('[CdsPanelNoteDetailComponent] Error handling Quill content change:', error);

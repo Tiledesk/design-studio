@@ -31,6 +31,7 @@
     <!-- Div giallo per menu contestuale -->
     <div 
         class="context-menu-overlay"
+        [class.tds_draggable]="isDraggable"
         [class.text-focus]="stateNote === 1"
         (click)="onNoteInputClick($event)"
         (dblclick)="onNoteInputDoubleClick($event)">

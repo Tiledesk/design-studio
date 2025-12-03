@@ -48,6 +48,7 @@
   -webkit-user-select: text;
   user-select: text;
   font-size: 0.9em;
+  color: var(--bs-black);
   // Cursor quando è draggable
   &.tds_draggable {
     cursor: grab;
