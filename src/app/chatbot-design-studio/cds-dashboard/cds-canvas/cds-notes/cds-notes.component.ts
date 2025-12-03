@@ -564,7 +564,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     let newFontSizeEm = this.startFontSizeEm * ratio;
 
     // Limiti ragionevoli
-    newFontSizeEm = Math.max(0.5, Math.min(4, newFontSizeEm)); // tra 0.5em e 4em
+    newFontSizeEm = Math.max(0.5, Math.min(10, newFontSizeEm)); // tra 0.5em e 10em
 
     // Aggiorna il modello (per persistenza)
     this.note.fontSize = newFontSizeEm.toFixed(2) + 'em';
