@@ -51,8 +51,15 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private startHeight = 0;
   private startNoteX = 0;
   private startNoteY = 0;
-  private startFontSize = 0;
+  private startFontSizeEm = Note.DEFAULT_FONT_SIZE_EM; // font-size iniziale in em
   private justFinishedResizing = false;
+
+  // PROPRIETÀ PRIVATE - Rotazione
+  // ============================================================================
+  private isRotating = false;
+  private startRotationAngle = 0; // Angolo iniziale di rotazione
+  private centerX = 0; // Centro X della nota
+  private centerY = 0; // Centro Y della nota
 
   // ============================================================================
   // PROPRIETÀ PRIVATE - Drag listeners
@@ -113,23 +120,24 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   ngAfterViewInit(): void {
     if (this.contentElement && this.note) {
       // Imposta dimensioni iniziali
-      const width = this.note.width || 220;
-      const height = this.note.height || 50;
+      const width = this.note.width || Note.DEFAULT_WIDTH;
+      const height = this.note.height || Note.DEFAULT_HEIGHT;
       this.contentElement.nativeElement.style.width = width + 'px';
       this.contentElement.nativeElement.style.height = height + 'px';
       
-      // Inizializza fontSize e fontFamily se non presenti
-      if (!this.note.fontSize) {
-        this.note.fontSize = 14;
-      }
-      if (!this.note.fontFamily) {
-        this.note.fontFamily = 'Open Sans, sans-serif';
-      }
+      
       
       // Applica fontSize e fontFamily
       if (this.noteInput) {
-        this.noteInput.nativeElement.style.fontSize = this.note.fontSize + 'px';
+        this.noteInput.nativeElement.style.fontSize = this.note.fontSize;
         this.noteInput.nativeElement.style.fontFamily = this.note.fontFamily;
+      }
+      
+      // Applica la rotazione se presente
+      if (this.note.rotation !== undefined && this.note.rotation !== 0) {
+        const transform = `rotate(${this.note.rotation}deg)`;
+        this.contentElement.nativeElement.style.transform = transform;
+        this.contentElement.nativeElement.style.transformOrigin = 'center center';
       }
       
       // Setup listeners e drag
@@ -169,43 +177,87 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
+    // Gestione rotazione
+    if (this.isRotating && this.contentElement && this.note) {
+      this.handleRotation(event);
+      return;
+    }
+    
+    // Gestione resize
     if (!this.isResizing || !this.contentElement || !this.note) return;
     
     const deltaX = event.clientX - this.startX;
-    const deltaY = event.clientY - this.startY;
-    const minWidth = 50;
-    const minHeight = this.noteInput.nativeElement.offsetHeight;
-    
+    // Usa il valore di default della larghezza dal model come minWidth
+    const minWidth = Note.DEFAULT_WIDTH;
     let newWidth = this.startWidth;
-    let newHeight = this.startHeight;
     let newNoteX = this.startNoteX;
     let newNoteY = this.startNoteY;
     
+    // Calcola il rapporto di aspetto iniziale
+    const aspectRatio = this.startHeight / this.startWidth;
+    
+    // Modifica la larghezza basandosi sul movimento orizzontale
     switch (this.resizeHandle) {
       case 'br': // Bottom-right: top-left fisso
           newWidth = Math.max(minWidth, this.startWidth + deltaX);
-          newHeight = Math.max(minHeight, this.startHeight + deltaY);
           newNoteX = this.startNoteX;
-          newNoteY = this.startNoteY;
+          // Y rimane invariata (punto fisso top-left)
         break;
       case 'tr': // Top-right: bottom-left fisso
           newWidth = Math.max(minWidth, this.startWidth + deltaX);
-          newHeight = Math.max(minHeight, this.startHeight - deltaY);
-        newNoteX = this.startNoteX;
-        newNoteY = this.startNoteY - (newHeight - this.startHeight);
+          newNoteX = this.startNoteX;
+          // Y verrà calcolata dopo per mantenere il punto bottom-left fisso
         break;
       case 'bl': // Bottom-left: top-right fisso
           newWidth = Math.max(minWidth, this.startWidth - deltaX);
-          newHeight = Math.max(minHeight, this.startHeight + deltaY);
-        newNoteX = this.startNoteX - (newWidth - this.startWidth);
-        newNoteY = this.startNoteY;
+          newNoteX = this.startNoteX - (newWidth - this.startWidth);
+          // Y rimane invariata (punto fisso top-right)
         break;
       case 'tl': // Top-left: bottom-right fisso
           newWidth = Math.max(minWidth, this.startWidth - deltaX);
-          newHeight = Math.max(minHeight, this.startHeight - deltaY);
-        newNoteX = this.startNoteX - (newWidth - this.startWidth);
-        newNoteY = this.startNoteY - (newHeight - this.startHeight);
+          newNoteX = this.startNoteX - (newWidth - this.startWidth);
+          // Y verrà calcolata dopo per mantenere il punto bottom-right fisso
         break;
+      case 'r': // Right: lato sinistro fisso, cambia solo larghezza
+          newWidth = Math.max(minWidth, this.startWidth + deltaX);
+          newNoteX = this.startNoteX;
+          // Altezza e testo rimangono invariati
+        break;
+      case 'l': // Left: lato destro fisso, cambia solo larghezza
+          newWidth = Math.max(minWidth, this.startWidth - deltaX);
+          newNoteX = this.startNoteX - (newWidth - this.startWidth);
+          // Altezza e testo rimangono invariati
+        break;
+    }
+    
+    // Per le maniglie verticali (l, r): cambia solo larghezza, mantieni altezza e testo invariati
+    const isVerticalHandle = this.resizeHandle === 'l' || this.resizeHandle === 'r';
+    
+    let newHeight: number;
+    if (isVerticalHandle) {
+      // Mantieni l'altezza invariata per le maniglie verticali
+      newHeight = this.startHeight;
+      newNoteY = this.startNoteY; // Y rimane invariata
+    } else {
+      // Calcola l'altezza proporzionale alla larghezza per le maniglie angolari
+      newHeight = newWidth * aspectRatio;
+      
+      // Calcola l'altezza minima del testo (se disponibile)
+      let minHeight = newHeight;
+      if (this.noteInput) {
+        const textScrollHeight = this.noteInput.nativeElement.scrollHeight;
+        const verticalPadding = 20; // 10px top + 10px bottom dal CSS
+        minHeight = textScrollHeight + verticalPadding;
+      }
+      
+      // Usa il massimo tra altezza proporzionale e altezza minima
+      newHeight = Math.max(newHeight, minHeight);
+      
+      // Per le maniglie superiori (tr, tl), aggiusta la posizione Y per mantenere il punto fisso
+      if (this.resizeHandle === 'tr' || this.resizeHandle === 'tl') {
+        const heightDelta = newHeight - this.startHeight;
+        newNoteY = this.startNoteY - heightDelta; // Sposta verso l'alto se l'altezza aumenta
+      }
     }
     
     // Aggiorna note
@@ -214,21 +266,21 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.note.x = newNoteX;
     this.note.y = newNoteY;
     
-    // Calcola font size proporzionale
-    const widthRatio = newWidth / this.startWidth;
-    const newFontSize = Math.max(8, Math.min(72, this.startFontSize * widthRatio));
-    this.note.fontSize = Math.round(newFontSize);
-    
     // Applica dimensioni al DOM
     this.contentElement.nativeElement.style.width = newWidth + 'px';
     this.contentElement.nativeElement.style.height = newHeight + 'px';
     
     if (this.noteInput) {
       this.noteInput.nativeElement.style.width = (newWidth - 16) + 'px';
-      this.noteInput.nativeElement.style.fontSize = this.note.fontSize + 'px';
       if (this.note.fontFamily) {
         this.noteInput.nativeElement.style.fontFamily = this.note.fontFamily;
       }
+    }
+
+    // Aggiorna il font-size proporzionalmente alla larghezza solo per le maniglie angolari
+    // Le maniglie verticali (l, r) non modificano il font-size
+    if (!isVerticalHandle) {
+      this.updateFontSizeOnResize(newWidth);
     }
   }
 
@@ -244,11 +296,16 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       }, 100);
       this.updateNote();
     }
+    
+    if (this.isRotating) {
+      this.isRotating = false;
+      this.updateNote();
+    }
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (this.isResizing || this.justFinishedResizing) {
+    if (this.isResizing || this.justFinishedResizing || this.isRotating) {
       return;
     }
     
@@ -369,12 +426,81 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.resizeHandle = handle;
     this.startX = event.clientX;
     this.startY = event.clientY;
-    this.startWidth = this.note.width || 220;
-    this.startHeight = this.note.height || 50;
-    this.startNoteX = this.note.x || 0;
-    this.startNoteY = this.note.y || 0;
-    this.startFontSize = this.note.fontSize || 14;
+    this.startWidth = this.note.width;
+    this.startHeight = this.note.height;
+    this.startNoteX = this.note.x;
+    this.startNoteY = this.note.y;
+
+    // Legge il fontSize dal modello (es. "0.9em") e lo converte in number (em)
+    const fontSizeStr = this.note.fontSize || '0.9em';
+    this.startFontSizeEm = parseFloat(fontSizeStr.replace('em', '').replace('px', '')) || 0.9;
+
     this.changeState(2);
+  }
+
+  /**
+   * Inizia la rotazione della nota
+   */
+  startRotate(event: MouseEvent): void {
+    event.stopPropagation();
+    event.preventDefault();
+    if (!this.contentElement || !this.note) return;
+    
+    this.isRotating = true;
+    
+    // Calcola il centro della nota
+    const rect = this.contentElement.nativeElement.getBoundingClientRect();
+    this.centerX = rect.left + rect.width / 2;
+    this.centerY = rect.top + rect.height / 2;
+    
+    // Salva l'angolo iniziale di rotazione
+    this.startRotationAngle = this.note.rotation || 0;
+    
+    // Calcola l'angolo iniziale tra il centro e la posizione del mouse
+    const dx = event.clientX - this.centerX;
+    const dy = event.clientY - this.centerY;
+    const initialAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+    
+    // Salva l'offset angolare iniziale
+    this.startX = initialAngle;
+    
+    this.changeState(2);
+  }
+
+  /**
+   * Gestisce la rotazione durante il movimento del mouse
+   */
+  private handleRotation(event: MouseEvent): void {
+    if (!this.contentElement || !this.note) return;
+    
+    // Calcola l'angolo corrente tra il centro e la posizione del mouse
+    const dx = event.clientX - this.centerX;
+    const dy = event.clientY - this.centerY;
+    const currentAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+    
+    // Calcola la differenza angolare rispetto all'angolo iniziale
+    let angleDelta = currentAngle - this.startX;
+    
+    // Normalizza l'angolo tra -180 e 180
+    while (angleDelta > 180) angleDelta -= 360;
+    while (angleDelta < -180) angleDelta += 360;
+    
+    // Calcola il nuovo angolo di rotazione
+    let newRotation = this.startRotationAngle + angleDelta;
+    
+    // Normalizza l'angolo finale tra 0 e 360
+    newRotation = ((newRotation % 360) + 360) % 360;
+    
+    // Aggiorna l'angolo nel modello
+    this.note.rotation = newRotation;
+    
+    // Applica la trasformazione CSS
+    if (this.contentElement) {
+      const transform = `rotate(${newRotation}deg)`;
+      this.contentElement.nativeElement.style.transform = transform;
+      // Imposta l'origine della trasformazione al centro
+      this.contentElement.nativeElement.style.transformOrigin = 'center center';
+    }
   }
 
   // ============================================================================
@@ -456,15 +582,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             }
           }
           
-          if (this.noteInput) {
-            if (updatedNote.fontSize && this.note.fontSize !== updatedNote.fontSize) {
-              this.noteInput.nativeElement.style.fontSize = updatedNote.fontSize + 'px';
-            }
-            if (updatedNote.fontFamily && this.note.fontFamily !== updatedNote.fontFamily) {
-              this.noteInput.nativeElement.style.fontFamily = updatedNote.fontFamily;
-            }
-          }
-          
+          // if (this.noteInput) {
+          //   if (updatedNote.fontSize && this.note.fontSize !== updatedNote.fontSize) {
+          //     this.noteInput.nativeElement.style.fontSize = updatedNote.fontSize + 'px';
+          //   }
+          //   if (updatedNote.fontFamily && this.note.fontFamily !== updatedNote.fontFamily) {
+          //     this.noteInput.nativeElement.style.fontFamily = updatedNote.fontFamily;
+          //   }
+          // }
           this.logger.log('[CDS-NOTES] Note updated from service:', updatedNote.note_id);
         }
       });
@@ -525,6 +650,84 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   // METODI PRIVATI - Utility e helper
   // ============================================================================
+  /**
+   * Aggiorna il font-size proporzionalmente alla larghezza del contenitore.
+   * Mantiene una relazione lineare tra larghezza e font-size.
+   * Verifica e corregge l'altezza del contenitore per garantire che non sia mai
+   * inferiore all'altezza minima del testo (scrollHeight + padding).
+   */
+  private updateFontSizeOnResize(newWidth: number): void {
+    if (!this.note || !this.noteInput) {
+      return;
+    }
+
+    // Valori di riferimento
+    const REFERENCE_WIDTH = Note.DEFAULT_WIDTH; // Larghezza iniziale del div contenitore in px
+    const REFERENCE_FONT_SIZE = Note.DEFAULT_FONT_SIZE_EM; // Dimensione iniziale del font in em 
+
+    // Calcola il rapporto tra la nuova larghezza e la larghezza di riferimento
+    const ratio = newWidth / REFERENCE_WIDTH;
+
+    // Calcola il nuovo font-size in em proporzionalmente alla larghezza
+    let newFontSizeEm = REFERENCE_FONT_SIZE * ratio;
+
+    // Limiti ragionevoli
+    newFontSizeEm = Math.max(0.5, Math.min(10, newFontSizeEm)); // tra 0.5em e 10em
+
+    // Aggiorna il modello (per persistenza)
+    this.note.fontSize = newFontSizeEm.toFixed(2) + 'em';
+
+    // Aggiorna il DOM
+    if (this.noteInput) {
+      this.noteInput.nativeElement.style.fontSize = this.note.fontSize;
+    }
+
+    // Verifica e corregge l'altezza minima dopo aver aggiornato il font-size
+    // (il font-size potrebbe essere cambiato, quindi anche l'altezza minima potrebbe essere cambiata)
+    this.ensureMinimumHeight();
+  }
+
+  /**
+   * Verifica che l'altezza del contenitore non sia inferiore all'altezza minima
+   * del testo (scrollHeight + padding verticale).
+   * Se l'altezza è inferiore al minimo, la corregge automaticamente.
+   * Se siamo in fase di resize e la maniglia è superiore (tr, tl), aggiorna anche la posizione Y.
+   */
+  private ensureMinimumHeight(): void {
+    if (!this.note || !this.noteInput || !this.contentElement) {
+      return;
+    }
+
+    // Calcola l'altezza minima: scrollHeight del testo + padding verticale (10px top + 10px bottom = 20px)
+    const textScrollHeight = this.noteInput.nativeElement.scrollHeight;
+    const verticalPadding = 20; // 10px top + 10px bottom dal CSS (.cds-notes-content padding: 10px 8px)
+    const minHeight = textScrollHeight + verticalPadding;
+
+    // Ottieni l'altezza corrente del contenitore
+    const currentHeight = this.note.height || this.contentElement.nativeElement.offsetHeight;
+
+    // Se l'altezza corrente è inferiore al minimo, correggila
+    if (currentHeight < minHeight) {
+      const newHeight = minHeight;
+      const heightDelta = newHeight - currentHeight;
+      
+      // Aggiorna il modello
+      this.note.height = newHeight;
+      
+      // Aggiorna il DOM
+      this.contentElement.nativeElement.style.height = newHeight + 'px';
+      
+      // Se siamo in fase di resize e la maniglia è superiore (tr, tl), aggiorna anche la posizione Y
+      // per mantenere il punto fisso (bottom-right per tl, bottom-left per tr)
+      if (this.isResizing && (this.resizeHandle === 'tr' || this.resizeHandle === 'tl')) {
+        this.note.y = this.note.y - heightDelta;
+        if (this.contentElement) {
+          this.contentElement.nativeElement.style.top = this.note.y + 'px';
+        }
+      }
+    }
+  }
+
   private purifyAndNormalizeText(html: string): string {
     if (!html) return '';
     
@@ -616,7 +819,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const top = parseFloat(computedStyle.top) || parseFloat(element.style.top) || element.offsetTop || 0;
     const width = parseFloat(computedStyle.width) || parseFloat(element.style.width) || element.offsetWidth || this.note.width || 220;
     const height = parseFloat(computedStyle.height) || parseFloat(element.style.height) || element.offsetHeight || this.note.height || 50;
-    
+     
     this.note.x = left;
     this.note.y = top;
     this.note.width = width;

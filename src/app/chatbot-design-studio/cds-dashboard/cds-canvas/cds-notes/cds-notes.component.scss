@@ -2,15 +2,15 @@
 // CONTAINER PRINCIPALE
 // ============================================================================
 .cds-notes-content {
-  min-width: 50px;
-  min-height: 50px;
   padding: 10px 8px;
   position: relative;
   box-sizing: border-box;
   border-radius: 6px;
   border: 1px solid rgba(0, 0, 0, 0.04);
   box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 3px 0px;
-  
+  width: 130px;
+  height: 42px;
+  min-height: fit-content;
   // Permette la selezione del testo quando lo stato è 1 (text focus)
   -webkit-user-select: text;
   user-select: text;
@@ -18,6 +18,11 @@
   // Background color viene applicato dinamicamente tramite [style.background-color]
   // Border color viene applicato dinamicamente tramite [style.border-color]
   // Box shadow viene applicato dinamicamente tramite [style.box-shadow]
+  
+  // Cursor quando lo stato è 1 (text focus)
+  &.text-focus {
+    cursor: text;
+  }
 }
 
 // ============================================================================
@@ -29,16 +34,12 @@
   background: transparent;
   outline: none;
   resize: none;
-  padding: 6px;
+  padding: 0;
   margin: 0;
   overflow: hidden;
   line-height: 1.4;
-  font-size: 14px;
-  font-family: inherit;
-  min-height: 1.4em;
   height: min-content;
   width: 100%;
-  min-width: 50px;
   box-sizing: border-box;
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -46,7 +47,8 @@
   position: relative;
   -webkit-user-select: text;
   user-select: text;
-  
+  font-size: 0.9em;
+  color: var(--bs-black);
   // Cursor quando è draggable
   &.tds_draggable {
     cursor: grab;
@@ -70,6 +72,25 @@
       
       &:hover {
         cursor: pointer !important;
+      }
+    }
+  }
+  
+  // Cursor quando lo stato è 1 (text focus)
+  &.text-focus {
+    cursor: text;
+    
+    // Tutti gli elementi figli ereditano il cursore text
+    ::ng-deep * {
+      cursor: text;
+    }
+    
+    // I link devono sempre avere il cursore pointer, anche quando è in text focus
+    ::ng-deep a {
+      cursor: pointer;
+      
+      &:hover {
+        cursor: pointer;
       }
     }
   }
@@ -108,6 +129,24 @@
     content: 'Type something';
     color: #999;
     pointer-events: none;
+  }
+}
+
+// ============================================================================
+// CONTEXT MENU OVERLAY
+// ============================================================================
+.context-menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: auto;
+  
+  // Cursor quando lo stato è 1 (text focus)
+  &.text-focus {
+    cursor: text;
   }
 }
 
@@ -155,5 +194,50 @@
     bottom: -4px;
     right: -4px;
     cursor: nwse-resize;
+  }
+  
+  // Posizioni dei lati verticali (solo larghezza)
+  .resize-l {
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+    width: 4px;
+    height: 20px;
+  }
+  
+  .resize-r {
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+    width: 4px;
+    height: 20px;
+  }
+  
+  // Handle rotazione al centro del lato superiore
+  .rotate-handle {
+    position: absolute;
+    top: -20px; // Staccato dal bordo superiore
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #007aff;
+    cursor: grab;
+    display: none;
+    z-index: 10;
+    user-select: none;
+    
+    &:active {
+      cursor: grabbing;
+    }
+  }
+  
+  // Quando selezionata → mostra handle di rotazione
+  &.selected .rotate-handle {
+    display: block;
   }
 }

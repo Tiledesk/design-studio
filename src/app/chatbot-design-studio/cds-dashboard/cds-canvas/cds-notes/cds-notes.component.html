@@ -2,6 +2,7 @@
 <div class="cds-notes-content"
     #noteContentElement
     [class.selected]="stateNote === 2"
+    [class.text-focus]="stateNote === 1"
     [class.tds_draggable]="isDraggable"
     [id]="note?.note_id"
     [style.box-shadow]="note?.boxShadow === false ? 'none' : null"
@@ -12,10 +13,11 @@
         #noteInput
         class="note-input"
         [class.tds_draggable]="isDraggable"
+        [class.text-focus]="stateNote === 1"
         [style.z-index]="stateNote === 1 ? 3 : 1"
         contenteditable="true"
         [innerHTML]="sanitizedNoteHtml"
-        [style.font-size.px]="note?.fontSize"
+        [style.font-size]="note?.fontSize"
         [style.font-family]="note?.fontFamily"
         (focus)="onFocusTextarea($event)"
         (input)="onInputChange($event)"
@@ -24,6 +26,15 @@
         (dblclick)="onNoteInputDoubleClick($event)"
         (mousedown)="onNoteInputMouseDown($event)"
         spellcheck="false">
+    </div>
+
+    <!-- Div giallo per menu contestuale -->
+    <div 
+        class="context-menu-overlay"
+        [class.tds_draggable]="isDraggable"
+        [class.text-focus]="stateNote === 1"
+        (click)="onNoteInputClick($event)"
+        (dblclick)="onNoteInputDoubleClick($event)">
     </div>
 
     <!-- Handle angoli per ridimensionamento -->
@@ -35,6 +46,16 @@
         (mousedown)="startResize($event, 'bl')"></div>
     <div class="resize-handle resize-br" 
         (mousedown)="startResize($event, 'br')"></div>
+    
+    <!-- Handle lati verticali per ridimensionamento solo larghezza -->
+    <div class="resize-handle resize-l" 
+        (mousedown)="startResize($event, 'l')"></div>
+    <div class="resize-handle resize-r" 
+        (mousedown)="startResize($event, 'r')"></div>
+    
+    <!-- Handle rotazione al centro del lato superiore -->
+    <div class="rotate-handle" 
+        (mousedown)="startRotate($event)"></div>
 
 </div>
 
