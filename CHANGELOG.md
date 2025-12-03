@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.14-rc4
+- **changed**: added rotation and horizontal scaling to the notes component
 
 # 1.39.14-rc3
 - **added**: added notes component
