@@ -23,6 +23,7 @@ export class Note {
   boxShadow?: boolean;
   fontSize?: string; // Dimensione del font in pixel
   fontFamily?: string; // Famiglia del font
+  rotation?: number; // Angolo di rotazione in gradi
 
   constructor(id_faq_kb: string, pos: any) {
     this.id_faq_kb = id_faq_kb;
@@ -41,6 +42,7 @@ export class Note {
     this.boxShadow = true; // Default: ombra attiva
     this.fontSize =  Note.DEFAULT_FONT_SIZE_EM + 'em'; // Dimensione del font di default
     this.fontFamily = 'Open Sans, sans-serif'; // Famiglia del font di default
+    this.rotation = 0; // Angolo di rotazione iniziale (0 gradi)
   }
 }
 

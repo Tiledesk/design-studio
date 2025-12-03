@@ -195,4 +195,49 @@
     right: -4px;
     cursor: nwse-resize;
   }
+  
+  // Posizioni dei lati verticali (solo larghezza)
+  .resize-l {
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+    width: 4px;
+    height: 20px;
+  }
+  
+  .resize-r {
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+    width: 4px;
+    height: 20px;
+  }
+  
+  // Handle rotazione al centro del lato superiore
+  .rotate-handle {
+    position: absolute;
+    top: -20px; // Staccato dal bordo superiore
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #007aff;
+    cursor: grab;
+    display: none;
+    z-index: 10;
+    user-select: none;
+    
+    &:active {
+      cursor: grabbing;
+    }
+  }
+  
+  // Quando selezionata → mostra handle di rotazione
+  &.selected .rotate-handle {
+    display: block;
+  }
 }
