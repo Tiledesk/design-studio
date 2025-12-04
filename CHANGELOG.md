@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+# 1.39.14
 - **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
 - **bug-fix**: added the "globals" variables created in the DS to the variable list
 - **changed**: open the Intent panel details by clicking on "start intent"
@@ -15,7 +15,6 @@
 - **added**: added ai-modules gpt-5.1, gemini-3-pro-preview, gemini-3-pro-image-preview
 - **bug-fix**: fixed an error when searching for parameters for "voice" chatbot_type
 - **bug-fix**: changed knwoledge to knowledge 
-
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
 
