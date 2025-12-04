@@ -38,7 +38,11 @@ import { CdsConnectorInComponent } from './base-elements/cds-connector-in/cds-co
 import { CdsWidgetLogsComponent } from './base-elements/cds-widget-logs/cds-widget-logs.component';
 import { ChangeAlphaColorComponent } from 'src/app/modals/change-alpha-color/change-alpha-color.component';
 import { CdsPanelPublishComponent } from './cds-panel-publish/cds-panel-publish.component';
+import { CdsNotesComponent } from './cds-notes/cds-notes.component';
+import { CdsPanelNoteDetailComponent } from './cds-panel-note-detail/cds-panel-note-detail.component';
 
+import { FormsModule } from '@angular/forms';
+import { QuillModule } from "ngx-quill";
 
 const routes: Routes = [
   {
@@ -84,6 +88,10 @@ const routes: Routes = [
     CdsOptionsComponent,
     ContextMenuComponent,
 
+    //CDS NOTES
+    CdsNotesComponent,
+    CdsPanelNoteDetailComponent,
+
     //ACTIONS
     //SHARED
     CdsActionControlsComponent,
@@ -113,8 +121,9 @@ const routes: Routes = [
     CdsActionsModule,
     CdsVoiceActionsModule,
     RouterModule.forChild(routes),
-    // ChatbotDesignStudioModule
-  ]
+    FormsModule,
+    QuillModule
+]
 })
 export class CdsCanvasModule { }
 

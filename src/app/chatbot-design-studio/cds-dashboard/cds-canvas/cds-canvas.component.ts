@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, skip, timeout } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -10,10 +10,12 @@ import { StageService } from '../../services/stage.service';
 import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { NoteService } from 'src/app/services/note.service';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
+import { Note } from 'src/app/models/note-model';
 
 // UTILS //
 import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
@@ -29,8 +31,10 @@ import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
 import { WebhookService } from '../../services/webhook-service.service';
 import { Chatbot } from 'src/app/models/faq_kb-model';
+import { v4 as uuidv4 } from 'uuid';
 
 // const swal = require('sweetalert');
+
 
 @Component({
   selector: 'cds-canvas',
@@ -41,6 +45,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   @ViewChild('receiver_elements_dropped_on_stage', { static: false }) receiverElementsDroppedOnStage: ElementRef;
   @ViewChild('drawer_of_items_to_zoom_and_drag', { static: false }) drawerOfItemsToZoomAndDrag: ElementRef;
+  @ViewChild('cdsOptions') cdsOptions: any;
 
   // @Output() testItOut = new EventEmitter();
   @Input() onHeaderTestItOut: Observable<Intent>
@@ -68,7 +73,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   private subscriptionListOfIntents: Subscription;
   listOfIntents: Array<Intent> = [];
-  listOfEvents: Array<Intent> = []
+  listOfEvents: Array<Intent> = [];
+  listOfNotes: Array<Note> = [];
   // intentSelected: Intent;
   intent_id: string;
   hasClickedAddAction: boolean = false;
@@ -140,8 +146,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** panel widget readonly readonly log */
   IS_OPEN_WIDGET_LOG: boolean = false;
   
+  /** note mode */
+  isNoteModeActive: boolean = false;
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
+  IS_OPEN_PANEL_NOTE_DETAIL: boolean = false;
+  noteSelected: Note;
   startDraggingPosition: any = null;
   mesage_request_id: string;
 
@@ -172,6 +182,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public appStorageService: AppStorageService,
     public logService: LogService,
     public webhookService: WebhookService,
+    private readonly noteService: NoteService,
     
   ) {
     this.setSubscriptions();
@@ -607,6 +618,18 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // set subtype chatbot
     // ---------------------------------------
     this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+
+
+    // ---------------------------------------
+    // set listOfNotes load from localStorage
+    // ---------------------------------------
+    // this.listOfNotes = this.noteService.getNotes(this.id_faq_kb);
+    this.listOfNotes = this.dashboardService.selectedChatbot.attributes.notes || [];
+    //this.logger.log("[CDS-CANVAS]  •••• listOfNotes ••••", this.listOfNotes);
+    
+    // NOTA: Non ci sottoscriviamo a notesChanged$ per mantenere il componente disaccoppiato.
+    // Il canvas aggiorna listOfNotes manualmente dopo ogni operazione (save, delete, duplicate).
+    // I componenti figli (cds-notes) si sottoscrivono a noteUpdated$ per aggiornare le singole note.
   }
 
 
@@ -618,6 +641,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // this._isOpenPanelWidget.next(false);
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
+    this.IS_OPEN_PANEL_NOTE_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
@@ -713,6 +737,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     /** start-dragging */
     this.listnerStartDragging = (e: CustomEvent) => {
       const el = e.detail.element;
+      // se nella classe list esiste 'cds-note' allora è una nota
+      if (el.classList.contains('cds-note')) {
+        // this.logger.log('[CDS-CANVAS] start-dragging nota ', el);
+        return;
+      }
       this.logger.log('[CDS-CANVAS] start-dragging ', el);
       this.removeConnectorDraftAndCloseFloatMenu();
       this.intentService.setIntentSelectedById(el.id);
@@ -729,6 +758,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     */
     this.listnerDragged = (e: CustomEvent) => {
       const el = e.detail.element;
+      if (el.classList.contains('cds-note')) {
+        // this.logger.log('[CDS-CANVAS] dragged nota ', el);
+        return;
+      }
       const x = e.detail.x;
       const y = e.detail.y;
       this.connectorService.moved(el, x, y);
@@ -739,19 +772,24 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     /** end-dragging */
     this.listnerEndDragging = (e: CustomEvent) => {
       const el = e.detail.element;
+      if (el.classList.contains('cds-note')) {
+        // this.logger.log('[CDS-CANVAS] end-dragging nota ', el);
+        return;
+      }
       this.logger.log('[CDS-CANVAS] end-dragging ', el);
-      // // el.style.zIndex = 1;
-      this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected.attributes.position);
+      this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected?.attributes?.position);
       this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
       // Verifica se la posizione è cambiata (drag effettivo)
-      const pos = this.intentService.intentSelected.attributes.position;
-      const dragged = !this.startDraggingPosition ||
-        (pos && (pos.x !== this.startDraggingPosition.x || pos.y !== this.startDraggingPosition.y));
-      this.closeAllPanels();
-      this.intentService.updateIntentSelected();
-      if (!dragged) {
-        this.openWebhookIntentPanel(this.intentService.intentSelected);
-      }
+      if(this.intentService.intentSelected){
+        const pos = this.intentService.intentSelected.attributes.position;
+        const dragged = !this.startDraggingPosition ||
+          (pos && (pos.x !== this.startDraggingPosition.x || pos.y !== this.startDraggingPosition.y));
+        this.closeAllPanels();
+        this.intentService.updateIntentSelected();
+        if (!dragged) {
+          this.openWebhookIntentPanel(this.intentService.intentSelected);
+        }
+      } 
     };
     document.addEventListener("end-dragging", this.listnerEndDragging, false);
 
@@ -1340,6 +1378,38 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     }, 0);
   }
 
+  /**
+   * Gestisce la selezione di una nota e apre il panel dei dettagli
+   * Simile a onIntentSelected per gli intent
+   */
+  onNoteSelected(note: Note | null): void {
+    if (note) {
+      // Verifica se il pannello è già aperto sulla stessa nota
+      if (this.IS_OPEN_PANEL_NOTE_DETAIL && 
+          this.noteSelected && 
+          this.noteSelected.note_id === note.note_id) {
+        // Il pannello è già aperto sulla stessa nota, non fare nulla
+        this.logger.log('[CDS-CANVAS] onNoteSelected - panel already open for note:', note.note_id);
+        return;
+      }
+      
+      // Apri il panel quando una nota viene selezionata (stateNote === 1 o 2)
+      this.logger.log('[CDS-CANVAS] onNoteSelected ', note.note_id);
+      this.closeAllPanels();
+      this.removeConnectorDraftAndCloseFloatMenu();
+      this.closeActionDetailPanel();
+      setTimeout(() => {
+        this.noteSelected = note;
+        this.IS_OPEN_PANEL_NOTE_DETAIL = true;
+      }, 0);
+    } else {
+      // Chiudi il panel quando note è null (stato cambiato a 0)
+      this.logger.log('[CDS-CANVAS] onNoteSelected - closing panel');
+      this.IS_OPEN_PANEL_NOTE_DETAIL = false;
+      this.noteSelected = null;
+    }
+  }
+
   /** onActionSelected  **
    * @ Close WHEN AN ACTION IS SELECTED FROM AN INTENT
    * - actions context menu (static & float)
@@ -1489,7 +1559,86 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.stageService.setAlphaConnectors(this.id_faq_kb, alpha);
         break;
       }
+      case OPTIONS.NOTE: {
+        this.isNoteModeActive = resp.isActive !== undefined ? resp.isActive : !this.isNoteModeActive;
+        this.logger.log("[CDS-CANVAS] note mode active: ", this.isNoteModeActive);
+        break;
+      }
     }
+  }
+
+  /**
+   * Gestisce il click sullo stage quando la modalità note è attiva
+   */
+  onStageClick(event: MouseEvent): void {
+    if (this.isNoteModeActive) {
+      // Verifichiamo che il click non provenga dal pulsante note o da altri elementi che non devono essere intercettati
+      const target = event.target as HTMLElement;
+      if (target.closest('#cds-options-panel')) {
+        // Non intercettare i click sul pannello delle opzioni
+        return;
+      }
+      
+      // Preveniamo la propagazione per evitare che il click venga gestito da altri handler
+      event.stopPropagation();
+      event.preventDefault();
+      
+      // Calcoliamo la posizione usando la stessa logica di onDroppedElementToStage
+      let pos = this.connectorService.tiledeskConnectors.logicPoint({ x: event.clientX, y: event.clientY });
+    
+      // Creiamo una nuova nota
+      const newNote = new Note(this.id_faq_kb, pos);
+      
+      // Aggiungiamo la nota all'array locale
+      this.listOfNotes.push(newNote);
+      
+      // Sincronizziamo listOfNotes con attributes.notes per assicurarci che siano allineati
+      // Questo è importante perché saveRemoteNote recupera le note da attributes.notes
+      if (!this.dashboardService.selectedChatbot.attributes) {
+        this.dashboardService.selectedChatbot.attributes = {};
+      }
+      this.dashboardService.selectedChatbot.attributes.notes = [...this.listOfNotes];
+      
+      // Salva la nota in remoto (saveRemoteNote aggiungerà la nota agli attributes se non presente)
+      // Usa firstValueFrom invece di subscribe per una gestione moderna e sicura
+      this.saveNoteRemotely(newNote);
+      
+      this.logger.log("[CDS-CANVAS] Note created at position:", pos, "Total notes:", this.listOfNotes.length);
+      
+      // Disattiviamo la modalità note
+      this.deactivateNoteMode();
+    }
+  }
+
+  /**
+   * Salva una nota in remoto usando firstValueFrom invece di subscribe
+   * Gestione moderna e sicura delle Observable
+   */
+  private async saveNoteRemotely(note: Note): Promise<void> {
+    try {
+      const data = await firstValueFrom(this.noteService.saveRemoteNote(note, this.id_faq_kb));
+      this.logger.log("[CDS-CANVAS] Note saved remotely successfully:", note.note_id);
+      // Sincronizza listOfNotes con attributes.notes dopo il salvataggio per mantenere la coerenza
+      if (this.dashboardService.selectedChatbot.attributes?.notes) {
+        this.listOfNotes = [...this.dashboardService.selectedChatbot.attributes.notes];
+      }
+    } catch (error) {
+      this.logger.error("[CDS-CANVAS] Error saving note remotely:", error);
+    }
+  }
+
+  /**
+   * Disattiva la modalità note e ripristina lo stato del pulsante
+   */
+  private deactivateNoteMode(): void {
+    this.isNoteModeActive = false;
+    
+    // Ripristiniamo lo stato del pulsante nel componente cds-options
+    if (this.cdsOptions) {
+      this.cdsOptions.isNoteModeActive = false;
+    }
+    
+    this.logger.log("[CDS-CANVAS] note mode deactivated");
   } 
 
 
@@ -1530,6 +1679,73 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       // this.onOpenDialog();
     }
     
+  }
+
+  /** onSavePanelNoteDetail */
+  onSavePanelNoteDetail(note: Note) {
+    this.logger.log('[CDS-CANVAS] onSavePanelNoteDetail note ', note)
+    if (note && note != null) {
+      // Aggiorna la nota nell'array listOfNotes
+      const index = this.listOfNotes.findIndex(n => n.note_id === note.note_id);
+      if (index >= 0) {
+        this.listOfNotes[index] = note;
+      }
+      // Aggiorna anche negli attributes del dashboardService
+      if (this.dashboardService.selectedChatbot.attributes?.notes) {
+        const attrIndex = this.dashboardService.selectedChatbot.attributes.notes.findIndex(n => n.note_id === note.note_id);
+        if (attrIndex >= 0) {
+          this.dashboardService.selectedChatbot.attributes.notes[attrIndex] = note;
+        }
+      }
+      // Salva la nota in remoto
+      // Il servizio notificherà automaticamente i cambiamenti tramite Observable
+      this.noteService.saveRemoteNote(note, this.id_faq_kb).subscribe({
+        next: (data) => {
+          // Sincronizza listOfNotes con l'array aggiornato dal servizio
+          this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+          this.logger.log('[CDS-CANVAS] Note saved successfully:', data);
+        },
+        error: (error) => {
+          this.logger.error('[CDS-CANVAS] Error saving note:', error);
+        }
+      });
+    }
+  }
+
+  /** onDeleteNote */
+  onDeleteNote(note: Note) {
+    this.logger.log('[CDS-CANVAS] onDeleteNote note ', note);
+    if (note && note != null) {
+      // Usa il servizio per eliminare la nota
+      this.noteService.deleteNote(note, this.id_faq_kb).subscribe({
+        next: (data) => {
+          // Sincronizza listOfNotes con l'array aggiornato dal servizio
+          this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+          this.logger.log('[CDS-CANVAS] Note deleted successfully, array updated:', data);
+        },
+        error: (error) => {
+          this.logger.error('[CDS-CANVAS] Note Error deleting note:', error);
+        }
+      });
+    }
+  }
+
+  /** onDuplicateNote */
+  onDuplicateNote(note: Note) {
+    this.logger.log('[CDS-CANVAS] onDuplicateNote note ', note);
+    if (note && note != null) {
+      // Usa il servizio per duplicare la nota
+      this.noteService.duplicateNote(note, this.id_faq_kb).subscribe({
+        next: (duplicatedNote) => {
+          // Sincronizza listOfNotes con l'array aggiornato dal servizio
+          this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+          this.logger.log('[CDS-CANVAS] Note duplicated successfully:', duplicatedNote.note_id);
+        },
+        error: (error) => {
+          this.logger.error('[CDS-CANVAS] Note Error duplicating note:', error);
+        }
+      });
+    }
   }
   // --------------------------------------------------------- //
 

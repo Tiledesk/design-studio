@@ -47,6 +47,7 @@
               "node_modules/roboto-fontface/css/roboto/roboto-fontface.css",
               "node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
               "node_modules/@ctrl/ngx-emoji-mart/picker.css",
+              "node_modules/quill/dist/quill.snow.css",
               "src/styles.scss",
               { "input" : "src/assets/sass/cds/tooltip-styles.scss", "inject": true, "bundleName": "cds-tooltip-style"},
               { "input" : "src/assets/sass/material-dashboard.scss", "inject": true, "bundleName": "material-dashboard"},

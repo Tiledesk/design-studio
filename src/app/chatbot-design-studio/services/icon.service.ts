@@ -408,6 +408,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/more_vert.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'more_horiz',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/more_horiz.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'mouse',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/mouse.svg')
     );
