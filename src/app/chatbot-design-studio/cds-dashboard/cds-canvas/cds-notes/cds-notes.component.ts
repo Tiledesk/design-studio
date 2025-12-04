@@ -47,11 +47,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private resizeHandle: string = '';
   private startX = 0;
   private startY = 0;
-  private startWidth = 0;
-  private startHeight = 0;
+  private startWidth = 0; // Dimensioni base (rimangono fisse, usiamo scale per ridimensionare)
+  private startHeight = 0; // Dimensioni base (rimangono fisse, usiamo scale per ridimensionare)
   private startNoteX = 0;
   private startNoteY = 0;
-  private startFontSizeEm = Note.DEFAULT_FONT_SIZE_EM; // font-size iniziale in em
+  private startScale = 1; // Scale iniziale
+  private startCenterX = 0; // Centro iniziale del box (per calcolo scale rispetto al centro)
+  private startCenterY = 0; // Centro iniziale del box (per calcolo scale rispetto al centro)
+  private startDistanceFromCenter = 0; // Distanza iniziale del mouse dal centro
   private justFinishedResizing = false;
 
   // PROPRIETÀ PRIVATE - Rotazione
@@ -119,13 +122,17 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
   ngAfterViewInit(): void {
     if (this.contentElement && this.note) {
-      // Imposta dimensioni iniziali
-      const width = this.note.width || Note.DEFAULT_WIDTH;
-      const height = this.note.height || Note.DEFAULT_HEIGHT;
-      this.contentElement.nativeElement.style.width = width + 'px';
-      this.contentElement.nativeElement.style.height = height + 'px';
+      // Imposta dimensioni base (rimangono fisse, usiamo scale per ridimensionare)
+      const baseWidth = Note.DEFAULT_WIDTH;
+      const baseHeight = Note.DEFAULT_HEIGHT;
+      this.contentElement.nativeElement.style.width = baseWidth + 'px';
+      this.contentElement.nativeElement.style.height = baseHeight + 'px';
       
-      
+      // Calcola lo scale iniziale basato sulle dimensioni salvate nel modello
+      const savedWidth = this.note.width || baseWidth;
+      const savedHeight = this.note.height || baseHeight;
+      const scaleX = savedWidth / baseWidth;
+      const scaleY = savedHeight / baseHeight;
       
       // Applica fontSize e fontFamily
       if (this.noteInput) {
@@ -133,12 +140,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         this.noteInput.nativeElement.style.fontFamily = this.note.fontFamily;
       }
       
-      // Applica la rotazione se presente
-      if (this.note.rotation !== undefined && this.note.rotation !== 0) {
-        const transform = `rotate(${this.note.rotation}deg)`;
+      // Applica la trasformazione combinando scale + rotate
+      const rotation = this.note.rotation || 0;
+      const transform = `scale(${scaleX}, ${scaleY}) rotate(${rotation}deg)`;
         this.contentElement.nativeElement.style.transform = transform;
         this.contentElement.nativeElement.style.transformOrigin = 'center center';
-      }
+      
+      // Applica scale inverso agli handle per mantenerli alla dimensione originale
+      this.updateHandlesScale(scaleX, scaleY);
       
       // Setup listeners e drag
       this.setupAllListeners();
@@ -183,110 +192,157 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       return;
     }
     
-    // Gestione resize
+    // Gestione resize con transform: scale()
     if (!this.isResizing || !this.contentElement || !this.note) return;
     
     const deltaX = event.clientX - this.startX;
-    // Usa il valore di default della larghezza dal model come minWidth
-    const minWidth = Note.DEFAULT_WIDTH;
-    let newWidth = this.startWidth;
-    let newNoteX = this.startNoteX;
-    let newNoteY = this.startNoteY;
+    const deltaY = event.clientY - this.startY;
     
-    // Calcola il rapporto di aspetto iniziale
-    const aspectRatio = this.startHeight / this.startWidth;
+    // Calcola le nuove dimensioni desiderate
+    const minScale = 0.1; // Scale minimo (10% della dimensione originale)
+    const maxScale = 10; // Scale massimo (1000% della dimensione originale)
     
-    // Modifica la larghezza basandosi sul movimento orizzontale
-    switch (this.resizeHandle) {
-      case 'br': // Bottom-right: top-left fisso
-          newWidth = Math.max(minWidth, this.startWidth + deltaX);
-          newNoteX = this.startNoteX;
-          // Y rimane invariata (punto fisso top-left)
-        break;
-      case 'tr': // Top-right: bottom-left fisso
-          newWidth = Math.max(minWidth, this.startWidth + deltaX);
-          newNoteX = this.startNoteX;
-          // Y verrà calcolata dopo per mantenere il punto bottom-left fisso
-        break;
-      case 'bl': // Bottom-left: top-right fisso
-          newWidth = Math.max(minWidth, this.startWidth - deltaX);
-          newNoteX = this.startNoteX - (newWidth - this.startWidth);
-          // Y rimane invariata (punto fisso top-right)
-        break;
-      case 'tl': // Top-left: bottom-right fisso
-          newWidth = Math.max(minWidth, this.startWidth - deltaX);
-          newNoteX = this.startNoteX - (newWidth - this.startWidth);
-          // Y verrà calcolata dopo per mantenere il punto bottom-right fisso
-        break;
-      case 'r': // Right: lato sinistro fisso, cambia solo larghezza
-          newWidth = Math.max(minWidth, this.startWidth + deltaX);
-          newNoteX = this.startNoteX;
-          // Altezza e testo rimangono invariati
-        break;
-      case 'l': // Left: lato destro fisso, cambia solo larghezza
-          newWidth = Math.max(minWidth, this.startWidth - deltaX);
-          newNoteX = this.startNoteX - (newWidth - this.startWidth);
-          // Altezza e testo rimangono invariati
-        break;
-    }
-    
-    // Per le maniglie verticali (l, r): cambia solo larghezza, mantieni altezza e testo invariati
     const isVerticalHandle = this.resizeHandle === 'l' || this.resizeHandle === 'r';
+    const isCornerHandle = this.resizeHandle === 'br' || this.resizeHandle === 'tr' || 
+                          this.resizeHandle === 'bl' || this.resizeHandle === 'tl';
     
-    let newHeight: number;
-    if (isVerticalHandle) {
-      // Mantieni l'altezza invariata per le maniglie verticali
-      newHeight = this.startHeight;
-      newNoteY = this.startNoteY; // Y rimane invariata
-    } else {
-      // Calcola l'altezza proporzionale alla larghezza per le maniglie angolari
-      newHeight = newWidth * aspectRatio;
+    // IMPORTANTE: Parti sempre dallo scale corrente (startScale), non da 1
+    // Questo è fondamentale per i resize successivi
+    let scaleX = this.startScale;
+    let scaleY = this.startScale;
+    
+    // IMPORTANTE: Usiamo sempre 'center center' come transform-origin
+    // Il centro del div rimane sempre fisso
+    const transformOrigin = 'center center';
+    
+    // Calcola la distanza corrente del mouse dal centro iniziale
+    const currentDx = event.clientX - this.startCenterX;
+    const currentDy = event.clientY - this.startCenterY;
+    const currentDistance = Math.sqrt(currentDx * currentDx + currentDy * currentDy);
+    
+    if (isCornerHandle) {
+      // Maniglie dei vertici: mantieni proporzioni perfette
+      // Calcola lo scale basandoti sulla distanza dal centro iniziale
+      // La distanza dal centro aumenta/diminuisce proporzionalmente allo scale
+      if (this.startDistanceFromCenter > 0) {
+        const distanceRatio = currentDistance / this.startDistanceFromCenter;
+        const newScale = this.startScale * distanceRatio;
+        scaleX = Math.max(minScale, Math.min(maxScale, newScale));
+        scaleY = scaleX; // Mantieni proporzioni perfette
+      } else {
+        // Se la distanza iniziale è 0 (maniglia al centro), usa il delta
+        const avgDelta = (Math.abs(deltaX) + Math.abs(deltaY)) / 2;
+        const newScale = this.startScale + (avgDelta / ((this.startWidth + this.startHeight) / 2));
+        scaleX = Math.max(minScale, Math.min(maxScale, newScale));
+        scaleY = scaleX;
+      }
+    } else if (isVerticalHandle) {
+      // Maniglie laterali: cambia solo larghezza, NON scalare il testo
+      // Calcola la nuova larghezza basandoti sul movimento orizzontale
+      const minWidth = Note.DEFAULT_WIDTH;
+      let newWidth = this.startWidth;
+      let newX = this.startNoteX;
       
-      // Calcola l'altezza minima del testo (se disponibile)
-      let minHeight = newHeight;
-      if (this.noteInput) {
-        const textScrollHeight = this.noteInput.nativeElement.scrollHeight;
-        const verticalPadding = 20; // 10px top + 10px bottom dal CSS
-        minHeight = textScrollHeight + verticalPadding;
+      switch (this.resizeHandle) {
+        case 'r': // Right: lato sinistro fisso (centro si sposta a destra)
+          newWidth = Math.max(minWidth, this.startWidth + deltaX);
+          // Per mantenere il centro fisso, devo spostare la posizione x verso sinistra
+          const widthDeltaR = newWidth - this.startWidth;
+          newX = this.startNoteX - widthDeltaR / 2;
+          break;
+        case 'l': // Left: lato destro fisso (centro si sposta a sinistra)
+          newWidth = Math.max(minWidth, this.startWidth - deltaX);
+          // Per mantenere il centro fisso, devo spostare la posizione x verso destra
+          const widthDeltaL = newWidth - this.startWidth;
+          newX = this.startNoteX - widthDeltaL / 2;
+          break;
       }
       
-      // Usa il massimo tra altezza proporzionale e altezza minima
-      newHeight = Math.max(newHeight, minHeight);
-      
-      // Per le maniglie superiori (tr, tl), aggiusta la posizione Y per mantenere il punto fisso
-      if (this.resizeHandle === 'tr' || this.resizeHandle === 'tl') {
-        const heightDelta = newHeight - this.startHeight;
-        newNoteY = this.startNoteY - heightDelta; // Sposta verso l'alto se l'altezza aumenta
+      // Per le maniglie laterali, NON usiamo scale() ma cambiamo direttamente la larghezza
+      // Il testo mantiene le dimensioni originali e può andare a capo
+      if (this.contentElement) {
+        // Aggiorna la posizione per mantenere il centro fisso
+        this.note.x = newX;
+        
+        // Cambia direttamente la larghezza del contenitore
+        this.contentElement.nativeElement.style.width = newWidth + 'px';
+        
+        // Aggiorna la larghezza del campo di testo PRIMA di calcolare l'altezza
+        // (sottraendo il padding: 8px left + 8px right = 16px)
+        if (this.noteInput) {
+          this.noteInput.nativeElement.style.width = (newWidth - 16) + 'px';
+          // Rimuovi qualsiasi scale dal testo per mantenere le dimensioni originali
+          this.noteInput.nativeElement.style.transform = 'none';
+        }
+        
+        // Applica solo la rotazione (senza scale) per le maniglie laterali
+        const rotation = this.note.rotation || 0;
+        const transform = `rotate(${rotation}deg)`;
+        this.contentElement.nativeElement.style.transform = transform;
+        this.contentElement.nativeElement.style.transformOrigin = transformOrigin;
+        
+        // Calcola l'altezza basata sul contenuto del testo
+        // Prima aggiorna la larghezza del campo di testo, poi calcola l'altezza
+        let newHeight = this.startHeight;
+        if (this.noteInput) {
+          // Forza il ricalcolo del layout per ottenere scrollHeight corretto
+          this.noteInput.nativeElement.style.width = (newWidth - 16) + 'px';
+          
+          // Calcola l'altezza minima basata sul contenuto
+          const textScrollHeight = this.noteInput.nativeElement.scrollHeight;
+          const verticalPadding = 20; // 10px top + 10px bottom dal CSS
+          newHeight = Math.max(this.startHeight, textScrollHeight + verticalPadding);
+          this.contentElement.nativeElement.style.height = newHeight + 'px';
+        }
+        
+        // Aggiorna le dimensioni nel modello
+        this.note.width = newWidth;
+        this.note.height = newHeight;
+        
+        // Non applicare scale inverso agli handle perché non stiamo usando scale
+        // Gli handle rimangono alla dimensione originale
+        return; // Esci subito, non applicare lo scale
       }
     }
     
-    // Aggiorna note
-    this.note.width = newWidth;
-    this.note.height = newHeight;
-    this.note.x = newNoteX;
-    this.note.y = newNoteY;
+    // Per le maniglie dei vertici: applica la trasformazione CSS con scale + rotate
+    const rotation = this.note.rotation || 0;
+    const transform = `scale(${scaleX}, ${scaleY}) rotate(${rotation}deg)`;
     
-    // Applica dimensioni al DOM
-    this.contentElement.nativeElement.style.width = newWidth + 'px';
-    this.contentElement.nativeElement.style.height = newHeight + 'px';
-    
-    if (this.noteInput) {
-      this.noteInput.nativeElement.style.width = (newWidth - 16) + 'px';
-      if (this.note.fontFamily) {
-        this.noteInput.nativeElement.style.fontFamily = this.note.fontFamily;
-      }
-    }
-
-    // Aggiorna il font-size proporzionalmente alla larghezza solo per le maniglie angolari
-    // Le maniglie verticali (l, r) non modificano il font-size
-    if (!isVerticalHandle) {
-      this.updateFontSizeOnResize(newWidth);
+    if (this.contentElement) {
+      this.contentElement.nativeElement.style.transform = transform;
+      this.contentElement.nativeElement.style.transformOrigin = transformOrigin;
+      
+      // Applica scale inverso agli handle per mantenerli alla dimensione originale
+      this.updateHandlesScale(scaleX, scaleY);
     }
   }
 
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
     if (this.isResizing) {
+      const isVerticalHandle = this.resizeHandle === 'l' || this.resizeHandle === 'r';
+      
+      if (isVerticalHandle) {
+        // Per le maniglie laterali, le dimensioni sono già state aggiornate direttamente
+        // durante il movimento, quindi non serve fare nulla qui
+      } else {
+        // Per le maniglie dei vertici, calcola le dimensioni finali basate sullo scale corrente
+        if (this.contentElement && this.note) {
+          const currentTransform = this.contentElement.nativeElement.style.transform || '';
+          const scaleMatch = currentTransform.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
+          
+          if (scaleMatch) {
+            const scaleX = parseFloat(scaleMatch[1]) || 1;
+            const scaleY = parseFloat(scaleMatch[2]) || scaleX;
+            
+            // Aggiorna le dimensioni nel modello con quelle reali (base * scale)
+            this.note.width = this.startWidth * scaleX;
+            this.note.height = this.startHeight * scaleY;
+          }
+        }
+      }
+      
       this.isResizing = false;
       this.resizeHandle = '';
       this.changeState(0);
@@ -426,16 +482,111 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.resizeHandle = handle;
     this.startX = event.clientX;
     this.startY = event.clientY;
-    this.startWidth = this.note.width;
-    this.startHeight = this.note.height;
+    
+    // IMPORTANTE: Le dimensioni base sono SEMPRE quelle del DOM (Note.DEFAULT_WIDTH/HEIGHT)
+    // non quelle reali del modello, perché nel DOM usiamo sempre le dimensioni base
+    // e applichiamo lo scale via transform
+    this.startWidth = Note.DEFAULT_WIDTH;
+    this.startHeight = Note.DEFAULT_HEIGHT;
     this.startNoteX = this.note.x;
     this.startNoteY = this.note.y;
 
-    // Legge il fontSize dal modello (es. "0.9em") e lo converte in number (em)
-    const fontSizeStr = this.note.fontSize || '0.9em';
-    this.startFontSizeEm = parseFloat(fontSizeStr.replace('em', '').replace('px', '')) || 0.9;
+    // Calcola lo scale iniziale dal transform corrente (se presente)
+    const currentTransform = this.contentElement.nativeElement.style.transform || '';
+    const scaleMatch = currentTransform.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
+    if (scaleMatch) {
+      this.startScale = parseFloat(scaleMatch[1]) || 1;
+    } else {
+      // Se non c'è transform, calcola lo scale dalle dimensioni reali del modello
+      const realWidth = this.note.width || Note.DEFAULT_WIDTH;
+      const realHeight = this.note.height || Note.DEFAULT_HEIGHT;
+      this.startScale = Math.min(realWidth / Note.DEFAULT_WIDTH, realHeight / Note.DEFAULT_HEIGHT);
+    }
+    
+    // Assicurati che le dimensioni base siano impostate nel DOM
+    this.contentElement.nativeElement.style.width = this.startWidth + 'px';
+    this.contentElement.nativeElement.style.height = this.startHeight + 'px';
+    
+    // IMPORTANTE: Usiamo sempre 'center center' come transform-origin
+    // Il centro del div rimane sempre fisso, indipendentemente dalla maniglia
+    // Questo semplifica enormemente la logica e elimina i problemi di spostamento
+    const transformOrigin = 'center center';
+    
+    // Salva le posizioni attuali (non le modifichiamo mai quando cambio maniglia)
+    this.startNoteX = this.note.x;
+    this.startNoteY = this.note.y;
+    
+    // Calcola lo scale corrente
+    const currentScaleX = this.startScale;
+    const currentScaleY = scaleMatch && scaleMatch[2] ? parseFloat(scaleMatch[2]) : currentScaleX;
+    
+    // Calcola e salva il centro iniziale del box (nel viewport)
+    const rect = this.contentElement.nativeElement.getBoundingClientRect();
+    this.startCenterX = rect.left + rect.width / 2;
+    this.startCenterY = rect.top + rect.height / 2;
+    
+    // Calcola la distanza iniziale del mouse dal centro
+    const dx = this.startX - this.startCenterX;
+    const dy = this.startY - this.startCenterY;
+    this.startDistanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+    
+    // Imposta sempre 'center center' come transform-origin
+    this.contentElement.nativeElement.style.transformOrigin = transformOrigin;
+    
+    // Preserva lo scale e la rotazione corrente
+    const rotation = this.note.rotation || 0;
+    const transform = `scale(${currentScaleX}, ${currentScaleY}) rotate(${rotation}deg)`;
+    this.contentElement.nativeElement.style.transform = transform;
+    
+    // Aggiorna anche gli handle
+    this.updateHandlesScale(currentScaleX, currentScaleY);
 
     this.changeState(2);
+  }
+  
+  /**
+   * Determina quale vertice deve rimanere fisso per una data origine
+   */
+  private getFixedVertexForOrigin(origin: string): string {
+    switch (origin) {
+      case 'top left':
+        return 'bottom right';
+      case 'top right':
+        return 'bottom left';
+      case 'bottom left':
+        return 'top right';
+      case 'bottom right':
+        return 'top left';
+      case 'left center':
+        return 'right center';
+      case 'right center':
+        return 'left center';
+      case 'center center':
+      default:
+        return 'center';
+    }
+  }
+  
+  /**
+   * Restituisce il transform-origin corretto per una data maniglia
+   */
+  private getTransformOriginForHandle(handle: string): string {
+    switch (handle) {
+      case 'br': // Bottom-right: top-left fisso
+        return 'top left';
+      case 'tr': // Top-right: bottom-left fisso
+        return 'bottom left';
+      case 'bl': // Bottom-left: top-right fisso
+        return 'top right';
+      case 'tl': // Top-left: bottom-right fisso
+        return 'bottom right';
+      case 'r': // Right: lato sinistro fisso
+        return 'left center';
+      case 'l': // Left: lato destro fisso
+        return 'right center';
+      default:
+        return 'center center';
+    }
   }
 
   /**
@@ -494,13 +645,64 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // Aggiorna l'angolo nel modello
     this.note.rotation = newRotation;
     
-    // Applica la trasformazione CSS
+    // Preserva lo scale esistente e combina con la rotazione
     if (this.contentElement) {
-      const transform = `rotate(${newRotation}deg)`;
+      const currentTransform = this.contentElement.nativeElement.style.transform || '';
+      const scaleMatch = currentTransform.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
+      
+      let scaleX = 1;
+      let scaleY = 1;
+      if (scaleMatch) {
+        scaleX = parseFloat(scaleMatch[1]) || 1;
+        scaleY = parseFloat(scaleMatch[2]) || scaleX;
+      }
+      
+      const transform = `scale(${scaleX}, ${scaleY}) rotate(${newRotation}deg)`;
       this.contentElement.nativeElement.style.transform = transform;
-      // Imposta l'origine della trasformazione al centro
       this.contentElement.nativeElement.style.transformOrigin = 'center center';
+      
+      // Aggiorna lo scale degli handle
+      this.updateHandlesScale(scaleX, scaleY);
     }
+  }
+
+  /**
+   * Applica uno scale inverso agli handle (resize e rotate) per mantenerli
+   * alla dimensione originale anche quando il contenitore viene scalato.
+   */
+  private updateHandlesScale(scaleX: number, scaleY: number): void {
+    if (!this.contentElement) return;
+    
+    // Calcola lo scale inverso
+    const inverseScaleX = 1 / scaleX;
+    const inverseScaleY = 1 / scaleY;
+    
+    // Trova tutti gli handle e applica lo scale inverso
+    const handles = this.contentElement.nativeElement.querySelectorAll(
+      '.resize-handle, .rotate-handle'
+    ) as NodeListOf<HTMLElement>;
+    
+    handles.forEach(handle => {
+      // Per le maniglie laterali (l, r), preserva il translateY(-50%) per il centraggio verticale
+      const isVerticalHandle = handle.classList.contains('resize-l') || handle.classList.contains('resize-r');
+      
+      if (isVerticalHandle) {
+        // Combina translateY(-50%) con lo scale inverso
+        handle.style.transform = `translateY(-50%) scale(${inverseScaleX}, ${inverseScaleY})`;
+      } else {
+        // Per gli altri handle (angoli e rotazione), applica solo lo scale inverso
+        // ma preserva eventuali trasformazioni esistenti (es. translateX per rotate-handle)
+        const isRotateHandle = handle.classList.contains('rotate-handle');
+        if (isRotateHandle) {
+          // Per rotate-handle, preserva translateX(-50%)
+          handle.style.transform = `translateX(-50%) scale(${inverseScaleX}, ${inverseScaleY})`;
+        } else {
+          // Per gli angoli, solo scale
+          handle.style.transform = `scale(${inverseScaleX}, ${inverseScaleY})`;
+        }
+      }
+      handle.style.transformOrigin = 'center center';
+    });
   }
 
   // ============================================================================
@@ -817,8 +1019,24 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const computedStyle = window.getComputedStyle(element);
     const left = parseFloat(computedStyle.left) || parseFloat(element.style.left) || element.offsetLeft || 0;
     const top = parseFloat(computedStyle.top) || parseFloat(element.style.top) || element.offsetTop || 0;
-    const width = parseFloat(computedStyle.width) || parseFloat(element.style.width) || element.offsetWidth || this.note.width || 220;
-    const height = parseFloat(computedStyle.height) || parseFloat(element.style.height) || element.offsetHeight || this.note.height || 50;
+    
+    // Leggi le dimensioni base dal DOM (sono fisse)
+    const baseWidth = parseFloat(element.style.width) || Note.DEFAULT_WIDTH;
+    const baseHeight = parseFloat(element.style.height) || Note.DEFAULT_HEIGHT;
+    
+    // Leggi lo scale dal transform
+    const transform = element.style.transform || '';
+    const scaleMatch = transform.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
+    let scaleX = 1;
+    let scaleY = 1;
+    if (scaleMatch) {
+      scaleX = parseFloat(scaleMatch[1]) || 1;
+      scaleY = parseFloat(scaleMatch[2]) || scaleX;
+    }
+    
+    // Calcola le dimensioni reali (base * scale)
+    const width = baseWidth * scaleX;
+    const height = baseHeight * scaleY;
      
     this.note.x = left;
     this.note.y = top;

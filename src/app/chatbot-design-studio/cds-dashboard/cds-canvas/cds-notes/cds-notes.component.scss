@@ -10,8 +10,8 @@
   box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 3px 0px;
   width: 130px;
   height: 42px;
-  // min-height: fit-content;
-  // max-height: fit-content;
+  min-height: fit-content;
+  max-height: fit-content;
   // Permette la selezione del testo quando lo stato è 1 (text focus)
   -webkit-user-select: text;
   user-select: text;
