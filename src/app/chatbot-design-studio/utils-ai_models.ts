@@ -64,7 +64,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     name: "Gemini 3 pro preview",
     value: "gemini-3-pro-preview",
     description: "TYPE_GPT_MODEL.gemini-3-pro-preview.description",
-    status: "inactive",
+    status: "active",
     min_tokens: 1,
     max_output_tokens: 65536 // Corretto da 128000 (Gemini 1.5 Pro supporta 1M)
   },
@@ -72,7 +72,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     name: "Gemini 3 pro image preview",
     value: "gemini-3-pro-image-preview",
     description: "TYPE_GPT_MODEL.gemini-3-pro-image-preview.description",
-    status: "inactive",
+    status: "active",
     min_tokens: 1,
     max_output_tokens: 65536 // Corretto da 128000 (Gemini 1.5 Pro supporta 1M)
   },
@@ -127,6 +127,38 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
 ]
 
 export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number}> = [
+  {
+    name: "Claude Sonnet 4.5",
+    value: "claude-sonnet-4-5",
+    description: "TYPE_GPT_MODEL.claude-sonnet-4-5.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536
+  },
+  {
+    name: "Claude Haiku 4.5",
+    value: "claude-haiku-4-5",
+    description: "TYPE_GPT_MODEL.claude-haiku-4-5.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536
+  },
+  {
+    name: "Claude Opus 4.5",
+    value: "claude-opus-4-5",
+    description: "TYPE_GPT_MODEL.claude-opus-4-5.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536
+  },
+  {
+    name: "Claude Opus 4.1",
+    value: "claude-opus-4-1",
+    description: "TYPE_GPT_MODEL.claude-opus-4-1.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536
+  },
   {
     name: "Claude-3.7 Sonnet",
     value: "claude-3-7-sonnet-20250219",
