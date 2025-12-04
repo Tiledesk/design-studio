@@ -75,7 +75,18 @@ export class CdsActionLeadUpdateComponent implements OnInit {
 
   onChangeSelect(propertySelected: {name: string, value: string}, index: number ){
     this.logger.log("[ACTION-LEAD-UPDATE] onChangeSelect event: ", propertySelected, this.action)
+    
+    // Get the previous key in the form
+    const oldKey = this.update.at(index).get('key')?.value;
+    // Update the form
     this.update.at(index).get('key')?.setValue(propertySelected.value);
+    // Update action.update
+    if (oldKey && this.action.update[oldKey] !== undefined) {
+      const oldValue = this.action.update[oldKey];
+      delete this.action.update[oldKey];         // remove old key
+      this.action.update[propertySelected.value] = oldValue; // add new key with same value
+    }
+    this.updateAndSaveAction.emit()
   }
 
   onChangeTextarea(text, index: number){
@@ -89,10 +100,8 @@ export class CdsActionLeadUpdateComponent implements OnInit {
     if (item.valid) {
       const key = item.get('key')!.value;
       const value = item.get('value')!.value;
-
       // Update action.update
       this.action.update[key] = value;
-
       // Update the disabled status on the lead property list
       this.updateDisabledList()
 
