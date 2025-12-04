@@ -34,8 +34,7 @@
 <div *ngIf="!previewMode">
     <div class="content-panel-intent-detail" id="scrollMe">
 
-        <ng-container *ngIf="showCards" [ngTemplateOutlet]="sections"></ng-container>
-        <ng-container *ngIf="showPlaceholder" [ngTemplateOutlet]="placeholder"></ng-container>
+        <ng-container [ngTemplateOutlet]="sections"></ng-container>
 
         <div class="filter-add-group-wrapper add-conditions-group">
             <div class="filter-add-group" (click)="onAddNewProperty()">
@@ -48,47 +47,10 @@
 </div>
 
 
-<ng-template #placeholder>
-    <div class="content">
 
-        <form [formGroup]="leadPropertyFormGroup">
-            <div class="setting-wrapper">
-                <div class="field-box" style="width: 100%;">
-                    <label class="title-label">{{'CDSCanvas.Key' | translate}}</label>
-                    <!-- <div class="text-editor-wpr" style="position: relative;"> -->
-                    <!-- [limitCharsText]="150"  -->
-                    <cds-select
-                        [items]="leadPropertyListFiltered"
-                        [bindLabelSelect]="'name'"
-                        [bindValueSelect]="'value'"
-                        [searchable]="true"
-                        [itemSelected]="leadPropertyFormGroup.controls.key.value"
-                        (onSelected)="onChangeSelect($event)">
-                    </cds-select>
-                </div>
-        
-                <div class="field-box" style="width: 100%;">
-                    <label class="title-label">{{'CDSCanvas.Value' | translate}}</label>
-                    <!-- <div class="text-editor-wpr" style="position: relative;"> -->
-                    <!-- [limitCharsText]="150"  -->
-                    <cds-textarea class="text-editable-div"
-                        [emojiPikerBtn]="false" 
-                        [textLimitBtn]="false" 
-                        [text]="selectedValue"
-                        [minRow]="1" [maxRow]="1" 
-                        popoverVerticalAlign="above"
-                        (blur)="onBlur($event)"
-                        (changeTextarea)="onChangeTextarea($event)">
-                    </cds-textarea>
-                </div>
-            </div>
-        </form>  
-
-    </div>
-</ng-template>
 
 <ng-template #sections>
-    <div class="content" *ngFor="let item of action?.update | keyvalue; let i=index">
+    <div class="content" *ngFor="let item of update.controls; let i=index">
 
         <div class="control-buttons">
             <div class="filter-remove" (click)="onDeleteProperty(i, item.key)">
@@ -105,8 +67,8 @@
                     [bindLabelSelect]="'name'"
                     [bindValueSelect]="'value'"
                     [searchable]="true"
-                    [itemSelected]="item.key"
-                    (onSelected)="onChangeSelect($event)">
+                    [itemSelected]="item.get('key')?.value"
+                    (onSelected)="onChangeSelect($event, i)">
                 </cds-select>
             </div>
     
@@ -117,11 +79,11 @@
                 <cds-textarea class="text-editable-div"
                     [emojiPikerBtn]="false" 
                     [textLimitBtn]="false" 
-                    [text]="item.value"
+                    [text]="item.get('value')?.value"
                     [minRow]="1" [maxRow]="1" 
                     popoverVerticalAlign="above"
-                    (blur)="onBlur($event)"
-                    (changeTextarea)="onChangeTextarea($event, 'selectedValue')">
+                    (blur)="onBlur($event, i)"
+                    (changeTextarea)="onChangeTextarea($event, i)">
                 </cds-textarea>
             </div>
         </div>
