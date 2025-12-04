@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.15-rc1
+- **bug-fix**: cannot able to update key or value in action lead_update
+
 # 1.39.14
 
 # 1.39.14-rc5
