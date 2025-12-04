@@ -53,7 +53,7 @@
     <div class="content" *ngFor="let item of update.controls; let i=index">
 
         <div class="control-buttons">
-            <div class="filter-remove" (click)="onDeleteProperty(i, item.key)">
+            <div class="filter-remove" (click)="onDeleteProperty(i, item.get('key')?.value)">
                 <span class="material-icons-outlined">delete</span>
             </div>
         </div>
