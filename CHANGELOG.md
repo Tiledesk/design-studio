@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # this branch
+- **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
 - **bug-fix**: added the "globals" variables created in the DS to the variable list
 - **changed**: open the Intent panel details by clicking on "start intent"
 - **bug-fix**: drag intent "start action"
