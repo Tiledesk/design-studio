@@ -11,6 +11,7 @@
   width: 130px;
   height: 42px;
   min-height: fit-content;
+  max-height: fit-content;
   // Permette la selezione del testo quando lo stato è 1 (text focus)
   -webkit-user-select: text;
   user-select: text;
