@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.15
+- **bug-fix**: cannot able to update key or value in action lead_update
+
 # 1.39.14
 - **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
 - **bug-fix**: added the "globals" variables created in the DS to the variable list
