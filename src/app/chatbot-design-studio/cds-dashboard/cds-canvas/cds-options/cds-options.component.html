@@ -1,5 +1,18 @@
 <div class="container">
 
+    <!-- NOTE -->
+    <div size="4" class="cds-elements" mat-button>
+        <div class="cds-element" (click)="onOptionClick(OPTIONS.NOTE)" #divNote>
+            <div class="cds-button-element" [class.is_active]="isNoteModeActive">
+                <div class="cds-box-button">
+                    <span class="box-img">
+                        <span class="material-icons-outlined">note</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- OPTIONS (click)="onTogleAlphaConnectorsMenu() -->
     <div size="4" class="cds-elements">
         <!-- ALPHA COLOR CONNECTORS -->

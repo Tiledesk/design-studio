@@ -22,7 +22,7 @@ export class FormatNumberPipe implements PipeTransform {
     if (value > 999) {
       const thousands = Math.round(value / 1000);
       const formattedThousands = formatNumber(thousands, locale, '1.0-0');
-      return formattedThousands + 'k';
+      return formattedThousands + 'K';
     }
     
     // Per numeri <= 999, mostra il numero normale

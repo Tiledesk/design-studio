@@ -26,10 +26,19 @@ export const DOCS_LINK = {
         more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
     },
     VOICE_SETTINGS: {
-        tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
-        stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
-        voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
-        voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+        'twilio': {
+            voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
+        },
+        'openai': {
+            tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
+            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},    
+            voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+        },
+        'elevenlabs': {
+            tts_model: { link: 'https://elevenlabs.io/docs/api-reference/text-to-speech/convert', target: '_blank'},
+            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},    
+            voice_openai: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
+        },
     },
     LIQUIDJS: {
         home: { link: 'https://liquidjs.com/tutorials/intro-to-liquid.html', target: '_blank'},
@@ -70,6 +79,12 @@ export enum INTENT_COLORS {
     COLOR4 = '204,68,75',
     COLOR5 = '210,130,40',
     COLOR6 = '182,139,206'
+  }
+
+  export enum NOTE_COLORS {
+    BACKGROUND_COLOR = '197, 231, 246',
+    TEXT_COLOR = '0, 0, 0',
+    BORDER_COLOR = '191, 223, 237'
   }
 
 export enum SIDEBAR_PAGES {
@@ -226,6 +241,7 @@ export enum TYPE_UPDATE_ACTION {
 }
 
 export enum OPTIONS {
+    NOTE        = 'note',
     ZOOM_IN     = 'zoom-in',
     ZOOM_OUT    = 'zoom-out',
     CENTER      = 'center',
@@ -234,21 +250,6 @@ export enum OPTIONS {
     MOUSE       = 'mouse',
     ALPHA       = 'alpha'
 }
-
-export const TYPE_GPT_MODEL: Array<{name: string, value: string, description: string, status: "active" | "inactive"}> = [
-    { name: "GPT-4.1",                          value: "gpt-4.1",               description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 mini",                     value: "gpt-4.1-mini",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 nano",                     value: "gpt-4.1-nano",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4o",                           value: "gpt-4o",                description: "TYPE_GPT_MODEL.gpt-4o.description",                   status: "active"    },
-    { name: "GPT-4o mini",                      value: "gpt-4o-mini",           description: "TYPE_GPT_MODEL.gpt-4o-mini.description",              status: "active"    },
-    { name: "GPT-4 (Legacy)",                   value: "gpt-4",                 description: "TYPE_GPT_MODEL.gpt-4.description",                    status: "active"    },
-    { name: "GPT-4 Turbo Preview",              value: "gpt-4-turbo-preview",   description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active"    },
-    { name: "GPT-3 (DaVinci)",                  value: "text-davinci-003",      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-3.5 Turbo",                    value: "gpt-3.5-turbo",         description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",            status: "active"    },
-    { name: "OpenAI o1-mini",                   value: "o1-mini",               description: "TYPE_GPT_MODEL.o1-mini.description",                  status: "inactive"    },
-    { name: "OpenAI o1-preview",                value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",               status: "inactive"    }
-]
-
 
 export const INTENT_TEMP_ID         = '';
 export const MESSAGE_METADTA_WIDTH  = '100%';
@@ -602,3 +603,314 @@ export function getColorFromRgba(rgba) {
     }
     return null;
   }
+
+/**
+ * Utility class per la gestione dei colori
+ * Fornisce funzioni per convertire e manipolare colori in vari formati
+ */
+export class ColorUtils {
+  /**
+   * Converte un colore hex (#rrggbb) in componenti RGB
+   */
+  static hexToRgb(hexColor: string): { r: number; g: number; b: number } {
+    const r = parseInt(hexColor.slice(1, 3), 16);
+    const g = parseInt(hexColor.slice(3, 5), 16);
+    const b = parseInt(hexColor.slice(5, 7), 16);
+    return { r, g, b };
+  }
+
+  /**
+   * Converte un colore nel formato "r,g,b" (come NOTE_COLORS) in hex
+   */
+  static rgbStringToHex(rgbString: string): string {
+    const parts = rgbString.split(',').map(s => parseInt(s.trim()));
+    if (parts.length !== 3 || parts.some(isNaN)) {
+      return '#c5e7f6'; // fallback
+    }
+    const [r, g, b] = parts;
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  }
+
+  /**
+   * Normalizza l'opacità (0–100) in un valore 0–1
+   */
+  static normalizeOpacity(rawOpacity?: number | null): number {
+    if (!rawOpacity || rawOpacity <= 0) {
+      return 0;
+    }
+    return (rawOpacity ?? 100) / 100;
+  }
+
+  /**
+   * Valida e normalizza un valore di opacità (0-100)
+   * Rimuove zeri iniziali, limita il range e gestisce valori nulli/vuoti
+   * @param value - Valore da normalizzare (number, string, null, undefined)
+   * @param defaultValue - Valore di default se il valore è nullo/vuoto (default: 0)
+   * @returns Numero normalizzato tra 0 e 100
+   */
+  static normalizeOpacityValue(value: number | string | null | undefined, defaultValue: number = 0): number {
+    let inputValue: number;
+
+    // Converte il valore in numero
+    if (typeof value === 'string') {
+      // Rimuove caratteri non numerici e converte
+      const cleanedValue = value.replace(/[^0-9]/g, '');
+      inputValue = cleanedValue === '' ? NaN : parseInt(cleanedValue, 10);
+    } else {
+      inputValue = typeof value === 'number' ? value : NaN;
+    }
+
+    // Valida e normalizza il valore
+    if (isNaN(inputValue) || inputValue === null || inputValue === undefined) {
+      return defaultValue;
+    }
+
+    // Rimuove zeri iniziali (es: "01" -> 1)
+    const stringValue = String(inputValue).replace(/^0+/, '') || '0';
+    let normalizedValue = parseInt(stringValue, 10);
+
+    // Limita il range tra 0 e 100
+    if (normalizedValue < 0) {
+      normalizedValue = 0;
+    } else if (normalizedValue > 100) {
+      normalizedValue = 100;
+    }
+
+    return normalizedValue;
+  }
+
+  /**
+   * Costruisce una stringa rgba a partire da componenti RGB e opacità
+   */
+  static buildRgba(r: number, g: number, b: number, opacity: number): string {
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  }
+
+  /**
+   * Converte un colore (hex/rgb/rgba) in hex, con fallback
+   * Estrae solo i componenti RGB, ignorando l'opacità
+   */
+  static toHexColor(color?: string | null, defaultHex: string = '#c5e7f6'): string {
+    if (!color) return defaultHex;
+
+    // Gestione del caso transparent
+    if (color === 'transparent') {
+      return defaultHex;
+    }
+
+    // Già hex
+    if (color.startsWith('#')) {
+      return color;
+    }
+
+    // rgb o rgba - estrae solo i primi 3 numeri (R, G, B) ignorando l'opacità
+    const rgbMatch = color.match(/(?:rgb|rgba)\((\d+),\s*(\d+),\s*(\d+)/);
+    if (rgbMatch) {
+      const r = parseInt(rgbMatch[1]);
+      const g = parseInt(rgbMatch[2]);
+      const b = parseInt(rgbMatch[3]);
+      return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b
+        .toString(16)
+        .padStart(2, '0')}`;
+    }
+
+    return defaultHex;
+  }
+
+  /**
+   * Applica l'opacità ad un colore (hex/rgb/rgba) restituendo sempre rgba
+   */
+  static applyOpacityToColor(
+    color: string | undefined | null,
+    opacityValue: number | undefined | null,
+    defaultColor: string
+  ): string {
+    const opacity = this.normalizeOpacity(opacityValue);
+    const baseColor = color || defaultColor;
+
+    // rgba -> usa i componenti, cambia solo l'alpha
+    if (baseColor.startsWith('rgba')) {
+      const rgbaMatch = baseColor.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*[\d\.]+\)/);
+      if (rgbaMatch) {
+        const r = parseInt(rgbaMatch[1]);
+        const g = parseInt(rgbaMatch[2]);
+        const b = parseInt(rgbaMatch[3]);
+        return this.buildRgba(r, g, b, opacity);
+      }
+    }
+
+    // hex -> converti e applica opacità
+    if (baseColor.startsWith('#')) {
+      const { r, g, b } = this.hexToRgb(baseColor);
+      return this.buildRgba(r, g, b, opacity);
+    }
+
+    // rgb -> converti e applica opacità
+    if (baseColor.startsWith('rgb(')) {
+      const rgbMatch = baseColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+      if (rgbMatch) {
+        const r = parseInt(rgbMatch[1]);
+        const g = parseInt(rgbMatch[2]);
+        const b = parseInt(rgbMatch[3]);
+        return this.buildRgba(r, g, b, opacity);
+      }
+    }
+
+    // fallback sul colore di default (già con alpha desiderato)
+    return defaultColor;
+  }
+}
+// =============================
+// INTENT UTILITY FUNCTIONS
+// =============================
+
+/**
+ * Verifica se il colore fornito è valido.
+ * 
+ * @param color - Colore da validare
+ * @returns true se il colore è valido, false altrimenti
+ */
+export function isValidColor(color: any): boolean {
+  return color && color !== undefined && color !== null && color !== '';
+}
+
+/**
+ * Verifica se gli ID sono validi per la creazione di un connettore.
+ * 
+ * @param fromId - ID di origine
+ * @param toId - ID di destinazione
+ * @returns true se gli ID sono validi, false altrimenti
+ */
+export function areValidIds(fromId: string | null, toId: string | null): boolean {
+  return fromId !== null && toId !== null && fromId !== '' && toId !== '';
+}
+
+/**
+ * Trova la chiave dell'enum corrispondente al tipo di azione.
+ * 
+ * @param actionType - Il tipo di azione da cercare
+ * @param TYPE_ACTION - L'enum dei tipi di azione
+ * @returns La chiave dell'enum o null se non trovata
+ */
+export function findActionKey(actionType: string, TYPE_ACTION: any): string | null {
+  const enumKeys = Object.keys(TYPE_ACTION);
+  
+  for (const key of enumKeys) {
+    if (TYPE_ACTION[key] === actionType) {
+      return key;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Aggiunge una classe CSS a un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da aggiungere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function addCssClassToElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log("[UTILS] Aggiunta classe CSS:", className, "a elemento:", componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element) {
+      element.classList.add(className);
+      if (logger) {
+        logger.log("[UTILS] Classe aggiunta con successo");
+      }
+    } else {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nell'aggiunta della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Rimuove una classe CSS da un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da rimuovere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function removeCssClassFromElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log('[UTILS] Rimozione classe CSS:', className, 'da elemento:', componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element && element.classList.contains(className)) {
+      element.classList.remove(className);
+      if (logger) {
+        logger.log("[UTILS] Classe rimossa con successo");
+      }
+    } else if (!element) {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    } else {
+      if (logger) {
+        logger.debug("[UTILS] Classe non presente sull'elemento:", className);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nella rimozione della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Calcola il numero di domande da una stringa di testo.
+ * 
+ * @param questionText - Testo contenente le domande
+ * @returns Numero di domande calcolato
+ */
+export function calculateQuestionCount(questionText: string): number {
+  if (!questionText) {
+    return 0;
+  }
+  
+  const questionSegments = questionText
+    .split(/\r?\n/)
+    .filter(segment => segment.trim() !== '');
+  
+  return questionSegments.length;
+}
+
+/**
+ * Calcola la dimensione di un form.
+ * 
+ * @param form - Oggetto form da analizzare
+ * @returns Dimensione del form (numero di campi)
+ */
+export function calculateFormSize(form: any): number {
+  if (form && form !== null) {
+    return Object.keys(form).length;
+  }
+  return 0;
+}

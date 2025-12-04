@@ -24,7 +24,7 @@ export class CDSTextComponent implements OnInit {
   @Input() customPrefix: boolean;
   @Input() disabled: boolean = false;
   // @Input() autocompleteOptions: string[] = [];
-  @Input() autocompleteOptions: Array<{label: string, value: string}> = [];
+  @Input() autocompleteOptions: Array<{label: string, value: string,  additionalText?: string}> = [];
   @Input() inputType: string = "text";
   @Input() showUtils: boolean = true;
   @Input() setAttributeBtn: boolean = true;
@@ -34,7 +34,7 @@ export class CDSTextComponent implements OnInit {
   @Output() onOptionSelected = new EventEmitter<{label: string, value: string}>();
   @Output() selectedAttribute = new EventEmitter();
   
-  filteredOptions: Observable<Array<{label: string, value: string}>>;
+  filteredOptions: Observable<Array<{label: string, value: string, additionalText?: string}>>;
   constructor() { }
 
   ngOnInit(): void {
@@ -75,7 +75,8 @@ export class CDSTextComponent implements OnInit {
   }
 
   onBlur(event){
-    this.blur.emit(event);
+    //this.blur.emit(event);
+    this.blur.emit(this.text);
   }
 
   onOpenClose(event: 'open' | 'close'){
@@ -99,7 +100,7 @@ export class CDSTextComponent implements OnInit {
 
   private _filter(value: string): { label: string; value: string }[] {
     const filterValue = value?.trim().toLowerCase();
-    return this.autocompleteOptions.filter(option => !filterValue || option.label.toLowerCase().includes(filterValue))
+    return this.autocompleteOptions?.filter(option => !filterValue || option.label.toLowerCase().includes(filterValue))
   }
 
 
