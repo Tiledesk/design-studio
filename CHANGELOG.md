@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+# 1.39.14-rc5
 - **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
 
 # 1.39.14-rc4
