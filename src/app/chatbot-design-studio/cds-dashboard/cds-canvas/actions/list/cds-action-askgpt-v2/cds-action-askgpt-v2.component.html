@@ -4,7 +4,10 @@
             <mat-icon class="icon" svgIcon="brain" aria-hidden="true"></mat-icon>
         </div>
         <div *ngIf="action?.question" class="action-row-right">
-            {{action?.namespace}}
+            {{ action?.namespaceAsName 
+                ? action?.namespace 
+                : (listOfNamespaces | find:{ key: 'value', value: action?.namespace })?.name 
+            }}
         </div>
     </div>
     
