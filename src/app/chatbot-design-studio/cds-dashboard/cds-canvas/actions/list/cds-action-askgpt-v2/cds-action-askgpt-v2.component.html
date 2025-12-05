@@ -3,12 +3,11 @@
         <div class="action-row-left empty">
             <mat-icon class="icon" svgIcon="brain" aria-hidden="true"></mat-icon>
         </div>
-        
-        <div *ngIf="namespaceAsName" class="action-row-right">
-            {{ (listOfNamespaces | find:{key: 'value', value: action?.namespace })?.name }}
-        </div>
-        <div *ngIf="!namespaceAsName" class="action-row-right">
-            {{ action?.namespace }}
+        <div *ngIf="action?.question" class="action-row-right">
+            {{ action?.namespaceAsName 
+                ? action?.namespace 
+                : (listOfNamespaces | find:{ key: 'value', value: action?.namespace })?.name 
+            }}
         </div>
     </div>
     
