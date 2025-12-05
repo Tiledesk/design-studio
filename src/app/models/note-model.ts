@@ -23,6 +23,7 @@ export class Note {
   boxShadow?: boolean;
   fontSize?: string; // Dimensione del font in pixel
   fontFamily?: string; // Famiglia del font
+  scale?: [number, number]; // Scale della nota
   rotation?: number; // Angolo di rotazione in gradi
 
   constructor(id_faq_kb: string, pos: any) {
@@ -43,6 +44,7 @@ export class Note {
     this.fontSize =  Note.DEFAULT_FONT_SIZE_EM + 'em'; // Dimensione del font di default
     this.fontFamily = 'Open Sans, sans-serif'; // Famiglia del font di default
     this.rotation = 0; // Angolo di rotazione iniziale (0 gradi)
+    this.scale = [1,1]; // Scale iniziale (1 = dimensioni originali)
   }
 }
 

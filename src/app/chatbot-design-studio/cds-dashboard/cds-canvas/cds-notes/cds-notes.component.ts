@@ -86,7 +86,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   constructor(
     private stageService: StageService,
     private noteService: NoteService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private elementRef: ElementRef
   ) { }
 
   // ============================================================================
@@ -120,32 +121,16 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
   ngAfterViewInit(): void {
     if (this.contentElement && this.note) {
-      // Imposta dimensioni base (rimangono fisse, usiamo scale per ridimensionare)
-      const baseWidth = Note.DEFAULT_WIDTH;
-      const baseHeight = Note.DEFAULT_HEIGHT;
-      this.contentElement.nativeElement.style.width = baseWidth + 'px';
-      this.contentElement.nativeElement.style.height = baseHeight + 'px';
+      // Calcola e applica il font-size basandosi su note.width (proporzione inversa)
+      this.calculateAndApplyFontSize();
       
-      // Calcola lo scale iniziale basato sulle dimensioni salvate nel modello
-      const savedWidth = this.note.width || baseWidth;
-      const savedHeight = this.note.height || baseHeight;
-      const scaleX = savedWidth / baseWidth;
-      const scaleY = savedHeight / baseHeight;
-      
-      // Applica fontSize e fontFamily
+      // Applica fontFamily
       if (this.noteInput) {
-        this.noteInput.nativeElement.style.fontSize = this.note.fontSize;
         this.noteInput.nativeElement.style.fontFamily = this.note.fontFamily;
       }
       
-      // Applica la trasformazione combinando scale + rotate
-      const rotation = this.note.rotation || 0;
-      const transform = `scale(${scaleX}, ${scaleY}) rotate(${rotation}deg)`;
-        this.contentElement.nativeElement.style.transform = transform;
-        this.contentElement.nativeElement.style.transformOrigin = 'center center';
-      
-      // Applica scale inverso agli handle per mantenerli alla dimensione originale
-      this.updateHandlesScale(scaleX, scaleY);
+      // Applica scale, dimensioni e trasformazioni usando la funzione riutilizzabile
+      this.applyScaleAndTransform();
       
       // Setup listeners e drag
       this.setupAllListeners();
@@ -235,20 +220,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
     if (this.isResizing) {
-      // Calcola le dimensioni finali basate sullo scale corrente
-      if (this.contentElement && this.note) {
-        const currentTransform = this.contentElement.nativeElement.style.transform || '';
-        const scaleMatch = currentTransform.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
-        
-        if (scaleMatch) {
-          const scaleX = parseFloat(scaleMatch[1]) || 1;
-          const scaleY = parseFloat(scaleMatch[2]) || scaleX;
-          
-          // Aggiorna le dimensioni nel modello con quelle reali (base * scale)
-          this.note.width = this.startWidth * scaleX;
-          this.note.height = this.startHeight * scaleY;
-        }
-      }
+      // Ricalcola dimensioni e scale basandosi sul transform corrente
+      this.applyScaleAndTransform();
       
       this.isResizing = false;
       this.resizeHandle = '';
@@ -262,6 +235,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     
     if (this.isRotating) {
       this.isRotating = false;
+      // Ricalcola dimensioni e scale dopo la rotazione
+      this.applyScaleAndTransform();
       this.updateNote();
     }
   }
@@ -394,15 +369,20 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const currentTransform = this.contentElement.nativeElement.style.transform || '';
     const scaleMatch = currentTransform.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
     
-    // PER I VERTICI: Usa sempre le dimensioni base e lo scale
-    let realWidth = this.note.width || Note.DEFAULT_WIDTH;
-    let realHeight = this.note.height || Note.DEFAULT_HEIGHT;
-    
+    // Determina lo scale iniziale con priorità:
+    // 1. Transform CSS corrente
+    // 2. Valore scale nel modello
+    // 3. Calcolo da dimensioni reali
     if (scaleMatch) {
-      // C'è già uno scale, usa quello
+      // C'è già uno scale nel transform, usa quello
       this.startScale = parseFloat(scaleMatch[1]) || 1;
+    } else if (this.note.scale && Array.isArray(this.note.scale) && this.note.scale.length >= 1) {
+      // Usa il valore scale dal modello
+      this.startScale = this.note.scale[0];
     } else {
-      // Non c'è transform, calcola lo scale dalle dimensioni reali del modello
+      // Calcola lo scale dalle dimensioni reali del modello
+      const realWidth = this.note.width || Note.DEFAULT_WIDTH;
+      const realHeight = this.note.height || Note.DEFAULT_HEIGHT;
       this.startScale = Math.min(realWidth / Note.DEFAULT_WIDTH, realHeight / Note.DEFAULT_HEIGHT);
     }
     
@@ -418,7 +398,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     
     // Calcola lo scale corrente
     const currentScaleX = this.startScale;
-    const currentScaleY = scaleMatch && scaleMatch[2] ? parseFloat(scaleMatch[2]) : currentScaleX;
+    const currentScaleY = scaleMatch && scaleMatch[2] ? parseFloat(scaleMatch[2]) : 
+                          (this.note.scale && Array.isArray(this.note.scale) && this.note.scale.length >= 2) ? 
+                          this.note.scale[1] : currentScaleX;
     
     // Calcola e salva il centro iniziale del box (nel viewport)
     const rect = this.contentElement.nativeElement.getBoundingClientRect();
@@ -509,10 +491,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       
       let scaleX = 1;
       let scaleY = 1;
+      
+      // Leggi lo scale dal transform corrente o dal modello
       if (scaleMatch) {
         scaleX = parseFloat(scaleMatch[1]) || 1;
         scaleY = parseFloat(scaleMatch[2]) || scaleX;
+      } else if (this.note.scale && Array.isArray(this.note.scale) && this.note.scale.length >= 2) {
+        scaleX = this.note.scale[0];
+        scaleY = this.note.scale[1];
       }
+      
+      // Aggiorna lo scale nel modello per mantenerlo sincronizzato
+      this.note.scale = [scaleX, scaleY];
       
       const transform = `scale(${scaleX}, ${scaleY}) rotate(${newRotation}deg)`;
       this.contentElement.nativeElement.style.transform = transform;
@@ -632,6 +622,11 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             }
           }
           
+          // Applica scale e trasformazioni se contentElement è disponibile
+          if (this.contentElement) {
+            this.applyScaleAndTransform();
+          }
+          
           // if (this.noteInput) {
           //   if (updatedNote.fontSize && this.note.fontSize !== updatedNote.fontSize) {
           //     this.noteInput.nativeElement.style.fontSize = updatedNote.fontSize + 'px';
@@ -686,10 +681,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.draggedListener = ((e: CustomEvent) => {
       const el = e.detail.element;
       if (el && el.id === this.note?.note_id) {
-        if (this.note.x !== el.offsetLeft || this.note.y !== el.offsetTop) {
-          this.recalculateNoteDimensionsAndPosition(el);
-          this.updateNote();
-        }
+        // Ricalcola sempre dimensioni e posizione prima di salvare
+        this.recalculateNoteDimensionsAndPosition();
+        this.updateNote();
       } else {
         this.changeState(0);
       }
@@ -701,40 +695,46 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // METODI PRIVATI - Utility e helper
   // ============================================================================
   /**
-   * Aggiorna il font-size proporzionalmente alla larghezza del contenitore.
-   * Mantiene una relazione lineare tra larghezza e font-size.
-   * Verifica e corregge l'altezza del contenitore per garantire che non sia mai
-   * inferiore all'altezza minima del testo (scrollHeight + padding).
+   * Calcola il font-size basandosi su note.width usando proporzione inversa.
+   * Formula: font-size = (DEFAULT_WIDTH / note.width) * DEFAULT_FONT_SIZE_EM
+   * 
+   * Esempio: se note.width = 200px, DEFAULT_WIDTH = 130px, DEFAULT_FONT_SIZE_EM = 0.96em
+   * font-size = (130 / 200) * 0.96 = 0.624em
    */
-  private updateFontSizeOnResize(newWidth: number): void {
+  private calculateAndApplyFontSize(): void {
     if (!this.note || !this.noteInput) {
       return;
     }
 
     // Valori di riferimento
-    const REFERENCE_WIDTH = Note.DEFAULT_WIDTH; // Larghezza iniziale del div contenitore in px
-    const REFERENCE_FONT_SIZE = Note.DEFAULT_FONT_SIZE_EM; // Dimensione iniziale del font in em 
+    const DEFAULT_WIDTH = Note.DEFAULT_WIDTH; // 130px
+    const DEFAULT_FONT_SIZE_EM = Note.DEFAULT_FONT_SIZE_EM; // 0.96em
+    
+    // Usa note.width originale (non modificato)
+    const noteWidth = this.note.width || DEFAULT_WIDTH;
 
-    // Calcola il rapporto tra la nuova larghezza e la larghezza di riferimento
-    const ratio = newWidth / REFERENCE_WIDTH;
+    // Calcola il font-size in proporzione inversa
+    // DEFAULT_WIDTH / DEFAULT_FONT_SIZE_EM = note.width / font-size
+    // Quindi: font-size = (DEFAULT_WIDTH / note.width) * DEFAULT_FONT_SIZE_EM
+    let fontSizeEm = (DEFAULT_WIDTH / noteWidth) * DEFAULT_FONT_SIZE_EM;
 
-    // Calcola il nuovo font-size in em proporzionalmente alla larghezza
-    let newFontSizeEm = REFERENCE_FONT_SIZE * ratio;
-
-    // Limiti ragionevoli
-    newFontSizeEm = Math.max(0.5, Math.min(10, newFontSizeEm)); // tra 0.5em e 10em
+    // Limiti ragionevoli per evitare font-size troppo piccoli o troppo grandi
+    fontSizeEm = Math.max(0.3, Math.min(3, fontSizeEm)); // tra 0.3em e 3em
 
     // Aggiorna il modello (per persistenza)
-    this.note.fontSize = newFontSizeEm.toFixed(2) + 'em';
+    this.note.fontSize = fontSizeEm.toFixed(2) + 'em';
 
-    // Aggiorna il DOM
+    // Applica al DOM
     if (this.noteInput) {
       this.noteInput.nativeElement.style.fontSize = this.note.fontSize;
     }
 
-    // Verifica e corregge l'altezza minima dopo aver aggiornato il font-size
-    // (il font-size potrebbe essere cambiato, quindi anche l'altezza minima potrebbe essere cambiata)
-    this.ensureMinimumHeight();
+    this.logger.log('[CDS-NOTES] Calculated font-size:', {
+      noteWidth: noteWidth,
+      defaultWidth: DEFAULT_WIDTH,
+      defaultFontSize: DEFAULT_FONT_SIZE_EM,
+      calculatedFontSize: this.note.fontSize
+    });
   }
 
   /**
@@ -757,14 +757,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const currentHeight = this.note.height || this.contentElement.nativeElement.offsetHeight;
 
     // Se l'altezza corrente è inferiore al minimo, correggila
+    // NOTA: Non aggiorniamo note.height per mantenerlo invariato, ma aggiorniamo solo il DOM
     if (currentHeight < minHeight) {
       const newHeight = minHeight;
       const heightDelta = newHeight - currentHeight;
       
-      // Aggiorna il modello
-      this.note.height = newHeight;
-      
-      // Aggiorna il DOM
+      // NON aggiorniamo il modello note.height (deve rimanere invariato)
+      // Aggiorna solo il DOM per la visualizzazione
       this.contentElement.nativeElement.style.height = newHeight + 'px';
       
       // Se siamo in fase di resize e la maniglia è superiore (tr, tl), aggiorna anche la posizione Y
@@ -861,35 +860,168 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     }
   }
 
-  private recalculateNoteDimensionsAndPosition(element: HTMLElement): void {
+  /**
+   * Funzione riutilizzabile che applica scale, dimensioni e trasformazioni CSS alla nota.
+   * 
+   * Questa funzione:
+   * 1. Legge il valore scale dal modello Note (se presente) oppure lo calcola da width/height
+   * 2. Imposta le dimensioni base nel DOM (DEFAULT_WIDTH x DEFAULT_HEIGHT)
+   * 3. Applica le trasformazioni CSS (scale + rotation)
+   * 4. Aggiorna le dimensioni nel modello basandosi su scale (base * scale)
+   * 5. Aggiorna anche il campo scale nel modello per mantenerlo sincronizzato
+   * 
+   * Viene chiamata in:
+   * - ngAfterViewInit: per inizializzare la nota
+   * - onMouseUp: dopo resize o rotazione
+   * - recalculateNoteDimensionsAndPosition: dopo drag
+   */
+  private applyScaleAndTransform(): void {
     if (!this.note || !this.contentElement) return;
     
-    const computedStyle = window.getComputedStyle(element);
-    const left = parseFloat(computedStyle.left) || parseFloat(element.style.left) || element.offsetLeft || 0;
-    const top = parseFloat(computedStyle.top) || parseFloat(element.style.top) || element.offsetTop || 0;
+    const element = this.contentElement.nativeElement;
+    const baseWidth = Note.DEFAULT_WIDTH;
+    const baseHeight = Note.DEFAULT_HEIGHT;
     
-    // Leggi le dimensioni base dal DOM (sono fisse)
-    const baseWidth = parseFloat(element.style.width) || Note.DEFAULT_WIDTH;
-    const baseHeight = parseFloat(element.style.height) || Note.DEFAULT_HEIGHT;
+    // Imposta sempre le dimensioni base nel DOM (rimangono fisse, usiamo scale per ridimensionare)
+    element.style.width = baseWidth + 'px';
+    element.style.height = baseHeight + 'px';
     
-    // Leggi lo scale dal transform
-    const transform = element.style.transform || '';
-    const scaleMatch = transform.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
+    // Determina lo scale da applicare
     let scaleX = 1;
     let scaleY = 1;
-    if (scaleMatch) {
-      scaleX = parseFloat(scaleMatch[1]) || 1;
-      scaleY = parseFloat(scaleMatch[2]) || scaleX;
+    
+    // Priorità 1: Se c'è un transform CSS già applicato, leggi lo scale da lì
+    const computedStyle = window.getComputedStyle(element);
+    const currentTransform = computedStyle.transform || element.style.transform || '';
+    
+    if (currentTransform && currentTransform !== 'none') {
+      // Prova prima con la stringa scale() se presente
+      const scaleMatch = currentTransform.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
+      if (scaleMatch) {
+        scaleX = parseFloat(scaleMatch[1]) || 1;
+        scaleY = parseFloat(scaleMatch[2]) || scaleX;
+      } else {
+        // Se è una matrix, estrai lo scale dalla matrice
+        // matrix(scaleX, skewY, skewX, scaleY, translateX, translateY)
+        const matrixMatch = currentTransform.match(/matrix\(([^)]+)\)/);
+        if (matrixMatch) {
+          const values = matrixMatch[1].split(',').map(v => parseFloat(v.trim()));
+          if (values.length >= 4) {
+            scaleX = Math.sqrt(values[0] * values[0] + values[1] * values[1]);
+            scaleY = Math.sqrt(values[2] * values[2] + values[3] * values[3]);
+          }
+        }
+      }
+    } else {
+      // Priorità 2: Se c'è un valore scale nel modello, usalo
+      if (this.note.scale && Array.isArray(this.note.scale) && this.note.scale.length >= 2) {
+        scaleX = this.note.scale[0];
+        scaleY = this.note.scale[1];
+      } else {
+        // Priorità 3: Calcola lo scale dalle dimensioni salvate nel modello
+        const savedWidth = this.note.width || baseWidth;
+        const savedHeight = this.note.height || baseHeight;
+        scaleX = savedWidth / baseWidth;
+        scaleY = savedHeight / baseHeight;
+      }
     }
+    
+    // Applica la trasformazione combinando scale + rotate
+    const rotation = this.note.rotation || 0;
+    const transform = `scale(${scaleX}, ${scaleY}) rotate(${rotation}deg)`;
+    element.style.transform = transform;
+    element.style.transformOrigin = 'center center';
     
     // Calcola le dimensioni reali (base * scale)
     const width = baseWidth * scaleX;
     const height = baseHeight * scaleY;
-     
+    
+    // Aggiorna il modello con le dimensioni reali e lo scale
+    // this.note.width = width;
+    // this.note.height = height;
+    this.note.scale = [scaleX, scaleY];
+    
+    // Applica scale inverso agli handle per mantenerli alla dimensione originale
+    this.updateHandlesScale(scaleX, scaleY);
+    
+    this.logger.log('[CDS-NOTES] Applied scale and transform:', {
+      scaleX: scaleX,
+      scaleY: scaleY,
+      width: width,
+      height: height,
+      rotation: rotation,
+      scale: this.note.scale
+    });
+  }
+
+  private recalculateNoteDimensionsAndPosition(): void {
+    if (!this.note || !this.contentElement) return;
+    
+    // L'elemento host del componente (cds-notes) ha la posizione impostata dal template
+    // Usa ElementRef per accedere all'elemento host
+    const hostElement = this.elementRef.nativeElement as HTMLElement;
+    const contentElement = this.contentElement.nativeElement;
+    
+    let left = 0;
+    let top = 0;
+    
+    // Prova a leggere la posizione dall'elemento host (dove viene impostata dal template)
+    const hostLeft = parseFloat(hostElement.style.left);
+    const hostTop = parseFloat(hostElement.style.top);
+    
+    if (!isNaN(hostLeft)) {
+      left = hostLeft;
+    } else {
+      // Fallback: leggi da offsetLeft/offsetTop dell'host
+      left = hostElement.offsetLeft || 0;
+    }
+    
+    if (!isNaN(hostTop)) {
+      top = hostTop;
+    } else {
+      // Fallback: leggi da offsetTop dell'host
+      top = hostElement.offsetTop || 0;
+    }
+    
+    // Se non abbiamo trovato la posizione dall'host, prova a leggere dal div interno
+    // (tiledesk-stage potrebbe impostare la posizione direttamente sul div con l'id)
+    if ((left === 0 && top === 0) || (isNaN(hostLeft) && isNaN(hostTop))) {
+      const contentLeft = parseFloat(contentElement.style.left);
+      const contentTop = parseFloat(contentElement.style.top);
+      
+      if (!isNaN(contentLeft)) {
+        left = contentLeft;
+      }
+      if (!isNaN(contentTop)) {
+        top = contentTop;
+      }
+    }
+    
+    // Se ancora non abbiamo trovato la posizione, usa i valori dal modello come ultimo fallback
+    // (ma solo se non sono 0,0, per evitare di sovrascrivere una posizione valida)
+    if (left === 0 && top === 0 && (this.note.x !== 0 || this.note.y !== 0)) {
+      left = this.note.x;
+      top = this.note.y;
+    }
+    
+    // Aggiorna la posizione nel modello
     this.note.x = left;
     this.note.y = top;
-    this.note.width = width;
-    this.note.height = height;
+    
+    // Ricalcola dimensioni e scale usando la funzione riutilizzabile
+    this.applyScaleAndTransform();
+    
+    this.logger.log('[CDS-NOTES] Recalculated dimensions and position:', {
+      x: this.note.x,
+      y: this.note.y,
+      width: this.note.width,
+      height: this.note.height,
+      scale: this.note.scale,
+      hostLeft: hostLeft,
+      hostTop: hostTop,
+      contentLeft: parseFloat(contentElement.style.left),
+      contentTop: parseFloat(contentElement.style.top)
+    });
   }
   
   private updateDragState(): void {
