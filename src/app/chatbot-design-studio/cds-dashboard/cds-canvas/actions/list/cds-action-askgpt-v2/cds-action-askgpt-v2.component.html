@@ -332,7 +332,7 @@
                 </div>
 
                 <!-- // alpha limit slider -->
-                <div *ngIf="IS_VISIBLE_ALPHA_SLIDER" class="text-editor-wrapper">
+                <div *ngIf="KB_HYBRID" class="text-editor-wrapper">
                     <div class="field-box">
                         <label class="title-label">{{'CDSCanvas.SearchTypeLimit' | translate }}</label>
                         <div class="action-wait-content">
@@ -374,6 +374,7 @@
                 <div class="field-box" [class.disabled]="action?.chunks_only">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
+                            [disabled]="action?.chunks_only"
                             [checked]="action?.advancedPrompt"
                             (change)="onChangeCheckbox($event,'advancedPrompt')">
                             {{"CDSCanvas.AdvancedContext" | translate}}
@@ -389,7 +390,8 @@
                     class="field-box" 
                     [class.disabled]="action?.chunks_only">
                     <section class="disable-input-message-section">
-                        <mat-checkbox 
+                        <mat-checkbox
+                            [disabled]="action?.chunks_only" 
                             [checked]="action?.citations"
                             (change)="onChangeCheckbox($event, 'citations')">
                             {{"CDSCanvas.Citations" | translate}}
@@ -400,7 +402,7 @@
                     </label>
                 </div>
 
-
+                <!-- // chunks_only --> 
                 <div class="field-box">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
@@ -416,7 +418,8 @@
                     -->
                 </div>
 
-                <div class="field-box">
+                <!-- // reranking --> 
+                <div *ngIf="KB_HYBRID" class="field-box">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.reranking"
@@ -431,6 +434,7 @@
                     -->
                 </div>
 
+                <!-- // skip_unanswered -->
                 <div class="field-box">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
