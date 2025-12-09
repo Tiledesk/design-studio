@@ -154,6 +154,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   noteSelected: Note;
   startDraggingPosition: any = null;
   mesage_request_id: string;
+  
+  /** Timer per debounce del salvataggio note */
+  private saveNoteDetailTimer: any = null;
+  private pendingNoteToSave: Note | null = null;
 
   // ---------------------------------------------------
   // @ Toggle Publish Panel 
@@ -200,6 +204,17 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngOnDestroy() {
     // Pulisci la coda di retry dei connettori
     this.connectorService.clearRetryQueue();
+
+    // Cancella il timer del debounce se è ancora attivo
+    if (this.saveNoteDetailTimer) {
+      clearTimeout(this.saveNoteDetailTimer);
+      this.saveNoteDetailTimer = null;
+    }
+    
+    // Se c'è una nota in attesa di salvataggio, salvala immediatamente prima di distruggere il componente
+    if (this.pendingNoteToSave) {
+      this.executeSaveNoteDetail();
+    }
 
     if (this.subscriptionChangedConnectorAttributes) {
       this.subscriptionChangedConnectorAttributes.unsubscribe();
@@ -1675,33 +1690,71 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** onSavePanelNoteDetail */
   onSavePanelNoteDetail(note: Note) {
-    this.logger.log('[CDS-CANVAS] onSavePanelNoteDetail note ', note)
-    if (note && note != null) {
-      // Aggiorna la nota nell'array listOfNotes
-      const index = this.listOfNotes.findIndex(n => n.note_id === note.note_id);
-      if (index >= 0) {
-        this.listOfNotes[index] = note;
-      }
-      // Aggiorna anche negli attributes del dashboardService
-      if (this.dashboardService.selectedChatbot.attributes?.notes) {
-        const attrIndex = this.dashboardService.selectedChatbot.attributes.notes.findIndex(n => n.note_id === note.note_id);
-        if (attrIndex >= 0) {
-          this.dashboardService.selectedChatbot.attributes.notes[attrIndex] = note;
-        }
-      }
-      // Salva la nota in remoto
-      // Il servizio notificherà automaticamente i cambiamenti tramite Observable
-      this.noteService.saveRemoteNote(note, this.id_faq_kb).subscribe({
-        next: (data) => {
-          // Sincronizza listOfNotes con l'array aggiornato dal servizio
-          this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
-          this.logger.log('[CDS-CANVAS] Note saved successfully:', data);
-        },
-        error: (error) => {
-          this.logger.error('[CDS-CANVAS] Error saving note:', error);
-        }
-      });
+    this.logger.log('[CDS-CANVAS] onSavePanelNoteDetail note (debounced)', note);
+    
+    if (!note || note == null) {
+      return;
     }
+    
+    // Salva la nota da salvare (sovrascrive quella precedente se c'è)
+    this.pendingNoteToSave = note;
+    
+    // Aggiorna immediatamente la nota nell'array listOfNotes (per feedback visivo)
+    const index = this.listOfNotes.findIndex(n => n.note_id === note.note_id);
+    if (index >= 0) {
+      this.listOfNotes[index] = note;
+      // notificherà automaticamente i cambiamenti tramite Observable
+      this.noteService.notifyNotesChanged();
+    }
+    // Aggiorna anche negli attributes del dashboardService
+    if (this.dashboardService.selectedChatbot.attributes?.notes) {
+      const attrIndex = this.dashboardService.selectedChatbot.attributes.notes.findIndex(n => n.note_id === note.note_id);
+      if (attrIndex >= 0) {
+        this.dashboardService.selectedChatbot.attributes.notes[attrIndex] = note;
+      }
+    }
+    
+
+
+
+    // Cancella il timer precedente se esiste
+    if (this.saveNoteDetailTimer) {
+      clearTimeout(this.saveNoteDetailTimer);
+      this.saveNoteDetailTimer = null;
+    }
+    
+    // Imposta un nuovo timer per salvare dopo 1 secondo
+    this.saveNoteDetailTimer = setTimeout(() => {
+      this.executeSaveNoteDetail();
+    }, 1000);
+  }
+  
+  /**
+   * Esegue il salvataggio effettivo della nota dopo il debounce
+   */
+  private executeSaveNoteDetail(): void {
+    if (!this.pendingNoteToSave) {
+      return;
+    }
+    
+    const noteToSave = this.pendingNoteToSave;
+    this.pendingNoteToSave = null;
+    this.saveNoteDetailTimer = null;
+    
+    this.logger.log('[CDS-CANVAS] Executing save note after debounce:', noteToSave);
+    
+    // Salva la nota in remoto
+    // Il servizio notificherà automaticamente i cambiamenti tramite Observable
+    this.noteService.saveRemoteNote(noteToSave, this.id_faq_kb).subscribe({
+      next: (data) => {
+        // Sincronizza listOfNotes con l'array aggiornato dal servizio
+        this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+        this.logger.log('[CDS-CANVAS] Note saved successfully:', data);
+      },
+      error: (error) => {
+        this.logger.error('[CDS-CANVAS] Error saving note:', error);
+      }
+    });
   }
 
   /** onDeleteNote */

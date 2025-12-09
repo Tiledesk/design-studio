@@ -764,11 +764,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.updateSanitizedHtml();
     }
     
-    this.noteUpdatedSubscription = this.noteService.noteUpdated$
+    this.noteUpdatedSubscription = this.noteService.notesChanged$
       .pipe(
-        filter(updatedNote => updatedNote && this.note && updatedNote.note_id === this.note.note_id)
+        filter(notes => notes && notes.length > 0 && !!this.note)
       )
-      .subscribe(updatedNote => {
+      .subscribe(notes => {
+        // Cerca la nota specifica nell'array aggiornato
+        const updatedNote = notes.find(n => n && n.note_id === this.note?.note_id);
         if (updatedNote && this.note) {
           Object.assign(this.note, updatedNote);
           
@@ -801,7 +803,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
           //     this.noteInput.nativeElement.style.fontFamily = updatedNote.fontFamily;
           //   }
           // }
-          this.logger.log('[CDS-NOTES] Note updated from service:', updatedNote.note_id);
+          this.logger.log('[CDS-NOTES] Note updated from service (notesChanged$):', updatedNote.note_id);
         }
       });
   }

@@ -32,7 +32,7 @@ export class NoteService {
    * Notifica i cambiamenti all'array di note
    * Chiamato internamente quando l'array viene modificato
    */
-  private notifyNotesChanged(): void {
+  public notifyNotesChanged(): void {
     const notes = this.dashboardService.selectedChatbot.attributes?.notes || [];
     this.notesChangedSubject.next([...notes]);
     this.logger.log('[NOTE-SERVICE] Notes changed notification sent. Total notes:', notes.length);
