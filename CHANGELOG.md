@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.15-rc3
+- **bug-fix**: update resizing note
+
 # 1.39.15-rc2
 - **bug-fix**: cannot update the key or delete an item in action lead_update
 
