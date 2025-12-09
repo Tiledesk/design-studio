@@ -4,7 +4,10 @@
             <mat-icon class="icon" svgIcon="brain" aria-hidden="true"></mat-icon>
         </div>
         <div *ngIf="action?.question" class="action-row-right">
-            {{action?.namespace}}
+            {{ action?.namespaceAsName 
+                ? action?.namespace 
+                : (listOfNamespaces | find:{ key: 'value', value: action?.namespace })?.name 
+            }}
         </div>
     </div>
     
@@ -203,7 +206,7 @@
             <mat-checkbox 
                 [checked]="action?.namespaceAsName"
                 (change)="onChangeCheckbox($event,'namespaceAsName')">
-                {{ 'CDSCanvas.UseKnwoledgeBaseName' | translate }}
+                {{ 'CDSCanvas.UseKnowledgeBaseName' | translate }}
             </mat-checkbox>
             <label class="field-description">{{ "CDSCanvas.UseKBNameDescription" | translate }}
                 <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.namespace_as_name.link" [target]="DOCS_LINK.namespace_as_name.target">{{ 'LearnMore' | translate }}</a>
@@ -259,6 +262,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -315,7 +319,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['chunk_limit'].step"  
                                     [min]="ai_setting['chunk_limit'].min"
-                                    [max]="ai_setting['chunk_limit'].max" 
+                                    [max]="ai_setting['chunk_limit'].max"
+                                    [disabled]="ai_setting['chunk_limit'].disabled" 
                                     [(ngModel)]="action.top_k"
                                     (change)="updateSliderValue($event.value, 'chunk_limit')" aria-label="units">
                                 </mat-slider>
@@ -329,7 +334,7 @@
                 </div>
 
                 <!-- // alpha limit slider -->
-                <div *ngIf="IS_VISIBLE_ALPHA_SLIDER" class="text-editor-wrapper">
+                <div *ngIf="KB_HYBRID" class="text-editor-wrapper">
                     <div class="field-box">
                         <label class="title-label">{{'CDSCanvas.SearchTypeLimit' | translate }}</label>
                         <div class="action-wait-content">
@@ -341,7 +346,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['search_type'].step"  
                                     [min]="ai_setting['search_type'].min"
-                                    [max]="ai_setting['search_type'].max" 
+                                    [max]="ai_setting['search_type'].max"
+                                    [disabled]="ai_setting['max_tokens'].disabled" 
                                     [(ngModel)]="action.alpha"
                                     (change)="updateSliderValue($event.value, 'alpha')" aria-label="units">
                                 </mat-slider>
@@ -358,6 +364,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 
@@ -371,6 +378,7 @@
                 <div class="field-box" [class.disabled]="action?.chunks_only">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
+                            [disabled]="action?.chunks_only"
                             [checked]="action?.advancedPrompt"
                             (change)="onChangeCheckbox($event,'advancedPrompt')">
                             {{"CDSCanvas.AdvancedContext" | translate}}
@@ -386,7 +394,8 @@
                     class="field-box" 
                     [class.disabled]="action?.chunks_only">
                     <section class="disable-input-message-section">
-                        <mat-checkbox 
+                        <mat-checkbox
+                            [disabled]="action?.chunks_only" 
                             [checked]="action?.citations"
                             (change)="onChangeCheckbox($event, 'citations')">
                             {{"CDSCanvas.Citations" | translate}}
@@ -397,7 +406,7 @@
                     </label>
                 </div>
 
-
+                <!-- // chunks_only --> 
                 <div class="field-box">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
@@ -406,14 +415,15 @@
                             {{"CDSCanvas.ChunksOnly" | translate}}
                         </mat-checkbox>
                     </section>
-                    <!-- 
+                    <!--
                     <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
                     </label> 
                     -->
                 </div>
 
-                <div class="field-box">
+                <!-- // reranking -->
+                <div *ngIf="KB_HYBRID" class="field-box">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [checked]="action?.reranking"
@@ -428,6 +438,7 @@
                     -->
                 </div>
 
+                <!-- // skip_unanswered -->
                 <div class="field-box">
                     <section class="disable-input-message-section">
                         <mat-checkbox 

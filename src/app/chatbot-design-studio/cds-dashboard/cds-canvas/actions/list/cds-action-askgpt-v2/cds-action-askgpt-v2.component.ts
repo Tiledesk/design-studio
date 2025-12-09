@@ -15,7 +15,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
@@ -79,7 +79,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
     "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
   }
-  IS_VISIBLE_ALPHA_SLIDER = false;
+  KB_HYBRID = false;
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.ASKGPTV2;
@@ -261,7 +261,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     const result = this.listOfNamespaces.find(el => el.value === namespace);
     this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result);
     if(result){
-      this.IS_VISIBLE_ALPHA_SLIDER = result.hybrid;
+      this.KB_HYBRID = result.hybrid;
     }
   }
 

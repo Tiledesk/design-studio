@@ -319,7 +319,7 @@
         "EnterTheQuestion": "Enter the question",
         "ChooseTheAIModel": "Choose the AI model",
         "SelectNamespace": "Select namespace",
-        "UseKnwoledgeBaseName": "Use Knwoledge Base name",
+        "UseKnowledgeBaseName": "Use Knowledge Base name",
         "SelectKnowledgeBase": "Select Knowledge Base",
         "SelectABlock": "Select a block",
         "ChooseKB": "Choose Knowledge Base",
@@ -434,9 +434,10 @@
         "Result": "Result",
         "Error": "Error",
         "ChooseBot": "Choose a bot",
+        "ChooseAgent": "Choose an Agent",
         "UseChatbotSlug": "Use Chatbot slag",
         "ChooseBlock": "Choose a block",
-        "ChooseBlockDescription": "Automatically execute this block when this chatbot joins the conversation",
+        "ChooseBlockDescription": "Automatically execute this block when the Agent joins the conversation",
         "ExecuteBlock": "Execute block",
         "ThisRequestNoBody": "This request does not have a body",
         "Location": "Location",
@@ -572,7 +573,11 @@
         "AnswerKB": "Answer",
         "EnterQuestion": "Your question",
         "EnterAnswer": "Your answer",
-        "ConfigureModel": "Configure"
+        "ConfigureModel": "Configure",
+        "IterableAttribute": "Iterable attribute",
+        "IteratableAttributeDescription": "The attribute that will be used to iterate over the data",
+        "AssignOutputTo": "Assign output to",
+        "AssignOutputToDescription": "The attribute that will be used to assign the output"
     },
     "Alert": {
         "ErrorMaxOptions": "Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -737,7 +742,8 @@
             "PlayPrompt": "Play prompt",
             "SpeechForm": "Speech form",
             "AudioRecord": "Audio record",
-            "SendWhatsapp": "Send Whatsapp"
+            "SendWhatsapp": "Send Whatsapp", 
+            "Iteration": "Iteration"
         },
         "DOC": {
             "Reply": {
@@ -832,8 +838,8 @@
                 "DOC_URL": "https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
             },
             "ReplaceAIAgent":{
-                "TITLE":"Replace the current bot with another one",
-                "DESCRIPTION":"Replaces the current chatbot with the specied one",
+                "TITLE":"Replaces the current Agent with the specied one",
+                "DESCRIPTION":"",
                 "IMAGE":"assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"

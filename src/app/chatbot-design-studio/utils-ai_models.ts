@@ -61,9 +61,25 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
 
 export const GOOGLE_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number}> = [
   {
+    name: "Gemini 3 pro preview",
+    value: "gemini-3-pro-preview",
+    description: "TYPE_GPT_MODEL.gemini-3-pro-preview.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536 // Corretto da 128000 (Gemini 1.5 Pro supporta 1M)
+  },
+  {
+    name: "Gemini 3 pro image preview",
+    value: "gemini-3-pro-image-preview",
+    description: "TYPE_GPT_MODEL.gemini-3-pro-image-preview.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536 // Corretto da 128000 (Gemini 1.5 Pro supporta 1M)
+  },
+  {
     name: "Gemini-pro",
     value: "gemini-pro",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    description: "TYPE_GPT_MODEL.gemini-pro.description",
     status: "inactive",
     min_tokens: 1,
     max_output_tokens: 1000000 // Corretto da 128000 (Gemini 1.5 Pro supporta 1M)
@@ -71,7 +87,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
   {
     name: "Gemini 1.5 Flash",
     value: "gemini-1.5-flash",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    description: "TYPE_GPT_MODEL.gemini-1.5-flash.description",
     status: "inactive",
     min_tokens: 1,
     max_output_tokens: 1000000 // Corretto da 128000 (Gemini 1.5 Flash supporta 1M)
@@ -79,7 +95,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
   {
     name: "Gemini 2.0 Flash",
     value: "gemini-2.0-flash",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    description: "TYPE_GPT_MODEL.gemini-2.0-flash.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 1000000 // Assumo che le versioni 2.x mantengano o migliorino 1.5
@@ -87,7 +103,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
   {
     name: "Gemini 2.0 Flash Lite",
     value: "gemini-2.0-flash-lite",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    description: "TYPE_GPT_MODEL.gemini-2.0-flash-lite.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 1000000 // Assumo
@@ -95,7 +111,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
   {
     name: "Gemini 2.5 Flash",
     value: "gemini-2.5-flash",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    description: "TYPE_GPT_MODEL.gemini-2.5-flash.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 1000000 // Assumo
@@ -103,7 +119,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
   {
     name: "Gemini 2.5 Flash Lite",
     value: "gemini-2.5-flash-lite",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    description: "TYPE_GPT_MODEL.gemini-2.5-flash-lite.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 1000000 // Assumo
@@ -111,6 +127,38 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
 ]
 
 export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number}> = [
+  {
+    name: "Claude Sonnet 4.5",
+    value: "claude-sonnet-4-5",
+    description: "TYPE_GPT_MODEL.claude-sonnet-4-5.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536
+  },
+  {
+    name: "Claude Haiku 4.5",
+    value: "claude-haiku-4-5",
+    description: "TYPE_GPT_MODEL.claude-haiku-4-5.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536
+  },
+  {
+    name: "Claude Opus 4.5",
+    value: "claude-opus-4-5",
+    description: "TYPE_GPT_MODEL.claude-opus-4-5.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536
+  },
+  {
+    name: "Claude Opus 4.1",
+    value: "claude-opus-4-1",
+    description: "TYPE_GPT_MODEL.claude-opus-4-1.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 65536
+  },
   {
     name: "Claude-3.7 Sonnet",
     value: "claude-3-7-sonnet-20250219",
@@ -390,9 +438,17 @@ export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:st
 
 export var OPENAI_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number}> = [
   {
+    name: "Gpt-5.1",
+    value: "gpt-5.1",
+    description: "TYPE_GPT_MODEL.gpt-5.1.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 128000
+  },
+  {
     name: "Gpt-5",
     value: "gpt-5",
-    description: "TYPE_GPT_MODEL.deepseek-chat.description",
+    description: "TYPE_GPT_MODEL.gpt-5.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 128000
@@ -400,7 +456,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
   {
     name: "Gpt-5-mini",
     value: "gpt-5-mini",
-    description: "TYPE_GPT_MODEL.deepseek-chat.description",
+    description: "TYPE_GPT_MODEL.gpt-5-mini.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 128000
@@ -408,7 +464,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
   {
     name: "Gpt-5-nano",
     value: "gpt-5-nano",
-    description: "TYPE_GPT_MODEL.deepseek-chat.description",
+    description: "TYPE_GPT_MODEL.gpt-5-nano.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 128000
@@ -416,7 +472,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
   {
     name: "GPT-4.1",
     value: "gpt-4.1",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    description: "TYPE_GPT_MODEL.gpt-4.1.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 32768
@@ -424,7 +480,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
   {
     name: "GPT-4.1 mini",
     value: "gpt-4.1-mini",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    description: "TYPE_GPT_MODEL.gpt-4.1-mini.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 32768
@@ -432,7 +488,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
   {
     name: "GPT-4.1 nano",
     value: "gpt-4.1-nano",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    description: "TYPE_GPT_MODEL.gpt-4.1-nano.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 32768
@@ -519,9 +575,9 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
   { name: "Groq",           value: "groq",              description: "",      src:"assets/images/icons/ai_prompt/groq.svg",        status: "active",   models: GROQ_MODEL          },
   { name: "Deepseek",       value: "deepseek",          description: "",      src:"assets/images/icons/ai_prompt/deepseek.svg",    status: "active",   models: DEEPSEEK_MODEL      },
   { name: "Ollama",         value: "ollama",            description: "",      src:"assets/images/icons/ai_prompt/ollama.svg",      status: "active",   models: OLLAMA_MODEL        },
-  { name: "OpenAI",         value: "openai",            description: "",      src:"assets/images/icons/ai_prompt/openai.svg",      status: "active",   models: OPENAI_MODEL        },
   { name: "vLLM",           value: "vllm",              description: "",      src:"assets/images/icons/ai_prompt/vllm.svg",        status: "active",   models: VLLM_MODEL          },
-]
+  { name: "OpenAI",         value: "openai",            description: "",      src:"assets/images/icons/ai_prompt/openai.svg",      status: "active",   models: OPENAI_MODEL        },
+ ]
 
 export const DEFAULT_MODEL: { name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number} = OPENAI_MODEL.find(model => model.value === "gpt-4o")!
 
