@@ -246,8 +246,34 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Gestisce il cambio del colore in tempo reale durante la selezione nel picker
+   * Viene chiamato durante il movimento del picker (evento input)
+   * Aggiorna immediatamente il colore e notifica il cambiamento per visualizzazione in tempo reale
+   */
+  onColorInput(event: Event, target: 'background' | 'border', opacity: number): void {
+    const colorInput = event.target as HTMLInputElement;
+    const hexColor = colorInput.value; // Il color picker restituisce sempre hex
+    if (!this.note) return;
+
+    const { r, g, b } = ColorUtils.hexToRgb(hexColor);
+
+    if (target === 'background') {
+      this.note.backgroundColor = ColorUtils.buildRgba(r, g, b, opacity);
+      this.logger.log('[CdsPanelNoteDetailComponent] Background color changed (real-time):', this.note.backgroundColor);
+    } else {
+      this.note.borderColor = ColorUtils.buildRgba(r, g, b, opacity);
+      this.logger.log('[CdsPanelNoteDetailComponent] Border color changed (real-time):', this.note.borderColor);
+    }
+
+    // Notifica immediatamente il cambiamento per visualizzazione in tempo reale
+    // senza debounce per avere feedback visivo istantaneo
+    this.savePanelNoteDetail.emit(this.note);
+  }
+
+  /**
    * Gestisce il cambio colore dal color picker per background e border
    * Usa la stessa logica con opacità e trasparenza
+   * Chiamato quando si chiude il picker (evento change)
    */
   onColorChange(event: Event, target: 'background' | 'border', opacity: number): void {
     const colorInput = event.target as HTMLInputElement;

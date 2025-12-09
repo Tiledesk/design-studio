@@ -55,6 +55,7 @@
                     <input type="color" 
                         class="color-swatch" 
                         [value]="getBaseColorForPicker('background')"
+                        (input)="onColorInput($event, 'background', note.backgroundOpacity)"
                         (change)="onColorChange($event, 'background', note.backgroundOpacity)">
                 </div>
                 <div class="slider-wrapper">
@@ -91,6 +92,7 @@
                     <input type="color" 
                         class="color-swatch" 
                         [value]="getBaseColorForPicker('border')"
+                        (input)="onColorInput($event, 'border', note.borderOpacity)"
                         (change)="onColorChange($event, 'border', note.borderOpacity)">
                 </div>
                 <div class="slider-wrapper">
