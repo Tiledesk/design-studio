@@ -401,14 +401,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.startScale = this.note.scale[0];
     } else {
       // Calcola lo scale dalle dimensioni reali del modello
-      const realWidth = this.note.width || Note.DEFAULT_WIDTH;
-      const realHeight = this.note.height || Note.DEFAULT_HEIGHT;
-      this.startScale = Math.min(realWidth / Note.DEFAULT_WIDTH, realHeight / Note.DEFAULT_HEIGHT);
+      // Usa i valori da note (garantiti da initializeDefaults)
+      const baseWidth = this.note.width;
+      const baseHeight = this.note.height;
+      const realWidth = this.note.width;
+      const realHeight = this.note.height;
+      this.startScale = Math.min(realWidth / baseWidth, realHeight / baseHeight);
     }
     
-    // Imposta sempre le dimensioni base nel DOM per i vertici
-    this.startWidth = Note.DEFAULT_WIDTH;
-    this.startHeight = Note.DEFAULT_HEIGHT;
+    // Imposta le dimensioni base nel DOM per i vertici
+    // Usa i valori da note (garantiti da initializeDefaults)
+    this.startWidth = this.note.width;
+    this.startHeight = this.note.height;
     this.contentElement.nativeElement.style.width = this.startWidth + 'px';
     this.contentElement.nativeElement.style.height = this.startHeight + 'px';
     
@@ -460,11 +464,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.startX = event.clientX;
     this.startY = event.clientY;
     
-    // Leggi la larghezza base corrente dal DOM (o usa currentBaseWidth o DEFAULT_WIDTH)
-    let currentWidth = parseFloat(this.contentElement.nativeElement.style.width);
-    if (isNaN(currentWidth) || currentWidth === 0) {
-      currentWidth = this.currentBaseWidth > 0 ? this.currentBaseWidth : Note.DEFAULT_WIDTH;
-    }
+    // Leggi la larghezza base corrente: usa note.width (garantito da initializeDefaults)
+    // Se currentBaseWidth è stata modificata da resize orizzontale, usa quella, altrimenti note.width
+    let currentWidth = this.currentBaseWidth > 0 ? this.currentBaseWidth : this.note.width;
     this.startWidth = currentWidth;
     this.currentBaseWidth = currentWidth; // Aggiorna anche currentBaseWidth
     
@@ -715,8 +717,45 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   // METODI PRIVATI - Inizializzazione
   // ============================================================================
+  /**
+   * Inizializza i valori di default solo se non sono già presenti nell'oggetto note.
+   * Se sono presenti, usa sempre i valori dell'oggetto note.
+   */
+  private initializeDefaults(): void {
+    if (!this.note) return;
+    
+    // Inizializza width solo se non presente
+    if (this.note.width === undefined || this.note.width === null) {
+      this.note.width = Note.DEFAULT_WIDTH;
+    }
+    
+    // Inizializza height solo se non presente
+    if (this.note.height === undefined || this.note.height === null) {
+      this.note.height = Note.DEFAULT_HEIGHT;
+    }
+    
+    // Inizializza fontSize solo se non presente
+    // Se non presente, calcola in proporzione inversa basandosi su width
+    if (!this.note.fontSize) {
+      const noteWidth = this.note.width;
+      const defaultWidth = Note.DEFAULT_WIDTH;
+      const defaultFontSizeEm = Note.DEFAULT_FONT_SIZE_EM;
+      
+      // Formula: font-size = (DEFAULT_WIDTH / note.width) * DEFAULT_FONT_SIZE_EM
+      let fontSizeEm = (defaultWidth / noteWidth) * defaultFontSizeEm;
+      
+      // Limiti ragionevoli per evitare font-size troppo piccoli o troppo grandi
+      fontSizeEm = Math.max(0.3, Math.min(3, fontSizeEm)); // tra 0.3em e 3em
+      
+      this.note.fontSize = fontSizeEm.toFixed(2) + 'em';
+    }
+  }
+
   private initialize(): void {
     if (this.note) {
+      // Inizializza i valori di default solo se non presenti
+      this.initializeDefaults();
+      
       const purifiedText = this.purifyAndNormalizeText(this.note.text || '');
       this.noteText = purifiedText;
       if (this.note.text !== purifiedText) {
@@ -822,46 +861,20 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // METODI PRIVATI - Utility e helper
   // ============================================================================
   /**
-   * Calcola il font-size basandosi su note.width usando proporzione inversa.
-   * Formula: font-size = (DEFAULT_WIDTH / note.width) * DEFAULT_FONT_SIZE_EM
-   * 
-   * Esempio: se note.width = 200px, DEFAULT_WIDTH = 130px, DEFAULT_FONT_SIZE_EM = 0.96em
-   * font-size = (130 / 200) * 0.96 = 0.624em
+   * Applica il font-size dall'oggetto note al DOM.
+   * Il font-size è garantito essere presente grazie a initializeDefaults().
    */
   private calculateAndApplyFontSize(): void {
     if (!this.note || !this.noteInput) {
       return;
     }
 
-    // Valori di riferimento
-    const DEFAULT_WIDTH = Note.DEFAULT_WIDTH; // 130px
-    const DEFAULT_FONT_SIZE_EM = Note.DEFAULT_FONT_SIZE_EM; // 0.96em
-    
-    // Usa note.width originale (non modificato)
-    const noteWidth = this.note.width || DEFAULT_WIDTH;
-
-    // Calcola il font-size in proporzione inversa
-    // DEFAULT_WIDTH / DEFAULT_FONT_SIZE_EM = note.width / font-size
-    // Quindi: font-size = (DEFAULT_WIDTH / note.width) * DEFAULT_FONT_SIZE_EM
-    let fontSizeEm = (DEFAULT_WIDTH / noteWidth) * DEFAULT_FONT_SIZE_EM;
-
-    // Limiti ragionevoli per evitare font-size troppo piccoli o troppo grandi
-    fontSizeEm = Math.max(0.3, Math.min(3, fontSizeEm)); // tra 0.3em e 3em
-
-    // Aggiorna il modello (per persistenza)
-    this.note.fontSize = fontSizeEm.toFixed(2) + 'em';
-
-    // Applica al DOM
+    // Usa fontSize da note (garantito da initializeDefaults)
     if (this.noteInput) {
       this.noteInput.nativeElement.style.fontSize = this.note.fontSize;
     }
 
-    this.logger.log('[CDS-NOTES] Calculated font-size:', {
-      noteWidth: noteWidth,
-      defaultWidth: DEFAULT_WIDTH,
-      defaultFontSize: DEFAULT_FONT_SIZE_EM,
-      calculatedFontSize: this.note.fontSize
-    });
+    this.logger.log('[CDS-NOTES] Applied font-size from note:', this.note.fontSize);
   }
 
   /**
@@ -1008,20 +1021,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const element = this.contentElement.nativeElement;
     
     // Determina la larghezza base: usa currentBaseWidth se è stata impostata (da resize orizzontale),
-    // altrimenti leggi dal DOM, altrimenti usa DEFAULT_WIDTH
-    let baseWidth = Note.DEFAULT_WIDTH;
-    if (this.currentBaseWidth > 0) {
-      baseWidth = this.currentBaseWidth;
-    } else {
-      // Prova a leggere dal DOM
-      const domWidth = parseFloat(element.style.width);
-      if (!isNaN(domWidth) && domWidth > 0) {
-        baseWidth = domWidth;
-        this.currentBaseWidth = baseWidth;
-      }
+    // altrimenti usa note.width (garantito da initializeDefaults)
+    let baseWidth = this.currentBaseWidth > 0 ? this.currentBaseWidth : this.note.width;
+    if (this.currentBaseWidth === 0) {
+      this.currentBaseWidth = baseWidth;
     }
     
-    const baseHeight = Note.DEFAULT_HEIGHT;
+    // Determina l'altezza base: usa note.height (garantito da initializeDefaults)
+    const baseHeight = this.note.height;
     
     // Imposta sempre le dimensioni base nel DOM (rimangono fisse, usiamo scale per ridimensionare)
     element.style.width = baseWidth + 'px';
@@ -1085,13 +1092,19 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // Applica scale inverso agli handle per mantenerli alla dimensione originale
     this.updateHandlesScale(scaleX, scaleY);
     
+    if(this.isHorizontalResizing) {
+      const DOMWidth = parseFloat(this.contentElement.nativeElement.style.width);
+      this.note.width = DOMWidth;
+    }
     this.logger.log('[CDS-NOTES] Applied scale and transform:', {
       scaleX: scaleX,
       scaleY: scaleY,
       width: width,
       height: height,
       rotation: rotation,
-      scale: this.note.scale
+      scale: this.note.scale,
+      DOMWidth: this.contentElement.nativeElement.style.width,
+      noteWidth: this.note.width,
     });
   }
 
