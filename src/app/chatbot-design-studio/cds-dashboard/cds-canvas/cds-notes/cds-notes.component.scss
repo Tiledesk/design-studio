@@ -65,6 +65,25 @@
       cursor: nwse-resize;
     }
     
+    // Handle laterali per ridimensionamento orizzontale
+    &.resize-left {
+      left: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 20px;
+      cursor: ew-resize;
+    }
+    
+    &.resize-right {
+      right: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 20px;
+      cursor: ew-resize;
+    }
+    
   }
   
   // Mostra handle quando selezionata

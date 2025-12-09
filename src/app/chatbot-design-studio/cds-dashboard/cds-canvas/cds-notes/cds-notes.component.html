@@ -47,6 +47,12 @@
     <div class="resize-handle resize-br" 
         (mousedown)="startResize($event, 'br')"></div>
     
+    <!-- Handle laterali per ridimensionamento orizzontale simmetrico -->
+    <div class="resize-handle resize-left" 
+        (mousedown)="startHorizontalResize($event, 'left')"></div>
+    <div class="resize-handle resize-right" 
+        (mousedown)="startHorizontalResize($event, 'right')"></div>
+    
     <!-- Handle rotazione al centro del lato superiore -->
     <div class="rotate-handle" 
         (mousedown)="startRotate($event)"></div>
