@@ -27,6 +27,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
+import { McpService } from 'src/app/services/mcp.service';
 import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
@@ -113,6 +114,7 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
     private readonly translate: TranslateService,
     private readonly dashboardService: DashboardService,
     private readonly projectService: ProjectService,
+    private readonly mcpService: McpService,
     private readonly formatNumberPipe: FormatNumberPipe
   ) { }
 
@@ -220,13 +222,31 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
 
     const INTEGRATIONS = await this.getIntegrations();
     this.logger.log('[ACTION AI_PROMPT] 1 - integrations:', INTEGRATIONS);
-    if(INTEGRATIONS){
-      INTEGRATIONS.forEach((el: any) => {
-        this.logger.log('[ACTION AI_PROMPT] 1 - integration:', el.name, el.value.apikey);
-        if(el.name && el.name === 'mcp'){
-          this.mcpServers = el.value.servers;
+    
+    // Load MCP servers using McpService
+    try {
+      const projectID = this.dashboardService.projectID;
+      const mcpIntegration = await firstValueFrom(this.mcpService.loadMcpServers(projectID));
+      if (mcpIntegration && mcpIntegration.value && mcpIntegration.value.servers) {
+        this.mcpServers = mcpIntegration.value.servers;
+        this.logger.log('[ACTION AI_PROMPT] MCP servers loaded:', this.mcpServers);
+      }
+    } catch (error) {
+      // If MCP integration doesn't exist (404), set empty array
+      if (error?.status === 404) {
+        this.mcpServers = [];
+        this.logger.log('[ACTION AI_PROMPT] No MCP integration found, using empty array');
+      } else {
+        this.logger.error('[ACTION AI_PROMPT] Error loading MCP servers:', error);
+        // Fallback: try to get from integrations
+        if(INTEGRATIONS){
+          INTEGRATIONS.forEach((el: any) => {
+            if(el.name && el.name === 'mcp'){
+              this.mcpServers = el.value.servers || [];
+            }
+          });
         }
-      });
+      }
     }
 
     this.llm_models_flat = result;

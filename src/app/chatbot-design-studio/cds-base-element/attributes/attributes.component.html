@@ -16,6 +16,7 @@
                     [text]="attribute.key"
                     [placeholder]="'CDSCanvas.Key' | translate"
                     [autocompleteOptions]="autocompleteOptions"
+                    [setAttributeBtn]="setAttributeBtn"
                     (blur)="onBlur($event)"
                     (onChange)="onChangeAttributes('key', $event, i)">
                 </cds-text>
@@ -26,7 +27,7 @@
                     [text]="attribute.value"
                     [textLimitBtn]="false"
                     [emojiPikerBtn]="false"
-                    [setAttributeBtn]="true"
+                    [setAttributeBtn]="setAttributeBtn"
                     [isLiquidjs]="false"
                     [minRow]="1" [maxRow]="4"
                     [showTextPreview]="true"

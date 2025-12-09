@@ -1,4 +1,23 @@
 <div class="tpl-modal-box">
+    <!-- JSON Response Overlay -->
+    <div class="json-overlay" *ngIf="showJsonOverlay">
+        <div class="json-overlay-content">
+            <div class="json-overlay-header">
+                <h3>Test Response</h3>
+                <button class="json-overlay-close" (click)="onCloseJsonOverlay()" type="button">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <div class="json-overlay-body">
+                <textarea 
+                    class="json-textarea" 
+                    readonly 
+                    [value]="formattedJsonResponse">
+                </textarea>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading overlay - shown only if saving takes more than 500ms -->
     <div class="loading-overlay" *ngIf="showLoader">
         <div class="loading-content">
@@ -39,12 +58,20 @@
             <!-- URL -->
             <div class="form-field">
                 <label class="field-label">URL</label>
-                <cds-text 
-                    [text]="editedServer.url"
-                    [setAttributeBtn]="false"
-                    [placeholder]="'CDSCanvas.EnterServerURL' | translate"
-                    (onChange)="onChangeField($event, 'url')">
-                </cds-text>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <cds-text 
+                        [text]="editedServer.url"
+                        [setAttributeBtn]="false"
+                        [placeholder]="'CDSCanvas.EnterServerURL' | translate"
+                        (onChange)="onChangeField($event, 'url')"
+                        style="flex: 1;">
+                    </cds-text>
+                    <button class="btn btn-primary cds-blue-button" type="button" 
+                        (click)="onToolsList()"
+                        style="margin-left: auto;">
+                        Tools list
+                    </button>
+                </div>
             </div>
 
             <!-- Transport Type (Read-only) -->
@@ -54,6 +81,18 @@
                     {{ editedServer.transport }}
                 </div>
                 <span class="field-hint">{{'CDSCanvas.OnlySupported' | translate}}</span>
+            </div>
+
+            <!-- Headers -->
+            <div class="form-field">
+                <label class="field-label">Headers</label>
+                <cds-attributes
+                    class="cds-attributes"
+                    [method]="typeMethodAttribute.INPUT"
+                    [attributes]="jsonHeaders"
+                    [setAttributeBtn]="false"
+                    (changeAttributes)="onChangeHeaders($event)">
+                </cds-attributes>
             </div>
         </form>
     </div>

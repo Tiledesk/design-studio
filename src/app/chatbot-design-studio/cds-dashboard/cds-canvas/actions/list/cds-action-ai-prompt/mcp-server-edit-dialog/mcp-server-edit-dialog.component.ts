@@ -2,23 +2,10 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { ProjectService } from 'src/app/services/projects.service';
+import { McpService, McpServer, McpIntegration } from 'src/app/services/mcp.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { firstValueFrom } from 'rxjs';
-
-interface McpServer {
-  name: string;
-  url: string;
-  transport: string;
-}
-
-interface McpIntegration {
-  id_project: string;
-  name: string;
-  value: {
-    servers: McpServer[];
-  };
-}
+import { TYPE_METHOD_ATTRIBUTE } from 'src/app/chatbot-design-studio/utils';
 
 
 @Component({
@@ -37,12 +24,16 @@ export class McpServerEditDialogComponent implements OnInit {
   isNewServer: boolean = false;
   errorMessage: string = '';
   showError: boolean = false;
+  showJsonOverlay: boolean = false;
+  formattedJsonResponse: string = '';
+  jsonHeaders: any = {};
+  typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
   
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
     public dialogRef: MatDialogRef<McpServerEditDialogComponent>,
-    private projectService: ProjectService,
+    private mcpService: McpService,
     private dashboardService: DashboardService,
     @Inject(MAT_DIALOG_DATA) public data: { 
       server?: McpServer;
@@ -62,13 +53,21 @@ export class McpServerEditDialogComponent implements OnInit {
       this.editedServer = {
         name: '',
         url: '',
-        transport: 'streamable_http' // Default value
+        transport: 'streamable_http', // Default value
+        headers: [],
+      };
+      // Initialize default headers
+      this.jsonHeaders = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       };
       this.originalServer = null;
     } else {
       // Create a copy of the server to edit
       this.originalServer = this.data.server;
       this.editedServer = { ...this.data.server };
+      // Convert headers to object format if needed
+      this.jsonHeaders = this.convertHeadersToObject(this.editedServer.headers);
     }
     
     // Store all servers
@@ -82,15 +81,96 @@ export class McpServerEditDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
+  onCloseJsonOverlay(): void {
+    this.showJsonOverlay = false;
+    this.formattedJsonResponse = '';
+  }
+
   onChangeField(value: string, field: 'name' | 'url' | 'transport'): void {
     this.editedServer[field] = value;
     this.logger.debug(`[McpServerEditDialog] Changed ${field}:`, value);
+  }
+
+  onChangeHeaders(attributes: any): void {
+    this.jsonHeaders = attributes;
+    this.editedServer.headers = attributes;
+    this.logger.debug(`[McpServerEditDialog] Changed headers:`, attributes);
+  }
+
+  private convertHeadersToObject(headers: any): any {
+    if (!headers) {
+      return {};
+    }
+    
+    // If it's already an object, return it
+    if (typeof headers === 'object' && !Array.isArray(headers)) {
+      return headers;
+    }
+    
+    // If it's an array of strings like ['Content-Type: application/json', 'Accept: application/json']
+    if (Array.isArray(headers)) {
+      const result: any = {};
+      headers.forEach((header: string) => {
+        if (typeof header === 'string' && header.includes(':')) {
+          const [key, ...valueParts] = header.split(':');
+          const value = valueParts.join(':').trim();
+          if (key && value) {
+            result[key.trim()] = value;
+          }
+        }
+      });
+      return result;
+    }
+    
+    return {};
   }
 
   isFormValid(): boolean {
     return !!(this.editedServer.name && 
               this.editedServer.url && 
               this.editedServer.transport);
+  }
+
+  async onToolsList(): Promise<void> {
+    this.logger.log("[McpServerEditDialog] Starting test with URL:", this.editedServer?.url || 'N/A');
+    
+    // Reset error state
+    this.showError = false;
+    this.errorMessage = '';
+
+    try {
+      // Chiama il service per testare la connessione (simula 2 chiamate POST in sequenza)
+      // Non effettua controlli sui dati, usa i dati mockati
+      const url = this.editedServer?.url || '';
+      const headers = this.editedServer?.headers || {};
+      const response = await firstValueFrom(
+        this.mcpService.loadMcpServerTools(url, headers)
+      );
+      
+      this.logger.log("[McpServerEditDialog] Test completed successfully:", response);
+      
+      // Formatta il JSON in modo leggibile
+      this.formattedJsonResponse = JSON.stringify(response, null, 2);
+      
+      // Mostra l'overlay con il JSON
+      this.showJsonOverlay = true;
+      
+      // Mostra successo
+      this.showError = false;
+      this.errorMessage = '';
+      
+    } catch (error) {
+      this.logger.error("[McpServerEditDialog] Error during test:", error);
+      this.showError = true;
+      
+      if (error?.error?.message) {
+        this.errorMessage = error.error.message;
+      } else if (error?.message) {
+        this.errorMessage = error.message;
+      } else {
+        this.errorMessage = "An error occurred while testing the server connection.";
+      }
+    }
   }
 
   async onSave(): Promise<void> {
@@ -152,7 +232,7 @@ export class McpServerEditDialogComponent implements OnInit {
 
       // Call service to save the entire MCP integration
       const response = await firstValueFrom(
-        this.projectService.saveIntegration(this.project_id, mcpIntegration)
+        this.mcpService.saveMcpIntegration(this.project_id, mcpIntegration)
       );
       
       this.logger.log("[McpServerEditDialog] Integration saved successfully:", response);

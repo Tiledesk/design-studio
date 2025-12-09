@@ -274,6 +274,54 @@ export class ProjectService {
     return this.http.post(url, integration, httpOptions);
   }
 
+  // ----------------------------------------------------------
+  // Test MCP Server Connection
+  // ----------------------------------------------------------
+
+  /**
+   * Simula 2 chiamate POST in sequenza per testare la connessione a un server MCP
+   * Per ora restituisce un JSON mock da file locale, successivamente implementeremo le chiamate reali
+   * @param url URL del server MCP da testare
+   * @returns Observable che emette la risposta JSON simulata
+   */
+  testMcpServerConnection(url: string): Observable<any> {
+    this.logger.log('[TILEDESK-SERVICE] - Testing MCP Server connection:', url);
+    
+    return new Observable(observer => {
+      // Simula la prima chiamata POST
+      setTimeout(() => {
+        this.logger.log('[TILEDESK-SERVICE] - First POST request simulated');
+        
+        // Simula la seconda chiamata POST (in sequenza)
+        setTimeout(() => {
+          this.logger.log('[TILEDESK-SERVICE] - Second POST request simulated');
+          
+          // Carica il JSON dal file locale usando HttpClient
+          this.http.get<any>('assets/mcp-test-response.json').subscribe({
+            next: (result) => {
+              this.logger.log('[TILEDESK-SERVICE] - Test completed, returning result from file:', result);
+              observer.next(result);
+              observer.complete();
+            },
+            error: (error) => {
+              this.logger.error('[TILEDESK-SERVICE] - Error loading test response file:', error);
+              // Fallback: restituisce un JSON di default se il file non viene trovato
+              const fallbackResult = {
+                result: {
+                  tools: []
+                },
+                jsonrpc: "2.0",
+                id: 2
+              };
+              observer.next(fallbackResult);
+              observer.complete();
+            }
+          });
+        }, 100); // Simula un piccolo delay per la seconda chiamata
+      }, 100); // Simula un piccolo delay per la prima chiamata
+    });
+  }
+
   //  updateMcpServer(project_id: string, mcpServer: { name: string, url: string, transport: string }): Observable<any> {
   //   this.logger.log('[TILEDESK-SERVICE] - UPDATE MCP SERVER', mcpServer);
   //   const httpOptions = {

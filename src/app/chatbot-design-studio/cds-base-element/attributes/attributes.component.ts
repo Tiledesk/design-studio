@@ -14,6 +14,7 @@ export class AttributesComponent implements OnInit {
   @Input() autocompleteOptions: Array<{label: string, value: string}> = [];
   @Input() method: any;
   @Input() openBlock: boolean;
+  @Input() setAttributeBtn: boolean = true;
 
   newAttributes: Array<any> = [];
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;

@@ -2,10 +2,14 @@
 @import "./src/assets/sass/cds/styles.scss";
 
 ::ng-deep .custom-mcp-edit-dialog-container {
-    width: 35vw!important;
-    min-width: 450px;
-    max-width: 600px!important;
+    width: 40vw!important;
+    min-width: 500px;
+    max-width: 700px!important;
     max-height: 80vh;
+    
+    .mat-dialog-container {
+        padding: 0px 10px;
+    }
 
     .tpl-modal-box {
         border-radius: 6px;
@@ -13,6 +17,8 @@
         flex-direction: column;
         background: rgb(255, 255, 255);
         max-height: 80vh;
+        min-height: 335px;
+        height: 80vh;
         position: relative;
     }
 
@@ -225,6 +231,120 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+.json-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    z-index: 2000;
+    padding: 0;
+    animation: fadeIn 0.3s ease;
+    overflow: hidden;
+    margin: 0;
+    border-radius: 6px;
+}
+
+.json-overlay-content {
+    background: white;
+    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    margin: 0;
+}
+
+.json-overlay-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e5e5;
+    flex-shrink: 0;
+    
+    h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+}
+
+.json-overlay-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: color 0.2s, opacity 0.2s;
+    border-radius: 4px;
+    
+    &:hover {
+        color: #333;
+        background-color: #f5f5f5;
+    }
+    
+    i {
+        font-size: 24px;
+    }
+}
+
+.json-overlay-body {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.json-textarea {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    padding: 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f9f9f9;
+    resize: none;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+    overflow-y: auto;
+    box-sizing: border-box;
+    
+    &:focus {
+        outline: none;
+        border-color: #006cff;
+        background-color: #fff;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
     }
 }
 

@@ -13,6 +13,7 @@ import { ProjectService } from './services/projects.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { UsersService } from './services/users.service';
 import { MultichannelService } from './services/multichannel.service';
+import { McpService } from './services/mcp.service';
 import { ScriptService } from 'src/chat21-core/providers/scripts/script.service';
 import { NetworkService } from './services/network.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -50,7 +51,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private imageRepoService: ImageRepoService,
     private scriptService: ScriptService,
     private networkService: NetworkService,
-    private iconService: IconService
+    private iconService: IconService,
+    private mcpService: McpService
   ){
 
   }
@@ -289,6 +291,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.multiChannelService.initialize(serverBaseURL)
         this.userService.initialize(serverBaseURL)
         this.uploadService.initialize();
+        this.mcpService.initialize(serverBaseURL);
 
         this.IS_ONLINE = true;
       }).catch(error => {
