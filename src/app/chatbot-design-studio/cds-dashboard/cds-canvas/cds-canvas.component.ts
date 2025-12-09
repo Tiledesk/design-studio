@@ -1390,18 +1390,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * Simile a onIntentSelected per gli intent
    */
   onNoteSelected(note: Note | null): void {
+     this.logger.log('[CDS-CANVAS] onNoteSelected',note);
     if (note) {
       // Verifica se il pannello è già aperto sulla stessa nota
       if (this.IS_OPEN_PANEL_NOTE_DETAIL && 
           this.noteSelected && 
           this.noteSelected.note_id === note.note_id) {
         // Il pannello è già aperto sulla stessa nota, non fare nulla
-        this.logger.log('[CDS-CANVAS] onNoteSelected - panel already open for note:', note.note_id);
+        // this.logger.log('[CDS-CANVAS] onNoteSelected - panel already open for note:', note.note_id);
         return;
       }
       
       // Apri il panel quando una nota viene selezionata (stateNote === 1 o 2)
-      this.logger.log('[CDS-CANVAS] onNoteSelected ', note.note_id);
+      // this.logger.log('[CDS-CANVAS] onNoteSelected ', note.note_id);
       this.closeAllPanels();
       this.removeConnectorDraftAndCloseFloatMenu();
       this.closeActionDetailPanel();
@@ -1411,9 +1412,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       }, 0);
     } else {
       // Chiudi il panel quando note è null (stato cambiato a 0)
-      this.logger.log('[CDS-CANVAS] onNoteSelected - closing panel');
-      this.IS_OPEN_PANEL_NOTE_DETAIL = false;
-      this.noteSelected = null;
+      // this.logger.log('[CDS-CANVAS] onNoteSelected - closing panel');
+      // this.IS_OPEN_PANEL_NOTE_DETAIL = false;
+      // this.noteSelected = null;
     }
   }
 

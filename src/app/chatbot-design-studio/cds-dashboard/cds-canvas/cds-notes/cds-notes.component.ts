@@ -35,7 +35,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   // PROPRIETÀ PRIVATE - Timer e sottoscrizioni
   // ============================================================================
-  private openPanelTimer: any = null;
+  // private openPanelTimer: any = null;
   private singleClickTimer: any = null;
   private noteUpdatedSubscription: Subscription;
   private mutationObserver: MutationObserver | null = null;
@@ -64,6 +64,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private startRotationAngle = 0; // Angolo iniziale di rotazione
   private centerX = 0; // Centro X della nota
   private centerY = 0; // Centro Y della nota
+
+  // PROPRIETÀ PRIVATE - Timing click
+  // ============================================================================
+  private mouseDownTimestamp: number = 0; // Timestamp del mouse down sulla nota
 
   // ============================================================================
   // PROPRIETÀ PRIVATE - Drag listeners
@@ -153,7 +157,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     }
     
     // Pulisci timer
-    this.cancelOpenPanelTimer();
+    // this.cancelOpenPanelTimer();
     this.cancelSingleClickTimer();
     
     // Rimuovi sottoscrizioni
@@ -228,52 +232,67 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent): void {
+   
+    
     if (this.isHorizontalResizing) {
       // Ricalcola dimensioni e scale basandosi sul transform corrente
       this.applyScaleAndTransform();
-      
       this.isHorizontalResizing = false;
       this.resizeHandle = '';
-      this.changeState(0);
+      // this.changeState(0);
       this.justFinishedResizing = true;
+      setTimeout(() => {
+        this.justFinishedResizing = false;
+      }, 100);
       this.updateNote();
     }
     
-    if (this.isResizing) {
+   else if (this.isResizing) {
       // Ricalcola dimensioni e scale basandosi sul transform corrente
       this.applyScaleAndTransform();
       
       this.isResizing = false;
       this.resizeHandle = '';
-      this.changeState(0);
+      // this.changeState(0);
       this.justFinishedResizing = true;
-      // setTimeout(() => {
-      //   this.justFinishedResizing = false;
-      // }, 100);
+      setTimeout(() => {
+        this.justFinishedResizing = false;
+      }, 100);
       this.updateNote();
     }
-    
-    if (this.isRotating) {
+    else if (this.isRotating) {
       this.isRotating = false;
       // Ricalcola dimensioni e scale dopo la rotazione
       this.applyScaleAndTransform();
+      this.justFinishedResizing = true;
+      setTimeout(() => {
+        this.justFinishedResizing = false;
+      }, 100);
       this.updateNote();
+    } else if (this.mouseDownTimestamp > 0) {
+      const mouseUpTimestamp = Date.now();
+      const clickDuration = mouseUpTimestamp - this.mouseDownTimestamp;
+      if(clickDuration < 100) {
+        this.changeState(2);
+        this.logger.log('[NOTES] Click duration:', clickDuration, 'ms');
+      }
+      this.mouseDownTimestamp = 0; // Reset per il prossimo click
     }
+
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (this.isResizing || this.isHorizontalResizing || this.justFinishedResizing || this.isRotating) {
+    if(this.justFinishedResizing) {
       return;
     }
-    
-    if ((this.stateNote === 1 || this.stateNote === 2) && this.contentElement) {
+    // Intercetta se il click è fuori dal div note
+    if (this.contentElement) {
       const target = event.target as HTMLElement;
       const clickedInside = this.contentElement.nativeElement.contains(target);
-      const clickedOnHandle = target.classList.contains('resize-handle');
-      const clickedOnPanel = target.closest('.panel-note-detail') !== null;
       
-      if (!clickedInside && !clickedOnHandle && !clickedOnPanel) {
+      // Se il click è fuori dal div note, deseleziona
+      if (!clickedInside) {
         this.changeState(0);
         this.updateDragState();
       }
@@ -332,6 +351,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
   onNoteInputMouseDown(event: MouseEvent): void {
     const target = event.target as HTMLElement;
+    
+    // Salva il timestamp del mouse down
+    this.mouseDownTimestamp = Date.now();
     
     this.logger.log('[CDS-NOTES] onNoteInputMouseDown - stateNote:', this.stateNote, 'isDraggable:', this.isDraggable, 'target:', target, 'hasTdsDraggable:', target.classList.contains('tds_draggable'));
     
@@ -680,7 +702,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.stateNote = state;
     
     if (state === 1) {
-      this.cancelOpenPanelTimer();
+      // this.cancelOpenPanelTimer();
       this.textareaHasFocus = true;
       if (previousState === 2) {
         this.noteSelected.emit(null);
@@ -700,7 +722,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.updateChildrenDraggableClass();
       this.openPanelWithDelay();
     } else if (state === 0 || state === 3) {
-      this.cancelOpenPanelTimer();
+      // this.cancelOpenPanelTimer();
       this.textareaHasFocus = false;
       if (this.noteInput) {
         this.noteInput.nativeElement.blur();
@@ -979,21 +1001,21 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   private openPanelWithDelay(): void {
-    this.cancelOpenPanelTimer();
+    // this.cancelOpenPanelTimer();
     // this.openPanelTimer = setTimeout(() => {
       if (this.stateNote === 2) {
         this.noteSelected.emit(this.note);
       }
-      this.openPanelTimer = null;
+      // this.openPanelTimer = null;
     // }, 200);
   }
 
-  private cancelOpenPanelTimer(): void {
-    if (this.openPanelTimer) {
-      clearTimeout(this.openPanelTimer);
-      this.openPanelTimer = null;
-    }
-  }
+  // private cancelOpenPanelTimer(): void {
+  //   if (this.openPanelTimer) {
+  //     clearTimeout(this.openPanelTimer);
+  //     this.openPanelTimer = null;
+  //   }
+  // }
 
   private cancelSingleClickTimer(): void {
     if (this.singleClickTimer) {
