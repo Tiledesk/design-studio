@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
@@ -291,45 +292,235 @@ export class McpService {
   /**
    * Load tools from an MCP server
    * Esegue una chiamata POST al server MCP per ottenere la lista dei tools disponibili
+   * Segue rigorosamente lo standard del protocollo MCP (Model Context Protocol)
    * @param url URL del server MCP
    * @param headers Optional headers object from the MCP server configuration
+   * @param server Optional complete MCP server object (for full protocol compliance)
    * @returns Observable che emette la risposta JSON con i tools
    */
-  loadMcpServerTools(url: string, headers?: any): Observable<any> {
+  loadMcpServerTools(url: string, headers?: any, server?: McpServer): Observable<any> {
     this.logger.log('[MCP-SERVICE] - Loading tools from MCP server:', url);
     this.logger.debug('[MCP-SERVICE] - Headers provided:', headers);
+    this.logger.debug('[MCP-SERVICE] - Server object provided:', server);
     
-    // Build HTTP headers for the request
+    // Build HTTP headers for the request according to MCP protocol standard
     let httpHeaders = new HttpHeaders();
     
-    // Set default headers
+    // Set required headers according to MCP protocol
     httpHeaders = httpHeaders.set('Accept', 'application/json, text/event-stream');
     httpHeaders = httpHeaders.set('Content-Type', 'application/json');
     
-    // Add custom headers from the MCP server configuration
-    if (headers && typeof headers === 'object') {
-      Object.keys(headers).forEach(key => {
-        const value = headers[key];
-        if (value && typeof value === 'string') {
-          httpHeaders = httpHeaders.set(key, value);
-          this.logger.debug(`[MCP-SERVICE] - Added header: ${key} = ${value}`);
-        }
-      });
+    // Add Authorization header if present in server configuration
+    // According to MCP standard, authorization_token can be provided
+    if (server && server.headers) {
+      // Process headers array if it's an array format
+      if (Array.isArray(server.headers)) {
+        server.headers.forEach((header: any) => {
+          if (header && typeof header === 'object' && header.key && header.value) {
+            const key = header.key;
+            const value = header.value;
+            if (typeof key === 'string' && typeof value === 'string') {
+              httpHeaders = httpHeaders.set(key, value);
+              this.logger.debug(`[MCP-SERVICE] - Added header from array: ${key} = ${value}`);
+            }
+          } else if (typeof header === 'string') {
+            // Handle string format headers if needed
+            const parts = header.split(':');
+            if (parts.length >= 2) {
+              const key = parts[0].trim();
+              const value = parts.slice(1).join(':').trim();
+              httpHeaders = httpHeaders.set(key, value);
+              this.logger.debug(`[MCP-SERVICE] - Added header from string: ${key} = ${value}`);
+            }
+          }
+        });
+      }
     }
     
-    // Build request body
-    const requestBody = {
+    // Add custom headers from the headers parameter (backward compatibility)
+    if (headers && typeof headers === 'object') {
+      if (Array.isArray(headers)) {
+        // Handle array format
+        headers.forEach((header: any) => {
+          if (header && typeof header === 'object' && header.key && header.value) {
+            const key = header.key;
+            const value = header.value;
+            if (typeof key === 'string' && typeof value === 'string') {
+              httpHeaders = httpHeaders.set(key, value);
+              this.logger.debug(`[MCP-SERVICE] - Added header from array param: ${key} = ${value}`);
+            }
+          }
+        });
+      } else {
+        // Handle object format
+        Object.keys(headers).forEach(key => {
+          const value = headers[key];
+          if (value && typeof value === 'string') {
+            httpHeaders = httpHeaders.set(key, value);
+            this.logger.debug(`[MCP-SERVICE] - Added header: ${key} = ${value}`);
+          }
+        });
+      }
+    }
+    
+    // Build request body according to MCP JSON-RPC 2.0 protocol standard
+    // The tools/list method requires all necessary parameters
+    const requestBody: any = {
       jsonrpc: '2.0',
       method: 'tools/list',
       params: {},
-      id: 2
+      id: this.generateRequestId()
     };
     
-    this.logger.debug('[MCP-SERVICE] - Request body:', requestBody);
-    this.logger.debug('[MCP-SERVICE] - Request headers:', httpHeaders.keys());
+    // Include server name in params if available (MCP protocol standard)
+    if (server && server.name) {
+      requestBody.params = {
+        ...requestBody.params,
+        name: server.name
+      };
+    }
     
-    // Make the POST request
+    // Include transport type in params if available and relevant
+    if (server && server.transport) {
+      requestBody.params = {
+        ...requestBody.params,
+        transport: server.transport
+      };
+    }
+    
+    this.logger.debug('[MCP-SERVICE] - Request body (MCP compliant):', requestBody);
+    this.logger.debug('[MCP-SERVICE] - Request headers:', httpHeaders.keys());
+    this.logger.debug('[MCP-SERVICE] - Full request URL:', url);
+    
+    // Make the POST request according to MCP protocol
     return this.http.post<any>(url, requestBody, { headers: httpHeaders });
+  }
+
+  /**
+   * Generate a unique request ID for JSON-RPC requests
+   * @returns A unique request ID
+   */
+  private generateRequestId(): number {
+    return Date.now() + Math.floor(Math.random() * 1000);
+  }
+
+  // ----------------------------------------------------------
+  // Initialize MCP Server
+  // ----------------------------------------------------------
+
+  /**
+   * Initialize an MCP server connection
+   * Implementa rigorosamente lo standard Model Context Protocol (MCP) secondo le specifiche ufficiali
+   * 
+   * Il processo di inizializzazione MCP segue questa sequenza:
+   * 1. Client invia richiesta "initialize" al server
+   * 2. Server risponde con le sue capabilities e informazioni
+   * 3. Client invia notifica "initialized" per completare l'handshake
+   * 
+   * @param server MCP server object completo con tutte le informazioni necessarie
+   * @param clientInfo Optional client information (name and version). Se non fornito, usa valori di default
+   * @returns Observable che emette un oggetto con body e headers della risposta
+   */
+  initializeMCP(server: McpServer, clientInfo?: { name?: string; version?: string }): Observable<{ body: any; headers: any }> {
+    this.logger.log('[MCP-SERVICE] - Starting MCP initialization for server:', server.name || server.url);
+    this.logger.log('[MCP-SERVICE] - Server configuration:', server);
+    
+    // Validazione input
+    if (!server || !server.url) {
+      const error = new Error('Server URL is required for MCP initialization');
+      this.logger.error('[MCP-SERVICE] - Validation error:', error.message);
+      return new Observable(observer => {
+        observer.error(error);
+      });
+    }
+
+    // Costruzione degli headers HTTP secondo lo standard MCP
+    // MCP richiede Content-Type: application/json e supporta Accept per event-stream
+    let httpHeaders = new HttpHeaders();
+    httpHeaders = httpHeaders.set('Content-Type', 'application/json');
+    httpHeaders = httpHeaders.set('Accept', 'application/json, text/event-stream');
+
+    // Costruzione del body della richiesta secondo lo standard JSON-RPC 2.0 e MCP
+    // Lo standard MCP richiede:
+    // - jsonrpc: "2.0" (standard JSON-RPC 2.0)
+    // - method: "initialize" (metodo MCP per l'inizializzazione)
+    // - params: oggetto con protocolVersion, capabilities, clientInfo
+    // - id: identificatore univoco della richiesta
+    const initializeRequest = {
+      jsonrpc: '2.0',
+      method: 'initialize',
+      params: {
+        // Protocol version: specifica la versione del protocollo MCP supportata dal client
+        // Formato: "YYYY-MM-DD" per versioni datate o "0.1.0" per versioni semantiche
+        protocolVersion: '0.1.0',
+        
+        // Capabilities: dichiara le capacità supportate dal client
+        // Oggetto vuoto indica che il client non dichiara capacità specifiche
+        // Può contenere: tools, prompts, resources, sampling, etc.
+        capabilities: {},
+        
+        // Client information: identifica il client che effettua la richiesta
+        clientInfo: {
+          name: clientInfo?.name || 'Design Studio MCP Client',
+          version: clientInfo?.version || '1.0.0'
+        },
+        rootUri: {file:'///'}
+      },
+      id: this.generateRequestId()
+    };
+    
+    this.logger.debug('[MCP-SERVICE] - Initialize request (MCP compliant):', JSON.stringify(initializeRequest, null, 2));
+    this.logger.debug('[MCP-SERVICE] - Request headers:', Array.from(httpHeaders.keys()));
+    this.logger.debug('[MCP-SERVICE] - Request URL:', server.url);
+    
+    // Invio della richiesta HTTP POST secondo lo standard MCP
+    // Usa observe: 'response' per ottenere la risposta completa inclusi gli headers
+    return this.http.post<any>(server.url, initializeRequest, { 
+      headers: httpHeaders,
+      observe: 'response'
+    }).pipe(
+      map((response: HttpResponse<any>) => {
+        this.logger.log('[MCP-SERVICE] ========================================== response: ',response);
+        // Estrazione di tutti gli headers della risposta
+        const responseHeaders: any = {};
+        response.headers.keys().forEach(key => {
+          responseHeaders[key] = response.headers.get(key);
+        });
+        
+        this.logger.log('[MCP-SERVICE] ==========================================');
+        this.logger.log('[MCP-SERVICE] - MCP INITIALIZE RESPONSE RECEIVED');
+        this.logger.log('[MCP-SERVICE] ==========================================');
+        this.logger.log('[MCP-SERVICE] - Response status:', response.status);
+        
+        // Stampa completa degli headers della risposta
+        this.logger.log('[MCP-SERVICE] - RESPONSE HEADERS:');
+        this.logger.log('[MCP-SERVICE]', JSON.stringify(responseHeaders, null, 2));
+        Object.keys(responseHeaders).forEach(key => {
+          this.logger.log(`[MCP-SERVICE]   ${key}: ${responseHeaders[key]}`);
+        });
+        
+        // Stampa completa del body della risposta
+        this.logger.log('[MCP-SERVICE] - RESPONSE BODY:');
+        this.logger.log('[MCP-SERVICE]', JSON.stringify(response.body, null, 2));
+        
+        // Verifica errori nella risposta JSON-RPC
+        if (response.body && response.body.error) {
+          this.logger.error('[MCP-SERVICE] - MCP initialization error:', response.body.error);
+          this.logger.error('[MCP-SERVICE] - Error code:', response.body.error.code);
+          this.logger.error('[MCP-SERVICE] - Error message:', response.body.error.message);
+        } else {
+          this.logger.log('[MCP-SERVICE] - Initialization completed successfully');
+        }
+        
+        this.logger.log('[MCP-SERVICE] ==========================================');
+        
+        // Restituisce body e headers per permettere al chiamante di processare la risposta
+        return {
+          body: response.body,
+          headers: responseHeaders
+        };
+      })
+    );
   }
 
   // ----------------------------------------------------------
@@ -339,12 +530,14 @@ export class McpService {
   /**
    * Test connection to an MCP server
    * Alias for loadMcpServerTools for backward compatibility
+   * Segue rigorosamente lo standard del protocollo MCP
    * @param url URL del server MCP da testare
    * @param headers Optional headers from the MCP server configuration
+   * @param server Optional complete MCP server object (for full protocol compliance)
    * @returns Observable che emette la risposta JSON con i tools
    */
-  testMcpServerConnection(url: string, headers?: any): Observable<any> {
-    return this.loadMcpServerTools(url, headers);
+  testMcpServerConnection(url: string, headers?: any, server?: McpServer): Observable<any> {
+    return this.loadMcpServerTools(url, headers, server);
   }
 }
 

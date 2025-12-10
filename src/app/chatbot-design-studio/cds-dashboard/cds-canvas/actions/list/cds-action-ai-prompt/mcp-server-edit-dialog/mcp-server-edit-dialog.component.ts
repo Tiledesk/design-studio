@@ -132,25 +132,35 @@ export class McpServerEditDialogComponent implements OnInit {
   }
 
   async onToolsList(): Promise<void> {
-    this.logger.log("[McpServerEditDialog] Starting test with URL:", this.editedServer?.url || 'N/A');
+    this.logger.log("[McpServerEditDialog] Starting MCP initialization with URL:", this.editedServer?.url || 'N/A');
     
     // Reset error state
     this.showError = false;
     this.errorMessage = '';
 
     try {
-      // Chiama il service per testare la connessione (simula 2 chiamate POST in sequenza)
-      // Non effettua controlli sui dati, usa i dati mockati
-      const url = this.editedServer?.url || '';
-      const headers = this.editedServer?.headers || {};
+      // Chiama il service per inizializzare il server MCP seguendo lo standard MCP
+      // Passa l'oggetto server completo per includere tutti i parametri richiesti dal protocollo
       const response = await firstValueFrom(
-        this.mcpService.loadMcpServerTools(url, headers)
+        this.mcpService.initializeMCP(this.editedServer)
       );
       
-      this.logger.log("[McpServerEditDialog] Test completed successfully:", response);
+      // Log del risultato completo
+      this.logger.log("[McpServerEditDialog] MCP initialization completed successfully");
+      this.logger.log("[McpServerEditDialog] Initialize response body:", JSON.stringify(response.body, null, 2));
       
-      // Formatta il JSON in modo leggibile
-      this.formattedJsonResponse = JSON.stringify(response, null, 2);
+      // Log di tutti gli headers restituiti dalla risposta
+      this.logger.log("[McpServerEditDialog] Response headers:", JSON.stringify(response.headers, null, 2));
+      this.logger.log("[McpServerEditDialog] All response headers:");
+      Object.keys(response.headers).forEach(headerKey => {
+        this.logger.log(`[McpServerEditDialog]   ${headerKey}: ${response.headers[headerKey]}`);
+      });
+      
+      // Formatta il JSON in modo leggibile includendo body e headers
+      this.formattedJsonResponse = JSON.stringify({
+        body: response.body,
+        headers: response.headers
+      }, null, 2);
       
       // Mostra l'overlay con il JSON
       this.showJsonOverlay = true;
@@ -160,7 +170,8 @@ export class McpServerEditDialogComponent implements OnInit {
       this.errorMessage = '';
       
     } catch (error) {
-      this.logger.error("[McpServerEditDialog] Error during test:", error);
+      this.logger.error("[McpServerEditDialog] Error during MCP initialization:", error);
+      this.logger.error("[McpServerEditDialog] Error details:", JSON.stringify(error, null, 2));
       this.showError = true;
       
       if (error?.error?.message) {
@@ -168,7 +179,7 @@ export class McpServerEditDialogComponent implements OnInit {
       } else if (error?.message) {
         this.errorMessage = error.message;
       } else {
-        this.errorMessage = "An error occurred while testing the server connection.";
+        this.errorMessage = "An error occurred while initializing the MCP server connection.";
       }
     }
   }
