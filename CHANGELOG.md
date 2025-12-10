@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **added**: added note
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management
