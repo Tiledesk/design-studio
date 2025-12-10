@@ -1095,7 +1095,7 @@ export class IntentService {
       action.intents.push({
         "label": idCondition,
         "prompt": "",
-        "conditionIntentId": ""
+        "conditionIntentId": null
       });
       action.fallbackIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
       action.errorIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;

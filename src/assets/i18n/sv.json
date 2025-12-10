@@ -1572,7 +1572,7 @@
         "CreationDate": "Skapelsedagen",
         "KbCounterFooter": "{{ counter }} av 3 kunskapsbaser tillagda",
         "AddKbInfoFirstText": "Ange en giltig URL för kunskapsbasen och din GPT-nyckel.",
-        "AddKbInfoSecondText": "Obs: du kan lägga till maximalt 3 Knwoledge-baser.",
+        "AddKbInfoSecondText": "Obs: du kan lägga till maximalt 3 Knowledge-baser.",
         "SearchingAnswer": "Söker efter ett passande svar...",
         "Answer": "Svar",
         "NoAnswerFound": "Kan inte hitta ett relevant svar",

@@ -35,6 +35,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() intent: Intent;
   @Input() hideActionPlaceholderOfActionPanel: boolean;
   @Input() chatbotSubtype: string;
+  @Input() IS_OPEN_PANEL_INTENT_DETAIL: boolean;
   
   @Output() componentRendered = new EventEmitter<string>();
   @Output() questionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
@@ -78,6 +79,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   newActionCreated: Action;
   dragDisabled: boolean = true;
   connectorIsOverAnIntent: boolean = false;
+  // Track mouse movement to distinguish click from drag
+  private mouseDownX: number = 0;
+  private mouseDownY: number = 0;
+  private hasMouseMoved: boolean = false;
+  private readonly MOUSE_MOVE_THRESHOLD: number = 5; // pixels threshold to consider as drag
   webHookTooltipText: string;
   isInternalIntent: boolean = false;
   actionIntent: ActionIntentConnected;
@@ -663,6 +669,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.formSelected.emit(this.intent.form);
   }
 
+
+
   onClickControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number) {
     this.logger.log('[CDS-INTENT] onClickControl', event, action);
     if (event === 'edit') {
@@ -917,6 +925,21 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.showPanelActions.emit(data);
   }
 
+  onOpenIntentPanel(intent: Intent){
+    this.logger.log('[CDS-INTENT] onOpenIntentPanel > intent', this.intent, " con : ", intent);
+    // Only open panel if there was no mouse movement (single click, not drag)
+    if(!this.hasMouseMoved && !intent['attributesChanged'] && this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL){
+      this.openIntentPanel(intent);
+    }
+  }
+
+  onIntentMouseDown(event: MouseEvent): void {
+    this.hasMouseMoved = false;
+  }
+
+  onIntentMouseMove(event: MouseEvent): void {
+    this.hasMouseMoved = true;
+  }
   /** ******************************
    * intent controls options: START
    * ****************************** */
