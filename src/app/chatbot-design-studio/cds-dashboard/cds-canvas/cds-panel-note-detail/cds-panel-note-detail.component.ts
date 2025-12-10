@@ -23,7 +23,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   @ViewChild('quillEditor', { static: false }) quillEditor: any;
   
   maximize: boolean = true;
-  private saveTimer: any = null; // Timer per il debounce del salvataggio automatico
+  // private saveTimer: any = null; // Timer per il debounce del salvataggio automatico
 
   toolbarOptions: any;
   quillModules: any;
@@ -54,11 +54,14 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     };
     
     // Sottoscrivi ai cambiamenti delle note per aggiornare il contenuto quando una nota viene modificata
-    this.noteUpdatedSubscription = this.noteService.noteUpdated$
+    // Usa notesChanged$ invece di noteUpdated$ per aggiornare quando cambiano (non solo quando vengono salvate)
+    this.noteUpdatedSubscription = this.noteService.notesChanged$
       .pipe(
-        filter(updatedNote => updatedNote && this.note && updatedNote.note_id === this.note.note_id)
+        filter(notes => notes && notes.length > 0 && !!this.note)
       )
-      .subscribe(updatedNote => {
+      .subscribe(notes => {
+        // Cerca la nota specifica nell'array aggiornato
+        const updatedNote = notes.find(n => n && n.note_id === this.note?.note_id);
         // Aggiorna la nota locale con i dati aggiornati
         if (updatedNote && this.note) {
           // Aggiorna tutte le proprietà della nota
@@ -90,17 +93,17 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
             }
           }
           
-          this.logger.log('[CdsPanelNoteDetailComponent] Note updated from service:', updatedNote.note_id);
+          this.logger.log('[CdsPanelNoteDetailComponent] Note updated from service (notesChanged$):', updatedNote.note_id);
         }
       });
   }
 
   ngOnDestroy(): void {
     // Pulisce il timer se il componente viene distrutto prima che il salvataggio venga completato
-    if (this.saveTimer) {
-      clearTimeout(this.saveTimer);
-      this.saveTimer = null;
-    }
+    // if (this.saveTimer) {
+    //   clearTimeout(this.saveTimer);
+    //   this.saveTimer = null;
+    // }
     
     // Rimuovi la sottoscrizione ai cambiamenti delle note
     if (this.noteUpdatedSubscription) {
@@ -243,8 +246,34 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Gestisce il cambio del colore in tempo reale durante la selezione nel picker
+   * Viene chiamato durante il movimento del picker (evento input)
+   * Aggiorna immediatamente il colore e notifica il cambiamento per visualizzazione in tempo reale
+   */
+  onColorInput(event: Event, target: 'background' | 'border', opacity: number): void {
+    const colorInput = event.target as HTMLInputElement;
+    const hexColor = colorInput.value; // Il color picker restituisce sempre hex
+    if (!this.note) return;
+
+    const { r, g, b } = ColorUtils.hexToRgb(hexColor);
+
+    if (target === 'background') {
+      this.note.backgroundColor = ColorUtils.buildRgba(r, g, b, opacity);
+      this.logger.log('[CdsPanelNoteDetailComponent] Background color changed (real-time):', this.note.backgroundColor);
+    } else {
+      this.note.borderColor = ColorUtils.buildRgba(r, g, b, opacity);
+      this.logger.log('[CdsPanelNoteDetailComponent] Border color changed (real-time):', this.note.borderColor);
+    }
+
+    // Notifica immediatamente il cambiamento per visualizzazione in tempo reale
+    // senza debounce per avere feedback visivo istantaneo
+    this.savePanelNoteDetail.emit(this.note);
+  }
+
+  /**
    * Gestisce il cambio colore dal color picker per background e border
    * Usa la stessa logica con opacità e trasparenza
+   * Chiamato quando si chiude il picker (evento change)
    */
   onColorChange(event: Event, target: 'background' | 'border', opacity: number): void {
     const colorInput = event.target as HTMLInputElement;
@@ -360,16 +389,16 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
    */
   private autoSave(): void {
     // Cancella il timer precedente se esiste
-    if (this.saveTimer) {
-      clearTimeout(this.saveTimer);
-    }
+    // if (this.saveTimer) {
+    //   clearTimeout(this.saveTimer);
+    // }
 
     // Imposta un nuovo timer per il salvataggio dopo 1 secondo
-    this.saveTimer = setTimeout(() => {
+    //this.saveTimer = setTimeout(() => {
       this.logger.log('[CdsPanelNoteDetailComponent] Auto-saving note after debounce');
       this.onSaveNote();
-      this.saveTimer = null;
-    }, 1000);
+      // this.saveTimer = null;
+    //}, 100);
   }
 
   onChangeMaximize(): void {

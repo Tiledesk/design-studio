@@ -7,8 +7,25 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+
+
+# 1.39.18-rc1
 - **bug-fix**: fixed handling of iframe URL in action replay
+
+# 1.39.17
+
+# 1.39.15-rc3
+- **bug-fix**: update resizing note
+
+# 1.39.15-rc2
+- **bug-fix**: cannot update the key or delete an item in action lead_update
+
+# 1.39.15-rc1
+- **bug-fix**: cannot able to update key or value in action lead_update
+
+# 1.39.14
+
+# 1.39.14-rc5
 - **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
 
 # 1.39.14-rc4
