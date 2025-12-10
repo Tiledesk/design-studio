@@ -1,15 +1,16 @@
-<div *ngIf="!metadata.src" class="response-frame-panel">
+<div *ngIf="!previewMode" class="response-frame-panel">
     <div class="row-upload">
         <div class="response-image-uploader-overlay">
     
             <div class="form-group">
-                <label class="control-label">
+                <label *ngIf="!metadata.src" class="control-label">
                     {{ 'CDSCanvas.AddPath' | translate }}
                 </label>
                 <cds-textarea 
+                    #pathTextarea
                     class="text-editable-div"
                     [text]="pathElement" 
-                    [minRow]="1" [maxRow]="2"
+                    [minRow]="1" [maxRow]="1"
                     [emojiPikerBtn]="false"
                     (blur)="onBlur($event)"
                     (changeTextarea)="onChangeTextArea($event)">
@@ -17,6 +18,7 @@
             </div> 
     
             <button 
+                *ngIf="!metadata.src"
                 type="button" 
                 class="btn btn-primary cds-blue-button" 
                 (click)="onLoadPathElement()">
