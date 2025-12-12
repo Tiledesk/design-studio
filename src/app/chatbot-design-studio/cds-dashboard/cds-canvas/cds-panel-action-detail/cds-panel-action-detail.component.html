@@ -298,6 +298,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-capture-user-reply>
 
+                    <cds-action-iteration *ngSwitchCase="TYPE_ACTION.ITERATION"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-iteration>
+
                     <cds-action-qapla *ngSwitchCase="TYPE_ACTION.QAPLA" 
                         class="panel-response" 
                         [intentSelected]="intentSelected"
