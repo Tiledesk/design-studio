@@ -7,8 +7,20 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
-- **bug-fix**: fixed handling of iframe URL in action replay
+# 1.39.18
+- **bug-fix**: Fixed display of iframe URL in action playback
+
+# 1.39.17
+- **added**: added the ability to put notes on the stage
+
+# 1.39.16
+- **added**: pipe find to show namespace name in action ask-kb-v2
+- **bug-fix**: show 'Re-ranking' option in action ask-kb-v2
+
+# 1.39.15
+- **bug-fix**: cannot able to update key or value in action lead_update
+
+# 1.39.14
 - **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
 - **bug-fix**: added the "globals" variables created in the DS to the variable list
 - **changed**: open the Intent panel details by clicking on "start intent"
@@ -16,9 +28,9 @@
 - **added**: added ai-modules gpt-5.1, gemini-3-pro-preview, gemini-3-pro-image-preview
 - **bug-fix**: fixed an error when searching for parameters for "voice" chatbot_type
 - **bug-fix**: changed knwoledge to knowledge 
-
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
+
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management

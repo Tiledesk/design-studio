@@ -1095,7 +1095,7 @@ export class IntentService {
       action.intents.push({
         "label": idCondition,
         "prompt": "",
-        "conditionIntentId": ""
+        "conditionIntentId": null
       });
       action.fallbackIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
       action.errorIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
@@ -1472,14 +1472,18 @@ export class IntentService {
       id_faq_kb: intent.id_faq_kb,
       operations: []
     };
-    this.operationsRedo.push({
-      type: "put", 
-      intent: JSON.parse(JSON.stringify(intent))
-    });
-    this.operationsUndo.push({
-      type: "put", 
-      intent: JSON.parse(JSON.stringify(intentPrev)) 
-    });
+    if(intent){
+      this.operationsRedo.push({
+        type: "put", 
+        intent: JSON.parse(JSON.stringify(intent))
+      });
+    }
+    if(intentPrev){
+      this.operationsUndo.push({
+        type: "put", 
+        intent: JSON.parse(JSON.stringify(intentPrev)) 
+      });
+    }
 
     if(fromIntent){
       // MAI!!! da verificare!!!

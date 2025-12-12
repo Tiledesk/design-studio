@@ -22,6 +22,11 @@
     &.is_disabled {
         opacity: 0.2;
     }
+    &.is_active {
+        .cds-box-button {
+            background-color: var(--gray-02);
+        }
+    }
 }
 
 .cds-box-button {

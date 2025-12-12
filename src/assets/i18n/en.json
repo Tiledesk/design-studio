@@ -292,6 +292,7 @@
         "ColorBlock": "Block color",
         "DeleteBlock": "Delete block",
         "CopyBlock": "Copy block",
+        "NoteDetails": "Note detail",
         "Paste": "Paste",
         "StartTest": "Start test from here",
         "DeleteAction": "Delete action",

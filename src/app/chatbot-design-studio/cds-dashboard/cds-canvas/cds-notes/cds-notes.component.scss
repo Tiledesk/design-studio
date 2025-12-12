@@ -1,0 +1,226 @@
+// ============================================================================
+// CONTAINER PRINCIPALE
+// ============================================================================
+.cds-notes-content {
+  position: relative;
+  padding: 10px 8px;
+  box-sizing: border-box;
+  width: 130px;
+  height: 42px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 3px 0px;
+  cursor: grab;
+  user-select: text;
+  -webkit-user-select: text;
+  max-height: fit-content;
+  min-height: fit-content;
+  // Background, border e box-shadow vengono applicati dinamicamente tramite [style.*]
+  
+  &.text-focus {
+    cursor: text;
+  }
+  
+  // ============================================================================
+  // RESIZE HANDLES
+  // ============================================================================
+  .resize-handle {
+    position: absolute;
+    display: none;
+    z-index: 10;
+    user-select: none;
+    border: 1px solid #007aff;
+    background: white;
+    
+    // Handle degli angoli
+    &.resize-tl {
+      top: -4px;
+      left: -4px;
+      width: 8px;
+      height: 8px;
+      cursor: nwse-resize;
+    }
+    
+    &.resize-tr {
+      top: -4px;
+      right: -4px;
+      width: 8px;
+      height: 8px;
+      cursor: nesw-resize;
+    }
+    
+    &.resize-bl {
+      bottom: -4px;
+      left: -4px;
+      width: 8px;
+      height: 8px;
+      cursor: nesw-resize;
+    }
+    
+    &.resize-br {
+      bottom: -4px;
+      right: -4px;
+      width: 8px;
+      height: 8px;
+      cursor: nwse-resize;
+    }
+    
+    // Handle laterali per ridimensionamento orizzontale
+    &.resize-left {
+      left: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 20px;
+      cursor: ew-resize;
+    }
+    
+    &.resize-right {
+      right: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 20px;
+      cursor: ew-resize;
+    }
+    
+  }
+  
+  // Mostra handle quando selezionata
+  &.selected {
+    .resize-handle,
+    .rotate-handle {
+      display: block;
+    }
+  }
+  
+  // ============================================================================
+  // ROTATE HANDLE
+  // ============================================================================
+  .rotate-handle {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    display: none;
+    z-index: 10;
+    user-select: none;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #007aff;
+    transform: translateX(-50%);
+    cursor: grab;
+    
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
+// ============================================================================
+// INPUT NOTE (CONTENTEDITABLE)
+// ============================================================================
+.note-input {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: min-content;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
+  z-index: 1;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.9em;
+  color: var(--bs-black);
+  background: transparent;
+  user-select: text;
+  -webkit-user-select: text;
+  
+  // Placeholder quando è vuoto
+  &:empty:before {
+    content: 'Type something';
+    color: #999;
+    pointer-events: none;
+    display: none;
+  }
+  
+  // Cursor states
+  &.tds_draggable {
+    cursor: grab;
+    
+    &:active {
+      cursor: grabbing;
+    }
+    
+    ::ng-deep * {
+      cursor: grab;
+    }
+    
+    ::ng-deep a {
+      cursor: pointer !important;
+    }
+  }
+  
+  &.text-focus {
+    cursor: text;
+    
+    ::ng-deep * {
+      cursor: text;
+    }
+    
+    ::ng-deep a {
+      cursor: pointer;
+    }
+  }
+  
+  // Stili per elementi HTML all'interno del contenteditable
+  ::ng-deep {
+    p {
+      margin: 0;
+    }
+    
+    strong,
+    b {
+      font-weight: bold;
+    }
+    
+    em,
+    i {
+      font-style: italic;
+    }
+    
+    u {
+      text-decoration: underline;
+    }
+    
+    a {
+      color: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+}
+
+// ============================================================================
+// CONTEXT MENU OVERLAY
+// ============================================================================
+.context-menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: auto;
+  
+  &.text-focus {
+    cursor: text;
+  }
+}
