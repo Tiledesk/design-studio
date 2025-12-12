@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.19-rc2
+- **added**: Added badge to count messages arriving in the widget-loq when the panel is closed
+- **changed**: intent block title hidden if "untitled"
+- **changed**: hidden form button and question button if they are empty 
+
 # 1.39.19-rc1
 - **added**: description on elevenlabs voices 
 
