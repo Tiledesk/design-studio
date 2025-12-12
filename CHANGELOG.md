@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # this branch
+- **added**: Added badge to count messages arriving in the widget-loq when the panel is closed
 - **changed**: intent block title hidden if "untitled"
 - **changed**: hidden form button and question button if they are empty 
 
