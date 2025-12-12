@@ -7,7 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
+# 1.39.18-rc2
+- **bug-fix**: css bug fix content-frame
 
 # 1.39.18-rc1
 - **bug-fix**: fixed handling of iframe URL in action replay
