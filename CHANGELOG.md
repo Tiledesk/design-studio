@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.19-rc1
+- **added**: description on elevenlabs voices 
+
 # 1.39.18
 - **bug-fix**: Fixed display of iframe URL in action playback
 
