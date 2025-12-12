@@ -153,8 +153,6 @@ export class CDSVoiceSettingsComponent implements OnInit {
           this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
           this.voiceLanguageSelect?.onResetValue(null)
           this.voice_language = null;
-
-          console.log('ellllll', this.voice_name_list)
         }
         break;
       };
