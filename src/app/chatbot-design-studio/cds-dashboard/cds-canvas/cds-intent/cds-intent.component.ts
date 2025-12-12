@@ -72,6 +72,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isStart = false;
   isDefaultFallback = false;
 
+  readonly UNTITLED_BLOCK_PREFIX = 'untitled_block_';
+
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;
@@ -98,6 +100,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   intentColor: any = INTENT_COLORS.COLOR1;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+
+  /** Check if intent display name starts with untitled_block_ */
+  get isUntitledBlock(): boolean {
+    return this.intent?.intent_display_name?.startsWith(this.UNTITLED_BLOCK_PREFIX) ?? false;
+  }
 
   constructor(
     public intentService: IntentService,
@@ -234,7 +241,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   async ngOnInit(): Promise<void> {
-      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
+      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
       if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
         this.showIntentOptions = false;
       } 
@@ -560,6 +567,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       } else {
         this.formSize = 0;
       }
+
+      if(this.questionCount === 0 && this.formSize === 0){  
+        this.showIntentOptions = false;
+      } 
     } catch (error) {
       this.logger.error("error: ", error);
     }

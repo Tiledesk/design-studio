@@ -102,9 +102,9 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   private initialize(intents){
     // // intents = this.intentService.hiddenEmptyIntents(intents);
     // // this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DEFAULT_FALLBACK));
-    this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true);
+    this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true && !obj.intent_display_name?.startsWith('untitled_block_'));
     this.logger.log('[cds-panel-intent-list] --- internalIntents ',this.internalIntents);
-    this.defaultIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true);
+    this.defaultIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true && !obj.intent_display_name?.startsWith('untitled_block_'));
     this.logger.log('[cds-panel-intent-list] --- defaultIntents ',this.defaultIntents);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.START, 0);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DEFAULT_FALLBACK, 1);
@@ -144,7 +144,10 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
 
   /** Search a block... */
   onLiveSearch(text: string) {
-    this.filteredIntents = this.defaultIntents.filter(element => element.intent_display_name.toLowerCase().includes(text.toLowerCase()));
+    this.filteredIntents = this.defaultIntents.filter(element => 
+      element.intent_display_name.toLowerCase().includes(text.toLowerCase()) && 
+      !element.intent_display_name?.startsWith('untitled_block_')
+    );
   }
 
   /** onSelectIntent */

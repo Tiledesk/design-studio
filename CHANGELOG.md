@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **changed**: intent block title hidden if "untitled"
+- **changed**: hidden form button and question button if they are empty 
+
+
 # 1.39.18
 - **bug-fix**: Fixed display of iframe URL in action playback
 
