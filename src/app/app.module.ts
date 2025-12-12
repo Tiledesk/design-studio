@@ -207,6 +207,7 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     KnowledgeBaseService,
     AiService,
     OpenaiService,
+    AiService,
     WhatsappService,
     BrandService,
     MultichannelService,
