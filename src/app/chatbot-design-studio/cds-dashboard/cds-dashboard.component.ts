@@ -30,6 +30,7 @@ import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from '../services/webhook-service.service';
+import { AiService } from 'src/app/services/ai.service';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -68,7 +69,8 @@ export class CdsDashboardComponent implements OnInit {
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
     private stageService: StageService, 
-    private readonly webhookService: WebhookService
+    private readonly webhookService: WebhookService,
+    private aiService: AiService
   ) {}
 
   
@@ -185,6 +187,7 @@ export class CdsDashboardComponent implements OnInit {
     this.faqService.initialize(serverBaseURL, this.project._id)
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
+    this.aiService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
 

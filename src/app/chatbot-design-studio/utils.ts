@@ -26,10 +26,19 @@ export const DOCS_LINK = {
         more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
     },
     VOICE_SETTINGS: {
-        tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
-        stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
-        voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
-        voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+        'twilio': {
+            voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
+        },
+        'openai': {
+            tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
+            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},    
+            voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+        },
+        'elevenlabs': {
+            tts_model: { link: 'https://elevenlabs.io/docs/api-reference/text-to-speech/convert', target: '_blank'},
+            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},    
+            voice_openai: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
+        },
     },
     LIQUIDJS: {
         home: { link: 'https://liquidjs.com/tutorials/intro-to-liquid.html', target: '_blank'},

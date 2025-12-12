@@ -18,3 +18,39 @@
         flex: 1 1 100%;
     }
 }
+
+.name-container{
+    display: flex;
+    align-items: center;
+    gap: 1rem; 
+    width: 100%;
+
+    cds-select{
+        flex: 1
+    }
+
+}
+
+.audio-player-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, var(--blu), var(--blu));
+    // box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: transform 0.3s ease, background 0.3s ease;
+  
+    &:hover .material-icons {
+      transform: scale(1.15);
+    }
+  
+    &.playing {
+      background: radial-gradient(circle at center, #e53935, #b71c1c);
+    }
+  
+    .material-icons {
+      font-size: 24px;
+      color: #ffffff;
+      pointer-events: none;
+    }
+  }
