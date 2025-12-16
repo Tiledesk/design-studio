@@ -7,6 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# this branch
+- **added**: added settings summary in AI action templates and all actions with AISEttings
+- **added**: added tag-replyto in mode preview
+- **added**: added badge on publish button
+- **added**: added badge to count messages arriving in the widget-loq when the panel is closed
+- **changed**: intent block title hidden if "untitled"
+- **changed**: hidden form button and question button if they are empty 
+
 # 1.39.19-rc1
 - **added**: description on elevenlabs voices 
 
