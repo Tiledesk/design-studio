@@ -8,12 +8,11 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.39.19-rc3
 - **added**: added settings summary in AI action templates and all actions with AISEttings
 - **added**: added tag-replyto in mode preview
 - **added**: added badge on publish button
 - **added**: added badge to count messages arriving in the widget-loq when the panel is closed
-
 
 # 1.39.19-rc2
 - **added**: Added badge to count messages arriving in the widget-loq when the panel is closed
