@@ -1681,6 +1681,7 @@ export class IntentService {
           // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);
+          this.dashboardService.selectedChatbot.modified = true;
           resolve(true);
         }, (error) => {
           this.logger.error('ERROR: ', error);

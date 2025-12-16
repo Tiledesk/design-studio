@@ -1309,7 +1309,8 @@
     },
     "Options": "Options",
     "CDSHeader": {
-        "LinkCopiedToClipboard": "Link copied to clipboard"
+        "LinkCopiedToClipboard": "Link copied to clipboard",
+        "ThereAreUnpublishedChanges": "There are unpublished changes"
     },
     "ReleaseHistory": "Release History",
     "ReleaseNotes": "Release notes",
