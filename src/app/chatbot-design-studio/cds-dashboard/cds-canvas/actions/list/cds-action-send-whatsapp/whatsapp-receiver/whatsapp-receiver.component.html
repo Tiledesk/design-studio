@@ -157,7 +157,7 @@
                         [emojiPikerBtn]="false"
                         [textLimitBtn]="false"
                         [minRow]="1" [maxRow]="1" 
-                        [text]="header_params[i].image.link" 
+                        [text]="getHeaderParamLink(i)" 
                         [placeholder]="'CDSCanvas.InsertValidURLOrUpdateFile' | translate "
                         (blur)="onBlur($event)" (focus)="onFocus()"
                         (selectedAttribute)="onSelectedAttribute($event, 'header_params', i+1)"
