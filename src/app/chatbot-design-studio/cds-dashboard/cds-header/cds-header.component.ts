@@ -39,10 +39,9 @@ const swal = require('sweetalert');
 export class CdsHeaderComponent implements OnInit {
   
   @Input() IS_OPEN_SIDEBAR: boolean;
-  // @Input() projectID: string;
   // @Input() defaultDepartmentId: string;
   // @Input() id_faq_kb: string;
-  // @Input() selectedChatbot: Chatbot;
+  @Input() selectedChatbot: Chatbot;
   @Output() toggleSidebarWith = new EventEmitter();
   @Output() goToBck = new EventEmitter();
 
@@ -51,7 +50,7 @@ export class CdsHeaderComponent implements OnInit {
   id_faq_kb: string;
   projectID: string;
   defaultDepartmentId: string;
-  selectedChatbot: Chatbot;
+  //selectedChatbot: Chatbot;
 
 
   isBetaUrl: boolean = false;
@@ -125,6 +124,7 @@ export class CdsHeaderComponent implements OnInit {
     this.projectID = this.dashboardService.projectID;
     this.defaultDepartmentId = this.dashboardService.defaultDepartment._id;
     this.selectedChatbot = this.dashboardService.selectedChatbot;
+    // this.IS_CHATBOT_MODIFIED = this.selectedChatbot?.modified || false;
     this.logger.log('[CdsHeaderComponent] selectedChatbot::: ', this.selectedChatbot);
     if(this.dashboardService.selectedChatbot.subtype === 'webhook' || this.dashboardService.selectedChatbot.subtype === 'copilot'){
       this.isWebhook = true;
@@ -226,7 +226,8 @@ export class CdsHeaderComponent implements OnInit {
 
   onClickPublish(){
     // this.publishPaneltoggleState = !this.publishPaneltoggleState
-    this.logger.log('[CDS DSBRD] click on PUBLISH --> open ', this.publishPaneltoggleState)
+    this.logger.log('[CDS DSBRD] click on PUBLISH --> open ', this.publishPaneltoggleState);
+    this.selectedChatbot.modified = false;
     this.controllerService.openPublishPanel()
   }
 

@@ -46,7 +46,7 @@
         class="pic-header" 
         [ngClass]="{'cds-start': isStart}">
 
-        <cds-panel-intent-header class="pic-title-text tds_draggable" 
+        <cds-panel-intent-header *ngIf="!isUntitledBlock" class="pic-title-text tds_draggable" 
             [class.isStart]="isStart"
             [intentColor]="intentColor"
             [intent]="intent"
