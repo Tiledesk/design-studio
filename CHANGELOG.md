@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.19-rc5
+- **bug-fix**: "TTS_VOICE_LANGUAGE" while selecting TTS_VOICE_NAME for elevenlabs voiceProvider
+
 # 1.39.19-rc4
 - **bug-fix**: bug fix for PDF template selection in WhatsApp send action
 
