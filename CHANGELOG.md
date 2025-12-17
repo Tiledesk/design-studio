@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
 # 1.39.18
 - **bug-fix**: Fixed display of iframe URL in action playback
 
