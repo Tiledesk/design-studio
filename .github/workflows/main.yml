@@ -24,8 +24,6 @@ jobs:
       with:	    
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        tag_with_ref: true
 
     - name: Generate Docker metadata
       id: meta
