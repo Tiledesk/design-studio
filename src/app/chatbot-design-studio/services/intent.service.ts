@@ -1498,17 +1498,45 @@ export class IntentService {
       });
     } else {
       // quando sposto un intent sullo stage
-      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id);
-      intentsToUpdate.forEach(ele => {
-        this.operationsUndo.push({
-          type: "put", 
-          intent: JSON.parse(JSON.stringify(ele))
-        }); 
-        this.operationsRedo.push({
-          type: "put", 
-          intent: JSON.parse(JSON.stringify(ele))
-        });
+      // Prima di chiamare findsIntentsToUpdate, salviamo una copia degli intent originali dalla lista
+      // per preservare i connettori completi prima che vengano modificati
+      const intentIdsToUpdate: string[] = [];
+      let listConnectors = this.connectorService.searchConnectorsInByIntent(intent.intent_id);
+      listConnectors.forEach(element => {
+        const splitFromId = element.fromId.split('/');
+        const intentToUpdateId = splitFromId[0];
+        if (!intentIdsToUpdate.includes(intentToUpdateId)) {
+          intentIdsToUpdate.push(intentToUpdateId);
+        }
       });
+      
+      // Per ogni intent da aggiornare, salviamo le versioni corrette
+      intentIdsToUpdate.forEach(intentToUpdateId => {
+        // Per operationsUndo, salviamo l'intent originale (prima della modifica)
+        const intentOriginal = this.prevListOfIntent.find((obj) => obj.intent_id === intentToUpdateId);
+        if(intentOriginal){
+          this.operationsUndo.push({
+            type: "put", 
+            intent: JSON.parse(JSON.stringify(intentOriginal))
+          });
+        }
+        
+        // Per operationsRedo, usiamo l'intent attuale dalla lista (che ha ancora i connettori completi)
+        // IMPORTANTE: preserviamo i connettori completi, non li rimuoviamo quando aggiorniamo un intent
+        const intentFromList = this.listOfIntents.find((obj) => obj.intent_id === intentToUpdateId);
+        if(intentFromList){
+          // Creiamo una copia dell'intent dalla lista con tutti i connettori preservati
+          const intentForRedo = JSON.parse(JSON.stringify(intentFromList));
+          this.operationsRedo.push({
+            type: "put", 
+            intent: intentForRedo
+          });
+        }
+      });
+      
+      // Ora chiamiamo findsIntentsToUpdate per aggiornare gli intent nella lista
+      // (questo modifica direttamente la lista, ma abbiamo già salvato le versioni corrette per il payload)
+      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id);
     }
     this.payload.operations = this.operationsRedo;
     let operations = {undo:this.operationsUndo, redo:this.operationsRedo};

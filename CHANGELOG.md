@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # this branch
+- **bug-fix**: hidden connectors should remain hidden if update the arrival block
 - **changed**: do not allow text selection in cds-panel-elements and cds-panel-intent-list
 - **added**: added settings summary in AI action templates and all actions with AISEttings
 - **added**: added tag-replyto in mode preview
