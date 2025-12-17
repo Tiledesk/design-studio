@@ -167,6 +167,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.voice_name = event.voiceId;
         if(this.voiceProvider === 'elevenlabs'){
           this.voice_language = this.selectedElement?.['attributes'].language
+          this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", this.voice_language)
         }
         break;
       };
