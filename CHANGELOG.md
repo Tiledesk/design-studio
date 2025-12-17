@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.19-rc6
+- **bug-fix**: minor fix on TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+
 # 1.39.19-rc5
 - **bug-fix**: "TTS_VOICE_LANGUAGE" while selecting TTS_VOICE_NAME for elevenlabs voiceProvider
 
