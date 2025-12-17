@@ -127,7 +127,7 @@ export class CdsActionSendWhatsappComponent implements OnInit {
 
   getTemplates() {
     this.whatsapp.getAllTemplates().subscribe({ next:(templates: any[]) => {
-      //this.logger.log("[ACTION-SEND WHATSAPP] get templates: ", templates);
+      this.logger.log("[ACTION-SEND WHATSAPP] get templates: ", templates);
       this.templates_list = templates.map(t => {
         if (t.category === 'MARKETING') {
           t.icon = "campaign"
@@ -147,7 +147,7 @@ export class CdsActionSendWhatsappComponent implements OnInit {
       if (this.action.templateName) {
        this.selected_template = this.templates_list.find(t => t.name === this.action.templateName);
       }
-      //this.logger.log("[ACTION-SEND WHATSAPP] get templates completed: ", this.action.templateName, this.templates_list, this.selected_template);
+      this.logger.log("[ACTION-SEND WHATSAPP] get templates completed: ", this.action.templateName, this.templates_list, this.selected_template);
       this.showLoader = false;
     }})
   }

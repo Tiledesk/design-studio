@@ -34,7 +34,7 @@
                             <img [src]="header_params[0].image.link" (error)="onHeaderImageError($event)" />
                         </div> -->
                         <span *ngIf="header_component?.format === 'IMAGE'">
-                            <img [src]="header_params[0].image.link" (error)="onHeaderImageError($event)" />
+                            <img [src]="header_params[0]?.image?.link" (error)="onHeaderImageError($event)" />
                         </span>
                         <span *ngIf="header_component?.format === 'DOCUMENT'">
                             <div class="pdf-preview">
