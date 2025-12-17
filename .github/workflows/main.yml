@@ -24,6 +24,8 @@ jobs:
       with:	    
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tag_with_ref: true
 
     - name: Generate Docker metadata
       id: meta
@@ -33,9 +35,6 @@ jobs:
         tags: |
           type=ref,event=branch
           type=semver,pattern={{version}}
-
-    - name: Build and push
-      uses: docker/build-push-action@v4
 
     - name: Build and push
       uses: docker/build-push-action@v4
