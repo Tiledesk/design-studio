@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+# 1.39.19
 - **bug-fix**: bug fix for PDF template selection in WhatsApp send action
 
 # 1.39.18
