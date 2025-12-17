@@ -23,9 +23,11 @@ export class CdsWidgetLogsComponent implements OnInit {
   @Input() 
   set IS_OPEN_PANEL_WIDGET(value: boolean) {
     this.isOpenPanelWidget = value;
-    if (!value) {
-      this.closeLog();
-    }
+    // Non chiudere la connessione MQTT quando il pannello viene nascosto
+    // La connessione verrà chiusa solo quando il componente viene distrutto (ngOnDestroy)
+    // if (!value) {
+    //   this.closeLog();
+    // }
   }
   @Input() request_id: string;
   @Output() closePanelLog = new EventEmitter();
@@ -44,6 +46,7 @@ export class CdsWidgetLogsComponent implements OnInit {
   mqtt_token: string;
   highestTimestamp: string;
   animationLog: boolean = true;
+  unreadMessagesCount: number = 0;
 
   private startY: number;
   private startHeight: number;
@@ -87,12 +90,12 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   getStaticLastLogs(){
     this.logService.getStaticLastLogs(this.selectedLogLevel).subscribe({ next: (resp)=> {
-      this.logger.log("[CDS-WIDGET-LOG-A] getStaticLastLogs", resp);
+      this.logger.log("[CDS-WIDGET-LOG] getStaticLastLogs", resp);
       this.appendFirstMessagesToHeadArray(resp);
     }, error: (error)=> {
-      this.logger.error("[CDS-WIDGET-LOG-A] getStaticLastLogs error: ", error);
+      this.logger.error("[CDS-WIDGET-LOG] getStaticLastLogs error: ", error);
     }, complete: () => {
-      this.logger.log("[CDS-WIDGET-LOG-A] getStaticLastLogs completed.");
+      this.logger.log("[CDS-WIDGET-LOG] getStaticLastLogs completed.");
     }})
   }
 
@@ -120,7 +123,7 @@ export class CdsWidgetLogsComponent implements OnInit {
       //this.listOfLogs.unshift(...transformedArray);
       this.highestTimestamp = this.listOfLogs[this.listOfLogs.length-1]?.timestamp;
       this.filterLogMessage();
-      this.logger.log("[CDS-WIDGET-LOG-A] appendFirstMessagesToHeadArray", transformedArray, this.listOfLogs);
+      this.logger.log("[CDS-WIDGET-LOG] appendFirstMessagesToHeadArray", transformedArray, this.listOfLogs);
   }
 
   
@@ -223,20 +226,27 @@ export class CdsWidgetLogsComponent implements OnInit {
     if(this.subscriptionLoadedWidget) {
       this.subscriptionLoadedWidget.unsubscribe();
     }
+    // Chiudi la connessione MQTT solo quando il componente viene distrutto
+    this.closeLog();
   }
 
 
   subscriptions(){
      /** get dynamic logs */
     this.subscriptionWidgetLoadedNewMessage = this.logService.BSWidgetLoadedNewMessage.subscribe((message: any) => {
-      // this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message, this.highestTimestamp);
       if(message){
         if (new Date(message.timestamp) > new Date(this.highestTimestamp) || !this.highestTimestamp){
           this.listOfLogs.push(message);
           this.highestTimestamp = this.listOfLogs[this.listOfLogs.length-1]?.timestamp;
+          // Incrementa il contatore dei messaggi non letti se il pannello è chiuso
+          if (this.isClosed) {
+            this.unreadMessagesCount++;
+          }
         }
-        //this.goToIntentByMessage(message);
-        this.scrollToBottom();
+        // Scroll solo se il pannello è aperto
+        if (!this.isClosed) {
+          this.scrollToBottom();
+        }
       } else {
         //this.goToIntentByMessage(message);
         // const intentId = this.intentService.intentSelectedID;
@@ -244,7 +254,10 @@ export class CdsWidgetLogsComponent implements OnInit {
         // this.addCssAnimationClass('live-start-intent', '#intent-content-' + (intentId), 6);
       }
       this.logger.log("[CDS-WIDGET-LOG] new message loaded ", message, this.listOfLogs);
-      this.goToIntentByMessage(message);
+      // Vai all'intent solo se il pannello è aperto
+      if (!this.isClosed) {
+        this.goToIntentByMessage(message);
+      }
       this.filterLogMessage();
     });  
 
@@ -301,8 +314,12 @@ export class CdsWidgetLogsComponent implements OnInit {
 
 
   private scrollToBottom(): void {
+    // Non fare scroll se il pannello è chiuso
+    if (this.isClosed) {
+      return;
+    }
     const logContainer = this.el.nativeElement.querySelector('#content-scroll-log');
-    this.logger.log("[CDS-WIDGET-LOG] scrollToBottom: ", logContainer, logContainer.offsetHeight);
+    this.logger.log("[CDS-WIDGET-LOG] scrollToBottom: ", logContainer, logContainer?.offsetHeight);
     setTimeout(() => {
       if(logContainer) {
         logContainer.scrollTop = logContainer.scrollHeight;
@@ -313,12 +330,12 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   starterLog(){
     this.listOfLogs = [];
-    this.logger.log('[CDS-WIDGET-LOG-A] >>> starterLog ');
+    this.logger.log('[CDS-WIDGET-LOG] >>> starterLog ');
     this.logService.starterLog(this.mqtt_token, this.request_id);
   }
 
   closeLog(){
-    this.logger.log('[CDS-WIDGET-LOG-A] >>> closeLog ');
+    this.logger.log('[CDS-WIDGET-LOG] >>> closeLog ');
     this.intentService.resetLiveActiveIntent();
     this.logService.closeLog();
   }
@@ -416,6 +433,7 @@ export class CdsWidgetLogsComponent implements OnInit {
 
   onOpenLog(){
     this.isClosed = false;
+    this.unreadMessagesCount = 0; // Resetta il contatore quando il pannello viene riaperto
     localStorage.setItem('default_closed_log_panel', JSON.stringify(this.isClosed));
   }
 
