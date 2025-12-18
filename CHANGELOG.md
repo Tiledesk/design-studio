@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.19-rc7
+- **bug-fix**: hidden connectors should remain hidden if update the arrival block
+- **changed**: do not allow text selection in cds-panel-elements and cds-panel-intent-list
+
+# 1.39.19-rc6
+- **bug-fix**: minor fix on TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+
 # 1.39.19-rc5
 - **bug-fix**: "TTS_VOICE_LANGUAGE" while selecting TTS_VOICE_NAME for elevenlabs voiceProvider
 
