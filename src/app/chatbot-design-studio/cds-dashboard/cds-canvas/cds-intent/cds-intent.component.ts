@@ -418,9 +418,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Altrimenti isNewChatbot = true
    */
   private checkIfNewChatbot(): void {
+    
+    //this.isNewChatbot = false;
+    //return;
     const cutoffDate = '2025-12-17T00:00:00.000Z';
     const chatbot = this.dashboardService.selectedChatbot;
-    
+    this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot.createdAt);
+
+
     if (!chatbot || !chatbot.createdAt) {
       // Se non c'è data di creazione, considera come nuovo chatbot
       this.isNewChatbot = true;
@@ -433,7 +438,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       // Altrimenti (successiva o uguale), isNewChatbot = true
       this.isNewChatbot = chatbot.createdAt >= cutoffDate;
       this.logger.log('[CDS-INTENT] checkIfNewChatbot:', {
-        createdAt: chatbot.createdAt.toISOString(),
         isNewChatbot: this.isNewChatbot
       });
     } catch (error) {
@@ -880,7 +884,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Predicate function that only allows type='intent' to be dropped into a list. */
   canEnterDropList(action: any) {
     return (item: CdkDrag<any>) => {
-      return true
+      // Se il chatbot è nuovo, disabilita il drop se c'è già un'action nell'intent
+      // Mantiene il limite di una action per blocco intent per i chatbot nuovi
+      if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
+        return false;
+      }
+      // Per i chatbot esistenti, permette il drop normalmente
+      return true;
     }
   }
 
@@ -896,6 +906,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    */
   async onDropAction(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
+    
+    // Se il chatbot è nuovo, impedisce il drop se c'è già un'action nell'intent
+    // Mantiene il limite di una action per blocco intent per i chatbot nuovi
+    if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
+      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot nuovo e c\'è già un\'action nell\'intent');
+      return;
+    }
+    
+    // Per i chatbot esistenti, esegue il drop normalmente
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
     if (event.previousContainer === event.container) {
