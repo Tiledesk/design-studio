@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, preDisplayName } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -93,6 +93,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   webhookUrl: string;
   serverBaseURL: any;
   chatbot_id: string;
+  isUntitledBlock: boolean = false;
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -127,6 +128,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           this.logger.log("[CDS-INTENT] sto modificando l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
           this.setAgentsAvailable();
+          // Aggiorna isUntitledBlock quando l'intent viene modificato
+          this.updateIsUntitledBlock();
           if (intent['attributesChanged']) {
             this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
             delete intent['attributesChanged'];
@@ -266,6 +269,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.setActionIntent();
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
+      this.updateIsUntitledBlock();
       this.addEventListener();
       this.setIntentAttributes();
   }
@@ -359,6 +363,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     this.setAgentsAvailable();
+    // Aggiorna isUntitledBlock se l'intent cambia
+    if (changes['intent'] && !changes['intent'].firstChange) {
+      this.updateIsUntitledBlock();
+    }
   }
 
   private setAgentsAvailable(){
@@ -369,6 +377,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       this.isAgentsAvailable = false;
     }
+  }
+
+  /** updateIsUntitledBlock
+   * Aggiorna la variabile isUntitledBlock basandosi sul nome dell'intent
+   */
+  private updateIsUntitledBlock(){
+    this.isUntitledBlock = this.intent?.intent_display_name?.startsWith(preDisplayName) ?? false;
   }
 
   ngAfterViewInit() {

@@ -107,13 +107,12 @@
   .pic-header {
     display: flex;
     justify-content: space-between;
-    min-height: 30px;
     width: auto;
-    margin: 0px;
-    // position: relative;
-    padding: 0 0px 10px 0px;
+    margin: 0;
+    padding: 0 0 10px 0;
     background-color: var(--intent-header-background);
     overflow: hidden;
+    justify-content: flex-end;
   }
 
   .agents-available {
@@ -630,6 +629,7 @@ cds-panel-intent-header.isStart ::ng-deep{
   justify-content: center;
   align-items: flex-end;
   gap: 5px;
+  height: 33px;
 
   .option {
     display: flex;
