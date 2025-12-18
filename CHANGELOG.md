@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.19-rc8
+- **bug-fix**: do not automatically set TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+- **bug-fix**: reset STT_MODEL and TTS_MODEL while switching from/to elevenlabs/openai for voiceSettings
+
 # 1.39.19-rc7
 - **bug-fix**: hidden connectors should remain hidden if update the arrival block
 - **changed**: do not allow text selection in cds-panel-elements and cds-panel-intent-list
