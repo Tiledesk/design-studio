@@ -19,6 +19,8 @@ export class CDSVoiceSettingsComponent implements OnInit {
 
   @ViewChild('voiceName') voiceNameSelect!: SelectComponent;
   @ViewChild('voiceLanguage') voiceLanguageSelect!: SelectComponent;
+  @ViewChild('ttsModel') ttsModelSelect!: SelectComponent;
+  @ViewChild('sttModel') sttModelSelect!: SelectComponent;
   
   @Input() selectedChatbot: Chatbot;
   @Input() project: Project;
@@ -140,6 +142,8 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.findAndUpdateProperty("TTS_MODEL", null)
         this.findAndUpdateProperty("STT_MODEL", null)
         this.voiceNameSelect?.onResetValue(null)
+        this.ttsModelSelect?.onResetValue(null)
+        this.sttModelSelect?.onResetValue(null)
         this.voiceProvider = event.key
         // this.voiceLanguageSelect.onResetValue(null)
         this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
@@ -165,10 +169,6 @@ export class CDSVoiceSettingsComponent implements OnInit {
       case 'TTS_VOICE_NAME':{
         this.findAndUpdateProperty("TTS_VOICE_NAME", event.voiceId)
         this.voice_name = event.voiceId;
-        if(this.voiceProvider === 'elevenlabs'){
-          this.voice_language = this.selectedElement?.['labels'].language
-          this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", this.voice_language)
-        }
         break;
       };
       case 'TTS_MODEL':{
