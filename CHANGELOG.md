@@ -7,15 +7,23 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
-# this branch
+# 1.39.19-rc7
 - **bug-fix**: hidden connectors should remain hidden if update the arrival block
 - **changed**: do not allow text selection in cds-panel-elements and cds-panel-intent-list
+
+# 1.39.19-rc6
+- **bug-fix**: minor fix on TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+
+# 1.39.19-rc5
+- **bug-fix**: "TTS_VOICE_LANGUAGE" while selecting TTS_VOICE_NAME for elevenlabs voiceProvider
+
+# 1.39.19-rc4
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
+# 1.39.19-rc3
 - **added**: added settings summary in AI action templates and all actions with AISEttings
 - **added**: added tag-replyto in mode preview
 - **added**: added badge on publish button
-- **added**: added badge to count messages arriving in the widget-loq when the panel is closed
-
 
 # 1.39.19-rc2
 - **added**: Added badge to count messages arriving in the widget-loq when the panel is closed
