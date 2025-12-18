@@ -94,6 +94,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   serverBaseURL: any;
   chatbot_id: string;
   isUntitledBlock: boolean = false;
+  isNewChatbot: boolean = false;
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -159,6 +160,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           } else {
             this.formSize = 0;
           }
+
+          // Aggiorna showIntentOptions basandosi su questionCount e formSize
+          this.updateShowIntentOptions();
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
@@ -270,6 +274,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.updateIsUntitledBlock();
+      // Aggiorna showIntentOptions dopo l'inizializzazione
+      this.updateShowIntentOptions();
+      // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
+      this.checkIfNewChatbot();
       this.addEventListener();
       this.setIntentAttributes();
   }
@@ -384,6 +392,55 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    */
   private updateIsUntitledBlock(){
     this.isUntitledBlock = this.intent?.intent_display_name?.startsWith(preDisplayName) ?? false;
+  }
+
+  /** updateShowIntentOptions
+   * Aggiorna showIntentOptions basandosi su questionCount e formSize
+   * showIntentOptions deve essere false se questionCount e formSize sono entrambi == 0
+   */
+  private updateShowIntentOptions(){
+    // Non modificare showIntentOptions se è già stato impostato a false per altri motivi
+    // (es. chatbotSubtype !== CHATBOT, START, WEBHOOK)
+    if(this.showIntentOptions === false){
+      return;
+    }
+    // Imposta a false se questionCount e formSize sono entrambi 0
+    if(this.questionCount === 0 && this.formSize === 0){
+      this.showIntentOptions = false;
+    } else {
+      this.showIntentOptions = true;
+    }
+  }
+
+  /** checkIfNewChatbot
+   * Verifica se il chatbot è stato creato dopo il 01/06/2025
+   * Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
+   * Altrimenti isNewChatbot = true
+   */
+  private checkIfNewChatbot(): void {
+    const cutoffDate = '2025-12-17T00:00:00.000Z';
+    const chatbot = this.dashboardService.selectedChatbot;
+    
+    if (!chatbot || !chatbot.createdAt) {
+      // Se non c'è data di creazione, considera come nuovo chatbot
+      this.isNewChatbot = true;
+      this.logger.log('[CDS-INTENT] checkIfNewChatbot: nessuna data di creazione, impostato a true');
+      return;
+    }
+
+    try {
+      // Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
+      // Altrimenti (successiva o uguale), isNewChatbot = true
+      this.isNewChatbot = chatbot.createdAt >= cutoffDate;
+      this.logger.log('[CDS-INTENT] checkIfNewChatbot:', {
+        createdAt: chatbot.createdAt.toISOString(),
+        isNewChatbot: this.isNewChatbot
+      });
+    } catch (error) {
+      this.logger.error('[CDS-INTENT] checkIfNewChatbot error:', error);
+      // In caso di errore, considera come nuovo chatbot
+      this.isNewChatbot = true;
+    }
   }
 
   ngAfterViewInit() {
@@ -575,6 +632,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       } else {
         this.formSize = 0;
       }
+      // Aggiorna showIntentOptions basandosi su questionCount e formSize
+      this.updateShowIntentOptions();
     } catch (error) {
       this.logger.error("error: ", error);
     }
