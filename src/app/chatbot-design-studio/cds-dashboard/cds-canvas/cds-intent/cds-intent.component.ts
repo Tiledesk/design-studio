@@ -95,7 +95,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   chatbot_id: string;
   isUntitledBlock: boolean = false;
   isNewChatbot: boolean = false;
-  DATE_NEW_CHATBOT = '2024-12-17T00:00:00.000Z';
+  DATE_NEW_CHATBOT = '2025-12-19T00:00:00.000Z';
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
