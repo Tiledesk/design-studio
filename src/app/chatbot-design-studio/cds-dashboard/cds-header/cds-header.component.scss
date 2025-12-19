@@ -141,6 +141,24 @@
 //     margin-right: 0.5px;
 // }
 
+#cds-publish-btn-wrp {
+    position: relative;
+    
+    .publish-badge {
+        position: absolute;
+        top: -5px;
+        right: -3px;
+        background-color: #dc362e;
+        border-radius: 50%;
+        width: 14px;
+        height: 14px;
+        display: block;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+    }
+}
+
 // .custom-mat-icon-btn {
 //     height: 33px;
 //     line-height: 33px;

@@ -174,6 +174,21 @@ mat-expansion-panel ::ng-deep {
         padding: 10px !important;
     }
 
+    .title-and-parameters-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .parameters-preview {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 80px);
+        height: 24px;
+    }
+
 }
 
 cds-select#model-condition ::ng-deep{
@@ -450,17 +465,6 @@ loading-spinner.custom-spinner ::ng-deep {
     color: var(--blu);
 }
 
-// .condition-number2 {
-//     background-color: var(--blu);
-//     color: white;
-//     padding: 4px 12px;
-//     border-radius: 16px;
-//     font-size: 12px;
-//     font-weight: 500;
-//     text-transform: uppercase;
-//     letter-spacing: 0.5px;
-// }
-
 .add-intent-container {
     display: flex;
     justify-content: center;
@@ -514,7 +518,7 @@ loading-spinner.custom-spinner ::ng-deep {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 4px 0;
+    padding: 4px 0 0 0;
     
     .prompt-label {
         font-size: 11px;
