@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 
+- **changed**: Intent block title hidden if "untitled"
+- **changed**: Form button and question button hidden if empty
+- **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
+- **changed**: If the chatbot is new, only one action per intent
+
 # 1.39.19
 - **bug-fix**: bug fix for PDF template selection in WhatsApp send action
 

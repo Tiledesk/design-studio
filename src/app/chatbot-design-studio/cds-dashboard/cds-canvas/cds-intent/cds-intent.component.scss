@@ -740,3 +740,27 @@ cds-panel-intent-header.isStart ::ng-deep{
   }
 }
 
+/** SLIM INTENT **/
+.tds-slim-intent {
+  padding: 2px;
+  .pic-header {
+    padding: 0px;
+  }
+  .pic-title-text {
+    padding: 4px 8px 10px;
+  }
+  .footer-intent{
+    min-height: 0px;
+    margin: 0;
+  }
+  .tds-drop-element {
+    position: absolute;
+    height: 30px;
+    width: calc(100% - 4px);
+    z-index: 1;
+    cursor: move;
+  }
+
+}
+
+

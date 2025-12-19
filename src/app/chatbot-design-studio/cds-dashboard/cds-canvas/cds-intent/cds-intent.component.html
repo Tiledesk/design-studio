@@ -1,9 +1,10 @@
-
+<!-- dragDisabled: true -->
 <div #resizeElement class="panel-intent-content tds_draggable"
     (mousedown)="onIntentMouseDown($event)"
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     [class.isStart]="isStart" 
+    [class.tds-slim-intent]="isNewChatbot"
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{
         'background-color': 'rgba('+intent.attributes.color+', 0.35)',
@@ -31,6 +32,8 @@
         class="pic-header" 
         [ngClass]="{'cds-start': isStart}">
 
+
+
         <cds-panel-intent-header *ngIf="!isUntitledBlock" 
             class="pic-title-text tds_draggable" 
             [class.isStart]="isStart"
@@ -39,7 +42,6 @@
             (click)="onOptionClicked($event)">
         </cds-panel-intent-header>
 
-        <!-- <div *ngIf="isNewChatbot">NUOVO CHATBOT</div> -->
 
         
         <div *ngIf="showIntentOptions" class="cds-intent-options tds_draggable">
@@ -67,7 +69,7 @@
         </cds-action-intent>
     </div>
 
-        <div *ngIf="!isStart" class="actions-list-wpr"  
+    <div *ngIf="!isStart" class="actions-list-wpr"
         cdkDropList
         [cdkDropListData]="listOfActions"
         [cdkDropListDisabled]="isNewChatbot"
@@ -102,6 +104,8 @@
                 </button> -->
             </div>
         </div>
+
+        <div *ngIf="isNewChatbot" class="tds-drop-element tds_draggable"></div>
 
         <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
             cdkDrag

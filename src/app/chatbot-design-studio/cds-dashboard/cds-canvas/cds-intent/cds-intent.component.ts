@@ -95,6 +95,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   chatbot_id: string;
   isUntitledBlock: boolean = false;
   isNewChatbot: boolean = false;
+  DATE_NEW_CHATBOT = '2024-12-17T00:00:00.000Z';
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -421,7 +422,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     
     //this.isNewChatbot = false;
     //return;
-    const cutoffDate = '2025-12-17T00:00:00.000Z';
+    const cutoffDate = this.DATE_NEW_CHATBOT;
     const chatbot = this.dashboardService.selectedChatbot;
     this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot.createdAt);
 
