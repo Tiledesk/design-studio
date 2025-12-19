@@ -79,7 +79,7 @@
                 {{ 'CDSSetting.TextToSpeechModel' | translate }}
             </label>
             <div style="width: 40%;">
-                <cds-select id="text-condition" 
+                <cds-select id="text-condition" #ttsModel
                     [items]="tts_model_list" 
                     [bindLabelSelect]="'name'"
                     [bindValueSelect]="'model'"
@@ -102,7 +102,7 @@
                 {{ 'CDSSetting.SpeechToTextModel' | translate }}
             </label>
             <div style="width: 40%;">
-                <cds-select id="text-condition" 
+                <cds-select id="text-condition" #sttModel
                     [items]="stt_model_list" 
                     [bindLabelSelect]="'name'"
                     [bindValueSelect]="'model'"
