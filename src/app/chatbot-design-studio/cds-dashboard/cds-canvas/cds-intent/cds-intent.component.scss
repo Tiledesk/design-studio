@@ -321,7 +321,8 @@
 
 
 .cds-no-featured-action {
-  background-color: var(--action-no-featured-backgroud);
+  // background-color: var(--action-no-featured-backgroud);
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 
@@ -754,13 +755,17 @@ cds-panel-intent-header.isStart ::ng-deep{
     margin: 0;
   }
   .tds-drop-element {
-    position: absolute;
-    height: 30px;
     width: calc(100% - 4px);
-    z-index: 1;
-    cursor: move;
   }
 
+}
+
+.tds-drop-element {
+  position: absolute;
+  height: 30px;
+  width: calc(100% - 20px);
+  z-index: 1;
+  cursor: move;
 }
 
 
