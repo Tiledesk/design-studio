@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.19-rc11 
+- **added**: added tag-replyto in mode preview ai condition and ask kb
+- **bug-fix**: change link "learn more" ai condition
+
+
 # 1.39.19-rc10 
 - **changed**: Intent block title hidden if "untitled"
 - **changed**: Form button and question button hidden if empty
