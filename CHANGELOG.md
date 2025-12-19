@@ -7,12 +7,55 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.19-rc8
+- **bug-fix**: do not automatically set TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+- **bug-fix**: reset STT_MODEL and TTS_MODEL while switching from/to elevenlabs/openai for voiceSettings
 
+# 1.39.19-rc7
+- **bug-fix**: hidden connectors should remain hidden if update the arrival block
+- **changed**: do not allow text selection in cds-panel-elements and cds-panel-intent-list
+
+# 1.39.19-rc6
+- **bug-fix**: minor fix on TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+
+# 1.39.19-rc5
+- **bug-fix**: "TTS_VOICE_LANGUAGE" while selecting TTS_VOICE_NAME for elevenlabs voiceProvider
+
+# 1.39.19-rc4
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
+# 1.39.19-rc3
+- **added**: added settings summary in AI action templates and all actions with AISEttings
+- **added**: added tag-replyto in mode preview
+- **added**: added badge on publish button
+
+# 1.39.19-rc2
+- **added**: Added badge to count messages arriving in the widget-loq when the panel is closed
+- **changed**: intent block title hidden if "untitled"
+- **changed**: hidden form button and question button if they are empty 
+- **added**: added badge to count messages arriving in the widget-loq when the panel is closed
+
+# 1.39.19-rc1
+- **added**: description on elevenlabs voices 
+
+# 1.39.18
+- **bug-fix**: Fixed display of iframe URL in action playback
+
+# 1.39.18-rc2
+- **bug-fix**: css bug fix content-frame
 
 # 1.39.18-rc1
 - **bug-fix**: fixed handling of iframe URL in action replay
 
 # 1.39.17
+- **added**: added the ability to put notes on the stage
+
+# 1.39.16
+- **added**: pipe find to show namespace name in action ask-kb-v2
+- **bug-fix**: show 'Re-ranking' option in action ask-kb-v2
+
+# 1.39.15
+- **bug-fix**: cannot able to update key or value in action lead_update
 
 # 1.39.15-rc3
 - **bug-fix**: update resizing note
@@ -45,6 +88,7 @@
 # 1.39.14-rc1
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
+
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management

@@ -19,6 +19,8 @@ export class CDSVoiceSettingsComponent implements OnInit {
 
   @ViewChild('voiceName') voiceNameSelect!: SelectComponent;
   @ViewChild('voiceLanguage') voiceLanguageSelect!: SelectComponent;
+  @ViewChild('ttsModel') ttsModelSelect!: SelectComponent;
+  @ViewChild('sttModel') sttModelSelect!: SelectComponent;
   
   @Input() selectedChatbot: Chatbot;
   @Input() project: Project;
@@ -68,13 +70,13 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value
     this.voice_name = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_VOICE_NAME')?.value
     this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
-    this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+    this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
     this.voice_language = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code
 
     if(this.voiceProvider === 'openai' || this.voiceProvider === 'elevenlabs'){
-      this.tts_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
-      this.stt_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
-      this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
+      this.tts_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+      this.stt_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, type: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
+      this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, type: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
     }
 
     if(this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals){
@@ -97,7 +99,9 @@ export class CDSVoiceSettingsComponent implements OnInit {
               preview_url: voice.preview_url,
               name: voice.name, 
               type: 'standard',
-              status: 'active'
+              status: 'active',
+              description: voice.description,
+              labels: { ...voice.labels }
             });
           }
         });
@@ -138,15 +142,17 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.findAndUpdateProperty("TTS_MODEL", null)
         this.findAndUpdateProperty("STT_MODEL", null)
         this.voiceNameSelect?.onResetValue(null)
+        this.ttsModelSelect?.onResetValue(null)
+        this.sttModelSelect?.onResetValue(null)
         this.voiceProvider = event.key
         // this.voiceLanguageSelect.onResetValue(null)
         this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
         this.voice_name_list = [];
-        // this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''} (${el.language_code})` }))
+        // this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''} (${el.language_code})` }))
         if(event && (event.key === 'openai' || event.key === 'elevenlabs')){
-          this.tts_model_list = voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
-          this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
-          this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+          this.tts_model_list = voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+          this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+          this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
 
           this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
           this.voiceLanguageSelect?.onResetValue(null)
@@ -157,8 +163,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
       case 'TTS_VOICE_LANGUAGE':{
         this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", event.language_code)
         this.voice_language = event.language_code;
-        this.voice_name_list = this.voiceProvider === 'twilio'? voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code).map(el => ({ ...el, description: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` })) : voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice
-        
+        this.voice_name_list = this.voiceProvider === 'twilio'? voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code).map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` })) : voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice
         break;
       };
       case 'TTS_VOICE_NAME':{
@@ -267,6 +272,11 @@ export class CDSVoiceSettingsComponent implements OnInit {
   get selectedPreviewUrl(): string | null {
     const selectedVoice = this.voice_name_list.find(voice => voice.voiceId === this.voice_name);
     return selectedVoice ? selectedVoice.preview_url : null;
+  }
+
+  get selectedElement(): Object | null {
+    const selectedVoice = this.voice_name_list.find(voice => voice.voiceId === this.voice_name);
+    return selectedVoice ? selectedVoice : null;
   }
 
   togglePlay(): void {

@@ -24,7 +24,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 // Utility e costanti
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, isValidColor, areValidIds, findActionKey, addCssClassToElement, removeCssClassFromElement, calculateQuestionCount, calculateFormSize } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX,replaceItemInArrayForKey, checkInternalIntent, isValidColor, areValidIds, findActionKey, addCssClassToElement, removeCssClassFromElement, calculateQuestionCount, calculateFormSize } from 'src/app/chatbot-design-studio/utils';
 
 // =============================
 // ENUM
@@ -210,6 +210,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Logger centralizzato */
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
+
   // ----------- COSTRUTTORE -----------
   constructor(
     public intentService: IntentService,
@@ -339,9 +340,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Inizializza il componente intent con tutte le configurazioni necessarie.
    * Gestisce webhook, tipi speciali di intent (start, fallback), e configurazione iniziale.
    */
+  // async ngOnInit(): Promise<void> {
+  //     this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
+  //     if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
+  //       this.showIntentOptions = false;
+  //     } 
+  // }
+
+
   async ngOnInit(): Promise<void> {
-      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
-    
+    this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
+    if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
+      this.showIntentOptions = false;
+    } 
     // --- Configurazione opzioni intent in base al tipo chatbot ---
     this.configureIntentOptions();
     
@@ -360,13 +371,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.setupEventListenersAndAttributes();
   }
 
+
   /**
    * Configura le opzioni dell'intent in base al tipo di chatbot
    */
   private configureIntentOptions(): void {
     if (this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT) {
         this.showIntentOptions = false;
-      } 
+    } 
   }
 
   /**
@@ -824,6 +836,25 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.listOfActions = null;
     this.formSize = 0;
     this.questionCount = 0;
+    try {
+      if (this.intent) {
+        // document.documentElement.style.setProperty('--intent-color', `rgba(${this.intentColor}, 1)`);
+        /** // this.patchAllActionsId(); */
+        this.patchAttributesPosition();
+        this.listOfActions = this.intent.actions;
+        if (this.intent.question) {
+          const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
+          this.questionCount = question_segment.length;
+        }
+      }
+      if (this.intent?.form && (this.intent.form !== null)) {
+        this.formSize = Object.keys(this.intent.form).length;
+      } else {
+        this.formSize = 0;
+      } 
+    } catch (error) {
+      this.logger.error("error: ", error);
+    }
   }
 
   /**

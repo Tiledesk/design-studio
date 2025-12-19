@@ -3,7 +3,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { IntentService } from '../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { INTENT_COLORS, RESERVED_INTENT_NAMES, preDisplayName } from '../../../../utils';
+import { INTENT_COLORS, RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX } from '../../../../utils';
 
 @Component({
   selector: 'cds-panel-intent-header',
@@ -95,7 +95,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   /** checkIntentName */
   private checkIntentName(name: string) {
     this.intentNameAlreadyExist = false;
-    if(!this.intentName || this.intentName.trim().length == 0 || this.intentName === preDisplayName) {
+    if(!this.intentName || this.intentName.trim().length == 0 || this.intentName === UNTITLED_BLOCK_PREFIX) {
       return false;
     }
     for (const element of this.listOfIntents) {

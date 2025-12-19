@@ -32,7 +32,7 @@
                         [items]="voice_language_list" 
                         [bindLabelSelect]="'language'"
                         [bindValueSelect]="'language_code'" 
-                        [optionalBindAdditionalText]="'description'"
+                        [optionalBindAdditionalText]="'type'"
                         [itemSelected]="voice_language" 
                         [placeholder]="'CDSSetting.SelectAnOption' | translate"
                         [clearable]="true" 
@@ -51,7 +51,8 @@
                         [items]="voice_name_list" 
                         [bindLabelSelect]="'name'"
                         [bindValueSelect]="'voiceId'" 
-                        [optionalBindAdditionalText]="'description'"
+                        [optionalBindAdditionalText]="'type'"
+                        [optionalBindDescription]="'description'"
                         [itemSelected]="voice_name" 
                         [placeholder]="'CDSSetting.SelectAnOption' | translate"
                         [clearable]="true" 
@@ -78,7 +79,7 @@
                 {{ 'CDSSetting.TextToSpeechModel' | translate }}
             </label>
             <div style="width: 40%;">
-                <cds-select id="text-condition" 
+                <cds-select id="text-condition" #ttsModel
                     [items]="tts_model_list" 
                     [bindLabelSelect]="'name'"
                     [bindValueSelect]="'model'"
@@ -101,7 +102,7 @@
                 {{ 'CDSSetting.SpeechToTextModel' | translate }}
             </label>
             <div style="width: 40%;">
-                <cds-select id="text-condition" 
+                <cds-select id="text-condition" #sttModel
                     [items]="stt_model_list" 
                     [bindLabelSelect]="'name'"
                     [bindValueSelect]="'model'"
