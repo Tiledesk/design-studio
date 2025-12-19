@@ -284,7 +284,6 @@
   border-radius: 8px;
   background-color: white;
   box-shadow: rgba(19, 33, 68, 0.01) 0px 1px 3px 1px, rgba(19, 33, 68, 0.12) 0px 5px 8px -8px, rgba(19, 33, 68, 0.12) 0px 2px 4px -3px, rgba(19, 33, 68, 0.03) 0px 0px 0px 1px;
-  overflow: hidden;
   transition: height 0.15s ease 0s;
   border: 2px solid var(--gray-02);
   display: flex;
@@ -297,13 +296,32 @@
     text-align: center;
     cursor: pointer;
     border-radius: 6px;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     .box-img {
       width: 24px;
       height: 24px;
+    }
+    .unread-badge {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      background-color: #dc362e;
+      color: white;
+      border-radius: 10px;
+      min-width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 0 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      z-index: 1;
     }
   }
   .cds-box-button:hover, 
