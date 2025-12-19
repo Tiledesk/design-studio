@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.20
+- **bug-fix**: sorted the list of intents in the intent selection select
+
+# 1.39.19
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
 # 1.39.18
 - **bug-fix**: Fixed display of iframe URL in action playback
 
