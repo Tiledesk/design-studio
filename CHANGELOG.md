@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # this branch
+- **bug-fix**: sorted the list of intents in the intent selection select
 - **bug-fix**: fixed handling of iframe URL in action replay
 - **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
 - **bug-fix**: added the "globals" variables created in the DS to the variable list
