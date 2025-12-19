@@ -1290,6 +1290,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   async onActionDrop(event: CdkDragDrop<string[]>): Promise<void> {
     this.logger.log('[CDS-INTENT] onActionDrop - event:', event, 'actions:', this.intent.actions);
     
+    // Se è un nuovo chatbot e l'intent ha già almeno un'azione, non permettere il drop
+    if (this.isNewChatbot && this.listOfActions?.length > 0 && event.previousContainer !== event.container) {
+      this.logger.log('[CDS-INTENT] onActionDrop - Drop negato: isNewChatbot è true e l\'intent ha già un\'azione');
+      return;
+    }
+    
     // Chiude tutti i pannelli e seleziona l'intent
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
@@ -1447,11 +1453,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * Predicato per determinare se un elemento può essere inserito nella drop list
-   * @param action - L'azione per cui verificare la possibilità di inserimento
-   * @returns Funzione che restituisce sempre true (tutti gli elementi possono essere inseriti)
+   * @param intent - L'intent per cui verificare la possibilità di inserimento
+   * @returns Funzione che restituisce false se isNewChatbot è true e l'intent ha già un'azione
    */
-  onDropListEnterCheck(action: any): (item: CdkDrag<any>) => boolean {
+  onDropListEnterCheck(intent: any): (item: CdkDrag<any>) => boolean {
     return (item: CdkDrag<any>): boolean => {
+      // Se è un nuovo chatbot e l'intent ha già almeno un'azione, non permettere il drop
+      if (this.isNewChatbot && this.listOfActions?.length > 0) {
+        this.logger.log('[CDS-INTENT] onDropListEnterCheck - Drop negato: isNewChatbot è true e l\'intent ha già un\'azione');
+        return false;
+      }
       return true;
     };
   }
@@ -1530,6 +1541,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    */
   private async handleExternalDrop(event: CdkDragDrop<string[]>): Promise<void> {
     try {
+      // Se è un nuovo chatbot e l'intent ha già almeno un'azione, non permettere il drop
+      if (this.isNewChatbot && this.listOfActions?.length > 0) {
+        this.logger.log('[CDS-INTENT] handleExternalDrop - Drop negato: isNewChatbot è true e l\'intent ha già un\'azione');
+        return;
+      }
+      
       const action: any = event.previousContainer.data[event.previousIndex];
       
       if (event.previousContainer.data.length > 0) {
