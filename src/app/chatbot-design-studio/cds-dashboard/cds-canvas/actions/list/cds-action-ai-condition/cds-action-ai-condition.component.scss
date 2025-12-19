@@ -60,7 +60,21 @@ div {
         padding: 5px 10px;
         background-color: #ecb606;
         color: white;
-
+    }
+    div.tag-replyto {
+        display: flex;
+        width: fit-content;
+        border-radius: 4px;
+        font-size: 10px;
+        margin: 3px;
+        height: -moz-fit-content;
+        height: fit-content;
+        padding: 0px 6px;
+        max-width: calc(100% - 25px);
+        background-color: var(--blu);
+        color: var(--color-white-hex);
+        flex-wrap: nowrap;
+        text-align: end;
     }
 }
 
