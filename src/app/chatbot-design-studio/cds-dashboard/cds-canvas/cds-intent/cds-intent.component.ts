@@ -210,10 +210,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Logger centralizzato */
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
-  /** Check if intent display name starts with untitled_block_ */
-  get isUntitledBlock(): boolean {
-    return this.intent?.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX) ?? false;
-  }
 
   // ----------- COSTRUTTORE -----------
   constructor(
@@ -855,10 +851,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.formSize = Object.keys(this.intent.form).length;
       } else {
         this.formSize = 0;
-      }
-
-      if(this.questionCount === 0 && this.formSize === 0){  
-        this.showIntentOptions = false;
       } 
     } catch (error) {
       this.logger.error("error: ", error);
