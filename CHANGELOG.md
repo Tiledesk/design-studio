@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 # this branch
+- **added**: added tag-replyto in mode preview ai condition and ask kb
+- **bug-fix**: change link "learn more" ai condition
 - **bug-fix**: hidden connectors should remain hidden if update the arrival block
 - **changed**: do not allow text selection in cds-panel-elements and cds-panel-intent-list
 - **added**: added settings summary in AI action templates and all actions with AISEttings
