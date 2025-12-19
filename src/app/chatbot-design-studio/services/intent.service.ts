@@ -690,6 +690,30 @@ export class IntentService {
 
   // START ACTION FUNCTIONS //
 
+  /** updateIntentDisplayNameInRealTime
+   * Aggiorna il display name dell'intent in tempo reale nell'UI senza salvare sul server
+   * Best practice: optimistic UI update per migliorare l'UX
+   */
+  public updateIntentDisplayNameInRealTime(intent: Intent): void {
+    if (!intent || !intent.intent_id) {
+      return;
+    }
+    
+    // Aggiorna l'intent nell'array listOfIntents
+    this.listOfIntents = replaceItemInArrayForKey('intent_id', this.listOfIntents, intent);
+    
+    // Aggiorna anche intentSelected se è lo stesso intent
+    if (this.intentSelected && this.intentSelected.intent_id === intent.intent_id) {
+      this.intentSelected.intent_display_name = intent.intent_display_name;
+    }
+    
+    // Emetti l'aggiornamento per aggiornare la preview (cds-intent component)
+    this.behaviorIntent.next(intent);
+    
+    // Emetti l'aggiornamento per aggiornare la lista (panel-intent-list component)
+    this.refreshIntents();
+  }
+
   /** update title of intent */
   public async changeIntentName(intent){
     // setTimeout(async () => {

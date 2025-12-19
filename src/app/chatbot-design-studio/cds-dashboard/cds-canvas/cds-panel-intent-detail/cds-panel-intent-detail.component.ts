@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TranslateService } from '@ngx-translate/core';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
@@ -11,6 +11,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { PanelIntentHeaderComponent } from '../cds-intent/panel-intent-header/panel-intent-header.component';
 
 const swal = require('sweetalert');
 
@@ -19,8 +20,9 @@ const swal = require('sweetalert');
   templateUrl: './cds-panel-intent-detail.component.html',
   styleUrls: ['./cds-panel-intent-detail.component.scss']
 })
-export class CdsPanelIntentDetailComponent implements OnInit {
+export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   @ViewChild('tooltip') tooltip: MatTooltip;
+  @ViewChild(PanelIntentHeaderComponent) panelIntentHeader: PanelIntentHeaderComponent;
   @Input() intent: Intent;
   @Output() savePanelIntentDetail = new EventEmitter();
   @Output() closePanel = new EventEmitter();
@@ -62,10 +64,23 @@ export class CdsPanelIntentDetailComponent implements OnInit {
       this.initializeWebhook();
     } 
   }
+
+  ngAfterViewInit(): void {
+    // Metti il focus sull'input del nome intent quando il pannello si apre
+    if (this.panelIntentHeader) {
+      this.panelIntentHeader.focusInput();
+    }
+  }
     
 
   ngOnChanges(changes: SimpleChanges): void {
     this.logger.log('[CdsPanelIntentDetailComponent] changes: ', changes)
+    // Se l'intent cambia, rimetti il focus sull'input
+    // if (changes['intent'] && !changes['intent'].firstChange && this.panelIntentHeader) {
+    //   setTimeout(() => {
+    //     this.panelIntentHeader.focusInput();
+    //   }, 0);
+    // }
   }
 
 

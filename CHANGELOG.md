@@ -7,6 +7,16 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.19-rc10 
+- **changed**: Intent block title hidden if "untitled"
+- **changed**: Form button and question button hidden if empty
+- **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
+- **changed**: If the chatbot is new, only one action per intent
+
+# 1.39.19
+# 1.39.19-rc9
+- **bug-fix**: sorted the listOfIntents in the intent selection select
+
 # 1.39.19-rc8
 - **bug-fix**: do not automatically set TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
 - **bug-fix**: reset STT_MODEL and TTS_MODEL while switching from/to elevenlabs/openai for voiceSettings

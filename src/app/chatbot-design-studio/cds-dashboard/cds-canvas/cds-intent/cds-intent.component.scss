@@ -126,7 +126,6 @@
     padding: 0 0 10px 0;
     background-color: var(--intent-header-background);
     overflow: hidden;
-
     justify-content: flex-end;
   }
 
@@ -297,7 +296,8 @@
 }
 
 .cds-no-featured-action {
-  background-color: var(--action-no-featured-backgroud);
+  // background-color: var(--action-no-featured-item-background);
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 .footer-intent {
@@ -552,6 +552,7 @@ cds-panel-intent-header.isStart ::ng-deep {
   justify-content: center;
   align-items: flex-end;
   gap: 5px;
+  height: 33px;
   min-height: 33px;
   .option {
     display: flex;
@@ -656,4 +657,32 @@ cds-panel-intent-header.isStart ::ng-deep {
     --outline-angle: -1turn;
   }
 }
+
+/** SLIM INTENT **/
+.tds-slim-intent {
+  padding: 2px;
+  .pic-header {
+    padding: 0px;
+  }
+  .pic-title-text {
+    padding: 4px 8px 10px;
+  }
+  .footer-intent{
+    min-height: 0px;
+    margin: 0;
+  }
+  .tds-drop-element {
+    width: calc(100% - 4px);
+  }
+
+}
+
+.tds-drop-element {
+  position: absolute;
+  height: 30px;
+  width: calc(100% - 20px);
+  z-index: 1;
+  cursor: move;
+}
+
 

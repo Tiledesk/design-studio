@@ -120,6 +120,7 @@ export enum TYPE_INTENT_NAME {
     CLOSE              = "close"
 }
 
+
 export enum TYPE_MATH_OPERATOR {
     addAsNumber         = "addAsNumber",
     addAsString         = "addAsString",
