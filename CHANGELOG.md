@@ -14,8 +14,6 @@
 - **added**: added tag-replyto in mode preview
 - **added**: added badge on publish button
 - **added**: added badge to count messages arriving in the widget-loq when the panel is closed
-- **changed**: intent block title hidden if "untitled"
-- **changed**: hidden form button and question button if they are empty 
 
 
 # 1.39.18
