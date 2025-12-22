@@ -1,21 +1,15 @@
 .action-connector {
-    cursor: pointer;
-    pointer-events: auto;
+
     z-index: 2;
     display: flex;
-    -webkit-box-align: center;
     align-items: center;
     align-self: center;
-    justify-content: center;
+    justify-content: flex-start;
     margin: 0;
-    position: absolute;
-    border: 1px solid;
-    background: #ffffff;
     color: rgb(168, 168, 174);
-    width: 18px;
+    width: 100%;
     height: 18px;
-    box-shadow: none;
-    border-radius: 50%;
+    position: absolute;
     left: -8px;
     top: -8px;
 }
@@ -23,4 +17,57 @@
 .label-connector{
     color: #7485ae;
     font-size: 10px;
+    cursor: pointer;
+    pointer-events: auto;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    align-self: center;
+    justify-content: center;
+    margin: 0;
+    border: 1px solid;
+    background: #ffffff;
+    color: rgb(168, 168, 174);
+    width: 18px;
+    height: 18px;
+    box-shadow: none;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.connector-in-menu {
+    display: none;
+    position: absolute;
+    right: calc(100% - 4px);
+    top: 1px;
+    margin-right: 0;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    outline: 1px solid rgb(230, 230, 230);
+    z-index: 0;
+    width: max-content;
+    overflow: hidden;
+
+    .menu-item {
+        padding: 4px 16px 4px 6px;
+        font-size: 10px;
+        color: var(--blu);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid rgb(240, 240, 240);
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    }
+}
+
+.action-connector:hover .connector-in-menu,
+.connector-in-menu:hover {
+    display: flex;
 }
