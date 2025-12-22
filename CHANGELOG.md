@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 # this branch
+- **changed**: sorted the list of Intents in alphabetical order
+- **added**: added the LLM model gpt-5.2
 - **bug-fix**: Fixed bug when changing the height of iframe
 
 - **added**: added tag-replyto in mode preview ai condition and ask kb

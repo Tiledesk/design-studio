@@ -8,7 +8,7 @@ import { IntentService } from '../../../services/intent.service';
 import { Intent } from 'src/app/models/intent-model';
 
 // UTILS //
-import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX } from '../../../utils';
+import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME } from '../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -110,6 +110,13 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DEFAULT_FALLBACK, 1);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.CLOSE, 2);
 
+    // Ordina gli intent in ordine alfabetico crescente
+    this.defaultIntents = this.defaultIntents.sort((a, b) => {
+      const nameA = a.intent_display_name?.toLowerCase() || '';
+      const nameB = b.intent_display_name?.toLowerCase() || '';
+      return nameA.localeCompare(nameB);
+    });
+
     this.filteredIntents = this.defaultIntents;
     if(!this.defaultIntents || this.defaultIntents.length == 0){
       this.intentService.setDefaultIntentSelected();
@@ -145,9 +152,12 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   /** Search a block... */
   onLiveSearch(text: string) {
     this.filteredIntents = this.defaultIntents.filter(element => 
-      element.intent_display_name.toLowerCase().includes(text.toLowerCase()) && 
-      !element.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX)
-    );
+      element.intent_display_name.toLowerCase().includes(text.toLowerCase())
+    ).sort((a, b) => {
+      const nameA = a.intent_display_name?.toLowerCase() || '';
+      const nameB = b.intent_display_name?.toLowerCase() || '';
+      return nameA.localeCompare(nameB);
+    });
   }
 
   /** onSelectIntent */
