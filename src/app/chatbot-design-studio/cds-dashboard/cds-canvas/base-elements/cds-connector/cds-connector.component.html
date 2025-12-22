@@ -8,8 +8,14 @@
         <div connector *ngIf="isConnected" [id]="idConnector" [attr.idConnection]="idConnection" class="point-connector"></div>
     </div>
 
-    <div [id]="idContractConnector" class="block-contract-connector" [style.display]="displayConnector" (click)="restoreDefaultConnector($event)" (mouseenter)="showConnectorDefault($event)" (mouseleave)="hideConnectorDefault($event)">
+    <div [id]="idContractConnector" class="block-contract-connector" [style.display]="displayConnector" 
+        (mouseenter)="showConnectorDefault($event)" 
+        (mouseleave)="hideConnectorDefault($event)">
         <em class="connector-line material-icons-outlined">trending_flat</em><span class="connector-to-intent">{{intent_display_name}}</span>
+        <div class="connector-text-menu">
+            <div class="menu-item" (click)="onRestoreConnector($event)">restore connector</div>
+            <div class="menu-item" (click)="onGoToIntent($event)">go to action</div>
+        </div>
     </div>
     
 </div>

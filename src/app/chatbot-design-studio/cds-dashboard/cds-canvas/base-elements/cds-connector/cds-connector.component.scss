@@ -116,6 +116,12 @@
     opacity: 1;
     margin-left: -4px;
     cursor: pointer;
+    position: relative;
+
+    &:hover {
+        padding-bottom: 4px;
+        margin-bottom: -4px;
+    }
 }
 
 .connector-line {
@@ -139,4 +145,43 @@
     border-radius: 6px;
     margin: 0px;
     align-items: center;
+}
+
+.connector-text-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 22px;
+    margin-top: 0;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    outline: 1px solid rgb(230, 230, 230);
+    z-index: 1;
+    width: max-content;
+    overflow: hidden;
+
+    .menu-item {
+        padding: 4px 6px;
+        font-size: 10px;
+        color: var(--blu);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid rgb(240, 240, 240);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    }
+}
+
+.block-contract-connector:hover .connector-text-menu,
+.block-contract-connector:hover .connector-text-menu:hover,
+.connector-text-menu:hover {
+    display: flex;
 }
