@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 # this branch
+- **bug-fix**: Fixed bug when changing the height of iframe
+
 - **added**: added tag-replyto in mode preview ai condition and ask kb
 - **bug-fix**: change link "learn more" ai condition
 - **bug-fix**: hidden connectors should remain hidden if update the arrival block
