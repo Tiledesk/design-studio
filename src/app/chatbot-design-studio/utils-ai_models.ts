@@ -446,6 +446,14 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     max_output_tokens: 128000
   },
   {
+    name: "Gpt-5.2",
+    value: "gpt-5.2",
+    description: "TYPE_GPT_MODEL.gpt-5.2.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 128000
+  },
+  {
     name: "Gpt-5",
     value: "gpt-5",
     description: "TYPE_GPT_MODEL.gpt-5.description",

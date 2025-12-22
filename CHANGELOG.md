@@ -28,6 +28,10 @@
 - **bug-fix**: reset STT_MODEL and TTS_MODEL while switching from/to elevenlabs/openai for voiceSettings
 
 # this branch
+- **changed**: sorted the list of Intents in alphabetical order
+- **added**: added the LLM model gpt-5.2
+- **bug-fix**: Fixed bug when changing the height of iframe
+
 - **added**: added tag-replyto in mode preview ai condition and ask kb
 - **bug-fix**: change link "learn more" ai condition
 - **bug-fix**: hidden connectors should remain hidden if update the arrival block
