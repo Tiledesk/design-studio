@@ -8,6 +8,13 @@
 *Tiledesk SRL*
 
 
+
+# 1.39.21-rc1
+- **changed**: sorted the list of Intents in alphabetical order
+- **added**: added the LLM model gpt-5.2
+- **bug-fix**: Fixed bug when changing the height of iframe
+
+
 # 1.39.19-rc12 
 - **added**: added tag-replyto in mode preview ai condition and ask kb
 - **bug-fix**: change link "learn more" ai condition
