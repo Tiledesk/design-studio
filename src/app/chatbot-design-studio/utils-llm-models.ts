@@ -242,6 +242,7 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmMod
 
   // Set token multiplier for each model
   const ai_models = loadTokenMultiplier(appConfigService.getConfig().aiModels);
+  logger.log(`[${componentName}] ai_models:`, ai_models);
   llm_models_flat.forEach(model => {
     if (ai_models[model.model]) {
       (model as LlmModel).multiplier = ai_models[model.model].toString() + ' x tokens';

@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.21
+- **added**: added the LLM model gpt-5.2
+
 # 1.39.20
 - **bug-fix**: sorted the list of intents in the intent selection select
 

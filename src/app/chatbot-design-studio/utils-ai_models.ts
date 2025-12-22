@@ -438,6 +438,14 @@ export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:st
 
 export var OPENAI_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number}> = [
   {
+    name: "Gpt-5.2",
+    value: "gpt-5.2",
+    description: "TYPE_GPT_MODEL.gpt-5.2.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 128000
+  },
+  {
     name: "Gpt-5.1",
     value: "gpt-5.1",
     description: "TYPE_GPT_MODEL.gpt-5.1.description",
