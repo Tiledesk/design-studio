@@ -7,11 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+# 1.39.22
 - **changed**: sorted the list of Intents in alphabetical order
 - **added**: added the LLM model gpt-5.2
 - **bug-fix**: Fixed bug when changing the height of iframe
-
 - **added**: added tag-replyto in mode preview ai condition and ask kb
 - **bug-fix**: change link "learn more" ai condition
 - **bug-fix**: hidden connectors should remain hidden if update the arrival block
@@ -21,6 +20,14 @@
 - **added**: added badge on publish button
 - **added**: added badge to count messages arriving in the widget-loq when the panel is closed
 
+# 1.39.21
+- **added**: added the LLM model gpt-5.2
+
+# 1.39.20
+- **bug-fix**: sorted the list of intents in the intent selection select
+
+# 1.39.19
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
 
 # 1.39.18
 - **bug-fix**: Fixed display of iframe URL in action playback
