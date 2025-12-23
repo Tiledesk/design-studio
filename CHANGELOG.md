@@ -8,10 +8,10 @@
 *Tiledesk SRL*
 
 
-# this branch
+
+# 1.39.23-rc1
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
-
 
 # 1.39.21
 - **added**: added the LLM model gpt-5.2
