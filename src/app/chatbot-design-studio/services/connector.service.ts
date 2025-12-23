@@ -1574,6 +1574,7 @@ export class ConnectorService {
     this.setDisplayElementById('contract_' + idConnector, 'none');
     // const connector = {id:idConnector, display:true};
     // this.subjectChangedConnectorAttributes.next(connector);
+    this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
   }
 
   showContractConnector(idConnection: string){
@@ -1582,6 +1583,7 @@ export class ConnectorService {
     this.setDisplayElementById('contract_' + idConnector, 'flex');
     // const connector = {id:idConnector, display:false};
     // this.subjectChangedConnectorAttributes.next(connector);
+    this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
   }
 
 
