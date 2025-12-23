@@ -7,10 +7,18 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# this branch
+- **added**: added connector-in-menu to display the list of blocks connected to the input
+- **added**: added menu on contract-connector to reset connector and move on connector
+
+
 # 1.39.21
 - **added**: added the LLM model gpt-5.2
 
 # 1.39.21-rc1
+
+# 1.39.22
 - **changed**: sorted the list of Intents in alphabetical order
 - **added**: added the LLM model gpt-5.2
 - **bug-fix**: Fixed bug when changing the height of iframe
