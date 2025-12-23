@@ -44,6 +44,7 @@ export class ConnectorService {
   mapOfConnectors: any = {};
   scale: number = 1;
   existingIntentIds: any;
+
   
   // Coda per connettori che hanno fallito il rendering
   private failedConnectorsQueue: Array<{intent: any, fromId: string, toId: string, attributes: any, retryCount: number}> = [];
@@ -1710,6 +1711,9 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // const connector = {id:idConnector, display:true};
     // this.subjectChangedConnectorAttributes.next(connector);
     this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
+    
+    // Notifica gli observer del cambiamento
+    this.notifyConnectorsChanged(idConnection);
   }
 
   showContractConnector(idConnection: string){
@@ -1719,6 +1723,24 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // const connector = {id:idConnector, display:false};
     // this.subjectChangedConnectorAttributes.next(connector);
     this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
+    
+    // Notifica gli observer del cambiamento
+    this.notifyConnectorsChanged(idConnection);
+  }
+
+  /**
+   * Notifica gli observer quando cambiano gli attributi di un connettore.
+   * Estrae l'ID dell'intent di destinazione e notifica solo quell'intent.
+   */
+  private notifyConnectorsChanged(connectorId: string): void {
+    const segments = connectorId.split('/');
+    const toIntentId = segments[segments.length - 1];
+    if (toIntentId) {
+      // Notifica gli observer (ricarica sempre i connettori freschi)
+      const connectors = this.getConnectorsInByIntent(toIntentId);
+      this.connectorsInChangedSubject.next({ intentId: toIntentId, connectors });
+      this.logger.log(`[CONNECTORS] Notificato cambiamento attributi connettore per blocco ${toIntentId}: ${connectors.length} connettori totali`);
+    }
   }
 
 

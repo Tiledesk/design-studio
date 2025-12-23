@@ -503,7 +503,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-
   /**
    * Carica i connettori in ingresso per questo intent.
    * Viene chiamata quando l'intent viene renderizzato.
