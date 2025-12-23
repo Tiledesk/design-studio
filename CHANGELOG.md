@@ -9,9 +9,11 @@
 
 
 # this branch
+- **added**: added go to block in panel intent detail;
+- **added**: added multi rows in url iframe;
+- **added**: showed connectors-in only if they are contract connectors
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
-
 
 
 # 1.39.22
