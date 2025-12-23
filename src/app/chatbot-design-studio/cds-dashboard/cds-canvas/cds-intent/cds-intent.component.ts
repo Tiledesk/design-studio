@@ -332,7 +332,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (!this.subscriptions.find(item => item.key === keyAlphaConnectors)) {
       const sub = this.stageService.alphaConnectors$.subscribe(value => {
         this.alphaConnectors = value;
-        this.getAllConnectorsIn();
+        // Ricarica i connettori quando cambia l'opacità
+        if (this.intent?.intent_id) {
+          this.loadConnectorsIn();
+        }
       });
       this.subscriptions.push({ key: keyAlphaConnectors, value: sub });
     }
@@ -466,6 +469,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   private setupEventListenersAndAttributes(): void {
       this.addEventListener();
       this.setIntentAttributes();
+      
+      // --- Carica i connettori in ingresso iniziali ---
+      this.loadConnectorsIn();
+      
+      // --- Sottoscriviti agli aggiornamenti dei connettori ---
+      this.initConnectorsInSubscription();
   }
 
   async getWebhook(): Promise<string | null> {
@@ -493,10 +502,60 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private getAllConnectorsIn(){
-    if(this.intent){
-      this.connectorsIn = this.connectorService.searchConnectorsInByIntent(this.intent.intent_id);
+
+
+  /**
+   * Carica i connettori in ingresso per questo intent.
+   * Viene chiamata quando l'intent viene renderizzato.
+   */
+  private loadConnectorsIn(): void {
+    if (!this.intent?.intent_id) {
+      this.logger.warn('[CONNECTORS] Intent non disponibile per caricare connettori');
+      return;
     }
+
+    // Carica i connettori in ingresso
+    const connectors = this.connectorService.getConnectorsInByIntent(this.intent.intent_id);
+    this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
+    this.logger.log(`[CONNECTORS] Connettori in ingresso caricati per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
+  }
+
+  /**
+   * Inizializza la subscription ai connettori in ingresso per questo intent.
+   * Viene chiamata in ngOnInit quando l'intent è sicuramente disponibile.
+   */
+  private initConnectorsInSubscription(): void {
+    if (!this.intent?.intent_id) {
+      this.logger.warn('[CONNECTORS] Intent non disponibile per inizializzare subscription connettori');
+      return;
+    }
+
+    const keyConnectorsIn = 'connectorsIn';
+    // Evita di creare subscription duplicate
+    if (this.subscriptions.find(item => item.key === keyConnectorsIn)) {
+      this.logger.log(`[CONNECTORS] Subscription già esistente per blocco ${this.intent.intent_id}`);
+      return;
+    }
+
+    // Usa l'observable filtrato del servizio che emette solo per questo intent
+    this.logger.log(`[CONNECTORS] Mi sottoscrivo agli aggiornamenti connettori per blocco ${this.intent.intent_id}`);
+    const sub = this.connectorService.getConnectorsInObservable(this.intent.intent_id)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(connectors => {
+        this.updateConnectorsIn(connectors);
+      });
+    
+    this.subscriptions.push({ key: keyConnectorsIn, value: sub });
+    this.logger.log(`[CONNECTORS] Subscription attiva per blocco ${this.intent.intent_id}`);
+  }
+
+  /**
+   * Aggiorna connectorsIn con nuovi valori ricevuti dall'observable.
+   * @param connectors - Array di connettori aggiornati
+   */
+  private updateConnectorsIn(connectors: any[]): void {
+    this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
+    this.logger.log(`[CONNECTORS] Aggiorno il numero dei connettori in ingresso per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
   }
 
   /**

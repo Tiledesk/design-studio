@@ -8,21 +8,21 @@
 *Tiledesk SRL*
 
 
-
-# 1.39.23-rc1
+# this branch
+- **added**: added go to block in panel intent detail;
+- **added**: added multi rows in url iframe;
+- **added**: showed connectors-in only if they are contract connectors
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
 
-# 1.39.21
-- **added**: added the LLM model gpt-5.2
-
-# 1.39.21-rc1
 
 # 1.39.22
 - **changed**: sorted the list of Intents in alphabetical order
 - **added**: added the LLM model gpt-5.2
 - **bug-fix**: Fixed bug when changing the height of iframe
 
+# 1.39.21
+- **added**: added the LLM model gpt-5.2
 
 # 1.39.20
 - **bug-fix**: sorted the list of intents in the intent selection select
