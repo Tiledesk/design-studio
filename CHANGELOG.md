@@ -7,11 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.23-rc4
+- **added**: showed connectors-in only if they are contract connectors
 
-# this branch
+# 1.39.23-rc3
+- **changed**: changed connector-in to only display the list of contracted connector-in to the input
 - **added**: added go to block in panel intent detail;
 - **added**: added multi rows in url iframe;
-- **added**: showed connectors-in only if they are contract connectors
+
+# 1.39.23-rc1
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
 
