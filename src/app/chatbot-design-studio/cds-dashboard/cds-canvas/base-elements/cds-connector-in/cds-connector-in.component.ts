@@ -3,6 +3,7 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Intent } from 'src/app/models/intent-model';
+import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 
 @Component({
   selector: 'cds-connector-in',
@@ -15,10 +16,12 @@ export class CdsConnectorInComponent implements OnInit {
   labelNumber: string;
   connectedIntents: Array<{intent: Intent, connectorIds: string[]}> = [];
 
+
   constructor(
     private readonly intentService: IntentService,
     private readonly stageService: StageService,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly connectorService: ConnectorService
   ) { }
 
   ngOnInit(): void {
@@ -84,20 +87,22 @@ export class CdsConnectorInComponent implements OnInit {
   }
 
   public hideConnectorsIn(event: MouseEvent){
+    // imposto l'opacità a quella settata nel chatbot-design-studio.component.ts
+    const alphaConnectors = this.stageService.getAlpha() / 100;
     event.stopPropagation();
     if(this.connectorsIn){
       this.connectorsIn.forEach((connector) => {
         const svgElement = document.getElementById(connector.id) as HTMLElement;
         if(svgElement){
-          svgElement.setAttribute('opacity', (0).toString());
+          svgElement.setAttribute('opacity', (alphaConnectors).toString());
         }
         const svgElementRec = document.getElementById('rect_'+connector.id) as HTMLElement;
         if(svgElementRec){
-          svgElementRec.setAttribute('opacity', (0).toString());
+          svgElementRec.setAttribute('opacity', (alphaConnectors).toString());
         }
         const svgElementTxt = document.getElementById('label_'+connector.id) as HTMLElement;
         if(svgElementTxt){
-          svgElementTxt.setAttribute('opacity', (0).toString());
+          svgElementTxt.setAttribute('opacity', (alphaConnectors).toString());
         }
       });
       
@@ -125,7 +130,19 @@ export class CdsConnectorInComponent implements OnInit {
         svgElement.setAttribute('marker-start', 'url(#tds_arrow_over)');
         svgElement.setAttribute('opacity', '1');
       }
+      // verifica se esiste un connector contract per questo connector il cui id è tutto tranne l'ultimo segmento
+      const connectorIdWithoutLastSegment = connectorId.split('/').slice(0, -1).join('/');
+      console.log('[cds-connector-in] onMenuItemMouseEnter:: connectorIdWithoutLastSegment', connectorIdWithoutLastSegment);
+      if (connectorIdWithoutLastSegment) {
+        const connectorContract = document.getElementById('contract_'+connectorIdWithoutLastSegment);
+        console.log('[cds-connector-in] onMenuItemMouseEnter:: connectorContract', connectorIdWithoutLastSegment);
+        const display = connectorContract.style.display;
+        if (display !== 'none') {
+          this.connectorService.showDefaultConnector(connectorId);
+        }
+      }
     });
+    
   }
 
   public onMenuItemMouseLeave(connectorIds: string[]): void {
@@ -133,11 +150,27 @@ export class CdsConnectorInComponent implements OnInit {
       const svgElement = document.getElementById(connectorId);
       if (svgElement) {
         svgElement.setAttribute('class', 'tds_connector');
-        svgElement.removeAttribute('marker-start');
+        // Ripristina il marker originale usando il pattern marker_${connectorId}
+        const originalMarkerId = `marker_${connectorId}`;
+        svgElement.setAttribute('marker-start', `url(#${originalMarkerId})`);
         // Mantieni l'opacità se il menu è ancora aperto
         const menuElement = document.querySelector('.connector-in-menu:hover');
         if (!menuElement) {
-          svgElement.setAttribute('opacity', '0');
+          const alphaConnectors = this.stageService.getAlpha() / 100;
+          svgElement.setAttribute('opacity', alphaConnectors.toString());
+        }
+      }
+      // verifica se esiste un connector contract per questo connector il cui id è tutto tranne l'ultimo segmento
+      const connectorIdWithoutLastSegment = connectorId.split('/').slice(0, -1).join('/');
+      console.log('[cds-connector-in] onMenuItemMouseEnter:: connectorIdWithoutLastSegment', connectorIdWithoutLastSegment);
+      if (connectorIdWithoutLastSegment) {
+        const connectorContract = document.getElementById('contract_'+connectorIdWithoutLastSegment);
+        // se connector contract esiste, e se display è diverso da none, nascondilo
+        if (connectorContract) {
+          const display = connectorContract.style.display;
+          if (display !== 'none') {
+            this.connectorService.hideDefaultConnector(connectorId);
+          }
         }
       }
     });
