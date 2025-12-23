@@ -1,4 +1,4 @@
-<div class="action-connector" 
+<div *ngIf="connectorsInFiltered?.length>0" class="action-connector" 
 (mouseenter)="showConnectorsIn($event)"
 (mouseleave)="hideConnectorsIn($event)">
 <span class="label-connector">{{labelNumber}}</span>

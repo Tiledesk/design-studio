@@ -211,6 +211,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.connectorIsOverAnIntent = false;
   };
 
+
   /** Logger centralizzato */
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -249,13 +250,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
            // Aggiorna isUntitledBlock quando l'intent viene modificato
            this.updateIsUntitledBlock();
-           if (intent['attributesChanged']) {
-             this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
-             delete intent['attributesChanged'];
-           } else { // if(this.intent.actions.length !== intent.actions.length && intent.actions.length>0)
-             this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
-             this.listOfActions = this.intent.actions;
-             this.setActionIntent();
+          if (intent['attributesChanged']) {
+            this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
+            delete intent['attributesChanged'];
+          } else { // if(this.intent.actions.length !== intent.actions.length && intent.actions.length>0)
+            this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
+            this.listOfActions = this.intent.actions;
+            this.setActionIntent();
            }
 
             // Se è cambiata solo la posizione, non aggiorno le azioni
@@ -332,7 +333,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (!this.subscriptions.find(item => item.key === keyAlphaConnectors)) {
       const sub = this.stageService.alphaConnectors$.subscribe(value => {
         this.alphaConnectors = value;
-        this.getAllConnectorsIn();
+        // Ricarica i connettori quando cambia l'opacità
+        if (this.intent?.intent_id) {
+          this.loadConnectorsIn();
+        }
       });
       this.subscriptions.push({ key: keyAlphaConnectors, value: sub });
     }
@@ -345,10 +349,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         .subscribe(resp => {
           if (resp.intentId && resp.intentId === this.intent?.intent_id && resp.color) {
             this.changeIntentColor(resp.color);
-        }
+          }
       });
       this.subscriptions.push({ key: keyChangeIntentColor, value: sub });
     }
+
+    // NOTA: La subscription ai connettori in ingresso viene inizializzata in ngOnInit
+    // quando l'intent è sicuramente disponibile (vedi initConnectorsInSubscription)
   }
 
   /**
@@ -366,9 +373,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   async ngOnInit(): Promise<void> {
     this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
 
-    if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
-      this.showIntentOptions = false;
-    } 
+      if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
+        this.showIntentOptions = false;
+      } 
     // --- Configurazione opzioni intent in base al tipo chatbot ---
     this.configureIntentOptions();
     
@@ -393,6 +400,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     
     // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
     this.checkIfNewChatbot();
+    
+    // --- Carica i connettori in ingresso iniziali ---
+    this.loadConnectorsIn();
+    
+    // --- Sottoscriviti agli aggiornamenti dei connettori ---
+    this.initConnectorsInSubscription();
   }
 
 
@@ -493,10 +506,58 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private getAllConnectorsIn(){
-    if(this.intent){
-      this.connectorsIn = this.connectorService.searchConnectorsInByIntent(this.intent.intent_id);
+  /**
+   * Carica i connettori in ingresso per questo intent.
+   * Viene chiamata quando l'intent viene renderizzato.
+   */
+  private loadConnectorsIn(): void {
+    if (!this.intent?.intent_id) {
+      this.logger.warn('[CONNECTORS] Intent non disponibile per caricare connettori');
+      return;
     }
+this.logger.log(`[CDS-INTENT] Connettori in ingresso caricati per blocco ${this.intent.intent_id}`);
+    // Carica i connettori in ingresso
+    const connectors = this.connectorService.getConnectorsInByIntent(this.intent.intent_id);
+    this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
+    this.logger.log(`[CONNECTORS] totale ${connectors.length} connettori`);
+  }
+
+  /**
+   * Inizializza la subscription ai connettori in ingresso per questo intent.
+   * Viene chiamata in ngOnInit quando l'intent è sicuramente disponibile.
+   */
+  private initConnectorsInSubscription(): void {
+    if (!this.intent?.intent_id) {
+      this.logger.warn('[CONNECTORS] Intent non disponibile per inizializzare subscription connettori');
+      return;
+    }
+
+    const keyConnectorsIn = 'connectorsIn';
+    // Evita di creare subscription duplicate
+    if (this.subscriptions.find(item => item.key === keyConnectorsIn)) {
+      this.logger.log(`[CONNECTORS] Subscription già esistente per blocco ${this.intent.intent_id}`);
+      return;
+    }
+
+    // Usa l'observable filtrato del servizio che emette solo per questo intent
+    this.logger.log(`[CONNECTORS] Mi sottoscrivo agli aggiornamenti connettori per blocco ${this.intent.intent_id}`);
+    const sub = this.connectorService.getConnectorsInObservable(this.intent.intent_id)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(connectors => {
+        this.updateConnectorsIn(connectors);
+      });
+    
+    this.subscriptions.push({ key: keyConnectorsIn, value: sub });
+    this.logger.log(`[CONNECTORS] Subscription attiva per blocco ${this.intent.intent_id}`);
+  }
+
+  /**
+   * Aggiorna connectorsIn con nuovi valori ricevuti dall'observable.
+   * @param connectors - Array di connettori aggiornati
+   */
+  private updateConnectorsIn(connectors: any[]): void {
+    this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
+    this.logger.log(`[CONNECTORS] Aggiorno il numero dei connettori in ingresso per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
   }
 
   /**
@@ -710,6 +771,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     document.removeEventListener("connector-release-on-intent", this.handleConnectorRelease, true);
     document.removeEventListener("connector-moved-over-intent", this.handleConnectorMovedOver, true);
     document.removeEventListener("connector-moved-out-of-intent", this.handleConnectorMovedOut, true);
+    // NOTA: connector-created e connector-deleted sono gestiti centralmente dal ConnectorService
 
     this.eventListenersAdded = false;
     this.logger.log('[CDS-INTENT] Event listeners rimossi');
@@ -758,6 +820,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     document.addEventListener("connector-release-on-intent", this.handleConnectorRelease, true);
     document.addEventListener("connector-moved-over-intent", this.handleConnectorMovedOver, true);
     document.addEventListener("connector-moved-out-of-intent", this.handleConnectorMovedOut, true);
+    // NOTA: connector-created e connector-deleted sono gestiti centralmente dal ConnectorService
 
     this.eventListenersAdded = true;
     this.logger.log('[CDS-INTENT] Event listeners aggiunti');

@@ -10,7 +10,7 @@
         </div>
     </div>
     <div id="content-panel" class="content-panel">
-        
+
         <!-- ---------------------------------------------------------- -->
         <!-- Agents available -->
         <!-- ---------------------------------------------------------- -->
@@ -110,6 +110,25 @@
 
             <div class="link-container">
                 <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
+            </div>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <!-- Next Block Connector -->
+        <!-- ---------------------------------------------------------- -->
+        <div *ngIf="!isWebhook && !isStart" class="row">
+            <div class="field-box">
+                <label class="title-label">{{'CDSCanvas.GoToBlock' | translate}}</label>
+                <cds-select id="next-intent-select"
+                    [items]="listOfIntents"
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'"
+                    [itemSelected]="selectedNextIntent"
+                    [placeholder]="'CDSCanvas.SelectABlock' | translate"
+                    [clearable]="true"
+                    (onSelected)="onChangeNextIntentSelect($event)"
+                    (onReset)="onResetNextIntentSelect($event)">
+                </cds-select>
             </div>
         </div>
 

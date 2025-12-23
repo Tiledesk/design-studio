@@ -3,8 +3,10 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { TranslateService } from '@ngx-translate/core';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { RESERVED_INTENT_NAMES, STAGE_SETTINGS } from 'src/app/chatbot-design-studio/utils';
-import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { Intent } from 'src/app/models/intent-model';
 import { Project } from 'src/app/models/project-model';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -33,6 +35,10 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   isStart: boolean = false;
   isWebhook: boolean = false;
 
+  // Connector management
+  listOfIntents: Array<{name: string, value: string, icon?:string}> = [];
+  selectedNextIntent: string | null = null;
+
 
   /* webhook params */
   serverBaseURL: string;
@@ -52,7 +58,9 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     private readonly appConfigService: AppConfigService,
     private readonly dashboardService: DashboardService,
     private readonly translate: TranslateService,
-    private stageService: StageService
+    private readonly stageService: StageService,
+    private readonly intentService: IntentService,
+    private readonly connectorService: ConnectorService
   ) { 
   }
 
@@ -62,7 +70,10 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
       this.initializeStart();
     } else if(this.intent.intent_display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
       this.initializeWebhook();
-    } 
+    }
+    
+    // Inizializza la lista degli intent per la select del connettore
+    this.initializeConnectorSelect();
   }
 
   ngAfterViewInit(): void {
@@ -250,4 +261,89 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
       let url = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.project_id +'/integrations?name='
       window.open(url, '_blank');
     }
+
+  /**
+   * Inizializza la select per gestire il connettore dell'intent.
+   * Carica la lista degli intent escludendo quello corrente.
+   */
+  private initializeConnectorSelect(): void {
+    // Ottiene la lista di tutti gli intent
+    this.listOfIntents = this.intentService.getListOfIntents();
+    
+    // Filtra escludendo l'intent corrente e gli intent riservati START/WEBHOOK
+    this.listOfIntents = this.listOfIntents.filter(intent => {
+      const intentId = intent.value.replace('#', '');
+      return intentId !== this.intent.intent_id &&
+             intent.name !== RESERVED_INTENT_NAMES.START &&
+             intent.name !== RESERVED_INTENT_NAMES.WEBHOOK;
+    });
+    
+    // Ordina alfabeticamente
+    this.listOfIntents.sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Imposta il valore selezionato se esiste già un connettore
+    if (this.intent.attributes?.nextBlockAction?.intentName) {
+      this.selectedNextIntent = this.intent.attributes.nextBlockAction.intentName;
+    }
+  }
+
+  /**
+   * Gestisce la selezione di un intent per il connettore.
+   */
+  onChangeNextIntentSelect(event: {name: string, value: string}): void {
+    if (!event || !event.value) {
+      return;
+    }
+
+    this.logger.log('[CdsPanelIntentDetailComponent] onChangeNextIntentSelect:', event);
+    
+    // Assicura che esista nextBlockAction
+    if (!this.intent.attributes) {
+      this.intent.attributes = {};
+    }
+    
+    if (!this.intent.attributes.nextBlockAction) {
+      // Crea una nuova azione INTENT se non esiste
+      this.intent.attributes.nextBlockAction = this.intentService.createNewAction(TYPE_ACTION.INTENT);
+    }
+    
+    // Aggiorna il valore
+    this.intent.attributes.nextBlockAction.intentName = event.value;
+    this.selectedNextIntent = event.value;
+    
+    // Crea o aggiorna il connettore
+    const fromId = `${this.intent.intent_id}/${this.intent.attributes.nextBlockAction._tdActionId}`;
+    const toId = event.value.replace('#', '');
+    
+    if (this.stageService.loaded) {
+      this.connectorService.createConnectorFromId(fromId, toId, true);
+    }
+    
+    // Salva l'intent
+    this.onSaveIntent();
+  }
+
+  /**
+   * Gestisce il reset della select del connettore.
+   */
+  onResetNextIntentSelect(event: {name: string, value: string}): void {
+    this.logger.log('[CdsPanelIntentDetailComponent] onResetNextIntentSelect');
+    
+    if (this.intent.attributes?.nextBlockAction) {
+      const fromId = `${this.intent.intent_id}/${this.intent.attributes.nextBlockAction._tdActionId}`;
+      const toId = this.intent.attributes.nextBlockAction.intentName?.replace('#', '');
+      
+      if (toId) {
+        const connectorId = `${fromId}/${toId}`;
+        this.connectorService.deleteConnector(this.intent, connectorId);
+      }
+      
+      // Rimuovi il riferimento al connettore
+      this.intent.attributes.nextBlockAction.intentName = null;
+      this.selectedNextIntent = null;
+      
+      // Salva l'intent
+      this.onSaveIntent();
+    }
+  }
 }
