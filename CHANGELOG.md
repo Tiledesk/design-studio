@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 
+# 1.39.23-rc2
+- **changed**: changed connector-in to only display the list of contracted connector-in to the input
 
 # 1.39.23-rc1
 - **added**: added connector-in-menu to display the list of blocks connected to the input
