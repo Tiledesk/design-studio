@@ -119,8 +119,8 @@
     position: relative;
 
     &:hover {
-        padding-bottom: 4px;
-        margin-bottom: -4px;
+        padding-right: 4px;
+        margin-right: -4px;
     }
 }
 
@@ -150,14 +150,12 @@
 .connector-text-menu {
     display: none;
     position: absolute;
-    top: 100%;
-    left: 22px;
-    margin-top: 0;
-    flex-direction: column;
-    background-color: white;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    outline: 1px solid rgb(230, 230, 230);
+    left: 100%;
+    top: 0;
+    margin-left: -5px;
+    padding-left: 10px;
+    flex-direction: row;
+    align-items: center;
     z-index: 1;
     width: max-content;
     overflow: hidden;
@@ -176,6 +174,28 @@
 
         &:hover {
             background-color: rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    .menu-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        background-color: white;
+        border: 1px solid rgb(230, 230, 230);
+        border-radius: 6px;
+        mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+            color: var(--blu);
+        }
+        &:hover {
+            padding: 2px;
+            border: 2px solid rgb(230, 230, 230);
         }
     }
 }

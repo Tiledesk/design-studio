@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges, OnChanges } from '@angular/core';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Intent } from 'src/app/models/intent-model';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'cds-connector-in',
@@ -12,9 +13,10 @@ import { ConnectorService } from 'src/app/chatbot-design-studio/services/connect
 })
 export class CdsConnectorInComponent implements OnInit {
   @Input() connectorsIn: any[] = [];
-
+  connectorsInFiltered: any[] = [];
   labelNumber: string;
   connectedIntents: Array<{intent: Intent, connectorIds: string[]}> = [];
+  private subscriptionChangedConnectorAttributes: Subscription;
 
 
   constructor(
@@ -25,19 +27,82 @@ export class CdsConnectorInComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.labelNumber = this.connectorsIn.length.toString();
-    if(this.connectorsIn.length>9){
+    this.initializeConnectors();
+    this.subscribeToChangedConnectorAttributes();
+  }
+
+  // ngOnChanges(changes: SimpleChanges): void {
+  //   console.log('[CDS-CONNECTOR-IN] --- AGGIORNATO connectorsIn ');
+  //   if (changes['connectorsIn'] && !changes['connectorsIn'].firstChange) {
+  //     console.log('[CDS-CONNECTOR-IN] --- INIZIALIZZO connectorsIn');
+  //     this.initializeConnectors();
+  //   }
+  // }
+  
+  ngOnDestroy() {
+    if (this.subscriptionChangedConnectorAttributes) {
+      this.subscriptionChangedConnectorAttributes.unsubscribe();
+    }
+  }
+  
+
+
+  // sottoscrivi al observableChangedConnectorAttributes
+  private subscribeToChangedConnectorAttributes(): void {
+    this.subscriptionChangedConnectorAttributes = this.connectorService.observableChangedConnectorAttributes.subscribe((connector: any) => {
+      console.log('[CDS-CONNECTOR-IN] --- AGGIORNATO connettore ', connector,this.connectorsIn);
+      // se l'id del connettore appartiene a connectorsIn allora aggiorna il connettore
+      if (this.connectorsIn.some((connector) => connector.id === connector.id)) {
+        console.log('[CDS-CONNECTOR-IN] --- AGGIORNATO connettore ', connector);
+        this.initializeConnectors();
+      }
+    });
+  }
+
+  /**
+   * Inizializza i connettori filtrandoli e calcolando le informazioni necessarie
+   */
+  private initializeConnectors(): void {
+    this.filterConnectorsWithVisibleContract();
+    this.labelNumber = this.connectorsInFiltered.length.toString();
+    if(this.connectorsInFiltered.length>9){
       this.labelNumber = "+9";
     }
     this.loadConnectedIntents();
   }
 
+  /**
+   * Filtra i connettori mantenendo solo quelli che hanno un contract connector visibile
+   */
+  private filterConnectorsWithVisibleContract(): void {
+    this.connectorsInFiltered = this.connectorsIn.filter((connector) => {
+      return this.hasVisibleContractConnector(connector.id);
+    });
+  }
+
+  /**
+   * Verifica se un connettore ha un contract connector visibile
+   * @param connectorId - ID completo del connettore
+   * @returns true se il contract connector esiste ed è visibile, false altrimenti
+   */
+  private hasVisibleContractConnector(connectorId: string): boolean {
+    const connectorIdWithoutLastSegment = connectorId.split('/').slice(0, -1).join('/');
+    if (connectorIdWithoutLastSegment) {
+      const connectorContract = document.getElementById('contract_' + connectorIdWithoutLastSegment);
+      if (connectorContract) {
+        const display = connectorContract.style.display;
+        return display !== 'none';
+      }
+    }
+    return false;
+  }
+
   private loadConnectedIntents(): void {
     this.connectedIntents = [];
-    if (this.connectorsIn && this.connectorsIn.length > 0) {
+    if (this.connectorsInFiltered && this.connectorsInFiltered.length > 0) {
       const intentMap = new Map<string, {intent: Intent, connectorIds: string[]}>();
       
-      this.connectorsIn.forEach((connector) => {
+      this.connectorsInFiltered.forEach((connector) => {
         if (connector.id) {
           // Estrae l'ID dell'intent di origine dalla connection ID
           // Il formato è: {fromIntentId}/{actionId}/.../{toIntentId}
@@ -67,8 +132,8 @@ export class CdsConnectorInComponent implements OnInit {
 
   public showConnectorsIn(event: MouseEvent){
     event.stopPropagation();
-    if(this.connectorsIn){
-      this.connectorsIn.forEach((connector) => {
+    if(this.connectorsInFiltered){
+      this.connectorsInFiltered.forEach((connector) => {
         const svgElement = document.getElementById(connector.id) as HTMLElement;
         if(svgElement){
           svgElement.setAttribute('opacity', (1).toString());
@@ -90,8 +155,8 @@ export class CdsConnectorInComponent implements OnInit {
     // imposto l'opacità a quella settata nel chatbot-design-studio.component.ts
     const alphaConnectors = this.stageService.getAlpha() / 100;
     event.stopPropagation();
-    if(this.connectorsIn){
-      this.connectorsIn.forEach((connector) => {
+    if(this.connectorsInFiltered){
+      this.connectorsInFiltered.forEach((connector) => {
         const svgElement = document.getElementById(connector.id) as HTMLElement;
         if(svgElement){
           svgElement.setAttribute('opacity', (alphaConnectors).toString());
@@ -131,15 +196,8 @@ export class CdsConnectorInComponent implements OnInit {
         svgElement.setAttribute('opacity', '1');
       }
       // verifica se esiste un connector contract per questo connector il cui id è tutto tranne l'ultimo segmento
-      const connectorIdWithoutLastSegment = connectorId.split('/').slice(0, -1).join('/');
-      console.log('[cds-connector-in] onMenuItemMouseEnter:: connectorIdWithoutLastSegment', connectorIdWithoutLastSegment);
-      if (connectorIdWithoutLastSegment) {
-        const connectorContract = document.getElementById('contract_'+connectorIdWithoutLastSegment);
-        console.log('[cds-connector-in] onMenuItemMouseEnter:: connectorContract', connectorIdWithoutLastSegment);
-        const display = connectorContract.style.display;
-        if (display !== 'none') {
-          this.connectorService.showDefaultConnector(connectorId);
-        }
+      if (this.hasVisibleContractConnector(connectorId)) {
+        this.connectorService.showDefaultConnector(connectorId);
       }
     });
     
@@ -161,17 +219,8 @@ export class CdsConnectorInComponent implements OnInit {
         }
       }
       // verifica se esiste un connector contract per questo connector il cui id è tutto tranne l'ultimo segmento
-      const connectorIdWithoutLastSegment = connectorId.split('/').slice(0, -1).join('/');
-      console.log('[cds-connector-in] onMenuItemMouseEnter:: connectorIdWithoutLastSegment', connectorIdWithoutLastSegment);
-      if (connectorIdWithoutLastSegment) {
-        const connectorContract = document.getElementById('contract_'+connectorIdWithoutLastSegment);
-        // se connector contract esiste, e se display è diverso da none, nascondilo
-        if (connectorContract) {
-          const display = connectorContract.style.display;
-          if (display !== 'none') {
-            this.connectorService.hideDefaultConnector(connectorId);
-          }
-        }
+      if (this.hasVisibleContractConnector(connectorId)) {
+        this.connectorService.hideDefaultConnector(connectorId);
       }
     });
   }
