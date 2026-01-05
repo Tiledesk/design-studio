@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # this branch
+- **bug-fix**: bug fixed text align
 - **added**: added note
 
 # 1.39.13

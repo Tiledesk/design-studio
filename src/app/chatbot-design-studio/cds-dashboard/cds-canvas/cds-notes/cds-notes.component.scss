@@ -205,6 +205,19 @@
       text-decoration: underline;
       cursor: pointer;
     }
+    
+    // Stili per allineamento Quill
+    .ql-align-center {
+      text-align: center;
+    }
+    
+    .ql-align-right {
+      text-align: right;
+    }
+    
+    .ql-align-left {
+      text-align: left;
+    }
   }
 }
 

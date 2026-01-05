@@ -54,7 +54,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private startCenterX = 0; // Centro iniziale del box (per calcolo scale rispetto al centro)
   private startCenterY = 0; // Centro iniziale del box (per calcolo scale rispetto al centro)
   private startDistanceFromCenter = 0; // Distanza iniziale del mouse dal centro
-  private startLeft = 0; // Posizione X iniziale per resize orizzontale
+  private startLeft = 0; // Posizione X iniziale CSS per resize orizzontale
+  private startCenterXReal = 0; // Centro X reale iniziale in viewport per resize orizzontale
+  private startHostLeftViewport = 0; // Posizione X iniziale dell'host in viewport per resize orizzontale
   private currentBaseWidth = 0; // Larghezza base corrente (può essere modificata dal resize orizzontale)
   private justFinishedResizing = false;
 
@@ -504,11 +506,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.startScale = 1;
     }
     
-    // Leggi la posizione X iniziale (dal modello o dal DOM)
+    // Calcola il centro X reale iniziale in viewport (questo deve rimanere fisso)
+    const rect = this.contentElement.nativeElement.getBoundingClientRect();
+    this.startCenterXReal = rect.left + rect.width / 2;
+    
+    // Leggi la posizione X iniziale dell'host in viewport e CSS
     const hostElement = this.elementRef.nativeElement as HTMLElement;
-    const hostLeft = parseFloat(hostElement.style.left);
-    if (!isNaN(hostLeft)) {
-      this.startLeft = hostLeft;
+    const hostRect = hostElement.getBoundingClientRect();
+    this.startHostLeftViewport = hostRect.left;
+    
+    const hostLeftCSS = parseFloat(hostElement.style.left);
+    if (!isNaN(hostLeftCSS)) {
+      this.startLeft = hostLeftCSS;
     } else {
       this.startLeft = this.note.x || 0;
     }
@@ -523,17 +532,24 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private handleHorizontalResize(event: MouseEvent): void {
     if (!this.contentElement || !this.note) return;
     
-    // Calcola il delta X (spostamento orizzontale del mouse)
-    const deltaX = event.clientX - this.startX;
-    
-    // Calcola la nuova larghezza base
-    // Per maniglia destra: aumenta la larghezza di 2*deltaX (per mantenere il centro fisso)
-    // Per maniglia sinistra: aumenta la larghezza di -2*deltaX
+    // Calcola la nuova larghezza basandoti sulla posizione attuale del mouse rispetto al centro fisso
+    // Il centro è fisso a: startCenterXReal
+    // Per maniglia destra: il bordo destro (scalato) deve essere alla posizione del mouse
+    // Per maniglia sinistra: il bordo sinistro (scalato) deve essere alla posizione del mouse
+    // Formula: newWidth * startScale / 2 = distanza dal centro al mouse
     let newWidth = this.startWidth;
     if (this.resizeHandle === 'right') {
-      newWidth = this.startWidth + (2 * deltaX);
+      // Il bordo destro è a: startCenterXReal + (newWidth * startScale) / 2
+      // Deve essere uguale a: event.clientX
+      // Quindi: newWidth * startScale / 2 = event.clientX - startCenterXReal
+      const distanceFromCenter = event.clientX - this.startCenterXReal;
+      newWidth = (2 * distanceFromCenter) / this.startScale;
     } else if (this.resizeHandle === 'left') {
-      newWidth = this.startWidth - (2 * deltaX);
+      // Il bordo sinistro è a: startCenterXReal - (newWidth * startScale) / 2
+      // Deve essere uguale a: event.clientX
+      // Quindi: newWidth * startScale / 2 = startCenterXReal - event.clientX
+      const distanceFromCenter = this.startCenterXReal - event.clientX;
+      newWidth = (2 * distanceFromCenter) / this.startScale;
     }
     
     // Limiti minimi e massimi per la larghezza
@@ -541,22 +557,39 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const maxWidth = 2000; // Larghezza massima
     newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
     
-    // Calcola la nuova posizione X per mantenere il centro fisso
-    // Il centro deve rimanere nella stessa posizione
-    // Centro iniziale = startLeft + (startWidth * startScale) / 2
-    // Nuovo centro = newLeft + (newWidth * startScale) / 2
-    // Quindi: newLeft = startLeft + (startWidth - newWidth) * startScale / 2
-    const widthDelta = newWidth - this.startWidth;
-    const newLeft = this.startLeft - (widthDelta * this.startScale) / 2;
-    
-    // Applica la nuova larghezza al DOM (senza modificare lo scale)
+    // Applica PRIMA la nuova larghezza al DOM (senza modificare lo scale)
     this.contentElement.nativeElement.style.width = newWidth + 'px';
     
     // Salva la nuova larghezza base
     this.currentBaseWidth = newWidth;
     
-    // Aggiorna la posizione X nel DOM e nel modello
+    // Calcola la nuova posizione X per mantenere il centro fisso
+    // Il centro reale iniziale in viewport è: startCenterXReal
+    // La larghezza visiva nuova sarà: newWidth * startScale
+    // Per mantenere il centro fisso, il nuovo centro del contentElement in viewport deve essere: startCenterXReal
+    // Quindi: newContentLeftViewport = startCenterXReal - (newWidth * startScale) / 2
+    
     const hostElement = this.elementRef.nativeElement as HTMLElement;
+    const newWidthVisual = newWidth * this.startScale;
+    const newContentLeftViewport = this.startCenterXReal - (newWidthVisual / 2);
+    
+    // Calcola l'offset tra host e contentElement (dovrebbe essere costante)
+    const currentContentRect = this.contentElement.nativeElement.getBoundingClientRect();
+    const currentContentLeftViewport = currentContentRect.left;
+    const currentHostRect = hostElement.getBoundingClientRect();
+    const currentHostLeftViewport = currentHostRect.left;
+    const hostToContentOffset = currentContentLeftViewport - currentHostLeftViewport;
+    
+    // La nuova posizione viewport dell'host dovrebbe essere:
+    const newHostLeftViewport = newContentLeftViewport - hostToContentOffset;
+    
+    // Calcola la differenza in viewport rispetto alla posizione iniziale
+    const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
+    
+    // Applica la differenza alla posizione CSS iniziale
+    const newLeft = this.startLeft + deltaViewport;
+    
+    // Aggiorna la posizione X nel DOM e nel modello
     hostElement.style.left = newLeft + 'px';
     this.note.x = newLeft;
     
@@ -681,8 +714,15 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const isHorizontalHandle = handle.classList.contains('resize-left') || handle.classList.contains('resize-right');
       
       if (isRotateHandle) {
-        // Per rotate-handle, preserva translateX(-50%)
-        handle.style.transform = `translateX(-50%) scale(${inverseScaleX}, ${inverseScaleY})`;
+        // Per rotate-handle, preserva translateX(-50%) e mantieni sempre -20px dal bordo superiore
+        // Il problema: il contenitore ha transform: scale(scaleY), quindi top: -20px diventa visivamente -20*scaleY
+        // Soluzione: usa top calcolato dinamicamente per compensare lo scale del contenitore
+        // top = -20px / scaleY (così quando viene scalato diventa -20px)
+        // Ma l'handle ha anche scale(inverseScaleY), quindi dobbiamo compensare ulteriormente
+        // La formula corretta: top = -20px, translateY = 20 * (scaleY - 1) * scaleY
+        handle.style.top = '-7px';
+        const translateY = 0 * (scaleY - 1) * scaleY;
+        handle.style.transform = `translateX(-50%) translateY(${translateY}px) scale(${inverseScaleX}, ${inverseScaleY})`;
       } else if (isHorizontalHandle) {
         // Per le maniglie laterali, preserva translateY(-50%)
         handle.style.transform = `translateY(-50%) scale(${inverseScaleX}, ${inverseScaleY})`;
