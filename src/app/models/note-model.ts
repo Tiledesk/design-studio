@@ -6,6 +6,7 @@ export class Note {
   static readonly DEFAULT_WIDTH = 130;
   static readonly DEFAULT_HEIGHT = 42;
   static readonly DEFAULT_FONT_SIZE_EM = 0.96;
+  static readonly DEFAULT_BORDER_WIDTH = 1;
   
   id_faq_kb?: string;
   note_id: string;
@@ -26,6 +27,7 @@ export class Note {
   height?: number;
   backgroundColor?: string;
   borderColor?: string;
+  borderWidth?: number; // Spessore bordo in px
   createdAt: Date;
   isNew?: boolean;
   
@@ -49,6 +51,7 @@ export class Note {
     this.createdAt = new Date();
     this.backgroundColor = 'rgba('+NOTE_COLORS.BACKGROUND_COLOR+', 1)'; // Colore di default
     this.borderColor = 'rgba('+NOTE_COLORS.BORDER_COLOR+', 1)'; // Colore di default
+    this.borderWidth = Note.DEFAULT_BORDER_WIDTH;
     this.isNew = true; // Indica che la nota è appena stata creata
     this.backgroundOpacity = 100;
     this.borderOpacity = 100;

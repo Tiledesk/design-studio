@@ -113,6 +113,33 @@
                     inputmode="numeric">
                 <span class="opacity-percent">%</span>
             </div>
+
+            <!-- ---------------------------------------------------------- -->
+            <!-- Border thickness Section -->
+            <!-- ---------------------------------------------------------- -->
+            <div class="section-header">
+                <h4 class="section-title">Border thickness</h4>
+                <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
+            </div>
+
+            <div class="color-control-group">
+                <div class="slider-wrapper">
+                    <input type="range"
+                        class="opacity-slider"
+                        min="0"
+                        max="20"
+                        [ngModel]="note.borderWidth"
+                        (ngModelChange)="onBorderWidthChange($event)">
+                </div>
+                <input type="text"
+                    class="opacity-input"
+                    [ngModel]="note.borderWidth"
+                    (ngModelChange)="onBorderWidthChange($event)"
+                    (input)="onBorderWidthInput($event)"
+                    pattern="[0-9]*"
+                    inputmode="numeric">
+                <span class="opacity-percent">px</span>
+            </div>
   
 
             <!-- ---------------------------------------------------------- -->

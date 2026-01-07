@@ -69,7 +69,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
           // perché potrebbe causare conflitti
           const propertiesToUpdate = [
             'backgroundColor', 'backgroundOpacity',
-            'borderColor', 'borderOpacity', 'boxShadow',
+            'borderColor', 'borderOpacity', 'borderWidth', 'boxShadow',
             'width', 'height', 'x', 'y'
           ];
           
@@ -96,6 +96,28 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
           this.logger.log('[CdsPanelNoteDetailComponent] Note updated from service (notesChanged$):', updatedNote.note_id);
         }
       });
+  }
+
+  // ============================================================================
+  // BORDER WIDTH (spessore bordo)
+  // ============================================================================
+  onBorderWidthInput(event: Event): void {
+    if (!this.note) return;
+    const input = event.target as HTMLInputElement;
+    let value = (input.value || '').replace(/[^0-9]/g, '');
+    if (value.length > 2) {
+      value = value.slice(0, 2);
+    }
+    input.value = value;
+  }
+
+  onBorderWidthChange(value?: any): void {
+    if (!this.note) return;
+    const parsed = typeof value === 'string' ? parseInt(value.replace(/[^0-9]/g, ''), 10) : value;
+    let borderWidth = Number.isFinite(parsed) ? parsed : 0;
+    borderWidth = Math.max(0, Math.min(20, borderWidth)); // 0..20px
+    this.note.borderWidth = borderWidth;
+    this.autoSave();
   }
 
   ngOnDestroy(): void {

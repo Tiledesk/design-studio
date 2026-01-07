@@ -7,6 +7,8 @@
     [class.rect-note]="!isTextNote"
     [id]="note?.note_id"
     [style.box-shadow]="note?.boxShadow === false ? 'none' : null"
+    [style.border-width.px]="note?.borderWidth"
+    [style.border-style]="'solid'"
     [style.border-color]="note?.borderColor"
     [style.background-color]="note?.backgroundColor">
     <!-- (input)="onInputChange($event)" -->

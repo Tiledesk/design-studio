@@ -37,6 +37,9 @@ export class NoteService {
     if (!note.type) {
       note.type = 'text';
     }
+    if (note.borderWidth === undefined || note.borderWidth === null) {
+      note.borderWidth = Note.DEFAULT_BORDER_WIDTH;
+    }
   }
   
   /**

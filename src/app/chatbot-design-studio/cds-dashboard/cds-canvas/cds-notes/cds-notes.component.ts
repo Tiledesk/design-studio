@@ -1007,6 +1007,11 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.note.type = 'text';
     }
 
+    // Inizializza borderWidth solo se non presente
+    if (this.note.borderWidth === undefined || this.note.borderWidth === null) {
+      this.note.borderWidth = Note.DEFAULT_BORDER_WIDTH;
+    }
+
     // Inizializza width solo se non presente
     if (this.note.width === undefined || this.note.width === null) {
       this.note.width = Note.DEFAULT_WIDTH;
