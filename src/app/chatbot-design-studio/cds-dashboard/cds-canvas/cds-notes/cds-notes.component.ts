@@ -45,6 +45,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   private isResizing = false;
   private isHorizontalResizing = false; // Flag per resize orizzontale simmetrico
+  private isVerticalResizing = false; // Flag per resize verticale simmetrico
   private resizeHandle: string = '';
   private startX = 0;
   private startY = 0;
@@ -58,6 +59,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private startCenterXReal = 0; // Centro X reale iniziale in viewport per resize orizzontale
   private startHostLeftViewport = 0; // Posizione X iniziale dell'host in viewport per resize orizzontale
   private currentBaseWidth = 0; // Larghezza base corrente (può essere modificata dal resize orizzontale)
+  private startTop = 0; // Posizione Y iniziale CSS per resize verticale
+  private startCenterYReal = 0; // Centro Y reale iniziale in viewport per resize verticale
+  private startHostTopViewport = 0; // Posizione Y iniziale dell'host in viewport per resize verticale
+  private currentBaseHeight = 0; // Altezza base corrente (può essere modificata dal resize verticale)
   private justFinishedResizing = false;
 
   // PROPRIETÀ PRIVATE - Rotazione
@@ -89,6 +94,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     return this.stateNote !== 1 && !this.textareaHasFocus;
   }
 
+  get isTextNote(): boolean {
+    return !this.note?.type || this.note.type === 'text';
+  }
+
   // ============================================================================
   // COSTRUTTORE
   // ============================================================================
@@ -108,6 +117,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['note'] && this.note) {
+      // Solo per note testuali
+      if (!this.isTextNote) {
+        return;
+      }
       const noteChange = changes['note'];
       
       if (noteChange.isFirstChange()) {
@@ -189,6 +202,12 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.handleHorizontalResize(event);
       return;
     }
+
+    // Gestione resize verticale simmetrico
+    if (this.isVerticalResizing && this.contentElement && this.note) {
+      this.handleVerticalResize(event);
+      return;
+    }
     
     // Gestione resize con transform: scale()
     if (!this.isResizing || !this.contentElement || !this.note) return;
@@ -242,6 +261,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.isHorizontalResizing = false;
       this.resizeHandle = '';
       // this.changeState(0);
+      this.justFinishedResizing = true;
+      setTimeout(() => {
+        this.justFinishedResizing = false;
+      }, 100);
+      this.updateNote();
+    }
+
+    else if (this.isVerticalResizing) {
+      // Ricalcola dimensioni e scale basandosi sul transform corrente
+      this.applyScaleAndTransform();
+      this.isVerticalResizing = false;
+      this.resizeHandle = '';
       this.justFinishedResizing = true;
       setTimeout(() => {
         this.justFinishedResizing = false;
@@ -377,6 +408,82 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       return;
     }
     
+    event.stopPropagation();
+  }
+
+  // ============================================================================
+  // EVENT HANDLERS - Surface (valido per tutti i tipi)
+  // ============================================================================
+  onNoteSurfaceClick(event: MouseEvent): void {
+    if (this.isTextNote) {
+      this.onNoteInputClick(event);
+      return;
+    }
+    this.onRectClick(event);
+  }
+
+  onNoteSurfaceDoubleClick(event: MouseEvent): void {
+    if (this.isTextNote) {
+      this.onNoteInputDoubleClick(event);
+      return;
+    }
+    this.onRectDoubleClick(event);
+  }
+
+  onNoteSurfaceMouseDown(event: MouseEvent): void {
+    if (this.isTextNote) {
+      this.onNoteInputMouseDown(event);
+      return;
+    }
+    this.onRectMouseDown(event);
+  }
+
+  // ============================================================================
+  // EVENT HANDLERS - Rect note
+  // ============================================================================
+  onRectClick(event: MouseEvent): void {
+    // Per i tipi non testuali: click seleziona (no focus)
+    if (this.stateNote === 1) {
+      event.stopPropagation();
+      return;
+    }
+
+    if (this.dragged) {
+      this.dragged = false;
+      if (!this.isDraggable) {
+        event.stopPropagation();
+      }
+      return;
+    }
+
+    this.cancelSingleClickTimer();
+    this.changeState(2);
+    this.updateDragState();
+
+    if (!this.isDraggable) {
+      event.stopPropagation();
+    }
+  }
+
+  onRectDoubleClick(event: MouseEvent): void {
+    // Nessun editing per rect: manteniamo solo la selezione
+    event.stopPropagation();
+    this.cancelSingleClickTimer();
+    this.changeState(2);
+    this.updateDragState();
+  }
+
+  onRectMouseDown(event: MouseEvent): void {
+    // Timestamp per coerenza con la logica click-duration (mouseup)
+    this.mouseDownTimestamp = Date.now();
+    if (this.stateNote === 1) {
+      event.stopPropagation();
+      return;
+    }
+
+    if (this.isDraggable) {
+      return;
+    }
     event.stopPropagation();
   }
 
@@ -526,6 +633,57 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   /**
+   * Inizia il ridimensionamento verticale simmetrico
+   * Il centro verticale del div rimane fisso durante il resize
+   */
+  startVerticalResize(event: MouseEvent, handle: 'top' | 'bottom'): void {
+    event.stopPropagation();
+    event.preventDefault();
+    if (!this.contentElement || !this.note) return;
+
+    this.isVerticalResizing = true;
+    this.resizeHandle = handle;
+    this.startX = event.clientX;
+    this.startY = event.clientY;
+
+    // Leggi l'altezza base corrente: usa note.height (garantito da initializeDefaults)
+    // Se currentBaseHeight è stata modificata da resize verticale, usa quella, altrimenti note.height
+    let currentHeight = this.currentBaseHeight > 0 ? this.currentBaseHeight : this.note.height;
+    this.startHeight = currentHeight;
+    this.currentBaseHeight = currentHeight;
+
+    // Leggi lo scale corrente (non deve essere modificato)
+    const currentTransform = this.contentElement.nativeElement.style.transform || '';
+    const scaleMatch = currentTransform.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
+
+    if (scaleMatch) {
+      this.startScale = parseFloat(scaleMatch[1]) || 1;
+    } else if (this.note.scale && Array.isArray(this.note.scale) && this.note.scale.length >= 1) {
+      this.startScale = this.note.scale[0];
+    } else {
+      this.startScale = 1;
+    }
+
+    // Calcola il centro Y reale iniziale in viewport (questo deve rimanere fisso)
+    const rect = this.contentElement.nativeElement.getBoundingClientRect();
+    this.startCenterYReal = rect.top + rect.height / 2;
+
+    // Leggi la posizione Y iniziale dell'host in viewport e CSS
+    const hostElement = this.elementRef.nativeElement as HTMLElement;
+    const hostRect = hostElement.getBoundingClientRect();
+    this.startHostTopViewport = hostRect.top;
+
+    const hostTopCSS = parseFloat(hostElement.style.top);
+    if (!isNaN(hostTopCSS)) {
+      this.startTop = hostTopCSS;
+    } else {
+      this.startTop = this.note.y || 0;
+    }
+
+    this.changeState(2);
+  }
+
+  /**
    * Gestisce il ridimensionamento orizzontale durante il movimento del mouse
    * Mantiene il centro orizzontale fisso e modifica solo la larghezza
    */
@@ -605,6 +763,60 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // Aggiorna la larghezza nel modello (larghezza effettiva = base * scale)
     // Ma non modifichiamo note.width direttamente, manteniamo solo la larghezza base nel DOM
     // e lo scale separato
+  }
+
+  /**
+   * Gestisce il ridimensionamento verticale durante il movimento del mouse
+   * Mantiene il centro verticale fisso e modifica solo l'altezza
+   */
+  private handleVerticalResize(event: MouseEvent): void {
+    if (!this.contentElement || !this.note) return;
+
+    let newHeight = this.startHeight;
+    if (this.resizeHandle === 'bottom') {
+      const distanceFromCenter = event.clientY - this.startCenterYReal;
+      newHeight = (2 * distanceFromCenter) / this.startScale;
+    } else if (this.resizeHandle === 'top') {
+      const distanceFromCenter = this.startCenterYReal - event.clientY;
+      newHeight = (2 * distanceFromCenter) / this.startScale;
+    }
+
+    const minHeight = 30;
+    const maxHeight = 2000;
+    newHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+
+    // Applica PRIMA la nuova altezza al DOM (senza modificare lo scale)
+    this.contentElement.nativeElement.style.height = newHeight + 'px';
+
+    // Salva la nuova altezza base
+    this.currentBaseHeight = newHeight;
+
+    // Calcola la nuova posizione Y per mantenere il centro fisso
+    const hostElement = this.elementRef.nativeElement as HTMLElement;
+    const newHeightVisual = newHeight * this.startScale;
+    const newContentTopViewport = this.startCenterYReal - (newHeightVisual / 2);
+
+    // Calcola l'offset tra host e contentElement (dovrebbe essere costante)
+    const currentContentRect = this.contentElement.nativeElement.getBoundingClientRect();
+    const currentContentTopViewport = currentContentRect.top;
+    const currentHostRect = hostElement.getBoundingClientRect();
+    const currentHostTopViewport = currentHostRect.top;
+    const hostToContentOffset = currentContentTopViewport - currentHostTopViewport;
+
+    const newHostTopViewport = newContentTopViewport - hostToContentOffset;
+    const deltaViewport = newHostTopViewport - this.startHostTopViewport;
+    const newTop = this.startTop + deltaViewport;
+
+    hostElement.style.top = newTop + 'px';
+    this.note.y = newTop;
+
+    // Preserva lo scale e la rotazione esistenti
+    const rotation = this.note.rotation || 0;
+    const transform = `scale(${this.startScale}, ${this.startScale}) rotate(${rotation}deg)`;
+    this.contentElement.nativeElement.style.transform = transform;
+    this.contentElement.nativeElement.style.transformOrigin = 'center center';
+
+    this.updateHandlesScale(this.startScale, this.startScale);
   }
 
   /**
@@ -712,6 +924,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       // Applica lo scale inverso agli handle per mantenerli alla dimensione originale
       const isRotateHandle = handle.classList.contains('rotate-handle');
       const isHorizontalHandle = handle.classList.contains('resize-left') || handle.classList.contains('resize-right');
+      const isVerticalHandle = handle.classList.contains('resize-top') || handle.classList.contains('resize-bottom');
       
       if (isRotateHandle) {
         // Per rotate-handle, preserva translateX(-50%) e mantieni sempre -20px dal bordo superiore
@@ -726,6 +939,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       } else if (isHorizontalHandle) {
         // Per le maniglie laterali, preserva translateY(-50%)
         handle.style.transform = `translateY(-50%) scale(${inverseScaleX}, ${inverseScaleY})`;
+      } else if (isVerticalHandle) {
+        // Per le maniglie verticali, preserva translateX(-50%)
+        handle.style.transform = `translateX(-50%) scale(${inverseScaleX}, ${inverseScaleY})`;
       } else {
         // Per gli angoli, solo scale
         handle.style.transform = `scale(${inverseScaleX}, ${inverseScaleY})`;
@@ -786,6 +1002,11 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private initializeDefaults(): void {
     if (!this.note) return;
     
+    // Inizializza type per retro-compatibilità (note salvate prima dell'introduzione dei tipi)
+    if (!this.note.type) {
+      this.note.type = 'text';
+    }
+
     // Inizializza width solo se non presente
     if (this.note.width === undefined || this.note.width === null) {
       this.note.width = Note.DEFAULT_WIDTH;
@@ -817,13 +1038,16 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     if (this.note) {
       // Inizializza i valori di default solo se non presenti
       this.initializeDefaults();
-      
-      const purifiedText = this.purifyAndNormalizeText(this.note.text || '');
-      this.noteText = purifiedText;
-      if (this.note.text !== purifiedText) {
-        this.note.text = purifiedText;
+
+      // Solo note testuali: sanificazione e binding HTML
+      if (this.isTextNote) {
+        const purifiedText = this.purifyAndNormalizeText(this.note.text || '');
+        this.noteText = purifiedText;
+        if (this.note.text !== purifiedText) {
+          this.note.text = purifiedText;
+        }
+        this.updateSanitizedHtml();
       }
-      this.updateSanitizedHtml();
     }
     
     this.noteUpdatedSubscription = this.noteService.notesChanged$
@@ -836,12 +1060,12 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         if (updatedNote && this.note) {
           Object.assign(this.note, updatedNote);
           
-          if (updatedNote.text) {
+          if (this.isTextNote && updatedNote.text) {
             const purifiedText = this.purifyAndNormalizeText(updatedNote.text);
             this.note.text = purifiedText;
           }
           
-          if (!this.textareaHasFocus) {
+          if (this.isTextNote && !this.textareaHasFocus) {
             const newText = this.note.text || '';
             if (this.noteText !== newText) {
               this.noteText = newText;
@@ -929,6 +1153,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    * Il font-size è garantito essere presente grazie a initializeDefaults().
    */
   private calculateAndApplyFontSize(): void {
+    if (!this.isTextNote) {
+      return;
+    }
     if (!this.note || !this.noteInput) {
       return;
     }
@@ -999,6 +1226,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   private updateSanitizedHtml(): void {
+    if (!this.isTextNote) {
+      return;
+    }
     if (this.textareaHasFocus) {
       return;
     }
@@ -1092,7 +1322,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     }
     
     // Determina l'altezza base: usa note.height (garantito da initializeDefaults)
-    const baseHeight = this.note.height;
+    const baseHeight = this.currentBaseHeight > 0 ? this.currentBaseHeight : this.note.height;
+    if (this.currentBaseHeight === 0) {
+      this.currentBaseHeight = baseHeight;
+    }
     
     // Imposta sempre le dimensioni base nel DOM (rimangono fisse, usiamo scale per ridimensionare)
     element.style.width = baseWidth + 'px';
@@ -1159,6 +1392,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     if(this.isHorizontalResizing) {
       const DOMWidth = parseFloat(this.contentElement.nativeElement.style.width);
       this.note.width = DOMWidth;
+    }
+    if(this.isVerticalResizing) {
+      const DOMHeight = parseFloat(this.contentElement.nativeElement.style.height);
+      this.note.height = DOMHeight;
     }
     this.logger.log('[CDS-NOTES] Applied scale and transform:', {
       scaleX: scaleX,

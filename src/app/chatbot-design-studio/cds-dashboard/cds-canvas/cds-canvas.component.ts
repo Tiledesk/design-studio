@@ -1596,6 +1596,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     
       // Creiamo una nuova nota
       const newNote = new Note(this.id_faq_kb, pos);
+      // Shift+click crea una nota rettangolo (non testuale), click normale crea nota testo
+      newNote.type = event.shiftKey ? 'rect' : 'text';
+      if (newNote.type !== 'text') {
+        // Per i tipi non testuali non usiamo `text` (retro-compatibile per `text`)
+        newNote.text = '';
+      }
       
       // Aggiungiamo la nota all'array locale
       this.listOfNotes.push(newNote);

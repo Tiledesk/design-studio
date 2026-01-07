@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { NOTE_COLORS } from 'src/app/chatbot-design-studio/utils';
+import { NotePayload, NoteType } from './note-types';
 
 export class Note {
   static readonly DEFAULT_WIDTH = 130;
@@ -10,7 +11,17 @@ export class Note {
   note_id: string;
   x: number;
   y: number;
+  /**
+   * Tipo della nota (estensibile).
+   * Retro-compatibilità: se mancante, va trattato come 'text'.
+   */
+  type?: NoteType;
   text?: string;
+  /**
+   * Payload extra per note non testuali (immagini/video/shape).
+   * Retro-compatibilità: per 'text' continuiamo ad usare `text`.
+   */
+  payload?: NotePayload;
   width?: number;
   height?: number;
   backgroundColor?: string;
@@ -31,6 +42,7 @@ export class Note {
     this.note_id = uuidv4();
     this.x = pos.x;
     this.y = pos.y;
+    this.type = 'text';
     this.text = 'Type something';
     this.width = Note.DEFAULT_WIDTH;
     this.height = Note.DEFAULT_HEIGHT;

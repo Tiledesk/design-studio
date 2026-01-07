@@ -83,6 +83,25 @@
       height: 20px;
       cursor: ew-resize;
     }
+
+    // Handle verticali per ridimensionamento verticale
+    &.resize-top {
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      cursor: ns-resize;
+    }
+
+    &.resize-bottom {
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      cursor: ns-resize;
+    }
     
   }
   
@@ -115,6 +134,31 @@
     &:active {
       cursor: grabbing;
     }
+  }
+}
+
+// ============================================================================
+// RECT NOTE (NON TESTUALE)
+// ============================================================================
+.cds-notes-content.rect-note {
+  user-select: none;
+  -webkit-user-select: none;
+
+  .rect-body {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    background: transparent;
+  }
+
+  // Nascondi maniglie ai vertici + pallino rotazione per le note rettangolo
+  // (override anche quando il container è `.selected`)
+  .resize-handle.resize-tl,
+  .resize-handle.resize-tr,
+  .resize-handle.resize-bl,
+  .resize-handle.resize-br,
+  .rotate-handle {
+    display: none !important;
   }
 }
 

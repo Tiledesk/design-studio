@@ -24,7 +24,7 @@
         <!-- ---------------------------------------------------------- -->
         <!-- Rich Text Editor Section -->
         <!-- ---------------------------------------------------------- -->
-        <div class="row rich-text-editor-section">
+        <div class="row rich-text-editor-section" *ngIf="note?.type === 'text' || !note?.type">
             <!-- <div class="section-header">
                 <h4 class="section-title">Markup text</h4>
                 <mat-icon class="more-options-icon" svgIcon="more_vert" aria-hidden="true"></mat-icon>

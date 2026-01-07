@@ -27,6 +27,17 @@ export class NoteService {
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService
   ) { }
+
+  /**
+   * Normalizza i default per retro-compatibilità (note salvate prima dell'introduzione dei tipi).
+   * Da chiamare prima di persistere o duplicare.
+   */
+  private ensureNoteDefaults(note: Note): void {
+    if (!note) return;
+    if (!note.type) {
+      note.type = 'text';
+    }
+  }
   
   /**
    * Notifica i cambiamenti all'array di note
@@ -145,6 +156,8 @@ export class NoteService {
    */
   saveRemoteNote(note: Note, id_faq_kb: string): Observable<any> {
     try {
+      this.ensureNoteDefaults(note);
+
       // Assicurati che attributes esista
       if (!this.dashboardService.selectedChatbot.attributes) {
         this.dashboardService.selectedChatbot.attributes = {};
@@ -152,6 +165,8 @@ export class NoteService {
       
       // Recupera tutte le note dal dashboardService (o array vuoto se non esiste)
       const notes = this.dashboardService.selectedChatbot.attributes.notes || [];
+      // Garantisce default anche per note già presenti (retro-compatibilità)
+      notes.forEach(n => this.ensureNoteDefaults(n));
       
       // Cerca se la nota esiste già nell'array
       const existingIndex = notes.findIndex(n => n.note_id === note.note_id);
@@ -247,6 +262,7 @@ export class NoteService {
       if (!note || !note.note_id) {
         throw new Error('Note is required for duplication');
       }
+      this.ensureNoteDefaults(note);
 
       // Crea una copia della nota con un nuovo ID
       // Sposta leggermente la posizione della nota duplicata
@@ -255,15 +271,30 @@ export class NoteService {
         y: note.y + 20
       });
       
-      // Copia tutte le proprietà dalla nota originale
-      duplicatedNote.text = note.text;
-      duplicatedNote.backgroundColor = note.backgroundColor;
-      duplicatedNote.backgroundOpacity = note.backgroundOpacity;
-      duplicatedNote.borderColor = note.borderColor;
-      duplicatedNote.borderOpacity = note.borderOpacity;
-      duplicatedNote.boxShadow = note.boxShadow;
-      duplicatedNote.width = note.width;
-      duplicatedNote.height = note.height;
+      /**
+       * Copia tutte le proprietà dalla nota originale, mantenendo:
+       * - `note_id` nuovo (generato dal costruttore)
+       * - `createdAt` nuovo
+       * - `x/y` spostati di offset
+       * - `id_faq_kb` coerente con quello passato
+       *
+       * Questo rende la duplicazione future-proof (nuove proprietà come `type/payload`,
+       * `scale/rotation`, `fontSize/fontFamily`, ecc. vengono duplicate automaticamente).
+       */
+      const {
+        note_id: _noteId,
+        createdAt: _createdAt,
+        x: _x,
+        y: _y,
+        id_faq_kb: _idFaqKb,
+        ...rest
+      } = note as any;
+      Object.assign(duplicatedNote, rest);
+      duplicatedNote.id_faq_kb = id_faq_kb;
+      duplicatedNote.x = note.x + 20;
+      duplicatedNote.y = note.y + 20;
+      duplicatedNote.createdAt = new Date();
+      duplicatedNote.isNew = true;
       
       // Assicurati che attributes esista
       if (!this.dashboardService.selectedChatbot.attributes) {
