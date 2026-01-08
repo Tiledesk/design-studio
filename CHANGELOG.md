@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.23-rc5
+- **added**: added sortedItems in selection intent
+
 # 1.39.23-rc4
 - **added**: showed connectors-in only if they are contract connectors
 
