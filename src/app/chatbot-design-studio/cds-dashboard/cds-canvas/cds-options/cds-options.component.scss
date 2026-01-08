@@ -58,33 +58,41 @@
 }
 
 // ---------------------------------------------------------------------------
-// NOTE TYPE MENU (Material mat-menu) - uniformato a `menuElement`
+// NOTE TYPE MENU (DIV custom) - mantiene gli stessi stili già impostati
 // ---------------------------------------------------------------------------
-// NB: `menuElement` è definito globalmente e imposta anche top/left/position.
-// Per questo menu vogliamo posizionamento gestito dall'overlay (sopra il trigger, left-aligned).
-::ng-deep .mat-menu-panel.menuElement.noteTypeMenu {
-    // manteniamo look&feel `menuElement`, ma annulliamo offset "hard-coded"
-    position: relative !important;
-    top: -10px !important;
-    left: -5px !important;
-    margin: 0 !important;
-
-    min-width: 185px;
-    max-width: 400px;
-    width: 185px;
-    border-radius: 8px;
-    background: rgb(255, 255, 255);
-    border: 3px solid var(--gray-02);
-    box-shadow: none;
-    overflow: visible;
-    padding: 0;
+.note-type-menu-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: transparent;
 }
 
-::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-content {
+.note-type-menu-backdrop.is-open {
+  display: block;
+}
+
+.note-type-menu.menuElement.noteTypeMenu {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  min-width: 185px;
+  max-width: 400px;
+  width: 185px;
+  border-radius: 8px;
+  background: rgb(255, 255, 255);
+  border: 3px solid var(--gray-02);
+  box-shadow: none;
+  overflow: visible;
   padding: 6px !important;
+  // offsets left/top sono gestiti da TS tramite noteTypeMenuPos + tuoi valori (-5/-10)
 }
 
-::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .note-type-menu-item {
+.note-type-menu.menuElement.noteTypeMenu.is-open {
+  display: block;
+}
+
+.note-type-menu.menuElement.noteTypeMenu .note-type-menu-item {
   color: var(--blu);
   padding: 0px 8px;
   vertical-align: middle;
@@ -97,19 +105,35 @@
   line-height: 30px;
   gap: 10px;
   border-radius: 6px;
+  .label {
+    background-color: transparent;
+  }
 }
 
-::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .note-type-menu-item:hover {
+// Durante il drag: l'item nel menu resta al suo posto ma lo rendiamo meno invasivo
+.note-type-menu.menuElement.noteTypeMenu .note-type-menu-item.cdk-drag-dragging {
+  opacity: 1;
+  background-color: #fff!important;
+}
+
+// Ghost sotto al cursore (il preview viene appeso al body => serve ::ng-deep)
+::ng-deep .note-drag-ghost {
+  background-color: #112233;
+  opacity: 1;
+}
+
+
+.note-type-menu.menuElement.noteTypeMenu .note-type-menu-item:hover {
   background-color: transparent;
   box-shadow: rgba(19, 33, 68, 0.0392156863) 0 12px 24px, rgba(19, 33, 68, 0.0392156863) 0 8px 12px, rgba(19, 33, 68, 0.0196078431) 0 4px 4px, rgba(19, 33, 68, 0.0117647059) 0 2px 2px, rgba(19, 33, 68, 0.0117647059) 0 1px 1px, rgba(17, 49, 96, 0.031372549) 0 0, rgba(17, 49, 96, 0.0588235294) 0 0 0 1px;
 }
 // Cursori drag&drop (solo palette note nel mat-menu)
-::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-item.cdk-drag {
-    cursor: grab;
+.note-type-menu.menuElement.noteTypeMenu .note-type-menu-item.cdk-drag {
+  cursor: grab;
 }
 
-::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-item.cdk-drag.cdk-drag-dragging {
-    cursor: grabbing;
+.note-type-menu.menuElement.noteTypeMenu .note-type-menu-item.cdk-drag.cdk-drag-dragging {
+  cursor: grabbing;
 }
 
 // Durante il drag: forziamo il cursore globale a grabbing per evitare "cursor flicker"
@@ -118,7 +142,7 @@
     cursor: grabbing !important;
 }
 
-::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-item .material-icons-outlined {
+.note-type-menu.menuElement.noteTypeMenu .material-icons-outlined {
     font-size: 18px;
     width: 18px;
     height: 18px;
@@ -126,10 +150,6 @@
     align-items: center;
     justify-content: center;
     color: var(--blu);
-}
-
-::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-divider {
-    margin: 4px 0;
 }
 
 ::ng-deep .mouse-trackpad-tips-panel {

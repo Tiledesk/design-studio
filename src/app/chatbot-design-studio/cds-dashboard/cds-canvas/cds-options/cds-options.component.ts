@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Input, Output, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnInit, Input, Output, ViewChild, ElementRef } from '@angular/core';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
@@ -11,6 +11,7 @@ import { NoteType } from 'src/app/models/note-types';
 })
 export class CdsOptionsComponent implements OnInit {
   @ViewChild('alphaInput') alphaInput!: ElementRef;
+  @ViewChild('divNote', { read: ElementRef }) divNote!: ElementRef<HTMLElement>;
   @Input() id_faq_kb: any;
   @Input() stateUndoRedo: any;
   @Output() onOptionClicked = new EventEmitter<{ option: OPTIONS; alpha?: any; isActive?: boolean; noteType?: NoteType }>();
@@ -26,6 +27,9 @@ export class CdsOptionsComponent implements OnInit {
     { type: 'image', icon: 'image', labelKey: 'CdsOptions.NoteType.Image' },
     { type: 'video', icon: 'videocam', labelKey: 'CdsOptions.NoteType.Video' },
   ];
+  isNoteTypeMenuOpen: boolean = false;
+  noteTypeMenuPos: { left: number; top: number } = { left: 0, top: 0 };
+  private isDraggingNotePalette: boolean = false;
   
   
 
@@ -54,6 +58,39 @@ export class CdsOptionsComponent implements OnInit {
     this.isMoreMenu = false;
   }
 
+  toggleNoteTypeMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    event.preventDefault();
+
+    this.isNoteTypeMenuOpen = !this.isNoteTypeMenuOpen;
+    if (!this.isNoteTypeMenuOpen) return;
+    this.repositionNoteTypeMenu();
+  }
+
+  private repositionNoteTypeMenu(): void {
+    const rect = this.divNote?.nativeElement?.getBoundingClientRect();
+    if (!rect) return;
+
+    // Replichiamo le stesse costanti che hai impostato nel CSS (top/left offsets)
+    const menuOffsetLeft = -5;
+    const menuOffsetTop = -10;
+    const itemHeight = 30;
+    const paddingY = 6 * 2; // padding menu content (top+bottom)
+    const borderY = 3 * 2;
+    const menuApproxHeight = paddingY + borderY + (itemHeight * this.notePalette.length);
+
+    // Posizionamento: sopra al pulsante note, left-aligned
+    this.noteTypeMenuPos = {
+      left: rect.left + menuOffsetLeft,
+      top: rect.top - menuApproxHeight + menuOffsetTop
+    };
+  }
+
+  closeNoteTypeMenu(): void {
+    if (this.isDraggingNotePalette) return;
+    this.isNoteTypeMenuOpen = false;
+  }
+
 
   onOptionClick(option){
     // Il pulsante NOTE ora serve solo ad aprire/chiudere il submenu.
@@ -65,6 +102,7 @@ export class CdsOptionsComponent implements OnInit {
     // Reset visivo dell'item nel menu (il drag è solo "palette", non spostiamo realmente l'elemento)
     event.source.reset();
     document.body.classList.remove('cds-note-palette-dragging');
+    this.isDraggingNotePalette = false;
 
     const rawEvent: any = (event as any).event;
     const clientX: number | undefined = rawEvent?.clientX ?? rawEvent?.changedTouches?.[0]?.clientX;
@@ -80,10 +118,13 @@ export class CdsOptionsComponent implements OnInit {
     if (!isInsideStage) return;
 
     this.noteDroppedOnStage.emit({ noteType, clientX, clientY });
+    // Chiudi il menu dopo un drop valido (evita click accidentali post-drag)
+    this.isNoteTypeMenuOpen = false;
   }
 
   onNotePaletteDragStarted(): void {
     document.body.classList.add('cds-note-palette-dragging');
+    this.isDraggingNotePalette = true;
   }
 
   onTogleAlphaConnectorsMenu(){
@@ -99,5 +140,27 @@ export class CdsOptionsComponent implements OnInit {
 
   onChangeAlphaConnectors(alpha){
     this.onOptionClicked.emit({ option: OPTIONS.ALPHA, alpha: alpha });
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (!this.isNoteTypeMenuOpen) return;
+    this.repositionNoteTypeMenu();
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  onDocumentMouseDown(event: MouseEvent): void {
+    if (!this.isNoteTypeMenuOpen) return;
+    if (this.isDraggingNotePalette) return;
+    const target = event.target as HTMLElement;
+    if (!target) return;
+    if (target.closest('.note-type-menu') || target.closest('#cds-options-panel')) return;
+    this.isNoteTypeMenuOpen = false;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (!this.isNoteTypeMenuOpen) return;
+    this.isNoteTypeMenuOpen = false;
   }
 }

@@ -4,7 +4,7 @@
     <div size="4" class="cds-elements" mat-button>
         <div class="cds-element" #divNote>
             <div class="cds-button-element">
-                <div class="cds-box-button" [matMenuTriggerFor]="noteTypeMenu">
+                <div class="cds-box-button" (click)="toggleNoteTypeMenu($event)">
                     <span class="box-img">
                         <span class="material-icons-outlined">note</span>
                     </span>
@@ -124,26 +124,30 @@
 
 </div>
 
-<!-- NOTE TYPE MENU (stile menuElement) -->
-<mat-menu
-    #noteTypeMenu="matMenu"
-    class="menuElement noteTypeMenu"
-    xPosition="after"
-    yPosition="above"
-    [overlapTrigger]="false">
-    <!-- Draggable palette items: drop sullo stage per creare la nota -->
-    <button
+<!-- NOTE TYPE MENU (DIV custom) -->
+<div
+    class="note-type-menu-backdrop"
+    [class.is-open]="isNoteTypeMenuOpen"
+    (mousedown)="closeNoteTypeMenu()"
+    (touchstart)="closeNoteTypeMenu()">
+</div>
+
+<div
+    class="note-type-menu menuElement noteTypeMenu"
+    [class.is-open]="isNoteTypeMenuOpen"
+    [style.left.px]="noteTypeMenuPos.left"
+    [style.top.px]="noteTypeMenuPos.top">
+    <div
         *ngFor="let item of notePalette"
         class="note-type-menu-item"
-        mat-menu-item
         cdkDrag
         [cdkDragData]="{ kind: 'note', noteType: item.type }"
         (cdkDragStarted)="onNotePaletteDragStarted()"
         (cdkDragEnded)="onNotePaletteDragEnded($event, item.type)">
         <span class="material-icons-outlined">{{ item.icon }}</span>
-        <span>{{ item.labelKey | translate }}</span>
-    </button>
-</mat-menu>
+        <span class="label">{{ item.labelKey | translate }}</span>
+    </div>
+</div>
 
 
 <sat-popover #mouseTips 
