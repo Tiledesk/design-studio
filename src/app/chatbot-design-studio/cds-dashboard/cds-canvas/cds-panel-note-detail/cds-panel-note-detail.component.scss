@@ -260,6 +260,48 @@
             margin: 0;
             color: #000000; // Colore di default del testo
         }
+
+        /* Quill pickers: our tokens are hex without '#', so we paint swatches via CSS. */
+        .ql-snow {
+            .ql-picker.ql-color,
+            .ql-picker.ql-background {
+                .ql-picker-item[data-value="000000"] { background-color: #000000; }
+                .ql-picker-item[data-value="e60000"] { background-color: #e60000; }
+                .ql-picker-item[data-value="ff9900"] { background-color: #ff9900; }
+                .ql-picker-item[data-value="ffff00"] { background-color: #ffff00; }
+                .ql-picker-item[data-value="008a00"] { background-color: #008a00; }
+                .ql-picker-item[data-value="0066cc"] { background-color: #0066cc; }
+                .ql-picker-item[data-value="9933ff"] { background-color: #9933ff; }
+                .ql-picker-item[data-value="ffffff"] { background-color: #ffffff; border: 1px solid #ddd; }
+                .ql-picker-item[data-value="facccc"] { background-color: #facccc; }
+                .ql-picker-item[data-value="ffebcc"] { background-color: #ffebcc; }
+                .ql-picker-item[data-value="ffffcc"] { background-color: #ffffcc; }
+                .ql-picker-item[data-value="cce8cc"] { background-color: #cce8cc; }
+                .ql-picker-item[data-value="cce0f5"] { background-color: #cce0f5; }
+                .ql-picker-item[data-value="ebd6ff"] { background-color: #ebd6ff; }
+                .ql-picker-item[data-value="bbbbbb"] { background-color: #bbbbbb; }
+                .ql-picker-item[data-value="f06666"] { background-color: #f06666; }
+                .ql-picker-item[data-value="ffc266"] { background-color: #ffc266; }
+                .ql-picker-item[data-value="ffff66"] { background-color: #ffff66; }
+                .ql-picker-item[data-value="66b966"] { background-color: #66b966; }
+                .ql-picker-item[data-value="66a3e0"] { background-color: #66a3e0; }
+                .ql-picker-item[data-value="c285ff"] { background-color: #c285ff; }
+                .ql-picker-item[data-value="888888"] { background-color: #888888; }
+                .ql-picker-item[data-value="a10000"] { background-color: #a10000; }
+                .ql-picker-item[data-value="b26b00"] { background-color: #b26b00; }
+                .ql-picker-item[data-value="b2b200"] { background-color: #b2b200; }
+                .ql-picker-item[data-value="006100"] { background-color: #006100; }
+                .ql-picker-item[data-value="0047b2"] { background-color: #0047b2; }
+                .ql-picker-item[data-value="6b24b2"] { background-color: #6b24b2; }
+                .ql-picker-item[data-value="444444"] { background-color: #444444; }
+                .ql-picker-item[data-value="5c0000"] { background-color: #5c0000; }
+                .ql-picker-item[data-value="663d00"] { background-color: #663d00; }
+                .ql-picker-item[data-value="666600"] { background-color: #666600; }
+                .ql-picker-item[data-value="003700"] { background-color: #003700; }
+                .ql-picker-item[data-value="002966"] { background-color: #002966; }
+                .ql-picker-item[data-value="3d1466"] { background-color: #3d1466; }
+            }
+        }
     }
 
     .rich-text-editor-wrapper {

@@ -8,6 +8,7 @@ import { STAGE_SETTINGS, ColorUtils, NOTE_COLORS } from 'src/app/chatbot-design-
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { QUILL_COLOR_TOKENS } from 'src/app/chatbot-design-studio/cds-dashboard/utils/quill-color-classes';
 
 @Component({
   selector: 'cds-panel-note-detail',
@@ -42,7 +43,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     this.maximize = this.stageService.getMaximize();
     this.toolbarOptions = [
       ['bold', 'italic', 'underline'],            // testo
-      [{ 'color': [] }, { 'background': [] }],    // colori
+      [{ 'color': QUILL_COLOR_TOKENS }, { 'background': QUILL_COLOR_TOKENS }],    // colori (class-based, no inline styles)
       [{ 'align': [] }],                          // allineamento
       ['link'],                                   // link
       ['clean']                                   // rimuovi formattazione
