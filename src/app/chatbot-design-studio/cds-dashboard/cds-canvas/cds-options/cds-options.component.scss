@@ -57,6 +57,79 @@
     user-select: none;
 }
 
+// ---------------------------------------------------------------------------
+// NOTE TYPE MENU (Material mat-menu) - uniformato a `menuElement`
+// ---------------------------------------------------------------------------
+// NB: `menuElement` è definito globalmente e imposta anche top/left/position.
+// Per questo menu vogliamo posizionamento gestito dall'overlay (sopra il trigger, left-aligned).
+::ng-deep .mat-menu-panel.menuElement.noteTypeMenu {
+    // manteniamo look&feel `menuElement`, ma annulliamo offset "hard-coded"
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    margin: 0 !important;
+
+    min-width: 185px;
+    max-width: 400px;
+    width: 185px;
+    border-radius: 8px;
+    background: rgb(255, 255, 255);
+    border: 2px solid var(--gray-02);
+    box-shadow: none;
+    overflow: visible;
+    padding: 0;
+}
+
+::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-content {
+    padding: 0;
+}
+
+::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-item {
+    
+}
+
+::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .note-type-menu-item {
+  color: var(--blu);
+    padding: 0px 8px;
+    vertical-align: middle;
+    font-size: 10px;
+    font-weight: 400;
+    font-family: var(--font-family-poppins);
+    display: flex;
+    align-items: center;
+    height: 30px;
+    line-height: 30px;
+    gap: 10px;
+}
+// Cursori drag&drop (solo palette note nel mat-menu)
+::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-item.cdk-drag {
+    cursor: grab;
+}
+
+::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-item.cdk-drag.cdk-drag-dragging {
+    cursor: grabbing;
+}
+
+// Durante il drag: forziamo il cursore globale a grabbing per evitare "cursor flicker"
+::ng-deep body.cds-note-palette-dragging,
+::ng-deep body.cds-note-palette-dragging * {
+    cursor: grabbing !important;
+}
+
+::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-item .material-icons-outlined {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blu);
+}
+
+::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-divider {
+    margin: 4px 0;
+}
+
 ::ng-deep .mouse-trackpad-tips-panel {
     // position: relative;
     box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;

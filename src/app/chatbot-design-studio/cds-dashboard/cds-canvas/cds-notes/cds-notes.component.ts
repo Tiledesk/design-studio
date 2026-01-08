@@ -58,10 +58,36 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private startLeft = 0; // Posizione X iniziale CSS per resize orizzontale
   private startCenterXReal = 0; // Centro X reale iniziale in viewport per resize orizzontale
   private startHostLeftViewport = 0; // Posizione X iniziale dell'host in viewport per resize orizzontale
+  /**
+   * Costante (viewport) che rappresenta l'offset "layout" tra host e content,
+   * separando il contributo geometrico dovuto allo scale con origin al centro.
+   *
+   * Modello (rotation ~ 0):
+   * contentLeftViewport = hostLeftViewport + C + widthBase * (1 - scale) / 2
+   * contentRightViewport = hostLeftViewport + C + widthBase * (1 + scale) / 2
+   */
+  private startContentCViewport = 0;
+  private startFixedLeftViewport = 0; // Bordo sinistro iniziale (viewport) per resize non-simmetrico
+  private startFixedRightViewport = 0; // Bordo destro iniziale (viewport) per resize non-simmetrico
   private currentBaseWidth = 0; // Larghezza base corrente (può essere modificata dal resize orizzontale)
+  private rafHorizontalResizeId: number | null = null;
+  private lastHorizontalClientX: number | null = null;
   private startTop = 0; // Posizione Y iniziale CSS per resize verticale
   private startCenterYReal = 0; // Centro Y reale iniziale in viewport per resize verticale
   private startHostTopViewport = 0; // Posizione Y iniziale dell'host in viewport per resize verticale
+  private startFixedTopViewport = 0; // Bordo superiore iniziale (viewport) per resize verticale non-simmetrico
+  private startFixedBottomViewport = 0; // Bordo inferiore iniziale (viewport) per resize verticale non-simmetrico
+  /**
+   * Costante (viewport) che rappresenta l'offset "layout" tra host e content,
+   * separando il contributo geometrico dovuto allo scale con origin al centro.
+   *
+   * Modello (rotation ~ 0):
+   * contentTopViewport = hostTopViewport + C + heightBase * (1 - scale) / 2
+   * contentBottomViewport = hostTopViewport + C + heightBase * (1 + scale) / 2
+   */
+  private startContentCViewportY = 0;
+  private rafVerticalResizeId: number | null = null;
+  private lastVerticalClientY: number | null = null;
   private currentBaseHeight = 0; // Altezza base corrente (può essere modificata dal resize verticale)
   private justFinishedResizing = false;
 
@@ -260,6 +286,17 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.applyScaleAndTransform();
       this.isHorizontalResizing = false;
       this.resizeHandle = '';
+      // Cleanup rAF/will-change (riduce flicker post-gesture)
+      if (this.rafHorizontalResizeId != null) {
+        window.cancelAnimationFrame(this.rafHorizontalResizeId);
+        this.rafHorizontalResizeId = null;
+      }
+      this.lastHorizontalClientX = null;
+      if (this.contentElement) {
+        this.contentElement.nativeElement.style.willChange = '';
+      }
+      const hostElement = this.elementRef.nativeElement as HTMLElement;
+      hostElement.style.willChange = '';
       // this.changeState(0);
       this.justFinishedResizing = true;
       setTimeout(() => {
@@ -273,6 +310,17 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.applyScaleAndTransform();
       this.isVerticalResizing = false;
       this.resizeHandle = '';
+      // Cleanup rAF/will-change (riduce flicker post-gesture)
+      if (this.rafVerticalResizeId != null) {
+        window.cancelAnimationFrame(this.rafVerticalResizeId);
+        this.rafVerticalResizeId = null;
+      }
+      this.lastVerticalClientY = null;
+      if (this.contentElement) {
+        this.contentElement.nativeElement.style.willChange = '';
+      }
+      const hostElement = this.elementRef.nativeElement as HTMLElement;
+      hostElement.style.willChange = '';
       this.justFinishedResizing = true;
       setTimeout(() => {
         this.justFinishedResizing = false;
@@ -582,8 +630,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   /**
-   * Inizia il ridimensionamento orizzontale simmetrico
-   * Il centro orizzontale del div rimane fisso durante il resize
+   * Inizia il ridimensionamento orizzontale NON simmetrico:
+   * - handle right: si espande solo verso destra mantenendo fisso il bordo sinistro
+   * - handle left: si espande solo verso sinistra mantenendo fisso il bordo destro
    */
   startHorizontalResize(event: MouseEvent, handle: 'left' | 'right'): void {
     event.stopPropagation();
@@ -613,14 +662,22 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.startScale = 1;
     }
     
-    // Calcola il centro X reale iniziale in viewport (questo deve rimanere fisso)
+    // Salva i bordi reali del bounding box in viewport (ancore)
     const rect = this.contentElement.nativeElement.getBoundingClientRect();
+    this.startFixedLeftViewport = rect.left;
+    this.startFixedRightViewport = rect.right;
+    // Manteniamo comunque questo campo per retro-compatibilità con altre parti
     this.startCenterXReal = rect.left + rect.width / 2;
     
     // Leggi la posizione X iniziale dell'host in viewport e CSS
     const hostElement = this.elementRef.nativeElement as HTMLElement;
     const hostRect = hostElement.getBoundingClientRect();
     this.startHostLeftViewport = hostRect.left;
+    // Calcola C (viewport) isolando l'effetto dello scale con transform-origin al centro.
+    // Questo evita che, con scale != 1, l'ancora "scivoli" durante il resize.
+    const scale = this.startScale || 1;
+    this.startContentCViewport =
+      rect.left - hostRect.left - (this.startWidth * (1 - scale)) / 2;
     
     const hostLeftCSS = parseFloat(hostElement.style.left);
     if (!isNaN(hostLeftCSS)) {
@@ -628,6 +685,19 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     } else {
       this.startLeft = this.note.x || 0;
     }
+
+    // Performance: durante il resize vogliamo minimizzare reflow/jank.
+    // - non aggiorniamo transform ad ogni mousemove (scale/rotation non cambiano qui)
+    // - lasciamo il browser ottimizzare width/left
+    this.contentElement.nativeElement.style.willChange = 'width';
+    hostElement.style.willChange = 'left';
+
+    // Assicuriamo che transform-origin/transform siano coerenti una volta sola
+    const rotation = this.note.rotation || 0;
+    const scaleForTransform = this.startScale || 1;
+    this.contentElement.nativeElement.style.transformOrigin = 'center center';
+    this.contentElement.nativeElement.style.transform = `scale(${scaleForTransform}, ${scaleForTransform}) rotate(${rotation}deg)`;
+    this.updateHandlesScale(scaleForTransform, scaleForTransform);
     
     this.changeState(2);
   }
@@ -667,11 +737,19 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // Calcola il centro Y reale iniziale in viewport (questo deve rimanere fisso)
     const rect = this.contentElement.nativeElement.getBoundingClientRect();
     this.startCenterYReal = rect.top + rect.height / 2;
+    // Non-simmetrico: salviamo i bordi in viewport come ancore
+    this.startFixedTopViewport = rect.top;
+    this.startFixedBottomViewport = rect.bottom;
 
     // Leggi la posizione Y iniziale dell'host in viewport e CSS
     const hostElement = this.elementRef.nativeElement as HTMLElement;
     const hostRect = hostElement.getBoundingClientRect();
     this.startHostTopViewport = hostRect.top;
+    // Calcola C (viewport) isolando l'effetto dello scale con transform-origin al centro.
+    // Questo evita che, con scale != 1, l'ancora "scivoli" durante il resize.
+    const scale = this.startScale || 1;
+    this.startContentCViewportY =
+      rect.top - hostRect.top - (this.startHeight * (1 - scale)) / 2;
 
     const hostTopCSS = parseFloat(hostElement.style.top);
     if (!isNaN(hostTopCSS)) {
@@ -680,89 +758,103 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.startTop = this.note.y || 0;
     }
 
+    // Performance: minimizza reflow/jank durante la gesture
+    this.contentElement.nativeElement.style.willChange = 'height';
+    hostElement.style.willChange = 'top';
+
+    // Assicuriamo che transform-origin/transform siano coerenti una volta sola
+    const rotation = this.note.rotation || 0;
+    const scaleForTransform = this.startScale || 1;
+    this.contentElement.nativeElement.style.transformOrigin = 'center center';
+    this.contentElement.nativeElement.style.transform = `scale(${scaleForTransform}, ${scaleForTransform}) rotate(${rotation}deg)`;
+    this.updateHandlesScale(scaleForTransform, scaleForTransform);
+
     this.changeState(2);
   }
 
   /**
-   * Gestisce il ridimensionamento orizzontale durante il movimento del mouse
-   * Mantiene il centro orizzontale fisso e modifica solo la larghezza
+   * Gestisce il ridimensionamento orizzontale durante il movimento del mouse.
+   * Non-simmetrico: mantiene fisso il lato opposto alla maniglia trascinata.
    */
   private handleHorizontalResize(event: MouseEvent): void {
     if (!this.contentElement || !this.note) return;
-    
-    // Calcola la nuova larghezza basandoti sulla posizione attuale del mouse rispetto al centro fisso
-    // Il centro è fisso a: startCenterXReal
-    // Per maniglia destra: il bordo destro (scalato) deve essere alla posizione del mouse
-    // Per maniglia sinistra: il bordo sinistro (scalato) deve essere alla posizione del mouse
-    // Formula: newWidth * startScale / 2 = distanza dal centro al mouse
+
+    // Batch su rAF: evita troppi layout per-frame su mousemove (soprattutto con scale != 1)
+    this.lastHorizontalClientX = event.clientX;
+    if (this.rafHorizontalResizeId != null) return;
+
+    this.rafHorizontalResizeId = window.requestAnimationFrame(() => {
+      this.rafHorizontalResizeId = null;
+      this.performHorizontalResizeFrame();
+    });
+  }
+
+  private performHorizontalResizeFrame(): void {
+    if (!this.contentElement || !this.note) return;
+    if (this.lastHorizontalClientX == null) return;
+
+    const hostElement = this.elementRef.nativeElement as HTMLElement;
+    const scale = this.startScale || 1;
+    const rotation = this.note.rotation || 0;
+    const normalizedRotation = ((rotation % 360) + 360) % 360;
+    const isEffectivelyUnrotated = normalizedRotation < 0.01 || Math.abs(normalizedRotation - 360) < 0.01;
+
+    // Calcolo della nuova larghezza base (unscaled), ancorando un bordo in viewport:
+    // - right: fixedLeft + visualWidth(mouse)
+    // - left:  fixedRight - visualWidth(mouse)
     let newWidth = this.startWidth;
     if (this.resizeHandle === 'right') {
-      // Il bordo destro è a: startCenterXReal + (newWidth * startScale) / 2
-      // Deve essere uguale a: event.clientX
-      // Quindi: newWidth * startScale / 2 = event.clientX - startCenterXReal
-      const distanceFromCenter = event.clientX - this.startCenterXReal;
-      newWidth = (2 * distanceFromCenter) / this.startScale;
+      const visualWidth = this.lastHorizontalClientX - this.startFixedLeftViewport;
+      newWidth = visualWidth / scale;
     } else if (this.resizeHandle === 'left') {
-      // Il bordo sinistro è a: startCenterXReal - (newWidth * startScale) / 2
-      // Deve essere uguale a: event.clientX
-      // Quindi: newWidth * startScale / 2 = startCenterXReal - event.clientX
-      const distanceFromCenter = this.startCenterXReal - event.clientX;
-      newWidth = (2 * distanceFromCenter) / this.startScale;
+      const visualWidth = this.startFixedRightViewport - this.lastHorizontalClientX;
+      newWidth = visualWidth / scale;
+    } else {
+      return;
     }
-    
-    // Limiti minimi e massimi per la larghezza
-    const minWidth = 50; // Larghezza minima
-    const maxWidth = 2000; // Larghezza massima
+
+    const minWidth = 50;
+    const maxWidth = 2000;
     newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-    
-    // Applica PRIMA la nuova larghezza al DOM (senza modificare lo scale)
+
+    // Applica width base (non tocchiamo scale/rotation)
     this.contentElement.nativeElement.style.width = newWidth + 'px';
-    
-    // Salva la nuova larghezza base
     this.currentBaseWidth = newWidth;
-    
-    // Calcola la nuova posizione X per mantenere il centro fisso
-    // Il centro reale iniziale in viewport è: startCenterXReal
-    // La larghezza visiva nuova sarà: newWidth * startScale
-    // Per mantenere il centro fisso, il nuovo centro del contentElement in viewport deve essere: startCenterXReal
-    // Quindi: newContentLeftViewport = startCenterXReal - (newWidth * startScale) / 2
-    
-    const hostElement = this.elementRef.nativeElement as HTMLElement;
-    const newWidthVisual = newWidth * this.startScale;
-    const newContentLeftViewport = this.startCenterXReal - (newWidthVisual / 2);
-    
-    // Calcola l'offset tra host e contentElement (dovrebbe essere costante)
-    const currentContentRect = this.contentElement.nativeElement.getBoundingClientRect();
-    const currentContentLeftViewport = currentContentRect.left;
-    const currentHostRect = hostElement.getBoundingClientRect();
-    const currentHostLeftViewport = currentHostRect.left;
-    const hostToContentOffset = currentContentLeftViewport - currentHostLeftViewport;
-    
-    // La nuova posizione viewport dell'host dovrebbe essere:
-    const newHostLeftViewport = newContentLeftViewport - hostToContentOffset;
-    
-    // Calcola la differenza in viewport rispetto alla posizione iniziale
-    const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
-    
-    // Applica la differenza alla posizione CSS iniziale
-    const newLeft = this.startLeft + deltaViewport;
-    
-    // Aggiorna la posizione X nel DOM e nel modello
-    hostElement.style.left = newLeft + 'px';
-    this.note.x = newLeft;
-    
-    // Preserva lo scale e la rotazione esistenti
-    const rotation = this.note.rotation || 0;
-    const transform = `scale(${this.startScale}, ${this.startScale}) rotate(${rotation}deg)`;
-    this.contentElement.nativeElement.style.transform = transform;
-    this.contentElement.nativeElement.style.transformOrigin = 'center center';
-    
-    // Aggiorna anche gli handle con lo scale inverso
-    this.updateHandlesScale(this.startScale, this.startScale);
-    
-    // Aggiorna la larghezza nel modello (larghezza effettiva = base * scale)
-    // Ma non modifichiamo note.width direttamente, manteniamo solo la larghezza base nel DOM
-    // e lo scale separato
+
+    // Riallinea l'host per mantenere fisso il bordo opposto, SENZA leggere rect ad ogni frame (evita flicker).
+    // Nota: questa formula è esatta quando rotation ~ 0 (caso principale). Se la nota è ruotata, fallback a rectAfter.
+    if (isEffectivelyUnrotated) {
+      let newHostLeftViewport = this.startHostLeftViewport;
+      if (this.resizeHandle === 'right') {
+        // Fisso il bordo sinistro:
+        // startFixedLeftViewport = hostLeft + C + newWidth*(1-scale)/2
+        newHostLeftViewport =
+          this.startFixedLeftViewport -
+          this.startContentCViewport -
+          (newWidth * (1 - scale)) / 2;
+      } else {
+        // Fisso il bordo destro:
+        // startFixedRightViewport = hostLeft + C + newWidth*(1+scale)/2
+        newHostLeftViewport =
+          this.startFixedRightViewport -
+          this.startContentCViewport -
+          (newWidth * (1 + scale)) / 2;
+      }
+
+      const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
+      const newLeft = this.startLeft + deltaViewport;
+      hostElement.style.left = newLeft + 'px';
+      this.note.x = newLeft;
+    } else {
+      // Fallback (ruotato): usa bounding rect dopo l'update (più costoso, può introdurre micro flicker).
+      const rectAfter = this.contentElement.nativeElement.getBoundingClientRect();
+      const deltaViewport = this.resizeHandle === 'right'
+        ? (this.startFixedLeftViewport - rectAfter.left)
+        : (this.startFixedRightViewport - rectAfter.right);
+      const newLeft = this.startLeft + deltaViewport;
+      hostElement.style.left = newLeft + 'px';
+      this.note.x = newLeft;
+    }
   }
 
   /**
@@ -772,51 +864,81 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private handleVerticalResize(event: MouseEvent): void {
     if (!this.contentElement || !this.note) return;
 
+    // Batch su rAF: evita troppi layout per-frame su mousemove (soprattutto con scale != 1)
+    this.lastVerticalClientY = event.clientY;
+    if (this.rafVerticalResizeId != null) return;
+
+    this.rafVerticalResizeId = window.requestAnimationFrame(() => {
+      this.rafVerticalResizeId = null;
+      this.performVerticalResizeFrame();
+    });
+  }
+
+  private performVerticalResizeFrame(): void {
+    if (!this.contentElement || !this.note) return;
+    if (this.lastVerticalClientY == null) return;
+
+    const hostElement = this.elementRef.nativeElement as HTMLElement;
+    const scale = this.startScale || 1;
+    const rotation = this.note.rotation || 0;
+    const normalizedRotation = ((rotation % 360) + 360) % 360;
+    const isEffectivelyUnrotated = normalizedRotation < 0.01 || Math.abs(normalizedRotation - 360) < 0.01;
+
+    // Calcolo della nuova altezza base (unscaled), ancorando un bordo in viewport:
+    // - bottom: fixedTop + visualHeight(mouse)
+    // - top:    fixedBottom - visualHeight(mouse)
     let newHeight = this.startHeight;
     if (this.resizeHandle === 'bottom') {
-      const distanceFromCenter = event.clientY - this.startCenterYReal;
-      newHeight = (2 * distanceFromCenter) / this.startScale;
+      const visualHeight = this.lastVerticalClientY - this.startFixedTopViewport;
+      newHeight = visualHeight / scale;
     } else if (this.resizeHandle === 'top') {
-      const distanceFromCenter = this.startCenterYReal - event.clientY;
-      newHeight = (2 * distanceFromCenter) / this.startScale;
+      const visualHeight = this.startFixedBottomViewport - this.lastVerticalClientY;
+      newHeight = visualHeight / scale;
+    } else {
+      return;
     }
 
     const minHeight = 30;
     const maxHeight = 2000;
     newHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
 
-    // Applica PRIMA la nuova altezza al DOM (senza modificare lo scale)
+    // Applica height base (non tocchiamo scale/rotation per-frame)
     this.contentElement.nativeElement.style.height = newHeight + 'px';
-
-    // Salva la nuova altezza base
     this.currentBaseHeight = newHeight;
 
-    // Calcola la nuova posizione Y per mantenere il centro fisso
-    const hostElement = this.elementRef.nativeElement as HTMLElement;
-    const newHeightVisual = newHeight * this.startScale;
-    const newContentTopViewport = this.startCenterYReal - (newHeightVisual / 2);
+    // Riallinea l'host per mantenere fisso il bordo opposto, SENZA leggere rect ad ogni frame (evita flicker).
+    // Nota: formula esatta quando rotation ~ 0. Se ruotato, fallback a rectAfter.
+    if (isEffectivelyUnrotated) {
+      let newHostTopViewport = this.startHostTopViewport;
+      if (this.resizeHandle === 'bottom') {
+        // Fisso il bordo superiore:
+        // startFixedTopViewport = hostTop + C + newHeight*(1-scale)/2
+        newHostTopViewport =
+          this.startFixedTopViewport -
+          this.startContentCViewportY -
+          (newHeight * (1 - scale)) / 2;
+      } else {
+        // Fisso il bordo inferiore:
+        // startFixedBottomViewport = hostTop + C + newHeight*(1+scale)/2
+        newHostTopViewport =
+          this.startFixedBottomViewport -
+          this.startContentCViewportY -
+          (newHeight * (1 + scale)) / 2;
+      }
 
-    // Calcola l'offset tra host e contentElement (dovrebbe essere costante)
-    const currentContentRect = this.contentElement.nativeElement.getBoundingClientRect();
-    const currentContentTopViewport = currentContentRect.top;
-    const currentHostRect = hostElement.getBoundingClientRect();
-    const currentHostTopViewport = currentHostRect.top;
-    const hostToContentOffset = currentContentTopViewport - currentHostTopViewport;
-
-    const newHostTopViewport = newContentTopViewport - hostToContentOffset;
-    const deltaViewport = newHostTopViewport - this.startHostTopViewport;
-    const newTop = this.startTop + deltaViewport;
-
-    hostElement.style.top = newTop + 'px';
-    this.note.y = newTop;
-
-    // Preserva lo scale e la rotazione esistenti
-    const rotation = this.note.rotation || 0;
-    const transform = `scale(${this.startScale}, ${this.startScale}) rotate(${rotation}deg)`;
-    this.contentElement.nativeElement.style.transform = transform;
-    this.contentElement.nativeElement.style.transformOrigin = 'center center';
-
-    this.updateHandlesScale(this.startScale, this.startScale);
+      const deltaViewport = newHostTopViewport - this.startHostTopViewport;
+      const newTop = this.startTop + deltaViewport;
+      hostElement.style.top = newTop + 'px';
+      this.note.y = newTop;
+    } else {
+      const rectAfter = this.contentElement.nativeElement.getBoundingClientRect();
+      const deltaViewport = this.resizeHandle === 'bottom'
+        ? (this.startFixedTopViewport - rectAfter.top)
+        : (this.startFixedBottomViewport - rectAfter.bottom);
+      const newTop = this.startTop + deltaViewport;
+      hostElement.style.top = newTop + 'px';
+      this.note.y = newTop;
+    }
   }
 
   /**

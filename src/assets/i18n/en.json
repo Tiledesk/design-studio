@@ -56,6 +56,14 @@
     "Advanced": "Advanced",
     "WatchVideo": "Watch video",
     "LearnMore": "Learn more",
+    "CdsOptions": {
+        "NoteType": {
+            "Rectangle": "Rectangle",
+            "Text": "Text",
+            "Image": "Image",
+            "Video": "Video"
+        }
+    },
     "BotsAddEditPage": {
         "AddBot": "Add Bot",
         "EditBot": "Edit Bot",

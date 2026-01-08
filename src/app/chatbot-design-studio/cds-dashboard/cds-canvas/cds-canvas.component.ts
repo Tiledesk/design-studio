@@ -16,6 +16,7 @@ import { NoteService } from 'src/app/services/note.service';
 import { Intent, Form } from 'src/app/models/intent-model';
 import { Button, Action} from 'src/app/models/action-model';
 import { Note } from 'src/app/models/note-model';
+import { NoteType } from 'src/app/models/note-types';
 
 // UTILS //
 import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
@@ -1580,47 +1581,31 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    */
   onStageClick(event: MouseEvent): void {
     if (this.isNoteModeActive) {
-      // Verifichiamo che il click non provenga dal pulsante note o da altri elementi che non devono essere intercettati
-      const target = event.target as HTMLElement;
-      if (target.closest('#cds-options-panel')) {
-        // Non intercettare i click sul pannello delle opzioni
-        return;
-      }
-      
-      // Preveniamo la propagazione per evitare che il click venga gestito da altri handler
-      event.stopPropagation();
-      event.preventDefault();
-      
-      // Calcoliamo la posizione usando la stessa logica di onDroppedElementToStage
-      let pos = this.connectorService.tiledeskConnectors.logicPoint({ x: event.clientX, y: event.clientY });
-    
-      // Creiamo una nuova nota
+      // La creazione note via click è stata sostituita dal drag&drop dalla palette (cds-options).
+      // Manteniamo questa guard per retro-compatibilità (nel caso venga riattivata la modalità note).
+      return;
+    }
+  }
+
+  onNoteDroppedOnStage(evt: { noteType: NoteType; clientX: number; clientY: number }): void {
+    try {
+      const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: evt.clientX, y: evt.clientY });
       const newNote = new Note(this.id_faq_kb, pos);
-      // Shift+click crea una nota rettangolo (non testuale), click normale crea nota testo
-      newNote.type = event.shiftKey ? 'rect' : 'text';
+      newNote.type = evt.noteType || 'text';
       if (newNote.type !== 'text') {
-        // Per i tipi non testuali non usiamo `text` (retro-compatibile per `text`)
         newNote.text = '';
       }
-      
-      // Aggiungiamo la nota all'array locale
+
       this.listOfNotes.push(newNote);
-      
-      // Sincronizziamo listOfNotes con attributes.notes per assicurarci che siano allineati
-      // Questo è importante perché saveRemoteNote recupera le note da attributes.notes
       if (!this.dashboardService.selectedChatbot.attributes) {
         this.dashboardService.selectedChatbot.attributes = {};
       }
       this.dashboardService.selectedChatbot.attributes.notes = [...this.listOfNotes];
-      
-      // Salva la nota in remoto (saveRemoteNote aggiungerà la nota agli attributes se non presente)
-      // Usa firstValueFrom invece di subscribe per una gestione moderna e sicura
       this.saveNoteRemotely(newNote);
-      
-      this.logger.log("[CDS-CANVAS] Note created at position:", pos, "Total notes:", this.listOfNotes.length);
-      
-      // Disattiviamo la modalità note
-      this.deactivateNoteMode();
+
+      this.logger.log("[CDS-CANVAS] Note dropped on stage:", evt.noteType, pos);
+    } catch (e) {
+      this.logger.error("[CDS-CANVAS] Error creating note from drop:", e);
     }
   }
 
