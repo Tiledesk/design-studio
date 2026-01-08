@@ -65,8 +65,8 @@
 ::ng-deep .mat-menu-panel.menuElement.noteTypeMenu {
     // manteniamo look&feel `menuElement`, ma annulliamo offset "hard-coded"
     position: relative !important;
-    top: 0 !important;
-    left: 0 !important;
+    top: -10px !important;
+    left: -5px !important;
     margin: 0 !important;
 
     min-width: 185px;
@@ -74,32 +74,34 @@
     width: 185px;
     border-radius: 8px;
     background: rgb(255, 255, 255);
-    border: 2px solid var(--gray-02);
+    border: 3px solid var(--gray-02);
     box-shadow: none;
     overflow: visible;
     padding: 0;
 }
 
 ::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-content {
-    padding: 0;
-}
-
-::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-item {
-    
+  padding: 6px !important;
 }
 
 ::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .note-type-menu-item {
   color: var(--blu);
-    padding: 0px 8px;
-    vertical-align: middle;
-    font-size: 10px;
-    font-weight: 400;
-    font-family: var(--font-family-poppins);
-    display: flex;
-    align-items: center;
-    height: 30px;
-    line-height: 30px;
-    gap: 10px;
+  padding: 0px 8px;
+  vertical-align: middle;
+  font-size: 10px;
+  font-weight: 400;
+  font-family: var(--font-family-poppins);
+  display: flex;
+  align-items: center;
+  height: 30px;
+  line-height: 30px;
+  gap: 10px;
+  border-radius: 6px;
+}
+
+::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .note-type-menu-item:hover {
+  background-color: transparent;
+  box-shadow: rgba(19, 33, 68, 0.0392156863) 0 12px 24px, rgba(19, 33, 68, 0.0392156863) 0 8px 12px, rgba(19, 33, 68, 0.0196078431) 0 4px 4px, rgba(19, 33, 68, 0.0117647059) 0 2px 2px, rgba(19, 33, 68, 0.0117647059) 0 1px 1px, rgba(17, 49, 96, 0.031372549) 0 0, rgba(17, 49, 96, 0.0588235294) 0 0 0 1px;
 }
 // Cursori drag&drop (solo palette note nel mat-menu)
 ::ng-deep .mat-menu-panel.menuElement.noteTypeMenu .mat-menu-item.cdk-drag {
