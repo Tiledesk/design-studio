@@ -4,13 +4,14 @@
     [class.selected]="stateNote === 2"
     [class.text-focus]="stateNote === 1"
     [class.tds_draggable]="isDraggable"
-    [class.rect-note]="!isTextNote"
+    [class.rect-note]="!isTextNote && !isImageNote"
+    [class.image-note]="isImageNote"
     [id]="note?.note_id"
     [style.box-shadow]="note?.boxShadow === false ? 'none' : null"
-    [style.border-width.px]="note?.borderWidth"
-    [style.border-style]="'solid'"
+    [style.border-width.px]="isImageNote ? 0 : note?.borderWidth"
+    [style.border-style]="isImageNote ? 'none' : 'solid'"
     [style.border-color]="note?.borderColor"
-    [style.background-color]="note?.backgroundColor">
+    [style.background-color]="isImageNote ? 'transparent' : note?.backgroundColor">
     <!-- (input)="onInputChange($event)" -->
     <div *ngIf="isTextNote; else rectBody"
       #noteInput
@@ -32,12 +33,23 @@
     </div>
 
     <ng-template #rectBody>
-      <div class="rect-body"
+      <div *ngIf="isImageNote; else rectOnly"
+        class="image-body"
         [class.tds_draggable]="isDraggable"
         (click)="onRectClick($event)"
         (dblclick)="onRectDoubleClick($event)"
         (mousedown)="onRectMouseDown($event)">
+        <img class="note-image" [src]="imageSrc" alt="note image" draggable="false" />
       </div>
+
+      <ng-template #rectOnly>
+        <div class="rect-body"
+          [class.tds_draggable]="isDraggable"
+          (click)="onRectClick($event)"
+          (dblclick)="onRectDoubleClick($event)"
+          (mousedown)="onRectMouseDown($event)">
+        </div>
+      </ng-template>
     </ng-template>
 
     <!-- Div giallo per menu contestuale -->
@@ -60,16 +72,16 @@
     <div class="resize-handle resize-br" 
         (mousedown)="startResize($event, 'br')"></div>
     
-    <!-- Handle laterali per ridimensionamento orizzontale simmetrico -->
-    <div class="resize-handle resize-left" 
+    <!-- Handle laterali: disabilitati per image note (resize solo dai vertici, proporzionale) -->
+    <div *ngIf="!isImageNote" class="resize-handle resize-left" 
         (mousedown)="startHorizontalResize($event, 'left')"></div>
-    <div class="resize-handle resize-right" 
+    <div *ngIf="!isImageNote" class="resize-handle resize-right" 
         (mousedown)="startHorizontalResize($event, 'right')"></div>
 
-    <!-- Handle verticali per ridimensionamento verticale simmetrico (solo rect note) -->
-    <div *ngIf="!isTextNote" class="resize-handle resize-top"
+    <!-- Handle verticali: disabilitati per image note (e per text già non mostrati) -->
+    <div *ngIf="!isTextNote && !isImageNote" class="resize-handle resize-top"
         (mousedown)="startVerticalResize($event, 'top')"></div>
-    <div *ngIf="!isTextNote" class="resize-handle resize-bottom"
+    <div *ngIf="!isTextNote && !isImageNote" class="resize-handle resize-bottom"
         (mousedown)="startVerticalResize($event, 'bottom')"></div>
     
     <!-- Handle rotazione al centro del lato superiore -->

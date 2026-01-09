@@ -149,6 +149,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   
   /** note mode */
   isNoteModeActive: boolean = false;
+  private pendingImageDraftNoteId: string | null = null;
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   IS_OPEN_PANEL_NOTE_DETAIL: boolean = false;
@@ -1596,6 +1597,20 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         newNote.text = '';
       }
 
+      // IMAGE NOTE: non aggiungere allo stage finché non c'è un'immagine valida.
+      // Apri subito il pannello di destra per il caricamento.
+      if (newNote.type === 'image') {
+        // Inizializza payload (soft typing)
+        if (!newNote.payload) newNote.payload = {};
+        (newNote.payload as any).imageSrc = '';
+        (newNote.payload as any).imageWidth = 0;
+        (newNote.payload as any).imageHeight = 0;
+
+        this.pendingImageDraftNoteId = newNote.note_id;
+        this.onNoteSelected(newNote);
+        return;
+      }
+
       this.listOfNotes.push(newNote);
       if (!this.dashboardService.selectedChatbot.attributes) {
         this.dashboardService.selectedChatbot.attributes = {};
@@ -1687,6 +1702,49 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (!note || note == null) {
       return;
     }
+
+    // Se è una image note in draft (non ancora nello stage), la aggiungiamo solo quando l'immagine è valida.
+    if (note.type === 'image') {
+      const src = (note.payload as any)?.imageSrc as string | undefined;
+      const w = (note.payload as any)?.imageWidth as number | undefined;
+      const h = (note.payload as any)?.imageHeight as number | undefined;
+      const isValid = !!src && typeof w === 'number' && w > 0 && typeof h === 'number' && h > 0;
+
+      const existsInList = this.listOfNotes.some(n => n.note_id === note.note_id);
+      if (!existsInList) {
+        if (!isValid) {
+          // Non committare allo stage finché non abbiamo un'immagine valida.
+          return;
+        }
+        // Commit: ora la nota può comparire sullo stage
+        this.listOfNotes.push(note);
+        if (!this.dashboardService.selectedChatbot.attributes) {
+          this.dashboardService.selectedChatbot.attributes = {};
+        }
+        this.dashboardService.selectedChatbot.attributes.notes = [...this.listOfNotes];
+        this.noteService.notifyNotesChanged();
+      }
+
+      // Una volta committata, non è più draft
+      if (this.pendingImageDraftNoteId === note.note_id) {
+        this.pendingImageDraftNoteId = null;
+      }
+
+      // VINCOLO: il salvataggio deve avvenire appena l'immagine è caricata sullo stage.
+      // Per le image note (poche modifiche e molto "event-based"), bypassiamo il debounce.
+      if (isValid) {
+        this.noteService.saveRemoteNote(note, this.id_faq_kb).subscribe({
+          next: (data) => {
+            this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+            this.logger.log('[CDS-CANVAS] Image note saved immediately:', data);
+          },
+          error: (error) => {
+            this.logger.error('[CDS-CANVAS] Error saving image note:', error);
+          }
+        });
+        return;
+      }
+    }
     
     // Salva la nota da salvare (sovrascrive quella precedente se c'è)
     this.pendingNoteToSave = note;
@@ -1753,6 +1811,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   onDeleteNote(note: Note) {
     this.logger.log('[CDS-CANVAS] onDeleteNote note ', note);
     if (note && note != null) {
+      // Se è una draft image note (mai committata nello stage), basta chiudere il pannello.
+      const existsInList = this.listOfNotes.some(n => n.note_id === note.note_id);
+      if (!existsInList && this.pendingImageDraftNoteId === note.note_id) {
+        this.pendingImageDraftNoteId = null;
+        return;
+      }
       // Usa il servizio per eliminare la nota
       this.noteService.deleteNote(note, this.id_faq_kb).subscribe({
         next: (data) => {

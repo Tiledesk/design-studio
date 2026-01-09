@@ -124,6 +124,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     return !this.note?.type || this.note.type === 'text';
   }
 
+  get isImageNote(): boolean {
+    return this.note?.type === 'image';
+  }
+
+  get imageSrc(): string {
+    return ((this.note?.payload as any)?.imageSrc as string) || '';
+  }
+
   // ============================================================================
   // COSTRUTTORE
   // ============================================================================
@@ -778,7 +786,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    */
   private handleHorizontalResize(event: MouseEvent): void {
     if (!this.contentElement || !this.note) return;
-
+    
     // Batch su rAF: evita troppi layout per-frame su mousemove (soprattutto con scale != 1)
     this.lastHorizontalClientX = event.clientX;
     if (this.rafHorizontalResizeId != null) return;
@@ -816,11 +824,11 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const minWidth = 50;
     const maxWidth = 2000;
     newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-
+    
     // Applica width base (non tocchiamo scale/rotation)
     this.contentElement.nativeElement.style.width = newWidth + 'px';
     this.currentBaseWidth = newWidth;
-
+    
     // Riallinea l'host per mantenere fisso il bordo opposto, SENZA leggere rect ad ogni frame (evita flicker).
     // Nota: questa formula è esatta quando rotation ~ 0 (caso principale). Se la nota è ruotata, fallback a rectAfter.
     if (isEffectivelyUnrotated) {
@@ -841,10 +849,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
           (newWidth * (1 + scale)) / 2;
       }
 
-      const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
-      const newLeft = this.startLeft + deltaViewport;
-      hostElement.style.left = newLeft + 'px';
-      this.note.x = newLeft;
+    const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
+    const newLeft = this.startLeft + deltaViewport;
+    hostElement.style.left = newLeft + 'px';
+    this.note.x = newLeft;
     } else {
       // Fallback (ruotato): usa bounding rect dopo l'update (più costoso, può introdurre micro flicker).
       const rectAfter = this.contentElement.nativeElement.getBoundingClientRect();
@@ -926,10 +934,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
           (newHeight * (1 + scale)) / 2;
       }
 
-      const deltaViewport = newHostTopViewport - this.startHostTopViewport;
-      const newTop = this.startTop + deltaViewport;
-      hostElement.style.top = newTop + 'px';
-      this.note.y = newTop;
+    const deltaViewport = newHostTopViewport - this.startHostTopViewport;
+    const newTop = this.startTop + deltaViewport;
+    hostElement.style.top = newTop + 'px';
+    this.note.y = newTop;
     } else {
       const rectAfter = this.contentElement.nativeElement.getBoundingClientRect();
       const deltaViewport = this.resizeHandle === 'bottom'
@@ -1033,9 +1041,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private updateHandlesScale(scaleX: number, scaleY: number): void {
     if (!this.contentElement) return;
     
-    // Calcola lo scale inverso
-    const inverseScaleX = 1 / scaleX;
-    const inverseScaleY = 1 / scaleY;
+    // Calcola lo scale inverso.
+    // I handle sono "figli" di un elemento scalato 2 volte:
+    // - scala nota: transform: scale(scaleX, scaleY) sul content
+    // - zoom stage: transform: scale(stageZoom) sul drawer (tds_drawer)
+    // Per mantenere le maniglie di dimensione fissa (px) indipendentemente dallo zoom,
+    // applichiamo un contro-scale pari a 1 / (scaleNota * stageZoom).
+    const safeScaleX = typeof scaleX === 'number' && isFinite(scaleX) && scaleX > 0 ? scaleX : 1;
+    const safeScaleY = typeof scaleY === 'number' && isFinite(scaleY) && scaleY > 0 ? scaleY : 1;
+    const stageZoom = this.stageService?.getZoom?.() || 1;
+    const safeStageZoom = typeof stageZoom === 'number' && isFinite(stageZoom) && stageZoom > 0 ? stageZoom : 1;
+    const inverseScaleX = 1 / (safeScaleX * safeStageZoom);
+    const inverseScaleY = 1 / (safeScaleY * safeStageZoom);
     
     // Trova tutti gli handle e applica lo scale inverso
     const handles = this.contentElement.nativeElement.querySelectorAll(
@@ -1056,7 +1073,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         // Ma l'handle ha anche scale(inverseScaleY), quindi dobbiamo compensare ulteriormente
         // La formula corretta: top = -20px, translateY = 20 * (scaleY - 1) * scaleY
         handle.style.top = '-7px';
-        const translateY = 0 * (scaleY - 1) * scaleY;
+        const translateY = 0 * (safeScaleY - 1) * safeScaleY;
         handle.style.transform = `translateX(-50%) translateY(${translateY}px) scale(${inverseScaleX}, ${inverseScaleY})`;
       } else if (isHorizontalHandle) {
         // Per le maniglie laterali, preserva translateY(-50%)

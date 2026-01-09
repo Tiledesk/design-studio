@@ -108,6 +108,135 @@
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
+// ---------------------------------------------------------------------------
+// IMAGE NOTE UI (no section-title)
+// ---------------------------------------------------------------------------
+.image-note-section {
+    padding: 20px 24px;
+}
+
+.image-upload-box {
+    border: 2px dashed var(--gray-02);
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+}
+
+.image-upload-hint {
+    font-size: 12px;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+    margin-bottom: 12px;
+}
+
+.image-upload-error {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #e22828;
+    font-family: var(--font-family-poppins);
+    line-height: 1.3;
+}
+
+.image-file-input {
+    display: none;
+}
+
+.image-upload-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    justify-content: center;
+}
+
+.image-url-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.image-url-input {
+    flex: 1;
+    height: 34px;
+    border: 2px solid var(--gray-02);
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-family: var(--font-family-poppins);
+    outline: none;
+}
+
+.image-btn {
+    height: 34px;
+    border-radius: 8px;
+    padding: 0 12px;
+    border: 2px solid var(--gray-02);
+    background: white;
+    color: var(--blu);
+    font-size: 12px;
+    font-family: var(--font-family-poppins);
+    cursor: pointer;
+}
+
+.image-btn.danger {
+    color: #e22828;
+}
+
+.image-preview-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.image-preview-frame {
+    width: 100%;
+    height: 220px; // dimensione fissa richiesta
+    border-radius: 8px;
+    border: none; // richiesto: niente bordo sul div anteprima
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.image-preview-placeholder {
+    position: absolute;
+    inset: 0;
+    background: #f3f4f6; // grigio chiaro
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+}
+
+.image-dimensions-hint {
+    font-size: 12px;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+}
+
+.image-dimensions {
+    font-size: 12px;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+    border: 2px solid var(--gray-02);
+    padding: 6px;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.image-buttons {
+    display: flex;
+    gap: 10px;
+}
+
 // Rich Text Editor Section
 .rich-text-editor-section {
     .section-header {
@@ -470,6 +599,7 @@
             
             // Nasconde le freccette per input type="number"
             &[type="number"] {
+                appearance: textfield;
                 -moz-appearance: textfield;
                 
                 &::-webkit-outer-spin-button,
@@ -586,6 +716,7 @@
             
             // Nasconde le freccette per input type="number"
             &[type="number"] {
+                appearance: textfield;
                 -moz-appearance: textfield;
                 
                 &::-webkit-outer-spin-button,

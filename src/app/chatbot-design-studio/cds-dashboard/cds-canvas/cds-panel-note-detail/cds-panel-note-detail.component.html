@@ -20,6 +20,52 @@
         </div>
     </div>
     <div id="content-panel" class="content-panel">
+
+        <!-- IMAGE NOTE (solo pannello upload + preview) -->
+        <div class="row image-note-section" *ngIf="note?.type === 'image'">
+            <!-- stato: nessuna immagine ancora -->
+            <div *ngIf="!hasImage || isReplacingImage" class="image-upload-box"
+                 (drop)="onImageDrop($event)"
+                 (dragover)="onImageDragOver($event)">
+
+                <input #imageFileInput type="file" accept="image/*" class="image-file-input" (change)="onImageFileSelected($event)" />
+
+                <div class="image-upload-hint">
+                    Drag & drop an image, click upload, or paste a link.
+                </div>
+
+                <div class="image-upload-actions">
+                    <button type="button" class="image-btn" [disabled]="isUploadingImage" (click)="triggerImageFilePicker()">carica</button>
+                </div>
+
+                <div class="image-url-row">
+                    <input class="image-url-input" type="text" [(ngModel)]="imageUrlInput" [disabled]="isUploadingImage" placeholder="https://..." />
+                    <button type="button" class="image-btn" [disabled]="isUploadingImage" (click)="onImageUrlSubmit()">add</button>
+                </div>
+
+                <loading-spinner *ngIf="isUploadingImage" class="custom-spinner"></loading-spinner>
+                <div *ngIf="imageUploadError" class="image-upload-error">{{ imageUploadError }}</div>
+            </div>
+
+            <!-- stato: immagine presente -->
+            <div *ngIf="hasImage && !isReplacingImage" class="image-preview-box">
+                <div class="image-preview-frame">
+                    <div class="image-preview-placeholder" *ngIf="!imagePreviewLoaded"></div>
+                    <img class="image-preview"
+                         [src]="imageSrc"
+                         alt="note image"
+                         (load)="onImagePreviewLoad()"
+                         (error)="onImagePreviewError()" />
+                </div>
+    
+                <div class="image-dimensions">Original image size (in pixels): {{ imageNaturalWidth }}px × {{ imageNaturalHeight }}px</div>
+
+                <div class="image-buttons">
+                    <button type="button" class="image-btn" (click)="onReplaceImage()">Replace</button>
+                    <button type="button" class="image-btn danger" (click)="onDeleteNote()">Remove</button>
+                </div>
+            </div>
+        </div>
         
         <!-- ---------------------------------------------------------- -->
         <!-- Rich Text Editor Section -->
@@ -40,7 +86,7 @@
         </div>
 
 
-        <div class="row background-section">
+        <div class="row background-section" *ngIf="note?.type !== 'image'">
             <!-- ---------------------------------------------------------- -->
             <!-- Background color Section -->
             <!-- ---------------------------------------------------------- -->
