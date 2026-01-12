@@ -90,6 +90,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private lastVerticalClientY: number | null = null;
   private currentBaseHeight = 0; // Altezza base corrente (può essere modificata dal resize verticale)
   private justFinishedResizing = false;
+  private gestureStageZoom = 1; // Zoom dello stage al momento dell'inizio gesture (tds_drawer scale)
 
   // PROPRIETÀ PRIVATE - Rotazione
   // ============================================================================
@@ -124,12 +125,27 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     return !this.note?.type || this.note.type === 'text';
   }
 
-  get isImageNote(): boolean {
-    return this.note?.type === 'image';
+  get isMediaNote(): boolean {
+    return this.note?.type === 'media';
   }
 
-  get imageSrc(): string {
-    return ((this.note?.payload as any)?.imageSrc as string) || '';
+  get mediaType(): 'image' | 'video' {
+    const t = ((this.note?.payload as any)?.mediaType as string) || '';
+    if (t === 'video') return 'video';
+    return 'image';
+  }
+
+  get mediaSrc(): string {
+    return (
+      ((this.note?.payload as any)?.mediaSrc as string) ||
+      ((this.note?.payload as any)?.imageSrc as string) ||
+      ''
+    );
+  }
+
+  get hasMedia(): boolean {
+    const src = this.mediaSrc;
+    return typeof src === 'string' && src.trim().length > 0;
   }
 
   // ============================================================================
@@ -651,6 +667,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.resizeHandle = handle;
     this.startX = event.clientX;
     this.startY = event.clientY;
+
+    // IMPORTANT: stage zoom affects all viewport measurements (clientX/rect).
+    // We keep all anchors in viewport px, but convert deltas back to CSS coords by dividing by stageZoom.
+    this.gestureStageZoom = this.getSafeStageZoom();
     
     // Leggi la larghezza base corrente: usa note.width (garantito da initializeDefaults)
     // Se currentBaseWidth è stata modificata da resize orizzontale, usa quella, altrimenti note.width
@@ -685,7 +705,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // Questo evita che, con scale != 1, l'ancora "scivoli" durante il resize.
     const scale = this.startScale || 1;
     this.startContentCViewport =
-      rect.left - hostRect.left - (this.startWidth * (1 - scale)) / 2;
+      rect.left - hostRect.left - ((this.startWidth * (1 - scale)) / 2) * this.gestureStageZoom;
     
     const hostLeftCSS = parseFloat(hostElement.style.left);
     if (!isNaN(hostLeftCSS)) {
@@ -724,6 +744,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.startX = event.clientX;
     this.startY = event.clientY;
 
+    this.gestureStageZoom = this.getSafeStageZoom();
+
     // Leggi l'altezza base corrente: usa note.height (garantito da initializeDefaults)
     // Se currentBaseHeight è stata modificata da resize verticale, usa quella, altrimenti note.height
     let currentHeight = this.currentBaseHeight > 0 ? this.currentBaseHeight : this.note.height;
@@ -757,7 +779,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // Questo evita che, con scale != 1, l'ancora "scivoli" durante il resize.
     const scale = this.startScale || 1;
     this.startContentCViewportY =
-      rect.top - hostRect.top - (this.startHeight * (1 - scale)) / 2;
+      rect.top - hostRect.top - ((this.startHeight * (1 - scale)) / 2) * this.gestureStageZoom;
 
     const hostTopCSS = parseFloat(hostElement.style.top);
     if (!isNaN(hostTopCSS)) {
@@ -803,6 +825,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
     const hostElement = this.elementRef.nativeElement as HTMLElement;
     const scale = this.startScale || 1;
+    const stageZoom = this.gestureStageZoom || this.getSafeStageZoom();
     const rotation = this.note.rotation || 0;
     const normalizedRotation = ((rotation % 360) + 360) % 360;
     const isEffectivelyUnrotated = normalizedRotation < 0.01 || Math.abs(normalizedRotation - 360) < 0.01;
@@ -813,10 +836,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     let newWidth = this.startWidth;
     if (this.resizeHandle === 'right') {
       const visualWidth = this.lastHorizontalClientX - this.startFixedLeftViewport;
-      newWidth = visualWidth / scale;
+      newWidth = visualWidth / (scale * stageZoom);
     } else if (this.resizeHandle === 'left') {
       const visualWidth = this.startFixedRightViewport - this.lastHorizontalClientX;
-      newWidth = visualWidth / scale;
+      newWidth = visualWidth / (scale * stageZoom);
     } else {
       return;
     }
@@ -835,22 +858,22 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       let newHostLeftViewport = this.startHostLeftViewport;
       if (this.resizeHandle === 'right') {
         // Fisso il bordo sinistro:
-        // startFixedLeftViewport = hostLeft + C + newWidth*(1-scale)/2
+        // startFixedLeftViewport = hostLeft + C + (newWidth*(1-scale)/2)*stageZoom
         newHostLeftViewport =
           this.startFixedLeftViewport -
           this.startContentCViewport -
-          (newWidth * (1 - scale)) / 2;
+          ((newWidth * (1 - scale)) / 2) * stageZoom;
       } else {
         // Fisso il bordo destro:
-        // startFixedRightViewport = hostLeft + C + newWidth*(1+scale)/2
+        // startFixedRightViewport = hostLeft + C + (newWidth*(1+scale)/2)*stageZoom
         newHostLeftViewport =
           this.startFixedRightViewport -
           this.startContentCViewport -
-          (newWidth * (1 + scale)) / 2;
+          ((newWidth * (1 + scale)) / 2) * stageZoom;
       }
 
     const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
-    const newLeft = this.startLeft + deltaViewport;
+    const newLeft = this.startLeft + deltaViewport / stageZoom;
     hostElement.style.left = newLeft + 'px';
     this.note.x = newLeft;
     } else {
@@ -859,7 +882,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const deltaViewport = this.resizeHandle === 'right'
         ? (this.startFixedLeftViewport - rectAfter.left)
         : (this.startFixedRightViewport - rectAfter.right);
-      const newLeft = this.startLeft + deltaViewport;
+      const newLeft = this.startLeft + deltaViewport / stageZoom;
       hostElement.style.left = newLeft + 'px';
       this.note.x = newLeft;
     }
@@ -888,6 +911,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
     const hostElement = this.elementRef.nativeElement as HTMLElement;
     const scale = this.startScale || 1;
+    const stageZoom = this.gestureStageZoom || this.getSafeStageZoom();
     const rotation = this.note.rotation || 0;
     const normalizedRotation = ((rotation % 360) + 360) % 360;
     const isEffectivelyUnrotated = normalizedRotation < 0.01 || Math.abs(normalizedRotation - 360) < 0.01;
@@ -898,10 +922,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     let newHeight = this.startHeight;
     if (this.resizeHandle === 'bottom') {
       const visualHeight = this.lastVerticalClientY - this.startFixedTopViewport;
-      newHeight = visualHeight / scale;
+      newHeight = visualHeight / (scale * stageZoom);
     } else if (this.resizeHandle === 'top') {
       const visualHeight = this.startFixedBottomViewport - this.lastVerticalClientY;
-      newHeight = visualHeight / scale;
+      newHeight = visualHeight / (scale * stageZoom);
     } else {
       return;
     }
@@ -920,22 +944,22 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       let newHostTopViewport = this.startHostTopViewport;
       if (this.resizeHandle === 'bottom') {
         // Fisso il bordo superiore:
-        // startFixedTopViewport = hostTop + C + newHeight*(1-scale)/2
+        // startFixedTopViewport = hostTop + C + (newHeight*(1-scale)/2)*stageZoom
         newHostTopViewport =
           this.startFixedTopViewport -
           this.startContentCViewportY -
-          (newHeight * (1 - scale)) / 2;
+          ((newHeight * (1 - scale)) / 2) * stageZoom;
       } else {
         // Fisso il bordo inferiore:
-        // startFixedBottomViewport = hostTop + C + newHeight*(1+scale)/2
+        // startFixedBottomViewport = hostTop + C + (newHeight*(1+scale)/2)*stageZoom
         newHostTopViewport =
           this.startFixedBottomViewport -
           this.startContentCViewportY -
-          (newHeight * (1 + scale)) / 2;
+          ((newHeight * (1 + scale)) / 2) * stageZoom;
       }
 
     const deltaViewport = newHostTopViewport - this.startHostTopViewport;
-    const newTop = this.startTop + deltaViewport;
+    const newTop = this.startTop + deltaViewport / stageZoom;
     hostElement.style.top = newTop + 'px';
     this.note.y = newTop;
     } else {
@@ -943,10 +967,15 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const deltaViewport = this.resizeHandle === 'bottom'
         ? (this.startFixedTopViewport - rectAfter.top)
         : (this.startFixedBottomViewport - rectAfter.bottom);
-      const newTop = this.startTop + deltaViewport;
+      const newTop = this.startTop + deltaViewport / stageZoom;
       hostElement.style.top = newTop + 'px';
       this.note.y = newTop;
     }
+  }
+
+  private getSafeStageZoom(): number {
+    const z = this.stageService?.getZoom?.() || 1;
+    return typeof z === 'number' && isFinite(z) && z > 0 ? z : 1;
   }
 
   /**
@@ -1066,15 +1095,19 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const isVerticalHandle = handle.classList.contains('resize-top') || handle.classList.contains('resize-bottom');
       
       if (isRotateHandle) {
-        // Per rotate-handle, preserva translateX(-50%) e mantieni sempre -20px dal bordo superiore
-        // Il problema: il contenitore ha transform: scale(scaleY), quindi top: -20px diventa visivamente -20*scaleY
-        // Soluzione: usa top calcolato dinamicamente per compensare lo scale del contenitore
-        // top = -20px / scaleY (così quando viene scalato diventa -20px)
-        // Ma l'handle ha anche scale(inverseScaleY), quindi dobbiamo compensare ulteriormente
-        // La formula corretta: top = -20px, translateY = 20 * (scaleY - 1) * scaleY
-        handle.style.top = '-7px';
-        const translateY = 0 * (safeScaleY - 1) * safeScaleY;
-        handle.style.transform = `translateX(-50%) translateY(${translateY}px) scale(${inverseScaleX}, ${inverseScaleY})`;
+        // Rotate-handle: must stay at a fixed 20px from the top edge in SCREEN pixels,
+        // independent from:
+        // - note scale (scaleY)
+        // - stage zoom (tds_drawer scale)
+        //
+        // The `top` property is affected by parent's scales (note scale * stage zoom),
+        // while the handle itself is counter-scaled via transform.
+        // To keep a constant rendered offset, set:
+        //   top = -20 / (scaleY * stageZoom)
+        const desiredOffsetPx = 0;
+        const topPx = -(desiredOffsetPx * inverseScaleY)-0;
+        //handle.style.top = `${topPx}px`;
+        handle.style.transform = `translateX(-50%) scale(${inverseScaleX}, ${inverseScaleY})`;
       } else if (isHorizontalHandle) {
         // Per le maniglie laterali, preserva translateY(-50%)
         handle.style.transform = `translateY(-50%) scale(${inverseScaleX}, ${inverseScaleY})`;
@@ -1159,6 +1192,12 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // Inizializza height solo se non presente
     if (this.note.height === undefined || this.note.height === null) {
       this.note.height = Note.DEFAULT_HEIGHT;
+    }
+
+    // Image/media notes: shadow disabled by default.
+    // Keep this backward compatible: if older notes don't have boxShadow set, force it off for image type.
+    if (this.note.type === 'media' && (this.note.boxShadow === undefined || this.note.boxShadow === null)) {
+      this.note.boxShadow = false;
     }
     
     // Inizializza fontSize solo se non presente
@@ -1457,6 +1496,21 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     if (!this.note || !this.contentElement) return;
     
     const element = this.contentElement.nativeElement;
+
+    // MEDIA NOTE: after loading media we update note.width/note.height to the real media size.
+    // But currentBaseWidth/currentBaseHeight might still be stuck to the placeholder (e.g. 240x180),
+    // causing the box to keep the old ratio and the media to be letterboxed (object-fit: contain),
+    // making handles appear "misaligned" with the media content.
+    //
+    // Fix: when we're not in an active resize gesture, let the base sizes follow the model.
+    if (this.note.type === 'media' && !this.isResizing && !this.isHorizontalResizing && !this.isVerticalResizing) {
+      const targetW = Number(this.note.width);
+      const targetH = Number(this.note.height);
+      const needsAdoptW = isFinite(targetW) && targetW > 0 && Math.abs(this.currentBaseWidth - targetW) > 0.5;
+      const needsAdoptH = isFinite(targetH) && targetH > 0 && Math.abs(this.currentBaseHeight - targetH) > 0.5;
+      if (needsAdoptW) this.currentBaseWidth = targetW;
+      if (needsAdoptH) this.currentBaseHeight = targetH;
+    }
     
     // Determina la larghezza base: usa currentBaseWidth se è stata impostata (da resize orizzontale),
     // altrimenti usa note.width (garantito da initializeDefaults)

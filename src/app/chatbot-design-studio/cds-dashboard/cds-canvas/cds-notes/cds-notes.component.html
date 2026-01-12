@@ -4,14 +4,14 @@
     [class.selected]="stateNote === 2"
     [class.text-focus]="stateNote === 1"
     [class.tds_draggable]="isDraggable"
-    [class.rect-note]="!isTextNote && !isImageNote"
-    [class.image-note]="isImageNote"
+    [class.rect-note]="!isTextNote && !isMediaNote"
+    [class.media-note]="isMediaNote"
     [id]="note?.note_id"
     [style.box-shadow]="note?.boxShadow === false ? 'none' : null"
-    [style.border-width.px]="isImageNote ? 0 : note?.borderWidth"
-    [style.border-style]="isImageNote ? 'none' : 'solid'"
+    [style.border-width.px]="isMediaNote ? 0 : note?.borderWidth"
+    [style.border-style]="isMediaNote ? 'none' : 'solid'"
     [style.border-color]="note?.borderColor"
-    [style.background-color]="isImageNote ? 'transparent' : note?.backgroundColor">
+    [style.background-color]="isMediaNote ? (hasMedia ? 'transparent' : '#f3f4f6') : note?.backgroundColor">
     <!-- (input)="onInputChange($event)" -->
     <div *ngIf="isTextNote; else rectBody"
       #noteInput
@@ -33,13 +33,26 @@
     </div>
 
     <ng-template #rectBody>
-      <div *ngIf="isImageNote; else rectOnly"
+      <div *ngIf="isMediaNote; else rectOnly"
         class="image-body"
+        [class.placeholder]="!hasMedia"
         [class.tds_draggable]="isDraggable"
         (click)="onRectClick($event)"
         (dblclick)="onRectDoubleClick($event)"
         (mousedown)="onRectMouseDown($event)">
-        <img class="note-image" [src]="imageSrc" alt="note image" draggable="false" />
+        <ng-container *ngIf="hasMedia; else mediaPlaceholder">
+          <ng-container *ngIf="mediaType === 'video'; else noteImage">
+            <video class="note-video" [src]="mediaSrc" muted loop playsinline autoplay></video>
+          </ng-container>
+          <ng-template #noteImage>
+            <img class="note-image" [src]="mediaSrc" [attr.alt]="'CDSCanvas.NoteMedia.Alt' | translate" draggable="false" />
+          </ng-template>
+        </ng-container>
+        <ng-template #mediaPlaceholder>
+          <button type="button" class="note-media-placeholder-btn" (click)="onPlaceholderUploadClick($event)">
+            {{ 'CDSCanvas.NoteMedia.PlaceholderCta' | translate }}
+          </button>
+        </ng-template>
       </div>
 
       <ng-template #rectOnly>
@@ -73,15 +86,15 @@
         (mousedown)="startResize($event, 'br')"></div>
     
     <!-- Handle laterali: disabilitati per image note (resize solo dai vertici, proporzionale) -->
-    <div *ngIf="!isImageNote" class="resize-handle resize-left" 
+    <div *ngIf="!isMediaNote" class="resize-handle resize-left" 
         (mousedown)="startHorizontalResize($event, 'left')"></div>
-    <div *ngIf="!isImageNote" class="resize-handle resize-right" 
+    <div *ngIf="!isMediaNote" class="resize-handle resize-right" 
         (mousedown)="startHorizontalResize($event, 'right')"></div>
 
     <!-- Handle verticali: disabilitati per image note (e per text già non mostrati) -->
-    <div *ngIf="!isTextNote && !isImageNote" class="resize-handle resize-top"
+    <div *ngIf="!isTextNote && !isMediaNote" class="resize-handle resize-top"
         (mousedown)="startVerticalResize($event, 'top')"></div>
-    <div *ngIf="!isTextNote && !isImageNote" class="resize-handle resize-bottom"
+    <div *ngIf="!isTextNote && !isMediaNote" class="resize-handle resize-bottom"
         (mousedown)="startVerticalResize($event, 'bottom')"></div>
     
     <!-- Handle rotazione al centro del lato superiore -->

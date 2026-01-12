@@ -40,6 +40,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   isUploadingImage: boolean = false;
   imagePreviewLoaded: boolean = false;
   imageUploadError: string = '';
+  private readonly MAX_MEDIA_BYTES = 4 * 1024 * 1024; // 4MB
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
@@ -111,26 +112,44 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   }
 
   // ============================================================================
-  // IMAGE NOTE
+  // MEDIA NOTE (type === 'media')
   // ============================================================================
-  get isImageNote(): boolean {
-    return this.note?.type === 'image';
+  get isMediaNote(): boolean {
+    return this.note?.type === 'media';
   }
 
-  get imageSrc(): string {
-    return ((this.note?.payload as any)?.imageSrc as string) || '';
+  get mediaType(): 'image' | 'video' {
+    const t = ((this.note?.payload as any)?.mediaType as string) || '';
+    if (t === 'video') return 'video';
+    return 'image';
   }
 
-  get imageNaturalWidth(): number {
-    return Number((this.note?.payload as any)?.imageWidth) || 0;
+  get mediaSrc(): string {
+    return (
+      ((this.note?.payload as any)?.mediaSrc as string) ||
+      ((this.note?.payload as any)?.imageSrc as string) ||
+      ''
+    );
   }
 
-  get imageNaturalHeight(): number {
-    return Number((this.note?.payload as any)?.imageHeight) || 0;
+  get mediaNaturalWidth(): number {
+    return (
+      Number((this.note?.payload as any)?.mediaWidth) ||
+      Number((this.note?.payload as any)?.imageWidth) ||
+      0
+    );
   }
 
-  get hasImage(): boolean {
-    return !!this.imageSrc && this.imageNaturalWidth > 0 && this.imageNaturalHeight > 0;
+  get mediaNaturalHeight(): number {
+    return (
+      Number((this.note?.payload as any)?.mediaHeight) ||
+      Number((this.note?.payload as any)?.imageHeight) ||
+      0
+    );
+  }
+
+  get hasMedia(): boolean {
+    return !!this.mediaSrc && this.mediaNaturalWidth > 0 && this.mediaNaturalHeight > 0;
   }
 
   triggerImageFilePicker(): void {
@@ -143,7 +162,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     const file = input?.files?.[0];
     if (!file) return;
-    this.loadImageFromFile(file);
+    this.loadMediaFromFile(file);
   }
 
   onImageDrop(event: DragEvent): void {
@@ -154,7 +173,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
 
     const file = dt.files && dt.files.length > 0 ? dt.files[0] : null;
     if (file) {
-      this.loadImageFromFile(file);
+      this.loadMediaFromFile(file);
       return;
     }
 
@@ -182,25 +201,48 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   }
 
   private async loadImageFromFile(file: File): Promise<void> {
+    // Backward compat wrapper
+    return this.loadMediaFromFile(file);
+  }
+
+  private isSupportedMediaFile(file: File): { ok: boolean; mediaType?: 'image' | 'video'; reason?: string } {
+    const type = file?.type || '';
+    if (type.startsWith('image/')) return { ok: true, mediaType: 'image' }; // includes gif
+    if (type.startsWith('video/')) return { ok: true, mediaType: 'video' };
+    return { ok: false, reason: 'Only images (including GIF) or videos are supported.' };
+  }
+
+  private async loadMediaFromFile(file: File): Promise<void> {
     if (!this.note) return;
-    if (!file.type.startsWith('image/')) return;
+
+    this.imageUploadError = '';
+    if (file.size > this.MAX_MEDIA_BYTES) {
+      this.imageUploadError = 'File too large. Max allowed size is 4MB.';
+      return;
+    }
+
+    const supported = this.isSupportedMediaFile(file);
+    if (!supported.ok || !supported.mediaType) {
+      this.imageUploadError = supported.reason || 'Unsupported file.';
+      return;
+    }
 
     try {
       this.isUploadingImage = true;
       this.imagePreviewLoaded = false;
-      this.imageUploadError = '';
       const user = this.tiledeskAuthService.getCurrentUser();
       const currentUpload = new UploadModel(file);
       const data = await this.uploadService.upload(user.uid, currentUpload);
+
       // VINCOLO: prima upload, poi salviamo l'URL risultante nella nota
       const url = data?.downloadURL || data?.src;
       if (!url) {
         throw new Error('Upload did not return downloadURL/src');
       }
-      await this.setImageFromSrc(url);
+      await this.setMediaFromSrc(url, supported.mediaType);
     } catch (e) {
       this.imageUploadError = 'Upload failed. Please try again.';
-      this.logger.error('[CdsPanelNoteDetailComponent] Error uploading image for image note', e);
+      this.logger.error('[CdsPanelNoteDetailComponent] Error uploading media for image note', e);
     } finally {
       this.isUploadingImage = false;
     }
@@ -221,10 +263,14 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
 
       // VINCOLO: per "link" prima salviamo l'immagine (upload) e poi scriviamo l'URL risultante nella nota.
       try {
-        const uploadedUrl = await this.uploadImageFromExternalUrl(normalized);
-        await this.setImageFromSrc(uploadedUrl);
+        const result = await this.uploadMediaFromExternalUrl(normalized);
+        await this.setMediaFromSrc(result.uploadedUrl, result.mediaType);
         return;
       } catch (e) {
+        if ((e as any)?.message === 'File too large') {
+          this.imageUploadError = 'File too large. Max allowed size is 4MB.';
+          return;
+        }
         /**
          * CORS NOTE:
          * Molti host consentono l'uso di <img src="..."> ma NON consentono fetch() cross-origin (manca Access-Control-Allow-Origin).
@@ -239,9 +285,10 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
           e
         });
 
-        await this.setImageFromSrc(normalized);
+        const inferred = this.inferMediaTypeFromUrl(normalized);
+        await this.setMediaFromSrc(normalized, inferred);
         this.imageUploadError =
-          'This URL cannot be imported into storage due to browser security (CORS). The image has been linked externally. To store a copy, upload the file instead.';
+          'This URL cannot be imported into storage due to browser security (CORS). The media has been linked externally. To store a copy, upload the file instead.';
         return;
       }
     } catch (e) {
@@ -253,14 +300,46 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   }
 
   private async setImageFromSrc(src: string): Promise<void> {
+    // Backward compat wrapper
+    return this.setMediaFromSrc(src, 'image');
+  }
+
+  private async setMediaFromSrc(src: string, requestedType: 'image' | 'video'): Promise<void> {
     if (!this.note) return;
     this.imagePreviewLoaded = false;
-    const { width, height } = await this.measureImage(src);
+    let mediaType: 'image' | 'video' = requestedType;
+    let measured: { width: number; height: number } | null = null;
+    try {
+      if (requestedType === 'video') {
+        measured = await this.measureVideo(src);
+      } else {
+        measured = await this.measureImage(src);
+      }
+    } catch (e) {
+      // Fallback heuristic: if image failed, try video (useful when URL extension is missing/misleading).
+      if (requestedType === 'image') {
+        measured = await this.measureVideo(src);
+        mediaType = 'video';
+      } else {
+        // if video failed, try image
+        measured = await this.measureImage(src);
+        mediaType = 'image';
+      }
+    }
+    const { width, height } = measured;
 
     if (!this.note.payload) this.note.payload = {};
-    (this.note.payload as any).imageSrc = src;
-    (this.note.payload as any).imageWidth = width;
-    (this.note.payload as any).imageHeight = height;
+    (this.note.payload as any).mediaType = mediaType;
+    (this.note.payload as any).mediaSrc = src;
+    (this.note.payload as any).mediaWidth = width;
+    (this.note.payload as any).mediaHeight = height;
+
+    // Backward compatibility: keep old image keys for images (including GIF)
+    if (mediaType === 'image') {
+      (this.note.payload as any).imageSrc = src;
+      (this.note.payload as any).imageWidth = width;
+      (this.note.payload as any).imageHeight = height;
+    }
 
     // Dimensioni sullo stage:
     // `tds_drawer` è scalato via transform (StageService.getZoom()).
@@ -296,6 +375,31 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  private measureVideo(src: string): Promise<{ width: number; height: number }> {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.muted = true;
+      video.playsInline = true as any;
+      video.onloadedmetadata = () => {
+        const w = video.videoWidth || 0;
+        const h = video.videoHeight || 0;
+        if (w > 0 && h > 0) {
+          resolve({ width: w, height: h });
+        } else {
+          reject(new Error('Invalid video'));
+        }
+        // cleanup
+        video.src = '';
+      };
+      video.onerror = () => {
+        reject(new Error('Invalid video'));
+        video.src = '';
+      };
+      video.src = src;
+    });
+  }
+
   private normalizeImageUrl(input: string): string | null {
     if (!input) return null;
     let url = input.trim();
@@ -311,7 +415,27 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async uploadImageFromExternalUrl(url: string): Promise<string> {
+  private inferMediaTypeFromUrl(url: string): 'image' | 'video' {
+    try {
+      const u = new URL(url);
+      const path = (u.pathname || '').toLowerCase();
+      if (path.endsWith('.gif')) return 'image';
+      if (
+        path.endsWith('.mp4') ||
+        path.endsWith('.webm') ||
+        path.endsWith('.ogg') ||
+        path.endsWith('.mov') ||
+        path.endsWith('.m4v')
+      ) {
+        return 'video';
+      }
+    } catch {
+      // ignore
+    }
+    return 'image';
+  }
+
+  private async uploadMediaFromExternalUrl(url: string): Promise<{ uploadedUrl: string; mediaType: 'image' | 'video' }> {
     const user = this.tiledeskAuthService.getCurrentUser();
 
     const res = await fetch(url);
@@ -319,9 +443,16 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       throw new Error(`Fetch failed: ${res.status}`);
     }
     const blob = await res.blob();
-    const type = blob.type || 'image/jpeg';
-    if (!type.startsWith('image/')) {
-      throw new Error(`Not an image: ${type}`);
+    const type = blob.type || 'application/octet-stream';
+    const mediaType: 'image' | 'video' =
+      type.startsWith('video/') ? 'video' :
+      type.startsWith('image/') ? 'image' :
+      this.inferMediaTypeFromUrl(url);
+    if (!(type.startsWith('image/') || type.startsWith('video/'))) {
+      throw new Error(`Not a supported media type: ${type}`);
+    }
+    if (blob.size > this.MAX_MEDIA_BYTES) {
+      throw new Error('File too large');
     }
 
     const filenameFromUrl = (() => {
@@ -334,13 +465,13 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       }
     })();
 
-    const file = new File([blob], filenameFromUrl, { type });
+    const file = new File([blob], filenameFromUrl, { type: type || undefined });
     const data = await this.uploadService.upload(user.uid, new UploadModel(file));
     const uploadedUrl = data?.downloadURL || data?.src;
     if (!uploadedUrl) {
       throw new Error('Upload did not return downloadURL/src');
     }
-    return uploadedUrl;
+    return { uploadedUrl, mediaType };
   }
 
   // ============================================================================

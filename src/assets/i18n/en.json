@@ -61,7 +61,8 @@
             "Rectangle": "Rectangle",
             "Text": "Text",
             "Image": "Image",
-            "Video": "Video"
+            "Video": "Video",
+            "Media": "Media"
         }
     },
     "BotsAddEditPage": {
@@ -301,6 +302,23 @@
         "DeleteBlock": "Delete block",
         "CopyBlock": "Copy block",
         "NoteDetails": "Note detail",
+        "NoteMedia": {
+            "Hint": "Drag & drop a file, click upload, or paste a link.",
+            "UrlPlaceholder": "https://...",
+            "Alt": "Note media",
+            "OriginalSizePx": "Original media size (in pixels): {{width}}px × {{height}}px",
+            "PlaceholderCta": "Upload an image or a video",
+            "Replace": "Replace",
+            "Remove": "Remove"
+        },
+        "NotePanel": {
+            "MarkupText": "Markup text",
+            "BackgroundColor": "Background color",
+            "BorderColor": "Border color",
+            "BorderThickness": "Border thickness",
+            "BoxParameters": "Box parameters",
+            "EnableShadow": "Enable shadow"
+        },
         "Paste": "Paste",
         "StartTest": "Start test from here",
         "DeleteAction": "Delete action",

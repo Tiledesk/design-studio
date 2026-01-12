@@ -127,8 +127,8 @@
     position: absolute;
     top: -20px;
     left: 50%;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     display: none;
     z-index: 10;
     user-select: none;
@@ -170,9 +170,9 @@
 }
 
 // ============================================================================
-// IMAGE NOTE
+// MEDIA NOTE
 // ============================================================================
-.cds-notes-content.image-note {
+.cds-notes-content.media-note {
   padding: 0 !important;
   margin: 0 !important;
   user-select: none;
@@ -189,7 +189,37 @@
     justify-content: center;
   }
 
+  .image-body.placeholder {
+    background: transparent;
+  }
+
+  .note-media-placeholder-btn {
+    border: none;
+    background: transparent;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    background-color: rgba(255, 255, 255, 0.75);
+  }
+
+  .note-media-placeholder-btn:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
   .note-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .note-video {
     width: 100%;
     height: 100%;
     object-fit: contain;

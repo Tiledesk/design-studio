@@ -24,8 +24,7 @@ export class CdsOptionsComponent implements OnInit {
   notePalette: Array<{ type: NoteType; icon: string; labelKey: string }> = [
     { type: 'rect', icon: 'crop_square', labelKey: 'CdsOptions.NoteType.Rectangle' },
     { type: 'text', icon: 'text_fields', labelKey: 'CdsOptions.NoteType.Text' },
-    { type: 'image', icon: 'image', labelKey: 'CdsOptions.NoteType.Image' },
-    { type: 'video', icon: 'videocam', labelKey: 'CdsOptions.NoteType.Video' },
+    { type: 'media', icon: 'perm_media', labelKey: 'CdsOptions.NoteType.Media' },
   ];
   isNoteTypeMenuOpen: boolean = false;
   noteTypeMenuPos: { left: number; top: number } = { left: 0, top: 0 };

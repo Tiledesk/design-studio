@@ -1,4 +1,7 @@
-export type NoteType = 'text' | 'rect' | 'image' | 'video';
+// Note type for the stage notes.
+// IMPORTANT: legacy saved notes may still have type 'image' or 'video'.
+// We normalize them to 'media' at load time.
+export type NoteType = 'text' | 'rect' | 'media';
 
 /**
  * Payload opzionale per tipi di nota non testuali (immagini/video/shape).

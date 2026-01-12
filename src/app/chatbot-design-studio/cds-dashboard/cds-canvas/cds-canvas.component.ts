@@ -639,7 +639,17 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // set listOfNotes load from localStorage
     // ---------------------------------------
     // this.listOfNotes = this.noteService.getNotes(this.id_faq_kb);
-    this.listOfNotes = this.dashboardService.selectedChatbot.attributes.notes || [];
+    // Normalize legacy note types:
+    // - 'image'/'video' => 'media'
+    const rawNotes = this.dashboardService.selectedChatbot.attributes.notes || [];
+    this.listOfNotes = rawNotes.map((n: any) => {
+      if (!n) return n;
+      const t = n.type;
+      if (t === 'image' || t === 'video') {
+        return { ...n, type: 'media' };
+      }
+      return n;
+    });
     //this.logger.log("[CDS-CANVAS]  •••• listOfNotes ••••", this.listOfNotes);
     
     // NOTA: Non ci sottoscriviamo a notesChanged$ per mantenere il componente disaccoppiato.
@@ -1597,16 +1607,33 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         newNote.text = '';
       }
 
-      // IMAGE NOTE: non aggiungere allo stage finché non c'è un'immagine valida.
+      // MEDIA NOTE: non salvare in remoto finché non c'è un media valido.
       // Apri subito il pannello di destra per il caricamento.
-      if (newNote.type === 'image') {
+      if (newNote.type === 'media') {
+        // Requirement: default shadow disabled for image/media notes
+        // (keep the option hidden in the panel UI)
+        newNote.boxShadow = false;
+
+        // Placeholder on stage (draft):
+        // - default size with 4/3 ratio
+        // - visible block (but NOT persisted remotely until media is valid)
+        newNote.width = 240;
+        newNote.height = 180;
+
         // Inizializza payload (soft typing)
         if (!newNote.payload) newNote.payload = {};
         (newNote.payload as any).imageSrc = '';
         (newNote.payload as any).imageWidth = 0;
         (newNote.payload as any).imageHeight = 0;
+        (newNote.payload as any).mediaType = 'image';
+        (newNote.payload as any).mediaSrc = '';
+        (newNote.payload as any).mediaWidth = 0;
+        (newNote.payload as any).mediaHeight = 0;
 
         this.pendingImageDraftNoteId = newNote.note_id;
+        // Add to the stage immediately as a placeholder (draft)
+        this.listOfNotes.push(newNote);
+        this.noteService.notifyNotesChanged();
         this.onNoteSelected(newNote);
         return;
       }
@@ -1703,21 +1730,40 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       return;
     }
 
-    // Se è una image note in draft (non ancora nello stage), la aggiungiamo solo quando l'immagine è valida.
-    if (note.type === 'image') {
-      const src = (note.payload as any)?.imageSrc as string | undefined;
-      const w = (note.payload as any)?.imageWidth as number | undefined;
-      const h = (note.payload as any)?.imageHeight as number | undefined;
+    // MEDIA note (draft placeholder): do not persist until media is valid.
+    if (note.type === 'media') {
+      const payload: any = note.payload || {};
+      const src =
+        (payload?.mediaSrc as string | undefined) ||
+        (payload?.imageSrc as string | undefined);
+      const w =
+        (payload?.mediaWidth as number | undefined) ||
+        (payload?.imageWidth as number | undefined);
+      const h =
+        (payload?.mediaHeight as number | undefined) ||
+        (payload?.imageHeight as number | undefined);
       const isValid = !!src && typeof w === 'number' && w > 0 && typeof h === 'number' && h > 0;
 
       const existsInList = this.listOfNotes.some(n => n.note_id === note.note_id);
-      if (!existsInList) {
-        if (!isValid) {
-          // Non committare allo stage finché non abbiamo un'immagine valida.
-          return;
+      const existsInAttributes =
+        !!this.dashboardService.selectedChatbot?.attributes?.notes?.some(n => n.note_id === note.note_id);
+
+      // Draft placeholder: never save remotely until media is valid.
+      if (!isValid) {
+        // Keep stage updated (note is already visible as placeholder).
+        if (existsInList) {
+          const idx = this.listOfNotes.findIndex(n => n.note_id === note.note_id);
+          if (idx >= 0) {
+            this.listOfNotes[idx] = note;
+            this.noteService.notifyNotesChanged();
+          }
         }
-        // Commit: ora la nota può comparire sullo stage
-        this.listOfNotes.push(note);
+        // Do NOT touch attributes.notes and do NOT schedule remote save.
+        return;
+      }
+
+      // Media is valid => commit to attributes.notes if this was a draft.
+      if (!existsInAttributes) {
         if (!this.dashboardService.selectedChatbot.attributes) {
           this.dashboardService.selectedChatbot.attributes = {};
         }
@@ -1731,15 +1777,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       }
 
       // VINCOLO: il salvataggio deve avvenire appena l'immagine è caricata sullo stage.
-      // Per le image note (poche modifiche e molto "event-based"), bypassiamo il debounce.
+      // Per le media note (poche modifiche e molto "event-based"), bypassiamo il debounce.
       if (isValid) {
         this.noteService.saveRemoteNote(note, this.id_faq_kb).subscribe({
           next: (data) => {
             this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
-            this.logger.log('[CDS-CANVAS] Image note saved immediately:', data);
+            this.logger.log('[CDS-CANVAS] Media note saved immediately:', data);
           },
           error: (error) => {
-            this.logger.error('[CDS-CANVAS] Error saving image note:', error);
+            this.logger.error('[CDS-CANVAS] Error saving media note:', error);
           }
         });
         return;
@@ -1811,10 +1857,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   onDeleteNote(note: Note) {
     this.logger.log('[CDS-CANVAS] onDeleteNote note ', note);
     if (note && note != null) {
-      // Se è una draft image note (mai committata nello stage), basta chiudere il pannello.
-      const existsInList = this.listOfNotes.some(n => n.note_id === note.note_id);
-      if (!existsInList && this.pendingImageDraftNoteId === note.note_id) {
+      // Draft image/media note (placeholder on stage, not yet persisted):
+      // remove locally and do NOT call remote delete.
+      const existsInAttributes =
+        !!this.dashboardService.selectedChatbot?.attributes?.notes?.some(n => n.note_id === note.note_id);
+      if (note.type === 'media' && this.pendingImageDraftNoteId === note.note_id && !existsInAttributes) {
+        this.listOfNotes = this.listOfNotes.filter(n => n.note_id !== note.note_id);
         this.pendingImageDraftNoteId = null;
+        this.noteService.notifyNotesChanged();
         return;
       }
       // Usa il servizio per eliminare la nota
