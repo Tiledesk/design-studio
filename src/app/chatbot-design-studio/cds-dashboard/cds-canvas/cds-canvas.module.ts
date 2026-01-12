@@ -43,6 +43,10 @@ import { CdsPanelNoteDetailComponent } from './cds-panel-note-detail/cds-panel-n
 
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from "ngx-quill";
+import { initQuillColorClasses } from 'src/app/chatbot-design-studio/cds-dashboard/utils/quill-color-classes';
+
+// Ensure Quill is configured once when this feature module is loaded.
+initQuillColorClasses();
 
 const routes: Routes = [
   {
