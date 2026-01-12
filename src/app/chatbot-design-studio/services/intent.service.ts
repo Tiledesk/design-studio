@@ -3,7 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
-import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
+import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
@@ -392,16 +392,16 @@ export class IntentService {
   /** generate display name of intent */
   public setDisplayName(){
     // let listOfIntents = this.behaviorIntents.getValue();
-    let displayNames = this.listOfIntents.filter((element) => element.intent_display_name.startsWith(preDisplayName))
-                                          .map((element) => element.intent_display_name.replace(preDisplayName, ''));
+    let displayNames = this.listOfIntents.filter((element) => element.intent_display_name.startsWith(UNTITLED_BLOCK_PREFIX))
+                                          .map((element) => element.intent_display_name.replace(UNTITLED_BLOCK_PREFIX, ''));
     // displayNames = displayNames.slice().sort();
     const numbers = displayNames.filter(el => el !== '').map((name) => parseInt(name, 10));
     numbers.sort((a, b) => a - b);
     const lastNumber = numbers[numbers.length - 1];
     if(numbers.length>0){
-      return preDisplayName+(lastNumber+1);
+      return UNTITLED_BLOCK_PREFIX+(lastNumber+1);
     } else {
-      return preDisplayName+1;
+      return UNTITLED_BLOCK_PREFIX+1;
     }
     // const filteredArray = this.listOfIntents.filter((element) => element.intent_display_name.startsWith(this.preDisplayName));
     // if(filteredArray.length>0){
@@ -1522,17 +1522,45 @@ export class IntentService {
       });
     } else {
       // quando sposto un intent sullo stage
-      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id);
-      intentsToUpdate.forEach(ele => {
-        this.operationsUndo.push({
-          type: "put", 
-          intent: JSON.parse(JSON.stringify(ele))
-        }); 
-        this.operationsRedo.push({
-          type: "put", 
-          intent: JSON.parse(JSON.stringify(ele))
-        });
+      // Prima di chiamare findsIntentsToUpdate, salviamo una copia degli intent originali dalla lista
+      // per preservare i connettori completi prima che vengano modificati
+      const intentIdsToUpdate: string[] = [];
+      let listConnectors = this.connectorService.searchConnectorsInByIntent(intent.intent_id);
+      listConnectors.forEach(element => {
+        const splitFromId = element.fromId.split('/');
+        const intentToUpdateId = splitFromId[0];
+        if (!intentIdsToUpdate.includes(intentToUpdateId)) {
+          intentIdsToUpdate.push(intentToUpdateId);
+        }
       });
+      
+      // Per ogni intent da aggiornare, salviamo le versioni corrette
+      intentIdsToUpdate.forEach(intentToUpdateId => {
+        // Per operationsUndo, salviamo l'intent originale (prima della modifica)
+        const intentOriginal = this.prevListOfIntent.find((obj) => obj.intent_id === intentToUpdateId);
+        if(intentOriginal){
+          this.operationsUndo.push({
+            type: "put", 
+            intent: JSON.parse(JSON.stringify(intentOriginal))
+          });
+        }
+        
+        // Per operationsRedo, usiamo l'intent attuale dalla lista (che ha ancora i connettori completi)
+        // IMPORTANTE: preserviamo i connettori completi, non li rimuoviamo quando aggiorniamo un intent
+        const intentFromList = this.listOfIntents.find((obj) => obj.intent_id === intentToUpdateId);
+        if(intentFromList){
+          // Creiamo una copia dell'intent dalla lista con tutti i connettori preservati
+          const intentForRedo = JSON.parse(JSON.stringify(intentFromList));
+          this.operationsRedo.push({
+            type: "put", 
+            intent: intentForRedo
+          });
+        }
+      });
+      
+      // Ora chiamiamo findsIntentsToUpdate per aggiornare gli intent nella lista
+      // (questo modifica direttamente la lista, ma abbiamo già salvato le versioni corrette per il payload)
+      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id);
     }
     this.payload.operations = this.operationsRedo;
     let operations = {undo:this.operationsUndo, redo:this.operationsRedo};
@@ -1705,6 +1733,7 @@ export class IntentService {
           // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);
+          this.dashboardService.selectedChatbot.modified = true;
           resolve(true);
         }, (error) => {
           this.logger.error('ERROR: ', error);

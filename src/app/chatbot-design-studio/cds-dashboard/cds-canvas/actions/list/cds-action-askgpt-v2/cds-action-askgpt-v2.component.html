@@ -39,6 +39,12 @@
         </div>
     </div>
 
+    <div class="action-row">
+        <div class="tag-replyto" *ngIf="action?.assignReplyTo">
+            {{action?.assignReplyTo}}
+        </div>
+    </div>
+
     <div class="previewContent">
         
         <div class="icon-action">
@@ -156,7 +162,7 @@
                     <loading-spinner class="custom-spinner"></loading-spinner>
                     <!-- <span style="margin-left: 8px;">loading ...</span> -->
                 </div>
-                <mat-expansion-panel *ngIf="!searching" class="custom-expansion-panel" [expanded]="action?.chunks_only || panelOpenState" (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+                <mat-expansion-panel *ngIf="!searching" class="custom-expansion-panel" [expanded]="action?.chunks_only || chunksPanelOpenState" (opened)="chunksPanelOpenState = true" (closed)="chunksPanelOpenState = false">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
                             <span *ngIf="!action?.chunks_only">Chunks used for the answer ({{chunks?.length}})</span>
@@ -221,11 +227,21 @@
 
 
     <mat-accordion>
-        <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
+        <mat-expansion-panel (opened)="aiSettingsPanelOpenState = true" (closed)="aiSettingsPanelOpenState = false"
             class="custom-expansion-panel">
             <mat-expansion-panel-header class="disable_ripple">
                 <mat-panel-title>
-                    {{'CDSCanvas.AISettings' | translate }}
+                    <div class="title-and-parameters-container">
+                        <div class="title-and-parameters-container">
+                            <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
+                            <div class="parameters-preview">
+                                <span *ngIf="!aiSettingsPanelOpenState && (action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
+                                <span *ngIf="!aiSettingsPanelOpenState && action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
+                                <span *ngIf="!aiSettingsPanelOpenState && action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
+                                <span *ngIf="!aiSettingsPanelOpenState && action?.context"> | system context: {{action.context}}</span>
+                            </div>
+                        </div>
+                    </div>
                 </mat-panel-title>
             </mat-expansion-panel-header>
             <div>

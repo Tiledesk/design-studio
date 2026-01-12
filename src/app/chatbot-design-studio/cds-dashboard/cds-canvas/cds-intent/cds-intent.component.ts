@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, preDisplayName } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -101,6 +101,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   intentColor: any = INTENT_COLORS.COLOR1;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+
 
   constructor(
     public intentService: IntentService,
@@ -242,7 +243,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   async ngOnInit(): Promise<void> {
-      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
+      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
       if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
         this.showIntentOptions = false;
       } 
@@ -392,7 +393,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Aggiorna la variabile isUntitledBlock basandosi sul nome dell'intent
    */
   private updateIsUntitledBlock(){
-    this.isUntitledBlock = this.intent?.intent_display_name?.startsWith(preDisplayName) ?? false;
+    this.isUntitledBlock = this.intent?.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX) ?? false;
   }
 
   /** updateShowIntentOptions

@@ -42,6 +42,12 @@
                 </span> -->
                 {{ 'Publish' | translate}}
             </button>
+            <span *ngIf="selectedChatbot?.modified" 
+                  class="publish-badge"
+                  [matTooltip]="'CDSHeader.ThereAreUnpublishedChanges' | translate"
+                  matTooltipClass="cds-mat-tooltip"
+                  matTooltipPosition="below"
+                  matTooltipHideDelay="100"></span>
 
             <!-- <button mat-icon-button [matMenuTriggerFor]="releasehistory"  class="custom-mat-icon-btn">
                 <mat-icon> arrow_drop_down </mat-icon>

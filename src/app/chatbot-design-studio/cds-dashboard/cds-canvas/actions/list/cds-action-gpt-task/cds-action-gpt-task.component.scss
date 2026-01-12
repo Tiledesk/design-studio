@@ -173,6 +173,20 @@ mat-expansion-panel ::ng-deep {
     .mat-expansion-panel-body {
         padding: 10px !important;
     }
+
+    .title-and-parameters-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    .parameters-preview {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 80px);
+        height: 24px;
+    }
 }
 
 cds-select#model-condition ::ng-deep{

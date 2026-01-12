@@ -8,7 +8,7 @@ import { IntentService } from '../../../services/intent.service';
 import { Intent } from 'src/app/models/intent-model';
 
 // UTILS //
-import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME, preDisplayName } from '../../../utils';
+import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX } from '../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -102,13 +102,20 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   private initialize(intents){
     // // intents = this.intentService.hiddenEmptyIntents(intents);
     // // this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DEFAULT_FALLBACK));
-    this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true && !obj.intent_display_name?.startsWith(preDisplayName));
+    this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true && !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
     this.logger.log('[cds-panel-intent-list] --- internalIntents ',this.internalIntents);
-    this.defaultIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true && !obj.intent_display_name?.startsWith(preDisplayName));
+    this.defaultIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true && !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
     this.logger.log('[cds-panel-intent-list] --- defaultIntents ',this.defaultIntents);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.START, 0);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DEFAULT_FALLBACK, 1);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.CLOSE, 2);
+
+    // Ordina gli intent in ordine alfabetico crescente
+    this.defaultIntents = this.defaultIntents.sort((a, b) => {
+      const nameA = a.intent_display_name?.toLowerCase() || '';
+      const nameB = b.intent_display_name?.toLowerCase() || '';
+      return nameA.localeCompare(nameB);
+    });
 
     this.filteredIntents = this.defaultIntents;
     if(!this.defaultIntents || this.defaultIntents.length == 0){
@@ -144,7 +151,13 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
 
   /** Search a block... */
   onLiveSearch(text: string) {
-    this.filteredIntents = this.defaultIntents.filter(element => element.intent_display_name.toLowerCase().includes(text.toLowerCase()));
+    this.filteredIntents = this.defaultIntents.filter(element => 
+      element.intent_display_name.toLowerCase().includes(text.toLowerCase())
+    ).sort((a, b) => {
+      const nameA = a.intent_display_name?.toLowerCase() || '';
+      const nameB = b.intent_display_name?.toLowerCase() || '';
+      return nameA.localeCompare(nameB);
+    });
   }
 
   /** onSelectIntent */
