@@ -167,9 +167,7 @@ export class NoteService {
       }
       
       // Recupera tutte le note dal dashboardService (o array vuoto se non esiste)
-      const notes = this.dashboardService.selectedChatbot.attributes.notes || [];
-      // Garantisce default anche per note già presenti (retro-compatibilità)
-      notes.forEach(n => this.ensureNoteDefaults(n));
+      const notes = this.dashboardService.selectedChatbot.attributes?.notes || [];
       
       // Cerca se la nota esiste già nell'array
       const existingIndex = notes.findIndex(n => n.note_id === note.note_id);
@@ -226,7 +224,7 @@ export class NoteService {
       }
       
       // Recupera tutte le note dal dashboardService
-      const notes = this.dashboardService.selectedChatbot.attributes.notes || [];
+      const notes = this.dashboardService.selectedChatbot.attributes?.notes || [];
       
       // Rimuove la nota dall'array
       const filteredNotes = notes.filter(n => n.note_id !== note.note_id);
@@ -305,7 +303,7 @@ export class NoteService {
       }
       
       // Recupera tutte le note dal dashboardService
-      const notes = this.dashboardService.selectedChatbot.attributes.notes || [];
+      const notes = this.dashboardService.selectedChatbot.attributes?.notes || [];
       
       // Aggiunge la nota duplicata all'array
       notes.push(duplicatedNote);
