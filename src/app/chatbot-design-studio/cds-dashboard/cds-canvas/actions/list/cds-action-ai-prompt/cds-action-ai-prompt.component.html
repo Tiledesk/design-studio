@@ -36,6 +36,13 @@
             </div>
         </div>
     </div>
+    <div class="action-row">
+        <div class="tag-replyto" *ngIf="action?.assignReplyTo">
+            {{action?.assignReplyTo}}
+        </div>
+    </div>
+
+
 
     <!-- MCP Tools Preview -->
     <div class="mcp-tools-preview-container" *ngIf="action?.servers && action.servers.length > 0">
@@ -46,6 +53,8 @@
             </span>
         </div>
     </div>
+
+ 
 
     <div class="previewContent">
         
@@ -229,13 +238,20 @@
             class="custom-expansion-panel">
             <mat-expansion-panel-header class="disable_ripple">
                 <mat-panel-title>
-                    {{'CDSCanvas.AISettings' | translate }}
+                    <div class="title-and-parameters-container">
+                        <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
+                        <div class="parameters-preview">
+                            <span *ngIf="!panelOpenState && (action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
+                            <span *ngIf="!panelOpenState && action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
+                            <span *ngIf="!panelOpenState && action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
+                            <span *ngIf="!panelOpenState && action?.context"> | system context: {{action.context}}</span>
+                        </div>
+                    </div>
                 </mat-panel-title>
+               
             </mat-expansion-panel-header>
+           
             <div>
-
-
-
                  <!-- // llm select -->
                  <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>

@@ -42,22 +42,25 @@
 }
 
 .response-frame-panel {
-    border: 2px dashed var(--blu-light-02);
+    // border: 2px dashed var(--blu-light-02);
     border-radius: 6px;
     display: flex;
     justify-content: center;
     font-size: 16px;
-    padding: 10px; //10px 20px 20px;
+    padding: 15px 0px;
     text-align: center;
 }
 
 .content-frame {
     display: flex;
     width: auto;
-
+    border-radius: 6px;
+    background-color: var(--blu-light-01);
+    height: calc(100vh - 450px);
+    min-height: 200px;
+    max-height: 400px;
     #contentFrame {
         position: relative;
-        border-radius: 6px;
     }
     .control-button {
         &.delete {
@@ -77,6 +80,18 @@
                 margin-right: -24px;
                 opacity: 1;
             }
+        }
+    }
+}
+
+.preview-mode-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    .icon-wrapper {
+        display: flex;
+        img {
+            width: 100%;
         }
     }
 }

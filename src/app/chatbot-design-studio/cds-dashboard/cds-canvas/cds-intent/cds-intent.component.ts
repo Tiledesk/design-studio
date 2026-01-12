@@ -24,7 +24,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 // Utility e costanti
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, isValidColor, areValidIds, findActionKey, addCssClassToElement, removeCssClassFromElement, calculateQuestionCount, calculateFormSize } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX,replaceItemInArrayForKey, checkInternalIntent, isValidColor, areValidIds, findActionKey, addCssClassToElement, removeCssClassFromElement, calculateQuestionCount, calculateFormSize } from 'src/app/chatbot-design-studio/utils';
 
 // =============================
 // ENUM
@@ -156,6 +156,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** ID chatbot */
   chatbot_id: string;
 
+  isUntitledBlock: boolean = false;
+  isNewChatbot: boolean = false;
+  DATE_NEW_CHATBOT = '2035-12-19T00:00:00.000Z';
+
   /** Colore dell'intent */
   intentColor: any = INTENT_COLORS.COLOR1;
 
@@ -210,6 +214,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Logger centralizzato */
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
+
   // ----------- COSTRUTTORE -----------
   constructor(
     public intentService: IntentService,
@@ -241,6 +246,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             this.logger.log("[CDS-INTENT] Modifica intent: ", this.intent, " con: ", intent);
           this.intent = intent;
           this.setAgentsAvailable();
+
+           // Aggiorna isUntitledBlock quando l'intent viene modificato
+           this.updateIsUntitledBlock();
+           if (intent['attributesChanged']) {
+             this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
+             delete intent['attributesChanged'];
+           } else { // if(this.intent.actions.length !== intent.actions.length && intent.actions.length>0)
+             this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
+             this.listOfActions = this.intent.actions;
+             this.setActionIntent();
+           }
 
             // Se è cambiata solo la posizione, non aggiorno le azioni
           if (intent['attributesChanged']) {
@@ -316,7 +332,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (!this.subscriptions.find(item => item.key === keyAlphaConnectors)) {
       const sub = this.stageService.alphaConnectors$.subscribe(value => {
         this.alphaConnectors = value;
-        this.getAllConnectorsIn();
+        // Ricarica i connettori quando cambia l'opacità
+        if (this.intent?.intent_id) {
+          this.loadConnectorsIn();
+        }
       });
       this.subscriptions.push({ key: keyAlphaConnectors, value: sub });
     }
@@ -339,9 +358,20 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    * Inizializza il componente intent con tutte le configurazioni necessarie.
    * Gestisce webhook, tipi speciali di intent (start, fallback), e configurazione iniziale.
    */
+  // async ngOnInit(): Promise<void> {
+  //     this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
+  //     if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
+  //       this.showIntentOptions = false;
+  //     } 
+  // }
+
+
   async ngOnInit(): Promise<void> {
-      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
-    
+    this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
+
+    if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
+      this.showIntentOptions = false;
+    } 
     // --- Configurazione opzioni intent in base al tipo chatbot ---
     this.configureIntentOptions();
     
@@ -358,7 +388,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     
     // --- Setup event listener e attributi finali ---
     this.setupEventListenersAndAttributes();
+
+    // Aggiorna showIntentOptions dopo l'inizializzazione
+    this.updateShowIntentOptions();
+
+    this.updateIsUntitledBlock();
+    
+    // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
+    this.checkIfNewChatbot();
   }
+
 
   /**
    * Configura le opzioni dell'intent in base al tipo di chatbot
@@ -366,7 +405,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   private configureIntentOptions(): void {
     if (this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT) {
         this.showIntentOptions = false;
-      } 
+    } 
   }
 
   /**
@@ -430,6 +469,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   private setupEventListenersAndAttributes(): void {
       this.addEventListener();
       this.setIntentAttributes();
+      
+      // --- Carica i connettori in ingresso iniziali ---
+      this.loadConnectorsIn();
+      
+      // --- Sottoscriviti agli aggiornamenti dei connettori ---
+      this.initConnectorsInSubscription();
   }
 
   async getWebhook(): Promise<string | null> {
@@ -457,10 +502,59 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private getAllConnectorsIn(){
-    if(this.intent){
-      this.connectorsIn = this.connectorService.searchConnectorsInByIntent(this.intent.intent_id);
+
+  /**
+   * Carica i connettori in ingresso per questo intent.
+   * Viene chiamata quando l'intent viene renderizzato.
+   */
+  private loadConnectorsIn(): void {
+    if (!this.intent?.intent_id) {
+      this.logger.warn('[CONNECTORS] Intent non disponibile per caricare connettori');
+      return;
     }
+
+    // Carica i connettori in ingresso
+    const connectors = this.connectorService.getConnectorsInByIntent(this.intent.intent_id);
+    this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
+    this.logger.log(`[CONNECTORS] Connettori in ingresso caricati per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
+  }
+
+  /**
+   * Inizializza la subscription ai connettori in ingresso per questo intent.
+   * Viene chiamata in ngOnInit quando l'intent è sicuramente disponibile.
+   */
+  private initConnectorsInSubscription(): void {
+    if (!this.intent?.intent_id) {
+      this.logger.warn('[CONNECTORS] Intent non disponibile per inizializzare subscription connettori');
+      return;
+    }
+
+    const keyConnectorsIn = 'connectorsIn';
+    // Evita di creare subscription duplicate
+    if (this.subscriptions.find(item => item.key === keyConnectorsIn)) {
+      this.logger.log(`[CONNECTORS] Subscription già esistente per blocco ${this.intent.intent_id}`);
+      return;
+    }
+
+    // Usa l'observable filtrato del servizio che emette solo per questo intent
+    this.logger.log(`[CONNECTORS] Mi sottoscrivo agli aggiornamenti connettori per blocco ${this.intent.intent_id}`);
+    const sub = this.connectorService.getConnectorsInObservable(this.intent.intent_id)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(connectors => {
+        this.updateConnectorsIn(connectors);
+      });
+    
+    this.subscriptions.push({ key: keyConnectorsIn, value: sub });
+    this.logger.log(`[CONNECTORS] Subscription attiva per blocco ${this.intent.intent_id}`);
+  }
+
+  /**
+   * Aggiorna connectorsIn con nuovi valori ricevuti dall'observable.
+   * @param connectors - Array di connettori aggiornati
+   */
+  private updateConnectorsIn(connectors: any[]): void {
+    this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
+    this.logger.log(`[CONNECTORS] Aggiorno il numero dei connettori in ingresso per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
   }
 
   /**
@@ -471,6 +565,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // Gestisce la visibilità del placeholder delle azioni quando viene trascinata un'azione
     this.handleActionPlaceholderVisibility();
     
+    // Aggiorna isUntitledBlock se l'intent cambia
+    if (changes['intent'] && !changes['intent'].firstChange) {
+      this.updateIsUntitledBlock();
+    }
+
     // Aggiorna lo stato degli agenti disponibili
     this.setAgentsAvailable();
   }
@@ -496,6 +595,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
 
+
+  /** updateIsUntitledBlock
+   * Aggiorna la variabile isUntitledBlock basandosi sul nome dell'intent
+   */
+  private updateIsUntitledBlock(){
+    this.isUntitledBlock = this.intent?.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX) ?? false;
+  }
   /**
    * Imposta la disponibilità degli agenti per l'intent corrente.
    * Se agents_available non è esplicitamente false, viene impostato a true.
@@ -508,6 +614,62 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.isAgentsAvailable = false;
     }
   }
+
+
+
+    /** updateShowIntentOptions
+   * Aggiorna showIntentOptions basandosi su questionCount e formSize
+   * showIntentOptions deve essere false se questionCount e formSize sono entrambi == 0
+   */
+    private updateShowIntentOptions(){
+      // Non modificare showIntentOptions se è già stato impostato a false per altri motivi
+      // (es. chatbotSubtype !== CHATBOT, START, WEBHOOK)
+      if(this.showIntentOptions === false){
+        return;
+      }
+      // Imposta a false se questionCount e formSize sono entrambi 0
+      if(this.questionCount === 0 && this.formSize === 0){
+        this.showIntentOptions = false;
+      } else {
+        this.showIntentOptions = true;
+      }
+    }
+
+  /** checkIfNewChatbot
+   * Verifica se il chatbot è stato creato dopo il 01/06/2025
+   * Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
+   * Altrimenti isNewChatbot = true
+   */
+  private checkIfNewChatbot(): void {
+    
+    //this.isNewChatbot = false;
+    //return;
+    const cutoffDate = this.DATE_NEW_CHATBOT;
+    const chatbot = this.dashboardService.selectedChatbot;
+    this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot.createdAt);
+
+
+    if (!chatbot || !chatbot.createdAt) {
+      // Se non c'è data di creazione, considera come nuovo chatbot
+      this.isNewChatbot = true;
+      this.logger.log('[CDS-INTENT] checkIfNewChatbot: nessuna data di creazione, impostato a true');
+      return;
+    }
+
+    try {
+      // Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
+      // Altrimenti (successiva o uguale), isNewChatbot = true
+      this.isNewChatbot = chatbot.createdAt >= cutoffDate;
+      this.logger.log('[CDS-INTENT] checkIfNewChatbot:', {
+        isNewChatbot: this.isNewChatbot
+      });
+    } catch (error) {
+      this.logger.error('[CDS-INTENT] checkIfNewChatbot error:', error);
+      // In caso di errore, considera come nuovo chatbot
+      this.isNewChatbot = true;
+    }
+  }
+
 
   /**
    * Inizializza il componente dopo che la view è stata renderizzata.
@@ -809,9 +971,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.questionCount = metrics.questionCount;
         this.formSize = metrics.formSize;
       }
-      
+      // Aggiorna showIntentOptions basandosi su questionCount e formSize
+      this.updateShowIntentOptions();
       this.logger.debug("[CDS-INTENT] Intent selezionato configurato:", this.intent?.intent_id);
-      
     } catch (error) {
       this.logger.error("[CDS-INTENT] Errore nella configurazione dell'intent selezionato:", error);
     }
@@ -824,6 +986,25 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.listOfActions = null;
     this.formSize = 0;
     this.questionCount = 0;
+    try {
+      if (this.intent) {
+        // document.documentElement.style.setProperty('--intent-color', `rgba(${this.intentColor}, 1)`);
+        /** // this.patchAllActionsId(); */
+        this.patchAttributesPosition();
+        this.listOfActions = this.intent.actions;
+        if (this.intent.question) {
+          const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
+          this.questionCount = question_segment.length;
+        }
+      }
+      if (this.intent?.form && (this.intent.form !== null)) {
+        this.formSize = Object.keys(this.intent.form).length;
+      } else {
+        this.formSize = 0;
+      } 
+    } catch (error) {
+      this.logger.error("error: ", error);
+    }
   }
 
   /**
@@ -1167,6 +1348,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   async onActionDrop(event: CdkDragDrop<string[]>): Promise<void> {
     this.logger.log('[CDS-INTENT] onActionDrop - event:', event, 'actions:', this.intent.actions);
     
+    // Se è un nuovo chatbot e l'intent ha già almeno un'azione, non permettere il drop
+    if (this.isNewChatbot && this.listOfActions?.length > 0 && event.previousContainer !== event.container) {
+      this.logger.log('[CDS-INTENT] onActionDrop - Drop negato: isNewChatbot è true e l\'intent ha già un\'azione');
+      return;
+    }
+    
     // Chiude tutti i pannelli e seleziona l'intent
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
@@ -1324,11 +1511,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /**
    * Predicato per determinare se un elemento può essere inserito nella drop list
-   * @param action - L'azione per cui verificare la possibilità di inserimento
-   * @returns Funzione che restituisce sempre true (tutti gli elementi possono essere inseriti)
+   * @param intent - L'intent per cui verificare la possibilità di inserimento
+   * @returns Funzione che restituisce false se isNewChatbot è true e l'intent ha già un'azione
    */
-  onDropListEnterCheck(action: any): (item: CdkDrag<any>) => boolean {
+  onDropListEnterCheck(intent: any): (item: CdkDrag<any>) => boolean {
     return (item: CdkDrag<any>): boolean => {
+      // Se è un nuovo chatbot e l'intent ha già almeno un'azione, non permettere il drop
+      if (this.isNewChatbot && this.listOfActions?.length > 0) {
+        this.logger.log('[CDS-INTENT] onDropListEnterCheck - Drop negato: isNewChatbot è true e l\'intent ha già un\'azione');
+        return false;
+      }
       return true;
     };
   }
@@ -1407,6 +1599,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    */
   private async handleExternalDrop(event: CdkDragDrop<string[]>): Promise<void> {
     try {
+      // Se è un nuovo chatbot e l'intent ha già almeno un'azione, non permettere il drop
+      if (this.isNewChatbot && this.listOfActions?.length > 0) {
+        this.logger.log('[CDS-INTENT] handleExternalDrop - Drop negato: isNewChatbot è true e l\'intent ha già un\'azione');
+        return;
+      }
+      
       const action: any = event.previousContainer.data[event.previousIndex];
       
       if (event.previousContainer.data.length > 0) {
@@ -1429,5 +1627,3 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 }
-
-

@@ -2,7 +2,7 @@ import { AbstractControl } from "@angular/forms";
 import { Intent } from "src/app/models/intent-model";
 import { v4 as uuidv4 } from 'uuid';
 
-export const preDisplayName:string  = 'untitled_block_';
+export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 
@@ -119,6 +119,7 @@ export enum TYPE_INTENT_NAME {
     WEBHOOK            = 'webhook',
     CLOSE              = "close"
 }
+
 
 export enum TYPE_MATH_OPERATOR {
     addAsNumber         = "addAsNumber",

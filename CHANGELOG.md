@@ -21,6 +21,99 @@
 - **bug-fix**: bug fixed text align
 - **added**: added note
 
+# 1.39.23-rc5
+- **added**: added sortedItems in selection intent
+
+# 1.39.23-rc4
+- **added**: showed connectors-in only if they are contract connectors
+
+# 1.39.23-rc3
+- **changed**: changed connector-in to only display the list of contracted connector-in to the input
+- **added**: added go to block in panel intent detail;
+- **added**: added multi rows in url iframe;
+
+# 1.39.23-rc1
+- **added**: added connector-in-menu to display the list of blocks connected to the input
+- **added**: added menu on contract-connector to reset connector and move on connector
+
+
+# 1.39.22
+- **changed**: sorted the list of Intents in alphabetical order
+- **added**: added the LLM model gpt-5.2
+- **bug-fix**: Fixed bug when changing the height of iframe
+
+# 1.39.21
+- **added**: added the LLM model gpt-5.2
+
+# 1.39.20
+- **bug-fix**: sorted the list of intents in the intent selection select
+
+# 1.39.19
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
+# 1.39.19-rc12 
+- **added**: added tag-replyto in mode preview ai condition and ask kb
+- **bug-fix**: change link "learn more" ai condition
+
+
+# 1.39.19-rc10 
+- **changed**: Intent block title hidden if "untitled"
+- **changed**: Form button and question button hidden if empty
+- **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
+- **changed**: If the chatbot is new, only one action per intent
+
+# 1.39.19-rc9
+- **bug-fix**: sorted the listOfIntents in the intent selection select
+
+# 1.39.19-rc8
+- **bug-fix**: do not automatically set TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+- **bug-fix**: reset STT_MODEL and TTS_MODEL while switching from/to elevenlabs/openai for voiceSettings
+
+# 1.39.19-rc6
+- **bug-fix**: minor fix on TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+
+# 1.39.19-rc5
+- **bug-fix**: "TTS_VOICE_LANGUAGE" while selecting TTS_VOICE_NAME for elevenlabs voiceProvider
+
+# 1.39.19-rc4
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
+# 1.39.19-rc3
+- **added**: added settings summary in AI action templates and all actions with AISEttings
+- **added**: added tag-replyto in mode preview
+- **added**: added badge on publish button
+
+# 1.39.19-rc2
+- **added**: Added badge to count messages arriving in the widget-loq when the panel is closed
+- **changed**: intent block title hidden if "untitled"
+- **changed**: hidden form button and question button if they are empty 
+- **added**: added badge to count messages arriving in the widget-loq when the panel is closed
+
+# 1.39.19-rc1
+- **added**: description on elevenlabs voices 
+
+# 1.39.18
+- **bug-fix**: Fixed display of iframe URL in action playback
+
+# 1.39.18-rc2
+- **bug-fix**: css bug fix content-frame
+
+# 1.39.18-rc1
+- **bug-fix**: fixed handling of iframe URL in action replay
+
+# 1.39.17
+- **added**: added the ability to put notes on the stage
+
+# 1.39.16
+- **added**: pipe find to show namespace name in action ask-kb-v2
+- **bug-fix**: show 'Re-ranking' option in action ask-kb-v2
+
+# 1.39.15
+- **bug-fix**: cannot able to update key or value in action lead_update
+
+# 1.39.15-rc3
+- **bug-fix**: update resizing note
+
 # 1.39.15-rc2
 - **bug-fix**: cannot update the key or delete an item in action lead_update
 
@@ -49,6 +142,10 @@
 # 1.39.14-rc1
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
+=========
+# this branch
+- **added**: added note
+>>>>>>>>> Temporary merge branch 2
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management

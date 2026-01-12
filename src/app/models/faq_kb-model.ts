@@ -34,4 +34,5 @@ export interface Chatbot extends FaqKb {
     imageURL: string;
     agents_available?: boolean;
     subtype: string;
+    modified: boolean;
 }

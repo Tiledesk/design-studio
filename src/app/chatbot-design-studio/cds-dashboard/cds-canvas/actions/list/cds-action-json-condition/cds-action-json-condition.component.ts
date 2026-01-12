@@ -136,6 +136,8 @@ export class CdsActionJsonConditionComponent implements OnInit {
       if (this.action) {
         this.setFormValue()
       }
+      // ordina listOfIntents per name
+      this.listOfIntents.sort((a, b) => a.name.localeCompare(b.name));
     }
   
     private setFormValue(){

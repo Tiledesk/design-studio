@@ -966,7 +966,7 @@
                 "DESCRIPTION": "The AI Condition Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
                 "IMAGE": "assets/images/doc/AI_CONDITION.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ai-condition"
             },
             "HiddenMessage": {
                 "TITLE": "Send an hidden message (for the end user)",
@@ -1340,7 +1340,8 @@
     },
     "Options": "Options",
     "CDSHeader": {
-        "LinkCopiedToClipboard": "Link copied to clipboard"
+        "LinkCopiedToClipboard": "Link copied to clipboard",
+        "ThereAreUnpublishedChanges": "There are unpublished changes"
     },
     "ReleaseHistory": "Release History",
     "ReleaseNotes": "Release notes",

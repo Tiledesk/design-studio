@@ -60,7 +60,21 @@ div {
         padding: 5px 10px;
         background-color: #ecb606;
         color: white;
-
+    }
+    div.tag-replyto {
+        display: flex;
+        width: fit-content;
+        border-radius: 4px;
+        font-size: 10px;
+        margin: 3px;
+        height: -moz-fit-content;
+        height: fit-content;
+        padding: 0px 6px;
+        max-width: calc(100% - 25px);
+        background-color: var(--blu);
+        color: var(--color-white-hex);
+        flex-wrap: nowrap;
+        text-align: end;
     }
 }
 
@@ -172,6 +186,21 @@ mat-expansion-panel ::ng-deep {
 
     .mat-expansion-panel-body {
         padding: 10px !important;
+    }
+
+    .title-and-parameters-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .parameters-preview {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 80px);
+        height: 24px;
     }
 
 }
