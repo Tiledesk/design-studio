@@ -8,6 +8,16 @@
 *Tiledesk SRL*
 
 # this branch
+- **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
+- **added**: Supportare rettangolo
+- **bug-fix**: Supportare spessore bordo
+- **bug-fix**: correggere il bug che non permette di salvare il colore del testo
+- **added**: aggiungi submenu con le varie tipologie di note
+- **added**: Inserimento con drag&drop
+- **added**: Supportare tipo Immagine
+- **added**: Supportare tipo Video
+- **bug-fix**:Appena inserita la Nota testo dovrebbe subito permetterti di scrivere con focus su testo
+- **bug-fix**: centra non funziona nel blocco
 - **bug-fix**: bug fixed text align
 - **added**: added note
 
