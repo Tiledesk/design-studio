@@ -644,7 +644,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // this.listOfNotes = this.noteService.getNotes(this.id_faq_kb);
     // Normalize legacy note types:
     // - 'image'/'video' => 'media'
-    const rawNotes = this.dashboardService.selectedChatbot.attributes.notes || [];
+    const rawNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
     this.listOfNotes = rawNotes.map((n: any) => {
       if (!n) return n;
       const t = n.type;
