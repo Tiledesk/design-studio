@@ -637,7 +637,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // set listOfNotes load from localStorage
     // ---------------------------------------
     // this.listOfNotes = this.noteService.getNotes(this.id_faq_kb);
-    this.listOfNotes = this.dashboardService.selectedChatbot.attributes.notes || [];
+    this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
     //this.logger.log("[CDS-CANVAS]  •••• listOfNotes ••••", this.listOfNotes);
     
     // NOTA: Non ci sottoscriviamo a notesChanged$ per mantenere il componente disaccoppiato.
