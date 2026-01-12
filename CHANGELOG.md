@@ -7,9 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.39.23-rc6
+# 1.39.23-rc7
 - **changed**: Refactored state management for expansion panels in cds-action-askgpt-v2 component. Introduced separate states for chunks and AI settings panels to improve UI responsiveness and maintainability
 - **changed**: Updated ACTIONS_LIST in utils-actions.ts to ensure consistent formatting and include additional chatbot types for FLOW_LOG action
+
+# 1.39.23-rc6
 - **added**: Support rectangle
 - **bug-fix**: Support border thickness
 - **bug-fix**: Fix the bug that prevents text color from being saved
