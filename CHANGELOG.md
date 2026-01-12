@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
+# new 
 - **changed**: Intent block title hidden if "untitled"
 - **changed**: Form button and question button hidden if empty
 - **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
