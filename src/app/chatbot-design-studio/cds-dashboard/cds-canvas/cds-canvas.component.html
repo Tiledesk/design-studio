@@ -85,9 +85,11 @@
             [id]="note.note_id"
             [note]="note"
             [IS_OPEN_PANEL_NOTE_DETAIL]="IS_OPEN_PANEL_NOTE_DETAIL"
+            [autoFocus]="note.note_id === pendingAutoFocusNoteId"
             [style.top.px]="note.y"
             [style.left.px]="note.x"
-            (noteSelected)="onNoteSelected($event)">
+            (noteSelected)="onNoteSelected($event)"
+            (autoFocused)="onNoteAutoFocused($event)">
         </cds-notes>
     </div> 
 

@@ -150,6 +150,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** note mode */
   isNoteModeActive: boolean = false;
   private pendingImageDraftNoteId: string | null = null;
+  pendingAutoFocusNoteId: string | null = null;
   
   IS_OPEN_PANEL_INTENT_DETAIL: boolean = false;
   IS_OPEN_PANEL_NOTE_DETAIL: boolean = false;
@@ -1645,9 +1646,20 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.dashboardService.selectedChatbot.attributes.notes = [...this.listOfNotes];
       this.saveNoteRemotely(newNote);
 
+      // UX: focus the text editor immediately after creating a text note.
+      if (newNote.type === 'text') {
+        this.pendingAutoFocusNoteId = newNote.note_id;
+      }
+
       this.logger.log("[CDS-CANVAS] Note dropped on stage:", evt.noteType, pos);
     } catch (e) {
       this.logger.error("[CDS-CANVAS] Error creating note from drop:", e);
+    }
+  }
+
+  onNoteAutoFocused(noteId: string): void {
+    if (this.pendingAutoFocusNoteId === noteId) {
+      this.pendingAutoFocusNoteId = null;
     }
   }
 

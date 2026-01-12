@@ -19,7 +19,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   @Input() note: Note;
   @Input() IS_OPEN_PANEL_NOTE_DETAIL: boolean = false;
+  @Input() autoFocus: boolean = false;
   @Output() noteSelected = new EventEmitter<Note>();
+  @Output() autoFocused = new EventEmitter<string>();
   @ViewChild('noteInput', { static: false }) noteInput: ElementRef<HTMLDivElement>;
   @ViewChild('noteContentElement', { static: false }) contentElement: ElementRef<HTMLDivElement>;
 
@@ -39,6 +41,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private singleClickTimer: any = null;
   private noteUpdatedSubscription: Subscription;
   private mutationObserver: MutationObserver | null = null;
+  private hasAutoFocusedOnce = false;
 
   // ============================================================================
   // PROPRIETÀ PRIVATE - Resize
@@ -189,6 +192,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         }
       }
     }
+
+    if (changes['autoFocus'] && changes['autoFocus'].currentValue === true) {
+      this.tryAutoFocusText();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -210,6 +217,28 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.updateChildrenDraggableClass();
       this.setupMutationObserver();
     }
+
+    // If the note was created with autoFocus, apply it after the first render.
+    this.tryAutoFocusText();
+  }
+
+  private tryAutoFocusText(): void {
+    if (this.hasAutoFocusedOnce) return;
+    if (!this.autoFocus) return;
+    if (!this.note || !this.isTextNote) return;
+    if (!this.noteInput) return;
+
+    // Let Angular finish binding + DOM settle.
+    setTimeout(() => {
+      if (this.hasAutoFocusedOnce) return;
+      if (!this.autoFocus) return;
+      if (!this.note || !this.isTextNote) return;
+      if (!this.noteInput) return;
+
+      this.changeState(1); // focuses contenteditable + caret at end
+      this.hasAutoFocusedOnce = true;
+      this.autoFocused.emit(this.note.note_id);
+    }, 0);
   }
 
   ngOnDestroy(): void {
