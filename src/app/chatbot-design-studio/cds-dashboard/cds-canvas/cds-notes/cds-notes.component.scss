@@ -1,6 +1,13 @@
 // ============================================================================
 // CONTAINER PRINCIPALE
 // ============================================================================
+:host {
+  width: 0;
+  height: 0;
+  overflow: visible;
+  display: block;
+}
+
 .cds-notes-content {
   position: relative;
   padding: 10px 8px;
@@ -83,6 +90,25 @@
       height: 20px;
       cursor: ew-resize;
     }
+
+    // Handle verticali per ridimensionamento verticale
+    &.resize-top {
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      cursor: ns-resize;
+    }
+
+    &.resize-bottom {
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      cursor: ns-resize;
+    }
     
   }
   
@@ -101,8 +127,8 @@
     position: absolute;
     top: -20px;
     left: 50%;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     display: none;
     z-index: 10;
     user-select: none;
@@ -115,6 +141,91 @@
     &:active {
       cursor: grabbing;
     }
+  }
+}
+
+// ============================================================================
+// RECT NOTE (NON TESTUALE)
+// ============================================================================
+.cds-notes-content.rect-note {
+  user-select: none;
+  -webkit-user-select: none;
+
+  .rect-body {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    background: transparent;
+  }
+
+  // Nascondi maniglie ai vertici + pallino rotazione per le note rettangolo
+  // (override anche quando il container è `.selected`)
+  .resize-handle.resize-tl,
+  .resize-handle.resize-tr,
+  .resize-handle.resize-bl,
+  .resize-handle.resize-br,
+  .rotate-handle {
+    display: none !important;
+  }
+}
+
+// ============================================================================
+// MEDIA NOTE
+// ============================================================================
+.cds-notes-content.media-note {
+  padding: 0 !important;
+  margin: 0 !important;
+  user-select: none;
+  -webkit-user-select: none;
+
+  .image-body {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .image-body.placeholder {
+    background: transparent;
+  }
+
+  .note-media-placeholder-btn {
+    border: none;
+    background: transparent;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    background-color: rgba(255, 255, 255, 0.75);
+  }
+
+  .note-media-placeholder-btn:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
+  .note-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .note-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
 }
 
@@ -148,6 +259,7 @@
     content: 'Type something';
     color: #999;
     pointer-events: none;
+    display: none;
   }
   
   // Cursor states
@@ -203,6 +315,19 @@
       color: inherit;
       text-decoration: underline;
       cursor: pointer;
+    }
+    
+    // Stili per allineamento Quill
+    .ql-align-center {
+      text-align: center;
+    }
+    
+    .ql-align-right {
+      text-align: right;
+    }
+    
+    .ql-align-left {
+      text-align: left;
     }
   }
 }
