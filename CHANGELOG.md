@@ -7,19 +7,16 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
-- **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
-- **added**: Supportare rettangolo
-- **bug-fix**: Supportare spessore bordo
-- **bug-fix**: correggere il bug che non permette di salvare il colore del testo
-- **added**: aggiungi submenu con le varie tipologie di note
-- **added**: Inserimento con drag&drop
-- **added**: Supportare tipo Immagine
-- **added**: Supportare tipo Video
-- **bug-fix**:Appena inserita la Nota testo dovrebbe subito permetterti di scrivere con focus su testo
-- **bug-fix**: centra non funziona nel blocco
-- **bug-fix**: bug fixed text align
-- **added**: added note
+# 1.39.23-rc6
+- **added**: Support rectangle
+- **bug-fix**: Support border thickness
+- **bug-fix**: Fix the bug that prevents text color from being saved
+- **added**: Add submenus with various note types
+- **added**: Drag-and-drop insertion
+- **added**: Support image type
+- **added**: Support video type
+- **bug-fix**: As soon as the text note is inserted, it should immediately allow you to write with focus on the text
+- **bug-fix**: Centering doesn't work in the block
 
 # 1.39.23-rc5
 - **added**: added sortedItems in selection intent
