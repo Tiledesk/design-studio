@@ -194,10 +194,10 @@
                     <div class="title-and-parameters-container">
                         <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                         <div class="parameters-preview">
-                            <span *ngIf="!panelOpenState && action?.model">{{ action?.model }}</span>
-                            <span *ngIf="!panelOpenState && action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
-                            <span *ngIf="!panelOpenState && action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
-                            <span *ngIf="!panelOpenState && action?.context"> | system context: {{action.context}}</span>
+                            <span *ngIf="action?.model">{{ action?.model }}</span>
+                            <span *ngIf="action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
+                            <span *ngIf="action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
+                            <span *ngIf="action?.context"> | system context: {{action.context}}</span>
                         </div>
                     </div>
                 </mat-panel-title>

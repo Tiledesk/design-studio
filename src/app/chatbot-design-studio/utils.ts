@@ -8,7 +8,8 @@ export const DOCS_LINK = {
     ASKGPTV2 : { 
         namespace_as_name: { link: 'https://gethelp.tiledesk.com/', target: '_blank'},
         advanced_prompt: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#advanced-context', target: '_blank' }, 
-        citations: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#get-contents-sources', target: '_blank' }
+        citations: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#get-contents-sources', target: '_blank' },
+        reranking: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/knowledge-base/re-ranking', target: '_blank' }
     }, 
     ADD_TO_KB: {
         namespace_as_name: { link: 'https://gethelp.tiledesk.com/articles/add-to-knowledge-base-action/', target: '_blank'},
