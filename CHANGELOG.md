@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.23
+- **bug-fix**: deleted duplicate AI model chatGPT 5.2
+
 # 1.39.22
 - **changed**: sorted the list of Intents in alphabetical order
 - **added**: added the LLM model gpt-5.2
