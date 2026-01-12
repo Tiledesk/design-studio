@@ -162,7 +162,7 @@
                     <loading-spinner class="custom-spinner"></loading-spinner>
                     <!-- <span style="margin-left: 8px;">loading ...</span> -->
                 </div>
-                <mat-expansion-panel *ngIf="!searching" class="custom-expansion-panel" [expanded]="action?.chunks_only || panelOpenState" (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+                <mat-expansion-panel *ngIf="!searching" class="custom-expansion-panel" [expanded]="action?.chunks_only || chunksPanelOpenState" (opened)="chunksPanelOpenState = true" (closed)="chunksPanelOpenState = false">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
                             <span *ngIf="!action?.chunks_only">Chunks used for the answer ({{chunks?.length}})</span>
@@ -227,7 +227,7 @@
 
 
     <mat-accordion>
-        <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false"
+        <mat-expansion-panel (opened)="aiSettingsPanelOpenState = true" (closed)="aiSettingsPanelOpenState = false"
             class="custom-expansion-panel">
             <mat-expansion-panel-header class="disable_ripple">
                 <mat-panel-title>

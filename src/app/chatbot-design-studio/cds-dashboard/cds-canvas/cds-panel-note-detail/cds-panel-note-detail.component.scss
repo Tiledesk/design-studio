@@ -108,6 +108,141 @@
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
+// ---------------------------------------------------------------------------
+// IMAGE NOTE UI (no section-title)
+// ---------------------------------------------------------------------------
+.image-note-section {
+    padding: 20px 24px;
+}
+
+.image-upload-box {
+    border: 2px dashed var(--gray-02);
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+}
+
+.image-upload-hint {
+    font-size: 12px;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+    margin-bottom: 12px;
+}
+
+.image-upload-error {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #e22828;
+    font-family: var(--font-family-poppins);
+    line-height: 1.3;
+}
+
+.image-file-input {
+    display: none;
+}
+
+.image-upload-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    justify-content: center;
+}
+
+.image-url-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.image-url-input {
+    flex: 1;
+    height: 34px;
+    border: 2px solid var(--gray-02);
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-family: var(--font-family-poppins);
+    outline: none;
+}
+
+.image-btn {
+    height: 34px;
+    border-radius: 8px;
+    padding: 0 12px;
+    border: 2px solid var(--gray-02);
+    background: white;
+    color: var(--blu);
+    font-size: 12px;
+    font-family: var(--font-family-poppins);
+    cursor: pointer;
+}
+
+.image-btn.danger {
+    color: #e22828;
+}
+
+.image-preview-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.image-preview-frame {
+    width: 100%;
+    height: 220px; // dimensione fissa richiesta
+    border-radius: 8px;
+    border: none; // richiesto: niente bordo sul div anteprima
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.image-preview-placeholder {
+    position: absolute;
+    inset: 0;
+    background: #f3f4f6; // grigio chiaro
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+}
+
+.image-preview.video-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.image-dimensions-hint {
+    font-size: 12px;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+}
+
+.image-dimensions {
+    font-size: 12px;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+    border: 2px solid var(--gray-02);
+    padding: 6px;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.image-buttons {
+    display: flex;
+    gap: 10px;
+}
+
 // Rich Text Editor Section
 .rich-text-editor-section {
     .section-header {
@@ -259,6 +394,48 @@
             padding: 12px;
             margin: 0;
             color: #000000; // Colore di default del testo
+        }
+
+        /* Quill pickers: our tokens are hex without '#', so we paint swatches via CSS. */
+        .ql-snow {
+            .ql-picker.ql-color,
+            .ql-picker.ql-background {
+                .ql-picker-item[data-value="000000"] { background-color: #000000; }
+                .ql-picker-item[data-value="e60000"] { background-color: #e60000; }
+                .ql-picker-item[data-value="ff9900"] { background-color: #ff9900; }
+                .ql-picker-item[data-value="ffff00"] { background-color: #ffff00; }
+                .ql-picker-item[data-value="008a00"] { background-color: #008a00; }
+                .ql-picker-item[data-value="0066cc"] { background-color: #0066cc; }
+                .ql-picker-item[data-value="9933ff"] { background-color: #9933ff; }
+                .ql-picker-item[data-value="ffffff"] { background-color: #ffffff; border: 1px solid #ddd; }
+                .ql-picker-item[data-value="facccc"] { background-color: #facccc; }
+                .ql-picker-item[data-value="ffebcc"] { background-color: #ffebcc; }
+                .ql-picker-item[data-value="ffffcc"] { background-color: #ffffcc; }
+                .ql-picker-item[data-value="cce8cc"] { background-color: #cce8cc; }
+                .ql-picker-item[data-value="cce0f5"] { background-color: #cce0f5; }
+                .ql-picker-item[data-value="ebd6ff"] { background-color: #ebd6ff; }
+                .ql-picker-item[data-value="bbbbbb"] { background-color: #bbbbbb; }
+                .ql-picker-item[data-value="f06666"] { background-color: #f06666; }
+                .ql-picker-item[data-value="ffc266"] { background-color: #ffc266; }
+                .ql-picker-item[data-value="ffff66"] { background-color: #ffff66; }
+                .ql-picker-item[data-value="66b966"] { background-color: #66b966; }
+                .ql-picker-item[data-value="66a3e0"] { background-color: #66a3e0; }
+                .ql-picker-item[data-value="c285ff"] { background-color: #c285ff; }
+                .ql-picker-item[data-value="888888"] { background-color: #888888; }
+                .ql-picker-item[data-value="a10000"] { background-color: #a10000; }
+                .ql-picker-item[data-value="b26b00"] { background-color: #b26b00; }
+                .ql-picker-item[data-value="b2b200"] { background-color: #b2b200; }
+                .ql-picker-item[data-value="006100"] { background-color: #006100; }
+                .ql-picker-item[data-value="0047b2"] { background-color: #0047b2; }
+                .ql-picker-item[data-value="6b24b2"] { background-color: #6b24b2; }
+                .ql-picker-item[data-value="444444"] { background-color: #444444; }
+                .ql-picker-item[data-value="5c0000"] { background-color: #5c0000; }
+                .ql-picker-item[data-value="663d00"] { background-color: #663d00; }
+                .ql-picker-item[data-value="666600"] { background-color: #666600; }
+                .ql-picker-item[data-value="003700"] { background-color: #003700; }
+                .ql-picker-item[data-value="002966"] { background-color: #002966; }
+                .ql-picker-item[data-value="3d1466"] { background-color: #3d1466; }
+            }
         }
     }
 
@@ -428,6 +605,7 @@
             
             // Nasconde le freccette per input type="number"
             &[type="number"] {
+                appearance: textfield;
                 -moz-appearance: textfield;
                 
                 &::-webkit-outer-spin-button,
@@ -544,6 +722,7 @@
             
             // Nasconde le freccette per input type="number"
             &[type="number"] {
+                appearance: textfield;
                 -moz-appearance: textfield;
                 
                 &::-webkit-outer-spin-button,

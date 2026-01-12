@@ -67,6 +67,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   ai_error: string = "";
   preview_response: any;
   chunks: Array<any> = [];
+  
+  chunksPanelOpenState: boolean = false;
+  aiSettingsPanelOpenState: boolean = false;
 
   temp_variables = [];
   // autocompleteOptions: Array<{label: string, value: string}> = [];
