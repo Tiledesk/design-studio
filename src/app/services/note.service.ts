@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Note } from '../models/note-model';
+import { NoteType } from '../models/note-types';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { FaqKbService } from './faq-kb.service';
@@ -12,6 +13,7 @@ import { map } from 'rxjs/operators';
 })
 export class NoteService {
   private logger: LoggerService = LoggerInstance.getInstance();
+  private static readonly LAST_USED_NOTE_STYLE_STORAGE_KEY = 'cds_last_used_note_style_v1';
   
   // Subject per notificare i cambiamenti alle note
   // Emette l'array completo di note quando viene modificato
@@ -40,6 +42,116 @@ export class NoteService {
     if (note.borderWidth === undefined || note.borderWidth === null) {
       note.borderWidth = Note.DEFAULT_BORDER_WIDTH;
     }
+    // Default colors depend on note type (retro-compat for saved notes missing these fields).
+    if (!note.backgroundColor) {
+      note.backgroundColor = Note.defaultBackgroundColor(note.type);
+    }
+    if (!note.borderColor) {
+      note.borderColor = Note.defaultBorderColor(note.type);
+    }
+  }
+
+  // ============================================================================
+  // LocalStorage: "Last used" note style (per type)
+  // ============================================================================
+  private safeReadLocalStorage(key: string): string | null {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return null;
+      return window.localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  private safeWriteLocalStorage(key: string, value: string): void {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      window.localStorage.setItem(key, value);
+    } catch (e) {
+      // ignore (privacy mode / storage full / server-side rendering)
+    }
+  }
+
+  private normalizeNoteType(type?: NoteType): NoteType {
+    if (!type) return 'text';
+    if (type === 'media') return 'media';
+    if (type === 'rect') return 'rect';
+    return 'text';
+  }
+
+  public getLastUsedColorsForType(type?: NoteType): {
+    backgroundColor?: string;
+    backgroundOpacity?: number;
+    borderColor?: string;
+    borderOpacity?: number;
+    borderWidth?: number;
+    boxShadow?: boolean;
+  } | null {
+    const normalized = this.normalizeNoteType(type);
+    if (normalized === 'media') return null;
+
+    const raw = this.safeReadLocalStorage(NoteService.LAST_USED_NOTE_STYLE_STORAGE_KEY);
+    if (!raw) return null;
+
+    try {
+      const parsed = JSON.parse(raw) as any;
+      const t = parsed?.[normalized];
+      if (!t || typeof t !== 'object') return null;
+      return {
+        backgroundColor: typeof t.backgroundColor === 'string' ? t.backgroundColor : undefined,
+        backgroundOpacity: typeof t.backgroundOpacity === 'number' ? t.backgroundOpacity : undefined,
+        borderColor: typeof t.borderColor === 'string' ? t.borderColor : undefined,
+        borderOpacity: typeof t.borderOpacity === 'number' ? t.borderOpacity : undefined,
+        borderWidth: typeof t.borderWidth === 'number' ? t.borderWidth : undefined,
+        boxShadow: typeof t.boxShadow === 'boolean' ? t.boxShadow : undefined,
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  public setLastUsedColorsForType(type: NoteType, colors: {
+    backgroundColor?: string;
+    backgroundOpacity?: number;
+    borderColor?: string;
+    borderOpacity?: number;
+    borderWidth?: number;
+    boxShadow?: boolean;
+  }): void {
+    const normalized = this.normalizeNoteType(type);
+    if (normalized === 'media') return;
+
+    const raw = this.safeReadLocalStorage(NoteService.LAST_USED_NOTE_STYLE_STORAGE_KEY);
+    let parsed: any = {};
+    if (raw) {
+      try {
+        parsed = JSON.parse(raw) || {};
+      } catch (e) {
+        parsed = {};
+      }
+    }
+
+    parsed[normalized] = {
+      ...(parsed[normalized] || {}),
+      ...(colors || {}),
+    };
+
+    this.safeWriteLocalStorage(NoteService.LAST_USED_NOTE_STYLE_STORAGE_KEY, JSON.stringify(parsed));
+  }
+
+  public rememberLastUsedColorsFromNote(note: Note | null | undefined): void {
+    if (!note) return;
+    const type = this.normalizeNoteType(note.type);
+    if (type === 'media') return;
+
+    this.setLastUsedColorsForType(type, {
+      backgroundColor: note.backgroundColor,
+      backgroundOpacity: note.backgroundOpacity,
+      borderColor: note.borderColor,
+      borderOpacity: note.borderOpacity,
+      borderWidth: note.borderWidth,
+      boxShadow: note.boxShadow,
+    });
   }
   
   /**

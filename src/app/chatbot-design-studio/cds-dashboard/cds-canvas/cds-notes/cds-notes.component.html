@@ -12,6 +12,12 @@
     [style.border-style]="isMediaNote ? 'none' : 'solid'"
     [style.border-color]="note?.borderColor"
     [style.background-color]="isMediaNote ? (hasMedia ? 'transparent' : '#f3f4f6') : note?.backgroundColor">
+    <cds-note-controls
+      [visible]="stateNote === 2 && !textareaHasFocus"
+      (openDetail)="onOpenDetailFromMenu()"
+      (duplicate)="onDuplicateFromMenu()"
+      (remove)="onDeleteFromMenu()">
+    </cds-note-controls>
     <!-- (input)="onInputChange($event)" -->
     <div *ngIf="isTextNote; else rectBody"
       #noteInput
@@ -40,12 +46,32 @@
         (click)="onRectClick($event)"
         (dblclick)="onRectDoubleClick($event)"
         (mousedown)="onRectMouseDown($event)">
+        <!-- When media is interactive (selected), provide a dedicated drag handle so the player can receive clicks. -->
+        <div *ngIf="hasMedia && stateNote === 2"
+          class="media-drag-handle"
+          [class.tds_draggable]="isDraggable"
+          (click)="$event.stopPropagation(); onRectClick($event)"
+          (mousedown)="$event.stopPropagation(); onRectMouseDown($event)">
+        </div>
         <ng-container *ngIf="hasMedia; else mediaPlaceholder">
-          <ng-container *ngIf="mediaType === 'video'; else noteImage">
-            <video class="note-video" [src]="mediaSrc" muted loop playsinline autoplay></video>
+          <ng-container *ngIf="isEmbedMedia; else directMedia">
+            <iframe
+              class="note-video"
+              [src]="safeEmbedUrl"
+              (mousedown)="$event.stopPropagation()"
+              (click)="$event.stopPropagation()"
+              frameborder="0"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              allowfullscreen>
+            </iframe>
           </ng-container>
-          <ng-template #noteImage>
-            <img class="note-image" [src]="mediaSrc" [attr.alt]="'CDSCanvas.NoteMedia.Alt' | translate" draggable="false" />
+          <ng-template #directMedia>
+            <ng-container *ngIf="mediaType === 'video'; else noteImage">
+              <video class="note-video" [src]="mediaSrc" muted loop playsinline autoplay controls (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()"></video>
+            </ng-container>
+            <ng-template #noteImage>
+              <img class="note-image" [src]="mediaSrc" [attr.alt]="'CDSCanvas.NoteMedia.Alt' | translate" draggable="false" />
+            </ng-template>
           </ng-template>
         </ng-container>
         <ng-template #mediaPlaceholder>
@@ -68,6 +94,7 @@
     <!-- Div giallo per menu contestuale -->
     <div 
         class="context-menu-overlay"
+        [class.media-interactive]="isMediaNote && hasMedia && stateNote === 2"
         [class.tds_draggable]="isDraggable"
         [class.text-focus]="stateNote === 1"
         (click)="onNoteSurfaceClick($event)"

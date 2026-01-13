@@ -7,6 +7,16 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# this branch
+- **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
+- **changed**: cambio colori di default
+- **changed**: memorizza gli ultimi colori nel LS
+- **added**: aggiungi lo stesso menu dell’intent ai blocchi note
+- **changed**: limita il caricamento solo a immagini e gif 
+- **added**: permetti di caricare i video da link
+
+
 # 1.39.23-rc7
 - **changed**: Refactored state management for expansion panels in cds-action-askgpt-v2 component. Introduced separate states for chunks and AI settings panels to improve UI responsiveness and maintainability
 - **changed**: Updated ACTIONS_LIST in utils-actions.ts to ensure consistent formatting and include additional chatbot types for FLOW_LOG action
@@ -143,10 +153,6 @@
 # 1.39.14-rc1
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
-=========
-# this branch
-- **added**: added note
->>>>>>>>> Temporary merge branch 2
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management

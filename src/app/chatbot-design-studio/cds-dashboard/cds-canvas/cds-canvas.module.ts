@@ -40,6 +40,7 @@ import { ChangeAlphaColorComponent } from 'src/app/modals/change-alpha-color/cha
 import { CdsPanelPublishComponent } from './cds-panel-publish/cds-panel-publish.component';
 import { CdsNotesComponent } from './cds-notes/cds-notes.component';
 import { CdsPanelNoteDetailComponent } from './cds-panel-note-detail/cds-panel-note-detail.component';
+import { NoteControlsComponent } from './cds-notes/note-controls/note-controls.component';
 
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from "ngx-quill";
@@ -94,6 +95,7 @@ const routes: Routes = [
 
     //CDS NOTES
     CdsNotesComponent,
+    NoteControlsComponent,
     CdsPanelNoteDetailComponent,
 
     //ACTIONS

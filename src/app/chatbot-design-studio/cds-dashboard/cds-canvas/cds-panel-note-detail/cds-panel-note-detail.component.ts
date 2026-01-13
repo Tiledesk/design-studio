@@ -12,6 +12,8 @@ import { QUILL_COLOR_TOKENS } from 'src/app/chatbot-design-studio/cds-dashboard/
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { UploadModel } from 'src/chat21-core/models/upload';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { NoteMediaService, NoteResolvedMedia } from 'src/app/services/note-media.service';
 
 @Component({
   selector: 'cds-panel-note-detail',
@@ -43,12 +45,16 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   private readonly MAX_MEDIA_BYTES = 4 * 1024 * 1024; // 4MB
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+  private embedUrlCache: string = '';
+  private safeEmbedUrlCache: SafeResourceUrl | null = null;
   
   constructor(
     private readonly stageService: StageService,
     private readonly noteService: NoteService,
     private readonly uploadService: UploadService,
-    private readonly tiledeskAuthService: TiledeskAuthService
+    private readonly tiledeskAuthService: TiledeskAuthService,
+    private readonly noteMediaService: NoteMediaService,
+    private readonly sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -124,6 +130,25 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     return 'image';
   }
 
+  get isEmbedMedia(): boolean {
+    return this.isMediaNote && ((this.note?.payload as any)?.renderMode as string) === 'embed';
+  }
+
+  get embedUrl(): string {
+    return (((this.note?.payload as any)?.embedUrl as string) || '');
+  }
+
+  get safeEmbedUrl(): SafeResourceUrl | null {
+    const url = this.embedUrl;
+    if (!url) return null;
+    // IMPORTANT: cache the SafeResourceUrl object to avoid iframe reload loops.
+    if (url !== this.embedUrlCache) {
+      this.embedUrlCache = url;
+      this.safeEmbedUrlCache = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    }
+    return this.safeEmbedUrlCache;
+  }
+
   get mediaSrc(): string {
     return (
       ((this.note?.payload as any)?.mediaSrc as string) ||
@@ -149,6 +174,9 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   }
 
   get hasMedia(): boolean {
+    if (this.isEmbedMedia) {
+      return !!this.embedUrl;
+    }
     return !!this.mediaSrc && this.mediaNaturalWidth > 0 && this.mediaNaturalHeight > 0;
   }
 
@@ -255,12 +283,26 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       this.isUploadingImage = true;
       this.imageUploadError = '';
 
-      const normalized = this.normalizeImageUrl(url);
+      const normalized = this.noteMediaService.normalizeUrl(url);
       if (!normalized) {
         this.imageUploadError = 'Invalid URL.';
         return;
       }
 
+      // Provider embeds (YouTube/Vimeo/TikTok/Facebook/Instagram) => iframe embed
+      const resolved: NoteResolvedMedia | null = this.noteMediaService.resolveMediaUrl(normalized);
+      if (resolved && resolved.kind === 'embed') {
+        this.applyEmbedMedia(resolved);
+        return;
+      }
+
+      // Direct video URLs => <video> (no upload-to-storage; we link it)
+      if (resolved && resolved.kind === 'direct' && resolved.mediaType === 'video') {
+        await this.setMediaFromSrc(resolved.directUrl, 'video');
+        return;
+      }
+
+      // Images: try importing into storage (when possible), fallback to hotlink if CORS prevents fetch.
       // VINCOLO: per "link" prima salviamo l'immagine (upload) e poi scriviamo l'URL risultante nella nota.
       try {
         const result = await this.uploadMediaFromExternalUrl(normalized);
@@ -285,8 +327,16 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
           e
         });
 
-        const inferred = this.inferMediaTypeFromUrl(normalized);
-        await this.setMediaFromSrc(normalized, inferred);
+        // Hotlink fallback:
+        // - if it's a direct video URL, we allow <video>
+        // - if it's an image URL, we allow <img>
+        // - if unknown (no extension), we stop with a clear message
+        if (resolved && resolved.kind === 'direct') {
+          await this.setMediaFromSrc(resolved.directUrl, resolved.mediaType);
+        } else {
+          this.imageUploadError = 'This URL cannot be linked as media. Please use a direct image/video URL or a supported provider link (YouTube/Vimeo/TikTok/Facebook/Instagram).';
+          return;
+        }
         this.imageUploadError =
           'This URL cannot be imported into storage due to browser security (CORS). The media has been linked externally. To store a copy, upload the file instead.';
         return;
@@ -316,19 +366,15 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
         measured = await this.measureImage(src);
       }
     } catch (e) {
-      // Fallback heuristic: if image failed, try video (useful when URL extension is missing/misleading).
-      if (requestedType === 'image') {
-        measured = await this.measureVideo(src);
-        mediaType = 'video';
-      } else {
-        // if video failed, try image
-        measured = await this.measureImage(src);
-        mediaType = 'image';
-      }
+      // We no longer "guess" video from an image request (provider links handled elsewhere).
+      throw e;
     }
     const { width, height } = measured;
 
     if (!this.note.payload) this.note.payload = {};
+    (this.note.payload as any).renderMode = 'direct';
+    (this.note.payload as any).embedUrl = '';
+    (this.note.payload as any).provider = 'unknown';
     (this.note.payload as any).mediaType = mediaType;
     (this.note.payload as any).mediaSrc = src;
     (this.note.payload as any).mediaWidth = width;
@@ -353,6 +399,28 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     this.note.scale = [1, 1];
 
     // Dopo caricamento valido: esci dalla modalità replace e salva immediatamente
+    this.isReplacingImage = false;
+    this.autoSave();
+  }
+
+  private applyEmbedMedia(resolved: Extract<NoteResolvedMedia, { kind: 'embed' }>): void {
+    if (!this.note) return;
+    if (!this.note.payload) this.note.payload = {};
+    // Embed is always video in our resolver
+    (this.note.payload as any).mediaType = 'video';
+    (this.note.payload as any).renderMode = 'embed';
+    (this.note.payload as any).provider = resolved.provider;
+    (this.note.payload as any).originalUrl = resolved.originalUrl;
+    (this.note.payload as any).embedUrl = resolved.embedUrl;
+    // keep mediaSrc for backward compatibility (some renderers might use it)
+    (this.note.payload as any).mediaSrc = '';
+    (this.note.payload as any).mediaWidth = 0;
+    (this.note.payload as any).mediaHeight = 0;
+
+    // Sensible default size for embeds
+    this.note.width = 360;
+    this.note.height = 202; // ~16:9
+    this.note.scale = [1, 1];
     this.isReplacingImage = false;
     this.autoSave();
   }
@@ -448,7 +516,11 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       type.startsWith('video/') ? 'video' :
       type.startsWith('image/') ? 'image' :
       this.inferMediaTypeFromUrl(url);
-    if (!(type.startsWith('image/') || type.startsWith('video/'))) {
+    // Restriction: images only (incl. GIF)
+    if (type.startsWith('video/') || mediaType === 'video') {
+      throw new Error('Videos are not supported');
+    }
+    if (!type.startsWith('image/')) {
       throw new Error(`Not a supported media type: ${type}`);
     }
     if (blob.size > this.MAX_MEDIA_BYTES) {
@@ -493,6 +565,8 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     let borderWidth = Number.isFinite(parsed) ? parsed : 0;
     borderWidth = Math.max(0, Math.min(20, borderWidth)); // 0..20px
     this.note.borderWidth = borderWidth;
+    // Persist "last used" style per note type (text/rect) in LocalStorage
+    this.noteService.rememberLastUsedColorsFromNote(this.note);
     this.autoSave();
   }
 
@@ -522,6 +596,8 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     if (this.note) {
       this.note.backgroundColor = this.calculateBackgroundColorWithOpacity();
       this.note.borderColor = this.calculateBorderColorWithOpacity();
+      // Persist "last used" colors per note type (text/rect) in LocalStorage
+      this.noteService.rememberLastUsedColorsFromNote(this.note);
     }
     
     // Salvataggio automatico con debounce - accorpa le chiamate multiple ravvicinate
@@ -535,6 +611,8 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     if (this.note) {
       this.note.boxShadow = event.checked;
       this.logger.log('[CdsPanelNoteDetailComponent] Box shadow changed:', this.note.boxShadow);
+      // Persist "last used" style per note type (text/rect) in LocalStorage
+      this.noteService.rememberLastUsedColorsFromNote(this.note);
       
       // Salvataggio automatico con debounce
       this.autoSave();
@@ -703,6 +781,9 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       this.note.borderColor = ColorUtils.buildRgba(r, g, b, opacity);
       this.logger.log('[CdsPanelNoteDetailComponent] Border color changed:', opacity, this.note.borderColor);
     }
+
+    // Persist "last used" colors per note type (text/rect) in LocalStorage
+    this.noteService.rememberLastUsedColorsFromNote(this.note);
 
     // Salvataggio automatico con debounce
     this.autoSave();

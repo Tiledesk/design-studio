@@ -1,0 +1,58 @@
+// Fully self-contained styles (no CSS variables, no Material, no shared imports).
+// Designed to visually match the pill-menu feel of panel-intent-controls while remaining independent.
+
+.note-controls {
+  position: absolute;
+  top: -10px;
+  right: 0;
+  height: 30px;
+  padding-left: 12px;
+  opacity: 0;
+  pointer-events: none; // enabled on the pill only
+  z-index: 20; // above handles/overlay
+}
+
+.note-controls.is-visible {
+  opacity: 1;
+}
+
+.note-controls__pill {
+  pointer-events: auto;
+  background: #ffffff;
+  height: 25px;
+  border-radius: 14px;
+  box-shadow: rgba(0, 27, 71, 0.08) 0 3px 8px;
+  outline: 1px solid rgba(0, 0, 0, 0.04);
+  display: flex;
+  padding: 3px 0;
+}
+
+.note-controls__btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 2px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+
+  svg {
+    fill: #6b7280; // gray
+  }
+}
+
+.note-controls__btn:first-child {
+  border-left: none;
+}
+
+.note-controls__btn:hover svg {
+  fill: #438cb5; // same hue used for rect border default
+}
+
+.note-controls__btn--danger:hover svg {
+  fill: #d14343;
+}
+
+
