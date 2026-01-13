@@ -9,6 +9,13 @@
 
 # this branch
 - **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
+
+- **changed**: cambio colori di default
+- **changed**: memorizza gli ultimi colori nel LS
+- **added**: aggiungi lo stesso menu dell’intent ai blocchi note
+- **changed**: limita il caricamento solo a immagini e gif 
+- **added**: permetti di caricare i video da link
+
 - **added**: Supportare rettangolo
 - **bug-fix**: Supportare spessore bordo
 - **bug-fix**: correggere il bug che non permette di salvare il colore del testo

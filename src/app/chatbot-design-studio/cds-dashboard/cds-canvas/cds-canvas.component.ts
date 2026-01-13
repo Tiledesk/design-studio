@@ -642,7 +642,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // this.listOfNotes = this.noteService.getNotes(this.id_faq_kb);
     // Normalize legacy note types:
     // - 'image'/'video' => 'media'
-    const rawNotes = this.dashboardService.selectedChatbot.attributes.notes || [];
+    const rawNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
     this.listOfNotes = rawNotes.map((n: any) => {
       if (!n) return n;
       const t = n.type;
@@ -1608,6 +1608,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         newNote.text = '';
       }
 
+      // RECT NOTE: default colors differ from text notes
+      if (newNote.type === 'rect') {
+        newNote.backgroundColor = Note.defaultBackgroundColor('rect');
+        newNote.borderColor = Note.defaultBorderColor('rect');
+      }
+
       // MEDIA NOTE: non salvare in remoto finché non c'è un media valido.
       // Apri subito il pannello di destra per il caricamento.
       if (newNote.type === 'media') {
@@ -1639,6 +1645,20 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         return;
       }
 
+      // Apply last-used colors (per note type) from LocalStorage, if any.
+      // Fallback: keep the existing defaults (text defaults or rect defaults above).
+      const lastUsed = this.noteService.getLastUsedColorsForType(newNote.type);
+      if (lastUsed) {
+        if (lastUsed.backgroundColor) newNote.backgroundColor = lastUsed.backgroundColor;
+        if (typeof lastUsed.backgroundOpacity === 'number') newNote.backgroundOpacity = lastUsed.backgroundOpacity;
+        if (lastUsed.borderColor) newNote.borderColor = lastUsed.borderColor;
+        if (typeof lastUsed.borderOpacity === 'number') newNote.borderOpacity = lastUsed.borderOpacity;
+        if (typeof lastUsed.borderWidth === 'number') newNote.borderWidth = lastUsed.borderWidth;
+        if (typeof lastUsed.boxShadow === 'boolean') newNote.boxShadow = lastUsed.boxShadow;
+      }
+      // Store the colors used for this newly created note as "last used" as well.
+      this.noteService.rememberLastUsedColorsFromNote(newNote);
+
       this.listOfNotes.push(newNote);
       if (!this.dashboardService.selectedChatbot.attributes) {
         this.dashboardService.selectedChatbot.attributes = {};
@@ -1650,6 +1670,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       if (newNote.type === 'text') {
         this.pendingAutoFocusNoteId = newNote.note_id;
       }
+
+      // Requirement: after dropping a note on the stage, open its detail panel automatically.
+      this.onNoteSelected(newNote);
 
       this.logger.log("[CDS-CANVAS] Note dropped on stage:", evt.noteType, pos);
     } catch (e) {

@@ -59,23 +59,34 @@
             <div *ngIf="hasMedia && !isReplacingImage" class="image-preview-box">
                 <div class="image-preview-frame">
                     <div class="image-preview-placeholder" *ngIf="!imagePreviewLoaded"></div>
-                    <ng-container *ngIf="mediaType === 'video'; else imagePreview">
-                        <video class="image-preview video-preview"
-                               [src]="mediaSrc"
-                               muted
-                               loop
-                               playsinline
-                               autoplay
-                               (loadedmetadata)="onImagePreviewLoad()"
-                               (error)="onImagePreviewError()">
-                        </video>
+                    <ng-container *ngIf="isEmbedMedia; else directMediaPreview">
+                        <iframe
+                            class="image-preview video-preview"
+                            [src]="safeEmbedUrl"
+                            frameborder="0"
+                            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                            allowfullscreen>
+                        </iframe>
                     </ng-container>
-                    <ng-template #imagePreview>
-                        <img class="image-preview"
-                             [src]="mediaSrc"
-                             [attr.alt]="'CDSCanvas.NoteMedia.Alt' | translate"
-                             (load)="onImagePreviewLoad()"
-                             (error)="onImagePreviewError()" />
+                    <ng-template #directMediaPreview>
+                        <ng-container *ngIf="mediaType === 'video'; else imagePreview">
+                            <video class="image-preview video-preview"
+                                   [src]="mediaSrc"
+                                   muted
+                                   loop
+                                   playsinline
+                                   autoplay
+                                   (loadedmetadata)="onImagePreviewLoad()"
+                                   (error)="onImagePreviewError()">
+                            </video>
+                        </ng-container>
+                        <ng-template #imagePreview>
+                            <img class="image-preview"
+                                 [src]="mediaSrc"
+                                 [attr.alt]="'CDSCanvas.NoteMedia.Alt' | translate"
+                                 (load)="onImagePreviewLoad()"
+                                 (error)="onImagePreviewError()" />
+                        </ng-template>
                     </ng-template>
                 </div>
     

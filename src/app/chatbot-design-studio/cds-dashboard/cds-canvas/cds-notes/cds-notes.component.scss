@@ -187,6 +187,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative; // needed for the drag handle overlay
   }
 
   .image-body.placeholder {
@@ -223,9 +224,38 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+    // Default: keep media non-interactive to preserve drag/select UX.
+    // When the note is selected, we enable interaction (controls/play/iframe).
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none;
+  }
+
+  // Enable interaction only when selected (so you can still drag/select without accidentally playing).
+  &.selected {
+    .note-video {
+      pointer-events: auto;
+    }
+  }
+
+  // Dedicated drag handle used when media is interactive (selected).
+  .media-drag-handle {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    z-index: 5;
+    pointer-events: auto;
+    cursor: grab;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 2px;
+  }
+
+  .media-drag-handle:active {
+    cursor: grabbing;
   }
 }
 
@@ -347,4 +377,10 @@
   &.text-focus {
     cursor: text;
   }
+}
+
+// When a media note is selected and has valid media, we want the player to receive pointer events.
+// The overlay is still used to handle the first click (selection), then it becomes inert.
+.context-menu-overlay.media-interactive {
+  pointer-events: none;
 }

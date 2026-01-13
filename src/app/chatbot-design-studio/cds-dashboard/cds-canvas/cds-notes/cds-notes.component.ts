@@ -1,5 +1,5 @@
 import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Note } from 'src/app/models/note-model';
 import { StageService } from '../../../services/stage.service';
 import { NoteService } from 'src/app/services/note.service';
@@ -22,6 +22,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   @Input() autoFocus: boolean = false;
   @Output() noteSelected = new EventEmitter<Note>();
   @Output() autoFocused = new EventEmitter<string>();
+  @Output() deleteNote = new EventEmitter<Note>();
+  @Output() duplicateNote = new EventEmitter<Note>();
   @ViewChild('noteInput', { static: false }) noteInput: ElementRef<HTMLDivElement>;
   @ViewChild('noteContentElement', { static: false }) contentElement: ElementRef<HTMLDivElement>;
 
@@ -33,6 +35,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   stateNote: 0|1|2|3 = 0; // 0: normal, 1: text focus, 2: selected, 3: dropping
   noteText: string;
   sanitizedNoteHtml: SafeHtml;
+  private embedUrlCache: string = '';
+  private safeEmbedUrlCache: SafeResourceUrl | null = null;
 
   // ============================================================================
   // PROPRIETÀ PRIVATE - Timer e sottoscrizioni
@@ -138,6 +142,27 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     return 'image';
   }
 
+  get isEmbedMedia(): boolean {
+    return this.isMediaNote && ((this.note?.payload as any)?.renderMode as string) === 'embed';
+  }
+
+  get embedUrl(): string {
+    return (((this.note?.payload as any)?.embedUrl as string) || '');
+  }
+
+  get safeEmbedUrl(): SafeResourceUrl | null {
+    const url = this.embedUrl;
+    if (!url) return null;
+    // IMPORTANT: cache the SafeResourceUrl object to avoid iframe reload loops.
+    // Angular change detection runs frequently; creating a new SafeResourceUrl each time
+    // makes `[src]` appear "changed" and forces a reload.
+    if (url !== this.embedUrlCache) {
+      this.embedUrlCache = url;
+      this.safeEmbedUrlCache = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    }
+    return this.safeEmbedUrlCache;
+  }
+
   get mediaSrc(): string {
     return (
       ((this.note?.payload as any)?.mediaSrc as string) ||
@@ -147,6 +172,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   get hasMedia(): boolean {
+    if (this.isEmbedMedia) {
+      return typeof this.embedUrl === 'string' && this.embedUrl.trim().length > 0;
+    }
     const src = this.mediaSrc;
     return typeof src === 'string' && src.trim().length > 0;
   }
@@ -1112,9 +1140,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const inverseScaleX = 1 / (safeScaleX * safeStageZoom);
     const inverseScaleY = 1 / (safeScaleY * safeStageZoom);
     
-    // Trova tutti gli handle e applica lo scale inverso
+    // Trova tutti gli handle/overlays che devono restare a dimensione costante.
+    // Include:
+    // - resize/rotate handles
+    // - internal note controls menu (must NOT scale while resizing the note)
+    // - media drag handle (optional)
     const handles = this.contentElement.nativeElement.querySelectorAll(
-      '.resize-handle, .rotate-handle'
+      '.resize-handle, .rotate-handle, .note-controls, .media-drag-handle'
     ) as NodeListOf<HTMLElement>;
     
     handles.forEach(handle => {
@@ -1122,8 +1154,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const isRotateHandle = handle.classList.contains('rotate-handle');
       const isHorizontalHandle = handle.classList.contains('resize-left') || handle.classList.contains('resize-right');
       const isVerticalHandle = handle.classList.contains('resize-top') || handle.classList.contains('resize-bottom');
+      const isNoteControls = handle.classList.contains('note-controls');
+      const isMediaDragHandle = handle.classList.contains('media-drag-handle');
       
-      if (isRotateHandle) {
+      if (isNoteControls || isMediaDragHandle) {
+        // No positional translate needed here: we only want a stable visual size.
+        handle.style.transform = `scale(${inverseScaleX}, ${inverseScaleY})`;
+      } else if (isRotateHandle) {
         // Rotate-handle: must stay at a fixed 20px from the top edge in SCREEN pixels,
         // independent from:
         // - note scale (scaleY)
@@ -1177,7 +1214,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         this.noteInput.nativeElement.blur();
       }
       this.updateChildrenDraggableClass();
-      this.openPanelWithDelay();
+      // NOTE: the detail panel must NOT open on click/select anymore.
+      // Opening the panel is now only available via the first icon in the internal note menu.
     } else if (state === 0 || state === 3) {
       // this.cancelOpenPanelTimer();
       this.textareaHasFocus = false;
@@ -1490,6 +1528,26 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       }
       // this.openPanelTimer = null;
     // }, 200);
+  }
+
+  // ============================================================================
+  // NOTE CONTROLS MENU (internal)
+  // ============================================================================
+  onOpenDetailFromMenu(): void {
+    if (!this.note) return;
+    this.changeState(2);
+    this.updateDragState();
+    this.noteSelected.emit(this.note);
+  }
+
+  onDuplicateFromMenu(): void {
+    if (!this.note) return;
+    this.duplicateNote.emit(this.note);
+  }
+
+  onDeleteFromMenu(): void {
+    if (!this.note) return;
+    this.deleteNote.emit(this.note);
   }
 
   // private cancelOpenPanelTimer(): void {

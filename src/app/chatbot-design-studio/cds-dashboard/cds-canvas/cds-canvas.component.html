@@ -89,6 +89,8 @@
             [style.top.px]="note.y"
             [style.left.px]="note.x"
             (noteSelected)="onNoteSelected($event)"
+            (deleteNote)="onDeleteNote($event)"
+            (duplicateNote)="onDuplicateNote($event)"
             (autoFocused)="onNoteAutoFocused($event)">
         </cds-notes>
     </div> 
