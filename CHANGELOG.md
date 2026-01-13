@@ -8,13 +8,12 @@
 *Tiledesk SRL*
 
 
-# this branch
-- **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
-- **changed**: cambio colori di default
-- **changed**: memorizza gli ultimi colori nel LS
-- **added**: aggiungi lo stesso menu dell’intent ai blocchi note
-- **changed**: limita il caricamento solo a immagini e gif 
-- **added**: permetti di caricare i video da link
+# 1.39.24-rc2
+- **changed**: note: change default colors
+- **changed**: note: store the last colors in the LS
+- **added**: note: add the same intent menu to notebooks
+- **changed**: note: limit uploads to images and GIFs only
+- **added**: note: allow uploading videos from links
 
 # 1.39.24-rc1
 - **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
