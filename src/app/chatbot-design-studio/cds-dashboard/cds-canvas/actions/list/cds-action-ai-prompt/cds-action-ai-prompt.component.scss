@@ -173,11 +173,8 @@ mat-expansion-panel ::ng-deep {
 
     .parameters-preview {
         font-size: 11px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: calc(100% - 80px);
         height: 24px;
+        line-height: normal;
     }
 
     .mat-expansion-indicator::after {

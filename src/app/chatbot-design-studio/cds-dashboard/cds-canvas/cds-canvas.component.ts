@@ -1704,7 +1704,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log("[CDS-CANVAS] Note saved remotely successfully:", note.note_id);
       // Sincronizza listOfNotes con attributes.notes dopo il salvataggio per mantenere la coerenza
       if (this.dashboardService.selectedChatbot.attributes?.notes) {
-        this.listOfNotes = [...this.dashboardService.selectedChatbot.attributes.notes];
+        this.listOfNotes = [...this.dashboardService.selectedChatbot.attributes?.notes || []];
       }
     } catch (error) {
       this.logger.error("[CDS-CANVAS] Error saving note remotely:", error);
@@ -1847,7 +1847,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     }
     // Aggiorna anche negli attributes del dashboardService
     if (this.dashboardService.selectedChatbot.attributes?.notes) {
-      const attrIndex = this.dashboardService.selectedChatbot.attributes.notes.findIndex(n => n.note_id === note.note_id);
+      const attrIndex = this.dashboardService.selectedChatbot.attributes?.notes.findIndex(n => n.note_id === note.note_id);
       if (attrIndex >= 0) {
         this.dashboardService.selectedChatbot.attributes.notes[attrIndex] = note;
       }

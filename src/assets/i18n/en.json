@@ -372,6 +372,7 @@
         "KBChunks": "Assign KB Chunks to",
         "ChunksOnly": "Chunks only",
         "Reranking": "Re-ranking",
+        "RerankingInfo": "Improve accuracy of your answers",
         "SkipUnanswered": "Do not update unanswered list",
         "ErrorAutomaticAssign": "Errors will be automatically assigned to variable:",
         "ApplyAFunctionToValue": "Apply a function to the value",

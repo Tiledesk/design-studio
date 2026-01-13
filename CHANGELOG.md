@@ -16,6 +16,15 @@
 - **changed**: limita il caricamento solo a immagini e gif 
 - **added**: permetti di caricare i video da link
 
+# 1.39.24-rc1
+- **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
+- **changed**: added text and links in reranking: Improve the accuracy of your answers
+- **changed**: web Request does not show output attributes in the stage preview
+- **changed**: change attribute preview in the AI ​​settings panel
+- **bug-fix**: show and save system context textarea in askgpt-v2
+- **changed**: 10K token minimo (dipende dai modelli)
+
+# 1.39.24
 
 # 1.39.23-rc7
 - **changed**: Refactored state management for expansion panels in cds-action-askgpt-v2 component. Introduced separate states for chunks and AI settings panels to improve UI responsiveness and maintainability
