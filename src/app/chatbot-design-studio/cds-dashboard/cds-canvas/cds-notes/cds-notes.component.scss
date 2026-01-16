@@ -1,6 +1,13 @@
 // ============================================================================
 // CONTAINER PRINCIPALE
 // ============================================================================
+:host {
+  width: 0;
+  height: 0;
+  overflow: visible;
+  display: block;
+}
+
 .cds-notes-content {
   position: relative;
   padding: 10px 8px;
@@ -83,6 +90,25 @@
       height: 20px;
       cursor: ew-resize;
     }
+
+    // Handle verticali per ridimensionamento verticale
+    &.resize-top {
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      cursor: ns-resize;
+    }
+
+    &.resize-bottom {
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      cursor: ns-resize;
+    }
     
   }
   
@@ -101,8 +127,8 @@
     position: absolute;
     top: -20px;
     left: 50%;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     display: none;
     z-index: 10;
     user-select: none;
@@ -115,6 +141,121 @@
     &:active {
       cursor: grabbing;
     }
+  }
+}
+
+// ============================================================================
+// RECT NOTE (NON TESTUALE)
+// ============================================================================
+.cds-notes-content.rect-note {
+  user-select: none;
+  -webkit-user-select: none;
+
+  .rect-body {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    background: transparent;
+  }
+
+  // Nascondi maniglie ai vertici + pallino rotazione per le note rettangolo
+  // (override anche quando il container è `.selected`)
+  .resize-handle.resize-tl,
+  .resize-handle.resize-tr,
+  .resize-handle.resize-bl,
+  .resize-handle.resize-br,
+  .rotate-handle {
+    display: none !important;
+  }
+}
+
+// ============================================================================
+// MEDIA NOTE
+// ============================================================================
+.cds-notes-content.media-note {
+  padding: 0 !important;
+  margin: 0 !important;
+  user-select: none;
+  -webkit-user-select: none;
+
+  .image-body {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; // needed for the drag handle overlay
+  }
+
+  .image-body.placeholder {
+    background: transparent;
+  }
+
+  .note-media-placeholder-btn {
+    border: none;
+    background: transparent;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    background-color: rgba(255, 255, 255, 0.75);
+  }
+
+  .note-media-placeholder-btn:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
+  .note-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .note-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    // Default: keep media non-interactive to preserve drag/select UX.
+    // When the note is selected, we enable interaction (controls/play/iframe).
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  // Enable interaction only when selected (so you can still drag/select without accidentally playing).
+  &.selected {
+    .note-video {
+      pointer-events: auto;
+    }
+  }
+
+  // Dedicated drag handle used when media is interactive (selected).
+  .media-drag-handle {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    z-index: 5;
+    pointer-events: auto;
+    cursor: grab;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 2px;
+  }
+
+  .media-drag-handle:active {
+    cursor: grabbing;
   }
 }
 
@@ -205,6 +346,19 @@
       text-decoration: underline;
       cursor: pointer;
     }
+    
+    // Stili per allineamento Quill
+    .ql-align-center {
+      text-align: center;
+    }
+    
+    .ql-align-right {
+      text-align: right;
+    }
+    
+    .ql-align-left {
+      text-align: left;
+    }
   }
 }
 
@@ -223,4 +377,10 @@
   &.text-focus {
     cursor: text;
   }
+}
+
+// When a media note is selected and has valid media, we want the player to receive pointer events.
+// The overlay is still used to handle the first click (selection), then it becomes inert.
+.context-menu-overlay.media-interactive {
+  pointer-events: none;
 }

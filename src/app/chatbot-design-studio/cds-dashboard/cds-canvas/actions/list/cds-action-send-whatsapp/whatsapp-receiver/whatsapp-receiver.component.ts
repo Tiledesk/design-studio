@@ -377,7 +377,9 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   }
 
   onHeaderImageError(event) {
-    event.target.src = this.header_component.example.header_handle[0];
+    if(this.header_component?.example?.header_handle){  
+      event.target.src = this.header_component.example.header_handle[0];
+    }
   }
 
   onDeleteReceiver() {

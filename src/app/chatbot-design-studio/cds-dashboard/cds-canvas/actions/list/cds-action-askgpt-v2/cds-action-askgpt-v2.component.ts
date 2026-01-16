@@ -15,7 +15,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
@@ -272,11 +272,23 @@ export class CdsActionAskgptV2Component implements OnInit {
   onChangeTextarea(event: string, property: string) {
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event);
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property);
+    const nextValue = (event ?? '').toString();
+    const currentValue = ((this.action && (this.action as any)[property]) ?? '').toString();
+
+    /**
+     * NOTE:
+     * `cds-textarea` may emit `changeTextarea` during init only when it has a non-empty initial value.
+     * When the initial value is empty, the first real user input/paste is the first emission.
+     * The previous implementation always dropped the first emission, causing "context not saved" on first edit.
+     */
     if (this.isInitializing[property]) {
       this.isInitializing[property] = false;
-      return;
+      if (nextValue === currentValue) {
+        return;
+      }
     }
-    this.action[property] = event;
+
+    (this.action as any)[property] = nextValue;
     this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
   }
   

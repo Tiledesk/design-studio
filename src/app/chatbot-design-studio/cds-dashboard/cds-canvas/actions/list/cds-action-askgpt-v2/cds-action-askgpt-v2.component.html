@@ -235,15 +235,35 @@
                         <div class="title-and-parameters-container">
                             <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                             <div class="parameters-preview">
-                                <span *ngIf="!aiSettingsPanelOpenState && (action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
-                                <span *ngIf="!aiSettingsPanelOpenState && action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
-                                <span *ngIf="!aiSettingsPanelOpenState && action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
-                                <span *ngIf="!aiSettingsPanelOpenState && action?.context"> | system context: {{action.context}}</span>
+                                <span *ngIf="(action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
+                                <span *ngIf="action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
+                                <span *ngIf="action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
+                                <span *ngIf="action?.context"> | system context: {{action.context}}</span>
+                                
+                                <!-- Advanced/KB options preview (when panel is collapsed) -->
+                                <span *ngIf="action?.advancedPrompt" class="preview-flag">
+                                    <span class="sep"> | </span>
+                                    <span class="label">{{"CDSCanvas.AdvancedContext" | translate}}</span>
+                                </span>
+                                <span *ngIf="action?.citations" class="preview-flag">
+                                    <span class="sep"> | </span>
+                                    <span class="label">{{"CDSCanvas.Citations" | translate}}</span>
+                                </span>
+                                <span *ngIf="action?.chunks_only" class="preview-flag">
+                                    <span class="sep"> | </span>
+                                    <span class="label">{{"CDSCanvas.ChunksOnly" | translate}}</span>
+                                </span>
+                                <span *ngIf="action?.skip_unanswered" class="preview-flag">
+                                    <span class="sep"> | </span>
+                                    <span class="label">{{"CDSCanvas.SkipUnanswered" | translate}}</span>
+                                </span>
                             </div>
+                            
                         </div>
                     </div>
                 </mat-panel-title>
             </mat-expansion-panel-header>
+            <hr class="custom-divider" style="margin-top: 10px;">
             <div>
 
                 <!-- // model select  -->
@@ -278,6 +298,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -334,7 +355,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['chunk_limit'].step"  
                                     [min]="ai_setting['chunk_limit'].min"
-                                    [max]="ai_setting['chunk_limit'].max" 
+                                    [max]="ai_setting['chunk_limit'].max"
+                                    [disabled]="ai_setting['chunk_limit'].disabled" 
                                     [(ngModel)]="action.top_k"
                                     (change)="updateSliderValue($event.value, 'chunk_limit')" aria-label="units">
                                 </mat-slider>
@@ -360,7 +382,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['search_type'].step"  
                                     [min]="ai_setting['search_type'].min"
-                                    [max]="ai_setting['search_type'].max" 
+                                    [max]="ai_setting['search_type'].max"
+                                    [disabled]="ai_setting['max_tokens'].disabled" 
                                     [(ngModel)]="action.alpha"
                                     (change)="updateSliderValue($event.value, 'alpha')" aria-label="units">
                                 </mat-slider>
@@ -377,6 +400,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 
@@ -427,7 +451,7 @@
                             {{"CDSCanvas.ChunksOnly" | translate}}
                         </mat-checkbox>
                     </section>
-                    <!-- 
+                    <!--
                     <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
                     </label> 
@@ -443,11 +467,9 @@
                             {{"CDSCanvas.Reranking" | translate}}
                         </mat-checkbox>
                     </section>
-                    <!-- 
-                    <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
-                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
+                    <label class="field-description">{{ "CDSCanvas.RerankingInfo" | translate }}.
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.reranking.link" [target]="DOCS_LINK.reranking.target">{{ 'LearnMore' | translate }}</a>
                     </label> 
-                    -->
                 </div>
 
                 <!-- // skip_unanswered -->

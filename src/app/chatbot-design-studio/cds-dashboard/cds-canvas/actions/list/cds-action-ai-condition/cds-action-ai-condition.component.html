@@ -17,11 +17,6 @@
             </div>
         </div>
     </div>
-    <div class="action-row">
-        <div class="tag-replyto" *ngIf="action?.assignReplyTo">
-            {{action?.assignReplyTo}}
-        </div>
-    </div>
 
 
 
@@ -171,10 +166,10 @@
                     <div class="title-and-parameters-container">
                         <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                         <div class="parameters-preview">
-                            <span *ngIf="!panelOpenState && (action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
-                            <span *ngIf="!panelOpenState && action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
-                            <span *ngIf="!panelOpenState && action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
-                            <span *ngIf="!panelOpenState && action?.context"> | system context: {{action.context}}</span>
+                            <span *ngIf="(action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
+                            <span *ngIf="action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
+                            <span *ngIf="action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
+                            <span *ngIf="action?.context"> | system context: {{action.context}}</span>
                         </div>
                     </div>
                 </mat-panel-title>

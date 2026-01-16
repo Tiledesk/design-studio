@@ -1,10 +1,10 @@
 <div class="container">
 
-    <!-- NOTE -->
+    <!-- NOTE (solo toggle submenu) -->
     <div size="4" class="cds-elements" mat-button>
-        <div class="cds-element" (click)="onOptionClick(OPTIONS.NOTE)" #divNote>
-            <div class="cds-button-element" [class.is_active]="isNoteModeActive">
-                <div class="cds-box-button">
+        <div class="cds-element" #divNote>
+            <div class="cds-button-element">
+                <div class="cds-box-button" (click)="toggleNoteTypeMenu($event)">
                     <span class="box-img">
                         <span class="material-icons-outlined">note</span>
                     </span>
@@ -122,6 +122,31 @@
 
    
 
+</div>
+
+<!-- NOTE TYPE MENU (DIV custom) -->
+<div
+    class="note-type-menu-backdrop"
+    [class.is-open]="isNoteTypeMenuOpen"
+    (mousedown)="closeNoteTypeMenu()"
+    (touchstart)="closeNoteTypeMenu()">
+</div>
+
+<div
+    class="note-type-menu menuElement noteTypeMenu"
+    [class.is-open]="isNoteTypeMenuOpen"
+    [style.left.px]="noteTypeMenuPos.left"
+    [style.top.px]="noteTypeMenuPos.top">
+    <div
+        *ngFor="let item of notePalette"
+        class="note-type-menu-item"
+        cdkDrag
+        [cdkDragData]="{ kind: 'note', noteType: item.type }"
+        (cdkDragStarted)="onNotePaletteDragStarted()"
+        (cdkDragEnded)="onNotePaletteDragEnded($event, item.type)">
+        <span class="material-icons-outlined">{{ item.icon }}</span>
+        <span class="label">{{ item.labelKey | translate }}</span>
+    </div>
 </div>
 
 

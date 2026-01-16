@@ -4,37 +4,102 @@
     [class.selected]="stateNote === 2"
     [class.text-focus]="stateNote === 1"
     [class.tds_draggable]="isDraggable"
+    [class.rect-note]="!isTextNote && !isMediaNote"
+    [class.media-note]="isMediaNote"
     [id]="note?.note_id"
     [style.box-shadow]="note?.boxShadow === false ? 'none' : null"
+    [style.border-width.px]="isMediaNote ? 0 : note?.borderWidth"
+    [style.border-style]="isMediaNote ? 'none' : 'solid'"
     [style.border-color]="note?.borderColor"
-    [style.background-color]="note?.backgroundColor">
+    [style.background-color]="isMediaNote ? (hasMedia ? 'transparent' : '#f3f4f6') : note?.backgroundColor">
+    <cds-note-controls
+      [visible]="stateNote === 2 && !textareaHasFocus"
+      (openDetail)="onOpenDetailFromMenu()"
+      (duplicate)="onDuplicateFromMenu()"
+      (remove)="onDeleteFromMenu()">
+    </cds-note-controls>
     <!-- (input)="onInputChange($event)" -->
-    <div 
-        #noteInput
-        class="note-input"
-        [class.tds_draggable]="isDraggable"
-        [class.text-focus]="stateNote === 1"
-        [style.z-index]="stateNote === 1 ? 3 : 1"
-        contenteditable="true"
-        [innerHTML]="sanitizedNoteHtml"
-        [style.font-size]="note?.fontSize"
-        [style.font-family]="note?.fontFamily"
-        (focus)="onFocusTextarea($event)"
-        (input)="onInputChange($event)"
-        (blur)="onBlurTextarea($event)"
-        (click)="onNoteInputClick($event)"
-        (dblclick)="onNoteInputDoubleClick($event)"
-        (mousedown)="onNoteInputMouseDown($event)"
-        spellcheck="false">
+    <div *ngIf="isTextNote; else rectBody"
+      #noteInput
+      class="note-input"
+      [class.tds_draggable]="isDraggable"
+      [class.text-focus]="stateNote === 1"
+      [style.z-index]="stateNote === 1 ? 3 : 1"
+      contenteditable="true"
+      [innerHTML]="sanitizedNoteHtml"
+      [style.font-size]="note?.fontSize"
+      [style.font-family]="note?.fontFamily"
+      (focus)="onFocusTextarea($event)"
+      (input)="onInputChange($event)"
+      (blur)="onBlurTextarea($event)"
+      (click)="onNoteInputClick($event)"
+      (dblclick)="onNoteInputDoubleClick($event)"
+      (mousedown)="onNoteInputMouseDown($event)"
+      spellcheck="false">
     </div>
+
+    <ng-template #rectBody>
+      <div *ngIf="isMediaNote; else rectOnly"
+        class="image-body"
+        [class.placeholder]="!hasMedia"
+        [class.tds_draggable]="isDraggable"
+        (click)="onRectClick($event)"
+        (dblclick)="onRectDoubleClick($event)"
+        (mousedown)="onRectMouseDown($event)">
+        <!-- When media is interactive (selected), provide a dedicated drag handle so the player can receive clicks. -->
+        <div *ngIf="hasMedia && stateNote === 2"
+          class="media-drag-handle"
+          [class.tds_draggable]="isDraggable"
+          (click)="$event.stopPropagation(); onRectClick($event)"
+          (mousedown)="$event.stopPropagation(); onRectMouseDown($event)">
+        </div>
+        <ng-container *ngIf="hasMedia; else mediaPlaceholder">
+          <ng-container *ngIf="isEmbedMedia; else directMedia">
+            <iframe
+              class="note-video"
+              [src]="safeEmbedUrl"
+              (mousedown)="$event.stopPropagation()"
+              (click)="$event.stopPropagation()"
+              frameborder="0"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              allowfullscreen>
+            </iframe>
+          </ng-container>
+          <ng-template #directMedia>
+            <ng-container *ngIf="mediaType === 'video'; else noteImage">
+              <video class="note-video" [src]="mediaSrc" muted loop playsinline autoplay controls (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()"></video>
+            </ng-container>
+            <ng-template #noteImage>
+              <img class="note-image" [src]="mediaSrc" [attr.alt]="'CDSCanvas.NoteMedia.Alt' | translate" draggable="false" />
+            </ng-template>
+          </ng-template>
+        </ng-container>
+        <ng-template #mediaPlaceholder>
+          <button type="button" class="note-media-placeholder-btn" (click)="onPlaceholderUploadClick($event)">
+            {{ 'CDSCanvas.NoteMedia.PlaceholderCta' | translate }}
+          </button>
+        </ng-template>
+      </div>
+
+      <ng-template #rectOnly>
+        <div class="rect-body"
+          [class.tds_draggable]="isDraggable"
+          (click)="onRectClick($event)"
+          (dblclick)="onRectDoubleClick($event)"
+          (mousedown)="onRectMouseDown($event)">
+        </div>
+      </ng-template>
+    </ng-template>
 
     <!-- Div giallo per menu contestuale -->
     <div 
         class="context-menu-overlay"
+        [class.media-interactive]="isMediaNote && hasMedia && stateNote === 2"
         [class.tds_draggable]="isDraggable"
         [class.text-focus]="stateNote === 1"
-        (click)="onNoteInputClick($event)"
-        (dblclick)="onNoteInputDoubleClick($event)">
+        (click)="onNoteSurfaceClick($event)"
+        (dblclick)="onNoteSurfaceDoubleClick($event)"
+        (mousedown)="onNoteSurfaceMouseDown($event)">
     </div>
 
     <!-- Handle angoli per ridimensionamento -->
@@ -47,11 +112,17 @@
     <div class="resize-handle resize-br" 
         (mousedown)="startResize($event, 'br')"></div>
     
-    <!-- Handle laterali per ridimensionamento orizzontale simmetrico -->
-    <div class="resize-handle resize-left" 
+    <!-- Handle laterali: disabilitati per image note (resize solo dai vertici, proporzionale) -->
+    <div *ngIf="!isMediaNote" class="resize-handle resize-left" 
         (mousedown)="startHorizontalResize($event, 'left')"></div>
-    <div class="resize-handle resize-right" 
+    <div *ngIf="!isMediaNote" class="resize-handle resize-right" 
         (mousedown)="startHorizontalResize($event, 'right')"></div>
+
+    <!-- Handle verticali: disabilitati per image note (e per text già non mostrati) -->
+    <div *ngIf="!isTextNote && !isMediaNote" class="resize-handle resize-top"
+        (mousedown)="startVerticalResize($event, 'top')"></div>
+    <div *ngIf="!isTextNote && !isMediaNote" class="resize-handle resize-bottom"
+        (mousedown)="startVerticalResize($event, 'bottom')"></div>
     
     <!-- Handle rotazione al centro del lato superiore -->
     <div class="rotate-handle" 
