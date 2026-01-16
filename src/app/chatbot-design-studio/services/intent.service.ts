@@ -1534,9 +1534,13 @@ export class IntentService {
         }
       });
       
-      // Ora chiamiamo findsIntentsToUpdate per aggiornare gli intent nella lista
-      // (questo modifica direttamente la lista, ma abbiamo già salvato le versioni corrette per il payload)
-      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id);
+      // IMPORTANT:
+      // When updating an intent (the target block), we MUST NOT mutate the connector attributes
+      // of incoming intents. Those attributes may store UI state (e.g. contracted/hidden connector)
+      // and must survive a page refresh.
+      //
+      // For deleteIntentNew(), instead, we DO need to remove references to the deleted intent.
+      this.findsIntentsToUpdate(intent.intent_id, false);
     }
     this.payload.operations = this.operationsRedo;
     let operations = {undo:this.operationsUndo, redo:this.operationsRedo};
@@ -1614,7 +1618,8 @@ export class IntentService {
         type: "post", 
         intent: JSON.parse(JSON.stringify(intent))
       });
-      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id);
+      // In delete flow we must remove connector references to the deleted intent.
+      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id, true);
       intentsToUpdate.forEach(ele => {
         this.operationsUndo.push({
           type: "put", 
@@ -1668,14 +1673,25 @@ export class IntentService {
 
 
     /** */
-    private findsIntentsToUpdate(intent_id){
+    private findsIntentsToUpdate(intent_id: string, removeConnectorAttributes: boolean = true){
       let intentsToUpdate = [];
       let listConnectors = this.connectorService.searchConnectorsInByIntent(intent_id);
       listConnectors.forEach(element => {
         const splitFromId = element.fromId.split('/');
         const intentToUpdateId = splitFromId[0];
         let intent = this.listOfIntents.find((intent: any) => intent.intent_id === intentToUpdateId);
-        intent.attributes.connectors = this.deleteIntentAttributesConnectorByIntent(intent_id, intent);
+        if (!intent) {
+          return;
+        }
+        if (removeConnectorAttributes) {
+          // Remove only the connector attributes that point to the intent being deleted.
+          // This prevents stale/broken connector metadata after delete.
+          if (!intent.attributes) intent.attributes = {};
+          const nextConnectors = this.deleteIntentAttributesConnectorByIntent(intent_id, intent);
+          if (nextConnectors) {
+            intent.attributes.connectors = nextConnectors;
+          }
+        }
         this.logger.log('[INTENT SERVICE] -> findsIntentsToUpdate::: ', intent);
         intentsToUpdate.push(intent);
       });

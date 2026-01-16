@@ -146,7 +146,9 @@ export class CDSTextareaComponent implements OnInit {
         // this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', this.text, this.textIsChanged);
       }
     }
-    if(event && (!this.isSelected || !this.readonly)){
+    // Emit also when the value becomes an empty string ('') so consumers can persist deletions.
+    // Keep the existing trim behavior to avoid regressions in callers.
+    if (event !== null && event !== undefined && (!this.isSelected || !this.readonly)) {
       this.changeTextarea.emit(event.toString().trim());
     }
   }

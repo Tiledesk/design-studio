@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# this branch
+- **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
+- **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
+
 # 1.39.23
 - **bug-fix**: deleted duplicate AI model chatGPT 5.2
 
