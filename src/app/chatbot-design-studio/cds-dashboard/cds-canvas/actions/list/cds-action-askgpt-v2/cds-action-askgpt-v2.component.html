@@ -342,33 +342,6 @@
                     </div>
                 </div>
 
-                <!-- // chunk limit slider -->
-                <div class="text-editor-wrapper">
-                    <div class="field-box">
-                        <label class="title-label">{{'CDSCanvas.ChunkLimit' | translate }}</label>
-                        <div class="action-wait-content">
-                            <div class="action-wait-slider">
-                                <div class="action-wait-range">{{ai_setting['chunk_limit'].min}}</div>
-                                <mat-slider 
-                                    class="wait-slider" 
-                                    thumbLabel 
-                                    [displayWith]="formatLabel" 
-                                    [step]="ai_setting['chunk_limit'].step"  
-                                    [min]="ai_setting['chunk_limit'].min"
-                                    [max]="ai_setting['chunk_limit'].max"
-                                    [disabled]="ai_setting['chunk_limit'].disabled" 
-                                    [(ngModel)]="action.top_k"
-                                    (change)="updateSliderValue($event.value, 'chunk_limit')" aria-label="units">
-                                </mat-slider>
-                                <div class="action-wait-range">{{ai_setting['chunk_limit'].max}}</div>
-                            </div>
-                            <!-- // doesn't work propely -->
-                            <input type="number" class="slider-input gpt-setting-input" value="{{action.top_k}}" disabled>
-                        </div>
-                        <div class="slider-description"></div>
-                    </div>
-                </div>
-
                 <!-- // alpha limit slider -->
                 <div *ngIf="KB_HYBRID" class="text-editor-wrapper">
                     <div class="field-box">
@@ -395,6 +368,72 @@
                     </div>
                 </div>
 
+                <!-- // chunk limit slider -->
+                <div class="text-editor-wrapper">
+                    <div class="field-box">
+                        <label class="title-label">{{'CDSCanvas.ChunkLimit' | translate }}</label>
+                        <div class="action-wait-content">
+                            <div class="action-wait-slider">
+                                <div class="action-wait-range">{{ai_setting['chunk_limit'].min}}</div>
+                                <mat-slider 
+                                    class="wait-slider" 
+                                    thumbLabel 
+                                    [displayWith]="formatLabel" 
+                                    [step]="ai_setting['chunk_limit'].step"  
+                                    [min]="ai_setting['chunk_limit'].min"
+                                    [max]="ai_setting['chunk_limit'].max" 
+                                    [(ngModel)]="action.top_k"
+                                    (change)="updateSliderValue($event.value, 'chunk_limit')" aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">{{ai_setting['chunk_limit'].max}}</div>
+                            </div>
+                            <!-- // doesn't work propely -->
+                            <input type="number" class="slider-input gpt-setting-input" value="{{action.top_k}}" disabled>
+                        </div>
+                        <div class="slider-description"></div>
+
+                         <!-- // reranking -->
+                        <div *ngIf="KB_HYBRID" class="">
+                            <section class="disable-input-message-section">
+                                <mat-checkbox 
+                                    [checked]="action?.reranking"
+                                    (change)="onChangeCheckbox($event, 'reranking')">
+                                    {{"CDSCanvas.Reranking" | translate}}
+                                </mat-checkbox>
+                            </section>
+                            <!-- <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                                <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
+                            </label>  -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- // reranking multiplier slider (visible only when reranking is enabled) -->
+                <div *ngIf="action?.reranking" class="text-editor-wrapper">
+                    <div class="field-box">
+                        <label class="title-label">{{'CDSCanvas.RerankingMultiplierLabel' | translate }}</label>
+                        <div class="action-wait-content">
+                            <div class="action-wait-slider">
+                                <div class="action-wait-range">{{ai_setting['reranking_multiplier'].min}}</div>
+                                <mat-slider 
+                                    class="wait-slider" 
+                                    thumbLabel 
+                                    [displayWith]="formatLabel" 
+                                    [step]="ai_setting['reranking_multiplier'].step"  
+                                    [min]="ai_setting['reranking_multiplier'].min"
+                                    [max]="ai_setting['reranking_multiplier'].max" 
+                                    [(ngModel)]="action.reranking_multiplier"
+                                    (change)="updateSliderValue($event.value, 'reranking_multiplier')" aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">{{ai_setting['reranking_multiplier'].max}}</div>
+                            </div>
+                            <input type="number" class="slider-input gpt-setting-input" value="{{action.reranking_multiplier}}" disabled>
+                        </div>
+                        <div class="slider-description"></div>
+                    </div>
+                </div>
+
+               
                 <!-- // system context textarea -->
                 <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
@@ -451,25 +490,11 @@
                             {{"CDSCanvas.ChunksOnly" | translate}}
                         </mat-checkbox>
                     </section>
-                    <!--
-                    <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                   
+                    <!-- <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
-                    </label> 
-                    -->
-                </div>
-
-                <!-- // reranking -->
-                <div *ngIf="KB_HYBRID" class="field-box">
-                    <section class="disable-input-message-section">
-                        <mat-checkbox 
-                            [checked]="action?.reranking"
-                            (change)="onChangeCheckbox($event, 'reranking')">
-                            {{"CDSCanvas.Reranking" | translate}}
-                        </mat-checkbox>
-                    </section>
-                    <label class="field-description">{{ "CDSCanvas.RerankingInfo" | translate }}.
-                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.reranking.link" [target]="DOCS_LINK.reranking.target">{{ 'LearnMore' | translate }}</a>
-                    </label> 
+                    </label>  -->
+                    
                 </div>
 
                 <!-- // skip_unanswered -->

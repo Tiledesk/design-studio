@@ -1124,7 +1124,8 @@ export class IntentService {
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
       action.assignChunksTo = 'kb_chunks';
-      action.max_tokens = 256;
+      // Default max tokens for Ask Knowledge Base
+      action.max_tokens = 10000;
       action.temperature = 0.7;
       action.top_k = 5;
       action.alpha = 0.5;

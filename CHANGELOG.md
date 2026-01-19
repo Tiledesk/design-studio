@@ -9,6 +9,8 @@
 
 
 # this branch
+- **changed**: Set the default max-token value to 10000
+- **added**: Added reranking multiplier
 - **added**: Intercepted Chrome background throttling / standby to refresh the page
 - **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
 - **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
@@ -21,6 +23,8 @@
 - **added**: note: allow uploading videos from links
 
 # 1.39.24-rc1
+# 1.39.23
+- **bug-fix**: deleted duplicate AI model chatGPT 5.2
 - **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
 - **changed**: added text and links in reranking: Improve the accuracy of your answers
 - **changed**: web Request does not show output attributes in the stage preview
