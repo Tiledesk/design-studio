@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.39.24-rc5
 - **changed**: Updated format-number with browser language formatting
 - **changed**: Edit AI preview settings: replace text with icons
 
