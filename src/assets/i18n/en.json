@@ -308,6 +308,9 @@
             "Alt": "Note media",
             "OriginalSizePx": "Original media size (in pixels): {{width}}px × {{height}}px",
             "PlaceholderCta": "Upload an image or a video",
+            "PlaceholderDrop": "Drop file here to start uploading",
+            "PlaceholderOr": "or",
+            "PlaceholderSelectFile": "Select file",
             "Replace": "Replace",
             "Remove": "Remove"
         },

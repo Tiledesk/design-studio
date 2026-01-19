@@ -3,7 +3,7 @@
 
 .note-controls {
   position: absolute;
-  top: -10px;
+  top: -15px;
   right: 0;
   height: 30px;
   padding-left: 12px;
@@ -14,10 +14,10 @@
 
 .note-controls.is-visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .note-controls__pill {
-  pointer-events: auto;
   background: #ffffff;
   height: 25px;
   border-radius: 14px;

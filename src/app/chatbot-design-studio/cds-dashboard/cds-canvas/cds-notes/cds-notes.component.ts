@@ -436,6 +436,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const clickDuration = mouseUpTimestamp - this.mouseDownTimestamp;
       if(clickDuration < 100) {
         this.changeState(2);
+        if (this.shouldOpenDetailPanelOnClick()) {
+          this.noteSelected.emit(this.note);
+        } else if (this.isMediaNote && !this.hasMedia) {
+          this.noteSelected.emit(this.note);
+        } else {
+          this.noteSelected.emit(null);
+        }
         this.logger.log('[NOTES] Click duration:', clickDuration, 'ms');
       }
       this.mouseDownTimestamp = 0; // Reset per il prossimo click
@@ -491,6 +498,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // this.singleClickTimer = setTimeout(() => {
       this.changeState(2);
       this.updateDragState();
+      if (this.shouldOpenDetailPanelOnClick()) {
+        this.noteSelected.emit(this.note);
+      }
       this.singleClickTimer = null;
     // }, 100);
     
@@ -588,6 +598,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.cancelSingleClickTimer();
     this.changeState(2);
     this.updateDragState();
+    if (this.shouldOpenDetailPanelOnClick()) {
+      this.noteSelected.emit(this.note);
+    } else {
+      // Media notes (image/video):
+      // - if still empty (placeholder), open detail panel so the user can add content
+      // - if it already has content, selecting the note must close the detail panel if open
+      if (this.isMediaNote && !this.hasMedia) {
+        this.noteSelected.emit(this.note);
+      } else {
+        this.noteSelected.emit(null);
+      }
+    }
 
     if (!this.isDraggable) {
       event.stopPropagation();
@@ -1191,6 +1213,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   // METODI PUBBLICI
   // ============================================================================
+  private shouldOpenDetailPanelOnClick(): boolean {
+    // Requirement:
+    // - rect + text => open detail panel on click
+    // - media (image/video) => DO NOT open detail panel on click
+    const type = this.note?.type || 'text';
+    return type === 'rect' || type === 'text';
+  }
+
   changeState(state: 0|1|2|3): void {
     const previousState = this.stateNote;
     this.stateNote = state;
@@ -1198,9 +1228,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     if (state === 1) {
       // this.cancelOpenPanelTimer();
       this.textareaHasFocus = true;
-      if (previousState === 2) {
-        this.noteSelected.emit(null);
-      }
       this.updateChildrenDraggableClass();
       // setTimeout(() => {
         if (this.noteInput) {
@@ -1214,8 +1241,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         this.noteInput.nativeElement.blur();
       }
       this.updateChildrenDraggableClass();
-      // NOTE: the detail panel must NOT open on click/select anymore.
-      // Opening the panel is now only available via the first icon in the internal note menu.
+      // NOTE:
+      // The detail panel opening is handled by click handlers and is conditional:
+      // - rect/text: emits noteSelected on click
+      // - media: no panel open on click (menu still supports open detail)
     } else if (state === 0 || state === 3) {
       // this.cancelOpenPanelTimer();
       this.textareaHasFocus = false;

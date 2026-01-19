@@ -14,6 +14,7 @@
     [style.background-color]="isMediaNote ? (hasMedia ? 'transparent' : '#f3f4f6') : note?.backgroundColor">
     <cds-note-controls
       [visible]="stateNote === 2 && !textareaHasFocus"
+      [isMedia]="isMediaNote"
       (openDetail)="onOpenDetailFromMenu()"
       (duplicate)="onDuplicateFromMenu()"
       (remove)="onDeleteFromMenu()">
@@ -75,9 +76,14 @@
           </ng-template>
         </ng-container>
         <ng-template #mediaPlaceholder>
-          <button type="button" class="note-media-placeholder-btn" (click)="onPlaceholderUploadClick($event)">
-            {{ 'CDSCanvas.NoteMedia.PlaceholderCta' | translate }}
-          </button>
+          <div class="note-media-placeholder">
+            <div class="note-media-placeholder-text">
+              {{ 'CDSCanvas.NoteMedia.PlaceholderDrop' | translate }} {{ 'CDSCanvas.NoteMedia.PlaceholderOr' | translate }}
+            </div>
+            <button type="button" class="note-media-placeholder-btn" (click)="onPlaceholderUploadClick($event)">
+              {{ 'CDSCanvas.NoteMedia.PlaceholderSelectFile' | translate }}
+            </button>
+          </div>
         </ng-template>
       </div>
 
