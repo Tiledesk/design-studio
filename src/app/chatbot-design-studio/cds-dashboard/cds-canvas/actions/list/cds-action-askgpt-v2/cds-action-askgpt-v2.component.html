@@ -236,9 +236,27 @@
                             <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                             <div class="parameters-preview">
                                 <span *ngIf="(action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
-                                <span *ngIf="action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
-                                <span *ngIf="action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
+                                <span *ngIf="action?.max_tokens">
+                                    <span class="sep"> | </span>
+                                    <mat-icon class="preview-icon" aria-label="tokens" title="tokens">toll</mat-icon> {{action.max_tokens | formatNumber}}
+                                </span>
+                                <span *ngIf="action?.temperature !== undefined">
+                                    <span class="sep"> | </span>
+                                    <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> {{action.temperature | formatNumber}}
+                                </span>
                                 <span *ngIf="action?.context"> | system context: {{action.context}}</span>
+                                <span *ngIf="KB_HYBRID && action?.alpha !== undefined">
+                                    <span class="sep"> | </span>
+                                    <mat-icon class="preview-icon" aria-label="search type" title="search type">manage_search</mat-icon> {{action.alpha | formatNumber}}
+                                </span>
+                                <span *ngIf="action?.top_k !== undefined">
+                                    <span class="sep"> | </span>
+                                    <mat-icon class="preview-icon" aria-label="chunk limit" title="chunk limit">view_list</mat-icon> {{action.top_k | formatNumber}}
+                                </span>
+                                <span *ngIf="action?.reranking && action?.reranking_multiplier !== undefined">
+                                    <span class="sep"> | </span>
+                                    <mat-icon class="preview-icon" aria-label="reranking multiplier" title="reranking multiplier">auto_graph</mat-icon> {{action.reranking_multiplier | formatNumber}}
+                                </span>
                                 
                                 <!-- Advanced/KB options preview (when panel is collapsed) -->
                                 <span *ngIf="action?.advancedPrompt" class="preview-flag">
@@ -291,7 +309,7 @@
                     <label class="title-label">{{'CDSCanvas.MaxTokens' | translate }}</label>
                     <div class="action-wait-content">
                         <div class="action-wait-slider ">
-                            <div class="action-wait-range">{{ai_setting['max_tokens'].min}}</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].min | formatNumber}}</div>
                             <mat-slider 
                                 class="wait-slider" thumbLabel 
                                 [displayWith]="formatSliderLabel"
@@ -333,7 +351,7 @@
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>
-                                <div class="action-wait-range">{{ai_setting['temperature'].max | number:'': browserLang}}</div>
+                                <div class="action-wait-range">{{ai_setting['temperature'].max | formatNumber}}</div>
                             </div>
                             <input type="number" class="slider-input gpt-setting-input" value="{{action.temperature}}" disabled>
                         </div>
@@ -399,8 +417,8 @@
                                     {{"CDSCanvas.Reranking" | translate}}
                                 </mat-checkbox>
                             </section>
-                            <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
-                                <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
+                            <label class="field-description">{{ "CDSCanvas.RerankingInfo" | translate }}
+                                <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.reranking.link" [target]="DOCS_LINK.reranking.target">{{ 'LearnMore' | translate }}</a>
                             </label> 
                         </div>
                     </div>

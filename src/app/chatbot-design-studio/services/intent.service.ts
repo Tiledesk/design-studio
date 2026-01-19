@@ -1058,6 +1058,8 @@ export class IntentService {
       action.preview = [];
       action.history = false;
       action.citations = false;
+      action.reranking = false;
+      action.reranking_multiplier = 2;
     }
     if(typeAction === TYPE_ACTION.GPT_TASK){
       action = new ActionGPTTask();

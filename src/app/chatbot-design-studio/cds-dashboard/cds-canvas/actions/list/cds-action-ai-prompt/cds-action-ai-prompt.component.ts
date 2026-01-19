@@ -119,6 +119,9 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
 
 
   async ngOnInit(): Promise<void> {
+    // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
+    const lang = this.translate.getBrowserLang() || 'en';
+    this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.logger.log("[ACTION AI_PROMPT] ngOnInit action: ", this.action);
 
     this.project_id = this.dashboardService.projectID;
