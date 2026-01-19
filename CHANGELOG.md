@@ -8,9 +8,11 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.39.24-rc4
 - **changed**: Set the default max-token value to 10000
 - **added**: Added reranking multiplier
+
+# 1.39.24-rc3
 - **added**: Intercepted Chrome background throttling / standby to refresh the page
 - **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
 - **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
