@@ -9,6 +9,8 @@
 
 
 # this branch
+- **changed**: Set the default max-token value to 10000
+- **added**: Added reranking multiplier
 - **added**: Intercepted Chrome background throttling / standby to refresh the page
 - **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
 - **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
