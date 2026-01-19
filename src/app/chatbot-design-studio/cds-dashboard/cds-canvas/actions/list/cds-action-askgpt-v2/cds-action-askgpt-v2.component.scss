@@ -94,6 +94,19 @@ mat-expansion-panel ::ng-deep {
         line-height: normal;
     }
 
+    .preview-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        height: 14px;
+        font-size: 14px;
+        line-height: 14px;
+        margin: 0;
+        vertical-align: middle;
+        color: var(--text-color);
+    }
+
     .preview-flag {
         font-size: 10px;
 
@@ -244,7 +257,8 @@ cds-select#model-condition ::ng-deep{
 
 .slider-input ::ng-deep {
     width: 60px;
-
+    min-width: 60px;
+    font-size: 12px;
     input {
         text-align: center;
     }

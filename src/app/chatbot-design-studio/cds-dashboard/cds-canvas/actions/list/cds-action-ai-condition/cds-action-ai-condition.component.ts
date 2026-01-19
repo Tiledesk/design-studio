@@ -53,7 +53,7 @@ export class CdsActionAiConditionComponent implements OnInit {
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
   }
 
@@ -121,6 +121,9 @@ export class CdsActionAiConditionComponent implements OnInit {
 
 
   async ngOnInit(): Promise<void> {
+    // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
+    const lang = this.translate.getBrowserLang() || 'en';
+    this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.logger.log("[ACTION AI_CONDITION] ngOnInit action: ", this.action);
     this.project_id = this.dashboardService.projectID;
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');

@@ -118,6 +118,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
+    // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
+    const lang = this.translate.getBrowserLang() || 'en';
+    this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.project_id = this.dashboardService.projectID
     this.logger.log("[ACTION-ASKGPTV2] action detail action: ", this.action);
     // aggiorno llm_model con i modelli dell'integration

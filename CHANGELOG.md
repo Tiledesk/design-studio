@@ -9,6 +9,9 @@
 
 
 # this branch
+- **changed**: Updated format-number with browser language formatting
+- **changed**: Edit AI preview settings: replace text with icons
+
 - **changed**: Set the default max-token value to 10000
 - **added**: Added reranking multiplier
 - **added**: Intercepted Chrome background throttling / standby to refresh the page
