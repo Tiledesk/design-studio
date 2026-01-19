@@ -379,6 +379,7 @@
         "Deterministic": "Deterministic",
         "Random": "Random",
         "ChunkLimit": "Chunk limit",
+        "RerankingMultiplierLabel": "Reranking multiplier",
         "SearchTypeLimit": "Search type",
         "FullText": "FullText",
         "Semantic": "Semantic",

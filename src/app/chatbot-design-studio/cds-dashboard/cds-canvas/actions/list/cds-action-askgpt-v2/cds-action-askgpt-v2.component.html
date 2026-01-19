@@ -409,7 +409,7 @@
                 <!-- // reranking multiplier slider (visible only when reranking is enabled) -->
                 <div *ngIf="action?.reranking" class="text-editor-wrapper">
                     <div class="field-box">
-                        <label class="title-label">Multiplier</label>
+                        <label class="title-label">{{'CDSCanvas.RerankingMultiplierLabel' | translate }}</label>
                         <div class="action-wait-content">
                             <div class="action-wait-slider">
                                 <div class="action-wait-range">{{ai_setting['reranking_multiplier'].min}}</div>
