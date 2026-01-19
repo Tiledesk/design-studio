@@ -1300,7 +1300,7 @@
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
     "AppInterruption": {
         "Title": "Session inactive — refresh required",
-        "Message": "This page was inactive for too long (Chrome background throttling / standby). Please refresh to continue safely.",
+        "Message": "This page was inactive for too long. Please refresh to continue safely.",
         "Refresh": "Refresh"
     },
     "CDSGlobals": {

@@ -80,7 +80,8 @@ export class CdsActionAskgptV2Component implements OnInit {
     "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
     "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
-    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false },
+    "reranking_multiplier": { name: "reranking_multiplier", min: 2, max: 50, step: 1, disabled: false }
   }
   KB_HYBRID = false;
 
@@ -374,6 +375,11 @@ export class CdsActionAskgptV2Component implements OnInit {
           }else{
             this.ai_setting['max_tokens'].min=10;
           }
+        } else if (target === 'reranking') {
+          // Initialize multiplier when reranking is enabled
+          if (this.action[target] && (this.action['reranking_multiplier'] === null || this.action['reranking_multiplier'] === undefined)) {
+            this.action['reranking_multiplier'] = this.ai_setting['reranking_multiplier'].min; // default = 2
+          }
         }
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
 
@@ -392,6 +398,15 @@ export class CdsActionAskgptV2Component implements OnInit {
         this.action.max_tokens = this.ai_setting['max_tokens'].max;
       } else {
         this.action.max_tokens = event;
+      }
+    } else if (target === 'reranking_multiplier') {
+      const min = this.ai_setting['reranking_multiplier'].min;
+      const max = this.ai_setting['reranking_multiplier'].max;
+      const v = typeof event === 'number' ? event : Number(event);
+      if (Number.isFinite(v)) {
+        this.action.reranking_multiplier = Math.min(Math.max(v, min), max);
+      } else {
+        this.action.reranking_multiplier = min;
       }
     }
     this.updateAndSaveAction.emit();
