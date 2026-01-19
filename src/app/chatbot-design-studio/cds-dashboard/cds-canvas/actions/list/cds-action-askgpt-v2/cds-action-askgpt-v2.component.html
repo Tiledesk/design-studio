@@ -235,15 +235,35 @@
                         <div class="title-and-parameters-container">
                             <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                             <div class="parameters-preview">
-                                <span *ngIf="!aiSettingsPanelOpenState && (action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
-                                <span *ngIf="!aiSettingsPanelOpenState && action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
-                                <span *ngIf="!aiSettingsPanelOpenState && action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
-                                <span *ngIf="!aiSettingsPanelOpenState && action?.context"> | system context: {{action.context}}</span>
+                                <span *ngIf="(action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
+                                <span *ngIf="action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
+                                <span *ngIf="action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
+                                <span *ngIf="action?.context"> | system context: {{action.context}}</span>
+                                
+                                <!-- Advanced/KB options preview (when panel is collapsed) -->
+                                <span *ngIf="action?.advancedPrompt" class="preview-flag">
+                                    <span class="sep"> | </span>
+                                    <span class="label">{{"CDSCanvas.AdvancedContext" | translate}}</span>
+                                </span>
+                                <span *ngIf="action?.citations" class="preview-flag">
+                                    <span class="sep"> | </span>
+                                    <span class="label">{{"CDSCanvas.Citations" | translate}}</span>
+                                </span>
+                                <span *ngIf="action?.chunks_only" class="preview-flag">
+                                    <span class="sep"> | </span>
+                                    <span class="label">{{"CDSCanvas.ChunksOnly" | translate}}</span>
+                                </span>
+                                <span *ngIf="action?.skip_unanswered" class="preview-flag">
+                                    <span class="sep"> | </span>
+                                    <span class="label">{{"CDSCanvas.SkipUnanswered" | translate}}</span>
+                                </span>
                             </div>
+                            
                         </div>
                     </div>
                 </mat-panel-title>
             </mat-expansion-panel-header>
+            <hr class="custom-divider" style="margin-top: 10px;">
             <div>
 
                 <!-- // model select  -->

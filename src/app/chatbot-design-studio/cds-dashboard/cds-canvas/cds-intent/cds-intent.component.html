@@ -13,7 +13,8 @@
      
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
-    <cds-connector-in *ngIf="!isStart && alphaConnectors < 1 && connectorsIn?.length>0"
+    <!-- && alphaConnectors < 1 -->
+    <cds-connector-in *ngIf="!isStart && connectorsIn?.length>0"
         [connectorsIn]="connectorsIn"
         (onShowConnectorsIn)="onShowConnectorsIn()"
         (onHideConnectorsIn)="onHideConnectorsIn()">

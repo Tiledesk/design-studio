@@ -273,11 +273,23 @@ export class CdsActionAskgptV2Component implements OnInit {
   onChangeTextarea(event: string, property: string) {
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event);
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property);
+    const nextValue = (event ?? '').toString();
+    const currentValue = ((this.action && (this.action as any)[property]) ?? '').toString();
+
+    /**
+     * NOTE:
+     * `cds-textarea` may emit `changeTextarea` during init only when it has a non-empty initial value.
+     * When the initial value is empty, the first real user input/paste is the first emission.
+     * The previous implementation always dropped the first emission, causing "context not saved" on first edit.
+     */
     if (this.isInitializing[property]) {
       this.isInitializing[property] = false;
-      return;
+      if (nextValue === currentValue) {
+        return;
+      }
     }
-    this.action[property] = event;
+
+    (this.action as any)[property] = nextValue;
     this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
   }
   
