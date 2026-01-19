@@ -36,6 +36,7 @@ import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
   styleUrls: ['./cds-action-ai-prompt.component.scss']
 })
 export class CdsActionAiPromptComponent implements OnInit, OnChanges {
+  private readonly DEFAULT_MAX_TOKENS = 10000;
   
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
   
@@ -314,9 +315,12 @@ setModel(modelName: string){
   this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
   this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
   this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
-  if(this.action.max_tokens > this.llm_model_selected.max_output_tokens){
-    this.action.max_tokens = this.llm_model_selected.max_output_tokens;
-  }
+  // Every model change resets max_tokens to default (capped by model max)
+  const min = this.ai_setting['max_tokens'].min;
+  const max = this.ai_setting['max_tokens'].max;
+  let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+  if (next < min) next = min;
+  this.action.max_tokens = next;
   if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
     this.action.temperature = 1
     this.ai_setting['temperature'].disabled= true
