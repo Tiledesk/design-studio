@@ -3,6 +3,7 @@
     #noteContentElement
     [class.selected]="stateNote === 2"
     [class.text-focus]="stateNote === 1"
+    [class.is-gesture-active]="isGestureActive"
     [class.tds_draggable]="isDraggable"
     [class.rect-note]="!isTextNote && !isMediaNote"
     [class.media-note]="isMediaNote"

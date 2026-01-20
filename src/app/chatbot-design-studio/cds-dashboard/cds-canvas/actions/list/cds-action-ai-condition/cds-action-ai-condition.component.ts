@@ -195,10 +195,10 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.action.model = result?.model?result.model:'';
     this.action.modelName = result?.modelName?result.modelName:'';
     this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
-    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
-    this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
-    if(this.action.max_tokens > this.llm_model_selected.max_output_tokens){
-      this.action.max_tokens = this.llm_model_selected.max_output_tokens;
+    this.ai_setting['max_tokens'].max = this.llm_model_selected?.max_output_tokens;
+    this.ai_setting['max_tokens'].min = this.llm_model_selected?.min_tokens;
+    if(this.action.max_tokens > this.llm_model_selected?.max_output_tokens){
+      this.action.max_tokens = this.llm_model_selected?.max_output_tokens;
     }
     if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
       this.action.temperature = 1
