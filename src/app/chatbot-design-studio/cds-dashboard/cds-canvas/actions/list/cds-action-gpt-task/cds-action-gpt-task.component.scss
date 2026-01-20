@@ -266,7 +266,8 @@ mat-checkbox ::ng-deep {
 
 .slider-input ::ng-deep {
     width: 60px;
-
+    min-width: 60px;
+    font-size: 12px;
     input {
         text-align: center;
     }

@@ -408,6 +408,7 @@
         "Deterministic": "Deterministic",
         "Random": "Random",
         "ChunkLimit": "Chunk limit",
+        "RerankingMultiplierLabel": "Reranking multiplier",
         "SearchTypeLimit": "Search type",
         "FullText": "FullText",
         "Semantic": "Semantic",
@@ -1333,6 +1334,11 @@
     "CopyLink": "Copy share link",
     "OpenLinkInNewTab": "Open share link",
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
+    "AppInterruption": {
+        "Title": "Session inactive — refresh required",
+        "Message": "This page was inactive for too long. Please refresh to continue safely.",
+        "Refresh": "Refresh"
+    },
     "CDSGlobals": {
         "Globals": "Globals",
         "NoGlobalVariables": "No global variables <br><br>Global variables are a set of variables that are always available in your flows",

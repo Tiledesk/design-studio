@@ -35,6 +35,7 @@ import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
   styleUrls: ['./cds-action-askgpt-v2.component.scss']
 })
 export class CdsActionAskgptV2Component implements OnInit {
+  private readonly DEFAULT_MAX_TOKENS = 10000;
 
   @Input() intentSelected: Intent;
   @Input() action: ActionAskGPTV2;
@@ -80,7 +81,8 @@ export class CdsActionAskgptV2Component implements OnInit {
     "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
     "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
-    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false },
+    "reranking_multiplier": { name: "reranking_multiplier", min: 2, max: 50, step: 1, disabled: false }
   }
   KB_HYBRID = false;
 
@@ -116,6 +118,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
+    // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
+    const lang = this.translate.getBrowserLang() || 'en';
+    this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.project_id = this.dashboardService.projectID
     this.logger.log("[ACTION-ASKGPTV2] action detail action: ", this.action);
     // aggiorno llm_model con i modelli dell'integration
@@ -180,6 +185,17 @@ export class CdsActionAskgptV2Component implements OnInit {
     if(this.action.max_tokens > this.llm_model_selected?.max_output_tokens){
       this.action.max_tokens = this.llm_model_selected?.max_output_tokens;
     }
+    // Preserve any higher min constraint (e.g. citations => min 1024)
+    const modelMin = this.llm_model_selected.min_tokens;
+    const citationsMin = this.action?.citations ? 1024 : 0;
+    this.ai_setting['max_tokens'].min = Math.max(modelMin, citationsMin);
+
+    // Every model change resets max_tokens to default (capped by model max)
+    const min = this.ai_setting['max_tokens'].min;
+    const max = this.ai_setting['max_tokens'].max;
+    let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+    if (next < min) next = min;
+    this.action.max_tokens = next;
     if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
       this.action.temperature = 1
       this.ai_setting['temperature'].disabled= true
@@ -386,6 +402,11 @@ export class CdsActionAskgptV2Component implements OnInit {
           }else{
             this.ai_setting['max_tokens'].min=10;
           }
+        } else if (target === 'reranking') {
+          // Initialize multiplier when reranking is enabled
+          if (this.action[target] && (this.action['reranking_multiplier'] === null || this.action['reranking_multiplier'] === undefined)) {
+            this.action['reranking_multiplier'] = this.ai_setting['reranking_multiplier'].min; // default = 2
+          }
         }
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
 
@@ -404,6 +425,15 @@ export class CdsActionAskgptV2Component implements OnInit {
         this.action.max_tokens = this.ai_setting['max_tokens'].max;
       } else {
         this.action.max_tokens = event;
+      }
+    } else if (target === 'reranking_multiplier') {
+      const min = this.ai_setting['reranking_multiplier'].min;
+      const max = this.ai_setting['reranking_multiplier'].max;
+      const v = typeof event === 'number' ? event : Number(event);
+      if (Number.isFinite(v)) {
+        this.action.reranking_multiplier = Math.min(Math.max(v, min), max);
+      } else {
+        this.action.reranking_multiplier = min;
       }
     }
     this.updateAndSaveAction.emit();

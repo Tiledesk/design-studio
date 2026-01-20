@@ -6,7 +6,7 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
     value: "command-r",
     description: "Cohere's Command R model.",
     status: "inactive",
-    min_tokens: 4096,
+    min_tokens: 1,
     max_output_tokens: 4096
   },
   {
@@ -14,7 +14,7 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
     value: "command-r-plus",
     description: "Cohere's enhanced Command R+ model.",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 128000
   },
   {
@@ -22,7 +22,7 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
     value: "command-a-03-2025",
     description: "Cohere's Command A model (March 2025).",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 512000
   },
   {
@@ -30,7 +30,7 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
     value: "command-r7b-12-2024",
     description: "Cohere's Command R7B model (December 2024).",
     status: "active",
-    min_tokens: 4096,
+    min_tokens: 1,
     max_output_tokens: 4096
   },
   {
@@ -38,7 +38,7 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
     value: "command-a-vision-07-2025",
     description: "Cohere's Command A Vision model (July 2025).",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 512000
   },
   {
@@ -46,7 +46,7 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
     value: "command-r-plus-04-2024",
     description: "Cohere's Command R+ model (April 2024).",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 128000
   },
   {
@@ -54,7 +54,7 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
     value: "command-r-plus-08-2024",
     description: "Cohere's Command R+ model (August 2024).",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 128000
   },
 ]
@@ -65,7 +65,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     value: "gemini-3-pro-preview",
     description: "TYPE_GPT_MODEL.gemini-3-pro-preview.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 65536 // Corretto da 128000 (Gemini 1.5 Pro supporta 1M)
   },
   {
@@ -73,7 +73,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     value: "gemini-3-pro-image-preview",
     description: "TYPE_GPT_MODEL.gemini-3-pro-image-preview.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 65536 // Corretto da 128000 (Gemini 1.5 Pro supporta 1M)
   },
   {
@@ -81,7 +81,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     value: "gemini-pro",
     description: "TYPE_GPT_MODEL.gemini-pro.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 1000000 // Corretto da 128000 (Gemini 1.5 Pro supporta 1M)
   },
   {
@@ -89,7 +89,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     value: "gemini-1.5-flash",
     description: "TYPE_GPT_MODEL.gemini-1.5-flash.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 1000000 // Corretto da 128000 (Gemini 1.5 Flash supporta 1M)
   },
   {
@@ -97,7 +97,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     value: "gemini-2.0-flash",
     description: "TYPE_GPT_MODEL.gemini-2.0-flash.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 1000000 // Assumo che le versioni 2.x mantengano o migliorino 1.5
   },
   {
@@ -105,7 +105,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     value: "gemini-2.0-flash-lite",
     description: "TYPE_GPT_MODEL.gemini-2.0-flash-lite.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 1000000 // Assumo
   },
   {
@@ -113,7 +113,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     value: "gemini-2.5-flash",
     description: "TYPE_GPT_MODEL.gemini-2.5-flash.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 1000000 // Assumo
   },
   {
@@ -121,7 +121,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     value: "gemini-2.5-flash-lite",
     description: "TYPE_GPT_MODEL.gemini-2.5-flash-lite.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 1000000 // Assumo
   },
 ]
@@ -132,7 +132,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-sonnet-4-5",
     description: "TYPE_GPT_MODEL.claude-sonnet-4-5.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 65536
   },
   {
@@ -140,7 +140,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-haiku-4-5",
     description: "TYPE_GPT_MODEL.claude-haiku-4-5.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 65536
   },
   {
@@ -148,7 +148,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-opus-4-5",
     description: "TYPE_GPT_MODEL.claude-opus-4-5.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 65536
   },
   {
@@ -156,7 +156,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-opus-4-1",
     description: "TYPE_GPT_MODEL.claude-opus-4-1.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 65536
   },
   {
@@ -164,7 +164,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-3-7-sonnet-20250219",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 200000
   },
   {
@@ -172,7 +172,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-sonnet-4-20250514",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 200000
   },
   {
@@ -180,7 +180,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-opus-4-20250514",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 200000
   },
   {
@@ -188,7 +188,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-3-5-sonnet-20240620",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 200000
   },
   {
@@ -196,7 +196,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-3-5-haiku-latest",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 200000
   },
   {
@@ -204,7 +204,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-3-7-sonnet-latest",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 200000
   },
   {
@@ -212,7 +212,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-opus-4-0",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 200000
   },
   {
@@ -220,7 +220,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     value: "claude-sonnet-4-0",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 200000
   },
 ]
@@ -231,7 +231,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "llama-3.2-11b-vision-preview",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 8192,
+    min_tokens: 1,
     max_output_tokens: 8192
   },
   {
@@ -239,7 +239,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "llama-3.2-3b-preview",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 8192,
+    min_tokens: 1,
     max_output_tokens: 8192
   },
   {
@@ -247,7 +247,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "llama-3.2-90b-vision-preview",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -255,7 +255,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "llama-guard-3-8b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 8192,
+    min_tokens: 1,
     max_output_tokens: 8192
   },
   {
@@ -263,7 +263,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "llama-3.2-1b-preview",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 4096,
+    min_tokens: 1,
     max_output_tokens: 4096
   },
   {
@@ -271,7 +271,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "llama3-70b-8192",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 8192,
+    min_tokens: 1,
     max_output_tokens: 8192
   },
   {
@@ -279,7 +279,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "llama-3.3-70b-specdec",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -287,7 +287,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "deepseek-r1-distill-qwen-32b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -295,7 +295,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "deepseek-r1-distill-llama-70b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -303,7 +303,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "qwen-2.5-32b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -311,7 +311,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "mixtral-8x7b-32768",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -319,7 +319,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "llama-3.1-8b-instant",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 8192,
+    min_tokens: 1,
     max_output_tokens: 8192
   },
   {
@@ -327,7 +327,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "llama-3.3-70b-versatile",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -335,7 +335,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "gemma2-9b-it",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 8192,
+    min_tokens: 1,
     max_output_tokens: 8192
   },
   {
@@ -343,7 +343,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "allam-2-7b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 8192,
+    min_tokens: 1,
     max_output_tokens: 8192
   },
   {
@@ -351,7 +351,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "meta-llama/llama-guard-4-12b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 8192,
+    min_tokens: 1,
     max_output_tokens: 8192
   },
   {
@@ -359,7 +359,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "deepseek-r1-distill-llama-70b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -367,7 +367,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "meta-llama/llama-4-maverick-17b-128e-instruct",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -375,7 +375,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "meta-llama/llama-4-scout-17b-16e-instruct",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -383,7 +383,7 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "moonshotai/kimi-k2-instruct",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -391,35 +391,35 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     value: "qwen/qwen3-32b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   { name: "Groq Compound",
     value: "groq/compound",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   { name: "Groq Compound Mini",
     value: "groq/compound-mini",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   { name: "OpenAI GPT-OSS 120B",
     value: "openai/gpt-oss-120b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   { name: "OpenAI GPT-OSS 20B",
     value: "openai/gpt-oss-20b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
 
@@ -431,7 +431,7 @@ export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:st
     value: "deepseek-chat",
     description: "TYPE_GPT_MODEL.deepseek-chat.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 128000 // valore stimato in base a modelli simili
   }
 ]
@@ -442,7 +442,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-5.2",
     description: "TYPE_GPT_MODEL.gpt-5.2.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 128000
   },
   {
@@ -450,15 +450,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-5.1",
     description: "TYPE_GPT_MODEL.gpt-5.1.description",
     status: "active",
-    min_tokens: 10000,
-    max_output_tokens: 128000
-  },
-  {
-    name: "Gpt-5.2",
-    value: "gpt-5.2",
-    description: "TYPE_GPT_MODEL.gpt-5.2.description",
-    status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 128000
   },
   {
@@ -466,7 +458,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-5",
     description: "TYPE_GPT_MODEL.gpt-5.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 128000
   },
   {
@@ -474,7 +466,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-5-mini",
     description: "TYPE_GPT_MODEL.gpt-5-mini.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 128000
   },
   {
@@ -482,7 +474,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-5-nano",
     description: "TYPE_GPT_MODEL.gpt-5-nano.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 128000
   },
   {
@@ -490,7 +482,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-4.1",
     description: "TYPE_GPT_MODEL.gpt-4.1.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -498,7 +490,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-4.1-mini",
     description: "TYPE_GPT_MODEL.gpt-4.1-mini.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -506,7 +498,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-4.1-nano",
     description: "TYPE_GPT_MODEL.gpt-4.1-nano.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   },
   {
@@ -514,7 +506,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-4o",
     description: "TYPE_GPT_MODEL.gpt-4o.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 16384
   },
   {
@@ -522,7 +514,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-4o-mini",
     description: "TYPE_GPT_MODEL.gpt-4o-mini.description",
     status: "active",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 16384
   },
   {
@@ -530,7 +522,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-4",
     description: "TYPE_GPT_MODEL.gpt-4.description",
     status: "active",
-    min_tokens: 8192,
+    min_tokens: 1,
     max_output_tokens: 8192
   },
   {
@@ -538,7 +530,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-4-turbo-preview",
     description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",
     status: "active",
-    min_tokens: 4096,
+    min_tokens: 1,
     max_output_tokens: 4096
   },
   {
@@ -546,7 +538,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "text-davinci-003",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
-    min_tokens: 4096,
+    min_tokens: 1,
     max_output_tokens: 4096
   },
   {
@@ -554,7 +546,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "gpt-3.5-turbo",
     description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",
     status: "active",
-    min_tokens: 4096,
+    min_tokens: 1,
     max_output_tokens: 4096
   },
   {
@@ -562,7 +554,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "o1-mini",
     description: "TYPE_GPT_MODEL.o1-mini.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 65536
   },
   {
@@ -570,7 +562,7 @@ export var OPENAI_MODEL: Array<{ name: string, value: string, description:string
     value: "o1-preview",
     description: "TYPE_GPT_MODEL.o1-preview.description",
     status: "inactive",
-    min_tokens: 10000,
+    min_tokens: 1,
     max_output_tokens: 32768
   }
 ]

@@ -167,8 +167,11 @@
                         <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                         <div class="parameters-preview">
                             <span *ngIf="(action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
-                            <span *ngIf="action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
-                            <span *ngIf="action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
+                            <span *ngIf="action?.max_tokens"> | tokens: {{action.max_tokens | number:'1.0-0':browserLang}}</span>
+                            <span *ngIf="action?.temperature !== undefined">
+                                <span class="sep"> | </span>
+                                <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> {{action.temperature}}
+                            </span>
                             <span *ngIf="action?.context"> | system context: {{action.context}}</span>
                         </div>
                     </div>
