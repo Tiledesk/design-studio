@@ -8,9 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch
-- **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
-
+# 1.39.24-rc6
 - **bug-fixed**: il resize della nota video non è fluido
 - **bug-fixed**: corretto errore max_output_tokens
 - **changed**: nella nota rettangolo sono state inserite le maniglie sui vertici
@@ -18,12 +16,6 @@
 - **bug-fixed**: disabilitato il menu note-controls delle note quando questo è trasparente
 - **changed**: ripristinata l'apertura del dettaglio note al click sulla nota, tranne che  per la nota video
 - **bug-fixed**: quando provo a cambiare colore si chiude il pannello di dettaglio della nota
-
-- **changed**: cambio colori di default
-- **changed**: memorizza gli ultimi colori nel LS
-- **added**: aggiungi lo stesso menu dell’intent ai blocchi note
-- **changed**: limita il caricamento solo a immagini e gif 
-- **added**: permetti di caricare i video da link
 
 
 # 1.39.24-rc5
