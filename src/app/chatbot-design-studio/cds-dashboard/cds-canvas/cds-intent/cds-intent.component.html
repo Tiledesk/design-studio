@@ -167,7 +167,7 @@
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
 
                     <cds-action-controls *ngIf="!isNewChatbot"
-                        (onClickControl)="onClickControl($event, action, i)">
+                        (onClickControl)="onActionControl($event, action, i)">
                     </cds-action-controls>
     
     

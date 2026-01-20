@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.39.24-rc7
+- **bug-fixed**: fix regression in action menu that doesn't allow deleting an action
+
 # 1.39.24-rc6
 - **bug-fixed**: Fixed max_output_tokens error
 - **bug-fixed**: Handles have been added to the vertices of the rectangle note
