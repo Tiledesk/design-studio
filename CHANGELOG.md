@@ -8,6 +8,12 @@
 *Tiledesk SRL*
 
 
+# this branch
+- **added**: aggiungere il testo: Total retrieved chunks for re-ranking: 45
+- **changed**: unire chunk limit, re-ranking e moltiplicatore in un unico blocco, quindi attenzione alla spaziature
+- **changed**: in ai settings sostituisco icona token e metto dei badge al posto della pipe
+- **changed**: aggiungere il tipo (H/S) ibrida o semantica, accanto al nome
+
 # 1.39.24-rc7
 - **bug-fixed**: fix regression in action menu that doesn't allow deleting an action
 

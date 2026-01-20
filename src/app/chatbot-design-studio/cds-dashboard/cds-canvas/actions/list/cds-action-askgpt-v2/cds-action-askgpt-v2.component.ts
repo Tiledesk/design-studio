@@ -44,7 +44,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  listOfNamespaces: Array<{name: string, value: string, icon?:string, hybrid:boolean}>;
+  listOfNamespaces: Array<{name: string, displayName: string, kbTypeLabel: string, value: string, icon?:string, hybrid:boolean}>;
 
   project_id: string;
   selectedNamespace: string;
@@ -256,7 +256,11 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, hybrid: el.hybrid? el.hybrid:false } })
+      this.listOfNamespaces = namaspaceList.map((el) => {
+        const isHybrid = el.hybrid ? el.hybrid : false;
+        const kbTypeLabel = isHybrid ? 'Hybrid' : 'Semantic';
+        return { name: el.name, displayName: el.name, kbTypeLabel, value: el.id, hybrid: isHybrid };
+      })
       // namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
