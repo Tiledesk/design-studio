@@ -9,6 +9,11 @@
 
 
 # this branch
+- **added**: aggiungere il testo: Total retrieved chunks for re-ranking: 45
+- **changed**: unire chunk limit, re-ranking e moltiplicatore in un unico blocco, quindi attenzione alla spaziature
+- **changed**: in ai settings sostituisco icona token e metto dei badge al posto della pipe
+- **changed**: aggiungere il tipo (H/S) ibrida o semantica, accanto al nome
+
 - **changed**: Updated format-number with browser language formatting
 - **changed**: Edit AI preview settings: replace text with icons
 
