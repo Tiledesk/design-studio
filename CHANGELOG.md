@@ -9,14 +9,13 @@
 
 
 # 1.39.24-rc6
-- **bug-fixed**: il resize della nota video non è fluido
-- **bug-fixed**: corretto errore max_output_tokens
-- **changed**: nella nota rettangolo sono state inserite le maniglie sui vertici
-- **bug-fixed**: disabilitata l'area sullo stage di 100x100px che non risulta cliccabile (tds-drag-drawer).
-- **bug-fixed**: disabilitato il menu note-controls delle note quando questo è trasparente
-- **changed**: ripristinata l'apertura del dettaglio note al click sulla nota, tranne che  per la nota video
-- **bug-fixed**: quando provo a cambiare colore si chiude il pannello di dettaglio della nota
-
+- **bug-fixed**: Fixed max_output_tokens error
+- **bug-fixed**: Handles have been added to the vertices of the rectangle note
+- **changed**: Disabled the 100x100px non-clickable stage area (tds-drag-drawer).
+- **bug-fixed**: Disabled the note-controls menu when it is transparent
+- **bug-fixed**: Restored the ability to open the note detail when clicking on the note, except for the video note
+- **changed**: When I try to change the color, the note detail panel closes
+- **bug-fixed**: The video note resize is not smooth
 
 # 1.39.24-rc5
 - **changed**: Updated format-number with browser language formatting
