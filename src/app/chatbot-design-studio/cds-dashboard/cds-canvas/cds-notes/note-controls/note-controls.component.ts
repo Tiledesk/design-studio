@@ -10,6 +10,10 @@ export class NoteControlsComponent {
    * Show/hide is controlled by the parent (`cds-notes`) to keep this component fully dumb.
    */
   @Input() visible: boolean = false;
+  /**
+   * When true (media notes), we hide actions that must not be available (e.g. duplicate).
+   */
+  @Input() isMedia: boolean = false;
 
   @Output() openDetail = new EventEmitter<void>();
   @Output() duplicate = new EventEmitter<void>();

@@ -21,6 +21,8 @@
     </div>
     <div id="content-panel" class="content-panel">
 
+
+
         <!-- MEDIA NOTE (solo pannello upload + preview) -->
         <div class="row image-note-section" *ngIf="note?.type === 'media'">
             <!-- stato: nessuna immagine ancora -->
@@ -31,12 +33,13 @@
                 <input #imageFileInput type="file" accept="image/*,video/*" class="image-file-input" (change)="onImageFileSelected($event)" />
 
                 <div class="image-upload-hint">
-                    {{ 'CDSCanvas.NoteMedia.Hint' | translate }}
+                    {{ 'CDSCanvas.NoteMedia.PlaceholderDrop' | translate }}
+                    {{ 'CDSCanvas.NoteMedia.PlaceholderOr' | translate }}
                 </div>
 
                 <div class="image-upload-actions">
                     <button type="button" class="image-btn" [disabled]="isUploadingImage" (click)="triggerImageFilePicker()">
-                        {{ 'Upload' | translate }}
+                        {{ 'CDSCanvas.NoteMedia.PlaceholderSelectFile' | translate }}
                     </button>
                 </div>
 

@@ -59,9 +59,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private startWidth = 0; // Dimensioni base (rimangono fisse, usiamo scale per ridimensionare)
   private startHeight = 0; // Dimensioni base (rimangono fisse, usiamo scale per ridimensionare)
   private startScale = 1; // Scale iniziale
+  private startScaleX = 1; // Scale X iniziale (per resize non proporzionale)
+  private startScaleY = 1; // Scale Y iniziale (per resize non proporzionale)
   private startCenterX = 0; // Centro iniziale del box (per calcolo scale rispetto al centro)
   private startCenterY = 0; // Centro iniziale del box (per calcolo scale rispetto al centro)
   private startDistanceFromCenter = 0; // Distanza iniziale del mouse dal centro
+  private startDxAbsFromCenter = 0; // |dx| iniziale (per resize non proporzionale)
+  private startDyAbsFromCenter = 0; // |dy| iniziale (per resize non proporzionale)
   private startLeft = 0; // Posizione X iniziale CSS per resize orizzontale
   private startCenterXReal = 0; // Centro X reale iniziale in viewport per resize orizzontale
   private startHostLeftViewport = 0; // Posizione X iniziale dell'host in viewport per resize orizzontale
@@ -105,6 +109,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private startRotationAngle = 0; // Angolo iniziale di rotazione
   private centerX = 0; // Centro X della nota
   private centerY = 0; // Centro Y della nota
+
+  get isGestureActive(): boolean {
+    return this.isResizing || this.isHorizontalResizing || this.isVerticalResizing || this.isRotating;
+  }
 
   // PROPRIETÀ PRIVATE - Timing click
   // ============================================================================
@@ -330,20 +338,33 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     
     let scaleX = this.startScale;
     let scaleY = this.startScale;
-    
-    if (this.startDistanceFromCenter > 0) {
-      const distanceRatio = currentDistance / this.startDistanceFromCenter;
-      const newScale = this.startScale * distanceRatio;
-      scaleX = Math.max(minScale, Math.min(maxScale, newScale));
-      scaleY = scaleX; // Mantieni proporzioni perfette
+
+    const isRect = this.note?.type === 'rect';
+    const isCornerHandle = this.resizeHandle === 'tl' || this.resizeHandle === 'tr' || this.resizeHandle === 'bl' || this.resizeHandle === 'br';
+    if (isRect && isCornerHandle && this.startDxAbsFromCenter > 0 && this.startDyAbsFromCenter > 0) {
+      // Rect note: corner resize without aspect ratio constraints (scaleX and scaleY independently)
+      const dxAbs = Math.abs(currentDx);
+      const dyAbs = Math.abs(currentDy);
+      const nextScaleX = this.startScaleX * (dxAbs / this.startDxAbsFromCenter);
+      const nextScaleY = this.startScaleY * (dyAbs / this.startDyAbsFromCenter);
+      scaleX = Math.max(minScale, Math.min(maxScale, nextScaleX));
+      scaleY = Math.max(minScale, Math.min(maxScale, nextScaleY));
     } else {
-      // Se la distanza iniziale è 0 (maniglia al centro), usa il delta
-      const deltaX = event.clientX - this.startX;
-      const deltaY = event.clientY - this.startY;
-      const avgDelta = (Math.abs(deltaX) + Math.abs(deltaY)) / 2;
-      const newScale = this.startScale + (avgDelta / ((this.startWidth + this.startHeight) / 2));
-      scaleX = Math.max(minScale, Math.min(maxScale, newScale));
-      scaleY = scaleX;
+    
+      if (this.startDistanceFromCenter > 0) {
+        const distanceRatio = currentDistance / this.startDistanceFromCenter;
+        const newScale = this.startScale * distanceRatio;
+        scaleX = Math.max(minScale, Math.min(maxScale, newScale));
+        scaleY = scaleX; // Mantieni proporzioni perfette
+      } else {
+        // Se la distanza iniziale è 0 (maniglia al centro), usa il delta
+        const deltaX = event.clientX - this.startX;
+        const deltaY = event.clientY - this.startY;
+        const avgDelta = (Math.abs(deltaX) + Math.abs(deltaY)) / 2;
+        const newScale = this.startScale + (avgDelta / ((this.startWidth + this.startHeight) / 2));
+        scaleX = Math.max(minScale, Math.min(maxScale, newScale));
+        scaleY = scaleX;
+      }
     }
     
     // Applica la trasformazione CSS con scale + rotate
@@ -436,6 +457,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const clickDuration = mouseUpTimestamp - this.mouseDownTimestamp;
       if(clickDuration < 100) {
         this.changeState(2);
+        if (this.shouldOpenDetailPanelOnClick()) {
+          this.noteSelected.emit(this.note);
+        } else if (this.isMediaNote && !this.hasMedia) {
+          this.noteSelected.emit(this.note);
+        } else {
+          this.noteSelected.emit(null);
+        }
         this.logger.log('[NOTES] Click duration:', clickDuration, 'ms');
       }
       this.mouseDownTimestamp = 0; // Reset per il prossimo click
@@ -443,10 +471,29 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
   }
 
+  // Fallback: if the user releases the mouse outside the window (or the window loses focus),
+  // ensure we never remain "stuck" in a resize/rotate gesture. Keep this scoped to media notes to
+  // minimize impact/regression risk.
+  @HostListener('window:blur')
+  onWindowBlur(): void {
+    if (!this.isMediaNote) return;
+    if (!this.isResizing && !this.isHorizontalResizing && !this.isVerticalResizing && !this.isRotating) return;
+    this.onMouseUp(new MouseEvent('mouseup'));
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if(this.justFinishedResizing) {
       return;
+    }
+    // If user is interacting with the note detail panel, do NOT deselect the note.
+    // Otherwise controls like color pickers would close the panel due to this global handler.
+    const target = event.target as HTMLElement | null;
+    if (target) {
+      const clickedInsideNoteDetailPanel = !!(target.closest('cds-panel-note-detail') || target.closest('.panel-note-detail'));
+      if (clickedInsideNoteDetailPanel) {
+        return;
+      }
     }
     // Intercetta se il click è fuori dal div note
     if (this.contentElement) {
@@ -491,6 +538,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // this.singleClickTimer = setTimeout(() => {
       this.changeState(2);
       this.updateDragState();
+      if (this.shouldOpenDetailPanelOnClick()) {
+        this.noteSelected.emit(this.note);
+      }
       this.singleClickTimer = null;
     // }, 100);
     
@@ -588,6 +638,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.cancelSingleClickTimer();
     this.changeState(2);
     this.updateDragState();
+    if (this.shouldOpenDetailPanelOnClick()) {
+      this.noteSelected.emit(this.note);
+    } else {
+      // Media notes (image/video):
+      // - if still empty (placeholder), open detail panel so the user can add content
+      // - if it already has content, selecting the note must close the detail panel if open
+      if (this.isMediaNote && !this.hasMedia) {
+        this.noteSelected.emit(this.note);
+      } else {
+        this.noteSelected.emit(null);
+      }
+    }
 
     if (!this.isDraggable) {
       event.stopPropagation();
@@ -685,6 +747,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const currentScaleY = scaleMatch && scaleMatch[2] ? parseFloat(scaleMatch[2]) : 
                           (this.note.scale && Array.isArray(this.note.scale) && this.note.scale.length >= 2) ? 
                           this.note.scale[1] : currentScaleX;
+    this.startScaleX = currentScaleX;
+    this.startScaleY = currentScaleY;
     
     // Calcola e salva il centro iniziale del box (nel viewport)
     const rect = this.contentElement.nativeElement.getBoundingClientRect();
@@ -695,6 +759,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const dx = this.startX - this.startCenterX;
     const dy = this.startY - this.startCenterY;
     this.startDistanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+    this.startDxAbsFromCenter = Math.abs(dx);
+    this.startDyAbsFromCenter = Math.abs(dy);
     
     // Imposta sempre 'center center' come transform-origin
     this.contentElement.nativeElement.style.transformOrigin = transformOrigin;
@@ -1191,6 +1257,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   // ============================================================================
   // METODI PUBBLICI
   // ============================================================================
+  private shouldOpenDetailPanelOnClick(): boolean {
+    // Requirement:
+    // - rect + text => open detail panel on click
+    // - media (image/video) => DO NOT open detail panel on click
+    const type = this.note?.type || 'text';
+    return type === 'rect' || type === 'text';
+  }
+
   changeState(state: 0|1|2|3): void {
     const previousState = this.stateNote;
     this.stateNote = state;
@@ -1198,9 +1272,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     if (state === 1) {
       // this.cancelOpenPanelTimer();
       this.textareaHasFocus = true;
-      if (previousState === 2) {
-        this.noteSelected.emit(null);
-      }
       this.updateChildrenDraggableClass();
       // setTimeout(() => {
         if (this.noteInput) {
@@ -1214,8 +1285,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         this.noteInput.nativeElement.blur();
       }
       this.updateChildrenDraggableClass();
-      // NOTE: the detail panel must NOT open on click/select anymore.
-      // Opening the panel is now only available via the first icon in the internal note menu.
+      // NOTE:
+      // The detail panel opening is handled by click handlers and is conditional:
+      // - rect/text: emits noteSelected on click
+      // - media: no panel open on click (menu still supports open detail)
     } else if (state === 0 || state === 3) {
       // this.cancelOpenPanelTimer();
       this.textareaHasFocus = false;

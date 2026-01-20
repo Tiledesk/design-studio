@@ -1433,9 +1433,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       }, 0);
     } else {
       // Chiudi il panel quando note è null (stato cambiato a 0)
-      // this.logger.log('[CDS-CANVAS] onNoteSelected - closing panel');
-      // this.IS_OPEN_PANEL_NOTE_DETAIL = false;
-      // this.noteSelected = null;
+      this.IS_OPEN_PANEL_NOTE_DETAIL = false;
+      this.noteSelected = null;
     }
   }
 

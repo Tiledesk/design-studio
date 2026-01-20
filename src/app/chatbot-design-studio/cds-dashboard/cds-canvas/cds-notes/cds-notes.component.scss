@@ -158,12 +158,14 @@
     background: transparent;
   }
 
-  // Nascondi maniglie ai vertici + pallino rotazione per le note rettangolo
-  // (override anche quando il container è `.selected`)
-  .resize-handle.resize-tl,
-  .resize-handle.resize-tr,
-  .resize-handle.resize-bl,
-  .resize-handle.resize-br,
+  // RECT resize behavior:
+  // - hide side handles (keep them in DOM to avoid regressions)
+  // - show corner handles (custom resize logic in TS for rect)
+  // - keep rotate handle hidden
+  .resize-handle.resize-left,
+  .resize-handle.resize-right,
+  .resize-handle.resize-top,
+  .resize-handle.resize-bottom,
   .rotate-handle {
     display: none !important;
   }
@@ -188,6 +190,7 @@
     align-items: center;
     justify-content: center;
     position: relative; // needed for the drag handle overlay
+    text-align: center;
   }
 
   .image-body.placeholder {
@@ -235,6 +238,15 @@
   &.selected {
     .note-video {
       pointer-events: auto;
+    }
+  }
+
+  // While resizing/rotating, disable interaction on media elements so they can't swallow mouseup/mousemove
+  // (especially if the media is an iframe). This prevents "stuck" resize gestures.
+  &.is-gesture-active {
+    .note-video,
+    .media-drag-handle {
+      pointer-events: none !important;
     }
   }
 

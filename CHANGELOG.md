@@ -10,6 +10,15 @@
 
 # this branch
 - **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
+
+- **bug-fixed**: il resize della nota video non è fluido
+- **bug-fixed**: corretto errore max_output_tokens
+- **changed**: nella nota rettangolo sono state inserite le maniglie sui vertici
+- **bug-fixed**: disabilitata l'area sullo stage di 100x100px che non risulta cliccabile (tds-drag-drawer).
+- **bug-fixed**: disabilitato il menu note-controls delle note quando questo è trasparente
+- **changed**: ripristinata l'apertura del dettaglio note al click sulla nota, tranne che  per la nota video
+- **bug-fixed**: quando provo a cambiare colore si chiude il pannello di dettaglio della nota
+
 - **changed**: cambio colori di default
 - **changed**: memorizza gli ultimi colori nel LS
 - **added**: aggiungi lo stesso menu dell’intent ai blocchi note
@@ -162,10 +171,21 @@
 # 1.39.14-rc1
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
+- **added**: Supportare rettangolo
+- **bug-fixed**: Supportare spessore bordo
+- **bug-fixed**: correggere il bug che non permette di salvare il colore del testo
+- **added**: aggiungi submenu con le varie tipologie di note
+- **added**: Inserimento con drag&drop
+- **added**: Supportare tipo Immagine
+- **added**: Supportare tipo Video
+- **bug-fixed**:Appena inserita la Nota testo dovrebbe subito permetterti di scrivere con focus su testo
+- **bug-fixed**: centra non funziona nel blocco
+- **bug-fixed**: bug fixed text align
+- **added**: added note
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management
-- **bug-fix**: set Id Contract Connector
+- **bug-fixed**: set Id Contract Connector
 - **changed**: changed label "Add MCP tools"
 
 # 1.39.12
@@ -176,6 +196,7 @@
 # 1.39.10
 - **bug-fix**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
 - **bug-fix**: Ctr-z is enabled in the text area when creating a new MCP server.
+
 # 1.39.9-rc16:
 - **bug-fix**: Updated MCP tools in the ai-prompt action when another ai-prompt action is selected
 
@@ -245,6 +266,8 @@
 
 # 1.39.9-rc1:
 - **added**: added vLLM model integration
+- **bug-fixed**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
+- **bug-fixed**: Ctr-z is enabled in the text area when creating a new MCP server.
 
 # 1.39.9 
 
@@ -268,13 +291,13 @@
 - **changed**: set max_tokens from 8192 to 100000
 
 # 1.39.5
-- **bug-fix**: added gpt-5 in aiModels env
+- **bug-fixed**: added gpt-5 in aiModels env
 - **added**: added a temperature filter if the model is gpt-5
 
 # 1.39.4
 
 # 1.39.3
-- **bug-fix**: added filter status "active" in generateLlmModels
+- **bug-fixed**: added filter status "active" in generateLlmModels
 
 # 1.39.3-rc1
 - **bug-fix**: added filter status "active" in generateLlmModels
@@ -294,12 +317,12 @@
 # 1.39.0
 
 # 1.39.0-rc26
-- **bug-fix**: css ai-condition fixed bug with long text in preview
+- **bug-fixed**: css ai-condition fixed bug with long text in preview
 
 # 1.39.0-rc25
 - **changed**: change css tag "new", "beta"
-- **bug-fix**: disable scroll on preview button in ai-prompt
-- **bug-fix**: css ai-condition
+- **bug-fixed**: disable scroll on preview button in ai-prompt
+- **bug-fixed**: css ai-condition
 
 # 1.39.0-rc24
 - **changed**: set isLiquidjs to false in web request from data
@@ -311,7 +334,7 @@
 
 # 1.39.0-rc21
 - **added**: changed the selection of LLM and model to only one select in ai-condition
-- **bug-fix**: fixed prompt saving error in "ai-condoition"
+- **bug-fixed**: fixed prompt saving error in "ai-condoition"
 - **changed**: graphical changes in the "ai-condition" action preview
 
 # 1.39.0-rc20
@@ -320,13 +343,13 @@
 - **added**: noMatch for action DTMF_Form for voice bot
 
 # 1.39.0-rc18
-- **bug-fix**: new order, openai and ollama never red
+- **bug-fixed**: new order, openai and ollama never red
 
 # 1.39.0-rc17
-- **bug-fix**: added catch (error) in getElevenLabsVoices and getElevenLabsModels
+- **bug-fixed**: added catch (error) in getElevenLabsVoices and getElevenLabsModels
 
 # 1.39.0-rc16
-- **bug-fix**: Fixed save prompt error
+- **bug-fixed**: Fixed save prompt error
 
 # 1.39.0-rc15
 - **added**: Added text area with autocomplete in LLM model selection
@@ -341,13 +364,13 @@
 - **added**: deprecation message and badge status. GPT Task action set as deprecated
 
 # 1.39.0-rc10
-- **bug-fix**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
+- **bug-fixed**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
 
 # 1.39.0-rc9
-- **bug-fix**: fixed bug new connector in action ai-condition 
+- **bug-fixed**: fixed bug new connector in action ai-condition 
 
 # 1.39.0-rc8
-- **bug-fix**: fixed bugs in action ai-condition
+- **bug-fixed**: fixed bugs in action ai-condition
 
 # 1.39.0-rc7
 - **added**: disabled property for mat-slider in ai-settings section
