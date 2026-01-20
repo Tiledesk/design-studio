@@ -90,7 +90,7 @@ mat-expansion-panel ::ng-deep {
     }
     .parameters-preview {
         font-size: 11px;
-        height: 24px;
+        height: 34px;
         line-height: normal;
     }
 
@@ -523,4 +523,31 @@ cds-select#model-condition.not-configured ::ng-deep {
     color: var(--color-white-hex);
     flex-wrap: nowrap;
     text-align: end;
+}
+
+.chunks-container {
+    margin-bottom: 20px;
+    .field-box {
+        margin-bottom: 10px;
+    }
+}
+
+
+.parameters-preview {
+    span {
+        line-height: 16px;
+        margin-right: 5px;
+    }
+    .preview-badge {
+        color: #fff;
+        background-color: var(--blu);
+        padding: 1px 3px;
+        border-radius: 6px;
+    }
+    .preview-icon {
+        color: var(--color-white-hex);
+    }
+    .preview-flag{
+        margin:0;
+    }
 }
