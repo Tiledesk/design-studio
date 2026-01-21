@@ -461,3 +461,36 @@ cds-widget-logs {
     width: calc(100% - 460px);
   }
 }
+
+/**
+ * Performance: during pan/zoom the scene is continuously transformed.
+ * Disabling expensive SVG operations while interacting reduces Layerise/Paint/Hit test costs.
+ * Interaction (hover/click) on connectors is temporarily disabled only while the user is moving/scaling the stage.
+ */
+::ng-deep #tds_container.tds-is-panning #tds_svgConnectors{
+  pointer-events: none;
+  .tds_path {
+    animation: none !important;
+    filter: none !important;
+  }
+  .tds_connector {
+    filter: none !important;
+  }
+}
+
+/**
+ * Performance: many icons in the stage UI are colored via CSS `filter:` rules.
+ * Filters can promote elements to compositor layers and increase Layerise cost when the whole scene is transformed.
+ * During pan/zoom, disable filters (and other expensive paint effects) for stage UI elements.
+ */
+::ng-deep #tds_container.tds-is-panning {
+  mat-icon,
+  img,
+  svg {
+    filter: none !important;
+  }
+  .panel-intent-content,
+  .panel-intent-content * {
+    box-shadow: none !important;
+  }
+}

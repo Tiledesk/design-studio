@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit, NgZone} from '@angular/core';
 import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -182,6 +182,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private readonly translate: TranslateService,
     public dashboardService: DashboardService,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
     private readonly route: ActivatedRoute, 
     public appStorageService: AppStorageService,
     public logService: LogService,
@@ -267,15 +268,22 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** */
   ngAfterViewInit() {
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
-    this.stageService.initializeStage(this.id_faq_kb);
+    // IMPORTANT (performance):
+    // `TiledeskStage` attaches high-frequency DOM listeners (wheel/mousemove) and schedules timers (setTimeout)
+    // during pan/zoom (see `src/assets/js/tiledesk-stage.js`). If initialized inside Angular zone, those timers
+    // will keep Angular "unstable" and can trigger Change Detection (`tick/refreshView`) even if no Angular
+    // template `(wheel)` handlers exist. We initialize Stage + Connectors outside Angular to keep pan/zoom CD-neutral.
+    this.ngZone.runOutsideAngular(() => {
+      this.stageService.initializeStage(this.id_faq_kb);
+      this.stageService.setDrawer();
+      this.connectorService.initializeConnectors();
+    });
     if(this.stageService.settings?.open_intent_list_state != null){
       this.IS_OPEN_INTENTS_LIST = this.stageService.settings.open_intent_list_state;
     }
     
     
     // this.stageService.initStageSettings(this.id_faq_kb);
-    this.stageService.setDrawer();
-    this.connectorService.initializeConnectors();
     this.changeDetectorRef.detectChanges();
     
     setTimeout(() => {
@@ -722,21 +730,46 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
     
 
-    /** moved-and-scaled ** 
-    * fires when I move the stage (move or scale it):
-    * - set the scale
-    * - close
-    * - delete the drawn connector and close the float menu if it is open
+    /** moved-and-scaled **
+    * fires when I move the stage (move or scale it).
+    *
+    * IMPORTANT (performance):
+    * This event is emitted at high frequency during pan/zoom. Handling it inside Angular's zone
+    * can trigger Change Detection on every tick. We intentionally handle it outside Angular and
+    * re-enter the zone only when we must update visible UI state.
     */
     let debounceTimeout: any;
+    let panningClassTimeout: any;
     this.listnerMovedAndScaled = (e: CustomEvent) => {
       const el = e.detail;
       this.connectorService.tiledeskConnectors.scale = e.detail.scale;
-      this.removeConnectorDraftAndCloseFloatMenu();
+
+      // Mark stage as "panning" to enable CSS optimizations (disable connector pointer-events/filters/animations)
+      // This runs outside Angular.
+      const stageEl = document.getElementById('tds_container');
+      if (stageEl) {
+        stageEl.classList.add('tds-is-panning');
+        clearTimeout(panningClassTimeout);
+        // Use a relatively long idle window to avoid thrashing (trackpads often emit wheel in bursts).
+        panningClassTimeout = setTimeout(() => {
+          stageEl.classList.remove('tds-is-panning');
+        }, 450);
+      }
+      
+      // Close connector draft without triggering Angular CD
+      this.connectorService.removeConnectorDraft();
+      
+      // Only re-enter Angular if we need to update UI flags
+      if (this.IS_OPEN_ADD_ACTIONS_MENU || this.IS_OPEN_CONTEXT_MENU || this.IS_OPEN_COLOR_MENU) {
+        this.ngZone.run(() => {
+          this.IS_OPEN_ADD_ACTIONS_MENU = false;
+          this.IS_OPEN_CONTEXT_MENU = false;
+          this.IS_OPEN_COLOR_MENU = false;
+        });
+      }
   
       clearTimeout(debounceTimeout);
       debounceTimeout = setTimeout(() => {
-        this.logger.log('[CDS-CANVAS] moved-and-scaled ', el);
         const pos = {
           x: el.x,
           y: el.y
@@ -745,7 +778,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       }, 100);
 
     };
-    document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+    this.ngZone.runOutsideAngular(() => {
+      document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+    });
 
     /** start-dragging */
     this.listnerStartDragging = (e: CustomEvent) => {
@@ -985,11 +1020,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       } 
     }
   }
-
-  @HostListener('wheel', ['$event'])
-  onMouseWheel(event: WheelEvent) {
-  }
-
 
   @HostListener('contextmenu', ['$event'])
   onRightClick(event){

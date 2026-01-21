@@ -246,19 +246,19 @@
 }
 
 @mixin transform-translate-x($value){
-     -webkit-transform:  translate3d($value, 0, 0);
-        -moz-transform: translate3d($value, 0, 0);
-        -o-transform: translate3d($value, 0, 0);
-        -ms-transform: translate3d($value, 0, 0);
-        transform: translate3d($value, 0, 0);
+     -webkit-transform: translateX($value);
+        -moz-transform: translateX($value);
+        -o-transform: translateX($value);
+        -ms-transform: translateX($value);
+        transform: translateX($value);
 }
 
 @mixin transform-translate-y($value){
-     -webkit-transform:  translate3d(0,$value, 0);
-        -moz-transform: translate3d(0, $value, 0);
-        -o-transform: translate3d(0, $value, 0);
-        -ms-transform: translate3d(0, $value, 0);
-        transform: translate3d(0, $value, 0);
+     -webkit-transform: translateY($value);
+        -moz-transform: translateY($value);
+        -o-transform: translateY($value);
+        -ms-transform: translateY($value);
+        transform: translateY($value);
 }
 
 @mixin transform-origin($coordinates){

@@ -136,7 +136,12 @@ $base-padding: 6px;
 .action-btn-icon .svg-icon {
     width: 16px;
     color: var(--gray-light-01);
-    filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+    // Avoid CSS filters on icons (they can create extra compositor layers). Use SVG fill via currentColor instead.
+    ::ng-deep svg,
+    ::ng-deep svg * {
+        fill: currentColor;
+        stroke: currentColor;
+    }
 }
 
 

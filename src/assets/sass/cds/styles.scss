@@ -204,7 +204,8 @@ emoji-mart {
 .panel-intent-content:hover cds-panel-intent-controls>.intent-header-actions-container {
     top: -30px;
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    // Avoid 3D transforms: they tend to promote elements to compositor layers (Layerise explosion with many intents)
+    transform: translateY(0);
 }
 
 /* Action Controls

@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 // import { TranslateService } from '@ngx-translate/core';
 
@@ -36,7 +36,7 @@ import { WebhookService } from '../services/webhook-service.service';
   templateUrl: './cds-dashboard.component.html',
   styleUrls: ['./cds-dashboard.component.scss']
 })
-export class CdsDashboardComponent implements OnInit {
+export class CdsDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   // @ViewChild('chatbot--dashboard') canvas!: ElementRef;
   
   SIDEBAR_PAGES = SIDEBAR_PAGES;
@@ -54,6 +54,9 @@ export class CdsDashboardComponent implements OnInit {
   isBetaUrl: boolean = false;
   showChangelog: boolean = false;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
+
+  @ViewChild('wheelContainer', { static: false }) wheelContainer?: ElementRef<HTMLElement>;
+  private wheelListener?: (e: WheelEvent) => void;
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -67,7 +70,8 @@ export class CdsDashboardComponent implements OnInit {
     public faqService: FaqService,
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
-    private stageService: StageService, 
+    private stageService: StageService,
+    private readonly ngZone: NgZone,
     private readonly webhookService: WebhookService
   ) {}
 
@@ -82,8 +86,23 @@ export class CdsDashboardComponent implements OnInit {
     this.hideShowWidget('hide');
   }
 
-  onSwipe(event: WheelEvent){
-    this.stageService.onSwipe(event);
+  ngAfterViewInit(): void {
+    // IMPORTANT (performance):
+    // Template `(wheel)="..."` bindings trigger Angular Change Detection for every wheel tick.
+    // We attach the wheel listener outside Angular's zone to avoid CD during pan/zoom.
+    const el = this.wheelContainer?.nativeElement;
+    if (!el) return;
+    this.wheelListener = (event: WheelEvent) => this.stageService.onSwipe(event);
+    this.ngZone.runOutsideAngular(() => {
+      el.addEventListener('wheel', this.wheelListener as unknown as EventListener, { passive: false });
+    });
+  }
+
+  ngOnDestroy(): void {
+    const el = this.wheelContainer?.nativeElement;
+    if (el && this.wheelListener) {
+      el.removeEventListener('wheel', this.wheelListener as unknown as EventListener);
+    }
   }
 
 

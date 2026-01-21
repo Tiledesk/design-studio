@@ -228,7 +228,8 @@
             top: 50%;
             left: 50%;
             transform-style: flat;
-            transform: translate3d(-50%,-50%,0);
+            // Avoid 3D transforms: they tend to promote elements to compositor layers
+            transform: translate(-50%,-50%);
             background: rgba(white,.2);
             border-radius: 100%;
             transition: width .5s ease, height .5s ease;
@@ -593,7 +594,8 @@ cds-image-upload ::ng-deep {
             top: 50%;
             left: 50%;
             transform-style: flat;
-            transform: translate3d(-50%,-50%,0);
+            // Avoid 3D transforms: they tend to promote elements to compositor layers
+            transform: translate(-50%,-50%);
             background: rgba(white,.2);
             border-radius: 100%;
             transition: width .5s ease, height .5s ease;

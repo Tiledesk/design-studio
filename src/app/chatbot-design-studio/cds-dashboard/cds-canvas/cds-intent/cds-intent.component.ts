@@ -720,7 +720,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (element) {
       const xPos = event.pointerPosition.x - 122;
       const yPos = event.pointerPosition.y - 20;
-      element.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+      element.style.transform = `translate(${xPos}px, ${yPos}px)`;
     }
 }
 
