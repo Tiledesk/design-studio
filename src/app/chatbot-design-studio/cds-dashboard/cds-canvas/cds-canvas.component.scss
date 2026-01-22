@@ -527,14 +527,15 @@ cds-widget-logs {
    * Performance: Chrome can promote `overflow:auto/scroll` elements to compositor layers ("scrollable overflow element using accelerated scrolling").
    * Large graphs may contain many `.response-wrp` boxes and other scrollable containers, inflating layer count and `Layerise`.
    *
-   * During pan/zoom the stage is non-interactive anyway, so we can safely disable scrollable overflow just while panning.
+   * During pan/zoom the stage is non-interactive anyway, so we can safely disable *scrollable* overflow just while panning.
+   * IMPORTANT: use `overflow: hidden` (not `visible`) to preserve clipping and avoid text spilling outside its card.
    */
   .response-wrp,
   .content,
   .previewMode .response-wrp {
-    overflow: visible !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
+    overflow: hidden !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
     -webkit-overflow-scrolling: auto !important;
   }
 }

@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.39.23-ps01
 - **changed**: Riduzione layers da overflow scroll accelerato durante panning**
 - **changed**: Massima fluidità durante pan/zoom: stage non interattivo**
 - **changed**: Riduzione layers: neutralizzazione 'will-change' dei bottoni nello stage**
