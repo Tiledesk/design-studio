@@ -469,6 +469,9 @@ cds-widget-logs {
  */
 ::ng-deep #tds_container.tds-is-panning #tds_svgConnectors{
   pointer-events: none;
+  // Hide connectors during active pan/zoom to reduce Paint/Hit test on very large graphs.
+  // They are restored shortly after interaction stops (see `tds-is-panning` toggle in `CdsCanvasComponent`).
+  display: none !important;
   .tds_path {
     animation: none !important;
     filter: none !important;
@@ -476,6 +479,14 @@ cds-widget-logs {
   .tds_connector {
     filter: none !important;
   }
+}
+
+// Also hide arrow/labels related to connectors during panning.
+::ng-deep #tds_container.tds-is-panning #tds_arrow{
+  display: none !important;
+}
+::ng-deep #tds_container.tds-is-panning .line-text-connector{
+  display: none !important;
 }
 
 /**
