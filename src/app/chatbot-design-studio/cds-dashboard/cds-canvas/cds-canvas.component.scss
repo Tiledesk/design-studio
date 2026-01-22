@@ -463,15 +463,24 @@ cds-widget-logs {
 }
 
 /**
+ * Performance: the global `.btn` style sets `will-change: box-shadow, transform`
+ * (see `src/assets/sass/md/_buttons.scss`). On very large stages this promotes hundreds of repeated buttons
+ * (e.g. `.drag-btn`) to compositor layers, increasing `Layerise` cost.
+ *
+ * We neutralize `will-change` inside the stage container only.
+ * This does not change visuals, only removes the compositing hint.
+ */
+::ng-deep #tds_container .btn {
+  will-change: auto !important;
+}
+
+/**
  * Performance: during pan/zoom the scene is continuously transformed.
  * Disabling expensive SVG operations while interacting reduces Layerise/Paint/Hit test costs.
  * Interaction (hover/click) on connectors is temporarily disabled only while the user is moving/scaling the stage.
  */
 ::ng-deep #tds_container.tds-is-panning #tds_svgConnectors{
   pointer-events: none;
-  // Hide connectors during active pan/zoom to reduce Paint/Hit test on very large graphs.
-  // They are restored shortly after interaction stops (see `tds-is-panning` toggle in `CdsCanvasComponent`).
-  display: none !important;
   .tds_path {
     animation: none !important;
     filter: none !important;
@@ -481,12 +490,12 @@ cds-widget-logs {
   }
 }
 
-// Also hide arrow/labels related to connectors during panning.
+// Keep connector arrows/labels visible, but make them non-interactive during panning.
 ::ng-deep #tds_container.tds-is-panning #tds_arrow{
-  display: none !important;
+  pointer-events: none;
 }
 ::ng-deep #tds_container.tds-is-panning .line-text-connector{
-  display: none !important;
+  pointer-events: none;
 }
 
 /**
@@ -495,6 +504,15 @@ cds-widget-logs {
  * During pan/zoom, disable filters (and other expensive paint effects) for stage UI elements.
  */
 ::ng-deep #tds_container.tds-is-panning {
+  /**
+   * Performance/UX: during pan/zoom we want maximum fluidity.
+   * Disable hit-testing and hover/click interactions for stage contents so Chrome does less work (Hit test/pointerover),
+   * while keeping the wheel target on `#tds_container`.
+   */
+  #tds_drawer {
+    pointer-events: none;
+  }
+
   mat-icon,
   img,
   svg {
@@ -503,5 +521,20 @@ cds-widget-logs {
   .panel-intent-content,
   .panel-intent-content * {
     box-shadow: none !important;
+  }
+
+  /**
+   * Performance: Chrome can promote `overflow:auto/scroll` elements to compositor layers ("scrollable overflow element using accelerated scrolling").
+   * Large graphs may contain many `.response-wrp` boxes and other scrollable containers, inflating layer count and `Layerise`.
+   *
+   * During pan/zoom the stage is non-interactive anyway, so we can safely disable scrollable overflow just while panning.
+   */
+  .response-wrp,
+  .content,
+  .previewMode .response-wrp {
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: auto !important;
   }
 }

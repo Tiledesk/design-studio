@@ -7,6 +7,19 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# this branch
+- **changed**: Riduzione layers da overflow scroll accelerato durante panning**
+- **changed**: Massima fluidità durante pan/zoom: stage non interattivo**
+- **changed**: Riduzione layers: neutralizzazione 'will-change' dei bottoni nello stage**
+- **changed**: Migrazione 'filter' → 'fill/stroke' per SVG/mat-icon dove 1:1**
+- **changed**: Riduzione “layer explosion”: 3D → 2D transforms su elementi ripetuti**
+- **changed**: Inizializzazione Stage/Connectors fuori Angular zone**
+- **changed**: Rimozione trigger CD da wheel su canvas**
+- **changed**: Rimozione trigger CD da wheel su dashboard**
+- **changed**: Neutralizzazione Change Detection durante pan/zoom (moved-and-scaled fuori Angular)**
+- **changed**: Eliminazione hot binding posizione intent (Angular template)**
+
 # 1.39.23
 - **bug-fix**: deleted duplicate AI model chatGPT 5.2
 
