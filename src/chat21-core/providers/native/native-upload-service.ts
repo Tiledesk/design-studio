@@ -1,7 +1,7 @@
 import { UploadService } from '../abstract/upload.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, first } from 'rxjs';
 import { UploadModel } from '../../models/upload';
 import { AppStorageService } from '../abstract/app-storage.service';
 import { LoggerService } from '../abstract/logger.service';
@@ -44,11 +44,14 @@ export class NativeUploadService extends UploadService {
         const that = this;
         const url = this.URL_TILEDESK_FILE + '/chat'
         return new Promise((resolve, reject) => {
-            that.http.post(url, formData, requestOptions).subscribe(data => {
-                const downloadURL = this.getBaseUrl() + 'files' + '?path=' + data['filename'];
-                resolve({downloadURL : downloadURL, src: downloadURL})
-            }, (error) => {
-                reject(error)
+            that.http.post(url, formData, requestOptions).pipe(first()).subscribe({
+                next: (data) => {
+                    const downloadURL = this.getBaseUrl() + 'files' + '?path=' + data['filename'];
+                    resolve({downloadURL : downloadURL, src: downloadURL})
+                },
+                error: (error) => {
+                    reject(error)
+                }
             });
         });
 
@@ -100,12 +103,15 @@ export class NativeUploadService extends UploadService {
         const botId = userId?.startsWith('bot_') ? userId.substring('bot_'.length) : userId
         const url = this.URL_TILEDESK_FILE + `/users/photo?bot_id=${botId}`
         return new Promise((resolve, reject) => {
-            that.http.post(url, formData, requestOptions).subscribe(data => {
-                const downloadURL = this.getBaseUrl() + 'files?path=' + data['thumbnail'];
-                resolve(downloadURL)
-                // that.BSStateUpload.next({upload: upload});
-            }, (error) => {
-                reject(error)
+            that.http.put(url, formData, requestOptions).pipe(first()).subscribe({
+                next: (data) => {
+                    const downloadURL = this.getBaseUrl() + 'files?path=' + data['thumbnail'];
+                    resolve(downloadURL)
+                    // that.BSStateUpload.next({upload: upload});
+                },
+                error: (error) => {
+                    reject(error)
+                }
             });
         });
     }
@@ -122,12 +128,15 @@ export class NativeUploadService extends UploadService {
         const that = this;
         const url = this.URL_TILEDESK_FILE + '?path=' + path.split('path=')[1]
         return new Promise((resolve, reject) => {
-            that.http.delete(url, requestOptions).subscribe(data => {
-                // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
-                resolve(true)
-                // that.BSStateUpload.next({upload: upload});
-            }, (error) => {
-                reject(error)
+            that.http.delete(url, requestOptions).pipe(first()).subscribe({
+                next: (data) => {
+                    // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
+                    resolve(true)
+                    // that.BSStateUpload.next({upload: upload});
+                },
+                error: (error) => {
+                    reject(error)
+                }
             });
         });
     }
@@ -144,12 +153,15 @@ export class NativeUploadService extends UploadService {
         const that = this;
         const url = this.URL_TILEDESK_FILE + '?path=' + "uploads/users/"+ userId + "/images/photo.jpg"
         return new Promise((resolve, reject) => {
-            that.http.delete(url, requestOptions).subscribe(data => {
-                // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
-                resolve(true)
-                // that.BSStateUpload.next({upload: upload});
-            }, (error) => {
-                reject(error)
+            that.http.delete(url, requestOptions).pipe(first()).subscribe({
+                next: (data) => {
+                    // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
+                    resolve(true)
+                    // that.BSStateUpload.next({upload: upload});
+                },
+                error: (error) => {
+                    reject(error)
+                }
             });
         });
     }
