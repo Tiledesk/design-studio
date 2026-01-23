@@ -1,4 +1,14 @@
-<div class="action-connector" 
+<div *ngIf="connectorsInFiltered?.length>0" class="action-connector" 
 (mouseenter)="showConnectorsIn($event)"
 (mouseleave)="hideConnectorsIn($event)">
-<span class="label-connector">{{labelNumber}}</span></div>
+<span class="label-connector">{{labelNumber}}</span>
+<div class="connector-in-menu">
+    <div class="menu-item" 
+        *ngFor="let item of connectedIntents" 
+        (click)="onGoToIntent($event, item.intent)"
+        (mouseenter)="onMenuItemMouseEnter(item.connectorIds)"
+        (mouseleave)="onMenuItemMouseLeave(item.connectorIds)">
+        {{item.intent.intent_display_name}}
+    </div>
+</div>
+</div>

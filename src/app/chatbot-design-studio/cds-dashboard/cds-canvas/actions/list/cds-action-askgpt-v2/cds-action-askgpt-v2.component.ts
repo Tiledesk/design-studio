@@ -15,7 +15,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
@@ -35,6 +35,7 @@ import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
   styleUrls: ['./cds-action-askgpt-v2.component.scss']
 })
 export class CdsActionAskgptV2Component implements OnInit {
+  private readonly DEFAULT_MAX_TOKENS = 10000;
 
   @Input() intentSelected: Intent;
   @Input() action: ActionAskGPTV2;
@@ -43,7 +44,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  listOfNamespaces: Array<{name: string, value: string, icon?:string, hybrid:boolean}>;
+  listOfNamespaces: Array<{name: string, displayName: string, kbTypeLabel: string, value: string, icon?:string, hybrid:boolean}>;
 
   project_id: string;
   selectedNamespace: string;
@@ -80,7 +81,8 @@ export class CdsActionAskgptV2Component implements OnInit {
     "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
     "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
-    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false },
+    "reranking_multiplier": { name: "reranking_multiplier", min: 2, max: 50, step: 1, disabled: false }
   }
   KB_HYBRID = false;
 
@@ -116,6 +118,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
+    // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
+    const lang = this.translate.getBrowserLang() || 'en';
+    this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.project_id = this.dashboardService.projectID
     this.logger.log("[ACTION-ASKGPTV2] action detail action: ", this.action);
     // aggiorno llm_model con i modelli dell'integration
@@ -175,11 +180,22 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.action.model = result?.model?result.model:'';
     this.action.modelName = result?.modelName?result.modelName:'';
     this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
-    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
-    this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
-    if(this.action.max_tokens > this.llm_model_selected.max_output_tokens){
-      this.action.max_tokens = this.llm_model_selected.max_output_tokens;
+    this.ai_setting['max_tokens'].max = this.llm_model_selected?.max_output_tokens;
+    this.ai_setting['max_tokens'].min = this.llm_model_selected?.min_tokens;
+    if(this.action.max_tokens > this.llm_model_selected?.max_output_tokens){
+      this.action.max_tokens = this.llm_model_selected?.max_output_tokens;
     }
+    // Preserve any higher min constraint (e.g. citations => min 1024)
+    const modelMin = this.llm_model_selected.min_tokens;
+    const citationsMin = this.action?.citations ? 1024 : 0;
+    this.ai_setting['max_tokens'].min = Math.max(modelMin, citationsMin);
+
+    // Every model change resets max_tokens to default (capped by model max)
+    const min = this.ai_setting['max_tokens'].min;
+    const max = this.ai_setting['max_tokens'].max;
+    let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+    if (next < min) next = min;
+    this.action.max_tokens = next;
     if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
       this.action.temperature = 1
       this.ai_setting['temperature'].disabled= true
@@ -240,7 +256,11 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, hybrid: el.hybrid? el.hybrid:false } })
+      this.listOfNamespaces = namaspaceList.map((el) => {
+        const isHybrid = el.hybrid ? el.hybrid : false;
+        const kbTypeLabel = isHybrid ? 'Hybrid' : 'Semantic';
+        return { name: el.name, displayName: el.name, kbTypeLabel, value: el.id, hybrid: isHybrid };
+      })
       // namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
@@ -272,11 +292,23 @@ export class CdsActionAskgptV2Component implements OnInit {
   onChangeTextarea(event: string, property: string) {
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event);
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property);
+    const nextValue = (event ?? '').toString();
+    const currentValue = ((this.action && (this.action as any)[property]) ?? '').toString();
+
+    /**
+     * NOTE:
+     * `cds-textarea` may emit `changeTextarea` during init only when it has a non-empty initial value.
+     * When the initial value is empty, the first real user input/paste is the first emission.
+     * The previous implementation always dropped the first emission, causing "context not saved" on first edit.
+     */
     if (this.isInitializing[property]) {
       this.isInitializing[property] = false;
-      return;
+      if (nextValue === currentValue) {
+        return;
+      }
     }
-    this.action[property] = event;
+
+    (this.action as any)[property] = nextValue;
     this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
   }
   
@@ -374,6 +406,11 @@ export class CdsActionAskgptV2Component implements OnInit {
           }else{
             this.ai_setting['max_tokens'].min=10;
           }
+        } else if (target === 'reranking') {
+          // Initialize multiplier when reranking is enabled
+          if (this.action[target] && (this.action['reranking_multiplier'] === null || this.action['reranking_multiplier'] === undefined)) {
+            this.action['reranking_multiplier'] = this.ai_setting['reranking_multiplier'].min; // default = 2
+          }
         }
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
 
@@ -392,6 +429,15 @@ export class CdsActionAskgptV2Component implements OnInit {
         this.action.max_tokens = this.ai_setting['max_tokens'].max;
       } else {
         this.action.max_tokens = event;
+      }
+    } else if (target === 'reranking_multiplier') {
+      const min = this.ai_setting['reranking_multiplier'].min;
+      const max = this.ai_setting['reranking_multiplier'].max;
+      const v = typeof event === 'number' ? event : Number(event);
+      if (Number.isFinite(v)) {
+        this.action.reranking_multiplier = Math.min(Math.max(v, min), max);
+      } else {
+        this.action.reranking_multiplier = min;
       }
     }
     this.updateAndSaveAction.emit();

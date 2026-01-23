@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActionKBContent } from 'src/app/models/action-model';
 import { AppConfigService } from 'src/app/services/app-config';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { OpenaiService } from 'src/app/services/openai.service';
@@ -22,7 +22,7 @@ export class CdsActionAddKbContentComponent implements OnInit {
 
   project_id: string;
   selectedNamespace: string;
-  listOfNamespaces: Array<{name: string, value: string, icon?:string}>;
+  listOfNamespaces: Array<{name: string, displayName: string, kbTypeLabel: string, value: string, icon?:string, hybrid?: boolean}>;
   autocompleteOptions: Array<{label: string, value: string}> = [];
   
 
@@ -53,7 +53,11 @@ export class CdsActionAddKbContentComponent implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
+      this.listOfNamespaces = namaspaceList.map((el) => {
+        const isHybrid = (el as any).hybrid ? (el as any).hybrid : false;
+        const kbTypeLabel = isHybrid ? 'Hybrid' : 'Semantic';
+        return { name: el.name, displayName: el.name, kbTypeLabel, value: el.id, hybrid: isHybrid };
+      })
       namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })

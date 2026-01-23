@@ -15,7 +15,7 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 
 //UTILS
 import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
@@ -24,6 +24,8 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { OPENAI_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { manageGpt5ModelSettings } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -44,10 +46,15 @@ export class CdsActionGPTTaskComponent implements OnInit {
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
-  model_list: Array<{ name: string, value: string }>;
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+  // model_list: Array<{ name: string, value: string }>;
+  // ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
+  //   "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1},
+  //   "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+  
+  model_list: Array<{ name: string, value: string, additionalText?: string }>;
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false}
   }
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
@@ -79,6 +86,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   DOCS_LINK = DOCS_LINK.GPT_TASK;
   
   private logger: LoggerService = LoggerInstance.getInstance();
+  browserLang: string = 'en';
   constructor(
     private dialog: MatDialog,
     private openaiService: OpenaiService,
@@ -89,14 +97,21 @@ export class CdsActionGPTTaskComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
+    const lang = this.translate.getBrowserLang() || 'en';
+    this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
-      if(ai_models[el.value])
-        return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
-      else
-        return { ...el, multiplier: null }
-    })
+    OPENAI_MODEL.forEach(el => {
+      if (ai_models[el.value]) {
+        // el.additionalText = `${ai_models[el.value]} x tokens`;
+        el.status = 'active';
+      } else {
+        // el.additionalText = null;
+        el.status = 'inactive';
+      }
+    });
+    this.model_list = OPENAI_MODEL.filter(el => el.status === 'active')
     this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
@@ -231,6 +246,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.logger.debug("[ACTION GPT-TASK] onChangeSelect event: ", event.value)
     this.logger.debug("[ACTION GPT-TASK] onChangeSelect target: ", target)
     this.action[target] = event.value;
+
+    /** MANAGE GPT-5 MODELS */
+    manageGpt5ModelSettings(this.action, this.ai_setting);
+
     this.updateAndSaveAction.emit();
   }
 
