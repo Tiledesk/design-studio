@@ -46,7 +46,7 @@ export class FirebaseUploadService extends UploadService {
     });
   }
 
-  public async initialize() {
+  public async initialize(projectId: string) {
     this.logger.log('[FIREBASEUploadSERVICE] initialize');
 
     const { default: firebase} = await import("firebase/app");

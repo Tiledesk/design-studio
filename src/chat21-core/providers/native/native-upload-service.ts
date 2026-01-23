@@ -14,7 +14,6 @@ export class NativeUploadService extends UploadService {
     BSStateUpload: BehaviorSubject<any> = new BehaviorSubject<any>(null)
 
     private tiledeskToken: string;
-    private URL_TILEDESK_IMAGES: string;
     private URL_TILEDESK_FILE: string;
     private logger: LoggerService = LoggerInstance.getInstance()
 
@@ -25,10 +24,9 @@ export class NativeUploadService extends UploadService {
         super();
     }
 
-    initialize(): void {
+    initialize(projectId: string): void {
         this.logger.info('[NATIVE UPLOAD] initialize', this.getBaseUrl())
-        this.URL_TILEDESK_FILE = this.getBaseUrl() + 'files'
-        this.URL_TILEDESK_IMAGES = this.getBaseUrl() + 'images'
+        this.URL_TILEDESK_FILE = this.getBaseUrl() + projectId + '/files'
         this.tiledeskToken = this.appStorage.getItem('tiledeskToken')
     }
 
@@ -44,35 +42,46 @@ export class NativeUploadService extends UploadService {
         formData.append('file', upload.file);
 
         const that = this;
-        if ((upload.file.type.startsWith('image') && (!upload.file.type.includes('svg')))) {
-            this.logger.log('[NATIVE UPLOAD] - upload new image', this.URL_TILEDESK_IMAGES)
-            //USE IMAGE API
-            const url = this.URL_TILEDESK_IMAGES + '/users'
-            return new Promise((resolve, reject) => {
-                that.http.post(url, formData, requestOptions).subscribe(data => {
-                    const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
-                    resolve({downloadURL : downloadURL, src: downloadURL})
-                    // that.BSStateUpload.next({upload: upload});
-                }, (error) => {
-                    reject(error)
-                });
+        const url = this.URL_TILEDESK_FILE + '/chat'
+        return new Promise((resolve, reject) => {
+            that.http.post(url, formData, requestOptions).subscribe(data => {
+                const downloadURL = this.getBaseUrl() + 'files' + '?path=' + data['filename'];
+                resolve({downloadURL : downloadURL, src: downloadURL})
+            }, (error) => {
+                reject(error)
             });
-        } else {
-            this.logger.log('[NATIVE UPLOAD] - upload new file', this.URL_TILEDESK_FILE)
-            //USE FILE API
-            const url = this.URL_TILEDESK_FILE + '/users'
-            return new Promise((resolve, reject) => {
-                that.http.post(url, formData, requestOptions).subscribe(data => {
-                    const src = this.URL_TILEDESK_FILE + '?path=' + encodeURI(data['filename']);
-                    const downloadURL = this.URL_TILEDESK_FILE + '/download' + '?path=' + encodeURI(data['filename']);
-                    resolve({downloadURL : downloadURL, src: src})
-                    // that.BSStateUpload.next({upload: upload});
-                }, (error) => {
-                    this.logger.error('[NATIVE UPLOAD] - ERROR upload new file ', error)
-                    reject(error)
-                });
-            });
-        }
+        });
+
+        //old_implemenation
+        // if ((upload.file.type.startsWith('image') && (!upload.file.type.includes('svg')))) {
+        //     this.logger.log('[NATIVE UPLOAD] - upload new image', this.URL_TILEDESK_IMAGES)
+        //     //USE IMAGE API
+        //     const url = this.URL_TILEDESK_IMAGES + '/users'
+        //     return new Promise((resolve, reject) => {
+        //         that.http.post(url, formData, requestOptions).subscribe(data => {
+        //             const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
+        //             resolve({downloadURL : downloadURL, src: downloadURL})
+        //             // that.BSStateUpload.next({upload: upload});
+        //         }, (error) => {
+        //             reject(error)
+        //         });
+        //     });
+        // } else {
+        //     this.logger.log('[NATIVE UPLOAD] - upload new file', this.URL_TILEDESK_FILE)
+        //     //USE FILE API
+        //     const url = this.URL_TILEDESK_FILE + '/users'
+        //     return new Promise((resolve, reject) => {
+        //         that.http.post(url, formData, requestOptions).subscribe(data => {
+        //             const src = this.URL_TILEDESK_FILE + '?path=' + encodeURI(data['filename']);
+        //             const downloadURL = this.URL_TILEDESK_FILE + '/download' + '?path=' + encodeURI(data['filename']);
+        //             resolve({downloadURL : downloadURL, src: src})
+        //             // that.BSStateUpload.next({upload: upload});
+        //         }, (error) => {
+        //             this.logger.error('[NATIVE UPLOAD] - ERROR upload new file ', error)
+        //             reject(error)
+        //         });
+        //     });
+        // }
         
     }
 
@@ -88,10 +97,11 @@ export class NativeUploadService extends UploadService {
 
         // USE IMAGE API
         const that = this;
-        const url = this.URL_TILEDESK_IMAGES + `/users/photo?force=true&bot_id=${userId}`
+        const botId = userId?.startsWith('bot_') ? userId.substring('bot_'.length) : userId
+        const url = this.URL_TILEDESK_FILE + `/users/photo?bot_id=${botId}`
         return new Promise((resolve, reject) => {
-            that.http.put(url, formData, requestOptions).subscribe(data => {
-                const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['thumbnail'];
+            that.http.post(url, formData, requestOptions).subscribe(data => {
+                const downloadURL = this.getBaseUrl() + 'files?path=' + data['thumbnail'];
                 resolve(downloadURL)
                 // that.BSStateUpload.next({upload: upload});
             }, (error) => {
@@ -110,7 +120,7 @@ export class NativeUploadService extends UploadService {
 
         //USE IMAGE API
         const that = this;
-        const url = this.URL_TILEDESK_IMAGES + '/users' + '?path=' + path.split('path=')[1]
+        const url = this.URL_TILEDESK_FILE + '?path=' + path.split('path=')[1]
         return new Promise((resolve, reject) => {
             that.http.delete(url, requestOptions).subscribe(data => {
                 // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
@@ -132,7 +142,7 @@ export class NativeUploadService extends UploadService {
 
         //USE IMAGE API
         const that = this;
-        const url = this.URL_TILEDESK_IMAGES + '/users' + '?path=' + "uploads/users/"+ userId + "/images/photo.jpg"
+        const url = this.URL_TILEDESK_FILE + '?path=' + "uploads/users/"+ userId + "/images/photo.jpg"
         return new Promise((resolve, reject) => {
             that.http.delete(url, requestOptions).subscribe(data => {
                 // const downloadURL = this.URL_TILEDESK_IMAGES + '?path=' + data['filename'];
