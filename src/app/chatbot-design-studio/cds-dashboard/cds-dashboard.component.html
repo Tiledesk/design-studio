@@ -1,7 +1,7 @@
 <div *ngIf="!initFinished" class="loader">
 </div>
 
-<div *ngIf="initFinished" (wheel)="onSwipe($event)">
+<div *ngIf="initFinished">
     <cds-header 
         class="cds-header" 
         [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 

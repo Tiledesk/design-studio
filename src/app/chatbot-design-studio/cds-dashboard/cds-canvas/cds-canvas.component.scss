@@ -88,6 +88,86 @@ $toogle-sidebar-width: 22px;
   }
 }
 
+/*
+ * PERF TEST (TEMPORARY) — SVG CONNECTORS: disable animation + filter
+ * Obiettivo: isolare l’impatto dei connectors su pan/zoom (Layerise/Paint/Hit test).
+ * Revert: commentare o rimuovere questo blocco.
+ */
+::ng-deep #tds_svgConnectors .tds_path,
+::ng-deep #tds_svgConnectors .tds_connector {
+  animation: none !important;
+  filter: none !important;
+}
+
+/*
+ * PERF TEST (TEMPORARY) — SVG CONNECTORS: disable hit-testing (pointer events)
+ * Obiettivo: ridurre `pointerover`/`Hit test` durante pan/zoom su stage grandi.
+ * Effetto collaterale: hover/click/select dei connectors disabilitati durante il test.
+ * Revert: commentare o rimuovere questo blocco.
+ */
+::ng-deep #tds_svgConnectors,
+::ng-deep #tds_svgConnectors * ,
+::ng-deep .line-text-connector,
+::ng-deep #tds_arrow {
+  pointer-events: none !important;
+}
+
+/*
+ * PERF TEST (TEMPORARY) — SVG CONNECTORS: hide completely
+ * Obiettivo: eliminare completamente i costi di Paint/Layerise/Hit test dei connectors durante pan/zoom.
+ * Effetto collaterale: connectors non visibili (solo per test).
+ * Revert: commentare o rimuovere questo blocco.
+ */
+::ng-deep #tds_svgConnectors,
+::ng-deep #tds_arrow,
+::ng-deep .line-text-connector {
+  display: none !important;
+}
+
+/*
+ * PERF TEST (TEMPORARY) — STAGE: disable transform transitions on drawer
+ * Obiettivo: eliminare “delay/easing” introdotto da `transition: transform ...` applicato via JS sul drawer.
+ * Revert: commentare o rimuovere questo blocco.
+ */
+::ng-deep #tds_drawer {
+  transition: none !important;
+}
+
+/*
+ * PERF TEST (TEMPORARY) — STAGE: hide iframe/canvas inside drawer
+ * Obiettivo: eliminare costi di compositing/paint legati a contenuti embedded durante pan/zoom.
+ * Effetto collaterale: azioni che usano iframe/canvas nello stage non saranno visibili durante il test.
+ * Revert: commentare o rimuovere questo blocco.
+ */
+::ng-deep #tds_drawer iframe,
+::ng-deep #tds_drawer canvas {
+  display: none !important;
+}
+
+/*
+ * PERF TEST (TEMPORARY) — STAGE: disable shadows
+ * Obiettivo: eliminare costi di paint/compositing dovuti a box-shadow/text-shadow su molti elementi dello stage.
+ * Revert: commentare o rimuovere questo blocco.
+ */
+::ng-deep #tds_container,
+::ng-deep #tds_container *,
+::ng-deep #tds_container *::before,
+::ng-deep #tds_container *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/*
+ * PERF TEST (TEMPORARY) — STAGE: force opaque rendering (no opacity)
+ * Obiettivo: ridurre costi di compositing dovuti ad alpha blending su molti elementi.
+ * Effetto collaterale: elementi che usano opacity per “nascondersi” potrebbero restare visibili durante il test.
+ * Revert: commentare o rimuovere questo blocco.
+ */
+::ng-deep #tds_container,
+::ng-deep #tds_container * {
+  opacity: 1 !important;
+}
+
 ::ng-deep #tds_arrow {
   stroke: #b1b1b7;
   .tds_connector {
@@ -98,6 +178,23 @@ $toogle-sidebar-width: 22px;
 
 ::ng-deep .line-text-connector {
   stroke: #b1b1b7;
+}
+
+/*
+ * PERF TEST (TEMPORARY) — DISABLE ALL ANIMATIONS/EFFECTS INSIDE THE STAGE
+ *
+ * NOTE: Riattivato su richiesta per test (evitare shipping se non necessario: è invasivo).
+ */
+
+::ng-deep #tds_container,
+::ng-deep #tds_container *,
+::ng-deep #tds_container *::before,
+::ng-deep #tds_container *::after {
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  will-change: auto !important;
 }
 
 

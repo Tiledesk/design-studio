@@ -28,7 +28,6 @@ import { Subject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
-import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from '../services/webhook-service.service';
 
 @Component({
@@ -67,7 +66,6 @@ export class CdsDashboardComponent implements OnInit {
     public faqService: FaqService,
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
-    private stageService: StageService, 
     private readonly webhookService: WebhookService
   ) {}
 
@@ -81,11 +79,6 @@ export class CdsDashboardComponent implements OnInit {
     this.executeAsyncFunctionsInSequence();
     this.hideShowWidget('hide');
   }
-
-  onSwipe(event: WheelEvent){
-    this.stageService.onSwipe(event);
-  }
-
 
   checkForChangelogNotify(): boolean { 
     if(!BRAND_BASE_INFO['DOCS']){

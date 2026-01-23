@@ -45,8 +45,8 @@
             [id]="intent.intent_id"
             [IS_OPEN_PANEL_INTENT_DETAIL]="IS_OPEN_PANEL_INTENT_DETAIL"
             class="panel-intent tds_input_block" 
-            [style.top.px]="getIntentPosition(intent.intent_id).y"
-            [style.left.px]="getIntentPosition(intent.intent_id).x" 
+            [style.top.px]="intent?.attributes?.position?.y || 0"
+            [style.left.px]="intent?.attributes?.position?.x || 0" 
             [intent]="intent"
             [alpha]=""
             [chatbotSubtype]="chatbotSubtype"
@@ -67,8 +67,8 @@
         <cds-event *ngFor="let intent of listOfEvents" 
             [id]="intent.intent_id"
             class="panel-intent tds_input_block tds_draggable" 
-            [style.top.px]="getIntentPosition(intent.intent_id).y"
-            [style.left.px]="getIntentPosition(intent.intent_id).x" 
+            [style.top.px]="intent?.attributes?.position?.y || 0"
+            [style.left.px]="intent?.attributes?.position?.x || 0" 
             [intent]="intent">
         </cds-event>
 

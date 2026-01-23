@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit, NgZone} from '@angular/core';
 import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -172,6 +172,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+  /**
+   * PERF TEST (TEMPORARY): disabilita i connettori sullo stage.
+   * Obiettivo: nessun connettore (SVG) creato/renderizzato per isolare il costo durante pan/zoom.
+   * Revert: impostare a false.
+   */
+  private readonly PERF_DISABLE_CONNECTORS_ON_STAGE: boolean = true;
 
 
   constructor(
@@ -182,6 +188,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private readonly translate: TranslateService,
     public dashboardService: DashboardService,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
     private readonly route: ActivatedRoute, 
     public appStorageService: AppStorageService,
     public logService: LogService,
@@ -335,6 +342,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   async onAllIntentsRendered() {
     this.labelInfoLoading = 'CDSCanvas.intentsComplete';
     this.logger.log("[CDS-CANVAS]  •••• Tutti i cds-intent sono stati renderizzati ••••", this.countRenderedElements);
+
+    // PERF: skip connectors entirely (no SVG connectors on stage)
+    if (this.PERF_DISABLE_CONNECTORS_ON_STAGE) {
+      this.renderedAllIntents = true;
+      this.stageService.loaded = true;
+      this.loadingProgress = 100;
+      this.renderedAllElements = true;
+      this.labelInfoLoading = 'CDSCanvas.connectorsComplete';
+      setTimeout(() => {
+        this.settingStage();
+      }, 100);
+      return;
+    }
     
     // Aspetta che Angular completi il rendering delle actions e dei loro connettori
     // Usa sia setTimeout che requestAnimationFrame per essere sicuri che il DOM sia pronto
@@ -611,8 +631,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.initLoadingStage();
       // // this.intentService.setStartIntent();
       this.mapOfIntents = await this.intentService.setMapOfIntents();
-      this.mapOfConnectors = await this.connectorService.setMapOfConnectors(this.listOfIntents);
       const numIntents = Object.values(this.mapOfIntents).length;
+      if (this.PERF_DISABLE_CONNECTORS_ON_STAGE) {
+        this.mapOfConnectors = [];
+      } else {
+        this.mapOfConnectors = await this.connectorService.setMapOfConnectors(this.listOfIntents);
+      }
       const numConnectors = Object.values(this.mapOfConnectors).length;
       this.totElementsOnTheStage = numIntents+numConnectors;
       this.logger.log('[CDS-CANVAS] totElementsOnTheStage ::', this.stageService.loaded, numIntents, numConnectors);
@@ -681,9 +705,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   /** getIntentPosition: call from html */
-  getIntentPosition(intentId: string) {
-    return this.intentService.getIntentPosition(intentId);
-  }
+  // getIntentPosition() removed: template now binds directly to `intent.attributes.position`
 
   /** SET DRAG STAGE AND CREATE CONNECTORS *
   * set drag and listner on intents, 
@@ -691,7 +713,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   */
   private refreshIntents() {
       this.setDragAndListnerEventToElements();
-      if(this.renderedAllIntents === true){
+      if(this.renderedAllIntents === true && !this.PERF_DISABLE_CONNECTORS_ON_STAGE){
         this.connectorService.createConnectors(this.listOfIntents);
       }
   }
@@ -722,30 +744,32 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
     
 
-    /** moved-and-scaled ** 
+    /** moved-and-scaled **
     * fires when I move the stage (move or scale it):
     * - set the scale
     * - close
     * - delete the drawn connector and close the float menu if it is open
     */
-    let debounceTimeout: any;
-    this.listnerMovedAndScaled = (e: CustomEvent) => {
-      const el = e.detail;
-      this.connectorService.tiledeskConnectors.scale = e.detail.scale;
-      this.removeConnectorDraftAndCloseFloatMenu();
-  
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(() => {
-        this.logger.log('[CDS-CANVAS] moved-and-scaled ', el);
-        const pos = {
-          x: el.x,
-          y: el.y
-        }
-        this.stageService.savePositionByPos(this.id_faq_kb, pos);
-      }, 100);
+    let saveTimeout: any;
+    this.ngZone.runOutsideAngular(() => {
+      this.listnerMovedAndScaled = (e: CustomEvent) => {
+        const el = e.detail;
+        this.connectorService.tiledeskConnectors.scale = el.scale;
 
-    };
-    document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+        // Only close menus once (and only if actually open) to avoid Angular CD in the hot path.
+        if (this.IS_OPEN_ADD_ACTIONS_MENU || this.IS_OPEN_CONTEXT_MENU || this.IS_OPEN_COLOR_MENU) {
+          this.ngZone.run(() => this.removeConnectorDraftAndCloseFloatMenu());
+        }
+
+        // Persist stage position only once after interaction becomes idle (avoid setTimeout() churn).
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+          const pos = { x: el.x, y: el.y };
+          this.stageService.savePositionByPos(this.id_faq_kb, pos);
+        }, 250);
+      };
+      document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+    });
 
     /** start-dragging */
     this.listnerStartDragging = (e: CustomEvent) => {

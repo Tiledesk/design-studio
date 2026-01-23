@@ -109,7 +109,6 @@ export class TiledeskStage {
             const customEvent = new CustomEvent("moved-and-scaled", { detail: {scale: this.scale, x: this.tx, y: this.ty} });
             document.dispatchEvent(customEvent);
         }, 0)
-        
     }
 
     // richiamato solo quando premo sul plsante più e meno
