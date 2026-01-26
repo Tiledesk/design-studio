@@ -7,6 +7,23 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+
+# 1.39.24
+- **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
+- **changed**: added text and links in reranking: Improve the accuracy of your answers
+- **changed**: web Request does not show output attributes in the stage preview
+- **changed**: change attribute preview in the AI ​​settings panel
+- **bug-fix**: show and save system context textarea in askgpt-v2
+- **changed**: 10K token minimo (dipende dai modelli)
+- **added**: added sortedItems in selection intent
+- **added**: added go to block in panel intent detail;
+- **added**: added multi rows in url iframe;
+- **added**: showed connectors-in only if they are contract connectors
+- **added**: added connector-in-menu to display the list of blocks connected to the input
+- **added**: added menu on contract-connector to reset connector and move on connector
+
+
 # 1.39.23
 - **bug-fix**: deleted duplicate AI model chatGPT 5.2
 

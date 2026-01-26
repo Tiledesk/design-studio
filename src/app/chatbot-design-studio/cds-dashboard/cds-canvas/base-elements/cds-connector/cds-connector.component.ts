@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
 // import { Intent } from 'src/app/models/intent-model';
 
 @Component({
@@ -37,7 +38,8 @@ export class CdsConnectorComponent implements OnInit {
   constructor(
     private readonly stageService: StageService,
     private readonly intentService: IntentService,
-    private readonly connectorService: ConnectorService
+    private readonly connectorService: ConnectorService,
+    private readonly dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -185,5 +187,32 @@ export class CdsConnectorComponent implements OnInit {
     this.connectorService.hideContractConnector(this.idConnection);
     const connector = { id: this.idConnection, display: true };
     this.intentService.updateIntentAttributeConnectors(connector);
+  }
+
+  public onGoToIntent(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.idConnection) {
+      let intentId = this.idConnection.substring(
+        this.idConnection.lastIndexOf('/') + 1
+      );
+      intentId = intentId.replace(/#/g, '');
+      if (intentId) {
+        const intent = this.intentService.getIntentFromId(intentId);
+        if (intent) {
+          this.intentService.setIntentSelected(intentId);
+          // Centra lo stage sull'intent selezionato (stessa animazione di cds-panel-intent-list)
+          let stageElement = document.getElementById(intentId);
+          if (stageElement) {
+            let id_faq_kb = this.dashboardService.id_faq_kb;
+            this.stageService.centerStageOnElement(id_faq_kb, stageElement);
+          }
+        }
+      }
+    }
+  }
+
+  public onRestoreConnector(event: MouseEvent): void {
+    event.stopPropagation();
+    this.restoreDefaultConnector(event);
   }
 }
