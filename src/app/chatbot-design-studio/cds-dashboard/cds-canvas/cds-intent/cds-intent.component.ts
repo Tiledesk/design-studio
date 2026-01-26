@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -95,7 +95,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   chatbot_id: string;
   isUntitledBlock: boolean = false;
   isNewChatbot: boolean = false;
-  DATE_NEW_CHATBOT = '2025-12-19T00:00:00.000Z';
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -480,7 +479,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     
     //this.isNewChatbot = false;
     //return;
-    const cutoffDate = this.DATE_NEW_CHATBOT;
+    const cutoffDate = DATE_NEW_CHATBOT;
     const chatbot = this.dashboardService.selectedChatbot;
     this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot.createdAt);
 
@@ -493,7 +492,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     try {
-      // Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
+      // Se la data di creazione è precedente al ... (DATE_NEW_CHATBOT), isNewChatbot = false
       // Altrimenti (successiva o uguale), isNewChatbot = true
       this.isNewChatbot = chatbot.createdAt >= cutoffDate;
       this.logger.log('[CDS-INTENT] checkIfNewChatbot:', {
