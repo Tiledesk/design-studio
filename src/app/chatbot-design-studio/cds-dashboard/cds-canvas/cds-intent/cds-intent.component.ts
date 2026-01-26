@@ -93,6 +93,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   webhookUrl: string;
   serverBaseURL: any;
   chatbot_id: string;
+  isUntitledBlock: boolean = false;
+  isNewChatbot: boolean = false;
+  DATE_NEW_CHATBOT = '2025-12-19T00:00:00.000Z';
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -128,6 +131,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           this.logger.log("[CDS-INTENT] sto modificando l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
           this.setAgentsAvailable();
+          // Aggiorna isUntitledBlock quando l'intent viene modificato
+          this.updateIsUntitledBlock();
           if (intent['attributesChanged']) {
             this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
             delete intent['attributesChanged'];
@@ -157,6 +162,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           } else {
             this.formSize = 0;
           }
+
+          // Aggiorna showIntentOptions basandosi su questionCount e formSize
+          this.updateShowIntentOptions();
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
@@ -270,6 +278,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.setActionIntent();
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
+      this.updateIsUntitledBlock();
+      // Aggiorna showIntentOptions dopo l'inizializzazione
+      this.updateShowIntentOptions();
+      // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
+      this.checkIfNewChatbot();
       this.addEventListener();
       this.setIntentAttributes();
       
@@ -417,6 +430,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     this.setAgentsAvailable();
+    // Aggiorna isUntitledBlock se l'intent cambia
+    if (changes['intent'] && !changes['intent'].firstChange) {
+      this.updateIsUntitledBlock();
+    }
   }
 
   private setAgentsAvailable(){
@@ -426,6 +443,66 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.isAgentsAvailable = true;
     } else {
       this.isAgentsAvailable = false;
+    }
+  }
+
+  /** updateIsUntitledBlock
+   * Aggiorna la variabile isUntitledBlock basandosi sul nome dell'intent
+   */
+  private updateIsUntitledBlock(){
+    this.isUntitledBlock = this.intent?.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX) ?? false;
+  }
+
+  /** updateShowIntentOptions
+   * Aggiorna showIntentOptions basandosi su questionCount e formSize
+   * showIntentOptions deve essere false se questionCount e formSize sono entrambi == 0
+   */
+  private updateShowIntentOptions(){
+    // Non modificare showIntentOptions se è già stato impostato a false per altri motivi
+    // (es. chatbotSubtype !== CHATBOT, START, WEBHOOK)
+    if(this.showIntentOptions === false){
+      return;
+    }
+    // Imposta a false se questionCount e formSize sono entrambi 0
+    if(this.questionCount === 0 && this.formSize === 0){
+      this.showIntentOptions = false;
+    } else {
+      this.showIntentOptions = true;
+    }
+  }
+
+  /** checkIfNewChatbot
+   * Verifica se il chatbot è stato creato dopo il 01/06/2025
+   * Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
+   * Altrimenti isNewChatbot = true
+   */
+  private checkIfNewChatbot(): void {
+    
+    //this.isNewChatbot = false;
+    //return;
+    const cutoffDate = this.DATE_NEW_CHATBOT;
+    const chatbot = this.dashboardService.selectedChatbot;
+    this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot.createdAt);
+
+
+    if (!chatbot || !chatbot.createdAt) {
+      // Se non c'è data di creazione, considera come nuovo chatbot
+      this.isNewChatbot = true;
+      this.logger.log('[CDS-INTENT] checkIfNewChatbot: nessuna data di creazione, impostato a true');
+      return;
+    }
+
+    try {
+      // Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
+      // Altrimenti (successiva o uguale), isNewChatbot = true
+      this.isNewChatbot = chatbot.createdAt >= cutoffDate;
+      this.logger.log('[CDS-INTENT] checkIfNewChatbot:', {
+        isNewChatbot: this.isNewChatbot
+      });
+    } catch (error) {
+      this.logger.error('[CDS-INTENT] checkIfNewChatbot error:', error);
+      // In caso di errore, considera come nuovo chatbot
+      this.isNewChatbot = true;
     }
   }
 
@@ -617,7 +694,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.formSize = Object.keys(this.intent.form).length;
       } else {
         this.formSize = 0;
-      } 
+      }
+      // Aggiorna showIntentOptions basandosi su questionCount e formSize
+      this.updateShowIntentOptions();
     } catch (error) {
       this.logger.error("error: ", error);
     }
@@ -864,7 +943,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Predicate function that only allows type='intent' to be dropped into a list. */
   canEnterDropList(action: any) {
     return (item: CdkDrag<any>) => {
-      return true
+      // Se il chatbot è nuovo, disabilita il drop se c'è già un'action nell'intent
+      // Mantiene il limite di una action per blocco intent per i chatbot nuovi
+      if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
+        return false;
+      }
+      // Per i chatbot esistenti, permette il drop normalmente
+      return true;
     }
   }
 
@@ -880,6 +965,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    */
   async onDropAction(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
+    
+    // Se il chatbot è nuovo, impedisce il drop se c'è già un'action nell'intent
+    // Mantiene il limite di una action per blocco intent per i chatbot nuovi
+    if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
+      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot nuovo e c\'è già un\'action nell\'intent');
+      return;
+    }
+    
+    // Per i chatbot esistenti, esegue il drop normalmente
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
     if (event.previousContainer === event.container) {

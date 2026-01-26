@@ -46,6 +46,11 @@
 - **changed**: note - limita il caricamento solo a immagini e gif 
 - **added**: note - permetti di caricare i video da link
 
+- **changed**: Intent block title hidden if "untitled"
+- **changed**: Form button and question button hidden if empty
+- **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
+- **changed**: If the chatbot is new, only one action per intent
+
 # 1.39.23
 - **bug-fix**: deleted duplicate AI model chatGPT 5.2
 
