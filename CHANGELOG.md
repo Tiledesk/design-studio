@@ -14,7 +14,6 @@
 - **changed**: unire chunk limit, re-ranking e moltiplicatore in un unico blocco, quindi attenzione alla spaziature
 - **changed**: in ai settings sostituisco icona token e metto dei badge al posto della pipe
 - **changed**: aggiungere il tipo (H/S) ibrida o semantica, accanto al nome
-
 - **changed**: Updated format-number with browser language formatting
 - **changed**: Edit AI preview settings: replace text with icons
 - **changed**: Set the default max-token value to 10000
@@ -22,7 +21,6 @@
 - **added**: Intercepted Chrome background throttling / standby to refresh the page
 - **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
 - **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
-
 - **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
 - **changed**: added text and links in reranking: Improve the accuracy of your answers
 - **changed**: web Request does not show output attributes in the stage preview
@@ -35,6 +33,18 @@
 - **added**: showed connectors-in only if they are contract connectors
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
+- **bug-fixed**: note - il resize della nota video non è fluido
+- **bug-fixed**: note - corretto errore max_output_tokens
+- **changed**: note - nella nota rettangolo sono state inserite le maniglie sui vertici
+- **bug-fixed**: note - disabilitata l'area sullo stage di 100x100px che non risulta cliccabile (tds-drag-drawer).
+- **bug-fixed**: note - disabilitato il menu note-controls delle note quando questo è trasparente
+- **changed**: note - ripristinata l'apertura del dettaglio note al click sulla nota, tranne che  per la nota video
+- **bug-fixed**: note - quando provo a cambiare colore si chiude il pannello di dettaglio della nota
+- **changed**: note - cambio colori di default
+- **changed**: note - memorizza gli ultimi colori nel LS
+- **added**: note - aggiungi lo stesso menu dell’intent ai blocchi note
+- **changed**: note - limita il caricamento solo a immagini e gif 
+- **added**: note - permetti di caricare i video da link
 
 # 1.39.23
 - **bug-fix**: deleted duplicate AI model chatGPT 5.2
@@ -85,10 +95,9 @@
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
 
-
 # 1.39.13
 - **added**: implemented queue for connector rendering management
-- **bug-fix**: set Id Contract Connector
+- **bug-fixed**: set Id Contract Connector
 - **changed**: changed label "Add MCP tools"
 
 # 1.39.12
@@ -97,8 +106,8 @@
 # 1.39.11
 
 # 1.39.10
-- **bug-fix**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
-- **bug-fix**: Ctr-z is enabled in the text area when creating a new MCP server.
+- **bug-fixed**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
+- **bug-fixed**: Ctr-z is enabled in the text area when creating a new MCP server.
 
 # 1.39.9 
 
@@ -113,13 +122,13 @@
 - **changed**: set max_tokens from 8192 to 100000
 
 # 1.39.5
-- **bug-fix**: added gpt-5 in aiModels env
+- **bug-fixed**: added gpt-5 in aiModels env
 - **added**: added a temperature filter if the model is gpt-5
 
 # 1.39.4
 
 # 1.39.3
-- **bug-fix**: added filter status "active" in generateLlmModels
+- **bug-fixed**: added filter status "active" in generateLlmModels
 
 # 1.39.2
 
@@ -128,12 +137,12 @@
 # 1.39.0
 
 # 1.39.0-rc26
-- **bug-fix**: css ai-condition fixed bug with long text in preview
+- **bug-fixed**: css ai-condition fixed bug with long text in preview
 
 # 1.39.0-rc25
 - **changed**: change css tag "new", "beta"
-- **bug-fix**: disable scroll on preview button in ai-prompt
-- **bug-fix**: css ai-condition
+- **bug-fixed**: disable scroll on preview button in ai-prompt
+- **bug-fixed**: css ai-condition
 
 # 1.39.0-rc24
 - **changed**: set isLiquidjs to false in web request from data
@@ -145,7 +154,7 @@
 
 # 1.39.0-rc21
 - **added**: changed the selection of LLM and model to only one select in ai-condition
-- **bug-fix**: fixed prompt saving error in "ai-condoition"
+- **bug-fixed**: fixed prompt saving error in "ai-condoition"
 - **changed**: graphical changes in the "ai-condition" action preview
 
 # 1.39.0-rc20
@@ -154,13 +163,13 @@
 - **added**: noMatch for action DTMF_Form for voice bot
 
 # 1.39.0-rc18
-- **bug-fix**: new order, openai and ollama never red
+- **bug-fixed**: new order, openai and ollama never red
 
 # 1.39.0-rc17
-- **bug-fix**: added catch (error) in getElevenLabsVoices and getElevenLabsModels
+- **bug-fixed**: added catch (error) in getElevenLabsVoices and getElevenLabsModels
 
 # 1.39.0-rc16
-- **bug-fix**: Fixed save prompt error
+- **bug-fixed**: Fixed save prompt error
 
 # 1.39.0-rc15
 - **added**: Added text area with autocomplete in LLM model selection
@@ -175,13 +184,13 @@
 - **added**: deprecation message and badge status. GPT Task action set as deprecated
 
 # 1.39.0-rc10
-- **bug-fix**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
+- **bug-fixed**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
 
 # 1.39.0-rc9
-- **bug-fix**: fixed bug new connector in action ai-condition 
+- **bug-fixed**: fixed bug new connector in action ai-condition 
 
 # 1.39.0-rc8
-- **bug-fix**: fixed bugs in action ai-condition
+- **bug-fixed**: fixed bugs in action ai-condition
 
 # 1.39.0-rc7
 - **added**: disabled property for mat-slider in ai-settings section
