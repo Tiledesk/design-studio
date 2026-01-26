@@ -1,9 +1,10 @@
-
+<!-- dragDisabled: true -->
 <div #resizeElement class="panel-intent-content tds_draggable"
     (mousedown)="onIntentMouseDown($event)"
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     [class.isStart]="isStart" 
+    [class.tds-slim-intent]="isNewChatbot"
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{
         'background-color': 'rgba('+intent.attributes.color+', 0.35)',
@@ -32,13 +33,18 @@
         class="pic-header" 
         [ngClass]="{'cds-start': isStart}">
 
-        <cds-panel-intent-header class="pic-title-text tds_draggable" 
+
+
+        <cds-panel-intent-header *ngIf="!isUntitledBlock" 
+            class="pic-title-text tds_draggable" 
             [class.isStart]="isStart"
             [intentColor]="intentColor"
             [intent]="intent"
             (click)="onOptionClicked($event)">
         </cds-panel-intent-header>
 
+
+        
         <div *ngIf="showIntentOptions" class="cds-intent-options tds_draggable">
             <div class="option" 
                 (click)="onSelectQuestion(HAS_SELECTED_TYPE.QUESTION)"
@@ -64,9 +70,10 @@
         </cds-action-intent>
     </div>
 
-    <div *ngIf="!isStart" class="actions-list-wpr"  
+    <div *ngIf="!isStart" class="actions-list-wpr"
         cdkDropList
         [cdkDropListData]="listOfActions"
+        [cdkDropListDisabled]="isNewChatbot"
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
@@ -75,7 +82,7 @@
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
             cdkDrag
-            [cdkDragDisabled]="dragDisabled">
+            [cdkDragDisabled]="dragDisabled || isNewChatbot">
             <!-- add-action-placeholder  -->
             <!-- <div class="add--action-placeholder-add-icon">
                 <span class="material-icons"> add </span>
@@ -99,8 +106,11 @@
             </div>
         </div>
 
+        <div class="tds-drop-element tds_draggable"></div>
+
         <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
             cdkDrag
+            [cdkDragDisabled]="isNewChatbot"
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
             (cdkDragReleased)="onDragEnded($event, i)"
             (cdkDragMoved)="onDragMove($event)"
@@ -141,7 +151,7 @@
     
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
 
-                    <cds-action-controls 
+                    <cds-action-controls *ngIf="!isNewChatbot"
                         (onClickControl)="onClickControl($event, action, i)">
                     </cds-action-controls>
     
@@ -521,7 +531,7 @@
     </cds-action-intent>
 
     <div class="footer-intent">
-        <div *ngIf="!isStart && listOfActions?.length > 0" class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">    
                 + {{ 'CDSCanvas.AddAction' | translate}}
