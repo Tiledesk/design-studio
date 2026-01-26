@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, OnDestroy, Output, ViewChild } from '@angular/core';
 import { Note } from 'src/app/models/note-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -8,6 +8,12 @@ import { STAGE_SETTINGS, ColorUtils, NOTE_COLORS } from 'src/app/chatbot-design-
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { QUILL_COLOR_TOKENS } from 'src/app/chatbot-design-studio/cds-dashboard/utils/quill-color-classes';
+import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { UploadModel } from 'src/chat21-core/models/upload';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { NoteMediaService, NoteResolvedMedia } from 'src/app/services/note-media.service';
 
 @Component({
   selector: 'cds-panel-note-detail',
@@ -21,6 +27,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   @Output() deleteNote = new EventEmitter<Note>();
   @Output() duplicateNote = new EventEmitter<Note>();
   @ViewChild('quillEditor', { static: false }) quillEditor: any;
+  @ViewChild('imageFileInput', { static: false }) imageFileInput: ElementRef<HTMLInputElement>;
   
   maximize: boolean = true;
   // private saveTimer: any = null; // Timer per il debounce del salvataggio automatico
@@ -30,19 +37,31 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   
   // Sottoscrizioni per i cambiamenti delle note
   private noteUpdatedSubscription: Subscription;
+  imageUrlInput: string = '';
+  isReplacingImage: boolean = false;
+  isUploadingImage: boolean = false;
+  imagePreviewLoaded: boolean = false;
+  imageUploadError: string = '';
+  private readonly MAX_MEDIA_BYTES = 4 * 1024 * 1024; // 4MB
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+  private embedUrlCache: string = '';
+  private safeEmbedUrlCache: SafeResourceUrl | null = null;
   
   constructor(
     private readonly stageService: StageService,
-    private readonly noteService: NoteService
+    private readonly noteService: NoteService,
+    private readonly uploadService: UploadService,
+    private readonly tiledeskAuthService: TiledeskAuthService,
+    private readonly noteMediaService: NoteMediaService,
+    private readonly sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
     this.maximize = this.stageService.getMaximize();
     this.toolbarOptions = [
       ['bold', 'italic', 'underline'],            // testo
-      [{ 'color': [] }, { 'background': [] }],    // colori
+      [{ 'color': QUILL_COLOR_TOKENS }, { 'background': QUILL_COLOR_TOKENS }],    // colori (class-based, no inline styles)
       [{ 'align': [] }],                          // allineamento
       ['link'],                                   // link
       ['clean']                                   // rimuovi formattazione
@@ -69,7 +88,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
           // perché potrebbe causare conflitti
           const propertiesToUpdate = [
             'backgroundColor', 'backgroundOpacity',
-            'borderColor', 'borderOpacity', 'boxShadow',
+            'borderColor', 'borderOpacity', 'borderWidth', 'boxShadow',
             'width', 'height', 'x', 'y'
           ];
           
@@ -98,6 +117,459 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+  // ============================================================================
+  // MEDIA NOTE (type === 'media')
+  // ============================================================================
+  get isMediaNote(): boolean {
+    return this.note?.type === 'media';
+  }
+
+  get mediaType(): 'image' | 'video' {
+    const t = ((this.note?.payload as any)?.mediaType as string) || '';
+    if (t === 'video') return 'video';
+    return 'image';
+  }
+
+  get isEmbedMedia(): boolean {
+    return this.isMediaNote && ((this.note?.payload as any)?.renderMode as string) === 'embed';
+  }
+
+  get embedUrl(): string {
+    return (((this.note?.payload as any)?.embedUrl as string) || '');
+  }
+
+  get safeEmbedUrl(): SafeResourceUrl | null {
+    const url = this.embedUrl;
+    if (!url) return null;
+    // IMPORTANT: cache the SafeResourceUrl object to avoid iframe reload loops.
+    if (url !== this.embedUrlCache) {
+      this.embedUrlCache = url;
+      this.safeEmbedUrlCache = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    }
+    return this.safeEmbedUrlCache;
+  }
+
+  get mediaSrc(): string {
+    return (
+      ((this.note?.payload as any)?.mediaSrc as string) ||
+      ((this.note?.payload as any)?.imageSrc as string) ||
+      ''
+    );
+  }
+
+  get mediaNaturalWidth(): number {
+    return (
+      Number((this.note?.payload as any)?.mediaWidth) ||
+      Number((this.note?.payload as any)?.imageWidth) ||
+      0
+    );
+  }
+
+  get mediaNaturalHeight(): number {
+    return (
+      Number((this.note?.payload as any)?.mediaHeight) ||
+      Number((this.note?.payload as any)?.imageHeight) ||
+      0
+    );
+  }
+
+  get hasMedia(): boolean {
+    if (this.isEmbedMedia) {
+      return !!this.embedUrl;
+    }
+    return !!this.mediaSrc && this.mediaNaturalWidth > 0 && this.mediaNaturalHeight > 0;
+  }
+
+  triggerImageFilePicker(): void {
+    if (!this.imageFileInput?.nativeElement) return;
+    this.imageFileInput.nativeElement.value = '';
+    this.imageFileInput.nativeElement.click();
+  }
+
+  onImageFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file) return;
+    this.loadMediaFromFile(file);
+  }
+
+  onImageDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const dt = event.dataTransfer;
+    if (!dt) return;
+
+    const file = dt.files && dt.files.length > 0 ? dt.files[0] : null;
+    if (file) {
+      this.loadMediaFromFile(file);
+      return;
+    }
+
+    const url = dt.getData('text/uri-list') || dt.getData('text/plain');
+    if (url) {
+      this.loadImageFromUrl(url.trim());
+    }
+  }
+
+  onImageDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  onImageUrlSubmit(): void {
+    const url = (this.imageUrlInput || '').trim();
+    if (!url) return;
+    this.loadImageFromUrl(url);
+  }
+
+  onReplaceImage(): void {
+    // Replace: mostriamo di nuovo le opzioni di caricamento
+    this.isReplacingImage = true;
+    this.imagePreviewLoaded = false;
+    this.imageUploadError = '';
+  }
+
+  private async loadImageFromFile(file: File): Promise<void> {
+    // Backward compat wrapper
+    return this.loadMediaFromFile(file);
+  }
+
+  private isSupportedMediaFile(file: File): { ok: boolean; mediaType?: 'image' | 'video'; reason?: string } {
+    const type = file?.type || '';
+    if (type.startsWith('image/')) return { ok: true, mediaType: 'image' }; // includes gif
+    if (type.startsWith('video/')) return { ok: true, mediaType: 'video' };
+    return { ok: false, reason: 'Only images (including GIF) or videos are supported.' };
+  }
+
+  private async loadMediaFromFile(file: File): Promise<void> {
+    if (!this.note) return;
+
+    this.imageUploadError = '';
+    if (file.size > this.MAX_MEDIA_BYTES) {
+      this.imageUploadError = 'File too large. Max allowed size is 4MB.';
+      return;
+    }
+
+    const supported = this.isSupportedMediaFile(file);
+    if (!supported.ok || !supported.mediaType) {
+      this.imageUploadError = supported.reason || 'Unsupported file.';
+      return;
+    }
+
+    try {
+      this.isUploadingImage = true;
+      this.imagePreviewLoaded = false;
+      const user = this.tiledeskAuthService.getCurrentUser();
+      const currentUpload = new UploadModel(file);
+      const data = await this.uploadService.upload(user.uid, currentUpload);
+
+      // VINCOLO: prima upload, poi salviamo l'URL risultante nella nota
+      const url = data?.downloadURL || data?.src;
+      if (!url) {
+        throw new Error('Upload did not return downloadURL/src');
+      }
+      await this.setMediaFromSrc(url, supported.mediaType);
+    } catch (e) {
+      this.imageUploadError = 'Upload failed. Please try again.';
+      this.logger.error('[CdsPanelNoteDetailComponent] Error uploading media for image note', e);
+    } finally {
+      this.isUploadingImage = false;
+    }
+  }
+
+  private async loadImageFromUrl(url: string): Promise<void> {
+    if (!this.note) return;
+    this.imagePreviewLoaded = false;
+    try {
+      this.isUploadingImage = true;
+      this.imageUploadError = '';
+
+      const normalized = this.noteMediaService.normalizeUrl(url);
+      if (!normalized) {
+        this.imageUploadError = 'Invalid URL.';
+        return;
+      }
+
+      // Provider embeds (YouTube/Vimeo/TikTok/Facebook/Instagram) => iframe embed
+      const resolved: NoteResolvedMedia | null = this.noteMediaService.resolveMediaUrl(normalized);
+      if (resolved && resolved.kind === 'embed') {
+        this.applyEmbedMedia(resolved);
+        return;
+      }
+
+      // Direct video URLs => <video> (no upload-to-storage; we link it)
+      if (resolved && resolved.kind === 'direct' && resolved.mediaType === 'video') {
+        await this.setMediaFromSrc(resolved.directUrl, 'video');
+        return;
+      }
+
+      // Images: try importing into storage (when possible), fallback to hotlink if CORS prevents fetch.
+      // VINCOLO: per "link" prima salviamo l'immagine (upload) e poi scriviamo l'URL risultante nella nota.
+      try {
+        const result = await this.uploadMediaFromExternalUrl(normalized);
+        await this.setMediaFromSrc(result.uploadedUrl, result.mediaType);
+        return;
+      } catch (e) {
+        if ((e as any)?.message === 'File too large') {
+          this.imageUploadError = 'File too large. Max allowed size is 4MB.';
+          return;
+        }
+        /**
+         * CORS NOTE:
+         * Molti host consentono l'uso di <img src="..."> ma NON consentono fetch() cross-origin (manca Access-Control-Allow-Origin).
+         * In quel caso il browser lancia TypeError: Failed to fetch.
+         * Non possiamo "fixare" CORS lato client: fallbackiamo a hotlink diretto.
+         */
+        const msg = (e as any)?.message || '';
+        const isFailedToFetch = typeof msg === 'string' && msg.toLowerCase().includes('failed to fetch');
+        this.logger.warn('[CdsPanelNoteDetailComponent] uploadImageFromExternalUrl failed, fallback to hotlink', {
+          url: normalized,
+          isFailedToFetch,
+          e
+        });
+
+        // Hotlink fallback:
+        // - if it's a direct video URL, we allow <video>
+        // - if it's an image URL, we allow <img>
+        // - if unknown (no extension), we stop with a clear message
+        if (resolved && resolved.kind === 'direct') {
+          await this.setMediaFromSrc(resolved.directUrl, resolved.mediaType);
+        } else {
+          this.imageUploadError = 'This URL cannot be linked as media. Please use a direct image/video URL or a supported provider link (YouTube/Vimeo/TikTok/Facebook/Instagram).';
+          return;
+        }
+        this.imageUploadError =
+          'This URL cannot be imported into storage due to browser security (CORS). The media has been linked externally. To store a copy, upload the file instead.';
+        return;
+      }
+    } catch (e) {
+      this.imageUploadError = 'Unable to load image from this URL.';
+      this.logger.error('[CdsPanelNoteDetailComponent] Error loading image from URL', { url, e });
+    } finally {
+      this.isUploadingImage = false;
+    }
+  }
+
+  private async setImageFromSrc(src: string): Promise<void> {
+    // Backward compat wrapper
+    return this.setMediaFromSrc(src, 'image');
+  }
+
+  private async setMediaFromSrc(src: string, requestedType: 'image' | 'video'): Promise<void> {
+    if (!this.note) return;
+    this.imagePreviewLoaded = false;
+    let mediaType: 'image' | 'video' = requestedType;
+    let measured: { width: number; height: number } | null = null;
+    try {
+      if (requestedType === 'video') {
+        measured = await this.measureVideo(src);
+      } else {
+        measured = await this.measureImage(src);
+      }
+    } catch (e) {
+      // We no longer "guess" video from an image request (provider links handled elsewhere).
+      throw e;
+    }
+    const { width, height } = measured;
+
+    if (!this.note.payload) this.note.payload = {};
+    (this.note.payload as any).renderMode = 'direct';
+    (this.note.payload as any).embedUrl = '';
+    (this.note.payload as any).provider = 'unknown';
+    (this.note.payload as any).mediaType = mediaType;
+    (this.note.payload as any).mediaSrc = src;
+    (this.note.payload as any).mediaWidth = width;
+    (this.note.payload as any).mediaHeight = height;
+
+    // Backward compatibility: keep old image keys for images (including GIF)
+    if (mediaType === 'image') {
+      (this.note.payload as any).imageSrc = src;
+      (this.note.payload as any).imageWidth = width;
+      (this.note.payload as any).imageHeight = height;
+    }
+
+    // Dimensioni sullo stage:
+    // `tds_drawer` è scalato via transform (StageService.getZoom()).
+    // Quindi per avere dimensione visiva = dimensione immagine * zoom,
+    // dobbiamo salvare width/height come dimensione reale (a zoom=1),
+    // senza dividere per lo zoom.
+    this.note.width = width;
+    this.note.height = height;
+
+    // Reset scale locale della nota (evita deformazioni)
+    this.note.scale = [1, 1];
+
+    // Dopo caricamento valido: esci dalla modalità replace e salva immediatamente
+    this.isReplacingImage = false;
+    this.autoSave();
+  }
+
+  private applyEmbedMedia(resolved: Extract<NoteResolvedMedia, { kind: 'embed' }>): void {
+    if (!this.note) return;
+    if (!this.note.payload) this.note.payload = {};
+    // Embed is always video in our resolver
+    (this.note.payload as any).mediaType = 'video';
+    (this.note.payload as any).renderMode = 'embed';
+    (this.note.payload as any).provider = resolved.provider;
+    (this.note.payload as any).originalUrl = resolved.originalUrl;
+    (this.note.payload as any).embedUrl = resolved.embedUrl;
+    // keep mediaSrc for backward compatibility (some renderers might use it)
+    (this.note.payload as any).mediaSrc = '';
+    (this.note.payload as any).mediaWidth = 0;
+    (this.note.payload as any).mediaHeight = 0;
+
+    // Sensible default size for embeds
+    this.note.width = 360;
+    this.note.height = 202; // ~16:9
+    this.note.scale = [1, 1];
+    this.isReplacingImage = false;
+    this.autoSave();
+  }
+
+  onImagePreviewLoad(): void {
+    this.imagePreviewLoaded = true;
+  }
+
+  onImagePreviewError(): void {
+    // Manteniamo placeholder visibile se il browser non riesce a renderizzare l'immagine
+    this.imagePreviewLoaded = false;
+  }
+
+  private measureImage(src: string): Promise<{ width: number; height: number }> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      img.onerror = () => reject(new Error('Invalid image'));
+      img.src = src;
+    });
+  }
+
+  private measureVideo(src: string): Promise<{ width: number; height: number }> {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.muted = true;
+      video.playsInline = true as any;
+      video.onloadedmetadata = () => {
+        const w = video.videoWidth || 0;
+        const h = video.videoHeight || 0;
+        if (w > 0 && h > 0) {
+          resolve({ width: w, height: h });
+        } else {
+          reject(new Error('Invalid video'));
+        }
+        // cleanup
+        video.src = '';
+      };
+      video.onerror = () => {
+        reject(new Error('Invalid video'));
+        video.src = '';
+      };
+      video.src = src;
+    });
+  }
+
+  private normalizeImageUrl(input: string): string | null {
+    if (!input) return null;
+    let url = input.trim();
+    if (!url) return null;
+    // Common UX: allow pasting without protocol
+    if (!/^https?:\/\//i.test(url)) {
+      url = `https://${url}`;
+    }
+    try {
+      return new URL(url).toString();
+    } catch {
+      return null;
+    }
+  }
+
+  private inferMediaTypeFromUrl(url: string): 'image' | 'video' {
+    try {
+      const u = new URL(url);
+      const path = (u.pathname || '').toLowerCase();
+      if (path.endsWith('.gif')) return 'image';
+      if (
+        path.endsWith('.mp4') ||
+        path.endsWith('.webm') ||
+        path.endsWith('.ogg') ||
+        path.endsWith('.mov') ||
+        path.endsWith('.m4v')
+      ) {
+        return 'video';
+      }
+    } catch {
+      // ignore
+    }
+    return 'image';
+  }
+
+  private async uploadMediaFromExternalUrl(url: string): Promise<{ uploadedUrl: string; mediaType: 'image' | 'video' }> {
+    const user = this.tiledeskAuthService.getCurrentUser();
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Fetch failed: ${res.status}`);
+    }
+    const blob = await res.blob();
+    const type = blob.type || 'application/octet-stream';
+    const mediaType: 'image' | 'video' =
+      type.startsWith('video/') ? 'video' :
+      type.startsWith('image/') ? 'image' :
+      this.inferMediaTypeFromUrl(url);
+    // Restriction: images only (incl. GIF)
+    if (type.startsWith('video/') || mediaType === 'video') {
+      throw new Error('Videos are not supported');
+    }
+    if (!type.startsWith('image/')) {
+      throw new Error(`Not a supported media type: ${type}`);
+    }
+    if (blob.size > this.MAX_MEDIA_BYTES) {
+      throw new Error('File too large');
+    }
+
+    const filenameFromUrl = (() => {
+      try {
+        const u = new URL(url);
+        const last = u.pathname.split('/').filter(Boolean).pop() || 'image';
+        return last;
+      } catch {
+        return 'image';
+      }
+    })();
+
+    const file = new File([blob], filenameFromUrl, { type: type || undefined });
+    const data = await this.uploadService.upload(user.uid, new UploadModel(file));
+    const uploadedUrl = data?.downloadURL || data?.src;
+    if (!uploadedUrl) {
+      throw new Error('Upload did not return downloadURL/src');
+    }
+    return { uploadedUrl, mediaType };
+  }
+
+  // ============================================================================
+  // BORDER WIDTH (spessore bordo)
+  // ============================================================================
+  onBorderWidthInput(event: Event): void {
+    if (!this.note) return;
+    const input = event.target as HTMLInputElement;
+    let value = (input.value || '').replace(/[^0-9]/g, '');
+    if (value.length > 2) {
+      value = value.slice(0, 2);
+    }
+    input.value = value;
+  }
+
+  onBorderWidthChange(value?: any): void {
+    if (!this.note) return;
+    const parsed = typeof value === 'string' ? parseInt(value.replace(/[^0-9]/g, ''), 10) : value;
+    let borderWidth = Number.isFinite(parsed) ? parsed : 0;
+    borderWidth = Math.max(0, Math.min(20, borderWidth)); // 0..20px
+    this.note.borderWidth = borderWidth;
+    // Persist "last used" style per note type (text/rect) in LocalStorage
+    this.noteService.rememberLastUsedColorsFromNote(this.note);
+    this.autoSave();
+  }
+
   ngOnDestroy(): void {
     // Pulisce il timer se il componente viene distrutto prima che il salvataggio venga completato
     // if (this.saveTimer) {
@@ -124,6 +596,8 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     if (this.note) {
       this.note.backgroundColor = this.calculateBackgroundColorWithOpacity();
       this.note.borderColor = this.calculateBorderColorWithOpacity();
+      // Persist "last used" colors per note type (text/rect) in LocalStorage
+      this.noteService.rememberLastUsedColorsFromNote(this.note);
     }
     
     // Salvataggio automatico con debounce - accorpa le chiamate multiple ravvicinate
@@ -137,6 +611,8 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     if (this.note) {
       this.note.boxShadow = event.checked;
       this.logger.log('[CdsPanelNoteDetailComponent] Box shadow changed:', this.note.boxShadow);
+      // Persist "last used" style per note type (text/rect) in LocalStorage
+      this.noteService.rememberLastUsedColorsFromNote(this.note);
       
       // Salvataggio automatico con debounce
       this.autoSave();
@@ -305,6 +781,9 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       this.note.borderColor = ColorUtils.buildRgba(r, g, b, opacity);
       this.logger.log('[CdsPanelNoteDetailComponent] Border color changed:', opacity, this.note.borderColor);
     }
+
+    // Persist "last used" colors per note type (text/rect) in LocalStorage
+    this.noteService.rememberLastUsedColorsFromNote(this.note);
 
     // Salvataggio automatico con debounce
     this.autoSave();

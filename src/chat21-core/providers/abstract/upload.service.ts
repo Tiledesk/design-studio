@@ -34,7 +34,7 @@ export abstract class UploadService {
   // abstract tenant = environment.tenant;
 
   // functions
-  abstract initialize(): void;
+  abstract initialize(projectId: string): void;
   abstract upload(userId: string, upload: UploadModel): Promise<{downloadURL: string, src: string}>;
   abstract uploadProfile(userId: string, upload: UploadModel): Promise<any>
   abstract delete(userId: string, path: string): Promise<any>;

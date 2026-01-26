@@ -36,6 +36,7 @@ import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
   styleUrls: ['./cds-action-ai-condition.component.scss']
 })
 export class CdsActionAiConditionComponent implements OnInit {
+  private readonly DEFAULT_MAX_TOKENS = 10000;
   
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
   
@@ -52,7 +53,7 @@ export class CdsActionAiConditionComponent implements OnInit {
   llm_models: Array<{ name: string, value: string, src: string, models: Array<{ name: string, value: string, status: "active" | "inactive" }> }> = [];
   llm_options_models: Array<{ name: string, value: string, status: "active" | "inactive" }> = [];
   ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
+    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
   }
 
@@ -120,6 +121,9 @@ export class CdsActionAiConditionComponent implements OnInit {
 
 
   async ngOnInit(): Promise<void> {
+    // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
+    const lang = this.translate.getBrowserLang() || 'en';
+    this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.logger.log("[ACTION AI_CONDITION] ngOnInit action: ", this.action);
     this.project_id = this.dashboardService.projectID;
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
@@ -195,11 +199,17 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.action.model = result?.model?result.model:'';
     this.action.modelName = result?.modelName?result.modelName:'';
     this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
-    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
-    this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
-    if(this.action.max_tokens > this.llm_model_selected.max_output_tokens){
-      this.action.max_tokens = this.llm_model_selected.max_output_tokens;
+    this.ai_setting['max_tokens'].max = this.llm_model_selected?.max_output_tokens;
+    this.ai_setting['max_tokens'].min = this.llm_model_selected?.min_tokens;
+    if(this.action.max_tokens > this.llm_model_selected?.max_output_tokens){
+      this.action.max_tokens = this.llm_model_selected?.max_output_tokens;
     }
+    // Every model change resets max_tokens to default (capped by model max)
+    const min = this.ai_setting['max_tokens'].min;
+    const max = this.ai_setting['max_tokens'].max;
+    let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+    if (next < min) next = min;
+    this.action.max_tokens = next;
     if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
       this.action.temperature = 1
       this.ai_setting['temperature'].disabled= true
@@ -279,7 +289,7 @@ export class CdsActionAiConditionComponent implements OnInit {
         if(found){
           found.conditionIntentId = null;
         }
-      } else {
+      } else if (this.connector.created) {
         if(this.listOfConnectors[idCondition]){
           this.listOfConnectors[idCondition].idConnection =  this.connector.id;
           this.listOfConnectors[idCondition].isConnected  =  true;
@@ -288,6 +298,7 @@ export class CdsActionAiConditionComponent implements OnInit {
           found.conditionIntentId = '#'+this.connector.toId;
         }
       }
+      this.logger.log('[ACTION AI_CONDITION] updateConnectionTrue:', this.listOfConnectors, idCondition, found);
       this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
     } catch (error) {
       this.logger.log('error: ', error);
@@ -344,13 +355,6 @@ export class CdsActionAiConditionComponent implements OnInit {
       return;
     }
     if(property === 'model'){
-      this.action['labelModel'] = event;
-      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
-        this.action.temperature = 1
-        this.ai_setting['temperature'].disabled= true
-      } else {
-        this.ai_setting['temperature'].disabled= false
-      }
       this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;
