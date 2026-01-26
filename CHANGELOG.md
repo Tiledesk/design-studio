@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+# 1.39.24-rc10
 - **added**: added tools MCP server
 
 # 1.39.24-rc9
