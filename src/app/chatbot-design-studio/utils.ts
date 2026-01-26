@@ -4,6 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const preDisplayName:string  = 'untitled_block_';
 
+/**
+ * Cutoff date used to determine whether a chatbot is considered "new".
+ * ISO string format, compared lexicographically against `createdAt` (also ISO).
+ */
+export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
+
 export const DOCS_LINK = {
     ASKGPTV2 : { 
         namespace_as_name: { link: 'https://gethelp.tiledesk.com/', target: '_blank'},
