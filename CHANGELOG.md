@@ -10,6 +10,19 @@
 
 
 # 1.39.24
+- **added**: aggiungere il testo: Total retrieved chunks for re-ranking: 45
+- **changed**: unire chunk limit, re-ranking e moltiplicatore in un unico blocco, quindi attenzione alla spaziature
+- **changed**: in ai settings sostituisco icona token e metto dei badge al posto della pipe
+- **changed**: aggiungere il tipo (H/S) ibrida o semantica, accanto al nome
+
+- **changed**: Updated format-number with browser language formatting
+- **changed**: Edit AI preview settings: replace text with icons
+- **changed**: Set the default max-token value to 10000
+- **added**: Added reranking multiplier
+- **added**: Intercepted Chrome background throttling / standby to refresh the page
+- **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
+- **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
+
 - **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
 - **changed**: added text and links in reranking: Improve the accuracy of your answers
 - **changed**: web Request does not show output attributes in the stage preview
@@ -22,7 +35,6 @@
 - **added**: showed connectors-in only if they are contract connectors
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
-
 
 # 1.39.23
 - **bug-fix**: deleted duplicate AI model chatGPT 5.2

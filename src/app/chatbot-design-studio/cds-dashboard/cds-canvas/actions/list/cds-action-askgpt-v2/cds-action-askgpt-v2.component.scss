@@ -90,8 +90,21 @@ mat-expansion-panel ::ng-deep {
     }
     .parameters-preview {
         font-size: 11px;
-        height: 24px;
+        height: 34px;
         line-height: normal;
+    }
+
+    .preview-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        height: 14px;
+        font-size: 14px;
+        line-height: 14px;
+        margin: 0;
+        vertical-align: middle;
+        color: var(--text-color);
     }
 
     .preview-flag {
@@ -244,7 +257,8 @@ cds-select#model-condition ::ng-deep{
 
 .slider-input ::ng-deep {
     width: 60px;
-
+    min-width: 60px;
+    font-size: 12px;
     input {
         text-align: center;
     }
@@ -509,4 +523,31 @@ cds-select#model-condition.not-configured ::ng-deep {
     color: var(--color-white-hex);
     flex-wrap: nowrap;
     text-align: end;
+}
+
+.chunks-container {
+    margin-bottom: 20px;
+    .field-box {
+        margin-bottom: 10px;
+    }
+}
+
+
+.parameters-preview {
+    span {
+        line-height: 16px;
+        margin-right: 5px;
+    }
+    .preview-badge {
+        color: #fff;
+        background-color: var(--blu);
+        padding: 1px 3px;
+        border-radius: 6px;
+    }
+    .preview-icon {
+        color: var(--color-white-hex);
+    }
+    .preview-flag{
+        margin:0;
+    }
 }

@@ -150,9 +150,9 @@
 
         <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.choices[0]?.message?.content">
             <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
+            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens | number:'1.0-0':browserLang }}</span>
+            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens | number:'1.0-0':browserLang }}</span>
+            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens | number:'1.0-0':browserLang }}</span>
         </div>
 
         <!-- <div id="preview-container" class="preview-container">
@@ -180,9 +180,9 @@
         <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content"
             style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 6px; padding: 0px 4px; color: #a6a6a6;  font-size: 11px; width: 100%;">
             <span style="font-weight: 500;">Tokens usage</span>
-            <span>Prompt: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>Answer: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens }}</span>
+            <span>Prompt: {{ ai_response.usage.prompt_tokens | number:'1.0-0' }}</span>
+            <span>Answer: {{ ai_response.usage.completion_tokens | number:'1.0-0' }}</span>
+            <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens | number:'1.0-0' }}</span>
         </div> -->
     </div>
 
@@ -194,10 +194,17 @@
                     <div class="title-and-parameters-container">
                         <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                         <div class="parameters-preview">
-                            <span *ngIf="action?.model">{{ action?.model }}</span>
-                            <span *ngIf="action?.max_tokens"> | tokens: {{action.max_tokens}}</span>
-                            <span *ngIf="action?.temperature !== undefined"> | temperature: {{action.temperature}}</span>
-                            <span *ngIf="action?.context"> | system context: {{action.context}}</span>
+                            <span *ngIf="action?.model" class="preview-flag">
+                                {{ action?.model }}
+                                <span class="sep"> | </span>
+                            </span>
+                            <span *ngIf="action?.max_tokens" class="preview-badge">
+                                <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
+                            </span>
+                            <span *ngIf="action?.temperature !== undefined" class="preview-badge">
+                                <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> {{action.temperature | formatNumber}}
+                            </span>
+                            <span *ngIf="action?.context">system context: {{action.context}}</span>
                         </div>
                     </div>
                 </mat-panel-title>
@@ -237,7 +244,7 @@
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
-                        <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens}}" disabled>
+                        <input type="text" class="slider-input gpt-setting-input" [value]="action.max_tokens | number:'1.0-0':browserLang" disabled>
                         <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
                     </div>
                 </div>

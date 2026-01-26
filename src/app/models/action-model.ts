@@ -447,6 +447,7 @@ export class ActionAskGPTV2 extends Action {
     chunks_only: boolean;
     skip_unanswered: boolean;
     reranking: boolean;
+    reranking_multiplier?: number;
   value: string;
     constructor() {
         super();

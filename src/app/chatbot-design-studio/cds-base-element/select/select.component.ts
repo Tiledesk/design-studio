@@ -17,6 +17,8 @@ export class SelectComponent implements OnInit {
   @Input() bindValueSelect: string;
   @Input() optionalBindAdditionalText: string; 
   @Input() optionalBindDescription: string; 
+  /** If true, renders the optionalBindAdditionalText as a right-aligned badge (opt-in, default false). */
+  @Input() additionalTextAsBadge: boolean = false;
   @Input() groupByKey: string; 
   @Input() footerButton: boolean = false;
   @Input() footerButtonDisabled: boolean = false;
