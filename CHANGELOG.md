@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **added**: added tools MCP server
+
 # 1.39.23
 - **bug-fix**: deleted duplicate AI model chatGPT 5.2
 
