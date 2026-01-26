@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.24-rc11
+- **changed**: minor updates on API for upload a file/chatbot avatar
+
 # 1.39.24-rc10
 - **added**: added tools MCP server
 
