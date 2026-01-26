@@ -149,3 +149,13 @@
     background: #e5e5e5;
     color: #4b5052;
 }
+
+/* ---- Attributes dialog: moved from inline styles ---- */
+::ng-deep .custom-setattribute-dialog-container .attr-dialog__hr {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+::ng-deep .custom-setattribute-dialog-container .attr-dialog__item {
+    margin-bottom: 14px;
+}
