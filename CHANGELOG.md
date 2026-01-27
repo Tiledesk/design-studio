@@ -10,8 +10,6 @@
 # 1.39.25
 
 
-
-
 # 1.39.24
 - **bug-fixed**: note - video note resizing is not smooth
 - **bug-fixed**: note - fixed max_output_tokens error
