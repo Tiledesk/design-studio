@@ -8,15 +8,30 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.39.25-rc2
 - **bug-fix**: Fixed a filter error when selecting a KB.
 - **bug-fix**: Fixed an error when setting the re-ranking multiplier when setting "use KB name."
 - **changed**: Set the "Max chunks for re-ranking" to 100.
 
-- **added**: aggiungere il testo: Total retrieved chunks for re-ranking: 45
-- **changed**: unire chunk limit, re-ranking e moltiplicatore in un unico blocco, quindi attenzione alla spaziature
-- **changed**: in ai settings sostituisco icona token e metto dei badge al posto della pipe
-- **changed**: aggiungere il tipo (H/S) ibrida o semantica, accanto al nome
+# 1.39.25-rc1
+- **changed**: updated MCP server, added "tools" selection for each server
+
+# 1.39.25
+
+# 1.39.24-rc11
+- **changed**: minor updates on API for upload a file/chatbot avatar
+
+# 1.39.24-rc10
+- **added**: added tools MCP server
+
+# 1.39.24-rc9
+- **changed**: API for upload a file/chatbot avatar
+
+# 1.39.24-rc8
+- **added**: Add text: Total retrieved chunks for re-ranking: x
+- **changed**: Merge chunk limit, re-ranking, and multiplier into a single block
+- **changed**: In the settings, replace the token icon and add badges in place of the pipe
+- **changed**: Add the type (H/S) hybrid or semantic, next to the name
 
 # 1.39.24-rc7
 - **bug-fixed**: fix regression in action menu that doesn't allow deleting an action

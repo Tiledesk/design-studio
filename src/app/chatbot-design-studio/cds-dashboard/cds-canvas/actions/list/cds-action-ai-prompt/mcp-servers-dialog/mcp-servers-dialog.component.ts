@@ -12,7 +12,7 @@ import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-serv
 })
 export class McpServersDialogComponent implements OnInit {
 
-  selectedServers: Array<{ name: string, url: string, transport: string }> = [];
+  selectedServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }> = [];
   filteredServers: Array<{ name: string, url: string, transport: string }> = [];
   searchFilter: string = '';
   onUpdateCallback: (data: any) => void;
@@ -23,8 +23,9 @@ export class McpServersDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<McpServersDialogComponent>,
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: { 
-      mcpServers: Array<{ name: string, url: string, transport: string }>,
-      selectedServers?: Array<{ name: string, url: string, transport: string }>,
+      // mcpServers comes from integrations; tools (metadata) may be present and must remain untouched.
+      mcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }>,
+      selectedServers?: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }>,
       onUpdate?: (data: any) => void
     }
   ) { }
@@ -57,7 +58,13 @@ export class McpServersDialogComponent implements OnInit {
     if (index > -1) {
       this.selectedServers.splice(index, 1);
     } else {
-      this.selectedServers.push(server);
+      // IMPORTANT: keep action payload minimal (no tools metadata from integrations).
+      this.selectedServers.push({
+        name: server.name,
+        url: server.url,
+        transport: server.transport,
+        tools: []
+      });
     }
     this.logger.log("[McpServersDialog] selectedServers: ", this.selectedServers);
     
@@ -94,6 +101,23 @@ export class McpServersDialogComponent implements OnInit {
     return this.selectedServers.some(s => s.name === server.name);
   }
 
+  /**
+   * Count of available tools for a server (from integrations -> data.mcpServers[].tools).
+   * Tools are optional.
+   */
+  getAvailableToolsCount(server: { name: string }): number {
+    const found = this.data?.mcpServers?.find(s => s.name === server.name) as any;
+    return Array.isArray(found?.tools) ? found.tools.length : 0;
+  }
+
+  /**
+   * Count of active/selected tools for a server in the action payload (selectedServers[].tools).
+   */
+  getActiveToolsCount(server: { name: string }): number {
+    const selected = this.selectedServers.find(s => s.name === server.name);
+    return Array.isArray(selected?.tools) ? selected.tools.length : 0;
+  }
+
   onAddMcpServer(): void {
     this.logger.log("[McpServersDialog] - onAddMcpServer clicked");
     
@@ -108,11 +132,17 @@ export class McpServersDialogComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.logger.log("[McpServerEditDialog] new server result:", result);
       if (result !== false && result) {
+        const createdServer = result?.server ? result.server : result;
         // Add the new server to the list
-        this.data.mcpServers.push(result);
+        this.data.mcpServers.push(createdServer);
         // Automatically select the new server
-        this.selectedServers.push(result);
-        this.logger.log("[McpServersDialog] New server added:", result);
+        this.selectedServers.push({
+          name: createdServer.name,
+          url: createdServer.url,
+          transport: createdServer.transport,
+          tools: result?.selectedTools || []
+        });
+        this.logger.log("[McpServersDialog] New server added:", createdServer);
         
         // Update filtered list
         this.onSearchChange();
@@ -129,27 +159,40 @@ export class McpServersDialogComponent implements OnInit {
     }
     this.logger.log("[McpServersDialog] - openEditServerDialog for:", server);
     
+    const selectedServer = this.selectedServers.find(s => s.name === server.name);
     const dialogRef = this.dialog.open(McpServerEditDialogComponent, {
       panelClass: 'custom-mcp-edit-dialog-container',
       data: { 
         server: server,
-        allServers: this.data.mcpServers 
+        allServers: this.data.mcpServers,
+        selectedTools: selectedServer?.tools || []
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       this.logger.log("[McpServerEditDialog] result:", result);
       if (result !== false && result) {
+        const updatedServer = result?.server ? result.server : result;
+        const selectedTools: Array<{ name: string }> | undefined = result?.selectedTools;
         // Update the server in the list
         const index = this.data.mcpServers.findIndex(s => s.name === server.name);
         if (index > -1) {
-          this.data.mcpServers[index] = result;
+          this.data.mcpServers[index] = updatedServer;
           // Update in selectedServers if it was selected
           const selectedIndex = this.selectedServers.findIndex(s => s.name === server.name);
           if (selectedIndex > -1) {
-            this.selectedServers[selectedIndex] = result;
+            const unique = new Map<string, { name: string }>();
+            (selectedTools || this.selectedServers[selectedIndex].tools || []).forEach(t => {
+              if (t?.name) unique.set(t.name, { name: t.name });
+            });
+            this.selectedServers[selectedIndex] = {
+              name: updatedServer.name,
+              url: updatedServer.url,
+              transport: updatedServer.transport,
+              tools: Array.from(unique.values())
+            };
           }
-          this.logger.log("[McpServersDialog] Server updated:", result);
+          this.logger.log("[McpServersDialog] Server updated:", updatedServer);
           
           // Update filtered list
           this.onSearchChange();
