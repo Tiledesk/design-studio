@@ -377,6 +377,7 @@
         "Reranking": "Re-ranking",
         "RerankingInfo": "Improve accuracy of your answers",
         "MultiplierInfo": "Total retrieved chunks for re-ranking",
+        "MaxChunksMessage": "Max chunks for re-ranking is 100",
         "SkipUnanswered": "Do not update unanswered list",
         "ErrorAutomaticAssign": "Errors will be automatically assigned to variable:",
         "ApplyAFunctionToValue": "Apply a function to the value",
