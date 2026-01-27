@@ -7,13 +7,28 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.25
+
+
 
 
 # 1.39.24
-- **added**: aggiungere il testo: Total retrieved chunks for re-ranking: 45
-- **changed**: unire chunk limit, re-ranking e moltiplicatore in un unico blocco, quindi attenzione alla spaziature
-- **changed**: in ai settings sostituisco icona token e metto dei badge al posto della pipe
-- **changed**: aggiungere il tipo (H/S) ibrida o semantica, accanto al nome
+- **bug-fixed**: note - video note resizing is not smooth
+- **bug-fixed**: note - fixed max_output_tokens error
+- **changed**: note - handles have been added to the rectangle note vertices
+- **bug-fixed**: note - disabled the 100x100px non-clickable stage area (tds-drag-drawer).
+- **bug-fixed**: note - disabled the note-controls menu when it is transparent
+- **changed**: note - restored the note detail panel opening when clicking on the note, except for the video note
+- **bug-fixed**: note - when change the color, the note detail panel closes
+- **changed**: note - change default colors
+- **changed**: note - store the last colors in the LS
+- **added**: note - add the same intent menu to notebooks
+- **changed**: note - limit uploads to images and GIFs only
+- **added**: note - allow uploading videos from links
+- **added**: Add the text: Total retrieved chunks for re-ranking: 
+- **changed**: Combine chunk limit, re-ranking, and multiplier into a single block, so pay attention to the spacing.
+- **changed**: In the settings, I replace the token icon and add badges in place of the pipe.
+- **changed**: Add the type (H/S) hybrid or semantic, next to the name.
 - **changed**: Updated format-number with browser language formatting
 - **changed**: Edit AI preview settings: replace text with icons
 - **changed**: Set the default max-token value to 10000
