@@ -8,11 +8,13 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.39.26-rc1
 - **bug-fix**: sort attribute list in Variable List Component
 - **bug-fix**: change the "use kb name" field to 2 lines
 - **bug-fix**: the selected model is red even when the api is set
 - **changed**: change the AI ​​settings preview
+
+# 1.39.25
 
 # 1.39.25-rc2
 - **bug-fix**: Fixed a filter error when selecting a KB.
@@ -22,7 +24,7 @@
 # 1.39.25-rc1
 - **changed**: updated MCP server, added "tools" selection for each server
 
-# 1.39.25
+# 1.39.24
 
 # 1.39.24-rc11
 - **changed**: minor updates on API for upload a file/chatbot avatar
