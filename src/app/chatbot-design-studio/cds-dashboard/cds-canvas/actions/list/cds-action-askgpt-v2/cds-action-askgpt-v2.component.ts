@@ -277,8 +277,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   selectKB(namespace){
-    const result = this.listOfNamespaces.find(el => el.value === namespace);
-    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result);
+    const type = this.action?.namespaceAsName ? 'name' : 'value';
+    const result = this.listOfNamespaces.find(el => type === 'value' ? el.value === namespace : el.name === namespace);
+    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, this.listOfNamespaces, result);
     if(result){
       this.KB_HYBRID = result.hybrid;
     }
@@ -286,8 +287,13 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
   onChangeTextarea(event: string, property: string) {
-    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event);
+    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event, this.listOfNamespaces);
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property);
+
+    if(property === 'namespace'){
+      this.selectKB(event);
+      return;
+    }
     const nextValue = (event ?? '').toString();
     const currentValue = ((this.action && (this.action as any)[property]) ?? '').toString();
 

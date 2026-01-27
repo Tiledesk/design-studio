@@ -409,7 +409,7 @@
                         <div class="slider-description"></div>
 
                          <!-- // reranking -->
-                        <div *ngIf="KB_HYBRID" class="">
+                        <div *ngIf="KB_HYBRID">
                             <section class="disable-input-message-section">
                                 <mat-checkbox 
                                     [checked]="action?.reranking"
@@ -425,7 +425,7 @@
 
 
                     <!-- // reranking multiplier slider (visible only when reranking is enabled) -->
-                    <div *ngIf="action?.reranking" class="text-editor-wrapper">
+                    <div *ngIf="action?.reranking && KB_HYBRID" class="text-editor-wrapper">
                         <div class="field-box">
                             <label class="title-label">{{'CDSCanvas.RerankingMultiplierLabel' | translate }}</label>
                             <div class="action-wait-content">
@@ -447,7 +447,7 @@
                             </div>
                             <div class="slider-description">
                                 <label class="field-description">{{ "CDSCanvas.MultiplierInfo" | translate }}: 
-                                    <b>{{action.reranking_multiplier * action.top_k | formatNumber}}</b>
+                                    <b>{{action.reranking_multiplier * action.top_k > 100 ? 100 : action.reranking_multiplier * action.top_k | formatNumber}} ({{'CDSCanvas.MaxChunksMessage' | translate }})</b>
                                 </label> 
                             </div>
                         </div>

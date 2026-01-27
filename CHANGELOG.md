@@ -9,6 +9,10 @@
 
 
 # this branch
+- **bug-fix**: Fixed a filter error when selecting a KB.
+- **bug-fix**: Fixed an error when setting the re-ranking multiplier when setting "use KB name."
+- **changed**: Set the "Max chunks for re-ranking" to 100.
+
 - **added**: aggiungere il testo: Total retrieved chunks for re-ranking: 45
 - **changed**: unire chunk limit, re-ranking e moltiplicatore in un unico blocco, quindi attenzione alla spaziature
 - **changed**: in ai settings sostituisco icona token e metto dei badge al posto della pipe
