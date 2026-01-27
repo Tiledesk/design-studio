@@ -7,7 +7,20 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.25
+- **bug-fixed**: note - video note resizing is not smooth
+- **bug-fixed**: note - fixed max_output_tokens error
+- **changed**: note - handles have been added to the rectangle note vertices
+- **bug-fixed**: note - disabled the 100x100px non-clickable stage area (tds-drag-drawer).
+- **bug-fixed**: note - disabled the note-controls menu when it is transparent
+- **changed**: note - restored the note detail panel opening when clicking on the note, except for the video note
+- **bug-fixed**: note - when change the color, the note detail panel closes
 
+- **changed**: note - change default colors
+- **changed**: note - store the last colors in the LS
+- **added**: note - add the same intent menu to notebooks
+- **changed**: note - limit uploads to images and GIFs only
+- **added**: note - allow uploading videos from links
 
 # 1.39.24
 - **added**: aggiungere il testo: Total retrieved chunks for re-ranking: 45
@@ -33,18 +46,6 @@
 - **added**: showed connectors-in only if they are contract connectors
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
-- **bug-fixed**: note - il resize della nota video non è fluido
-- **bug-fixed**: note - corretto errore max_output_tokens
-- **changed**: note - nella nota rettangolo sono state inserite le maniglie sui vertici
-- **bug-fixed**: note - disabilitata l'area sullo stage di 100x100px che non risulta cliccabile (tds-drag-drawer).
-- **bug-fixed**: note - disabilitato il menu note-controls delle note quando questo è trasparente
-- **changed**: note - ripristinata l'apertura del dettaglio note al click sulla nota, tranne che  per la nota video
-- **bug-fixed**: note - quando provo a cambiare colore si chiude il pannello di dettaglio della nota
-- **changed**: note - cambio colori di default
-- **changed**: note - memorizza gli ultimi colori nel LS
-- **added**: note - aggiungi lo stesso menu dell’intent ai blocchi note
-- **changed**: note - limita il caricamento solo a immagini e gif 
-- **added**: note - permetti di caricare i video da link
 
 - **changed**: Intent block title hidden if "untitled"
 - **changed**: Form button and question button hidden if empty
