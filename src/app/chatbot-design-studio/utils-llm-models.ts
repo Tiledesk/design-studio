@@ -257,21 +257,33 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmMod
   llm_models_flat = llm_models_flat.filter(model => model.status === 'active');
 
   // Set configured status for llm_models_flat
+  // First, initialize all models as not configured
+  llm_models_flat.forEach(model => {
+    model.configured = false;
+  });
+
+  // First pass: Set configured = true for models that match configured integrations
   if(INTEGRATIONS){
     INTEGRATIONS.forEach((el: any) => {
-      if(el.name){
+      if(el.name && el.value?.apikey){
         llm_models_flat.forEach(model => {
-          if(model.llm === el.name && el.value?.apikey) {
+          // If the model's LLM provider matches the integration name, set configured = true
+          if(model.llm === el.name) {
             model.configured = true;
-          } else if(model.llm.toLowerCase() === 'openai' || model.llm.toLowerCase() === 'ollama' || model.llm.toLowerCase() === 'vllm'){
-            model.configured = true;
-          } else {
-            model.configured = false;
           }
         });
       }
     });
   }
+  
+  // Second pass: Always set configured = true for openai, ollama, vllm
+  // (these don't require explicit project integration configuration)
+  llm_models_flat.forEach(model => {
+    const llmLower = model.llm.toLowerCase();
+    if(llmLower === 'openai' || llmLower === 'ollama' || llmLower === 'vllm'){
+      model.configured = true;
+    }
+  });
   // logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
 
   // Set token multiplier for each model
