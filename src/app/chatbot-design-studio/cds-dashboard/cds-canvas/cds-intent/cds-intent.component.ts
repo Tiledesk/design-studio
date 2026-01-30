@@ -156,6 +156,23 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
   // Classi precomputate per evitare binding multipli
   intentClasses: { [key: string]: boolean } = {};
 
+  // Classi precomputate per agents-available (evita binding classe valutato ad ogni change detection)
+  agentsAvailableClasses: { [key: string]: boolean } = {};
+
+  // ID precomputato per block-header (evita concatenazione stringa nel template)
+  blockHeaderId: string = '';
+
+  // Espressioni booleane precomputate per evitare valutazioni nel template
+  hasQuestions: boolean = false;
+  hasForm: boolean = false;
+
+  // Costanti enum precomputate per evitare accessi diretti nel template
+  readonly QUESTION_TYPE = HAS_SELECTED_TYPE.QUESTION;
+  readonly FORM_TYPE = HAS_SELECTED_TYPE.FORM;
+
+  // Proprietà precomputata per evitare valutazione espressione complessa nel template
+  showConnectorIn: boolean = false;
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
 
@@ -239,6 +256,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
           } else {
             this.formSize = 0;
           }
+
+          // Aggiorna espressioni booleane precomputate
+          this.updateComputedBooleanExpressions();
 
           // Aggiorna showIntentOptions basandosi su questionCount e formSize
           this.updateShowIntentOptions();
@@ -395,6 +415,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
       // Aggiorna i valori precomputati per template
       this.updateComputedTemplateValues();
       
+      // Aggiorna le espressioni booleane precomputate
+      this.updateComputedBooleanExpressions();
+      
+      // Aggiorna showConnectorIn dopo l'inizializzazione
+      this.updateShowConnectorIn();
+      
       // Aggiorna i valori precomputati per cds-panel-intent-controls
       this.updateIntentControlsValues();
   }
@@ -480,6 +506,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
     this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
     this.logger.log(`[CONNECTORS] Aggiorno il numero dei connettori in ingresso per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
     
+    // Aggiorna showConnectorIn quando cambiano i connettori
+    this.updateShowConnectorIn();
+    
     // Aggiorna valori controlli intent (deleteOptionEnabled potrebbe cambiare)
     this.updateIntentControlsValues();
     
@@ -563,6 +592,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
     } else {
       this.isAgentsAvailable = false;
     }
+    
+    // Aggiorna classi precomputate per agents-available quando cambia isAgentsAvailable
+    this.updateComputedTemplateValues();
   }
 
   /** updateIsUntitledBlock
@@ -921,11 +953,41 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
     // Precomputa ID per evitare concatenazione stringa nel template
     this.intentContentId = this.intent?.intent_id ? `intent-content-${this.intent.intent_id}` : '';
     
+    // Precomputa ID block-header per evitare concatenazione stringa nel template
+    this.blockHeaderId = this.intent?.intent_id ? `block-header-${this.intent.intent_id}` : '';
+    
     // Precomputa classi per evitare binding multipli
     this.intentClasses = {
       'isStart': this.isStart,
       'tds-slim-intent': this.isNewChatbot
     };
+    
+    // Precomputa classi per agents-available (evita binding classe valutato ad ogni change detection)
+    this.agentsAvailableClasses = {
+      'isStart': this.isStart && this.isAgentsAvailable
+    };
+    
+    // Aggiorna showConnectorIn quando cambia isStart
+    this.updateShowConnectorIn();
+  }
+
+  /**
+   * Aggiorna le espressioni booleane precomputate per evitare valutazioni nel template.
+   * Chiamato quando cambiano questionCount o formSize.
+   */
+  private updateComputedBooleanExpressions(): void {
+    this.hasQuestions = this.questionCount > 0;
+    this.hasForm = this.formSize > 0;
+  }
+
+  /**
+   * Aggiorna showConnectorIn basandosi su isStart, connectorsIn e stageService.getConnectorsEnabled().
+   * Chiamato quando cambiano le dipendenze per evitare valutazione espressione complessa nel template.
+   */
+  private updateShowConnectorIn(): void {
+    this.showConnectorIn = !this.isStart 
+      && (this.connectorsIn?.length ?? 0) > 0 
+      && this.stageService.getConnectorsEnabled();
   }
 
   /**
@@ -977,6 +1039,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
       } else {
         this.formSize = 0;
       }
+      
+      // Aggiorna espressioni booleane precomputate
+      this.updateComputedBooleanExpressions();
+      
       // Aggiorna showIntentOptions basandosi su questionCount e formSize
       this.updateShowIntentOptions();
     } catch (error) {

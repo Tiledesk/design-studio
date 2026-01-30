@@ -13,8 +13,8 @@
      
     <!-- <span class="panel-intent-content tds_draggable intent-background-overlay"></span> -->
 
-    <!-- OTTIMIZZATO: Rimossi event handlers inutili (onShowConnectorsIn/onHideConnectorsIn non esistono e non vengono emessi) -->
-    <cds-connector-in *ngIf="!isStart && connectorsIn?.length>0 && stageService.getConnectorsEnabled()"
+    <!-- OTTIMIZZATO: Espressione precomputata invece di valutazione nel template (evita chiamate a metodo e valutazioni complesse) -->
+    <cds-connector-in *ngIf="showConnectorIn"
         [connectorsIn]="connectorsIn">
     </cds-connector-in>
 
@@ -29,13 +29,13 @@
         (optionClicked)="onOptionClicked($event)">
     </cds-panel-intent-controls>
 
-    <div [id]="'block-header-'+ intent?.intent_id"
+    <!-- OTTIMIZZATO: ID precomputato, binding classe duplicato rimosso, espressioni booleane precomputate, enum precomputati -->
+    <div [id]="blockHeaderId"
         class="pic-header" 
         [ngClass]="{'cds-start': isStart}">
         
         <cds-panel-intent-header *ngIf="!isUntitledBlock" 
             class="pic-title-text tds_draggable" 
-            [class.isStart]="isStart"
             [intentColor]="intentColor"
             [intent]="intent"
             (click)="onOptionClicked($event)">
@@ -43,23 +43,25 @@
 
         <div *ngIf="showIntentOptions" class="cds-intent-options tds_draggable">
             <div class="option" 
-                (click)="onSelectQuestion(HAS_SELECTED_TYPE.QUESTION)"
-                [attr.active]="questionCount > 0">
+                (click)="onSelectQuestion(QUESTION_TYPE)"
+                [attr.active]="hasQuestions">
                 <img src="assets/images/brain.svg" [title]="'Question' | translate" alt="Question">
             </div>
-            <div class="option" (click)="onSelectForm(HAS_SELECTED_TYPE.FORM)" 
-                [attr.active]="formSize > 0">
+            <div class="option" (click)="onSelectForm(FORM_TYPE)" 
+                [attr.active]="hasForm">
                 <img src="assets/images/form.svg" [title]="'Form' | translate" alt="Form">
             </div>
         </div>
 
     </div>
     
-    <div *ngIf="isAgentsAvailable" class="agents-available" [class.isStart]="isStart"><span class="material-icons">boy</span></div>
+    <!-- OTTIMIZZATO: Classe precomputata invece di binding classe valutato ad ogni change detection -->
+    <div *ngIf="isAgentsAvailable" class="agents-available" [ngClass]="agentsAvailableClasses"><span class="material-icons">boy</span></div>
 
+    <!-- OTTIMIZZATO: Binding isStart eliminato (sempre true quando renderizzato per *ngIf="isStart") -->
     <div *ngIf="isStart" class="cds-start-content tds_draggable">
         <cds-action-intent class="panel-response" 
-            [isStart]="isStart" 
+            [isStart]="true" 
             [intentSelected]="intent"
             [action]="startAction" 
             (updateAndSaveAction)="onUpdateAndSaveAction($event)">
