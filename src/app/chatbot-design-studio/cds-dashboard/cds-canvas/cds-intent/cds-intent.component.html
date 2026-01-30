@@ -110,7 +110,7 @@
             [ngStyle]="{'outline': actionOutlineStyle.get(action._tdActionId || 'action-'+i)}"
             (keydown)="onKeydown($event)" 
             (click)="onSelectAction(action, i, action._tdActionId)">
-            <!--
+            
             <span class="action-element">
 
                 <div *cdkDragPreview id="customDragPreview">
@@ -120,7 +120,7 @@
                         [elementType]="action._tdActionType">
                     </cds-action-description>
                 </div>
-            
+             
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
                 <cds-action-description 
@@ -128,7 +128,7 @@
                     cdkDragHandle
                     [elementType]="action._tdActionType">
                 </cds-action-description>
-    
+                <!--
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
 
                     <cds-action-controls *ngIf="!isNewChatbot"
@@ -479,7 +479,7 @@
                     </cds-action-flow-log>
 
                 </div>
-               
+               -->
             </span>
             
            
@@ -490,7 +490,7 @@
                 class="cds-action-arrow">
             </cds-action-arrow> 
         
-            -->
+            
 
 
         </div>

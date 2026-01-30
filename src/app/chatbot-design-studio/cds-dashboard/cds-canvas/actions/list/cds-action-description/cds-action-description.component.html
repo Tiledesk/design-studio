@@ -1,84 +1,49 @@
+<!-- OTTIMIZZATO: Tutti i valori precomputati nel componente, eliminati pipe translate, concatenazioni stringa, accessi nested -->
 <div [class.preview]="previewMode" class="action_wrp">
 
-    <!-- <div class="edit-mode-header-buttons" *ngIf="!previewMode">
-        <div class="control-button" 
-            (click)="onCloseIntent()"
-            matTooltipClass="cds-custom-tooltip"
-            [matTooltip]="cClose" 
-            matTooltipPosition='below'>
-            <em class="material-icons">close</em>
-        </div> 
-        <div class="control-button" 
-            (click)="onSaveIntent()"
-            matTooltipClass="cds-custom-tooltip"
-            matTooltip="Save & close" 
-            matTooltipPosition='below'>
-            <em class="material-icons">check</em>
-        </div> 
-    </div> -->
-
-    <!-- <div class="custom-action-title">
-        <div class="custom-icon-action">
-            <img [src]="element?.src" [title]="element?.name">
-        </div>
-        <div class="custom-action-info-container">
-            <div class="custom-action-info">
-                <p>{{element?.name}}</p>
-                <input *ngIf="showTip" class="action-input"
-                    [ngModel]="dataInput"
-                    [placeholder]="titlePlaceholder"
-                    (input)="onChangeText($event.target.value)"/>    
-                </div>
-                <span *ngIf="showTip" class="material-icons-outlined custom-icon">more_vert</span>
-        </div>
-    </div> -->
-
-
     <div class="section">
+        <!-- TEST PERFORMANCE: Commentato righe 6-25 per isolare problema performance -->
+        
         <div class="action-title">
             <div class="icon-action">
-                <img class="active-icon" [src]="element?.src" [title]="element?.name | translate ">
-                <!-- <span *ngIf="previewMode && element.badge" [class.deprecation-badge]="element.badge==='DEP'" class="trigger-beta-badge">{{element.badge}}</span> -->
-                <span *ngIf="previewMode && element.badge" [class]="'trigger-beta-badge badge-' + element.badge">{{element.badge}}</span>
+                <img class="active-icon" [src]="elementSrc" [title]="elementNameTitle">
+                <span *ngIf="previewMode && showBadge" [class]="badgeClass">{{elementBadge}}</span>
             </div>
-
-            <p *ngIf="!previewMode" class="label-action">{{element?.name | translate }}</p>
-            <!-- <span *ngIf="!previewMode && element.badge" [class.deprecation-badge]="element.badge==='DEP'" class="trigger-beta-badge">{{element.badge}}</span> -->
-            <span *ngIf="!previewMode && element.badge" [class]="'trigger-beta-badge badge-' + element.badge">{{element.badge}}</span>
-            <span *ngIf="!previewMode && element?.status ==='beta'" class="trigger-beta-badge">Beta</span>
-
-            <div *ngIf="previewMode" class="action-btn-icon">
-                <button class="btn btn-tdblu-no-boxshadow drag-btn">
-                    <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate">
-                </button>
+            <p *ngIf="!previewMode" class="label-action">{{elementNameTranslated}}</p>
+            <span *ngIf="!previewMode && showBadge" [class]="badgeClass">{{elementBadge}}</span>
+            <span *ngIf="showBeta" class="trigger-beta-badge">Beta</span>
+            <!-- OTTIMIZZATO: Sostituito <img> con CSS background-image, ottimizzato per GPU, attributi non necessari rimossi -->
+            <!-- BEST PRACTICE: Drag and drop funziona con cdkDragHandle sul componente, questo è solo visivo -->
+            <!-- OTTIMIZZATO: GPU acceleration, contain per isolare rendering, nascondi durante pan per eliminare overhead -->
+            <div *ngIf="previewMode && !isPanOrZoomActive" class="action-btn-icon">
+                <div class="btn btn-tdblu-no-boxshadow drag-btn drag-icon">
+                </div> 
             </div>
-
         </div>
+
         
         <div *ngIf="showTip" class="action-description">
-            <div *ngIf="element?.doc"
+            <div *ngIf="descriptionKey"
                 [satPopoverAnchor]="descriptionTooltip"
                 (click)="descriptionTooltip.toggle()">
                 <span class="material-icons-outlined">info</span>
             </div>
-        
             <div [innerHtml]="tipText"></div>
-        
-            <!-- **** _tdActionTitle **** -->
-            <!-- <input class="action-input"
-                 [ngModel]="dataInput"
-                 [placeholder]="titlePlaceholder"
-                (input)="onChangeText($event.target.value)"/>
-                (input)="onChangeText($event.target.value)"/> -->
-
         </div>
+
     </div>
 
-    <div *ngIf="!previewMode && element.badge ==='DEP'" class="deprecation-message">{{'CDSCanvas.DeprecationMessage' | translate}}</div>
+    <!-- OTTIMIZZATO: showDeprecationMessage e deprecationMessageTranslated precomputati -->
+     <div *ngIf="showDeprecationMessage" class="deprecation-message">{{deprecationMessageTranslated}}</div>
 
 </div>
 
-<sat-popover #descriptionTooltip id="descriptionTooltip" 
+<!-- OTTIMIZZATO: Lazy initialize sat-popover solo quando showTip e descriptionKey sono true -->
+ <!-- OTTIMIZZATO: descriptionTranslated precomputato -->
+ <!-- OTTIMIZZATO: showDocs e docUrlTranslated precomputati -->
+<sat-popover *ngIf="showTip && descriptionKey" 
+    #descriptionTooltip 
+    id="descriptionTooltip" 
     hasBackdrop 
     verticalAlign="center" 
     horizontalAlign="after" 
@@ -86,7 +51,7 @@
     panelClass="description-tooltip">
     <div class="tooltip-wrp">
         <div class="caret_tooltip"></div>
-        <span [innerHTML]="element?.doc+'.DESCRIPTION' | translate: tparams"></span>
-        <span *ngIf="BRAND_BASE_INFO['DOCS']" [innerHTML]="element?.doc+'.DOC_URL' | translate: tparams"></span>
+        <span [innerHTML]="descriptionTranslated"></span>
+        <span *ngIf="showDocs" [innerHTML]="docUrlTranslated"></span>
    </div>
-</sat-popover>
+</sat-popover> 
