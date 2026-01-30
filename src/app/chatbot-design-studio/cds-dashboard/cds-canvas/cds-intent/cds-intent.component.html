@@ -7,13 +7,12 @@
     [class.tds-slim-intent]="isNewChatbot"
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{
-        'background-color': 'rgba('+intent.attributes.color+', 0.35)',
-        'outline': intentService.intentSelectedID === intent.intent_id && intentService.intentActive ? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
+        'background-color': backgroundColor,
+        'outline': outlineStyle
       }">
      
-    <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
+    <!-- <span class="panel-intent-content tds_draggable intent-background-overlay"></span> -->
 
-    <!-- Connettori disabilitati temporaneamente per test performance -->
     <cds-connector-in *ngIf="!isStart && connectorsIn?.length>0 && stageService.getConnectorsEnabled()"
         [connectorsIn]="connectorsIn"
         (onShowConnectorsIn)="onShowConnectorsIn()"
@@ -95,7 +94,7 @@
 
         <div class="tds-drop-element tds_draggable"></div>
 
-        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
+        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last; trackBy: trackByActionId" 
             cdkDrag
             [cdkDragDisabled]="isNewChatbot"
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
@@ -113,7 +112,7 @@
             }"
             (keydown)="onKeydown($event)" 
             (click)="onSelectAction(action, i, action._tdActionId)">
-
+            <!--
             <span class="action-element">
 
                 <div *cdkDragPreview id="customDragPreview">
@@ -424,7 +423,6 @@
                         [action]="action">
                     </cds-action-move-unassigned>
 
-                    <!-- ****** ACTION VOICE: start ******* -->
                     <cds-action-dtmf-form *ngSwitchCase="TYPE_ACTION_VXML.DTMF_FORM"    
                         class="panel-response"
                         [intentSelected]="intent" 
@@ -459,7 +457,7 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-speech-form>
-                    <!-- ****** ACTION VOICE: end ******* -->
+                    
 
                     <cds-action-send-whatsapp *ngSwitchCase="TYPE_ACTION.SEND_WHATSAPP" 
                         class="panel-response"
@@ -483,22 +481,25 @@
                     </cds-action-flow-log>
 
                 </div>
+               
             </span>
             
            
 
-        
+       
             <cds-action-arrow *ngIf="(listOfActions?.length-1) > i" 
                 id="action-arrow-{{i}}"
                 class="cds-action-arrow">
-            </cds-action-arrow>
+            </cds-action-arrow> 
+        
+            -->
 
 
         </div>
         
     </div>
     
-    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
+    <!-- <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
         class="panel-response last-action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"
@@ -513,7 +514,7 @@
                 + {{ 'CDSCanvas.AddAction' | translate}}
             </div>
         </div>
-    </div>
+    </div> -->
     
 
 

@@ -1,4 +1,4 @@
-import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
+import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { takeUntil, timeInterval } from 'rxjs/operators';
 import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, CdkDropListGroup, CdkDropList, CdkDragHandle } from '@angular/cdk/drag-drop';
@@ -28,7 +28,8 @@ export enum HAS_SELECTED_TYPE {
 @Component({
   selector: 'cds-intent',
   templateUrl: './cds-intent.component.html',
-  styleUrls: ['./cds-intent.component.scss']
+  styleUrls: ['./cds-intent.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
@@ -98,6 +99,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
+  
+  // Colore di sfondo precomputato (equivalente a rgba con alpha 0.35 su sfondo bianco)
+  backgroundColor: string = 'rgb(255, 255, 255)';
+  
+  // Outline precomputato (equivalente a rgba con alpha 1.0)
+  outlineStyle: string = 'none';
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -113,6 +120,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     private readonly appStorageService: AppStorageService,
     private readonly dashboardService: DashboardService,
     private readonly webhookService: WebhookService,
+    private readonly cdr: ChangeDetectorRef, // Per gestire manualmente change detection con OnPush
   ) {
     this.initSubscriptions();
   }
@@ -145,6 +153,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             // });
           }
           
+          // Aggiorna i colori precomputati se il colore è cambiato
+          if (intent.attributes?.color !== this.intentColor) {
+            this.updateComputedColors();
+          }
+          
+          // Con OnPush, notifica manualmente il change detection
+          this.cdr.markForCheck();
+          
 
           //UPDATE QUESTIONS
           if (this.intent.question) {
@@ -164,6 +180,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
           // Aggiorna showIntentOptions basandosi su questionCount e formSize
           this.updateShowIntentOptions();
+          
+          // Con OnPush, notifica manualmente il change detection
+          this.cdr.markForCheck();
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
@@ -199,6 +218,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
                 if(logAnimationType) {
                   this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
                 }
+                // Con OnPush, notifica manualmente il change detection
+                this.cdr.markForCheck();
               }, 500);
             }
           } else {
@@ -207,6 +228,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             }
             this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
           }
+          
+          // Con OnPush, notifica manualmente il change detection
+          this.cdr.markForCheck();
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -223,6 +247,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         if (this.intent?.intent_id) {
           this.loadConnectorsIn();
         }
+        // Con OnPush, notifica manualmente il change detection
+        this.cdr.markForCheck();
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -236,6 +262,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           if(resp.color){
             this.changeIntentColor(resp.color);
           }
+          // Con OnPush, notifica manualmente il change detection
+          this.cdr.markForCheck();
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
@@ -290,6 +318,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       
       // --- Sottoscriviti agli aggiornamenti dei connettori ---
       this.initConnectorsInSubscription();
+      
+      // Aggiorna i colori precomputati dopo l'inizializzazione
+      this.updateComputedColors();
   }
 
 
@@ -372,6 +403,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   private updateConnectorsIn(connectors: any[]): void {
     this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
     this.logger.log(`[CONNECTORS] Aggiorno il numero dei connettori in ingresso per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
+    // Con OnPush, notifica manualmente il change detection
+    this.cdr.markForCheck();
   }
 
 
@@ -409,6 +442,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   // }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // Aggiorna i colori precomputati se l'intent cambia
+    if (changes['intent']) {
+      if (!changes['intent'].firstChange) {
+        this.updateComputedColors();
+      }
+      // Con OnPush, ngOnChanges viene sempre chiamato quando cambiano gli Input
+      // ma dobbiamo comunque notificare manualmente per altri aggiornamenti
+      this.cdr.markForCheck();
+    }
+    
     // Fixed bug where an empty intent's action placeholder remains visible if an action is dragged from the left action menu
     this.logger.log('[CDS-INTENT] hideActionPlaceholderOfActionPanel (dragged from sx panel) ', this.hideActionPlaceholderOfActionPanel)
     if (this.hideActionPlaceholderOfActionPanel === false) {
@@ -522,6 +565,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     resizeObserver.observe(elementoDom);
     setTimeout(() => {
       this.componentRendered.emit(this.intent.intent_id);
+      // Con OnPush, notifica manualmente il change detection dopo il rendering
+      this.cdr.markForCheck();
     }, 0);
     this.setIntentAttributes();
   }
@@ -676,6 +721,77 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.intentColor = INTENT_COLORS.COLOR1;
       this.intent.attributes.color = INTENT_COLORS.COLOR1;
     }
+    
+    // Precomputa i colori per evitare calcoli nel template
+    this.updateComputedColors();
+  }
+
+  /**
+   * Calcola il colore equivalente senza trasparenza.
+   * Converte rgba(r, g, b, 0.35) su sfondo bianco in rgb equivalente.
+   * Formula: result = (foreground * alpha) + (background * (1 - alpha))
+   * @param colorString Stringa nel formato "r, g, b" (es. "255, 0, 0")
+   * @returns Stringa rgb equivalente (es. "rgb(242, 242, 255)")
+   */
+  private computeBackgroundColor(colorString: string): string {
+    if (!colorString) {
+      return 'rgb(255, 255, 255)';
+    }
+    
+    const parts = colorString.split(',').map(s => parseInt(s.trim(), 10));
+    if (parts.length !== 3 || parts.some(isNaN)) {
+      return 'rgb(255, 255, 255)';
+    }
+    
+    const [r, g, b] = parts;
+    const alpha = 0.35;
+    const white = 255;
+    
+    // Calcolo: (colore * alpha) + (bianco * (1 - alpha))
+    const resultR = Math.round((r * alpha) + (white * (1 - alpha)));
+    const resultG = Math.round((g * alpha) + (white * (1 - alpha)));
+    const resultB = Math.round((b * alpha) + (white * (1 - alpha)));
+    
+    return `rgb(${resultR}, ${resultG}, ${resultB})`;
+  }
+
+  /**
+   * Calcola lo stile outline se l'intent è selezionato.
+   * @param colorString Stringa nel formato "r, g, b"
+   * @returns Stringa outline o 'none'
+   */
+  private computeOutlineStyle(colorString: string, isSelected: boolean, isActive: boolean): string {
+    if (!isSelected || !isActive || !colorString) {
+      return 'none';
+    }
+    
+    return `2px solid rgb(${colorString})`;
+  }
+
+  /**
+   * Aggiorna i colori precomputati basandosi sullo stato corrente dell'intent.
+   */
+  private updateComputedColors(): void {
+    const colorString = this.intent?.attributes?.color || INTENT_COLORS.COLOR1;
+    const isSelected = this.intentService.intentSelectedID === this.intent?.intent_id;
+    const isActive = this.intentService.intentActive;
+    
+    this.backgroundColor = this.computeBackgroundColor(colorString);
+    this.outlineStyle = this.computeOutlineStyle(colorString, isSelected, isActive);
+    
+    // Con OnPush, dobbiamo notificare manualmente il change detection
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * TrackBy function per ngFor delle action.
+   * Usa _tdActionId come identificatore univoco per evitare ricreazione DOM inutile.
+   * @param index Indice dell'elemento
+   * @param action Oggetto action
+   * @returns Identificatore univoco dell'action
+   */
+  trackByActionId(index: number, action: Action): string {
+    return action?._tdActionId || `action-${index}`;
   }
 
   private setIntentSelected() {
@@ -794,6 +910,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.logger.log('[CDS-INTENT] onSelectQuestion-->', elementSelected, this.intent.question)
     this.elementTypeSelected = elementSelected;
     this.intentService.setIntentSelected(this.intent.intent_id)
+    this.updateComputedColors(); // Aggiorna outline se l'intent viene selezionato
     /** // this.isIntentElementSelected = true; */
     this.questionSelected.emit(this.intent.question);
   }
@@ -802,6 +919,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     /** // this.isIntentElementSelected = true; */
     this.elementTypeSelected = elementSelected;
     this.intentService.setIntentSelected(this.intent.intent_id)
+    this.updateComputedColors(); // Aggiorna outline se l'intent viene selezionato
     if (this.intent && !this.intent.form) {
       let newForm = new Form()
       this.intent.form = newForm;
@@ -979,6 +1097,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // Per i chatbot esistenti, esegue il drop normalmente
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
+    this.updateComputedColors(); // Aggiorna outline se l'intent viene selezionato
     if (event.previousContainer === event.container) {
       // moving action in the same intent 
       moveItemInArray(this.intent.actions, event.previousIndex, event.currentIndex);
@@ -1150,6 +1269,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent ', intent)
     this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent webhook_enabled ', intent.webhook_enabled)
     this.intentService.setIntentSelected(this.intent.intent_id);
+    this.updateComputedColors(); // Aggiorna outline se l'intent viene selezionato
     intent.webhook_enabled = !intent.webhook_enabled;
     /* // this.webHookTooltipText = "Disable webhook"
     // this.webHookTooltipText = "Enable webhook"
@@ -1171,11 +1291,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   openIntentPanel(intent: Intent){
     this.intentService.setIntentSelected(this.intent.intent_id);
+    this.updateComputedColors(); // Aggiorna outline se l'intent viene selezionato
     this.openIntent.emit(intent);
   }
 
   onColorIntent(intent: Intent) {
     this.intentService.setIntentSelected(this.intent.intent_id);
+    this.updateComputedColors(); // Aggiorna outline se l'intent viene selezionato
     this.changeColorIntent.emit(intent);
   }
 
@@ -1200,7 +1322,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       //   element.style.setProperty('background-color', `rgba(${this.intentColor}, 0.35)`);
       // }
       this.setConnectorColor(color);
-      this.intentService.updateIntent(this.intent); 
+      this.intentService.updateIntent(this.intent);
+      
+      // Aggiorna i colori precomputati
+      this.updateComputedColors();
     }
    
   }
