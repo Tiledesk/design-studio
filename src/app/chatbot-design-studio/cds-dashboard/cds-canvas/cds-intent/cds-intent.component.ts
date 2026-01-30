@@ -173,6 +173,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
   // Proprietà precomputata per evitare valutazione espressione complessa nel template
   showConnectorIn: boolean = false;
 
+  // Proprietà per disattivare cdkDrag durante pan/zoom (ottimizzazione performance)
+  isPanOrZoomActive: boolean = false;
+
+  // Proprietà precomputate per actions list (ottimizzazione performance)
+  hasActions: boolean = false; // Precomputato da listOfActions?.length > 0
+  canEnterDropListResult: boolean = true; // Precomputato da canEnterDropList(intent)
+  actionClasses: Map<string, { [key: string]: boolean }> = new Map(); // Memoizzazione classi per action
+  actionOutlineStyle: Map<string, string> = new Map(); // Memoizzazione outline style per action
+  currentActionSelectedID: string | null = null; // Cache per actionSelectedID del servizio
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
 
@@ -218,6 +228,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
         this.listOfActions = this._intent.actions;
         this.setActionIntent();
         
+        // Aggiorna hasActions e canEnterDropListResult
+        this.updateHasActions();
+        this.updateCanEnterDropListResult();
+        
+        // Aggiorna valori precomputati per actions
+        this.updateCurrentActionSelectedID();
+        this.updateAllActionsComputedValues();
+        
         // Aggiorna valori controlli intent (deleteOptionEnabled potrebbe cambiare)
         this.updateIntentControlsValues();
             // cerca il primo connect to block e fissalo in fondo
@@ -262,6 +280,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
 
           // Aggiorna showIntentOptions basandosi su questionCount e formSize
           this.updateShowIntentOptions();
+          
+          // Aggiorna listOfActions se necessario
+          if (intent.actions) {
+            this.listOfActions = intent.actions;
+            this.updateHasActions();
+            this.updateCanEnterDropListResult();
+            this.updateAllActionsComputedValues();
+          }
           
           // Con OnPush, notifica manualmente il change detection
           this.cdr.markForCheck();
@@ -421,6 +447,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
       // Aggiorna showConnectorIn dopo l'inizializzazione
       this.updateShowConnectorIn();
       
+      // Aggiorna hasActions e canEnterDropListResult
+      this.updateHasActions();
+      this.updateCanEnterDropListResult();
+      
+      // Aggiorna valori precomputati per actions
+      this.updateCurrentActionSelectedID();
+      this.updateAllActionsComputedValues();
+      
+      // Sottoscrivi a panZoomActive$ per disattivare cdkDrag durante pan/zoom
+      this.initPanZoomSubscription();
+      
       // Aggiorna i valori precomputati per cds-panel-intent-controls
       this.updateIntentControlsValues();
   }
@@ -467,6 +504,30 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
     const connectors = this.connectorService.getConnectorsInByIntent(this.intent.intent_id);
     this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
     this.logger.log(`[CONNECTORS] Connettori in ingresso caricati per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
+  }
+
+  /**
+   * Inizializza la subscription a panZoomActive$ per disattivare cdkDrag durante pan/zoom.
+   */
+  private initPanZoomSubscription(): void {
+    const keyPanZoom = 'panZoomActive';
+    
+    // Verifica se la subscription esiste già
+    if (this.subscriptions.find(item => item.key === keyPanZoom)) {
+      this.logger.log(`[CDS-INTENT] Subscription panZoomActive già esistente per blocco ${this.intent.intent_id}`);
+      return;
+    }
+
+    // Sottoscrivi a panZoomActive$ per disattivare cdkDrag durante pan/zoom
+    const sub = this.stageService.panZoomActive$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(isActive => {
+        this.isPanOrZoomActive = isActive;
+        this.cdr.markForCheck(); // Notifica OnPush
+      });
+    
+    this.subscriptions.push({ key: keyPanZoom, value: sub });
+    this.logger.log(`[CDS-INTENT] Subscription panZoomActive attiva per blocco ${this.intent.intent_id}`);
   }
 
   /**
@@ -941,6 +1002,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
     this.backgroundColor = this.computeBackgroundColor(colorString);
     this.outlineStyle = this.computeOutlineStyle(colorString, isSelected, isActive);
     
+    // Aggiorna outline style per actions quando cambia il colore
+    this.updateAllActionsComputedValues();
+    
     // Con OnPush, dobbiamo notificare manualmente il change detection
     this.cdr.markForCheck();
   }
@@ -978,6 +1042,91 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
   private updateComputedBooleanExpressions(): void {
     this.hasQuestions = this.questionCount > 0;
     this.hasForm = this.formSize > 0;
+  }
+
+  /**
+   * Aggiorna hasActions basandosi su listOfActions.length.
+   * Chiamato quando cambia listOfActions.
+   */
+  private updateHasActions(): void {
+    this.hasActions = (this.listOfActions?.length ?? 0) > 0;
+  }
+
+  /**
+   * Aggiorna canEnterDropListResult basandosi su canEnterDropList(intent).
+   * Chiamato quando cambiano le dipendenze.
+   */
+  private updateCanEnterDropListResult(): void {
+    // canEnterDropList ritorna una funzione, quindi dobbiamo chiamarla e verificare il risultato
+    // Per semplicità, memoizziamo il risultato della funzione canEnterDropList
+    // La funzione canEnterDropList ritorna una funzione predicate, quindi dobbiamo testarla
+    // Per ora, assumiamo che il risultato dipenda solo da isNewChatbot e listOfActions.length
+    this.canEnterDropListResult = !(this.isNewChatbot && (this.listOfActions?.length ?? 0) > 0);
+  }
+
+  /**
+   * Aggiorna le classi precomputate per una action specifica.
+   * @param action - Action per cui calcolare le classi
+   * @param isLast - Se è l'ultima action nella lista
+   */
+  private updateActionClasses(action: Action, isLast: boolean): { [key: string]: boolean } {
+    // CORRETTO: Logica corretta (rimossa doppia negazione errata)
+    const isNoFeaturedAction = action._tdActionType !== TYPE_ACTION.REPLY 
+      && action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM 
+      && action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER;
+    
+    return {
+      'cds-no-featured-action': isNoFeaturedAction,
+      'cds-last-action': isLast
+    };
+  }
+
+  /**
+   * Aggiorna l'outline style precomputato per una action specifica.
+   * @param action - Action per cui calcolare l'outline style
+   */
+  private updateActionOutlineStyle(action: Action): string {
+    const isSelected = this.currentActionSelectedID === action._tdActionId;
+    if (isSelected) {
+      const color = this.intent?.attributes?.color || INTENT_COLORS.COLOR1;
+      return `2px solid rgba(${color}, 1)`;
+    }
+    return 'none';
+  }
+
+  /**
+   * Aggiorna currentActionSelectedID dal servizio.
+   * Chiamato quando cambia actionSelectedID nel servizio.
+   */
+  private updateCurrentActionSelectedID(): void {
+    this.currentActionSelectedID = this.intentService.actionSelectedID;
+  }
+
+  /**
+   * Aggiorna tutte le classi e gli stili precomputati per tutte le actions.
+   * Chiamato quando cambiano listOfActions, actionSelectedID, o intent.attributes.color.
+   */
+  private updateAllActionsComputedValues(): void {
+    // Aggiorna currentActionSelectedID prima di calcolare gli stili
+    this.updateCurrentActionSelectedID();
+    
+    if (!this.listOfActions || this.listOfActions.length === 0) {
+      this.actionClasses.clear();
+      this.actionOutlineStyle.clear();
+      return;
+    }
+
+    // Aggiorna classi e stili per ogni action
+    this.listOfActions.forEach((action, index) => {
+      const isLast = index === this.listOfActions.length - 1;
+      const actionId = action._tdActionId || `action-${index}`;
+      
+      // Aggiorna classi
+      this.actionClasses.set(actionId, this.updateActionClasses(action, isLast));
+      
+      // Aggiorna outline style
+      this.actionOutlineStyle.set(actionId, this.updateActionOutlineStyle(action));
+    });
   }
 
   /**
@@ -1197,6 +1346,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
     this.logger.log('[CDS-INTENT] onKeydown: ', event);
     if (event.key === 'Backspace' || event.key === 'Escape' || event.key === 'Canc') {
       this.intentService.deleteSelectedAction();
+      
+      // Aggiorna valori precomputati per actions quando viene eliminata un'action
+      this.updateCurrentActionSelectedID();
+      this.updateAllActionsComputedValues();
+      this.cdr.markForCheck();
     }
   }
 
@@ -1329,6 +1483,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
       this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot nuovo e c\'è già un\'action nell\'intent');
       return;
     }
+    
+    // Aggiorna listOfActions dopo il drop
+    this.listOfActions = this.intent.actions;
+    this.updateHasActions();
+    this.updateCanEnterDropListResult();
+    this.updateAllActionsComputedValues();
     
     // Per i chatbot esistenti, esegue il drop normalmente
     this.controllerService.closeAllPanels();

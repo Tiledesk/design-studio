@@ -51,12 +51,22 @@ export class TiledeskStage {
                 this.getPositionNow();
                 startX = this.tx;
                 startY = this.ty;
+                
+                // Notifica che pan sta per iniziare (sarà confermato al primo mousemove)
+                const panStartEvent = new CustomEvent("pan-start", { detail: {} });
+                document.dispatchEvent(panStartEvent);
+                
                 document.onmousemove = (function(event) {
                     if (isDragging) {
                         let direction = 1;
                         this.tx = startX + (event.clientX - clientX) * direction;
                         this.ty = startY + (event.clientY - clientY) * direction;
                         this.transform();
+                        
+                        // Notifica che pan è attivo
+                        const panActiveEvent = new CustomEvent("pan-active", { detail: {} });
+                        document.dispatchEvent(panActiveEvent);
+                        
                         setTimeout(() => {
                             const customEvent = new CustomEvent("moved-and-scaled", { detail: {scale: this.scale, x: this.tx, y: this.ty} });
                             document.dispatchEvent(customEvent);
@@ -66,6 +76,11 @@ export class TiledeskStage {
 
                 document.onmouseup = (function() {
                     isDragging = false;
+                    
+                    // Notifica che pan è terminato
+                    const panEndEvent = new CustomEvent("pan-end", { detail: {} });
+                    document.dispatchEvent(panEndEvent);
+                    
                     document.onmousemove = null;
                     document.onmouseup = null;
                 }).bind(this);
@@ -84,11 +99,17 @@ export class TiledeskStage {
         this.getPositionNow();
 
         if (event.ctrlKey === false) {
+            // Pan (senza ctrl)
             let direction = -1;
             this.tx += event.deltaX * direction;
             this.ty += event.deltaY * direction;
             this.transform();
+            
+            // Notifica che pan è attivo
+            const panActiveEvent = new CustomEvent("pan-active", { detail: {} });
+            document.dispatchEvent(panActiveEvent);
         } else {
+            // Zoom (con ctrl)
             let originRec = this.container.getBoundingClientRect();            
             // zoom
             let zoom_target = {x:0,y:0}
@@ -104,6 +125,10 @@ export class TiledeskStage {
             this.ty = -zoom_target.y * this.scale + zoom_point.y
             // Apply scale transform
             this.transform();
+            
+            // Notifica che zoom è attivo
+            const zoomActiveEvent = new CustomEvent("zoom-active", { detail: {} });
+            document.dispatchEvent(zoomActiveEvent);
         }
         setTimeout(() => {
             const customEvent = new CustomEvent("moved-and-scaled", { detail: {scale: this.scale, x: this.tx, y: this.ty} });

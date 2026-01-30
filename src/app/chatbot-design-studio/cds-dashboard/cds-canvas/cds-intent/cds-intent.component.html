@@ -68,13 +68,15 @@
         </cds-action-intent>
     </div>
 
+    <!-- OTTIMIZZATO: Espressioni precomputate, logica ngClass corretta, accessi a servizio eliminati -->
     <div *ngIf="!isStart" class="actions-list-wpr"
         cdkDropList
         [cdkDropListData]="listOfActions"
         [cdkDropListDisabled]="isNewChatbot"
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
-        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
+        <!-- OTTIMIZZATO: Espressione booleana precomputata -->
+        <div class="add--action-placeholder" *ngIf="!hasActions" 
             cdkDrag
             [cdkDragDisabled]="dragDisabled || isNewChatbot">
             <div class="add--action-placeholder-text">
@@ -94,22 +96,18 @@
 
         <div class="tds-drop-element tds_draggable"></div>
 
+        <!-- OTTIMIZZATO: Classi e stili precomputati, accessi a servizio eliminati, logica ngClass corretta, cdkDrag disattivato durante pan/zoom -->
         <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last; trackBy: trackByActionId" 
             cdkDrag
-            [cdkDragDisabled]="isNewChatbot"
+            [cdkDragDisabled]="isPanOrZoomActive || isNewChatbot"
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
             (cdkDragReleased)="onDragEnded($event, i)"
             (cdkDragMoved)="onDragMove($event)"
             [id]="action._tdActionId" 
             class="box-action" 
             tabindex=-1
-            [ngClass]="{
-                'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
-                'cds-last-action': last
-            }" 
-            [ngStyle]="{
-                'outline': intentService.actionSelectedID === action._tdActionId? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
-            }"
+            [ngClass]="actionClasses.get(action._tdActionId || 'action-'+i)" 
+            [ngStyle]="{'outline': actionOutlineStyle.get(action._tdActionId || 'action-'+i)}"
             (keydown)="onKeydown($event)" 
             (click)="onSelectAction(action, i, action._tdActionId)">
             <!--

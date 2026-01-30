@@ -64,6 +64,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   listnerEndDragging: (e: CustomEvent) => void;
   listnerDragged: (e: CustomEvent) => void;
   listnerStartDragging: (e: CustomEvent) => void;
+  listnerPanActive: (e: CustomEvent) => void;
+  listnerPanEnd: (e: CustomEvent) => void;
+  listnerZoomActive: (e: CustomEvent) => void;
 
   blockId: string | null = null;
   blockName: string | null = null;
@@ -256,6 +259,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     document.removeEventListener("connector-drawn", this.listnerConnectorDrawn, false);
     document.removeEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
     document.removeEventListener("start-dragging", this.listnerStartDragging, false);
+    document.removeEventListener("pan-active", this.listnerPanActive, false);
+    document.removeEventListener("pan-end", this.listnerPanEnd, false);
+    document.removeEventListener("zoom-active", this.listnerZoomActive, false);
     document.removeEventListener("keydown", this.listnerKeydown, false);
     document.removeEventListener("connector-selected", this.listnerConnectorSelected, false);
     document.removeEventListener("connector-deselected", this.listnerConnectorDeselected, false);
@@ -763,6 +769,33 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
     };
     document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+
+    /** pan-active / pan-end / zoom-active / zoom-end **
+    * fires when pan/zoom starts or ends:
+    * - disattiva/riattiva cdkDrag per migliorare performance
+    */
+    let zoomDebounceTimeout: any;
+    
+    this.listnerPanActive = (e: CustomEvent) => {
+      this.stageService.setPanning(true);
+    };
+    document.addEventListener("pan-active", this.listnerPanActive, false);
+
+    this.listnerPanEnd = (e: CustomEvent) => {
+      this.stageService.setPanning(false);
+    };
+    document.addEventListener("pan-end", this.listnerPanEnd, false);
+
+    this.listnerZoomActive = (e: CustomEvent) => {
+      this.stageService.setZooming(true);
+      clearTimeout(zoomDebounceTimeout);
+      
+      // Riattiva cdkDrag dopo 300ms dall'ultimo zoom event
+      zoomDebounceTimeout = setTimeout(() => {
+        this.stageService.setZooming(false);
+      }, 300);
+    };
+    document.addEventListener("zoom-active", this.listnerZoomActive, false);
 
     /** start-dragging */
     this.listnerStartDragging = (e: CustomEvent) => {

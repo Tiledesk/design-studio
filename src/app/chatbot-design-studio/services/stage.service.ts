@@ -27,10 +27,18 @@ export class StageService {
   private readonly alphaConnectorsSubject = new BehaviorSubject<number>(100);
   alphaConnectors$ = this.alphaConnectorsSubject.asObservable();
 
+  // Observable per notificare quando pan/zoom è attivo (per disattivare cdkDrag)
+  private panZoomActiveSubject = new BehaviorSubject<boolean>(false);
+  panZoomActive$ = this.panZoomActiveSubject.asObservable();
+
   private tiledeskStage: any;
   private alpha_connectors: number = DEFAULT_ALPHA_CONNECTORS;
   settings: Settings;
   loaded: boolean = false;
+  
+  // Stato pan/zoom per disattivare cdkDrag durante pan/zoom
+  private isPanning: boolean = false;
+  private isZooming: boolean = false;
 
   /**
    * Flag centralizzato per disabilitare/abilitare connettori
@@ -308,6 +316,37 @@ export class StageService {
     if (svgContainer) {
       svgContainer.style.display = enabled ? 'block' : 'none';
     }
+  }
+
+  /**
+   * setPanning
+   * Imposta lo stato di pan attivo per disattivare cdkDrag durante pan
+   * @param isPanning - true se pan è attivo, false altrimenti
+   */
+  setPanning(isPanning: boolean): void {
+    this.isPanning = isPanning;
+    this.updatePanZoomActive();
+    this.logger.log("[CDS-STAGE] Panning " + (isPanning ? "attivo" : "inattivo"));
+  }
+
+  /**
+   * setZooming
+   * Imposta lo stato di zoom attivo per disattivare cdkDrag durante zoom
+   * @param isZooming - true se zoom è attivo, false altrimenti
+   */
+  setZooming(isZooming: boolean): void {
+    this.isZooming = isZooming;
+    this.updatePanZoomActive();
+    this.logger.log("[CDS-STAGE] Zooming " + (isZooming ? "attivo" : "inattivo"));
+  }
+
+  /**
+   * updatePanZoomActive
+   * Aggiorna lo stato pan/zoom attivo e emette observable
+   */
+  private updatePanZoomActive(): void {
+    const isActive = this.isPanning || this.isZooming;
+    this.panZoomActiveSubject.next(isActive);
   }
 
 
