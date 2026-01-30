@@ -34,11 +34,17 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
     if (this._actionSelected !== value) {
       this._actionSelected = value;
       if (value) {
-        // Se actionSelected cambia, aggiorna elementType
+        // FIX: Se actionSelected cambia, aggiorna sempre elementType con il tipo specifico dell'action
+        // Questo è necessario perché in cds-panel-action-detail viene passato elementType='ACTION' 
+        // che non è un tipo valido per ACTIONS_LIST
         this.elementType = value._tdActionType;
         if (value._tdActionTitle && value._tdActionTitle !== "") {
           this.dataInput = value._tdActionTitle;
         }
+      } else {
+        // FIX: Se actionSelected è null, non resettare elementType se è già un tipo valido
+        // (potrebbe essere 'question', 'form', 'answer' da INTENT_ELEMENT)
+        // Solo se elementType è 'ACTION' (non valido), non fare nulla
       }
       // Notifica OnPush che lo stato è cambiato
       this.cdr.markForCheck();
@@ -51,9 +57,17 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
   @Input() 
   set elementType(value: string) {
     if (this._elementType !== value) {
-      this._elementType = value;
+      // FIX: Se elementType è 'action' (valore generico da TYPE_INTENT_ELEMENT) e actionSelected è disponibile,
+      // usa il tipo specifico dell'action invece del valore generico
+      if (value === 'action' && this._actionSelected && this._actionSelected._tdActionType) {
+        this._elementType = this._actionSelected._tdActionType;
+        this.logger.log(`[CDS-ACTION-DESCRIPTION] elementType='action' sostituito con tipo specifico: ${this._actionSelected._tdActionType}`);
+      } else {
+        this._elementType = value;
+      }
       this._element = null; // Reset memoization
       this.calculateElement();
+      // FIX: Aggiorna sempre i valori computati quando elementType cambia, indipendentemente da previewMode
       this.updateComputedValues();
       // Notifica OnPush che lo stato è cambiato
       this.cdr.markForCheck();
@@ -67,7 +81,12 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
   set previewMode(value: boolean) {
     if (this._previewMode !== value) {
       this._previewMode = value;
-      // Aggiorna valori che dipendono da previewMode
+      // FIX: Assicura che element sia calcolato prima di aggiornare i valori
+      // Se elementType è disponibile ma element non è ancora calcolato, calcolalo
+      if (this._elementType && !this.element) {
+        this.calculateElement();
+      }
+      // Aggiorna valori che dipendono da previewMode (e anche quelli che non dipendono)
       if (this.element) {
         this.updateComputedValues();
       }
@@ -121,8 +140,6 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
   tipText: string = ''; // Fix: proprietà mancante
 
   // BEST PRACTICE: Flag per nascondere drag button durante pan/zoom per eliminare overhead
-  isPanOrZoomActive: boolean = false;
-  private panZoomSubscription: Subscription | null = null;
   private unsubscribe$ = new Subject<void>();
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -168,6 +185,13 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
       });
     }
 
+    // FIX: Se elementType è 'action' (valore generico) e actionSelected è disponibile,
+    // usa il tipo specifico dell'action prima di calcolare element
+    if (this._elementType === 'action' && this._actionSelected && this._actionSelected._tdActionType) {
+      this._elementType = this._actionSelected._tdActionType;
+      this.logger.log(`[CDS-ACTION-DESCRIPTION] ngOnInit: elementType='action' sostituito con tipo specifico: ${this._actionSelected._tdActionType}`);
+    }
+
     // Calcola element se elementType è già disponibile
     if (this._elementType) {
       this.calculateElement();
@@ -175,22 +199,8 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
       // Notifica OnPush dopo inizializzazione
       this.cdr.markForCheck();
     }
-
-    // BEST PRACTICE: Sottoscrivi a panZoomActive$ per nascondere drag button durante pan/zoom
-    this.initPanZoomSubscription();
   }
 
-  /**
-   * Inizializza la subscription a panZoomActive$ per nascondere drag button durante pan/zoom.
-   */
-  private initPanZoomSubscription(): void {
-    this.panZoomSubscription = this.stageService.panZoomActive$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(isActive => {
-        this.isPanOrZoomActive = isActive;
-        this.cdr.markForCheck(); // Notifica OnPush
-      });
-  }
 
   /**
    * Calcola element da elementType usando mappa statica (lookup O(1) invece di Object.values().find() O(n)).
@@ -241,6 +251,7 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
   /**
    * Precomputa tutti i valori per il template per eliminare valutazioni costose durante change detection.
    * Chiamato quando cambia element o elementType.
+   * FIX: Calcola sempre elementSrc e elementNameTranslated indipendentemente da previewMode.
    */
   private updateComputedValues(): void {
     if (!this.element) {
@@ -259,10 +270,11 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
       this.docUrlKey = '';
       this.docUrlTranslated = '';
       this.tipText = '';
+      this.logger.log('[CDS-ACTION-DESCRIPTION] updateComputedValues: element non disponibile');
       return;
     }
 
-    // Precomputa accessi a proprietà nested
+    // FIX: Precomputa sempre elementSrc e elementNameTranslated (non dipendono da previewMode)
     this.elementSrc = this.element?.src || '';
     const elementName = this.element?.name || '';
     
@@ -274,6 +286,8 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
       this.elementNameTranslated = elementName;
       this.elementNameTitle = elementName;
     }
+    
+    this.logger.log(`[CDS-ACTION-DESCRIPTION] updateComputedValues: elementSrc=${this.elementSrc}, elementNameTranslated=${this.elementNameTranslated}, previewMode=${this._previewMode}`);
 
     // Precomputa badge class e flags
     const badge = this.element?.badge;
@@ -332,11 +346,9 @@ export class CdsActionDescriptionComponent implements OnInit, OnDestroy {
     this.actionSelected._tdActionTitle = text;
   }
 
+
   ngOnDestroy(): void {
     // BEST PRACTICE: Cleanup subscription per evitare memory leaks
-    if (this.panZoomSubscription) {
-      this.panZoomSubscription.unsubscribe();
-    }
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }

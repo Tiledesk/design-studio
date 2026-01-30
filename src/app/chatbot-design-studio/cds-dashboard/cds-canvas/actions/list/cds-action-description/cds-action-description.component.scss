@@ -1,3 +1,4 @@
+// Container principale
 .action_wrp {
     position: relative;
     display: flex;
@@ -7,78 +8,49 @@
     padding: 10px;
 }
 
-.preview {
-    padding: 5px !important;
-    border-bottom: 0 !important;
+// Action button icon (drag handle) - visibile solo in preview mode
+.action-btn-icon {
+    display: inline-flex;
+    color: #394f5a;
+    padding: 0;
+    vertical-align: middle;
 
-    .label-action {
-        font-size: 12px !important;
-        color: var(--blu) !important;
-        width: 100%;
-    }
-
-    .icon-action {
-        // background: var(--brown) !important;
-
-        img {
-            width: 18px;
-            height: auto;
-        }
-    }
-
-    .action-title{
-        justify-content: space-between;
-        width: 100%;
-    }
-
-    .action-btn-icon {
-        display: inline-flex;
-        color: #394f5a;
+    .btn-tdblu-no-boxshadow {
+        margin: 0;
+        cursor: grab;
         padding: 0;
-        vertical-align: middle;
-        // margin: 0 6px;
-        .btn-tdblu-no-boxshadow {
-            margin: 0;
-            cursor: grab;
-            padding: 0!important;
-            background: transparent !important;
-            font-size: 12px;
-            width: 25px;
-            height: 25px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: none;
-        }
-        // BEST PRACTICE: Sostituito <img> con CSS background-image per eliminare 300-500 immagini dal DOM
-        // Drag and drop funziona con cdkDragHandle sul componente, questo è solo visivo
-        // OTTIMIZZATO: GPU acceleration, contain per isolare rendering, eliminare overhead durante pan
-        .drag-btn.drag-icon {
-            width: 16px;
-            height: 16px;
-            // NOTA: Percorso assoluto dalla root del progetto (src/assets)
-            background-image: url('/assets/images/icons/drag_indicator.svg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            cursor: grab;
-            pointer-events: auto;
-            // Rimuove padding/margin default button
-            border: none;
-            outline: none;
-            
-            // BEST PRACTICE: GPU acceleration per performance durante pan/zoom
-            // Riduce overhead rendering del 70-80% isolando rendering e usando GPU layer
-            will-change: transform;
-            transform: translateZ(0); // Forza GPU layer (compositing layer)
-            contain: layout style paint; // Isola rendering per evitare repaint di elementi vicini
-            
-            &:active {
-                cursor: grabbing;
-            }
+        background: transparent;
+        font-size: 12px;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: none;
+    }
+
+    // BEST PRACTICE: Immagine <img> con lazy loading per migliorare performance
+    // Drag and drop funziona con cdkDragHandle sul componente, questo è solo visivo
+    // OTTIMIZZATO: GPU acceleration, contain per isolare rendering, eliminare overhead durante pan
+    .drag-btn.drag-icon {
+        width: 16px;
+        height: 16px;
+        cursor: grab;
+        pointer-events: auto;
+        border: none;
+        outline: none;
+        display: block;
+        
+        // BEST PRACTICE: GPU acceleration per performance durante pan/zoom
+        // Riduce overhead rendering del 70-80% isolando rendering e usando GPU layer
+        will-change: transform;
+        transform: translateZ(0); // Forza GPU layer (compositing layer)
+        contain: layout style paint; // Isola rendering per evitare repaint di elementi vicini
+        
+        &:active {
+            cursor: grabbing;
         }
     }
-    
 }
 
 .trigger-beta-badge2 {
@@ -171,30 +143,28 @@
     width: 100%;
 }
 
+// Action title container
 .action-title {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 5px;
     max-width: calc(100% - 70px);
-
+    &.previewMode {
+        width: 100%;
+    }
     .icon-action {
-        transition: opacity .15s ease 0s;
-        // width: 20px;
+        transition: opacity 0.15s ease 0s;
         height: 20px;
         border-radius: 4px;
-        // margin-right: 6px;
-        // align-self: start;
         color: var(--blu);
         background: none;
-
         display: flex;
         align-items: center;
         justify-content: center;
 
         img {
-            // width: 18px;
-            // margin: auto 6px auto 4px;
+            width: 18px;
             height: 16px;
         }
     }

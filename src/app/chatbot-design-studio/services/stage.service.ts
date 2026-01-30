@@ -78,6 +78,13 @@ export class StageService {
       maximize: false, 
       open_intent_list_state: true
     };
+    
+    // FIX: Assicura che isPanning e isZooming siano inizializzati a false
+    this.isPanning = false;
+    this.isZooming = false;
+    // FIX: Aggiorna esplicitamente lo stato pan/zoom per sincronizzare BehaviorSubject
+    this.updatePanZoomActive();
+    
     this.initStageSettings(id_faq_kb);
     
     // BEST PRACTICE: Assicura che il container SVG sia visibile se i connettori sono abilitati

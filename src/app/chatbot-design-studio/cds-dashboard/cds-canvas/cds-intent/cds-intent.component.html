@@ -94,7 +94,7 @@
             </div>
         </div>
 
-        <div class="tds-drop-element tds_draggable"></div>
+        <!-- <div class="tds-drop-element tds_draggable"></div> -->
 
         <!-- OTTIMIZZATO: Classi e stili precomputati, accessi a servizio eliminati, logica ngClass corretta, cdkDrag disattivato durante pan/zoom -->
         <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last; trackBy: trackByActionId" 
@@ -129,7 +129,7 @@
                     [elementType]="action._tdActionType">
                 </cds-action-description>
                 
-                <!--
+          
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
                     
                     <cds-action-controls *ngIf="!isNewChatbot"
@@ -480,7 +480,7 @@
                     </cds-action-flow-log>
                    
                 </div>
-                -->
+              
             </span>
             
            

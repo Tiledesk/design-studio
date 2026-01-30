@@ -1,13 +1,13 @@
 <!-- OTTIMIZZATO: Tutti i valori precomputati nel componente, eliminati pipe translate, concatenazioni stringa, accessi nested -->
-<div [class.preview]="previewMode" class="action_wrp">
+<div class="action_wrp">
 
     <div class="section">
         <!-- TEST PERFORMANCE: Commentato righe 6-25 per isolare problema performance -->
         
-        <div class="action-title">
+        <div class="action-title" [class.previewMode]="previewMode">
             <div class="icon-action">
                 <img class="active-icon" [src]="elementSrc" [title]="elementNameTitle">
-                <span *ngIf="previewMode && showBadge" [class]="badgeClass">{{elementBadge}}</span>
+                <span *ngIf="previewMode && showBadge" [class]="badgeClass">{{elementBadge}}</span>   
             </div>
             <p *ngIf="!previewMode" class="label-action">{{elementNameTranslated}}</p>
             <span *ngIf="!previewMode && showBadge" [class]="badgeClass">{{elementBadge}}</span>
@@ -15,19 +15,44 @@
             <!-- OTTIMIZZATO: Sostituito <img> con CSS background-image, ottimizzato per GPU, attributi non necessari rimossi -->
             <!-- BEST PRACTICE: Drag and drop funziona con cdkDragHandle sul componente, questo è solo visivo -->
             <!-- OTTIMIZZATO: GPU acceleration, contain per isolare rendering, nascondi durante pan per eliminare overhead -->
-            <div *ngIf="previewMode && !isPanOrZoomActive" class="action-btn-icon">
-                <div class="btn btn-tdblu-no-boxshadow drag-btn drag-icon">
-                </div> 
+
+            <!-- OTTIMIZZATO: Sostituito CSS background-image con <img> lazy loading per migliorare performance -->
+            <div *ngIf="previewMode" class="action-btn-icon">
+                <img 
+                    class="btn btn-tdblu-no-boxshadow drag-btn drag-icon active-icon"
+                    src="/assets/images/icons/drag_indicator.svg"
+                    alt="Drag"
+                    loading="lazy"
+                    width="16"
+                    height="16">
             </div>
         </div>
 
         
         <div *ngIf="showTip" class="action-description">
-            <div *ngIf="descriptionKey"
-                [satPopoverAnchor]="descriptionTooltip"
-                (click)="descriptionTooltip.toggle()">
-                <span class="material-icons-outlined">info</span>
-            </div>
+            <!-- FIX: Usa ng-container per raggruppare popover e anchor con la stessa condizione -->
+            <!-- Questo assicura che la template reference variable sia disponibile quando satPopoverAnchor viene valutato -->
+            <ng-container *ngIf="showTip && descriptionKey">
+                <div [satPopoverAnchor]="descriptionTooltip"
+                    (click)="descriptionTooltip.toggle()">
+                    <span class="material-icons-outlined">info</span>
+                </div>
+                
+                <sat-popover 
+                    #descriptionTooltip 
+                    id="descriptionTooltip" 
+                    hasBackdrop 
+                    verticalAlign="center" 
+                    horizontalAlign="after" 
+                    (backdropClicked)="descriptionTooltip.close()" 
+                    panelClass="description-tooltip">
+                    <div class="tooltip-wrp">
+                        <div class="caret_tooltip"></div>
+                        <span [innerHTML]="descriptionTranslated"></span>
+                        <span *ngIf="showDocs" [innerHTML]="docUrlTranslated"></span>
+                    </div>
+                </sat-popover>
+            </ng-container>
             <div [innerHtml]="tipText"></div>
         </div>
 
@@ -36,22 +61,4 @@
     <!-- OTTIMIZZATO: showDeprecationMessage e deprecationMessageTranslated precomputati -->
      <div *ngIf="showDeprecationMessage" class="deprecation-message">{{deprecationMessageTranslated}}</div>
 
-</div>
-
-<!-- OTTIMIZZATO: Lazy initialize sat-popover solo quando showTip e descriptionKey sono true -->
- <!-- OTTIMIZZATO: descriptionTranslated precomputato -->
- <!-- OTTIMIZZATO: showDocs e docUrlTranslated precomputati -->
-<sat-popover *ngIf="showTip && descriptionKey" 
-    #descriptionTooltip 
-    id="descriptionTooltip" 
-    hasBackdrop 
-    verticalAlign="center" 
-    horizontalAlign="after" 
-    (backdropClicked)="descriptionTooltip.close()" 
-    panelClass="description-tooltip">
-    <div class="tooltip-wrp">
-        <div class="caret_tooltip"></div>
-        <span [innerHTML]="descriptionTranslated"></span>
-        <span *ngIf="showDocs" [innerHTML]="docUrlTranslated"></span>
-   </div>
-</sat-popover> 
+</div> 
