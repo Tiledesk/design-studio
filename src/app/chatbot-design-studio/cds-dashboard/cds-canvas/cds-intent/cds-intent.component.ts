@@ -106,7 +106,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     public intentService: IntentService,
     public appConfigService: AppConfigService,
     private readonly connectorService: ConnectorService,
-    private readonly stageService: StageService,
+    public readonly stageService: StageService, // Public per accesso nel template
     private readonly controllerService: ControllerService,
     private readonly elemenRef: ElementRef,
     private readonly renderer: Renderer2,
@@ -508,6 +508,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   ngAfterViewInit() {
     this.logger.log("[CDS-INTENT]  •••• ngAfterViewInit ••••");
     const resizeObserver = new ResizeObserver(entries => {
+      // Skip se connettori disabilitati
+      if (!this.stageService.getConnectorsEnabled()) {
+        return;
+      }
       for (const entry of entries) {
         const nuovaAltezza = entry.contentRect.height;
         this.logger.log('[CDS-INTENT] ngAfterViewInit Nuova altezza del div:', nuovaAltezza);

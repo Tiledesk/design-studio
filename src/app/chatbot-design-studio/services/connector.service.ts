@@ -55,6 +55,19 @@ export class ConnectorService {
   constructor(
   ) {}
 
+  /**
+   * Verifica se i connettori sono abilitati
+   * Controlla direttamente la visibilità del container SVG per evitare dipendenze circolari
+   * @returns true se abilitati, false altrimenti
+   */
+  private areConnectorsEnabled(): boolean {
+    const svgContainer = document.getElementById('tds_svgContainer');
+    if (!svgContainer) {
+      return false; // Container non esiste ancora = connettori non inizializzati
+    }
+    return svgContainer.style.display !== 'none';
+  }
+
   initializeConnectors(){
     this.tiledeskConnectors = new TiledeskConnectors("tds_drawer", {"input_block": "tds_input_block"}, {});
     this.tiledeskConnectors.mousedown(document);
@@ -215,6 +228,10 @@ export class ConnectorService {
    * 
    */
   async createNewConnector(fromId:string, toId:string){
+    if (!this.areConnectorsEnabled()) {
+      this.logger.log('[CONNECTOR-SERV] Connettori disabilitati - skip createNewConnector');
+      return;
+    }
     this.logger.log('[CONNECTOR-SERV] createNewConnector:: fromId:', fromId, 'toId:', toId);
     let elFrom = await isElementOnTheStage(fromId); // sync
     let elTo = await isElementOnTheStage(toId); // sync
@@ -236,6 +253,10 @@ export class ConnectorService {
    * 
    */
   public async createConnectors(intents){
+    if (!this.areConnectorsEnabled()) {
+      this.logger.log('[CONNECTOR-SERV] Connettori disabilitati - skip createConnectors');
+      return;
+    }
     this.listOfIntents = intents;
     // Pulisci la coda di retry prima di iniziare
     this.clearRetryQueue();
@@ -266,6 +287,10 @@ export class ConnectorService {
    * @returns 
    */
   public async createConnectorFromId(fromId, toId, notify=false, attributes=null) {
+    if (!this.areConnectorsEnabled()) {
+      this.logger.log('[CONNECTOR-SERV] Connettori disabilitati - skip createConnectorFromId');
+      return false;
+    }
     const connectorID = fromId+'/'+toId;
     const isConnector = document.getElementById(connectorID);
     if (isConnector) {
@@ -356,6 +381,9 @@ export class ConnectorService {
    * create connectors from Intent
    */
   public async createConnectorsOfIntent(intent:any){
+    if (!this.areConnectorsEnabled()) {
+      return; // Skip se connettori disabilitati
+    }
     if(intent.attributes?.nextBlockAction){
       let idConnectorFrom = null;
       let idConnectorTo = null;
@@ -1337,6 +1365,9 @@ export class ConnectorService {
    * @param elementID 
    */
   public async updateConnector(elementID){
+    if (!this.areConnectorsEnabled()) {
+      return; // Skip se connettori disabilitati
+    }
     this.logger.log('[CONNECTOR-SERV] movedConnector elementID ' ,elementID )
     const elem = await isElementOnTheStage(elementID); // chiamata sincrona
     // const elem = document.getElementById(elementID);
@@ -1402,6 +1433,9 @@ export class ConnectorService {
    * @param elementID 
    */
   public async updateConnectorsOfBlock(elementID){
+    if (!this.areConnectorsEnabled()) {
+      return; // Skip se connettori disabilitati
+    }
     this.logger.log('[CONNECTOR-SERV] updateConnector2 elementID ' ,elementID);
     const elem = await isElementOnTheStage(elementID); //sync
     if(elem){
@@ -1443,6 +1477,9 @@ export class ConnectorService {
    * @param y 
    */
   public moved(element, x, y){
+    if (!this.areConnectorsEnabled()) {
+      return; // Skip se connettori disabilitati
+    }
     this.tiledeskConnectors.moved(element, x, y);
     // this.logger.log('[CONNECTOR-SERV] moved element ' ,element , ' x ' , x ,  'y ',  y )
   }

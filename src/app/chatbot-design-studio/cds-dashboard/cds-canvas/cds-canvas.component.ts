@@ -726,6 +726,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     /** LISTENER OF TILEDESK STAGE */
     /** triggers when a connector is drawn on the stage  */
     this.listnerConnectorDrawn = (e: CustomEvent) => {
+      // Skip se connettori disabilitati
+      if (!this.stageService.getConnectorsEnabled()) {
+        return;
+      }
       const connector = e.detail.connector;
       this.setConnectorColor(connector);
       this.checkAllConnectors(connector);
@@ -790,7 +794,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       }
       const x = e.detail.x;
       const y = e.detail.y;
-      this.connectorService.moved(el, x, y);
+      // Skip se connettori disabilitati
+      if (this.stageService.getConnectorsEnabled()) {
+        this.connectorService.moved(el, x, y);
+      }
       this.intentService.setIntentSelectedPosition(el.offsetLeft, el.offsetTop);
     };
     document.addEventListener("dragged", this.listnerDragged, false);
@@ -853,6 +860,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     * notify actions that connectors have changed (onChangedConnector) to update the dots
     */
     this.listnerConnectorCreated = (e: CustomEvent) => {
+      // Skip se connettori disabilitati
+      if (!this.stageService.getConnectorsEnabled()) {
+        return;
+      }
       this.logger.log("[CDS-CANVAS] connector-created:", e);
       const connector = e.detail.connector;
       connector['created'] = true;
@@ -874,6 +885,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     * notify actions that connectors have changed (onChangedConnector) to update the dots
     */
     this.listnerConnectorDeleted = (e: CustomEvent) => {
+      // Skip se connettori disabilitati
+      if (!this.stageService.getConnectorsEnabled()) {
+        return;
+      }
       this.logger.log("[CDS-CANVAS] connector-deleted:", e);
       const connector = e.detail.connector;
       connector['deleted'] = true;
@@ -894,6 +909,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     * fires when a connector is updated:
     */   
     this.listnerConnectorUpdated = (e: CustomEvent) => {
+      // Skip se connettori disabilitati
+      if (!this.stageService.getConnectorsEnabled()) {
+        return;
+      }
       this.logger.log("[CDS-CANVAS] connector-updated:", e);
       const connector = e.detail.connector;
       // if(connector.notify)
@@ -908,6 +927,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     * unselect action and intent (unselectAction)
     */  
     this.listnerConnectorSelected = (e: CustomEvent) => {
+      // Skip se connettori disabilitati
+      if (!this.stageService.getConnectorsEnabled()) {
+        return;
+      }
       this.closeAllPanels();
       this.closeActionDetailPanel();
       this.setConnectorSelected(e.detail.connector.id);

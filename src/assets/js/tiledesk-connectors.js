@@ -116,6 +116,11 @@ export class TiledeskConnectors {
     notify = true,
     attributes = null
   ) {
+    // Skip se connettori disabilitati (container SVG nascosto)
+    const svgContainer = document.getElementById(this.svgContainerId);
+    if (svgContainer && svgContainer.style.display === 'none') {
+      return;
+    }
     // console.log("[JS] createConnector:::::  ", attributes, fromId, toId, fromPoint, toPoint);
     if (!fromPoint || !toPoint) return;
     const id = fromId + "/" + toId;
@@ -465,6 +470,11 @@ export class TiledeskConnectors {
   }
 
   moved(element, x, y) {
+    // Skip se connettori disabilitati (container SVG nascosto)
+    const svgContainer = document.getElementById(this.svgContainerId);
+    if (svgContainer && svgContainer.style.display === 'none') {
+      return;
+    }
     //  console.log("moving ----> ", element.id, x, y);
     const blockId = element.id;
     let block = this.blocks[blockId];
@@ -516,6 +526,8 @@ export class TiledeskConnectors {
     svgContainer.style.position = "absolute";
     svgContainer.style.zIndex = "inherit";
     svgContainer.style.pointerEvents = "none";
+    // Nascondi inizialmente se connettori disabilitati (verrà controllato da stage.service)
+    svgContainer.style.display = "none";
     // Create the `<defs>` element and attributes
     const defsElement = document.createElementNS(
       "http://www.w3.org/2000/svg",
@@ -872,6 +884,11 @@ export class TiledeskConnectors {
    * Creates or modify a connector in HTML
    */
   #drawConnector(id, backPoint, frontPoint, attributes = null) {
+    // Skip se connettori disabilitati (container SVG nascosto)
+    const svgContainer = document.getElementById(this.svgContainerId);
+    if (svgContainer && svgContainer.style.display === 'none') {
+      return;
+    }
     // console.log("[JS] drawConnector:::::  ", id, backPoint, frontPoint, attributes);
     let label = null;
     if (attributes?.label) {
@@ -1187,6 +1204,11 @@ export class TiledeskConnectors {
   // }
 
   updateConnectorsOutOfItent(element) {
+    // Skip se connettori disabilitati (container SVG nascosto)
+    const svgContainer = document.getElementById(this.svgContainerId);
+    if (svgContainer && svgContainer.style.display === 'none') {
+      return;
+    }
     // // console.log("updateConnectorsOutOfItent ----> ", this.blocks, element.id);
     const blockId = element.id;
     let block = this.blocks[blockId];

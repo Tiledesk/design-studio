@@ -32,6 +32,24 @@ export class StageService {
   settings: Settings;
   loaded: boolean = false;
 
+  /**
+   * Flag centralizzato per disabilitare/abilitare connettori
+   * 
+   * PER DISABILITARE I CONNETTORI (test performance):
+   * - Impostare a false (default: false = DISABILITATI)
+   * 
+   * PER RIABILITARE I CONNETTORI:
+   * - Chiamare: stageService.setConnectorsEnabled(true)
+   * - Oppure modificare il valore di default qui sotto a true
+   * 
+   * Quando disabilitati:
+   * - Nessun calcolo di connettori (createConnector, updateConnector, moved)
+   * - Container SVG nascosto graficamente
+   * - Componente cds-connector-in nascosto nel template
+   * - Event listeners skip operazioni sui connettori
+   */
+  private connectorsEnabled: boolean = false; // DISABILITATI per default (per test performance pan/zoom)
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -247,6 +265,9 @@ export class StageService {
    * updateAlphaConnectors 
    * */
   updateAlphaConnectors(alpha: number) {
+    if (!this.connectorsEnabled) {
+      return; // Skip se connettori disabilitati
+    }
     this.logger.log("[CDS-STAGE]  •••• updateAlphaConnectors ••••", alpha);
     const svgElement = document.querySelector('#tds_svgConnectors'); 
     if (svgElement) {
@@ -263,6 +284,30 @@ export class StageService {
       const text = svgLine.querySelector('text');
       text.setAttribute('opacity', alphaLabel.toString());
     });
+  }
+
+  /**
+   * getConnectorsEnabled
+   * Ritorna lo stato di abilitazione dei connettori
+   */
+  getConnectorsEnabled(): boolean {
+    return this.connectorsEnabled;
+  }
+
+  /**
+   * setConnectorsEnabled
+   * Abilita/disabilita i connettori
+   * @param enabled - true per abilitare, false per disabilitare
+   */
+  setConnectorsEnabled(enabled: boolean): void {
+    this.connectorsEnabled = enabled;
+    this.logger.log("[CDS-STAGE] Connettori " + (enabled ? "abilitati" : "disabilitati"));
+    
+    // Nascondi/mostra SVG container
+    const svgContainer = document.getElementById('tds_svgContainer');
+    if (svgContainer) {
+      svgContainer.style.display = enabled ? 'block' : 'none';
+    }
   }
 
 
