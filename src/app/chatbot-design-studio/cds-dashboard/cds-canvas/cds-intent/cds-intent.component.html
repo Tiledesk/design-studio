@@ -1,11 +1,11 @@
 <!-- dragDisabled: true -->
 <div #resizeElement class="panel-intent-content tds_draggable"
     (mousedown)="onIntentMouseDown($event)"
-    (mousemove)="onIntentMouseMove($event)"
+    (mouseenter)="onIntentMouseEnter($event)"
+    (mouseleave)="onIntentMouseLeave($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
-    [class.isStart]="isStart" 
-    [class.tds-slim-intent]="isNewChatbot"
-    [id]="'intent-content-'+ intent?.intent_id"
+    [ngClass]="intentClasses"
+    [id]="intentContentId"
     [ngStyle]="{
         'background-color': backgroundColor,
         'outline': outlineStyle
@@ -13,26 +13,26 @@
      
     <!-- <span class="panel-intent-content tds_draggable intent-background-overlay"></span> -->
 
+    <!-- OTTIMIZZATO: Rimossi event handlers inutili (onShowConnectorsIn/onHideConnectorsIn non esistono e non vengono emessi) -->
     <cds-connector-in *ngIf="!isStart && connectorsIn?.length>0 && stageService.getConnectorsEnabled()"
-        [connectorsIn]="connectorsIn"
-        (onShowConnectorsIn)="onShowConnectorsIn()"
-        (onHideConnectorsIn)="onHideConnectorsIn()">
+        [connectorsIn]="connectorsIn">
     </cds-connector-in>
+
     <div class="header-draggable tds_draggable"></div>
-    <cds-panel-intent-controls
+    
+    <!-- OTTIMIZZATO: *ngIf per nascondere durante drag/pan, valori precomputati per evitare valutazioni nel template -->
+    <cds-panel-intent-controls *ngIf="showIntentControls"
         [isInternalIntent]="isInternalIntent"
-        [display_name]="intent.intent_display_name"
-        [deleteOptionEnabled]="listOfActions?.length > 0"
-        [webhookEnabled]="intent.webhook_enabled"
+        [display_name]="displayName"
+        [deleteOptionEnabled]="deleteOptionEnabled"
+        [webhookEnabled]="webhookEnabled"
         (optionClicked)="onOptionClicked($event)">
     </cds-panel-intent-controls>
 
     <div [id]="'block-header-'+ intent?.intent_id"
         class="pic-header" 
         [ngClass]="{'cds-start': isStart}">
-
-
-
+        
         <cds-panel-intent-header *ngIf="!isUntitledBlock" 
             class="pic-title-text tds_draggable" 
             [class.isStart]="isStart"
@@ -41,8 +41,6 @@
             (click)="onOptionClicked($event)">
         </cds-panel-intent-header>
 
-
-        
         <div *ngIf="showIntentOptions" class="cds-intent-options tds_draggable">
             <div class="option" 
                 (click)="onSelectQuestion(HAS_SELECTED_TYPE.QUESTION)"

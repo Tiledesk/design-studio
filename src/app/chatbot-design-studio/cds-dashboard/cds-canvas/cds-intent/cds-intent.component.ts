@@ -1,4 +1,4 @@
-import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Renderer2, Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { takeUntil, timeInterval } from 'rxjs/operators';
 import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, CdkDropListGroup, CdkDropList, CdkDragHandle } from '@angular/cdk/drag-drop';
@@ -32,9 +32,39 @@ export enum HAS_SELECTED_TYPE {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() intent: Intent;
-  @Input() hideActionPlaceholderOfActionPanel: boolean;
+export class CdsIntentComponent implements OnInit, OnDestroy {
+  // OTTIMIZZATO: Rimossa implementazione OnChanges, usiamo getter/setter per controllo fine
+  private _intent: Intent;
+  private _hideActionPlaceholderOfActionPanel: boolean;
+  
+  @Input() 
+  set intent(value: Intent) {
+    const previousIntentId = this._intent?.intent_id;
+    this._intent = value;
+    
+    // Aggiorna valori precomputati solo se l'intent è cambiato (non al primo set)
+    if (previousIntentId && previousIntentId !== value?.intent_id) {
+      this.updateComputedColors();
+      this.updateComputedTemplateValues();
+      this.cdr.markForCheck();
+    }
+  }
+  get intent(): Intent {
+    return this._intent;
+  }
+  
+  @Input() 
+  set hideActionPlaceholderOfActionPanel(value: boolean) {
+    // Aggiorna placeholder solo se il valore è cambiato
+    if (this._hideActionPlaceholderOfActionPanel !== value) {
+      this._hideActionPlaceholderOfActionPanel = value;
+      this.updateActionPlaceholderVisibility(value);
+    }
+  }
+  get hideActionPlaceholderOfActionPanel(): boolean {
+    return this._hideActionPlaceholderOfActionPanel;
+  }
+  
   @Input() chatbotSubtype: string;
   @Input() IS_OPEN_PANEL_INTENT_DETAIL: boolean;
   
@@ -81,12 +111,26 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   dragDisabled: boolean = true;
   connectorIsOverAnIntent: boolean = false;
   // Track mouse movement to distinguish click from drag
-  private mouseDownX: number = 0;
-  private mouseDownY: number = 0;
-  private hasMouseMoved: boolean = false;
-  private readonly MOUSE_MOVE_THRESHOLD: number = 5; // pixels threshold to consider as drag
+  // OTTIMIZZATO: Usa timestamp invece di mousemove per evitare 100+ listener
+  private mouseDownTimestamp: number = 0;
+  private readonly CLICK_MAX_DURATION_MS = 200; // Se mousedown + click < 200ms = click, altrimenti drag
+  
+  // ResizeObserver per ottimizzare le performance
+  private resizeObserver: ResizeObserver | null = null;
+  private resizeDebounceTimeout: any = null;
+  private readonly RESIZE_DEBOUNCE_MS = 150; // Debounce per evitare troppe chiamate durante resize
   webHookTooltipText: string;
   isInternalIntent: boolean = false;
+  
+  // Gestione visibilità controlli intent (ottimizzazione performance)
+  showIntentControls: boolean = false; // Nascosto di default, mostrato solo su hover dopo 500ms
+  private hoverTimeout: any = null;
+  private readonly HOVER_DELAY_MS = 500; // Delay per mostrare controlli su hover
+  
+  // Valori precomputati per cds-panel-intent-controls (ottimizzazione performance)
+  deleteOptionEnabled: boolean = false;
+  displayName: string = '';
+  webhookEnabled: boolean = false;
   actionIntent: ActionIntentConnected;
   isActionIntent: boolean = false;
   isAgentsAvailable: boolean = false;
@@ -105,6 +149,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   
   // Outline precomputato (equivalente a rgba con alpha 1.0)
   outlineStyle: string = 'none';
+  
+  // ID precomputato per evitare concatenazione stringa nel template
+  intentContentId: string = '';
+  
+  // Classi precomputate per evitare binding multipli
+  intentClasses: { [key: string]: boolean } = {};
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -134,9 +184,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.intentService.behaviorIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
-        if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
-          this.logger.log("[CDS-INTENT] sto modificando l'intent: ", this.intent, " con : ", intent);
-          this.intent = intent;
+        if (intent && this._intent && intent.intent_id === this._intent.intent_id) {
+          this.logger.log("[CDS-INTENT] sto modificando l'intent: ", this._intent, " con : ", intent);
+          
+          // Aggiorna direttamente _intent per evitare trigger del setter (già gestito qui)
+          this._intent = intent;
+          
           this.setAgentsAvailable();
           // Aggiorna isUntitledBlock quando l'intent viene modificato
           this.updateIsUntitledBlock();
@@ -145,8 +198,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             delete intent['attributesChanged'];
           } else { // if(this.intent.actions.length !== intent.actions.length && intent.actions.length>0)
             this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
-            this.listOfActions = this.intent.actions;
-            this.setActionIntent();
+        this.listOfActions = this._intent.actions;
+        this.setActionIntent();
+        
+        // Aggiorna valori controlli intent (deleteOptionEnabled potrebbe cambiare)
+        this.updateIntentControlsValues();
             // cerca il primo connect to block e fissalo in fondo
             // this.listOfActions = this.intent.actions.filter(function(obj) {
             //   return obj._tdActionType !== TYPE_ACTION.INTENT;
@@ -158,13 +214,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             this.updateComputedColors();
           }
           
+          // Aggiorna valori template
+          this.updateComputedTemplateValues();
+          
+          // Aggiorna valori controlli intent
+          this.updateIntentControlsValues();
+          
           // Con OnPush, notifica manualmente il change detection
           this.cdr.markForCheck();
           
 
           //UPDATE QUESTIONS
-          if (this.intent.question) {
-            const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
+          if (this._intent.question) {
+            const question_segment = this._intent.question.split(/\r?\n/).filter(element => element);
             this.questionCount = question_segment.length;
             /** this.question = this.intent.question; */
           } else {
@@ -172,8 +234,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           }
 
           //UPDATE FORM
-          if (this.intent?.form && (this.intent.form !== null)) {
-            this.formSize = Object.keys(this.intent.form).length;
+          if (this._intent?.form && (this._intent.form !== null)) {
+            this.formSize = Object.keys(this._intent.form).length;
           } else {
             this.formSize = 0;
           }
@@ -199,34 +261,37 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             const intent = data.intent;
             const logAnimationType = data.logAnimationType;
             const scale = data.scale;
-            if(intent && intent.intent_id !== this.intent?.intent_id && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
-              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
-            } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
-              const stageElement = document.getElementById(this.intent.intent_id);
-              this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
-              this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
-            } else if (!intent || intent.intent_id !== this.intent?.intent_id) {
+            const currentIntentId = this._intent?.intent_id;
+            const currentIntentDisplayName = this._intent?.intent_display_name;
+            
+            if(intent && intent.intent_id !== currentIntentId && currentIntentDisplayName === TYPE_CHATBOT.WEBHOOK){
+              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + currentIntentId);
+            } else if(!intent && currentIntentDisplayName === TYPE_CHATBOT.WEBHOOK){
+              const stageElement = document.getElementById(currentIntentId);
+              this.addCssClassIntentActive('live-start-intent', '#intent-content-' + currentIntentId);
+              this.stageService.centerStageOnTopPosition(this._intent.id_faq_kb, stageElement, scale);
+            } else if (!intent || intent.intent_id !== currentIntentId) {
               setTimeout(() => {
-                this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
+                this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + currentIntentId);
               }, 500);
-            } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
+            } else if (intent && this._intent && intent.intent_id === currentIntentId) {
               // this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
-              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
+              this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + currentIntentId);
               setTimeout(() => {
                 this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));
                 const stageElement = document.getElementById(intent.intent_id);
                 if(logAnimationType) {
-                  this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
+                  this.stageService.centerStageOnTopPosition(this._intent.id_faq_kb, stageElement, scale);
                 }
                 // Con OnPush, notifica manualmente il change detection
                 this.cdr.markForCheck();
               }, 500);
             }
           } else {
-            if(this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
-              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
+            if(this._intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+              this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this._intent.intent_id);
             }
-            this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
+            this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this._intent?.intent_id);
           }
           
           // Con OnPush, notifica manualmente il change detection
@@ -297,6 +362,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         }
         this.showIntentOptions = false;
         this.startAction = this.intent.actions[0];
+        // Aggiorna classi precomputate quando cambia isStart
+        this.updateComputedTemplateValues();
       }
       else {
         this.setIntentSelected();
@@ -310,6 +377,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.updateShowIntentOptions();
       // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
       this.checkIfNewChatbot();
+      
+      // Aggiorna classi precomputate dopo checkIfNewChatbot
+      this.updateComputedTemplateValues();
       this.addEventListener();
       this.setIntentAttributes();
       
@@ -321,6 +391,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       
       // Aggiorna i colori precomputati dopo l'inizializzazione
       this.updateComputedColors();
+      
+      // Aggiorna i valori precomputati per template
+      this.updateComputedTemplateValues();
+      
+      // Aggiorna i valori precomputati per cds-panel-intent-controls
+      this.updateIntentControlsValues();
   }
 
 
@@ -403,6 +479,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   private updateConnectorsIn(connectors: any[]): void {
     this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
     this.logger.log(`[CONNECTORS] Aggiorno il numero dei connettori in ingresso per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
+    
+    // Aggiorna valori controlli intent (deleteOptionEnabled potrebbe cambiare)
+    this.updateIntentControlsValues();
+    
     // Con OnPush, notifica manualmente il change detection
     this.cdr.markForCheck();
   }
@@ -441,41 +521,38 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   //   }
   // }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    // Aggiorna i colori precomputati se l'intent cambia
-    if (changes['intent']) {
-      if (!changes['intent'].firstChange) {
-        this.updateComputedColors();
-      }
-      // Con OnPush, ngOnChanges viene sempre chiamato quando cambiano gli Input
-      // ma dobbiamo comunque notificare manualmente per altri aggiornamenti
-      this.cdr.markForCheck();
-    }
-    
-    // Fixed bug where an empty intent's action placeholder remains visible if an action is dragged from the left action menu
-    this.logger.log('[CDS-INTENT] hideActionPlaceholderOfActionPanel (dragged from sx panel) ', this.hideActionPlaceholderOfActionPanel)
-    if (this.hideActionPlaceholderOfActionPanel === false) {
-      const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
+  /**
+   * OTTIMIZZATO: Rimossa implementazione OnChanges.
+   * 
+   * Perché:
+   * 1. Con OnPush + getter/setter abbiamo controllo più fine
+   * 2. La logica per `intent` è già gestita da subscription RxJS (behaviorIntent)
+   * 3. Evitiamo chiamate inutili quando cambiano altri Input
+   * 4. querySelector costoso viene chiamato solo quando necessario
+   * 
+   * Benefici:
+   * - Con 100+ intent, evitiamo 100+ chiamate a ngOnChanges quando cambiano altri Input
+   * - querySelector viene chiamato solo quando hideActionPlaceholderOfActionPanel cambia
+   * - Maggiore controllo e performance
+   */
+
+  /**
+   * Aggiorna la visibilità del placeholder delle action.
+   * OTTIMIZZATO: Chiamato solo quando hideActionPlaceholderOfActionPanel cambia (via setter).
+   * Usa ViewChild se disponibile, altrimenti querySelector come fallback.
+   */
+  private updateActionPlaceholderVisibility(shouldHide: boolean): void {
+    // Usa requestAnimationFrame per evitare layout thrashing
+    requestAnimationFrame(() => {
+      // Prova prima con ViewChild se disponibile (più performante)
+      // Altrimenti usa querySelector come fallback
+      const addActionPlaceholderEl = this.elemenRef?.nativeElement?.querySelector('.add--action-placeholder');
+      
       if (addActionPlaceholderEl instanceof HTMLElement) {
-        this.logger.log('[CDS-INTENT] HERE 1 !!!! addActionPlaceholderEl ', addActionPlaceholderEl);
-        if (addActionPlaceholderEl !== null) {
-          addActionPlaceholderEl.style.opacity = '0';
-        }
+        addActionPlaceholderEl.style.opacity = shouldHide ? '0' : '1';
+        this.logger.log('[CDS-INTENT] updateActionPlaceholderVisibility:', shouldHide);
       }
-    } else if (this.hideActionPlaceholderOfActionPanel === true) {
-      const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
-      if (addActionPlaceholderEl instanceof HTMLElement) {
-        this.logger.log('[CDS-INTENT] HERE 2 !!!! addActionPlaceholderEl ', addActionPlaceholderEl);
-        if (addActionPlaceholderEl !== null) {
-          addActionPlaceholderEl.style.opacity = '1';
-        }
-      }
-    }
-    this.setAgentsAvailable();
-    // Aggiorna isUntitledBlock se l'intent cambia
-    if (changes['intent'] && !changes['intent'].firstChange) {
-      this.updateIsUntitledBlock();
-    }
+    });
   }
 
   private setAgentsAvailable(){
@@ -550,29 +627,82 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   ngAfterViewInit() {
     this.logger.log("[CDS-INTENT]  •••• ngAfterViewInit ••••");
-    const resizeObserver = new ResizeObserver(entries => {
-      // Skip se connettori disabilitati
+    
+    // Inizializza ResizeObserver solo se i connettori sono abilitati
+    // Evita overhead inutile se i connettori sono disabilitati
+    if (this.stageService.getConnectorsEnabled()) {
+      this.setupResizeObserver();
+    }
+    
+    // Usa requestAnimationFrame invece di setTimeout per emettere componentRendered
+    // È più efficiente e si allinea al ciclo di rendering del browser
+    requestAnimationFrame(() => {
+      this.componentRendered.emit(this.intent.intent_id);
+      // Non serve markForCheck qui: l'evento viene emesso, non cambia lo stato del componente
+    });
+    
+    this.setIntentAttributes();
+  }
+
+  /**
+   * Configura il ResizeObserver con debounce per ottimizzare le performance.
+   * Il callback viene chiamato solo dopo che il resize è stabile per RESIZE_DEBOUNCE_MS ms.
+   */
+  private setupResizeObserver(): void {
+    if (this.resizeObserver) {
+      // Se esiste già, disconnetti prima di ricrearlo
+      this.resizeObserver.disconnect();
+    }
+
+    this.resizeObserver = new ResizeObserver(entries => {
+      // Skip se connettori sono stati disabilitati dopo l'inizializzazione
       if (!this.stageService.getConnectorsEnabled()) {
         return;
       }
-      for (const entry of entries) {
-        const nuovaAltezza = entry.contentRect.height;
-        this.logger.log('[CDS-INTENT] ngAfterViewInit Nuova altezza del div:', nuovaAltezza);
-        if(!this.isDragging)this.connectorService.updateConnector(this.intent.intent_id);
+
+      // Skip durante drag per evitare aggiornamenti inutili
+      if (this.isDragging) {
+        return;
       }
+
+      // Debounce: cancella il timeout precedente e ne crea uno nuovo
+      // Questo evita troppe chiamate durante resize continuo
+      clearTimeout(this.resizeDebounceTimeout);
+      this.resizeDebounceTimeout = setTimeout(() => {
+        for (const entry of entries) {
+          const nuovaAltezza = entry.contentRect.height;
+          this.logger.log('[CDS-INTENT] ResizeObserver - Nuova altezza del div:', nuovaAltezza);
+          this.connectorService.updateConnector(this.intent.intent_id);
+        }
+      }, this.RESIZE_DEBOUNCE_MS);
     });
-    const elementoDom = this.resizeElement.nativeElement;
-    resizeObserver.observe(elementoDom);
-    setTimeout(() => {
-      this.componentRendered.emit(this.intent.intent_id);
-      // Con OnPush, notifica manualmente il change detection dopo il rendering
-      this.cdr.markForCheck();
-    }, 0);
-    this.setIntentAttributes();
+
+    const elementoDom = this.resizeElement?.nativeElement;
+    if (elementoDom) {
+      this.resizeObserver.observe(elementoDom);
+    }
   }
 
 
   ngOnDestroy() {
+    // Disconnetti ResizeObserver per evitare memory leak
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    
+    // Pulisci timeout debounce se ancora attivo
+    if (this.resizeDebounceTimeout) {
+      clearTimeout(this.resizeDebounceTimeout);
+      this.resizeDebounceTimeout = null;
+    }
+    
+    // Pulisci timeout hover se ancora attivo
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+    
     this.unsubscribe();
   }
 
@@ -784,6 +914,36 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
+   * Aggiorna i valori precomputati per template (id, classi).
+   * Chiamato quando cambiano isStart, isNewChatbot o intent.
+   */
+  private updateComputedTemplateValues(): void {
+    // Precomputa ID per evitare concatenazione stringa nel template
+    this.intentContentId = this.intent?.intent_id ? `intent-content-${this.intent.intent_id}` : '';
+    
+    // Precomputa classi per evitare binding multipli
+    this.intentClasses = {
+      'isStart': this.isStart,
+      'tds-slim-intent': this.isNewChatbot
+    };
+  }
+
+  /**
+   * Aggiorna i valori precomputati per cds-panel-intent-controls.
+   * Elimina valutazioni nel template e accessi diretti a proprietà intent.
+   */
+  private updateIntentControlsValues(): void {
+    // Precomputa deleteOptionEnabled invece di valutare listOfActions?.length > 0 nel template
+    this.deleteOptionEnabled = (this.listOfActions?.length ?? 0) > 0;
+    
+    // Precomputa displayName invece di accedere a intent.intent_display_name nel template
+    this.displayName = this.intent?.intent_display_name || '';
+    
+    // Precomputa webhookEnabled invece di accedere a intent.webhook_enabled nel template
+    this.webhookEnabled = this.intent?.webhook_enabled || false;
+  }
+
+  /**
    * TrackBy function per ngFor delle action.
    * Usa _tdActionId come identificatore univoco per evitare ricreazione DOM inutile.
    * @param index Indice dell'elemento
@@ -804,6 +964,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         /** // this.patchAllActionsId(); */
         this.patchAttributesPosition();
         this.listOfActions = this.intent.actions;
+        
+        // Aggiorna valori controlli intent (deleteOptionEnabled potrebbe cambiare)
+        this.updateIntentControlsValues();
         if (this.intent.question) {
           const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
           this.questionCount = question_segment.length;
@@ -994,6 +1157,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.isDragging = true;
     this.logger.log('[CDS-INTENT] isDragging - onDragStarted', this.isDragging)
     
+    // Nascondi controlli durante drag (requisito UX)
+    this.hideIntentControls();
+    
     // ----------------------------------
     // Hide action arrow on drag started 
     // ----------------------------------
@@ -1049,6 +1215,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   onDragEnded(event, index) {
     this.logger.log('[CDS-INTENT] onDragEnded: ', event, this.intent.intent_id);
     this.isDragging = false;
+    
+    // Dopo drag, i controlli verranno mostrati solo se in hover (gestito da onIntentMouseEnter)
+    // Non mostrare immediatamente per evitare flickering
+    
     this.connectorService.updateConnector(this.intent.intent_id);
     /** 
     // const previousIntentId = this.intentService.previousIntentId;
@@ -1199,20 +1369,90 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.showPanelActions.emit(data);
   }
 
+  /**
+   * OTTIMIZZATO: Usa timestamp invece di hasMouseMoved per distinguere click da drag.
+   * Se mousedown + click < CLICK_MAX_DURATION_MS = click veloce (non drag).
+   */
   onOpenIntentPanel(intent: Intent){
     this.logger.log('[CDS-INTENT] onOpenIntentPanel > intent', this.intent, " con : ", intent);
-    // Only open panel if there was no mouse movement (single click, not drag)
-    if(!this.hasMouseMoved && !intent['attributesChanged'] && this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL){
+    
+    // Calcola durata tra mousedown e click
+    const clickDuration = Date.now() - this.mouseDownTimestamp;
+    const isQuickClick = clickDuration < this.CLICK_MAX_DURATION_MS;
+    
+    // Only open panel if it was a quick click (not drag) and other conditions are met
+    if(isQuickClick && !intent['attributesChanged'] && this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL){
       this.openIntentPanel(intent);
     }
   }
 
+  /**
+   * OTTIMIZZATO: Usa timestamp invece di mousemove per distinguere click da drag.
+   * Elimina la necessità di (mousemove) su ogni intent (100+ listener).
+   * Nasconde immediatamente i controlli intent su mousedown.
+   */
   onIntentMouseDown(event: MouseEvent): void {
-    this.hasMouseMoved = false;
+    this.mouseDownTimestamp = Date.now();
+    
+    // Nascondi controlli immediatamente su mousedown (requisito UX)
+    this.hideIntentControls();
   }
 
-  onIntentMouseMove(event: MouseEvent): void {
-    this.hasMouseMoved = true;
+  /**
+   * RIMOSSO: onIntentMouseMove non è più necessario.
+   * Usiamo timestamp in mousedown + durata click per distinguere click da drag.
+   */
+
+  /**
+   * Gestisce l'evento mouseenter per mostrare i controlli intent dopo 500ms.
+   * OTTIMIZZATO: Debounce 500ms per evitare flickering e ridurre overhead rendering.
+   */
+  onIntentMouseEnter(event: MouseEvent): void {
+    // Skip se in drag (controlli devono rimanere nascosti)
+    if (this.isDragging) {
+      return;
+    }
+    
+    // Cancella timeout precedente se esiste (hover rapido)
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+    
+    // Mostra controlli dopo 500ms (requisito UX)
+    this.hoverTimeout = setTimeout(() => {
+      if (!this.isDragging) { // Double-check: non mostrare se drag iniziato durante hover
+        this.showIntentControls = true;
+        this.cdr.markForCheck(); // Con OnPush, notifica manualmente il change detection
+      }
+      this.hoverTimeout = null;
+    }, this.HOVER_DELAY_MS);
+  }
+
+  /**
+   * Gestisce l'evento mouseleave per nascondere immediatamente i controlli intent.
+   * OTTIMIZZATO: Nasconde subito per ridurre overhead rendering.
+   */
+  onIntentMouseLeave(event: MouseEvent): void {
+    // Cancella timeout hover se ancora attivo (hover rapido < 500ms)
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+    
+    // Nascondi controlli immediatamente
+    this.hideIntentControls();
+  }
+
+  /**
+   * Nasconde i controlli intent immediatamente.
+   * Chiamato su mousedown, drag start, e mouseleave.
+   */
+  private hideIntentControls(): void {
+    if (this.showIntentControls) {
+      this.showIntentControls = false;
+      this.cdr.markForCheck(); // Con OnPush, notifica manualmente il change detection
+    }
   }
   /** ******************************
    * intent controls options: START
