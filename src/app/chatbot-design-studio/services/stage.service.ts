@@ -44,11 +44,12 @@ export class StageService {
    * Flag centralizzato per disabilitare/abilitare connettori
    * 
    * PER DISABILITARE I CONNETTORI (test performance):
-   * - Impostare a false (default: false = DISABILITATI)
+   * - Impostare a false
+   * - Oppure chiamare: stageService.setConnectorsEnabled(false)
    * 
    * PER RIABILITARE I CONNETTORI:
-   * - Chiamare: stageService.setConnectorsEnabled(true)
-   * - Oppure modificare il valore di default qui sotto a true
+   * - Impostare a true (default: true = ABILITATI)
+   * - Oppure chiamare: stageService.setConnectorsEnabled(true)
    * 
    * Quando disabilitati:
    * - Nessun calcolo di connettori (createConnector, updateConnector, moved)
@@ -56,7 +57,7 @@ export class StageService {
    * - Componente cds-connector-in nascosto nel template
    * - Event listeners skip operazioni sui connettori
    */
-  private connectorsEnabled: boolean = false; // DISABILITATI per default (per test performance pan/zoom)
+  private connectorsEnabled: boolean = true; // ABILITATI per default
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -78,6 +79,17 @@ export class StageService {
       open_intent_list_state: true
     };
     this.initStageSettings(id_faq_kb);
+    
+    // BEST PRACTICE: Assicura che il container SVG sia visibile se i connettori sono abilitati
+    if (this.connectorsEnabled) {
+      // Usa setTimeout per assicurarsi che il DOM sia pronto
+      setTimeout(() => {
+        const svgContainer = document.getElementById('tds_svgContainer');
+        if (svgContainer) {
+          svgContainer.style.display = 'block';
+        }
+      }, 0);
+    }
   }
 
 
