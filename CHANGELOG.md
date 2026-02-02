@@ -7,8 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.26-performance
+- **changed**: refactoring cds-intent
 
 # 1.39.26-rc1
+- **bug-fix**: sort attribute list in Variable List Component
 - **bug-fix**: sort attribute list in Variable List Component
 - **bug-fix**: change the "use kb name" field to 2 lines
 - **bug-fix**: the selected model is red even when the api is set
