@@ -8,6 +8,7 @@
                 <img class="active-icon" [src]="elementSrc" [title]="elementNameTitle">
                 <!-- DETAIL MODE: Badge mostrato sotto l'icona, non nell'icona -->
             </div>
+            <p class="label-action">{{elementNameTranslated}}</p>
             <!-- DETAIL MODE: Nome mostrato sempre (previewMode=false) -->
             <span *ngIf="showBadge" [class]="badgeClass">{{elementBadge}}</span>
             <span *ngIf="showBeta" class="trigger-beta-badge">Beta</span>

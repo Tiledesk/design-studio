@@ -1,6 +1,7 @@
 <!-- OTTIMIZZATO: Tutti i valori precomputati nel componente, eliminati pipe translate, concatenazioni stringa, accessi nested -->
 <!-- PREVIEW MODE: Versione ottimizzata per canvas con drag button e gestione pan/zoom -->
-<div class="action_wrp">
+<!-- STEP 2: Classe condizionale per disabilitare transitions durante pan/zoom -->
+<div class="action_wrp" [ngClass]="{'pan-zoom-active': isPanOrZoomActive}">
 
     <div class="section">
         <div class="action-title previewMode">

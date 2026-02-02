@@ -133,11 +133,11 @@
                 
           
                 <div cdkDragDisabled  class="body-action" [ngSwitch]="action._tdActionType">
-                    <!--                  
+                                      
                     <cds-action-controls *ngIf="!isNewChatbot"
                         (onClickControl)="onClickControl($event, action, i)">
                     </cds-action-controls>
-                   
+                    
 
                     <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY" 
                         class="panel-response" 
@@ -162,7 +162,8 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-reply>
-    
+
+                 
                     
                     <cds-action-intent *ngSwitchCase="TYPE_ACTION.INTENT" 
                         class="panel-response" 
@@ -483,7 +484,7 @@
                     </cds-action-flow-log>
                    
 
-                -->
+                <!-- -->
                 </div>
                 
             </span>
