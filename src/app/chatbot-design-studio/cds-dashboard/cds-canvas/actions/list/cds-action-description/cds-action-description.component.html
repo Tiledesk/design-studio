@@ -1,31 +1,17 @@
 <!-- OTTIMIZZATO: Tutti i valori precomputati nel componente, eliminati pipe translate, concatenazioni stringa, accessi nested -->
+<!-- DETAIL MODE: Versione per panel detail con nome completo e badge sotto l'icona -->
 <div class="action_wrp">
 
     <div class="section">
-        <!-- TEST PERFORMANCE: Commentato righe 6-25 per isolare problema performance -->
-        
-        <div class="action-title" [class.previewMode]="previewMode">
+        <div class="action-title">
             <div class="icon-action">
                 <img class="active-icon" [src]="elementSrc" [title]="elementNameTitle">
-                <span *ngIf="previewMode && showBadge" [class]="badgeClass">{{elementBadge}}</span>   
+                <!-- DETAIL MODE: Badge mostrato sotto l'icona, non nell'icona -->
             </div>
-            <p *ngIf="!previewMode" class="label-action">{{elementNameTranslated}}</p>
-            <span *ngIf="!previewMode && showBadge" [class]="badgeClass">{{elementBadge}}</span>
+            <!-- DETAIL MODE: Nome mostrato sempre (previewMode=false) -->
+            <span *ngIf="showBadge" [class]="badgeClass">{{elementBadge}}</span>
             <span *ngIf="showBeta" class="trigger-beta-badge">Beta</span>
-            <!-- OTTIMIZZATO: Sostituito <img> con CSS background-image, ottimizzato per GPU, attributi non necessari rimossi -->
-            <!-- BEST PRACTICE: Drag and drop funziona con cdkDragHandle sul componente, questo è solo visivo -->
-            <!-- OTTIMIZZATO: GPU acceleration, contain per isolare rendering, nascondi durante pan per eliminare overhead -->
-
-            <!-- OTTIMIZZATO: Sostituito CSS background-image con <img> lazy loading per migliorare performance -->
-            <div *ngIf="previewMode" class="action-btn-icon">
-                <img 
-                    class="btn btn-tdblu-no-boxshadow drag-btn drag-icon active-icon"
-                    src="/assets/images/icons/drag_indicator.svg"
-                    alt="Drag"
-                    loading="lazy"
-                    width="16"
-                    height="16">
-            </div>
+            <!-- DETAIL MODE: Drag button non mostrato (solo in preview mode) -->
         </div>
 
         
@@ -59,6 +45,6 @@
     </div>
 
     <!-- OTTIMIZZATO: showDeprecationMessage e deprecationMessageTranslated precomputati -->
-     <div *ngIf="showDeprecationMessage" class="deprecation-message">{{deprecationMessageTranslated}}</div>
+    <div *ngIf="showDeprecationMessage" class="deprecation-message">{{deprecationMessageTranslated}}</div>
 
 </div> 

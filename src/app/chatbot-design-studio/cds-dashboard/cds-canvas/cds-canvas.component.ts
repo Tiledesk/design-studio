@@ -775,13 +775,23 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     * - disattiva/riattiva cdkDrag per migliorare performance
     */
     let zoomDebounceTimeout: any;
+    let panDebounceTimeout: any;
     
     this.listnerPanActive = (e: CustomEvent) => {
       this.stageService.setPanning(true);
+      clearTimeout(panDebounceTimeout);
+      
+      // Riattiva cdkDrag dopo 300ms dall'ultimo pan event
+      // Questo gestisce sia pan da mouse drag (che emette pan-end) che pan da wheel (che non emette pan-end)
+      panDebounceTimeout = setTimeout(() => {
+        this.stageService.setPanning(false);
+      }, 300);
     };
     document.addEventListener("pan-active", this.listnerPanActive, false);
 
     this.listnerPanEnd = (e: CustomEvent) => {
+      // Cancella il debounce se pan-end viene emesso (pan da mouse drag)
+      clearTimeout(panDebounceTimeout);
       this.stageService.setPanning(false);
     };
     document.addEventListener("pan-end", this.listnerPanEnd, false);

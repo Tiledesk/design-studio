@@ -27,6 +27,7 @@ import { CdsActionCodeComponent } from './cds-action-code/cds-action-code.compon
 import { CdsActionCustomerioComponent } from './cds-action-customerio/cds-action-customerio.component';
 import { CdsActionDeleteVariableComponent } from './cds-action-delete-variable/cds-action-delete-variable.component';
 import { CdsActionDescriptionComponent } from './cds-action-description/cds-action-description.component';
+import { CdsActionDescriptionPreviewComponent } from './cds-action-description/cds-action-description-preview.component';
 import { CdsActionEmailComponent } from './cds-action-email/cds-action-email.component';
 import { AttributesDialogComponent } from './cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
 import { CdsActionGPTTaskComponent } from './cds-action-gpt-task/cds-action-gpt-task.component';
@@ -102,6 +103,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsQuestionComponent,
     CdsAnswerComponent,
     CdsActionDescriptionComponent,
+    CdsActionDescriptionPreviewComponent,
     CdsActionReplyComponent,
     CdsActionReplyV2Component,
     CdsActionWaitComponent,
@@ -213,6 +215,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsQuestionComponent,
     CdsAnswerComponent,
     CdsActionDescriptionComponent,
+    CdsActionDescriptionPreviewComponent,
     CdsActionReplyComponent,
     CdsActionReplyV2Component,
     CdsActionWaitComponent,

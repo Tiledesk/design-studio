@@ -3,7 +3,7 @@
     (mousedown)="onIntentMouseDown($event)"
     (mouseenter)="onIntentMouseEnter($event)"
     (mouseleave)="onIntentMouseLeave($event)"
-    (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
+    (click)="$event.stopPropagation();onOpenIntentPanel(intent, $event)"
     [ngClass]="intentClasses"
     [id]="intentContentId"
     [ngStyle]="{
@@ -111,32 +111,34 @@
             (keydown)="onKeydown($event)" 
             (click)="onSelectAction(action, i, action._tdActionId)">
             
-            <span class="action-element">
+            <!--   -->
+            <span class="action-element" cdkDragHandle>
 
                 <div *cdkDragPreview id="customDragPreview">
-                    <cds-action-description 
+                    <cds-action-description-preview 
                         class="header-action" 
                         [previewMode]="false"
                         [elementType]="action._tdActionType">
-                    </cds-action-description>
+                    </cds-action-description-preview>
                 </div>
-             
+              
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
-                <cds-action-description 
+                
+                <cds-action-description-preview
                     class="header-action" 
-                    cdkDragHandle
-                    [elementType]="action._tdActionType">
-                </cds-action-description>
+                    [elementType]="action._tdActionType"
+                    [isPanOrZoomActive]="isPanOrZoomActive">
+                </cds-action-description-preview>
                 
           
-                <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
-                    
+                <div cdkDragDisabled  class="body-action" [ngSwitch]="action._tdActionType">
+                    <!--                  
                     <cds-action-controls *ngIf="!isNewChatbot"
                         (onClickControl)="onClickControl($event, action, i)">
                     </cds-action-controls>
-    
-                    
+                   
+
                     <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY" 
                         class="panel-response" 
                         [intentSelected]="intent"
@@ -161,6 +163,7 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-reply>
     
+                    
                     <cds-action-intent *ngSwitchCase="TYPE_ACTION.INTENT" 
                         class="panel-response" 
                         [intentSelected]="intent"
@@ -479,8 +482,10 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-flow-log>
                    
+
+                -->
                 </div>
-              
+                
             </span>
             
            
@@ -491,14 +496,14 @@
                 class="cds-action-arrow">
             </cds-action-arrow> 
         
-            
+           
 
 
         </div>
         
     </div>
     
-    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
+    <!-- <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
         class="panel-response last-action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"
@@ -513,7 +518,7 @@
                 + {{ 'CDSCanvas.AddAction' | translate}}
             </div>
         </div>
-    </div>
+    </div> -->
     
 
 

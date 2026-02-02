@@ -1,0 +1,41 @@
+<!-- OTTIMIZZATO: Tutti i valori precomputati nel componente, eliminati pipe translate, concatenazioni stringa, accessi nested -->
+<!-- PREVIEW MODE: Versione ottimizzata per canvas con drag button e gestione pan/zoom -->
+<div class="action_wrp">
+
+    <div class="section">
+        <div class="action-title previewMode">
+            <div class="icon-action">
+                <img class="active-icon" [src]="elementSrc" [title]="elementNameTitle">
+                <span *ngIf="showBadge" [class]="badgeClass">{{elementBadge}}</span>   
+            </div>
+            <span *ngIf="showBeta" class="trigger-beta-badge">Beta</span>
+            
+            <!-- l'aggiunta di questa icona fa precipitare le performance del canvas. -->
+            <!-- <div class="action-btn-icon"> -->
+                <!-- <img 
+                    class="btn btn-tdblu-no-boxshadow drag-btn drag-icon active-icon"
+                    [style.display]="isPanOrZoomActive ? 'none' : 'block'"
+                    src="/assets/images/icons/drag_indicator.svg"
+                    alt="Drag"
+                    loading="lazy"
+                    width="16"
+                    height="16"> -->
+
+                <!-- <mat-icon svgIcon="drag_indicator" aria-hidden="true"></mat-icon> -->
+
+                <!-- <svg
+                    class="btn btn-tdblu-no-boxshadow drag-btn drag-icon2 active-icon"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    role="img"
+                    aria-label="Drag">
+                    <use href="/assets/images/icons/drag_indicator.svg"></use>
+                </svg> -->
+                    
+            <!-- </div> -->
+
+        </div>
+    </div>
+
+</div>

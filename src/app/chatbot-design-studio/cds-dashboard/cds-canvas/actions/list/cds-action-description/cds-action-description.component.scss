@@ -152,6 +152,7 @@
     max-width: calc(100% - 70px);
     &.previewMode {
         width: 100%;
+        max-width: 100%;
     }
     .icon-action {
         transition: opacity 0.15s ease 0s;
@@ -211,7 +212,6 @@ input.action-input {
     font-size: 1.15em;
     line-height: 16px;
 }
-
 
 
 // .custom-action-title {

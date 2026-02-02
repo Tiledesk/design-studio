@@ -1599,8 +1599,21 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
    * OTTIMIZZATO: Usa timestamp invece di hasMouseMoved per distinguere click da drag.
    * Se mousedown + click < CLICK_MAX_DURATION_MS = click veloce (non drag).
    */
-  onOpenIntentPanel(intent: Intent){
+  onOpenIntentPanel(intent: Intent, event?: MouseEvent){
     this.logger.log('[CDS-INTENT] onOpenIntentPanel > intent', this.intent, " con : ", intent);
+    
+    // FIX: Non aprire il panel se il click è sui controlli intent (evita interferenza)
+    if (event) {
+      const target = event.target as HTMLElement;
+      const isClickOnControls = target.closest('cds-panel-intent-controls') !== null 
+        || target.closest('.intent-header-action-btn') !== null
+        || target.closest('.intent-header-actions-wpr') !== null;
+      
+      if (isClickOnControls) {
+        // Il click è sui controlli, lascia che gestiscano l'evento
+        return;
+      }
+    }
     
     // Calcola durata tra mousedown e click
     const clickDuration = Date.now() - this.mouseDownTimestamp;
@@ -1615,13 +1628,22 @@ export class CdsIntentComponent implements OnInit, OnDestroy {
   /**
    * OTTIMIZZATO: Usa timestamp invece di mousemove per distinguere click da drag.
    * Elimina la necessità di (mousemove) su ogni intent (100+ listener).
-   * Nasconde immediatamente i controlli intent su mousedown.
+   * FIX: Non nascondere controlli se il click è sui controlli stessi (evita regressione).
    */
   onIntentMouseDown(event: MouseEvent): void {
     this.mouseDownTimestamp = Date.now();
     
-    // Nascondi controlli immediatamente su mousedown (requisito UX)
-    this.hideIntentControls();
+    // FIX: Non nascondere controlli se il click è sui controlli intent (evita regressione)
+    // Verifica se il click è su un elemento dentro cds-panel-intent-controls o sui suoi bottoni
+    const target = event.target as HTMLElement;
+    const isClickOnControls = target.closest('cds-panel-intent-controls') !== null 
+      || target.closest('.intent-header-action-btn') !== null
+      || target.closest('.intent-header-actions-wpr') !== null;
+    
+    if (!isClickOnControls) {
+      // Nascondi controlli immediatamente su mousedown solo se non si clicca sui controlli (requisito UX)
+      this.hideIntentControls();
+    }
   }
 
   /**
