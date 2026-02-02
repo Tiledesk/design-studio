@@ -44,6 +44,7 @@ export class ConnectorService {
   mapOfConnectors: any = {};
   scale: number = 1;
   existingIntentIds: any;
+
   
   // Coda per connettori che hanno fallito il rendering
   private failedConnectorsQueue: Array<{intent: any, fromId: string, toId: string, attributes: any, retryCount: number}> = [];
@@ -218,7 +219,7 @@ export class ConnectorService {
   public addConnectorToList(connector){
     this.listOfConnectors[connector.id] = connector;
     this.mapOfConnectors[connector.id] =  {'shown': true };
-    this.logger.log('[CONNECTOR-SERV] addConnector::  connector ', connector)
+    this.logger.log('[CONNECTOR-SERV] addConnectorToList:: connector added to listOfConnectors and mapOfConnectors', connector.id)
   }
 
   /**
@@ -1022,6 +1023,38 @@ export class ConnectorService {
           }
         }
 
+        /**  ITERATION */
+        if(action._tdActionType === TYPE_ACTION.ITERATION){
+          this.logger.log('[CONNECTOR-SERV] ITERATION - intent_display_name', intent.intent_display_name);
+          this.logger.log('[CONNECTOR-SERV] ITERATION - action:', { goToIntent: action.goToIntent, fallbackIntent: action.fallbackIntent });
+          
+          // goToIntent (con /goto)
+          if(action.goToIntent && action.goToIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId+'/goto';
+            idConnectorTo = action.goToIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              this.logger.log('[CONNECTOR-SERV] ITERATION - goToIntent target does not exist:', idConnectorTo);
+              action.goToIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] ITERATION - Creating goTo connector:', { from: idConnectorFrom, to: idConnectorTo });
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          
+          // fallbackIntent (con /fallback)
+          if(action.fallbackIntent && action.fallbackIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId+'/fallback';
+            idConnectorTo = action.fallbackIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              this.logger.log('[CONNECTOR-SERV] ITERATION - fallbackIntent target does not exist:', idConnectorTo);
+              action.fallbackIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] ITERATION - Creating fallback connector:', { from: idConnectorFrom, to: idConnectorTo });
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
         /** DTMF_MENU' ||  DTMF_FORM  || SPEECH_FORM */
         if(action._tdActionType === TYPE_ACTION_VXML.DTMF_MENU  || action._tdActionType === TYPE_ACTION_VXML.DTMF_FORM
             || action._tdActionType === TYPE_ACTION_VXML.SPEECH_FORM){
@@ -1300,15 +1333,23 @@ export class ConnectorService {
    * 
    */
   public deleteConnector(intent, idConnection, save=false, notify=true) {
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
-    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
-    this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
-    if(idConnector && intent.attributes?.connectors[idConnector]){
-      delete intent.attributes.connectors[idConnector];
+    try {
+      this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
+      if (!intent || !idConnection) return;
+      if (!intent.attributes) intent.attributes = {};
+      if (!intent.attributes.connectors) intent.attributes.connectors = {};
+      const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+      this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
+      if(idConnector && intent.attributes.connectors[idConnector]){
+        delete intent.attributes.connectors[idConnector];
+      }
+      this.hideContractConnector(idConnection);
+      if (this.tiledeskConnectors && typeof this.tiledeskConnectors.deleteConnector === 'function') {
+        this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
+      }
+    } catch (err) {
+      this.logger.error('[CONNECTOR-SERV] deleteConnector error:', err);
     }
-    this.hideContractConnector(idConnection);
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  intent ', intent);
-    this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 
 
@@ -1317,8 +1358,10 @@ export class ConnectorService {
    * @param connectorID 
    */
   public deleteConnectorToList(connectorID){
-    // this.logger.log('[CONNECTOR-SERV] deleteConnectorToList::  connectorID ', connectorID)
+    this.logger.log('[CONNECTOR-SERV] deleteConnectorToList:: connectorID ', connectorID)
     delete this.listOfConnectors[connectorID];
+    // delete this.mapOfConnectors[connectorID];
+    this.logger.log('[CONNECTOR-SERV] deleteConnectorToList:: deleted from listOfConnectors and mapOfConnectors',this.listOfConnectors, this.mapOfConnectors)
   }
 
   /** */
@@ -1345,7 +1388,7 @@ export class ConnectorService {
         return filteredMap;
       }, {});
       for (const [key, connector] of Object.entries(listOfConnectors)) {
-        this.logger.log('delete connector :: ', key );
+        this.logger.log('[CONNECTOR-SERV] delete connector :: ', key );
         const intentId = connectorID.split('/')[0];
         const intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
         this.deleteConnector(intent, key, save, notify);
@@ -1610,6 +1653,8 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
               connectorID = intent_id+"/"+tdActionId+'/fallback/'+idConnectorTo;
             } else if(key === 'errorIntent'){ 
               connectorID = intent_id+"/"+tdActionId+'/error/'+idConnectorTo;
+            } else if(key === 'goToIntent'){ 
+              connectorID = intent_id+"/"+tdActionId+'/goto/'+idConnectorTo;
             } 
 
             let shown = 'false';
@@ -1703,6 +1748,9 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // const connector = {id:idConnector, display:true};
     // this.subjectChangedConnectorAttributes.next(connector);
     this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
+    
+    // Notifica gli observer del cambiamento
+    this.notifyConnectorsChanged(idConnection);
   }
 
   showContractConnector(idConnection: string){
@@ -1712,6 +1760,24 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // const connector = {id:idConnector, display:false};
     // this.subjectChangedConnectorAttributes.next(connector);
     this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
+    
+    // Notifica gli observer del cambiamento
+    this.notifyConnectorsChanged(idConnection);
+  }
+
+  /**
+   * Notifica gli observer quando cambiano gli attributi di un connettore.
+   * Estrae l'ID dell'intent di destinazione e notifica solo quell'intent.
+   */
+  private notifyConnectorsChanged(connectorId: string): void {
+    const segments = connectorId.split('/');
+    const toIntentId = segments[segments.length - 1];
+    if (toIntentId) {
+      // Notifica gli observer (ricarica sempre i connettori freschi)
+      const connectors = this.getConnectorsInByIntent(toIntentId);
+      this.connectorsInChangedSubject.next({ intentId: toIntentId, connectors });
+      this.logger.log(`[CONNECTORS] Notificato cambiamento attributi connettore per blocco ${toIntentId}: ${connectors.length} connettori totali`);
+    }
   }
 
 

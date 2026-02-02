@@ -241,9 +241,8 @@
                     <div class="title-and-parameters-container">
                         <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                         <div class="parameters-preview">
-                            <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-flag">
+                            <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-badge">
                                 {{ action?.modelName || llm_model_selected?.modelName }}
-                                <span class="sep"> | </span>
                             </span>
                             <span *ngIf="action?.max_tokens" class="preview-badge">
                                 <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
@@ -300,7 +299,7 @@
                         [placeholder]="'CDSCanvas.Model' | translate"
                         [autocompleteOptions]="autocompleteOptions"
                         (onOptionSelected)="onOptionSelected($event, 'model')"
-                        (blur)="onBlur($event)"
+                        (blur)="onBlur($event, 'model')"
                         (onChange)="onChangeTextarea($event, actionLabelModel, 'model')">
                     </cds-text>
                 </div> -->
@@ -322,6 +321,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -371,6 +371,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
