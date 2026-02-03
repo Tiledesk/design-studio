@@ -43,7 +43,7 @@
 
   <div [id]="blockHeaderId"
        class="pic-header" 
-       [class.cds-start]="isStart">
+       [ngClass]="{'cds-start': isStart}">
 
     <cds-panel-intent-header *ngIf="!isUntitledBlock" 
         class="pic-title-text tds_draggable" 
@@ -123,8 +123,11 @@
          [cdkDragDisabled]="isNewChatbot"
          [id]="action._tdActionId" 
          class="box-action" 
-         [class.cds-no-featured-action]="isNoFeaturedAction(action)"
-         [class.cds-last-action]="last"
+         tabindex="-1"
+         [ngClass]="{
+           'cds-no-featured-action': isNoFeaturedAction(action),
+           'cds-last-action': last
+         }" 
          [style.--action-outline]="getActionOutline(action)"
          (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
          (cdkDragReleased)="onDragEnded($event, i)"

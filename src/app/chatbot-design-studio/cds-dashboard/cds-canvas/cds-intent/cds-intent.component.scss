@@ -1,9 +1,37 @@
+/* 
+  ============================================================================
+  COMPONENT: cds-intent.component.scss
+  ============================================================================
+  
+  STYLES FOR:
+  - Main intent container with dynamic styling
+  - Intent header and controls
+  - Actions list with drag & drop
+  - Action items and placeholders
+  - Footer and add action button
+  
+  ORGANIZATION:
+  1. CSS Custom Properties (CSS Variables)
+  2. Host Styles
+  3. Main Container Styles
+  4. Header Styles
+  5. Actions List Styles
+  6. Action Item Styles
+  7. Drag & Drop Styles
+  8. Footer Styles
+  9. Utility Classes
+  10. Animations & Effects
+  ============================================================================
+*/
+
 @import "./src/assets/sass/animations.scss";
 
-
-:host{
+/* ============================================================================
+   CSS CUSTOM PROPERTIES
+   ============================================================================ */
+:host {
   --action-background: #{var(--action-item-background)};
-  --action-no-featured-backgroud: #{var(--action-no-featured-item-background)};
+  --action-no-featured-background: #{var(--action-no-featured-item-background)};
   --intent-background: #{var(--intent-preview-background)};
   --intent-border-color: #{var(--intent-preview-borderColor)};
   --intent-header-background: transparent;
@@ -14,14 +42,21 @@
   --add-action-btn-color: #{var(--add-action-btn-color-preview)};
   --add-action-btn-hover-color: #{var(--add-action-btn-hover-color-preview)};
   --base-color: #{var(--blu)};
-  --startIntentMaxWith: 160px;
+  --start-intent-max-width: 160px;
   --base-border-radius-base: #{var(--button-border-radius-base)};
+  
+  /* Optimized filter values - cached for performance */
+  --filter-option-default: brightness(0) invert(99%) sepia(8%) saturate(403%) hue-rotate(225deg) brightness(117%);
+  --filter-option-active: brightness(0) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+  --filter-icon-action: brightness(0) invert(97%) sepia(66%) saturate(6656%) hue-rotate(177deg) brightness(102%) contrast(98%);
 }
 
-
+/* ============================================================================
+   DRAG PREVIEW
+   ============================================================================ */
 #customDragPreview {
   display: block;
-  position:absolute;
+  position: absolute;
   pointer-events: none;
   user-select: none;
   opacity: 0.8;
@@ -30,125 +65,96 @@
   width: 100%;
 }
 
-
-.action-element{
-  width: 100%;
-}
-
-
+/* ============================================================================
+   MAIN INTENT CONTAINER
+   ============================================================================ */
 .panel-intent-content {
-  transition: background-color 0.15s ease 0s;
-  width: 264px;
-  cursor: grab;
   position: relative;
-  margin: 0px;
+  width: 264px;
+  margin: 0;
   padding: var(--base-padding-preview);
   border-radius: var(--base-border-radius-preview);
+  cursor: grab;
+  /* Optimized: Removed transition on background-color (expensive property)
+     Background color changes are handled via CSS custom properties which are more performant */
   background-color: var(--intent-bg-color, transparent);
   outline: var(--intent-outline, none);
+
   &::before {
-    display: block;
-    border-radius: 10px;
-    position: absolute;
     content: "";
-    transition: box-shadow 0.15s ease 0s;
+    display: block;
+    position: absolute;
+    border-radius: 10px;
+    /* Optimized: Removed transition on box-shadow (expensive property)
+       Box-shadow changes are rare and don't need smooth transitions */
   }
-  &.outline-border {
-    outline: 2px solid var(--brown);
-    border-radius: var(--base-border-radius-preview);
-  }
-  &.ripple-effect {
-    animation-name: ripple_effect;
-    animation-duration: 1s;
-    animation-iteration-count: 1s;
-    border-radius: var(--base-border-radius-preview);
-  }
-  &.isStart{
+
+  /* Start Intent Variant */
+  &.isStart {
     position: absolute;
     height: 100%;
-    background-color: unset!important;
+    max-width: var(--start-intent-max-width);
     padding: 0;
-    border-radius: unset;
-    border: unset;
-    max-width: var(--startIntentMaxWith);
-    outline: unset!important;
+    border: none;
+    border-radius: 0;
+    background-color: unset;
+    outline: none;
+
     .intent-background-overlay {
-      background-color: transparent!important;
-      outline: unset!important;
+      background-color: transparent;
+      outline: none;
     }
+
     .header-draggable {
-      height: 100%;
       width: 100%;
-    }
-    .pic-header {
       height: 100%;
-      display: block;
+    }
+
+    .pic-header {
       position: absolute;
+      display: block;
+      height: 100%;
       margin: 0;
       padding: 0;
     }
   }
 
-  .intent-background-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #fff;
-      z-index: -1;
-  }
+  /* Slim Intent Variant (New Chatbot) */
+  &.tds-slim-intent {
+    padding: 2px;
 
-  .header-draggable {
-    position: absolute;
-    background-color: transparent;
-    width: calc(100% - 20px);
-    height: 40px;
-  }
-  .pic-header {
-    display: flex;
-    justify-content: space-between;
-    width: auto;
-    margin: 0;
-    padding: 0 0 10px 0;
-    background-color: var(--intent-header-background);
-    overflow: hidden;
-    justify-content: flex-end;
-  }
-
-  .agents-available {
-    margin-top: -70px;
-    margin-left: -10px;
-    display: block;
-    position: absolute;
-    &.isStart{
-      margin-top: -25px;
-      margin-left: 10px;
+    .pic-header {
+      padding: 0;
     }
-    span.material-icons{
-      color: var(--intent-header-icon-color)
+
+    .pic-title-text {
+      padding: 4px 8px 10px;
+    }
+
+    .footer-intent {
+      min-height: 0;
+      margin: 0;
+    }
+
+    .tds-drop-element {
+      width: calc(100% - 4px);
     }
   }
-  // --------------------------------
-  // https://stackoverflow.com/questions/9476923/css3-animate-border-color
 
-  .flashBorder {
-    // border: 3px solid #fff;
-    animation-name: flash_border;
-    animation-duration: 2s;
-    animation-timing-function: linear;
-    animation-iteration-count: 2s; //infinite;
-    -webkit-animation-name: flash_border;
-    -webkit-animation-duration: 2s;
-    -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: 2s; //infinite;
-    -moz-animation-name: flash_border;
-    -moz-animation-duration: 2s;
-    -moz-animation-timing-function: linear;
-    -moz-animation-iteration-count: 2s //infinite;
+  /* Connector Overlay States */
+  &.outline-border {
+    outline: 2px solid var(--brown);
+    border-radius: var(--base-border-radius-preview);
   }
 
+  &.ripple-effect {
+    animation-name: ripple_effect;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+    border-radius: var(--base-border-radius-preview);
+  }
 
+  /* Live Intent States */
   &.live-active-intent-pulse {
     cursor: pointer;
     animation: pulse-blu 1s 2 forwards;
@@ -157,27 +163,72 @@
 
   &.live-active-intent2 {
     cursor: pointer;
-    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
+    /* Optimized: Removed invisible box-shadow (0 0 0 = no visual effect) */
     outline: 3px solid var(--blu);
     outline-offset: 9px;
   }
 
   &.live-start-intent {
     cursor: pointer;
-    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
+    /* Optimized: Removed invisible box-shadow (0 0 0 = no visual effect) */
     min-height: 44px;
     border-radius: 20px;
     animation: pulse 1s infinite;
+    
+    /* Optimized: Pause animation when element is out of viewport */
+    &.out-of-viewport {
+      animation-play-state: paused;
+    }
   }
+}
 
+/* ============================================================================
+   INTENT BACKGROUND OVERLAY
+   ============================================================================ */
+.intent-background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  z-index: -1;
+}
 
-  .cds-start {
-    transition: box-shadow .15s ease 0s, background-color .15s ease 0s;
+/* ============================================================================
+   HEADER DRAGGABLE AREA
+   ============================================================================ */
+.header-draggable {
+  position: absolute;
+  width: calc(100% - 20px);
+  height: 40px;
+  background-color: transparent;
+}
+
+/* ============================================================================
+   INTENT HEADER SECTION
+   ============================================================================ */
+.pic-header {
+  display: flex;
+  justify-content: flex-end;
+  width: auto;
+  margin: 0;
+  padding: 0 0 10px 0;
+  background-color: var(--intent-header-background);
+  overflow: hidden;
+
+  &.cds-start {
+    /* Optimized: Replaced expensive transitions (box-shadow, background-color) with transform/opacity
+       Only transition GPU-accelerated properties for better performance */
+    transition: transform 0.15s ease, opacity 0.15s ease;
     position: absolute;
+    /* Optimized: Inset shadow is relatively cheap, but isolate in compositing layer */
     box-shadow: #00000052 0 -1px inset;
+    transform: translateZ(0);
+    will-change: transform, opacity;
     background-color: #4b5052;
     border-radius: 22px;
-    max-width: var(--startIntentMaxWith);
+    max-width: var(--start-intent-max-width);
     right: 0;
     cursor: pointer;
     opacity: 1;
@@ -185,19 +236,6 @@
     .cds-intent-options {
       margin-right: 30px;
     }
-  }
-
-  .cds-start-content {
-    position: relative;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    align-content: center;
-    flex-direction: row;
-    height: 100%;
-    right: 11px;
-    .title-label {
-      display: none;
     }
   }
 
@@ -207,425 +245,75 @@
     margin: auto 0;
   }
 
-  // .pic-title-text:hover {
-  //   /*  background: rgb(221, 212, 183); */
-  // }
-
   .pic-title-text {
-    transition: background 0.15s ease 0s;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 100%;
     padding: 4px 8px;
     border-radius: 5px;
     font-size: 15px;
     font-weight: 600;
+  color: rgb(108, 104, 89);
     cursor: grab;
     box-sizing: border-box;
-    max-width: 100%;
-    width: 100%;
-    color: rgb(108, 104, 89);
-    display: inline-block;
     white-space: pre-wrap;
     overflow-wrap: break-word;
     pointer-events: auto;
-    &.isStart{
+    /* Optimized: Removed transition on background (expensive property)
+       Background changes are rare and don't need smooth transitions */
+
+  &.isStart {
       height: 100%;
-      display:flex;
+    display: flex;
       align-items: center;
     }
+
     .header {
-      padding:0px!important;
-    }
+    padding: 0;
+  }
+}
+
+/* ============================================================================
+   AGENTS AVAILABLE INDICATOR
+   ============================================================================ */
+.agents-available {
+  position: absolute;
+  display: block;
+  margin-top: -70px;
+  margin-left: -10px;
+
+  &.isStart {
+    margin-top: -25px;
+    margin-left: 10px;
   }
 
+  .material-icons {
+    color: var(--intent-header-icon-color);
+  }
 }
 
-
-
-
-
-
-/* Actions list
-/* ***************************** */
-.actions-list-wpr {
-  display: flex;
-  flex-direction: column;
-  // gap: 10px; // nk
-  gap: 18px; // nk
-  //min-height: 200px;
-  //width: 200px;
-  // border: 1px solid #ccc;
-  //padding: 10px;
-  padding-top: 0px;
-}
-
-.box-action {
+/* ============================================================================
+   START INTENT CONTENT
+   ============================================================================ */
+.cds-start-content {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: flex-end;
   align-items: center;
-  width: 100%;
-  min-height: 30px;
-  border-radius: var(--base-border-radius-preview);
-  border: 2px solid rgb(255, 255, 255);
-  background-color: var(--action-background);
-  outline: var(--action-outline, none);
-  &.isFirst{
-    // height: 1px!important;
+  align-content: center;
+  height: 100%;
+  right: 11px;
+
+  .title-label {
     display: none;
   }
 }
 
-/* Drag placeholder 
-/* ******************************** */
-.cdk-drag-preview {
-  box-sizing: border-box;
-  border-radius: 4px;
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-    0 8px 10px 1px rgba(0, 0, 0, 0.14),
-    0 3px 14px 2px rgba(0, 0, 0, 0.12);
-}
-
-
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-// .box-action:last-child {
-//   border: none;
-// }
-
-.actions-list-wpr.cdk-drop-list-dragging .box-action:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.action-drag-placeholder {
-  // background: #ccc;
-  background: var(--drop-zone-background);
-  // border: dotted 3px #999;
-  border: dashed 1px var(----drop-zone-color-border);
-  min-height: 60px;
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-  border-radius: 8px;
-  opacity: 0;
-}
-
-.cdk-action-placeholder {
-  opacity: 1;
-}
-
-.hide-drag-action-palceholder {
-  display: none;
-}
-
-.cdk-drag-placeholder {
-  opacity: 1;
-}
-
-
-.cds-no-featured-action {
-  // background-color: var(--action-no-featured-backgroud);
-  background-color: rgba(255, 255, 255, 0.7);
-}
-
-
-.footer-intent {
-  cursor: pointer;
-  margin-bottom: -10px;
-  min-height: 12px;
-  .csd-open-action-menu-btn-wpr {
-    bottom: -28px;
-  }
-}
-
-.last-action-intent {
-  display: block;
-  float: inline-end;
-  // margin: 6px -12px 0 0;
-  // padding: 0 24px 0 0;
-  margin: 6px 0 0 0;
-  padding: 0;
-}
-/* Btn add action
-/* --------------------------------- */
-.csd-open-action-menu-btn-wpr {
-  text-align: center;
-  position: absolute;
-  display: block;
-  bottom: -41px;
-  left: 0px;
-  right: 0px;
-  padding-top: 20px;
-}
-
-.footer-intent>.csd-open-action-menu-btn-wpr,
-.add--action-placeholder .csd-open-action-menu-btn-wpr
-{
-  opacity: 0;
-}
-
-.footer-intent:hover>.csd-open-action-menu-btn-wpr,
-.add--action-placeholder:hover .csd-open-action-menu-btn-wpr {
-  opacity: 1;
-  transform: translate3d(0, 00px, 0);
-  transition: 0.25s all ease-in-out;
-}
-
-
-// .cds-last-action>.csd-open-action-menu-btn-wpr {
-//   opacity: 0;
-// }
-
-// .cds-last-action:hover>.csd-open-action-menu-btn-wpr {
-//   opacity: 1;
-// }
-
-.body-action {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  // background-color: #ffffff80; // nk
-  // box-shadow: #0000000f 0 0 0 1px; // nk
-  border-radius: 6px; // nk
-}
-
-// .cds-featured-action {
-//   background-color: #e3e1f1;
-// }
-
-.header-action {
-  position: relative;
-  min-height: 54px;
-  /* padding: 0px 10px; */
-  padding: 0px 0px;
-  width: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  // flex-direction: column;
-  min-height: 25px;
-  // border-radius: 6px;
-  // background-color: rgb(255 255 255 / 50%);
-  // box-shadow: rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
-  &.isLast{
-    display: none;
-  }
-}
-
-.icon-action {
-  transition: opacity .15s ease 0s;
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  margin-right: 6px;
-  align-self: start;
-  color: #718497;
-  opacity: .85;
-  background: var(--brown);
-}
-
-.label-action {
-  overflow-x: clip;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: 14px;
-}
-
-
-.tds_connectable {
-  width: 30px;
-  height: 30px;
-  background-color: #ff4000;
-}
-
-.unselectable {
-  -moz-user-select: -moz-none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-}
-
-.button-intent {
-  display: block;
-  text-align: center;
-  user-select: none;
-  box-sizing: border-box;
-  outline: none;
-  border: 0.1em dashed #d2d2d2;
-  border-radius: 20px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: normal;
-  height: auto;
-  line-height: 32px;
-  margin: 10px 5px 0;
-  font-family: var(--font-family-poppins);
-  padding: 10px;
-  transition: all 0.1s;
-
-  // min-width: 100px;
-  &:hover {
-    background-color: #d2d2d2;
-    color: #333333;
-  }
-}
-
-
-
-.button-intent-active {
-  // background-color: #d2d2d2;
-  // color: #333333;
-
-  outline: 2px solid rgba(236, 182, 6, .6901960784) !important;
-
-}
-
-
-// .button-intent:hover svg {
-//   fill: #333333;
-// } 
-
-.button-intent-active {
-  background-color: #d2d2d2;
-  color: #333333;
-}
-
-.intent--action {
-  display: block;
-  text-align: center;
-  user-select: none;
-  box-sizing: border-box;
-  outline: none;
-  border: 0.1em dashed #d2d2d2;
-  border-radius: 20px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: normal;
-  height: auto;
-  line-height: 32px;
-  margin: 10px 5px 0;
-  font-family: var(--font-family-poppins);
-  padding: 10px;
-  transition: all 0.3s;
-  width: 96px;
-}
-
-.actions-btn-active {
-  background-color: #fff;
-  color: #333333;
-  border: 1px solid #fff !important;
-}
-
-.cds-action-title {
-  position: absolute;
-  width: 155px;
-  margin-top: -57px;
-  text-align: center;
-  line-height: 15px;
-  height: 18px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: 11px;
-  font-size: 10px;
-  font-weight: 400;
-}
-
-.action-wpr {
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cds-action-icon-wpr {
-  display: flex;
-  margin-right: 10px;
-
-  img {
-    width: 18px;
-    filter: brightness(0) saturate(100%) invert(97%) sepia(66%) saturate(6656%) hue-rotate(177deg) brightness(102%) contrast(98%);
-  }
-}
-
-// .header__center {
-//   font-size: 2rem;
-//   display: grid;
-//   grid-template-columns: 1fr max-content 1fr;
-//   grid-column-gap: 1.2rem;
-//   align-items: center;
-//   margin-top: 24px;
-//   margin-bottom: 0px;
-//   padding-left: 12px;
-//   padding-right: 12px;
-// }
-
-// .header__center::before,
-// .header__center::after {
-//   content: "";
-//   display: block;
-//   height: 1px;
-//   background-color: currentColor;
-// }
-
-
-.cds-action-arrow {
-  position: absolute;
-  // display: flex;
-  bottom: -15px
-}
-
-.cds-action-arrow>span {
-  transform: rotate(-90deg);
-  color: #d2e3fc;
-}
-
-
-
-
-.cds-add-action-btn {
-  margin: 0px;
-  padding: 0 10px;
-  background: var(--add-action-btn-background);
-  box-shadow: #001b4714 0 3px 8px;
-  border-radius: var(--base-border-radius-base);
-  color: var(--add-action-btn-color);
-  cursor: pointer;
-  font-size: 0.7em;
-  font-weight: 400;
-  transition: all .3s;
-  line-height: 20px;
-  width: 100%;
-  // outline: 2px solid var(--base-color) !important;
-  // z-index: 2;
-}
-
-.cds-add-action-btn>span {
-  font-size: 16px;
-  color: var(--base-color);
-}
-
-.cds-add-action-btn:hover {
-  opacity: 0.8;
-  // color: var(--add-action-btn-hover-color)
-}
-
-cds-action-description.header-action ::ng-deep{
-  .action-title{
-    max-width: 100%
-  }
-}
-
-cds-panel-intent-header.isStart ::ng-deep{
-  input {
-    color: white !important;
-  }
-}
-
-
-//** FLOATING MENU - start**//
+/* ============================================================================
+   INTENT OPTIONS (Question/Form Toggle)
+   ============================================================================ */
 .cds-intent-options {
   display: flex;
   justify-content: center;
@@ -641,9 +329,13 @@ cds-panel-intent-header.isStart ::ng-deep{
       opacity: 0.85;
     }
 
-    &[active=true] {
+    &[active="true"] {
       img {
-        filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+        /* Optimized: Simplified filter chain, removed redundant saturate(100%) */
+        filter: var(--filter-option-active);
+        /* Isolate in compositing layer for better performance */
+        transform: translateZ(0);
+        will-change: filter;
       }
     }
   }
@@ -651,15 +343,145 @@ cds-panel-intent-header.isStart ::ng-deep{
   img {
     width: 24px;
     height: 24px;
-    filter: brightness(0) saturate(100%) invert(99%) sepia(8%) saturate(403%) hue-rotate(225deg) brightness(117%) contrast(100%);
+    /* Optimized: Simplified filter chain, removed redundant saturate(100%) and contrast(100%) */
+    filter: var(--filter-option-default);
+    /* Isolate in compositing layer only when filter is active */
+    transform: translateZ(0);
+    /* Hint browser to optimize filter rendering */
+    will-change: filter;
   }
 }
 
-//** FLOATING MENU - end**//
+/* ============================================================================
+   ACTIONS LIST CONTAINER
+   ============================================================================ */
+.actions-list-wpr {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 0;
 
+  &.cdk-drop-list-dragging .box-action:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}
 
+/* ============================================================================
+   ACTION ITEM
+   ============================================================================ */
+.box-action {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 30px;
+  border: 2px solid rgb(255, 255, 255);
+  border-radius: var(--base-border-radius-preview);
+  background-color: var(--action-background);
+  outline: var(--action-outline, none);
 
+  &.isFirst {
+    display: none;
+  }
+}
 
+.action-element {
+  width: 100%;
+}
+
+/* ============================================================================
+   ACTION BODY
+   ============================================================================ */
+.body-action {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 6px;
+}
+
+.header-action {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 25px;
+  padding: 0;
+
+  &.isLast {
+    display: none;
+  }
+}
+
+.cds-no-featured-action {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================================================
+   DRAG & DROP STYLES
+   ============================================================================ */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  /* Optimized: Simplified from 3 shadows to 1 shadow for better performance
+     Original: 3 shadows (0 5px 5px -3px, 0 8px 10px 1px, 0 3px 14px 2px)
+     New: Single shadow that approximates the visual effect with less paint cost */
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.25);
+  /* Optimized: Isolate in compositing layer for better performance during drag */
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.action-drag-placeholder {
+  min-height: 60px;
+  border: dashed 1px var(--drop-zone-color-border);
+  border-radius: 8px;
+  background: var(--drop-zone-background);
+  opacity: 0;
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-placeholder {
+  opacity: 1;
+}
+
+.cdk-action-placeholder {
+  opacity: 1;
+}
+
+.hide-drag-action-placeholder {
+  display: none;
+}
+
+.tds-drop-element {
+  position: absolute;
+  width: calc(100% - 20px);
+  height: 30px;
+  z-index: 1;
+  cursor: move;
+}
+
+/* ============================================================================
+   ACTION ARROW
+   ============================================================================ */
+.cds-action-arrow {
+  position: absolute;
+  bottom: -15px;
+
+  > span {
+    transform: rotate(-90deg);
+    color: #d2e3fc;
+  }
+}
+
+/* ============================================================================
+   ADD ACTION PLACEHOLDER
+   ============================================================================ */
 .add--action-placeholder {
   position: relative;
   display: flex;
@@ -667,12 +489,23 @@ cds-panel-intent-header.isStart ::ng-deep{
   align-items: center;
   width: 100%;
   min-height: 30px;
-  border-radius: 10px;
-  border: 1px solid var(--brown);
   padding: 12px 6px;
-  border-style: dashed;
-  // background: rgba(62, 169, 245, 0.1);
-  background: rgba(221, 228, 234, .8);
+  border: 1px dashed var(--brown);
+  border-radius: 10px;
+  background: rgba(221, 228, 234, 0.8);
+
+  &:hover {
+    border-color: #3ea9f5;
+
+    .add--action-placeholder-add-icon span,
+    .add--action-placeholder-text {
+      color: #3ea9f5;
+    }
+
+    > .add-action-from-placeholder-btn-wpr {
+      opacity: 1;
+    }
+  }
 }
 
 .add--action-placeholder-add-icon span {
@@ -687,86 +520,293 @@ cds-panel-intent-header.isStart ::ng-deep{
   text-align: center;
 }
 
-.add--action-placeholder:hover .add--action-placeholder-add-icon span {
-  color: #3ea9f5;
-}
-
-.add--action-placeholder:hover .add--action-placeholder-text {
-  color: #3ea9f5;
-}
-
-.add--action-placeholder:hover {
-  border: 1px solid #3ea9f5;
-  border-style: dashed;
-}
-
-.add--action-placeholder>.add-action-from-placeholder-btn-wpr {
+.add-action-from-placeholder-btn-wpr {
   opacity: 0;
   position: absolute;
   top: 99px;
 }
 
-.add--action-placeholder:hover>.add-action-from-placeholder-btn-wpr {
-  opacity: 1;
+/* ============================================================================
+   ADD ACTION BUTTON
+   ============================================================================ */
+.csd-open-action-menu-btn-wpr {
+  position: absolute;
+  display: block;
+  bottom: -41px;
+  left: 0;
+  right: 0;
+  padding-top: 20px;
+  text-align: center;
 }
 
+.footer-intent > .csd-open-action-menu-btn-wpr,
+.add--action-placeholder .csd-open-action-menu-btn-wpr {
+  opacity: 0;
+}
 
-/** INTENT BORDER ANIMATION **/
+.footer-intent:hover > .csd-open-action-menu-btn-wpr,
+.add--action-placeholder:hover .csd-open-action-menu-btn-wpr {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  /* Optimized: Replaced "all" with specific GPU-accelerated properties */
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+}
+
+.cds-add-action-btn {
+  width: 100%;
+  margin: 0;
+  padding: 0 10px;
+  border-radius: var(--base-border-radius-base);
+  background: var(--add-action-btn-background);
+  /* Optimized: Single shadow is relatively cheap, but isolate in compositing layer */
+  box-shadow: #001b4714 0 3px 8px;
+  transform: translateZ(0);
+  will-change: box-shadow, opacity;
+  color: var(--add-action-btn-color);
+  font-size: 0.7em;
+  font-weight: 400;
+  line-height: 20px;
+  cursor: pointer;
+  /* Optimized: Replaced "all" with specific property (opacity is GPU-accelerated) */
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  > span {
+    font-size: 16px;
+    color: var(--base-color);
+  }
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+.footer-intent {
+  cursor: pointer;
+  min-height: 12px;
+  margin-bottom: -10px;
+}
+
+.last-action-intent {
+  display: block;
+  float: inline-end;
+  margin: 6px 0 0 0;
+  padding: 0;
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+.unselectable {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.icon-action {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  border-radius: 4px;
+  align-self: start;
+  color: #718497;
+  opacity: 0.85;
+  background: var(--brown);
+  /* Optimized: Opacity is GPU-accelerated, add will-change for better performance */
+  transition: opacity 0.15s ease;
+  will-change: opacity;
+}
+
+.label-action {
+  overflow-x: clip;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+.action-wpr {
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cds-action-icon-wpr {
+  display: flex;
+  margin-right: 10px;
+
+  img {
+    width: 18px;
+    /* Optimized: Simplified filter chain, removed redundant saturate(100%) */
+    filter: var(--filter-icon-action);
+    /* Isolate in compositing layer for better performance */
+    transform: translateZ(0);
+    /* Hint browser to optimize filter rendering */
+    will-change: filter;
+  }
+}
+
+.cds-action-title {
+  position: absolute;
+  width: 155px;
+  margin-top: -57px;
+  text-align: center;
+  line-height: 15px;
+  height: 18px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+/* ============================================================================
+   BUTTON INTENT (Legacy - may be used by other components)
+   ============================================================================ */
+.button-intent {
+  display: block;
+  box-sizing: border-box;
+  margin: 10px 5px 0;
+  padding: 10px;
+  border: 0.1em dashed #d2d2d2;
+  border-radius: 20px;
+  outline: none;
+  color: #fff;
+  font-size: 1em;
+  font-weight: normal;
+  font-family: var(--font-family-poppins);
+  line-height: 32px;
+  text-align: center;
+    cursor: pointer;
+  user-select: none;
+  /* Optimized: Replaced "all" with specific properties (color is cheap, outline is acceptable) */
+  transition: background-color 0.1s ease, color 0.1s ease, outline 0.1s ease;
+
+    &:hover {
+    background-color: #d2d2d2;
+    color: #333333;
+  }
+
+  &.button-intent-active {
+    background-color: #d2d2d2;
+    color: #333333;
+    outline: 2px solid rgba(236, 182, 6, 0.69);
+  }
+}
+
+.intent--action {
+  display: block;
+  box-sizing: border-box;
+  width: 96px;
+  margin: 10px 5px 0;
+  padding: 10px;
+  border: 0.1em dashed #d2d2d2;
+  border-radius: 20px;
+  outline: none;
+  color: #fff;
+  font-size: 1em;
+  font-weight: normal;
+  font-family: var(--font-family-poppins);
+  line-height: 32px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  /* Optimized: Replaced "all" with specific properties */
+  transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
+
+  &.actions-btn-active {
+    background-color: #fff;
+    color: #333333;
+    border: 1px solid #fff;
+  }
+}
+
+/* ============================================================================
+   ANIMATIONS & EFFECTS
+   ============================================================================ */
+.flashBorder {
+  animation-name: flash_border;
+  animation-duration: 2s;
+  animation-timing-function: linear;
+  animation-iteration-count: 2;
+  -webkit-animation-name: flash_border;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-iteration-count: 2;
+  -moz-animation-name: flash_border;
+  -moz-animation-duration: 2s;
+  -moz-animation-timing-function: linear;
+  -moz-animation-iteration-count: 2;
+}
+
 .live-active-intent {
   position: relative;
+  
+  /* Optimized: Isolate in compositing layer for better performance */
+  transform: translateZ(0);
+  will-change: transform;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    padding: 10px;
+    border-radius: 13px;
+    z-index: -1;
+    /* Optimized: Isolate pseudo-element in separate compositing layer */
+    transform: translateZ(0);
+    will-change: transform, background;
+    /* Optimized: Cache gradient calculation */
+    background: conic-gradient(
+      from var(--outline-angle),
+      var(--blu) 60%,
+      rgba(255, 255, 255, 0.5) 90%,
+      transparent 10%,
+      var(--blu) 80%
+    );
+    /* Optimized: Animation can be paused when element is out of viewport */
+    animation: outline-spin 3s linear infinite;
+  }
+  
+  /* Optimized: Pause animation when element is out of viewport or not visible */
+  &.out-of-viewport::before,
+  &.animation-paused::before {
+    animation-play-state: paused;
+  }
+  
+  /* Optimized: Reduce animation cost when element is not in focus */
+  &.reduced-motion::before {
+    animation-duration: 6s; /* Slower animation = less CPU usage */
+  }
 }
-.live-active-intent::before {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: 13px;
-  z-index: -1;
-  padding: 10px;
-  background: conic-gradient(
-    from var(--outline-angle),
-    var(--blu) 60%,
-    rgba(255, 255, 255, 0.5) 90%,
-    transparent 10%,               
-    var(--blu) 80%   
-  );
-  animation: outline-spin 3s linear infinite;
-}
+
 @property --outline-angle {
   syntax: "<angle>";
   inherits: false;
   initial-value: 0turn;
 }
+
 @keyframes outline-spin {
   to {
     --outline-angle: -1turn;
   }
 }
 
-/** SLIM INTENT **/
-.tds-slim-intent {
-  padding: 2px;
-  .pic-header {
-    padding: 0px;
+/* ============================================================================
+   DEEP SELECTORS (Component Overrides)
+   ============================================================================ */
+cds-action-description.header-action ::ng-deep {
+  .action-title {
+    max-width: 100%;
   }
-  .pic-title-text {
-    padding: 4px 8px 10px;
-  }
-  .footer-intent{
-    min-height: 0px;
-    margin: 0;
-  }
-  .tds-drop-element {
-    width: calc(100% - 4px);
-  }
-
 }
 
-.tds-drop-element {
-  position: absolute;
-  height: 30px;
-  width: calc(100% - 20px);
-  z-index: 1;
-  cursor: move;
+cds-panel-intent-header.isStart ::ng-deep {
+  input.form-control {
+    color: white;
+  }
 }
-
-

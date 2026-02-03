@@ -57,6 +57,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   subscriptions: Array<{ key: string, value: Subscription }> = [];
   unsubscribe$: Subject<any> = new Subject<any>();
 
+  // IntersectionObserver for pausing animations when element is out of viewport
+  private intersectionObserver: IntersectionObserver | null = null;
+  private isElementInViewport: boolean = true;
+
   alphaConnectors: number;
   connectorsIn: any;
   formSize: number = 0;
@@ -181,7 +185,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
-   * Helper function to check if action is not featured (for class binding)
+   * Helper function to check if action is not featured (for ngClass)
    * Returns true if action is NOT REPLY, DTMF_FORM, or BLIND_TRANSFER
    * @param action - Action to check
    */
@@ -649,6 +653,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     });
     const elementoDom = this.resizeElement.nativeElement;
     resizeObserver.observe(elementoDom);
+    
+    // Optimized: Setup IntersectionObserver to pause animations when element is out of viewport
+    this.setupIntersectionObserver();
+    
     setTimeout(() => {
       this.componentRendered.emit(this.intent.intent_id);
     }, 0);
@@ -657,6 +665,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   ngOnDestroy() {
+    // Cleanup IntersectionObserver
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
+    }
     this.unsubscribe();
   }
 
@@ -1333,6 +1346,66 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
    
   }
+
+  /**
+   * Optimized: Setup IntersectionObserver to pause conic-gradient animation
+   * when element is out of viewport for better performance
+   */
+  private setupIntersectionObserver(): void {
+    if (!this.resizeElement?.nativeElement) {
+      return;
+    }
+
+    // Check if IntersectionObserver is supported
+    if (typeof IntersectionObserver === 'undefined') {
+      this.logger.log('[CDS-INTENT] IntersectionObserver not supported, skipping animation optimization');
+      return;
+    }
+
+    const element = this.resizeElement.nativeElement;
+    const intentContentId = `#intent-content-${this.intent?.intent_id}`;
+    const intentElement = element.querySelector(intentContentId) as HTMLElement;
+
+    if (!intentElement) {
+      return;
+    }
+
+    // Create IntersectionObserver with threshold to trigger when element is partially visible
+    // Using rootMargin to trigger slightly before element enters/exits viewport
+    this.intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const isIntersecting = entry.isIntersecting;
+          
+          // Only update if visibility state changed
+          if (isIntersecting !== this.isElementInViewport) {
+            this.isElementInViewport = isIntersecting;
+            
+            // Add/remove class to pause animation when out of viewport
+            // This affects both .live-active-intent (conic-gradient) and .live-start-intent (pulse)
+            if (isIntersecting) {
+              intentElement.classList.remove('out-of-viewport');
+              this.logger.log('[CDS-INTENT] Element entered viewport, resuming animations');
+            } else {
+              intentElement.classList.add('out-of-viewport');
+              this.logger.log('[CDS-INTENT] Element left viewport, pausing animations');
+            }
+          }
+        });
+      },
+      {
+        // Trigger when at least 10% of element is visible
+        threshold: 0.1,
+        // Trigger slightly before element enters/exits viewport (50px margin)
+        rootMargin: '50px'
+      }
+    );
+
+    // Start observing the intent element
+    this.intersectionObserver.observe(intentElement);
+    this.logger.log('[CDS-INTENT] IntersectionObserver setup completed for intent:', this.intent?.intent_id);
+  }
+
   /** ******************************
    * intent controls options: END 
    * ****************************** */
