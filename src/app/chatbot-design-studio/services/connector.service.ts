@@ -1337,14 +1337,21 @@ export class ConnectorService {
    * @param elementID 
    */
   public async updateConnector(elementID){
-    this.logger.log('[CONNECTOR-SERV] movedConnector elementID ' ,elementID )
-    const elem = await isElementOnTheStage(elementID); // chiamata sincrona
-    // const elem = document.getElementById(elementID);
+    // Optimized: Check if element exists first before calling isElementOnTheStage
+    // This avoids unnecessary polling when element is already in DOM
+    let elem = document.getElementById(elementID);
+    
+    if (!elem) {
+      // Only call isElementOnTheStage if element is not found
+      this.logger.log('[CONNECTOR-SERV] element not found, waiting for it: ', elementID);
+      elem = await isElementOnTheStage(elementID);
+    }
+    
     if(elem){
       this.logger.log('[CONNECTOR-SERV] aggiorno i connettori: ', elem);
-      //setTimeout(() => {
-        this.tiledeskConnectors.updateConnectorsOutOfItent(elem);
-      //}, 0);
+      this.tiledeskConnectors.updateConnectorsOutOfItent(elem);
+    } else {
+      this.logger.warn('[CONNECTOR-SERV] element not found after waiting: ', elementID);
     }
   }
 

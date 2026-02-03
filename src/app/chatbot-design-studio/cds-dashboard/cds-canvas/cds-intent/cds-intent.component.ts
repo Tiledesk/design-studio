@@ -334,19 +334,26 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
   ngAfterViewInit(): void {
     this.logger.log("[CDS-INTENT] •••• ngAfterViewInit ••••");
     
-    // Setup ResizeObserver for connector updates
+    // Setup ResizeObserver for connector updates with debounce
+    let resizeDebounceTimeout: any = null;
     const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        const nuovaAltezza = entry.contentRect.height;
-        this.logger.log('[CDS-INTENT] ngAfterViewInit Nuova altezza del div:', nuovaAltezza);
-        if (!this.isDragging) {
-          this.connectorService.updateConnector(this.intent.intent_id);
+      // Debounce resize events to avoid excessive connector updates
+      clearTimeout(resizeDebounceTimeout);
+      resizeDebounceTimeout = setTimeout(() => {
+        for (const entry of entries) {
+          const nuovaAltezza = entry.contentRect.height;
+          this.logger.log('[CDS-INTENT] ngAfterViewInit Nuova altezza del div:', nuovaAltezza);
+          if (!this.isDragging) {
+            this.connectorService.updateConnector(this.intent.intent_id);
+          }
         }
-      }
+      }, 150); // Debounce: wait 150ms after last resize event
     });
     
     const elementoDom = this.resizeElement.nativeElement;
-    resizeObserver.observe(elementoDom);
+    if (elementoDom) {
+      resizeObserver.observe(elementoDom);
+    }
     
     // Setup IntersectionObserver for performance optimization
     this.setupIntersectionObserver();

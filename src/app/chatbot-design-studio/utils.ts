@@ -406,15 +406,30 @@ export function convertJsonToArray(jsonData:any){
     return arrayOfObjs;
 }
 
+/**
+ * Waits for an element to appear on the stage.
+ * Optimized: Uses 50ms interval instead of 0 to reduce CPU usage.
+ * @param elementId - The ID of the element to wait for
+ * @returns Promise that resolves with the element or false if timeout
+ */
 export async function isElementOnTheStage(elementId:string): Promise<any>{
     return new Promise((resolve) => {
-        let intervalId = setInterval(async () => {
+        // Optimized: Use 50ms interval instead of 0 to reduce CPU usage
+        // Check immediately first, then poll every 50ms
+        const result = document.getElementById(elementId);
+        if (result) {
+            resolve(result);
+            return;
+        }
+        
+        let intervalId = setInterval(() => {
             const result = document.getElementById(elementId);
             if (result) {
                 clearInterval(intervalId);
                 resolve(result);
             }
-        }, 0);
+        }, 50); // Changed from 0 to 50ms to reduce CPU usage
+        
         setTimeout(() => {
             clearInterval(intervalId);
             resolve(false);
