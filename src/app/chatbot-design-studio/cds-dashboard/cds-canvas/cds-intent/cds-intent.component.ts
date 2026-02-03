@@ -142,6 +142,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
   private mouseDownY: number = 0;
   private hasMouseMoved: boolean = false;
   private readonly MOUSE_MOVE_THRESHOLD: number = 5;
+  private showIntentControlsTimeout: any = null;
 
   // ============================================================================
   // PUBLIC PROPERTIES - State
@@ -177,6 +178,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
   isUntitledBlock: boolean = false;
   isNewChatbot: boolean = false;
   intentColor: string = INTENT_COLORS.COLOR1;
+  showIntentControls: boolean = false; // Controls visibility of intent controls with hover delay
 
   // ============================================================================
   // PUBLIC PROPERTIES - Template Exports
@@ -362,6 +364,13 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
       this.intersectionObserver.disconnect();
       this.intersectionObserver = null;
     }
+    
+    // Cleanup intent controls visibility timeout
+    if (this.showIntentControlsTimeout) {
+      clearTimeout(this.showIntentControlsTimeout);
+      this.showIntentControlsTimeout = null;
+    }
+    
     this.unsubscribe();
   }
 
@@ -698,6 +707,35 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
 
   onIntentMouseMove(event: MouseEvent): void {
     this.hasMouseMoved = true;
+  }
+
+  /**
+   * Show intent controls on hover with 200ms delay
+   */
+  onIntentMouseEnter(): void {
+    // Clear any existing timeout
+    if (this.showIntentControlsTimeout) {
+      clearTimeout(this.showIntentControlsTimeout);
+    }
+    
+    // Show after 200ms delay
+    this.showIntentControlsTimeout = setTimeout(() => {
+      this.showIntentControls = true;
+      this.showIntentControlsTimeout = null;
+    }, 200);
+  }
+
+  /**
+   * Hide intent controls immediately on mouse leave
+   */
+  onIntentMouseLeave(): void {
+    // Clear timeout if mouse leaves before delay completes
+    if (this.showIntentControlsTimeout) {
+      clearTimeout(this.showIntentControlsTimeout);
+      this.showIntentControlsTimeout = null;
+    }
+    
+    this.showIntentControls = false;
   }
 
   private openIntentPanel(intent: Intent): void {

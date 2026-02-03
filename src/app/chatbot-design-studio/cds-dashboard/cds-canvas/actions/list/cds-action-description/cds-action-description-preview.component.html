@@ -1,0 +1,23 @@
+<div class="action_wrp preview">
+  <div class="section">
+    <div class="action-title">
+      <div class="icon-action">
+        <img class="active-icon" 
+             [src]="element?.src" 
+             [title]="element?.name | translate">
+        <span *ngIf="element?.badge" 
+              [class]="'trigger-beta-badge badge-' + element.badge">
+          {{element.badge}}
+        </span>
+      </div>
+
+      <div class="action-btn-icon">
+        <button class="btn btn-tdblu-no-boxshadow drag-btn">
+          <img class="active-icon" 
+               src="assets/images/icons/drag_indicator.svg" 
+               [title]="'CDSCanvas.Drag' | translate">
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

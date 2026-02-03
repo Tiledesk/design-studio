@@ -1,0 +1,49 @@
+<div class="action_wrp">
+  <div class="section">
+    <div class="action-title">
+      <div class="icon-action">
+        <img class="active-icon" 
+             [src]="element?.src" 
+             [title]="element?.name | translate">
+      </div>
+
+      <p class="label-action">{{element?.name | translate}}</p>
+      
+      <span *ngIf="element?.badge" 
+            [class]="'trigger-beta-badge badge-' + element.badge">
+        {{element.badge}}
+      </span>
+      <span *ngIf="element?.status === 'beta'" 
+            class="trigger-beta-badge">
+        Beta
+      </span>
+    </div>
+    
+    <div *ngIf="showTip" class="action-description">
+      <div *ngIf="element?.doc"
+           [satPopoverAnchor]="descriptionTooltip"
+           (click)="descriptionTooltip.toggle()">
+        <span class="material-icons-outlined">info</span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="element?.badge === 'DEP'" class="deprecation-message">
+    {{'CDSCanvas.DeprecationMessage' | translate}}
+  </div>
+</div>
+
+<sat-popover #descriptionTooltip 
+              id="descriptionTooltip" 
+              hasBackdrop 
+              verticalAlign="center" 
+              horizontalAlign="after" 
+              (backdropClicked)="descriptionTooltip.close()" 
+              panelClass="description-tooltip">
+  <div class="tooltip-wrp">
+    <div class="caret_tooltip"></div>
+    <span [innerHTML]="element?.doc+'.DESCRIPTION' | translate: tparams"></span>
+    <span *ngIf="BRAND_BASE_INFO['DOCS']" 
+          [innerHTML]="element?.doc+'.DOC_URL' | translate: tparams"></span>
+  </div>
+</sat-popover>
