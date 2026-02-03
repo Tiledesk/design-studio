@@ -181,7 +181,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
-   * Helper function to check if action is not featured (for ngClass)
+   * Helper function to check if action is not featured (for class binding)
    * Returns true if action is NOT REPLY, DTMF_FORM, or BLIND_TRANSFER
    * @param action - Action to check
    */
