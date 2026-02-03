@@ -154,6 +154,14 @@ export enum TYPE_INTENT_ELEMENT {
     ANSWER          = 'answer'
 }
 
+export enum HAS_SELECTED_TYPE {
+    ANSWER = "HAS_SELECTED_ANSWER",
+    QUESTION = "HAS_SELECTED_QUESTION",
+    FORM = "HAS_SELECTED_FORM",
+    ACTION = "HAS_SELECTED_ACTION",
+    INTENT = "HAS_SELECTED_INTENT",
+}
+
 export enum TYPE_RESPONSE {
     TEXT        = 'text',
     RANDOM_TEXT = 'randomText',
