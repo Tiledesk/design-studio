@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT, rgbaToRgbOnWhite } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -100,6 +100,64 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   intentColor: any = INTENT_COLORS.COLOR1;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+
+  // Precomputed values for template performance optimization
+  get intentContentId(): string {
+    return this.intent?.intent_id ? `intent-content-${this.intent.intent_id}` : '';
+  }
+
+  get blockHeaderId(): string {
+    return this.intent?.intent_id ? `block-header-${this.intent.intent_id}` : '';
+  }
+
+  get backgroundColor(): string {
+    const color = this.intent?.attributes?.color || this.intentColor || INTENT_COLORS.COLOR1;
+    // Convert rgba(r,g,b, 0.35) to equivalent rgb on white background
+    const colorParts = color.split(',').map(c => parseInt(c.trim(), 10));
+    if (colorParts.length === 3 && !colorParts.some(isNaN)) {
+      const [r, g, b] = colorParts;
+      return rgbaToRgbOnWhite(r, g, b, 0.35);
+    }
+    // Fallback se il formato del colore non è valido
+    return `rgb(221, 228, 234)`;
+  }
+
+  get outlineColor(): string {
+    const color = this.intent?.attributes?.color || this.intentColor || INTENT_COLORS.COLOR1;
+    return `rgb(${color})`;
+  }
+
+  get isIntentSelected(): boolean {
+    return this.intentService.intentSelectedID === this.intent?.intent_id && this.intentService.intentActive;
+  }
+
+  get hasActions(): boolean {
+    return this.listOfActions?.length > 0;
+  }
+
+  get isEmptyActions(): boolean {
+    return !this.listOfActions || this.listOfActions.length === 0;
+  }
+
+  get showAddActionButton(): boolean {
+    return !this.isStart && this.hasActions && !this.isNewChatbot;
+  }
+
+  isActionSelected(actionId: string): boolean {
+    return this.intentService.actionSelectedID === actionId;
+  }
+
+  getActionArrowId(index: number): string {
+    return `action-arrow-${index}`;
+  }
+
+  shouldShowActionArrow(index: number): boolean {
+    return this.listOfActions && (this.listOfActions.length - 1) > index;
+  }
+
+  trackByActionId(index: number, action: Action): string {
+    return action?._tdActionId || index.toString();
+  }
 
 
   constructor(

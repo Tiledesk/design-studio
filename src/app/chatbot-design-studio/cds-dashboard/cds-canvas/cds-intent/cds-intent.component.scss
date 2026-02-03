@@ -56,6 +56,10 @@
     outline: 2px solid var(--brown);
     border-radius: var(--base-border-radius-preview);
   }
+
+  &.intent-selected {
+    outline: 2px solid var(--intent-outline-color, var(--action-selected-color));
+  }
   &.ripple-effect {
     animation-name: ripple_effect;
     animation-duration: 1s;
@@ -270,6 +274,9 @@
   &.isFirst{
     // height: 1px!important;
     display: none;
+  }
+  &.action-selected {
+    outline: 2px solid var(--intent-outline-color, var(--action-selected-color));
   }
 }
 

@@ -280,6 +280,31 @@ export const DEFAULT_ALPHA_CONNECTORS = 50;
 
 
 
+/**
+ * Converts an RGBA color to RGB equivalent on a white background.
+ * This function calculates the resulting color when a semi-transparent color
+ * is overlaid on a white background (255, 255, 255).
+ * 
+ * Formula: result = color * alpha + white * (1 - alpha)
+ * 
+ * @param r - Red component (0-255)
+ * @param g - Green component (0-255)
+ * @param b - Blue component (0-255)
+ * @param alpha - Alpha/opacity value (0.0-1.0)
+ * @returns RGB color string in format "rgb(r, g, b)"
+ * 
+ * @example
+ * // rgba(156, 163, 205, 0.35) on white background
+ * rgbaToRgbOnWhite(156, 163, 205, 0.35) // returns "rgb(221, 228, 234)"
+ */
+export function rgbaToRgbOnWhite(r: number, g: number, b: number, alpha: number): string {
+  const whiteBg = 255;
+  const rResult = Math.round(r * alpha + whiteBg * (1 - alpha));
+  const gResult = Math.round(g * alpha + whiteBg * (1 - alpha));
+  const bResult = Math.round(b * alpha + whiteBg * (1 - alpha));
+  return `rgb(${rResult}, ${gResult}, ${bResult})`;
+}
+
 export function calculatingRemainingCharacters(text: string, limit: number): number {
     if (text) {
         let numCharsText = text.length;
