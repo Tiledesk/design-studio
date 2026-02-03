@@ -280,31 +280,6 @@ export const DEFAULT_ALPHA_CONNECTORS = 50;
 
 
 
-/**
- * Converts an RGBA color to RGB equivalent on a white background.
- * This function calculates the resulting color when a semi-transparent color
- * is overlaid on a white background (255, 255, 255).
- * 
- * Formula: result = color * alpha + white * (1 - alpha)
- * 
- * @param r - Red component (0-255)
- * @param g - Green component (0-255)
- * @param b - Blue component (0-255)
- * @param alpha - Alpha/opacity value (0.0-1.0)
- * @returns RGB color string in format "rgb(r, g, b)"
- * 
- * @example
- * // rgba(156, 163, 205, 0.35) on white background
- * rgbaToRgbOnWhite(156, 163, 205, 0.35) // returns "rgb(221, 228, 234)"
- */
-export function rgbaToRgbOnWhite(r: number, g: number, b: number, alpha: number): string {
-  const whiteBg = 255;
-  const rResult = Math.round(r * alpha + whiteBg * (1 - alpha));
-  const gResult = Math.round(g * alpha + whiteBg * (1 - alpha));
-  const bResult = Math.round(b * alpha + whiteBg * (1 - alpha));
-  return `rgb(${rResult}, ${gResult}, ${bResult})`;
-}
-
 export function calculatingRemainingCharacters(text: string, limit: number): number {
     if (text) {
         let numCharsText = text.length;
@@ -642,6 +617,68 @@ export function getColorFromRgba(rgba) {
     }
     return null;
   }
+
+/**
+ * Converte un colore rgba su sfondo bianco nel corrispondente colore rgb.
+ * La formula applicata è: rgb_result = alpha * rgba_color + (1 - alpha) * white
+ * 
+ * @param rgb - Colore RGB come stringa "r,g,b" (es. "156,163,205") o array [r, g, b]
+ * @param alpha - Valore alpha tra 0 e 1 (es. 0.35 per 35% di opacità)
+ * @param returnFormat - Formato di ritorno: 'string' per "r,g,b" (default) o 'rgb' per "rgb(r,g,b)"
+ * @returns Colore RGB equivalente come stringa nel formato specificato
+ * 
+ * @example
+ * // Con alpha 0.35 su sfondo bianco
+ * rgbaToRgbOnWhite('156,163,205', 0.35) // Returns "220,223,238"
+ * rgbaToRgbOnWhite('156,163,205', 0.35, 'rgb') // Returns "rgb(220,223,238)"
+ * 
+ * @example
+ * // Con alpha 1.0 (opaco) il colore rimane invariato
+ * rgbaToRgbOnWhite('156,163,205', 1.0) // Returns "156,163,205"
+ */
+export function rgbaToRgbOnWhite(rgb: string | [number, number, number], alpha: number, returnFormat: 'string' | 'rgb' = 'string'): string {
+    // Normalizza l'input: converte stringa in array o usa array direttamente
+    let r: number, g: number, b: number;
+    
+    if (typeof rgb === 'string') {
+        // Rimuove spazi e divide per virgola
+        const parts = rgb.split(',').map(part => parseInt(part.trim(), 10));
+        if (parts.length !== 3 || parts.some(isNaN)) {
+            throw new Error(`Invalid RGB format: "${rgb}". Expected format: "r,g,b" or [r, g, b]`);
+        }
+        [r, g, b] = parts;
+    } else if (Array.isArray(rgb) && rgb.length === 3) {
+        [r, g, b] = rgb;
+    } else {
+        throw new Error(`Invalid RGB format: "${rgb}". Expected format: "r,g,b" or [r, g, b]`);
+    }
+
+    // Valida alpha
+    if (alpha < 0 || alpha > 1) {
+        throw new Error(`Invalid alpha value: ${alpha}. Alpha must be between 0 and 1`);
+    }
+
+    // Valida valori RGB
+    if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+        throw new Error(`Invalid RGB values: r=${r}, g=${g}, b=${b}. Values must be between 0 and 255`);
+    }
+
+    // Formula: rgb_result = alpha * rgba_color + (1 - alpha) * white (255,255,255)
+    const rResult = Math.round(alpha * r + (1 - alpha) * 255);
+    const gResult = Math.round(alpha * g + (1 - alpha) * 255);
+    const bResult = Math.round(alpha * b + (1 - alpha) * 255);
+
+    // Clamp valori tra 0 e 255 (per sicurezza)
+    const rFinal = Math.max(0, Math.min(255, rResult));
+    const gFinal = Math.max(0, Math.min(255, gResult));
+    const bFinal = Math.max(0, Math.min(255, bResult));
+
+    // Ritorna nel formato richiesto
+    if (returnFormat === 'rgb') {
+        return `rgb(${rFinal},${gFinal},${bFinal})`;
+    }
+    return `${rFinal},${gFinal},${bFinal}`;
+}
 
 /**
  * Utility class per la gestione dei colori

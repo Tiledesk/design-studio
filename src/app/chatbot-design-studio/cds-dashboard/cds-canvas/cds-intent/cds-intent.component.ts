@@ -101,62 +101,137 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
-  // Precomputed values for template performance optimization
+  // ============================================
+  // PRECOMPUTED VALUES FOR TEMPLATE OPTIMIZATION
+  // ============================================
+
+  /**
+   * Precomputed intent content ID to avoid string concatenation in template
+   */
   get intentContentId(): string {
     return this.intent?.intent_id ? `intent-content-${this.intent.intent_id}` : '';
   }
 
+  /**
+   * Precomputed block header ID to avoid string concatenation in template
+   */
   get blockHeaderId(): string {
     return this.intent?.intent_id ? `block-header-${this.intent.intent_id}` : '';
   }
 
+  /**
+   * Precomputed background color converted from rgba to rgb on white background
+   * Original: rgba(color, 0.35) -> rgb equivalent on white
+   */
   get backgroundColor(): string {
-    const color = this.intent?.attributes?.color || this.intentColor || INTENT_COLORS.COLOR1;
-    // Convert rgba(r,g,b, 0.35) to equivalent rgb on white background
-    const colorParts = color.split(',').map(c => parseInt(c.trim(), 10));
-    if (colorParts.length === 3 && !colorParts.some(isNaN)) {
-      const [r, g, b] = colorParts;
-      return rgbaToRgbOnWhite(r, g, b, 0.35);
-    }
-    // Fallback se il formato del colore non è valido
-    return `rgb(221, 228, 234)`;
+    const color = this.intent?.attributes?.color || INTENT_COLORS.COLOR1;
+    const rgbColor = rgbaToRgbOnWhite(color, 0.35, 'rgb');
+    return rgbColor;
   }
 
+  /**
+   * Precomputed outline color (full opacity) for selected intent
+   * With alpha 1.0, the color remains unchanged, so we use rgb directly
+   */
   get outlineColor(): string {
-    const color = this.intent?.attributes?.color || this.intentColor || INTENT_COLORS.COLOR1;
+    const color = this.intent?.attributes?.color || INTENT_COLORS.COLOR1;
     return `rgb(${color})`;
   }
 
+  /**
+   * Precomputed check if intent is currently selected
+   */
   get isIntentSelected(): boolean {
     return this.intentService.intentSelectedID === this.intent?.intent_id && this.intentService.intentActive;
   }
 
-  get hasActions(): boolean {
-    return this.listOfActions?.length > 0;
+  /**
+   * CSS custom property for intent background color
+   */
+  get intentBackgroundColor(): string {
+    return this.backgroundColor;
   }
 
+  /**
+   * CSS custom property for intent outline
+   */
+  get intentOutline(): string {
+    return this.isIntentSelected ? `2px solid ${this.outlineColor}` : 'none';
+  }
+
+  /**
+   * Precomputed check if actions list is empty
+   */
   get isEmptyActions(): boolean {
     return !this.listOfActions || this.listOfActions.length === 0;
   }
 
+  /**
+   * Precomputed check if actions list has items
+   */
+  get hasActions(): boolean {
+    return this.listOfActions && this.listOfActions.length > 0;
+  }
+
+  /**
+   * Precomputed check if add action button should be shown
+   */
   get showAddActionButton(): boolean {
     return !this.isStart && this.hasActions && !this.isNewChatbot;
   }
 
+  /**
+   * Helper function to check if action is not featured (for ngClass)
+   * Returns true if action is NOT REPLY, DTMF_FORM, or BLIND_TRANSFER
+   * @param action - Action to check
+   */
+  isNoFeaturedAction(action: Action): boolean {
+    return action._tdActionType !== TYPE_ACTION.REPLY && 
+           action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM && 
+           action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER;
+  }
+
+  /**
+   * Helper function to check if action is selected
+   * @param actionId - Action ID to check
+   */
   isActionSelected(actionId: string): boolean {
     return this.intentService.actionSelectedID === actionId;
   }
 
-  getActionArrowId(index: number): string {
-    return `action-arrow-${index}`;
+  /**
+   * CSS custom property for action outline
+   * @param action - Action to get outline for
+   */
+  getActionOutline(action: Action): string {
+    return this.isActionSelected(action._tdActionId) 
+      ? `2px solid ${this.outlineColor}` 
+      : 'none';
   }
 
+  /**
+   * Helper function to check if action arrow should be shown
+   * @param index - Current action index
+   */
   shouldShowActionArrow(index: number): boolean {
     return this.listOfActions && (this.listOfActions.length - 1) > index;
   }
 
+  /**
+   * Precomputed action arrow ID
+   * @param index - Action index
+   */
+  getActionArrowId(index: number): string {
+    return `action-arrow-${index}`;
+  }
+
+  /**
+   * TrackBy function for *ngFor to optimize change detection
+   * @param index - Item index
+   * @param action - Action item
+   */
   trackByActionId(index: number, action: Action): string {
-    return action?._tdActionId || index.toString();
+    return action._tdActionId || `action-${index}`;
   }
 
 

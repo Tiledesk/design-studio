@@ -44,7 +44,8 @@
   margin: 0px;
   padding: var(--base-padding-preview);
   border-radius: var(--base-border-radius-preview);
-  // outline: 1px solid var(--intent-border-color);
+  background-color: var(--intent-bg-color, transparent);
+  outline: var(--intent-outline, none);
   &::before {
     display: block;
     border-radius: 10px;
@@ -55,10 +56,6 @@
   &.outline-border {
     outline: 2px solid var(--brown);
     border-radius: var(--base-border-radius-preview);
-  }
-
-  &.intent-selected {
-    outline: 2px solid var(--intent-outline-color, var(--action-selected-color));
   }
   &.ripple-effect {
     animation-name: ripple_effect;
@@ -269,14 +266,11 @@
   min-height: 30px;
   border-radius: var(--base-border-radius-preview);
   border: 2px solid rgb(255, 255, 255);
-  // padding: 0 10px 10px 10px;
   background-color: var(--action-background);
+  outline: var(--action-outline, none);
   &.isFirst{
     // height: 1px!important;
     display: none;
-  }
-  &.action-selected {
-    outline: 2px solid var(--intent-outline-color, var(--action-selected-color));
   }
 }
 

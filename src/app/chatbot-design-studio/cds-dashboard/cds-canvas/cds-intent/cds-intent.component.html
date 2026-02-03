@@ -3,11 +3,17 @@
   Purpose: Renders an intent block in the chatbot design studio canvas with drag-and-drop functionality,
            action management, and connector support.
   
-  Performance Optimizations:
-  - Precomputed values in component getters to avoid template calculations
-  - CSS custom properties for dynamic colors instead of ngStyle
-  - RGB colors used where alpha=1 (instead of rgba)
-  - Class-based styling instead of inline styles where possible
+  Structure:
+  - Main intent container with dynamic background and outline colors
+  - Incoming connectors for intent connections
+  - Intent controls (menu options)
+  - Intent header with title and options (Question/Form toggle)
+  - Agents available indicator
+  - Start intent content (special case for start blocks)
+  - Actions list container with drag & drop support
+  - Action components (various types: reply, intent, email, etc.)
+  - Last action intent connector
+  - Footer with add action button
 -->
 
 <div #resizeElement 
@@ -15,22 +21,17 @@
      [id]="intentContentId"
      [class.isStart]="isStart" 
      [class.tds-slim-intent]="isNewChatbot"
-     [class.intent-selected]="isIntentSelected"
-     [style.background-color]="backgroundColor"
-     [style.--intent-outline-color]="outlineColor"
+     [style.--intent-bg-color]="intentBackgroundColor"
+     [style.--intent-outline]="intentOutline"
      (mousedown)="onIntentMouseDown($event)"
      (mousemove)="onIntentMouseMove($event)"
      (click)="$event.stopPropagation();onOpenIntentPanel(intent)">
   
-  <!-- <span class="panel-intent-content tds_draggable intent-background-overlay"></span> -->
-
   <cds-connector-in *ngIf="!isStart && connectorsIn?.length>0"
       [connectorsIn]="connectorsIn"
       (onShowConnectorsIn)="onShowConnectorsIn()"
       (onHideConnectorsIn)="onHideConnectorsIn()">
   </cds-connector-in>
-
-  <div class="header-draggable tds_draggable"></div>
 
   <cds-panel-intent-controls
       [isInternalIntent]="isInternalIntent"
@@ -124,21 +125,18 @@
          class="box-action" 
          tabindex="-1"
          [ngClass]="{
-           'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && 
-             (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || 
-              action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
-           'cds-last-action': last,
-           'action-selected': isActionSelected(action._tdActionId)
-         }"
-         [style.--intent-outline-color]="outlineColor"
+           'cds-no-featured-action': isNoFeaturedAction(action),
+           'cds-last-action': last
+         }" 
+         [style.--action-outline]="getActionOutline(action)"
          (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
          (cdkDragReleased)="onDragEnded($event, i)"
          (cdkDragMoved)="onDragMove($event)"
          (keydown)="onKeydown($event)" 
          (click)="onSelectAction(action, i, action._tdActionId)">
 
-    <span class="action-element">
-    <!--
+      <span class="action-element">
+
         <div *cdkDragPreview id="customDragPreview">
           <cds-action-description 
               class="header-action" 
@@ -505,9 +503,7 @@
           </cds-action-flow-log>
 
         </div>
-
-    -->
-    </span>
+      </span>
 
       <cds-action-arrow *ngIf="shouldShowActionArrow(i)" 
           [id]="getActionArrowId(i)"
