@@ -3,7 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
-import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, preDisplayName, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
+import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
@@ -392,16 +392,16 @@ export class IntentService {
   /** generate display name of intent */
   public setDisplayName(){
     // let listOfIntents = this.behaviorIntents.getValue();
-    let displayNames = this.listOfIntents.filter((element) => element.intent_display_name.startsWith(preDisplayName))
-                                          .map((element) => element.intent_display_name.replace(preDisplayName, ''));
+    let displayNames = this.listOfIntents.filter((element) => element.intent_display_name.startsWith(UNTITLED_BLOCK_PREFIX))
+                                          .map((element) => element.intent_display_name.replace(UNTITLED_BLOCK_PREFIX, ''));
     // displayNames = displayNames.slice().sort();
     const numbers = displayNames.filter(el => el !== '').map((name) => parseInt(name, 10));
     numbers.sort((a, b) => a - b);
     const lastNumber = numbers[numbers.length - 1];
     if(numbers.length>0){
-      return preDisplayName+(lastNumber+1);
+      return UNTITLED_BLOCK_PREFIX+(lastNumber+1);
     } else {
-      return preDisplayName+1;
+      return UNTITLED_BLOCK_PREFIX+1;
     }
     // const filteredArray = this.listOfIntents.filter((element) => element.intent_display_name.startsWith(this.preDisplayName));
     // if(filteredArray.length>0){
@@ -638,6 +638,30 @@ export class IntentService {
 
 
   // START ACTION FUNCTIONS //
+
+  /** updateIntentDisplayNameInRealTime
+   * Aggiorna il display name dell'intent in tempo reale nell'UI senza salvare sul server
+   * Best practice: optimistic UI update per migliorare l'UX
+   */
+  public updateIntentDisplayNameInRealTime(intent: Intent): void {
+    if (!intent || !intent.intent_id) {
+      return;
+    }
+    
+    // Aggiorna l'intent nell'array listOfIntents
+    this.listOfIntents = replaceItemInArrayForKey('intent_id', this.listOfIntents, intent);
+    
+    // Aggiorna anche intentSelected se è lo stesso intent
+    if (this.intentSelected && this.intentSelected.intent_id === intent.intent_id) {
+      this.intentSelected.intent_display_name = intent.intent_display_name;
+    }
+    
+    // Emetti l'aggiornamento per aggiornare la preview (cds-intent component)
+    this.behaviorIntent.next(intent);
+    
+    // Emetti l'aggiornamento per aggiornare la lista (panel-intent-list component)
+    this.refreshIntents();
+  }
 
   /** update title of intent */
   public async changeIntentName(intent){
@@ -1049,7 +1073,8 @@ export class IntentService {
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
       action.assignChunksTo = 'kb_chunks';
-      action.max_tokens = 256;
+      // Default max tokens for Ask Knowledge Base
+      action.max_tokens = 10000;
       action.temperature = 0.7;
       action.top_k = 5;
       action.alpha = 0.5;
@@ -1057,6 +1082,8 @@ export class IntentService {
       action.preview = [];
       action.history = false;
       action.citations = false;
+      action.reranking = false;
+      action.reranking_multiplier = 2;
     }
     if(typeAction === TYPE_ACTION.GPT_TASK){
       action = new ActionGPTTask();
@@ -1095,7 +1122,7 @@ export class IntentService {
       action.intents.push({
         "label": idCondition,
         "prompt": "",
-        "conditionIntentId": ""
+        "conditionIntentId": null
       });
       action.fallbackIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
       action.errorIntent = null;//"#"+this.getDefaultFallbackIntent().intent_id;
@@ -1476,14 +1503,18 @@ export class IntentService {
       id_faq_kb: intent.id_faq_kb,
       operations: []
     };
-    this.operationsRedo.push({
-      type: "put", 
-      intent: JSON.parse(JSON.stringify(intent))
-    });
-    this.operationsUndo.push({
-      type: "put", 
-      intent: JSON.parse(JSON.stringify(intentPrev)) 
-    });
+    if(intent){
+      this.operationsRedo.push({
+        type: "put", 
+        intent: JSON.parse(JSON.stringify(intent))
+      });
+    }
+    if(intentPrev){
+      this.operationsUndo.push({
+        type: "put", 
+        intent: JSON.parse(JSON.stringify(intentPrev)) 
+      });
+    }
 
     if(fromIntent){
       // MAI!!! da verificare!!!
@@ -1498,17 +1529,49 @@ export class IntentService {
       });
     } else {
       // quando sposto un intent sullo stage
-      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id);
-      intentsToUpdate.forEach(ele => {
-        this.operationsUndo.push({
-          type: "put", 
-          intent: JSON.parse(JSON.stringify(ele))
-        }); 
-        this.operationsRedo.push({
-          type: "put", 
-          intent: JSON.parse(JSON.stringify(ele))
-        });
+      // Prima di chiamare findsIntentsToUpdate, salviamo una copia degli intent originali dalla lista
+      // per preservare i connettori completi prima che vengano modificati
+      const intentIdsToUpdate: string[] = [];
+      let listConnectors = this.connectorService.searchConnectorsInByIntent(intent.intent_id);
+      listConnectors.forEach(element => {
+        const splitFromId = element.fromId.split('/');
+        const intentToUpdateId = splitFromId[0];
+        if (!intentIdsToUpdate.includes(intentToUpdateId)) {
+          intentIdsToUpdate.push(intentToUpdateId);
+        }
       });
+      
+      // Per ogni intent da aggiornare, salviamo le versioni corrette
+      intentIdsToUpdate.forEach(intentToUpdateId => {
+        // Per operationsUndo, salviamo l'intent originale (prima della modifica)
+        const intentOriginal = this.prevListOfIntent.find((obj) => obj.intent_id === intentToUpdateId);
+        if(intentOriginal){
+          this.operationsUndo.push({
+            type: "put", 
+            intent: JSON.parse(JSON.stringify(intentOriginal))
+          });
+        }
+        
+        // Per operationsRedo, usiamo l'intent attuale dalla lista (che ha ancora i connettori completi)
+        // IMPORTANTE: preserviamo i connettori completi, non li rimuoviamo quando aggiorniamo un intent
+        const intentFromList = this.listOfIntents.find((obj) => obj.intent_id === intentToUpdateId);
+        if(intentFromList){
+          // Creiamo una copia dell'intent dalla lista con tutti i connettori preservati
+          const intentForRedo = JSON.parse(JSON.stringify(intentFromList));
+          this.operationsRedo.push({
+            type: "put", 
+            intent: intentForRedo
+          });
+        }
+      });
+      
+      // IMPORTANT:
+      // When updating an intent (the target block), we MUST NOT mutate the connector attributes
+      // of incoming intents. Those attributes may store UI state (e.g. contracted/hidden connector)
+      // and must survive a page refresh.
+      //
+      // For deleteIntentNew(), instead, we DO need to remove references to the deleted intent.
+      this.findsIntentsToUpdate(intent.intent_id, false);
     }
     this.payload.operations = this.operationsRedo;
     let operations = {undo:this.operationsUndo, redo:this.operationsRedo};
@@ -1586,7 +1649,8 @@ export class IntentService {
         type: "post", 
         intent: JSON.parse(JSON.stringify(intent))
       });
-      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id);
+      // In delete flow we must remove connector references to the deleted intent.
+      let intentsToUpdate = this.findsIntentsToUpdate(intent.intent_id, true);
       intentsToUpdate.forEach(ele => {
         this.operationsUndo.push({
           type: "put", 
@@ -1640,14 +1704,25 @@ export class IntentService {
 
 
     /** */
-    private findsIntentsToUpdate(intent_id){
+    private findsIntentsToUpdate(intent_id: string, removeConnectorAttributes: boolean = true){
       let intentsToUpdate = [];
       let listConnectors = this.connectorService.searchConnectorsInByIntent(intent_id);
       listConnectors.forEach(element => {
         const splitFromId = element.fromId.split('/');
         const intentToUpdateId = splitFromId[0];
         let intent = this.listOfIntents.find((intent: any) => intent.intent_id === intentToUpdateId);
-        intent.attributes.connectors = this.deleteIntentAttributesConnectorByIntent(intent_id, intent);
+        if (!intent) {
+          return;
+        }
+        if (removeConnectorAttributes) {
+          // Remove only the connector attributes that point to the intent being deleted.
+          // This prevents stale/broken connector metadata after delete.
+          if (!intent.attributes) intent.attributes = {};
+          const nextConnectors = this.deleteIntentAttributesConnectorByIntent(intent_id, intent);
+          if (nextConnectors) {
+            intent.attributes.connectors = nextConnectors;
+          }
+        }
         this.logger.log('[INTENT SERVICE] -> findsIntentsToUpdate::: ', intent);
         intentsToUpdate.push(intent);
       });
@@ -1681,6 +1756,7 @@ export class IntentService {
           // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);
+          this.dashboardService.selectedChatbot.modified = true;
           resolve(true);
         }, (error) => {
           this.logger.error('ERROR: ', error);

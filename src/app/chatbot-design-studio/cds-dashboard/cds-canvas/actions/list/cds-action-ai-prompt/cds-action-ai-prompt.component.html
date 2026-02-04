@@ -22,7 +22,9 @@
     <div class="action-row">
         <div id="gpt-icon" class="action-row-left icon-action">
             <mat-icon *ngIf="!action?.llm" svgIcon="add_ai_model" aria-hidden="true"></mat-icon>
-            <img *ngIf="action?.llm" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
+            <img *ngIf="action?.llm && (llm_models | find:{key: 'value', value: action?.llm})" 
+                 src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" 
+                 alt="">
         </div>
 
         <div class="action-row-right">
@@ -34,6 +36,25 @@
             </div>
         </div>
     </div>
+    <div class="action-row">
+        <div class="tag-replyto" *ngIf="action?.assignReplyTo">
+            {{action?.assignReplyTo}}
+        </div>
+    </div>
+
+
+
+    <!-- MCP Tools Preview -->
+    <div class="mcp-tools-preview-container" *ngIf="action?.servers && action.servers.length > 0">
+        <div class="mcp-tools-header">{{'CDSCanvas.ToolsUsed' | translate}}</div>
+        <div class="mcp-tools-preview">
+            <span class="mcp-tool-tag" *ngFor="let server of action.servers">
+                {{ server.name }}
+            </span>
+        </div>
+    </div>
+
+ 
 
     <div class="previewContent">
         
@@ -109,6 +130,31 @@
         </section>
     </div>
 
+
+    <!-- MCP SERVERS SECTION -->
+    <div class="field-box mcp-servers-section">
+        <label class="title-label">{{'CDSCanvas.UseToolsToCompleteOperation' | translate}}</label>
+        <div class="mcp-servers-grid">
+            <!-- Selected MCP Servers -->
+            <button 
+                *ngFor="let server of selectedMcpServers"
+                class="mcp-server-button selected"
+                type="button">
+                {{ server.name }}
+                <span class="material-icons remove-icon" (click)="removeSelectedServer(server, $event)">close</span>
+            </button>
+            
+            <!-- Add/Select MCP tools button -->
+            <button 
+                class="mcp-server-button add-tool-button"
+                type="button"
+                (click)="openMcpServersDialog()">
+                <span class="material-icons" style="font-size: 18px; margin-right: 6px;">add</span>
+                {{ selectedMcpServers.length > 0 ? ('CDSCanvas.AddMoreTools' | translate) : ('CDSCanvas.SelectMCPTools' | translate) }}
+            </button>
+        </div>
+    </div>
+
     <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
         <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
             [disabled]="!action.question" (click)="execPreview()">
@@ -121,7 +167,7 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm })?.name }} )</span>
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{llm_model_selected.modelName}} )</span>
                 </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
@@ -151,9 +197,9 @@
 
         <!-- <div class="usage-container" *ngIf="!searching && !showAiError && ai_response?.answer">
             <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
-            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens }}</span>
+            <span>{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens | number:'1.0-0':browserLang }}</span>
+            <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens | number:'1.0-0':browserLang }}</span>
+            <span style="font-size: 13px;">{{'CDSCanvas.Total' | translate }}: {{ ai_response.usage.total_tokens | number:'1.0-0':browserLang }}</span>
         </div> -->
 
         <!-- <div id="preview-container" class="preview-container">
@@ -181,9 +227,9 @@
         <div *ngIf="!searching && !missingVariables && ai_response?.choices[0]?.message?.content"
             style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 6px; padding: 0px 4px; color: #a6a6a6;  font-size: 11px; width: 100%;">
             <span style="font-weight: 500;">Tokens usage</span>
-            <span>Prompt: {{ ai_response.usage.prompt_tokens }}</span>
-            <span>Answer: {{ ai_response.usage.completion_tokens }}</span>
-            <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens }}</span>
+            <span>Prompt: {{ ai_response.usage.prompt_tokens | number:'1.0-0':browserLang }}</span>
+            <span>Answer: {{ ai_response.usage.completion_tokens | number:'1.0-0':browserLang }}</span>
+            <span style="font-size: 13px;">Total: {{ ai_response.usage.total_tokens | number:'1.0-0':browserLang }}</span>
         </div> -->
     </div>
 
@@ -192,55 +238,45 @@
             class="custom-expansion-panel">
             <mat-expansion-panel-header class="disable_ripple">
                 <mat-panel-title>
-                    {{'CDSCanvas.AISettings' | translate }}
+                    <div class="title-and-parameters-container">
+                        <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
+                        <div class="parameters-preview">
+                            <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-flag">
+                                {{ action?.modelName || llm_model_selected?.modelName }}
+                                <span class="sep"> | </span>
+                            </span>
+                            <span *ngIf="action?.max_tokens" class="preview-badge">
+                                <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
+                            </span>
+                            <span *ngIf="action?.temperature !== undefined" class="preview-badge">
+                                <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> {{action.temperature | formatNumber}}
+                            </span>
+                            <span *ngIf="action?.context">system context: {{action.context}}</span>
+                        </div>
+                    </div>
                 </mat-panel-title>
+               
             </mat-expansion-panel-header>
+           
             <div>
-
-
-
                  <!-- // llm select -->
                  <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
-                    
-                    <!-- 
-                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
-                        <div class="status-indicator" *ngIf="!selectedModelConfigured"></div>
                         <cds-select id="model-condition"
-                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
-                            [items]="llm_models_2" 
-                            [itemSelected]="labelModel"
-                            [bindLabelSelect]="'labelModel'" 
-                            [bindValueSelect]="'value'"
-                            [placeholder]="'CDSCanvas.SelectLL' | translate"
-                            (onSelected)="onChangeSelect($event, 'llm2')">
+                            [class]="!llm_model_selected.configured ? 'not-configured' : ''"
+                            [items]="llm_models_flat" 
+                            [itemSelected]="llm_model_selected.model"
+                            [bindLabelSelect]="'modelName'" 
+                            [bindValueSelect]="'model'"
+                            [groupByKey]="'llm'"
+                            [clearable]="false" 
+                            [searchable]="true"
+                            [optionalBindAdditionalText]="'multiplier'" 
+                            (onSelected)="onChangeSelect($event, 'llm_model')">
                         </cds-select>
-                    </div> 
-                    -->
-                    
-                    <div class="select-container" [class.not-configured]="!selectedModelConfigured">
-                        <!-- <div class="status-indicator" *ngIf="!selectedModelConfigured"></div> -->
-                        <cds-text id="text-label-model"
-                            class="sx-input" 
-                            [class]="!selectedModelConfigured ? 'not-configured' : ''"
-                            [text]="labelModel"
-                            [autocompleteOptions]="autocompleteOptions_2"
-                            [placeholder]="'CDSCanvas.Model' | translate"
-                            [setAttributeBtn]="false"
-                            (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"
-                            (blur)="onBlur($event)"
-                            >
-                            <!--   
-                                (onOptionSelected)="onOptionSelected($event, 'llm_model')" 
-                            -->
-                        </cds-text>
-                    </div>
-             
-                    <!-- Container per i due elementi sulla stessa riga -->
-                    <div class="bottom-row">
-                        <div class="multiplier-container"><span *ngIf="multiplier">{{multiplier}} x tokens</span></div>
-                        <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
-                    </div>
+                        <div class="bottom-row">
+                            <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                        </div>
                 </div>
                 
                 <!-- // llm select -->
@@ -282,6 +318,7 @@
                             <div class="action-wait-range">{{ai_setting['max_tokens'].min}}</div>
                             <mat-slider 
                                 class="wait-slider"  thumbLabel 
+                                [displayWith]="formatSliderLabel"
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
@@ -289,11 +326,16 @@
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
                             </mat-slider>
-                            <div class="action-wait-range">{{ai_setting['max_tokens'].max | number:'': browserLang}}</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].max | formatNumber}}</div>
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
-                        <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens | number:'': browserLang}}" disabled>
+                        <input type="number" 
+                               class="slider-input gpt-setting-input" 
+                               [(ngModel)]="action.max_tokens"
+                               [min]="ai_setting['max_tokens'].min"
+                               [max]="ai_setting['max_tokens'].max"
+                               (change)="updateSliderValue(action.max_tokens, 'max_tokens')">
                         <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
                     </div>
                 </div>
@@ -319,7 +361,7 @@
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
-                            <input type="text" class="slider-input gpt-setting-input" value="{{action.temperature | number:'': browserLang}}" disabled>
+                            <input type="number" class="slider-input gpt-setting-input" value="{{action.temperature}}" disabled>
                         </div>
                     </div>
                 </div>

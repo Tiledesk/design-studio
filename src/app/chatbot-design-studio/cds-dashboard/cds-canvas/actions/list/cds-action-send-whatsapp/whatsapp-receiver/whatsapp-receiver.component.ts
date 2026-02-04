@@ -76,6 +76,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
         }
         if (this.receiver.header_params[i].type === 'DOCUMENT') {
           hp.document.link = this.receiver.header_params[i].document.link;
+          this.fileUploadedName = this.receiver.header_params[i].document.link;
         }
         // hp.text = this.receiver.header_params[i].text;
         //this.logger.log("this.receiver.header_params", this.receiver.header_params);
@@ -251,6 +252,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     }
     if (this.header_params[param_num - 1].type === 'DOCUMENT') {
       this.header_params[param_num - 1].document.link = event;
+      this.fileUploadedName = event;
       this.sanitizeUrl(event);
     }
 
@@ -478,10 +480,28 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     that.logger.debug('[IMAGE-UPLOAD] reader-result: ', file);
   }
 
+  getHeaderParamLink(index: number): string {
+    const param = this.header_params[index];
+    if (!param) return null;
+    if (param.image && param.image.link) {
+      return param.image.link;
+    }
+    if (param.document && param.document.link) {
+      return param.document.link;
+    }
+    return null;
+  }
+
   removeHeaderFile(index) {
     this.isFilePendingToUpload = true;
+    const linkToDelete = this.getHeaderParamLink(0);
+    
+    if (!linkToDelete) {
+      this.isFilePendingToUpload = false;
+      return;
+    }
 
-    this.uploadService.delete(this.user.uid, this.header_params[0].image.link).then((result)=>{
+    this.uploadService.delete(this.user.uid, linkToDelete).then((result)=>{
       
       this.isFilePendingToUpload = false;
       this.fileUploadedName = null;

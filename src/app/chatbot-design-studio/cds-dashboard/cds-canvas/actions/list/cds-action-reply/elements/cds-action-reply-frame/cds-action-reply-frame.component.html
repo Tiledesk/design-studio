@@ -64,7 +64,8 @@
         <div *ngIf="response.metadata.src" class="content-frame">
             <cds-element-from-url 
                 class="frame-panel"
-                [metadata] = response.metadata>
+                [metadata] = response.metadata
+                [previewMode]="previewMode">
             </cds-element-from-url>
         </div>
     
@@ -85,6 +86,7 @@
         <div class="response-frame-wrapper">
             <cds-element-from-url class="frame-panel"
                 [metadata] = response.metadata
+                [previewMode]="previewMode"
                 (onChangeMetadata)="onLoadPathElement()"
                 (onDeletedMetadata)="onDeletedMetadata($event)">
             </cds-element-from-url>

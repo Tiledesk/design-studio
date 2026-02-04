@@ -1,0 +1,74 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>{{'CDSCanvas.ChooseToolOrAddMCPServer' | translate}}</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+    
+    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+    
+    <!-- Search and Counter Section - Always visible -->
+    <div class="search-section">
+        <div class="server-count">
+            {{'CDSCanvas.TotalMCPServers' | translate}}: <span class="count-number">{{ filteredServers.length }}</span>
+        </div>
+        <div class="search-input-wrapper">
+            <input 
+                type="text" 
+                class="search-input"
+                [(ngModel)]="searchFilter"
+                (input)="onSearchChange()"
+                [placeholder]="'CDSCanvas.SearchByNameURLOrType' | translate">
+            <span class="material-icons search-icon">search</span>
+        </div>
+    </div>
+    
+    <div class="tpl-modal-content">
+        <div class="mcp-servers-list">
+            <div *ngIf="!data.mcpServers || data.mcpServers.length === 0" class="empty-state">
+                <span class="material-icons empty-icon">cloud_off</span>
+                <p class="empty-message">{{'CDSCanvas.NoMCPServerConfigured' | translate}}</p>
+            </div>
+            
+            <div *ngIf="filteredServers.length === 0 && data.mcpServers && data.mcpServers.length > 0" class="empty-state">
+                <span class="material-icons empty-icon">search_off</span>
+                <p class="empty-message">{{'CDSCanvas.NoServersMatchSearch' | translate}}</p>
+            </div>
+            
+            <div class="mcp-server-item-wrapper" *ngFor="let server of filteredServers">
+                <button 
+                    class="mcp-server-item"
+                    [class.selected]="isServerSelected(server)"
+                    type="button"
+                    (click)="toggleServerSelection(server, $event)">
+                    <div class="server-info">
+                        <div class="server-name">{{ server.name }}</div>
+                        <div class="server-url">{{ server.url }}</div>
+                        <div class="server-type">{{ server.transport }}</div>
+                    </div>
+                    <span class="material-icons checkmark-icon" *ngIf="isServerSelected(server)">check_circle</span>
+                </button>
+                <button 
+                    class="edit-button" 
+                    type="button"
+                    (click)="openEditServerDialog(server, $event)">
+                    <span class="material-icons">edit</span>
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="tpl-modal-buttons">
+        <button id="cds-add-server-btn" class="btn btn-primary cds-blue-button" type="button" 
+            (click)="onAddMcpServer()">
+            <span class="material-icons" style="font-size: 18px; margin-right: 6px;">add</span>
+            {{'CDSCanvas.AddMCPServer' | translate}}
+        </button>
+        <button id="cds-ok-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">
+            OK
+        </button>
+    </div>
+</div>
+

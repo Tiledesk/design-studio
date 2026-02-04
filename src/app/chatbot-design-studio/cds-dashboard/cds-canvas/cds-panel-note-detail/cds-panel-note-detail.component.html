@@ -1,0 +1,272 @@
+<div class="panel-note-detail" [class.minimize]="!maximize" [class.maximize]="maximize">
+    <div class="header-panel">
+        <div class="pic-title-text">
+            <div class="note-icon">
+                <span class="material-icons">note</span>
+            </div>
+            <div class="title-text">
+                <h3>{{ 'CDSCanvas.NoteDetails' | translate }}</h3>
+            </div>
+        </div>
+        <!-- <div class="header-options-wrp icon-action" (click)="onChangeMaximize()">
+            <img *ngIf="!maximize" src="assets/images/icons/fold.svg" class="active-icon" [title]="'Maximize' | translate" alt="">
+            <img *ngIf="maximize" src="assets/images/icons/unfold.svg" class="active-icon" [title]="'Minimize' | translate" alt="">
+        </div> -->
+        <div class="header-menu-wrp icon-action" [matMenuTriggerFor]="noteMenu">
+            <mat-icon class="active-icon" svgIcon="more_horiz" aria-hidden="true"></mat-icon>
+        </div>
+        <div class="header-close-wrp icon-action" (click)="onClosePanel()">
+            <mat-icon class="active-icon" svgIcon="close" aria-hidden="true"></mat-icon>
+        </div>
+    </div>
+    <div id="content-panel" class="content-panel">
+
+
+
+        <!-- MEDIA NOTE (solo pannello upload + preview) -->
+        <div class="row image-note-section" *ngIf="note?.type === 'media'">
+            <!-- stato: nessuna immagine ancora -->
+            <div *ngIf="!hasMedia || isReplacingImage" class="image-upload-box"
+                 (drop)="onImageDrop($event)"
+                 (dragover)="onImageDragOver($event)">
+
+                <input #imageFileInput type="file" accept="image/*,video/*" class="image-file-input" (change)="onImageFileSelected($event)" />
+
+                <div class="image-upload-hint">
+                    {{ 'CDSCanvas.NoteMedia.PlaceholderDrop' | translate }}
+                    {{ 'CDSCanvas.NoteMedia.PlaceholderOr' | translate }}
+                </div>
+
+                <div class="image-upload-actions">
+                    <button type="button" class="image-btn" [disabled]="isUploadingImage" (click)="triggerImageFilePicker()">
+                        {{ 'CDSCanvas.NoteMedia.PlaceholderSelectFile' | translate }}
+                    </button>
+                </div>
+
+                <div class="image-url-row">
+                    <input class="image-url-input"
+                           type="text"
+                           [(ngModel)]="imageUrlInput"
+                           [disabled]="isUploadingImage"
+                           [placeholder]="'CDSCanvas.NoteMedia.UrlPlaceholder' | translate" />
+                    <button type="button" class="image-btn" [disabled]="isUploadingImage" (click)="onImageUrlSubmit()">
+                        {{ 'Add' | translate }}
+                    </button>
+                </div>
+
+                <loading-spinner *ngIf="isUploadingImage" class="custom-spinner"></loading-spinner>
+                <div *ngIf="imageUploadError" class="image-upload-error">{{ imageUploadError }}</div>
+            </div>
+
+            <!-- stato: media presente -->
+            <div *ngIf="hasMedia && !isReplacingImage" class="image-preview-box">
+                <div class="image-preview-frame">
+                    <div class="image-preview-placeholder" *ngIf="!imagePreviewLoaded"></div>
+                    <ng-container *ngIf="isEmbedMedia; else directMediaPreview">
+                        <iframe
+                            class="image-preview video-preview"
+                            [src]="safeEmbedUrl"
+                            frameborder="0"
+                            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                            allowfullscreen>
+                        </iframe>
+                    </ng-container>
+                    <ng-template #directMediaPreview>
+                        <ng-container *ngIf="mediaType === 'video'; else imagePreview">
+                            <video class="image-preview video-preview"
+                                   [src]="mediaSrc"
+                                   muted
+                                   loop
+                                   playsinline
+                                   autoplay
+                                   (loadedmetadata)="onImagePreviewLoad()"
+                                   (error)="onImagePreviewError()">
+                            </video>
+                        </ng-container>
+                        <ng-template #imagePreview>
+                            <img class="image-preview"
+                                 [src]="mediaSrc"
+                                 [attr.alt]="'CDSCanvas.NoteMedia.Alt' | translate"
+                                 (load)="onImagePreviewLoad()"
+                                 (error)="onImagePreviewError()" />
+                        </ng-template>
+                    </ng-template>
+                </div>
+    
+                 <div class="image-dimensions">
+                    {{ 'CDSCanvas.NoteMedia.OriginalSizePx' | translate:{ width: mediaNaturalWidth, height: mediaNaturalHeight } }}
+                 </div>
+
+                <div class="image-buttons">
+                    <button type="button" class="image-btn" (click)="onReplaceImage()">
+                        {{ 'CDSCanvas.NoteMedia.Replace' | translate }}
+                    </button>
+                    <button type="button" class="image-btn danger" (click)="onDeleteNote()">
+                        {{ 'CDSCanvas.NoteMedia.Remove' | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ---------------------------------------------------------- -->
+        <!-- Rich Text Editor Section -->
+        <!-- ---------------------------------------------------------- -->
+        <div class="row rich-text-editor-section" *ngIf="note?.type === 'text' || !note?.type">
+            <!-- <div class="section-header">
+                <h4 class="section-title">{{ 'CDSCanvas.NotePanel.MarkupText' | translate }}</h4>
+                <mat-icon class="more-options-icon" svgIcon="more_vert" aria-hidden="true"></mat-icon>
+            </div> -->
+            <quill-editor 
+            #quillEditor
+            [(ngModel)]="note.text"
+            [modules]="quillModules"
+            (onContentChanged)="onQuillContentChanged($event)"
+            [styles]="{ height: '150px' }">
+          </quill-editor>
+
+        </div>
+
+
+        <div class="row background-section" *ngIf="note?.type !== 'media'">
+            <!-- ---------------------------------------------------------- -->
+            <!-- Background color Section -->
+            <!-- ---------------------------------------------------------- -->
+        
+            <div class="section-header">
+                <h4 class="section-title">{{ 'CDSCanvas.NotePanel.BackgroundColor' | translate }}</h4>
+                <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
+            </div>
+
+            <div class="color-control-group">
+                <div class="color-swatch-wrapper">
+                    <input type="color" 
+                        class="color-swatch" 
+                        [value]="getBaseColorForPicker('background')"
+                        (input)="onColorInput($event, 'background', note.backgroundOpacity)"
+                        (change)="onColorChange($event, 'background', note.backgroundOpacity)">
+                </div>
+                <div class="slider-wrapper">
+                    <input type="range" 
+                        class="opacity-slider" 
+                        min="0" 
+                        max="100" 
+                        [(ngModel)]="note.backgroundOpacity"
+                        (input)="onFormatChange()">
+                </div>
+                <input type="text" 
+                    class="opacity-input" 
+                    [ngModel]="note.backgroundOpacity"
+                    (ngModelChange)="onOpacityInputChange('background', $event)"
+                    (input)="onOpacityInput($event, 'background')"
+                    (blur)="onOpacityInputBlur('background')"
+                    pattern="[0-9]*"
+                    inputmode="numeric">
+                <span class="opacity-percent">%</span>
+            </div>
+
+
+            <!-- ---------------------------------------------------------- -->
+            <!-- Border color Section -->
+            <!-- ---------------------------------------------------------- -->
+    
+            <div class="section-header">
+                <h4 class="section-title">{{ 'CDSCanvas.NotePanel.BorderColor' | translate }}</h4>
+                <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
+            </div>
+
+            <div class="color-control-group">
+                <div class="color-swatch-wrapper">
+                    <input type="color" 
+                        class="color-swatch" 
+                        [value]="getBaseColorForPicker('border')"
+                        (input)="onColorInput($event, 'border', note.borderOpacity)"
+                        (change)="onColorChange($event, 'border', note.borderOpacity)">
+                </div>
+                <div class="slider-wrapper">
+                    <input type="range" 
+                        class="opacity-slider" 
+                        min="0" 
+                        max="100" 
+                        [(ngModel)]="note.borderOpacity"
+                        (input)="onFormatChange()">
+                </div>
+                <input type="text" 
+                    class="opacity-input" 
+                    [ngModel]="note.borderOpacity"
+                    (ngModelChange)="onOpacityInputChange('border', $event)"
+                    (input)="onOpacityInput($event, 'border')"
+                    (blur)="onOpacityInputBlur('border')"
+                    pattern="[0-9]*"
+                    inputmode="numeric">
+                <span class="opacity-percent">%</span>
+            </div>
+
+            <!-- ---------------------------------------------------------- -->
+            <!-- Border thickness Section -->
+            <!-- ---------------------------------------------------------- -->
+            <div class="section-header">
+                <h4 class="section-title">{{ 'CDSCanvas.NotePanel.BorderThickness' | translate }}</h4>
+                <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
+            </div>
+
+            <div class="color-control-group">
+                <div class="slider-wrapper">
+                    <input type="range"
+                        class="opacity-slider"
+                        min="0"
+                        max="20"
+                        [ngModel]="note.borderWidth"
+                        (ngModelChange)="onBorderWidthChange($event)">
+                </div>
+                <input type="text"
+                    class="opacity-input"
+                    [ngModel]="note.borderWidth"
+                    (ngModelChange)="onBorderWidthChange($event)"
+                    (input)="onBorderWidthInput($event)"
+                    pattern="[0-9]*"
+                    inputmode="numeric">
+                <span class="opacity-percent">px</span>
+            </div>
+  
+
+            <!-- ---------------------------------------------------------- -->
+            <!-- Box Shadow Section (hidden for image/media notes) -->
+            <!-- ---------------------------------------------------------- -->
+
+            <ng-container *ngIf="note?.type !== 'media'">
+                <div class="section-header">
+                    <h4 class="section-title">{{ 'CDSCanvas.NotePanel.BoxParameters' | translate }}</h4>
+                    <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
+                </div>
+
+                <div class="field-box">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="note.boxShadow"
+                            (change)="onBoxShadowChange($event)">
+                            {{ 'CDSCanvas.NotePanel.EnableShadow' | translate }}
+                        </mat-checkbox>
+                    </section>
+                </div>
+            </ng-container>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <!-- Save Button -->
+        <!-- ---------------------------------------------------------- -->
+        <!-- Pulsante Salva nascosto - salvataggio automatico con debounce -->
+
+    </div>
+</div>
+
+<!-- Note Menu -->
+<mat-menu #noteMenu="matMenu" xPosition="before" yPosition="below">
+    <button mat-menu-item (click)="onDuplicateNote()">
+        <mat-icon svgIcon="copy" aria-hidden="true"></mat-icon>
+        <span>{{ 'Duplicate' | translate }}</span>
+    </button>
+    <button mat-menu-item (click)="onDeleteNote()">
+        <mat-icon svgIcon="bin" aria-hidden="true"></mat-icon>
+        <span>{{ 'Delete' | translate }}</span>
+    </button>
+</mat-menu>

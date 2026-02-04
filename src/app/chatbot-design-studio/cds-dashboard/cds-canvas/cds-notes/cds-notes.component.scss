@@ -1,0 +1,398 @@
+// ============================================================================
+// CONTAINER PRINCIPALE
+// ============================================================================
+:host {
+  width: 0;
+  height: 0;
+  overflow: visible;
+  display: block;
+}
+
+.cds-notes-content {
+  position: relative;
+  padding: 10px 8px;
+  box-sizing: border-box;
+  width: 130px;
+  height: 42px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 3px 0px;
+  cursor: grab;
+  user-select: text;
+  -webkit-user-select: text;
+  max-height: fit-content;
+  min-height: fit-content;
+  // Background, border e box-shadow vengono applicati dinamicamente tramite [style.*]
+  
+  &.text-focus {
+    cursor: text;
+  }
+  
+  // ============================================================================
+  // RESIZE HANDLES
+  // ============================================================================
+  .resize-handle {
+    position: absolute;
+    display: none;
+    z-index: 10;
+    user-select: none;
+    border: 1px solid #007aff;
+    background: white;
+    
+    // Handle degli angoli
+    &.resize-tl {
+      top: -4px;
+      left: -4px;
+      width: 8px;
+      height: 8px;
+      cursor: nwse-resize;
+    }
+    
+    &.resize-tr {
+      top: -4px;
+      right: -4px;
+      width: 8px;
+      height: 8px;
+      cursor: nesw-resize;
+    }
+    
+    &.resize-bl {
+      bottom: -4px;
+      left: -4px;
+      width: 8px;
+      height: 8px;
+      cursor: nesw-resize;
+    }
+    
+    &.resize-br {
+      bottom: -4px;
+      right: -4px;
+      width: 8px;
+      height: 8px;
+      cursor: nwse-resize;
+    }
+    
+    // Handle laterali per ridimensionamento orizzontale
+    &.resize-left {
+      left: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 20px;
+      cursor: ew-resize;
+    }
+    
+    &.resize-right {
+      right: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 20px;
+      cursor: ew-resize;
+    }
+
+    // Handle verticali per ridimensionamento verticale
+    &.resize-top {
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      cursor: ns-resize;
+    }
+
+    &.resize-bottom {
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      cursor: ns-resize;
+    }
+    
+  }
+  
+  // Mostra handle quando selezionata
+  &.selected {
+    .resize-handle,
+    .rotate-handle {
+      display: block;
+    }
+  }
+  
+  // ============================================================================
+  // ROTATE HANDLE
+  // ============================================================================
+  .rotate-handle {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    display: none;
+    z-index: 10;
+    user-select: none;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #007aff;
+    transform: translateX(-50%);
+    cursor: grab;
+    
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
+// ============================================================================
+// RECT NOTE (NON TESTUALE)
+// ============================================================================
+.cds-notes-content.rect-note {
+  user-select: none;
+  -webkit-user-select: none;
+
+  .rect-body {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    background: transparent;
+  }
+
+  // RECT resize behavior:
+  // - hide side handles (keep them in DOM to avoid regressions)
+  // - show corner handles (custom resize logic in TS for rect)
+  // - keep rotate handle hidden
+  .resize-handle.resize-left,
+  .resize-handle.resize-right,
+  .resize-handle.resize-top,
+  .resize-handle.resize-bottom,
+  .rotate-handle {
+    display: none !important;
+  }
+}
+
+// ============================================================================
+// MEDIA NOTE
+// ============================================================================
+.cds-notes-content.media-note {
+  padding: 0 !important;
+  margin: 0 !important;
+  user-select: none;
+  -webkit-user-select: none;
+
+  .image-body {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; // needed for the drag handle overlay
+    text-align: center;
+  }
+
+  .image-body.placeholder {
+    background: transparent;
+  }
+
+  .note-media-placeholder-btn {
+    border: none;
+    background: transparent;
+    color: var(--blu);
+    font-family: var(--font-family-poppins);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    background-color: rgba(255, 255, 255, 0.75);
+  }
+
+  .note-media-placeholder-btn:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
+  .note-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .note-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    // Default: keep media non-interactive to preserve drag/select UX.
+    // When the note is selected, we enable interaction (controls/play/iframe).
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  // Enable interaction only when selected (so you can still drag/select without accidentally playing).
+  &.selected {
+    .note-video {
+      pointer-events: auto;
+    }
+  }
+
+  // While resizing/rotating, disable interaction on media elements so they can't swallow mouseup/mousemove
+  // (especially if the media is an iframe). This prevents "stuck" resize gestures.
+  &.is-gesture-active {
+    .note-video,
+    .media-drag-handle {
+      pointer-events: none !important;
+    }
+  }
+
+  // Dedicated drag handle used when media is interactive (selected).
+  .media-drag-handle {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    z-index: 5;
+    pointer-events: auto;
+    cursor: grab;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 2px;
+  }
+
+  .media-drag-handle:active {
+    cursor: grabbing;
+  }
+}
+
+// ============================================================================
+// INPUT NOTE (CONTENTEDITABLE)
+// ============================================================================
+.note-input {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: min-content;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
+  z-index: 1;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.9em;
+  color: var(--bs-black);
+  background: transparent;
+  user-select: text;
+  -webkit-user-select: text;
+  
+  // Placeholder quando è vuoto
+  &:empty:before {
+    content: 'Type something';
+    color: #999;
+    pointer-events: none;
+    display: none;
+  }
+  
+  // Cursor states
+  &.tds_draggable {
+    cursor: grab;
+    
+    &:active {
+      cursor: grabbing;
+    }
+    
+    ::ng-deep * {
+      cursor: grab;
+    }
+    
+    ::ng-deep a {
+      cursor: pointer !important;
+    }
+  }
+  
+  &.text-focus {
+    cursor: text;
+    
+    ::ng-deep * {
+      cursor: text;
+    }
+    
+    ::ng-deep a {
+      cursor: pointer;
+    }
+  }
+  
+  // Stili per elementi HTML all'interno del contenteditable
+  ::ng-deep {
+    p {
+      margin: 0;
+    }
+    
+    strong,
+    b {
+      font-weight: bold;
+    }
+    
+    em,
+    i {
+      font-style: italic;
+    }
+    
+    u {
+      text-decoration: underline;
+    }
+    
+    a {
+      color: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    
+    // Stili per allineamento Quill
+    .ql-align-center {
+      text-align: center;
+    }
+    
+    .ql-align-right {
+      text-align: right;
+    }
+    
+    .ql-align-left {
+      text-align: left;
+    }
+  }
+}
+
+// ============================================================================
+// CONTEXT MENU OVERLAY
+// ============================================================================
+.context-menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: auto;
+  
+  &.text-focus {
+    cursor: text;
+  }
+}
+
+// When a media note is selected and has valid media, we want the player to receive pointer events.
+// The overlay is still used to handle the first click (selection), then it becomes inert.
+.context-menu-overlay.media-interactive {
+  pointer-events: none;
+}

@@ -1,0 +1,230 @@
+@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/styles.scss";
+
+::ng-deep .custom-mcp-edit-dialog-container {
+    width: 35vw!important;
+    min-width: 450px;
+    max-width: 600px!important;
+    max-height: 80vh;
+
+    .tpl-modal-box {
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        background: rgb(255, 255, 255);
+        max-height: 80vh;
+        position: relative;
+    }
+
+    .tpl-modal-header {
+        align-items: flex-start;
+        align-items: center;
+        display: flex;
+        flex-shrink: 0;
+        justify-content: center;
+        width: 100%;
+        padding: 20px 20px 10px 20px;
+
+        i {
+            flex-shrink: 0;
+            font-size: 24px;
+            line-height: 23px;
+            margin-left: auto;
+            cursor: pointer;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.7;
+            }
+        }
+    }
+    
+    .tpl-modal-header-text {
+        flex-grow: 1;
+        text-align: center;
+        width: 0;
+
+        span {
+            word-wrap: break-word;
+            display: -webkit-box;
+            line-height: 23px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 69px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+    }
+    
+    .tpl-modal-content {
+        flex-grow: 1;
+        padding: 20px;
+        width: 100%;
+        overflow-y: auto;
+    }
+    
+    .tpl-modal-buttons {
+        display: flex;
+        flex-shrink: 0;
+        justify-content: flex-end;
+        padding: 15px 20px;
+        color: #333;
+        gap: 10px;
+        border-top: 1px solid #e5e5e5;
+    }
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+.readonly-field {
+    padding: 10px 12px;
+    background-color: #f5f5f5;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    color: #666;
+    font-size: 14px;
+    font-family: var(--font-family-poppins);
+}
+
+.field-hint {
+    font-size: 12px;
+    color: #999;
+    font-style: italic;
+    margin-top: 4px;
+    display: block;
+}
+
+#cds-save-btn:hover:enabled {
+    opacity: .8 !important;
+}
+
+#cds-save-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+#cds-cancel-btn {
+    background: #e5e5e5;
+    color: #4b5052;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: 6px;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.spinner-large {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(0, 108, 255, 0.2);
+    border-top-color: #006cff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #006cff;
+}
+
+.error-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    background-color: #fee;
+    border: 1px solid #fcc;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    animation: slideDown 0.3s ease;
+    
+    .error-icon {
+        color: #d32f2f;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+    
+    .error-text {
+        color: #d32f2f;
+        font-size: 14px;
+        line-height: 1.5;
+        flex: 1;
+    }
+    
+    .close-error {
+        color: #d32f2f;
+        font-size: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: opacity 0.2s;
+        
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

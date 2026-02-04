@@ -50,6 +50,8 @@
             [items]="listOfNamespaces" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
+            [optionalBindAdditionalText]="'kbTypeLabel'"
+            [additionalTextAsBadge]="true"
             [itemSelected]="action.namespace" 
             [placeholder]="'CDSCanvas.SelectNamespace' | translate"
             [clearable]="true" 
@@ -69,7 +71,7 @@
             <mat-checkbox 
                 [checked]="action?.namespaceAsName"
                 (change)="onChangeCheckbox($event,'namespaceAsName')">
-                {{ 'CDSCanvas.UseKnwoledgeBaseName' | translate }}
+                {{ 'CDSCanvas.UseKnowledgeBaseName' | translate }}
             </mat-checkbox>
             <label class="field-description">{{ "CDSCanvas.UseKBNameDescription" | translate }}
                 <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.namespace_as_name.link" [target]="DOCS_LINK.namespace_as_name.target">{{ 'LearnMore' | translate }}</a>

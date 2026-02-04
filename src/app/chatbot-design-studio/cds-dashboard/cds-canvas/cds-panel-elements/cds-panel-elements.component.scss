@@ -12,6 +12,11 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 svg {
     overflow: hidden;

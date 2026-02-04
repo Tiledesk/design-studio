@@ -56,6 +56,15 @@
     "Advanced": "Advanced",
     "WatchVideo": "Watch video",
     "LearnMore": "Learn more",
+    "CdsOptions": {
+        "NoteType": {
+            "Rectangle": "Rectangle",
+            "Text": "Text",
+            "Image": "Image",
+            "Video": "Video",
+            "Media": "Media"
+        }
+    },
     "BotsAddEditPage": {
         "AddBot": "Add Bot",
         "EditBot": "Edit Bot",
@@ -292,6 +301,27 @@
         "ColorBlock": "Block color",
         "DeleteBlock": "Delete block",
         "CopyBlock": "Copy block",
+        "NoteDetails": "Note detail",
+        "NoteMedia": {
+            "Hint": "Drag & drop a file, click upload, or paste a link.",
+            "UrlPlaceholder": "https://...",
+            "Alt": "Note media",
+            "OriginalSizePx": "Original media size (in pixels): {{width}}px × {{height}}px",
+            "PlaceholderCta": "Upload an image or a video",
+            "PlaceholderDrop": "Drop file here to start uploading",
+            "PlaceholderOr": "or",
+            "PlaceholderSelectFile": "Select file",
+            "Replace": "Replace",
+            "Remove": "Remove"
+        },
+        "NotePanel": {
+            "MarkupText": "Markup text",
+            "BackgroundColor": "Background color",
+            "BorderColor": "Border color",
+            "BorderThickness": "Border thickness",
+            "BoxParameters": "Box parameters",
+            "EnableShadow": "Enable shadow"
+        },
         "Paste": "Paste",
         "StartTest": "Start test from here",
         "DeleteAction": "Delete action",
@@ -318,7 +348,7 @@
         "EnterTheQuestion": "Enter the question",
         "ChooseTheAIModel": "Choose the AI model",
         "SelectNamespace": "Select namespace",
-        "UseKnwoledgeBaseName": "Use Knwoledge Base name",
+        "UseKnowledgeBaseName": "Use Knowledge Base name",
         "SelectKnowledgeBase": "Select Knowledge Base",
         "SelectABlock": "Select a block",
         "ChooseKB": "Choose Knowledge Base",
@@ -344,6 +374,11 @@
         "KBSource": "Assign KB Source to",
         "KBChunks": "Assign KB Chunks to",
         "ChunksOnly": "Chunks only",
+        "Reranking": "Re-ranking",
+        "RerankingInfo": "Improve accuracy of your answers",
+        "MultiplierInfo": "Total retrieved chunks for re-ranking",
+        "MaxChunksMessage": "Max chunks for re-ranking is 100",
+        "SkipUnanswered": "Do not update unanswered list",
         "ErrorAutomaticAssign": "Errors will be automatically assigned to variable:",
         "ApplyAFunctionToValue": "Apply a function to the value",
         "InsertConstantValueOrChoise": "Insert a constant value or choose an attribute",
@@ -375,6 +410,7 @@
         "Deterministic": "Deterministic",
         "Random": "Random",
         "ChunkLimit": "Chunk limit",
+        "RerankingMultiplierLabel": "Re-ranking multiplier",
         "SearchTypeLimit": "Search type",
         "FullText": "FullText",
         "Semantic": "Semantic",
@@ -431,9 +467,10 @@
         "Result": "Result",
         "Error": "Error",
         "ChooseBot": "Choose a bot",
+        "ChooseAgent": "Choose an Agent",
         "UseChatbotSlug": "Use Chatbot slag",
         "ChooseBlock": "Choose a block",
-        "ChooseBlockDescription": "Automatically execute this block when this chatbot joins the conversation",
+        "ChooseBlockDescription": "Automatically execute this block when the Agent joins the conversation",
         "ExecuteBlock": "Execute block",
         "ThisRequestNoBody": "This request does not have a body",
         "Location": "Location",
@@ -547,6 +584,24 @@
         "LoadingBefore": "loading ... before",
         "VisibilityConnectors": "Visibility of connectors",
         "ChangeAlphaConnectors": "Change alpha of the connectors color",
+        "AddMCPServer": "Add MCP Server",
+        "EditMCPServer": "Edit MCP Server",
+        "Name": "Name",
+        "EnterServerName": "Enter server name",
+        "EnterServerURL": "Enter server URL",
+        "OnlySupported": "only supported",
+        "Save": "Save",
+        "Saving": "Saving",
+        "Confirm": "Confirm",
+        "ChooseToolOrAddMCPServer": "Choose a tool from the available ones or add an MCP server",
+        "NoMCPServerConfigured": "No MCP server configured",
+        "UseToolsToCompleteOperation": "Use tools to complete the operation",
+        "SelectMCPTools": "Select MCP tools",
+        "AddMoreTools": "Add MCP tools",
+        "TotalMCPServers": "Total MCP Servers",
+        "SearchByNameURLOrType": "Search by name, URL or type",
+        "NoServersMatchSearch": "No servers match your search",
+        "ToolsUsed": "Tools used",
         "QuestionKB": "Question",
         "AnswerKB": "Answer",
         "EnterQuestion": "Your question",
@@ -816,8 +871,8 @@
                 "DOC_URL": "https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
             },
             "ReplaceAIAgent":{
-                "TITLE":"Replace the current bot with another one",
-                "DESCRIPTION":"Replaces the current chatbot with the specied one",
+                "TITLE":"Replaces the current Agent with the specied one",
+                "DESCRIPTION":"",
                 "IMAGE":"assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
@@ -918,7 +973,7 @@
                 "DESCRIPTION": "The AI Condition Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
                 "IMAGE": "assets/images/doc/AI_CONDITION.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ai-condition"
             },
             "HiddenMessage": {
                 "TITLE": "Send an hidden message (for the end user)",
@@ -1281,6 +1336,11 @@
     "CopyLink": "Copy share link",
     "OpenLinkInNewTab": "Open share link",
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
+    "AppInterruption": {
+        "Title": "Session inactive — refresh required",
+        "Message": "This page was inactive for too long. Please refresh to continue safely.",
+        "Refresh": "Refresh"
+    },
     "CDSGlobals": {
         "Globals": "Globals",
         "NoGlobalVariables": "No global variables <br><br>Global variables are a set of variables that are always available in your flows",
@@ -1292,7 +1352,8 @@
     },
     "Options": "Options",
     "CDSHeader": {
-        "LinkCopiedToClipboard": "Link copied to clipboard"
+        "LinkCopiedToClipboard": "Link copied to clipboard",
+        "ThereAreUnpublishedChanges": "There are unpublished changes"
     },
     "ReleaseHistory": "Release History",
     "ReleaseNotes": "Release notes",

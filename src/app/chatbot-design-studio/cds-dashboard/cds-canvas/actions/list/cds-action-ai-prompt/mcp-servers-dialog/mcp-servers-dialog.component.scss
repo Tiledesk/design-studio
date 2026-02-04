@@ -1,0 +1,314 @@
+@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/styles.scss";
+
+::ng-deep .custom-mcp-dialog-container {
+    width: 40vw!important;
+    min-width: 500px;
+    max-width: 700px!important;
+    max-height: 80vh;
+  
+    .mat-dialog-container {
+        padding: 0px 10px;
+    }
+
+    .tpl-modal-box {
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        background: rgb(255, 255, 255);
+        max-height: 80vh;
+        min-height: 335px;
+        height: 80vh;
+    }
+
+    .tpl-modal-header {
+        align-items: flex-start;
+        align-items: center;
+        display: flex;
+        flex-shrink: 0;
+        justify-content: center;
+        width: 100%;
+        padding: 20px 20px 10px 20px;
+
+        i {
+            flex-shrink: 0;
+            font-size: 24px;
+            line-height: 23px;
+            margin-left: auto;
+            cursor: pointer;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.7;
+            }
+        }
+    }
+    
+    .tpl-modal-header-text {
+        flex-grow: 1;
+        text-align: center;
+        width: 0;
+
+        span {
+            word-wrap: break-word;
+            display: -webkit-box;
+            line-height: 23px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 69px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+    }
+    
+    .search-section {
+        padding: 15px 20px;
+        // border-bottom: 1px solid #e5e5e5;
+        // background-color: #fafafa;
+        flex-shrink: 0;
+    }
+
+    .tpl-modal-content {
+        flex-grow: 1;
+        padding: 0 20px 20px 20px;
+        width: 100%;
+        overflow-y: auto;
+        height: calc(100% - 400px);
+        border: none;
+
+        // Custom scrollbar styles
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: var(--blu-02);
+            border-radius: 4px;
+            
+            &:hover {
+                background: var(--blu);
+            }
+        }
+    }
+    
+    .tpl-modal-buttons {
+        display: flex;
+        flex-shrink: 0;
+        justify-content: space-between;
+        padding: 15px 20px;
+        color: #333;
+        gap: 10px;
+        border-top: 1px solid #e5e5e5;
+    }
+}
+
+.server-count {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+    
+    .count-number {
+        color: var(--blu-02);
+        font-weight: 600;
+    }
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 40px 10px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: var(--font-family-poppins);
+    outline: none;
+    transition: all 0.2s ease;
+    
+    &:focus {
+        border-color: var(--blu-02);
+        box-shadow: 0 0 0 3px rgba(0, 108, 255, 0.1);
+    }
+    
+    &::placeholder {
+        color: #999;
+    }
+}
+
+.search-icon {
+    position: absolute;
+    right: 12px;
+    color: #999;
+    font-size: 20px;
+    pointer-events: none;
+}
+
+.mcp-servers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mcp-server-item-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+    
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+    
+    .empty-message {
+        font-size: 14px;
+        margin: 0;
+    }
+}
+
+.mcp-server-item {
+    background-color: #ffffff;
+    border: 2px solid var(--blu-light-01);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-family: var(--font-family-poppins);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex: 1;
+    width: 100%;
+    min-height: 50px;
+    max-width: calc(100% - 34px);
+
+    &:hover {
+        background-color: var(--blu-light-01);
+        border-color: #b0b0b0;
+    }
+
+    &.selected {
+        background-color: #e8f4ff;
+        border-color: var(--blu-02);
+        border-width: 2px;
+    }
+}
+
+.server-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.server-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: normal;
+}
+
+.server-url {
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: normal;
+}
+
+.server-type {
+    font-size: 10px;
+    color: #999;
+    font-style: italic;
+    line-height: normal;
+}
+
+.checkmark-icon {
+    color: var(--blu-02);
+    font-size: 24px !important;
+    flex-shrink: 0;
+}
+
+.edit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    background-color: #ffffff;
+    border: 0px solid #d0d0d0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    margin-top: 4px;
+    .material-icons {
+        font-size: 20px;
+        color: var(--blu);
+    }
+
+    &:hover {
+        background-color: var(--blu-light-01);
+        border-color: #b0b0b0;
+        
+        .material-icons {
+            color: #333;
+        }
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+#cds-add-server-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:enabled {
+        opacity: .8 !important;
+    }
+}
+
+#cds-ok-btn {
+    background: #e5e5e5;
+    color: #4b5052;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+

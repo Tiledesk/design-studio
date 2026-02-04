@@ -25,7 +25,7 @@
 </div>
 
 
-<div id="tds_container" class="box-right tds-drag-container" cdkDropListGroup (contextmenu)="onShowContextMenu($event)">
+<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
 
     <cds-panel-elements class="cds-panel-elements" 
         [ngStyle]="{'left': IS_OPEN_INTENTS_LIST ? '230px' : '0px'}"
@@ -80,13 +80,27 @@
             (addActionFromConnectorMenu)="onAddActionFromConnectorMenu($event)">
         </cds-panel-connector-menu>
 
+        <cds-notes *ngFor="let note of listOfNotes"
+            class="cds-note" 
+            [id]="note.note_id"
+            [note]="note"
+            [IS_OPEN_PANEL_NOTE_DETAIL]="IS_OPEN_PANEL_NOTE_DETAIL"
+            [autoFocus]="note.note_id === pendingAutoFocusNoteId"
+            [style.top.px]="note.y"
+            [style.left.px]="note.x"
+            (noteSelected)="onNoteSelected($event)"
+            (deleteNote)="onDeleteNote($event)"
+            (duplicateNote)="onDuplicateNote($event)"
+            (autoFocused)="onNoteAutoFocused($event)">
+        </cds-notes>
     </div> 
 
-    <cds-options class="cds-panel-elements" 
+    <cds-options #cdsOptions class="cds-panel-elements" 
         id="cds-options-panel"
         [id_faq_kb] = "id_faq_kb"
         [stateUndoRedo]="stateUndoRedo"
-        (onOptionClicked)="onOptionClicked($event)">
+        (onOptionClicked)="onOptionClicked($event)"
+        (noteDroppedOnStage)="onNoteDroppedOnStage($event)">
     </cds-options>
 </div>
 
@@ -124,6 +138,16 @@
     (closePanel)="closeAllPanels()"
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-intent-detail>
+
+<cds-panel-note-detail *ngIf="IS_OPEN_PANEL_NOTE_DETAIL"
+    id="note-detail" 
+    class="cds-generic-panel"
+    [note]="noteSelected"
+    (closePanel)="closeAllPanels()"
+    (savePanelNoteDetail)="onSavePanelNoteDetail($event)"
+    (deleteNote)="onDeleteNote($event)"
+    (duplicateNote)="onDuplicateNote($event)">
+</cds-panel-note-detail>
 
 <cds-panel-publish *ngIf="IS_OPEN_PUBLISH_PANEL"
     id="publish-panel" 

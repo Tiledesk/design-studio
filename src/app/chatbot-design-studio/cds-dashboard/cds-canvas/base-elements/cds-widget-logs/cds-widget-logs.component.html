@@ -59,6 +59,9 @@
                 <span class="box-img">
                     <mat-icon class="icon" svgIcon="terminal" aria-hidden="true"></mat-icon>
                 </span>
+                <span *ngIf="unreadMessagesCount > 0" class="unread-badge">
+                    {{ unreadMessagesCount > 99 ? '+99' : unreadMessagesCount }}
+                </span>
             </div>
         </div>
     </div>

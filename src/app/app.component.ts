@@ -19,6 +19,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 import { IconService } from './chatbot-design-studio/services/icon.service';
+import { AppInterruptionComponent } from './modals/app-interruption/app-interruption.component';
 
 @Component({
   selector: 'app-root',
@@ -32,6 +33,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   public lang: string; 
   IS_ONLINE: boolean;
   initFinished:boolean = false;
+
+  // --- Resume / Background throttling detection ---
+  private lastHiddenAt: number | null = null;
+  private resumeDialogOpen = false;
+  private visibilityHandler?: () => void;
+  private readonly IWT_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes (approx Chrome Intensive Wake-Up Throttling threshold)
 
 
   constructor(
@@ -109,9 +116,63 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     // Watch to network status
     // ---------------------------------------
     this.watchToConnectionStatus();
+    this.watchToTabResume();
 
     await this.initAuthentication();
     this.setLanguage(null);
+  }
+
+  /**
+   * Minimal approach:
+   * On tab visibility restore, if the page was hidden for >= IWT threshold, show a blocking dialog
+   * asking for a refresh. This avoids extra listeners and network checks.
+   *
+   * We keep this isolated from offline detection to minimize regressions.
+   */
+  private watchToTabResume(): void {
+    // init lastHiddenAt from current state
+    if (document.hidden) {
+      this.lastHiddenAt = Date.now();
+    }
+
+    this.visibilityHandler = () => {
+      if (document.hidden) {
+        this.lastHiddenAt = Date.now();
+        return;
+      }
+      // document became visible
+      this.onTabResumed();
+    };
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+  }
+
+  private onTabResumed(): void {
+    const now = Date.now();
+    if (this.resumeDialogOpen) return;
+
+    const hiddenDurationMs = this.lastHiddenAt != null ? now - this.lastHiddenAt : null;
+    // Reset: this resume has been handled; further focus events won't retrigger unless we go hidden again.
+    this.lastHiddenAt = null;
+
+    // Gate: show only when the page was inactive long enough to likely hit IWT or worse.
+    if (!(typeof hiddenDurationMs === 'number' && hiddenDurationMs >= this.IWT_THRESHOLD_MS)) {
+      return;
+    }
+
+    this.resumeDialogOpen = true;
+    const ref = this.dialog.open(AppInterruptionComponent, {
+      data: {
+        resumedAt: now,
+        hiddenDurationMs,
+        visibilityState: document.visibilityState,
+        navigatorOnLine: typeof navigator?.onLine === 'boolean' ? navigator.onLine : null,
+      },
+      panelClass: 'custom-dialog-container',
+      disableClose: true
+    });
+    ref.afterClosed().subscribe(() => {
+      this.resumeDialogOpen = false;
+    });
   }
 
 
@@ -327,7 +388,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+    }
   }
 
   

@@ -6,7 +6,8 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 
 import { Setting } from 'src/app/models/action-model';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject, Observable } from 'rxjs';
+import { filter, map, shareReplay } from 'rxjs/operators';
 
 
 // SERVICES //
@@ -26,6 +27,16 @@ export class ConnectorService {
   private readonly subjectChangedConnectorAttributes = new Subject<any>();
   observableChangedConnectorAttributes = this.subjectChangedConnectorAttributes.asObservable();
   
+  // Observable per notificare cambiamenti ai connettori in ingresso di un intent specifico
+  private readonly connectorsInChangedSubject = new Subject<{ intentId: string, connectors: any[] }>();
+  public readonly connectorsInChanged$ = this.connectorsInChangedSubject.asObservable();
+  
+  // Cache per gli observable dei connettori in ingresso per ogni intent
+  private connectorsInObservablesCache: Map<string, Observable<any[]>> = new Map();
+  
+  // Flag per indicare se il listener globale è stato inizializzato
+  private globalConnectorListenerInitialized = false;
+  
   listOfConnectors: any = {};
   tiledeskConnectors: any;
   connectorDraft: any = {};
@@ -33,6 +44,11 @@ export class ConnectorService {
   mapOfConnectors: any = {};
   scale: number = 1;
   existingIntentIds: any;
+  
+  // Coda per connettori che hanno fallito il rendering
+  private failedConnectorsQueue: Array<{intent: any, fromId: string, toId: string, attributes: any, retryCount: number}> = [];
+  private retryIntervalId: any = null;
+  private readonly MAX_RETRY_ATTEMPTS = 5;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
@@ -42,6 +58,113 @@ export class ConnectorService {
   initializeConnectors(){
     this.tiledeskConnectors = new TiledeskConnectors("tds_drawer", {"input_block": "tds_input_block"}, {});
     this.tiledeskConnectors.mousedown(document);
+    this.initializeGlobalConnectorListener();
+  }
+
+  /**
+   * Inizializza il listener globale per gli eventi connector-created e connector-deleted.
+   * Viene chiamato una sola volta per evitare listener multipli.
+   * 
+   * NOTA: Questi eventi vengono sollevati dal core tiledesk-connectors.js tramite
+   * document.dispatchEvent(). Usiamo il capture phase (true) per processare gli eventi
+   * prima degli altri listener, garantendo che gli observer vengano notificati il prima possibile.
+   */
+  private initializeGlobalConnectorListener(): void {
+    if (this.globalConnectorListenerInitialized) {
+      return;
+    }
+
+    // Listener per connector-created (evento sollevato da tiledesk-connectors.js)
+    document.addEventListener("connector-created", (e: CustomEvent) => {
+      const connector = e.detail?.connector;
+      if (connector?.id) {
+        this.handleConnectorChange(connector.id, 'created');
+      }
+    }, true); // Capture phase per processare prima degli altri listener
+
+    // Listener per connector-deleted (evento sollevato da tiledesk-connectors.js)
+    document.addEventListener("connector-deleted", (e: CustomEvent) => {
+      const connector = e.detail?.connector;
+      if (connector?.id) {
+        this.handleConnectorChange(connector.id, 'deleted');
+      }
+    }, true); // Capture phase per processare prima degli altri listener
+
+    this.globalConnectorListenerInitialized = true;
+    this.logger.log('[CONNECTORS] Global connector listener inizializzato (usa eventi da tiledesk-connectors.js)');
+  }
+
+  /**
+   * Gestisce i cambiamenti dei connettori (creazione/eliminazione)
+   * Notifica solo gli intent interessati
+   */
+  private handleConnectorChange(connectorId: string, changeType: 'created' | 'deleted'): void {
+    // Estrae l'ID dell'intent di destinazione dall'ID del connettore
+    const segments = connectorId.split('/');
+    const toIntentId = segments[segments.length - 1];
+
+    if (toIntentId) {
+      this.logger.log(`[CONNECTORS] Connettore ${changeType === 'created' ? 'creato' : 'eliminato'}: ${connectorId} per blocco ${toIntentId}`);
+      
+      // Notifica solo l'intent interessato (ricarica sempre i connettori freschi)
+      const connectors = this.getConnectorsInByIntent(toIntentId);
+      this.connectorsInChangedSubject.next({ intentId: toIntentId, connectors });
+      
+      this.logger.log(`[CONNECTORS] Notificato aggiornamento connettori per blocco ${toIntentId}: ${connectors.length} connettori totali`);
+    }
+  }
+
+  /**
+   * Ottiene i connettori in ingresso per un intent.
+   * Cerca sempre direttamente in tiledeskConnectors senza cache.
+   */
+  public getConnectorsInByIntent(intentId: string): any[] {
+    this.logger.log(`[CONNECTORS] Carico i connettori in ingresso per blocco ${intentId}`);
+    const connectors = this.searchConnectorsInByIntent(intentId);
+    this.logger.log(`[CONNECTORS] totale ${connectors.length} connettori`);
+    return connectors;
+  }
+
+  /**
+   * Ottiene un observable filtrato per i connettori in ingresso di un intent specifico.
+   * Emette solo quando cambiano i connettori di quell'intent.
+   * Usa una cache per evitare di creare osservabili multipli per lo stesso intent.
+   * 
+   * @param intentId - ID dell'intent per cui ricevere gli aggiornamenti
+   * @returns Observable che emette l'array di connettori quando cambia
+   */
+  public getConnectorsInObservable(intentId: string): Observable<any[]> {
+    // Se esiste già un observable in cache, lo restituisce
+    if (this.connectorsInObservablesCache.has(intentId)) {
+      return this.connectorsInObservablesCache.get(intentId)!;
+    }
+
+    this.logger.log(`[CONNECTORS] Creo observable per aggiornamenti connettori del blocco ${intentId}`);
+    // Restituisce il valore corrente (non lo loggiamo qui perché verrà loggato da getConnectorsInByIntent)
+    const currentValue = this.getConnectorsInByIntent(intentId);
+    const subject = new BehaviorSubject<any[]>(currentValue);
+
+    // Sottoscrivi agli aggiornamenti filtrati per questo intent
+    this.connectorsInChanged$
+      .pipe(
+        filter(change => change.intentId === intentId),
+        map(change => change.connectors)
+      )
+      .subscribe(connectors => {
+        subject.next(connectors);
+      });
+
+    // Crea l'observable condiviso usando shareReplay
+    // refCount: true pulisce automaticamente la subscription quando non ci sono più subscriber
+    const observable = subject.asObservable().pipe(
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
+
+    // Metti in cache
+    this.connectorsInObservablesCache.set(intentId, observable);
+    this.logger.log(`[CONNECTORS] Observable creato per blocco ${intentId}`);
+    
+    return observable;
   }
 
   /** setScale
@@ -112,11 +235,14 @@ export class ConnectorService {
    * @param intents 
    * 
    */
-  public createConnectors(intents){
+  public async createConnectors(intents){
     this.listOfIntents = intents;
-    intents.forEach(intent => {
-      this.createConnectorsOfIntent(intent);
-    });
+    // Pulisci la coda di retry prima di iniziare
+    this.clearRetryQueue();
+    
+    for (const intent of intents) {
+      await this.createConnectorsOfIntent(intent);
+    }
   }
 
 
@@ -229,7 +355,7 @@ export class ConnectorService {
    * 
    * create connectors from Intent
    */
-  public createConnectorsOfIntent(intent:any){
+  public async createConnectorsOfIntent(intent:any){
     if(intent.attributes?.nextBlockAction){
       let idConnectorFrom = null;
       let idConnectorTo = null;
@@ -993,7 +1119,7 @@ export class ConnectorService {
     }
   }
 
-  private createConnector(intent, idConnectorFrom, idConnectorTo){
+  private async createConnector(intent, idConnectorFrom, idConnectorTo){
     const connectorsAttributes = intent.attributes.connectors;
     this.logger.log('[DEBUG] - createConnector ->', intent, connectorsAttributes, idConnectorFrom, idConnectorTo);
     if(idConnectorFrom && idConnectorTo){
@@ -1003,10 +1129,96 @@ export class ConnectorService {
         attributes = connectorsAttributes[idConnectorFrom];
       }
       this.logger.log('[DEBUG] - createConnector attributes ->', idConnectorFrom, connectorsAttributes, attributes);
-      this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
+      const success = await this.createConnectorFromId(idConnectorFrom, idConnectorTo, false, attributes);
+      
+      // Se il connettore non è stato creato, aggiungilo alla coda per retry
+      if (!success) {
+        this.logger.log('[CONNECTOR-SERV] Connettore fallito, aggiunto alla coda retry:', idConnectorFrom, idConnectorTo);
+        this.addToRetryQueue(intent, idConnectorFrom, idConnectorTo, attributes);
+      }
     } else {
       this.logger.log('[DEBUG] - il connettore è rotto non esiste intent ->', idConnectorTo);
     }
+  }
+  
+  /**
+   * Aggiunge un connettore fallito alla coda per ritentare
+   */
+  private addToRetryQueue(intent: any, fromId: string, toId: string, attributes: any) {
+    this.failedConnectorsQueue.push({
+      intent,
+      fromId,
+      toId,
+      attributes,
+      retryCount: 0
+    });
+    
+    // Avvia il processo di retry se non è già attivo
+    if (!this.retryIntervalId) {
+      this.startRetryProcess();
+    }
+  }
+  
+  /**
+   * Avvia il processo di retry per i connettori falliti
+   */
+  private startRetryProcess() {
+    this.logger.log('[CONNECTOR-SERV] Avvio processo retry per connettori falliti');
+    
+    this.retryIntervalId = setInterval(async () => {
+      if (this.failedConnectorsQueue.length === 0) {
+        this.logger.log('[CONNECTOR-SERV] Coda retry vuota, termino processo');
+        this.stopRetryProcess();
+        return;
+      }
+      
+      this.logger.log('[CONNECTOR-SERV] Ritento creazione connettori, coda:', this.failedConnectorsQueue.length);
+      
+      // Processa tutti i connettori nella coda
+      const connectorsToRetry = [...this.failedConnectorsQueue];
+      this.failedConnectorsQueue = [];
+      
+      for (const connector of connectorsToRetry) {
+        connector.retryCount++;
+        
+        if (connector.retryCount > this.MAX_RETRY_ATTEMPTS) {
+          this.logger.error('[CONNECTOR-SERV] Connettore fallito definitivamente dopo', this.MAX_RETRY_ATTEMPTS, 'tentativi:', connector.fromId, connector.toId);
+          continue;
+        }
+        
+        const success = await this.createConnectorFromId(
+          connector.fromId, 
+          connector.toId, 
+          false, 
+          connector.attributes
+        );
+        
+        // Se ancora fallisce, rimettilo in coda
+        if (!success) {
+          this.failedConnectorsQueue.push(connector);
+        } else {
+          this.logger.log('[CONNECTOR-SERV] Connettore creato con successo al tentativo', connector.retryCount, ':', connector.fromId, connector.toId);
+        }
+      }
+    }, 500); // Ritenta ogni 500ms
+  }
+  
+  /**
+   * Ferma il processo di retry
+   */
+  private stopRetryProcess() {
+    if (this.retryIntervalId) {
+      clearInterval(this.retryIntervalId);
+      this.retryIntervalId = null;
+    }
+  }
+  
+  /**
+   * Pulisce la coda di retry (da chiamare quando si cambia bot o si resetta)
+   */
+  public clearRetryQueue() {
+    this.failedConnectorsQueue = [];
+    this.stopRetryProcess();
   }
   /*************************************************/
 
@@ -1276,22 +1488,39 @@ export class ConnectorService {
   /*************************************************/
 
 
-  /**
+/**
    * searchConnectorsInOfIntent
    * @param intent_id 
-   * @returns 
+   * @returns Array di connettori in ingresso per l'intent specificato
    */
-  public searchConnectorsInByIntent(intent_id: string): Array<any>{
-    const connectors = Object.keys(this.tiledeskConnectors.connectors)
-    .filter(key => key.includes(intent_id) && !key.startsWith(intent_id) )
-    .reduce((filteredMap, key) => {
-      filteredMap[key] = this.tiledeskConnectors.connectors[key];
-      return filteredMap;
-    }, {});
-    const arrayConnectors = Object.values(connectors);
-    // this.logger.log('[CONNECTOR-SERV] -----> arrayConnectors::: ', arrayConnectors);
-    return arrayConnectors;
+public searchConnectorsInByIntent(intent_id: string): Array<any>{
+  if (!this.tiledeskConnectors) {
+    this.logger.log(`[CONNECTORS] tiledeskConnectors non inizializzato per blocco ${intent_id}`);
+    return [];
   }
+  
+  if (!this.tiledeskConnectors.connectors) {
+    this.logger.log(`[CONNECTORS] tiledeskConnectors.connectors non disponibile per blocco ${intent_id}`);
+    return [];
+  }
+  
+  const connectors = Object.keys(this.tiledeskConnectors.connectors)
+  .filter(key => {
+    // Verifica che il connettore sia in ingresso (contiene intent_id ma non inizia con esso)
+    // E che l'ultimo segmento coincida con intent_id (destinazione)
+    const segments = key.split('/');
+    const toIntentId = segments[segments.length - 1];
+    return toIntentId === intent_id;
+    //return key.includes(intent_id) && !key.startsWith(intent_id) && toIntentId === intent_id;
+  })
+  .reduce((filteredMap, key) => {
+    filteredMap[key] = this.tiledeskConnectors.connectors[key];
+    return filteredMap;
+  }, {});
+  const arrayConnectors = Object.values(connectors);
+  return arrayConnectors;
+}
+
 
    /**
    * searchConnectorsInOfIntent
@@ -1472,6 +1701,7 @@ export class ConnectorService {
     this.setDisplayElementById('contract_' + idConnector, 'none');
     // const connector = {id:idConnector, display:true};
     // this.subjectChangedConnectorAttributes.next(connector);
+    this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
   }
 
   showContractConnector(idConnection: string){
@@ -1480,6 +1710,7 @@ export class ConnectorService {
     this.setDisplayElementById('contract_' + idConnector, 'flex');
     // const connector = {id:idConnector, display:false};
     // this.subjectChangedConnectorAttributes.next(connector);
+    this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
   }
 
 

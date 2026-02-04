@@ -515,6 +515,7 @@ export class TiledeskConnectors {
     svgContainer.style.top = "0px";
     svgContainer.style.position = "absolute";
     svgContainer.style.zIndex = "inherit";
+    svgContainer.style.pointerEvents = "none";
     // Create the `<defs>` element and attributes
     const defsElement = document.createElementNS(
       "http://www.w3.org/2000/svg",
@@ -823,7 +824,7 @@ export class TiledeskConnectors {
 
   /** drawConnectorDraft */
   #drawConnectorDraft() {
-    console.log("[JS] drawConnectorDraft:::::  ");
+    // console.log("[JS] drawConnectorDraft:::::  ");
     let connector = document.getElementById("connectorDraft");
     if (!connector) {
       connector = document.createElementNS(

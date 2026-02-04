@@ -20,7 +20,7 @@
             {{ (chatbots_name_list | find:{key: 'id', value: action?.botId })?.name }} <div class="slug" [ngClass]="action?.botSlug | variableCssClass"  *ngIf="action?.botSlug">{{ formatBotSlug(action?.botSlug) }}</div>
         </div>
         <div *ngIf="!action?.botId && !action?.botSlug" class="action-row-right empty"> 
-            {{'CDSCanvas.ChooseBot' | translate }}
+            {{'CDSCanvas.ChooseAgent' | translate }}
         </div>
         
     </div>
@@ -42,7 +42,7 @@
 
 <div *ngIf="!previewMode" class="content-panel-intent-detail">
     <div class="field-box">
-        <label class="title-label">{{'CDSCanvas.ChooseBot' | translate }}</label>
+        <label class="title-label">{{'CDSCanvas.ChooseAgent' | translate }}</label>
         <cds-select *ngIf="!action?.useSlug" id="text-condition" 
             [items]="chatbots_name_list" 
             [bindLabelSelect]="'name2'"

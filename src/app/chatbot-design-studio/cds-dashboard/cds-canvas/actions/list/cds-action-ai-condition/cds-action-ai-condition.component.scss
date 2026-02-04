@@ -60,7 +60,21 @@ div {
         padding: 5px 10px;
         background-color: #ecb606;
         color: white;
-
+    }
+    div.tag-replyto {
+        display: flex;
+        width: fit-content;
+        border-radius: 4px;
+        font-size: 10px;
+        margin: 3px;
+        height: -moz-fit-content;
+        height: fit-content;
+        padding: 0px 6px;
+        max-width: calc(100% - 25px);
+        background-color: var(--blu);
+        color: var(--color-white-hex);
+        flex-wrap: nowrap;
+        text-align: end;
     }
 }
 
@@ -174,6 +188,43 @@ mat-expansion-panel ::ng-deep {
         padding: 10px !important;
     }
 
+    .title-and-parameters-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .parameters-preview {
+        font-size: 11px;
+        height: 24px;
+        line-height: normal;
+        span {
+            line-height: 16px;
+            margin-right: 5px;
+        }
+        .preview-badge {
+            color: #fff;
+            background-color: var(--blu);
+            padding: 1px 3px;
+            border-radius: 6px;
+        }
+        .preview-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            font-size: 14px;
+            line-height: 14px;
+            margin: 0;
+            vertical-align: middle;
+            color: var(--color-white-hex);
+        }
+        .preview-flag{
+            margin:0;
+        }
+    }
+
 }
 
 cds-select#model-condition ::ng-deep{
@@ -230,6 +281,9 @@ mat-checkbox ::ng-deep {
     width: 100%;
     margin-left: 6px;
 }
+.action-wait-slider.disabled {
+    opacity: 0.4;
+}
 
 .action-wait-slider ::ng-deep{
     .mat-accent .mat-slider-track-fill {
@@ -240,7 +294,7 @@ mat-checkbox ::ng-deep {
     }
     .mat-slider-thumb-label-text{
         color: var(--background-color) !important;
-        font-size: 8px!important;
+        font-size: 10px !important;
     }
     .mat-slider-thumb {
         background-color: var(--text-color) !important;
@@ -256,11 +310,26 @@ mat-checkbox ::ng-deep {
     border-radius: 12px;
     background-color: white;
     border: 1px solid var(--text-color);
+
+    // Hide number input spinner arrows
+    /* Chrome, Safari, Edge, Opera */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    &[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
 }
 
 .slider-input ::ng-deep {
     width: 60px;
-
+    min-width: 60px;
+    font-size: 12px;
     input {
         text-align: center;
     }
@@ -318,7 +387,7 @@ mat-checkbox ::ng-deep {
 
 .preview-container-extended {
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .placeholder-container {
@@ -545,6 +614,17 @@ loading-spinner.custom-spinner ::ng-deep {
 }
 
 
+
+cds-select#model-condition.not-configured ::ng-deep {
+    .ng-select .ng-select-container {
+        border: 1px solid var(--empty-value-text-color);
+    }
+    .ng-select .ng-select-container .ng-value span.label-select{
+        color: var(--empty-value-text-color);
+    }
+}
+
+
 .select-container {
     &.not-configured {
         ::ng-deep .ng-select .ng-select-container {
@@ -558,10 +638,7 @@ loading-spinner.custom-spinner ::ng-deep {
             color: var(--empty-value-text-color)!important;
             border: 1px solid var(--empty-value-text-color)!important;
         }
-
     }
-
-
     .status-indicator {
         width: 8px;
         height: 8px;
@@ -572,16 +649,15 @@ loading-spinner.custom-spinner ::ng-deep {
         left: 0px;
         top: 96px;
     }
-
 }
 
-// Multiplier and Configure Button Row
+// Bottom row styles for model selection
 .bottom-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-top: 0px;
-    padding-left: 10px;
+    padding-left: 0px;
+    flex-direction: row-reverse;
 }
 
 .multiplier-container {
@@ -596,7 +672,6 @@ loading-spinner.custom-spinner ::ng-deep {
     font-size: 12px;
     text-decoration: underline;
     display: inline-block;
-    
     &:hover {
         opacity: 0.7;
     }

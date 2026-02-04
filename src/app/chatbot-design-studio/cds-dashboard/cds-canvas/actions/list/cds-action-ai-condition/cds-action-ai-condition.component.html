@@ -4,13 +4,15 @@
     <div class="action-row">
         <div id="gpt-icon" class="action-row-left icon-action">
             <mat-icon *ngIf="!action?.llm" svgIcon="add_ai_model" aria-hidden="true"></mat-icon>
-            <img *ngIf="action?.llm" src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" alt="">
+            <img *ngIf="action?.llm && (llm_models | find:{key: 'value', value: action?.llm})" 
+                 src="{{ (llm_models | find:{key: 'value', value: action?.llm }).src }}" 
+                 alt="">
         </div>
         <div class="action-row-right">
-            <div *ngIf="action?.llm" class="action-row-right">
+            <div *ngIf="action?.llm && (llm_models | find:{key: 'value', value: action?.llm})" class="action-row-right">
                 {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} <span *ngIf="action?.model">({{action?.model}})</span>
             </div>
-            <div *ngIf="!action?.llm" class="action-row-right empty">
+            <div *ngIf="!action?.llm || !(llm_models | find:{key: 'value', value: action?.llm})" class="action-row-right empty">
                 {{'CDSCanvas.ChooseTheAIModel' | translate }}
             </div>
         </div>
@@ -130,7 +132,9 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ (llm_models | find:{key: 'value', value: action?.llm }).name }} )</span>
+                    <span class="subtitle-label" *ngIf="llm_models | find:{key: 'value', value: action?.llm}">
+                        ( {{'CDSCanvas.GeneratedWith' | translate }}  {{llm_model_selected.modelName}} )
+                    </span>
                 </label>
             </div>
         </div>
@@ -159,36 +163,67 @@
             class="custom-expansion-panel">
             <mat-expansion-panel-header class="disable_ripple">
                 <mat-panel-title>
-                    {{'CDSCanvas.AISettings' | translate }}
+                    <div class="title-and-parameters-container">
+                        <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
+                        <div class="parameters-preview">
+                            <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-flag">
+                                {{ action?.modelName || llm_model_selected?.modelName }}
+                                <span class="sep"> | </span>
+                            </span>
+                            <span *ngIf="action?.max_tokens" class="preview-badge">
+                                <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
+                            </span>
+                            <span *ngIf="action?.temperature !== undefined" class="preview-badge">
+                                <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> {{action.temperature | formatNumber}}
+                            </span>
+                            <span *ngIf="action?.context">system context: {{action.context}}</span>
+                        </div>
+                    </div>
                 </mat-panel-title>
             </mat-expansion-panel-header>
             <div>
 
-                <div class="field-box">
+
+                 <!-- // llm select -->
+                 <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
+                    <cds-select id="model-condition"
+                        [class]="!llm_model_selected.configured ? 'not-configured' : ''"
+                        [items]="llm_models_flat" 
+                        [itemSelected]="llm_model_selected.model"
+                        [bindLabelSelect]="'modelName'" 
+                        [bindValueSelect]="'model'"
+                        [groupByKey]="'llm'"
+                        [clearable]="false" 
+                        [searchable]="true"
+                        [optionalBindAdditionalText]="'multiplier'" 
+                        (onSelected)="onChangeSelect($event, 'llm_model')">
+                    </cds-select>
+                    <div class="bottom-row">
+                        <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                    </div>
+                </div>
+
+                <!-- <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
                     <div class="select-container" [class.not-configured]="!selectedModelConfigured">
                         <cds-text id="text-label-model"
                             class="sx-input" 
                             [class]="!selectedModelConfigured ? 'not-configured' : ''"
                             [text]="labelModel"
-                            [autocompleteOptions]="autocompleteOptions_2"
+                            [autocompleteOptions]="autocompleteOptionsFlat"
                             [placeholder]="'CDSCanvas.Model' | translate"
                             [setAttributeBtn]="false"
                             (onChange)="onChangeTextarea($event, labelModel, 'llm_model')"
                             (blur)="onBlur($event)"
                             >
-                            <!--   
-                                (onOptionSelected)="onOptionSelected($event, 'llm_model')" 
-                            -->
                         </cds-text>
                     </div>
-                    <!-- Container per i due elementi sulla stessa riga -->
                     <div class="bottom-row">
                         <div class="multiplier-container"><span *ngIf="multiplier">{{multiplier}} x tokens</span></div>
                         <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
                     </div>
-
-                </div>
+                </div> -->
 
                 
                 <!-- // llm select -->
@@ -230,6 +265,7 @@
                             <div class="action-wait-range">{{ai_setting['max_tokens'].min}}</div>
                             <mat-slider 
                                 class="wait-slider" thumbLabel 
+                                [displayWith]="formatSliderLabel"
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
@@ -237,11 +273,16 @@
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
                             </mat-slider>
-                            <div class="action-wait-range">{{ai_setting['max_tokens'].max | number:'': browserLang}}</div>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].max | formatNumber}}</div>
                         </div>
                         <!-- // doesn't work propely -->
                         <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
-                        <input type="text" class="slider-input gpt-setting-input" value="{{action.max_tokens | number:'': browserLang}}" disabled>
+                        <input type="number" 
+                               class="slider-input gpt-setting-input" 
+                               [(ngModel)]="action.max_tokens"
+                               [min]="ai_setting['max_tokens'].min"
+                               [max]="ai_setting['max_tokens'].max"
+                               (change)="updateSliderValue(action.max_tokens, 'max_tokens')">
                         <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
                     </div>
                 </div>
@@ -267,7 +308,7 @@
                             </div>
                             <!-- // doesn't work propely -->
                             <!-- <cds-text [text]="action.temperature.toString()" [inputType]="'number'" [maxlength]="4" [min]="0" [max]="1" (onChange)="updateSliderValue($event, 'temperature')" class="slider-input"></cds-text> -->
-                            <input type="text" class="slider-input gpt-setting-input" value="{{action.temperature | number:'': browserLang}}" disabled>
+                            <input type="number" class="slider-input gpt-setting-input" value="{{action.temperature}}" disabled>
                         </div>
                     </div>
                 </div>

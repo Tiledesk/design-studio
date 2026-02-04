@@ -16,6 +16,7 @@ import { BaseElementModule } from './base-element.module';
 import { BaseConditionRowComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/actions/list/cds-action-json-condition/base-condition-row/base-condition-row.component';
 import { FilterPipe } from '../pipe/filter.pipe';
 import { FindPipe } from '../pipe/find.pipe';
+import { FormatNumberPipe } from '../pipe/format-number.pipe';
 
 
 
@@ -34,7 +35,8 @@ import { FindPipe } from '../pipe/find.pipe';
 
     //PIPES
     FilterPipe,
-    FindPipe
+    FindPipe,
+    FormatNumberPipe
   ],
   imports: [
     CommonModule,
@@ -57,7 +59,14 @@ import { FindPipe } from '../pipe/find.pipe';
 
     //PIPES
     FilterPipe,
-    FindPipe
+    FindPipe,
+    FormatNumberPipe
   ],
+  providers: [
+    //PIPES (available for injection)
+    FilterPipe,
+    FindPipe,
+    FormatNumberPipe
+  ]
 })
 export class CdsBaseElementModule { }
