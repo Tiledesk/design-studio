@@ -1,6 +1,8 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil, first } from 'rxjs/operators';
 // import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES //
@@ -24,7 +26,6 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { DepartmentService } from 'src/app/services/department.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { FaqService } from 'src/app/services/faq.service';
-import { Subject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
@@ -36,7 +37,7 @@ import { WebhookService } from '../services/webhook-service.service';
   templateUrl: './cds-dashboard.component.html',
   styleUrls: ['./cds-dashboard.component.scss']
 })
-export class CdsDashboardComponent implements OnInit {
+export class CdsDashboardComponent implements OnInit, OnDestroy {
   // @ViewChild('chatbot--dashboard') canvas!: ElementRef;
   
   SIDEBAR_PAGES = SIDEBAR_PAGES;
@@ -56,6 +57,10 @@ export class CdsDashboardComponent implements OnInit {
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   private logger: LoggerService = LoggerInstance.getInstance();
+  
+  // --- Subscription cleanup ---
+  private destroy$ = new Subject<void>();
+  private routeParamsSubscription: Subscription | null = null;
   constructor(
     private route: ActivatedRoute,
     private appConfigService: AppConfigService,
@@ -113,17 +118,30 @@ export class CdsDashboardComponent implements OnInit {
 
   async getUrlParams(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.route.params.subscribe({ next: (params) => {
-          this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  PARAMS', params);
-          this.dashboardService.setParams(params)
-          resolve(true);
-        }, error: (error) => {
-          this.logger.error('[ DSHBRD-SERVICE ] ERROR: ', error);
-          reject(false);
-        }, complete: () => {
-          this.logger.log('COMPLETE');
-        }
-      });
+      // Cleanup previous subscription if exists
+      if (this.routeParamsSubscription) {
+        this.routeParamsSubscription.unsubscribe();
+      }
+      
+      this.routeParamsSubscription = this.route.params
+        .pipe(
+          takeUntil(this.destroy$),
+          first() // Completa dopo primo emit (route params tipicamente emettono una volta)
+        )
+        .subscribe({
+          next: (params) => {
+            this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  PARAMS', params);
+            this.dashboardService.setParams(params);
+            resolve(true);
+          },
+          error: (error) => {
+            this.logger.error('[ DSHBRD-SERVICE ] ERROR: ', error);
+            reject(false);
+          },
+          complete: () => {
+            this.logger.log('COMPLETE');
+          }
+        });
     });
   }
 
@@ -239,5 +257,17 @@ export class CdsDashboardComponent implements OnInit {
     this.activeSidebarSection = event;
   }
   /*****************************************************/ 
+
+  ngOnDestroy(): void {
+    // Cleanup route params subscription
+    if (this.routeParamsSubscription) {
+      this.routeParamsSubscription.unsubscribe();
+      this.routeParamsSubscription = null;
+    }
+    
+    // Cleanup all subscriptions via takeUntil
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
 }

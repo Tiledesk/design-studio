@@ -20,6 +20,8 @@ import { NetworkOfflineComponent } from './modals/network-offline/network-offlin
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 import { IconService } from './chatbot-design-studio/services/icon.service';
 import { AppInterruptionComponent } from './modals/app-interruption/app-interruption.component';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -39,6 +41,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   private resumeDialogOpen = false;
   private visibilityHandler?: () => void;
   private readonly IWT_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes (approx Chrome Intensive Wake-Up Throttling threshold)
+
+  // --- Subscription cleanup ---
+  private destroy$ = new Subject<void>();
+  private resumeDialogSubscription: Subscription | null = null;
 
 
   constructor(
@@ -170,9 +176,17 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       panelClass: 'custom-dialog-container',
       disableClose: true
     });
-    ref.afterClosed().subscribe(() => {
-      this.resumeDialogOpen = false;
-    });
+    
+    // Cleanup previous subscription if exists
+    if (this.resumeDialogSubscription) {
+      this.resumeDialogSubscription.unsubscribe();
+    }
+    
+    this.resumeDialogSubscription = ref.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.resumeDialogOpen = false;
+      });
   }
 
 
@@ -242,17 +256,19 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   watchToConnectionStatus() {
-    this.networkService.networkStatus$.subscribe((isOnline)=>{
-      this.logger.log('[APP-COMP] watchToConnectionStatus IS ONLINEEEEE-->', isOnline)
-      if(!isOnline){
-         const dialog = this.dialog.open(NetworkOfflineComponent, {
-          data: {},
-          panelClass: 'custom-dialog-container',
-          position: {bottom:'10px'},
-          disableClose: true
-        });
-      }
-    })
+    this.networkService.networkStatus$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isOnline) => {
+        this.logger.log('[APP-COMP] watchToConnectionStatus IS ONLINEEEEE-->', isOnline)
+        if(!isOnline){
+           const dialog = this.dialog.open(NetworkOfflineComponent, {
+            data: {},
+            panelClass: 'custom-dialog-container',
+            position: {bottom:'10px'},
+            disableClose: true
+          });
+        }
+      })
   }
 
   updateStoredCurrentUser() {
@@ -388,9 +404,20 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Cleanup event listener
     if (this.visibilityHandler) {
       document.removeEventListener('visibilitychange', this.visibilityHandler);
     }
+    
+    // Cleanup dialog subscription
+    if (this.resumeDialogSubscription) {
+      this.resumeDialogSubscription.unsubscribe();
+      this.resumeDialogSubscription = null;
+    }
+    
+    // Cleanup all subscriptions via takeUntil
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   

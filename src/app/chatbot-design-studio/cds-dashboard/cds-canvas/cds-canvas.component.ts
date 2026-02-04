@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, Subject, skip, timeout, firstValueFrom } from 'rxjs';
+import { takeUntil, first } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -168,6 +169,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private subscriptionTogglePublishPanelState: Subscription;
   IS_OPEN_PUBLISH_PANEL: boolean = false;
 
+  // --- Subscription cleanup ---
+  private destroy$ = new Subject<void>();
 
   chatbotSubtype: string;
   selectedChatbot: Chatbot;
@@ -251,6 +254,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.subscriptionTogglePublishPanelState.unsubscribe();
     }
 
+    // Cleanup all subscriptions via takeUntil (for route.queryParams)
+    this.destroy$.next();
+    this.destroy$.complete();
 
     
     document.removeEventListener("connector-drawn", this.listnerConnectorDrawn, false);
@@ -290,12 +296,17 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * getParamsFromURL
    */
   private getParamsFromURL(){
-    this.route.queryParams.subscribe(params => {
-      this.blockId = params['blockid'];
-      if (this.blockId) { /* empty */ }
-      this.blockName = params['blockname'];
-      if (this.blockName) { /* empty */ }
-    });
+    this.route.queryParams
+      .pipe(
+        takeUntil(this.destroy$),
+        first() // Completa dopo primo emit (query params tipicamente emettono una volta)
+      )
+      .subscribe(params => {
+        this.blockId = params['blockid'];
+        if (this.blockId) { /* empty */ }
+        this.blockName = params['blockname'];
+        if (this.blockName) { /* empty */ }
+      });
   }
 
   /** 

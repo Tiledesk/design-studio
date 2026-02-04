@@ -216,14 +216,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtionKey = 'alphaConnectors';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
-      subscribtion = this.stageService.alphaConnectors$.subscribe(value => {
-        // this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
-        this.alphaConnectors = value;
-        // Ricarica i connettori quando cambia l'opacità
-        if (this.intent?.intent_id) {
-          this.loadConnectorsIn();
-        }
-      });
+      subscribtion = this.stageService.alphaConnectors$
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe(value => {
+          // this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
+          this.alphaConnectors = value;
+          // Ricarica i connettori quando cambia l'opacità
+          if (this.intent?.intent_id) {
+            this.loadConnectorsIn();
+          }
+        });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
     }

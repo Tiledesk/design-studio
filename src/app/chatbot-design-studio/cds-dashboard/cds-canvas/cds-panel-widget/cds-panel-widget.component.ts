@@ -9,7 +9,8 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Intent } from 'src/app/models/intent-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
-import { skip } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { skip, takeUntil } from 'rxjs/operators';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
@@ -35,6 +36,9 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   widgetTestSiteUrl: SafeResourceUrl = null;
   private messageListener: (event: Event) => void;
   private logger: LoggerService = LoggerInstance.getInstance();
+  
+  // --- Subscription cleanup ---
+  private destroy$ = new Subject<void>();
 
   constructor( 
     public appConfigService: AppConfigService,
@@ -57,13 +61,15 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
      *  - save and check if intent name has changed
      *  - notify iframe with a postMessage about the changes
      */
-    this.intentService.testIntent.subscribe((intent: Intent) => {
-      if(intent && intent.intent_display_name){
-        this.intentName = intent.intent_display_name;
-        this.widgetIframe.nativeElement.contentWindow?.postMessage(
-          {action: 'restart', intentName: this.intentName}, "*");
-      }
-    })
+    this.intentService.testIntent
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((intent: Intent) => {
+        if(intent && intent.intent_display_name){
+          this.intentName = intent.intent_display_name;
+          this.widgetIframe.nativeElement.contentWindow?.postMessage(
+            {action: 'restart', intentName: this.intentName}, "*");
+        }
+      })
 
     this.projectID = this.dashboardService.projectID;
     this.selectedChatbot = this.dashboardService.selectedChatbot;
@@ -169,6 +175,11 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // Cleanup all subscriptions via takeUntil
+    this.destroy$.next();
+    this.destroy$.complete();
+    
+    // Cleanup event listener
     window.removeEventListener('message', this.messageListener);
   }
 
