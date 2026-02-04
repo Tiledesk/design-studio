@@ -60,9 +60,8 @@
   pointer-events: none;
   user-select: none;
   opacity: 0.8;
-  background-color: var(--drag-preview-background);
-  max-width: 244px;
-  width: 100%;
+  background-color: #fff;
+  width: 244px;
 }
 
 /* ============================================================================
@@ -245,7 +244,7 @@
     margin: auto 0;
   }
 
-  .pic-title-text {
+.pic-title-text {
   position: relative;
   display: inline-block;
   width: 100%;
@@ -600,7 +599,7 @@
    UTILITY CLASSES
    ============================================================================ */
 .unselectable {
-  -moz-user-select: -moz-none;
+  -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
   -o-user-select: none;

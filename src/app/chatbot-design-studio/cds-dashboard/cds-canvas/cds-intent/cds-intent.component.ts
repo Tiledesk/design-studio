@@ -106,7 +106,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
   // INPUTS
   // ============================================================================
   @Input() intent: Intent;
+  /** Nasconde il placeholder delle azioni nel pannello azioni */
   @Input() hideActionPlaceholderOfActionPanel: boolean;
+  /** Sottotipo del chatbot (es: chatbot, copilot, ecc.) */
   @Input() chatbotSubtype: string;
   @Input() IS_OPEN_PANEL_INTENT_DETAIL: boolean;
   
@@ -128,6 +130,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
   // VIEW CHILD
   // ============================================================================
   @ViewChild('resizeElement', { static: false }) resizeElement: ElementRef;
+  /** Bottone per aprire il menu azioni */
   @ViewChild('openActionMenuBtn', { static: false }) openActionMenuBtnRef: ElementRef;
 
   // ============================================================================
@@ -152,7 +155,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
   connector: any = null; // Used by action components (reply, reply-v2, random-reply)
   connectorChanged: any = null; // Used by action components (online-agents, open-hours)
   formSize: number = 0;
+  /** Numero di domande */
   questionCount: number = 0;
+  /** Lista delle azioni dell'intent */
   listOfActions: Action[];
   elementTypeSelected: HAS_SELECTED_TYPE;
   isOpen: boolean = true;
@@ -161,20 +166,32 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
   isDefaultFallback: boolean = false;
   startAction: Action;
   isDragging: boolean = false;
+  /** Larghezza placeholder drag */
   actionDragPlaceholderWidth: number;
+  /** Se nascondere il placeholder drag */
   hideActionDragPlaceholder: boolean;
+  /** Nuova azione creata */
   newActionCreated: Action;
+  /** Se il drag è disabilitato */
   dragDisabled: boolean = true;
+  /** Se il connettore è sopra un intent */
   connectorIsOverAnIntent: boolean = false;
   webHookTooltipText: string;
+  /** Se l'intent è interno */
   isInternalIntent: boolean = false;
+  /** Azione INTENT collegata */
   actionIntent: ActionIntentConnected;
+  /** Se l'intent ha un'azione INTENT */
   isActionIntent: boolean = false;
+  /** Se ci sono agenti disponibili */
   isAgentsAvailable: boolean = false;
+  /** Se mostrare le opzioni intent */
   showIntentOptions: boolean = true;
+  /** URL webhook */
   webhookUrl: string;
   serverBaseURL: string;
   chatbot_id: string;
+
   isUntitledBlock: boolean = false;
   isNewChatbot: boolean = false;
   intentColor: string = INTENT_COLORS.COLOR1;
@@ -276,7 +293,6 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
         action._tdActionType = "intent";
           this.intent.actions.push(action);
         }
-        this.showIntentOptions = false;
         this.startAction = this.intent.actions[0];
     } else {
         this.setIntentSelected();
@@ -1031,6 +1047,14 @@ export class CdsIntentComponent implements OnInit, OnChanges, OnDestroy {
       console.error("[CDS-INTENT] getActionParams ERROR: ", error);
       return;
     }
+
+    const color = this.intent.attributes.color;
+    const isSelected = this.intentService.intentSelectedID === this.intent.intent_id && this.intentService.intentActive;
+    
+    return {
+      'background-color': `rgba(${color}, 0.35)`,
+      'outline': isSelected ? `2px solid rgba(${color}, 1)` : 'none'
+    };
   }
 
   // ============================================================================

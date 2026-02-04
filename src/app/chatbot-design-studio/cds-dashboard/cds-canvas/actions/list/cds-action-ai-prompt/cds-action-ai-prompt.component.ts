@@ -316,8 +316,11 @@ setModel(modelName: string){
   this.action.model = result?.model?result.model:'';
   this.action.modelName = result?.modelName?result.modelName:'';
   this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
-  this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
-  this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
+  this.ai_setting['max_tokens'].max = this.llm_model_selected?.max_output_tokens;
+  this.ai_setting['max_tokens'].min = this.llm_model_selected?.min_tokens;
+  if(this.action.max_tokens > this.llm_model_selected?.max_output_tokens){
+    this.action.max_tokens = this.llm_model_selected?.max_output_tokens;
+  }
   // Every model change resets max_tokens to default (capped by model max)
   const min = this.ai_setting['max_tokens'].min;
   const max = this.ai_setting['max_tokens'].max;
