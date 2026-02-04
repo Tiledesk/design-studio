@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.26-performance
+- **changed**: refactoring the intent component
 
 # 1.39.26-rc1
 - **bug-fix**: sort attribute list in Variable List Component
