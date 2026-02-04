@@ -1,5 +1,4 @@
 .action-connector {
-
     z-index: 2;
     display: flex;
     align-items: center;
@@ -12,6 +11,7 @@
     position: absolute;
     left: -8px;
     top: -8px;
+    pointer-events: none;
 }
 
 .label-connector{

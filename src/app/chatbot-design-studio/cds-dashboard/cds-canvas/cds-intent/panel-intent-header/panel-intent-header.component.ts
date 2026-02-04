@@ -79,6 +79,9 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
       this.isWebhook = true;
       // this.intentNameAlreadyExist = true;
     }
+    if(this.isStart || this.isWebhook){
+      this.intentColor = INTENT_COLORS.COLOR0;
+    }
     if(!this.intentColor){
       this.intentColor = INTENT_COLORS.COLOR1;
     }

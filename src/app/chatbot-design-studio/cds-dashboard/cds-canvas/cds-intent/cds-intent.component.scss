@@ -216,7 +216,7 @@
   padding: 0 0 10px 0;
   background-color: var(--intent-header-background);
   overflow: hidden;
-
+  pointer-events: none;
   &.cds-start {
     /* Optimized: Replaced expensive transitions (box-shadow, background-color) with transform/opacity
        Only transition GPU-accelerated properties for better performance */
