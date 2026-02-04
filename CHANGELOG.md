@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.26
+- **added**: added iteration action
+
 # 1.39.25
 - **bug-fix**: Fixed a filter error when selecting a KB.
 - **bug-fix**: Fixed an error when setting the re-ranking multiplier when setting "use KB name."
