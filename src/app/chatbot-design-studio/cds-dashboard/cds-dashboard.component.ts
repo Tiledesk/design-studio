@@ -1,10 +1,11 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 // import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { DashboardFacadeService } from 'src/app/services/dashboard-facade.service';
 
 // MODEL //
 import { Project } from 'src/app/models/project-model';
@@ -25,6 +26,7 @@ import { DepartmentService } from 'src/app/services/department.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { Subject } from 'rxjs';
+import { takeUntil, switchMap } from 'rxjs/operators';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
@@ -36,7 +38,7 @@ import { WebhookService } from '../services/webhook-service.service';
   templateUrl: './cds-dashboard.component.html',
   styleUrls: ['./cds-dashboard.component.scss']
 })
-export class CdsDashboardComponent implements OnInit {
+export class CdsDashboardComponent implements OnInit, OnDestroy {
   // @ViewChild('chatbot--dashboard') canvas!: ElementRef;
   
   SIDEBAR_PAGES = SIDEBAR_PAGES;
@@ -56,11 +58,14 @@ export class CdsDashboardComponent implements OnInit {
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   private logger: LoggerService = LoggerInstance.getInstance();
+  private destroy$ = new Subject<void>();
+  
   constructor(
     private route: ActivatedRoute,
     private appConfigService: AppConfigService,
     private appStorageService: AppStorageService,
     private dashboardService: DashboardService,
+    private dashboardFacade: DashboardFacadeService,
     private kbService: KnowledgeBaseService,
     public departmentService: DepartmentService,
     public faqKbService: FaqKbService,
@@ -74,12 +79,14 @@ export class CdsDashboardComponent implements OnInit {
   
 
   ngOnInit() {
-    // ---------------------------------------
-    // Changelog alert
-    // ---------------------------------------
     this.showChangelog = this.checkForChangelogNotify();
-    this.executeAsyncFunctionsInSequence();
+    this.initDashboard();
     this.hideShowWidget('hide');
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onSwipe(event: WheelEvent){
@@ -111,68 +118,36 @@ export class CdsDashboardComponent implements OnInit {
     this.appStorageService.setItem('changelog', environment.VERSION)
   }
 
-  async getUrlParams(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this.route.params.subscribe({ next: (params) => {
-          this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  PARAMS', params);
-          this.dashboardService.setParams(params)
-          resolve(true);
-        }, error: (error) => {
-          this.logger.error('[ DSHBRD-SERVICE ] ERROR: ', error);
-          reject(false);
-        }, complete: () => {
-          this.logger.log('COMPLETE');
-        }
-      });
-    });
-  }
-
   /**************** CUSTOM FUNCTIONS ****************/
-  /** 
-   * execute Async Functions In Sequence
-   * Le funzioni async sono gestite in maniera sincrona ed eseguite in coda
-   * da aggiungere un loader durante il processo e se tutte vanno a buon fine 
-   * possiamo visualizzare lo stage completo
+  /**
+   * Inizializza la dashboard usando DashboardFacadeService con pattern reattivo.
    */
-  async executeAsyncFunctionsInSequence() {
-    this.logger.log('[CDS DSHBRD] executeAsyncFunctionsInSequence -------------> ');    
-    try {
-      const getTranslations = await this.getTranslations();
-      this.logger.log('[CDS DSHBRD] Risultato 1:', getTranslations);
-      const getUrlParams = await this.getUrlParams();
-      this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
-      const getCurrentProject = await this.dashboardService.getCurrentProject();
-      this.logger.log('[CDS DSHBRD] Risultato 3:', getCurrentProject);
-      this.project = this.dashboardService.project;
-      this.initialize();
-      const getBotById = await this.dashboardService.getBotById();
-      this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
-      const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();
-      this.logger.log('[CDS DSHBRD] Risultato 5:', getDefaultDepartmentId);
-      if (getTranslations && getUrlParams && getBotById && getCurrentProject && getDefaultDepartmentId) {
-        this.logger.log('[CDS DSHBRD] Ho finito di inizializzare la dashboard');
-        this.selectedChatbot = this.dashboardService.selectedChatbot;
+  private initDashboard(): void {
+    this.logger.log('[CDS DSHBRD] initDashboard -------------> ');
+    
+    this.route.params.pipe(
+      takeUntil(this.destroy$),
+      switchMap(params => {
+        this.logger.log('[CDS DSHBRD] Route params:', params);
+        return this.dashboardFacade.initDashboard(params);
+      })
+    ).subscribe({
+      next: ({ project, chatbot, defaultDept }) => {
+        this.logger.log('[CDS DSHBRD] InitDashboard success:', { project, chatbot, defaultDept });
+        
+        this.project = project;
+        this.selectedChatbot = chatbot;
+        this.defaultDepartmentId = defaultDept?._id;
+        
+        this.initialize();
+        
         this.initFinished = true;
+        this.logger.log('[CDS DSHBRD] Dashboard initialization completed');
+      },
+      error: (error) => {
+        this.logger.error('[CDS DSHBRD] InitDashboard error:', error);
+        console.error('error: ', error);
       }
-    } catch (error) {
-      console.error('error: ', error);
-    }
-  }
-
-  /** GET TRANSLATIONS */
-  private async getTranslations(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      // this.translateCreateFaqSuccessMsg();
-      // this.translateCreateFaqErrorMsg();
-      // this.translateUpdateFaqSuccessMsg();
-      // this.translateUpdateFaqErrorMsg();
-      // this.translateWarningMsg();
-      // this.translateAreYouSure();
-      // this.translateErrorDeleting();
-      // this.translateDone();
-      // this.translateErrorOccurredDeletingAnswer();
-      // this.translateAnswerSuccessfullyDeleted();
-      resolve(true);
     });
   }
 
