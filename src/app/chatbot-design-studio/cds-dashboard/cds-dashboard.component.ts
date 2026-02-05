@@ -129,10 +129,12 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     this.logger.log('[SLICE1] initDashboard - Dashboard loading started');
     this.logger.log('[CDS DSHBRD] initDashboard -------------> ');
     
+    this.logger.log('[SLICE2] CdsDashboardComponent - Route params subscription already managed correctly (Slice 1) - Pattern consistent');
     this.route.params.pipe(
       takeUntil(this.destroy$),
       switchMap(params => {
         this.logger.log('[SLICE1] Route params received - Navigation working:', params);
+        this.logger.log('[SLICE2] CdsDashboardComponent - Route params received - Navigation working correctly');
         this.logger.log('[CDS DSHBRD] Route params:', params);
         return this.dashboardFacade.initDashboard(params);
       })

@@ -1,5 +1,5 @@
 import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { TranslateService } from '@ngx-translate/core';
 import { Project } from 'src/app/models/project-model';
@@ -10,7 +10,8 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { ProjectService } from 'src/app/services/projects.service';
 import { BotsBaseComponent } from 'src/app/components/bots/bots-base/bots-base.component';
 import { SETTINGS_SECTION } from '../utils';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BRAND_BASE_INFO } from '../utils-resources';
 const swal = require('sweetalert');
@@ -20,7 +21,7 @@ const swal = require('sweetalert');
   templateUrl: './cds-chatbot-details.component.html',
   styleUrls: ['./cds-chatbot-details.component.scss']
 })
-export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnInit {
+export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnInit, OnDestroy {
   
   selectedChatbot: Chatbot;
   @Input() activeSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
@@ -38,6 +39,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
   translationsVoiceSettingsMap: Map<string, string> = new Map();
 
   private subscriptionOpenWidgetPanel: Subscription;
+  private destroy$ = new Subject<void>();
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -66,12 +68,29 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
       this.toggleTab(this.activeSection)
     }
 
-    this.route.queryParams.subscribe((params) => {
+    this.logger.log('[SLICE2] CdsChatbotDetailsComponent - Setting up route query params subscription with takeUntil(destroy$)');
+    this.route.queryParams.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((params) => {
+      this.logger.log('[SLICE2] CdsChatbotDetailsComponent - Route query params received - Navigation working:', params);
       if(!params.hasOwnProperty('active')){
         this.toggleTab(this.activeSection)
       }
       this.activeSection = params['active']
+      this.logger.log('[SLICE2] CdsChatbotDetailsComponent - Query params processed, activeSection updated:', this.activeSection);
     })
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup route params subscription usando takeUntil
+    this.logger.log('[SLICE2] CdsChatbotDetailsComponent - Cleaning up route query params subscription (takeUntil destroy$) - No memory leaks');
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.logger.log('[SLICE2] CdsChatbotDetailsComponent - Route query params subscription cleaned up successfully');
+    
+    if (this.subscriptionOpenWidgetPanel) {
+      this.subscriptionOpenWidgetPanel.unsubscribe();
+    }
   }
 
   toggleTab(section) {

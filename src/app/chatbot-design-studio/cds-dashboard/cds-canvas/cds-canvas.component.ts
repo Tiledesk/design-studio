@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit, OnDestroy} from '@angular/core';
+import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -42,7 +43,7 @@ import { v4 as uuidv4 } from 'uuid';
   templateUrl: './cds-canvas.component.html',
   styleUrls: ['./cds-canvas.component.scss']
 })
-export class CdsCanvasComponent implements OnInit, AfterViewInit{
+export class CdsCanvasComponent implements OnInit, AfterViewInit, OnDestroy{
 
   @ViewChild('receiver_elements_dropped_on_stage', { static: false }) receiverElementsDroppedOnStage: ElementRef;
   @ViewChild('drawer_of_items_to_zoom_and_drag', { static: false }) drawerOfItemsToZoomAndDrag: ElementRef;
@@ -73,6 +74,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   TYPE_INTENT_NAME = TYPE_INTENT_NAME;
 
   private subscriptionListOfIntents: Subscription;
+  private destroy$ = new Subject<void>();
   listOfIntents: Array<Intent> = [];
   listOfEvents: Array<Intent> = [];
   listOfNotes: Array<Note> = [];
@@ -205,6 +207,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** */
   ngOnDestroy() {
+    // Cleanup route params subscription usando takeUntil
+    this.logger.log('[SLICE2] CdsCanvasComponent - Cleaning up route query params subscription (takeUntil destroy$) - No memory leaks');
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.logger.log('[SLICE2] CdsCanvasComponent - Route query params subscription cleaned up successfully');
+    
     // Pulisci la coda di retry dei connettori
     this.connectorService.clearRetryQueue();
 
@@ -290,11 +298,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * getParamsFromURL
    */
   private getParamsFromURL(){
-    this.route.queryParams.subscribe(params => {
+    this.logger.log('[SLICE2] CdsCanvasComponent - Setting up route query params subscription with takeUntil(destroy$)');
+    this.route.queryParams.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(params => {
+      this.logger.log('[SLICE2] CdsCanvasComponent - Route query params received - Navigation working:', params);
       this.blockId = params['blockid'];
       if (this.blockId) { /* empty */ }
       this.blockName = params['blockname'];
       if (this.blockName) { /* empty */ }
+      this.logger.log('[SLICE2] CdsCanvasComponent - Query params processed:', { blockId: this.blockId, blockName: this.blockName });
     });
   }
 
