@@ -27,10 +27,13 @@ import { DepartmentService } from 'src/app/services/department.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
-import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from '../services/webhook-service.service';
+import { DashboardErrorHandlerService } from 'src/app/services/dashboard-error-handler.service';
+import { ServiceInitializationService } from 'src/app/services/service-initialization.service';
+import { ChangelogService } from 'src/app/services/changelog.service';
+import { WidgetManagerService } from 'src/app/services/widget-manager.service';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -73,7 +76,11 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
     private stageService: StageService, 
-    private readonly webhookService: WebhookService
+    private readonly webhookService: WebhookService,
+    private readonly errorHandler: DashboardErrorHandlerService,
+    private readonly serviceInitializationService: ServiceInitializationService,
+    private readonly changelogService: ChangelogService,
+    private readonly widgetManager: WidgetManagerService
   ) {}
 
   
@@ -82,9 +89,11 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // ---------------------------------------
     // Changelog alert
     // ---------------------------------------
-    this.showChangelog = this.checkForChangelogNotify();
+    this.showChangelog = this.changelogService.shouldShowChangelog();
+    // Assicura che initFinished sia false prima di iniziare
+    this.initFinished = false;
     this.executeAsyncFunctionsInSequence();
-    this.hideShowWidget('hide');
+    this.widgetManager.hideWidget();
   }
 
   onSwipe(event: WheelEvent){
@@ -92,28 +101,9 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   }
 
 
-  checkForChangelogNotify(): boolean { 
-    if(!BRAND_BASE_INFO['DOCS']){
-      return false
-    }
-    let changelogKey = this.appStorageService.getItem("changelog")
-    if(!changelogKey){
-      return true
-    }
-    if(changelogKey && changelogKey !== environment.VERSION){
-      let stored_minor_version = changelogKey.split('.')[1]
-      let local_minor_version = environment.VERSION.split('.')[1]
-      if(stored_minor_version === local_minor_version){
-        return false
-      }
-      return true
-    }
-    return false;
-  }
-
   onCloseChangelog(){
     this.showChangelog = false;
-    this.appStorageService.setItem('changelog', environment.VERSION)
+    this.changelogService.markChangelogAsSeen();
   }
 
   async getUrlParams(): Promise<boolean> {
@@ -135,7 +125,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
             resolve(true);
           },
           error: (error) => {
-            this.logger.error('[ DSHBRD-SERVICE ] ERROR: ', error);
+            this.errorHandler.handleInitializationError(error, 'getUrlParams');
             reject(false);
           },
           complete: () => {
@@ -155,76 +145,55 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   async executeAsyncFunctionsInSequence() {
     this.logger.log('[CDS DSHBRD] executeAsyncFunctionsInSequence -------------> ');    
     try {
-      const getTranslations = await this.getTranslations();
-      this.logger.log('[CDS DSHBRD] Risultato 1:', getTranslations);
+      // Step 1: getUrlParams (deve essere primo per ottenere id_faq_kb e projectID)
       const getUrlParams = await this.getUrlParams();
-      this.logger.log('[CDS DSHBRD] Risultato 2:', getUrlParams);
+      this.logger.log('[CDS DSHBRD] Risultato 1 (getUrlParams):', getUrlParams);
+      if (!getUrlParams) {
+        throw new Error('Failed to get URL parameters');
+      }
+
+      // Step 2: getCurrentProject (deve essere prima di initialize)
       const getCurrentProject = await this.dashboardService.getCurrentProject();
-      this.logger.log('[CDS DSHBRD] Risultato 3:', getCurrentProject);
+      this.logger.log('[CDS DSHBRD] Risultato 2 (getCurrentProject):', getCurrentProject);
+      if (!getCurrentProject) {
+        throw new Error('Failed to get current project');
+      }
+
       this.project = this.dashboardService.project;
       this.initialize();
-      const getBotById = await this.dashboardService.getBotById();
-      this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
-      const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();
-      this.logger.log('[CDS DSHBRD] Risultato 5:', getDefaultDepartmentId);
-      if (getTranslations && getUrlParams && getBotById && getCurrentProject && getDefaultDepartmentId) {
+
+      // Step 3: Operazioni parallele (getBotById e getDeptsByProjectId)
+      // Queste operazioni sono indipendenti e possono essere eseguite in parallelo
+      const [getBotById, getDefaultDepartmentId] = await Promise.all([
+        this.dashboardService.getBotById(),
+        this.dashboardService.getDeptsByProjectId()
+      ]);
+
+      this.logger.log('[CDS DSHBRD] Risultato 3 (getBotById):', getBotById);
+      this.logger.log('[CDS DSHBRD] Risultato 4 (getDeptsByProjectId):', getDefaultDepartmentId);
+
+      if (!getBotById) {
+        throw new Error('Failed to get bot by ID');
+      }
+
+      if (!getDefaultDepartmentId) {
+        throw new Error('Failed to get default department');
+      }
+
+      // Tutte le operazioni completate con successo
+      if (getUrlParams && getBotById && getCurrentProject && getDefaultDepartmentId) {
         this.logger.log('[CDS DSHBRD] Ho finito di inizializzare la dashboard');
         this.selectedChatbot = this.dashboardService.selectedChatbot;
         this.initFinished = true;
       }
     } catch (error) {
-      console.error('error: ', error);
+      this.errorHandler.handleInitializationError(error, 'executeAsyncFunctionsInSequence');
     }
-  }
-
-  /** GET TRANSLATIONS */
-  private async getTranslations(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      // this.translateCreateFaqSuccessMsg();
-      // this.translateCreateFaqErrorMsg();
-      // this.translateUpdateFaqSuccessMsg();
-      // this.translateUpdateFaqErrorMsg();
-      // this.translateWarningMsg();
-      // this.translateAreYouSure();
-      // this.translateErrorDeleting();
-      // this.translateDone();
-      // this.translateErrorOccurredDeletingAnswer();
-      // this.translateAnswerSuccessfullyDeleted();
-      resolve(true);
-    });
   }
 
   private initialize(){
-    let serverBaseURL = this.appConfigService.getConfig().apiUrl
-    let whatsappBaseUrl = this.appConfigService.getConfig().whatsappTemplatesBaseUrl
-
-    this.departmentService.initialize(serverBaseURL, this.project._id);
-    this.faqKbService.initialize(serverBaseURL, this.project._id)
-    this.faqService.initialize(serverBaseURL, this.project._id)
-    this.kbService.initialize(serverBaseURL, this.project._id)
-    this.openaiService.initialize(serverBaseURL, this.project._id)
-    this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
-    this.webhookService.initialize(serverBaseURL, this.project._id);
-
-    this.hideShowWidget('hide')
-
-  }
-
-
-  /** hideShowWidget */
-  private hideShowWidget(status: "hide" | "show") {
-    try {
-      if (window && window['tiledesk']) {
-        this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
-        if (status === 'hide') {
-          window['tiledesk'].hide();
-        } else if (status === 'show') {
-          window['tiledesk'].show();
-        }
-      }
-    } catch (error) {
-      this.logger.error('tiledesk_widget_hide ERROR', error)
-    }
+    this.serviceInitializationService.initializeAllServices(this.project._id);
+    this.widgetManager.hideWidget();
   }
 
 
@@ -241,7 +210,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     window.open(dashbordBaseUrl, '_self')
     // this.location.back()
     // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);
-    this.hideShowWidget('show');
+    this.widgetManager.showWidget();
   }
   /*****************************************************/
 

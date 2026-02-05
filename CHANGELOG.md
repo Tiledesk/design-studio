@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **changed**: refactor: semplificata l’inizializzazione di cds-dashboard (service di inizializzazione, gestione errori e business logic estratta in servizi dedicati) senza cambiare il comportamento funzionale.
+- **changed**: ux/perf: unificata la maschera di preload usando solo mask-canv nel canvas, corretta la creazione/visibilità dei connettori e ripristinato il drag&drop degli intent sullo stage.
+
+- **changed**: Corretti 7 memory leaks in 5 componenti (AppComponent, CdsDashboardComponent, CdsCanvasComponent, CdsPanelWidgetComponent, CdsIntentComponent) implementando il pattern takeUntil per il cleanup automatico delle subscription RxJS quando i componenti vengono distrutti."
+
 # 1.39.26
 - **added**: added iteration action
 
