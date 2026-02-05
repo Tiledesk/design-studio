@@ -1,6 +1,6 @@
-import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 // SERVICES //
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -30,14 +30,43 @@ export class DashboardService {
   botType: string;
   intent_id: string;
 
-  selectedChatbot: Chatbot;
+  // --- State reattivo ---
+  private _selectedChatbot$ = new BehaviorSubject<Chatbot | null>(null);
+  private _project$ = new BehaviorSubject<Project | null>(null);
+  private _defaultDepartment$ = new BehaviorSubject<Department | null>(null);
+
+  /** Observable pubblici (per future migrazioni a state reattivo) */
+  selectedChatbot$ = this._selectedChatbot$.asObservable();
+  project$ = this._project$.asObservable();
+  defaultDepartment$ = this._defaultDepartment$.asObservable();
+
+  /** Getter/Setter compatibili con il codice esistente */
+  get selectedChatbot(): Chatbot | null {
+    return this._selectedChatbot$.getValue();
+  }
+  set selectedChatbot(value: Chatbot | null) {
+    this._selectedChatbot$.next(value);
+  }
+
   translateparamBotName: any;
 
-  project: Project;
+  get project(): Project | null {
+    return this._project$.getValue();
+  }
+  set project(value: Project | null) {
+    this._project$.next(value);
+  }
+
   projectID: string;
 
   departments: Department[]
-  defaultDepartment: Department;
+
+  get defaultDepartment(): Department | null {
+    return this._defaultDepartment$.getValue();
+  }
+  set defaultDepartment(value: Department | null) {
+    this._defaultDepartment$.next(value);
+  }
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -85,62 +114,94 @@ export class DashboardService {
   // ----------------------------------------------------------
   // Get bot by id
   // ----------------------------------------------------------
+  /**
+   * Versione "pura": restituisce l'Observable del chatbot per un dato botId,
+   * senza modificare lo stato interno né fare side-effect.
+   * Utile per usi reattivi (es. nel facade o in altri componenti).
+   * Nota: FaqKb è il tipo base, ma viene trattato come Chatbot nel codice esistente.
+   */
+  loadBot$(botId: string): Observable<any> {
+    this.logger.log('[CDS DSHBRD] - LOAD BOT BY ID -', botId);
+    return this.faqKbService.getBotById(botId);
+  }
+
+  /**
+   * Applica i side-effect necessari dopo il caricamento del chatbot
+   * (aggiorna stato interno, variableList, ecc.)
+   */
+  applyBotSideEffects(chatbot: Chatbot): void {
+    this.selectedChatbot = chatbot;
+    this.translateparamBotName = { bot_name: this.selectedChatbot.name };
+    variableList.find(el => el.key === 'userDefined').elements = [];
+    if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {
+      variableList.find(el => el.key === 'userDefined').elements = convertJsonToArray(this.selectedChatbot.attributes.variables);
+    }
+    if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals) {
+      variableList.find(el => el.key === 'globals').elements = this.selectedChatbot.attributes.globals.map(({
+        key: name,
+        ...rest
+      }) => ({
+        name,
+        value: name
+      }));
+    }
+  }
+
   async getBotById(): Promise<boolean> {
     this.logger.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', this.id_faq_kb);
     return new Promise((resolve, reject) => {
-      this.faqKbService.getBotById(this.id_faq_kb).subscribe({ next: (chatbot: Chatbot) => {
+      this.loadBot$(this.id_faq_kb).subscribe({
+        next: (chatbot: Chatbot) => {
           this.logger.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', chatbot);
           if (chatbot) {
-            this.selectedChatbot = chatbot;
-            this.translateparamBotName = { bot_name: this.selectedChatbot.name }
-            variableList.find(el => el.key ==='userDefined').elements = [];
-            if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {
-              variableList.find(el => el.key ==='userDefined').elements = convertJsonToArray(this.selectedChatbot.attributes.variables);
-            }
-            if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.globals) {
-              variableList.find(el => el.key ==='globals').elements = this.selectedChatbot.attributes.globals.map(({
-                key: name,
-                ...rest
-              }) => ({
-                name,
-                value: name
-              }))
-            }
-            //this.logger.log('[CDS DSHBRD] - variableList', variableList, this.selectedChatbot.attributes, this.selectedChatbot.attributes?.globals);
+            this.applyBotSideEffects(chatbot);
             resolve(true);
           }
-        }, error: (error) => {
+        },
+        error: (error) => {
           this.logger.error('[ DSHBRD-SERVICE ] getBotById ERROR: ', error);
           this.router.navigate([`project/unauthorized`]);
           reject(false);
-          //redirect t ounauth
-          //resolve(true)
-        }, complete: () => {
+        },
+        complete: () => {
           this.logger.log('COMPLETE ');
           resolve(true);
         }
-      })
+      });
     });
   }
 
   // ----------------------------------------------------------
   // Get current project
   // ----------------------------------------------------------
+  /**
+   * Versione \"pura\": restituisce l'Observable del progetto per un dato projectId,
+   * senza modificare lo stato interno né fare side-effect (es. redirect).
+   * Utile per usi reattivi (es. nel facade o in altri componenti).
+   */
+  loadProject$(projectId: string): Observable<Project> {
+    this.logger.log('[CDS DSHBRD] - LOAD PROJECT BY ID -', projectId);
+    return this.projectService.getProjectById(projectId);
+  }
+
   async getCurrentProject(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.projectService.getProjectById(this.projectID).subscribe({ next: (project: Project)=>{
-        if (project) {
-          this.project = project;
-          this.projectID = project._id;
-          resolve(true);
+      this.loadProject$(this.projectID).subscribe({
+        next: (project: Project) => {
+          if (project) {
+            this.project = project;
+            this.projectID = project._id;
+            resolve(true);
+          }
+        },
+        error: (error) => {
+          this.logger.error(' [ DSHBRD-SERVICE ] getCurrentProject ERROR: ', error);
+          reject(false);
+        },
+        complete: () => {
+          this.logger.log('COMPLETE ');
         }
-      }, error: (error)=>{
-        this.logger.error(' [ DSHBRD-SERVICE ] getCurrentProject ERROR: ', error);
-        reject(false);
-      }, complete: ()=> {
-        this.logger.log('COMPLETE ');
-        resolve(true);
-      }})
+      });
     });
   }
 
@@ -148,30 +209,50 @@ export class DashboardService {
   // ----------------------------------------------------------
   // Get depts
   // ----------------------------------------------------------
-  getDeptsByProjectId(): Promise<boolean>{
-   return new Promise((resolve, reject)=>{
-    this.departmentService.getDeptsByProjectId().subscribe({ next: (departments: any) => {
-      this.logger.log('[CDS DSHBRD] - DEPT GET DEPTS ', departments);
-      if (departments) {
-        this.departments = departments
-        departments.forEach((dept: any) => {
-          // this.logger.log('[CDS DSHBRD] - DEPT', dept);
-          if (dept.default === true) {
-            this.defaultDepartment = dept;
-            return
-          }
-        })
-        resolve(true);
-      }
-    }, error: (error) => {
-      this.logger.error('[CDS DSHBRD] - DEPT - GET DEPTS  - ERROR', error);
-      reject(false);
-    }, complete: () => {
-      this.logger.log('[CDS DSHBRD] - DEPT - GET DEPTS - COMPLETE');
-      resolve(true);
-    }});
+  /**
+   * Versione "pura": restituisce l'Observable dei dipartimenti,
+   * senza modificare lo stato interno né fare side-effect.
+   * Utile per usi reattivi (es. nel facade o in altri componenti).
+   */
+  loadDepartments$(): Observable<Department[]> {
+    this.logger.log('[CDS DSHBRD] - LOAD DEPARTMENTS');
+    return this.departmentService.getDeptsByProjectId();
+  }
 
-   })
+  /**
+   * Applica i side-effect necessari dopo il caricamento dei dipartimenti
+   * (aggiorna stato interno, trova defaultDepartment, ecc.)
+   */
+  applyDepartmentsSideEffects(departments: Department[]): void {
+    this.departments = departments;
+    departments.forEach((dept: any) => {
+      if (dept.default === true) {
+        this.defaultDepartment = dept;
+        return;
+      }
+    });
+  }
+
+  getDeptsByProjectId(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.loadDepartments$().subscribe({
+        next: (departments: any) => {
+          this.logger.log('[CDS DSHBRD] - DEPT GET DEPTS ', departments);
+          if (departments) {
+            this.applyDepartmentsSideEffects(departments);
+            resolve(true);
+          }
+        },
+        error: (error) => {
+          this.logger.error('[CDS DSHBRD] - DEPT - GET DEPTS  - ERROR', error);
+          reject(false);
+        },
+        complete: () => {
+          this.logger.log('[CDS DSHBRD] - DEPT - GET DEPTS - COMPLETE');
+          resolve(true);
+        }
+      });
+    });
   }
 
 }

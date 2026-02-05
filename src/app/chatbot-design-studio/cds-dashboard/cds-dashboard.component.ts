@@ -31,9 +31,7 @@ import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from '../services/webhook-service.service';
 import { DashboardErrorHandlerService } from 'src/app/services/dashboard-error-handler.service';
-import { ServiceInitializationService } from 'src/app/services/service-initialization.service';
-import { ChangelogService } from 'src/app/services/changelog.service';
-import { WidgetManagerService } from 'src/app/services/widget-manager.service';
+import { DashboardFacadeService } from 'src/app/services/dashboard-facade.service';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -78,9 +76,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private stageService: StageService, 
     private readonly webhookService: WebhookService,
     private readonly errorHandler: DashboardErrorHandlerService,
-    private readonly serviceInitializationService: ServiceInitializationService,
-    private readonly changelogService: ChangelogService,
-    private readonly widgetManager: WidgetManagerService
+    private readonly dashboardFacade: DashboardFacadeService
   ) {}
 
   
@@ -89,11 +85,10 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // ---------------------------------------
     // Changelog alert
     // ---------------------------------------
-    this.showChangelog = this.changelogService.shouldShowChangelog();
+    this.showChangelog = this.dashboardFacade.shouldShowChangelog();
     // Assicura che initFinished sia false prima di iniziare
     this.initFinished = false;
     this.executeAsyncFunctionsInSequence();
-    this.widgetManager.hideWidget();
   }
 
   onSwipe(event: WheelEvent){
@@ -103,10 +98,53 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
 
   onCloseChangelog(){
     this.showChangelog = false;
-    this.changelogService.markChangelogAsSeen();
+    this.dashboardFacade.markChangelogAsSeen();
   }
 
-  async getUrlParams(): Promise<boolean> {
+  /**************** CUSTOM FUNCTIONS ****************/
+  /** 
+   * execute Async Functions In Sequence
+   * Usa il DashboardFacadeService per inizializzare la dashboard in modo reattivo.
+   * Il facade gestisce il caricamento parallelo di progetto, bot e departments.
+   */
+  async executeAsyncFunctionsInSequence() {
+    this.logger.log('[CDS DSHBRD] executeAsyncFunctionsInSequence -------------> ');    
+    try {
+      // Step 1: Ottieni i parametri dalla route
+      const params = await this.getUrlParams();
+      if (!params) {
+        throw new Error('Failed to get URL parameters');
+      }
+
+      // Step 2: Usa il facade per inizializzare tutto (progetto, bot, departments in parallelo)
+      this.dashboardFacade.initDashboard(params)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (result) => {
+            this.logger.log('[CDS DSHBRD] Dashboard initialized successfully:', result);
+            // Aggiorna lo stato del componente con i dati caricati
+            this.project = result.project;
+            this.selectedChatbot = result.chatbot;
+            if (result.defaultDept) {
+              this.defaultDepartmentId = result.defaultDept._id;
+            }
+            this.initFinished = true;
+          },
+          error: (error) => {
+            this.logger.error('[CDS DSHBRD] Error initializing dashboard:', error);
+            this.errorHandler.handleInitializationError(error, 'executeAsyncFunctionsInSequence');
+          }
+        });
+    } catch (error) {
+      this.errorHandler.handleInitializationError(error, 'executeAsyncFunctionsInSequence');
+    }
+  }
+
+  /**
+   * Ottiene i parametri dalla route e li restituisce come Promise.
+   * Modificato per restituire i params invece di un boolean.
+   */
+  async getUrlParams(): Promise<any> {
     return new Promise((resolve, reject) => {
       // Cleanup previous subscription if exists
       if (this.routeParamsSubscription) {
@@ -121,79 +159,17 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (params) => {
             this.logger.log('[ DSHBRD-SERVICE ] getUrlParams  PARAMS', params);
-            this.dashboardService.setParams(params);
-            resolve(true);
+            resolve(params);
           },
           error: (error) => {
             this.errorHandler.handleInitializationError(error, 'getUrlParams');
-            reject(false);
+            reject(null);
           },
           complete: () => {
             this.logger.log('COMPLETE');
           }
         });
     });
-  }
-
-  /**************** CUSTOM FUNCTIONS ****************/
-  /** 
-   * execute Async Functions In Sequence
-   * Le funzioni async sono gestite in maniera sincrona ed eseguite in coda
-   * da aggiungere un loader durante il processo e se tutte vanno a buon fine 
-   * possiamo visualizzare lo stage completo
-   */
-  async executeAsyncFunctionsInSequence() {
-    this.logger.log('[CDS DSHBRD] executeAsyncFunctionsInSequence -------------> ');    
-    try {
-      // Step 1: getUrlParams (deve essere primo per ottenere id_faq_kb e projectID)
-      const getUrlParams = await this.getUrlParams();
-      this.logger.log('[CDS DSHBRD] Risultato 1 (getUrlParams):', getUrlParams);
-      if (!getUrlParams) {
-        throw new Error('Failed to get URL parameters');
-      }
-
-      // Step 2: getCurrentProject (deve essere prima di initialize)
-      const getCurrentProject = await this.dashboardService.getCurrentProject();
-      this.logger.log('[CDS DSHBRD] Risultato 2 (getCurrentProject):', getCurrentProject);
-      if (!getCurrentProject) {
-        throw new Error('Failed to get current project');
-      }
-
-      this.project = this.dashboardService.project;
-      this.initialize();
-
-      // Step 3: Operazioni parallele (getBotById e getDeptsByProjectId)
-      // Queste operazioni sono indipendenti e possono essere eseguite in parallelo
-      const [getBotById, getDefaultDepartmentId] = await Promise.all([
-        this.dashboardService.getBotById(),
-        this.dashboardService.getDeptsByProjectId()
-      ]);
-
-      this.logger.log('[CDS DSHBRD] Risultato 3 (getBotById):', getBotById);
-      this.logger.log('[CDS DSHBRD] Risultato 4 (getDeptsByProjectId):', getDefaultDepartmentId);
-
-      if (!getBotById) {
-        throw new Error('Failed to get bot by ID');
-      }
-
-      if (!getDefaultDepartmentId) {
-        throw new Error('Failed to get default department');
-      }
-
-      // Tutte le operazioni completate con successo
-      if (getUrlParams && getBotById && getCurrentProject && getDefaultDepartmentId) {
-        this.logger.log('[CDS DSHBRD] Ho finito di inizializzare la dashboard');
-        this.selectedChatbot = this.dashboardService.selectedChatbot;
-        this.initFinished = true;
-      }
-    } catch (error) {
-      this.errorHandler.handleInitializationError(error, 'executeAsyncFunctionsInSequence');
-    }
-  }
-
-  private initialize(){
-    this.serviceInitializationService.initializeAllServices(this.project._id);
-    this.widgetManager.hideWidget();
   }
 
 
@@ -206,11 +182,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
 
   /** Go back to previous page */
   goBack() {
-    let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
-    window.open(dashbordBaseUrl, '_self')
-    // this.location.back()
-    // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);
-    this.widgetManager.showWidget();
+    this.dashboardFacade.navigateBackToBotsDashboard();
   }
   /*****************************************************/
 

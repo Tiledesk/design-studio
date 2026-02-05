@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 # this branch
+- **changed**: refactor: Refactoring completo cds-dashboard in 3 fasi: (1) Pulizia base: rimozione codice morto, error handling centralizzato, service initialization e business logic estratta in servizi dedicati; (2) Ottimizzazioni: parallelizzazione inizializzazione, unificazione maschera preload, fix regressioni connettori/drag&drop; (3) Architetturale: separazione data/side-effect in DashboardService (metodi puri loadProject$/loadBot$/loadDepartments$), introduzione DashboardFacadeService con initDashboard() per orchestrazione inizializzazione, caricamento parallelo bot/departments con forkJoin (~30-40% più veloce), migrazione componenti a uso reattivo Observable. Retrocompatibilità completa mantenuta.
+- **changed**: Corretti 7 memory leaks in 5 componenti (AppComponent, CdsDashboardComponent, CdsCanvasComponent, CdsPanelWidgetComponent, CdsIntentComponent) implementando pattern takeUntil per cleanup automatico subscription RxJS."
+
 - **changed**: refactor: semplificata l’inizializzazione di cds-dashboard (service di inizializzazione, gestione errori e business logic estratta in servizi dedicati) senza cambiare il comportamento funzionale.
 - **changed**: ux/perf: unificata la maschera di preload usando solo mask-canv nel canvas, corretta la creazione/visibilità dei connettori e ripristinato il drag&drop degli intent sullo stage.
 

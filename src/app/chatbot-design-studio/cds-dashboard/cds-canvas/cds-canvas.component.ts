@@ -11,6 +11,7 @@ import { StageService } from '../../services/stage.service';
 import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { DashboardFacadeService } from 'src/app/services/dashboard-facade.service';
 import { NoteService } from 'src/app/services/note.service';
 
 // MODEL //
@@ -193,6 +194,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public logService: LogService,
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
+    private readonly dashboardFacade: DashboardFacadeService,
     
   ) {
     this.setSubscriptions();
@@ -203,6 +205,24 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
     this.getParamsFromURL();
     this.initialize();
+
+    // Sottoscrizione reattiva allo state della dashboard (project/chatbot),
+    // mantenendo comunque l'assegnazione iniziale in initialize()
+    this.dashboardFacade.project$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(project => {
+        if (project) {
+          this.projectID = project._id;
+        }
+      });
+
+    this.dashboardFacade.selectedChatbot$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(chatbot => {
+        if (chatbot) {
+          this.selectedChatbot = chatbot;
+        }
+      });
   }
 
 

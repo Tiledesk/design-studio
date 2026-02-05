@@ -4,6 +4,7 @@ import { takeUntil } from 'rxjs/operators';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { DashboardFacadeService } from 'src/app/services/dashboard-facade.service';
 
 // UTILS //
 import { SIDEBAR_PAGES } from '../../utils';
@@ -43,12 +44,23 @@ export class CdsSidebarComponent implements OnInit {
     private el: ElementRef,
     private dashboardService: DashboardService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private readonly dashboardFacade: DashboardFacadeService
   ) { }
 
   ngOnInit(): void {
     this.projectID = this.dashboardService.projectID;
     this.user = this.tiledeskAuthService.getCurrentUser()
+
+    // Sottoscrizione reattiva al project corrente
+    this.dashboardFacade.project$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(project => {
+        if (project) {
+          this.projectID = project._id;
+        }
+      });
+
     this.getUserRole();
   }
 

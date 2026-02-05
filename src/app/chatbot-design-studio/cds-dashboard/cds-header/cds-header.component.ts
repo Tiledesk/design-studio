@@ -1,7 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { lastValueFrom, firstValueFrom, every, filter, Subscription } from 'rxjs';
+import { lastValueFrom, firstValueFrom, every, filter, Subscription, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { MultichannelService } from 'src/app/services/multichannel.service';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -27,6 +28,7 @@ import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
 import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
+import { DashboardFacadeService } from 'src/app/services/dashboard-facade.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
 
 const swal = require('sweetalert');
@@ -36,7 +38,7 @@ const swal = require('sweetalert');
   templateUrl: './cds-header.component.html',
   styleUrls: ['./cds-header.component.scss']
 })
-export class CdsHeaderComponent implements OnInit {
+export class CdsHeaderComponent implements OnInit, OnDestroy {
   
   @Input() IS_OPEN_SIDEBAR: boolean;
   // @Input() defaultDepartmentId: string;
@@ -46,6 +48,7 @@ export class CdsHeaderComponent implements OnInit {
   @Output() goToBck = new EventEmitter();
 
    private subscriptionTestItOutPlayed: Subscription;
+   private destroy$ = new Subject<void>();
 
   id_faq_kb: string;
   projectID: string;
@@ -93,6 +96,7 @@ export class CdsHeaderComponent implements OnInit {
     private readonly webhookService: WebhookService,
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
+    private readonly dashboardFacade: DashboardFacadeService,
   ) { 
     this.manageRouteChanges();
     this.setSubscriptions();
@@ -136,24 +140,53 @@ export class CdsHeaderComponent implements OnInit {
     if(this.router.url.includes('beta')){
       this.isBetaUrl = true;
     }
+
+    // Sottoscrizione reattiva allo state della dashboard (project, chatbot, default dept)
+    this.dashboardFacade.project$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(project => {
+        if (project) {
+          this.projectID = project._id;
+        }
+      });
+
+    this.dashboardFacade.selectedChatbot$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(chatbot => {
+        if (chatbot) {
+          this.selectedChatbot = chatbot;
+        }
+      });
+
+    this.dashboardFacade.defaultDepartment$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(dept => {
+        if (dept) {
+          this.defaultDepartmentId = dept._id;
+        }
+      });
   }
 
   ngOnDestroy() {
     if (this.subscriptionTestItOutPlayed) {
       this.subscriptionTestItOutPlayed.unsubscribe();
     }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 
   private setSubscriptions(){
       /** SUBSCRIBE TO THE STATE TEST IT OUT */
-      this.subscriptionTestItOutPlayed = this.controllerService.isTestItOutPlaying$.subscribe((state) => {
-        this.logger.log('[CdsHeaderComponent]  isTestItOutPlaying DDD ', state);
-        this.isPlaying = state;
-        if(!state){
-          this.onCloseTestItOut()
-        }
-      });
+      this.subscriptionTestItOutPlayed = this.controllerService.isTestItOutPlaying$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((state) => {
+          this.logger.log('[CdsHeaderComponent]  isTestItOutPlaying DDD ', state);
+          this.isPlaying = state;
+          if(!state){
+            this.onCloseTestItOut()
+          }
+        });
   }
 
 

@@ -59,3 +59,11 @@ Thumbs.db
 settings.json
 docs
 docs_2
+CHANGELOG_ENTRY.md
+COMMIT_MESSAGE.md
+COMMIT_MESSAGE_IT.md
+NEXT_STEPS.md
+PROSSIMI_PASSI.md
+PROSSIMI_STEP_DOPO_PUSH.md
+verify-subscription-cleanup.js
+dashboard-facade.service.ts
