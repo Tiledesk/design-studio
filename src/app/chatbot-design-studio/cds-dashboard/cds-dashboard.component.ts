@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { DashboardFacadeService } from 'src/app/services/dashboard-facade.service';
+import { WidgetManagerService } from 'src/app/services/widget-manager.service';
 
 // MODEL //
 import { Project } from 'src/app/models/project-model';
@@ -66,6 +67,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private appStorageService: AppStorageService,
     private dashboardService: DashboardService,
     private dashboardFacade: DashboardFacadeService,
+    private widgetManager: WidgetManagerService,
     private kbService: KnowledgeBaseService,
     public departmentService: DepartmentService,
     public faqKbService: FaqKbService,
@@ -74,22 +76,27 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private whatsappService: WhatsappService,
     private stageService: StageService, 
     private readonly webhookService: WebhookService
-  ) {}
+  ) {
+    this.logger.log('[SLICE3] WidgetManagerService injected successfully - hideWidget() and showWidget() methods available');
+    this.logger.log('[SLICE3] All hideShowWidget() calls replaced - Old method removed from component');
+  }
 
   
 
   ngOnInit() {
-    this.logger.log('[SLICE1] ngOnInit - Dashboard component initialization started');
+    // this.logger.log('[SLICE1] ngOnInit - Dashboard component initialization started');
+    this.logger.log('[SLICE3] ngOnInit - WidgetManagerService injected and ready');
     this.showChangelog = this.checkForChangelogNotify();
     this.initDashboard();
-    this.hideShowWidget('hide');
+    this.logger.log('[SLICE3] Calling widgetManager.hideWidget() - Widget hidden at startup');
+    this.widgetManager.hideWidget();
   }
 
   ngOnDestroy(): void {
-    this.logger.log('[SLICE1] ngOnDestroy - Cleaning up subscriptions (takeUntil destroy$)');
+    // this.logger.log('[SLICE1] ngOnDestroy - Cleaning up subscriptions (takeUntil destroy$)');
     this.destroy$.next();
     this.destroy$.complete();
-    this.logger.log('[SLICE1] ngOnDestroy - Subscriptions cleaned up, no memory leaks');
+    // this.logger.log('[SLICE1] ngOnDestroy - Subscriptions cleaned up, no memory leaks');
   }
 
   onSwipe(event: WheelEvent){
@@ -126,15 +133,15 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
    * Inizializza la dashboard usando DashboardFacadeService con pattern reattivo.
    */
   private initDashboard(): void {
-    this.logger.log('[SLICE1] initDashboard - Dashboard loading started');
+    // this.logger.log('[SLICE1] initDashboard - Dashboard loading started');
     this.logger.log('[CDS DSHBRD] initDashboard -------------> ');
     
-    this.logger.log('[SLICE2] CdsDashboardComponent - Route params subscription already managed correctly (Slice 1) - Pattern consistent');
+    // this.logger.log('[SLICE2] CdsDashboardComponent - Route params subscription already managed correctly (Slice 1) - Pattern consistent');
     this.route.params.pipe(
       takeUntil(this.destroy$),
       switchMap(params => {
-        this.logger.log('[SLICE1] Route params received - Navigation working:', params);
-        this.logger.log('[SLICE2] CdsDashboardComponent - Route params received - Navigation working correctly');
+        // this.logger.log('[SLICE1] Route params received - Navigation working:', params);
+        // this.logger.log('[SLICE2] CdsDashboardComponent - Route params received - Navigation working correctly');
         this.logger.log('[CDS DSHBRD] Route params:', params);
         return this.dashboardFacade.initDashboard(params);
       })
@@ -144,11 +151,11 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
         
         // Checklist: project popolato
         this.project = project;
-        this.logger.log('[SLICE1] Project populated:', { id: project?._id, name: project?.name });
+        // this.logger.log('[SLICE1] Project populated:', { id: project?._id, name: project?.name });
         
         // Checklist: selectedChatbot popolato
         this.selectedChatbot = chatbot;
-        this.logger.log('[SLICE1] SelectedChatbot populated:', { id: chatbot?._id, name: chatbot?.name });
+        // this.logger.log('[SLICE1] SelectedChatbot populated:', { id: chatbot?._id, name: chatbot?.name });
         
         this.defaultDepartmentId = defaultDept?._id;
         
@@ -156,11 +163,12 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
         
         // Checklist: initFinished diventa true
         this.initFinished = true;
-        this.logger.log('[SLICE1] initFinished set to true - Dashboard loaded correctly');
+        // this.logger.log('[SLICE1] initFinished set to true - Dashboard loaded correctly');
         this.logger.log('[CDS DSHBRD] Dashboard initialization completed');
       },
       error: (error) => {
-        this.logger.error('[SLICE1] InitDashboard error - Console error detected:', error);
+        // this.logger.error('[SLICE1] InitDashboard error - Console error detected:', error);
+        this.logger.error('[SLICE3] InitDashboard error - Console error detected:', error);
         this.logger.error('[CDS DSHBRD] InitDashboard error:', error);
         console.error('error: ', error);
       }
@@ -168,7 +176,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   }
 
   private initialize(){
-    this.logger.log('[SLICE1] initialize() called - Initializing services');
+    // this.logger.log('[SLICE1] initialize() called - Initializing services');
     let serverBaseURL = this.appConfigService.getConfig().apiUrl
     let whatsappBaseUrl = this.appConfigService.getConfig().whatsappTemplatesBaseUrl
 
@@ -180,37 +188,19 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
 
-    this.logger.log('[SLICE1] All services initialized:', {
-      departmentService: true,
-      faqKbService: true,
-      faqService: true,
-      kbService: true,
-      openaiService: true,
-      whatsappService: true,
-      webhookService: true
-    });
+    // this.logger.log('[SLICE1] All services initialized:', {
+    //   departmentService: true,
+    //   faqKbService: true,
+    //   faqService: true,
+    //   kbService: true,
+    //   openaiService: true,
+    //   whatsappService: true,
+    //   webhookService: true
+    // });
 
-    this.hideShowWidget('hide')
+    this.logger.log('[SLICE3] Calling widgetManager.hideWidget() after services initialization - Widget hidden after initialization');
+    this.widgetManager.hideWidget();
 
-  }
-
-
-  /** hideShowWidget */
-  private hideShowWidget(status: "hide" | "show") {
-    try {
-      if (window && window['tiledesk']) {
-        this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
-        if (status === 'hide') {
-          window['tiledesk'].hide();
-          this.logger.log('[SLICE1] Widget hidden (hideShowWidget called with hide)');
-        } else if (status === 'show') {
-          window['tiledesk'].show();
-          this.logger.log('[SLICE1] Widget shown (hideShowWidget called with show)');
-        }
-      }
-    } catch (error) {
-      this.logger.error('tiledesk_widget_hide ERROR', error)
-    }
   }
 
 
