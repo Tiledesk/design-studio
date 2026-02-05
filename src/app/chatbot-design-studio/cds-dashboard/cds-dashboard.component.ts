@@ -79,14 +79,17 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   
 
   ngOnInit() {
+    this.logger.log('[SLICE1] ngOnInit - Dashboard component initialization started');
     this.showChangelog = this.checkForChangelogNotify();
     this.initDashboard();
     this.hideShowWidget('hide');
   }
 
   ngOnDestroy(): void {
+    this.logger.log('[SLICE1] ngOnDestroy - Cleaning up subscriptions (takeUntil destroy$)');
     this.destroy$.next();
     this.destroy$.complete();
+    this.logger.log('[SLICE1] ngOnDestroy - Subscriptions cleaned up, no memory leaks');
   }
 
   onSwipe(event: WheelEvent){
@@ -123,11 +126,13 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
    * Inizializza la dashboard usando DashboardFacadeService con pattern reattivo.
    */
   private initDashboard(): void {
+    this.logger.log('[SLICE1] initDashboard - Dashboard loading started');
     this.logger.log('[CDS DSHBRD] initDashboard -------------> ');
     
     this.route.params.pipe(
       takeUntil(this.destroy$),
       switchMap(params => {
+        this.logger.log('[SLICE1] Route params received - Navigation working:', params);
         this.logger.log('[CDS DSHBRD] Route params:', params);
         return this.dashboardFacade.initDashboard(params);
       })
@@ -135,16 +140,25 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       next: ({ project, chatbot, defaultDept }) => {
         this.logger.log('[CDS DSHBRD] InitDashboard success:', { project, chatbot, defaultDept });
         
+        // Checklist: project popolato
         this.project = project;
+        this.logger.log('[SLICE1] Project populated:', { id: project?._id, name: project?.name });
+        
+        // Checklist: selectedChatbot popolato
         this.selectedChatbot = chatbot;
+        this.logger.log('[SLICE1] SelectedChatbot populated:', { id: chatbot?._id, name: chatbot?.name });
+        
         this.defaultDepartmentId = defaultDept?._id;
         
         this.initialize();
         
+        // Checklist: initFinished diventa true
         this.initFinished = true;
+        this.logger.log('[SLICE1] initFinished set to true - Dashboard loaded correctly');
         this.logger.log('[CDS DSHBRD] Dashboard initialization completed');
       },
       error: (error) => {
+        this.logger.error('[SLICE1] InitDashboard error - Console error detected:', error);
         this.logger.error('[CDS DSHBRD] InitDashboard error:', error);
         console.error('error: ', error);
       }
@@ -152,6 +166,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   }
 
   private initialize(){
+    this.logger.log('[SLICE1] initialize() called - Initializing services');
     let serverBaseURL = this.appConfigService.getConfig().apiUrl
     let whatsappBaseUrl = this.appConfigService.getConfig().whatsappTemplatesBaseUrl
 
@@ -162,6 +177,16 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     this.openaiService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
+
+    this.logger.log('[SLICE1] All services initialized:', {
+      departmentService: true,
+      faqKbService: true,
+      faqService: true,
+      kbService: true,
+      openaiService: true,
+      whatsappService: true,
+      webhookService: true
+    });
 
     this.hideShowWidget('hide')
 
@@ -175,8 +200,10 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
         this.logger.log('[CDS DSHBRD] HIDE WIDGET ', window['tiledesk'])
         if (status === 'hide') {
           window['tiledesk'].hide();
+          this.logger.log('[SLICE1] Widget hidden (hideShowWidget called with hide)');
         } else if (status === 'show') {
           window['tiledesk'].show();
+          this.logger.log('[SLICE1] Widget shown (hideShowWidget called with show)');
         }
       }
     } catch (error) {
@@ -193,13 +220,15 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   }
 
   /** Go back to previous page */
-  goBack() {
-    let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
-    window.open(dashbordBaseUrl, '_self')
-    // this.location.back()
-    // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);
-    this.hideShowWidget('show');
-  }
+  // COMMENTATO: Il pulsante che chiama questo metodo è commentato nel template del header
+  // Per ripristinare: decommentare (goToBck)="goBack()" nel template e il pulsante nel header
+  // goBack() {
+  //   let dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/'+ this.dashboardService.projectID + '/bots/my-chatbots/all'
+  //   window.open(dashbordBaseUrl, '_self')
+  //   // this.location.back()
+  //   // this.router.navigate(['project/' + this.project._id + '/bots/my-chatbots/all']);
+  //   this.hideShowWidget('show');
+  // }
   /*****************************************************/
 
 

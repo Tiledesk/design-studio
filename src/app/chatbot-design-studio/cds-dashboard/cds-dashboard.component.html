@@ -2,12 +2,13 @@
 </div>
 
 <div *ngIf="initFinished" (wheel)="onSwipe($event)">
+    <!-- COMMENTATO: Il pulsante goBack nel header è commentato. Per ripristinare decommentare (goToBck)="goBack()" qui e il metodo goBack() nel componente -->
     <cds-header 
         class="cds-header" 
         [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 
         [selectedChatbot]="selectedChatbot"
-        (goToBck)="goBack()"
         (toggleSidebarWith)="onToggleSidebarWith($event)">
+        <!-- (goToBck)="goBack()" -->
     </cds-header>
 
     <div id="chatbot--dashboard" 
