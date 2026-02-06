@@ -1,7 +1,9 @@
 @import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/cds/styles.scss";
 
-
+// ============================================================
+// VARIABLES
+// ============================================================
 $width-card-tools: 160px;
 $margin-left-card: 30px;
 $margin-top-card: 30px;
@@ -9,18 +11,26 @@ $box-left-width: 230px;
 $box-left-width-closed: 0px;
 $toogle-sidebar-width: 22px;
 
-
+// ============================================================
+// HOST
+// ============================================================
 :host {
   display: flex;
   width: calc(100% - var(--sidebar-base-width));
   overflow: hidden;
 }
 
+// ============================================================
+// CONTEXT MENUS
+// ============================================================
 .context-menu {
   position: absolute;
 }
 
-.cds-generic-panel{
+// ============================================================
+// GENERIC PANELS (Right Side)
+// ============================================================
+.cds-generic-panel {
   position: absolute;
   right: 0;
   top: 0;
@@ -29,25 +39,32 @@ $toogle-sidebar-width: 22px;
   transform: translateX(100%);
   animation: slide-in 0.2s ease-in-out forwards;
   animation-delay: 0s;
+
   &#intent-detail {
     z-index: 10;
   }
-  &#publish-panel{
+
+  &#publish-panel {
     z-index: 10;
   }
-  &#action-detail{
+
+  &#action-detail {
     z-index: 10;
   }
-  &#button-configuration{
-    z-index: 11
+
+  &#button-configuration {
+    z-index: 11;
   }
-  &#widget-preview{
+
+  &#widget-preview {
     z-index: 12;
-    &.isVisible{
+
+    &.isVisible {
       width: 0;
       visibility: visible;
     }
-    &.isHidden{
+
+    &.isHidden {
       visibility: hidden;
     }
   }
@@ -59,9 +76,12 @@ $toogle-sidebar-width: 22px;
   }
 }
 
-
-::ng-deep #tds_svgConnectors{
+// ============================================================
+// CONNECTORS (SVG)
+// ============================================================
+::ng-deep #tds_svgConnectors {
   stroke: #b1b1b7;
+
   .tds_path {
     animation: dash 30s linear infinite;
     stroke-dasharray: 6;
@@ -69,75 +89,76 @@ $toogle-sidebar-width: 22px;
     stroke: var(--connector-default-color);
     filter: brightness(70%);
   }
+
   .tds_connector {
     stroke: var(--connector-default-color);
     stroke-width: var(--connector-width);
     filter: brightness(70%);
   }
+
   .tds_connector_over {
-    stroke:var(--connector-over-color) !important;
-    stroke-width: var(--connector-width)!important;
-    opacity: 1!important;
-    filter: none!important;
+    stroke: var(--connector-over-color) !important;
+    stroke-width: var(--connector-width) !important;
+    opacity: 1 !important;
+    filter: none !important;
   }
+
   .tds_connector_selected {
     stroke: var(--connector-selected-color) !important;
-    stroke-width: var(--connector-width)!important;
-    opacity: 1!important;
-    filter: none!important;
+    stroke-width: var(--connector-width) !important;
+    opacity: 1 !important;
+    filter: none !important;
   }
 }
 
 ::ng-deep #tds_arrow {
   stroke: #b1b1b7;
+
   .tds_connector {
     fill: #b1b1b7;
   }
 }
 
-
 ::ng-deep .line-text-connector {
   stroke: #b1b1b7;
 }
 
+@keyframes dash {
+  to {
+    stroke-dashoffset: 1000;
+  }
+}
 
-
-
+// ============================================================
+// FLOAT MENU ELEMENT
+// ============================================================
 #floatMenuElement {
   position: absolute;
   min-width: 100px;
   max-width: 400px;
   min-height: 100px;
-  max-height: 400px;// dp
-  // height: 612px; // nk
-  // width: 148px; // dp
-  width: 240px; // nk
+  max-height: 400px;
+  width: 240px;
   color: #132144;
   font-size: 15px;
-  // line-height: 18px;
   line-height: 12px;
   list-style: none;
   overflow: hidden;
   padding: 0;
-  // box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
   border-radius: 6px;
-  background: rgb(255,255,255);
+  background: rgb(255, 255, 255);
   will-change: transform;
-  animation: .15s ease 0s 1 normal none running fadein, .15s ease 0s 1 normal none running movein, .1s ease 0s 1 normal none running scaleY;
+  animation: .15s ease 0s 1 normal none running fadein, 
+             .15s ease 0s 1 normal none running movein, 
+             .1s ease 0s 1 normal none running scaleY;
   margin: 0;
-  position: absolute;
   top: 4px;
   left: 80px;
 }
 
-
-
-cds-rules,
-cds-chatbot-details,
-cds-fulfillment {
-    width: 100%;
-}
-
+// ============================================================
+// SIDEBAR TOGGLE ICONS
+// ============================================================
 .cds-toggle-setting-sidebar-icon-right-wpr {
   display: block;
   position: absolute;
@@ -152,14 +173,13 @@ cds-fulfillment {
   z-index: 1050;
   width: $toogle-sidebar-width;
   height: $toogle-sidebar-width;
-  // background: #1e293b;
   right: calc(0px - $toogle-sidebar-width/2);
   top: 50%;
   transition: 0.3s;
 
   &.is_opened {
-      right: calc(0px - $toogle-sidebar-width/2);
-      transition: 0.3s;
+    right: calc(0px - $toogle-sidebar-width/2);
+    transition: 0.3s;
   }
 }
 
@@ -173,119 +193,121 @@ cds-fulfillment {
   cursor: pointer;
   font-size: 18px;
   display: block;
-}
 
-.toggle-setting-sidebar-icon:hover {
-  background: #f5f8fa;
-  color: var(--blu);
-}
-
-
-
-  .box-left {
-    width: $box-left-width;
-    max-width: $box-left-width;
-    min-width: $box-left-width;
-    background-color: var(--blu-light-01);
-    border-right: 1px solid var(--gray-light-02);
-    z-index: 10;
-    position: relative;
-    .panel-intent-list {
-      position: relative;
-      display: inline-flex;
-      width: 100%;
-      height: 100vh;
-      max-height: 100%;
-      border-radius: 0em;
-      overflow: hidden;
-      margin: 0px;
-      padding: 0px 2px 10px 2px;
-      align-items: flex-start;
-      overflow-y: scroll;
-
-      
-
-      &:hover{
-        &::-webkit-scrollbar {
-          width: 3px;
-        }
-        &::-webkit-scrollbar-track {
-          background-color: var(--scrollbar-track-background);
-        }
-        &::-webkit-scrollbar-thumb {
-          background-color: var(--scrollbar-thumb-background);
-          border-radius: var(--scrollbar-thumb-border-radius);
-        }
-      }
-
-    }
-
-    &.is_closed{
-      width: $box-left-width-closed;
-      max-width: $box-left-width-closed;
-      min-width: $box-left-width-closed;
-    }
-
-
-    &:hover{
-      .cds-toggle-setting-sidebar-icon-left-wpr{
-        display: block;
-      }
-    }
-
-    
+  &:hover {
+    background: #f5f8fa;
+    color: var(--blu);
   }
+}
 
+// ============================================================
+// LEFT SIDEBAR
+// ============================================================
+.box-left {
+  width: $box-left-width;
+  max-width: $box-left-width;
+  min-width: $box-left-width;
+  background-color: var(--blu-light-01);
+  border-right: 1px solid var(--gray-light-02);
+  z-index: 10;
+  position: relative;
 
-  .box-right {
-    display: inline-table;
+  .panel-intent-list {
     position: relative;
-    // flex-grow: 1;
+    display: inline-flex;
+    width: 100%;
     height: 100vh;
-    overflow: visible;
-    // overflow-y: scroll;
     max-height: 100%;
-    width: 100%; //inherit;
+    border-radius: 0em;
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px 2px 10px 2px;
+    align-items: flex-start;
+    overflow-y: scroll;
 
-    .box-right-header {
-      width: 100%;
-      height: 50px;
-    }
+    &:hover {
+      &::-webkit-scrollbar {
+        width: 3px;
+      }
 
-    .panel-intent {
-      position: absolute;
-      margin: 0px;
-      padding: 0px;
-      z-index: 1;
-      user-select: none;
-      min-height: 43px;
-    }
-    .panel-intent-detail-wrapper {
-      display: flex;
-      margin: 0;
-      background: rgba(34,48,74,.6);
-      inset: 0;
-      position: fixed;
-      top: 0;
-      left: 0;
-      padding: 85px 25px 25px 0;
-      z-index: 2;
-    }
+      &::-webkit-scrollbar-track {
+        background-color: var(--scrollbar-track-background);
+      }
 
-    .cds-note {
-      position: absolute;
-      margin: 0px;
-      padding: 0px;
-      z-index: 0;
-      user-select: none;
-      p {
-        margin: 0;
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb-background);
+        border-radius: var(--scrollbar-thumb-border-radius);
       }
     }
-
   }
 
-.panel--connector--menu{
+  &.is_closed {
+    width: $box-left-width-closed;
+    max-width: $box-left-width-closed;
+    min-width: $box-left-width-closed;
+  }
+
+  &:hover {
+    .cds-toggle-setting-sidebar-icon-left-wpr {
+      display: block;
+    }
+  }
+}
+
+// ============================================================
+// RIGHT CANVAS AREA
+// ============================================================
+.box-right {
+  display: inline-table;
+  position: relative;
+  height: 100vh;
+  overflow: visible;
+  max-height: 100%;
+  width: 100%;
+
+  .box-right-header {
+    width: 100%;
+    height: 50px;
+  }
+
+  .panel-intent {
+    position: absolute;
+    margin: 0px;
+    padding: 0px;
+    z-index: 1;
+    user-select: none;
+    min-height: 43px;
+  }
+
+  .panel-intent-detail-wrapper {
+    display: flex;
+    margin: 0;
+    background: rgba(34, 48, 74, .6);
+    inset: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 85px 25px 25px 0;
+    z-index: 2;
+  }
+
+  .cds-note {
+    position: absolute;
+    margin: 0px;
+    padding: 0px;
+    z-index: 0;
+    user-select: none;
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+// ============================================================
+// CONNECTOR MENU
+// ============================================================
+.panel--connector--menu {
   top: 0;
   left: 0;
   width: 30px;
@@ -298,37 +320,38 @@ cds-fulfillment {
   z-index: 3;
 }
 
-
+// ============================================================
+// PANEL BACKDROPS
+// ============================================================
 .panel-action-backdrop {
   display: flex;
   margin: 0;
-  // background: rgba(34,48,74,.6);
   background: transparent;
   inset: 0;
   position: fixed;
   top: 0;
   left: 0;
-  // padding: 85px 25px 25px 0;
-  padding-top: 60px; // nk
+  padding-top: 60px;
   z-index: 2;
-  justify-content: flex-end; // nk
+  justify-content: flex-end;
 }
 
 .panel-button-backdrop {
   display: flex;
   margin: 0;
-  // background: rgba(34,48,74,.6);
   background: transparent;
   inset: 0;
   position: fixed;
   top: 0;
   left: 0;
-  // padding: 85px 25px 25px 0;
-  padding-top: 60px; // nk
+  padding-top: 60px;
   z-index: 2;
-  justify-content: flex-end; // nk
+  justify-content: flex-end;
 }
 
+// ============================================================
+// DROP ZONE & DRAWER
+// ============================================================
 .receiver-elements-dropped-on-stage {
   position: absolute;
   display: block;
@@ -343,15 +366,14 @@ cds-fulfillment {
   position: absolute;
 }
 
-#cds-options-panel{
+#cds-options-panel {
   bottom: 12px;
   right: 12px;
 }
 
-
-
-
-/*********** START Draggable  *************/
+// ============================================================
+// DRAGGABLE CONTAINER & DRAWER
+// ============================================================
 #tds_container {
   width: calc(100% - var(--sidebar-base-width));
 }
@@ -361,7 +383,6 @@ cds-fulfillment {
   display: block;
   background-size: 16px 16px;
   background-image: radial-gradient(var(--container-background) 1.14286px, var(--container-points-color) 1.14286px);
-  // background-image: radial-gradient(rgb(218, 226, 226) 1.14286px, rgb(244, 246, 246) 1.14286px);
   background-position: 593.4px -230.4px;
 
   &.note-mode-active {
@@ -383,27 +404,25 @@ cds-fulfillment {
   background-color: chartreuse;
 }
 
-.cdk-drag-placehoder{
+.cdk-drag-placehoder {
   pointer-events: auto;
   cursor: grabbing;
 }
 
-::ng-deep .cdk-drag-preview{
+::ng-deep .cdk-drag-preview {
   transition: none !important;
 }
-/*********** END Draggable  *************/
 
-@keyframes dash {
-  to {
-    stroke-dashoffset: 1000;
-  }
-}
-
+// ============================================================
+// SVG
+// ============================================================
 svg:not(:root) {
   display: block;
 }
 
-
+// ============================================================
+// LOADING MASK
+// ============================================================
 #masck-canv {
   position: absolute;
   top: 0;
@@ -419,19 +438,23 @@ svg:not(:root) {
   transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
   transition-delay: 0s;
   opacity: 1;
-  &.disabled{
+
+  &.disabled {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
   }
+
   img {
     max-width: 40px;
     max-height: 40px;
   }
+
   .loading {
     position: absolute;
     margin-top: 80px;
   }
+
   .info-loading {
     font-size: smaller;
     line-height: normal;
@@ -441,6 +464,7 @@ svg:not(:root) {
     min-height: 20px;
     text-align: center;
   }
+
   .progress-bar {
     width: 100px;
     display: flex;
@@ -448,6 +472,9 @@ svg:not(:root) {
   }
 }
 
+// ============================================================
+// WIDGET LOGS
+// ============================================================
 cds-widget-logs {
   width: calc(100% - 60px);
   position: absolute;
@@ -457,7 +484,16 @@ cds-widget-logs {
   -ms-user-select: none;
   user-select: none;
 
-  &.small{
+  &.small {
     width: calc(100% - 460px);
   }
+}
+
+// ============================================================
+// COMPONENT SPECIFIC STYLES
+// ============================================================
+cds-rules,
+cds-chatbot-details,
+cds-fulfillment {
+  width: 100%;
 }
