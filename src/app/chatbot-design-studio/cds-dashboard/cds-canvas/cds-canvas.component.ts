@@ -55,7 +55,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** listners */
   listnerConnectorDrawn: (e: CustomEvent) => void;
   listnerMovedAndScaled: (e: CustomEvent) => void;
-  listnerKeydown: (e: any) => void;
+  listnerKeydown: (e: KeyboardEvent) => void;
   listnerConnectorSelected: (e: CustomEvent) => void;
   listnerConnectorDeselected: (e: CustomEvent) => void;
   listnerConnectorUpdated: (e: CustomEvent) => void;
@@ -184,6 +184,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    */
   unsubscribe$: Subject<any> = new Subject<any>();
 
+  /**
+   * Timeout handle for debouncing stage position save operations.
+   * Used in onMovedAndScaled to prevent saving position too frequently.
+   */
+  private debounceTimeout: any;
+
   constructor(
     private readonly intentService: IntentService,
     private readonly stageService: StageService,
@@ -225,6 +231,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * Also cleans up connector retry queue, note save timer, and DOM event listeners.
    */
   ngOnDestroy() {
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Starting cleanup: removing all DOM event listeners');
+    
     // Completa tutte le subscription usando takeUntil pattern
     this.unsubscribe();
     
@@ -248,17 +256,31 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
     
     document.removeEventListener("connector-drawn", this.listnerConnectorDrawn, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: connector-drawn');
     document.removeEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: moved-and-scaled');
     document.removeEventListener("start-dragging", this.listnerStartDragging, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: start-dragging');
     document.removeEventListener("keydown", this.listnerKeydown, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: keydown');
     document.removeEventListener("connector-selected", this.listnerConnectorSelected, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: connector-selected');
     document.removeEventListener("connector-deselected", this.listnerConnectorDeselected, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: connector-deselected');
     document.removeEventListener("connector-updated", this.listnerConnectorUpdated, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: connector-updated');
     document.removeEventListener("connector-deleted", this.listnerConnectorDeleted, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: connector-deleted');
     document.removeEventListener("connector-created", this.listnerConnectorCreated, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: connector-created');
     document.removeEventListener("connector-draft-released", this.listnerConnectorDraftReleased, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: connector-draft-released');
     document.removeEventListener("end-dragging", this.listnerEndDragging, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: end-dragging');
     document.removeEventListener("dragged", this.listnerDragged, false);
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - Removed listener: dragged');
+    
+    // this.logger.log('[SLICE2-CANVAS] ngOnDestroy - ✅ All 12 listeners removed successfully');
   }
 
   /** */
@@ -437,20 +459,20 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((connector: any) => {
         this.logger.log('[CDS-CANVAS] --- AGGIORNATO connettore ', connector);
-        // if (connector) {
-        //   this.intentService.updateIntentAttributeConnectors(connector);
-        // }
-      });
+      // if (connector) {
+      //   this.intentService.updateIntentAttributeConnectors(connector);
+      // }
+    });
 
 
     this.subscriptionUndoRedo = this.intentService.behaviorUndoRedo
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((undoRedo: any) => {
         this.logger.log('[cds-panel-intent-list] --- AGGIORNATO undoRedo ',undoRedo);
-        if (undoRedo) {
-          this.stateUndoRedo = undoRedo;
-        }
-      });
+      if (undoRedo) {
+        this.stateUndoRedo = undoRedo;
+      }
+    });
 
     // /** SUBSCRIBE TO THE LIST OF INTENTS **
     //  * Creo una sottoscrizione all'array di INTENT per averlo sempre aggiornato
@@ -473,27 +495,27 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(intents => {
         this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
-        if(intents.length>0){
-          this.listOfIntents = intents;
-          // const chatbot_id = this.dashboardService.id_faq_kb;
-          // const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
-          // const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
-          // if (updateWebhookObs) {
-          //   updateWebhookObs.subscribe({
-          //     next: (resp: any) => {
-          //       this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
-          //     },
-          //     error: (error) => {
-          //       this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
-          //     },
-          //     complete: () => {
-          //       this.logger.log("[cds-action-webhook] updateWebhook completed.");
-          //     }
-          //   });
-          // } else {
-          //   this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
-          // }
-        }
+      if(intents.length>0){
+        this.listOfIntents = intents;
+        // const chatbot_id = this.dashboardService.id_faq_kb;
+        // const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
+        // const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
+        // if (updateWebhookObs) {
+        //   updateWebhookObs.subscribe({
+        //     next: (resp: any) => {
+        //       this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
+        //     },
+        //     error: (error) => {
+        //       this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
+        //     },
+        //     complete: () => {
+        //       this.logger.log("[cds-action-webhook] updateWebhook completed.");
+        //     }
+        //   });
+        // } else {
+        //   this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
+        // }
+      }
       });
 
     /** SUBSCRIBE TO THE STATE INTENT DETAIL PANEL */
@@ -512,53 +534,53 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.subscriptionOpenDetailPanel = this.controllerService.isOpenActionDetailPanel$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((element: { type: TYPE_INTENT_ELEMENT, element: Action | string | Form }) => {
-        this.elementIntentSelected = element;
-        if (element.type) {
-          this.closeAllPanels();
-          this.IS_OPEN_PANEL_ACTION_DETAIL = true;
-          this.intentService.inactiveIntent();
-          this.removeConnectorDraftAndCloseFloatMenu();
-          // setTimeout(() => {
-          //   this.IS_OPEN_PANEL_ACTION_DETAIL = true;
-          // }, 0);
-        } else {
-          this.IS_OPEN_PANEL_ACTION_DETAIL = false;
-        }
+      this.elementIntentSelected = element;
+      if (element.type) {
+        this.closeAllPanels();
+        this.IS_OPEN_PANEL_ACTION_DETAIL = true;
+        this.intentService.inactiveIntent();
+        this.removeConnectorDraftAndCloseFloatMenu();
+        // setTimeout(() => {
+        //   this.IS_OPEN_PANEL_ACTION_DETAIL = true;
+        // }, 0);
+      } else {
+        this.IS_OPEN_PANEL_ACTION_DETAIL = false;
+      }
         this.logger.log('[CDS-CANVAS]  isOpenActionDetailPanel ', element, this.IS_OPEN_PANEL_ACTION_DETAIL);
-      });
+    });
 
     /** SUBSCRIBE TO THE STATE ACTION REPLY BUTTON PANEL */
     this.subscriptionOpenButtonPanel = this.controllerService.isOpenButtonPanel$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((button: Button) => {
-        this.buttonSelected = button;
+      this.buttonSelected = button;
         this.logger.log('[CDS-CANVAS]  isOpenButtonPanel ', button);
 
-        if (button) {
-          this.closeAllPanels();
-          this.closeActionDetailPanel();
-          // this.IS_OPEN_PANEL_WIDGET = false;
-          this.removeConnectorDraftAndCloseFloatMenu();
-          setTimeout(() => {
-            this.IS_OPEN_PANEL_BUTTON_CONFIG = true;
-          }, 0);
-        } else {
-          this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
-        }
-      });
+      if (button) {
+        this.closeAllPanels();
+        this.closeActionDetailPanel();
+        // this.IS_OPEN_PANEL_WIDGET = false;
+        this.removeConnectorDraftAndCloseFloatMenu();
+        setTimeout(() => {
+          this.IS_OPEN_PANEL_BUTTON_CONFIG = true;
+        }, 0);
+      } else {
+        this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
+      }
+    });
 
     /** SUBSCRIBE TO THE STATE ACTION DETAIL PANEL */
     this.subscriptionOpenAddActionMenu = this.controllerService.isOpenAddActionMenu$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((menu: any) => {
-        if (menu) {
-          this.closeAllPanels();
-          this.closeActionDetailPanel()
-        } else {
-          this.IS_OPEN_ADD_ACTIONS_MENU = false;
-        }
-      });
-
+      if (menu) {
+        this.closeAllPanels();
+        this.closeActionDetailPanel()
+      } else {
+        this.IS_OPEN_ADD_ACTIONS_MENU = false;
+      }
+    });    
+  
     this.subscriptionOpenWidgetPanel = this.intentService.BSTestItOut.pipe(
       skip(1),
       takeUntil(this.unsubscribe$)
@@ -573,34 +595,34 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.IS_OPEN_PANEL_WIDGET = false;
         //this.IS_OPEN_WIDGET_LOG = false;
       }
-    });
+    });    
 
     this.subscriptionTogglePublishPanelState = this.controllerService.isOpenPublishPanel$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((event: any) => {
         this.logger.log("[CDS-CANVAS] has opened Publish panel ", event);
-        // this.IS_OPEN_PUBLISH_PANEL = event
+      // this.IS_OPEN_PUBLISH_PANEL = event
         this.logger.log("[CDS-CANVAS] has opened Publish IS_OPEN_PUBLISH_PANEL ", this.IS_OPEN_PUBLISH_PANEL);
-        // isOpenButtonPanel
-        // if (event) {
-        //   this.closeAllPanels();
-        //   this.closeActionDetailPanel()
-        // } else {
-        //   this.IS_OPEN_ADD_ACTIONS_MENU = false;
-        // }
+      // isOpenButtonPanel
+      // if (event) {
+      //   this.closeAllPanels();
+      //   this.closeActionDetailPanel()
+      // } else {
+      //   this.IS_OPEN_ADD_ACTIONS_MENU = false;
+      // }
 
-        if (event) {
-          this.closeAllPanels();
-          this.closeActionDetailPanel();
-          // this.IS_OPEN_PANEL_WIDGET = false;
-          this.removeConnectorDraftAndCloseFloatMenu();
-          setTimeout(() => {
-            this.IS_OPEN_PUBLISH_PANEL = true;
-          }, 0);
-        } else {
-          this.IS_OPEN_PUBLISH_PANEL = false;
-        }
-      });
+      if (event) {
+        this.closeAllPanels();
+        this.closeActionDetailPanel();
+        // this.IS_OPEN_PANEL_WIDGET = false;
+        this.removeConnectorDraftAndCloseFloatMenu();
+        setTimeout(() => {
+          this.IS_OPEN_PUBLISH_PANEL = true;
+        }, 0);
+      } else {
+        this.IS_OPEN_PUBLISH_PANEL = false;
+      }
+    });    
   }
 
    /** initialize */
@@ -732,10 +754,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   setListnerEvents(){
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Initializing all DOM event listeners with extracted private methods');
+    
     /** LISTENER OF TILEDESK STAGE */
     /** triggers when a connector is drawn on the stage  */
     this.listnerConnectorDrawn = this.onConnectorDrawn.bind(this);
     document.addEventListener("connector-drawn", this.listnerConnectorDrawn, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: connector-drawn -> onConnectorDrawn');
     
 
     
@@ -746,40 +771,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     * - close
     * - delete the drawn connector and close the float menu if it is open
     */
-    let debounceTimeout: any;
-    this.listnerMovedAndScaled = (e: CustomEvent) => {
-      const el = e.detail;
-      this.connectorService.tiledeskConnectors.scale = e.detail.scale;
-      this.removeConnectorDraftAndCloseFloatMenu();
-  
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(() => {
-        this.logger.log('[CDS-CANVAS] moved-and-scaled ', el);
-        const pos = {
-          x: el.x,
-          y: el.y
-        }
-        this.stageService.savePositionByPos(this.id_faq_kb, pos);
-      }, 100);
-
-    };
+    this.listnerMovedAndScaled = this.onMovedAndScaled.bind(this);
     document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: moved-and-scaled -> onMovedAndScaled');
 
     /** start-dragging */
-    this.listnerStartDragging = (e: CustomEvent) => {
-      const el = e.detail.element;
-      // se nella classe list esiste 'cds-note' allora è una nota
-      if (el.classList.contains('cds-note')) {
-        // this.logger.log('[CDS-CANVAS] start-dragging nota ', el);
-        return;
-      }
-      this.logger.log('[CDS-CANVAS] start-dragging ', el);
-      this.removeConnectorDraftAndCloseFloatMenu();
-      this.intentService.setIntentSelectedById(el.id);
-      this.startDraggingPosition = { x: el.offsetLeft, y: el.offsetTop };
-      el.style.zIndex = 2;
-    };
+    this.listnerStartDragging = this.onStartDragging.bind(this);
     document.addEventListener("start-dragging", this.listnerStartDragging, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: start-dragging -> onStartDragging');
 
     /** dragged **
     * the event fires when I move an intent on the stage:
@@ -787,42 +786,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     * remove any dotted connectors and close the float menu if it is open
     * update the position of the selected intent
     */
-    this.listnerDragged = (e: CustomEvent) => {
-      const el = e.detail.element;
-      if (el.classList.contains('cds-note')) {
-        // this.logger.log('[CDS-CANVAS] dragged nota ', el);
-        return;
-      }
-      const x = e.detail.x;
-      const y = e.detail.y;
-      this.connectorService.moved(el, x, y);
-      this.intentService.setIntentSelectedPosition(el.offsetLeft, el.offsetTop);
-    };
+    this.listnerDragged = this.onDragged.bind(this);
     document.addEventListener("dragged", this.listnerDragged, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: dragged -> onDragged');
 
     /** end-dragging */
-    this.listnerEndDragging = (e: CustomEvent) => {
-      const el = e.detail.element;
-      if (el.classList.contains('cds-note')) {
-        // this.logger.log('[CDS-CANVAS] end-dragging nota ', el);
-        return;
-      }
-      this.logger.log('[CDS-CANVAS] end-dragging ', el);
-      this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected?.attributes?.position);
-      this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
-      // Verifica se la posizione è cambiata (drag effettivo)
-      if(this.intentService.intentSelected){
-        const pos = this.intentService.intentSelected.attributes.position;
-        const dragged = !this.startDraggingPosition ||
-          (pos && (pos.x !== this.startDraggingPosition.x || pos.y !== this.startDraggingPosition.y));
-        this.closeAllPanels();
-        this.intentService.updateIntentSelected();
-        if (!dragged) {
-          this.openWebhookIntentPanel(this.intentService.intentSelected);
-        }
-      } 
-    };
+    this.listnerEndDragging = this.onEndDragging.bind(this);
     document.addEventListener("end-dragging", this.listnerEndDragging, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: end-dragging -> onEndDragging');
 
     /** connector-draft-released ** 
     * it only fires when a connector is NOT created, that is when I drop the dotted connector in a point that is not "connectable"
@@ -830,35 +801,82 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     * otherwise
     * I remove the dotted connector
     */
-    this.listnerConnectorDraftReleased = (e: CustomEvent) => {
-      this.logger.log("[CDS-CANVAS] connector-draft-released :: ", e.detail);
-      if(!e?.detail) return;
-      let detail = e.detail;
-      const arrayOfClass = detail.target.classList.value.split(' ');
-      if (detail.target && arrayOfClass.includes("receiver-elements-dropped-on-stage") && detail.toPoint && detail.menuPoint) {
-        this.logger.log("[CDS-CANVAS] ho rilasciato il connettore tratteggiato nello stage (nell'elemento con classe 'receiver_elements_dropped_on_stage') e quindi apro il float menu");
-        const intentId = e.detail.fromId.split('/')[0];
-        const intent = this.intentService.getIntentFromId(intentId);
-        if(intent.attributes?.color){
-          detail.color = intent.attributes.color;
-        } else {
-          detail.color = INTENT_COLORS.COLOR1;
-        }
-        this.openFloatMenuOnConnectorDraftReleased(detail);
-      } else {
-        this.logger.log("[CDS-CANVAS] ho rilasciato in un punto qualsiasi del DS ma non sullo stage quindi non devo aprire il menu", detail);
-        this.removeConnectorDraftAndCloseFloatMenu();
-      }
-    };
+    this.listnerConnectorDraftReleased = this.onConnectorDraftReleased.bind(this);
     document.addEventListener("connector-draft-released", this.listnerConnectorDraftReleased, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: connector-draft-released -> onConnectorDraftReleased');
 
     /** connector-created **
     * fires when a connector is created:
     * add the connector to the connector list (addConnectorToList)
     * notify actions that connectors have changed (onChangedConnector) to update the dots
     */
-    this.listnerConnectorCreated = (e: CustomEvent) => {
-      this.logger.log("[CDS-CANVAS] connector-created:", e);
+    this.listnerConnectorCreated = this.onConnectorCreated.bind(this);
+    document.addEventListener("connector-created", this.listnerConnectorCreated, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: connector-created -> onConnectorCreated');
+
+    /** connector-deleted **
+    * fires when a connector is deleted:
+    * delete the connector from the connector list (deleteConnectorToList)
+    * notify actions that connectors have changed (onChangedConnector) to update the dots
+    */
+    this.listnerConnectorDeleted = this.onConnectorDeleted.bind(this);
+    document.addEventListener("connector-deleted", this.listnerConnectorDeleted, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: connector-deleted -> onConnectorDeleted');
+
+    /** connector-updated **
+    * fires when a connector is updated:
+    */   
+    this.listnerConnectorUpdated = this.onConnectorUpdated.bind(this);
+    document.addEventListener("connector-updated", this.listnerConnectorUpdated, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: connector-updated -> onConnectorUpdated');
+
+
+    /** connector-selected **
+    * fires when a connector is selected:
+    * unselect action and intent (unselectAction)
+    */  
+    this.listnerConnectorSelected = this.onConnectorSelected.bind(this);
+    document.addEventListener("connector-selected", this.listnerConnectorSelected, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: connector-selected -> onConnectorSelected');
+
+
+    this.listnerConnectorDeselected = this.onConnectorDeselected.bind(this);
+    document.addEventListener('connector-deselected',  this.listnerConnectorDeselected, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: connector-deselected -> onConnectorDeselected');
+
+    /**  keydown 
+    * check if Ctrl (Windows) or Command (Mac) and Z were pressed at the same time
+    */
+    this.listnerKeydown = this.onKeydown.bind(this);
+    document.addEventListener("keydown", this.listnerKeydown, false);
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Registered listener: keydown -> onKeydown');
+    
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - ✅ All 12 listeners initialized with extracted private methods');
+    // this.logger.log('[SLICE2-CANVAS] setListnerEvents - Listeners: connector-drawn, moved-and-scaled, start-dragging, dragged, end-dragging, connector-draft-released, connector-created, connector-deleted, connector-updated, connector-selected, connector-deselected, keydown');
+  }
+
+  // ---------------------------------------------------------
+  // END Stage and Connectors event listeners
+  // ---------------------------------------------------------
+
+  /**
+   * Handles the connector-drawn event.
+   * Sets the connector color and checks all connectors.
+   */
+  private onConnectorDrawn(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onConnectorDrawn - Called (extracted method)');
+    const connector = e.detail.connector;
+    this.setConnectorColor(connector);
+    this.checkAllConnectors(connector);
+  }
+
+  /**
+   * Handles the connector-created event.
+   * Adds the connector to the connector list and notifies that connectors have changed.
+   */
+  private onConnectorCreated(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onConnectorCreated - Called (extracted method)');
+    this.logger.log("[CDS-CANVAS] connector-created:", e);
       const connector = e.detail.connector;
       connector['created'] = true;
       delete connector['deleted'];
@@ -869,17 +887,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       // if (connector) {
       //   this.intentService.updateIntentAttributeConnectors(connector);
       // }
+  }
 
-    };
-    document.addEventListener("connector-created", this.listnerConnectorCreated, false);
-
-    /** connector-deleted **
-    * fires when a connector is deleted:
-    * delete the connector from the connector list (deleteConnectorToList)
-    * notify actions that connectors have changed (onChangedConnector) to update the dots
-    */
-    this.listnerConnectorDeleted = (e: CustomEvent) => {
-      this.logger.log("[CDS-CANVAS] connector-deleted:", e);
+  /**
+   * Handles the connector-deleted event.
+   * Deletes the connector from the connector list and notifies that connectors have changed.
+   */
+  private onConnectorDeleted(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onConnectorDeleted - Called (extracted method)');
+    this.logger.log("[CDS-CANVAS] connector-deleted:", e);
       const connector = e.detail.connector;
       connector['deleted'] = true;
       delete connector['created'];
@@ -892,28 +908,74 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.connectorService.deleteConnectorToList(connector.id);
       this.intentService.onChangedConnector(connector);
       this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
-    };
-    document.addEventListener("connector-deleted", this.listnerConnectorDeleted, false);
+  }
 
-    /** connector-updated **
-    * fires when a connector is updated:
+  /**
+   * Handles the connector-updated event.
+   * Notifies that connectors have changed to update the dots.
     */   
-    this.listnerConnectorUpdated = (e: CustomEvent) => {
-      this.logger.log("[CDS-CANVAS] connector-updated:", e);
+  private onConnectorUpdated(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onConnectorUpdated - Called (extracted method)');
+    this.logger.log("[CDS-CANVAS] connector-updated:", e);
       const connector = e.detail.connector;
       // if(connector.notify)
       connector['updated'] = true;
       this.intentService.onChangedConnector(connector);
-    };
-    document.addEventListener("connector-updated", this.listnerConnectorUpdated, false);
+  }
 
+  /**
+   * Handles the connector-deselected event.
+   */
+  private onConnectorDeselected(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onConnectorDeselected - Called (extracted method)');
+    //this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
+  }
 
-    /** connector-selected **
-    * fires when a connector is selected:
-    * unselect action and intent (unselectAction)
-    */  
-    this.listnerConnectorSelected = (e: CustomEvent) => {
-      this.closeAllPanels();
+  /**
+   * Handles the start-dragging event.
+   * Initializes drag operation for an intent (not for notes).
+   */
+  private onStartDragging(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onStartDragging - Called (extracted method)');
+    const el = e.detail.element;
+    // se nella classe list esiste 'cds-note' allora è una nota
+    if (el.classList.contains('cds-note')) {
+      // this.logger.log('[CDS-CANVAS] start-dragging nota ', el);
+      // this.logger.log('[SLICE2-CANVAS] onStartDragging - Early return for note (expected behavior)');
+      return;
+    }
+    this.logger.log('[CDS-CANVAS] start-dragging ', el);
+    this.removeConnectorDraftAndCloseFloatMenu();
+    this.intentService.setIntentSelectedById(el.id);
+    this.startDraggingPosition = { x: el.offsetLeft, y: el.offsetTop };
+    el.style.zIndex = 2;
+  }
+
+  /**
+   * Handles the dragged event.
+   * Updates connector positions and intent position during drag operation (not for notes).
+   */
+  private onDragged(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onDragged - Called (extracted method)');
+    const el = e.detail.element;
+    if (el.classList.contains('cds-note')) {
+      // this.logger.log('[CDS-CANVAS] dragged nota ', el);
+      // this.logger.log('[SLICE2-CANVAS] onDragged - Early return for note (expected behavior)');
+      return;
+    }
+    const x = e.detail.x;
+    const y = e.detail.y;
+    this.connectorService.moved(el, x, y);
+    this.intentService.setIntentSelectedPosition(el.offsetLeft, el.offsetTop);
+  }
+
+  /**
+   * Handles the connector-selected event.
+   * Closes all panels, selects the connector, opens connector menu, and unselects action.
+   */
+  private onConnectorSelected(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onConnectorSelected - Called (extracted method)');
+    this.closeAllPanels();
       this.closeActionDetailPanel();
       this.setConnectorSelected(e.detail.connector.id);
       this.IS_OPEN_PANEL_CONNECTOR_MENU = true;
@@ -921,60 +983,127 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.mousePosition.x -= -10;
       this.mousePosition.y -= 25;
       this.intentService.unselectAction();
-    };
-    document.addEventListener("connector-selected", this.listnerConnectorSelected, false);
-
-
-    this.listnerConnectorDeselected = (e: CustomEvent) => {
-      //this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
-    }
-    document.addEventListener('connector-deselected',  this.listnerConnectorDeselected, false);
-
-    /**  keydown 
-    * check if Ctrl (Windows) or Command (Mac) and Z were pressed at the same time
-    */
-    this.listnerKeydown = (e) => {
-      this.logger.log('[CDS-CANVAS]  keydown ', e);
-      var focusedElement = document.activeElement;
-      if (focusedElement.tagName === 'TEXTAREA' || focusedElement.tagName === 'INPUT') {
-        return;
-      }
-      // Prevent undo/redo if a detail panel is open (to allow native undo/redo in panel inputs)
-      if (this.IS_OPEN_PANEL_ACTION_DETAIL || this.IS_OPEN_PANEL_INTENT_DETAIL) {
-        this.logger.log('[CDS-CANVAS] Panel is open - skipping canvas undo/redo');
-        return;
-      }
-
-
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
-        e.preventDefault(); 
-        // Evita il comportamento predefinito, ad esempio la navigazione indietro nella cronologia del browser
-        this.logger.log("Hai premuto Ctrl+ALT+Z (o Command+Alt+Z)!");
-        this.intentService.restoreLastREDO();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-        // Impedisci il comportamento predefinito (ad esempio, l'undo in un campo di testo)
-        e.preventDefault(); 
-        this.logger.log("Hai premuto Ctrl+Z (o Command+Z)!");
-        this.intentService.restoreLastUNDO();
-      }
-    };
-    document.addEventListener("keydown", this.listnerKeydown, false);
   }
-
-  // ---------------------------------------------------------
-  // END Stage and Connectors event listeners
-  // ---------------------------------------------------------
 
   /**
-   * Handles the connector-drawn event.
-   * Sets the connector color and checks all connectors.
+   * Handles the moved-and-scaled event.
+   * Updates connector scale, removes connector draft, and saves stage position with debounce.
    */
-  private onConnectorDrawn(e: CustomEvent): void {
-    const connector = e.detail.connector;
-    this.setConnectorColor(connector);
-    this.checkAllConnectors(connector);
+  private onMovedAndScaled(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onMovedAndScaled - Called (extracted method)');
+    const el = e.detail;
+    this.connectorService.tiledeskConnectors.scale = e.detail.scale;
+    this.removeConnectorDraftAndCloseFloatMenu();
+
+    clearTimeout(this.debounceTimeout);
+    this.debounceTimeout = setTimeout(() => {
+      this.logger.log('[CDS-CANVAS] moved-and-scaled ', el);
+      const pos = {
+        x: el.x,
+        y: el.y
+      }
+      this.stageService.savePositionByPos(this.id_faq_kb, pos);
+    }, 100);
   }
 
+  /**
+   * Handles the end-dragging event.
+   * Verifies if there was an actual drag or just a click, and updates intent or opens webhook panel accordingly.
+   */
+  private onEndDragging(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onEndDragging - Called (extracted method)');
+    const el = e.detail.element;
+    if (el.classList.contains('cds-note')) {
+      // this.logger.log('[CDS-CANVAS] end-dragging nota ', el);
+      // this.logger.log('[SLICE2-CANVAS] onEndDragging - Early return for note (expected behavior)');
+      return;
+    }
+    this.logger.log('[CDS-CANVAS] end-dragging ', el);
+    this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected?.attributes?.position);
+    this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
+    // Verifica se la posizione è cambiata (drag effettivo)
+    if(this.intentService.intentSelected){
+      const pos = this.intentService.intentSelected.attributes.position;
+      const dragged = !this.startDraggingPosition ||
+        (pos && (pos.x !== this.startDraggingPosition.x || pos.y !== this.startDraggingPosition.y));
+      // this.logger.log(`[SLICE2-CANVAS] onEndDragging - Drag detected: ${dragged ? 'YES (actual drag)' : 'NO (just click)'}`);
+      this.closeAllPanels();
+      this.intentService.updateIntentSelected();
+      if (!dragged) {
+        // this.logger.log('[SLICE2-CANVAS] onEndDragging - Opening webhook panel (no drag, just click)');
+        this.openWebhookIntentPanel(this.intentService.intentSelected);
+      } else {
+        // this.logger.log('[SLICE2-CANVAS] onEndDragging - Skipping webhook panel (actual drag occurred)');
+      }
+    } 
+  }
+
+  /**
+   * Handles the connector-draft-released event.
+   * Opens float menu if released on stage, otherwise removes connector draft.
+   */
+  private onConnectorDraftReleased(e: CustomEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onConnectorDraftReleased - Called (extracted method)');
+    this.logger.log("[CDS-CANVAS] connector-draft-released :: ", e.detail);
+    if(!e?.detail) {
+      // this.logger.log('[SLICE2-CANVAS] onConnectorDraftReleased - Early return: no detail (expected behavior)');
+      return;
+    }
+    let detail = e.detail;
+    const arrayOfClass = detail.target.classList.value.split(' ');
+    if (detail.target && arrayOfClass.includes("receiver-elements-dropped-on-stage") && detail.toPoint && detail.menuPoint) {
+      this.logger.log("[CDS-CANVAS] ho rilasciato il connettore tratteggiato nello stage (nell'elemento con classe 'receiver_elements_dropped_on_stage') e quindi apro il float menu");
+      // this.logger.log('[SLICE2-CANVAS] onConnectorDraftReleased - Condition met: released on stage with valid points');
+      const intentId = e.detail.fromId.split('/')[0];
+      const intent = this.intentService.getIntentFromId(intentId);
+      if(intent.attributes?.color){
+        detail.color = intent.attributes.color;
+      } else {
+        detail.color = INTENT_COLORS.COLOR1;
+      }
+      // this.logger.log('[SLICE2-CANVAS] onConnectorDraftReleased - Opening float menu on stage');
+      this.openFloatMenuOnConnectorDraftReleased(detail);
+    } else {
+      this.logger.log("[CDS-CANVAS] ho rilasciato in un punto qualsiasi del DS ma non sullo stage quindi non devo aprire il menu", detail);
+      // this.logger.log('[SLICE2-CANVAS] onConnectorDraftReleased - Removing connector draft (released outside stage)');
+      this.removeConnectorDraftAndCloseFloatMenu();
+    }
+  }
+
+  /**
+   * Handles the keydown event.
+   * Implements undo/redo functionality with Ctrl+Z (or Cmd+Z) and Ctrl+Shift+Z (or Cmd+Shift+Z).
+   * Skips undo/redo if focus is on input/textarea or if detail panels are open.
+   */
+  private onKeydown(e: KeyboardEvent): void {
+    // this.logger.log('[SLICE2-CANVAS] onKeydown - Called (extracted method)');
+    this.logger.log('[CDS-CANVAS]  keydown ', e);
+    var focusedElement = document.activeElement;
+    if (focusedElement.tagName === 'TEXTAREA' || focusedElement.tagName === 'INPUT') {
+      // this.logger.log('[SLICE2-CANVAS] onKeydown - Early return for input/textarea (expected behavior)');
+      return;
+    }
+    // Prevent undo/redo if a detail panel is open (to allow native undo/redo in panel inputs)
+    if (this.IS_OPEN_PANEL_ACTION_DETAIL || this.IS_OPEN_PANEL_INTENT_DETAIL) {
+      this.logger.log('[CDS-CANVAS] Panel is open - skipping canvas undo/redo');
+      // this.logger.log('[SLICE2-CANVAS] onKeydown - Early return for open panel (expected behavior)');
+      return;
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
+      e.preventDefault(); 
+      // Evita il comportamento predefinito, ad esempio la navigazione indietro nella cronologia del browser
+      this.logger.log("Hai premuto Ctrl+ALT+Z (o Command+Alt+Z)!");
+      // this.logger.log('[SLICE2-CANVAS] onKeydown - Executing REDO');
+      this.intentService.restoreLastREDO();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+      // Impedisci il comportamento predefinito (ad esempio, l'undo in un campo di testo)
+      e.preventDefault(); 
+      this.logger.log("Hai premuto Ctrl+Z (o Command+Z)!");
+      // this.logger.log('[SLICE2-CANVAS] onKeydown - Executing UNDO');
+      this.intentService.restoreLastUNDO();
+    }
+  }
 
   // -------------------------------------------------------
   // @ Close WHEN THE STAGE IS CLICKED 
