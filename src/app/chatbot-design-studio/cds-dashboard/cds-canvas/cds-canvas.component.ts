@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -176,6 +177,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
+  /**
+   * Subject used to signal all RxJS subscriptions to complete when component is destroyed.
+   * All subscriptions in this component use `takeUntil(this.unsubscribe$)` pattern for automatic cleanup.
+   * This prevents memory leaks by ensuring subscriptions are properly unsubscribed when the component is destroyed.
+   */
+  unsubscribe$: Subject<any> = new Subject<any>();
 
   constructor(
     private readonly intentService: IntentService,
@@ -202,9 +209,25 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.initialize();
   }
 
+  /**
+   * Completes unsubscribe$ Subject to signal all takeUntil subscriptions to complete.
+   * This method is called automatically in ngOnDestroy() to ensure all RxJS subscriptions
+   * using the `takeUntil(this.unsubscribe$)` pattern are properly cleaned up.
+   */
+  unsubscribe(): void {
+    this.unsubscribe$.next(null);
+    this.unsubscribe$.complete();
+  }
 
-  /** */
+  /**
+   * Angular lifecycle hook called when component is destroyed.
+   * Completes all RxJS subscriptions using the takeUntil pattern by calling unsubscribe().
+   * Also cleans up connector retry queue, note save timer, and DOM event listeners.
+   */
   ngOnDestroy() {
+    // Completa tutte le subscription usando takeUntil pattern
+    this.unsubscribe();
+    
     // Pulisci la coda di retry dei connettori
     this.connectorService.clearRetryQueue();
 
@@ -219,38 +242,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.executeSaveNoteDetail();
     }
 
-    if (this.subscriptionChangedConnectorAttributes) {
-      this.subscriptionChangedConnectorAttributes.unsubscribe();
-    }
-    if (this.subscriptionListOfIntents) {
-      this.subscriptionListOfIntents.unsubscribe();
-    }
-    if (this.subscriptionOpenDetailPanel) {
-      this.subscriptionOpenDetailPanel.unsubscribe();
-    }
-    if (this.subscriptionOpenAddActionMenu) {
-      this.subscriptionOpenAddActionMenu.unsubscribe();
-    }
-    if (this.subscriptionOpenButtonPanel) {
-      this.subscriptionOpenButtonPanel.unsubscribe();
-    }
-    if (this.subscriptionOpenWidgetPanel) {
-      this.subscriptionOpenWidgetPanel.unsubscribe();
-    }
     if (this.subscriptionWidgetLoaded) {
       this.subscriptionWidgetLoaded.unsubscribe();
     }
-    if (this.subscriptionUndoRedo) {
-      this.subscriptionUndoRedo.unsubscribe();
-    }
-    if (this.subscriptionUndoRedo) {
-      this.subscriptionUndoRedo.unsubscribe();
-    }
-
-    if (this.subscriptionTogglePublishPanelState) {
-      this.subscriptionTogglePublishPanelState.unsubscribe();
-    }
-
 
     
     document.removeEventListener("connector-drawn", this.listnerConnectorDrawn, false);
@@ -439,21 +433,24 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // --------------------------------------------------------- //
   
   private setSubscriptions(){
+    this.subscriptionChangedConnectorAttributes = this.connectorService.observableChangedConnectorAttributes
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((connector: any) => {
+        this.logger.log('[CDS-CANVAS] --- AGGIORNATO connettore ', connector);
+        // if (connector) {
+        //   this.intentService.updateIntentAttributeConnectors(connector);
+        // }
+      });
 
-    this.subscriptionChangedConnectorAttributes = this.connectorService.observableChangedConnectorAttributes.subscribe((connector: any) => {
-      this.logger.log('[CDS-CANVAS] --- AGGIORNATO connettore ', connector);
-      // if (connector) {
-      //   this.intentService.updateIntentAttributeConnectors(connector);
-      // }
-    });
 
-
-    this.subscriptionUndoRedo = this.intentService.behaviorUndoRedo.subscribe((undoRedo: any) => {
-      this.logger.log('[cds-panel-intent-list] --- AGGIORNATO undoRedo ',undoRedo);
-      if (undoRedo) {
-        this.stateUndoRedo = undoRedo;
-      }
-    });
+    this.subscriptionUndoRedo = this.intentService.behaviorUndoRedo
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((undoRedo: any) => {
+        this.logger.log('[cds-panel-intent-list] --- AGGIORNATO undoRedo ',undoRedo);
+        if (undoRedo) {
+          this.stateUndoRedo = undoRedo;
+        }
+      });
 
     // /** SUBSCRIBE TO THE LIST OF INTENTS **
     //  * Creo una sottoscrizione all'array di INTENT per averlo sempre aggiornato
@@ -472,30 +469,32 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
      * Creo una sottoscrizione all'array di INTENT per averlo sempre aggiornato
      * ad ogni modifica (aggiunta eliminazione di un intent)
     */
-    this.subscriptionListOfIntents = this.intentService.getIntents().subscribe(intents => {
-      this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
-      if(intents.length>0){
-        this.listOfIntents = intents;
-        // const chatbot_id = this.dashboardService.id_faq_kb;
-        // const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
-        // const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
-        // if (updateWebhookObs) {
-        //   updateWebhookObs.subscribe({
-        //     next: (resp: any) => {
-        //       this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
-        //     },
-        //     error: (error) => {
-        //       this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
-        //     },
-        //     complete: () => {
-        //       this.logger.log("[cds-action-webhook] updateWebhook completed.");
-        //     }
-        //   });
-        // } else {
-        //   this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
-        // }
-      }
-    })
+    this.subscriptionListOfIntents = this.intentService.getIntents()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(intents => {
+        this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
+        if(intents.length>0){
+          this.listOfIntents = intents;
+          // const chatbot_id = this.dashboardService.id_faq_kb;
+          // const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
+          // const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
+          // if (updateWebhookObs) {
+          //   updateWebhookObs.subscribe({
+          //     next: (resp: any) => {
+          //       this.logger.log("[cds-action-webhook] updateWebhook : ", resp);
+          //     },
+          //     error: (error) => {
+          //       this.logger.error("[cds-action-webhook] error updateWebhook: ", error);
+          //     },
+          //     complete: () => {
+          //       this.logger.log("[cds-action-webhook] updateWebhook completed.");
+          //     }
+          //   });
+          // } else {
+          //   this.logger.log("[cds-action-webhook] Nessun update webhook necessario (condizione non soddisfatta).");
+          // }
+        }
+      });
 
     /** SUBSCRIBE TO THE STATE INTENT DETAIL PANEL */
     // this.subscriptionOpenDetailPanel = this.controllerService.isOpenIntentDetailPanel$.subscribe((element: Intent) => {
@@ -510,52 +509,60 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // });
 
     /** SUBSCRIBE TO THE STATE ACTION DETAIL PANEL */
-    this.subscriptionOpenDetailPanel = this.controllerService.isOpenActionDetailPanel$.subscribe((element: { type: TYPE_INTENT_ELEMENT, element: Action | string | Form }) => {
-      this.elementIntentSelected = element;
-      if (element.type) {
-        this.closeAllPanels();
-        this.IS_OPEN_PANEL_ACTION_DETAIL = true;
-        this.intentService.inactiveIntent();
-        this.removeConnectorDraftAndCloseFloatMenu();
-        // setTimeout(() => {
-        //   this.IS_OPEN_PANEL_ACTION_DETAIL = true;
-        // }, 0);
-      } else {
-        this.IS_OPEN_PANEL_ACTION_DETAIL = false;
-      }
-      this.logger.log('[CDS-CANVAS]  isOpenActionDetailPanel ', element, this.IS_OPEN_PANEL_ACTION_DETAIL);
-    });
+    this.subscriptionOpenDetailPanel = this.controllerService.isOpenActionDetailPanel$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((element: { type: TYPE_INTENT_ELEMENT, element: Action | string | Form }) => {
+        this.elementIntentSelected = element;
+        if (element.type) {
+          this.closeAllPanels();
+          this.IS_OPEN_PANEL_ACTION_DETAIL = true;
+          this.intentService.inactiveIntent();
+          this.removeConnectorDraftAndCloseFloatMenu();
+          // setTimeout(() => {
+          //   this.IS_OPEN_PANEL_ACTION_DETAIL = true;
+          // }, 0);
+        } else {
+          this.IS_OPEN_PANEL_ACTION_DETAIL = false;
+        }
+        this.logger.log('[CDS-CANVAS]  isOpenActionDetailPanel ', element, this.IS_OPEN_PANEL_ACTION_DETAIL);
+      });
 
     /** SUBSCRIBE TO THE STATE ACTION REPLY BUTTON PANEL */
-    this.subscriptionOpenButtonPanel = this.controllerService.isOpenButtonPanel$.subscribe((button: Button) => {
-      this.buttonSelected = button;
-      this.logger.log('[CDS-CANVAS]  isOpenButtonPanel ', button);
+    this.subscriptionOpenButtonPanel = this.controllerService.isOpenButtonPanel$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((button: Button) => {
+        this.buttonSelected = button;
+        this.logger.log('[CDS-CANVAS]  isOpenButtonPanel ', button);
 
-      if (button) {
-        this.closeAllPanels();
-        this.closeActionDetailPanel();
-        // this.IS_OPEN_PANEL_WIDGET = false;
-        this.removeConnectorDraftAndCloseFloatMenu();
-        setTimeout(() => {
-          this.IS_OPEN_PANEL_BUTTON_CONFIG = true;
-        }, 0);
-      } else {
-        this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
-      }
-    });
+        if (button) {
+          this.closeAllPanels();
+          this.closeActionDetailPanel();
+          // this.IS_OPEN_PANEL_WIDGET = false;
+          this.removeConnectorDraftAndCloseFloatMenu();
+          setTimeout(() => {
+            this.IS_OPEN_PANEL_BUTTON_CONFIG = true;
+          }, 0);
+        } else {
+          this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
+        }
+      });
 
     /** SUBSCRIBE TO THE STATE ACTION DETAIL PANEL */
-    this.subscriptionOpenAddActionMenu = this.controllerService.isOpenAddActionMenu$.subscribe((menu: any) => {
-      if (menu) {
-        this.closeAllPanels();
-        this.closeActionDetailPanel()
-      } else {
-        this.IS_OPEN_ADD_ACTIONS_MENU = false;
-      }
-    });    
-  
+    this.subscriptionOpenAddActionMenu = this.controllerService.isOpenAddActionMenu$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((menu: any) => {
+        if (menu) {
+          this.closeAllPanels();
+          this.closeActionDetailPanel()
+        } else {
+          this.IS_OPEN_ADD_ACTIONS_MENU = false;
+        }
+      });
 
-    this.subscriptionOpenWidgetPanel = this.intentService.BSTestItOut.pipe(skip(1)).subscribe((intent) => {
+    this.subscriptionOpenWidgetPanel = this.intentService.BSTestItOut.pipe(
+      skip(1),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((intent) => {
       this.logger.log("[CDS-CANVAS] ******* BSTestItOut ", intent);
       if(intent){
         this.onTestItOut(intent);
@@ -566,32 +573,34 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.IS_OPEN_PANEL_WIDGET = false;
         //this.IS_OPEN_WIDGET_LOG = false;
       }
-    });    
+    });
 
-    this.subscriptionTogglePublishPanelState = this.controllerService.isOpenPublishPanel$.subscribe((event: any) => {
-      this.logger.log("[CDS-CANVAS] has opened Publish panel ", event);
-      // this.IS_OPEN_PUBLISH_PANEL = event
-      this.logger.log("[CDS-CANVAS] has opened Publish IS_OPEN_PUBLISH_PANEL ", this.IS_OPEN_PUBLISH_PANEL);
-      // isOpenButtonPanel
-      // if (event) {
-      //   this.closeAllPanels();
-      //   this.closeActionDetailPanel()
-      // } else {
-      //   this.IS_OPEN_ADD_ACTIONS_MENU = false;
-      // }
+    this.subscriptionTogglePublishPanelState = this.controllerService.isOpenPublishPanel$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((event: any) => {
+        this.logger.log("[CDS-CANVAS] has opened Publish panel ", event);
+        // this.IS_OPEN_PUBLISH_PANEL = event
+        this.logger.log("[CDS-CANVAS] has opened Publish IS_OPEN_PUBLISH_PANEL ", this.IS_OPEN_PUBLISH_PANEL);
+        // isOpenButtonPanel
+        // if (event) {
+        //   this.closeAllPanels();
+        //   this.closeActionDetailPanel()
+        // } else {
+        //   this.IS_OPEN_ADD_ACTIONS_MENU = false;
+        // }
 
-      if (event) {
-        this.closeAllPanels();
-        this.closeActionDetailPanel();
-        // this.IS_OPEN_PANEL_WIDGET = false;
-        this.removeConnectorDraftAndCloseFloatMenu();
-        setTimeout(() => {
-          this.IS_OPEN_PUBLISH_PANEL = true;
-        }, 0);
-      } else {
-        this.IS_OPEN_PUBLISH_PANEL = false;
-      }
-    });    
+        if (event) {
+          this.closeAllPanels();
+          this.closeActionDetailPanel();
+          // this.IS_OPEN_PANEL_WIDGET = false;
+          this.removeConnectorDraftAndCloseFloatMenu();
+          setTimeout(() => {
+            this.IS_OPEN_PUBLISH_PANEL = true;
+          }, 0);
+        } else {
+          this.IS_OPEN_PUBLISH_PANEL = false;
+        }
+      });
   }
 
    /** initialize */
@@ -725,11 +734,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   setListnerEvents(){
     /** LISTENER OF TILEDESK STAGE */
     /** triggers when a connector is drawn on the stage  */
-    this.listnerConnectorDrawn = (e: CustomEvent) => {
-      const connector = e.detail.connector;
-      this.setConnectorColor(connector);
-      this.checkAllConnectors(connector);
-    };
+    this.listnerConnectorDrawn = this.onConnectorDrawn.bind(this);
     document.addEventListener("connector-drawn", this.listnerConnectorDrawn, false);
     
 
@@ -959,6 +964,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // ---------------------------------------------------------
   // END Stage and Connectors event listeners
   // ---------------------------------------------------------
+
+  /**
+   * Handles the connector-drawn event.
+   * Sets the connector color and checks all connectors.
+   */
+  private onConnectorDrawn(e: CustomEvent): void {
+    const connector = e.detail.connector;
+    this.setConnectorColor(connector);
+    this.checkAllConnectors(connector);
+  }
 
 
   // -------------------------------------------------------
