@@ -10,7 +10,6 @@
         'background-color': 'rgba('+intent.attributes.color+', 0.35)',
         'outline': intentService.intentSelectedID === intent.intent_id && intentService.intentActive ? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
       }">
-    <!-- (click)="$event.stopPropagation();openWebhookIntentPanel(intent)"> -->
      
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
@@ -76,17 +75,9 @@
         [cdkDropListDisabled]="isNewChatbot"
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
-        <!-- [id]="'action_'+i" -->
-        <!-- ------------------------------------------------------------------------------------------------------------------------- -->
-        <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
-        <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
             cdkDrag
             [cdkDragDisabled]="dragDisabled || isNewChatbot">
-            <!-- add-action-placeholder  -->
-            <!-- <div class="add--action-placeholder-add-icon">
-                <span class="material-icons"> add </span>
-            </div> -->
             <div class="add--action-placeholder-text">
                 {{ 'CDSCanvas.AddAnActionToBlock' | translate}}
                 <span style="display: block;font-size: 12px;">

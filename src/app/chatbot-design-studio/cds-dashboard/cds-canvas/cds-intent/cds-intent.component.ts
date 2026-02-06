@@ -39,7 +39,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   
   @Output() componentRendered = new EventEmitter<string>();
   @Output() questionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
-  @Output() answerSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() formSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
   @Output() actionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
 
@@ -780,12 +779,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.actionSelected.emit({ action: action, index: index, maxLength: this.listOfActions.length });
   }
 
-  // onSelectAnswer(elementSelected) {
-  //   this.elementTypeSelected = elementSelected;
-  //   // this.isIntentElementSelected = true;
-  //   this.answerSelected.emit(this.answer);
-  // }
-
   onSelectQuestion(elementSelected) {
     this.logger.log('[CDS-INTENT] onSelectQuestion-->', elementSelected, this.intent.question)
     this.elementTypeSelected = elementSelected;
@@ -1132,11 +1125,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.appStorageService.setItem(data.key, data.data)
   }
 
-  // openTestSiteInPopupWindow() {
-  //   this.testItOut.emit(this.intent)
-  // }
-
-
   onOpenTestItOut(){
     this.intentService.openTestItOut(this.intent);
   }
@@ -1147,10 +1135,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent webhook_enabled ', intent.webhook_enabled)
     this.intentService.setIntentSelected(this.intent.intent_id);
     intent.webhook_enabled = !intent.webhook_enabled;
-    /* // this.webHookTooltipText = "Disable webhook"
-    // this.webHookTooltipText = "Enable webhook"
-    // this.intentService.onUpdateIntentWithTimeout(intent);
-    // */
     this.intentService.updateIntent(this.intent, null);
   }
 
@@ -1187,14 +1171,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   changeIntentColor(color){
     if(color){
-      // const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
       this.intentColor = color;
       this.intent.attributes.color = color;
-      // document.documentElement.style.setProperty('--intent-color', `rgba(${this.intentColor}, 1)`);
-      // const element = document.getElementById('intent-content-'+ this.intent?.intent_id);
-      // if(element){
-      //   element.style.setProperty('background-color', `rgba(${this.intentColor}, 0.35)`);
-      // }
       this.setConnectorColor(color);
       this.intentService.updateIntent(this.intent); 
     }
