@@ -1742,65 +1742,98 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     }
   }
 
+  /**
+   * Configura i valori di default per una nuova nota in base al tipo.
+   * Per le media note, inizializza anche il draft placeholder e aggiunge alla stage.
+   * @param note La nota da configurare
+   * @param noteType Il tipo di nota (text, rect, media)
+   * @returns true se la nota è una media note (early return necessario), false altrimenti
+   */
+  private setupNewNoteDefaults(note: Note, noteType: NoteType): boolean {
+    if (noteType !== 'text') {
+      note.text = '';
+    }
+
+    // RECT NOTE: default colors differ from text notes
+    if (noteType === 'rect') {
+      note.backgroundColor = Note.defaultBackgroundColor('rect');
+      note.borderColor = Note.defaultBorderColor('rect');
+    }
+
+    // MEDIA NOTE: non salvare in remoto finché non c'è un media valido.
+    // Apri subito il pannello di destra per il caricamento.
+    if (noteType === 'media') {
+      // Requirement: default shadow disabled for image/media notes
+      // (keep the option hidden in the panel UI)
+      note.boxShadow = false;
+
+      // Placeholder on stage (draft):
+      // - default size with 4/3 ratio
+      // - visible block (but NOT persisted remotely until media is valid)
+      note.width = 240;
+      note.height = 180;
+
+      // Inizializza payload (soft typing)
+      if (!note.payload) note.payload = {};
+      (note.payload as any).imageSrc = '';
+      (note.payload as any).imageWidth = 0;
+      (note.payload as any).imageHeight = 0;
+      (note.payload as any).mediaType = 'image';
+      (note.payload as any).mediaSrc = '';
+      (note.payload as any).mediaWidth = 0;
+      (note.payload as any).mediaHeight = 0;
+
+      this.pendingImageDraftNoteId = note.note_id;
+      // Add to the stage immediately as a placeholder (draft)
+      this.listOfNotes.push(note);
+      this.noteService.notifyNotesChanged();
+      this.onNoteSelected(note);
+      return true; // Early return necessario per media note
+    }
+
+    return false; // Continua con il flusso normale
+  }
+
+  /**
+   * Applica gli ultimi colori usati (per tipo di nota) da LocalStorage, se disponibili.
+   * Salva anche i colori della nota corrente come "ultimi usati".
+   * @param note La nota a cui applicare i colori
+   */
+  private applyLastUsedColors(note: Note): void {
+    // Apply last-used colors (per note type) from LocalStorage, if any.
+    // Fallback: keep the existing defaults (text defaults or rect defaults above).
+    const lastUsed = this.noteService.getLastUsedColorsForType(note.type);
+    if (lastUsed) {
+      if (lastUsed.backgroundColor) note.backgroundColor = lastUsed.backgroundColor;
+      if (typeof lastUsed.backgroundOpacity === 'number') note.backgroundOpacity = lastUsed.backgroundOpacity;
+      if (lastUsed.borderColor) note.borderColor = lastUsed.borderColor;
+      if (typeof lastUsed.borderOpacity === 'number') note.borderOpacity = lastUsed.borderOpacity;
+      if (typeof lastUsed.borderWidth === 'number') note.borderWidth = lastUsed.borderWidth;
+      if (typeof lastUsed.boxShadow === 'boolean') note.boxShadow = lastUsed.boxShadow;
+    }
+    // Store the colors used for this newly created note as "last used" as well.
+    this.noteService.rememberLastUsedColorsFromNote(note);
+  }
+
+  /**
+   * Sincronizza listOfNotes con l'array aggiornato da attributes.notes.
+   * Da chiamare dopo operazioni remote (delete, duplicate) per mantenere coerenza.
+   */
+  private syncListOfNotesAfterOperation(): void {
+    this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+  }
+
   onNoteDroppedOnStage(evt: { noteType: NoteType; clientX: number; clientY: number }): void {
     try {
       const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: evt.clientX, y: evt.clientY });
       const newNote = new Note(this.id_faq_kb, pos);
       newNote.type = evt.noteType || 'text';
-      if (newNote.type !== 'text') {
-        newNote.text = '';
-      }
-
-      // RECT NOTE: default colors differ from text notes
-      if (newNote.type === 'rect') {
-        newNote.backgroundColor = Note.defaultBackgroundColor('rect');
-        newNote.borderColor = Note.defaultBorderColor('rect');
-      }
-
-      // MEDIA NOTE: non salvare in remoto finché non c'è un media valido.
-      // Apri subito il pannello di destra per il caricamento.
-      if (newNote.type === 'media') {
-        // Requirement: default shadow disabled for image/media notes
-        // (keep the option hidden in the panel UI)
-        newNote.boxShadow = false;
-
-        // Placeholder on stage (draft):
-        // - default size with 4/3 ratio
-        // - visible block (but NOT persisted remotely until media is valid)
-        newNote.width = 240;
-        newNote.height = 180;
-
-        // Inizializza payload (soft typing)
-        if (!newNote.payload) newNote.payload = {};
-        (newNote.payload as any).imageSrc = '';
-        (newNote.payload as any).imageWidth = 0;
-        (newNote.payload as any).imageHeight = 0;
-        (newNote.payload as any).mediaType = 'image';
-        (newNote.payload as any).mediaSrc = '';
-        (newNote.payload as any).mediaWidth = 0;
-        (newNote.payload as any).mediaHeight = 0;
-
-        this.pendingImageDraftNoteId = newNote.note_id;
-        // Add to the stage immediately as a placeholder (draft)
-        this.listOfNotes.push(newNote);
-        this.noteService.notifyNotesChanged();
-        this.onNoteSelected(newNote);
-        return;
+      if (this.setupNewNoteDefaults(newNote, newNote.type)) {
+        return; // Early return per media note
       }
 
       // Apply last-used colors (per note type) from LocalStorage, if any.
-      // Fallback: keep the existing defaults (text defaults or rect defaults above).
-      const lastUsed = this.noteService.getLastUsedColorsForType(newNote.type);
-      if (lastUsed) {
-        if (lastUsed.backgroundColor) newNote.backgroundColor = lastUsed.backgroundColor;
-        if (typeof lastUsed.backgroundOpacity === 'number') newNote.backgroundOpacity = lastUsed.backgroundOpacity;
-        if (lastUsed.borderColor) newNote.borderColor = lastUsed.borderColor;
-        if (typeof lastUsed.borderOpacity === 'number') newNote.borderOpacity = lastUsed.borderOpacity;
-        if (typeof lastUsed.borderWidth === 'number') newNote.borderWidth = lastUsed.borderWidth;
-        if (typeof lastUsed.boxShadow === 'boolean') newNote.boxShadow = lastUsed.boxShadow;
-      }
-      // Store the colors used for this newly created note as "last used" as well.
-      this.noteService.rememberLastUsedColorsFromNote(newNote);
+      this.applyLastUsedColors(newNote);
 
       this.listOfNotes.push(newNote);
       if (!this.dashboardService.selectedChatbot.attributes) {
@@ -1900,6 +1933,112 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     
   }
 
+  /**
+   * Valida se una media note ha un media valido caricato.
+   * @param note La nota da validare
+   * @returns true se la nota ha un media valido (src, width > 0, height > 0)
+   */
+  private validateMediaNote(note: Note): boolean {
+    const payload: any = note.payload || {};
+    const src =
+      (payload?.mediaSrc as string | undefined) ||
+      (payload?.imageSrc as string | undefined);
+    const w =
+      (payload?.mediaWidth as number | undefined) ||
+      (payload?.imageWidth as number | undefined);
+    const h =
+      (payload?.mediaHeight as number | undefined) ||
+      (payload?.imageHeight as number | undefined);
+    return !!src && typeof w === 'number' && w > 0 && typeof h === 'number' && h > 0;
+  }
+
+  /**
+   * Aggiorna una nota nell'array listOfNotes se esiste.
+   * Notifica automaticamente i cambiamenti tramite NoteService.
+   * @param note La nota da aggiornare
+   */
+  private updateNoteInList(note: Note): void {
+    const index = this.listOfNotes.findIndex(n => n.note_id === note.note_id);
+    if (index >= 0) {
+      this.listOfNotes[index] = note;
+      // notificherà automaticamente i cambiamenti tramite Observable
+      this.noteService.notifyNotesChanged();
+    }
+  }
+
+  /**
+   * Aggiorna una nota nell'array attributes.notes se esiste.
+   * @param note La nota da aggiornare
+   */
+  private updateNoteInAttributes(note: Note): void {
+    if (this.dashboardService.selectedChatbot.attributes?.notes) {
+      const attrIndex = this.dashboardService.selectedChatbot.attributes?.notes.findIndex(n => n.note_id === note.note_id);
+      if (attrIndex >= 0) {
+        this.dashboardService.selectedChatbot.attributes.notes[attrIndex] = note;
+      }
+    }
+  }
+
+  /**
+   * Gestisce una media note draft (placeholder non ancora valida).
+   * Aggiorna solo listOfNotes senza toccare attributes.notes o salvare in remoto.
+   * @param note La nota draft da gestire
+   * @param isValid true se la nota ha un media valido
+   * @returns true se la nota è un draft non valido (early return necessario), false altrimenti
+   */
+  private handleMediaNoteDraft(note: Note, isValid: boolean): boolean {
+    if (!isValid) {
+      const existsInList = this.listOfNotes.some(n => n.note_id === note.note_id);
+      // Keep stage updated (note is already visible as placeholder).
+      if (existsInList) {
+        const idx = this.listOfNotes.findIndex(n => n.note_id === note.note_id);
+        if (idx >= 0) {
+          this.listOfNotes[idx] = note;
+          this.noteService.notifyNotesChanged();
+        }
+      }
+      // Do NOT touch attributes.notes and do NOT schedule remote save.
+      return true; // Early return necessario
+    }
+    return false; // Continua con il flusso normale
+  }
+
+  /**
+   * Committa una media note valida in attributes.notes e salva immediatamente in remoto.
+   * Rimuove il flag pendingImageDraftNoteId se presente.
+   * @param note La nota media valida da committare
+   */
+  private commitValidMediaNote(note: Note): void {
+    const existsInAttributes =
+      !!this.dashboardService.selectedChatbot?.attributes?.notes?.some(n => n.note_id === note.note_id);
+    
+    // Media is valid => commit to attributes.notes if this was a draft.
+    if (!existsInAttributes) {
+      if (!this.dashboardService.selectedChatbot.attributes) {
+        this.dashboardService.selectedChatbot.attributes = {};
+      }
+      this.dashboardService.selectedChatbot.attributes.notes = [...this.listOfNotes];
+      this.noteService.notifyNotesChanged();
+    }
+
+    // Una volta committata, non è più draft
+    if (this.pendingImageDraftNoteId === note.note_id) {
+      this.pendingImageDraftNoteId = null;
+    }
+
+    // VINCOLO: il salvataggio deve avvenire appena l'immagine è caricata sullo stage.
+    // Per le media note (poche modifiche e molto "event-based"), bypassiamo il debounce.
+    this.noteService.saveRemoteNote(note, this.id_faq_kb).subscribe({
+      next: (data) => {
+        this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+        this.logger.log('[CDS-CANVAS] Media note saved immediately:', data);
+      },
+      error: (error) => {
+        this.logger.error('[CDS-CANVAS] Error saving media note:', error);
+      }
+    });
+  }
+
   /** onSavePanelNoteDetail */
   onSavePanelNoteDetail(note: Note) {
     this.logger.log('[CDS-CANVAS] onSavePanelNoteDetail note (debounced)', note);
@@ -1910,83 +2049,23 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
     // MEDIA note (draft placeholder): do not persist until media is valid.
     if (note.type === 'media') {
-      const payload: any = note.payload || {};
-      const src =
-        (payload?.mediaSrc as string | undefined) ||
-        (payload?.imageSrc as string | undefined);
-      const w =
-        (payload?.mediaWidth as number | undefined) ||
-        (payload?.imageWidth as number | undefined);
-      const h =
-        (payload?.mediaHeight as number | undefined) ||
-        (payload?.imageHeight as number | undefined);
-      const isValid = !!src && typeof w === 'number' && w > 0 && typeof h === 'number' && h > 0;
-
-      const existsInList = this.listOfNotes.some(n => n.note_id === note.note_id);
-      const existsInAttributes =
-        !!this.dashboardService.selectedChatbot?.attributes?.notes?.some(n => n.note_id === note.note_id);
-
+      const isValid = this.validateMediaNote(note);
       // Draft placeholder: never save remotely until media is valid.
-      if (!isValid) {
-        // Keep stage updated (note is already visible as placeholder).
-        if (existsInList) {
-          const idx = this.listOfNotes.findIndex(n => n.note_id === note.note_id);
-          if (idx >= 0) {
-            this.listOfNotes[idx] = note;
-            this.noteService.notifyNotesChanged();
-          }
-        }
-        // Do NOT touch attributes.notes and do NOT schedule remote save.
-        return;
+      if (this.handleMediaNoteDraft(note, isValid)) {
+        return; // Early return per draft non valido
       }
-
-      // Media is valid => commit to attributes.notes if this was a draft.
-      if (!existsInAttributes) {
-        if (!this.dashboardService.selectedChatbot.attributes) {
-          this.dashboardService.selectedChatbot.attributes = {};
-        }
-        this.dashboardService.selectedChatbot.attributes.notes = [...this.listOfNotes];
-        this.noteService.notifyNotesChanged();
-      }
-
-      // Una volta committata, non è più draft
-      if (this.pendingImageDraftNoteId === note.note_id) {
-        this.pendingImageDraftNoteId = null;
-      }
-
-      // VINCOLO: il salvataggio deve avvenire appena l'immagine è caricata sullo stage.
-      // Per le media note (poche modifiche e molto "event-based"), bypassiamo il debounce.
-      if (isValid) {
-        this.noteService.saveRemoteNote(note, this.id_faq_kb).subscribe({
-          next: (data) => {
-            this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
-            this.logger.log('[CDS-CANVAS] Media note saved immediately:', data);
-          },
-          error: (error) => {
-            this.logger.error('[CDS-CANVAS] Error saving media note:', error);
-          }
-        });
-        return;
-      }
+      // Media is valid => commit and save immediately
+      this.commitValidMediaNote(note);
+      return;
     }
     
     // Salva la nota da salvare (sovrascrive quella precedente se c'è)
     this.pendingNoteToSave = note;
     
     // Aggiorna immediatamente la nota nell'array listOfNotes (per feedback visivo)
-    const index = this.listOfNotes.findIndex(n => n.note_id === note.note_id);
-    if (index >= 0) {
-      this.listOfNotes[index] = note;
-      // notificherà automaticamente i cambiamenti tramite Observable
-      this.noteService.notifyNotesChanged();
-    }
+    this.updateNoteInList(note);
     // Aggiorna anche negli attributes del dashboardService
-    if (this.dashboardService.selectedChatbot.attributes?.notes) {
-      const attrIndex = this.dashboardService.selectedChatbot.attributes?.notes.findIndex(n => n.note_id === note.note_id);
-      if (attrIndex >= 0) {
-        this.dashboardService.selectedChatbot.attributes.notes[attrIndex] = note;
-      }
-    }
+    this.updateNoteInAttributes(note);
     
 
 
@@ -2049,7 +2128,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.noteService.deleteNote(note, this.id_faq_kb).subscribe({
         next: (data) => {
           // Sincronizza listOfNotes con l'array aggiornato dal servizio
-          this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+          this.syncListOfNotesAfterOperation();
           this.logger.log('[CDS-CANVAS] Note deleted successfully, array updated:', data);
         },
         error: (error) => {
@@ -2067,7 +2146,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.noteService.duplicateNote(note, this.id_faq_kb).subscribe({
         next: (duplicatedNote) => {
           // Sincronizza listOfNotes con l'array aggiornato dal servizio
-          this.listOfNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
+          this.syncListOfNotesAfterOperation();
           this.logger.log('[CDS-CANVAS] Note duplicated successfully:', duplicatedNote.note_id);
         },
         error: (error) => {
