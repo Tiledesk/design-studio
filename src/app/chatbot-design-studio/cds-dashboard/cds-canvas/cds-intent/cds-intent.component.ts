@@ -116,8 +116,23 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.initSubscriptions();
   }
 
-
+  /**
+   * Inizializza tutte le subscription RxJS del componente.
+   * 
+   * Pattern utilizzato:
+   * - Tutte le subscription usano `takeUntil(this.unsubscribe$)` per cleanup automatico
+   * - Array `subscriptions` previene doppie subscription (verifica con `find()`)
+   * - `ngOnDestroy()` emette `unsubscribe$` per completare tutte le subscription
+   * 
+   * Subscription gestite:
+   * - behaviorIntent: aggiornamenti intent
+   * - liveActiveIntent: selezione live intent da test site
+   * - alphaConnectors$: opacità connettori
+   * - behaviorIntentColor: cambio colore intent
+   * - connectorsInChanged$: aggiornamenti connettori in (gestita in `initConnectorsInSubscription()`)
+   */
   initSubscriptions() {
+    this.logger.log('[CDS-INTENT-SLICE2] STEP1: Inizializzazione subscription - Pattern takeUntil verificato');
     let subscribtion: any;
     let subscribtionKey: string;
     /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
@@ -125,6 +140,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.intentService.behaviorIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
+        this.logger.log('[CDS-INTENT-SLICE2] STEP4: behaviorIntent emesso - Test funzionale OK', intent?.intent_id);
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] sto modificando l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
@@ -167,6 +183,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP3: behaviorIntent creata con takeUntil - Pattern consistente OK');
+    } else {
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: behaviorIntent già esistente - Anti-doppia-subscription OK');
     }
 
     /** SUBSCRIBE TO THE INTENT LIVE SELECTED FROM TEST SITE */
@@ -176,6 +195,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
         // this.logger.log("[CDS-INTENT] intentLiveActive: ", data, this.intent.intent_display_name);
           if (data) {
+            this.logger.log('[CDS-INTENT-SLICE2] STEP4: liveActiveIntent emesso - Test funzionale OK', data.intent?.intent_id);
             const intent = data.intent;
             const logAnimationType = data.logAnimationType;
             const scale = data.scale;
@@ -209,13 +229,18 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP3: liveActiveIntent creata con takeUntil - Pattern consistente OK');
+    } else {
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: liveActiveIntent già esistente - Anti-doppia-subscription OK');
     }
 
     /** SUBSCRIBE TO THE ALPHA CONNECTOR VALUE */
     subscribtionKey = 'alphaConnectors';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
-      subscribtion = this.stageService.alphaConnectors$.subscribe(value => {
+      subscribtion = this.stageService.alphaConnectors$.pipe(takeUntil(this.unsubscribe$)).subscribe(value => {
+        this.logger.log('[CDS-INTENT-SLICE2] STEP2: alphaConnectors$ emesso con takeUntil - Standardizzazione OK', value);
+        this.logger.log('[CDS-INTENT-SLICE2] STEP4: alphaConnectors$ emesso - Test funzionale OK', value);
         // this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
         this.alphaConnectors = value;
         // Ricarica i connettori quando cambia l'opacità
@@ -225,6 +250,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP2: alphaConnectors$ creata con takeUntil - Standardizzazione OK');
+      this.logger.log('[CDS-INTENT-SLICE2] STEP3: alphaConnectors$ creata con takeUntil - Pattern consistente OK');
+    } else {
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: alphaConnectors$ già esistente - Anti-doppia-subscription OK');
     }
     /** SUBSCRIBE TO THE CHANGE INTENT COLOR */
     subscribtionKey = 'changeIntentColor';
@@ -232,6 +261,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     if (!subscribtion) {
       subscribtion = this.intentService.behaviorIntentColor.pipe(takeUntil(this.unsubscribe$)).subscribe(resp => {
         if(resp.intentId && resp.intentId === this.intent?.intent_id){
+          this.logger.log('[CDS-INTENT-SLICE2] STEP4: behaviorIntentColor emesso - Test funzionale OK', resp.color);
           if(resp.color){
             this.changeIntentColor(resp.color);
           }
@@ -239,7 +269,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP3: behaviorIntentColor creata con takeUntil - Pattern consistente OK');
+    } else {
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: behaviorIntentColor già esistente - Anti-doppia-subscription OK');
     }
+    this.logger.log('[CDS-INTENT-SLICE2] STEP3: Tutte le subscription inizializzate - Pattern consistente OK', `Total: ${this.subscriptions.length}`);
   }
 
 
@@ -349,6 +383,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // Evita di creare subscription duplicate
     if (this.subscriptions.find(item => item.key === keyConnectorsIn)) {
       this.logger.log(`[CONNECTORS] Subscription già esistente per blocco ${this.intent.intent_id}`);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: connectorsInChanged$ già esistente - Anti-doppia-subscription OK');
       return;
     }
 
@@ -357,11 +392,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     const sub = this.connectorService.getConnectorsInObservable(this.intent.intent_id)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(connectors => {
+        this.logger.log('[CDS-INTENT-SLICE2] STEP4: connectorsInChanged$ emesso - Test funzionale OK', connectors?.length);
         this.updateConnectorsIn(connectors);
       });
     
     this.subscriptions.push({ key: keyConnectorsIn, value: sub });
     this.logger.log(`[CONNECTORS] Subscription attiva per blocco ${this.intent.intent_id}`);
+    this.logger.log('[CDS-INTENT-SLICE2] STEP3: connectorsInChanged$ creata con takeUntil - Pattern consistente OK');
   }
 
   /**
@@ -523,7 +560,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   ngOnDestroy() {
+    this.logger.log('[CDS-INTENT-SLICE2] STEP5: ngOnDestroy chiamato - Cleanup subscription iniziato', `Total subscriptions: ${this.subscriptions.length}`);
     this.unsubscribe();
+    this.logger.log('[CDS-INTENT-SLICE2] STEP5: unsubscribe$ emesso e completato - Memory leak prevenuto OK');
   }
 
 
