@@ -277,54 +277,107 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
+  /**
+   * Inizializza il componente intent.
+   * 
+   * Orchestratore che chiama metodi helper privati per inizializzare:
+   * 1. Webhook (se intent webhook)
+   * 2. Intent type (start/fallback/normal)
+   * 3. Actions (con setTimeout per timing)
+   * 4. Attributes (internal, untitled, show options, ecc.)
+   * 5. Connettori (caricamento e subscription)
+   * 
+   * L'ordine di esecuzione è critico e deve essere preservato.
+   */
   async ngOnInit(): Promise<void> {
-      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
-      if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
-        this.showIntentOptions = false;
-      } 
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
-        this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
-        this.chatbot_id = this.dashboardService.id_faq_kb;
-        this.webhookUrl = await this.getWebhook();
-        if(!this.webhookUrl){
-          this.webhookUrl = await this.createWebhook(this.intent);
-        }
-      }
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
-        this.isDefaultFallback = true;
-      }
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
-        this.isStart = true;
-        if(this.intent.actions.length === 0){
-          let action = new Action;
-          action._tdActionType =  "intent";
-          this.intent.actions.push(action);
-        }
-        this.showIntentOptions = false;
-        this.startAction = this.intent.actions[0];
-      }
-      else {
-        this.setIntentSelected();
-      }
-      setTimeout(() => {
-        this.setActionIntent();
-      }, 100); 
-      this.isInternalIntent = checkInternalIntent(this.intent)
-      this.updateIsUntitledBlock();
-      // Aggiorna showIntentOptions dopo l'inizializzazione
-      this.updateShowIntentOptions();
-      // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
-      this.checkIfNewChatbot();
-      this.addEventListener();
-      this.setIntentAttributes();
-      
-      // --- Carica i connettori in ingresso iniziali ---
-      this.loadConnectorsIn();
-      
-      // --- Sottoscriviti agli aggiornamenti dei connettori ---
-      this.initConnectorsInSubscription();
+    this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
+    
+    if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
+      this.showIntentOptions = false;
+    }
+    
+    await this.initializeWebhook();
+    this.initializeIntentType();
+    this.initializeActions();
+    this.initializeAttributes();
+    this.initializeConnectors();
   }
 
+  /**
+   * Inizializza webhook per intent webhook.
+   * Recupera webhook esistente o ne crea uno nuovo se non esiste.
+   */
+  private async initializeWebhook(): Promise<void> {
+    if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+      this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
+      this.chatbot_id = this.dashboardService.id_faq_kb;
+      this.webhookUrl = await this.getWebhook();
+      if(!this.webhookUrl){
+        this.webhookUrl = await this.createWebhook(this.intent);
+      }
+    }
+  }
+
+  /**
+   * Inizializza tipo intent (start/fallback/normal).
+   * Imposta isStart, isDefaultFallback e gestisce actions per intent start/webhook.
+   */
+  private initializeIntentType(): void {
+    if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
+      this.isDefaultFallback = true;
+    }
+    if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+      this.isStart = true;
+      if(this.intent.actions.length === 0){
+        let action = new Action;
+        action._tdActionType =  "intent";
+        this.intent.actions.push(action);
+      }
+      this.showIntentOptions = false;
+      this.startAction = this.intent.actions[0];
+    }
+    else {
+      this.setIntentSelected();
+    }
+  }
+
+  /**
+   * Inizializza actions con timing.
+   * Usa setTimeout per garantire che setActionIntent() venga chiamato dopo l'inizializzazione.
+   */
+  private initializeActions(): void {
+    setTimeout(() => {
+      this.setActionIntent();
+    }, 100);
+  }
+
+  /**
+   * Inizializza attributi del componente.
+   * Imposta isInternalIntent, aggiorna isUntitledBlock, showIntentOptions, verifica se chatbot è nuovo,
+   * aggiunge event listener e imposta attributi intent.
+   */
+  private initializeAttributes(): void {
+    this.isInternalIntent = checkInternalIntent(this.intent);
+    this.updateIsUntitledBlock();
+    // Aggiorna showIntentOptions dopo l'inizializzazione
+    this.updateShowIntentOptions();
+    // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
+    this.checkIfNewChatbot();
+    this.addEventListener();
+    this.setIntentAttributes();
+  }
+
+  /**
+   * Inizializza connettori in ingresso.
+   * Carica i connettori iniziali e sottoscrive agli aggiornamenti.
+   */
+  private initializeConnectors(): void {
+    // --- Carica i connettori in ingresso iniziali ---
+    this.loadConnectorsIn();
+    
+    // --- Sottoscriviti agli aggiornamenti dei connettori ---
+    this.initConnectorsInSubscription();
+  }
 
   async getWebhook(): Promise<string | null> {
     try {
