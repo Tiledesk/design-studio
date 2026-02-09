@@ -892,16 +892,68 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   }
 
   /**
-   * Usata dal template come [cdkDropListEnterPredicate]: restituisce una funzione predicate per il drop.
-   * Blocca l’ingresso nella lista se il chatbot è “nuovo” e l’intent ha già un’action (limite un’action per blocco); altrimenti consente il drop.
+   * Predicate stabile per [cdkDropListEnterPredicate]: stessa riferimento a ogni CD per evitare re-evaluazione inutili.
+   * Blocca l’ingresso nella lista se il chatbot è “nuovo” e l’intent ha già un’action (limite un’action per blocco).
    */
-  canEnterDropList(action: any) {
-    return (item: CdkDrag<any>) => {
-      if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
-        return false;
-      }
-      return true;
+  readonly dropListEnterPredicate = (item: CdkDrag<any>) => {
+    if (this.isNewChatbot && this.intent?.actions?.length) {
+      return false;
+    }
+    return true;
+  };
+
+  /**
+   * Usata dal template come trackBy nell’*ngFor delle action: identifica univocamente l’item per ridurre re-render.
+   */
+  trackByActionId(_index: number, action: Action): string {
+    return action._tdActionId;
+  }
+
+  /**
+   * Stili dinamici del blocco intent (background e outline selezione). Esposta come getter per evitare oggetto inline nel template.
+   */
+  get intentStyle(): { [key: string]: string } {
+    if (!this.intent?.attributes?.color) {
+      return {};
+    }
+    const c = this.intent.attributes.color;
+    const outline =
+      this.intentService.intentSelectedID === this.intent.intent_id && this.intentService.intentActive
+        ? `2px solid rgba(${c}, 1)`
+        : 'none';
+    return {
+      'background-color': `rgba(${c}, 0.35)`,
+      outline,
     };
+  }
+
+  /**
+   * Stile outline per la singola action (selezionata o no). Usata nel template al posto di ngStyle inline.
+   */
+  getActionItemStyle(action: Action): { [key: string]: string } {
+    if (!this.intent?.attributes?.color) {
+      return {};
+    }
+    const outline =
+      this.intentService.actionSelectedID === action._tdActionId
+        ? `2px solid rgba(${this.intent.attributes.color}, 1)`
+        : 'none';
+    return { outline };
+  }
+
+  /**
+   * Chiamate da cds-connector-in (onShowConnectorsIn / onHideConnectorsIn). Implementazione vuota per evitare binding morti.
+   */
+  onShowConnectorsIn(): void {}
+
+  onHideConnectorsIn(): void {}
+
+  /**
+   * Usata nel template per la classe cds-no-featured-action.
+   * Comportamento invariato rispetto al precedente template: la condizione originale equivale a (tipo !== REPLY).
+   */
+  isNoFeaturedAction(action: Action): boolean {
+    return action._tdActionType !== TYPE_ACTION.REPLY;
   }
 
   /**

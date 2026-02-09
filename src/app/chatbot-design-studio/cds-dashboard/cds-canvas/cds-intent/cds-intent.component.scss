@@ -3,7 +3,7 @@
 /* Variabili host per tema e dimensioni */
 :host {
   --action-background: #{var(--action-item-background)};
-  --action-no-featured-backgroud: #{var(--action-no-featured-item-background)};
+  --action-no-featured-background: #{var(--action-no-featured-item-background)};
   --intent-background: #{var(--intent-preview-background)};
   --intent-border-color: #{var(--intent-preview-borderColor)};
   --intent-header-background: transparent;
@@ -14,7 +14,7 @@
   --add-action-btn-color: #{var(--add-action-btn-color-preview)};
   --add-action-btn-hover-color: #{var(--add-action-btn-hover-color-preview)};
   --base-color: #{var(--blu)};
-  --startIntentMaxWith: 160px;
+  --startIntentMaxWidth: 160px;
   --base-border-radius-base: #{var(--button-border-radius-base)};
 }
 
@@ -68,7 +68,7 @@
     padding: 0;
     border-radius: unset;
     border: unset;
-    max-width: var(--startIntentMaxWith);
+    max-width: var(--startIntentMaxWidth);
     outline: unset!important;
     .intent-background-overlay {
       background-color: transparent!important;
@@ -105,7 +105,6 @@
   }
   .pic-header {
     display: flex;
-    justify-content: space-between;
     width: auto;
     margin: 0;
     padding: 0 0 10px 0;
@@ -131,15 +130,15 @@
     animation-name: flash_border;
     animation-duration: 2s;
     animation-timing-function: linear;
-    animation-iteration-count: 2s;
+    animation-iteration-count: 2;
     -webkit-animation-name: flash_border;
     -webkit-animation-duration: 2s;
     -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: 2s;
+    -webkit-animation-iteration-count: 2;
     -moz-animation-name: flash_border;
     -moz-animation-duration: 2s;
     -moz-animation-timing-function: linear;
-    -moz-animation-iteration-count: 2s;
+    -moz-animation-iteration-count: 2;
   }
 
 
@@ -171,7 +170,7 @@
     box-shadow: #00000052 0 -1px inset;
     background-color: #4b5052;
     border-radius: 22px;
-    max-width: var(--startIntentMaxWith);
+    max-width: var(--startIntentMaxWidth);
     right: 0;
     cursor: pointer;
     opacity: 1;
@@ -271,7 +270,7 @@
 
 .action-drag-placeholder {
   background: var(--drop-zone-background);
-  border: dashed 1px var(----drop-zone-color-border);
+  border: dashed 1px var(--drop-zone-color-border);
   min-height: 60px;
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   border-radius: 8px;
@@ -295,7 +294,7 @@
   background-color: rgba(255, 255, 255, 0.7);
 }
 
-
+/* Footer intent */
 .footer-intent {
   cursor: pointer;
   margin-bottom: -10px;
@@ -335,6 +334,7 @@
   transition: 0.25s all ease-in-out;
 }
 
+/* Body e header azione */
 .body-action {
   position: relative;
   display: flex;
@@ -390,7 +390,8 @@
   user-select: none;
 }
 
-.button-intent {
+/* Pulsanti intent (base condivisa) */
+%intent-btn-base {
   display: block;
   text-align: center;
   user-select: none;
@@ -407,6 +408,10 @@
   margin: 10px 5px 0;
   font-family: var(--font-family-poppins);
   padding: 10px;
+}
+
+.button-intent {
+  @extend %intent-btn-base;
   transition: all 0.1s;
 
   &:hover {
@@ -415,8 +420,6 @@
   }
 }
 
-
-
 .button-intent-active {
   outline: 2px solid rgba(236, 182, 6, .6901960784) !important;
   background-color: #d2d2d2;
@@ -424,22 +427,7 @@
 }
 
 .intent--action {
-  display: block;
-  text-align: center;
-  user-select: none;
-  box-sizing: border-box;
-  outline: none;
-  border: 0.1em dashed #d2d2d2;
-  border-radius: 20px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: normal;
-  height: auto;
-  line-height: 32px;
-  margin: 10px 5px 0;
-  font-family: var(--font-family-poppins);
-  padding: 10px;
+  @extend %intent-btn-base;
   transition: all 0.3s;
   width: 96px;
 }
@@ -460,7 +448,6 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 11px;
   font-size: 10px;
   font-weight: 400;
 }
@@ -582,6 +569,11 @@ cds-panel-intent-header.isStart ::ng-deep {
   color: var(--brown);
   font-size: 14px;
   text-align: center;
+}
+
+.add--action-placeholder-desc {
+  display: block;
+  font-size: 12px;
 }
 
 .add--action-placeholder:hover .add--action-placeholder-add-icon span {

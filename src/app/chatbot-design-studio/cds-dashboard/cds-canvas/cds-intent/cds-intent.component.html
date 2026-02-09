@@ -5,10 +5,7 @@
     [class.isStart]="isStart" 
     [class.tds-slim-intent]="isNewChatbot"
     [id]="'intent-content-'+ intent?.intent_id"
-    [ngStyle]="{
-        'background-color': 'rgba('+intent.attributes.color+', 0.35)',
-        'outline': intentService.intentSelectedID === intent.intent_id && intentService.intentActive ? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
-      }">
+    [ngStyle]="intentStyle">
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
     <cds-connector-in *ngIf="!isStart && connectorsIn?.length>0"
@@ -64,13 +61,13 @@
         [cdkDropListData]="listOfActions"
         [cdkDropListDisabled]="isNewChatbot"
         (cdkDropListDropped)="onDropAction($event)"
-        [cdkDropListEnterPredicate]="canEnterDropList(intent)">
+        [cdkDropListEnterPredicate]="dropListEnterPredicate">
         <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
             cdkDrag
             [cdkDragDisabled]="dragDisabled || isNewChatbot">
             <div class="add--action-placeholder-text">
                 {{ 'CDSCanvas.AddAnActionToBlock' | translate}}
-                <span style="display: block;font-size: 12px;">
+                <span class="add--action-placeholder-desc">
                     {{ 'CDSCanvas.AddAnActionToBlockDescription' | translate}}
                 </span>
             </div>
@@ -83,7 +80,7 @@
             </div>
         </div>
 
-        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
+        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last; trackBy: trackByActionId" 
             cdkDrag
             [cdkDragDisabled]="isNewChatbot"
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
@@ -91,14 +88,12 @@
             (cdkDragMoved)="onDragMove($event)"
             [id]="action._tdActionId" 
             class="box-action" 
-            tabindex=-1
+            tabindex="-1"
             [ngClass]="{
-                'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
+                'cds-no-featured-action': isNoFeaturedAction(action),
                 'cds-last-action': last
             }" 
-            [ngStyle]="{
-                'outline': intentService.actionSelectedID === action._tdActionId? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
-            }"
+            [ngStyle]="getActionItemStyle(action)"
             (keydown)="onKeydown($event)"
             (click)="onSelectAction(action, i, action._tdActionId)">
             <span class="action-element">
@@ -475,7 +470,7 @@
 
                 </div>
             </span>
-            <cds-action-arrow *ngIf="(listOfActions?.length-1) > i" 
+            <cds-action-arrow *ngIf="!last" 
                 id="action-arrow-{{i}}"
                 class="cds-action-arrow">
             </cds-action-arrow>
