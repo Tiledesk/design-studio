@@ -306,8 +306,40 @@
                 </div> -->
 
 
+                <!-- aggiungi una checkbox per reasoning con label "Reasoning"-->
+                <div class="field-box">
+                    <!-- <label class="title-label">{{'CDSCanvas.Reasoning' | translate }}</label> -->
+                    <mat-checkbox
+                        [checked]="action.reasoning"
+                        (change)="onChangeCheckbox($event, 'reasoning')">
+                        {{'CDSCanvas.Reasoning' | translate }}
+                    </mat-checkbox>
+                </div>
 
-
+                <div class="field-box" *ngIf="action.reasoning">
+                    <label class="title-label">{{'CDSCanvas.ReasoningLevel' | translate }}</label>
+                    <div class="action-wait-content">
+                        <div class="action-wait-slider">
+                            <div class="action-wait-range">{{'CDSCanvas.ReasoningLevelLow' | translate }}</div>
+                            <mat-slider
+                                class="wait-slider"
+                                thumbLabel
+                                [displayWith]="formatReasoningLabel"
+                                [step]="1"
+                                [min]="0"
+                                [max]="2"
+                                [ngModel]="reasoningLevelSlider"
+                                (change)="onReasoningLevelChange($event.value)"
+                                aria-label="reasoning level">
+                            </mat-slider>
+                            <div class="action-wait-range">{{'CDSCanvas.ReasoningLevelHigh' | translate }}</div>
+                        </div>
+                        <input type="text"
+                               class="slider-input gpt-setting-input"
+                               [value]="formatReasoningLabel(action.reasoningLevel ?? 'medium')"
+                               readonly>
+                    </div>
+                </div>
 
                 <!-- // max_tokens slider -->
                 <div class="field-box">

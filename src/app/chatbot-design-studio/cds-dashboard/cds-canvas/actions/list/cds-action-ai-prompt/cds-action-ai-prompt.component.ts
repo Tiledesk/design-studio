@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, On
 import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 //MODELS
-import { ActionAiPrompt } from 'src/app/models/action-model';
+import { ActionAiPrompt, ReasoningLevel } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 
 //SERVICES
@@ -330,6 +330,7 @@ setModel(modelName: string){
   } else {
     this.ai_setting['temperature'].disabled= false
   }
+  console.log("[ACTION AI_PROMPT] llm_models_flat: ", this.llm_models_flat);
 }
 
 
@@ -371,9 +372,39 @@ setModel(modelName: string){
     this.updateAndSaveAction.emit();
   }
 
+  /** Chiamato al change dello slider reasoning: salva l'enum e emette il save */
+  onReasoningLevelChange(value: number): void {
+    this.action.reasoningLevel = this.numberToReasoningLevel(value);
+    this.updateAndSaveAction.emit();
+  }
+
+  /** Converte 0,1,2 in enum ReasoningLevel (per slider → action) */
+  numberToReasoningLevel(n: number): ReasoningLevel {
+    const clamped = Math.min(2, Math.max(0, n));
+    return clamped === 0 ? 'low' : clamped === 1 ? 'medium' : 'high';
+  }
+
+  /** Valore numerico per lo slider (0, 1, 2) da action.reasoningLevel */
+  get reasoningLevelSlider(): number {
+    const v = this.action.reasoningLevel;
+    if (v === 'low') return 0;
+    if (v === 'medium') return 1;
+    if (v === 'high') return 2;
+    // retrocompatibilità: se era salvato come number
+    if (typeof v === 'number') return Math.min(2, Math.max(0, v));
+    return 1; // default medium
+  }
+  set reasoningLevelSlider(value: number) {
+    this.action.reasoningLevel = this.numberToReasoningLevel(value);
+  }
+
   onChangeCheckbox(event: MatCheckboxChange, target){
     try {
       this.action[target] = event.checked;
+      if (target === 'reasoning' && event.checked && (this.action.reasoningLevel === undefined || this.action.reasoningLevel === null)) {
+        this.action.reasoningLevel = 'medium';
+      }
+      // this.action.assignReasoningContentTo = "reasoning_content";
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     } catch (error) {
       this.logger.log("[ACTION AI_PROMPT] Error: ", error);
@@ -726,6 +757,13 @@ setModel(modelName: string){
    */
   formatSliderLabel = (value: number): string => {
     return this.formatNumberPipe.transform(value);
+  }
+
+  /** Label per reasoning: accetta number (0,1,2) per lo slider thumb o enum ('low'|'medium'|'high') per l'input */
+  formatReasoningLabel = (value: number | ReasoningLevel): string => {
+    const n = typeof value === 'number' ? value : (value === 'low' ? 0 : value === 'medium' ? 1 : 2);
+    const key = n === 0 ? 'CDSCanvas.ReasoningLevelLow' : n === 1 ? 'CDSCanvas.ReasoningLevelMedium' : 'CDSCanvas.ReasoningLevelHigh';
+    return this.translate.instant(key);
   }
 
 }
