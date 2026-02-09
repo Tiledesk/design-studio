@@ -421,22 +421,19 @@ svg:not(:root) {
 }
 
 // ============================================================
-// LOADING MASK
+// LOADING MASK (solo sullo stage, dentro #tds_container)
 // ============================================================
 #masck-canv {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 60px;
-  right: 0;
+  inset: 0;
   z-index: 999;
   pointer-events: all;
   background-color: var(--blu-light-04);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-  transition-delay: 0s;
   opacity: 1;
 
   &.disabled {
@@ -445,14 +442,17 @@ svg:not(:root) {
     pointer-events: none;
   }
 
-  img {
+  img.logo {
     max-width: 40px;
     max-height: 40px;
+    flex-shrink: 0;
   }
 
   .loading {
-    position: absolute;
-    margin-top: 80px;
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .info-loading {

@@ -1,7 +1,7 @@
 @import "./src/assets/sass/animations.scss";
 
-
-:host{
+/* Variabili host per tema e dimensioni */
+:host {
   --action-background: #{var(--action-item-background)};
   --action-no-featured-backgroud: #{var(--action-no-featured-item-background)};
   --intent-background: #{var(--intent-preview-background)};
@@ -18,10 +18,10 @@
   --base-border-radius-base: #{var(--button-border-radius-base)};
 }
 
-
+/* Preview durante drag (CDK) */
 #customDragPreview {
   display: block;
-  position:absolute;
+  position: absolute;
   pointer-events: none;
   user-select: none;
   opacity: 0.8;
@@ -31,20 +31,19 @@
 }
 
 
-.action-element{
+.action-element {
   width: 100%;
 }
 
-
+/* Blocco intent (card principale) */
 .panel-intent-content {
   transition: background-color 0.15s ease 0s;
   width: 264px;
   cursor: grab;
   position: relative;
-  margin: 0px;
+  margin: 0;
   padding: var(--base-padding-preview);
   border-radius: var(--base-border-radius-preview);
-  // outline: 1px solid var(--intent-border-color);
   &::before {
     display: block;
     border-radius: 10px;
@@ -62,7 +61,7 @@
     animation-iteration-count: 1s;
     border-radius: var(--base-border-radius-preview);
   }
-  &.isStart{
+  &.isStart {
     position: absolute;
     height: 100%;
     background-color: unset!important;
@@ -120,31 +119,27 @@
     margin-left: -10px;
     display: block;
     position: absolute;
-    &.isStart{
+    &.isStart {
       margin-top: -25px;
       margin-left: 10px;
     }
-    span.material-icons{
-      color: var(--intent-header-icon-color)
+    span.material-icons {
+      color: var(--intent-header-icon-color);
     }
   }
-  // --------------------------------
-  // https://stackoverflow.com/questions/9476923/css3-animate-border-color
-
   .flashBorder {
-    // border: 3px solid #fff;
     animation-name: flash_border;
     animation-duration: 2s;
     animation-timing-function: linear;
-    animation-iteration-count: 2s; //infinite;
+    animation-iteration-count: 2s;
     -webkit-animation-name: flash_border;
     -webkit-animation-duration: 2s;
     -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: 2s; //infinite;
+    -webkit-animation-iteration-count: 2s;
     -moz-animation-name: flash_border;
     -moz-animation-duration: 2s;
     -moz-animation-timing-function: linear;
-    -moz-animation-iteration-count: 2s //infinite;
+    -moz-animation-iteration-count: 2s;
   }
 
 
@@ -206,10 +201,6 @@
     margin: auto 0;
   }
 
-  // .pic-title-text:hover {
-  //   /*  background: rgb(221, 212, 183); */
-  // }
-
   .pic-title-text {
     transition: background 0.15s ease 0s;
     padding: 4px 8px;
@@ -225,35 +216,24 @@
     white-space: pre-wrap;
     overflow-wrap: break-word;
     pointer-events: auto;
-    &.isStart{
+    &.isStart {
       height: 100%;
       display:flex;
       align-items: center;
     }
     .header {
-      padding:0px!important;
+      padding: 0 !important;
     }
   }
 
 }
 
-
-
-
-
-
-/* Actions list
-/* ***************************** */
+/* Lista azioni */
 .actions-list-wpr {
   display: flex;
   flex-direction: column;
-  // gap: 10px; // nk
-  gap: 18px; // nk
-  //min-height: 200px;
-  //width: 200px;
-  // border: 1px solid #ccc;
-  //padding: 10px;
-  padding-top: 0px;
+  gap: 18px;
+  padding-top: 0;
 }
 
 .box-action {
@@ -265,16 +245,13 @@
   min-height: 30px;
   border-radius: var(--base-border-radius-preview);
   border: 2px solid rgb(255, 255, 255);
-  // padding: 0 10px 10px 10px;
   background-color: var(--action-background);
-  &.isFirst{
-    // height: 1px!important;
+  &.isFirst {
     display: none;
   }
 }
 
-/* Drag placeholder 
-/* ******************************** */
+/* Drag placeholder */
 .cdk-drag-preview {
   box-sizing: border-box;
   border-radius: 4px;
@@ -288,18 +265,12 @@
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-// .box-action:last-child {
-//   border: none;
-// }
-
 .actions-list-wpr.cdk-drop-list-dragging .box-action:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 .action-drag-placeholder {
-  // background: #ccc;
   background: var(--drop-zone-background);
-  // border: dotted 3px #999;
   border: dashed 1px var(----drop-zone-color-border);
   min-height: 60px;
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
@@ -321,7 +292,6 @@
 
 
 .cds-no-featured-action {
-  // background-color: var(--action-no-featured-backgroud);
   background-color: rgba(255, 255, 255, 0.7);
 }
 
@@ -338,74 +308,50 @@
 .last-action-intent {
   display: block;
   float: inline-end;
-  // margin: 6px -12px 0 0;
-  // padding: 0 24px 0 0;
   margin: 6px 0 0 0;
   padding: 0;
 }
-/* Btn add action
-/* --------------------------------- */
+
+/* Pulsante aggiungi azione */
 .csd-open-action-menu-btn-wpr {
   text-align: center;
   position: absolute;
   display: block;
   bottom: -41px;
-  left: 0px;
-  right: 0px;
+  left: 0;
+  right: 0;
   padding-top: 20px;
 }
 
-.footer-intent>.csd-open-action-menu-btn-wpr,
-.add--action-placeholder .csd-open-action-menu-btn-wpr
-{
+.footer-intent > .csd-open-action-menu-btn-wpr,
+.add--action-placeholder .csd-open-action-menu-btn-wpr {
   opacity: 0;
 }
 
-.footer-intent:hover>.csd-open-action-menu-btn-wpr,
+.footer-intent:hover > .csd-open-action-menu-btn-wpr,
 .add--action-placeholder:hover .csd-open-action-menu-btn-wpr {
   opacity: 1;
-  transform: translate3d(0, 00px, 0);
+  transform: translate3d(0, 0, 0);
   transition: 0.25s all ease-in-out;
 }
-
-
-// .cds-last-action>.csd-open-action-menu-btn-wpr {
-//   opacity: 0;
-// }
-
-// .cds-last-action:hover>.csd-open-action-menu-btn-wpr {
-//   opacity: 1;
-// }
 
 .body-action {
   position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
-  // background-color: #ffffff80; // nk
-  // box-shadow: #0000000f 0 0 0 1px; // nk
-  border-radius: 6px; // nk
+  border-radius: 6px;
 }
-
-// .cds-featured-action {
-//   background-color: #e3e1f1;
-// }
 
 .header-action {
   position: relative;
   min-height: 54px;
-  /* padding: 0px 10px; */
-  padding: 0px 0px;
+  padding: 0;
   width: 100%;
-  position: relative;
   display: flex;
   align-items: center;
-  // flex-direction: column;
   min-height: 25px;
-  // border-radius: 6px;
-  // background-color: rgb(255 255 255 / 50%);
-  // box-shadow: rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
-  &.isLast{
+  &.isLast {
     display: none;
   }
 }
@@ -463,7 +409,6 @@
   padding: 10px;
   transition: all 0.1s;
 
-  // min-width: 100px;
   &:hover {
     background-color: #d2d2d2;
     color: #333333;
@@ -473,19 +418,7 @@
 
 
 .button-intent-active {
-  // background-color: #d2d2d2;
-  // color: #333333;
-
   outline: 2px solid rgba(236, 182, 6, .6901960784) !important;
-
-}
-
-
-// .button-intent:hover svg {
-//   fill: #333333;
-// } 
-
-.button-intent-active {
   background-color: #d2d2d2;
   color: #333333;
 }
@@ -549,43 +482,18 @@
   }
 }
 
-// .header__center {
-//   font-size: 2rem;
-//   display: grid;
-//   grid-template-columns: 1fr max-content 1fr;
-//   grid-column-gap: 1.2rem;
-//   align-items: center;
-//   margin-top: 24px;
-//   margin-bottom: 0px;
-//   padding-left: 12px;
-//   padding-right: 12px;
-// }
-
-// .header__center::before,
-// .header__center::after {
-//   content: "";
-//   display: block;
-//   height: 1px;
-//   background-color: currentColor;
-// }
-
-
 .cds-action-arrow {
   position: absolute;
-  // display: flex;
-  bottom: -15px
+  bottom: -15px;
 }
 
-.cds-action-arrow>span {
+.cds-action-arrow > span {
   transform: rotate(-90deg);
   color: #d2e3fc;
 }
 
-
-
-
 .cds-add-action-btn {
-  margin: 0px;
+  margin: 0;
   padding: 0 10px;
   background: var(--add-action-btn-background);
   box-shadow: #001b4714 0 3px 8px;
@@ -597,34 +505,30 @@
   transition: all .3s;
   line-height: 20px;
   width: 100%;
-  // outline: 2px solid var(--base-color) !important;
-  // z-index: 2;
 }
 
-.cds-add-action-btn>span {
+.cds-add-action-btn > span {
   font-size: 16px;
   color: var(--base-color);
 }
 
 .cds-add-action-btn:hover {
   opacity: 0.8;
-  // color: var(--add-action-btn-hover-color)
 }
 
-cds-action-description.header-action ::ng-deep{
-  .action-title{
-    max-width: 100%
+cds-action-description.header-action ::ng-deep {
+  .action-title {
+    max-width: 100%;
   }
 }
 
-cds-panel-intent-header.isStart ::ng-deep{
+cds-panel-intent-header.isStart ::ng-deep {
   input {
     color: white !important;
   }
 }
 
-
-//** FLOATING MENU - start**//
+/* Opzioni intent (question/form) */
 .cds-intent-options {
   display: flex;
   justify-content: center;
@@ -654,11 +558,6 @@ cds-panel-intent-header.isStart ::ng-deep{
   }
 }
 
-//** FLOATING MENU - end**//
-
-
-
-
 .add--action-placeholder {
   position: relative;
   display: flex;
@@ -670,7 +569,6 @@ cds-panel-intent-header.isStart ::ng-deep{
   border: 1px solid var(--brown);
   padding: 12px 6px;
   border-style: dashed;
-  // background: rgba(62, 169, 245, 0.1);
   background: rgba(221, 228, 234, .8);
 }
 
@@ -699,18 +597,17 @@ cds-panel-intent-header.isStart ::ng-deep{
   border-style: dashed;
 }
 
-.add--action-placeholder>.add-action-from-placeholder-btn-wpr {
+.add--action-placeholder > .add-action-from-placeholder-btn-wpr {
   opacity: 0;
   position: absolute;
   top: 99px;
 }
 
-.add--action-placeholder:hover>.add-action-from-placeholder-btn-wpr {
+.add--action-placeholder:hover > .add-action-from-placeholder-btn-wpr {
   opacity: 1;
 }
 
-
-/** INTENT BORDER ANIMATION **/
+/* Animazione bordo intent live */
 .live-active-intent {
   position: relative;
 }
@@ -735,13 +632,14 @@ cds-panel-intent-header.isStart ::ng-deep{
   inherits: false;
   initial-value: 0turn;
 }
+
 @keyframes outline-spin {
   to {
     --outline-angle: -1turn;
   }
 }
 
-/** SLIM INTENT **/
+/* Intent compatto (new chatbot) */
 .tds-slim-intent {
   padding: 2px;
   .pic-header {
@@ -750,14 +648,13 @@ cds-panel-intent-header.isStart ::ng-deep{
   .pic-title-text {
     padding: 4px 8px 10px;
   }
-  .footer-intent{
-    min-height: 0px;
+  .footer-intent {
+    min-height: 0;
     margin: 0;
   }
   .tds-drop-element {
     width: calc(100% - 4px);
   }
-
 }
 
 .tds-drop-element {
@@ -767,5 +664,3 @@ cds-panel-intent-header.isStart ::ng-deep{
   z-index: 1;
   cursor: move;
 }
-
-
