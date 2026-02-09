@@ -306,11 +306,12 @@
                 </div> -->
 
 
-                <!-- aggiungi una checkbox per reasoning con label "Reasoning"-->
-                <div class="field-box">
+                <!-- aggiungi una checkbox per reasoning con label "Reasoning" (disabilitata se il modello non supporta reasoning)-->
+                <div class="field-box checkbox-reasoning">
                     <!-- <label class="title-label">{{'CDSCanvas.Reasoning' | translate }}</label> -->
                     <mat-checkbox
                         [checked]="action.reasoning"
+                        [disabled]="isReasoningCheckboxDisabled"
                         (change)="onChangeCheckbox($event, 'reasoning')">
                         {{'CDSCanvas.Reasoning' | translate }}
                     </mat-checkbox>

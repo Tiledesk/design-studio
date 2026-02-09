@@ -21,6 +21,7 @@ export interface LlmModel {
   multiplier?: string;
   min_tokens?: number;
   max_output_tokens?: number;
+  reasoning?: boolean;
 }
 
 export interface AutocompleteOption {

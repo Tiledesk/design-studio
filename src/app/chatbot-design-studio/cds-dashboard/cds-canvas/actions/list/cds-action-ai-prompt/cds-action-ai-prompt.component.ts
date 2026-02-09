@@ -330,6 +330,10 @@ setModel(modelName: string){
   } else {
     this.ai_setting['temperature'].disabled= false
   }
+  // Se il modello non supporta reasoning, disattiva reasoning sull'action
+  if (this.llm_model_selected?.reasoning !== true) {
+    this.action.reasoning = false;
+  }
   // console.log("[ACTION AI_PROMPT] llm_models_flat: ", this.llm_models_flat);
 }
 
@@ -382,6 +386,11 @@ setModel(modelName: string){
   numberToReasoningLevel(n: number): ReasoningLevel {
     const clamped = Math.min(2, Math.max(0, n));
     return clamped === 0 ? 'low' : clamped === 1 ? 'medium' : 'high';
+  }
+
+  /** True se la checkbox Reasoning deve essere disabilitata (modello senza supporto reasoning) */
+  get isReasoningCheckboxDisabled(): boolean {
+    return this.llm_model_selected?.reasoning !== true;
   }
 
   /** Valore numerico per lo slider (0, 1, 2) da action.reasoningLevel */
