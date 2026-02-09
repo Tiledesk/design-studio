@@ -7,33 +7,62 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+
+# 1.39.27-rc1
+- **added**: added reasoning in AI Prompt action
+
 # 1.39.26
 - **added**: added iteration action
 
-# 1.39.25
+# 1.39.26-rc1
+- **bug-fix**: sort attribute list in Variable List Component
+- **bug-fix**: change the "use kb name" field to 2 lines
+- **bug-fix**: the selected model is red even when the api is set
+- **changed**: change the AI ​​settings preview
+
+# 1.39.25-rc2
 - **bug-fix**: Fixed a filter error when selecting a KB.
 - **bug-fix**: Fixed an error when setting the re-ranking multiplier when setting "use KB name."
 - **changed**: Set the "Max chunks for re-ranking" to 100.
 
-# 1.39.24
-- **bug-fixed**: note - video note resizing is not smooth
-- **bug-fixed**: note - fixed max_output_tokens error
-- **changed**: note - handles have been added to the rectangle note vertices
-- **bug-fixed**: note - disabled the 100x100px non-clickable stage area (tds-drag-drawer).
-- **bug-fixed**: note - disabled the note-controls menu when it is transparent
-- **changed**: note - restored the note detail panel opening when clicking on the note, except for the video note
-- **bug-fixed**: note - when change the color, the note detail panel closes
-- **changed**: note - change default colors
-- **changed**: note - store the last colors in the LS
-- **added**: note - add the same intent menu to notebooks
-- **changed**: note - limit uploads to images and GIFs only
-- **added**: note - allow uploading videos from links
-- **added**: Add the text: Total retrieved chunks for re-ranking: 
-- **changed**: Combine chunk limit, re-ranking, and multiplier into a single block, so pay attention to the spacing.
-- **changed**: In the settings, I replace the token icon and add badges in place of the pipe.
-- **changed**: Add the type (H/S) hybrid or semantic, next to the name.
+# 1.39.25-rc1
+- **changed**: updated MCP server, added "tools" selection for each server
+
+# 1.39.25
+
+# 1.39.24-rc11
+- **changed**: minor updates on API for upload a file/chatbot avatar
+
+# 1.39.24-rc10
+- **added**: added tools MCP server
+
+# 1.39.24-rc9
+- **changed**: API for upload a file/chatbot avatar
+
+# 1.39.24-rc8
+- **added**: Add text: Total retrieved chunks for re-ranking: x
+- **changed**: Merge chunk limit, re-ranking, and multiplier into a single block
+- **changed**: In the settings, replace the token icon and add badges in place of the pipe
+- **changed**: Add the type (H/S) hybrid or semantic, next to the name
+
+# 1.39.24-rc7
+- **bug-fixed**: fix regression in action menu that doesn't allow deleting an action
+
+# 1.39.24-rc6
+- **bug-fixed**: Fixed max_output_tokens error
+- **bug-fixed**: Handles have been added to the vertices of the rectangle note
+- **changed**: Disabled the 100x100px non-clickable stage area (tds-drag-drawer).
+- **bug-fixed**: Disabled the note-controls menu when it is transparent
+- **bug-fixed**: Restored the ability to open the note detail when clicking on the note, except for the video note
+- **changed**: When I try to change the color, the note detail panel closes
+- **bug-fixed**: The video note resize is not smooth
+
+# 1.39.24-rc5
 - **changed**: Updated format-number with browser language formatting
 - **changed**: Edit AI preview settings: replace text with icons
+
+# 1.39.24-rc4
 - **changed**: Set the default max-token value to 10000
 - **added**: Added reranking multiplier
 
@@ -41,12 +70,42 @@
 - **added**: Intercepted Chrome background throttling / standby to refresh the page
 - **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
 - **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
+
+# 1.39.24-rc2
+- **changed**: note: change default colors
+- **changed**: note: store the last colors in the LS
+- **added**: note: add the same intent menu to notebooks
+- **changed**: note: limit uploads to images and GIFs only
+- **added**: note: allow uploading videos from links
+
+# 1.39.24-rc1
+
+- **bug-fix**: deleted duplicate AI model chatGPT 5.2
 - **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
 - **changed**: added text and links in reranking: Improve the accuracy of your answers
 - **changed**: web Request does not show output attributes in the stage preview
 - **changed**: change attribute preview in the AI ​​settings panel
 - **bug-fix**: show and save system context textarea in askgpt-v2
 - **changed**: 10K token minimo (dipende dai modelli)
+
+# 1.39.23
+
+# 1.39.23-rc7
+- **changed**: Refactored state management for expansion panels in cds-action-askgpt-v2 component. Introduced separate states for chunks and AI settings panels to improve UI responsiveness and maintainability
+- **changed**: Updated ACTIONS_LIST in utils-actions.ts to ensure consistent formatting and include additional chatbot types for FLOW_LOG action
+
+# 1.39.23-rc6
+- **added**: Support rectangle
+- **bug-fix**: Support border thickness
+- **bug-fix**: Fix the bug that prevents text color from being saved
+- **added**: Add submenus with various note types
+- **added**: Drag-and-drop insertion
+- **added**: Support image type
+- **added**: Support video type
+- **bug-fix**: As soon as the text note is inserted, it should immediately allow you to write with focus on the text
+- **bug-fix**: Centering doesn't work in the block
+
+# 1.39.23-rc5
 - **added**: added sortedItems in selection intent
 
 # 1.39.23-rc4
@@ -60,10 +119,6 @@
 # 1.39.23-rc1
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
-- **changed**: Intent block title hidden if "untitled"
-- **changed**: Form button and question button hidden if empty
-- **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
-- **changed**: If the chatbot is new, only one action per intent
 
 # 1.39.23
 - **bug-fix**: deleted duplicate AI model chatGPT 5.2
@@ -173,6 +228,17 @@
 # 1.39.14-rc1
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
+- **added**: Supportare rettangolo
+- **bug-fixed**: Supportare spessore bordo
+- **bug-fixed**: correggere il bug che non permette di salvare il colore del testo
+- **added**: aggiungi submenu con le varie tipologie di note
+- **added**: Inserimento con drag&drop
+- **added**: Supportare tipo Immagine
+- **added**: Supportare tipo Video
+- **bug-fixed**:Appena inserita la Nota testo dovrebbe subito permetterti di scrivere con focus su testo
+- **bug-fixed**: centra non funziona nel blocco
+- **bug-fixed**: bug fixed text align
+- **added**: added note
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management
@@ -1969,4 +2035,3 @@ delete an action (delete all outgoing connectors)
 
 # 0.0.1
  first deploy<br>
-
