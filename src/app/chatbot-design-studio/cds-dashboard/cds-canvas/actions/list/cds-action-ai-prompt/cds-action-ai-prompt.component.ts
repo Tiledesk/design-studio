@@ -330,7 +330,7 @@ setModel(modelName: string){
   } else {
     this.ai_setting['temperature'].disabled= false
   }
-  console.log("[ACTION AI_PROMPT] llm_models_flat: ", this.llm_models_flat);
+  // console.log("[ACTION AI_PROMPT] llm_models_flat: ", this.llm_models_flat);
 }
 
 
