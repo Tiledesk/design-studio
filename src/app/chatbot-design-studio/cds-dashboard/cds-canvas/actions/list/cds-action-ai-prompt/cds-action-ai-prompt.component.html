@@ -310,10 +310,12 @@
                 <div class="field-box checkbox-reasoning">
                     <!-- <label class="title-label">{{'CDSCanvas.Reasoning' | translate }}</label> -->
                     <mat-checkbox
+                        class="reasoning-checkbox"
+                        [class.reasoning-checkbox-disabled]="isReasoningCheckboxDisabled"
                         [checked]="action.reasoning"
                         [disabled]="isReasoningCheckboxDisabled"
                         (change)="onChangeCheckbox($event, 'reasoning')">
-                        {{'CDSCanvas.Reasoning' | translate }}
+                        {{'CDSCanvas.Reasoning' | translate }}<span *ngIf="isReasoningCheckboxDisabled"> ({{'CDSCanvas.ReasoningNotAvailableForModel' | translate }})</span>
                     </mat-checkbox>
                 </div>
 

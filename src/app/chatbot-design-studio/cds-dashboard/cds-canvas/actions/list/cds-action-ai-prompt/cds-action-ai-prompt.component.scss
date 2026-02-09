@@ -682,3 +682,6 @@ cds-select#model-condition.not-configured ::ng-deep {
 .checkbox-reasoning{
     margin-top: -20px;
 }
+.checkbox-reasoning .reasoning-checkbox-disabled ::ng-deep .mat-checkbox-background {
+    background-color: #e0e0e0 !important;
+}
