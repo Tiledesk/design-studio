@@ -7,10 +7,16 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
+
+
+
+# 1.39.28-rc2 
 - **bug-fix**: filtered LLM templates based on those present in the environment file
 - **bug-fix**: fixed bug on GptTask action in prompt preview
 - **bug-fix**: enabled saving when changing the "OR / AND" operator filter
+
+# 1.39.28-rc1
+- **changed**: refactoring of cds-canvas and cds-intent components
 
 # 1.39.27
 - **changed**: API for upload a file/images
