@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.27
+- **changed**: API for upload a file/images
+
 # 1.39.26
 - **added**: added iteration action
 
