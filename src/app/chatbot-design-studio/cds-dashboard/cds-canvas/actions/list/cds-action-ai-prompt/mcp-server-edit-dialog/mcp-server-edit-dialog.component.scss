@@ -111,6 +111,166 @@
     display: block;
 }
 
+/* ---- MCP Tools UI (moved from inline styles) ---- */
+.tools-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.tools-select-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    background: var(--blu) !important;
+    color: #fff !important;
+    border-color: var(--blu) !important;
+
+    &:hover:enabled {
+        opacity: 0.9;
+    }
+}
+
+.btn-inline-spinner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tools-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+}
+
+.tools-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.tools-modal__panel {
+    position: relative;
+    margin: 6vh auto;
+    width: min(820px, 92vw);
+    max-height: 88vh;
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.tools-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.tools-modal__header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tools-modal__title {
+    font-weight: 700;
+}
+
+.tools-modal__subtitle {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.tools-modal__list {
+    margin-top: 12px;
+    overflow: auto;
+    max-height: calc(88vh - 92px);
+    padding-right: 6px;
+    overflow-x: hidden;
+
+    /* Custom scrollbar styles (aligned with .custom-mcp-dialog-container .tpl-modal-content) */
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--blu-02);
+        border-radius: 4px;
+
+        &:hover {
+            background: var(--blu);
+        }
+    }
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--blu-02) transparent;
+}
+
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal__item {
+    display: block;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.tools-modal__item-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.tools-modal__item-name {
+    font-weight: 700;
+}
+
+.tools-modal__item-title {
+    color: #111827;
+    margin-top: 2px;
+}
+
+.tools-modal__item-description {
+    color: #6b7280;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Ensure no horizontal scrollbar is introduced by long tokens */
+.tools-modal__panel,
+.tools-modal__list,
+.tools-modal__item-content {
+    overflow-x: hidden;
+}
+
+/**
+ * Remove ANY background/ripple effect for checkboxes in Available tools list
+ * (hover, focus, active, etc.)
+ */
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal__list .mat-checkbox-ripple,
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal__list .mat-checkbox-persistent-ripple,
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal__list .mat-ripple-element {
+    display: none !important;
+    background: transparent !important;
+}
+
+/**
+ * Angular Material: remove background on hover for persistent ripple
+ * (requested: .mat-checkbox-persistent-ripple must NOT show background color on hover)
+ * Keep scope local to this dialog to avoid global regressions.
+ */
+::ng-deep .custom-mcp-edit-dialog-container mat-checkbox .mat-checkbox-persistent-ripple,
+::ng-deep .custom-mcp-edit-dialog-container mat-checkbox:hover .mat-checkbox-persistent-ripple,
+::ng-deep .custom-mcp-edit-dialog-container mat-checkbox.cdk-focused .mat-checkbox-persistent-ripple,
+::ng-deep .custom-mcp-edit-dialog-container mat-checkbox:focus .mat-checkbox-persistent-ripple {
+    background-color: transparent !important;
+}
+
 #cds-save-btn:hover:enabled {
     opacity: .8 !important;
 }

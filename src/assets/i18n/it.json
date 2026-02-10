@@ -199,7 +199,8 @@
       "DragAnImageOrClick": "trascina un'immagine qui o fai clic per selezionarla",
       "ImageDragging": "trascinamento dell'immagine",
       "AddPath": "Aggiungi percorso",
-      "LoadFrame": "Carica Frame"
+      "LoadFrame": "Carica Frame",
+      "ReasoningNotAvailableForModel": "Non disponibile per questo modello"
     },
     "Name": "Nome",
     "Label": "Etichetta",
