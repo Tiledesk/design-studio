@@ -303,10 +303,13 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmMod
   });
   // logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
 
-  // Set token multiplier and filter by aiModels config
+  // Set token multiplier; filter by aiModels config ONLY for OpenAI models (other providers show all)
   const ai_models = loadTokenMultiplier(appConfigService.getConfig().aiModels);
   logger.log(`[${componentName}] ai_models:`, ai_models);
-  llm_models_flat = filterModelsByAiModelsConfig(llm_models_flat, ai_models, m => m.model);
+  const openaiModels = llm_models_flat.filter(m => m.llm?.toLowerCase() === 'openai');
+  const otherModels = llm_models_flat.filter(m => m.llm?.toLowerCase() !== 'openai');
+  const filteredOpenai = filterModelsByAiModelsConfig(openaiModels, ai_models, m => m.model);
+  llm_models_flat = [...filteredOpenai, ...otherModels];
   llm_models_flat.forEach(model => {
     if (ai_models[model.model]) {
       (model as LlmModel).multiplier = ai_models[model.model].toString() + ' x tokens';
