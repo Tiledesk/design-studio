@@ -125,7 +125,7 @@
             <div class="header-answer-preview">
                 <div class="label-and-button-container">
                     <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} {{llm_model_selected.modelName}})</span>
+                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} {{llm_model_selected?.modelName}})</span>
                     </label>
                 </div>
             </div>
@@ -287,9 +287,9 @@
                 <!-- // model select  -->
                 <div class="field-box">
                     <cds-select id="model-condition"
-                        [class]="!llm_model_selected.configured ? 'not-configured' : ''"
+                        [class]="!llm_model_selected?.configured ? 'not-configured' : ''"
                         [items]="llm_models_flat" 
-                        [itemSelected]="llm_model_selected.model"
+                        [itemSelected]="llm_model_selected?.model"
                         [bindLabelSelect]="'modelName'" 
                         [bindValueSelect]="'model'"
                         [groupByKey]="'llm'"

@@ -167,7 +167,7 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{llm_model_selected.modelName}} )</span>
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{llm_model_selected?.modelName}} )</span>
                 </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
@@ -263,9 +263,9 @@
                  <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
                         <cds-select id="model-condition"
-                            [class]="!llm_model_selected.configured ? 'not-configured' : ''"
+                            [class]="!llm_model_selected?.configured ? 'not-configured' : ''"
                             [items]="llm_models_flat" 
-                            [itemSelected]="llm_model_selected.model"
+                            [itemSelected]="llm_model_selected?.model"
                             [bindLabelSelect]="'modelName'" 
                             [bindValueSelect]="'model'"
                             [groupByKey]="'llm'"

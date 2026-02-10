@@ -189,6 +189,22 @@ export async function getIntegrationModels(
 }
 
 /**
+ * Filters models to keep only those present in the aiModels configuration.
+ * @param models Array of models to filter
+ * @param aiModelsParsed Parsed aiModels config from loadTokenMultiplier
+ * @param getModelKey Function to extract the model key from each item
+ * @returns Filtered array of models
+ */
+export function filterModelsByAiModelsConfig<T>(
+  models: T[],
+  aiModelsParsed: Record<string, number | null>,
+  getModelKey: (model: T) => string
+): T[] {
+  const allowedKeys = Object.keys(aiModelsParsed || {});
+  return models.filter(m => allowedKeys.includes(getModelKey(m)));
+}
+
+/**
  * Sets the selected model and updates related properties
  * @param modelName The label of the model to set
  * @param llmModels Array of available LLM models
@@ -240,9 +256,10 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmMod
   }
   // logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
 
-  // Set token multiplier for each model
+  // Set token multiplier and filter by aiModels config
   const ai_models = loadTokenMultiplier(appConfigService.getConfig().aiModels);
   logger.log(`[${componentName}] ai_models:`, ai_models);
+  llm_models_flat = filterModelsByAiModelsConfig(llm_models_flat, ai_models, m => m.model);
   llm_models_flat.forEach(model => {
     if (ai_models[model.model]) {
       (model as LlmModel).multiplier = ai_models[model.model].toString() + ' x tokens';
