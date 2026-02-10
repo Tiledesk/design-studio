@@ -7,7 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.28-rc1
+- **changed**: refactoring of cds-canvas and cds-intent components
 
+# 1.39.27
 
 # 1.39.27-rc1
 - **added**: added reasoning in AI Prompt action
