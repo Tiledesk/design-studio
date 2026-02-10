@@ -217,6 +217,7 @@
                 {{ 'CDSCanvas.UseKnowledgeBaseName' | translate }}
             </mat-checkbox>
             <label class="field-description">{{ "CDSCanvas.UseKBNameDescription" | translate }}
+                <br>
                 <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.namespace_as_name.link" [target]="DOCS_LINK.namespace_as_name.target">{{ 'LearnMore' | translate }}</a>
             </label>
         </section>
@@ -237,9 +238,8 @@
                         <div class="title-and-parameters-container">
                             <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                             <div class="parameters-preview">
-                                <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-flag">
+                                <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-badge">
                                     {{ action?.modelName || llm_model_selected?.modelName }}
-                                    <span class="sep"> | </span>
                                 </span>
                                 <span *ngIf="action?.max_tokens" class="preview-badge">
                                     <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
@@ -260,19 +260,15 @@
                                 
                                 <!-- Advanced/KB options preview (when panel is collapsed) -->
                                 <span *ngIf="action?.advancedPrompt" class="preview-flag">
-                                    <span class="sep"> | </span>
                                     <span class="label">{{"CDSCanvas.AdvancedContext" | translate}}</span>
                                 </span>
                                 <span *ngIf="action?.citations" class="preview-flag">
-                                    <span class="sep"> | </span>
                                     <span class="label">{{"CDSCanvas.Citations" | translate}}</span>
                                 </span>
                                 <span *ngIf="action?.chunks_only" class="preview-flag">
-                                    <span class="sep"> | </span>
                                     <span class="label">{{"CDSCanvas.ChunksOnly" | translate}}</span>
                                 </span>
                                 <span *ngIf="action?.skip_unanswered" class="preview-flag">
-                                    <span class="sep"> | </span>
                                     <span class="label">{{"CDSCanvas.SkipUnanswered" | translate}}</span>
                                 </span>
                             </div>
@@ -316,6 +312,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -372,7 +369,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['search_type'].step"  
                                     [min]="ai_setting['search_type'].min"
-                                    [max]="ai_setting['search_type'].max" 
+                                    [max]="ai_setting['search_type'].max"
+                                    [disabled]="ai_setting['max_tokens'].disabled" 
                                     [(ngModel)]="action.alpha"
                                     (change)="updateSliderValue($event.value, 'alpha')" aria-label="units">
                                 </mat-slider>
@@ -463,6 +461,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 

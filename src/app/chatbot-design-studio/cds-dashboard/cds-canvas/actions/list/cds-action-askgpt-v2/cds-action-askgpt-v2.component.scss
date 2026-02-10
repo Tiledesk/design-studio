@@ -1,5 +1,5 @@
 
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -90,7 +90,7 @@ mat-expansion-panel ::ng-deep {
     }
     .parameters-preview {
         font-size: 11px;
-        height: 34px;
+        height: 38px;
         line-height: normal;
     }
 
