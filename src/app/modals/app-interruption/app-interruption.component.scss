@@ -1,0 +1,85 @@
+.app-interruption {
+  width: min(520px, calc(100vw - 48px));
+  padding: 16px;
+  color: #0f172a;
+  font-family: inherit;
+}
+
+.header {
+  text-align: center;
+}
+
+.header .title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.header .subtitle {
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 12px;
+}
+
+.body {
+  background: rgba(244, 246, 251, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 10px;
+  padding: 6px 0;
+  align-items: baseline;
+}
+
+.k {
+  font-size: 12px;
+  color: #475569;
+}
+
+.v {
+  font-size: 12px;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(148, 163, 184, 0.35);
+  margin: 8px 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.btn.secondary {
+  background: #fff;
+  border-color: rgba(148, 163, 184, 0.6);
+  color: #0f172a;
+}
+

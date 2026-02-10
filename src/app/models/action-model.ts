@@ -447,6 +447,7 @@ export class ActionAskGPTV2 extends Action {
     chunks_only: boolean;
     skip_unanswered: boolean;
     reranking: boolean;
+    reranking_multiplier?: number;
   value: string;
     constructor() {
         super();
@@ -532,6 +533,18 @@ export class ActionCaptureUserReply extends Action {
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.CAPTURE_USER_REPLY
+    }   
+}
+
+export class ActionIteration extends Action {
+    iterable: any;
+    assignOutputTo: string;
+    goToIntent: string;
+    fallbackIntent: string;
+    delay: number;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.ITERATION
     }   
 }
 

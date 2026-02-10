@@ -56,6 +56,15 @@
     "Advanced": "Advanced",
     "WatchVideo": "Watch video",
     "LearnMore": "Learn more",
+    "CdsOptions": {
+        "NoteType": {
+            "Rectangle": "Rectangle",
+            "Text": "Text",
+            "Image": "Image",
+            "Video": "Video",
+            "Media": "Media"
+        }
+    },
     "BotsAddEditPage": {
         "AddBot": "Add Bot",
         "EditBot": "Edit Bot",
@@ -293,6 +302,26 @@
         "DeleteBlock": "Delete block",
         "CopyBlock": "Copy block",
         "NoteDetails": "Note detail",
+        "NoteMedia": {
+            "Hint": "Drag & drop a file, click upload, or paste a link.",
+            "UrlPlaceholder": "https://...",
+            "Alt": "Note media",
+            "OriginalSizePx": "Original media size (in pixels): {{width}}px × {{height}}px",
+            "PlaceholderCta": "Upload an image or a video",
+            "PlaceholderDrop": "Drop file here to start uploading",
+            "PlaceholderOr": "or",
+            "PlaceholderSelectFile": "Select file",
+            "Replace": "Replace",
+            "Remove": "Remove"
+        },
+        "NotePanel": {
+            "MarkupText": "Markup text",
+            "BackgroundColor": "Background color",
+            "BorderColor": "Border color",
+            "BorderThickness": "Border thickness",
+            "BoxParameters": "Box parameters",
+            "EnableShadow": "Enable shadow"
+        },
         "Paste": "Paste",
         "StartTest": "Start test from here",
         "DeleteAction": "Delete action",
@@ -346,6 +375,9 @@
         "KBChunks": "Assign KB Chunks to",
         "ChunksOnly": "Chunks only",
         "Reranking": "Re-ranking",
+        "RerankingInfo": "Improve accuracy of your answers",
+        "MultiplierInfo": "Total retrieved chunks for re-ranking",
+        "MaxChunksMessage": "Max chunks for re-ranking is 100",
         "SkipUnanswered": "Do not update unanswered list",
         "ErrorAutomaticAssign": "Errors will be automatically assigned to variable:",
         "ApplyAFunctionToValue": "Apply a function to the value",
@@ -378,6 +410,7 @@
         "Deterministic": "Deterministic",
         "Random": "Random",
         "ChunkLimit": "Chunk limit",
+        "RerankingMultiplierLabel": "Re-ranking multiplier",
         "SearchTypeLimit": "Search type",
         "FullText": "FullText",
         "Semantic": "Semantic",
@@ -573,7 +606,11 @@
         "AnswerKB": "Answer",
         "EnterQuestion": "Your question",
         "EnterAnswer": "Your answer",
-        "ConfigureModel": "Configure"
+        "ConfigureModel": "Configure",
+        "IterableAttribute": "Iterable attribute",
+        "IteratableAttributeDescription": "The attribute that will be used to iterate over the data",
+        "AssignOutputTo": "Assign output to",
+        "AssignOutputToDescription": "The attribute that will be used to assign the output"
     },
     "Alert": {
         "ErrorMaxOptions": "Cannot add another option. Max available options achived ( 0..9, *, # )",
@@ -738,7 +775,8 @@
             "PlayPrompt": "Play prompt",
             "SpeechForm": "Speech form",
             "AudioRecord": "Audio record",
-            "SendWhatsapp": "Send Whatsapp"
+            "SendWhatsapp": "Send Whatsapp", 
+            "Iteration": "Iteration"
         },
         "DOC": {
             "Reply": {
@@ -1298,6 +1336,11 @@
     "CopyLink": "Copy share link",
     "OpenLinkInNewTab": "Open share link",
     "ThereWasSomeTroubleConnectingToNetwork": "Our apologies. There was some trouble connecting to network",
+    "AppInterruption": {
+        "Title": "Session inactive — refresh required",
+        "Message": "This page was inactive for too long. Please refresh to continue safely.",
+        "Refresh": "Refresh"
+    },
     "CDSGlobals": {
         "Globals": "Globals",
         "NoGlobalVariables": "No global variables <br><br>Global variables are a set of variables that are always available in your flows",

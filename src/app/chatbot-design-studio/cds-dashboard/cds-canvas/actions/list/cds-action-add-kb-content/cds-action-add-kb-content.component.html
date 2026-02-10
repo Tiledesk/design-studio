@@ -50,6 +50,8 @@
             [items]="listOfNamespaces" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
+            [optionalBindAdditionalText]="'kbTypeLabel'"
+            [additionalTextAsBadge]="true"
             [itemSelected]="action.namespace" 
             [placeholder]="'CDSCanvas.SelectNamespace' | translate"
             [clearable]="true" 
