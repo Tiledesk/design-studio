@@ -9,7 +9,6 @@
 
 
 
-
 # 1.39.28-rc2 
 - **bug-fix**: filtered LLM templates based on those present in the environment file
 - **bug-fix**: fixed bug on GptTask action in prompt preview
