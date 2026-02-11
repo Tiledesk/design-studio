@@ -11,6 +11,7 @@ import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
+import { NoteResizeStateService } from './note-resize-state.service';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
@@ -190,7 +191,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public logService: LogService,
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
-    
+    public noteResizeState: NoteResizeStateService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -1410,6 +1411,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * Gestisce la selezione di una nota e apre il panel dei dettagli
    * Simile a onIntentSelected per gli intent
    */
+  /** Restituisce la left da usare per la nota: valore live durante resize orizzontale, altrimenti note.x (evita flicker). */
+  getNoteLeft(note: Note): number {
+    return this.noteResizeState.getNoteLeft(note);
+  }
+
   onNoteSelected(note: Note | null): void {
      this.logger.log('[CDS-CANVAS] onNoteSelected',note);
     if (note) {
@@ -1648,7 +1654,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         // Add to the stage immediately as a placeholder (draft)
         this.listOfNotes.push(newNote);
         this.noteService.notifyNotesChanged();
-        this.onNoteSelected(newNote);
         return;
       }
 
@@ -1677,9 +1682,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       if (newNote.type === 'text') {
         this.pendingAutoFocusNoteId = newNote.note_id;
       }
-
-      // Requirement: after dropping a note on the stage, open its detail panel automatically.
-      this.onNoteSelected(newNote);
 
       this.logger.log("[CDS-CANVAS] Note dropped on stage:", evt.noteType, pos);
     } catch (e) {
