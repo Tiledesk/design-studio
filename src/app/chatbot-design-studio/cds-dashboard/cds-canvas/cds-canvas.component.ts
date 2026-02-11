@@ -1646,7 +1646,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         // Add to the stage immediately as a placeholder (draft)
         this.listOfNotes.push(newNote);
         this.noteService.notifyNotesChanged();
-        this.onNoteSelected(newNote);
         return;
       }
 
@@ -1675,9 +1674,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       if (newNote.type === 'text') {
         this.pendingAutoFocusNoteId = newNote.note_id;
       }
-
-      // Requirement: after dropping a note on the stage, open its detail panel automatically.
-      this.onNoteSelected(newNote);
 
       this.logger.log("[CDS-CANVAS] Note dropped on stage:", evt.noteType, pos);
     } catch (e) {
