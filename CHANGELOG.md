@@ -10,6 +10,13 @@
 # this branch
 - **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
 
+- **added**: aggiunto un titolo note al rettangolo note
+- **changed**: eliminato il bordo delle note nelle note tipo rettangolo
+- **changed**: disabilitata l'altezza massima sui rettangoli e impostata una dimensione minima
+- **bug-fixed**: risolto il problema sul resize delle note rettangolo. Il vertice opposto a quello trascinato ora rimanere bloccato.
+- **bug-fixed**: corretto il resize orizzontale delle note testo eliminato il flicking
+
+
 - **bug-fixed**: il resize della nota video non è fluido
 - **bug-fixed**: corretto errore max_output_tokens
 - **changed**: nella nota rettangolo sono state inserite le maniglie sui vertici
