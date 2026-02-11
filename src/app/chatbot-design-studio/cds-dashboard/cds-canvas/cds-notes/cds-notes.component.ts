@@ -1417,6 +1417,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       }
       handle.style.transformOrigin = 'center center';
     });
+
+    // Titolo rect: scala inversa solo rispetto alla nota (non allo zoom stage) così resta 40px in altezza e in 0,0.
+    // Larghezza: calc(100% * scaleX); altezza: 40 * scaleY px; dopo scale(1/sx, 1/sy) il titolo occupa visivamente 100% x 40px.
+    if (this.note?.type === 'rect') {
+      const titleEl = this.contentElement.nativeElement.querySelector('.note-title') as HTMLElement | null;
+      if (titleEl) {
+        titleEl.style.width = `calc(100% * ${safeScaleX})`;
+        titleEl.style.height = `${40 * safeScaleY}px`;
+        titleEl.style.transform = `scale(${1 / safeScaleX}, ${1 / safeScaleY})`;
+        titleEl.style.transformOrigin = '0 0';
+      }
+    }
   }
 
   // ============================================================================
@@ -1490,8 +1502,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.note.type = 'text';
     }
 
-    // Inizializza borderWidth solo se non presente
-    if (this.note.borderWidth === undefined || this.note.borderWidth === null) {
+    // Inizializza borderWidth: 0 per note rettangolo (bordo disabilitato), altrimenti default se non presente
+    if (this.note.type === 'rect') {
+      this.note.borderWidth = 0;
+      if (this.note.title === undefined || this.note.title === null) {
+        this.note.title = '';
+      }
+    } else if (this.note.borderWidth === undefined || this.note.borderWidth === null) {
       this.note.borderWidth = Note.DEFAULT_BORDER_WIDTH;
     }
 
@@ -1730,6 +1747,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const html = this.note?.text || '';
     const purifiedHtml = this.purifyAndNormalizeText(html);
     this.sanitizedNoteHtml = this.sanitizer.bypassSecurityTrustHtml(purifiedHtml);
+  }
+
+  /** HTML sanitizzato per il titolo della nota rect (da Quill); vuoto se non rect o titolo assente. */
+  get sanitizedTitleHtml(): SafeHtml {
+    if (this.note?.type !== 'rect') {
+      return this.sanitizer.bypassSecurityTrustHtml('');
+    }
+    const raw = this.note?.title ?? '';
+    if (!raw) {
+      return this.sanitizer.bypassSecurityTrustHtml('');
+    }
+    return this.sanitizer.bypassSecurityTrustHtml(this.purifyAndNormalizeText(raw));
   }
 
   private updateChildrenDraggableClass(): void {

@@ -27,6 +27,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   @Output() deleteNote = new EventEmitter<Note>();
   @Output() duplicateNote = new EventEmitter<Note>();
   @ViewChild('quillEditor', { static: false }) quillEditor: any;
+  @ViewChild('quillTitleEditor', { static: false }) quillTitleEditor: any;
   @ViewChild('imageFileInput', { static: false }) imageFileInput: ElementRef<HTMLInputElement>;
   
   maximize: boolean = true;
@@ -34,6 +35,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
 
   toolbarOptions: any;
   quillModules: any;
+  quillModulesTitle: any;
   
   // Sottoscrizioni per i cambiamenti delle note
   private noteUpdatedSubscription: Subscription;
@@ -71,6 +73,11 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     this.quillModules = {
       toolbar: this.toolbarOptions
     };
+    // Toolbar ridotta per il titolo (rect)
+    this.quillModulesTitle = {
+      toolbar: this.toolbarOptions
+      // toolbar: [['bold', 'italic', 'underline'], ['link'], ['clean']]
+    };
     
     // Sottoscrivi ai cambiamenti delle note per aggiornare il contenuto quando una nota viene modificata
     // Usa notesChanged$ invece di noteUpdated$ per aggiornare quando cambiano (non solo quando vengono salvate)
@@ -97,6 +104,15 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
               this.note[prop] = updatedNote[prop];
             }
           });
+
+          // Aggiorna il titolo (rect) solo se l'editor titolo non ha il focus
+          if (updatedNote.title !== undefined) {
+            if (this.quillTitleEditor?.quillEditor && !this.quillTitleEditor.quillEditor.hasFocus()) {
+              this.note.title = updatedNote.title;
+            } else if (!this.quillTitleEditor?.quillEditor) {
+              this.note.title = updatedNote.title;
+            }
+          }
           
           // Aggiorna il testo solo se non è stato modificato localmente
           // (il testo viene gestito separatamente per evitare conflitti con Quill)
@@ -859,6 +875,20 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       this.autoSave();
     } catch (error) {
       this.logger.error('[CdsPanelNoteDetailComponent] Error handling Quill content change:', error);
+    }
+  }
+
+  /**
+   * Gestisce il cambio di contenuto nel Quill del titolo (note rect).
+   * Chiama autoSave() per salvare automaticamente con debounce.
+   */
+  onTitleQuillContentChanged(event: any): void {
+    if (!this.note || !event) return;
+    try {
+      this.logger.log('[CdsPanelNoteDetailComponent] Title Quill content changed, triggering auto-save', event);
+      this.autoSave();
+    } catch (error) {
+      this.logger.error('[CdsPanelNoteDetailComponent] Error handling title Quill content change:', error);
     }
   }
 
