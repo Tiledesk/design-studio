@@ -1,8 +1,9 @@
-import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy, NgZone } from '@angular/core';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Note } from 'src/app/models/note-model';
 import { StageService } from '../../../services/stage.service';
 import { NoteService } from 'src/app/services/note.service';
+import { NoteResizeStateService } from '../note-resize-state.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { firstValueFrom, Subscription } from 'rxjs';
@@ -83,6 +84,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private currentBaseWidth = 0; // Larghezza base corrente (può essere modificata dal resize orizzontale)
   private rafHorizontalResizeId: number | null = null;
   private lastHorizontalClientX: number | null = null;
+  /** Contatore frame per log resize orizzontale (diagnostica flicker) */
+  private horizontalResizeFrameCount = 0;
   private startTop = 0; // Posizione Y iniziale CSS per resize verticale
   private startCenterYReal = 0; // Centro Y reale iniziale in viewport per resize verticale
   private startHostTopViewport = 0; // Posizione Y iniziale dell'host in viewport per resize verticale
@@ -199,7 +202,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     private stageService: StageService,
     private noteService: NoteService,
     private sanitizer: DomSanitizer,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private ngZone: NgZone,
+    private noteResizeState: NoteResizeStateService
   ) { }
 
   // ============================================================================
@@ -210,6 +215,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // Log diagnostica flicker: se durante resize orizzontale il parent ri-applica gli input (note), la CD può causare flicker
+    if (changes['note'] && !changes['note'].firstChange && this.isHorizontalResizing) {
+      this.logger.log('[CDS-NOTES-H-RESIZE] ngOnChanges: note input changed DURANTE resize orizzontale', {
+        noteId: this.note?.note_id,
+        previousValue: changes['note'].previousValue?.note_id,
+        currentValue: changes['note'].currentValue?.note_id
+      });
+    }
     if (changes['note'] && this.note) {
       // Solo per note testuali
       if (!this.isTextNote) {
@@ -415,8 +428,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    
     
     if (this.isHorizontalResizing) {
+      const hostElement = this.elementRef.nativeElement as HTMLElement;
+      const finalLeft = parseFloat(hostElement.style.left);
+      if (!isNaN(finalLeft)) this.note.x = finalLeft;
+      this.noteResizeState.setHorizontalResize(null);
       // Ricalcola dimensioni e scale basandosi sul transform corrente
       this.applyScaleAndTransform();
+      this.logger.log('[CDS-NOTES-H-RESIZE] onMouseUp: fine resize orizzontale', { totalFrames: this.horizontalResizeFrameCount });
       this.isHorizontalResizing = false;
       this.resizeHandle = '';
       // Cleanup rAF/will-change (riduce flicker post-gesture)
@@ -428,7 +446,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       if (this.contentElement) {
         this.contentElement.nativeElement.style.willChange = '';
       }
-      const hostElement = this.elementRef.nativeElement as HTMLElement;
       hostElement.style.willChange = '';
       // this.changeState(0);
       this.justFinishedResizing = true;
@@ -978,6 +995,17 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.contentElement.nativeElement.style.willChange = 'width';
     hostElement.style.willChange = 'left';
 
+    this.horizontalResizeFrameCount = 0;
+    this.logger.log('[CDS-NOTES-H-RESIZE] startHorizontalResize', {
+      noteId: this.note.note_id,
+      handle: handle,
+      startWidth: this.startWidth,
+      startLeft: this.startLeft,
+      startFixedLeftViewport: this.startFixedLeftViewport,
+      startFixedRightViewport: this.startFixedRightViewport
+    });
+    this.noteResizeState.setHorizontalResize(this.note.note_id, this.startLeft);
+
     // Assicuriamo che transform-origin/transform siano coerenti una volta sola
     const rotation = this.note.rotation || 0;
     const scaleForTransform = this.startScale || 1;
@@ -1061,19 +1089,90 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   /**
+   * Calcola newWidth e newLeft per il resize orizzontale (stessa logica usata da performHorizontalResizeFrame).
+   * Usato in mousemove per aggiornare subito il servizio, così la CD del parent legge già il valore giusto (niente flicker).
+   */
+  private computeHorizontalResizeValues(): { newWidth: number; newLeft: number } | null {
+    if (!this.contentElement || !this.note || this.lastHorizontalClientX == null) return null;
+    if (this.resizeHandle !== 'left' && this.resizeHandle !== 'right') return null;
+
+    const scale = this.startScale || 1;
+    const stageZoom = this.gestureStageZoom || this.getSafeStageZoom();
+
+    let newWidth = this.startWidth;
+    if (this.resizeHandle === 'right') {
+      const visualWidth = this.lastHorizontalClientX - this.startFixedLeftViewport;
+      newWidth = visualWidth / (scale * stageZoom);
+    } else {
+      const visualWidth = this.startFixedRightViewport - this.lastHorizontalClientX;
+      newWidth = visualWidth / (scale * stageZoom);
+    }
+    const minWidth = 50;
+    const maxWidth = 2000;
+    newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+
+    const rotation = this.note.rotation || 0;
+    const normalizedRotation = ((rotation % 360) + 360) % 360;
+    const isEffectivelyUnrotated = normalizedRotation < 0.01 || Math.abs(normalizedRotation - 360) < 0.01;
+
+    let newLeft: number;
+    if (isEffectivelyUnrotated) {
+      let newHostLeftViewport = this.startHostLeftViewport;
+      if (this.resizeHandle === 'right') {
+        newHostLeftViewport =
+          this.startFixedLeftViewport -
+          this.startContentCViewport -
+          ((newWidth * (1 - scale)) / 2) * stageZoom;
+      } else {
+        newHostLeftViewport =
+          this.startFixedRightViewport -
+          this.startContentCViewport -
+          ((newWidth * (1 + scale)) / 2) * stageZoom;
+      }
+      const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
+      newLeft = this.startLeft + deltaViewport / stageZoom;
+    } else {
+      // Ruotato: servizio aggiornato al frame prima; qui usiamo stima da formula non ruotata per evitare getBoundingClientRect nel mousemove
+      let newHostLeftViewport = this.startHostLeftViewport;
+      if (this.resizeHandle === 'right') {
+        newHostLeftViewport =
+          this.startFixedLeftViewport -
+          this.startContentCViewport -
+          ((newWidth * (1 - scale)) / 2) * stageZoom;
+      } else {
+        newHostLeftViewport =
+          this.startFixedRightViewport -
+          this.startContentCViewport -
+          ((newWidth * (1 + scale)) / 2) * stageZoom;
+      }
+      newLeft = this.startLeft + (newHostLeftViewport - this.startHostLeftViewport) / stageZoom;
+    }
+    return { newWidth, newLeft };
+  }
+
+  /**
    * Gestisce il ridimensionamento orizzontale durante il movimento del mouse.
-   * Non-simmetrico: mantiene fisso il lato opposto alla maniglia trascinata.
+   * Aggiorna subito width del content e servizio (liveLeft) nel mousemove così, quando la CD
+   * applica la nuova left dal parent, left e width sono coerenti (bordo opposto resta fisso, niente regressioni).
+   * Il rAF riapplica DOM e servizio per coerenza.
    */
   private handleHorizontalResize(event: MouseEvent): void {
     if (!this.contentElement || !this.note) return;
-    
-    // Batch su rAF: evita troppi layout per-frame su mousemove (soprattutto con scale != 1)
-    this.lastHorizontalClientX = event.clientX;
-    if (this.rafHorizontalResizeId != null) return;
 
-    this.rafHorizontalResizeId = window.requestAnimationFrame(() => {
-      this.rafHorizontalResizeId = null;
-      this.performHorizontalResizeFrame();
+    this.lastHorizontalClientX = event.clientX;
+    const values = this.computeHorizontalResizeValues();
+    if (values) {
+      this.contentElement.nativeElement.style.width = values.newWidth + 'px';
+      this.currentBaseWidth = values.newWidth;
+      this.noteResizeState.setHorizontalResize(this.note.note_id, values.newLeft);
+    }
+
+    if (this.rafHorizontalResizeId != null) return;
+    this.ngZone.runOutsideAngular(() => {
+      this.rafHorizontalResizeId = window.requestAnimationFrame(() => {
+        this.rafHorizontalResizeId = null;
+        this.performHorizontalResizeFrame();
+      });
     });
   }
 
@@ -1088,9 +1187,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const normalizedRotation = ((rotation % 360) + 360) % 360;
     const isEffectivelyUnrotated = normalizedRotation < 0.01 || Math.abs(normalizedRotation - 360) < 0.01;
 
-    // Calcolo della nuova larghezza base (unscaled), ancorando un bordo in viewport:
-    // - right: fixedLeft + visualWidth(mouse)
-    // - left:  fixedRight - visualWidth(mouse)
     let newWidth = this.startWidth;
     if (this.resizeHandle === 'right') {
       const visualWidth = this.lastHorizontalClientX - this.startFixedLeftViewport;
@@ -1105,49 +1201,45 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const minWidth = 50;
     const maxWidth = 2000;
     newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-    
-    // Applica width base (non tocchiamo scale/rotation)
+
     this.contentElement.nativeElement.style.width = newWidth + 'px';
     this.currentBaseWidth = newWidth;
-    
-    // Riallinea l'host per mantenere fisso il bordo opposto, SENZA leggere rect ad ogni frame (evita flicker).
-    // Nota: questa formula è esatta quando rotation ~ 0 (caso principale). Se la nota è ruotata, fallback a rectAfter.
+
+    let newLeft = 0;
     if (isEffectivelyUnrotated) {
       let newHostLeftViewport = this.startHostLeftViewport;
       if (this.resizeHandle === 'right') {
-        // Fisso il bordo sinistro:
-        // startFixedLeftViewport = hostLeft + C + (newWidth*(1-scale)/2)*stageZoom
         newHostLeftViewport =
           this.startFixedLeftViewport -
           this.startContentCViewport -
           ((newWidth * (1 - scale)) / 2) * stageZoom;
       } else {
-        // Fisso il bordo destro:
-        // startFixedRightViewport = hostLeft + C + (newWidth*(1+scale)/2)*stageZoom
         newHostLeftViewport =
           this.startFixedRightViewport -
           this.startContentCViewport -
           ((newWidth * (1 + scale)) / 2) * stageZoom;
       }
-
-    const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
-    const newLeft = this.startLeft + deltaViewport / stageZoom;
-    hostElement.style.left = newLeft + 'px';
-    this.note.x = newLeft;
+      const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
+      newLeft = this.startLeft + deltaViewport / stageZoom;
+      hostElement.style.left = newLeft + 'px';
+      this.noteResizeState.setHorizontalResize(this.note.note_id, newLeft);
+      this.ngZone.run(() => {});
     } else {
-      // Fallback (ruotato): usa bounding rect dopo l'update (più costoso, può introdurre micro flicker).
       const rectAfter = this.contentElement.nativeElement.getBoundingClientRect();
       const deltaViewport = this.resizeHandle === 'right'
         ? (this.startFixedLeftViewport - rectAfter.left)
         : (this.startFixedRightViewport - rectAfter.right);
-      const newLeft = this.startLeft + deltaViewport / stageZoom;
+      newLeft = this.startLeft + deltaViewport / stageZoom;
       hostElement.style.left = newLeft + 'px';
-      this.note.x = newLeft;
+      this.noteResizeState.setHorizontalResize(this.note.note_id, newLeft);
+      this.ngZone.run(() => {});
     }
+
+    this.horizontalResizeFrameCount++;
   }
 
   /**
-   * Gestisce il ridimensionamento verticale durante il movimento del mouse
+   * Gestisce il ridimensionamento verticale durante il movimento del mouse durante il movimento del mouse
    * Mantiene il centro verticale fisso e modifica solo l'altezza
    */
   private handleVerticalResize(event: MouseEvent): void {
