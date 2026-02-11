@@ -133,7 +133,7 @@
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
                     <span class="subtitle-label" *ngIf="llm_models | find:{key: 'value', value: action?.llm}">
-                        ( {{'CDSCanvas.GeneratedWith' | translate }}  {{llm_model_selected.modelName}} )
+                        ( {{'CDSCanvas.GeneratedWith' | translate }}  {{llm_model_selected?.modelName}} )
                     </span>
                 </label>
             </div>
@@ -166,13 +166,16 @@
                     <div class="title-and-parameters-container">
                         <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                         <div class="parameters-preview">
-                            <span *ngIf="(action?.modelName || llm_model_selected?.modelName)">{{ action?.modelName || llm_model_selected?.modelName }}</span>
-                            <span *ngIf="action?.max_tokens"> | tokens: {{action.max_tokens | number:'1.0-0':browserLang}}</span>
-                            <span *ngIf="action?.temperature !== undefined">
-                                <span class="sep"> | </span>
-                                <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> {{action.temperature}}
+                            <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-badge">
+                                {{ action?.modelName || llm_model_selected?.modelName }}
                             </span>
-                            <span *ngIf="action?.context"> | system context: {{action.context}}</span>
+                            <span *ngIf="action?.max_tokens" class="preview-badge">
+                                <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
+                            </span>
+                            <span *ngIf="action?.temperature !== undefined" class="preview-badge">
+                                <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> {{action.temperature | formatNumber}}
+                            </span>
+                            <span *ngIf="action?.context">system context: {{action.context}}</span>
                         </div>
                     </div>
                 </mat-panel-title>
@@ -184,9 +187,9 @@
                  <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
                     <cds-select id="model-condition"
-                        [class]="!llm_model_selected.configured ? 'not-configured' : ''"
+                        [class]="!llm_model_selected?.configured ? 'not-configured' : ''"
                         [items]="llm_models_flat" 
-                        [itemSelected]="llm_model_selected.model"
+                        [itemSelected]="llm_model_selected?.model"
                         [bindLabelSelect]="'modelName'" 
                         [bindValueSelect]="'model'"
                         [groupByKey]="'llm'"

@@ -487,11 +487,16 @@ export class ActionGPTAssistant extends Action {
     }
 }
 
+/** Livello di reasoning: low | medium | high */
+export type ReasoningLevel = 'low' | 'medium' | 'high';
+
 export class ActionAiPrompt extends Action {
     question: string;
     assignReplyTo: string;
     context: string;
     history: boolean;
+    reasoning?: boolean;
+    reasoningLevel?: ReasoningLevel;
     max_tokens: number;
     temperature: number;
     labelModel: string;

@@ -8,30 +8,74 @@
 *Tiledesk SRL*
 
 
-# this branch
-- **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
-
-- **added**: aggiunto un titolo note al rettangolo note
-- **changed**: eliminato il bordo delle note nelle note tipo rettangolo
-- **changed**: disabilitata l'altezza massima sui rettangoli e impostata una dimensione minima
-- **bug-fixed**: risolto il problema sul resize delle note rettangolo. Il vertice opposto a quello trascinato ora rimanere bloccato.
-- **bug-fixed**: corretto il resize orizzontale delle note testo eliminato il flicking
+# 1.39.28-rc3
+- **added**: Added a note title to the note rectangle
+- **changed**: Removed the note border in rectangle notes
+- **changed**: Disabled the maximum height on rectangles and set a minimum size
+- **bug-fixed**: Fixed the issue with resizing rectangle notes. The corner opposite the one being dragged now remains locked.
+- **bug-fixed**: Fixed the horizontal resizing of text notes; eliminated flickering.
 
 
-- **bug-fixed**: il resize della nota video non è fluido
-- **bug-fixed**: corretto errore max_output_tokens
-- **changed**: nella nota rettangolo sono state inserite le maniglie sui vertici
-- **bug-fixed**: disabilitata l'area sullo stage di 100x100px che non risulta cliccabile (tds-drag-drawer).
-- **bug-fixed**: disabilitato il menu note-controls delle note quando questo è trasparente
-- **changed**: ripristinata l'apertura del dettaglio note al click sulla nota, tranne che  per la nota video
-- **bug-fixed**: quando provo a cambiare colore si chiude il pannello di dettaglio della nota
+# 1.39.28-rc2 
+- **bug-fix**: filtered LLM templates based on those present in the environment file
+- **bug-fix**: fixed bug on GptTask action in prompt preview
+- **bug-fix**: enabled saving when changing the "OR / AND" operator filter
 
-- **changed**: cambio colori di default
-- **changed**: memorizza gli ultimi colori nel LS
-- **added**: aggiungi lo stesso menu dell’intent ai blocchi note
-- **changed**: limita il caricamento solo a immagini e gif 
-- **added**: permetti di caricare i video da link
+# 1.39.28-rc1
+- **changed**: refactoring of cds-canvas and cds-intent components
 
+# 1.39.27
+- **changed**: API for upload a file/images
+
+
+# 1.39.27-rc1
+- **added**: added reasoning in AI Prompt action
+
+# 1.39.26
+- **added**: added iteration action
+
+# 1.39.26-rc1
+- **bug-fix**: sort attribute list in Variable List Component
+- **bug-fix**: change the "use kb name" field to 2 lines
+- **bug-fix**: the selected model is red even when the api is set
+- **changed**: change the AI ​​settings preview
+
+# 1.39.25-rc2
+- **bug-fix**: Fixed a filter error when selecting a KB.
+- **bug-fix**: Fixed an error when setting the re-ranking multiplier when setting "use KB name."
+- **changed**: Set the "Max chunks for re-ranking" to 100.
+
+# 1.39.25-rc1
+- **changed**: updated MCP server, added "tools" selection for each server
+
+# 1.39.25
+
+# 1.39.24-rc11
+- **changed**: minor updates on API for upload a file/chatbot avatar
+
+# 1.39.24-rc10
+- **added**: added tools MCP server
+
+# 1.39.24-rc9
+- **changed**: API for upload a file/chatbot avatar
+
+# 1.39.24-rc8
+- **added**: Add text: Total retrieved chunks for re-ranking: x
+- **changed**: Merge chunk limit, re-ranking, and multiplier into a single block
+- **changed**: In the settings, replace the token icon and add badges in place of the pipe
+- **changed**: Add the type (H/S) hybrid or semantic, next to the name
+
+# 1.39.24-rc7
+- **bug-fixed**: fix regression in action menu that doesn't allow deleting an action
+
+# 1.39.24-rc6
+- **bug-fixed**: Fixed max_output_tokens error
+- **bug-fixed**: Handles have been added to the vertices of the rectangle note
+- **changed**: Disabled the 100x100px non-clickable stage area (tds-drag-drawer).
+- **bug-fixed**: Disabled the note-controls menu when it is transparent
+- **bug-fixed**: Restored the ability to open the note detail when clicking on the note, except for the video note
+- **changed**: When I try to change the color, the note detail panel closes
+- **bug-fixed**: The video note resize is not smooth
 
 # 1.39.24-rc5
 - **changed**: Updated format-number with browser language formatting
@@ -2010,4 +2054,3 @@ delete an action (delete all outgoing connectors)
 
 # 0.0.1
  first deploy<br>
-

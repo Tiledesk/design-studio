@@ -16,15 +16,16 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 //UTILS
 import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog.component';
 import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { OPENAI_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
+import { filterModelsByAiModelsConfig } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
-import { OPENAI_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { manageGpt5ModelSettings } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
@@ -101,17 +102,13 @@ export class CdsActionGPTTaskComponent implements OnInit {
     const lang = this.translate.getBrowserLang() || 'en';
     this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
-    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    OPENAI_MODEL.forEach(el => {
-      if (ai_models[el.value]) {
-        // el.additionalText = `${ai_models[el.value]} x tokens`;
-        el.status = 'active';
-      } else {
-        // el.additionalText = null;
-        el.status = 'inactive';
-      }
+    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
+    const filteredModels = filterModelsByAiModelsConfig(OPENAI_MODEL, ai_models, el => el.value);
+    this.model_list = filteredModels.map((el) => {
+      if (ai_models[el.value])
+        return { name: el.name, value: el.value, description: el.description, multiplier: ai_models[el.value] + ' x tokens' };
+      return { name: el.name, value: el.value, description: el.description, multiplier: null };
     });
-    this.model_list = OPENAI_MODEL.filter(el => el.status === 'active')
     this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);

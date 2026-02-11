@@ -175,6 +175,31 @@ mat-expansion-panel ::ng-deep {
         font-size: 11px;
         height: 24px;
         line-height: normal;
+        span {
+            line-height: 16px;
+            margin-right: 5px;
+        }
+        .preview-badge {
+            color: #fff;
+            background-color: var(--blu);
+            padding: 1px 3px;
+            border-radius: 6px;
+        }
+        .preview-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            font-size: 14px;
+            line-height: 14px;
+            margin: 0;
+            vertical-align: middle;
+            color: var(--color-white-hex);
+        }
+        .preview-flag{
+            margin:0;
+        }
     }
 
     .mat-expansion-indicator::after {
@@ -653,3 +678,10 @@ cds-select#model-condition.not-configured ::ng-deep {
 // MCP SERVERS SECTION --- end **************** //
 
 // PREVIEW SECTION --- start **************** //
+
+.checkbox-reasoning{
+    margin-top: -20px;
+}
+.checkbox-reasoning .reasoning-checkbox-disabled ::ng-deep .mat-checkbox-background {
+    background-color: #e0e0e0 !important;
+}

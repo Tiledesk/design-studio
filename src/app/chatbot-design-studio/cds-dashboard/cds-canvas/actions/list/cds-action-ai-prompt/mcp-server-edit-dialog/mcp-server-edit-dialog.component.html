@@ -43,6 +43,7 @@
                     [text]="editedServer.url"
                     [setAttributeBtn]="false"
                     [placeholder]="'CDSCanvas.EnterServerURL' | translate"
+                    (blur)="onUrlBlur()"
                     (onChange)="onChangeField($event, 'url')">
                 </cds-text>
             </div>
@@ -55,20 +56,55 @@
                 </div>
                 <span class="field-hint">{{'CDSCanvas.OnlySupported' | translate}}</span>
             </div>
+
+            <!-- Tools (optional, read from integrations -> this.data.allServers/tools) -->
+            <div class="form-field">
+                <label class="field-label">{{'CDSCanvas.Tools' | translate}}</label>
+
+                <!-- Counters + Select button -->
+                <div class="field-hint tools-header-row">
+                    <span>
+                        {{'CDSCanvas.ToolsSelected' | translate}}: {{ selectedToolsCount }} / {{ totalToolsCount }}
+                    </span>
+                    <button *ngIf="totalToolsCount > 0"
+                        type="button"
+                        class="btn btn-primary cds-blue-button tools-select-btn"
+                        (click)="openToolsModal()">
+                        {{'CDSCanvas.SelectTools' | translate}}
+                    </button>
+                </div>
+
+                <div *ngIf="totalToolsCount === 0" class="readonly-field">
+                    {{'CDSCanvas.NoToolsAvailable' | translate}}
+                </div>
+            </div>
         </form>
     </div>
 
     <div class="tpl-modal-buttons">
         <button id="cds-cancel-btn" class="btn btn-primary cds-blue-button" type="button" 
             [mat-dialog-close]="false"
-            [disabled]="isSaving">
+            [disabled]="isSaving || isLoadingTools">
             {{'Cancel' | translate}}
         </button>
-        <button id="cds-save-btn" class="btn btn-primary cds-blue-button" type="button" 
-            [disabled]="!isFormValid() || isSaving"
+
+        <!-- Connect / Refresh tools (Edit: visible only if URL has been changed) -->
+        <button *ngIf="showConnectButton" id="cds-connect-btn" class="btn btn-primary cds-blue-button" type="button"
+            [disabled]="!isFormValid() || isSaving || isLoadingTools"
+            (click)="onConnect()">
+            <span *ngIf="!isLoadingTools">{{ connectButtonLabelKey | translate }}</span>
+            <span *ngIf="isLoadingTools" class="btn-inline-spinner">
+                <span class="spinner"></span>
+                {{'CDSCanvas.LoadingTools' | translate}}...
+            </span>
+        </button>
+
+        <!-- Save -->
+        <button *ngIf="showSaveButton" id="cds-save-btn" class="btn btn-primary cds-blue-button" type="button" 
+            [disabled]="isSaveDisabled"
             (click)="onSave()">
             <span *ngIf="!isSaving">{{'CDSCanvas.Save' | translate}}</span>
-            <span *ngIf="isSaving" style="display: flex; align-items: center; gap: 8px;">
+            <span *ngIf="isSaving" class="btn-inline-spinner">
                 <span class="spinner"></span>
                 {{'CDSCanvas.Saving' | translate}}...
             </span>
@@ -76,3 +112,39 @@
     </div>
 </div>
 
+<!-- Tools modal: elenco completo + selezione (scrollabile) -->
+<div *ngIf="isToolsModalOpen" class="tools-modal">
+    <div (click)="closeToolsModal()" class="tools-modal__backdrop"></div>
+
+    <div class="tools-modal__panel">
+        <div class="tools-modal__header">
+            <div class="tools-modal__header-left">
+                <div class="tools-modal__title">
+                    {{'CDSCanvas.AvailableTools' | translate}} ({{ totalToolsCount }})
+                </div>
+                <div class="tools-modal__subtitle">
+                    {{'CDSCanvas.ToolsSelected' | translate}}: {{ selectedToolsCount }} / {{ totalToolsCount }}
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary cds-blue-button" (click)="closeToolsModal()">
+                {{'CDSCanvas.Close' | translate}}
+            </button>
+        </div>
+
+        <div class="tools-modal__list">
+            <mat-checkbox
+                *ngFor="let tool of availableTools"
+                [checked]="isToolSelected(tool.name)"
+                (change)="onToggleTool(tool.name, $event.checked)"
+                class="tools-modal__item">
+                <div class="tools-modal__item-content">
+                    <span class="tools-modal__item-name">{{ tool.name }}</span>
+                    <span *ngIf="tool.title" class="tools-modal__item-title">{{ tool.title }}</span>
+                    <span *ngIf="tool.description" class="tools-modal__item-description">
+                        {{ tool.description }}
+                    </span>
+                </div>
+            </mat-checkbox>
+        </div>
+    </div>
+</div>

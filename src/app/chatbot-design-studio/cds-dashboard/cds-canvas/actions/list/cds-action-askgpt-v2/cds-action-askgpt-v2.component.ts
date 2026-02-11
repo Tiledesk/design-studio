@@ -44,7 +44,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  listOfNamespaces: Array<{name: string, value: string, icon?:string, hybrid:boolean}>;
+  listOfNamespaces: Array<{name: string, displayName: string, kbTypeLabel: string, value: string, icon?:string, hybrid:boolean}>;
 
   project_id: string;
   selectedNamespace: string;
@@ -173,12 +173,16 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
   setModel(modelName: string){
-    const result = setModel(modelName, this.llm_models_flat, this.logger);
-    this.llm_model_selected = result;
+    let result = setModel(modelName, this.llm_models_flat, this.logger);
+    if (!result && this.llm_models_flat?.length) {
+      result = setModel(this.default_model.name, this.llm_models_flat, this.logger)
+        ?? this.llm_models_flat[0];
+    }
+    this.llm_model_selected = result ?? ({} as LlmModel);
     this.logger.log("[ACTION ASKGPTV2] llm_model_selected: ", this.llm_model_selected);
-    this.action.llm = result?.llm?result.llm:'';
-    this.action.model = result?.model?result.model:'';
-    this.action.modelName = result?.modelName?result.modelName:'';
+    this.action.llm = result?.llm ?? '';
+    this.action.model = result?.model ?? '';
+    this.action.modelName = result?.modelName ?? '';
     this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
     this.ai_setting['max_tokens'].max = this.llm_model_selected?.max_output_tokens;
     this.ai_setting['max_tokens'].min = this.llm_model_selected?.min_tokens;
@@ -186,16 +190,18 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.action.max_tokens = this.llm_model_selected?.max_output_tokens;
     }
     // Preserve any higher min constraint (e.g. citations => min 1024)
-    const modelMin = this.llm_model_selected.min_tokens;
+    const modelMin = result?.min_tokens ?? this.ai_setting['max_tokens'].min;
     const citationsMin = this.action?.citations ? 1024 : 0;
     this.ai_setting['max_tokens'].min = Math.max(modelMin, citationsMin);
 
     // Every model change resets max_tokens to default (capped by model max)
-    const min = this.ai_setting['max_tokens'].min;
-    const max = this.ai_setting['max_tokens'].max;
-    let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
-    if (next < min) next = min;
-    this.action.max_tokens = next;
+    if (result) {
+      const min = this.ai_setting['max_tokens'].min;
+      const max = this.ai_setting['max_tokens'].max;
+      let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+      if (next < min) next = min;
+      this.action.max_tokens = next;
+    }
     if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
       this.action.temperature = 1
       this.ai_setting['temperature'].disabled= true
@@ -256,7 +262,11 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, hybrid: el.hybrid? el.hybrid:false } })
+      this.listOfNamespaces = namaspaceList.map((el) => {
+        const isHybrid = el.hybrid ? el.hybrid : false;
+        const kbTypeLabel = isHybrid ? 'Hybrid' : 'Semantic';
+        return { name: el.name, displayName: el.name, kbTypeLabel, value: el.id, hybrid: isHybrid };
+      })
       // namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
@@ -277,8 +287,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   selectKB(namespace){
-    const result = this.listOfNamespaces.find(el => el.value === namespace);
-    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result);
+    const type = this.action?.namespaceAsName ? 'name' : 'value';
+    const result = this.listOfNamespaces.find(el => type === 'value' ? el.value === namespace : el.name === namespace);
+    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, this.listOfNamespaces, result);
     if(result){
       this.KB_HYBRID = result.hybrid;
     }
@@ -286,8 +297,13 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
   onChangeTextarea(event: string, property: string) {
-    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event);
+    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event, this.listOfNamespaces);
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property);
+
+    if(property === 'namespace'){
+      this.selectKB(event);
+      return;
+    }
     const nextValue = (event ?? '').toString();
     const currentValue = ((this.action && (this.action as any)[property]) ?? '').toString();
 

@@ -100,7 +100,7 @@ export class CDSTextComponent implements OnInit {
 
   private _filter(value: string): { label: string; value: string }[] {
     const filterValue = value?.trim().toLowerCase();
-    return this.autocompleteOptions?.filter(option => !filterValue || option.label.toLowerCase().includes(filterValue))
+    return this.autocompleteOptions?.filter(option => !filterValue || option?.label?.toLowerCase()?.includes(filterValue))
   }
 
 
