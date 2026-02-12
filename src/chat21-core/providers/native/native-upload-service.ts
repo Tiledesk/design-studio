@@ -122,8 +122,13 @@ export class NativeUploadService extends UploadService {
         return new Promise((resolve, reject) => {
             that.http.post(url, formData, requestOptions).pipe(first()).subscribe({
                 next: (data) => {
-                    const src = this.URL_TILEDESK_UPLOAD + 'files?path=' + data['filename'];
-                    const downloadURL = this.URL_TILEDESK_UPLOAD + 'files/download?path=' + encodeURIComponent(data['filename']);
+                    const filename = data['filename'];
+                    // filename dall'API è spesso già encoded (es. uploads%2Fprojects%2F...): non doppio-encodare
+                    const pathParam = (filename && typeof filename === 'string' && filename.includes('%'))
+                        ? filename
+                        : encodeURIComponent(filename || '');
+                    const src = this.URL_TILEDESK_UPLOAD + 'files?path=' + pathParam;
+                    const downloadURL = this.URL_TILEDESK_UPLOAD + 'files/download?path=' + pathParam;
                     resolve({downloadURL : downloadURL, src: src})
                 },
                 error: (error) => {

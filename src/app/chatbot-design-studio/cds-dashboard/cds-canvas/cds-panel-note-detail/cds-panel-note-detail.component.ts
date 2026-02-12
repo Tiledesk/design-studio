@@ -256,7 +256,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     return { ok: false, reason: 'Only images (including GIF) or videos are supported.' };
   }
 
-  private async loadMediaFromFile(file: File): Promise<void> {
+  private async loadMediaFromFile_OLD(file: File): Promise<void> {
     if (!this.note) return;
 
     this.imageUploadError = '';
@@ -277,7 +277,6 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       const user = this.tiledeskAuthService.getCurrentUser();
       const currentUpload = new UploadModel(file);
       const data = await this.uploadService.upload(user.uid, currentUpload);
-
       // VINCOLO: prima upload, poi salviamo l'URL risultante nella nota
       const url = data?.downloadURL || data?.src;
       if (!url) {
@@ -290,7 +289,106 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     } finally {
       this.isUploadingImage = false;
     }
+
   }
+
+
+  loadMediaFromFile(file): Promise<void> {
+    if (!this.note) return;
+    this.imageUploadError = '';
+    if (file.size > this.MAX_MEDIA_BYTES) {
+      this.imageUploadError = 'File too large. Max allowed size is 4MB.';
+      return;
+    }
+
+    const supported = this.isSupportedMediaFile(file);
+    if (!supported.ok || !supported.mediaType) {
+      this.imageUploadError = supported.reason || 'Unsupported file.';
+      return;
+    }
+    const that = this;
+    that.logger.log('[CdsPanelNoteDetailComponent] loadMediaFromFile start', { fileName: file?.name, size: file?.size, type: file?.type });
+
+    const currentUpload = new UploadModel(file);
+    const user = this.tiledeskAuthService.getCurrentUser();
+    if (!user) {
+      that.logger.error('[CdsPanelNoteDetailComponent] loadMediaFromFile: user is null/undefined');
+      this.imageUploadError = 'User not logged in.';
+      return;
+    }
+    if (!user.uid) {
+      that.logger.error('[CdsPanelNoteDetailComponent] loadMediaFromFile: user.uid is empty', { user });
+      this.imageUploadError = 'User not logged in.';
+      return;
+    }
+
+    this.uploadService.uploadAsset(user.uid, currentUpload).then(async (data) => {
+      that.logger.log('[CdsPanelNoteDetailComponent] uploadAsset then: raw response', {
+        data,
+        hasDownloadURL: !!(data && (data as any).downloadURL),
+        hasSrc: !!(data && (data as any).src),
+        hasFilename: !!(data && (data as any).filename),
+        downloadURL: data && (data as any).downloadURL,
+        src: data && (data as any).src,
+        filename: data && (data as any).filename
+      });
+      const url = that.getMediaUrlFromUploadResponse(data);
+      if (!url) {
+        that.logger.warn('[CdsPanelNoteDetailComponent] uploadAsset: no usable URL (downloadURL, src or filename)');
+        throw new Error('Upload did not return a usable URL');
+      }
+      that.logger.log('[CdsPanelNoteDetailComponent] uploadAsset: using URL', { urlPreview: url.length > 80 ? url.slice(0, 80) + '...' : url });
+      await this.setMediaFromSrc(url, supported.mediaType);
+    }).catch(error => {
+      that.logger.error('[CdsPanelNoteDetailComponent] loadMediaFromFile catch', {
+        message: error?.message,
+        error,
+        errorError: (error as any)?.error,
+        errorBody: (error as any)?.body,
+        errorFilename: (error as any)?.filename,
+        errorErrorFilename: (error as any)?.error?.filename
+      });
+      this.imageUploadError = 'Upload failed. Please try again.';
+      this.logger.error('[CdsPanelNoteDetailComponent] Error uploading media for image note', error);
+    });
+    that.logger.log('[CdsPanelNoteDetailComponent] loadMediaFromFile: uploadAsset promise started');
+  }
+
+  /** Estrae l'URL dal risultato dell'upload: supporta downloadURL/src e risposta con filename (senza doppia codifica). */
+  private getMediaUrlFromUploadResponse(data: any): string | null {
+    if (!data) return null;
+    const d = data.data ?? data.body ?? data;
+    if (d.downloadURL) return d.downloadURL;
+    if (d.src) return d.src;
+    const filename = d.filename;
+    if (filename && typeof filename === 'string') {
+      const baseUrl = this.uploadService.getBaseUrl().replace(/\/$/, '');
+      const pathParam = filename.includes('%') ? filename : encodeURIComponent(filename);
+      return `${baseUrl}/files/download?path=${pathParam}`;
+    }
+    return null;
+  }
+
+
+    //   const data = await this.uploadService.uploadAsset(user.uid, currentUpload);
+    //   this.logger.log(`[CdsPanelNoteDetailComponent] Successfully uploaded file and got download link - ${data}`);
+    //   // VINCOLO: prima upload, poi salviamo l'URL risultante nella nota
+    //   const url = data?.downloadURL || data?.src;
+    //   if (!url) {
+    //     throw new Error('Upload did not return downloadURL/src');
+    //   }
+    //   this.logger.log(`[CdsPanelNoteDetailComponent] Successfully url result - ${url}`);
+    //   this.setMediaFromSrc(url, supported.mediaType);
+    // } catch (e) {
+    //   this.imageUploadError = 'Upload failed. Please try again.';
+    //   this.logger.error('[CdsPanelNoteDetailComponent] Error uploading media for image note', e);
+    // } finally {
+    //   this.isUploadingImage = false;
+    // }
+
+
+
+  
 
   private async loadImageFromUrl(url: string): Promise<void> {
     if (!this.note) return;
@@ -554,7 +652,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     })();
 
     const file = new File([blob], filenameFromUrl, { type: type || undefined });
-    const data = await this.uploadService.upload(user.uid, new UploadModel(file));
+    const data = await this.uploadService.upload(user.uid, new UploadModel(file)); // uploadAsset
     const uploadedUrl = data?.downloadURL || data?.src;
     if (!uploadedUrl) {
       throw new Error('Upload did not return downloadURL/src');
