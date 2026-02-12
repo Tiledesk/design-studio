@@ -79,6 +79,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   DOCS_LINK = DOCS_LINK.GPT_TASK;
   
   private logger: LoggerService = LoggerInstance.getInstance();
+  browserLang: string = 'en';
   constructor(
     private dialog: MatDialog,
     private openaiService: OpenaiService,
@@ -89,6 +90,9 @@ export class CdsActionGPTTaskComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
+    const lang = this.translate.getBrowserLang() || 'en';
+    this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
     const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
     this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {

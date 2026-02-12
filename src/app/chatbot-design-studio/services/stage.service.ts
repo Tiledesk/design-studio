@@ -179,6 +179,25 @@ export class StageService {
     return this.alpha_connectors;
   }
 
+  /**
+   * Ritorna lo zoom corrente dello stage.
+   * Priorità:
+   * - tiledeskStage.scale (runtime)
+   * - settings.zoom (persistito)
+   * - fallback 1
+   */
+  getZoom(): number {
+    const runtimeScale = (this.tiledeskStage as any)?.scale;
+    if (typeof runtimeScale === 'number' && isFinite(runtimeScale) && runtimeScale > 0) {
+      return runtimeScale;
+    }
+    const stored = this.settings?.zoom;
+    if (typeof stored === 'number' && isFinite(stored) && stored > 0) {
+      return stored;
+    }
+    return 1;
+  }
+
 
   /** onSwipe */
   onSwipe(event: WheelEvent) {

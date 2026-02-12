@@ -8,7 +8,7 @@ import { IntentService } from '../../../services/intent.service';
 import { Intent } from 'src/app/models/intent-model';
 
 // UTILS //
-import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME } from '../../../utils';
+import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX } from '../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -102,9 +102,9 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   private initialize(intents){
     // // intents = this.intentService.hiddenEmptyIntents(intents);
     // // this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DEFAULT_FALLBACK));
-    this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true ); //&& !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX)
+    this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true && !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
     this.logger.log('[cds-panel-intent-list] --- internalIntents ',this.internalIntents);
-    this.defaultIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true ); //&& !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX)
+    this.defaultIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true && !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
     this.logger.log('[cds-panel-intent-list] --- defaultIntents ',this.defaultIntents);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.START, 0);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DEFAULT_FALLBACK, 1);

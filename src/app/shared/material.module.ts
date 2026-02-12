@@ -19,6 +19,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { A11yModule } from '@angular/cdk/a11y';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -49,6 +50,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatExpansionModule,
     MatTabsModule,
     MatMenuModule,
+    MatDividerModule,
     MatSnackBarModule,
     //CDK
     TextFieldModule,
@@ -76,6 +78,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatExpansionModule,
     MatTabsModule,
     MatMenuModule,
+    MatDividerModule,
     MatSnackBarModule,
     //CDK
     TextFieldModule,
