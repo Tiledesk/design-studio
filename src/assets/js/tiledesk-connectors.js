@@ -824,7 +824,7 @@ export class TiledeskConnectors {
 
   /** drawConnectorDraft */
   #drawConnectorDraft() {
-    console.log("[JS] drawConnectorDraft:::::  ");
+    // console.log("[JS] drawConnectorDraft:::::  ");
     let connector = document.getElementById("connectorDraft");
     if (!connector) {
       connector = document.createElementNS(

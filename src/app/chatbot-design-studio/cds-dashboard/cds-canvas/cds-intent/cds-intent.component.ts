@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -35,6 +35,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() intent: Intent;
   @Input() hideActionPlaceholderOfActionPanel: boolean;
   @Input() chatbotSubtype: string;
+  @Input() IS_OPEN_PANEL_INTENT_DETAIL: boolean;
   
   @Output() componentRendered = new EventEmitter<string>();
   @Output() questionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
@@ -78,6 +79,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   newActionCreated: Action;
   dragDisabled: boolean = true;
   connectorIsOverAnIntent: boolean = false;
+  // Track mouse movement to distinguish click from drag
+  private mouseDownX: number = 0;
+  private mouseDownY: number = 0;
+  private hasMouseMoved: boolean = false;
+  private readonly MOUSE_MOVE_THRESHOLD: number = 5; // pixels threshold to consider as drag
   webHookTooltipText: string;
   isInternalIntent: boolean = false;
   actionIntent: ActionIntentConnected;
@@ -92,6 +98,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   intentColor: any = INTENT_COLORS.COLOR1;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
+
 
   constructor(
     public intentService: IntentService,
@@ -228,7 +235,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   async ngOnInit(): Promise<void> {
-      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent);
+      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
       if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
         this.showIntentOptions = false;
       } 
@@ -553,7 +560,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.formSize = Object.keys(this.intent.form).length;
       } else {
         this.formSize = 0;
-      }
+      } 
     } catch (error) {
       this.logger.error("error: ", error);
     }
@@ -662,6 +669,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
     this.formSelected.emit(this.intent.form);
   }
+
+
 
   onClickControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number) {
     this.logger.log('[CDS-INTENT] onClickControl', event, action);
@@ -917,6 +926,21 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.showPanelActions.emit(data);
   }
 
+  onOpenIntentPanel(intent: Intent){
+    this.logger.log('[CDS-INTENT] onOpenIntentPanel > intent', this.intent, " con : ", intent);
+    // Only open panel if there was no mouse movement (single click, not drag)
+    if(!this.hasMouseMoved && !intent['attributesChanged'] && this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL){
+      this.openIntentPanel(intent);
+    }
+  }
+
+  onIntentMouseDown(event: MouseEvent): void {
+    this.hasMouseMoved = false;
+  }
+
+  onIntentMouseMove(event: MouseEvent): void {
+    this.hasMouseMoved = true;
+  }
   /** ******************************
    * intent controls options: START
    * ****************************** */

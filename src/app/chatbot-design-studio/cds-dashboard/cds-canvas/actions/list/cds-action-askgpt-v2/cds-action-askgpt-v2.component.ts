@@ -67,6 +67,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   ai_error: string = "";
   preview_response: any;
   chunks: Array<any> = [];
+  
+  chunksPanelOpenState: boolean = false;
+  aiSettingsPanelOpenState: boolean = false;
 
   temp_variables = [];
   // autocompleteOptions: Array<{label: string, value: string}> = [];
@@ -79,7 +82,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
     "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
   }
-  IS_VISIBLE_ALPHA_SLIDER = false;
+  KB_HYBRID = false;
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.ASKGPTV2;
@@ -261,7 +264,7 @@ export class CdsActionAskgptV2Component implements OnInit {
     const result = this.listOfNamespaces.find(el => el.value === namespace);
     this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result);
     if(result){
-      this.IS_VISIBLE_ALPHA_SLIDER = result.hybrid;
+      this.KB_HYBRID = result.hybrid;
     }
   }
 

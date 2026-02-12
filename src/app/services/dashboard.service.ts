@@ -106,6 +106,7 @@ export class DashboardService {
                 value: name
               }))
             }
+            this.logger.log('[CDS DSHBRD] - variableList', variableList, this.selectedChatbot.attributes, this.selectedChatbot.attributes.globals);
             resolve(true);
           }
         }, error: (error) => {
