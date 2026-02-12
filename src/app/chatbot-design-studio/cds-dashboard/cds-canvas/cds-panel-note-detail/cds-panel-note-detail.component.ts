@@ -292,6 +292,85 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+
+
+  // loadMediaFromFile(file): Promise<void> {
+  //   if (!this.note) return;
+  //   this.imageUploadError = '';
+  //   if (file.size > this.MAX_MEDIA_BYTES) {
+  //     this.imageUploadError = 'File too large. Max allowed size is 4MB.';
+  //     return;
+  //   }
+
+  //   const supported = this.isSupportedMediaFile(file);
+  //   if (!supported.ok || !supported.mediaType) {
+  //     this.imageUploadError = supported.reason || 'Unsupported file.';
+  //     return;
+  //   }
+  //   const that = this;
+  //   that.logger.log('[CdsPanelNoteDetailComponent] loadMediaFromFile start', { fileName: file?.name, size: file?.size, type: file?.type });
+
+  //   const currentUpload = new UploadModel(file);
+  //   const user = this.tiledeskAuthService.getCurrentUser();
+  //   if (!user) {
+  //     that.logger.error('[CdsPanelNoteDetailComponent] loadMediaFromFile: user is null/undefined');
+  //     this.imageUploadError = 'User not logged in.';
+  //     return;
+  //   }
+  //   if (!user.uid) {
+  //     that.logger.error('[CdsPanelNoteDetailComponent] loadMediaFromFile: user.uid is empty', { user });
+  //     this.imageUploadError = 'User not logged in.';
+  //     return;
+  //   }
+
+  //   this.uploadService.uploadAsset(user.uid, currentUpload).then(async (data) => {
+  //     that.logger.log('[CdsPanelNoteDetailComponent] uploadAsset then: raw response', {
+  //       data,
+  //       hasDownloadURL: !!(data && (data as any).downloadURL),
+  //       hasSrc: !!(data && (data as any).src),
+  //       hasFilename: !!(data && (data as any).filename),
+  //       downloadURL: data && (data as any).downloadURL,
+  //       src: data && (data as any).src,
+  //       filename: data && (data as any).filename
+  //     });
+  //     const url = that.getMediaUrlFromUploadResponse(data);
+  //     if (!url) {
+  //       that.logger.warn('[CdsPanelNoteDetailComponent] uploadAsset: no usable URL (downloadURL, src or filename)');
+  //       throw new Error('Upload did not return a usable URL');
+  //     }
+  //     that.logger.log('[CdsPanelNoteDetailComponent] uploadAsset: using URL', { urlPreview: url.length > 80 ? url.slice(0, 80) + '...' : url });
+  //     await this.setMediaFromSrc(url, supported.mediaType);
+  //   }).catch(error => {
+  //     that.logger.error('[CdsPanelNoteDetailComponent] loadMediaFromFile catch', {
+  //       message: error?.message,
+  //       error,
+  //       errorError: (error as any)?.error,
+  //       errorBody: (error as any)?.body,
+  //       errorFilename: (error as any)?.filename,
+  //       errorErrorFilename: (error as any)?.error?.filename
+  //     });
+  //     this.imageUploadError = 'Upload failed. Please try again.';
+  //     this.logger.error('[CdsPanelNoteDetailComponent] Error uploading media for image note', error);
+  //   });
+  //   that.logger.log('[CdsPanelNoteDetailComponent] loadMediaFromFile: uploadAsset promise started');
+  // }
+
+  /** Estrae l'URL dal risultato dell'upload: supporta downloadURL/src e risposta con filename (senza doppia codifica). */
+  private getMediaUrlFromUploadResponse(data: any): string | null {
+    if (!data) return null;
+    const d = data.data ?? data.body ?? data;
+    if (d.downloadURL) return d.downloadURL;
+    if (d.src) return d.src;
+    const filename = d.filename;
+    if (filename && typeof filename === 'string') {
+      const baseUrl = this.uploadService.getBaseUrl().replace(/\/$/, '');
+      const pathParam = filename.includes('%') ? filename : encodeURIComponent(filename);
+      return `${baseUrl}/files/download?path=${pathParam}`;
+    }
+    return null;
+  }
+
+
   private async loadImageFromUrl(url: string): Promise<void> {
     if (!this.note) return;
     this.imagePreviewLoaded = false;
