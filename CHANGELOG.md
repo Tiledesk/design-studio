@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
+
 # 1.39.28
 - **added**: added tools MCP server
 
