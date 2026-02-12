@@ -15,7 +15,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
@@ -173,25 +173,35 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
   setModel(modelName: string){
-    const result = setModel(modelName, this.llm_models_flat, this.logger);
-    this.llm_model_selected = result;
+    let result = setModel(modelName, this.llm_models_flat, this.logger);
+    if (!result && this.llm_models_flat?.length) {
+      result = setModel(this.default_model.name, this.llm_models_flat, this.logger)
+        ?? this.llm_models_flat[0];
+    }
+    this.llm_model_selected = result ?? ({} as LlmModel);
     this.logger.log("[ACTION ASKGPTV2] llm_model_selected: ", this.llm_model_selected);
-    this.action.llm = result?.llm?result.llm:'';
-    this.action.model = result?.model?result.model:'';
-    this.action.modelName = result?.modelName?result.modelName:'';
+    this.action.llm = result?.llm ?? '';
+    this.action.model = result?.model ?? '';
+    this.action.modelName = result?.modelName ?? '';
     this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
-    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
+    this.ai_setting['max_tokens'].max = this.llm_model_selected?.max_output_tokens;
+    this.ai_setting['max_tokens'].min = this.llm_model_selected?.min_tokens;
+    if(this.action.max_tokens > this.llm_model_selected?.max_output_tokens){
+      this.action.max_tokens = this.llm_model_selected?.max_output_tokens;
+    }
     // Preserve any higher min constraint (e.g. citations => min 1024)
-    const modelMin = this.llm_model_selected.min_tokens;
+    const modelMin = result?.min_tokens ?? this.ai_setting['max_tokens'].min;
     const citationsMin = this.action?.citations ? 1024 : 0;
     this.ai_setting['max_tokens'].min = Math.max(modelMin, citationsMin);
 
     // Every model change resets max_tokens to default (capped by model max)
-    const min = this.ai_setting['max_tokens'].min;
-    const max = this.ai_setting['max_tokens'].max;
-    let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
-    if (next < min) next = min;
-    this.action.max_tokens = next;
+    if (result) {
+      const min = this.ai_setting['max_tokens'].min;
+      const max = this.ai_setting['max_tokens'].max;
+      let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+      if (next < min) next = min;
+      this.action.max_tokens = next;
+    }
     if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
       this.action.temperature = 1
       this.ai_setting['temperature'].disabled= true

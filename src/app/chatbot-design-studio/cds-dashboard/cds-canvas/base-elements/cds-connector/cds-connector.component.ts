@@ -10,6 +10,8 @@ import { Subscription } from 'rxjs';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from 'src/app/services/dashboard.service';
 // import { Intent } from 'src/app/models/intent-model';
 
@@ -34,6 +36,7 @@ export class CdsConnectorComponent implements OnInit {
   // connectorDisplay: string;
   // intent: Intent;
   connector: any;
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     private readonly stageService: StageService,
@@ -59,6 +62,7 @@ export class CdsConnectorComponent implements OnInit {
       this.idConnection = changes.idConnection?.currentValue;
       this.getIntentDisplayName();
     }
+    this.setIdContractConnector();
   }
 
 
@@ -85,6 +89,9 @@ export class CdsConnectorComponent implements OnInit {
   }
 
   setIntentConnector() {
+    // this.logger.log('[cds-connector] setIntentConnector: ', this.idConnector);
+    // this.logger.log('[cds-connector] idContractConnector: ', this.idContractConnector);
+    // this.logger.log('[cds-connector] displayConnector: ', this.displayConnector);
     let display = true;
     if (this.idConnector) {
       this.idContractConnector = 'contract_' + this.idConnector;

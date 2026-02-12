@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, On
 import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 //MODELS
-import { ActionAiPrompt } from 'src/app/models/action-model';
+import { ActionAiPrompt, ReasoningLevel } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 
 //SERVICES
@@ -309,27 +309,41 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
 
 
 setModel(modelName: string){
-  const result = setModel(modelName, this.llm_models_flat, this.logger);
-  this.llm_model_selected = result;
+  let result = setModel(modelName, this.llm_models_flat, this.logger);
+  if (!result && this.llm_models_flat?.length) {
+    result = setModel(this.default_model.name, this.llm_models_flat, this.logger)
+      ?? this.llm_models_flat[0];
+  }
+  this.llm_model_selected = result ?? ({} as LlmModel);
   this.logger.log("[ACTION AI_PROMPT] llm_model_selected: ", this.llm_model_selected);
-  this.action.llm = result?.llm?result.llm:'';
-  this.action.model = result?.model?result.model:'';
-  this.action.modelName = result?.modelName?result.modelName:'';
+  this.action.llm = result?.llm ?? '';
+  this.action.model = result?.model ?? '';
+  this.action.modelName = result?.modelName ?? '';
   this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
-  this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
-  this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
+  this.ai_setting['max_tokens'].max = this.llm_model_selected?.max_output_tokens;
+  this.ai_setting['max_tokens'].min = this.llm_model_selected?.min_tokens;
+  if(this.action.max_tokens > this.llm_model_selected?.max_output_tokens){
+    this.action.max_tokens = this.llm_model_selected?.max_output_tokens;
+  }
   // Every model change resets max_tokens to default (capped by model max)
-  const min = this.ai_setting['max_tokens'].min;
-  const max = this.ai_setting['max_tokens'].max;
-  let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
-  if (next < min) next = min;
-  this.action.max_tokens = next;
+  if (result) {
+    const min = this.ai_setting['max_tokens'].min;
+    const max = this.ai_setting['max_tokens'].max;
+    let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+    if (next < min) next = min;
+    this.action.max_tokens = next;
+  }
   if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
     this.action.temperature = 1
     this.ai_setting['temperature'].disabled= true
   } else {
     this.ai_setting['temperature'].disabled= false
   }
+  // Se il modello non supporta reasoning, disattiva reasoning sull'action
+  if (this.llm_model_selected?.reasoning !== true) {
+    this.action.reasoning = false;
+  }
+  // console.log("[ACTION AI_PROMPT] llm_models_flat: ", this.llm_models_flat);
 }
 
 
@@ -371,9 +385,44 @@ setModel(modelName: string){
     this.updateAndSaveAction.emit();
   }
 
+  /** Chiamato al change dello slider reasoning: salva l'enum e emette il save */
+  onReasoningLevelChange(value: number): void {
+    this.action.reasoningLevel = this.numberToReasoningLevel(value);
+    this.updateAndSaveAction.emit();
+  }
+
+  /** Converte 0,1,2 in enum ReasoningLevel (per slider → action) */
+  numberToReasoningLevel(n: number): ReasoningLevel {
+    const clamped = Math.min(2, Math.max(0, n));
+    return clamped === 0 ? 'low' : clamped === 1 ? 'medium' : 'high';
+  }
+
+  /** True se la checkbox Reasoning deve essere disabilitata (modello senza supporto reasoning) */
+  get isReasoningCheckboxDisabled(): boolean {
+    return this.llm_model_selected?.reasoning !== true;
+  }
+
+  /** Valore numerico per lo slider (0, 1, 2) da action.reasoningLevel */
+  get reasoningLevelSlider(): number {
+    const v = this.action.reasoningLevel;
+    if (v === 'low') return 0;
+    if (v === 'medium') return 1;
+    if (v === 'high') return 2;
+    // retrocompatibilità: se era salvato come number
+    if (typeof v === 'number') return Math.min(2, Math.max(0, v));
+    return 1; // default medium
+  }
+  set reasoningLevelSlider(value: number) {
+    this.action.reasoningLevel = this.numberToReasoningLevel(value);
+  }
+
   onChangeCheckbox(event: MatCheckboxChange, target){
     try {
       this.action[target] = event.checked;
+      if (target === 'reasoning' && event.checked && (this.action.reasoningLevel === undefined || this.action.reasoningLevel === null)) {
+        this.action.reasoningLevel = 'medium';
+      }
+      // this.action.assignReasoningContentTo = "reasoning_content";
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     } catch (error) {
       this.logger.log("[ACTION AI_PROMPT] Error: ", error);
@@ -726,6 +775,13 @@ setModel(modelName: string){
    */
   formatSliderLabel = (value: number): string => {
     return this.formatNumberPipe.transform(value);
+  }
+
+  /** Label per reasoning: accetta number (0,1,2) per lo slider thumb o enum ('low'|'medium'|'high') per l'input */
+  formatReasoningLabel = (value: number | ReasoningLevel): string => {
+    const n = typeof value === 'number' ? value : (value === 'low' ? 0 : value === 'medium' ? 1 : 2);
+    const key = n === 0 ? 'CDSCanvas.ReasoningLevelLow' : n === 1 ? 'CDSCanvas.ReasoningLevelMedium' : 'CDSCanvas.ReasoningLevelHigh';
+    return this.translate.instant(key);
   }
 
 }
