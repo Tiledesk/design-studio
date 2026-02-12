@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.28-rc5
+- **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
 
 # 1.39.28-rc4
 - **bug-fixed**: Fixed image loading bug with new API
