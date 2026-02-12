@@ -8,8 +8,10 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.39.28-rc4
 - **bug-fixed**: Fixed image loading bug with new API
+
+# 1.39.28-rc3
 - **added**: Added a note title to the note rectangle
 - **changed**: Removed the note border in rectangle notes
 - **changed**: Disabled the maximum height on rectangles and set a minimum size
