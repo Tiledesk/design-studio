@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+# 1.39.29
 - **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
 
 # 1.39.28
