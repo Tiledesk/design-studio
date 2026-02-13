@@ -7,22 +7,18 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+
+# 1.39.29-rc3
+- **changed**: modificata posizione del pannello cds-note-controls
+
+
 # 1.39.29-rc2
 - **changed**: show MCP server in alphabetical order
 - **changed**: show MCP tools in alphabetical order
 - **changed**: Manage saving and refreshing MCP tools better
 - **changed**: change the color of the badges in the list models
 - **changed**: change the cursor to the selected MCP tools, and the text from "Chose..." to "Manage MCP Tools"
-
-# this branch
-- **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
-- **changed**: modificata posizione del pannello cds-note-controls
-
-- **added**: aggiunto un titolo note al rettangolo note
-- **changed**: eliminato il bordo delle note nelle note tipo rettangolo
-- **changed**: disabilitata l'altezza massima sui rettangoli e impostata una dimensione minima
-- **bug-fixed**: risolto il problema sul resize delle note rettangolo. Il vertice opposto a quello trascinato ora rimanere bloccato.
-- **bug-fixed**: corretto il resize orizzontale delle note testo eliminato il flicking
 
 # 1.39.29-rc1
 - **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
