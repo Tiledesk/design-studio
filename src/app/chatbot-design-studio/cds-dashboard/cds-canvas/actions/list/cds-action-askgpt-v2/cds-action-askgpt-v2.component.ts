@@ -288,7 +288,7 @@ export class CdsActionAskgptV2Component implements OnInit {
 
   selectKB(namespace){
     const type = this.action?.namespaceAsName ? 'name' : 'value';
-    const result = this.listOfNamespaces.find(el => type === 'value' ? el.value === namespace : el.name === namespace);
+    const result = this.listOfNamespaces?.find(el => type === 'value' ? el.value === namespace : el.name === namespace);
     this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, this.listOfNamespaces, result);
     if(result){
       this.KB_HYBRID = result.hybrid;
@@ -325,6 +325,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
   
   onBlur(event){
+    this.action.namespace = event.target.value;
     this.updateAndSaveAction.emit();
   }
 

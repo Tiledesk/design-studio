@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.29-rc2
+- **changed**: show MCP server in alphabetical order
+- **changed**: show MCP tools in alphabetical order
+- **changed**: Manage saving and refreshing MCP tools better
+- **changed**: change the color of the badges in the list models
+- **changed**: change the cursor to the selected MCP tools, and the text from "Chose..." to "Manage MCP Tools"
 
 # this branch
 - **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
@@ -17,6 +23,19 @@
 - **changed**: disabilitata l'altezza massima sui rettangoli e impostata una dimensione minima
 - **bug-fixed**: risolto il problema sul resize delle note rettangolo. Il vertice opposto a quello trascinato ora rimanere bloccato.
 - **bug-fixed**: corretto il resize orizzontale delle note testo eliminato il flicking
+
+# 1.39.29-rc1
+- **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
+
+# 1.39.28-rc4
+- **bug-fixed**: Fixed image loading bug with new API
+
+# 1.39.28-rc3
+- **added**: Added a note title to the note rectangle
+- **changed**: Removed the note border in rectangle notes
+- **changed**: Disabled the maximum height on rectangles and set a minimum size
+- **bug-fixed**: Fixed the issue with resizing rectangle notes. The corner opposite the one being dragged now remains locked.
+- **bug-fixed**: Fixed the horizontal resizing of text notes; eliminated flickering.
 
 
 # 1.39.28-rc2 

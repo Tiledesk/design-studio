@@ -138,8 +138,9 @@ export class CdsActionAddKbContentComponent implements OnInit {
   onBlur(event, property){
     if(property == 'source'){
       this.action.content = this.action.name?  this.action.name + '\n'+this.action[property] : this.action[property];
+    } else if(property == 'namespace'){
+      this.action.namespace = event.target.value;
     }
-
     this.updateAndSaveAction.emit()
   }
  

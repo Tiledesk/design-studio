@@ -23,8 +23,8 @@ export class McpServersDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<McpServersDialogComponent>,
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: { 
-      // mcpServers comes from integrations; tools (metadata) may be present and must remain untouched.
-      mcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }>,
+      // mcpServers from integrations: tools = selected tools, availableToolsCount = total from last discovery (optional).
+      mcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }>, availableToolsCount?: number }>,
       selectedServers?: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }>,
       onUpdate?: (data: any) => void
     }
@@ -41,8 +41,8 @@ export class McpServersDialogComponent implements OnInit {
     if (this.data.onUpdate) {
       this.onUpdateCallback = this.data.onUpdate;
     }
-    // Initialize filtered servers
-    this.filteredServers = [...this.data.mcpServers];
+    // Initialize filtered servers (alphabetically by name)
+    this.filteredServers = [...this.data.mcpServers].sort((a, b) => a.name.localeCompare(b.name));
   }
 
   onCloseDialog(): void {
@@ -85,13 +85,15 @@ export class McpServersDialogComponent implements OnInit {
     const filter = this.searchFilter.toLowerCase().trim();
     
     if (!filter) {
-      this.filteredServers = [...this.data.mcpServers];
+      this.filteredServers = [...this.data.mcpServers].sort((a, b) => a.name.localeCompare(b.name));
     } else {
-      this.filteredServers = this.data.mcpServers.filter(server => 
-        server.name.toLowerCase().includes(filter) ||
-        server.url.toLowerCase().includes(filter) ||
-        server.transport.toLowerCase().includes(filter)
-      );
+      this.filteredServers = this.data.mcpServers
+        .filter(server =>
+          server.name.toLowerCase().includes(filter) ||
+          server.url.toLowerCase().includes(filter) ||
+          server.transport.toLowerCase().includes(filter)
+        )
+        .sort((a, b) => a.name.localeCompare(b.name));
     }
     
     this.logger.log("[McpServersDialog] Filtered servers:", this.filteredServers.length);
@@ -102,11 +104,14 @@ export class McpServersDialogComponent implements OnInit {
   }
 
   /**
-   * Count of available tools for a server (from integrations -> data.mcpServers[].tools).
-   * Tools are optional.
+   * Count of tools available from the MCP server (from last discovery, persisted as availableToolsCount).
+   * Falls back to tools.length for older integrations that don't have availableToolsCount.
    */
   getAvailableToolsCount(server: { name: string }): number {
-    const found = this.data?.mcpServers?.find(s => s.name === server.name) as any;
+    const found = this.data?.mcpServers?.find(s => s.name === server.name) as { tools?: Array<{ name: string }>; availableToolsCount?: number } | undefined;
+    if (found?.availableToolsCount != null && Number.isFinite(found.availableToolsCount)) {
+      return found.availableToolsCount;
+    }
     return Array.isArray(found?.tools) ? found.tools.length : 0;
   }
 
