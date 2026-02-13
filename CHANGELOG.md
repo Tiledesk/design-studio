@@ -14,6 +14,11 @@
 - **Modified**: Disabled the maximum height on rectangle note and set a minimum size
 - **Bug Fix**: Fixed an issue with resizing rectangle note. The corner opposite the one being dragged now remains locked.
 - **Bug Fix**: Fixed horizontal resizing of text notes; eliminated flickering.
+- **changed**: show MCP server in alphabetical order
+- **changed**: show MCP tools in alphabetical order
+- **changed**: Manage saving and refreshing MCP tools better
+- **changed**: change the color of the badges in the list models
+- **changed**: change the cursor to the selected MCP tools, and the text from "Chose..." to "Manage MCP Tools"
 
 # 1.39.29
 - **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
