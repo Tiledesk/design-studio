@@ -9,12 +9,14 @@
 
 
 # this branch
-- **bug-fixed**: Fixed image loading bug with new API
-- **added**: Added a note title to the note rectangle
-- **changed**: Removed the note border in rectangle notes
-- **changed**: Disabled the maximum height on rectangles and set a minimum size
-- **bug-fixed**: Fixed the issue with resizing rectangle notes. The corner opposite the one being dragged now remains locked.
-- **bug-fixed**: Fixed the horizontal resizing of text notes; eliminated flickering.
+- **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
+- **changed**: modificata posizione del pannello cds-note-controls
+
+- **added**: aggiunto un titolo note al rettangolo note
+- **changed**: eliminato il bordo delle note nelle note tipo rettangolo
+- **changed**: disabilitata l'altezza massima sui rettangoli e impostata una dimensione minima
+- **bug-fixed**: risolto il problema sul resize delle note rettangolo. Il vertice opposto a quello trascinato ora rimanere bloccato.
+- **bug-fixed**: corretto il resize orizzontale delle note testo eliminato il flicking
 
 
 # 1.39.28-rc2 
