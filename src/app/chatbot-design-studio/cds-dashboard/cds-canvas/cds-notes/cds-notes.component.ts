@@ -693,12 +693,12 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.onNoteInputClick(event);
       return;
     }
-    console.log('[CDS-NOTES-CLICK] Click su superficie blocco note (prima di onRectClick)', {
-      noteId: this.note?.note_id,
-      type: this.note?.type,
-      modelXY: this.note ? { x: this.note.x, y: this.note.y } : null,
-      hostStyle: this.elementRef?.nativeElement ? { left: (this.elementRef.nativeElement as HTMLElement).style?.left, top: (this.elementRef.nativeElement as HTMLElement).style?.top } : null,
-    });
+    // console.log('[CDS-NOTES-CLICK] Click su superficie blocco note (prima di onRectClick)', {
+    //   noteId: this.note?.note_id,
+    //   type: this.note?.type,
+    //   modelXY: this.note ? { x: this.note.x, y: this.note.y } : null,
+    //   hostStyle: this.elementRef?.nativeElement ? { left: (this.elementRef.nativeElement as HTMLElement).style?.left, top: (this.elementRef.nativeElement as HTMLElement).style?.top } : null,
+    // });
     this.onRectClick(event);
   }
 
@@ -737,10 +737,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     }
 
     this.cancelSingleClickTimer();
-    console.log('[CDS-NOTES-CLICK] onRectClick: prima di changeState(2)', {
-      noteId: this.note?.note_id,
-      modelXY: this.note ? { x: this.note.x, y: this.note.y } : null,
-    });
+    // console.log('[CDS-NOTES-CLICK] onRectClick: prima di changeState(2)', {
+    //   noteId: this.note?.note_id,
+    //   modelXY: this.note ? { x: this.note.x, y: this.note.y } : null,
+    // });
     this.changeState(2);
     this.updateDragState();
     if (this.shouldOpenDetailPanelOnClick()) {
@@ -1355,7 +1355,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       contentTransform: contentEl.style.transform || '(none)',
       contentTransformOrigin: contentEl.style.transformOrigin || '(default)',
     };
-    console.log('[CDS-NOTES-RESIZE-POS]', payload);
+    // console.log('[CDS-NOTES-RESIZE-POS]', payload);
   }
 
   /**
@@ -1480,7 +1480,17 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const isNoteControls = handle.classList.contains('note-controls');
       const isMediaDragHandle = handle.classList.contains('media-drag-handle');
       
-      if (isNoteControls || isMediaDragHandle) {
+      if (isNoteControls) {
+        // Posizione fissa in alto a destra: top -30px, right 0px (in pixel visivi).
+        // Con scale nota e zoom stage, in coordinate del content servono:
+        // top = -30 / (scaleY * stageZoom), right = 0 / (scaleX * stageZoom).
+        const topPx = -30 * inverseScaleY;
+        const rightPx = 0 * inverseScaleX;
+        handle.style.top = `${topPx}px`;
+        handle.style.right = `${rightPx}px`;
+        handle.style.transform = `scale(${inverseScaleX}, ${inverseScaleY})`;
+        handle.style.transformOrigin = 'top right';
+      } else if (isMediaDragHandle) {
         // No positional translate needed here: we only want a stable visual size.
         handle.style.transform = `scale(${inverseScaleX}, ${inverseScaleY})`;
       } else if (isRotateHandle) {
@@ -1507,7 +1517,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         // Per gli angoli, solo scale
         handle.style.transform = `scale(${inverseScaleX}, ${inverseScaleY})`;
       }
-      handle.style.transformOrigin = 'center center';
+      if (!isNoteControls) {
+        handle.style.transformOrigin = 'center center';
+      }
     });
 
     // Titolo rect: scala inversa solo rispetto alla nota (non allo zoom stage) così resta 40px in altezza e in 0,0.
@@ -1538,11 +1550,11 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const previousState = this.stateNote;
     this.stateNote = state;
     if (state === 2) {
-      console.log('[CDS-NOTES-CLICK] SELEZIONE (changeState 2)', {
-        noteId: this.note?.note_id,
-        previousState,
-        modelXY: this.note ? { x: this.note.x, y: this.note.y } : null,
-      });
+      // console.log('[CDS-NOTES-CLICK] SELEZIONE (changeState 2)', {
+      //   noteId: this.note?.note_id,
+      //   previousState,
+      //   modelXY: this.note ? { x: this.note.x, y: this.note.y } : null,
+      // });
     }
     if (state === 1) {
       // this.cancelOpenPanelTimer();
@@ -1681,7 +1693,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
           
           // Applica scale e trasformazioni se contentElement è disponibile
           if (this.contentElement) {
-            console.log('[CDS-NOTES-CLICK] notesChanged$: applico applyScaleAndTransform', this.note?.note_id);
+            // console.log('[CDS-NOTES-CLICK] notesChanged$: applico applyScaleAndTransform', this.note?.note_id);
             this.applyScaleAndTransform();
           }
           
@@ -1947,11 +1959,11 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    */
   private applyScaleAndTransform(): void {
     if (!this.note || !this.contentElement) return;
-    console.log('[CDS-NOTES-CLICK] applyScaleAndTransform chiamata', {
-      noteId: this.note.note_id,
-      type: this.note.type,
-      modelXYBefore: { x: this.note.x, y: this.note.y },
-    });
+    // console.log('[CDS-NOTES-CLICK] applyScaleAndTransform chiamata', {
+    //   noteId: this.note.note_id,
+    //   type: this.note.type,
+    //   modelXYBefore: { x: this.note.x, y: this.note.y },
+    // });
     const element = this.contentElement.nativeElement;
 
     // MEDIA NOTE: after loading media we update note.width/note.height to the real media size.
@@ -2038,16 +2050,16 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         const hostEl = this.elementRef.nativeElement as HTMLElement;
         hostEl.style.left = this.note.x + 'px';
         hostEl.style.top = this.note.y + 'px';
-        console.log('[CDS-NOTES-CLICK] applyScaleAndTransform: MIGRAZIONE RECT (origin non center)', {
-          noteId: this.note.note_id,
-          transformOrigin: origin,
-          baseWidth,
-          baseHeight,
-          sx,
-          sy,
-          xyBefore: { x: xBefore, y: yBefore },
-          xyAfter: { x: this.note.x, y: this.note.y },
-        });
+        // console.log('[CDS-NOTES-CLICK] applyScaleAndTransform: MIGRAZIONE RECT (origin non center)', {
+        //   noteId: this.note.note_id,
+        //   transformOrigin: origin,
+        //   baseWidth,
+        //   baseHeight,
+        //   sx,
+        //   sy,
+        //   xyBefore: { x: xBefore, y: yBefore },
+        //   xyAfter: { x: this.note.x, y: this.note.y },
+        // });
       }
     }
     
