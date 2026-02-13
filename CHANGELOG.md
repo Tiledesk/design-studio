@@ -10,7 +10,7 @@
 
 
 # 1.39.29-rc3
-- **changed**: modificata posizione del pannello cds-note-controls
+- **changed**: changed the position of the cds-note-controls panel
 
 
 # 1.39.29-rc2
