@@ -645,7 +645,7 @@ cds-select#model-condition.not-configured ::ng-deep {
         border-color: var(--blu-02);
         padding-right: 30px;
         justify-content: flex-start;
-        
+        cursor: default;
         .remove-icon {
             position: absolute;
             right: 4px;

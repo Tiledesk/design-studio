@@ -597,7 +597,7 @@
         "NoMCPServerConfigured": "No MCP server configured",
         "UseToolsToCompleteOperation": "Use tools to complete the operation",
         "SelectMCPTools": "Select MCP tools",
-        "AddMoreTools": "Choose MCP tools",
+        "AddMoreTools": "Manage MCP tools",
         "TotalMCPServers": "Total MCP Servers",
         "SearchByNameURLOrType": "Search by name, URL or type",
         "NoServersMatchSearch": "No servers match your search",
