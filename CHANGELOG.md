@@ -9,6 +9,7 @@
 
 # this branch
 - **added**: IMPORTANTE: aggiunto @agentNote da ingaggiare ogni volta che modifico il componente 
+- **changed**: modificata posizione del pannello cds-note-controls
 
 - **added**: aggiunto un titolo note al rettangolo note
 - **changed**: eliminato il bordo delle note nelle note tipo rettangolo
