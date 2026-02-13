@@ -316,6 +316,8 @@
         },
         "NotePanel": {
             "MarkupText": "Markup text",
+            "Title": "Title",
+            "TitlePlaceholder": "Enter title",
             "BackgroundColor": "Background color",
             "BorderColor": "Border color",
             "BorderThickness": "Border thickness",

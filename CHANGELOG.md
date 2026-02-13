@@ -7,6 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.30
+- **Modified**: Changed the position of the cds-note-controls panel
+- **Added**: Added a note title to the rectangle note
+- **Modified**: Removed the note border in the rectangle note
+- **Modified**: Disabled the maximum height on rectangle note and set a minimum size
+- **Bug Fix**: Fixed an issue with resizing rectangle note. The corner opposite the one being dragged now remains locked.
+- **Bug Fix**: Fixed horizontal resizing of text notes; eliminated flickering.
+
 # 1.39.29
 - **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
 
@@ -65,6 +73,7 @@
 - **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
 - **changed**: If the chatbot is new, only one action per intent
 
+<<<<<<< HEAD
 # 1.39.23
 - **bug-fix**: deleted duplicate AI model chatGPT 5.2
 
@@ -113,6 +122,19 @@
 - **bug-fix**: changed knwoledge to knowledge 
 - **bug-fix**: Text correction on replace AI agent
 - **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
+=======
+- **added**: Supportare rettangolo
+- **bug-fixed**: Supportare spessore bordo
+- **bug-fixed**: correggere il bug che non permette di salvare il colore del testo
+- **added**: aggiungi submenu con le varie tipologie di note
+- **added**: Inserimento con drag&drop
+- **added**: Supportare tipo Immagine
+- **added**: Supportare tipo Video
+- **bug-fixed**:Appena inserita la Nota testo dovrebbe subito permetterti di scrivere con focus su testo
+- **bug-fixed**: centra non funziona nel blocco
+- **bug-fixed**: bug fixed text align
+- **added**: added note
+>>>>>>> features/from-master/ds-note-native
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management
