@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 
+# 1.39.29-rc4
+- **bug-fix**: eliminated AAAAAA
 
 # 1.39.29-rc3
 - **changed**: changed the position of the cds-note-controls panel
