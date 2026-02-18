@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+
+# this branch 
+- **Added**: aggiunta la possibilità di inserire tag nella action ask KB e nella action create KB
+
+
 # 1.39.30
 - **Modified**: Changed the position of the cds-note-controls panel
 - **Added**: Added a note title to the rectangle note
