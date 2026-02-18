@@ -125,7 +125,7 @@
             <div class="header-answer-preview">
                 <div class="label-and-button-container">
                     <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} {{llm_model_selected.modelName}})</span>
+                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} {{llm_model_selected?.modelName}})</span>
                     </label>
                 </div>
             </div>
@@ -283,9 +283,9 @@
                 <!-- // model select  -->
                 <div class="field-box">
                     <cds-select id="model-condition"
-                        [class]="!llm_model_selected.configured ? 'not-configured' : ''"
+                        [class]="!llm_model_selected?.configured ? 'not-configured' : ''"
                         [items]="llm_models_flat" 
-                        [itemSelected]="llm_model_selected.model"
+                        [itemSelected]="llm_model_selected?.model"
                         [bindLabelSelect]="'modelName'" 
                         [bindValueSelect]="'model'"
                         [groupByKey]="'llm'"
@@ -312,6 +312,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -368,7 +369,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['search_type'].step"  
                                     [min]="ai_setting['search_type'].min"
-                                    [max]="ai_setting['search_type'].max" 
+                                    [max]="ai_setting['search_type'].max"
+                                    [disabled]="ai_setting['max_tokens'].disabled" 
                                     [(ngModel)]="action.alpha"
                                     (change)="updateSliderValue($event.value, 'alpha')" aria-label="units">
                                 </mat-slider>
@@ -459,6 +461,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 

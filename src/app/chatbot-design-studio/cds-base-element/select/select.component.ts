@@ -52,9 +52,11 @@ export class SelectComponent implements OnInit {
     }
 
     if (this.itemSelected != null && this.sortedItems?.length && this.bindValueSelect) {
-      const found = this.sortedItems.find(el => el[this.bindValueSelect] === this.itemSelected);
-      if (found) {
-        this.itemSelected = found[this.bindValueSelect];
+      try {
+        const found = this.sortedItems.find(el => el[this.bindValueSelect] === this.itemSelected);
+        this.itemSelected = found ? found[this.bindValueSelect] : this.itemSelected;
+      } catch (error) {
+        console.error('ERROR', error);
       }
     }
   }

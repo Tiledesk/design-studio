@@ -1,18 +1,31 @@
-import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  Renderer2,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+import { CdkDrag, CdkDragDrop, CdkDragMove, moveItemInArray } from '@angular/cdk/drag-drop';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
-import { takeUntil, timeInterval } from 'rxjs/operators';
-import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, CdkDropListGroup, CdkDropList, CdkDragHandle } from '@angular/cdk/drag-drop';
-import { Form, Intent } from 'src/app/models/intent-model';
+import { takeUntil } from 'rxjs/operators';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
-import { IntentService } from '../../../services/intent.service';
-import { ConnectorService } from '../../../services/connector.service';
-import { StageService } from '../../../services/stage.service';
-import { ControllerService } from '../../../services/controller.service';
+import { Form, Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
+import { IntentService } from '../../../services/intent.service';
+import { ConnectorService } from '../../../services/connector.service';
+import { StageService } from '../../../services/stage.service';
+import { ControllerService } from '../../../services/controller.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -31,21 +44,18 @@ export enum HAS_SELECTED_TYPE {
   styleUrls: ['./cds-intent.component.scss']
 })
 
-export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
+export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() intent: Intent;
   @Input() hideActionPlaceholderOfActionPanel: boolean;
   @Input() chatbotSubtype: string;
   @Input() IS_OPEN_PANEL_INTENT_DETAIL: boolean;
-  
-  @Output() componentRendered = new EventEmitter<string>();
-  @Output() questionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
-  @Output() answerSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
-  @Output() formSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
-  @Output() actionSelected = new EventEmitter(); // !!! SI PUO' ELIMINARE
 
+  @Output() componentRendered = new EventEmitter<string>();
+  @Output() questionSelected = new EventEmitter();
+  @Output() formSelected = new EventEmitter();
+  @Output() actionSelected = new EventEmitter();
   @Output() actionDeleted = new EventEmitter();
-  @Output() showPanelActions = new EventEmitter(); // nk
-  // @Output() testItOut = new EventEmitter<Intent>();
+  @Output() showPanelActions = new EventEmitter();
   @Output() deleteIntent = new EventEmitter();
   @Output() openIntent = new EventEmitter<Intent>();
   @Output() changeColorIntent = new EventEmitter();
@@ -66,7 +76,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   TYPE_ACTION = TYPE_ACTION;
   TYPE_ACTION_VXML = TYPE_ACTION_VXML;
   ACTIONS_LIST = ACTIONS_LIST;
-  elementTypeSelected: HAS_SELECTED_TYPE
+  elementTypeSelected: HAS_SELECTED_TYPE;
   isOpen: boolean = true;
   positionMenu: any;
   isStart = false;
@@ -79,11 +89,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   newActionCreated: Action;
   dragDisabled: boolean = true;
   connectorIsOverAnIntent: boolean = false;
-  // Track mouse movement to distinguish click from drag
-  private mouseDownX: number = 0;
-  private mouseDownY: number = 0;
+  /** Usato per distinguere click da drag (es. apertura pannello intent). */
   private hasMouseMoved: boolean = false;
-  private readonly MOUSE_MOVE_THRESHOLD: number = 5; // pixels threshold to consider as drag
   webHookTooltipText: string;
   isInternalIntent: boolean = false;
   actionIntent: ActionIntentConnected;
@@ -96,12 +103,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isUntitledBlock: boolean = false;
   isNewChatbot: boolean = false;
 
-  /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
 
+  /**
+   * Chiamato da Angular alla creazione del componente.
+   * Inietta i servizi e avvia initSubscriptions per registrare le subscription agli observable (intent, connettori, colore, ecc.).
+   */
   constructor(
     public intentService: IntentService,
     public appConfigService: AppConfigService,
@@ -117,66 +127,64 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.initSubscriptions();
   }
 
-
-  initSubscriptions() {
+  /**
+   * Chiamata dal constructor alla creazione del componente.
+   * Registra le subscription RxJS (behaviorIntent, liveActiveIntent, alphaConnectors$, behaviorIntentColor, connectorsIn)
+   * per reagire agli aggiornamenti dall’esterno; evita doppie subscription e fa cleanup in ngOnDestroy.
+   */
+  initSubscriptions(): void {
+    this.logger.log('[CDS-INTENT-SLICE2] STEP1: Inizializzazione subscription - Pattern takeUntil verificato');
     let subscribtion: any;
     let subscribtionKey: string;
-    /** SUBSCRIBE TO THE INTENT CREATED OR UPDATED */
+
     subscribtionKey = 'behaviorIntent';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.intentService.behaviorIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(intent => {
+        this.logger.log('[CDS-INTENT-SLICE2] STEP4: behaviorIntent emesso - Test funzionale OK', intent?.intent_id);
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] sto modificando l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
           this.setAgentsAvailable();
-          // Aggiorna isUntitledBlock quando l'intent viene modificato
           this.updateIsUntitledBlock();
           if (intent['attributesChanged']) {
             this.logger.log("[CDS-INTENT] ho solo cambiato la posizione sullo stage");
             delete intent['attributesChanged'];
-          } else { // if(this.intent.actions.length !== intent.actions.length && intent.actions.length>0)
+          } else {
             this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
             this.listOfActions = this.intent.actions;
             this.setActionIntent();
-            // cerca il primo connect to block e fissalo in fondo
-            // this.listOfActions = this.intent.actions.filter(function(obj) {
-            //   return obj._tdActionType !== TYPE_ACTION.INTENT;
-            // });
           }
-          
 
-          //UPDATE QUESTIONS
           if (this.intent.question) {
             const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
             this.questionCount = question_segment.length;
-            /** this.question = this.intent.question; */
           } else {
             this.questionCount = 0;
           }
 
-          //UPDATE FORM
           if (this.intent?.form && (this.intent.form !== null)) {
             this.formSize = Object.keys(this.intent.form).length;
           } else {
             this.formSize = 0;
           }
 
-          // Aggiorna showIntentOptions basandosi su questionCount e formSize
           this.updateShowIntentOptions();
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP3: behaviorIntent creata con takeUntil - Pattern consistente OK');
+    } else {
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: behaviorIntent già esistente - Anti-doppia-subscription OK');
     }
 
-    /** SUBSCRIBE TO THE INTENT LIVE SELECTED FROM TEST SITE */
     subscribtionKey = 'intentLiveActive';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.intentService.liveActiveIntent.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-        // this.logger.log("[CDS-INTENT] intentLiveActive: ", data, this.intent.intent_display_name);
           if (data) {
+            this.logger.log('[CDS-INTENT-SLICE2] STEP4: liveActiveIntent emesso - Test funzionale OK', data.intent?.intent_id);
             const intent = data.intent;
             const logAnimationType = data.logAnimationType;
             const scale = data.scale;
@@ -191,7 +199,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
                 this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
               }, 500);
             } else if (intent && this.intent && intent.intent_id === this.intent?.intent_id) {
-              // this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
               this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (this.intent.intent_id));
               setTimeout(() => {
                 this.addCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + (intent.intent_id));
@@ -210,29 +217,36 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP3: liveActiveIntent creata con takeUntil - Pattern consistente OK');
+    } else {
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: liveActiveIntent già esistente - Anti-doppia-subscription OK');
     }
 
-    /** SUBSCRIBE TO THE ALPHA CONNECTOR VALUE */
     subscribtionKey = 'alphaConnectors';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
-      subscribtion = this.stageService.alphaConnectors$.subscribe(value => {
-        // this.logger.log("[CDS-INTENT] alphaConnectors: ", value);
+      subscribtion = this.stageService.alphaConnectors$.pipe(takeUntil(this.unsubscribe$)).subscribe(value => {
+        this.logger.log('[CDS-INTENT-SLICE2] STEP2: alphaConnectors$ emesso con takeUntil - Standardizzazione OK', value);
+        this.logger.log('[CDS-INTENT-SLICE2] STEP4: alphaConnectors$ emesso - Test funzionale OK', value);
         this.alphaConnectors = value;
-        // Ricarica i connettori quando cambia l'opacità
         if (this.intent?.intent_id) {
           this.loadConnectorsIn();
         }
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP2: alphaConnectors$ creata con takeUntil - Standardizzazione OK');
+      this.logger.log('[CDS-INTENT-SLICE2] STEP3: alphaConnectors$ creata con takeUntil - Pattern consistente OK');
+    } else {
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: alphaConnectors$ già esistente - Anti-doppia-subscription OK');
     }
-    /** SUBSCRIBE TO THE CHANGE INTENT COLOR */
+
     subscribtionKey = 'changeIntentColor';
     subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
     if (!subscribtion) {
       subscribtion = this.intentService.behaviorIntentColor.pipe(takeUntil(this.unsubscribe$)).subscribe(resp => {
         if(resp.intentId && resp.intentId === this.intent?.intent_id){
+          this.logger.log('[CDS-INTENT-SLICE2] STEP4: behaviorIntentColor emesso - Test funzionale OK', resp.color);
           if(resp.color){
             this.changeIntentColor(resp.color);
           }
@@ -240,59 +254,105 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP3: behaviorIntentColor creata con takeUntil - Pattern consistente OK');
+    } else {
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: behaviorIntentColor già esistente - Anti-doppia-subscription OK');
+    }
+    this.logger.log('[CDS-INTENT-SLICE2] STEP3: Tutte le subscription inizializzate - Pattern consistente OK', `Total: ${this.subscriptions.length}`);
+  }
+
+
+  /**
+   * Chiamata da Angular dopo la prima change detection sugli input.
+   * Avvia l’inizializzazione del blocco intent (webhook, tipo, actions, attributi, connettori) nell’ordine richiesto.
+   */
+  async ngOnInit(): Promise<void> {
+    this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
+    
+    if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
+      this.showIntentOptions = false;
+    }
+    
+    await this.initializeWebhook();
+    this.initializeIntentType();
+    this.initializeActions();
+    this.initializeAttributes();
+    this.initializeConnectors();
+  }
+
+  /**
+   * Chiamata da ngOnInit solo per intent di tipo WEBHOOK.
+   * Recupera l’URL del webhook esistente o ne crea uno nuovo, così il blocco può esporre l’endpoint.
+   */
+  private async initializeWebhook(): Promise<void> {
+    if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+      this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
+      this.chatbot_id = this.dashboardService.id_faq_kb;
+      this.webhookUrl = await this.getWebhook();
+      if(!this.webhookUrl){
+        this.webhookUrl = await this.createWebhook(this.intent);
+      }
     }
   }
 
-
-  async ngOnInit(): Promise<void> {
-      this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
-      if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
-        this.showIntentOptions = false;
-      } 
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
-        this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
-        this.chatbot_id = this.dashboardService.id_faq_kb;
-        this.webhookUrl = await this.getWebhook();
-        if(!this.webhookUrl){
-          this.webhookUrl = await this.createWebhook(this.intent);
-        }
+  /**
+   * Chiamata da ngOnInit dopo initializeWebhook.
+   * Imposta isStart/isDefaultFallback e, per START/WEBHOOK, garantisce almeno un’action e assegna startAction; altrimenti carica lo stato con setIntentSelected.
+   */
+  private initializeIntentType(): void {
+    if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
+      this.isDefaultFallback = true;
+    }
+    if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+      this.isStart = true;
+      if(this.intent.actions.length === 0){
+        let action = new Action;
+        action._tdActionType =  "intent";
+        this.intent.actions.push(action);
       }
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
-        this.isDefaultFallback = true;
-      }
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
-        this.isStart = true;
-        if(this.intent.actions.length === 0){
-          let action = new Action;
-          action._tdActionType =  "intent";
-          this.intent.actions.push(action);
-        }
-        this.showIntentOptions = false;
-        this.startAction = this.intent.actions[0];
-      }
-      else {
-        this.setIntentSelected();
-      }
-      setTimeout(() => {
-        this.setActionIntent();
-      }, 100); 
-      this.isInternalIntent = checkInternalIntent(this.intent)
-      this.updateIsUntitledBlock();
-      // Aggiorna showIntentOptions dopo l'inizializzazione
-      this.updateShowIntentOptions();
-      // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
-      this.checkIfNewChatbot();
-      this.addEventListener();
-      this.setIntentAttributes();
-      
-      // --- Carica i connettori in ingresso iniziali ---
-      this.loadConnectorsIn();
-      
-      // --- Sottoscriviti agli aggiornamenti dei connettori ---
-      this.initConnectorsInSubscription();
+      this.showIntentOptions = false;
+      this.startAction = this.intent.actions[0];
+    }
+    else {
+      this.setIntentSelected();
+    }
   }
 
+  /**
+   * Chiamata da ngOnInit; esegue setActionIntent in un setTimeout(100ms) per dare tempo al DOM/stage di essere pronto prima di creare/aggiornare i connettori.
+   */
+  private initializeActions(): void {
+    setTimeout(() => {
+      this.setActionIntent();
+    }, 100);
+  }
 
+  /**
+   * Chiamata da ngOnInit dopo initializeIntentType/initializeActions.
+   * Imposta flag (internal, untitled, showIntentOptions, newChatbot), registra i listener per i connettori e sincronizza il colore dell’intent.
+   */
+  private initializeAttributes(): void {
+    this.isInternalIntent = checkInternalIntent(this.intent);
+    this.updateIsUntitledBlock();
+    this.updateShowIntentOptions();
+    this.checkIfNewChatbot();
+    this.addEventListener();
+    this.setIntentAttributes();
+  }
+
+  /**
+   * Chiamata da ngOnInit alla fine dell’init.
+   * Carica la lista dei connettori in ingresso per questo intent e si sottoscrive agli aggiornamenti (ConnectorService) per tenerla aggiornata.
+   */
+  private initializeConnectors(): void {
+    this.loadConnectorsIn();
+    this.initConnectorsInSubscription();
+  }
+
+  /**
+   * Chiamata da initializeWebhook per intent WEBHOOK.
+   * Chiede al WebhookService l’URL del webhook del chatbot e lo restituisce (o null in caso di errore).
+   */
   async getWebhook(): Promise<string | null> {
     try {
       const resp: any = await firstValueFrom(this.webhookService.getWebhook(this.chatbot_id));
@@ -305,7 +365,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  async createWebhook(intent): Promise<string | null> {
+  /**
+   * Chiamata da initializeWebhook quando getWebhook non restituisce un URL.
+   * Crea un nuovo webhook via WebhookService per questo intent e restituisce l’URL (o null in caso di errore).
+   */
+  async createWebhook(intent: Intent): Promise<string | null> {
     this.logger.log("[cds-intent] createWebhook : ", this.chatbot_id, intent.intent_id);
     const copilot = this.chatbotSubtype === TYPE_CHATBOT.COPILOT;
     try {
@@ -318,11 +382,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-
-
   /**
-   * Carica i connettori in ingresso per questo intent.
-   * Viene chiamata quando l'intent viene renderizzato.
+   * Chiamata da initializeConnectors e dalla subscription alphaConnectors$ quando cambia l’opacità.
+   * Legge da ConnectorService i connettori in ingresso per questo intent e aggiorna connectorsIn per il template.
    */
   private loadConnectorsIn(): void {
     if (!this.intent?.intent_id) {
@@ -330,15 +392,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    // Carica i connettori in ingresso
     const connectors = this.connectorService.getConnectorsInByIntent(this.intent.intent_id);
-    this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
+    this.connectorsIn = [...connectors];
     this.logger.log(`[CONNECTORS] Connettori in ingresso caricati per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
   }
 
   /**
-   * Inizializza la subscription ai connettori in ingresso per questo intent.
-   * Viene chiamata in ngOnInit quando l'intent è sicuramente disponibile.
+   * Chiamata da initializeConnectors una sola volta per intent.
+   * Sottoscrive all’observable dei connettori in ingresso (ConnectorService) e aggiorna connectorsIn al ogni emissione, evitando subscription duplicate.
    */
   private initConnectorsInSubscription(): void {
     if (!this.intent?.intent_id) {
@@ -347,70 +408,40 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     const keyConnectorsIn = 'connectorsIn';
-    // Evita di creare subscription duplicate
     if (this.subscriptions.find(item => item.key === keyConnectorsIn)) {
       this.logger.log(`[CONNECTORS] Subscription già esistente per blocco ${this.intent.intent_id}`);
+      this.logger.log('[CDS-INTENT-SLICE2] STEP6: connectorsInChanged$ già esistente - Anti-doppia-subscription OK');
       return;
     }
 
-    // Usa l'observable filtrato del servizio che emette solo per questo intent
     this.logger.log(`[CONNECTORS] Mi sottoscrivo agli aggiornamenti connettori per blocco ${this.intent.intent_id}`);
     const sub = this.connectorService.getConnectorsInObservable(this.intent.intent_id)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(connectors => {
+        this.logger.log('[CDS-INTENT-SLICE2] STEP4: connectorsInChanged$ emesso - Test funzionale OK', connectors?.length);
         this.updateConnectorsIn(connectors);
       });
     
     this.subscriptions.push({ key: keyConnectorsIn, value: sub });
     this.logger.log(`[CONNECTORS] Subscription attiva per blocco ${this.intent.intent_id}`);
+    this.logger.log('[CDS-INTENT-SLICE2] STEP3: connectorsInChanged$ creata con takeUntil - Pattern consistente OK');
   }
 
   /**
-   * Aggiorna connectorsIn con nuovi valori ricevuti dall'observable.
-   * @param connectors - Array di connettori aggiornati
+   * Chiamata dal callback della subscription connettori in initConnectorsInSubscription.
+   * Sostituisce connectorsIn con l’array ricevuto per aggiornare la vista (es. cds-connector-in).
    */
   private updateConnectorsIn(connectors: any[]): void {
-    this.connectorsIn = [...connectors]; // Spread operator crea un nuovo array per il change detection
+    this.connectorsIn = [...connectors];
     this.logger.log(`[CONNECTORS] Aggiorno il numero dei connettori in ingresso per blocco ${this.intent.intent_id}: totale ${connectors.length} connettori`);
   }
 
-
-  // private setActionIntent(){
-  //   try {
-  //     let connectorID = '';
-  //     let fromId, toId;
-  //     if(this.intent.attributes.nextBlockAction){
-  //       this.actionIntent = this.intent.attributes.nextBlockAction;
-  //       fromId = this.actionIntent._tdActionId?this.intent.intent_id+'/'+this.actionIntent._tdActionId:null;
-  //       toId = this.actionIntent.intentName?this.actionIntent.intentName.replace("#", ""):null;
-  //     } else {
-  //       this.actionIntent = this.intentService.createNewAction(TYPE_ACTION.INTENT);
-  //       this.intent.attributes.nextBlockAction = this.actionIntent;
-  //     }
-  //     this.logger.log('[CDS-INTENT] actionIntent1 :: ', this.actionIntent);
-  //     // this.logger.log('[CDS-INTENT] connectorID:: ', connectorID, fromId, toId);
-  //     this.isActionIntent = this.intent.actions.some(obj => obj._tdActionType === TYPE_ACTION.INTENT);
-  //     if(this.isActionIntent){
-  //       this.actionIntent = null;
-  //       if(fromId && toId && fromId !== '' && toId !== ''){
-  //         connectorID = fromId+"/"+toId;
-  //         this.connectorService.deleteConnector(connectorID);
-  //       }
-  //     }  else {
-  //       if(fromId && toId && fromId !== '' && toId !== ''){
-  //         if(this.stageService.loaded == true){
-  //           this.connectorService.createConnectorFromId(fromId, toId);
-  //         }
-  //       }
-  //     }
-  //   } catch (error) {
-  //     this.logger.log('[CDS-INTENT] error: ', error);
-  //   }
-  // }
-
+  /**
+   * Chiamata da Angular quando cambiano gli input (es. intent, hideActionPlaceholderOfActionPanel).
+   * Aggiorna l’opacità del placeholder “aggiungi action” in base a hideActionPlaceholderOfActionPanel, aggiorna agents e isUntitledBlock se cambia l’intent.
+   */
   ngOnChanges(changes: SimpleChanges): void {
-    // Fixed bug where an empty intent's action placeholder remains visible if an action is dragged from the left action menu
-    this.logger.log('[CDS-INTENT] hideActionPlaceholderOfActionPanel (dragged from sx panel) ', this.hideActionPlaceholderOfActionPanel)
+    this.logger.log('[CDS-INTENT] hideActionPlaceholderOfActionPanel (dragged from sx panel) ', this.hideActionPlaceholderOfActionPanel);
     if (this.hideActionPlaceholderOfActionPanel === false) {
       const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
       if (addActionPlaceholderEl instanceof HTMLElement) {
@@ -429,15 +460,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     this.setAgentsAvailable();
-    // Aggiorna isUntitledBlock se l'intent cambia
     if (changes['intent'] && !changes['intent'].firstChange) {
       this.updateIsUntitledBlock();
     }
   }
 
-  private setAgentsAvailable(){
-    // /if(this.intent.agents_available != false && this.intent.intent_display_name != TYPE_INTENT_NAME.START && this.intent.intent_display_name != TYPE_INTENT_NAME.DEFAULT_FALLBACK){
-    if(this.intent.agents_available != false){ 
+  /**
+   * Chiamata dalla subscription behaviorIntent e da ngOnChanges.
+   * Imposta isAgentsAvailable e intent.agents_available in base al valore attuale dell’intent (per mostrare/nascondere l’icona agents).
+   */
+  private setAgentsAvailable(): void {
+    if (this.intent.agents_available != false) { 
       this.intent.agents_available = true;
       this.isAgentsAvailable = true;
     } else {
@@ -445,148 +478,137 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  /** updateIsUntitledBlock
-   * Aggiorna la variabile isUntitledBlock basandosi sul nome dell'intent
+  /**
+   * Chiamata da behaviorIntent, ngOnInit (via initializeAttributes), ngOnChanges.
+   * Imposta isUntitledBlock se il nome dell’intent inizia con UNTITLED_BLOCK_PREFIX, per mostrare/nascondere il titolo.
    */
-  private updateIsUntitledBlock(){
+  private updateIsUntitledBlock(): void {
     this.isUntitledBlock = this.intent?.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX) ?? false;
   }
 
-  /** updateShowIntentOptions
-   * Aggiorna showIntentOptions basandosi su questionCount e formSize
-   * showIntentOptions deve essere false se questionCount e formSize sono entrambi == 0
+  /**
+   * Chiamata da behaviorIntent, initializeAttributes, setIntentSelected.
+   * Imposta showIntentOptions a false se non ci sono domande né campi form; non sovrascrive un false già impostato (es. per subtype/start/webhook).
    */
-  private updateShowIntentOptions(){
-    // Non modificare showIntentOptions se è già stato impostato a false per altri motivi
-    // (es. chatbotSubtype !== CHATBOT, START, WEBHOOK)
-    if(this.showIntentOptions === false){
+  private updateShowIntentOptions(): void {
+    if (this.showIntentOptions === false) {
       return;
     }
-    // Imposta a false se questionCount e formSize sono entrambi 0
-    if(this.questionCount === 0 && this.formSize === 0){
+    if (this.questionCount === 0 && this.formSize === 0) {
       this.showIntentOptions = false;
     } else {
       this.showIntentOptions = true;
     }
   }
 
-  /** checkIfNewChatbot
-   * Verifica se il chatbot è stato creato dopo il 01/06/2025
-   * Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
-   * Altrimenti isNewChatbot = true
+  /**
+   * Chiamata da initializeAttributes in ngOnInit.
+   * Imposta isNewChatbot confrontando la data di creazione del chatbot con DATE_NEW_CHATBOT (per regole UI/UX sui chatbot “nuovi”).
    */
   private checkIfNewChatbot(): void {
-    
-    //this.isNewChatbot = false;
-    //return;
     const cutoffDate = DATE_NEW_CHATBOT;
     const chatbot = this.dashboardService.selectedChatbot;
-    this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot.createdAt);
-
-
+    this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot?.createdAt);
     if (!chatbot || !chatbot.createdAt) {
-      // Se non c'è data di creazione, considera come nuovo chatbot
       this.isNewChatbot = true;
       this.logger.log('[CDS-INTENT] checkIfNewChatbot: nessuna data di creazione, impostato a true');
       return;
     }
 
     try {
-      // Se la data di creazione è precedente al ... (DATE_NEW_CHATBOT), isNewChatbot = false
-      // Altrimenti (successiva o uguale), isNewChatbot = true
       this.isNewChatbot = chatbot.createdAt >= cutoffDate;
       this.logger.log('[CDS-INTENT] checkIfNewChatbot:', {
         isNewChatbot: this.isNewChatbot
       });
     } catch (error) {
       this.logger.error('[CDS-INTENT] checkIfNewChatbot error:', error);
-      // In caso di errore, considera come nuovo chatbot
       this.isNewChatbot = true;
     }
   }
 
-  ngAfterViewInit() {
+  /**
+   * Chiamata da Angular dopo che la view del componente è stata inizializzata.
+   * Emette componentRendered per il preload del canvas, avvia il ResizeObserver sul blocco per aggiornare i connettori al ridimensionamento, e riapplica gli attributi intent (colore).
+   */
+  ngAfterViewInit(): void {
     this.logger.log("[CDS-INTENT]  •••• ngAfterViewInit ••••");
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        const nuovaAltezza = entry.contentRect.height;
-        this.logger.log('[CDS-INTENT] ngAfterViewInit Nuova altezza del div:', nuovaAltezza);
-        if(!this.isDragging)this.connectorService.updateConnector(this.intent.intent_id);
-      }
-    });
-    const elementoDom = this.resizeElement.nativeElement;
-    resizeObserver.observe(elementoDom);
     setTimeout(() => {
       this.componentRendered.emit(this.intent.intent_id);
     }, 0);
+    const elementoDom = this.resizeElement?.nativeElement;
+    if (elementoDom) {
+      const resizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          if (!this.isDragging) {
+            this.connectorService.updateConnector(this.intent.intent_id);
+          }
+        }
+      });
+      resizeObserver.observe(elementoDom);
+    }
     this.setIntentAttributes();
   }
 
 
-  ngOnDestroy() {
+  /**
+   * Chiamata da Angular prima della distruzione del componente.
+   * Completa unsubscribe$ per disiscriversi da tutte le subscription e evitare memory leak.
+   */
+  ngOnDestroy(): void {
+    this.logger.log('[CDS-INTENT-SLICE2] STEP5: ngOnDestroy chiamato - Cleanup subscription iniziato', `Total subscriptions: ${this.subscriptions.length}`);
     this.unsubscribe();
+    this.logger.log('[CDS-INTENT-SLICE2] STEP5: unsubscribe$ emesso e completato - Memory leak prevenuto OK');
   }
 
 
-  unsubscribe() {
+  /**
+   * Chiamata da ngOnDestroy.
+   * Emette su unsubscribe$ e completa il Subject così tutte le subscription con takeUntil(unsubscribe$) si chiudono.
+   */
+  unsubscribe(): void {
     this.unsubscribe$.next(null);
     this.unsubscribe$.complete();
   }
 
-
-
-  
-  // ---------------------------------------------------------
-  // Event listener
-  // ---------------------------------------------------------
-  addEventListener() {
+  /**
+   * Chiamata da initializeAttributes in ngOnInit.
+   * Registra su document i listener per gli eventi custom dei connettori (release su intent, passaggio sopra/fuori) per aggiornare classi CSS (outline, ripple).
+   */
+  addEventListener(): void {
     document.addEventListener(
-      "connector-release-on-intent", (e: CustomEvent) => {
-        // //this.logger.log('[CDS-INTENT] connector-release-on-intent e ', e)
+      'connector-release-on-intent',
+      (e: CustomEvent) => {
         if (e.detail.toId === this.intent.intent_id) {
           const intentContentEl = document.querySelector(`#intent-content-${e.detail.toId}`);
-          // const blockHeaderEl = <HTMLElement>document.querySelector(`#block-header-${e.detail.toId}`);
-          // this.logger.log('[CDS-INTENT] Connector released on intent -  blockHeaderEl', blockHeaderEl)
           if (intentContentEl instanceof HTMLElement) {
-            this.logger.log('[CDS-INTENT] Connector released on intent -  intentContentEl', intentContentEl)
-            intentContentEl.classList.remove("outline-border")
-            intentContentEl.classList.add("ripple-effect")
-            setTimeout(() => {
-              intentContentEl.classList.remove("ripple-effect")
-            }, 2000);
+            intentContentEl.classList.remove('outline-border');
+            intentContentEl.classList.add('ripple-effect');
+            setTimeout(() => intentContentEl.classList.remove('ripple-effect'), 2000);
           }
         }
       },
       true
     );
-
     document.addEventListener(
-      "connector-moved-over-intent", (e: CustomEvent) => {
-        // //this.logger.log('[CDS-INTENT] Connector Moved over intent e ', e);
+      'connector-moved-over-intent',
+      (e: CustomEvent) => {
         if (e.detail?.toId === this.intent.intent_id) {
           this.connectorIsOverAnIntent = true;
-          this.logger.log('[CDS-INTENT] Connector Moved over intent connectorIsOverAnIntent ', this.connectorIsOverAnIntent)
           const intentContentEl = document.querySelector(`#intent-content-${e.detail.toId}`);
           if (intentContentEl instanceof HTMLElement) {
-            this.logger.log('[CDS-INTENT] Connector Moved over intent -  intentContentEl', intentContentEl);
-            intentContentEl.classList.add("outline-border");
+            intentContentEl.classList.add('outline-border');
           }
-        } else {
-          // //this.logger.log('[CDS-INTENT] Connector Moved over intent here yes 2 ')
         }
       },
       true
     );
-
     document.addEventListener(
-      "connector-moved-out-of-intent", (e: CustomEvent) => {
-        // // this.logger.log('[CDS-INTENT] Connector Moved out of intent e ', e);
-        // !!!se il connettore è a meno di Xpx dalla fine dello stage sposta lo stage!!!!
+      'connector-moved-out-of-intent',
+      (e: CustomEvent) => {
         if (e.detail?.toId === this.intent.intent_id) {
           const intentContentEl = document.querySelector(`#intent-content-${e.detail.toId}`);
           if (intentContentEl instanceof HTMLElement) {
-            this.logger.log('[CDS-INTENT] Connector Moved out of intent -  intentContentEl', intentContentEl)
-            intentContentEl.classList.remove("outline-border")
+            intentContentEl.classList.remove('outline-border');
           }
         }
         this.connectorIsOverAnIntent = false;
@@ -595,13 +617,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     );
   }
 
-
-
-
-  /** CUSTOM FUNCTIONS  */
-
-  /** setActionIntent */
-  private setActionIntent(){
+  /**
+   * Chiamata da behaviorIntent (quando l’intent viene aggiornato), da initializeActions (setTimeout in ngOnInit) e indirettamente da onUpdateAndSaveAction.
+   * Gestisce l’action “connect to block”: crea/aggiorna actionIntent e nextBlockAction, crea o rimuove il connettore verso l’altro blocco in base a isActionIntent e stageService.loaded.
+   */
+  private setActionIntent(): void {
     try {
       let connectorID = '';
       let fromId: string, toId: string;
@@ -631,37 +651,45 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  /** addCssClassIntentActive */
-  private addCssClassIntentActive(className: string, componentID: string) {
-    this.logger.log("[CDS-INTENT] addCssClassIntentActive: ", className, componentID);
-    let element = this.elemenRef.nativeElement.querySelector(componentID)
+  /**
+   * Chiamata dalla subscription liveActiveIntent (test site) per evidenziare il blocco attivo.
+   * Aggiunge una classe CSS all’elemento del blocco intent identificato da componentID.
+   */
+  private addCssClassIntentActive(className: string, componentID: string): void {
+    const element = this.elemenRef.nativeElement.querySelector(componentID);
     if (element) {
       element.classList.add(className);
     }
   }
 
-  private removeCssClassIntentActive(className: string, componentID: string) {
-    let element = this.elemenRef.nativeElement.querySelector(componentID);
-    this.logger.log('[CDS-INTENT] removeCssClassIntentActive: ', className, componentID);
-    if (element && element.classList.contains(className)) {
+  /**
+   * Chiamata dalla subscription liveActiveIntent quando il blocco non è più attivo.
+   * Rimuove la classe CSS dall’elemento del blocco se presente.
+   */
+  private removeCssClassIntentActive(className: string, componentID: string): void {
+    const element = this.elemenRef.nativeElement.querySelector(componentID);
+    if (element?.classList.contains(className)) {
       element.classList.remove(className);
     }
   }
 
-
-  private addCssClassAndRemoveAfterTime(className: string, componentID: string, delay: number) {
-    let element = this.elemenRef.nativeElement.querySelector(componentID)
+  /**
+   * Chiamata internamente quando serve un feedback visivo temporaneo (es. evidenziazione per X secondi).
+   * Aggiunge la classe all’elemento e la rimuove dopo delay secondi.
+   */
+  private addCssClassAndRemoveAfterTime(className: string, componentID: string, delay: number): void {
+    const element = this.elemenRef.nativeElement.querySelector(componentID);
     if (element) {
-      element.classList.add(className)
-      setTimeout(() => {
-        element.classList.remove(className)
-      }, delay * 1000)
+      element.classList.add(className);
+      setTimeout(() => element.classList.remove(className), delay * 1000);
     }
   }
 
-
-  /** setIntentAttribute */
-  private setIntentAttributes(){
+  /**
+   * Chiamata da ngAfterViewInit e dalla subscription behaviorIntent (indirettamente).
+   * Sincronizza intentColor con intent.attributes.color e imposta un default se manca, per colore blocco e connettori.
+   */
+  private setIntentAttributes(): void {
     if (!this.intent?.attributes) {
       this.intent['attributes'] = {};
     }
@@ -674,14 +702,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private setIntentSelected() {
+  /**
+   * Chiamata da initializeIntentType per intent non START/WEBHOOK.
+   * Carica listOfActions, questionCount e formSize dall’intent, applica patch position e aggiorna showIntentOptions.
+   */
+  private setIntentSelected(): void {
     this.listOfActions = null;
     this.formSize = 0;
     this.questionCount = 0;
     try {
       if (this.intent) {
-        // document.documentElement.style.setProperty('--intent-color', `rgba(${this.intentColor}, 1)`);
-        /** // this.patchAllActionsId(); */
         this.patchAttributesPosition();
         this.listOfActions = this.intent.actions;
         if (this.intent.question) {
@@ -689,12 +719,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           this.questionCount = question_segment.length;
         }
       }
-      if (this.intent?.form && (this.intent.form !== null)) {
+      if (this.intent?.form && this.intent.form !== null) {
         this.formSize = Object.keys(this.intent.form).length;
       } else {
         this.formSize = 0;
       }
-      // Aggiorna showIntentOptions basandosi su questionCount e formSize
       this.updateShowIntentOptions();
     } catch (error) {
       this.logger.error("error: ", error);
@@ -702,27 +731,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-  /** patchAllActionsId
-   * retrocompatibility patch.
-   * Check if the action has a ._tdActionId attribute
-   * otherwise it generates it on the fly */
-  // private patchAllActionsId() {
-  //   if (this.listOfActions && this.listOfActions.length > 0) {
-  //     this.listOfActions.forEach(function (action, index, object) {
-  //       this.logger.log('[CDS-INTENT] patchAllActionsId action: ', action);
-  //       if (!action._tdActionId) {
-  //       object[index] = patchActionId(action);
-  //       this.logger.log('[CDS-INTENT] object: ', object[index]);
-  //       }
-  //     });
-  //   }
-  // }
-
   /**
-   * patchAttributesPosition
-   * retrocompatibility patch.
+   * Chiamata da setIntentSelected.
+   * Assicura che intent.attributes.position esista (retrocompatibilità) per il posizionamento sullo stage.
    */
-  private patchAttributesPosition() {
+  private patchAttributesPosition(): void {
     if (!this.intent?.attributes) {
       this.intent['attributes'] = {};
     }
@@ -732,10 +745,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-  /** getActionParams
-   * Get action parameters from a map to create the header (title, icon) 
-   * */
-  getActionParams(action) {
+  /**
+   * Chiamata dal template (o da componenti figli) per ottenere titolo/icona da mostrare per un’action.
+   * Restituisce l’oggetto in ACTIONS_LIST corrispondente al tipo _tdActionType dell’action.
+   */
+  getActionParams(action: Action): any {
     const enumKeys = Object.keys(TYPE_ACTION);
     let keyAction = '';
     try {
@@ -752,26 +766,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  /*********************************************/
-  // onMouseDownIntent(){
-  //   this.elementTypeSelected = null;
-  // }
-
-  // onSelectIntent(){
-  //   if(!this.elementTypeSelected){
-  //     this.intentSelected.emit(this.intent);
-  //   }
-  // }
-
-  /** EVENTS  */
-
-  // onSelectActionIfWebhook(action: any, index: number, idAction: HAS_SELECTED_TYPE){
-  //   if(this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
-  //     this.onSelectAction(action, index, idAction);
-  //   }
-  // }
-
-  onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE) {
+  /**
+   * Chiamata dal template al click su un’action nel blocco.
+   * Notifica IntentService della selezione, imposta elementTypeSelected e emette actionSelected verso il parent (canvas) per aprire il pannello dettaglio.
+   */
+  onSelectAction(action: Action, index: number, idAction: HAS_SELECTED_TYPE): void {
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
     this.logger.log('[CDS-INTENT] onActionSelected index: ', index);
     this.logger.log('[CDS-INTENT] onActionSelected idAction: ', idAction);
@@ -780,76 +779,61 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.actionSelected.emit({ action: action, index: index, maxLength: this.listOfActions.length });
   }
 
-  // onSelectAnswer(elementSelected) {
-  //   this.elementTypeSelected = elementSelected;
-  //   // this.isIntentElementSelected = true;
-  //   this.answerSelected.emit(this.answer);
-  // }
-
-  onSelectQuestion(elementSelected) {
-    this.logger.log('[CDS-INTENT] onSelectQuestion-->', elementSelected, this.intent.question)
+  /**
+   * Chiamata dal template al click sull’opzione Question.
+   * Seleziona l’intent nel servizio e emette questionSelected con il testo delle domande per aprire il pannello domande.
+   */
+  onSelectQuestion(elementSelected: HAS_SELECTED_TYPE): void {
     this.elementTypeSelected = elementSelected;
-    this.intentService.setIntentSelected(this.intent.intent_id)
-    /** // this.isIntentElementSelected = true; */
+    this.intentService.setIntentSelected(this.intent.intent_id);
     this.questionSelected.emit(this.intent.question);
   }
 
-  onSelectForm(elementSelected) {
-    /** // this.isIntentElementSelected = true; */
+  /**
+   * Chiamata dal template al click sull’opzione Form.
+   * Seleziona l’intent, crea un Form vuoto se manca, e emette formSelected per aprire il pannello form.
+   */
+  onSelectForm(elementSelected: HAS_SELECTED_TYPE): void {
     this.elementTypeSelected = elementSelected;
-    this.intentService.setIntentSelected(this.intent.intent_id)
+    this.intentService.setIntentSelected(this.intent.intent_id);
     if (this.intent && !this.intent.form) {
-      let newForm = new Form()
-      this.intent.form = newForm;
+      this.intent.form = new Form();
     }
     this.formSelected.emit(this.intent.form);
   }
 
-
-
-  onClickControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number) {
+  /**
+   * Chiamata dal template (cds-action-controls) quando l’utente clicca su modifica/copia/elimina su un’action.
+   * Esegue edit (apre dettaglio), delete (rimuove connettori e action e chiama deleteSelectedAction) o copy (copia in localStorage).
+   */
+  onClickControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number): void {
     this.logger.log('[CDS-INTENT] onClickControl', event, action);
     if (event === 'edit') {
-      this.onSelectAction(action, index, action._tdActionId)
+      this.onSelectAction(action, index, action._tdActionId);
     } else if (event === 'delete') {
-      
       this.intent.attributes.connectors = this.intentService.deleteIntentAttributesConnectorByAction(action._tdActionId, this.intent);
-      
-      this.intentService.selectAction(this.intent.intent_id, action._tdActionId)
+      this.intentService.selectAction(this.intent.intent_id, action._tdActionId);
       this.intentService.deleteSelectedAction();
-      // this.actionDeleted.emit(true)
     } else if (event === 'copy') {
       this.copyAction(action);
     }
   }
 
-
-
-
-  // deleteIntentAttributesConnectorByAction(actionId){
-  //   const connectorsList = this.intent.attributes?.connectors;
-  //   const filteredData = Object.keys(connectorsList)
-  //   .filter(key => !key.includes(actionId))
-  //   .reduce((acc, key) => {
-  //     acc[key] = connectorsList[key];
-  //     return acc;
-  //   }, {});
-  //   this.intent.attributes.connectors = filteredData;
-  //   this.logger.log('[CDS-INTENT] deleteConnectorOfAction', this.intent.attributes.connectors);
-  //   // this.connectorService.deleteConnector(this.intent, event.connector.id, true, true);
-  // }
   /**
-   * onKeydown
-   * delete selected action by keydown backspace
-   * */
-  onKeydown(event) {
-    this.logger.log('[CDS-INTENT] onKeydown: ', event);
+   * Chiamata dal template (keydown) quando si preme un tasto sull’action in focus.
+   * Se il tasto è Backspace, Escape o Canc, elimina l’action selezionata tramite IntentService.
+   */
+  onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Backspace' || event.key === 'Escape' || event.key === 'Canc') {
       this.intentService.deleteSelectedAction();
     }
   }
 
 
+  /**
+   * Chiamata da Angular CDK durante il drag di un’action (cdkDragMoved).
+   * Sposta il preview del drag (customDragPreview) seguendo il puntatore per un feedback visivo corretto.
+   */
   public onDragMove(event: CdkDragMove): void {
     const element = document.getElementById('customDragPreview');
     if (element) {
@@ -857,144 +841,149 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       const yPos = event.pointerPosition.y - 20;
       element.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
     }
-}
+  }
 
-
-  /** !!! IMPORTANT 
-   * when the drag of an action starts, I save the starting intent. 
-   * Useful in case I move an action between different intents 
-  * */
-  onDragStarted(event, previousIntentId, index) {
+  /**
+   * Chiamata dal template (cdkDragStarted) quando inizia il drag di un’action.
+   * Chiude il pannello dettaglio, salva l’intent di partenza in IntentService (per spostamento tra intent), imposta isDragging e gestisce visivamente placeholder/add-action durante il drag.
+   */
+  onDragStarted(event: any, previousIntentId: string, index: number): void {
     this.controllerService.closeActionDetailPanel();
-    this.logger.log('[CDS-INTENT] onDragStarted event ', event, 'previousIntentId ', previousIntentId);
-    this.logger.log('[CDS-INTENT] onDragStarted index ', index);
     this.intentService.setPreviousIntentId(previousIntentId);
     this.isDragging = true;
-    this.logger.log('[CDS-INTENT] isDragging - onDragStarted', this.isDragging)
-    
-    // ----------------------------------
-    // Hide action arrow on drag started 
-    // ----------------------------------
-    // const actionArrowElem = <HTMLElement>document.querySelector(`#action-arrow-${index}`);
-    // actionArrowElem.style.display = 'none';
-    // this.logger.log('[CDS-INTENT] onDragStarted actionArrowElem', actionArrowElem)
-    // const actionDragPlaceholderWidth = actionDragPlaceholder.offsetWidth;
-    // this.logger.log('[CDS-INTENT] onDragStarted actionDragPlaceholderWidth', actionDragPlaceholderWidth)
-
-    // --------------------------------------------------------------------------------------------------
-    // Bug fix: When an action is dragged, the "drag placeholder" moves up and changes size to full width
-    // --------------------------------------------------------------------------------------------------
     const actionDragPlaceholder = document.querySelector('.action-drag-placeholder');
     const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
-
-    this.logger.log('[CDS-INTENT] onDragStarted actionDragPlaceholder', actionDragPlaceholder)
-    this.logger.log('[CDS-INTENT] onDragStarted addActionPlaceholderEl ', addActionPlaceholderEl)
     const myObserver = new ResizeObserver(entries => {
-      // this will get called whenever div dimension changes
       entries.forEach(entry => {
-        this.actionDragPlaceholderWidth = entry.contentRect.width
-        this.logger.log('[CDS-INTENT] width actionDragPlaceholderWidth', this.actionDragPlaceholderWidth);
+        this.actionDragPlaceholderWidth = entry.contentRect.width;
         if (this.actionDragPlaceholderWidth <= 270) {
           this.hideActionDragPlaceholder = false;
-          this.logger.log('[CDS-INTENT] Hide action drag placeholder', this.hideActionDragPlaceholder);
           if (actionDragPlaceholder instanceof HTMLElement) {
             actionDragPlaceholder.style.opacity = '1';
           }
           if (addActionPlaceholderEl instanceof HTMLElement) {
             addActionPlaceholderEl.style.opacity = '0';
           }
-          this.logger.log('[CDS-INTENT] HERE 1 !!!! ');
         } else {
           this.hideActionDragPlaceholder = true;
-          this.logger.log('[CDS-INTENT] Hide action drag placeholder', this.hideActionDragPlaceholder);
           if (actionDragPlaceholder instanceof HTMLElement) {
             actionDragPlaceholder.style.opacity = '0';
           }
           if (addActionPlaceholderEl instanceof HTMLElement) {
             addActionPlaceholderEl.style.opacity = '1';
           }
-          this.logger.log('[CDS-INTENT] HERE 2 !!!! ');
         }
       });
     });
-    myObserver.observe(actionDragPlaceholder);
-  }
-
-
-
-  /** onDragEnded
-   * get the action moved and update its connectors */
-  onDragEnded(event, index) {
-    this.logger.log('[CDS-INTENT] onDragEnded: ', event, this.intent.intent_id);
-    this.isDragging = false;
-    this.connectorService.updateConnector(this.intent.intent_id);
-    /** 
-    // const previousIntentId = this.intentService.previousIntentId;
-    // if(previousIntentId){
-    //   this.logger.log("[CDS-INTENT] onDropAction previousIntentId: ", previousIntentId);
-    //   this.connectorService.updateConnector(previousIntentId);
-    // }
-    // this.connectorService.updateConnector(this.intent.intent_id);
-    // */
-  }
-
-
-  /** Predicate function that only allows type='intent' to be dropped into a list. */
-  canEnterDropList(action: any) {
-    return (item: CdkDrag<any>) => {
-      // Se il chatbot è nuovo, disabilita il drop se c'è già un'action nell'intent
-      // Mantiene il limite di una action per blocco intent per i chatbot nuovi
-      if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
-        return false;
-      }
-      // Per i chatbot esistenti, permette il drop normalmente
-      return true;
+    if (actionDragPlaceholder) {
+      myObserver.observe(actionDragPlaceholder);
     }
   }
 
 
 
+  /**
+   * Chiamata dal template (cdkDragReleased) quando termina il drag di un’action.
+   * Resetta isDragging e chiede a ConnectorService di aggiornare i connettori per questo intent.
+   */
+  onDragEnded(event: any, index: number): void {
+    this.isDragging = false;
+    this.connectorService.updateConnector(this.intent.intent_id);
+  }
 
+  /**
+   * Predicate stabile per [cdkDropListEnterPredicate]: stessa riferimento a ogni CD per evitare re-evaluazione inutili.
+   * Blocca l’ingresso nella lista se il chatbot è “nuovo” e l’intent ha già un’action (limite un’action per blocco).
+   */
+  readonly dropListEnterPredicate = (item: CdkDrag<any>) => {
+    if (this.isNewChatbot && this.intent?.actions?.length) {
+      return false;
+    }
+    return true;
+  };
 
-  /** on Drop Action check the three possible cases:
-   * chaimata quando muovo la action in un intent
-   * 1 - moving action in the same intent 
-   * 2 - moving action from another intent
-   * 3 - moving new action in intent from panel elements
+  /**
+   * Usata dal template come trackBy nell’*ngFor delle action: identifica univocamente l’item per ridurre re-render.
+   */
+  trackByActionId(_index: number, action: Action): string {
+    return action._tdActionId;
+  }
+
+  /**
+   * Stili dinamici del blocco intent (background e outline selezione). Esposta come getter per evitare oggetto inline nel template.
+   */
+  get intentStyle(): { [key: string]: string } {
+    if (!this.intent?.attributes?.color) {
+      return {};
+    }
+    const c = this.intent.attributes.color;
+    const outline =
+      this.intentService.intentSelectedID === this.intent.intent_id && this.intentService.intentActive
+        ? `2px solid rgba(${c}, 1)`
+        : 'none';
+    return {
+      'background-color': `rgba(${c}, 0.35)`,
+      outline,
+    };
+  }
+
+  /**
+   * Stile outline per la singola action (selezionata o no). Usata nel template al posto di ngStyle inline.
+   */
+  getActionItemStyle(action: Action): { [key: string]: string } {
+    if (!this.intent?.attributes?.color) {
+      return {};
+    }
+    const outline =
+      this.intentService.actionSelectedID === action._tdActionId
+        ? `2px solid rgba(${this.intent.attributes.color}, 1)`
+        : 'none';
+    return { outline };
+  }
+
+  /**
+   * Chiamate da cds-connector-in (onShowConnectorsIn / onHideConnectorsIn). Implementazione vuota per evitare binding morti.
+   */
+  onShowConnectorsIn(): void {}
+
+  onHideConnectorsIn(): void {}
+
+  /**
+   * Usata nel template per la classe cds-no-featured-action.
+   * Comportamento invariato rispetto al precedente template: la condizione originale equivale a (tipo !== REPLY).
+   */
+  isNoFeaturedAction(action: Action): boolean {
+    return action._tdActionType !== TYPE_ACTION.REPLY;
+  }
+
+  /**
+   * Chiamata dal template (cdkDropListDropped) quando si rilascia un’action sulla lista di questo intent.
+   * Gestisce tre casi: riordino nello stesso intent (moveItemInArray), spostamento da altro intent (moveActionBetweenDifferentIntents), nuova action dal pannello (moveNewActionIntoIntent). Per chatbot nuovi blocca il drop se c’è già un’action.
    */
   async onDropAction(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
-    
-    // Se il chatbot è nuovo, impedisce il drop se c'è già un'action nell'intent
-    // Mantiene il limite di una action per blocco intent per i chatbot nuovi
     if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
       this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot nuovo e c\'è già un\'action nell\'intent');
       return;
     }
-    
-    // Per i chatbot esistenti, esegue il drop normalmente
+
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
     if (event.previousContainer === event.container) {
-      // moving action in the same intent 
       moveItemInArray(this.intent.actions, event.previousIndex, event.currentIndex);
       this.intentService.updateIntent(this.intent, null);
-      /** //const response = await this.intentService.onUpdateIntentWithTimeout(this.intent); */
     } else {
       try {
-        let action: any = event.previousContainer.data[event.previousIndex];
+        const action: any = event.previousContainer.data[event.previousIndex];
         if (event.previousContainer.data.length > 0) {
           if (action._tdActionType) {
-            // moving action from another intent
             this.logger.log("[CDS-INTENT] onDropAction sposto la action tra 2 intent differenti");
             this.intentService.moveActionBetweenDifferentIntents(event, action, this.intent.intent_id);
             this.intentService.updateIntent(this.intent, null);
-            this.connectorService.updateConnectorsOfBlock(this.intent.intent_id)
+            this.connectorService.updateConnectorsOfBlock(this.intent.intent_id);
           } else if (action.value?.type) {
-            // moving new action in intent from panel elements
             this.logger.log("[CDS-INTENT] onDropAction aggiungo una nuova action all'intent da panel elements - action ", this.newActionCreated);
             this.intentService.moveNewActionIntoIntent(event.currentIndex, action, this.intent.intent_id);
-            // this.onSelectAction(newAction, event.currentIndex, newAction._tdActionId)
           }
         }
       } catch (error) {
@@ -1004,97 +993,71 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-  /**  onUpdateAndSaveAction: 
-   * function called by all actions in @output whenever they are modified!
-   * called when the connector is created or deleted
-   * OR 
-   * called when the action is modified
-   * */
-  public async onUpdateAndSaveAction(object) {
-    //this.logger.log('[CDS-INTENT] onUpdateAndSaveAction::::', object);
-    let connector = null;
-    /** 
-    // if(object && object.type && object.type === 'connector'){
-    //   connector = object.element;
-    //   this.setActionIntent();
-    // } else if(object && object.type && object.type === 'action'){
-    //   const action  = object.element;
-    //   if(action && action._tdActionId){
-    //     replaceItemInArrayForKey('_tdActionId', this.intent.actions, action);
-    //   }
-    // }
-    // const action  = object.element; 
-    // */
-    if(object?._tdActionId){
+  /**
+   * Chiamata dai componenti figli (action) tramite output (updateAndSaveAction) quando l’utente modifica un’action o quando cambia un connettore.
+   * Aggiorna l’array intent.actions con l’oggetto ricevuto (replaceItemInArrayForKey) e persiste l’intent tramite IntentService.
+   */
+  public async onUpdateAndSaveAction(object: any): Promise<void> {
+    if (object?._tdActionId) {
       this.intent.actions = replaceItemInArrayForKey('_tdActionId', this.intent.actions, object);
     }
-    /** // this.setActionIntentInListOfActions(); */
     this.logger.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
     this.intentService.updateIntent(this.intent);
-    /** // this.intentService.onUpdateIntentWithTimeout(this.intent, 0, true, connector); */
   }
 
-  // private setActionIntentInListOfActions(){
-  //   let actionIntent = this.actionIntent;
-  //   let addIntentAction = true; 
-  //   // for (let i = this.intent.actions.length - 1; i >= 0; i--) {
-  //   //   if (this.intent.actions[i]._tdActionType === TYPE_ACTION.INTENT) {
-  //   //     // this.actionIntent = this.intent.actions[i];
-  //   //     // this.logger.log('setActionIntentInIntent:: ', this.intent.actions[i]);
-  //   //     // this.intent.actions.splice(i, 1);
-  //   //     addIntentAction = true;
-  //   //     this.intent.actions[i] = actionIntent;
-  //   //     break; 
-  //   //   }
-  //   // }
-  //   this.intent.actions = this.intent.actions.map(function(action) {
-  //     if(action._tdActionType === TYPE_ACTION.INTENT){
-  //       addIntentAction = false;
-  //       return actionIntent;
-  //     }
-  //     return action;
-  //   });
-  //   if (addIntentAction) {
-  //     this.intent.actions.push(this.actionIntent);
-  //   }
-  // }
-
-  openActionMenu(intent: any, calleBy: string) {
-    this.logger.log('[CDS-INTENT] openActionMenu > intent ', intent)
-    this.logger.log('[CDS-INTENT] openActionMenu > calleBy ', calleBy)
-    const openActionMenuElm = this.openActionMenuBtnRef.nativeElement.getBoundingClientRect()
-    let xOffSet = openActionMenuElm.width + 10 // offset = element width + padding 
+  /**
+   * Chiamata dal template al click sul pulsante “Aggiungi action” (nel placeholder o nel footer).
+   * Calcola la posizione del menu flottante in base al bottone (calleBy), seleziona l’intent e emette showPanelActions verso il canvas per aprire il pannello delle action.
+   */
+  openActionMenu(intent: Intent, calleBy: string): void {
+    this.logger.log('[CDS-INTENT] openActionMenu > intent ', intent);
+    this.logger.log('[CDS-INTENT] openActionMenu > calleBy ', calleBy);
+    const openActionMenuElm = this.openActionMenuBtnRef.nativeElement.getBoundingClientRect();
+    let xOffSet = openActionMenuElm.width + 10;
     if (calleBy === 'add-action-placeholder') {
-      xOffSet = 277
+      xOffSet = 277;
     }
-    let buttonXposition = openActionMenuElm.x + xOffSet // 157 
-    let buttonYposition = openActionMenuElm.y // - 10
-    this.logger.log('[CDS-INTENT] openActionMenu > openActionMenuBtnRef ', openActionMenuElm)
-    this.logger.log('[CDS-INTENT] openActionMenu > buttonXposition ', buttonXposition)
-    const data = { 'x': buttonXposition, 'y': buttonYposition, 'intent': intent, 'addAction': true };
+    const buttonXposition = openActionMenuElm.x + xOffSet;
+    const buttonYposition = openActionMenuElm.y;
+    this.logger.log('[CDS-INTENT] openActionMenu > openActionMenuBtnRef ', openActionMenuElm);
+    this.logger.log('[CDS-INTENT] openActionMenu > buttonXposition ', buttonXposition);
+    const data = { x: buttonXposition, y: buttonYposition, intent, addAction: true };
     this.intentService.setIntentSelected(this.intent.intent_id);
     this.showPanelActions.emit(data);
   }
 
-  onOpenIntentPanel(intent: Intent){
+  /**
+   * Chiamata dal template al click sul contenuto del blocco intent.
+   * Apre il pannello dettaglio intent solo se non c’è stato movimento del mouse (click vero, non drag), il blocco è start e il pannello non è già aperto; evita di aprire dopo un drag.
+   */
+  onOpenIntentPanel(intent: Intent): void {
     this.logger.log('[CDS-INTENT] onOpenIntentPanel > intent', this.intent, " con : ", intent);
-    // Only open panel if there was no mouse movement (single click, not drag)
-    if(!this.hasMouseMoved && !intent['attributesChanged'] && this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL){
+    if (!this.hasMouseMoved && !intent['attributesChanged'] && this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL) {
       this.openIntentPanel(intent);
     }
   }
 
+  /**
+   * Chiamata dal template (mousedown) sul blocco intent.
+   * Resetta hasMouseMoved per distinguere un click da un drag quando poi si riceve il click.
+   */
   onIntentMouseDown(event: MouseEvent): void {
     this.hasMouseMoved = false;
   }
 
+  /**
+   * Chiamata dal template (mousemove) sul blocco intent.
+   * Imposta hasMouseMoved a true così onOpenIntentPanel non aprirà il pannello se l’utente stava trascinando.
+   */
   onIntentMouseMove(event: MouseEvent): void {
     this.hasMouseMoved = true;
   }
-  /** ******************************
-   * intent controls options: START
-   * ****************************** */
-  onOptionClicked(event: 'webhook' | 'color' | 'delete' | 'test' | 'copy' | 'open'){
+
+  /**
+   * Chiamata dal template (cds-panel-intent-controls) quando l’utente clicca un’opzione del menu intent (webhook, colore, delete, test, copy, open).
+   * Esegue l’azione corrispondente: toggle webhook, cambio colore, delete, test, copy intent o apertura pannello.
+   */
+  onOptionClicked(event: 'webhook' | 'color' | 'delete' | 'test' | 'copy' | 'open'): void {
     switch(event){
       case 'webhook':
         this.toggleIntentWebhook(this.intent);
@@ -1118,89 +1081,104 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-  private copyIntent(){
-    let intent = JSON.parse(JSON.stringify(this.intent));
-    const element = {element: intent, type: 'INTENT', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
-    let data = this.intentService.copyElement(element);
-    this.appStorageService.setItem(data.key, data.data)
+  /**
+   * Chiamata da onOptionClicked quando l’utente sceglie “copy” dal menu intent.
+   * Serializza l’intent e lo salva in localStorage tramite IntentService e AppStorageService per un successivo incolla.
+   */
+  private copyIntent(): void {
+    const intent = JSON.parse(JSON.stringify(this.intent));
+    const element = { element: intent, type: 'INTENT', chatbot: this.intent.id_faq_kb, intentId: this.intent.intent_id };
+    const data = this.intentService.copyElement(element);
+    this.appStorageService.setItem(data.key, data.data);
   }
 
-  private copyAction(ele){
-    let action = JSON.parse(JSON.stringify(ele));
-    const element = {element: action, type: 'ACTION', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
-    let data = this.intentService.copyElement(element);
-    this.appStorageService.setItem(data.key, data.data)
+  /**
+   * Chiamata da onClickControl quando l’utente sceglie “copy” su un’action.
+   * Serializza l’action e la salva in localStorage tramite IntentService e AppStorageService per un successivo incolla.
+   */
+  private copyAction(ele: Action): void {
+    const action = JSON.parse(JSON.stringify(ele));
+    const element = { element: action, type: 'ACTION', chatbot: this.intent.id_faq_kb, intentId: this.intent.intent_id };
+    const data = this.intentService.copyElement(element);
+    this.appStorageService.setItem(data.key, data.data);
   }
 
-  // openTestSiteInPopupWindow() {
-  //   this.testItOut.emit(this.intent)
-  // }
-
-
-  onOpenTestItOut(){
+  /**
+   * Chiamata da onOptionClicked quando l’utente sceglie “test” dal menu intent.
+   * Delega a IntentService l’apertura del flusso “Test it out” per questo intent.
+   */
+  onOpenTestItOut(): void {
     this.intentService.openTestItOut(this.intent);
   }
 
-
-  toggleIntentWebhook(intent) {
-    this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent ', intent)
-    this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent webhook_enabled ', intent.webhook_enabled)
+  /**
+   * Chiamata da onOptionClicked (opzione webhook) o dal template.
+   * Inverte webhook_enabled sull’intent, seleziona l’intent e persiste l’aggiornamento per abilitare/disabilitare il webhook del blocco.
+   */
+  toggleIntentWebhook(intent: Intent): void {
+    this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent ', intent);
+    this.logger.log('[CDS-INTENT] toggleIntentWebhook  intent webhook_enabled ', intent.webhook_enabled);
     this.intentService.setIntentSelected(this.intent.intent_id);
     intent.webhook_enabled = !intent.webhook_enabled;
-    /* // this.webHookTooltipText = "Disable webhook"
-    // this.webHookTooltipText = "Enable webhook"
-    // this.intentService.onUpdateIntentWithTimeout(intent);
-    // */
     this.intentService.updateIntent(this.intent, null);
   }
 
-  onDeleteIntent(intent: Intent) {
+  /**
+   * Chiamata da onOptionClicked quando l’utente sceglie “delete” dal menu intent.
+   * Emette deleteIntent verso il parent (canvas) che gestirà la rimozione dell’intent e l’aggiornamento della lista.
+   */
+  onDeleteIntent(intent: Intent): void {
     this.deleteIntent.emit(intent);
   }
 
-  openWebhookIntentPanel(intent: Intent){
-    const webhookIntent = this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK ? true:false;
-    if(webhookIntent){
+  /**
+   * Chiamata dal template quando si clicca su un intent di tipo WEBHOOK (es. header).
+   * Apre il pannello dettaglio intent solo se questo blocco è effettivamente un webhook.
+   */
+  openWebhookIntentPanel(intent: Intent): void {
+    if (this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK) {
       this.openIntentPanel(intent);
     }
   }
 
-  openIntentPanel(intent: Intent){
+  /**
+   * Chiamata da onOpenIntentPanel, onOptionClicked (open), openWebhookIntentPanel e da altri punti che devono aprire il pannello dettaglio.
+   * Seleziona l’intent nel servizio e emette openIntent verso il parent per mostrare il pannello.
+   */
+  openIntentPanel(intent: Intent): void {
     this.intentService.setIntentSelected(this.intent.intent_id);
     this.openIntent.emit(intent);
   }
 
-  onColorIntent(intent: Intent) {
+  /**
+   * Chiamata da onOptionClicked (opzione color) quando l’utente vuole cambiare il colore del blocco.
+   * Seleziona l’intent e emette changeColorIntent verso il parent che aprirà il menu colore.
+   */
+  onColorIntent(intent: Intent): void {
     this.intentService.setIntentSelected(this.intent.intent_id);
     this.changeColorIntent.emit(intent);
   }
 
-
-
-  setConnectorColor(color: string){
+  /**
+   * Chiamata da changeIntentColor (e possibilmente dal parent dopo la scelta del colore).
+   * Imposta il colore dei connettori in uscita da questo intent tramite ConnectorService (con opacità fissa 0.7).
+   */
+  setConnectorColor(color: string): void {
     const nwColor = color ?? INTENT_COLORS.COLOR1;
     const opacity = 0.7;
-    const intentFromId = this.intent.intent_id;
-    this.connectorService.setConnectorColor(intentFromId, nwColor, opacity);
+    this.connectorService.setConnectorColor(this.intent.intent_id, nwColor, opacity);
   }
 
-
-  changeIntentColor(color){
-    if(color){
-      // const coloreValue: string = INTENT_COLORS[color as keyof typeof INTENT_COLORS];
+  /**
+   * Chiamata dalla subscription behaviorIntentColor (quando si sceglie un colore dal menu) e da onOptionClicked indirettamente.
+   * Aggiorna intentColor e intent.attributes.color, applica il colore ai connettori e persiste l’intent.
+   */
+  changeIntentColor(color: string): void {
+    if (color) {
       this.intentColor = color;
       this.intent.attributes.color = color;
-      // document.documentElement.style.setProperty('--intent-color', `rgba(${this.intentColor}, 1)`);
-      // const element = document.getElementById('intent-content-'+ this.intent?.intent_id);
-      // if(element){
-      //   element.style.setProperty('background-color', `rgba(${this.intentColor}, 0.35)`);
-      // }
       this.setConnectorColor(color);
-      this.intentService.updateIntent(this.intent); 
+      this.intentService.updateIntent(this.intent);
     }
-   
   }
-  /** ******************************
-   * intent controls options: END 
-   * ****************************** */
 }

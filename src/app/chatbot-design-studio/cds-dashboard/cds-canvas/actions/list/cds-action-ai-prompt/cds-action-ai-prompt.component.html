@@ -167,7 +167,7 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{llm_model_selected.modelName}} )</span>
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{llm_model_selected?.modelName}} )</span>
                 </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
@@ -262,9 +262,9 @@
                  <div class="field-box">
                     <label class="title-label">{{'CDSCanvas.LLM' | translate }} - {{'CDSCanvas.Model' | translate }}</label>
                         <cds-select id="model-condition"
-                            [class]="!llm_model_selected.configured ? 'not-configured' : ''"
+                            [class]="!llm_model_selected?.configured ? 'not-configured' : ''"
                             [items]="llm_models_flat" 
-                            [itemSelected]="llm_model_selected.model"
+                            [itemSelected]="llm_model_selected?.model"
                             [bindLabelSelect]="'modelName'" 
                             [bindValueSelect]="'model'"
                             [groupByKey]="'llm'"
@@ -299,14 +299,49 @@
                         [placeholder]="'CDSCanvas.Model' | translate"
                         [autocompleteOptions]="autocompleteOptions"
                         (onOptionSelected)="onOptionSelected($event, 'model')"
-                        (blur)="onBlur($event)"
+                        (blur)="onBlur($event, 'model')"
                         (onChange)="onChangeTextarea($event, actionLabelModel, 'model')">
                     </cds-text>
                 </div> -->
 
 
+                <!-- aggiungi una checkbox per reasoning con label "Reasoning" (disabilitata se il modello non supporta reasoning)-->
+                <div class="field-box checkbox-reasoning">
+                    <!-- <label class="title-label">{{'CDSCanvas.Reasoning' | translate }}</label> -->
+                    <mat-checkbox
+                        class="reasoning-checkbox"
+                        [class.reasoning-checkbox-disabled]="isReasoningCheckboxDisabled"
+                        [checked]="action.reasoning"
+                        [disabled]="isReasoningCheckboxDisabled"
+                        (change)="onChangeCheckbox($event, 'reasoning')">
+                        {{'CDSCanvas.Reasoning' | translate }}<span *ngIf="isReasoningCheckboxDisabled"> ({{'CDSCanvas.ReasoningNotAvailableForModel' | translate }})</span>
+                    </mat-checkbox>
+                </div>
 
-
+                <div class="field-box" *ngIf="action.reasoning">
+                    <label class="title-label">{{'CDSCanvas.ReasoningLevel' | translate }}</label>
+                    <div class="action-wait-content">
+                        <div class="action-wait-slider">
+                            <div class="action-wait-range">{{'CDSCanvas.ReasoningLevelLow' | translate }}</div>
+                            <mat-slider
+                                class="wait-slider"
+                                thumbLabel
+                                [displayWith]="formatReasoningLabel"
+                                [step]="1"
+                                [min]="0"
+                                [max]="2"
+                                [ngModel]="reasoningLevelSlider"
+                                (change)="onReasoningLevelChange($event.value)"
+                                aria-label="reasoning level">
+                            </mat-slider>
+                            <div class="action-wait-range">{{'CDSCanvas.ReasoningLevelHigh' | translate }}</div>
+                        </div>
+                        <input type="text"
+                               class="slider-input gpt-setting-input"
+                               [value]="formatReasoningLabel(action.reasoningLevel ?? 'medium')"
+                               readonly>
+                    </div>
+                </div>
 
                 <!-- // max_tokens slider -->
                 <div class="field-box">
@@ -321,6 +356,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -370,6 +406,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
