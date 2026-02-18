@@ -231,7 +231,13 @@
       "ToolsAvailable": "disponibili",
       "Connect": "Connetti",
       "RefreshTools": "Aggiorna strumenti",
-      "LoadingTools": "Caricamento strumenti"
+      "LoadingTools": "Caricamento strumenti",
+      "ModelsOptional": "Modelli (opzionale)",
+      "ModelsOptionalPlaceholder": "Digita un modello e invia",
+      "Send": "Invia",
+      "RemoveTag": "Rimuovi tag",
+      "Tags": "Tag",
+      "TagsOptionalPlaceholder": "Digita un tag e invia"
     },
     "Name": "Nome",
     "Label": "Etichetta",
