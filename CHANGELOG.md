@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.39.29-rc5
+- - **added**: added tag to action ask kb and action create kb
+
 # 1.39.29-rc4
 - **bug-fix**: eliminated AAAAAA
 
