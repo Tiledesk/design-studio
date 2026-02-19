@@ -7,6 +7,24 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# this branch
+abilitato cds-action-controls sullhover intent
+disabilitato cds-action-controls in cds intent sul pan e sullo zoom 
+
+# branch di partenza ds-refactoring-2 
+refactoring panel-intent-controls e panel-intent-header
+stilato il piano refactoring connectors
+refactoring del codice html e css pulendo e ottimizzando il codice cds-intent
+refactoring del codice ts html css pulendo i files senza modificarli cds-canvas e cds intent
+SLICE 3: Riorganizzazione Metodi di Inizializzazione cds-intent
+SLICE 2: Standardizzazione Pattern Subscription RxJS cds-intent
+SLICE 1: Cleanup Output non utilizzato e Codice Commentato cds-intent
+SAFE CLEANUP TS + HTML + SCS cds-canvas
+SLICE 3: Estrazione Logica Note in Metodi Helper Privati cds-canvas
+SLICE 2: Estrazione Callback Logic in Metodi Privati (setListnerEvents) cds-canvas
+Refactor Plan - SLICE 1: Migrazione RxJS Subscription a Pattern takeUntil cds-canvas
+
 # 1.39.26
 - **added**: added iteration action
 

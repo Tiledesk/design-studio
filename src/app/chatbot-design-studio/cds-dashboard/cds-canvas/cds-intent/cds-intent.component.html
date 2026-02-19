@@ -1,6 +1,9 @@
+<!-- Step 3: hover sul blocco intent → cds-action-controls solo se isIntentHovered e mouse sulla action -->
 <div #resizeElement class="panel-intent-content tds_draggable"
     (mousedown)="onIntentMouseDown($event)"
     (mousemove)="onIntentMouseMove($event)"
+    (mouseenter)="isIntentHovered = true"
+    (mouseleave)="isIntentHovered = false"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     [class.isStart]="isStart" 
     [class.tds-slim-intent]="isNewChatbot"
@@ -80,6 +83,7 @@
             </div>
         </div>
 
+        <!-- Step 2: hover su .box-action → cds-action-controls solo per l'action sotto il mouse -->
         <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last; trackBy: trackByActionId" 
             cdkDrag
             [cdkDragDisabled]="isNewChatbot"
@@ -95,8 +99,11 @@
             }" 
             [ngStyle]="getActionItemStyle(action)"
             (keydown)="onKeydown($event)"
-            (click)="onSelectAction(action, i, action._tdActionId)">
+            (click)="onSelectAction(action, i, action._tdActionId)"
+            (mouseenter)="onActionMouseEnter(i)"
+            (mouseleave)="onActionMouseLeave()">
             <span class="action-element">
+                  
                 <div *cdkDragPreview id="customDragPreview">
                     <cds-action-description 
                         class="header-action" 
@@ -111,16 +118,18 @@
                     class="header-action" 
                     cdkDragHandle
                     [elementType]="action._tdActionType">
-                </cds-action-description>
+                </cds-action-description> 
+               
     
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
 
-                    <cds-action-controls *ngIf="!isNewChatbot"
+                    <!-- Step 1+3: visibilità logica; Step 3: solo se mouse sul blocco intent e sulla action. -->
+                    <cds-action-controls *ngIf="!isNewChatbot && isIntentHovered && hoveredActionIndex === i"
                         (onClickControl)="onClickControl($event, action, i)">
                     </cds-action-controls>
     
     
-                    <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY" 
+                    <!-- <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY" 
                         class="panel-response" 
                         [intentSelected]="intent"
                         [connector]="connector" 
@@ -204,7 +213,7 @@
     
                     <cds-action-close *ngSwitchCase="TYPE_ACTION.CLOSE" 
                         [action]="action">
-                    </cds-action-close>
+                    </cds-action-close> 
     
                     <cds-action-json-condition *ngSwitchCase="TYPE_ACTION.JSON_CONDITION" 
                         class="panel-response"
@@ -212,7 +221,7 @@
                         [action]="action" 
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-json-condition>
-    
+  
                     <cds-action-replace-bot *ngSwitchCase="TYPE_ACTION.REPLACE_BOT" 
                         class="panel-response"
                         [action]="action">
@@ -242,7 +251,7 @@
                         class="panel-response"
                         [action]="action">
                     </cds-action-delete-variable>
-    
+     
                     <cds-action-hide-message *ngSwitchCase="TYPE_ACTION.HIDE_MESSAGE" 
                         class="panel-response"
                         [action]="action" 
@@ -466,23 +475,23 @@
                         [intentSelected]="intent"
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-flow-log>
+                    </cds-action-flow-log> -->
 
                 </div>
             </span>
-            <cds-action-arrow *ngIf="!last" 
+            <!-- <cds-action-arrow *ngIf="!last" 
                 id="action-arrow-{{i}}"
                 class="cds-action-arrow">
-            </cds-action-arrow>
+            </cds-action-arrow> -->
         </div>
     </div>
-    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
+    <!-- <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
         class="panel-response last-action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"
         [isLast]="true"
         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-    </cds-action-intent>
+    </cds-action-intent> -->
 
     <div class="footer-intent">
         <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
