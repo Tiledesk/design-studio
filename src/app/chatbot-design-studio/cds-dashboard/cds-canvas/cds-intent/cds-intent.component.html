@@ -129,7 +129,7 @@
                     </cds-action-controls>
     
     
-                    <!-- <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY" 
+                    <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY" 
                         class="panel-response" 
                         [intentSelected]="intent"
                         [connector]="connector" 
@@ -475,23 +475,23 @@
                         [intentSelected]="intent"
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-flow-log> -->
+                    </cds-action-flow-log>
 
                 </div>
             </span>
-            <!-- <cds-action-arrow *ngIf="!last" 
+            <cds-action-arrow *ngIf="!last" 
                 id="action-arrow-{{i}}"
                 class="cds-action-arrow">
-            </cds-action-arrow> -->
+            </cds-action-arrow>
         </div>
     </div>
-    <!-- <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
+    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
         class="panel-response last-action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"
         [isLast]="true"
         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-    </cds-action-intent> -->
+    </cds-action-intent>
 
     <div class="footer-intent">
         <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
