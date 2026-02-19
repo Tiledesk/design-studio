@@ -9,8 +9,14 @@
 
 
 # this branch
-abilitato cds-action-controls sullhover intent
-disabilitato cds-action-controls in cds intent sul pan e sullo zoom 
+- **changed**: **perf (pan/zoom)**: refactor evento moved-and-scaled per ridurre jank durante pan/zoom
+- **changed**: **perf (stage)**: dispatch moved-and-scaled in batch con requestAnimationFrame (max 1 per frame) in tiledesk-stage.js
+- **changed**: **perf (stage)**: rimosso getPositionNow() dal loop wheel; tx/ty/scale come unica fonte di verità; sync in centerStageOnTopPosition e centerStageOnHorizontalPosition
+- **changed**: **perf (canvas)**: listener moved-and-scaled registrato fuori NgZone e applicazione aggiornamenti in batch con rAF; rientro in zone solo per aggiornare UI
+- **changed**: **perf (canvas)**: removeConnectorDraftAndCloseFloatMenu chiamato solo se draft o menu aperti (guard per evitare lavoro inutile a ogni frame)
+- **changed**: **perf (canvas)**: debounce salvataggio posizione stage portato da 100ms a 300ms
+- **changed**: abilitato cds-action-controls sull'hover intent
+- **changed**: disabilitato cds-action-controls in cds intent sul pan e sullo zoom 
 
 # branch di partenza ds-refactoring-2 
 refactoring panel-intent-controls e panel-intent-header
