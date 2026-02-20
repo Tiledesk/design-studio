@@ -42,6 +42,34 @@ export class ProjectService {
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')
   }
 
+  /**
+   * MCP Tools discovery for a specific MCP server endpoint.
+   *
+   * API:
+   * POST /api/{id_project}/mcp/tools
+   * Body: { url: "<server_url>" }
+   *
+   * NOTE: we build the URL following the same pattern used by other project-scoped endpoints:
+   * SERVER_BASE_URL + project_id + '/mcp/tools'
+   */
+  public getMcpTools(project_id: string, server_url: string): Observable<any> {
+    const url = this.SERVER_BASE_URL + project_id + '/mcp/tools';
+    this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - URL', url);
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: this.tiledeskToken
+      })
+    };
+
+    const body = { url: server_url };
+    return this.http.post(url, body, httpOptions).pipe(map((res: any) => {
+      this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - RES ', res);
+      return res;
+    }));
+  }
+
 
   getCurrentProject(): Project {
     return this.project
