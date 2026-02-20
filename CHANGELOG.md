@@ -9,14 +9,17 @@
 
 
 # this branch
-- **changed**: **perf (pan/zoom)**: refactor evento moved-and-scaled per ridurre jank durante pan/zoom
-- **changed**: **perf (stage)**: dispatch moved-and-scaled in batch con requestAnimationFrame (max 1 per frame) in tiledesk-stage.js
-- **changed**: **perf (stage)**: rimosso getPositionNow() dal loop wheel; tx/ty/scale come unica fonte di verità; sync in centerStageOnTopPosition e centerStageOnHorizontalPosition
-- **changed**: **perf (canvas)**: listener moved-and-scaled registrato fuori NgZone e applicazione aggiornamenti in batch con rAF; rientro in zone solo per aggiornare UI
-- **changed**: **perf (canvas)**: removeConnectorDraftAndCloseFloatMenu chiamato solo se draft o menu aperti (guard per evitare lavoro inutile a ogni frame)
-- **changed**: **perf (canvas)**: debounce salvataggio posizione stage portato da 100ms a 300ms
-- **changed**: abilitato cds-action-controls sull'hover intent
-- **changed**: disabilitato cds-action-controls in cds intent sul pan e sullo zoom 
+**Pan/zoom (jank)**  
+- `tiledesk-stage.js`: evento moved-and-scaled inviato in batch con rAF (max 1/frame); rimosso getPositionNow() dal loop wheel; tx/ty/scale come unica fonte di verità.  
+- `cds-canvas.component.ts`: listener moved-and-scaled fuori NgZone, aggiornamenti in rAF; guard su removeConnectorDraftAndCloseFloatMenu (solo se draft o menu aperti); debounce salvataggio posizione 300ms.
+**Intent (performance)**  
+- `cds-intent.component.ts/html/scss`: template senza getter/ngStyle/ngClass (stili cached, binding primitivi e class); styling con --intent-color e .intent-selected; cache DOM (resizeElement, drag preview); ChangeDetectionStrategy.OnPush.  
+- `cds-canvas.component.ts`: ViewChildren(CdsIntentComponent) e requestCheck() sugli intent a fine applyMovedAndScaled (evita flicker con OnPush).
+**Connettori**  
+- `cds-intent.component.ts`: connect-to-block non più invisibile al primo caricamento; se stage non è loaded si schedula creazione con retry (100ms, max 30); pulizia pending su delete connettore, cambio intent, ngOnDestroy.  
+- `cds-action-intent.component.ts`, `cds-intent.component.html`: connettore “Vai al blocco” visibile anche senza selezionare l’intent (ngOnChanges + refreshConnectionState; input connectorRefreshTrigger da alphaConnectors).
+**UI**  
+- cds-action-controls: visibili on hover sul blocco intent; nascosti durante pan e zoom. 
 
 # branch di partenza ds-refactoring-2 
 refactoring panel-intent-controls e panel-intent-header

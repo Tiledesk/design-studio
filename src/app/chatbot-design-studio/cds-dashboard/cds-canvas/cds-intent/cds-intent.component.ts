@@ -1,5 +1,7 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -41,7 +43,8 @@ export enum HAS_SELECTED_TYPE {
 @Component({
   selector: 'cds-intent',
   templateUrl: './cds-intent.component.html',
-  styleUrls: ['./cds-intent.component.scss']
+  styleUrls: ['./cds-intent.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
@@ -109,6 +112,11 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
   intentColor: any = INTENT_COLORS.COLOR1;
 
+  /** Deferred create connettore connect-to-block quando stage non è ancora loaded; max 30 tentativi ogni 100ms. */
+  private pendingActionIntentConnector: { intervalId: number; fromId: string; toId: string; attempts: number } | null = null;
+  private static readonly PENDING_INTERVAL_MS = 100;
+  private static readonly PENDING_MAX_ATTEMPTS = 30;
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
 
@@ -127,8 +135,14 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private readonly appStorageService: AppStorageService,
     private readonly dashboardService: DashboardService,
     private readonly webhookService: WebhookService,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     this.initSubscriptions();
+  }
+
+  /** Chiamato dal canvas dopo applyMovedAndScaled per aggiornare la vista durante pan/zoom (OnPush: input non cambiano). */
+  requestCheck(): void {
+    this.cdr.markForCheck();
   }
 
   /**
@@ -175,6 +189,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
           this.updateShowIntentOptions();
         }
+        this.cdr.markForCheck();
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -236,6 +251,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
         if (this.intent?.intent_id) {
           this.loadConnectorsIn();
         }
+        this.cdr.markForCheck();
       });
       const subscribe = { key: subscribtionKey, value: subscribtion };
       this.subscriptions.push(subscribe);
@@ -253,6 +269,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
           this.logger.log('[CDS-INTENT-SLICE2] STEP4: behaviorIntentColor emesso - Test funzionale OK', resp.color);
           if(resp.color){
             this.changeIntentColor(resp.color);
+            this.cdr.markForCheck();
           }
         }
       });
@@ -282,6 +299,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     this.initializeActions();
     this.initializeAttributes();
     this.initializeConnectors();
+    this.cdr.markForCheck();
   }
 
   /**
@@ -424,6 +442,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
       .subscribe(connectors => {
         this.logger.log('[CDS-INTENT-SLICE2] STEP4: connectorsInChanged$ emesso - Test funzionale OK', connectors?.length);
         this.updateConnectorsIn(connectors);
+        this.cdr.markForCheck();
       });
     
     this.subscriptions.push({ key: keyConnectorsIn, value: sub });
@@ -445,6 +464,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Aggiorna l’opacità del placeholder “aggiungi action” in base a hideActionPlaceholderOfActionPanel, aggiorna agents e isUntitledBlock se cambia l’intent.
    */
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['intent']) {
+      this.cancelPendingActionIntentConnector();
+    }
     this.logger.log('[CDS-INTENT] hideActionPlaceholderOfActionPanel (dragged from sx panel) ', this.hideActionPlaceholderOfActionPanel);
     if (this.hideActionPlaceholderOfActionPanel === false) {
       const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
@@ -559,6 +581,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Completa unsubscribe$ per disiscriversi da tutte le subscription e evitare memory leak.
    */
   ngOnDestroy(): void {
+    this.cancelPendingActionIntentConnector();
     this.logger.log('[CDS-INTENT-SLICE2] STEP5: ngOnDestroy chiamato - Cleanup subscription iniziato', `Total subscriptions: ${this.subscriptions.length}`);
     this.unsubscribe();
     this.logger.log('[CDS-INTENT-SLICE2] STEP5: unsubscribe$ emesso e completato - Memory leak prevenuto OK');
@@ -640,6 +663,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
       this.logger.log('[CDS-INTENT] actionIntent :: ', this.actionIntent);
       this.isActionIntent = this.intent.actions.some(obj => obj._tdActionType === TYPE_ACTION.INTENT);
       if(this.isActionIntent){
+        this.cancelPendingActionIntentConnector();
         this.actionIntent = null;
         if(fromId && toId && fromId !== '' && toId !== ''){
           connectorID = fromId+"/"+toId;
@@ -648,10 +672,50 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
       } else if(fromId && toId && fromId !== '' && toId !== ''){
           if(this.stageService.loaded === true){
             this.connectorService.createConnectorFromId(fromId, toId);
+          } else {
+            this.scheduleCreateActionIntentConnector(fromId, toId);
           }
         }
     } catch (error) {
       this.logger.log('[CDS-INTENT] error: ', error);
+    }
+  }
+
+  /**
+   * Annulla il retry deferred del connettore connect-to-block (chiamato quando il connettore viene eliminato,
+   * l'intent cambia o actionIntent viene azzerato).
+   */
+  private cancelPendingActionIntentConnector(): void {
+    if (this.pendingActionIntentConnector) {
+      clearInterval(this.pendingActionIntentConnector.intervalId);
+      this.pendingActionIntentConnector = null;
+    }
+  }
+
+  /**
+   * Schedula la creazione del connettore connect-to-block con retry ogni PENDING_INTERVAL_MS (max PENDING_MAX_ATTEMPTS).
+   * Usato quando setActionIntent viene chiamato con stageService.loaded === false.
+   */
+  private scheduleCreateActionIntentConnector(fromId: string, toId: string): void {
+    this.cancelPendingActionIntentConnector();
+    const intervalId = window.setInterval(() => this.tryCreatePendingActionIntentConnector(), CdsIntentComponent.PENDING_INTERVAL_MS);
+    this.pendingActionIntentConnector = { intervalId, fromId, toId, attempts: 0 };
+  }
+
+  /**
+   * Un tentativo di creare il connettore pending: se lo stage è loaded crea e annulla il pending; altrimenti incrementa attempts e dopo PENDING_MAX_ATTEMPTS annulla.
+   */
+  private tryCreatePendingActionIntentConnector(): void {
+    if (!this.pendingActionIntentConnector) return;
+    const p = this.pendingActionIntentConnector;
+    if (this.stageService.loaded === true) {
+      this.connectorService.createConnectorFromId(p.fromId, p.toId);
+      this.cancelPendingActionIntentConnector();
+      return;
+    }
+    p.attempts += 1;
+    if (p.attempts >= CdsIntentComponent.PENDING_MAX_ATTEMPTS) {
+      this.cancelPendingActionIntentConnector();
     }
   }
 
@@ -942,33 +1006,11 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   }
 
   /**
-   * Stile outline per la singola action (selezionata o no). Usata nel template al posto di ngStyle inline.
-   */
-  getActionItemStyle(action: Action): { [key: string]: string } {
-    if (!this.intent?.attributes?.color) {
-      return {};
-    }
-    const outline =
-      this.intentService.actionSelectedID === action._tdActionId
-        ? `2px solid rgba(${this.intent.attributes.color}, 1)`
-        : 'none';
-    return { outline };
-  }
-
-  /**
    * Chiamate da cds-connector-in (onShowConnectorsIn / onHideConnectorsIn). Implementazione vuota per evitare binding morti.
    */
   onShowConnectorsIn(): void {}
 
   onHideConnectorsIn(): void {}
-
-  /**
-   * Usata nel template per la classe cds-no-featured-action.
-   * Comportamento invariato rispetto al precedente template: la condizione originale equivale a (tipo !== REPLY).
-   */
-  isNoFeaturedAction(action: Action): boolean {
-    return action._tdActionType !== TYPE_ACTION.REPLY;
-  }
 
   /**
    * Chiamata dal template (cdkDropListDropped) quando si rilascia un’action sulla lista di questo intent.

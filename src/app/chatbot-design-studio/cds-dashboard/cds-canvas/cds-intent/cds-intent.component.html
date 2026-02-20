@@ -93,11 +93,9 @@
             [id]="action._tdActionId" 
             class="box-action" 
             tabindex="-1"
-            [ngClass]="{
-                'cds-no-featured-action': isNoFeaturedAction(action),
-                'cds-last-action': last
-            }" 
-            [ngStyle]="getActionItemStyle(action)"
+            [class.cds-no-featured-action]="action._tdActionType !== TYPE_ACTION.REPLY"
+            [class.cds-last-action]="last"
+            [class.action-selected]="intentService.actionSelectedID === action._tdActionId"
             (keydown)="onKeydown($event)"
             (click)="onSelectAction(action, i, action._tdActionId)"
             (mouseenter)="onActionMouseEnter(i)"

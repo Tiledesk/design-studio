@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Input, ChangeDetectorRef, AfterViewInit, NgZone } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList, ElementRef, HostListener, Input, ChangeDetectorRef, AfterViewInit, NgZone } from '@angular/core';
 import { Observable, Subscription, skip, firstValueFrom, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -31,6 +31,7 @@ import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+import { CdsIntentComponent } from './cds-intent/cds-intent.component';
 
 @Component({
   selector: 'cds-canvas',
@@ -45,6 +46,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   @ViewChild('receiver_elements_dropped_on_stage', { static: false }) receiverElementsDroppedOnStage: ElementRef;
   @ViewChild('drawer_of_items_to_zoom_and_drag', { static: false }) drawerOfItemsToZoomAndDrag: ElementRef;
   @ViewChild('cdsOptions') cdsOptions: any;
+  @ViewChildren(CdsIntentComponent) intentComponents: QueryList<CdsIntentComponent>;
 
   @Input() onHeaderTestItOut: Observable<Intent>;
 
@@ -696,6 +698,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
       this.logger.log('[CDS-CANVAS] moved-and-scaled ', detail);
       this.stageService.savePositionByPos(this.id_faq_kb, { x: detail.x, y: detail.y });
     }, 300);
+    // cds-intent usa OnPush: non riceve change detection da NgZone quando lo stage emette moved-and-scaled
+    // (listener è in runOutsideAngular). Invalidiamo esplicitamente la vista di ogni intent così si
+    // aggiornano posizione/connettori dopo pan/zoom senza flicker o scomparsa.
+    this.intentComponents?.forEach(c => c.requestCheck());
   }
 
   private onKeydown(e: KeyboardEvent): void {

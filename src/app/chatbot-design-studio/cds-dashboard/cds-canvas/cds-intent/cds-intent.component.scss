@@ -248,6 +248,9 @@
   &.isFirst {
     display: none;
   }
+  &.action-selected {
+    outline: 2px solid rgba(var(--intent-color, 220, 220, 220), 1);
+  }
 }
 
 /* Drag placeholder */
