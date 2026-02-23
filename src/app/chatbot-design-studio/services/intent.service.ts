@@ -35,6 +35,8 @@ export class IntentService {
   BSTestItOut = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
   behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
+  /** Emette quando cambiano intentSelectedID o intentActive; usato da cds-intent per aggiornare stili senza ngDoCheck. */
+  behaviorIntentSelection = new BehaviorSubject<{ intentSelectedID: string | null; intentActive: boolean }>({ intentSelectedID: null, intentActive: false });
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
@@ -85,8 +87,10 @@ export class IntentService {
     private stageService: StageService,
     private dashboardService: DashboardService,
     private tiledeskAuthService: TiledeskAuthService
-  ) { 
+  ) { }
 
+  private emitIntentSelection(): void {
+    this.behaviorIntentSelection.next({ intentSelectedID: this.intentSelectedID, intentActive: this.intentActive });
   }
 
 
@@ -155,6 +159,7 @@ export class IntentService {
       this.intentActive = false;
       this.resetZindex();
     }
+    this.emitIntentSelection();
   }
 
 
@@ -173,8 +178,9 @@ export class IntentService {
 
   public setIntentSelectedByIntent(intent){
     this.intentSelected = intent;
-    this.intentSelectedID = this.intentSelected.intent_id;
+    this.intentSelectedID = this.intentSelected?.intent_id ?? null;
     this.intentActive = true;
+    this.emitIntentSelection();
   }
 
   public setIntentSelectedPosition(x, y){
@@ -834,32 +840,28 @@ export class IntentService {
     this.intentActive = false;
     this.actionSelectedID = actionId;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
-    this.listActions = this.intentSelected.actions;
-    this.selectedAction = this.listActions.find(action => action._tdActionId === actionId);
-    // this.logger.log('[INTENT SERVICE] --> selectAction: ', intentID, actionId);
+    this.listActions = this.intentSelected?.actions;
+    this.selectedAction = this.listActions?.find(action => action._tdActionId === actionId);
     this.behaviorIntent.next(this.intentSelected);
+    this.emitIntentSelection();
   }
 
   /** setIntentSelected */
   public setIntentSelected(intentID){
     this.logger.log('[INTENT SERVICE] ::: setIntentSelected:: ', intentID);
     this.intentSelected = this.selectIntent(intentID);
-    this.intentSelectedID = this.intentSelected.intent_id;
-    this.intentActive = true;
+    this.intentSelectedID = this.intentSelected?.intent_id ?? null;
+    this.intentActive = !!this.intentSelected;
     this.actionSelectedID = null;
     this.listActions = null;
     this.selectedAction = null;
     if(this.intentSelected?.actions){
       this.listActions = this.intentSelected.actions;
     }
-    // //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
-    // //this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
     if(this.intentSelected){
       this.behaviorIntent.next(this.intentSelected);
     }
-    // if(!this.intentSelected)return;
-    // chiudo tutti i pannelli
-    // this.controllerService.closeAllPanels();
+    this.emitIntentSelection();
   }
 
   
@@ -867,6 +869,7 @@ export class IntentService {
   public async setStartIntent(){
     this.intentSelectedID = null;
     this.intentActive = false;
+    this.emitIntentSelection();
     const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
     let startingName = STARTING_NAMES[subtype];
     this.logger.log('[CDS-INTENT] startingName: ', startingName);
@@ -901,6 +904,7 @@ export class IntentService {
   /** unselectIntent */
   public inactiveIntent(){
     this.intentActive = false;
+    this.emitIntentSelection();
   }
 
 

@@ -5,7 +5,8 @@
     [class.isStart]="isStart" 
     [class.tds-slim-intent]="isNewChatbot"
     [id]="'intent-content-'+ intent?.intent_id"
-    [ngStyle]="intentStyle">
+    [style.background-color]="vm.backgroundColor"
+    [style.outline]="vm.outline">
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
     <cds-connector-in *ngIf="!isStart && connectorsIn?.length>0"
@@ -89,11 +90,9 @@
             [id]="action._tdActionId" 
             class="box-action" 
             tabindex="-1"
-            [ngClass]="{
-                'cds-no-featured-action': isNoFeaturedAction(action),
-                'cds-last-action': last
-            }" 
-            [ngStyle]="getActionItemStyle(action)"
+            [class.cds-no-featured-action]="action._isNoFeatured"
+            [class.cds-last-action]="last" 
+            [style.outline]="action._outline"
             (keydown)="onKeydown($event)"
             (click)="onSelectAction(action, i, action._tdActionId)">
             <span class="action-element">

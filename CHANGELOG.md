@@ -9,6 +9,7 @@
 
 # this branch
 - **changed**: Pan/zoom (moved-and-scaled): in stage al massimo un evento per frame (throttle con requestAnimationFrame) invece di uno per ogni movimento; in canvas il listener gira fuori dalla zona Angular e gli aggiornamenti vengono raggruppati a un solo aggiornamento per frame (batching rAF); menu e bozze si chiudono solo se erano aperti.
+- **changed**: Performance intent (canvas con 100+ blocchi): stili intent e action senza funzioni/oggetti in template. Blocco intent: `[ngStyle]` sostituito con binding atomici e view model `vm` (aggiornato solo a cambio selezione via observable). Action: outline e classe no-featured precalcolati su ogni action (`_outline`, `_isNoFeatured`); rimosse `getActionItemStyle` e `isNoFeaturedAction` dal template. Selezione intent/action notificata da IntentService (`behaviorIntentSelection`) per evitare `ngDoCheck` e trascinamento a scatti.
 
 # 1.39.26
 - **added**: added iteration action
