@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Input, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, Input, ChangeDetectorRef, AfterViewInit, NgZone } from '@angular/core';
 import { Observable, Subscription, skip, firstValueFrom, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -166,6 +166,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   private readonly unsubscribe$: Subject<any> = new Subject<any>();
   private debounceTimeout: any;
+  /** rAF throttle for moved-and-scaled: at most one Angular update per frame */
+  private _movedAndScaledRafId: number | null = null;
+  private _movedAndScaledPendingDetail: { scale: number; x: number; y: number } | null = null;
 
   // ============================================================
   // CONSTRUCTOR & LIFECYCLE
@@ -183,6 +186,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     public logService: LogService,
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
+    private readonly ngZone: NgZone,
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -420,8 +424,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     this.listnerConnectorDraftReleased = this.onConnectorDraftReleased.bind(this);
     document.addEventListener("connector-draft-released", this.listnerConnectorDraftReleased, false);
 
+    // moved-and-scaled: listener registrato fuori dalla zona Angular (runOutsideAngular) così
+    // il handler non scatena il change detection a ogni evento di pan/zoom; gli aggiornamenti
+    // Angular avvengono al massimo una volta per frame tramite batching rAF in onMovedAndScaled.
     this.listnerMovedAndScaled = this.onMovedAndScaled.bind(this);
-    document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+    this.ngZone.runOutsideAngular(() => {
+      document.addEventListener("moved-and-scaled", this.listnerMovedAndScaled, false);
+    });
 
     this.listnerStartDragging = this.onStartDragging.bind(this);
     document.addEventListener("start-dragging", this.listnerStartDragging, false);
@@ -653,20 +662,31 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Handler per moved-and-scaled (pan/zoom). Esegue fuori dalla zona Angular.
+   * Batching rAF: accumula l'ultimo detail e pianifica al massimo un requestAnimationFrame per frame;
+   * nel callback rAF rientra in zona (ngZone.run) una sola volta per applicare scale, chiudere menu e salvare posizione.
+   */
   private onMovedAndScaled(e: CustomEvent): void {
-    const el = e.detail;
-    this.connectorService.tiledeskConnectors.scale = e.detail.scale;
-    this.removeConnectorDraftAndCloseFloatMenu();
-
-    clearTimeout(this.debounceTimeout);
-    this.debounceTimeout = setTimeout(() => {
-      this.logger.log('[CDS-CANVAS] moved-and-scaled ', el);
-      const pos = {
-        x: el.x,
-        y: el.y
-      };
-      this.stageService.savePositionByPos(this.id_faq_kb, pos);
-    }, 100);
+    this._movedAndScaledPendingDetail = e.detail;
+    if (this._movedAndScaledRafId != null) return;
+    this._movedAndScaledRafId = requestAnimationFrame(() => {
+      this._movedAndScaledRafId = null;
+      const detail = this._movedAndScaledPendingDetail;
+      this._movedAndScaledPendingDetail = null;
+      if (detail == null) return;
+      this.ngZone.run(() => {
+        this.connectorService.tiledeskConnectors.scale = detail.scale;
+        if (this.IS_OPEN_ADD_ACTIONS_MENU || this.IS_OPEN_CONTEXT_MENU || this.IS_OPEN_COLOR_MENU || this.connectorService.connectorDraft != null) {
+          this.removeConnectorDraftAndCloseFloatMenu();
+        }
+        clearTimeout(this.debounceTimeout);
+        this.debounceTimeout = setTimeout(() => {
+          this.logger.log('[CDS-CANVAS] moved-and-scaled ', detail);
+          this.stageService.savePositionByPos(this.id_faq_kb, { x: detail.x, y: detail.y });
+        }, 100);
+      });
+    });
   }
 
   private onKeydown(e: KeyboardEvent): void {

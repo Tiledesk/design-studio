@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **changed**: Pan/zoom (moved-and-scaled): in stage al massimo un evento per frame (throttle con requestAnimationFrame) invece di uno per ogni movimento; in canvas il listener gira fuori dalla zona Angular e gli aggiornamenti vengono raggruppati a un solo aggiornamento per frame (batching rAF); menu e bozze si chiudono solo se erano aperti.
+
 # 1.39.26
 - **added**: added iteration action
 
