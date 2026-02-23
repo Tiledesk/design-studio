@@ -26,6 +26,7 @@ import { IntentService } from '../../../services/intent.service';
 import { ConnectorService } from '../../../services/connector.service';
 import { StageService } from '../../../services/stage.service';
 import { ControllerService } from '../../../services/controller.service';
+import { TranslateService } from '@ngx-translate/core';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -105,6 +106,13 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
   intentColor: any = INTENT_COLORS.COLOR1;
 
+  /** Label tradotte (STEP 5: evitare pipe translate ripetute in template; aggiornate al cambio lingua). */
+  labelQuestion = '';
+  labelForm = '';
+  labelAddAnActionToBlock = '';
+  labelAddAnActionToBlockDescription = '';
+  labelAddAction = '';
+
   /** View model stabile per stili intent (background, outline): aggiornato solo quando cambiano intent/colore o selezione, per ridurre checkStylingProperty. */
   vm: { backgroundColor: string; outline: string } = { backgroundColor: '', outline: 'none' };
   private _lastSelectedId: string | null = null;
@@ -123,6 +131,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private readonly connectorService: ConnectorService,
     private readonly stageService: StageService,
     private readonly controllerService: ControllerService,
+    private readonly translate: TranslateService,
     private readonly elemenRef: ElementRef,
     private readonly renderer: Renderer2,
     private readonly appStorageService: AppStorageService,
@@ -130,6 +139,15 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private readonly webhookService: WebhookService,
   ) {
     this.initSubscriptions();
+  }
+
+  /** Aggiorna le label tradotte (chiamato in ngOnInit e al cambio lingua). */
+  private updateTranslationLabels(): void {
+    this.labelQuestion = this.translate.instant('Question');
+    this.labelForm = this.translate.instant('Form');
+    this.labelAddAnActionToBlock = this.translate.instant('CDSCanvas.AddAnActionToBlock');
+    this.labelAddAnActionToBlockDescription = this.translate.instant('CDSCanvas.AddAnActionToBlockDescription');
+    this.labelAddAction = this.translate.instant('CDSCanvas.AddAction');
   }
 
   /**
@@ -297,6 +315,8 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     this.initializeAttributes();
     this.initializeConnectors();
     this.updateIntentStyleVm();
+    this.updateTranslationLabels();
+    this.translate.onLangChange.pipe(takeUntil(this.unsubscribe$)).subscribe(() => this.updateTranslationLabels());
   }
 
   /**

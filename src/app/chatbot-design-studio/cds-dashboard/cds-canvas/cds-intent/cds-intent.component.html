@@ -37,11 +37,11 @@
             <div class="option" 
                 (click)="onSelectQuestion(HAS_SELECTED_TYPE.QUESTION)"
                 [attr.active]="questionCount > 0">
-                <img src="assets/images/brain.svg" [title]="'Question' | translate" alt="Question">
+                <img src="assets/images/brain.svg" [title]="labelQuestion" alt="Question">
             </div>
             <div class="option" (click)="onSelectForm(HAS_SELECTED_TYPE.FORM)" 
                 [attr.active]="formSize > 0">
-                <img src="assets/images/form.svg" [title]="'Form' | translate" alt="Form">
+                <img src="assets/images/form.svg" [title]="labelForm" alt="Form">
             </div>
         </div>
 
@@ -67,16 +67,16 @@
             cdkDrag
             [cdkDragDisabled]="dragDisabled || isNewChatbot">
             <div class="add--action-placeholder-text">
-                {{ 'CDSCanvas.AddAnActionToBlock' | translate}}
+                {{ labelAddAnActionToBlock }}
                 <span class="add--action-placeholder-desc">
-                    {{ 'CDSCanvas.AddAnActionToBlockDescription' | translate}}
+                    {{ labelAddAnActionToBlockDescription }}
                 </span>
             </div>
 
             <div class="csd-open-action-menu-btn-wpr">
                 <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                     class="cds-add-action-btn">
-                    + {{ 'CDSCanvas.AddAction' | translate}}
+                    + {{ labelAddAction }}
                 </div>
             </div>
         </div>
@@ -487,7 +487,7 @@
         <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">
-                + {{ 'CDSCanvas.AddAction' | translate}}
+                + {{ labelAddAction }}
             </div>
         </div>
     </div>
