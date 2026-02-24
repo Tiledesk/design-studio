@@ -7,21 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch refactoring component: cds-connector-in
-
-- **changed**: Corretto bug nella subscription ai connector: il confronto usava un parametro che shadowava l’emissione (sempre true); ora si aggiorna solo quando il connector è in lista. Rimossi console.log.
-- **changed**: OnPush e `markForCheck()` dopo aggiornamenti asincroni; meno change detection inutile.
-- **changed**: `ngOnChanges` riattivato: quando cambia l’input `connectorsIn` (es. intent eliminato) il componente si aggiorna.
-- **changed**: `trackBy` per l’`*ngFor` del menu (trackByIntentId) per riusare i nodi DOM.
-- **changed**: Filtro “contract visibile”: cache per ciclo (stesso elemento non letto più volte) e helper `getContractElementId`.
-- **changed**: Cache degli elementi DOM in show/hide: id precalcolati e riferimenti in cache; invalidata al cambio lista. Meno getElementById a ogni hover.
-- **changed**: Alpha (opacità linee) in cache: aggiornato in showConnectorsIn e ngOnInit, riusato in hideConnectorsIn e onMenuItemMouseLeave. Cache di visibilità contract in onMenuItemMouseEnter/Leave.
-- **changed**: Menu mostrato/nascosto con classe `.is-hidden` e proprietà `menuVisible` (mouseenter/mouseleave) invece di solo CSS :hover su display.
-- **changed**: Template: spazio tra `*ngIf` e `class` nel div radice (manutenzione).
-
+# 1.39.29-rc8
+- **changed**: Updated and refactored the cds-intent and cds-connector-in components to improve performance
 
 # 1.39.29-rc7
-- **bug-fix**:Set retro compatibility between onActionUpdate and onUpdateAndSaveAction in CdsIntentComponent
+- **bug-fix**: Set retro compatibility between onActionUpdate and onUpdateAndSaveAction in CdsIntentComponent
 
 # 1.39.29-rc6
 - **changed**: Updated and refactored the cds-intent and cds-connector components to improve performance
