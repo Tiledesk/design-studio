@@ -1,8 +1,9 @@
-import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy, NgZone } from '@angular/core';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Note } from 'src/app/models/note-model';
 import { StageService } from '../../../services/stage.service';
 import { NoteService } from 'src/app/services/note.service';
+import { NoteResizeStateService } from '../note-resize-state.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { firstValueFrom, Subscription } from 'rxjs';
@@ -83,6 +84,8 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private currentBaseWidth = 0; // Larghezza base corrente (può essere modificata dal resize orizzontale)
   private rafHorizontalResizeId: number | null = null;
   private lastHorizontalClientX: number | null = null;
+  /** Contatore frame per log resize orizzontale (diagnostica flicker) */
+  private horizontalResizeFrameCount = 0;
   private startTop = 0; // Posizione Y iniziale CSS per resize verticale
   private startCenterYReal = 0; // Centro Y reale iniziale in viewport per resize verticale
   private startHostTopViewport = 0; // Posizione Y iniziale dell'host in viewport per resize verticale
@@ -102,6 +105,11 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private currentBaseHeight = 0; // Altezza base corrente (può essere modificata dal resize verticale)
   private justFinishedResizing = false;
   private gestureStageZoom = 1; // Zoom dello stage al momento dell'inizio gesture (tds_drawer scale)
+  /** Rect corner resize: viewport del content all'avvio (vertice opposto fisso). */
+  private startRectLeft = 0;
+  private startRectTop = 0;
+  private startRectRight = 0;
+  private startRectBottom = 0;
 
   // PROPRIETÀ PRIVATE - Rotazione
   // ============================================================================
@@ -194,7 +202,9 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     private stageService: StageService,
     private noteService: NoteService,
     private sanitizer: DomSanitizer,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private ngZone: NgZone,
+    private noteResizeState: NoteResizeStateService
   ) { }
 
   // ============================================================================
@@ -205,6 +215,14 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // Log diagnostica flicker: se durante resize orizzontale il parent ri-applica gli input (note), la CD può causare flicker
+    if (changes['note'] && !changes['note'].firstChange && this.isHorizontalResizing) {
+      this.logger.log('[CDS-NOTES-H-RESIZE] ngOnChanges: note input changed DURANTE resize orizzontale', {
+        noteId: this.note?.note_id,
+        previousValue: changes['note'].previousValue?.note_id,
+        currentValue: changes['note'].currentValue?.note_id
+      });
+    }
     if (changes['note'] && this.note) {
       // Solo per note testuali
       if (!this.isTextNote) {
@@ -330,34 +348,62 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const minScale = 0.1; // Scale minimo (10% della dimensione originale)
     const maxScale = 10; // Scale massimo (1000% della dimensione originale)
     
-    // Calcola lo scale basandoti sulla distanza dal centro iniziale
-    // La distanza dal centro aumenta/diminuisce proporzionalmente allo scale
     const currentDx = event.clientX - this.startCenterX;
     const currentDy = event.clientY - this.startCenterY;
     const currentDistance = Math.sqrt(currentDx * currentDx + currentDy * currentDy);
     
     let scaleX = this.startScale;
     let scaleY = this.startScale;
+    let transformOrigin = 'center center';
 
     const isRect = this.note?.type === 'rect';
     const isCornerHandle = this.resizeHandle === 'tl' || this.resizeHandle === 'tr' || this.resizeHandle === 'bl' || this.resizeHandle === 'br';
-    if (isRect && isCornerHandle && this.startDxAbsFromCenter > 0 && this.startDyAbsFromCenter > 0) {
-      // Rect note: corner resize without aspect ratio constraints (scaleX and scaleY independently)
-      const dxAbs = Math.abs(currentDx);
-      const dyAbs = Math.abs(currentDy);
-      const nextScaleX = this.startScaleX * (dxAbs / this.startDxAbsFromCenter);
-      const nextScaleY = this.startScaleY * (dyAbs / this.startDyAbsFromCenter);
-      scaleX = Math.max(minScale, Math.min(maxScale, nextScaleX));
-      scaleY = Math.max(minScale, Math.min(maxScale, nextScaleY));
+
+    if (isRect && isCornerHandle) {
+      // Rect: vertice opposto fisso. Dimensione minima 40x40 px, nessun limite massimo.
+      const MIN_RECT_SIZE_PX = 40;
+      const minScaleXRect = MIN_RECT_SIZE_PX / this.startWidth;
+      const minScaleYRect = MIN_RECT_SIZE_PX / this.startHeight;
+      const zoom = this.gestureStageZoom || this.getSafeStageZoom();
+      const wBase = this.startWidth * zoom;
+      const hBase = this.startHeight * zoom;
+      let newW = 0;
+      let newH = 0;
+      switch (this.resizeHandle) {
+        case 'br':
+          newW = event.clientX - this.startRectLeft;
+          newH = event.clientY - this.startRectTop;
+          transformOrigin = '0 0';
+          break;
+        case 'bl':
+          newW = this.startRectRight - event.clientX;
+          newH = event.clientY - this.startRectTop;
+          transformOrigin = '100% 0';
+          break;
+        case 'tr':
+          newW = event.clientX - this.startRectLeft;
+          newH = this.startRectBottom - event.clientY;
+          transformOrigin = '0 100%';
+          break;
+        case 'tl':
+          newW = this.startRectRight - event.clientX;
+          newH = this.startRectBottom - event.clientY;
+          transformOrigin = '100% 100%';
+          break;
+        default:
+          break;
+      }
+      if (wBase > 0 && hBase > 0) {
+        scaleX = Math.max(minScaleXRect, newW / wBase);
+        scaleY = Math.max(minScaleYRect, newH / hBase);
+      }
     } else {
-    
       if (this.startDistanceFromCenter > 0) {
         const distanceRatio = currentDistance / this.startDistanceFromCenter;
         const newScale = this.startScale * distanceRatio;
         scaleX = Math.max(minScale, Math.min(maxScale, newScale));
         scaleY = scaleX; // Mantieni proporzioni perfette
       } else {
-        // Se la distanza iniziale è 0 (maniglia al centro), usa il delta
         const deltaX = event.clientX - this.startX;
         const deltaY = event.clientY - this.startY;
         const avgDelta = (Math.abs(deltaX) + Math.abs(deltaY)) / 2;
@@ -367,8 +413,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       }
     }
     
-    // Applica la trasformazione CSS con scale + rotate
-    const transformOrigin = 'center center';
     const rotation = this.note.rotation || 0;
     const transform = `scale(${scaleX}, ${scaleY}) rotate(${rotation}deg)`;
     
@@ -384,8 +428,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    
     
     if (this.isHorizontalResizing) {
+      const hostElement = this.elementRef.nativeElement as HTMLElement;
+      const finalLeft = parseFloat(hostElement.style.left);
+      if (!isNaN(finalLeft)) this.note.x = finalLeft;
+      this.noteResizeState.setHorizontalResize(null);
       // Ricalcola dimensioni e scale basandosi sul transform corrente
       this.applyScaleAndTransform();
+      this.logger.log('[CDS-NOTES-H-RESIZE] onMouseUp: fine resize orizzontale', { totalFrames: this.horizontalResizeFrameCount });
       this.isHorizontalResizing = false;
       this.resizeHandle = '';
       // Cleanup rAF/will-change (riduce flicker post-gesture)
@@ -397,7 +446,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       if (this.contentElement) {
         this.contentElement.nativeElement.style.willChange = '';
       }
-      const hostElement = this.elementRef.nativeElement as HTMLElement;
       hostElement.style.willChange = '';
       // this.changeState(0);
       this.justFinishedResizing = true;
@@ -431,9 +479,56 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     }
     
    else if (this.isResizing) {
-      // Ricalcola dimensioni e scale basandosi sul transform corrente
-      this.applyScaleAndTransform();
-      
+      this.logNoteBlockPosition('AL RILASCIO (prima di applyScaleAndTransform)');
+      const isRectCorner = this.note?.type === 'rect' &&
+        (this.resizeHandle === 'tl' || this.resizeHandle === 'tr' || this.resizeHandle === 'bl' || this.resizeHandle === 'br');
+      if (isRectCorner && this.contentElement) {
+        // Normalizza: porta origin a center e aggiorna host così il top-left del box resta fermo.
+        // Con origin (ox,oy) e scale(sx,sy), top-left = (note.x + ox*(1-sx), note.y + oy*(1-sy)).
+        // Con origin center (w/2, h/2), top-left = (newX + w*(1-sx)/2, newY + h*(1-sy)/2). Uguagliando si ricava newX, newY.
+        const el = this.contentElement.nativeElement;
+        const t = el.style.transform || '';
+        const scaleMatch = t.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
+        const sx = scaleMatch ? (parseFloat(scaleMatch[1]) || 1) : 1;
+        const sy = scaleMatch && scaleMatch[2] ? (parseFloat(scaleMatch[2]) || sx) : sx;
+        const w = this.note.width || this.startWidth;
+        const h = this.note.height || this.startHeight;
+        let newX: number;
+        let newY: number;
+        switch (this.resizeHandle) {
+          case 'br': // origin 0,0: topLeft = (note.x, note.y) => newX + w*(1-sx)/2 = note.x
+            newX = this.note.x - w * (1 - sx) / 2;
+            newY = this.note.y - h * (1 - sy) / 2;
+            break;
+          case 'bl': // origin w,0: topLeft = (note.x + w*(1-sx), note.y)
+            newX = this.note.x + w * (1 - sx) / 2;
+            newY = this.note.y - h * (1 - sy) / 2;
+            break;
+          case 'tr': // origin 0,h: topLeft = (note.x, note.y + h*(1-sy))
+            newX = this.note.x - w * (1 - sx) / 2;
+            newY = this.note.y + h * (1 - sy) / 2;
+            break;
+          case 'tl': // origin w,h: topLeft = (note.x + w*(1-sx), note.y + h*(1-sy))
+            newX = this.note.x + w * (1 - sx) / 2;
+            newY = this.note.y + h * (1 - sy) / 2;
+            break;
+          default:
+            newX = this.note.x;
+            newY = this.note.y;
+        }
+        this.note.x = newX;
+        this.note.y = newY;
+        this.note.scale = [sx, sy];
+        const hostEl = this.elementRef.nativeElement as HTMLElement;
+        hostEl.style.left = newX + 'px';
+        hostEl.style.top = newY + 'px';
+        el.style.transformOrigin = 'center center';
+        // Non chiamare applyScaleAndTransform: abbiamo già normalizzato; notesChanged$ lo chiamerà e non migrerà (origin già center).
+      } else {
+        // Ricalcola dimensioni e scale basandosi sul transform corrente (non rect corner)
+        this.applyScaleAndTransform();
+      }
+      this.logNoteBlockPosition('AL RILASCIO (dopo applyScaleAndTransform)');
       this.isResizing = false;
       this.resizeHandle = '';
       // this.changeState(0);
@@ -598,6 +693,12 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.onNoteInputClick(event);
       return;
     }
+    // console.log('[CDS-NOTES-CLICK] Click su superficie blocco note (prima di onRectClick)', {
+    //   noteId: this.note?.note_id,
+    //   type: this.note?.type,
+    //   modelXY: this.note ? { x: this.note.x, y: this.note.y } : null,
+    //   hostStyle: this.elementRef?.nativeElement ? { left: (this.elementRef.nativeElement as HTMLElement).style?.left, top: (this.elementRef.nativeElement as HTMLElement).style?.top } : null,
+    // });
     this.onRectClick(event);
   }
 
@@ -636,6 +737,10 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     }
 
     this.cancelSingleClickTimer();
+    // console.log('[CDS-NOTES-CLICK] onRectClick: prima di changeState(2)', {
+    //   noteId: this.note?.note_id,
+    //   modelXY: this.note ? { x: this.note.x, y: this.note.y } : null,
+    // });
     this.changeState(2);
     this.updateDragState();
     if (this.shouldOpenDetailPanelOnClick()) {
@@ -702,6 +807,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     event.preventDefault();
     if (!this.contentElement || !this.note) return;
     
+    this.logNoteBlockPosition('PRIMA DEL CLICK (maniglia: ' + handle + ')');
     this.isResizing = true;
     this.resizeHandle = handle;
     this.startX = event.clientX;
@@ -738,10 +844,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.contentElement.nativeElement.style.width = this.startWidth + 'px';
     this.contentElement.nativeElement.style.height = this.startHeight + 'px';
     
-    // IMPORTANTE: Usiamo sempre 'center center' come transform-origin
-    // Il centro del div rimane sempre fisso
-    const transformOrigin = 'center center';
-    
     // Calcola lo scale corrente
     const currentScaleX = this.startScale;
     const currentScaleY = scaleMatch && scaleMatch[2] ? parseFloat(scaleMatch[2]) : 
@@ -750,19 +852,44 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.startScaleX = currentScaleX;
     this.startScaleY = currentScaleY;
     
-    // Calcola e salva il centro iniziale del box (nel viewport)
     const rect = this.contentElement.nativeElement.getBoundingClientRect();
-    this.startCenterX = rect.left + rect.width / 2;
-    this.startCenterY = rect.top + rect.height / 2;
+    const isRect = this.note.type === 'rect';
+    const isCornerHandle = handle === 'tl' || handle === 'tr' || handle === 'bl' || handle === 'br';
     
-    // Calcola la distanza iniziale del mouse dal centro
-    const dx = this.startX - this.startCenterX;
-    const dy = this.startY - this.startCenterY;
-    this.startDistanceFromCenter = Math.sqrt(dx * dx + dy * dy);
-    this.startDxAbsFromCenter = Math.abs(dx);
-    this.startDyAbsFromCenter = Math.abs(dy);
+    let transformOrigin: string;
+    if (isRect && isCornerHandle) {
+      // Rect: vertice opposto fisso. Salviamo viewport e zoom per il move.
+      this.gestureStageZoom = this.getSafeStageZoom();
+      this.startRectLeft = rect.left;
+      this.startRectTop = rect.top;
+      this.startRectRight = rect.right;
+      this.startRectBottom = rect.bottom;
+      // transform-origin sul vertice opposto alla maniglia
+      switch (handle) {
+        case 'br': transformOrigin = '0 0'; break;           // fisso TL
+        case 'bl': transformOrigin = '100% 0'; break;       // fisso TR
+        case 'tr': transformOrigin = '0 100%'; break;       // fisso BL
+        case 'tl': transformOrigin = '100% 100%'; break;    // fisso BR
+        default: transformOrigin = 'center center';
+      }
+      // Per il branch rect+corner in onMouseMove non usiamo centro/distanza
+      this.startCenterX = rect.left + rect.width / 2;
+      this.startCenterY = rect.top + rect.height / 2;
+      this.startDistanceFromCenter = 0;
+      this.startDxAbsFromCenter = 0;
+      this.startDyAbsFromCenter = 0;
+    } else {
+      // Centro fisso (comportamento storico)
+      transformOrigin = 'center center';
+      this.startCenterX = rect.left + rect.width / 2;
+      this.startCenterY = rect.top + rect.height / 2;
+      const dx = this.startX - this.startCenterX;
+      const dy = this.startY - this.startCenterY;
+      this.startDistanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+      this.startDxAbsFromCenter = Math.abs(dx);
+      this.startDyAbsFromCenter = Math.abs(dy);
+    }
     
-    // Imposta sempre 'center center' come transform-origin
     this.contentElement.nativeElement.style.transformOrigin = transformOrigin;
     
     // Preserva lo scale e la rotazione corrente
@@ -770,10 +897,35 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const transform = `scale(${currentScaleX}, ${currentScaleY}) rotate(${rotation}deg)`;
     this.contentElement.nativeElement.style.transform = transform;
     
+    // Rect corner: sposta l'host così il vertice fissato (transform-origin) resta nella stessa posizione.
+    // Con origin center il box è centrato su (note.x + w/2, note.y + h/2); con origin a un vertice
+    // quel vertice deve restare dove era, quindi aggiorniamo note.x/y e lo stile dell'host.
+    if (isRect && isCornerHandle) {
+      const w = this.startWidth;
+      const h = this.startHeight;
+      const sx = currentScaleX;
+      const sy = currentScaleY;
+      let newX = this.note.x;
+      let newY = this.note.y;
+      switch (handle) {
+        case 'br': newX = this.note.x + w * (1 - sx) / 2; newY = this.note.y + h * (1 - sy) / 2; break;
+        case 'bl': newX = this.note.x + w * (sx - 1) / 2; newY = this.note.y + h * (1 - sy) / 2; break;
+        case 'tr': newX = this.note.x + w * (1 - sx) / 2; newY = this.note.y + h * (sy - 1) / 2; break;
+        case 'tl': newX = this.note.x + w * (sx - 1) / 2; newY = this.note.y + h * (sy - 1) / 2; break;
+        default: break;
+      }
+      this.note.x = newX;
+      this.note.y = newY;
+      const hostEl = this.elementRef.nativeElement as HTMLElement;
+      hostEl.style.left = newX + 'px';
+      hostEl.style.top = newY + 'px';
+    }
+    
     // Aggiorna anche gli handle
     this.updateHandlesScale(currentScaleX, currentScaleY);
     
     this.changeState(2);
+    this.logNoteBlockPosition('SUBITO DOPO CLICK (maniglia: ' + handle + ')');
   }
 
   /**
@@ -842,6 +994,17 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     // - lasciamo il browser ottimizzare width/left
     this.contentElement.nativeElement.style.willChange = 'width';
     hostElement.style.willChange = 'left';
+
+    this.horizontalResizeFrameCount = 0;
+    this.logger.log('[CDS-NOTES-H-RESIZE] startHorizontalResize', {
+      noteId: this.note.note_id,
+      handle: handle,
+      startWidth: this.startWidth,
+      startLeft: this.startLeft,
+      startFixedLeftViewport: this.startFixedLeftViewport,
+      startFixedRightViewport: this.startFixedRightViewport
+    });
+    this.noteResizeState.setHorizontalResize(this.note.note_id, this.startLeft);
 
     // Assicuriamo che transform-origin/transform siano coerenti una volta sola
     const rotation = this.note.rotation || 0;
@@ -926,19 +1089,90 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   /**
+   * Calcola newWidth e newLeft per il resize orizzontale (stessa logica usata da performHorizontalResizeFrame).
+   * Usato in mousemove per aggiornare subito il servizio, così la CD del parent legge già il valore giusto (niente flicker).
+   */
+  private computeHorizontalResizeValues(): { newWidth: number; newLeft: number } | null {
+    if (!this.contentElement || !this.note || this.lastHorizontalClientX == null) return null;
+    if (this.resizeHandle !== 'left' && this.resizeHandle !== 'right') return null;
+
+    const scale = this.startScale || 1;
+    const stageZoom = this.gestureStageZoom || this.getSafeStageZoom();
+
+    let newWidth = this.startWidth;
+    if (this.resizeHandle === 'right') {
+      const visualWidth = this.lastHorizontalClientX - this.startFixedLeftViewport;
+      newWidth = visualWidth / (scale * stageZoom);
+    } else {
+      const visualWidth = this.startFixedRightViewport - this.lastHorizontalClientX;
+      newWidth = visualWidth / (scale * stageZoom);
+    }
+    const minWidth = 50;
+    const maxWidth = 2000;
+    newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+
+    const rotation = this.note.rotation || 0;
+    const normalizedRotation = ((rotation % 360) + 360) % 360;
+    const isEffectivelyUnrotated = normalizedRotation < 0.01 || Math.abs(normalizedRotation - 360) < 0.01;
+
+    let newLeft: number;
+    if (isEffectivelyUnrotated) {
+      let newHostLeftViewport = this.startHostLeftViewport;
+      if (this.resizeHandle === 'right') {
+        newHostLeftViewport =
+          this.startFixedLeftViewport -
+          this.startContentCViewport -
+          ((newWidth * (1 - scale)) / 2) * stageZoom;
+      } else {
+        newHostLeftViewport =
+          this.startFixedRightViewport -
+          this.startContentCViewport -
+          ((newWidth * (1 + scale)) / 2) * stageZoom;
+      }
+      const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
+      newLeft = this.startLeft + deltaViewport / stageZoom;
+    } else {
+      // Ruotato: servizio aggiornato al frame prima; qui usiamo stima da formula non ruotata per evitare getBoundingClientRect nel mousemove
+      let newHostLeftViewport = this.startHostLeftViewport;
+      if (this.resizeHandle === 'right') {
+        newHostLeftViewport =
+          this.startFixedLeftViewport -
+          this.startContentCViewport -
+          ((newWidth * (1 - scale)) / 2) * stageZoom;
+      } else {
+        newHostLeftViewport =
+          this.startFixedRightViewport -
+          this.startContentCViewport -
+          ((newWidth * (1 + scale)) / 2) * stageZoom;
+      }
+      newLeft = this.startLeft + (newHostLeftViewport - this.startHostLeftViewport) / stageZoom;
+    }
+    return { newWidth, newLeft };
+  }
+
+  /**
    * Gestisce il ridimensionamento orizzontale durante il movimento del mouse.
-   * Non-simmetrico: mantiene fisso il lato opposto alla maniglia trascinata.
+   * Aggiorna subito width del content e servizio (liveLeft) nel mousemove così, quando la CD
+   * applica la nuova left dal parent, left e width sono coerenti (bordo opposto resta fisso, niente regressioni).
+   * Il rAF riapplica DOM e servizio per coerenza.
    */
   private handleHorizontalResize(event: MouseEvent): void {
     if (!this.contentElement || !this.note) return;
-    
-    // Batch su rAF: evita troppi layout per-frame su mousemove (soprattutto con scale != 1)
-    this.lastHorizontalClientX = event.clientX;
-    if (this.rafHorizontalResizeId != null) return;
 
-    this.rafHorizontalResizeId = window.requestAnimationFrame(() => {
-      this.rafHorizontalResizeId = null;
-      this.performHorizontalResizeFrame();
+    this.lastHorizontalClientX = event.clientX;
+    const values = this.computeHorizontalResizeValues();
+    if (values) {
+      this.contentElement.nativeElement.style.width = values.newWidth + 'px';
+      this.currentBaseWidth = values.newWidth;
+      this.noteResizeState.setHorizontalResize(this.note.note_id, values.newLeft);
+    }
+
+    if (this.rafHorizontalResizeId != null) return;
+    this.ngZone.runOutsideAngular(() => {
+      this.rafHorizontalResizeId = window.requestAnimationFrame(() => {
+        this.rafHorizontalResizeId = null;
+        this.performHorizontalResizeFrame();
+      });
     });
   }
 
@@ -953,9 +1187,6 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const normalizedRotation = ((rotation % 360) + 360) % 360;
     const isEffectivelyUnrotated = normalizedRotation < 0.01 || Math.abs(normalizedRotation - 360) < 0.01;
 
-    // Calcolo della nuova larghezza base (unscaled), ancorando un bordo in viewport:
-    // - right: fixedLeft + visualWidth(mouse)
-    // - left:  fixedRight - visualWidth(mouse)
     let newWidth = this.startWidth;
     if (this.resizeHandle === 'right') {
       const visualWidth = this.lastHorizontalClientX - this.startFixedLeftViewport;
@@ -970,49 +1201,45 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const minWidth = 50;
     const maxWidth = 2000;
     newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-    
-    // Applica width base (non tocchiamo scale/rotation)
+
     this.contentElement.nativeElement.style.width = newWidth + 'px';
     this.currentBaseWidth = newWidth;
-    
-    // Riallinea l'host per mantenere fisso il bordo opposto, SENZA leggere rect ad ogni frame (evita flicker).
-    // Nota: questa formula è esatta quando rotation ~ 0 (caso principale). Se la nota è ruotata, fallback a rectAfter.
+
+    let newLeft = 0;
     if (isEffectivelyUnrotated) {
       let newHostLeftViewport = this.startHostLeftViewport;
       if (this.resizeHandle === 'right') {
-        // Fisso il bordo sinistro:
-        // startFixedLeftViewport = hostLeft + C + (newWidth*(1-scale)/2)*stageZoom
         newHostLeftViewport =
           this.startFixedLeftViewport -
           this.startContentCViewport -
           ((newWidth * (1 - scale)) / 2) * stageZoom;
       } else {
-        // Fisso il bordo destro:
-        // startFixedRightViewport = hostLeft + C + (newWidth*(1+scale)/2)*stageZoom
         newHostLeftViewport =
           this.startFixedRightViewport -
           this.startContentCViewport -
           ((newWidth * (1 + scale)) / 2) * stageZoom;
       }
-
-    const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
-    const newLeft = this.startLeft + deltaViewport / stageZoom;
-    hostElement.style.left = newLeft + 'px';
-    this.note.x = newLeft;
+      const deltaViewport = newHostLeftViewport - this.startHostLeftViewport;
+      newLeft = this.startLeft + deltaViewport / stageZoom;
+      hostElement.style.left = newLeft + 'px';
+      this.noteResizeState.setHorizontalResize(this.note.note_id, newLeft);
+      this.ngZone.run(() => {});
     } else {
-      // Fallback (ruotato): usa bounding rect dopo l'update (più costoso, può introdurre micro flicker).
       const rectAfter = this.contentElement.nativeElement.getBoundingClientRect();
       const deltaViewport = this.resizeHandle === 'right'
         ? (this.startFixedLeftViewport - rectAfter.left)
         : (this.startFixedRightViewport - rectAfter.right);
-      const newLeft = this.startLeft + deltaViewport / stageZoom;
+      newLeft = this.startLeft + deltaViewport / stageZoom;
       hostElement.style.left = newLeft + 'px';
-      this.note.x = newLeft;
+      this.noteResizeState.setHorizontalResize(this.note.note_id, newLeft);
+      this.ngZone.run(() => {});
     }
+
+    this.horizontalResizeFrameCount++;
   }
 
   /**
-   * Gestisce il ridimensionamento verticale durante il movimento del mouse
+   * Gestisce il ridimensionamento verticale durante il movimento del mouse durante il movimento del mouse
    * Mantiene il centro verticale fisso e modifica solo l'altezza
    */
   private handleVerticalResize(event: MouseEvent): void {
@@ -1099,6 +1326,36 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   private getSafeStageZoom(): number {
     const z = this.stageService?.getZoom?.() || 1;
     return typeof z === 'number' && isFinite(z) && z > 0 ? z : 1;
+  }
+
+  /**
+   * Log in console posizione del blocco nota (host, content, modello) e scale.
+   * Usato per debug resize: prima del click su maniglia, subito dopo, al rilascio.
+   */
+  private logNoteBlockPosition(label: string): void {
+    if (!this.note || !this.contentElement) return;
+    const hostEl = this.elementRef.nativeElement as HTMLElement;
+    const contentEl = this.contentElement.nativeElement;
+    const hostRect = hostEl.getBoundingClientRect();
+    const contentRect = contentEl.getBoundingClientRect();
+    const hostLeft = parseFloat(hostEl.style.left);
+    const hostTop = parseFloat(hostEl.style.top);
+    const scale = this.note.scale && Array.isArray(this.note.scale)
+      ? [this.note.scale[0], this.note.scale[1]]
+      : [1, 1];
+    const zoom = this.getSafeStageZoom();
+    const payload = {
+      label,
+      noteId: this.note.note_id,
+      model: { x: this.note.x, y: this.note.y, scale },
+      hostStyle: { left: hostLeft, top: hostTop },
+      hostRect: { left: hostRect.left, top: hostRect.top, width: hostRect.width, height: hostRect.height },
+      contentRect: { left: contentRect.left, top: contentRect.top, width: contentRect.width, height: contentRect.height },
+      stageZoom: zoom,
+      contentTransform: contentEl.style.transform || '(none)',
+      contentTransformOrigin: contentEl.style.transformOrigin || '(default)',
+    };
+    // console.log('[CDS-NOTES-RESIZE-POS]', payload);
   }
 
   /**
@@ -1223,7 +1480,17 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       const isNoteControls = handle.classList.contains('note-controls');
       const isMediaDragHandle = handle.classList.contains('media-drag-handle');
       
-      if (isNoteControls || isMediaDragHandle) {
+      if (isNoteControls) {
+        // Posizione fissa in alto a destra: top -30px, right 0px (in pixel visivi).
+        // Con scale nota e zoom stage, in coordinate del content servono:
+        // top = -30 / (scaleY * stageZoom), right = 0 / (scaleX * stageZoom).
+        const topPx = -30 * inverseScaleY;
+        const rightPx = 0 * inverseScaleX;
+        handle.style.top = `${topPx}px`;
+        handle.style.right = `${rightPx}px`;
+        handle.style.transform = `scale(${inverseScaleX}, ${inverseScaleY})`;
+        handle.style.transformOrigin = 'top right';
+      } else if (isMediaDragHandle) {
         // No positional translate needed here: we only want a stable visual size.
         handle.style.transform = `scale(${inverseScaleX}, ${inverseScaleY})`;
       } else if (isRotateHandle) {
@@ -1250,8 +1517,22 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         // Per gli angoli, solo scale
         handle.style.transform = `scale(${inverseScaleX}, ${inverseScaleY})`;
       }
-      handle.style.transformOrigin = 'center center';
+      if (!isNoteControls) {
+        handle.style.transformOrigin = 'center center';
+      }
     });
+
+    // Titolo rect: scala inversa solo rispetto alla nota (non allo zoom stage) così resta 40px in altezza e in 0,0.
+    // Larghezza: calc(100% * scaleX); altezza: 40 * scaleY px; dopo scale(1/sx, 1/sy) il titolo occupa visivamente 100% x 40px.
+    if (this.note?.type === 'rect') {
+      const titleEl = this.contentElement.nativeElement.querySelector('.note-title') as HTMLElement | null;
+      if (titleEl) {
+        titleEl.style.width = `calc(100% * ${safeScaleX})`;
+        titleEl.style.height = `${40 * safeScaleY}px`;
+        titleEl.style.transform = `scale(${1 / safeScaleX}, ${1 / safeScaleY})`;
+        titleEl.style.transformOrigin = '0 0';
+      }
+    }
   }
 
   // ============================================================================
@@ -1268,7 +1549,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   changeState(state: 0|1|2|3): void {
     const previousState = this.stateNote;
     this.stateNote = state;
-    
+    if (state === 2) {
+      // console.log('[CDS-NOTES-CLICK] SELEZIONE (changeState 2)', {
+      //   noteId: this.note?.note_id,
+      //   previousState,
+      //   modelXY: this.note ? { x: this.note.x, y: this.note.y } : null,
+      // });
+    }
     if (state === 1) {
       // this.cancelOpenPanelTimer();
       this.textareaHasFocus = true;
@@ -1319,8 +1606,13 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.note.type = 'text';
     }
 
-    // Inizializza borderWidth solo se non presente
-    if (this.note.borderWidth === undefined || this.note.borderWidth === null) {
+    // Inizializza borderWidth: 0 per note rettangolo (bordo disabilitato), altrimenti default se non presente
+    if (this.note.type === 'rect') {
+      this.note.borderWidth = 0;
+      if (this.note.title === undefined || this.note.title === null) {
+        this.note.title = '';
+      }
+    } else if (this.note.borderWidth === undefined || this.note.borderWidth === null) {
       this.note.borderWidth = Note.DEFAULT_BORDER_WIDTH;
     }
 
@@ -1401,6 +1693,7 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
           
           // Applica scale e trasformazioni se contentElement è disponibile
           if (this.contentElement) {
+            // console.log('[CDS-NOTES-CLICK] notesChanged$: applico applyScaleAndTransform', this.note?.note_id);
             this.applyScaleAndTransform();
           }
           
@@ -1560,6 +1853,18 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.sanitizedNoteHtml = this.sanitizer.bypassSecurityTrustHtml(purifiedHtml);
   }
 
+  /** HTML sanitizzato per il titolo della nota rect (da Quill); vuoto se non rect o titolo assente. */
+  get sanitizedTitleHtml(): SafeHtml {
+    if (this.note?.type !== 'rect') {
+      return this.sanitizer.bypassSecurityTrustHtml('');
+    }
+    const raw = this.note?.title ?? '';
+    if (!raw) {
+      return this.sanitizer.bypassSecurityTrustHtml('');
+    }
+    return this.sanitizer.bypassSecurityTrustHtml(this.purifyAndNormalizeText(raw));
+  }
+
   private updateChildrenDraggableClass(): void {
     if (!this.noteInput) return;
     
@@ -1654,7 +1959,11 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
    */
   private applyScaleAndTransform(): void {
     if (!this.note || !this.contentElement) return;
-    
+    // console.log('[CDS-NOTES-CLICK] applyScaleAndTransform chiamata', {
+    //   noteId: this.note.note_id,
+    //   type: this.note.type,
+    //   modelXYBefore: { x: this.note.x, y: this.note.y },
+    // });
     const element = this.contentElement.nativeElement;
 
     // MEDIA NOTE: after loading media we update note.width/note.height to the real media size.
@@ -1683,6 +1992,75 @@ export class CdsNotesComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     const baseHeight = this.currentBaseHeight > 0 ? this.currentBaseHeight : this.note.height;
     if (this.currentBaseHeight === 0) {
       this.currentBaseHeight = baseHeight;
+    }
+    
+    // Rect con origin a vertice (es. dopo resize corner): migra host a "center" così il visivo non salta.
+    // Esegui la migrazione SOLO se l'origin è davvero un vertice (0 0, 100% 0, 0 100%, 100% 100% o equivalenti in px).
+    // Il browser può restituire "65px 21px" per center (50% 50%) → non migrare in quel caso.
+    if (this.note.type === 'rect') {
+      const compStyle = window.getComputedStyle(element);
+      const origin = (compStyle.transformOrigin || element.style.transformOrigin || '').trim();
+      const originLower = origin.toLowerCase();
+      let isOriginAtVertex = false;
+      if (originLower.includes('50%') || originLower === 'center center') {
+        isOriginAtVertex = false; // center
+      } else if (originLower === '0 0' || originLower === '0% 0%' || originLower === '0px 0px') {
+        isOriginAtVertex = true;
+      } else if (originLower.includes('100%') || (originLower.includes('0px') && originLower.includes('100%'))) {
+        isOriginAtVertex = true; // 100% 0, 0 100%, 100% 100%, 100% 0px, etc.
+      } else {
+        // Pixel: "65px 21px" → center se ~ (baseWidth/2, baseHeight/2)
+        const pxMatch = origin.match(/^(\d+(?:\.\d+)?)px\s+(\d+(?:\.\d+)?)px$/);
+        if (pxMatch) {
+          const ox = parseFloat(pxMatch[1]);
+          const oy = parseFloat(pxMatch[2]);
+          const centerTolerance = 2;
+          const isPixelCenter = Math.abs(ox - baseWidth / 2) <= centerTolerance && Math.abs(oy - baseHeight / 2) <= centerTolerance;
+          isOriginAtVertex = !isPixelCenter;
+        }
+        // Se non siamo in pixel e non è 50%/center, potrebbe essere 100% 100% senza "0px"
+        if (!pxMatch && (originLower.includes('100%') || originLower === 'top left' || originLower === 'top right' || originLower === 'bottom left' || originLower === 'bottom right')) {
+          isOriginAtVertex = true;
+        }
+      }
+      if (isOriginAtVertex) {
+        const curT = compStyle.transform || element.style.transform || '';
+        let sx = 1;
+        let sy = 1;
+        const scaleMatch = curT.match(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/);
+        if (scaleMatch) {
+          sx = parseFloat(scaleMatch[1]) || 1;
+          sy = scaleMatch[2] ? (parseFloat(scaleMatch[2]) || sx) : sx;
+        } else {
+          const matrixMatch = curT.match(/matrix\(([^)]+)\)/);
+          if (matrixMatch) {
+            const v = matrixMatch[1].split(',').map(x => parseFloat(x.trim()));
+            if (v.length >= 4) {
+              sx = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+              sy = Math.sqrt(v[2] * v[2] + v[3] * v[3]);
+            }
+          }
+        }
+        const xBefore = this.note.x;
+        const yBefore = this.note.y;
+        // Mantenere il top-left del box fisso: con origin a vertice il top-left è in (note.x + w*(1-sx), note.y + h*(1-sy));
+        // con origin center il top-left è in (host - w*sx/2, host - h*sy/2). Uguagliando: host = note.x + w*(1 - sx/2).
+        this.note.x = this.note.x + baseWidth * (1 - sx / 2);
+        this.note.y = this.note.y + baseHeight * (1 - sy / 2);
+        const hostEl = this.elementRef.nativeElement as HTMLElement;
+        hostEl.style.left = this.note.x + 'px';
+        hostEl.style.top = this.note.y + 'px';
+        // console.log('[CDS-NOTES-CLICK] applyScaleAndTransform: MIGRAZIONE RECT (origin non center)', {
+        //   noteId: this.note.note_id,
+        //   transformOrigin: origin,
+        //   baseWidth,
+        //   baseHeight,
+        //   sx,
+        //   sy,
+        //   xyBefore: { x: xBefore, y: yBefore },
+        //   xyAfter: { x: this.note.x, y: this.note.y },
+        // });
+      }
     }
     
     // Imposta sempre le dimensioni base nel DOM (rimangono fisse, usiamo scale per ridimensionare)

@@ -16,6 +16,10 @@
   --base-color: #{var(--blu)};
   --startIntentMaxWidth: 160px;
   --base-border-radius-base: #{var(--button-border-radius-base)};
+  --drag-preview-max-width: 244;
+  --intent-title-color: rgb(108, 104, 89);
+  --intent-active-outline-color: rgba(236, 182, 6, 0.69);
+  --drop-zone-border-color: var(--drop-zone-color-border);
 }
 
 /* Preview durante drag (CDK) */
@@ -25,9 +29,8 @@
   pointer-events: none;
   user-select: none;
   opacity: 0.8;
-  background-color: var(--drag-preview-background);
-  max-width: 244px;
-  width: 100%;
+  background-color: #fff;
+  width: 244px;
 }
 
 
@@ -37,7 +40,7 @@
 
 /* Blocco intent (card principale) */
 .panel-intent-content {
-  transition: background-color 0.15s ease 0s;
+  transition: background-color 0.15s ease;
   width: 264px;
   cursor: grab;
   position: relative;
@@ -49,16 +52,16 @@
     border-radius: 10px;
     position: absolute;
     content: "";
-    transition: box-shadow 0.15s ease 0s;
+    transition: box-shadow 0.15s ease;
   }
+  
   &.outline-border {
     outline: 2px solid var(--brown);
     border-radius: var(--base-border-radius-preview);
   }
+  
   &.ripple-effect {
-    animation-name: ripple_effect;
-    animation-duration: 1s;
-    animation-iteration-count: 1s;
+    animation: ripple_effect 1s ease-in-out;
     border-radius: var(--base-border-radius-preview);
   }
   &.isStart {
@@ -71,8 +74,19 @@
     max-width: var(--startIntentMaxWidth);
     outline: unset!important;
     .intent-background-overlay {
-      background-color: transparent!important;
-      outline: unset!important;
+      background-color: transparent !important;
+      outline: unset !important;
+    }
+    .header-draggable {
+      height: 100%;
+      width: 100%;
+    }
+    .pic-header {
+      height: 100%;
+      display: block;
+      position: absolute;
+      margin: 0;
+      padding: 0;
     }
     .header-draggable {
       height: 100%;
@@ -88,13 +102,13 @@
   }
 
   .intent-background-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #fff;
-      z-index: -1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    z-index: -1;
   }
 
   .header-draggable {
@@ -103,6 +117,7 @@
     width: calc(100% - 20px);
     height: 40px;
   }
+  
   .pic-header {
     display: flex;
     width: auto;
@@ -141,7 +156,6 @@
     -moz-animation-iteration-count: 2;
   }
 
-
   &.live-active-intent-pulse {
     cursor: pointer;
     animation: pulse-blu 1s 2 forwards;
@@ -163,9 +177,8 @@
     animation: pulse 1s infinite;
   }
 
-
   .cds-start {
-    transition: box-shadow .15s ease 0s, background-color .15s ease 0s;
+    transition: box-shadow 0.15s ease, background-color 0.15s ease;
     position: absolute;
     box-shadow: #00000052 0 -1px inset;
     background-color: #4b5052;
@@ -181,7 +194,7 @@
   }
 
   .cds-start-content {
-    position: relative;
+    position: absolute;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -201,7 +214,7 @@
   }
 
   .pic-title-text {
-    transition: background 0.15s ease 0s;
+    transition: background 0.15s ease;
     padding: 4px 8px;
     border-radius: 5px;
     font-size: 15px;
@@ -210,7 +223,7 @@
     box-sizing: border-box;
     max-width: 100%;
     width: 100%;
-    color: rgb(108, 104, 89);
+    color: var(--intent-title-color);
     display: inline-block;
     white-space: pre-wrap;
     overflow-wrap: break-word;
@@ -224,7 +237,6 @@
       padding: 0 !important;
     }
   }
-
 }
 
 /* Lista azioni */
@@ -259,7 +271,6 @@
     0 3px 14px 2px rgba(0, 0, 0, 0.12);
 }
 
-
 .cdk-drag-animating {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
@@ -275,6 +286,7 @@
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   border-radius: 8px;
   opacity: 0;
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .cdk-action-placeholder {
@@ -289,7 +301,6 @@
   opacity: 1;
 }
 
-
 .cds-no-featured-action {
   background-color: rgba(255, 255, 255, 0.7);
 }
@@ -299,6 +310,7 @@
   cursor: pointer;
   margin-bottom: -10px;
   min-height: 12px;
+  
   .csd-open-action-menu-btn-wpr {
     bottom: -28px;
   }
@@ -357,14 +369,14 @@
 }
 
 .icon-action {
-  transition: opacity .15s ease 0s;
+  transition: opacity 0.15s ease;
   width: 20px;
   height: 20px;
   border-radius: 4px;
   margin-right: 6px;
   align-self: start;
   color: #718497;
-  opacity: .85;
+  opacity: 0.85;
   background: var(--brown);
 }
 
@@ -375,7 +387,6 @@
   font-size: 14px;
 }
 
-
 .tds_connectable {
   width: 30px;
   height: 30px;
@@ -383,7 +394,7 @@
 }
 
 .unselectable {
-  -moz-user-select: -moz-none;
+  -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
   -o-user-select: none;
@@ -418,18 +429,29 @@
     background-color: #d2d2d2;
     color: #333333;
   }
+  
+  &:focus {
+    outline: 2px solid var(--base-color);
+    outline-offset: 2px;
+  }
 }
 
 .button-intent-active {
   outline: 2px solid rgba(236, 182, 6, .6901960784) !important;
   background-color: #d2d2d2;
   color: #333333;
+  outline: 2px solid var(--intent-active-outline-color) !important;
 }
 
 .intent--action {
   @extend %intent-btn-base;
   transition: background-color 0.3s, color 0.3s, border-color 0.3s;
   width: 96px;
+  
+  &:focus {
+    outline: 2px solid var(--base-color);
+    outline-offset: 2px;
+  }
 }
 
 .actions-btn-active {
@@ -489,7 +511,7 @@
   cursor: pointer;
   font-size: 0.7em;
   font-weight: 400;
-  transition: opacity .3s, background-color .3s, color .3s;
+  transition: opacity 0.3s ease;
   line-height: 20px;
   width: 100%;
 }
@@ -522,7 +544,7 @@ cds-panel-intent-header.isStart ::ng-deep {
   align-items: flex-end;
   gap: 5px;
   height: 33px;
-
+  min-height: 33px;
   .option {
     display: flex;
     cursor: pointer;
@@ -553,7 +575,7 @@ cds-panel-intent-header.isStart ::ng-deep {
   width: 100%;
   min-height: 30px;
   border-radius: 10px;
-  border: 1px solid var(--brown);
+  border: 1px dashed var(--brown);
   padding: 12px 6px;
   border-style: dashed;
   background: rgba(221, 228, 234, .8);
@@ -562,6 +584,7 @@ cds-panel-intent-header.isStart ::ng-deep {
 .add--action-placeholder-add-icon span {
   color: var(--brown);
   font-size: 30px;
+  transition: color 0.3s ease;
 }
 
 .add--action-placeholder-text {
@@ -569,6 +592,7 @@ cds-panel-intent-header.isStart ::ng-deep {
   color: var(--brown);
   font-size: 14px;
   text-align: center;
+  transition: color 0.3s ease;
 }
 
 .add--action-placeholder-desc {
@@ -602,23 +626,25 @@ cds-panel-intent-header.isStart ::ng-deep {
 /* Animazione bordo intent live */
 .live-active-intent {
   position: relative;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 13px;
+    z-index: -1;
+    padding: 10px;
+    background: conic-gradient(
+      from var(--outline-angle),
+      var(--blu) 60%,
+      rgba(255, 255, 255, 0.5) 90%,
+      transparent 10%,               
+      var(--blu) 80%   
+    );
+    animation: outline-spin 3s linear infinite;
+  }
 }
-.live-active-intent::before {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: 13px;
-  z-index: -1;
-  padding: 10px;
-  background: conic-gradient(
-    from var(--outline-angle),
-    var(--blu) 60%,
-    rgba(255, 255, 255, 0.5) 90%,
-    transparent 10%,               
-    var(--blu) 80%   
-  );
-  animation: outline-spin 3s linear infinite;
-}
+
 @property --outline-angle {
   syntax: "<angle>";
   inherits: false;
