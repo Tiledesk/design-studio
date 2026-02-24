@@ -95,6 +95,7 @@
         <cds-textarea 
             class="text-editable-div"
             [text]="response.text" 
+            [placeholder]="'CDSCanvas.ClickToAddText' | translate"
             [minRow]="1"
             popoverVerticalAlign="above"
             (blur)="onBlur($event)"

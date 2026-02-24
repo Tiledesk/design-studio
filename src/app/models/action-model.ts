@@ -414,6 +414,7 @@ export class ActionKBContent extends Action {
     type: string;
     namespace: string;
     namespaceAsName: boolean;
+    tags?: string[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.KB_CONTENT;
@@ -449,6 +450,7 @@ export class ActionAskGPTV2 extends Action {
     reranking: boolean;
     reranking_multiplier?: number;
   value: string;
+    tags?: string[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2
@@ -487,11 +489,16 @@ export class ActionGPTAssistant extends Action {
     }
 }
 
+/** Livello di reasoning: low | medium | high */
+export type ReasoningLevel = 'low' | 'medium' | 'high';
+
 export class ActionAiPrompt extends Action {
     question: string;
     assignReplyTo: string;
     context: string;
     history: boolean;
+    reasoning?: boolean;
+    reasoningLevel?: ReasoningLevel;
     max_tokens: number;
     temperature: number;
     labelModel: string;

@@ -54,6 +54,8 @@ export class Note {
   fontFamily?: string; // Famiglia del font
   scale?: [number, number]; // Scale della nota
   rotation?: number; // Angolo di rotazione in gradi
+  /** Titolo della barra superiore (solo per type === 'rect'). Altezza fissa 40px, posizione 0,0. */
+  title?: string;
 
   constructor(id_faq_kb: string, pos: any) {
     this.id_faq_kb = id_faq_kb;

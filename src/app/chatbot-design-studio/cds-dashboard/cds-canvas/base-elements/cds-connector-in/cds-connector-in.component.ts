@@ -50,10 +50,10 @@ export class CdsConnectorInComponent implements OnInit {
   // sottoscrivi al observableChangedConnectorAttributes
   private subscribeToChangedConnectorAttributes(): void {
     this.subscriptionChangedConnectorAttributes = this.connectorService.observableChangedConnectorAttributes.subscribe((connector: any) => {
-      console.log('[CDS-CONNECTOR-IN] --- AGGIORNATO connettore ', connector,this.connectorsIn);
+      // console.log('[CDS-CONNECTOR-IN] --- AGGIORNATO connettore ', connector,this.connectorsIn);
       // se l'id del connettore appartiene a connectorsIn allora aggiorna il connettore
       if (this.connectorsIn.some((connector) => connector.id === connector.id)) {
-        console.log('[CDS-CONNECTOR-IN] --- AGGIORNATO connettore ', connector);
+        // console.log('[CDS-CONNECTOR-IN] --- AGGIORNATO connettore ', connector);
         this.initializeConnectors();
       }
     });

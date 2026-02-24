@@ -1,4 +1,4 @@
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -645,7 +645,7 @@ cds-select#model-condition.not-configured ::ng-deep {
         border-color: var(--blu-02);
         padding-right: 30px;
         justify-content: flex-start;
-        
+        cursor: default;
         .remove-icon {
             position: absolute;
             right: 4px;
@@ -678,3 +678,10 @@ cds-select#model-condition.not-configured ::ng-deep {
 // MCP SERVERS SECTION --- end **************** //
 
 // PREVIEW SECTION --- start **************** //
+
+.checkbox-reasoning{
+    margin-top: -20px;
+}
+.checkbox-reasoning .reasoning-checkbox-disabled ::ng-deep .mat-checkbox-background {
+    background-color: #e0e0e0 !important;
+}

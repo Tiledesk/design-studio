@@ -12,20 +12,23 @@ import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
-import { LogService } from 'src/app/services/log.service';
-import { WebhookService } from '../../services/webhook-service.service';
+import { NoteResizeStateService } from './note-resize-state.service';
 
-// MODELS
+// MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
-import { Button, Action } from 'src/app/models/action-model';
+import { Button, Action} from 'src/app/models/action-model';
 import { Note } from 'src/app/models/note-model';
 import { NoteType } from 'src/app/models/note-types';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 
-// UTILS
-import { INTENT_COLORS, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
+// UTILS //
+import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
 import { LOGOS_ITEMS } from './../../utils-resources';
 import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+
+import { storage } from 'firebase';
+import { LogService } from 'src/app/services/log.service';
+import { WebhookService } from '../../services/webhook-service.service';
 
 // CORE
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -187,6 +190,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
     private readonly ngZone: NgZone,
+    public noteResizeState: NoteResizeStateService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -891,6 +895,49 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
+  /**
+   * Gestisce la selezione di una nota e apre il panel dei dettagli
+   * Simile a onIntentSelected per gli intent
+   */
+  /** Restituisce la left da usare per la nota: valore live durante resize orizzontale, altrimenti note.x (evita flicker). */
+  getNoteLeft(note: Note): number {
+    return this.noteResizeState.getNoteLeft(note);
+  }
+
+  onNoteSelected(note: Note | null): void {
+     this.logger.log('[CDS-CANVAS] onNoteSelected',note);
+    if (note) {
+      // Verifica se il pannello è già aperto sulla stessa nota
+      if (this.IS_OPEN_PANEL_NOTE_DETAIL && 
+          this.noteSelected && 
+          this.noteSelected.note_id === note.note_id) {
+        // Il pannello è già aperto sulla stessa nota, non fare nulla
+        // this.logger.log('[CDS-CANVAS] onNoteSelected - panel already open for note:', note.note_id);
+        return;
+      }
+      
+      // Apri il panel quando una nota viene selezionata (stateNote === 1 o 2)
+      // this.logger.log('[CDS-CANVAS] onNoteSelected ', note.note_id);
+      this.closeAllPanels();
+      this.removeConnectorDraftAndCloseFloatMenu();
+      this.closeActionDetailPanel();
+      setTimeout(() => {
+        this.noteSelected = note;
+        this.IS_OPEN_PANEL_NOTE_DETAIL = true;
+      }, 0);
+    } else {
+      // Chiudi il panel quando note è null (stato cambiato a 0)
+      this.IS_OPEN_PANEL_NOTE_DETAIL = false;
+      this.noteSelected = null;
+    }
+  }
+
+  /** onActionSelected  **
+   * @ Close WHEN AN ACTION IS SELECTED FROM AN INTENT
+   * - actions context menu (static & float)
+   * - button configuration panel  
+   * - test widget
+  */
   onActionSelected(event) {
     this.logger.log('[CDS-CANVAS] onActionSelected from PANEL INTENT - action ', event.action, ' - index ', event.index);
     if (!this.hasClickedAddAction) {
@@ -1167,7 +1214,43 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
       const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: evt.clientX, y: evt.clientY });
       const newNote = new Note(this.id_faq_kb, pos);
       newNote.type = evt.noteType || 'text';
-      if (this.setupNewNoteDefaults(newNote, newNote.type)) {
+      if (newNote.type !== 'text') {
+        newNote.text = '';
+      }
+
+      // RECT NOTE: default colors differ from text notes
+      if (newNote.type === 'rect') {
+        newNote.backgroundColor = Note.defaultBackgroundColor('rect');
+        newNote.borderColor = Note.defaultBorderColor('rect');
+      }
+
+      // MEDIA NOTE: non salvare in remoto finché non c'è un media valido.
+      // Apri subito il pannello di destra per il caricamento.
+      if (newNote.type === 'media') {
+        // Requirement: default shadow disabled for image/media notes
+        // (keep the option hidden in the panel UI)
+        newNote.boxShadow = false;
+
+        // Placeholder on stage (draft):
+        // - default size with 4/3 ratio
+        // - visible block (but NOT persisted remotely until media is valid)
+        newNote.width = 240;
+        newNote.height = 180;
+
+        // Inizializza payload (soft typing)
+        if (!newNote.payload) newNote.payload = {};
+        (newNote.payload as any).imageSrc = '';
+        (newNote.payload as any).imageWidth = 0;
+        (newNote.payload as any).imageHeight = 0;
+        (newNote.payload as any).mediaType = 'image';
+        (newNote.payload as any).mediaSrc = '';
+        (newNote.payload as any).mediaWidth = 0;
+        (newNote.payload as any).mediaHeight = 0;
+
+        this.pendingImageDraftNoteId = newNote.note_id;
+        // Add to the stage immediately as a placeholder (draft)
+        this.listOfNotes.push(newNote);
+        this.noteService.notifyNotesChanged();
         return;
       }
 
@@ -1183,34 +1266,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
       if (newNote.type === 'text') {
         this.pendingAutoFocusNoteId = newNote.note_id;
       }
-
-      this.onNoteSelected(newNote);
-
       this.logger.log("[CDS-CANVAS] Note dropped on stage:", evt.noteType, pos);
     } catch (e) {
       this.logger.error("[CDS-CANVAS] Error creating note from drop:", e);
-    }
-  }
-
-  onNoteSelected(note: Note | null): void {
-    this.logger.log('[CDS-CANVAS] onNoteSelected', note);
-    if (note) {
-      if (this.IS_OPEN_PANEL_NOTE_DETAIL &&
-        this.noteSelected &&
-        this.noteSelected.note_id === note.note_id) {
-        return;
-      }
-
-      this.closeAllPanels();
-      this.removeConnectorDraftAndCloseFloatMenu();
-      this.closeActionDetailPanel();
-      setTimeout(() => {
-        this.noteSelected = note;
-        this.IS_OPEN_PANEL_NOTE_DETAIL = true;
-      }, 0);
-    } else {
-      this.IS_OPEN_PANEL_NOTE_DETAIL = false;
-      this.noteSelected = null;
     }
   }
 
