@@ -1,14 +1,19 @@
-<!--   -->
 <div class="action-connector" (mouseenter)="showConnector()" (mouseleave)="hideConnector()">
     <div class="block-line">
         <!-- <svg shape-rendering="geometricPrecision" class="pre-line"><path d="M 0 4 L 13 4" class="sc-eGiIjr kEjIty sc-bTQVhO kjXfPj"></path></svg> -->
     </div>
     <div class="block-connector">
-        <div connector *ngIf="!isConnected" [id]="idConnector" class="point-connector-empty tds_connectable"></div>
-        <div connector *ngIf="isConnected" [id]="idConnector" [attr.idConnection]="idConnection" class="point-connector"></div>
+        <div
+            connector
+            [id]="idConnector"
+            [class.point-connector]="isConnected"
+            [class.point-connector-empty]="!isConnected"
+            [attr.idConnection]="isConnected ? idConnection : null"
+            class="tds_connectable">
+        </div>
     </div>
 
-    <div [id]="idContractConnector" class="block-contract-connector" [style.display]="displayConnector" 
+    <div *ngIf="isConnected" [id]="idContractConnector" class="block-contract-connector" [style.display]="displayConnector" 
         (mouseenter)="showConnectorDefault($event)" 
         (mouseleave)="hideConnectorDefault($event)">
         <em class="connector-line material-icons-outlined">trending_flat</em><span class="connector-to-intent" (click)="onRestoreConnector($event)">{{intent_display_name}}</span>

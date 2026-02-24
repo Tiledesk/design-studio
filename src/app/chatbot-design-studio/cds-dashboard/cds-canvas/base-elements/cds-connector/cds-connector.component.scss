@@ -47,45 +47,30 @@
     // cursor: copy;
 }
 
-.point-connector {
-    // background: #e4e4e7;
-    border: 0px solid;
-    // border-color: rgba(0,0,0,.12);
-    // background: #b1b1b7;
-    width: 10px;
-    height: 10px;
-}
-
-
 .point-connector-empty {
     box-shadow: none;
     border-radius: 50%;
     position: relative;
     box-sizing: border-box;
     border: 1px solid rgb(255, 255, 255);
-    transition: width 0.1s ease 0s, height 0.1s ease 0s, background-color 0.1s ease 0s, border 0.1s ease 0s;
+    transition: transform 0.1s ease;
     width: 18px;
     height: 18px;
-    // background: rgb(0 0 0 / 50%);
     background: rgb(168, 168, 174);
     cursor: copy;
     &::before {
         inset: 1px;
         border: 4px solid rgb(255, 255, 255);
-        transition: inset 0.1s ease 0s, border 0.1s ease 0s;
         position: absolute;
         content: "";
         border-radius: 50%;
     }
-    &:hover{
+    &:hover {
+        transform: scale(1.05);
         background: rgb(168, 168, 174);
-        border: 0px;
         cursor: copy;
     }
 }
-
-
-
 
 .point-connector {
     box-shadow: none;
@@ -93,18 +78,20 @@
     position: relative;
     box-sizing: border-box;
     border: 2px solid rgb(255, 255, 255);
-    transition: width 0.1s ease 0s, height 0.1s ease 0s, background-color 0.1s ease 0s, border 0.1s ease 0s;
-    width: 16px; //14px
-    height: 16px; //14px
-    background-color: rgb(221,221,221,1);
+    transition: transform 0.1s ease;
+    width: 16px;
+    height: 16px;
+    background-color: rgb(221, 221, 221, 1);
     cursor: default;
     &::before {
         inset: 0px;
         border: 1px solid rgb(168, 168, 174);
-        transition: inset 0.1s ease 0s, border 0.1s ease 0s;
         position: absolute;
         content: "";
         border-radius: 50%;
+    }
+    &:hover {
+        transform: scale(1.05);
     }
 }
 

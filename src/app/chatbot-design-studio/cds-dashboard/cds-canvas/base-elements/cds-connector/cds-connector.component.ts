@@ -5,8 +5,11 @@ import {
   Output,
   EventEmitter,
   SimpleChanges,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject, BehaviorSubject, EMPTY } from 'rxjs';
+import { takeUntil, switchMap, distinctUntilChanged } from 'rxjs/operators';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
@@ -17,9 +20,22 @@ import { DashboardService } from 'src/app/services/dashboard.service';
   selector: 'cds-connector',
   templateUrl: './cds-connector.component.html',
   styleUrls: ['./cds-connector.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CdsConnectorComponent implements OnInit {
-  private subscriptionChangeIntent: Subscription;
+  private readonly destroy$ = new Subject<void>();
+  /** Intent id a cui questo connector è collegato (derivato da idConnection); usato per sottoscriversi solo ai suoi aggiornamenti. */
+  private readonly intentId$ = new BehaviorSubject<string | null>(null);
+  /** Alpha (0-1) usato in hideConnector, aggiornato a ogni showConnector per evitare getAlpha() a ogni mouseleave. */
+  private cachedAlpha = 0;
+  /** Id derivati da idConnection (senza #), calcolati una volta per evitare ripetute replace/concat su mouseenter/mouseleave. */
+  private idConnectionClean: string | null = null;
+  private rectId: string | null = null;
+  private labelId: string | null = null;
+  /** Cache elementi DOM per linea/rect/label; invalidata al cambio di idConnection. */
+  private svgLineEl: HTMLElement | null = null;
+  private svgRectEl: HTMLElement | null = null;
+  private svgLabelEl: HTMLElement | null = null;
   @Input() idConnector: string;
   @Input() idConnection: string;
   @Input() isConnected: boolean;
@@ -39,44 +55,97 @@ export class CdsConnectorComponent implements OnInit {
     private readonly stageService: StageService,
     private readonly intentService: IntentService,
     private readonly connectorService: ConnectorService,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.cachedAlpha = this.stageService.getAlpha() / 100;
+    this.intentId$.next(this.getIntentIdFromConnection());
+    this.updateConnectionIds();
     this.initSubscriptions();
-    // this.setIdContractConnector();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    this.setIdContractConnector();
+  /** Restituisce l'intent_id di destinazione dal connection (idConnection dopo l'ultimo '/'). */
+  private getIntentIdFromConnection(): string | null {
+    const id = this.idConnection?.split('/').pop();
+    return id != null && id !== '' ? id.replace(/#/g, '') : null;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes.isConnected?.currentValue === false) {
       this.displayConnector = 'none';
-      const element = document.getElementById(this.idContractConnector);
-      if (element) {
-        element.style.display = 'none'; // Nasconde il div
-      }
-    } else if (changes.idConnection?.currentValue) {
-      this.idConnection = changes.idConnection?.currentValue;
-      this.getIntentDisplayName();
+      return;
     }
+    if (changes.idConnection?.currentValue !== undefined) {
+      this.idConnection = changes.idConnection.currentValue;
+      this.intentId$.next(this.getIntentIdFromConnection());
+      this.updateConnectionIds();
+      this.clearConnectionElementCache();
+    }
+    this.setIdContractConnector();
+  }
+
+  /** Calcola e memorizza idConnectionClean, rectId, labelId da idConnection. */
+  private updateConnectionIds(): void {
+    if (!this.idConnection) {
+      this.idConnectionClean = null;
+      this.rectId = null;
+      this.labelId = null;
+      return;
+    }
+    this.idConnectionClean = this.idConnection.replace(/#/g, '');
+    this.rectId = 'rect_' + this.idConnectionClean;
+    this.labelId = 'label_' + this.idConnectionClean;
+  }
+
+  /** Invalida la cache degli elementi DOM (chiamare quando idConnection cambia). */
+  private clearConnectionElementCache(): void {
+    this.svgLineEl = null;
+    this.svgRectEl = null;
+    this.svgLabelEl = null;
+  }
+
+  /** Restituisce gli elementi DOM linea/rect/label, usando cache se disponibile. */
+  private getConnectionElements(): { line: HTMLElement | null; rect: HTMLElement | null; label: HTMLElement | null } {
+    if (!this.idConnectionClean) {
+      this.updateConnectionIds();
+    }
+    if (!this.idConnectionClean) {
+      return { line: null, rect: null, label: null };
+    }
+    if (!this.svgLineEl) {
+      this.svgLineEl = document.getElementById(this.idConnectionClean);
+    }
+    if (!this.svgRectEl && this.rectId) {
+      this.svgRectEl = document.getElementById(this.rectId);
+    }
+    if (!this.svgLabelEl && this.labelId) {
+      this.svgLabelEl = document.getElementById(this.labelId);
+    }
+    return { line: this.svgLineEl, rect: this.svgRectEl, label: this.svgLabelEl };
   }
 
 
-  ngOnDestroy() {
-    if (this.subscriptionChangeIntent) {
-      this.subscriptionChangeIntent.unsubscribe();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  initSubscriptions(){
-    if (!this.subscriptionChangeIntent) {
-      this.subscriptionChangeIntent = this.intentService.behaviorIntent.subscribe(intent => {
-        const idToIntent = this.idConnection?.split('/').pop();
-        if (intent?.intent_id && intent.intent_id === idToIntent) {
-          this.intent_display_name = intent.intent_display_name;
-        }
-      });
-    }
+  initSubscriptions(): void {
+    this.intentId$.pipe(
+      switchMap((intentId) =>
+        intentId
+          ? this.intentService.intentUpdatesById$(intentId).pipe(
+              distinctUntilChanged((a, b) => a?.intent_display_name === b?.intent_display_name)
+            )
+          : EMPTY
+      ),
+      takeUntil(this.destroy$)
+    ).subscribe((intent) => {
+      this.intent_display_name = intent.intent_display_name;
+      this.cdr.markForCheck();
+    });
   }
 
   setIdContractConnector() {
@@ -120,51 +189,21 @@ export class CdsConnectorComponent implements OnInit {
     // console.log('getToIntentDisplayName: ', this.idConnection, this.intent_display_name);
   }
 
-  public showConnector() {
-    // // console.log('showConnector: ', this.idConnection, this.isConnected);
-    if (this.idConnection && this.isConnected) {
-      const idConnection = this.idConnection?.replace('#', '');
-      const svgElement: HTMLElement = document.getElementById(idConnection);
-      if (svgElement) {
-        svgElement.setAttribute('opacity', (1).toString());
-      }
-      const svgElementRec: HTMLElement = document.getElementById(
-        'rect_' + idConnection
-      );
-      if (svgElementRec) {
-        svgElementRec.setAttribute('opacity', (1).toString());
-      }
-      const svgElementTxt: HTMLElement = document.getElementById(
-        'label_' + idConnection
-      );
-      if (svgElementTxt) {
-        svgElementTxt.setAttribute('opacity', (1).toString());
-      }
-    }
+  public showConnector(): void {
+    this.cachedAlpha = this.stageService.getAlpha() / 100;
+    if (!this.idConnection || !this.isConnected) return;
+    const { line, rect, label } = this.getConnectionElements();
+    if (line) line.setAttribute('opacity', '1');
+    if (rect) rect.setAttribute('opacity', '1');
+    if (label) label.setAttribute('opacity', '1');
   }
 
-  public hideConnector() {
-    const alphaConnector = this.stageService.getAlpha() / 100;
-    if (this.idConnection && this.isConnected) {
-      const idConnection = this.idConnection.replace('#', '');
-      const svgElement: HTMLElement = document.getElementById(idConnection);
-      if (svgElement) {
-        svgElement.setAttribute('opacity', alphaConnector.toString());
-      }
-
-      const svgElementRec: HTMLElement = document.getElementById(
-        'rect_' + idConnection
-      );
-      if (svgElementRec) {
-        svgElementRec.setAttribute('opacity', (1).toString());
-      }
-      const svgElementTxt: HTMLElement = document.getElementById(
-        'label_' + idConnection
-      );
-      if (svgElementTxt) {
-        svgElementTxt.setAttribute('opacity', (1).toString());
-      }
-    }
+  public hideConnector(): void {
+    if (!this.idConnection || !this.isConnected) return;
+    const { line, rect, label } = this.getConnectionElements();
+    if (line) line.setAttribute('opacity', this.cachedAlpha.toString());
+    if (rect) rect.setAttribute('opacity', '1');
+    if (label) label.setAttribute('opacity', '1');
   }
 
   public showConnectorDefault(event: MouseEvent): void {
