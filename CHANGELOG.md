@@ -7,20 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
 
-- **changed**: Componente più “leggero”: Angular aggiorna la vista solo quando serve (OnPush) e ogni connector ascolta solo l’intent a cui è collegato, non tutti gli aggiornamenti.
-- **changed**: Un solo pallino nel DOM: non si crea/distrugge più l’elemento al collegare/scollegare; si cambiano solo classe e attributi (point-connector vs point-connector-empty).
-- **changed**: Nascosto/mostrato il blocco “contratto” (nome intent + menu) con una classe CSS (`.is-hidden`) invece che con la proprietà `display` via stringa; niente più rischio di typo e meno lavoro per il browser.
-- **changed**: Su mouseenter/mouseleave gli id degli elementi SVG e i riferimenti DOM vengono calcolati una volta e messi in cache; si evitano ripetute ricerche nel DOM.
-- **changed**: Animazioni dei pallini: invece di animare larghezza/altezza/bordo (costose), si usa solo `transform: scale()` al passaggio del mouse.
-- **changed**: SCSS: un’unica definizione per `.point-connector` (rimosso il blocco duplicato).
-- **changed**: IntentService: nuovo metodo `intentUpdatesById$(id)` per sottoscriversi solo agli aggiornamenti di un singolo intent (usato dai connector).
-- **changed**: Intent (cds-intent): pipe `translate` in template sostituita con label precompilate (`labelQuestion`, `labelForm`, ecc.) aggiornate in `updateTranslationLabels()` su init e su `translate.onLangChange`, per ridurre valutazioni in change detection.
-- **changed**: Intent (cds-intent): in SCSS sostituito `transition: all` con proprietà esplicite (opacity, transform, background-color, color, border-color) su footer, pulsanti e azioni per evitare transizioni su layout e ridurre il costo di paint.
-- **changed**: Pan/zoom (moved-and-scaled): in stage al massimo un evento per frame (throttle con requestAnimationFrame) invece di uno per ogni movimento; in canvas il listener gira fuori dalla zona Angular e gli aggiornamenti vengono raggruppati a un solo aggiornamento per frame (batching rAF); menu e bozze si chiudono solo se erano aperti.
-- **changed**: Performance intent (canvas con 100+ blocchi): stili intent e action senza funzioni/oggetti in template. Blocco intent: `[ngStyle]` sostituito con binding atomici e view model `vm` (aggiornato solo a cambio selezione via observable). Action: outline e classe no-featured precalcolati su ogni action (`_outline`, `_isNoFeatured`); rimosse `getActionItemStyle` e `isNoFeaturedAction` dal template. Selezione intent/action notificata da IntentService (`behaviorIntentSelection`) per evitare `ngDoCheck` e trascinamento a scatti.
-
+# 1.39.29-rc6
+- **changed**: Updated and refactored the cds-intent and cds-connector components to improve performance
 
 # 1.39.29-rc5
 - - **added**: added tag to action ask kb and action create kb
