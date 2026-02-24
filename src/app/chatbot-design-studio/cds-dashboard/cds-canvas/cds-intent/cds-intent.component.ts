@@ -1047,6 +1047,11 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     this.intentService.updateIntent(this.intent);
   }
 
+  /** Alias per compatibilità: il template può chiamare onActionUpdate (updateAndSaveAction). */
+  public onActionUpdate(object: any): void {
+    this.onUpdateAndSaveAction(object);
+  }
+
   /**
    * Chiamata dal template al click sul pulsante “Aggiungi action” (nel placeholder o nel footer).
    * Calcola la posizione del menu flottante in base al bottone (calleBy), seleziona l’intent e emette showPanelActions verso il canvas per aprire il pannello delle action.
