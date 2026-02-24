@@ -7,10 +7,19 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
-Modifiche seguendo **Performance Improvement Plan – cds-connector**.
+# this branch refactoring component: cds-connector-in
 
-**cds-connector (pallini/connessioni sul canvas)**  
+- **changed**: Corretto bug nella subscription ai connector: il confronto usava un parametro che shadowava l’emissione (sempre true); ora si aggiorna solo quando il connector è in lista. Rimossi console.log.
+- **changed**: OnPush e `markForCheck()` dopo aggiornamenti asincroni; meno change detection inutile.
+- **changed**: `ngOnChanges` riattivato: quando cambia l’input `connectorsIn` (es. intent eliminato) il componente si aggiorna.
+- **changed**: `trackBy` per l’`*ngFor` del menu (trackByIntentId) per riusare i nodi DOM.
+- **changed**: Filtro “contract visibile”: cache per ciclo (stesso elemento non letto più volte) e helper `getContractElementId`.
+- **changed**: Cache degli elementi DOM in show/hide: id precalcolati e riferimenti in cache; invalidata al cambio lista. Meno getElementById a ogni hover.
+- **changed**: Alpha (opacità linee) in cache: aggiornato in showConnectorsIn e ngOnInit, riusato in hideConnectorsIn e onMenuItemMouseLeave. Cache di visibilità contract in onMenuItemMouseEnter/Leave.
+- **changed**: Menu mostrato/nascosto con classe `.is-hidden` e proprietà `menuVisible` (mouseenter/mouseleave) invece di solo CSS :hover su display.
+- **changed**: Template: spazio tra `*ngIf` e `class` nel div radice (manutenzione).
+
+# prev branch
 - **changed**: Componente più “leggero”: Angular aggiorna la vista solo quando serve (OnPush) e ogni connector ascolta solo l’intent a cui è collegato, non tutti gli aggiornamenti.
 - **changed**: Un solo pallino nel DOM: non si crea/distrugge più l’elemento al collegare/scollegare; si cambiano solo classe e attributi (point-connector vs point-connector-empty).
 - **changed**: Nascosto/mostrato il blocco “contratto” (nome intent + menu) con una classe CSS (`.is-hidden`) invece che con la proprietà `display` via stringa; niente più rischio di typo e meno lavoro per il browser.
@@ -18,8 +27,6 @@ Modifiche seguendo **Performance Improvement Plan – cds-connector**.
 - **changed**: Animazioni dei pallini: invece di animare larghezza/altezza/bordo (costose), si usa solo `transform: scale()` al passaggio del mouse.
 - **changed**: SCSS: un’unica definizione per `.point-connector` (rimosso il blocco duplicato).
 - **changed**: IntentService: nuovo metodo `intentUpdatesById$(id)` per sottoscriversi solo agli aggiornamenti di un singolo intent (usato dai connector).
-
----
 
 - **changed**: Intent (cds-intent): pipe `translate` in template sostituita con label precompilate (`labelQuestion`, `labelForm`, ecc.) aggiornate in `updateTranslationLabels()` su init e su `translate.onLangChange`, per ridurre valutazioni in change detection.
 - **changed**: Intent (cds-intent): in SCSS sostituito `transition: all` con proprietà esplicite (opacity, transform, background-color, color, border-color) su footer, pulsanti e azioni per evitare transizioni su layout e ridurre il costo di paint.
