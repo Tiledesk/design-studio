@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.39.29-rc7
+- **bug-fix**:Set retro compatibility between onActionUpdate and onUpdateAndSaveAction in CdsIntentComponent
+
 # 1.39.29-rc6
 - **changed**: Updated and refactored the cds-intent and cds-connector components to improve performance
 
