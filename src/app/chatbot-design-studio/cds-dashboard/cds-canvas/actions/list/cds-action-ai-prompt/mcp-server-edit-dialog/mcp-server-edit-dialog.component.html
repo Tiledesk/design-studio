@@ -88,8 +88,8 @@
             {{'Cancel' | translate}}
         </button>
 
-        <!-- Connect / Refresh tools (Edit: visible only if URL has been changed) -->
-        <button *ngIf="showConnectButton" id="cds-connect-btn" class="btn btn-primary cds-blue-button" type="button"
+        <!-- Connect / Refresh tools (Edit: visible only if URL has been changed) *ngIf="showConnectButton" -->
+        <button id="cds-connect-btn" class="btn btn-primary cds-blue-button" type="button"
             [disabled]="!isFormValid() || isSaving || isLoadingTools"
             (click)="onConnect()">
             <span *ngIf="!isLoadingTools">{{ connectButtonLabelKey | translate }}</span>

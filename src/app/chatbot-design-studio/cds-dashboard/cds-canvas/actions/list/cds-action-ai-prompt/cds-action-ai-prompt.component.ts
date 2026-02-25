@@ -103,8 +103,8 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   browserLang: string = 'it';
 
-  mcpServers: Array<{ name: string, url: string, transport: string }> = [];
-  selectedMcpServers: Array<{ name: string, url: string, transport: string }> = [];
+  mcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }> = [];
+  selectedMcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }> = [];
 
   constructor(
     private readonly dialog: MatDialog,

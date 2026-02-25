@@ -13,7 +13,7 @@ import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-serv
 export class McpServersDialogComponent implements OnInit {
 
   selectedServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }> = [];
-  filteredServers: Array<{ name: string, url: string, transport: string }> = [];
+  filteredServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }> = [];
   searchFilter: string = '';
   onUpdateCallback: (data: any) => void;
   
@@ -23,8 +23,8 @@ export class McpServersDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<McpServersDialogComponent>,
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: { 
-      // mcpServers comes from integrations; tools (metadata) may be present and must remain untouched.
-      mcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }>,
+      // mcpServers from integrations: tools = available, selectedTools = last selection (kept even when server not selected).
+      mcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }>,
       selectedServers?: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }>,
       onUpdate?: (data: any) => void
     }
@@ -50,7 +50,7 @@ export class McpServersDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
-  toggleServerSelection(server: { name: string, url: string, transport: string }, event?: Event): void {
+  toggleServerSelection(server: { name: string, url: string, transport: string, selectedTools?: Array<{ name: string }> }, event?: Event): void {
     if (event) {
       event.stopPropagation(); // Prevent triggering the button click
     }
@@ -58,12 +58,14 @@ export class McpServersDialogComponent implements OnInit {
     if (index > -1) {
       this.selectedServers.splice(index, 1);
     } else {
-      // IMPORTANT: keep action payload minimal (no tools metadata from integrations).
+      // Use stored selectedTools from integration when adding, so previous selection is restored
+      const stored = this.data.mcpServers?.find(s => s.name === server.name);
+      const tools = Array.isArray(stored?.selectedTools) ? [...stored.selectedTools] : [];
       this.selectedServers.push({
         name: server.name,
         url: server.url,
         transport: server.transport,
-        tools: []
+        tools
       });
     }
     this.logger.log("[McpServersDialog] selectedServers: ", this.selectedServers);
@@ -103,19 +105,22 @@ export class McpServersDialogComponent implements OnInit {
 
   /**
    * Count of available tools for a server (from integrations -> data.mcpServers[].tools).
-   * Tools are optional.
    */
   getAvailableToolsCount(server: { name: string }): number {
-    const found = this.data?.mcpServers?.find(s => s.name === server.name) as any;
+    const found = this.data?.mcpServers?.find(s => s.name === server.name);
     return Array.isArray(found?.tools) ? found.tools.length : 0;
   }
 
   /**
-   * Count of active/selected tools for a server in the action payload (selectedServers[].tools).
+   * Count of active/selected tools: from selectedServers when server is selected, else from stored selectedTools (integration).
    */
   getActiveToolsCount(server: { name: string }): number {
     const selected = this.selectedServers.find(s => s.name === server.name);
-    return Array.isArray(selected?.tools) ? selected.tools.length : 0;
+    if (selected && Array.isArray(selected.tools)) {
+      return selected.tools.length;
+    }
+    const found = this.data?.mcpServers?.find(s => s.name === server.name);
+    return Array.isArray(found?.selectedTools) ? found.selectedTools.length : 0;
   }
 
   onAddMcpServer(): void {
@@ -153,19 +158,22 @@ export class McpServersDialogComponent implements OnInit {
     });
   }
 
-  openEditServerDialog(server: { name: string, url: string, transport: string }, event?: Event): void {
+  openEditServerDialog(server: { name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }, event?: Event): void {
     if (event) {
       event.stopPropagation(); // Prevent any unwanted propagation
     }
     this.logger.log("[McpServersDialog] - openEditServerDialog for:", server);
-    
+    // Use action selection if server is selected, else use stored selectedTools from integration
     const selectedServer = this.selectedServers.find(s => s.name === server.name);
+    const initialSelectedTools = selectedServer?.tools?.length
+      ? selectedServer.tools
+      : (Array.isArray(server.selectedTools) ? server.selectedTools : []);
     const dialogRef = this.dialog.open(McpServerEditDialogComponent, {
       panelClass: 'custom-mcp-edit-dialog-container',
       data: { 
         server: server,
         allServers: this.data.mcpServers,
-        selectedTools: selectedServer?.tools || []
+        selectedTools: initialSelectedTools
       }
     });
 
@@ -174,7 +182,7 @@ export class McpServersDialogComponent implements OnInit {
       if (result !== false && result) {
         const updatedServer = result?.server ? result.server : result;
         const selectedTools: Array<{ name: string }> | undefined = result?.selectedTools;
-        // Update the server in the list
+        // Update the server in the list (tools + selectedTools so they are shown and persisted)
         const index = this.data.mcpServers.findIndex(s => s.name === server.name);
         if (index > -1) {
           this.data.mcpServers[index] = updatedServer;
