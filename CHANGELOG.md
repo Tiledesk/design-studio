@@ -17,7 +17,7 @@
 - **chiarezza**: In variable-list, `onChangeSearch` normalizza subito l’input (stringa o evento) e usa un solo valore per filtri e stato.
 - **fix**: Cambio operatore in una condizione ora emette l’evento e salva correttamente (emit in `onChangeOperator`, filter.component).
 - **fix**: Liste ordinate per nome: intent in `initializeConnector`; variabili in variable-list (iniziale e risultati di ricerca).
-
+- **cleanup**: Pulizia strutturale (agent-safe-cleanup-refactor) su base-condition-row, base-filter, variable-list e cds-action-json-condition: import riordinati, codice morto rimosso, formattazione e commenti didattici; nessuna modifica funzionale.
 
 # previous branch 
 - **changed**: Corretto bug nella subscription ai connector: il confronto usava un parametro che shadowava l’emissione (sempre true); ora si aggiorna solo quando il connector è in lista. Rimossi console.log.

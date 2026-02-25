@@ -2,7 +2,6 @@
 
     <div class="filter-row" *ngFor="let group of expression?.conditions; let i = index; let last = last; trackBy: trackByConditionIndex">
         <div class="text-editor-wrapper">
-            <!-- CONDITION [i]-->
             <div *ngIf="i%2 === 0" 
                 class="filter-condition" 
                 (click)="onOpenConditionDetail(i); addConditionFilter.toggle();">
@@ -18,9 +17,8 @@
                     {{ getOperatorName(group?.operator) | translate }}
                     <b *ngIf="group?.operand2.type === 'const'">{{group?.operand2?.value}}</b>
                     <b *ngIf="group?.operand2.type === 'var'">{{group?.operand2?.name}}</b>
-                </div>                    
+                </div>
             </div>
-            <!-- OPERATOR [i]-->
             <div *ngIf="i%2 === 1">
                 <cds-select
                     class="filter-operator"
@@ -42,10 +40,8 @@
             {{'CDSCanvas.AddNewCondition' | translate }}
         </div>
     </div>
-    
 </div>
 
-<!-- verticalAlign="below" -->
 <sat-popover #addConditionFilter 
     id="addConditionFilter"
     horizontalAlign="center" 
@@ -59,5 +55,3 @@
         (close)="onDismiss($event)">
     </base-condition-row>
 </sat-popover>
-
-

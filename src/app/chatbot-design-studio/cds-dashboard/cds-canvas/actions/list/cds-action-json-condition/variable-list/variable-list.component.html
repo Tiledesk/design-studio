@@ -36,18 +36,6 @@
                     matTooltipClass="cds-mat-tooltip"  matTooltip="{{ variable?.description | translate: BRAND_BASE_INFO }}" #tooltip="matTooltip" matTooltipPosition='left' matTooltipHideDelay="100">
                     <span class="material-icons-outlined">info</span>
                 </div>
-
-                <!-- <sat-popover #descriptionTooltip id="descriptionTooltip" 
-                    hasBackdrop 
-                    verticalAlign="center" 
-                    horizontalAlign="after" 
-                    (backdropClicked)="descriptionTooltip.close()" 
-                    panelClass="description-tooltip">
-                    <div class="tooltip-wrp">
-                        <div class="caret_tooltip"></div>
-                        <span [innerHTML]="variable?.description"></span>
-                    </div>
-                </sat-popover>  -->
             </div>
         </mat-expansion-panel>
     </div>
@@ -78,5 +66,4 @@
     <span class="material-icons">add</span>
     <div>{{'CDSCanvas.AddCustomAttributes' | translate }}</div>
 </div>
-
 
