@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 # this branch
+- **bug-fix**: bug fixed in selecting and refreshing MCP server tools.
+- **bug-fix**: Css changes to the preview of selected tools.
 - **added**: added tools MCP server
 
 # 1.39.23
