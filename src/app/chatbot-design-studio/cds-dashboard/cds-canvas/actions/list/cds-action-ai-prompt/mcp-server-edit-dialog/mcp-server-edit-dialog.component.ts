@@ -157,6 +157,11 @@ export class McpServerEditDialogComponent implements OnInit {
       // Keep this as a safe refresh: tools are optional anyway.
       this.refreshAvailableTools();
     }
+    if (field === 'url') {
+      // As soon as URL is modified: hide Save and show Connect (no need to wait for blur).
+      const current = (this.editedServer.url || '').trim();
+      this.urlChangedSinceLastConnect = this.isNewServer ? true : (current !== ((this.originalSnapshot?.url || '').trim()));
+    }
   }
 
   /**
@@ -185,7 +190,7 @@ export class McpServerEditDialogComponent implements OnInit {
   private refreshAvailableTools(): void {
     // Prefer tools from the server currently being edited (after Connect/Refresh).
     if (Array.isArray(this.editedServer?.tools)) {
-      this.availableTools = this.editedServer.tools;
+      this.availableTools = [...this.editedServer.tools].sort((a, b) => a.name.localeCompare(b.name));
     } else {
       const serverName = this.isNewServer ? this.editedServer?.name : this.originalServer?.name;
       if (!serverName) {
@@ -193,7 +198,8 @@ export class McpServerEditDialogComponent implements OnInit {
         return;
       }
       const found = this.allMcpServers.find(s => s.name === serverName);
-      this.availableTools = Array.isArray(found?.tools) ? found.tools : [];
+      const tools = Array.isArray(found?.tools) ? found.tools : [];
+      this.availableTools = [...tools].sort((a, b) => a.name.localeCompare(b.name));
     }
 
     // Keep selection consistent: drop selected tools that are no longer available (avoid stale names).
@@ -256,9 +262,8 @@ export class McpServerEditDialogComponent implements OnInit {
   }
 
   get showConnectButton(): boolean {
-    // In Edit: connect ONLY when URL has been modified.
-    // In Add: connect is the discovery step.
-    return this.isNewServer ? true : this.urlChangedSinceLastConnect;
+    // Connect / Refresh button always visible (Connect when no tools, Refresh tools when loaded).
+    return true;
   }
 
   get showSaveButton(): boolean {
@@ -271,8 +276,9 @@ export class McpServerEditDialogComponent implements OnInit {
   get isSaveDisabled(): boolean {
     if (this.isSaving || this.isLoadingTools) return true;
     if (!this.isFormValid()) return true;
-    if (!this.toolsLoaded) return true;
-    if (this.isNewServer) return false; // create: connect gates, not dirty
+    // Add mode: Save enabled only after Connect (tools loaded).
+    if (this.isNewServer) return !this.toolsLoaded;
+    // Edit mode: enable Save whenever any value except URL was modified (dirty).
     return !this.isDirty;
   }
 
@@ -389,6 +395,15 @@ export class McpServerEditDialogComponent implements OnInit {
     }, 500);
 
     try {
+      const selectedTools = this.buildSelectedToolsPayload();
+      // Persist total available tools count from last Connect/Refresh so list dialog can show correct "X available".
+      const availableToolsCount = this.availableTools?.length ?? 0;
+      const serverToSave = {
+        ...this.editedServer,
+        tools: selectedTools,
+        availableToolsCount
+      };
+
       if (this.isNewServer) {
         // Check if server name already exists
         const nameExists = this.allMcpServers.some(s => s.name === this.editedServer.name);

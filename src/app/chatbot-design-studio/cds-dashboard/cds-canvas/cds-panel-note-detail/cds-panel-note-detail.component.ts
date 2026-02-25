@@ -27,6 +27,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
   @Output() deleteNote = new EventEmitter<Note>();
   @Output() duplicateNote = new EventEmitter<Note>();
   @ViewChild('quillEditor', { static: false }) quillEditor: any;
+  @ViewChild('quillTitleEditor', { static: false }) quillTitleEditor: any;
   @ViewChild('imageFileInput', { static: false }) imageFileInput: ElementRef<HTMLInputElement>;
   
   maximize: boolean = true;
@@ -34,6 +35,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
 
   toolbarOptions: any;
   quillModules: any;
+  quillModulesTitle: any;
   
   // Sottoscrizioni per i cambiamenti delle note
   private noteUpdatedSubscription: Subscription;
@@ -71,6 +73,11 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     this.quillModules = {
       toolbar: this.toolbarOptions
     };
+    // Toolbar ridotta per il titolo (rect)
+    this.quillModulesTitle = {
+      toolbar: this.toolbarOptions
+      // toolbar: [['bold', 'italic', 'underline'], ['link'], ['clean']]
+    };
     
     // Sottoscrivi ai cambiamenti delle note per aggiornare il contenuto quando una nota viene modificata
     // Usa notesChanged$ invece di noteUpdated$ per aggiornare quando cambiano (non solo quando vengono salvate)
@@ -97,6 +104,15 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
               this.note[prop] = updatedNote[prop];
             }
           });
+
+          // Aggiorna il titolo (rect) solo se l'editor titolo non ha il focus
+          if (updatedNote.title !== undefined) {
+            if (this.quillTitleEditor?.quillEditor && !this.quillTitleEditor.quillEditor.hasFocus()) {
+              this.note.title = updatedNote.title;
+            } else if (!this.quillTitleEditor?.quillEditor) {
+              this.note.title = updatedNote.title;
+            }
+          }
           
           // Aggiorna il testo solo se non è stato modificato localmente
           // (il testo viene gestito separatamente per evitare conflitti con Quill)
@@ -240,7 +256,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     return { ok: false, reason: 'Only images (including GIF) or videos are supported.' };
   }
 
-  private async loadMediaFromFile(file: File): Promise<void> {
+  private async OLD_loadMediaFromFile(file: File): Promise<void> {
     if (!this.note) return;
 
     this.imageUploadError = '';
@@ -275,6 +291,85 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       this.isUploadingImage = false;
     }
   }
+
+
+
+  loadMediaFromFile(file): Promise<void> {
+    if (!this.note) return;
+    this.imageUploadError = '';
+    if (file.size > this.MAX_MEDIA_BYTES) {
+      this.imageUploadError = 'File too large. Max allowed size is 4MB.';
+      return;
+    }
+
+    const supported = this.isSupportedMediaFile(file);
+    if (!supported.ok || !supported.mediaType) {
+      this.imageUploadError = supported.reason || 'Unsupported file.';
+      return;
+    }
+    const that = this;
+    that.logger.log('[CdsPanelNoteDetailComponent] loadMediaFromFile start', { fileName: file?.name, size: file?.size, type: file?.type });
+
+    const currentUpload = new UploadModel(file);
+    const user = this.tiledeskAuthService.getCurrentUser();
+    if (!user) {
+      that.logger.error('[CdsPanelNoteDetailComponent] loadMediaFromFile: user is null/undefined');
+      this.imageUploadError = 'User not logged in.';
+      return;
+    }
+    if (!user.uid) {
+      that.logger.error('[CdsPanelNoteDetailComponent] loadMediaFromFile: user.uid is empty', { user });
+      this.imageUploadError = 'User not logged in.';
+      return;
+    }
+
+    this.uploadService.uploadAsset(user.uid, currentUpload).then(async (data) => {
+      that.logger.log('[CdsPanelNoteDetailComponent] uploadAsset then: raw response', {
+        data,
+        hasDownloadURL: !!(data && (data as any).downloadURL),
+        hasSrc: !!(data && (data as any).src),
+        hasFilename: !!(data && (data as any).filename),
+        downloadURL: data && (data as any).downloadURL,
+        src: data && (data as any).src,
+        filename: data && (data as any).filename
+      });
+      const url = that.getMediaUrlFromUploadResponse(data);
+      if (!url) {
+        that.logger.warn('[CdsPanelNoteDetailComponent] uploadAsset: no usable URL (downloadURL, src or filename)');
+        throw new Error('Upload did not return a usable URL');
+      }
+      that.logger.log('[CdsPanelNoteDetailComponent] uploadAsset: using URL', { urlPreview: url.length > 80 ? url.slice(0, 80) + '...' : url });
+      await this.setMediaFromSrc(url, supported.mediaType);
+    }).catch(error => {
+      that.logger.error('[CdsPanelNoteDetailComponent] loadMediaFromFile catch', {
+        message: error?.message,
+        error,
+        errorError: (error as any)?.error,
+        errorBody: (error as any)?.body,
+        errorFilename: (error as any)?.filename,
+        errorErrorFilename: (error as any)?.error?.filename
+      });
+      this.imageUploadError = 'Upload failed. Please try again.';
+      this.logger.error('[CdsPanelNoteDetailComponent] Error uploading media for image note', error);
+    });
+    that.logger.log('[CdsPanelNoteDetailComponent] loadMediaFromFile: uploadAsset promise started');
+  }
+
+  /** Estrae l'URL dal risultato dell'upload: supporta downloadURL/src e risposta con filename (senza doppia codifica). */
+  private getMediaUrlFromUploadResponse(data: any): string | null {
+    if (!data) return null;
+    const d = data.data ?? data.body ?? data;
+    if (d.downloadURL) return d.downloadURL;
+    if (d.src) return d.src;
+    const filename = d.filename;
+    if (filename && typeof filename === 'string') {
+      const baseUrl = this.uploadService.getBaseUrl().replace(/\/$/, '');
+      const pathParam = filename.includes('%') ? filename : encodeURIComponent(filename);
+      return `${baseUrl}/files/download?path=${pathParam}`;
+    }
+    return null;
+  }
+
 
   private async loadImageFromUrl(url: string): Promise<void> {
     if (!this.note) return;
@@ -859,6 +954,20 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       this.autoSave();
     } catch (error) {
       this.logger.error('[CdsPanelNoteDetailComponent] Error handling Quill content change:', error);
+    }
+  }
+
+  /**
+   * Gestisce il cambio di contenuto nel Quill del titolo (note rect).
+   * Chiama autoSave() per salvare automaticamente con debounce.
+   */
+  onTitleQuillContentChanged(event: any): void {
+    if (!this.note || !event) return;
+    try {
+      this.logger.log('[CdsPanelNoteDetailComponent] Title Quill content changed, triggering auto-save', event);
+      this.autoSave();
+    } catch (error) {
+      this.logger.error('[CdsPanelNoteDetailComponent] Error handling title Quill content change:', error);
     }
   }
 

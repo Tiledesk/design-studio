@@ -41,8 +41,8 @@ export class McpServersDialogComponent implements OnInit {
     if (this.data.onUpdate) {
       this.onUpdateCallback = this.data.onUpdate;
     }
-    // Initialize filtered servers
-    this.filteredServers = [...this.data.mcpServers];
+    // Initialize filtered servers (alphabetically by name)
+    this.filteredServers = [...this.data.mcpServers].sort((a, b) => a.name.localeCompare(b.name));
   }
 
   onCloseDialog(): void {
@@ -87,13 +87,15 @@ export class McpServersDialogComponent implements OnInit {
     const filter = this.searchFilter.toLowerCase().trim();
     
     if (!filter) {
-      this.filteredServers = [...this.data.mcpServers];
+      this.filteredServers = [...this.data.mcpServers].sort((a, b) => a.name.localeCompare(b.name));
     } else {
-      this.filteredServers = this.data.mcpServers.filter(server => 
-        server.name.toLowerCase().includes(filter) ||
-        server.url.toLowerCase().includes(filter) ||
-        server.transport.toLowerCase().includes(filter)
-      );
+      this.filteredServers = this.data.mcpServers
+        .filter(server =>
+          server.name.toLowerCase().includes(filter) ||
+          server.url.toLowerCase().includes(filter) ||
+          server.transport.toLowerCase().includes(filter)
+        )
+        .sort((a, b) => a.name.localeCompare(b.name));
     }
     
     this.logger.log("[McpServersDialog] Filtered servers:", this.filteredServers.length);

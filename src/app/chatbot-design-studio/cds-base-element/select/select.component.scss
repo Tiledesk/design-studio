@@ -51,13 +51,14 @@
             // Opt-in: render additional text as a right-aligned badge (used e.g. for KB type).
             span.label-select-option.right-badge {
                 margin-left: auto;
-                color: #fff;
-                background-color: var(--blu);
+                background-color: var(--gray-light-02);
+                color: var(--blu);
                 padding: 1px 6px;
                 border-radius: 999px;
                 font-size: 11px;
                 line-height: 16px;
                 white-space: nowrap;
+                font-weight: inherit;
             }
 
             span.description {
@@ -144,13 +145,14 @@
             // Keep the selected label consistent with the dropdown: optional right-aligned badge.
             span.label-select-option.right-badge {
                 margin-left: auto;
-                color: #fff;
-                background-color: var(--blu);
+                background-color: var(--gray-light-02);
+                color: var(--blu);
                 padding: 1px 6px;
                 border-radius: 999px;
                 font-size: 11px;
                 line-height: 16px;
                 white-space: nowrap;
+                font-weight: inherit;
             }
             
         }
