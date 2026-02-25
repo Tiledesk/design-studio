@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 
+# 1.39.32
+
 # 1.39.29-rc9
 - **bug-fix**: Bug fixed in selecting and refreshing MCP server tools.
 - **bug-fix**: Css changes to the preview of selected tools.
