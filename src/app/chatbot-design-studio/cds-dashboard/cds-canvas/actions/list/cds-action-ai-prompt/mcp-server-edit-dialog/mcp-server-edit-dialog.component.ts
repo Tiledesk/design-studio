@@ -16,11 +16,10 @@ interface McpServer {
   name: string;
   url: string;
   transport: string;
-  /**
-   * Optional tools array coming from integrations.
-   * IMPORTANT: this structure must NOT be modified or persisted from here.
-   */
+  /** Available tools (from Connect / integrations). Persisted on Save. */
   tools?: McpTool[];
+  /** Selected tools for this server. Persisted in integration so selection is kept even when server is not selected. */
+  selectedTools?: Array<{ name: string }>;
 }
 
 interface McpIntegration {
@@ -72,6 +71,10 @@ export class McpServerEditDialogComponent implements OnInit {
 
   private originalSnapshot: { name: string; url: string; transport: string } | null = null;
   private originalSelectedToolsSnapshot: Set<string> = new Set();
+  /** Snapshot of available tool names when dialog opened (or after first load). Used to detect changes after Refresh. */
+  private originalAvailableToolNames: Set<string> = new Set();
+  /** True when Refresh returned a different list of tools than the original, so Save should be enabled. */
+  private availableToolsChangedAfterRefresh: boolean = false;
   private lastUrlBlurValue: string = '';
   
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -127,8 +130,11 @@ export class McpServerEditDialogComponent implements OnInit {
     this.originalSelectedToolsSnapshot = new Set(Array.from(this.selectedToolNames));
     this.refreshAvailableTools();
     this.toolsLoaded = Array.isArray(this.availableTools) && this.availableTools.length > 0;
+    this.originalAvailableToolNames = new Set((this.availableTools || []).map(t => t.name));
     this.urlChangedSinceLastConnect = false;
     this.lastUrlBlurValue = (this.editedServer?.url || '').trim();
+
+    this.logger.log("[McpServerEditDialog] toolsLoaded:", this.toolsLoaded);
   }
 
   onCloseDialog(): void {
@@ -232,7 +238,7 @@ export class McpServerEditDialogComponent implements OnInit {
 
   /**
    * Dirty state (edit mode):
-   * Save becomes enabled only if the user changed name/transport or selected tools.
+   * Save becomes enabled if the user changed name/transport, selected tools, or if Refresh returned a different tool list.
    * NOTE: URL changes are handled separately (Save hidden -> Connect) and do NOT enable Save by themselves.
    */
   get isDirty(): boolean {
@@ -245,8 +251,8 @@ export class McpServerEditDialogComponent implements OnInit {
 
     const nameChanged = (this.editedServer?.name || '') !== snap.name;
     const transportChanged = (this.editedServer?.transport || '') !== snap.transport;
-    const toolsChanged = !this.areSetsEqual(this.selectedToolNames, this.originalSelectedToolsSnapshot);
-    return nameChanged || transportChanged || toolsChanged;
+    const toolsSelectionChanged = !this.areSetsEqual(this.selectedToolNames, this.originalSelectedToolsSnapshot);
+    return nameChanged || transportChanged || toolsSelectionChanged || this.availableToolsChangedAfterRefresh;
   }
 
   get showConnectButton(): boolean {
@@ -325,6 +331,10 @@ export class McpServerEditDialogComponent implements OnInit {
       this.urlChangedSinceLastConnect = false;
       this.lastUrlBlurValue = (this.editedServer?.url || '').trim();
 
+      // If the list of available tools changed after Refresh, enable Save so user can persist it.
+      const newToolNames = new Set(this.availableTools.map(t => t.name));
+      this.availableToolsChangedAfterRefresh = !this.areSetsEqual(newToolNames, this.originalAvailableToolNames);
+
       // Ensure selected tools are subset of available tools (refresh scenario).
       const availableNames = new Set(this.availableTools.map(t => t.name));
       for (const name of Array.from(this.selectedToolNames)) {
@@ -390,13 +400,21 @@ export class McpServerEditDialogComponent implements OnInit {
           clearTimeout(loaderTimer);
           return;
         }
-        // Add new server to the array
-        this.allMcpServers.push({ ...this.editedServer });
+        // Add new server to the array (include tools + selectedTools for persistence)
+        this.allMcpServers.push({
+          ...this.editedServer,
+          tools: this.editedServer.tools,
+          selectedTools: this.buildSelectedToolsPayload()
+        });
       } else {
-        // Find and update the server in the array
+        // Find and update the server in the array (include tools + selectedTools for persistence)
         const serverIndex = this.allMcpServers.findIndex(s => s.name === this.originalServer.name);
         if (serverIndex > -1) {
-          this.allMcpServers[serverIndex] = { ...this.editedServer };
+          this.allMcpServers[serverIndex] = {
+            ...this.editedServer,
+            tools: this.editedServer.tools,
+            selectedTools: this.buildSelectedToolsPayload()
+          };
         }
       }
 
@@ -423,10 +441,15 @@ export class McpServerEditDialogComponent implements OnInit {
       this.isSaving = false;
       this.showLoader = false;
       
-      // Close with the edited data
+      // Close with the edited data (server includes tools + selectedTools so list dialog can show and persist them)
+      const selectedToolsPayload = this.buildSelectedToolsPayload();
       this.dialogRef.close({
-        server: this.editedServer,
-        selectedTools: this.buildSelectedToolsPayload()
+        server: {
+          ...this.editedServer,
+          tools: this.editedServer.tools,
+          selectedTools: selectedToolsPayload
+        },
+        selectedTools: selectedToolsPayload
       });
     } catch (error) {
       this.logger.error("[McpServerEditDialog] Error saving integration:", error);
