@@ -212,7 +212,7 @@
       "NoMCPServerConfigured": "Nessun server MCP configurato",
       "UseToolsToCompleteOperation": "Usa strumenti per completare l'operazione",
       "SelectMCPTools": "Seleziona strumenti MCP",
-      "AddMoreTools": "Aggiungi strumenti MCP",
+      "AddMoreTools": "Gestione strumenti MCP",
       "TotalMCPServers": "Totale server MCP",
       "SearchByNameURLOrType": "Cerca per nome, URL o tipo",
       "NoServersMatchSearch": "Nessun server corrisponde alla ricerca",
@@ -231,7 +231,13 @@
       "ToolsAvailable": "disponibili",
       "Connect": "Connetti",
       "RefreshTools": "Aggiorna strumenti",
-      "LoadingTools": "Caricamento strumenti"
+      "LoadingTools": "Caricamento strumenti",
+      "ModelsOptional": "Modelli (opzionale)",
+      "ModelsOptionalPlaceholder": "Digita un modello e invia",
+      "Send": "Invia",
+      "RemoveTag": "Rimuovi tag",
+      "Tags": "Tag",
+      "TagsOptionalPlaceholder": "Digita un tag e invia"
     },
     "Name": "Nome",
     "Label": "Etichetta",

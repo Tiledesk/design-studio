@@ -39,12 +39,12 @@
             <div class="icon-action">
                 <img class="active-icon" [src]="element?.src" [title]="element?.name | translate ">
                 <!-- <span *ngIf="previewMode && element.badge" [class.deprecation-badge]="element.badge==='DEP'" class="trigger-beta-badge">{{element.badge}}</span> -->
-                <span *ngIf="previewMode && element.badge" [class]="'trigger-beta-badge badge-' + element.badge">{{element.badge}}</span>
+                <span *ngIf="previewMode && element?.badge" [class]="'trigger-beta-badge badge-' + element?.badge">{{element?.badge}}</span>
             </div>
 
             <p *ngIf="!previewMode" class="label-action">{{element?.name | translate }}</p>
             <!-- <span *ngIf="!previewMode && element.badge" [class.deprecation-badge]="element.badge==='DEP'" class="trigger-beta-badge">{{element.badge}}</span> -->
-            <span *ngIf="!previewMode && element.badge" [class]="'trigger-beta-badge badge-' + element.badge">{{element.badge}}</span>
+            <span *ngIf="!previewMode && element?.badge" [class]="'trigger-beta-badge badge-' + element?.badge">{{element?.badge}}</span>
             <span *ngIf="!previewMode && element?.status ==='beta'" class="trigger-beta-badge">Beta</span>
 
             <div *ngIf="previewMode" class="action-btn-icon">
@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <div *ngIf="!previewMode && element.badge ==='DEP'" class="deprecation-message">{{'CDSCanvas.DeprecationMessage' | translate}}</div>
+    <div *ngIf="!previewMode && element?.badge ==='DEP'" class="deprecation-message">{{'CDSCanvas.DeprecationMessage' | translate}}</div>
 
 </div>
 

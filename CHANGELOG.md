@@ -7,6 +7,80 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.29-rc8
+- **changed**: Updated and refactored the cds-intent and cds-connector-in components to improve performance
+
+# 1.39.29-rc7
+- **bug-fix**: Set retro compatibility between onActionUpdate and onUpdateAndSaveAction in CdsIntentComponent
+
+# 1.39.29-rc6
+- **changed**: Updated and refactored the cds-intent and cds-connector components to improve performance
+
+# 1.39.29-rc5
+- - **added**: added tag to action ask kb and action create kb
+
+# 1.39.29-rc4
+- **bug-fix**: eliminated AAAAAA
+
+# 1.39.29-rc3
+- **changed**: changed the position of the cds-note-controls panel
+
+
+# 1.39.29-rc2
+- **changed**: show MCP server in alphabetical order
+- **changed**: show MCP tools in alphabetical order
+- **changed**: Manage saving and refreshing MCP tools better
+- **changed**: change the color of the badges in the list models
+- **changed**: change the cursor to the selected MCP tools, and the text from "Chose..." to "Manage MCP Tools"
+
+# 1.39.29-rc1
+- **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
+
+# 1.39.28-rc4
+- **bug-fixed**: Fixed image loading bug with new API
+
+# 1.39.28-rc3
+- **added**: Added a note title to the note rectangle
+- **changed**: Removed the note border in rectangle notes
+- **changed**: Disabled the maximum height on rectangles and set a minimum size
+- **bug-fixed**: Fixed the issue with resizing rectangle notes. The corner opposite the one being dragged now remains locked.
+- **bug-fixed**: Fixed the horizontal resizing of text notes; eliminated flickering.
+
+
+# 1.39.28-rc2 
+- **bug-fix**: filtered LLM templates based on those present in the environment file
+- **bug-fix**: fixed bug on GptTask action in prompt preview
+- **bug-fix**: enabled saving when changing the "OR / AND" operator filter
+
+# 1.39.28-rc1
+- **changed**: refactoring of cds-canvas and cds-intent components
+
+# 1.39.27
+- **changed**: API for upload a file/images
+
+
+# 1.39.27-rc1
+- **added**: added reasoning in AI Prompt action
+
+# 1.39.26
+- **added**: added iteration action
+
+# 1.39.26-rc1
+- **bug-fix**: sort attribute list in Variable List Component
+- **bug-fix**: change the "use kb name" field to 2 lines
+- **bug-fix**: the selected model is red even when the api is set
+- **changed**: change the AI ​​settings preview
+
+# 1.39.25-rc2
+- **bug-fix**: Fixed a filter error when selecting a KB.
+- **bug-fix**: Fixed an error when setting the re-ranking multiplier when setting "use KB name."
+- **changed**: Set the "Max chunks for re-ranking" to 100.
+
+# 1.39.25-rc1
+- **changed**: updated MCP server, added "tools" selection for each server
+
+# 1.39.25
+
 # 1.39.24-rc11
 - **changed**: minor updates on API for upload a file/chatbot avatar
 
@@ -2011,4 +2085,3 @@ delete an action (delete all outgoing connectors)
 
 # 0.0.1
  first deploy<br>
-

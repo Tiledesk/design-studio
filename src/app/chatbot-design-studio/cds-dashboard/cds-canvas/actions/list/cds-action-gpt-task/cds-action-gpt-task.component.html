@@ -120,7 +120,7 @@
         <div class="header-answer-preview">
             <div class="label-and-button-container">
                 <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{llm_model_selected.modelName}} )</span>
+                    <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }}  {{ action?.model }} )</span>
                 </label>
                 <!-- <button id="cds-publish-btn" class="btn btn-primar set-var-btn" type="button" *ngIf="showVariablesBtn"
                     (click)="showHideVariablesSection()">Set variables
@@ -194,9 +194,8 @@
                     <div class="title-and-parameters-container">
                         <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                         <div class="parameters-preview">
-                            <span *ngIf="action?.model" class="preview-flag">
+                            <span *ngIf="action?.model" class="preview-badge">
                                 {{ action?.model }}
-                                <span class="sep"> | </span>
                             </span>
                             <span *ngIf="action?.max_tokens" class="preview-badge">
                                 <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
