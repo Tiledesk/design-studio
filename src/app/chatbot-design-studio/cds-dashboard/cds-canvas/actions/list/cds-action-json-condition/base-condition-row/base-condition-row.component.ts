@@ -36,13 +36,13 @@ export class BaseConditionRowComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.log('[BASE_CONDITION_ROW] ******* ngOnInit-->');
+    this.operatorsList = Object.keys(OPERATORS_LIST).map(key => OPERATORS_LIST[key]);
   }
 
   ngOnChanges(changes: SimpleChanges){
     this.logger.log('[BASE_CONDITION_ROW] ******* ngOnChanges-->');
     this.conditionForm = this.createConditionGroup()
     this.step=0;
-    this.operatorsList = Object.keys(OPERATORS_LIST).map(key => (OPERATORS_LIST[key]))
     if(this.condition){
       this.logger.log('[BASE_CONDITION_ROW] selectedConditionnnn-->', this.condition)
       this.setFormValue()
@@ -193,6 +193,10 @@ export class BaseConditionRowComponent implements OnInit {
     if (keyCode === 27) { // Esc keyboard code
       this.onClose();
     }
+  }
+
+  trackByOperatorType(index: number, item: { type?: string }): string | number {
+    return item?.type ?? index;
   }
 
 }

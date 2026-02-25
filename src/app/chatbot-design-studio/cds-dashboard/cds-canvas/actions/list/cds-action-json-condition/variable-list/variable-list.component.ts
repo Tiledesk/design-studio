@@ -90,13 +90,13 @@ export class VariableListComponent implements OnInit {
     this.filteredGlobalsList = []
     this.filteredIntentVariableList = [];
     if(this.variableListUserDefined){
-      this.filteredVariableList.push(this.variableListUserDefined)
+      this.filteredVariableList.push({ key: this.variableListUserDefined.key, elements: this.sortElementsByName(this.variableListUserDefined.elements || []) })
     }
     if(this.variableListGlobals){
-      this.filteredGlobalsList.push(this.variableListGlobals)
+      this.filteredGlobalsList.push({ key: this.variableListGlobals.key, elements: this.sortElementsByName(this.variableListGlobals.elements || []) })
     }
-    variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals')).map(el => {
-      this.filteredIntentVariableList.push( { key: el.key, elements: el.elements })
+    variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals')).forEach(el => {
+      this.filteredIntentVariableList.push({ key: el.key, elements: this.sortElementsByName(el.elements || []) })
     })
 
 
@@ -149,21 +149,15 @@ export class VariableListComponent implements OnInit {
     this.onSelected.emit(variableSelected);
   }
 
-  onChangeSearch(event){
-    // this.logger.log('[VARIABLE-LIST] onChangeSearch-->', event, this.textVariable);
-    if(event && event.target){
-      this.textVariable = event.target.value
-    }else {
-      this.textVariable = event
-    }
-    // this.logger.log('[VARIABLE-LIST] onChangeSearch--> 1', this.textVariable, this.variableListUserDefined, this.variableListGlobals, this.variableListSystemDefined);
-    this.filteredVariableList = this._filter2(this.textVariable, [this.variableListUserDefined])
-    this.filteredGlobalsList = this._filter2(this.textVariable, [this.variableListGlobals])
-    this.filteredIntentVariableList = this._filter2(this.textVariable, this.variableListSystemDefined)
-    // this.logger.log('[VARIABLE-LIST] onChangeSearch--> 2', this.filteredVariableList, this.filteredGlobalsList, this.filteredIntentVariableList);
-    this.isEmpty = (this.filteredIntentVariableList.every(el => el.elements.length === 0) && this.filteredVariableList[0].elements.length === 0 ) 
-    this.isSearching = (this.textVariable !== '')
-    // this.logger.log('[VARIABLE-LIST] onChangeSearch--> 3', this.isEmpty, this.isSearching);
+  onChangeSearch(event: string | { target?: { value?: string } }){
+    const value = typeof event === 'string' ? event : (event?.target?.value ?? '');
+    this.textVariable = value;
+    this.filteredVariableList = this._filter2(value, this.variableListUserDefined ? [this.variableListUserDefined] : []);
+    this.filteredGlobalsList = this._filter2(value, this.variableListGlobals ? [this.variableListGlobals] : []);
+    this.filteredIntentVariableList = this._filter2(value, this.variableListSystemDefined || []);
+    const hasUserDefined = this.filteredVariableList?.length > 0 && this.filteredVariableList[0]?.elements?.length > 0;
+    this.isEmpty = (this.filteredIntentVariableList.every(el => el.elements.length === 0) && !hasUserDefined);
+    this.isSearching = (value !== '');
   }
 
   private _filter(value: string, array: Array<any>): Array<any> {
@@ -173,11 +167,27 @@ export class VariableListComponent implements OnInit {
 
   private _filter2(value: string, array: Array<{key: string, elements: Array<any>}>): Array<any> {
     const filterValue = value.toLowerCase();
-    return array.map(el => { return { key: el.key, elements: el.elements.filter(option => option.name.toLowerCase().includes(filterValue))}});
+    return array.map(el => {
+      const filtered = el.elements.filter(option => option.name.toLowerCase().includes(filterValue));
+      const sorted = [...filtered].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      return { key: el.key, elements: sorted };
+    });
+  }
+
+  private sortElementsByName<T extends { name?: string }>(elements: T[]): T[] {
+    return elements.length ? [...elements].sort((a, b) => (a.name || '').localeCompare(b.name || '')) : elements;
   }
 
   onAddCustomAttribute(){
     this.openDialog();
+  }
+
+  trackByVariableName(index: number, variable: { name?: string; value?: string }): string | number {
+    return variable?.name ?? variable?.value ?? index;
+  }
+
+  trackByIntentItemKey(index: number, item: { key?: string }): string | number {
+    return item?.key ?? index;
   }
 
 }

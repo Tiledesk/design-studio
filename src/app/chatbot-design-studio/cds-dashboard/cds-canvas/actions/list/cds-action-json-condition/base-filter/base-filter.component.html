@@ -1,6 +1,6 @@
 <div class="content">
 
-    <div class="filter-row" *ngFor="let group of expression?.conditions; let i = index; let last = last">
+    <div class="filter-row" *ngFor="let group of expression?.conditions; let i = index; let last = last; trackBy: trackByConditionIndex">
         <div class="text-editor-wrapper">
             <!-- CONDITION [i]-->
             <div *ngIf="i%2 === 0" 
@@ -15,7 +15,7 @@
                 </div>
                 <div class="filter-text no-ellips">
                     <b>{{group?.operand1}}</b> 
-                    {{OPERATORS_LIST[group?.operator].name | translate }}
+                    {{ getOperatorName(group?.operator) | translate }}
                     <b *ngIf="group?.operand2.type === 'const'">{{group?.operand2?.value}}</b>
                     <b *ngIf="group?.operand2.type === 'var'">{{group?.operand2?.name}}</b>
                 </div>                    

@@ -32,7 +32,7 @@
         <section class="condition">
             <div>{{'CDSCanvas.Condition' | translate }}</div>
             <div class="operators-list">
-                <div class="operator" [class.active]="conditionForm.value.operator === item.type" *ngFor="let item of operatorsList" (click)="onClickOperator(item)">
+                <div class="operator" [class.active]="conditionForm.value.operator === item.type" *ngFor="let item of operatorsList; trackBy: trackByOperatorType" (click)="onClickOperator(item)">
                     <img class="active-icon" *ngIf="item.src" width="10px" [src]="item.src">
                     <div>{{item.name | translate}}</div>
                 </div>

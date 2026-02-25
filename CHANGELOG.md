@@ -7,8 +7,19 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch refactoring component: cds-connector-in
+# this branch refactoring component: cds-actions-json-condition
+- **performance**: Aggiunto `trackBy` a tutte le liste (`*ngFor`) per evitare ricostruzioni inutili del DOM.
+- **performance**: Nomi operatori letti tramite metodo `getOperatorName` invece che nel template; meno lavoro a ogni aggiornamento.
+- **performance**: Condizioni lunghe nel template sostituite con getter (`hasEmptyConditions`, `hasConditions`, `showElse`); rimossa condizione duplicata.
+- **stabilità**: Subscription al form (`valueChanges`) salvata e disattivata in `ngOnDestroy` per evitare memory leak.
+- **performance**: Lista operatori in base-condition-row creata una sola volta in `ngOnInit` invece che a ogni cambio.
+- **stabilità**: Lista intent ordinata su copia (no mutazione array condiviso); accessi sicuri a liste filtrate in variable-list; calcolo `isEmpty` senza rischi su array vuoti.
+- **chiarezza**: In variable-list, `onChangeSearch` normalizza subito l’input (stringa o evento) e usa un solo valore per filtri e stato.
+- **fix**: Cambio operatore in una condizione ora emette l’evento e salva correttamente (emit in `onChangeOperator`, filter.component).
+- **fix**: Liste ordinate per nome: intent in `initializeConnector`; variabili in variable-list (iniziale e risultati di ricerca).
 
+
+# previous branch 
 - **changed**: Corretto bug nella subscription ai connector: il confronto usava un parametro che shadowava l’emissione (sempre true); ora si aggiorna solo quando il connector è in lista. Rimossi console.log.
 - **changed**: OnPush e `markForCheck()` dopo aggiornamenti asincroni; meno change detection inutile.
 - **changed**: `ngOnChanges` riattivato: quando cambia l’input `connectorsIn` (es. intent eliminato) il componente si aggiorna.
@@ -19,7 +30,7 @@
 - **changed**: Menu mostrato/nascosto con classe `.is-hidden` e proprietà `menuVisible` (mouseenter/mouseleave) invece di solo CSS :hover su display.
 - **changed**: Template: spazio tra `*ngIf` e `class` nel div radice (manutenzione).
 
-# prev branch
+# previous branch
 - **changed**: Componente più “leggero”: Angular aggiorna la vista solo quando serve (OnPush) e ogni connector ascolta solo l’intent a cui è collegato, non tutti gli aggiornamenti.
 - **changed**: Un solo pallino nel DOM: non si crea/distrugge più l’elemento al collegare/scollegare; si cambiano solo classe e attributi (point-connector vs point-connector-empty).
 - **changed**: Nascosto/mostrato il blocco “contratto” (nome intent + menu) con una classe CSS (`.is-hidden`) invece che con la proprietà `display` via stringa; niente più rischio di typo e meno lavoro per il browser.

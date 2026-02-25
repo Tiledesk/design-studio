@@ -41,6 +41,7 @@ export class CdsActionJsonConditionComponent implements OnInit {
   isConnectedFalse: boolean = false;
   connector: any;
   private subscriptionChangedConnector: Subscription;
+  private subscriptionFormChanges: Subscription;
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
@@ -69,6 +70,9 @@ export class CdsActionJsonConditionComponent implements OnInit {
       if (this.subscriptionChangedConnector) {
         this.subscriptionChangedConnector.unsubscribe();
       }
+      if (this.subscriptionFormChanges) {
+        this.subscriptionFormChanges.unsubscribe();
+      }
     }
   
     // ngOnChanges() {
@@ -88,6 +92,9 @@ export class CdsActionJsonConditionComponent implements OnInit {
       this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
       this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
       this.listOfIntents = this.intentService.getListOfIntents();
+      if (this.listOfIntents?.length) {
+        this.listOfIntents = [...this.listOfIntents].sort((a, b) => a.name.localeCompare(b.name));
+      }
       this.checkConnectionStatus();
     }
 
@@ -118,7 +125,7 @@ export class CdsActionJsonConditionComponent implements OnInit {
   
     private initialize() {
       this.actionJsonConditionFormGroup = this.buildForm();
-      this.actionJsonConditionFormGroup.valueChanges.subscribe(form => {
+      this.subscriptionFormChanges = this.actionJsonConditionFormGroup.valueChanges.subscribe(form => {
         this.logger.log('[ACTION-JSON-CONDITION] form valueChanges-->', form)
         if(form && (form.trueIntent !== '' || form.falseIntent !== '' ||  form.stopOnConditionMet !== '')){
           this.action.trueIntent = this.actionJsonConditionFormGroup.value.trueIntent
@@ -136,8 +143,6 @@ export class CdsActionJsonConditionComponent implements OnInit {
       if (this.action) {
         this.setFormValue()
       }
-      // ordina listOfIntents per name
-      this.listOfIntents.sort((a, b) => a.name.localeCompare(b.name));
     }
   
     private setFormValue(){
@@ -270,6 +275,34 @@ export class CdsActionJsonConditionComponent implements OnInit {
         this.logger.log("Error: ", error);
       }
     }
+
+  trackByGroupIndex(index: number): number {
+    return index;
+  }
+
+  trackByConditionIndex(index: number): number {
+    return index;
+  }
+
+  getOperatorName(operatorKey: string): string {
+    return this.OPERATORS_LIST[operatorKey]?.name ?? '';
+  }
+
+  get hasEmptyConditions(): boolean {
+    const g = this.action?.groups;
+    const first = g?.[0] as Expression | undefined;
+    return !!(g?.length && first?.conditions && first.conditions.length === 0);
+  }
+
+  get hasConditions(): boolean {
+    const g = this.action?.groups;
+    const first = g?.[0] as Expression | undefined;
+    return !!(g?.length && first?.conditions && first.conditions.length > 0);
+  }
+
+  get showElse(): boolean {
+    return !(this.action as ActionJsonCondition & { noelse?: boolean })?.noelse;
+  }
   
   }
   

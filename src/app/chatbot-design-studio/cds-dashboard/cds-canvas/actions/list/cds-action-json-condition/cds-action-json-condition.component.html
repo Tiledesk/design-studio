@@ -6,8 +6,8 @@
         </div>
 
 
-        <ng-container *ngIf="action?.groups.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length === 0" [ngTemplateOutlet]="placeholder"></ng-container>
-        <ng-container *ngIf="action?.groups.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length > 0" [ngTemplateOutlet]="conditions"></ng-container>
+        <ng-container *ngIf="hasEmptyConditions" [ngTemplateOutlet]="placeholder"></ng-container>
+        <ng-container *ngIf="hasConditions" [ngTemplateOutlet]="conditions"></ng-container>
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
@@ -18,9 +18,9 @@
     </div>
 
 
-    <hr *ngIf="!action?.noelse" class="preview-divider">
+    <hr *ngIf="showElse" class="preview-divider">
 
-    <div *ngIf="!action?.noelse" class="previewContent">   
+    <div *ngIf="showElse" class="previewContent">   
         <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
             [idConnector] = "idConnectorFalse"
@@ -39,13 +39,13 @@
             <!-- formArrayName="groups" -->
             <div > 
                 <!-- [formGroupName]="i" -->
-                <div class="text-editor-wrapper" *ngFor="let group of action?.groups; let i = index; let last = last">
+                <div class="text-editor-wrapper" *ngFor="let group of action?.groups; let i = index; let last = last; trackBy: trackByGroupIndex">
                     <!-- EXPRESSION [i]-->
                     <div *ngIf="i%2 === 0" class="base-filter">
                         <div class="control-buttons" *ngIf="group?.conditions && group?.conditions.length > 0 || i!==0">
                             <div class="filter-remove" (click)="onDeleteGroup(i, last)"><span class="material-icons-outlined">delete</span></div>
                         </div>
-                        <base-filter *ngIf="i%2 === 0"
+                        <base-filter
                             [expression]="group"
                             [booleanOperators]="booleanOperators"
                             (onChangeExpression)="onChangeExpression($event)">
@@ -105,7 +105,7 @@
             </div>
         
             <!-- falseIntent -->
-            <div *ngIf="!action?.noelse" class="field-box">
+            <div *ngIf="showElse" class="field-box">
                 <div class="condition-container">
                     <span class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</span>
                 </div>
@@ -151,18 +151,18 @@
 
 <ng-template #conditions>
    <div id="conditions">
-        <div *ngFor="let group of action?.groups; let i = index;" class="group">
+        <div *ngFor="let group of action?.groups; let i = index; trackBy: trackByGroupIndex" class="group">
             
             <!-- EXPRESSION [i]-->
             <div *ngIf="i%2 === 0 && group?.conditions && group?.conditions.length > 0" class="expression">
-                <div *ngFor="let condition of group.conditions; let j = index;" >
+                <div *ngFor="let condition of group.conditions; let j = index; trackBy: trackByConditionIndex" >
                     <div *ngIf="j%2 === 0" class="condition-group">
                         <div class="filter-icon">
                             <span class="material-icons">data_object</span>
                         </div>
                         <div class="filter-text no-ellips">
                             <b>{{condition?.operand1}}</b> 
-                            {{OPERATORS_LIST[condition?.operator].name | translate }}
+                            {{ getOperatorName(condition?.operator) | translate }}
                             <b *ngIf="condition?.operand2.type === 'const'">{{condition?.operand2?.value}}</b>
                             <b *ngIf="condition?.operand2.type === 'var'">{{condition?.operand2?.name}}</b>
                         </div>
