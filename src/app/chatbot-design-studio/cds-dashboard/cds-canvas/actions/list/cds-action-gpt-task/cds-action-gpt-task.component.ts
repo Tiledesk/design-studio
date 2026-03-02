@@ -24,6 +24,8 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { OPENAI_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
   selector: 'cds-action-gpt-task',
@@ -89,18 +91,35 @@ export class CdsActionGPTTaskComponent implements OnInit {
     private dashboardService: DashboardService
   ) { }
 
+
   ngOnInit(): void {
     // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
     const lang = this.translate.getBrowserLang() || 'en';
     this.browserLang = lang.startsWith('it') ? 'it' : 'en';
-    this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
-    const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
-    this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
-      if(ai_models[el.value])
-        return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
-      else
-        return { ...el, multiplier: null }
-    })
+
+  // Filtra per aiModels solo i modelli GPT (id che inizia con 'gpt-'); gli altri restano tutti
+  const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
+  const allowedModelIds = Object.keys(ai_models);
+  this.model_list = OPENAI_MODEL.filter(model =>
+    allowedModelIds.includes(model.value)
+  );
+  
+  this.model_list = this.model_list.map((model: any) =>
+    ai_models[model.value] != null
+      ? { ...model, multiplier: ai_models[model.value] + ' x tokens' }
+      : { ...model, multiplier: null }
+  );
+
+
+    // this.logger.debug("[ACTION GPT-TASK] ngOnInit action: ", this.action);
+    // const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels)
+    
+    // this.model_list = TYPE_GPT_MODEL.filter(el => Object.keys(ai_models).includes(el.value)).map((el)=> {
+    //   if(ai_models[el.value])
+    //     return { ...el, multiplier: ai_models[el.value] + ' x tokens' }
+    //   else
+    //     return { ...el, multiplier: null }
+    // })
     this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
