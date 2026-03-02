@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.32-rc1
+- **bug-fix**: GptTask Preview broken
+- **bug-fix**: Condition blocks not saved when changing Boolean operators
+- **bug-fix**: OpenAI models present in the select even if they are missing from the environment variable
 
 # 1.39.32
 
