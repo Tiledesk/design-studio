@@ -56,7 +56,7 @@ export class SelectComponent implements OnInit {
       try {
         this.itemSelected = this.sortedItems.find(el => el[this.bindValueSelect] === this.itemSelected)[this.bindValueSelect]
       } catch (error) {
-        console.error('ERROR', error);
+        //console.error('ERROR', error);
       }
       
     }
