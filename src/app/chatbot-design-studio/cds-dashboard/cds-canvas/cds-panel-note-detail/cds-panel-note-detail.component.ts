@@ -256,7 +256,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     return { ok: false, reason: 'Only images (including GIF) or videos are supported.' };
   }
 
-  private async OLD_loadMediaFromFile(file: File): Promise<void> {
+  private async loadMediaFromFile_OLD(file: File): Promise<void> {
     if (!this.note) return;
 
     this.imageUploadError = '';
@@ -277,7 +277,6 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
       const user = this.tiledeskAuthService.getCurrentUser();
       const currentUpload = new UploadModel(file);
       const data = await this.uploadService.upload(user.uid, currentUpload);
-
       // VINCOLO: prima upload, poi salviamo l'URL risultante nella nota
       const url = data?.downloadURL || data?.src;
       if (!url) {
@@ -290,8 +289,8 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     } finally {
       this.isUploadingImage = false;
     }
-  }
 
+  }
 
 
   loadMediaFromFile(file): Promise<void> {
@@ -370,6 +369,26 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     return null;
   }
 
+
+    //   const data = await this.uploadService.uploadAsset(user.uid, currentUpload);
+    //   this.logger.log(`[CdsPanelNoteDetailComponent] Successfully uploaded file and got download link - ${data}`);
+    //   // VINCOLO: prima upload, poi salviamo l'URL risultante nella nota
+    //   const url = data?.downloadURL || data?.src;
+    //   if (!url) {
+    //     throw new Error('Upload did not return downloadURL/src');
+    //   }
+    //   this.logger.log(`[CdsPanelNoteDetailComponent] Successfully url result - ${url}`);
+    //   this.setMediaFromSrc(url, supported.mediaType);
+    // } catch (e) {
+    //   this.imageUploadError = 'Upload failed. Please try again.';
+    //   this.logger.error('[CdsPanelNoteDetailComponent] Error uploading media for image note', e);
+    // } finally {
+    //   this.isUploadingImage = false;
+    // }
+
+
+
+  
 
   private async loadImageFromUrl(url: string): Promise<void> {
     if (!this.note) return;
@@ -633,7 +652,7 @@ export class CdsPanelNoteDetailComponent implements OnInit, OnDestroy {
     })();
 
     const file = new File([blob], filenameFromUrl, { type: type || undefined });
-    const data = await this.uploadService.upload(user.uid, new UploadModel(file));
+    const data = await this.uploadService.upload(user.uid, new UploadModel(file)); // uploadAsset
     const uploadedUrl = data?.downloadURL || data?.src;
     if (!uploadedUrl) {
       throw new Error('Upload did not return downloadURL/src');

@@ -51,14 +51,13 @@ export class SelectComponent implements OnInit {
       this.sortedItems = this.sortItemsAlphabetically(this.items);
     }
 
-    if(this.itemSelected && this.sortedItems){
-      //   this.itemSelected = this.items.find(el => el[this.bindValueSelect] === this.itemSelected)
+    if (this.itemSelected != null && this.sortedItems?.length && this.bindValueSelect) {
       try {
-        this.itemSelected = this.sortedItems.find(el => el[this.bindValueSelect] === this.itemSelected)[this.bindValueSelect]
+        const found = this.sortedItems.find(el => el[this.bindValueSelect] === this.itemSelected);
+        this.itemSelected = found ? found[this.bindValueSelect] : this.itemSelected;
       } catch (error) {
         console.error('ERROR', error);
       }
-      
     }
   }
 
