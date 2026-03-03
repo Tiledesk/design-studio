@@ -16,6 +16,19 @@
 
 
 # 1.39.29-rc2
+
+# this branch 
+- **changed**: replaced "Tag" with "Label"
+- **Added**: aggiunta la possibilità di inserire tag nella action ask KB e nella action create KB
+
+
+# 1.39.30
+- **Modified**: Changed the position of the cds-note-controls panel
+- **Added**: Added a note title to the rectangle note
+- **Modified**: Removed the note border in the rectangle note
+- **Modified**: Disabled the maximum height on rectangle note and set a minimum size
+- **Bug Fix**: Fixed an issue with resizing rectangle note. The corner opposite the one being dragged now remains locked.
+- **Bug Fix**: Fixed horizontal resizing of text notes; eliminated flickering.
 - **changed**: show MCP server in alphabetical order
 - **changed**: show MCP tools in alphabetical order
 - **changed**: Manage saving and refreshing MCP tools better
