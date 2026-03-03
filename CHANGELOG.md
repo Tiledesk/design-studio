@@ -7,37 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch refactoring component: cds-actions-json-condition
-- **performance**: Aggiunto `trackBy` a tutte le liste (`*ngFor`) per evitare ricostruzioni inutili del DOM.
-- **performance**: Nomi operatori letti tramite metodo `getOperatorName` invece che nel template; meno lavoro a ogni aggiornamento.
-- **performance**: Condizioni lunghe nel template sostituite con getter (`hasEmptyConditions`, `hasConditions`, `showElse`); rimossa condizione duplicata.
-- **stabilità**: Subscription al form (`valueChanges`) salvata e disattivata in `ngOnDestroy` per evitare memory leak.
-- **performance**: Lista operatori in base-condition-row creata una sola volta in `ngOnInit` invece che a ogni cambio.
-- **stabilità**: Lista intent ordinata su copia (no mutazione array condiviso); accessi sicuri a liste filtrate in variable-list; calcolo `isEmpty` senza rischi su array vuoti.
-- **chiarezza**: In variable-list, `onChangeSearch` normalizza subito l’input (stringa o evento) e usa un solo valore per filtri e stato.
-- **fix**: Cambio operatore in una condizione ora emette l’evento e salva correttamente (emit in `onChangeOperator`, filter.component).
-- **fix**: Liste ordinate per nome: intent in `initializeConnector`; variabili in variable-list (iniziale e risultati di ricerca).
-- **cleanup**: Pulizia strutturale (agent-safe-cleanup-refactor) su base-condition-row, base-filter, variable-list e cds-action-json-condition: import riordinati, codice morto rimosso, formattazione e commenti didattici; nessuna modifica funzionale.
+# 1.39.33-rc1
+- **changed**: update and refactoring cds-action-json-condition
 
-# previous branch 
-- **changed**: Corretto bug nella subscription ai connector: il confronto usava un parametro che shadowava l’emissione (sempre true); ora si aggiorna solo quando il connector è in lista. Rimossi console.log.
-- **changed**: OnPush e `markForCheck()` dopo aggiornamenti asincroni; meno change detection inutile.
-- **changed**: `ngOnChanges` riattivato: quando cambia l’input `connectorsIn` (es. intent eliminato) il componente si aggiorna.
-- **changed**: `trackBy` per l’`*ngFor` del menu (trackByIntentId) per riusare i nodi DOM.
-- **changed**: Filtro “contract visibile”: cache per ciclo (stesso elemento non letto più volte) e helper `getContractElementId`.
-- **changed**: Cache degli elementi DOM in show/hide: id precalcolati e riferimenti in cache; invalidata al cambio lista. Meno getElementById a ogni hover.
-- **changed**: Alpha (opacità linee) in cache: aggiornato in showConnectorsIn e ngOnInit, riusato in hideConnectorsIn e onMenuItemMouseLeave. Cache di visibilità contract in onMenuItemMouseEnter/Leave.
-- **changed**: Menu mostrato/nascosto con classe `.is-hidden` e proprietà `menuVisible` (mouseenter/mouseleave) invece di solo CSS :hover su display.
-- **changed**: Template: spazio tra `*ngIf` e `class` nel div radice (manutenzione).
+# 1.39.33
 
-# previous branch
-- **changed**: Componente più “leggero”: Angular aggiorna la vista solo quando serve (OnPush) e ogni connector ascolta solo l’intent a cui è collegato, non tutti gli aggiornamenti.
-- **changed**: Un solo pallino nel DOM: non si crea/distrugge più l’elemento al collegare/scollegare; si cambiano solo classe e attributi (point-connector vs point-connector-empty).
-- **changed**: Nascosto/mostrato il blocco “contratto” (nome intent + menu) con una classe CSS (`.is-hidden`) invece che con la proprietà `display` via stringa; niente più rischio di typo e meno lavoro per il browser.
-- **changed**: Su mouseenter/mouseleave gli id degli elementi SVG e i riferimenti DOM vengono calcolati una volta e messi in cache; si evitano ripetute ricerche nel DOM.
-- **changed**: Animazioni dei pallini: invece di animare larghezza/altezza/bordo (costose), si usa solo `transform: scale()` al passaggio del mouse.
-- **changed**: SCSS: un’unica definizione per `.point-connector` (rimosso il blocco duplicato).
-- **changed**: IntentService: nuovo metodo `intentUpdatesById$(id)` per sottoscriversi solo agli aggiornamenti di un singolo intent (usato dai connector).
 # 1.39.32-rc1
 - **bug-fix**: GptTask Preview broken
 - **bug-fix**: Condition blocks not saved when changing Boolean operators
