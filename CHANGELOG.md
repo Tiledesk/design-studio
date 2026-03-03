@@ -10,6 +10,7 @@
 
 
 # this branch 
+- **changed**: replaced "Tag" with "Label"
 - **Added**: aggiunta la possibilità di inserire tag nella action ask KB e nella action create KB
 
 
