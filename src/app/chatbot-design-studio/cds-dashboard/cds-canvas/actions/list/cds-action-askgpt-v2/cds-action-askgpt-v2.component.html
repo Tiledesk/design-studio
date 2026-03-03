@@ -125,7 +125,7 @@
             <div class="header-answer-preview">
                 <div class="label-and-button-container">
                     <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
-                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} {{llm_model_selected.modelName}})</span>
+                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} {{llm_model_selected?.modelName}})</span>
                     </label>
                 </div>
             </div>
@@ -217,12 +217,13 @@
                 {{ 'CDSCanvas.UseKnowledgeBaseName' | translate }}
             </mat-checkbox>
             <label class="field-description">{{ "CDSCanvas.UseKBNameDescription" | translate }}
+                <br>
                 <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.namespace_as_name.link" [target]="DOCS_LINK.namespace_as_name.target">{{ 'LearnMore' | translate }}</a>
             </label>
         </section>
     </div>
 
-
+    
     <div class="link-container">
         <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
     </div>
@@ -237,9 +238,8 @@
                         <div class="title-and-parameters-container">
                             <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                             <div class="parameters-preview">
-                                <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-flag">
+                                <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-badge">
                                     {{ action?.modelName || llm_model_selected?.modelName }}
-                                    <span class="sep"> | </span>
                                 </span>
                                 <span *ngIf="action?.max_tokens" class="preview-badge">
                                     <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
@@ -260,19 +260,15 @@
                                 
                                 <!-- Advanced/KB options preview (when panel is collapsed) -->
                                 <span *ngIf="action?.advancedPrompt" class="preview-flag">
-                                    <span class="sep"> | </span>
                                     <span class="label">{{"CDSCanvas.AdvancedContext" | translate}}</span>
                                 </span>
                                 <span *ngIf="action?.citations" class="preview-flag">
-                                    <span class="sep"> | </span>
                                     <span class="label">{{"CDSCanvas.Citations" | translate}}</span>
                                 </span>
                                 <span *ngIf="action?.chunks_only" class="preview-flag">
-                                    <span class="sep"> | </span>
                                     <span class="label">{{"CDSCanvas.ChunksOnly" | translate}}</span>
                                 </span>
                                 <span *ngIf="action?.skip_unanswered" class="preview-flag">
-                                    <span class="sep"> | </span>
                                     <span class="label">{{"CDSCanvas.SkipUnanswered" | translate}}</span>
                                 </span>
                             </div>
@@ -287,9 +283,9 @@
                 <!-- // model select  -->
                 <div class="field-box">
                     <cds-select id="model-condition"
-                        [class]="!llm_model_selected.configured ? 'not-configured' : ''"
+                        [class]="!llm_model_selected?.configured ? 'not-configured' : ''"
                         [items]="llm_models_flat" 
-                        [itemSelected]="llm_model_selected.model"
+                        [itemSelected]="llm_model_selected?.model"
                         [bindLabelSelect]="'modelName'" 
                         [bindValueSelect]="'model'"
                         [groupByKey]="'llm'"
@@ -316,6 +312,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -372,7 +369,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['search_type'].step"  
                                     [min]="ai_setting['search_type'].min"
-                                    [max]="ai_setting['search_type'].max" 
+                                    [max]="ai_setting['search_type'].max"
+                                    [disabled]="ai_setting['max_tokens'].disabled" 
                                     [(ngModel)]="action.alpha"
                                     (change)="updateSliderValue($event.value, 'alpha')" aria-label="units">
                                 </mat-slider>
@@ -463,6 +461,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 
@@ -473,7 +472,7 @@
                 </div>
 
                 <!-- // advanced prompt -->                     
-                <div class="field-box" [class.disabled]="action?.chunks_only">
+                <div class="field-box advanced-prompt-container" [class.disabled]="action?.chunks_only">
                     <section class="disable-input-message-section">
                         <mat-checkbox 
                             [disabled]="action?.chunks_only"
@@ -485,6 +484,36 @@
                     <label class="field-description">{{ "CDSCanvas.AdvancedContextDesctiption" | translate }}
                         <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.advanced_prompt.link" [target]="DOCS_LINK.advanced_prompt.target">{{ 'LearnMore' | translate }}</a>
                     </label>
+                </div>
+
+                <!-- // tags --> 
+                <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.Tags' | translate}}</label>
+                    <div class="tags-input-row">
+                        <input type="text"
+                            class="tags-input"
+                            [value]="tagInputValue"
+                            (input)="tagInputValue = $any($event.target).value"
+                            [placeholder]="'CDSCanvas.TagsOptionalPlaceholder' | translate"
+                            (keydown.enter)="$event.preventDefault(); addTag()" />
+                        <button type="button"
+                            class="tags-send-btn"
+                            *ngIf="tagInputValue?.trim().length > 0"
+                            (click)="addTag()">
+                            {{'CDSCanvas.Send' | translate}}
+                        </button>
+                    </div>
+                    <div class="models--container" *ngIf="action?.tags?.length">
+                        <div aria-label="{{ 'CDSCanvas.Tags' | translate }}" *ngFor="let tag of action.tags" class="model-name-and-btn-wpr">
+                            <p class="model-name">{{ tag }}</p>
+                            <button type="button" class="delete-model" (click)="removeTag(tag)" [attr.aria-label]="('CDSCanvas.RemoveTag' | translate) + ' ' + tag">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" class="remove-tag-icon" aria-hidden="true">
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                                    <path d="M0 0h24v24H0z" fill="none" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- // citations -->    

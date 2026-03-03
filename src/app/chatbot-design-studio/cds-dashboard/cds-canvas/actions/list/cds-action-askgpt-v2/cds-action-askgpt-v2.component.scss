@@ -1,5 +1,5 @@
 
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -12,6 +12,105 @@
 // ::-webkit-scrollbar {
 //     width: 0px;
 // }
+
+.tags-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--blu-light-02, #d2d4d6);
+    border-radius: var(--input-border-radius-base, 8px);
+    padding: 0 4px 0 12px;
+    background: #fff;
+    box-sizing: border-box;
+
+    .tags-input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        outline: none;
+        padding: 5px 0;
+        font-size: 14px;
+        background: transparent;
+        color: var(--gray);
+        &::placeholder {
+            color: #9aa0a6;
+        }
+    }
+
+    .tags-send-btn {
+        flex-shrink: 0;
+        padding: 3px 7px;
+        border: none;
+        border-radius: 6px;
+        background: var(--blu);
+        color: #fff;
+        font-size: 12px;
+        line-height: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        height: 26px;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+}
+
+.models--container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.model-name-and-btn-wpr {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0px;
+    border-radius: 4px;
+    background-color: var(--blu-light-01);
+    border: 0px solid #d2d4d6;
+    font-size: 12px;
+}
+
+.model-name {
+    margin: 0;
+    font-weight: 300;
+    color: var(--blu);
+    padding-left: 6px;
+}
+
+.delete-model {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    margin: 0;
+    height: 100%;
+    min-width: 14px;
+    min-height: 14px;
+    border: none;
+    background: transparent;
+    color: #3d4047;
+    cursor: pointer;
+    border-radius: 0px 4px 4px 0px;
+
+    &:hover {
+        background: var(--blu);
+        .remove-tag-icon {
+            fill: var(--color-white-hex);
+        }
+    }
+}
+
+.remove-tag-icon {
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    min-height: 12px;
+    fill: currentColor;
+}
 
 .link-container {
     margin-bottom: 20px;
@@ -90,7 +189,7 @@ mat-expansion-panel ::ng-deep {
     }
     .parameters-preview {
         font-size: 11px;
-        height: 34px;
+        height: 38px;
         line-height: normal;
     }
 
@@ -396,6 +495,9 @@ mat-checkbox ::ng-deep {
 
 
 .field-box {
+    &.advanced-prompt-container {
+        margin-top: -10px;
+    }
     &.disabled {
         pointer-events: none;
         opacity: 0.5;

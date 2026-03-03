@@ -42,11 +42,38 @@
         </cds-textarea>
     </div>
 
-
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.Tags' | translate}}</label>
+        <div class="tags-input-row">
+            <input type="text"
+                class="tags-input"
+                [value]="tagInputValue"
+                (input)="tagInputValue = $any($event.target).value"
+                [placeholder]="'CDSCanvas.TagsOptionalPlaceholder' | translate"
+                (keydown.enter)="$event.preventDefault(); addTag()" />
+            <button type="button"
+                class="tags-send-btn"
+                *ngIf="tagInputValue?.trim().length > 0"
+                (click)="addTag()">
+                {{'CDSCanvas.Send' | translate}}
+            </button>
+        </div>
+        <div class="models--container" *ngIf="action?.tags?.length">
+            <div aria-label="{{ 'CDSCanvas.Tags' | translate }}" *ngFor="let tag of action.tags" class="model-name-and-btn-wpr">
+                <p class="model-name">{{ tag }}</p>
+                <button type="button" class="delete-model" (click)="removeTag(tag)" [attr.aria-label]="('CDSCanvas.RemoveTag' | translate) + ' ' + tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" class="remove-tag-icon" aria-hidden="true">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                        <path d="M0 0h24v24H0z" fill="none" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.ChooseKB' | translate}}</label>
-        <cds-select *ngIf="!action?.namespaceAsName" id="text-condition" 
+        <cds-select *ngIf="listOfNamespaces && !action?.namespaceAsName" id="text-condition" 
             [items]="listOfNamespaces" 
             [bindLabelSelect]="'name'"
             [bindValueSelect]="'value'" 
@@ -74,6 +101,7 @@
                 {{ 'CDSCanvas.UseKnowledgeBaseName' | translate }}
             </mat-checkbox>
             <label class="field-description">{{ "CDSCanvas.UseKBNameDescription" | translate }}
+                <br>
                 <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.namespace_as_name.link" [target]="DOCS_LINK.namespace_as_name.target">{{ 'LearnMore' | translate }}</a>
             </label>
         </section>

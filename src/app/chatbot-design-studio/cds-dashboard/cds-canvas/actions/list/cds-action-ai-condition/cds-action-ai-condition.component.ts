@@ -193,25 +193,27 @@ export class CdsActionAiConditionComponent implements OnInit {
 
   setModel(modelName: string){
     const result = setModel(modelName, this.llm_models_flat, this.logger);
-    this.llm_model_selected = result;
+    this.llm_model_selected = result ?? ({} as LlmModel);
     this.logger.log("[ACTION AI_PROMPT] llm_model_selected: ", this.llm_model_selected);
-    this.action.llm = result?.llm?result.llm:'';
-    this.action.model = result?.model?result.model:'';
-    this.action.modelName = result?.modelName?result.modelName:'';
+    this.action.llm = result?.llm ? result.llm : '';
+    this.action.model = result?.model ? result.model : '';
+    this.action.modelName = result?.modelName ? result.modelName : '';
     this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
-    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
-    this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
-    // Every model change resets max_tokens to default (capped by model max)
-    const min = this.ai_setting['max_tokens'].min;
-    const max = this.ai_setting['max_tokens'].max;
-    let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
-    if (next < min) next = min;
-    this.action.max_tokens = next;
-    if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
-      this.action.temperature = 1
-      this.ai_setting['temperature'].disabled= true
-    } else {
-      this.ai_setting['temperature'].disabled= false
+    if (result) {
+      this.ai_setting['max_tokens'].max = result.max_output_tokens;
+      this.ai_setting['max_tokens'].min = result.min_tokens;
+      // Every model change resets max_tokens to default (capped by model max)
+      const min = this.ai_setting['max_tokens'].min;
+      const max = this.ai_setting['max_tokens'].max;
+      let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+      if (next < min) next = min;
+      this.action.max_tokens = next;
+      if (modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')) {
+        this.action.temperature = 1;
+        this.ai_setting['temperature'].disabled = true;
+      } else {
+        this.ai_setting['temperature'].disabled = false;
+      }
     }
   }
 
@@ -286,7 +288,7 @@ export class CdsActionAiConditionComponent implements OnInit {
         if(found){
           found.conditionIntentId = null;
         }
-      } else {
+      } else if (this.connector.created) {
         if(this.listOfConnectors[idCondition]){
           this.listOfConnectors[idCondition].idConnection =  this.connector.id;
           this.listOfConnectors[idCondition].isConnected  =  true;
@@ -295,6 +297,7 @@ export class CdsActionAiConditionComponent implements OnInit {
           found.conditionIntentId = '#'+this.connector.toId;
         }
       }
+      this.logger.log('[ACTION AI_CONDITION] updateConnectionTrue:', this.listOfConnectors, idCondition, found);
       this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
     } catch (error) {
       this.logger.log('error: ', error);
@@ -351,13 +354,6 @@ export class CdsActionAiConditionComponent implements OnInit {
       return;
     }
     if(property === 'model'){
-      this.action['labelModel'] = event;
-      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
-        this.action.temperature = 1
-        this.ai_setting['temperature'].disabled= true
-      } else {
-        this.ai_setting['temperature'].disabled= false
-      }
       this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;

@@ -17,6 +17,8 @@ import { takeUntil, switchMap, distinctUntilChanged } from 'rxjs/operators';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
@@ -74,6 +76,7 @@ export class CdsConnectorComponent implements OnInit, OnChanges, OnDestroy {
   displayConnector: string;
 
   connector: any;
+  private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     private readonly stageService: StageService,

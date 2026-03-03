@@ -59,13 +59,36 @@ export class VariableListComponent implements OnInit {
     }
     this.idBot = this.dashboardService.id_faq_kb;
     this.variableListUserDefined = variableList.find(el => el.key === 'userDefined');
+    // Sort userDefined elements alphabetically by name
+    if (this.variableListUserDefined && this.variableListUserDefined.elements) {
+      this.variableListUserDefined.elements.sort((a, b) => {
+        const nameA = a.name?.toLowerCase() || '';
+        const nameB = b.name?.toLowerCase() || '';
+        return nameA.localeCompare(nameB);
+      });
+    }
     this.logger.log('[VARIABLE-LIST] initialize--> 1', this.type_chatbot, variableList);
     this.variableListGlobals = variableList.find(el => el.key === 'globals');
+    // Sort globals elements alphabetically by name
+    if (this.variableListGlobals && this.variableListGlobals.elements) {
+      this.variableListGlobals.elements.sort((a, b) => {
+        const nameA = a.name?.toLowerCase() || '';
+        const nameB = b.name?.toLowerCase() || '';
+        return nameA.localeCompare(nameB);
+      });
+    }
+
     this.variableListSystemDefined = variableList
       .filter(el => (el.key !== 'userDefined' && el.key !== 'globals'))
       .map(el => ({
       ...el,
-      elements: el.elements.filter(elem => elem.chatbot_types?.includes(this.type_chatbot))
+      elements: el.elements
+        .filter(elem => elem.chatbot_types?.includes(this.type_chatbot))
+        .sort((a, b) => {
+          const nameA = a.name?.toLowerCase() || '';
+          const nameB = b.name?.toLowerCase() || '';
+          return nameA.localeCompare(nameB);
+        })
     }));
 
     this.filteredVariableList = [];
@@ -77,9 +100,20 @@ export class VariableListComponent implements OnInit {
     if (this.variableListGlobals) {
       this.filteredGlobalsList.push({ key: this.variableListGlobals.key, elements: this.sortElementsByName(this.variableListGlobals.elements || []) });
     }
-    variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals')).forEach(el => {
-      this.filteredIntentVariableList.push({ key: el.key, elements: this.sortElementsByName(el.elements || []) });
-    });
+    variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals')).map(el => {
+      // Sort elements alphabetically before adding to filteredIntentVariableList
+      const sortedElements = [...el.elements].sort((a, b) => {
+        const nameA = a.name?.toLowerCase() || '';
+        const nameB = b.name?.toLowerCase() || '';
+        return nameA.localeCompare(nameB);
+      });
+      this.filteredIntentVariableList.push( { key: el.key, elements: sortedElements })
+    })
+
+
+    // if(this.variableListSystemDefined){
+    //   this.filteredIntentVariableList = this.variableListSystemDefined
+    // }
   }
 
   /** Apre dialog per aggiungere attributo custom; al salvataggio aggiunge alla lista e persiste. */
@@ -93,6 +127,12 @@ export class VariableListComponent implements OnInit {
       if (result && result !== undefined && result !== false) {
         const variable = { name: result, chatbot_types: this.type_chatbot, value: result };
         that.variableListUserDefined.elements.push(variable);
+        // Sort elements alphabetically after adding new variable
+        that.variableListUserDefined.elements.sort((a, b) => {
+          const nameA = a.name?.toLowerCase() || '';
+          const nameB = b.name?.toLowerCase() || '';
+          return nameA.localeCompare(nameB);
+        });
         this.saveVariables(this.variableListUserDefined.elements);
       }
     });

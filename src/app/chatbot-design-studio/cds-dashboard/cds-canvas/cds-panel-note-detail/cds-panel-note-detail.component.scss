@@ -763,6 +763,11 @@
     }
 }
 
+// Titolo rect: stessa grafica di .rich-text-editor-section (condivide la classe); altezza editor 80px
+.title-section.rich-text-editor-section ::ng-deep .ql-editor {
+    min-height: 80px;
+}
+
 .form-group {
     margin-bottom: 20px;
     

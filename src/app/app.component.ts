@@ -53,7 +53,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     // public dashboardService: DashboardService,
     private userService: UsersService,
     private multiChannelService: MultichannelService,
-    private uploadService: UploadService,
     private imageRepoService: ImageRepoService,
     private scriptService: ScriptService,
     private networkService: NetworkService,
@@ -349,7 +348,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.projectService.initialize(serverBaseURL);
         this.multiChannelService.initialize(serverBaseURL)
         this.userService.initialize(serverBaseURL)
-        this.uploadService.initialize();
 
         this.IS_ONLINE = true;
       }).catch(error => {

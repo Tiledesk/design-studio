@@ -16,7 +16,7 @@ export class NativeImageRepoService extends ImageRepoService {
      * @param uid
      */
     getImagePhotoUrl(uid: string): string {
-        this.baseImageURL = this.getImageBaseUrl() + 'images'
+        this.baseImageURL = this.getImageBaseUrl() + 'files'
         let sender_id = '';
         if (uid.includes('bot_')) {
             sender_id = uid.slice(4)

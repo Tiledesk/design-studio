@@ -1,22 +1,10 @@
-
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 // import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
-
-// MODEL //
-import { Project } from 'src/app/models/project-model';
-import { Chatbot } from 'src/app/models/faq_kb-model';
-
-// UTILS //
-import { SETTINGS_SECTION, SIDEBAR_PAGES } from 'src/app/chatbot-design-studio/utils';
-import { Intent } from 'src/app/models/intent-model';
-
-//LOGGER
-import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
-import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { AiService } from 'src/app/services/ai.service';
 import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
 import { OpenaiService } from 'src/app/services/openai.service';
 import { WhatsappService } from 'src/app/services/whatsapp.service';
@@ -30,6 +18,19 @@ import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from '../services/webhook-service.service';
+import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
+
+// MODEL //
+import { Project } from 'src/app/models/project-model';
+import { Chatbot } from 'src/app/models/faq_kb-model';
+
+// UTILS //
+import { SETTINGS_SECTION, SIDEBAR_PAGES } from 'src/app/chatbot-design-studio/utils';
+import { Intent } from 'src/app/models/intent-model';
+
+//LOGGER
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -63,12 +64,14 @@ export class CdsDashboardComponent implements OnInit {
     private dashboardService: DashboardService,
     private kbService: KnowledgeBaseService,
     public departmentService: DepartmentService,
+    private uploadService: UploadService,
     public faqKbService: FaqKbService,
     public faqService: FaqService,
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
     private stageService: StageService, 
-    private readonly webhookService: WebhookService
+    private readonly webhookService: WebhookService,
+    private aiService: AiService
   ) {}
 
   
@@ -185,8 +188,10 @@ export class CdsDashboardComponent implements OnInit {
     this.faqService.initialize(serverBaseURL, this.project._id)
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
+    this.aiService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
+    this.uploadService.initialize(this.project._id);
 
     this.hideShowWidget('hide')
 

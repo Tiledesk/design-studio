@@ -6,7 +6,7 @@
         <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
     </div>
     
-    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+    <hr class="custom-hr mcp-dialog__hr">
     
     <!-- Search and Counter Section - Always visible -->
     <div class="search-section">
@@ -42,18 +42,36 @@
                     [class.selected]="isServerSelected(server)"
                     type="button"
                     (click)="toggleServerSelection(server, $event)">
+                    <!-- Edit badge (must NOT trigger server selection) -->
+                    <span
+                        class="edit-button mcp-server__edit-badge"
+                        role="button"
+                        tabindex="0"
+                        (click)="openEditServerDialog(server, $event)"
+                        (keydown.enter)="openEditServerDialog(server, $event)"
+                        (keydown.space)="openEditServerDialog(server, $event)">
+                        <span class="material-icons mcp-server__edit-icon">edit</span>
+                    </span>
                     <div class="server-info">
-                        <div class="server-name">{{ server.name }}</div>
+                        <div class="server-name">
+                            {{ server.name }}
+                            <span *ngIf="isServerSelected(server)" class="mcp-server__status-badge mcp-server__status-badge--active">
+                                {{'CDSCanvas.Active' | translate}}
+                            </span>
+                            <span *ngIf="!isServerSelected(server)" class="mcp-server__status-badge mcp-server__status-badge--available">
+                                {{'CDSCanvas.Available' | translate}}
+                            </span>
+                        </div>
                         <div class="server-url">{{ server.url }}</div>
                         <div class="server-type">{{ server.transport }}</div>
+                        <div class="server-type mcp-server__tools-meta">
+                            {{'CDSCanvas.Tools' | translate}}:
+                            <strong>{{ getActiveToolsCount(server) }}</strong> {{'CDSCanvas.ToolsActive' | translate}}
+                            /
+                            <strong>{{ getAvailableToolsCount(server) }}</strong> {{'CDSCanvas.ToolsAvailable' | translate}}
+                        </div>
                     </div>
-                    <span class="material-icons checkmark-icon" *ngIf="isServerSelected(server)">check_circle</span>
-                </button>
-                <button 
-                    class="edit-button" 
-                    type="button"
-                    (click)="openEditServerDialog(server, $event)">
-                    <span class="material-icons">edit</span>
+                    <!-- <span class="material-icons checkmark-icon" *ngIf="isServerSelected(server)">check_circle</span> -->
                 </button>
             </div>
             
@@ -63,7 +81,7 @@
     <div class="tpl-modal-buttons">
         <button id="cds-add-server-btn" class="btn btn-primary cds-blue-button" type="button" 
             (click)="onAddMcpServer()">
-            <span class="material-icons" style="font-size: 18px; margin-right: 6px;">add</span>
+            <span class="material-icons mcp-dialog__add-icon">add</span>
             {{'CDSCanvas.AddMCPServer' | translate}}
         </button>
         <button id="cds-ok-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">

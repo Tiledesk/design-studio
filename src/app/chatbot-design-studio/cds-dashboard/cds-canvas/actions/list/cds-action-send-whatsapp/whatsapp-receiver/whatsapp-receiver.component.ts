@@ -377,7 +377,9 @@ export class CdsWhatsappReceiverComponent implements OnInit {
   }
 
   onHeaderImageError(event) {
-    event.target.src = this.header_component.example.header_handle[0];
+    if(this.header_component?.example?.header_handle){  
+      event.target.src = this.header_component.example.header_handle[0];
+    }
   }
 
   onDeleteReceiver() {
@@ -459,7 +461,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
  
-    this.uploadService.upload(this.user.uid, currentUpload).then(data => {
+    this.uploadService.uploadAsset(this.user.uid, currentUpload).then(data => {
       that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${data}`);
 
       this.fileUploadedName = file.name;
@@ -501,7 +503,7 @@ export class CdsWhatsappReceiverComponent implements OnInit {
       return;
     }
 
-    this.uploadService.delete(this.user.uid, linkToDelete).then((result)=>{
+    this.uploadService.deleteAsset(this.user.uid, linkToDelete).then((result)=>{
       
       this.isFilePendingToUpload = false;
       this.fileUploadedName = null;

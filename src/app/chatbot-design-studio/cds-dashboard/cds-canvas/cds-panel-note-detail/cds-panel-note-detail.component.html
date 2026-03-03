@@ -126,6 +126,16 @@
 
         </div>
 
+        <!-- Titolo (solo note rettangolo) - stessa grafica di Rich Text Editor -->
+        <div class="row rich-text-editor-section title-section" *ngIf="note?.type === 'rect'">
+            <quill-editor
+                #quillTitleEditor
+                [(ngModel)]="note.title"
+                [modules]="quillModulesTitle"
+                (onContentChanged)="onTitleQuillContentChanged($event)"
+                [styles]="{ height: '80px' }">
+            </quill-editor>
+        </div>
 
         <div class="row background-section" *ngIf="note?.type !== 'media'">
             <!-- ---------------------------------------------------------- -->
@@ -166,9 +176,9 @@
 
 
             <!-- ---------------------------------------------------------- -->
-            <!-- Border color Section -->
+            <!-- Border color + thickness (nascosti per note rettangolo) -->
             <!-- ---------------------------------------------------------- -->
-    
+            <ng-container *ngIf="note?.type !== 'rect'">
             <div class="section-header">
                 <h4 class="section-title">{{ 'CDSCanvas.NotePanel.BorderColor' | translate }}</h4>
                 <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
@@ -201,9 +211,6 @@
                 <span class="opacity-percent">%</span>
             </div>
 
-            <!-- ---------------------------------------------------------- -->
-            <!-- Border thickness Section -->
-            <!-- ---------------------------------------------------------- -->
             <div class="section-header">
                 <h4 class="section-title">{{ 'CDSCanvas.NotePanel.BorderThickness' | translate }}</h4>
                 <mat-icon class="collapse-icon" svgIcon="remove" aria-hidden="true"></mat-icon>
@@ -227,7 +234,7 @@
                     inputmode="numeric">
                 <span class="opacity-percent">px</span>
             </div>
-  
+            </ng-container>
 
             <!-- ---------------------------------------------------------- -->
             <!-- Box Shadow Section (hidden for image/media notes) -->

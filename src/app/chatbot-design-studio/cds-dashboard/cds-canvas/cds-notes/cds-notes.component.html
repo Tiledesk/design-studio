@@ -9,9 +9,9 @@
     [class.media-note]="isMediaNote"
     [id]="note?.note_id"
     [style.box-shadow]="note?.boxShadow === false ? 'none' : null"
-    [style.border-width.px]="isMediaNote ? 0 : note?.borderWidth"
-    [style.border-style]="isMediaNote ? 'none' : 'solid'"
-    [style.border-color]="note?.borderColor"
+    [style.border-width.px]="(isMediaNote || note?.type === 'rect') ? 0 : note?.borderWidth"
+    [style.border-style]="(isMediaNote || note?.type === 'rect') ? 'none' : 'solid'"
+    [style.border-color]="(isMediaNote || note?.type === 'rect') ? 'transparent' : note?.borderColor"
     [style.background-color]="isMediaNote ? (hasMedia ? 'transparent' : '#f3f4f6') : note?.backgroundColor">
     <cds-note-controls
       [visible]="stateNote === 2 && !textareaHasFocus"
@@ -20,6 +20,8 @@
       (duplicate)="onDuplicateFromMenu()"
       (remove)="onDeleteFromMenu()">
     </cds-note-controls>
+    <!-- Titolo rect: altezza fissa 40px, sempre in 0,0; scala inversa applicata in updateHandlesScale; contenuto da Quill (HTML sanitizzato) -->
+    <div *ngIf="note?.type === 'rect'" class="note-title" [innerHTML]="sanitizedTitleHtml"></div>
     <!-- (input)="onInputChange($event)" -->
     <div *ngIf="isTextNote; else rectBody"
       #noteInput

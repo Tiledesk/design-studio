@@ -41,6 +41,7 @@ import { CdsPanelPublishComponent } from './cds-panel-publish/cds-panel-publish.
 import { CdsNotesComponent } from './cds-notes/cds-notes.component';
 import { CdsPanelNoteDetailComponent } from './cds-panel-note-detail/cds-panel-note-detail.component';
 import { NoteControlsComponent } from './cds-notes/note-controls/note-controls.component';
+import { NoteResizeStateService } from './note-resize-state.service';
 
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from "ngx-quill";
@@ -129,7 +130,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     FormsModule,
     QuillModule
-]
+  ],
+  providers: [NoteResizeStateService]
 })
 export class CdsCanvasModule { }
 

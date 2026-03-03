@@ -117,7 +117,7 @@
             [IS_OPEN_PANEL_NOTE_DETAIL]="IS_OPEN_PANEL_NOTE_DETAIL"
             [autoFocus]="note.note_id === pendingAutoFocusNoteId"
             [style.top.px]="note.y"
-            [style.left.px]="note.x"
+            [style.left.px]="getNoteLeft(note)"
             (noteSelected)="onNoteSelected($event)"
             (deleteNote)="onDeleteNote($event)"
             (duplicateNote)="onDuplicateNote($event)"
