@@ -5,7 +5,8 @@
     [class.isStart]="isStart" 
     [class.tds-slim-intent]="isNewChatbot"
     [id]="'intent-content-'+ intent?.intent_id"
-    [ngStyle]="intentStyle">
+    [style.background-color]="vm.backgroundColor"
+    [style.outline]="vm.outline">
     <span class="panel-intent-content tds_draggable intent-background-overlay"></span>
 
     <cds-connector-in *ngIf="!isStart && connectorsIn?.length>0"
@@ -71,16 +72,16 @@
             cdkDrag
             [cdkDragDisabled]="dragDisabled || isNewChatbot">
             <div class="add--action-placeholder-text">
-                {{ 'CDSCanvas.AddAnActionToBlock' | translate}}
+                {{ labelAddAnActionToBlock }}
                 <span class="add--action-placeholder-desc">
-                    {{ 'CDSCanvas.AddAnActionToBlockDescription' | translate}}
+                    {{ labelAddAnActionToBlockDescription }}
                 </span>
             </div>
 
             <div class="csd-open-action-menu-btn-wpr">
                 <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                     class="cds-add-action-btn">
-                    + {{ 'CDSCanvas.AddAction' | translate}}
+                    + {{ labelAddAction }}
                 </div>
             </div>
         </div>
@@ -94,11 +95,9 @@
             [id]="action._tdActionId" 
             class="box-action" 
             tabindex="-1"
-            [ngClass]="{
-                'cds-no-featured-action': isNoFeaturedAction(action),
-                'cds-last-action': last
-            }" 
-            [ngStyle]="getActionItemStyle(action)"
+            [class.cds-no-featured-action]="action._isNoFeatured"
+            [class.cds-last-action]="last" 
+            [style.outline]="action._outline"
             (keydown)="onKeydown($event)"
             (click)="onSelectAction(action, i, action._tdActionId)">
             <span class="action-element">
@@ -496,7 +495,7 @@
         <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">
-                + {{ 'CDSCanvas.AddAction' | translate}}
+                + {{ labelAddAction }}
             </div>
         </div>
     </div>

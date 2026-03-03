@@ -7,6 +7,33 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.33-rc1
+- **changed**: update and refactoring cds-action-json-condition
+
+# 1.39.33
+
+# 1.39.32-rc1
+- **bug-fix**: GptTask Preview broken
+- **bug-fix**: Condition blocks not saved when changing Boolean operators
+- **bug-fix**: OpenAI models present in the select even if they are missing from the environment variable
+
+# 1.39.32
+
+# 1.39.29-rc9
+- **bug-fix**: Bug fixed in selecting and refreshing MCP server tools.
+- **bug-fix**: Css changes to the preview of selected tools.
+
+# 1.39.29-rc8
+- **changed**: Updated and refactored the cds-intent and cds-connector-in components to improve performance
+
+# 1.39.29-rc7
+- **bug-fix**: Set retro compatibility between onActionUpdate and onUpdateAndSaveAction in CdsIntentComponent
+
+# 1.39.29-rc6
+- **changed**: Updated and refactored the cds-intent and cds-connector components to improve performance
+
+# 1.39.29-rc5
+- - **added**: added tag to action ask kb and action create kb
 
 # 1.39.29-rc4
 - **bug-fix**: eliminated AAAAAA

@@ -1,14 +1,30 @@
-<div *ngIf="connectorsInFiltered?.length>0" class="action-connector" 
-(mouseenter)="showConnectorsIn($event)"
-(mouseleave)="hideConnectorsIn($event)">
-<span class="label-connector">{{labelNumber}}</span>
-<div class="connector-in-menu">
-    <div class="menu-item" 
-        *ngFor="let item of connectedIntents" 
-        (click)="onGoToIntent($event, item.intent)"
-        (mouseenter)="onMenuItemMouseEnter(item.connectorIds)"
-        (mouseleave)="onMenuItemMouseLeave(item.connectorIds)">
-        {{item.intent.intent_display_name}}
+<!--
+  Mostra il badge “connector-in” solo se esistono connectors filtrati.
+  Hover sul container:
+  - showConnectorsIn: mostra menu + evidenzia linee
+  - hideConnectorsIn: nasconde menu + ripristina opacità
+-->
+<div
+  *ngIf="connectorsInFiltered?.length > 0"
+  class="action-connector"
+  (mouseenter)="showConnectorsIn($event)"
+  (mouseleave)="hideConnectorsIn($event)">
+
+  <!-- Badge numerico (es. "3" oppure "+9") -->
+  <span class="label-connector">{{ labelNumber }}</span>
+
+  <!-- Menu con lista intent collegati (nascosto con classe is-hidden) -->
+  <div class="connector-in-menu" [class.is-hidden]="!menuVisible">
+
+    <!-- Una voce per intent sorgente (raggruppato) -->
+    <div
+      class="menu-item"
+      *ngFor="let item of connectedIntents; trackBy: trackByIntentId"
+      (click)="onGoToIntent($event, item.intent)"
+      (mouseenter)="onMenuItemMouseEnter(item.connectorIds)"
+      (mouseleave)="onMenuItemMouseLeave(item.connectorIds)">
+
+      {{ item.intent.intent_display_name }}
     </div>
-</div>
+  </div>
 </div>

@@ -343,7 +343,7 @@
 .add--action-placeholder:hover .csd-open-action-menu-btn-wpr {
   opacity: 1;
   transform: translate3d(0, 0, 0);
-  transition: 0.25s all ease-in-out;
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
 }
 
 /* Body e header azione */
@@ -423,7 +423,7 @@
 
 .button-intent {
   @extend %intent-btn-base;
-  transition: all 0.1s;
+  transition: background-color 0.1s, color 0.1s;
 
   &:hover {
     background-color: #d2d2d2;
@@ -445,7 +445,7 @@
 
 .intent--action {
   @extend %intent-btn-base;
-  transition: all 0.3s;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
   width: 96px;
   
   &:focus {

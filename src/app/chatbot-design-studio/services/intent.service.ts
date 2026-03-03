@@ -1,5 +1,6 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
 import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
@@ -36,6 +37,8 @@ export class IntentService {
   BSTestItOut = new BehaviorSubject<Intent>(null);
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
   behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
+  /** Emette quando cambiano intentSelectedID o intentActive; usato da cds-intent per aggiornare stili senza ngDoCheck. */
+  behaviorIntentSelection = new BehaviorSubject<{ intentSelectedID: string | null; intentActive: boolean }>({ intentSelectedID: null, intentActive: false });
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
@@ -87,8 +90,10 @@ export class IntentService {
     private dashboardService: DashboardService,
     private tiledeskAuthService: TiledeskAuthService,
     private http: HttpClient
-  ) { 
-
+  ) { }
+    
+  private emitIntentSelection(): void {
+    this.behaviorIntentSelection.next({ intentSelectedID: this.intentSelectedID, intentActive: this.intentActive });
   }
 
 
@@ -206,6 +211,7 @@ export class IntentService {
       this.intentActive = false;
       this.resetZindex();
     }
+    this.emitIntentSelection();
   }
 
 
@@ -224,8 +230,9 @@ export class IntentService {
 
   public setIntentSelectedByIntent(intent){
     this.intentSelected = intent;
-    this.intentSelectedID = this.intentSelected.intent_id;
+    this.intentSelectedID = this.intentSelected?.intent_id ?? null;
     this.intentActive = true;
+    this.emitIntentSelection();
   }
 
   public setIntentSelectedPosition(x, y){
@@ -308,6 +315,16 @@ export class IntentService {
   getIntentFromId(intentId) {
     let intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
     return intent;
+  }
+
+  /**
+   * Observable che emette solo quando l'intent con il given id è aggiornato (behaviorIntent).
+   * Usato da cds-connector per sottoscriversi solo al proprio intent e ridurre il costo N×subscription.
+   */
+  intentUpdatesById$(intentId: string) {
+    return this.behaviorIntent.pipe(
+      filter((intent) => intent?.intent_id === intentId)
+    );
   }
 
 
@@ -885,32 +902,28 @@ export class IntentService {
     this.intentActive = false;
     this.actionSelectedID = actionId;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
-    this.listActions = this.intentSelected.actions;
-    this.selectedAction = this.listActions.find(action => action._tdActionId === actionId);
-    // this.logger.log('[INTENT SERVICE] --> selectAction: ', intentID, actionId);
+    this.listActions = this.intentSelected?.actions;
+    this.selectedAction = this.listActions?.find(action => action._tdActionId === actionId);
     this.behaviorIntent.next(this.intentSelected);
+    this.emitIntentSelection();
   }
 
   /** setIntentSelected */
   public setIntentSelected(intentID){
     this.logger.log('[INTENT SERVICE] ::: setIntentSelected:: ', intentID);
     this.intentSelected = this.selectIntent(intentID);
-    this.intentSelectedID = this.intentSelected.intent_id;
-    this.intentActive = true;
+    this.intentSelectedID = this.intentSelected?.intent_id ?? null;
+    this.intentActive = !!this.intentSelected;
     this.actionSelectedID = null;
     this.listActions = null;
     this.selectedAction = null;
     if(this.intentSelected?.actions){
       this.listActions = this.intentSelected.actions;
     }
-    // //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
-    // //this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
     if(this.intentSelected){
       this.behaviorIntent.next(this.intentSelected);
     }
-    // if(!this.intentSelected)return;
-    // chiudo tutti i pannelli
-    // this.controllerService.closeAllPanels();
+    this.emitIntentSelection();
   }
 
   
@@ -918,6 +931,7 @@ export class IntentService {
   public async setStartIntent(){
     this.intentSelectedID = null;
     this.intentActive = false;
+    this.emitIntentSelection();
     const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
     let startingName = STARTING_NAMES[subtype];
     this.logger.log('[CDS-INTENT] startingName: ', startingName);
@@ -952,6 +966,7 @@ export class IntentService {
   /** unselectIntent */
   public inactiveIntent(){
     this.intentActive = false;
+    this.emitIntentSelection();
   }
 
 

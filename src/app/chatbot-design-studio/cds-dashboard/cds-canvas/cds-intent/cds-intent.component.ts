@@ -26,6 +26,7 @@ import { IntentService } from '../../../services/intent.service';
 import { ConnectorService } from '../../../services/connector.service';
 import { StageService } from '../../../services/stage.service';
 import { ControllerService } from '../../../services/controller.service';
+import { TranslateService } from '@ngx-translate/core';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -105,6 +106,18 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
   intentColor: any = INTENT_COLORS.COLOR1;
 
+  /** Label tradotte (STEP 5: evitare pipe translate ripetute in template; aggiornate al cambio lingua). */
+  labelQuestion = '';
+  labelForm = '';
+  labelAddAnActionToBlock = '';
+  labelAddAnActionToBlockDescription = '';
+  labelAddAction = '';
+
+  /** View model stabile per stili intent (background, outline): aggiornato solo quando cambiano intent/colore o selezione, per ridurre checkStylingProperty. */
+  vm: { backgroundColor: string; outline: string } = { backgroundColor: '', outline: 'none' };
+  private _lastSelectedId: string | null = null;
+  private _lastIntentActive: boolean = false;
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
 
@@ -118,6 +131,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private readonly connectorService: ConnectorService,
     private readonly stageService: StageService,
     private readonly controllerService: ControllerService,
+    private readonly translate: TranslateService,
     private readonly elemenRef: ElementRef,
     private readonly renderer: Renderer2,
     private readonly appStorageService: AppStorageService,
@@ -125,6 +139,15 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private readonly webhookService: WebhookService,
   ) {
     this.initSubscriptions();
+  }
+
+  /** Aggiorna le label tradotte (chiamato in ngOnInit e al cambio lingua). */
+  private updateTranslationLabels(): void {
+    this.labelQuestion = this.translate.instant('Question');
+    this.labelForm = this.translate.instant('Form');
+    this.labelAddAnActionToBlock = this.translate.instant('CDSCanvas.AddAnActionToBlock');
+    this.labelAddAnActionToBlockDescription = this.translate.instant('CDSCanvas.AddAnActionToBlockDescription');
+    this.labelAddAction = this.translate.instant('CDSCanvas.AddAction');
   }
 
   /**
@@ -145,6 +168,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
         if (intent && this.intent && intent.intent_id === this.intent.intent_id) {
           this.logger.log("[CDS-INTENT] sto modificando l'intent: ", this.intent, " con : ", intent);
           this.intent = intent;
+          this.updateIntentStyleVm();
           this.setAgentsAvailable();
           this.updateIsUntitledBlock();
           if (intent['attributesChanged']) {
@@ -153,6 +177,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
           } else {
             this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
             this.listOfActions = this.intent.actions;
+            this.updateActionsOutline();
             this.setActionIntent();
           }
 
@@ -258,6 +283,17 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     } else {
       this.logger.log('[CDS-INTENT-SLICE2] STEP6: behaviorIntentColor già esistente - Anti-doppia-subscription OK');
     }
+
+    subscribtionKey = 'intentSelection';
+    subscribtion = this.subscriptions.find(item => item.key === subscribtionKey);
+    if (!subscribtion) {
+      subscribtion = this.intentService.behaviorIntentSelection.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+        this.updateIntentStyleVm();
+        this.updateActionsOutline();
+      });
+      this.subscriptions.push({ key: subscribtionKey, value: subscribtion });
+    }
+
     this.logger.log('[CDS-INTENT-SLICE2] STEP3: Tutte le subscription inizializzate - Pattern consistente OK', `Total: ${this.subscriptions.length}`);
   }
 
@@ -278,6 +314,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     this.initializeActions();
     this.initializeAttributes();
     this.initializeConnectors();
+    this.updateIntentStyleVm();
+    this.updateTranslationLabels();
+    this.translate.onLangChange.pipe(takeUntil(this.unsubscribe$)).subscribe(() => this.updateTranslationLabels());
   }
 
   /**
@@ -460,8 +499,11 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
       }
     }
     this.setAgentsAvailable();
-    if (changes['intent'] && !changes['intent'].firstChange) {
-      this.updateIsUntitledBlock();
+    if (changes['intent']) {
+      if (!changes['intent'].firstChange) {
+        this.updateIsUntitledBlock();
+      }
+      this.updateIntentStyleVm();
     }
   }
 
@@ -714,6 +756,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
       if (this.intent) {
         this.patchAttributesPosition();
         this.listOfActions = this.intent.actions;
+        this.updateActionsOutline();
         if (this.intent.question) {
           const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
           this.questionCount = question_segment.length;
@@ -910,35 +953,42 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   }
 
   /**
-   * Stili dinamici del blocco intent (background e outline selezione). Esposta come getter per evitare oggetto inline nel template.
+   * Aggiorna vm (backgroundColor, outline) in base a intent e selezione. Chiamato da ngOnInit, ngOnChanges (intent), ngDoCheck (selezione).
+   * Evita oggetti ngStyle nel template e riduce checkStylingProperty durante CD.
    */
-  get intentStyle(): { [key: string]: string } {
+  private updateIntentStyleVm(): void {
     if (!this.intent?.attributes?.color) {
-      return {};
+      this.vm.backgroundColor = '';
+      this.vm.outline = 'none';
+      this._lastSelectedId = this.intentService.intentSelectedID;
+      this._lastIntentActive = this.intentService.intentActive;
+      return;
     }
     const c = this.intent.attributes.color;
-    const outline =
+    this.vm.backgroundColor = `rgba(${c}, 0.35)`;
+    this.vm.outline =
       this.intentService.intentSelectedID === this.intent.intent_id && this.intentService.intentActive
         ? `2px solid rgba(${c}, 1)`
         : 'none';
-    return {
-      'background-color': `rgba(${c}, 0.35)`,
-      outline,
-    };
+    this._lastSelectedId = this.intentService.intentSelectedID;
+    this._lastIntentActive = this.intentService.intentActive;
   }
 
   /**
-   * Stile outline per la singola action (selezionata o no). Usata nel template al posto di ngStyle inline.
+   * Pre-calcola action._outline e action._isNoFeatured per ogni action in listOfActions.
+   * Chiamato quando si aggiorna listOfActions o quando cambia actionSelectedID; evita funzioni/ngClass nel template.
    */
-  getActionItemStyle(action: Action): { [key: string]: string } {
-    if (!this.intent?.attributes?.color) {
-      return {};
+  private updateActionsOutline(): void {
+    if (!this.listOfActions?.length) {
+      return;
     }
-    const outline =
-      this.intentService.actionSelectedID === action._tdActionId
-        ? `2px solid rgba(${this.intent.attributes.color}, 1)`
-        : 'none';
-    return { outline };
+    const c = this.intent?.attributes?.color;
+    const selectedId = this.intentService.actionSelectedID;
+    for (const action of this.listOfActions) {
+      const a = action as Action & { _outline?: string; _isNoFeatured?: boolean };
+      a._outline = c && selectedId === action._tdActionId ? `2px solid rgba(${c}, 1)` : 'none';
+      a._isNoFeatured = action._tdActionType !== TYPE_ACTION.REPLY;
+    }
   }
 
   /**
@@ -947,14 +997,6 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   onShowConnectorsIn(): void {}
 
   onHideConnectorsIn(): void {}
-
-  /**
-   * Usata nel template per la classe cds-no-featured-action.
-   * Comportamento invariato rispetto al precedente template: la condizione originale equivale a (tipo !== REPLY).
-   */
-  isNoFeaturedAction(action: Action): boolean {
-    return action._tdActionType !== TYPE_ACTION.REPLY;
-  }
 
   /**
    * Chiamata dal template (cdkDropListDropped) quando si rilascia un’action sulla lista di questo intent.
@@ -1003,6 +1045,11 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     }
     this.logger.log('[CDS-INTENT] onUpdateAndSaveAction:::: ', object, this.intent, this.intent.actions);
     this.intentService.updateIntent(this.intent);
+  }
+
+  /** Alias per compatibilità: il template può chiamare onActionUpdate (updateAndSaveAction). */
+  public onActionUpdate(object: any): void {
+    this.onUpdateAndSaveAction(object);
   }
 
   /**

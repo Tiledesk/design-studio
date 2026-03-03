@@ -303,15 +303,16 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmMod
   });
   // logger.log(`[${componentName}] - this.llm_models_flat:`, llm_models_flat);
 
-  // Set token multiplier; filter by aiModels config ONLY for OpenAI models (other providers show all)
+  // Filtra per aiModels solo i modelli GPT (id che inizia con 'gpt-'); gli altri restano tutti
   const ai_models = loadTokenMultiplier(appConfigService.getConfig().aiModels);
   logger.log(`[${componentName}] ai_models:`, ai_models);
-  const openaiModels = llm_models_flat.filter(m => m.llm?.toLowerCase() === 'openai');
-  const otherModels = llm_models_flat.filter(m => m.llm?.toLowerCase() !== 'openai');
-  const filteredOpenai = filterModelsByAiModelsConfig(openaiModels, ai_models, m => m.model);
-  llm_models_flat = [...filteredOpenai, ...otherModels];
+  const allowedModelIds = Object.keys(ai_models);
+  const isGptModel = (modelId: string) => modelId?.toLowerCase().startsWith('gpt-');
+  llm_models_flat = llm_models_flat.filter(model =>
+    !isGptModel(model.model) || allowedModelIds.includes(model.model)
+  );
   llm_models_flat.forEach(model => {
-    if (ai_models[model.model]) {
+    if (ai_models[model.model] != null) {
       (model as LlmModel).multiplier = ai_models[model.model].toString() + ' x tokens';
     }
   });
