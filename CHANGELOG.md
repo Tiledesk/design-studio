@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.33-rc2
+- **changed**: replaced "Tag" with "Label"
+
 # 1.39.33-rc1
 - **changed**: update and refactoring cds-action-json-condition
 
@@ -43,9 +46,6 @@
 
 
 # 1.39.29-rc2
-
-# this branch 
-- **changed**: replaced "Tag" with "Label"
 - **Added**: aggiunta la possibilità di inserire tag nella action ask KB e nella action create KB
 
 
