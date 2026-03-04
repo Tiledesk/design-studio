@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.33-rc4
+- **bug-fix**: renamed onClickControl to onActionControl in intent.component
 
 # 1.39.33-rc3
 - **bug-fix**: The action detail panel closes when an action is modified

@@ -849,8 +849,8 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Chiamata dal template (cds-action-controls) quando l’utente clicca su modifica/copia/elimina su un’action.
    * Esegue edit (apre dettaglio), delete (rimuove connettori e action e chiama deleteSelectedAction) o copy (copia in localStorage).
    */
-  onClickControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number): void {
-    this.logger.log('[CDS-INTENT] onClickControl', event, action);
+  onActionControl(event: 'copy' | 'delete' | 'edit', action: Action, index: number): void {
+    this.logger.log('[CDS-INTENT] onActionControl', event, action);
     if (event === 'edit') {
       this.onSelectAction(action, index, action._tdActionId);
     } else if (event === 'delete') {
@@ -1140,7 +1140,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   }
 
   /**
-   * Chiamata da onClickControl quando l’utente sceglie “copy” su un’action.
+   * Chiamata da onActionControl quando l’utente sceglie “copy” su un’action.
    * Serializza l’action e la salva in localStorage tramite IntentService e AppStorageService per un successivo incolla.
    */
   private copyAction(ele: Action): void {
