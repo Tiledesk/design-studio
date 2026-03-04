@@ -87,4 +87,12 @@ export class CDSFilterComponent implements OnInit {
     this.selectedIndex= null
   }
 
+  trackByConditionIndex(index: number): number {
+    return index;
+  }
+
+  getOperatorName(operatorKey: string): string {
+    return this.OPERATORS_LIST[operatorKey]?.name ?? '';
+  }
+
 }
