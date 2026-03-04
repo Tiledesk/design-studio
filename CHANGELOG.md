@@ -9,11 +9,17 @@
 
 
 
-# this branch 
-- **changed**: replaced "Label" with "Tag"
-- **changed**: replaced "Tag" with "Label"
-- **Added**: aggiunta la possibilità di inserire tag nella action ask KB e nella action create KB
+# 1.39.33
+- **Added**: Added the ability to insert tags into the KB ask action and the KB create action
 
+# 1.39.32 
+- **bug-fix**: GptTask Preview broken
+- **bug-fix**: Condition blocks not saved when changing Boolean operators
+- **bug-fix**: OpenAI models present in the select even if they are missing from the environment variable
+
+# 1.39.31
+- **bug-fix**: bug fixed in selecting and refreshing MCP server tools.
+- **bug-fix**: Css changes to the preview of selected tools.
 
 # 1.39.30
 - **Modified**: Changed the position of the cds-note-controls panel
@@ -86,56 +92,6 @@
 - **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
 - **changed**: If the chatbot is new, only one action per intent
 
-<<<<<<< HEAD
-# 1.39.23
-- **bug-fix**: deleted duplicate AI model chatGPT 5.2
-
-# 1.39.22
-- **changed**: sorted the list of Intents in alphabetical order
-- **added**: added the LLM model gpt-5.2
-- **bug-fix**: Fixed bug when changing the height of iframe
-- **added**: added tag-replyto in mode preview ai condition and ask kb
-- **bug-fix**: change link "learn more" ai condition
-- **bug-fix**: hidden connectors should remain hidden if update the arrival block
-- **changed**: do not allow text selection in cds-panel-elements and cds-panel-intent-list
-- **added**: added settings summary in AI action templates and all actions with AISEttings
-- **added**: added tag-replyto in mode preview
-- **added**: added badge on publish button
-- **added**: added badge to count messages arriving in the widget-loq when the panel is closed
-
-# 1.39.21
-- **added**: added the LLM model gpt-5.2
-
-# 1.39.20
-- **bug-fix**: sorted the list of intents in the intent selection select
-
-# 1.39.19
-- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
-
-# 1.39.18
-- **bug-fix**: Fixed display of iframe URL in action playback
-
-# 1.39.17
-- **added**: added the ability to put notes on the stage
-
-# 1.39.16
-- **added**: pipe find to show namespace name in action ask-kb-v2
-- **bug-fix**: show 'Re-ranking' option in action ask-kb-v2
-
-# 1.39.15
-- **bug-fix**: cannot able to update key or value in action lead_update
-
-# 1.39.14
-- **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
-- **bug-fix**: added the "globals" variables created in the DS to the variable list
-- **changed**: open the Intent panel details by clicking on "start intent"
-- **bug-fix**: drag intent "start action"
-- **added**: added ai-modules gpt-5.1, gemini-3-pro-preview, gemini-3-pro-image-preview
-- **bug-fix**: fixed an error when searching for parameters for "voice" chatbot_type
-- **bug-fix**: changed knwoledge to knowledge 
-- **bug-fix**: Text correction on replace AI agent
-- **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
-=======
 - **added**: Supportare rettangolo
 - **bug-fixed**: Supportare spessore bordo
 - **bug-fixed**: correggere il bug che non permette di salvare il colore del testo
@@ -147,7 +103,6 @@
 - **bug-fixed**: centra non funziona nel blocco
 - **bug-fixed**: bug fixed text align
 - **added**: added note
->>>>>>> features/from-master/ds-note-native
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management
