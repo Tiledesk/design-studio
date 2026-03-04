@@ -264,7 +264,6 @@ export class IntentService {
   // START DASHBOARD FUNCTIONS //
 
   refreshIntents(){
-    // this.logger.log("aggiorno elenco intent: ", this.listOfIntents);
     this.behaviorIntents.next(this.listOfIntents);
   }
 
@@ -1496,6 +1495,7 @@ export class IntentService {
   /** */
   public async updateIntent(intent: Intent, fromIntent?: Intent){
     this.logger.log('[INTENT SERVICE] -> updateIntentNew, ', intent, fromIntent);
+    
     const intentPrev = this.prevListOfIntent.find((obj) => obj.intent_id === intent.intent_id);
     this.operationsUndo = [];
     this.operationsRedo = [];
@@ -1515,7 +1515,7 @@ export class IntentService {
         intent: JSON.parse(JSON.stringify(intentPrev)) 
       });
     }
-
+  
     if(fromIntent){
       // MAI!!! da verificare!!!
       const fromIntentPrev = this.prevListOfIntent.find((obj) => obj.intent_id === fromIntent.intent_id);
@@ -1540,6 +1540,7 @@ export class IntentService {
           intentIdsToUpdate.push(intentToUpdateId);
         }
       });
+
       
       // Per ogni intent da aggiornare, salviamo le versioni corrette
       intentIdsToUpdate.forEach(intentToUpdateId => {
@@ -1551,7 +1552,6 @@ export class IntentService {
             intent: JSON.parse(JSON.stringify(intentOriginal))
           });
         }
-        
         // Per operationsRedo, usiamo l'intent attuale dalla lista (che ha ancora i connettori completi)
         // IMPORTANTE: preserviamo i connettori completi, non li rimuoviamo quando aggiorniamo un intent
         const intentFromList = this.listOfIntents.find((obj) => obj.intent_id === intentToUpdateId);
@@ -1564,7 +1564,6 @@ export class IntentService {
           });
         }
       });
-      
       // IMPORTANT:
       // When updating an intent (the target block), we MUST NOT mutate the connector attributes
       // of incoming intents. Those attributes may store UI state (e.g. contracted/hidden connector)
@@ -1573,20 +1572,22 @@ export class IntentService {
       // For deleteIntentNew(), instead, we DO need to remove references to the deleted intent.
       this.findsIntentsToUpdate(intent.intent_id, false);
     }
+
     this.payload.operations = this.operationsRedo;
     let operations = {undo:this.operationsUndo, redo:this.operationsRedo};
     this.arrayUNDO.push(operations);
     this.arrayREDO = [];
     this.setBehaviorUndoRedo();
     this.logger.log('[INTENT SERVICE] updateIntentNew -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
-    this.refreshIntents();
+    this.logger.log("[INTENT SERVICE] aggiorno elenco intent: ", this.listOfIntents);
+    //this.refreshIntents(); // è stato commentato perchè altrimenti chiude in automatico il pannello di modifica dell'intent
     try {
       let intentToUpdate = this.listOfIntents.find((obj) => obj.intent_id === this.intentSelected.intent_id);
       this.refreshIntent(intentToUpdate)
     } catch (error) {
       this.logger.log('[INTENT SERVICE] -> error, ', error);
     }
-    this.opsUpdate(this.payload);
+    this.opsUpdate(this.payload); 
   }
 
   /** */
