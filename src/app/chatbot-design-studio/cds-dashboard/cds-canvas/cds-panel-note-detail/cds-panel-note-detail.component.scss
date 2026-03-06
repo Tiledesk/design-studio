@@ -753,6 +753,7 @@
                 margin-bottom: 8px;
                 
                 ::ng-deep .mat-checkbox {
+                    display: block;
                     .mat-checkbox-label {
                         font-size: 14px;
                         color: var(--gray-dark);

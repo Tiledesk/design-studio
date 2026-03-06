@@ -316,9 +316,13 @@ export class CdsActionAskgptV2Component implements OnInit {
     this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
   }
   
-  onBlur(event){
-    this.action.namespace = event.target.value;
-    this.updateAndSaveAction.emit();
+  onBlur(event, property){
+    if(property === 'namespace'){
+      this.action[property] = event;
+    } else {
+      this.action[property] = event.target.value;
+    }
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
   onSelectedAttribute(variableSelected: { name: string, value: string }, key) {

@@ -45,7 +45,9 @@ export class CdsActionAddKbContentComponent implements OnInit {
   onChangeTextarea($event: string, property: string) {
     this.logger.log("[ACTION-ADD_KBCONTENT] onEditableDivTextChange event", $event);
     this.logger.log("[ACTION-ADD_KBCONTENT] onEditableDivTextChange property", property);
-    this.action[property] = $event;
+    if(property === 'namespace'){
+      this.action[property] = $event;
+    } 
     // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -136,12 +138,14 @@ export class CdsActionAddKbContentComponent implements OnInit {
 
 
   onBlur(event, property){
-    if(property == 'source'){
+    if(property === 'source'){
       this.action.content = this.action.name?  this.action.name + '\n'+this.action[property] : this.action[property];
-    } else if(property == 'namespace'){
-      this.action.namespace = event.target.value;
+    } else if(property === 'namespace'){
+      // this.action.namespace = event.target.value;
+      this.action[property] = event;
     }
-    this.updateAndSaveAction.emit()
+    // this.updateAndSaveAction.emit()
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
  
   goToKNB(){

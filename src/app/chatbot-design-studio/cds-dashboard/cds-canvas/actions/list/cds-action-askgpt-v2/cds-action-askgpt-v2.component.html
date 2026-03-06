@@ -86,7 +86,7 @@
             [minRow]="4"[maxRow]="25" 
             [text]="action?.question" 
             [placeholder]="'CDSCanvas.QuestionToSubmit' | translate"
-            (blur)="onBlur($event)"
+            (blur)="onBlur($event, 'question')"
             (changeTextarea)="onChangeTextarea($event, 'question')">
         </cds-textarea>
 
@@ -187,6 +187,7 @@
 
 
     <div class="field-box">
+        
         <label class="title-label">{{'CDSCanvas.ChooseKB' | translate}}</label>
         <cds-select *ngIf="!action?.namespaceAsName" id="text-condition" 
             [items]="listOfNamespaces" 
@@ -201,12 +202,13 @@
             (onReset)="onResetBlockSelect($event, 'namespace')">
         </cds-select>
         <!-- KEY -->
+
         <cds-text *ngIf="action?.namespaceAsName" id="text"
             class="sx-input" 
             [text]="action.namespace"
             [placeholder]="'CDSCanvas.SelectNamespace' | translate"
             [autocompleteOptions]="autocompleteOptions"
-            (blur)="onBlur($event)"
+            (blur)="onBlur($event, 'namespace')"
             (onChange)="onChangeTextarea($event, 'namespace')">
         </cds-text>
 
@@ -463,7 +465,7 @@
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 
                         [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
-                        (blur)="onBlur($event)"
+                        (blur)="onBlur($event,'context')"
                         (changeTextarea)="onChangeTextarea($event, 'context')">
                     </cds-textarea>
                 </div>

@@ -23,7 +23,7 @@
             [minRow]="1"[maxRow]="1" 
             [text]="action?.name" 
             [placeholder]="'CDSCanvas.EnterQuestion' | translate"
-            (blur)="onBlur($event)"
+            (blur)="onBlur($event, 'name')"
             (changeTextarea)="onChangeTextarea($event, 'name')">
         </cds-textarea>
     </div>
@@ -63,7 +63,7 @@
             [text]="action.namespace"
             [placeholder]="'CDSCanvas.SelectNamespace' | translate"
             [autocompleteOptions]="autocompleteOptions"
-            (blur)="onBlur($event)"
+            (blur)="onBlur($event, 'namespace')"
             (onChange)="onChangeTextarea($event, 'namespace')">
         </cds-text>
 
