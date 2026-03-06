@@ -1579,8 +1579,7 @@ export class IntentService {
     this.arrayREDO = [];
     this.setBehaviorUndoRedo();
     this.logger.log('[INTENT SERVICE] updateIntentNew -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
-    this.logger.log("[INTENT SERVICE] aggiorno elenco intent: ", this.listOfIntents);
-    //this.refreshIntents(); // è stato commentato perchè altrimenti chiude in automatico il pannello di modifica dell'intent
+    // this.refreshIntents();
     try {
       let intentToUpdate = this.listOfIntents.find((obj) => obj.intent_id === this.intentSelected.intent_id);
       this.refreshIntent(intentToUpdate)

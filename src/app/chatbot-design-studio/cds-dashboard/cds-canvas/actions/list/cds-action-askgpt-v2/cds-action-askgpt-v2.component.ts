@@ -95,6 +95,8 @@ export class CdsActionAskgptV2Component implements OnInit {
   llm_models_flat: Array<LlmModel>;
   llm_model_selected: LlmModel = {} as LlmModel;
 
+  tagInputValue = '';
+
   private isInitializing = {
     'llm_model': true,
     'context': true,
@@ -140,8 +142,35 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.action.preview = []; // per retrocompatibilità
     }
     this.getListNamespaces();
+    this.ensureTags();
     // this.patchActionsKey();
     await this.initialize();
+  }
+
+  private ensureTags(): void {
+    if (!Array.isArray(this.action.tags)) {
+      this.action.tags = [];
+    }
+  }
+
+  addTag(): void {
+    const value = this.tagInputValue?.trim() || '';
+    if (!value) return;
+    this.ensureTags();
+    if (this.action.tags.indexOf(value) === -1) {
+      this.action.tags.push(value);
+      this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
+    }
+    this.tagInputValue = '';
+  }
+
+  removeTag(tag: string): void {
+    this.ensureTags();
+    const index = this.action.tags.indexOf(tag);
+    if (index !== -1) {
+      this.action.tags.splice(index, 1);
+      this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
+    }
   }
 
   ngOnDestroy() {

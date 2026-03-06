@@ -414,6 +414,7 @@ export class ActionKBContent extends Action {
     type: string;
     namespace: string;
     namespaceAsName: boolean;
+    tags?: string[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.KB_CONTENT;
@@ -449,6 +450,7 @@ export class ActionAskGPTV2 extends Action {
     reranking: boolean;
     reranking_multiplier?: number;
   value: string;
+    tags?: string[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2

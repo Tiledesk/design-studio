@@ -12,6 +12,9 @@
 # this branch 
 - **bug-fix**: when I change the text of an ask kb action I lose the value of the selected kb
 
+# 1.39.33
+- **Added**: Added the ability to insert tags into the KB ask action and the KB create action
+
 # 1.39.32 
 - **bug-fix**: GptTask Preview broken
 - **bug-fix**: Condition blocks not saved when changing Boolean operators

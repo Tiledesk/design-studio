@@ -58,7 +58,6 @@ export class SelectComponent implements OnInit {
       } catch (error) {
         //console.error('ERROR', error);
       }
-      
     }
   }
 
